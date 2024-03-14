@@ -292,58 +292,8 @@ export class Prestamos_NominaComponent implements OnInit {
   contentPDF(data : any) : any {
     let content : any[] = [];
     let information : any = ``;
-
-    content.push(this.headerTableLoan());
-    content.push(this.observationPDF());
     return content;
   }
-
-  //Encabezado de tabla consolidada del PDF
-  headerTableLoan(data : any = []) {
-    let columns : any[] = ['N°', 'Cedula', 'Empleado', 'Valor', 'Valor cuotas', 'Lapso cuotas', 'Fecha Inicio', 'Fecha Plazo'];
-    let widths: Array<string> = ['5%', '10%', '30%', '10%', '10%', '15%', '10%', '10%'];
-    return {
-      margin: [0, 0, 0, 0],
-      borders : 'noBorders',
-      table : {
-        headerRows : 2,
-        widths : widths, 
-        body : this.builderTableBody(data, columns, 'Información detallada del prestamo'),
-      },
-      fontSize : 8,
-      layout : {
-        fillColor : function(rowIndex) {
-          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null; 
-        },
-      }
-    }
-  }
-
-  //Constructor tabla 1 (Consolidada)
-  builderTableBody(data, columns, tittle) {
-    var body = [];
-    body.push([{ colSpan: 8, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {}, {}, {}, {}, {}]);
-    body.push(columns);
-    data.forEach(function (row) {
-      var dataRow = [];
-      columns.forEach((column) => dataRow.push(row[column].toString()));
-      body.push(dataRow);
-    });
-    return body;
-  }
-
-  observationPDF(){
-    return {
-			style: 'tableExample',
-			table: {
-				heights: [50],
-				body: [
-					['Observación: '],
-				]
-			}
-		}
-  }
-  
 }
 
 export interface loan {

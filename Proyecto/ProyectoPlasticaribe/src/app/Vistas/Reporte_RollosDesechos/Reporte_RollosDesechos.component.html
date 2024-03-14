@@ -34,21 +34,13 @@
     <div class="mb-3" id="filtros">
       <div class="row g-3">
 
-        <!-- Fecha Inicial -->
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+         <!--Rango fechas-->  
+         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-calendar formControlName="fecha" inputId="FechaInicial" [showIcon]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Inicial</label>
+            <p-calendar formControlName="fechas" inputId="fecha" selectionMode="range" [showIcon]="true"></p-calendar>
+            <label for="fecha">Rango de Fechas</label>
           </span>
-        </div>
-
-        <!-- Fecha Final -->
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
-          </span>
-        </div>
+        </div> 
 
         <!-- OT -->
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
@@ -75,7 +67,7 @@
         </div>
 
         <!-- Item -->
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-6 col-xl-6 col-xxl-2">
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-4">
           <span class="p-float-label">
             <input formControlName="producto" id="Item"  list="items" type="text" pInputText (change)='selectEventProducto()' [(ngModel)]="Item" (keyup)="obtenerProductos()"/>
             <datalist id="items">
@@ -90,9 +82,9 @@
     <!-- BOTONES -->
     <div class="mb-1" id="botones">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="validarConsulta()"> </button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"> </button>
-        <button pButton class="p-button-danger" type="button" label="Exportar" pTooltip="Generar archivo Excel/PDF" icon="pi pi-file-export" (click)="exportarExcel()"> </button>
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="validateSearch()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar excel" [disabled]="ArrayDocumento.length == 0" icon="pi pi-file-export" (click)="exportarExcel()"></button>
       </div>
     </div>
   </form>
@@ -109,13 +101,6 @@
           columnResizeMode="expand"
           styleClass="p-datatable-gridlines p-datatable-sm"
           responsiveLayout="scroll"
-          [paginator]="true"
-          [rows]="rows"
-          [showCurrentPageReport]="true"
-          [(first)]="first"
-          responsiveLayout="scroll"
-          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-          [rowsPerPageOptions]="[10,20,30,50,70,100]"
           [rowHover]="true"
           dataKey="id"
           [scrollable]="true"
@@ -135,39 +120,41 @@
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>
             <tr class="font-size-13">
-              <th id="" scope="col" pSortableColumn="ot">OT</th>
-              <th id="" scope="col" pResizableColumn >Rollo</th>
-              <th id="" scope="col" pResizableColumn >Cliente</th>
-              <th id="" scope="col" pResizableColumn >Item</th>
-              <th id="" scope="col" pResizableColumn >Nombre Item</th>
-              <th id="" scope="col" pResizableColumn >Ancho</th>
-              <th id="" scope="col" pResizableColumn >Largo</th>
-              <th id="" scope="col" pResizableColumn >Fuelle</th>
-              <th id="" scope="col" pResizableColumn >Medida</th>
-              <th id="" scope="col" pResizableColumn >Peso</th>
-              <th id="" scope="col" pResizableColumn >Und.</th>
-              <th id="" scope="col" pResizableColumn >Fecha</th>
-              <th id="" scope="col" pResizableColumn >Proceso</th>
+              <th class="text-center" scope="col" >N° <p-columnFilter type="text" field="type" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pSortableColumn="ot">OT <p-columnFilter type="text" field="Orden" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Rollo <p-columnFilter type="text" field="Rollo" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Cliente <p-columnFilter type="text" field="Cliente" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Item <p-columnFilter type="text" field="Item_Id" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Nombre Item <p-columnFilter type="text" field="Item" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Peso <p-columnFilter type="text" field="Peso" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Und. <p-columnFilter type="text" field="Unidad" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Falla <p-columnFilter type="text" field="Falla" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Proceso <p-columnFilter type="text" field="Proceso" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Observación <p-columnFilter type="text" field="Observacion" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Fecha Peso <p-columnFilter type="text" field="Fecha" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Fecha Eliminación <p-columnFilter type="text" field="Fecha_Eliminacion" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Hora Eliminación <p-columnFilter type="text" field="Hora_Eliminacion" display="menu"></p-columnFilter></th>
               <th *ngFor="let col of columns" pResizableColumn>
                 {{col.header}}
               </th>
           </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-rowData let-ArrayDocumento let-columns="columns">
+          <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex" let-ArrayDocumento let-columns="columns">
             <tr class="font-size-13">
-              <td id="OT" scope="col"><b>{{ArrayDocumento.Orden}}</b></td>
-              <td id="Rollo" scope="col">{{ArrayDocumento.Rollo}}</td>
-              <td id="Cliente" scope="col"><b>{{ArrayDocumento.Cliente}}</b></td>
-              <td id="ItemId" scope="col">{{ArrayDocumento.Item_Id}}</td>
-              <td id="Item" scope="col"><b>{{ArrayDocumento.Item}}</b></td>
-              <td id="Ancho" scope="col">{{ArrayDocumento.Ancho | number: '1.2-2'}}</td>
-              <td id="Largo" scope="col">{{ArrayDocumento.Largo | number: '1.2-2'}}</td>
-              <td id="Fuelle" scope="col">{{ArrayDocumento.Fuelle | number: '1.2-2'}}</td>
-              <td id="Medida" scope="col">{{ArrayDocumento.Medida}}</td>
-              <td id="Neto" scope="col"><b>{{ArrayDocumento.Peso}}</b></td>
-              <td id="Und" scope="col"><b>{{ArrayDocumento.Kg }}</b></td>
-              <td id="Fecha" scope="col">{{ArrayDocumento.Fecha}}</td>
-              <td id="Fecha" scope="col"><b>{{ArrayDocumento.Proceso}}</b></td>
+              <td class="text-center" scope="col"><b>{{rowIndex + 1}}</b></td>
+              <td class="text-center" scope="col"><b>{{ArrayDocumento.Orden}}</b></td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Rollo}}</td>
+              <td scope="col"><b>{{ArrayDocumento.Cliente}}</b></td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Item_Id}}</td>
+              <td scope="col"><b>{{ArrayDocumento.Item}}</b></td>
+              <td class="text-center" scope="col"><b>{{ArrayDocumento.Peso}}</b></td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Unidad }}</td>
+              <td class="text-center" scope="col"><b>{{ArrayDocumento.Falla }}</b></td>
+              <td class="text-center" scope="col"><b>{{ArrayDocumento.Proceso}}</b></td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Observacion}}</td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Fecha}}</td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Fecha_Eliminacion}}</td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Hora_Eliminacion}}</td>
               <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
             </tr>
           </ng-template>

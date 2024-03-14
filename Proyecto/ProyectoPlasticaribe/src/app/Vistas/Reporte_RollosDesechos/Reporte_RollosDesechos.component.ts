@@ -4,18 +4,13 @@ import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
-import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import Swal from 'sweetalert2';
 import { defaultStepOptions, stepsReporteRollosEliminados as defaultSteps } from 'src/app/data';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',
@@ -26,55 +21,40 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   public formConsultaRollos !: FormGroup; /** Formulario de rollos con filtros de busqueda */
   public today : any = moment().format('YYYY-MM-DD'); /** Obtener fecha de hoy */
-  public fechaAnterior : any = '2020-11-03'; /** Fecha de hoy */
-  public idCliente : string;
-  public validarInputClientes : any = true;
-  public arrayClientes = []; /** Array que contendrá la info del cliente */
-  public arrayTurnos = []; /** Array que contendrá la info de los turnos */
-  public arrayMaterial = []; /** Array que contendrá la info de los materiales mat. prima */
   public arrayProductos = []; /** Array que contendrá la info de los productos */
-  public validarInputNombresProductos : any = true;
   idProducto : any = 0;
   public ArrayDocumento : any [] = []; /** Array que contendrá la info cargada en la tabla de consultar un filtro */
-  public arrayOperarios = []; /** Array que contendrá la info cargada en la tabla de operarios */
   public load : boolean = true; /** Carga la imagen de carga al momento de realizar una busqueda */
   _columnasSeleccionada : any [] = []; /**  */
-  first = 0; /** Cantidad de Items mostrados en la tabla. */
-  rows = 10;
   columnas : any[] = [];
   columnas2 : any[] = [];
   public storage_Id : number; /** Guarda el ID de la persona logueada */
   public storage_Nombre: any; /** Guarda el nombre de la persona logueada */
   public ValidarRol: number; /** valida el tipo de rol de la persona logueada */
   public storage_Rol: any; /** Guarda el rol de la persona logueada */
-  public cantidadOTs : number; /** Cantidad de rollos consultados en cualquiera de los filtros */
-  public arrayDataConsolidada : any = [];  /** Array que guardará la data consolidada para mostrarla en el PDF */
   public PesoTotalKg : number = 0; /** Peso total en Kg de rollos eliminados para mostrarlos en el PDF */
   public Item : any = null; /** variable ngModel que servirá para la consulta de tipo LIKE para traer nombres de productos */
   public arrayProcesos : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private formbuilder : FormBuilder,
-                private servicioTurno : TurnosService,
-                  private servicioMaterial : MaterialProductoService,
-                    private servicioProducto : ProductoService,
-                      private servicioBagPro : BagproService,
-                        private servicioRollos : SrvRollosEliminadosService,
-                          private AppComponent : AppComponent,
-                            private servicioProcesos : ProcesosService,
-                                private shepherdService: ShepherdService,
-                                  private msj : MensajesAplicacionService) {
+                private servicioProducto : ProductoService,
+                  private servicioRollos : SrvRollosEliminadosService,
+                    private AppComponent : AppComponent,
+                      private servicioProcesos : ProcesosService,
+                        private shepherdService: ShepherdService,
+                          private msj : MensajesAplicacionService, 
+                            private svExcel : CreacionExcelService) {
+    
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
-      fecha : [null],
-      fechaFinal : [null],
+      fechas : [null],
       producto: [null, Validators.required],
       id_producto : [null],
       rollo : [null],
       Proceso : [null],
     });
-
   }
 
   ngOnInit() {
@@ -86,8 +66,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   //Función para cargar fechas en el rango. 
   loadRankDates(){
-    let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
-    this.formConsultaRollos.patchValue({ 'fecha' : initialDate, 'fechaFinal' : new Date() });
+    let initialDate = new Date(moment().subtract(7, 'days').format('YYYY-MM-DD'));
+    this.formConsultaRollos.patchValue({ 'fechas' : [initialDate, new Date()] });
   }
 
   tutorial(){
@@ -127,460 +107,47 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   LimpiarCampos() {
     this.formConsultaRollos.reset();
     this.load = true;
-    this.cantidadOTs = 0;
     this.ArrayDocumento = [];
     this.loadRankDates();
   }
 
   /** Cargar los procesos de donde puede venir el rollo. */
-  obtenerProcesos(){
-    this.servicioProcesos.srvObtenerLista().subscribe(dataProcesos => { this.arrayProcesos = dataProcesos; });
+  obtenerProcesos = () => this.servicioProcesos.srvObtenerLista().subscribe(data => { this.arrayProcesos = data.filter(x => [3,4,8,7,2,1,9,5,6].includes(x.proceso_Codigo)); });
+
+  //Función que validará la ruta del API que será consultada.
+  urlAPI(){
+    let url : string = ``;
+    let ot : any = this.formConsultaRollos.value.OT;
+    let item : any = this.formConsultaRollos.value.id_producto;
+    let roll : any = this.formConsultaRollos.value.rollo;
+    let process : any = this.formConsultaRollos.value.Proceso;
+    
+    if(ot != null) url += `ot=${ot}`;
+    if(item != null) url.length > 0 ? url += `&item=${item}` : url += `item=${item}`;
+    if(roll != null) url.length > 0 ? url += `&roll=${roll}` : url += `roll=${roll}`;
+    if(process != null) url.length > 0 ? url += `&process=${process}` : url += `process=${process}`;
+    url.length > 0 ? url = `?${url}` : url = ``;
+    console.log(url)
+    return url;
   }
 
-  validarConsulta(){}
-
-
-  /** Filtros de consulta que cargarán información en la tabla. */
-  validarConsulta2() {
+  //Función que realizará la busqueda de los rollos eliminados.
+  validateSearch(){
     this.load = false;
-    this.cantidadOTs = 0;
     this.ArrayDocumento = [];
-    let ordenTrabajo : number = this.formConsultaRollos.value.OT
-    let rolloEliminado : number = this.formConsultaRollos.value.rollo;
-    let fecha1 : any = moment(this.formConsultaRollos.value.fecha).format('YYYY-MM-DD');
-    let fecha2 : any  = moment(this.formConsultaRollos.value.fechaFinal).format('YYYY-MM-DD');
-    let proceso : any = this.formConsultaRollos.value.Proceso;
-    let productoConsulta : any = this.formConsultaRollos.value.id_producto;
-    if (this.idProducto == 0) productoConsulta = null;
+    let date1 : any = moment(this.formConsultaRollos.value.fechas[0]).format('YYYY-MM-DD');
+    let date2 : any = moment(this.formConsultaRollos.value.fechas[1]).format('YYYY-MM-DD');
 
-    if (fecha1 == 'Fecha inválida') fecha1 = null;
-    if (fecha2 == 'Fecha inválida') fecha2 = null;
-
-    if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxRolloxItemxOT(fecha1, fecha2, rolloEliminado, this.idProducto, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null && proceso != null) {
-      this.servicioRollos.getRollosxFechasxRolloxItemxProceso(fecha1, fecha2, rolloEliminado, this.idProducto, proceso).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1
-          }
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && proceso != null) {
-      this.servicioRollos.getRollosxFechasxRolloxProceso(fecha1, fecha2, rolloEliminado, proceso).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxRolloxItem(fecha1, fecha2, rolloEliminado, this.idProducto).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;;
-          }
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && proceso != null) {
-      this.servicioRollos.getRollosxFechasxRolloxItemxProceso(fecha1, fecha1, rolloEliminado, this.idProducto, proceso).subscribe(dataRollos => {
-        if(dataRollos.length == 0) setTimeout(() => { this.rollosNoEncontrados(); }, 3000);
-        else {
-          for (let index = 0; index < dataRollos.length; index++) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1
-          }
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && productoConsulta != null && proceso != null) {
-      this.servicioRollos.getRollosxFechasxItemxProceso(fecha1, fecha2, this.idProducto, proceso).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && productoConsulta != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxRolloxOT(fecha1, fecha2, rolloEliminado, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && productoConsulta != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxItem(fecha1, fecha2, this.idProducto).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null && proceso != null) {
-      this.servicioRollos.getRollosxFechasxProceso(fecha1, fecha2, proceso).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-            }
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && productoConsulta != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && productoConsulta != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechas(fecha1, fecha1).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(rolloEliminado != null && productoConsulta != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(rolloEliminado != null && productoConsulta != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(rolloEliminado != null && ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].proceso_Id == proceso && dataRollos[index].rollo_Id == rolloEliminado) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && fecha2 != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechas(fecha1, fecha2).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1;
-        }
-      });
-    } else if(fecha1 != null && rolloEliminado != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && productoConsulta != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechas(fecha1, fecha2).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechas(fecha1, fecha2).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(rolloEliminado != null && productoConsulta != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(rolloEliminado != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(rolloEliminado != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(productoConsulta != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(productoConsulta != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxItem(this.idProducto).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(ordenTrabajo != null && proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else if(fecha1 != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechas(fecha1, fecha1).subscribe(dataRollos => {
-          for (let index = 0; index < dataRollos.length; index++) {
-            this.parametrosTablaRollos(dataRollos[index]);
-            this.cantidadOTs += 1;
-        }
-      });
-    } else if(rolloEliminado != null) {
-      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1;
-        }
-      });
-    } else if(productoConsulta != null) {
-      this.servicioRollos.srvObtenerListaRollosxItem(this.idProducto).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1;
-        }
-      });
-    } else if(ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1;
-        }
-      });
-    } else if(proceso != null) {
-      this.servicioRollos.srvObtenerListaRollosxProceso(proceso).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].proceso_Id == proceso) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1;
-          }
-        }
-      });
-    } else {
-      this.servicioRollos.srvObtenerListaRollosxFechas(this.today, this.today).subscribe(dataRollos => {
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1;
-        }
-      });
-    }
-
-    setTimeout(() => {
-      if (this.cantidadOTs == 0) this.rollosNoEncontrados();
+    this.servicioRollos.getRemovedRolls(date1, date2, this.urlAPI()).subscribe(data => {
+      if(data.length > 0) this.parametrosTablaRollos(data);
+      else {
+        this.msj.mensajeAdvertencia(`Advertencia`, 'No se encontraron resultados de búsqueda!');
+        this.load = true;
+      } 
+    }, error => {
       this.load = true;
-    }, 3000);
-  }
-
-  /** Mensaje que aparecerá cuando no se encuentrén resultados luego de una busqueda. */
-  rollosNoEncontrados() {
-    this.msj.mensajeAdvertencia(`Advertencia`, 'No se encontraron resultados de búsqueda!');
-  }
-
-  /** NO USADA: Función para cargar los turnos en el combobox de la vista */
-  obtenerTurno(){
-    this.servicioTurno.srvObtenerLista().subscribe(dataTurnos => { this.arrayTurnos = dataTurnos; });
-  }
-
-  /** NO USADA: Función para cargar los materiales de mat. prima en el combobox de la vista */
-  obtenerMaterial(){
-    this.servicioMaterial.srvObtenerLista().subscribe(dataMaterial => { this.arrayMaterial = dataMaterial; });
+      this.msj.mensajeError(`Error`, 'Error al consultar los rollos eliminados!');
+    });
   }
 
    /** Función para cargar los productos en el datalist de la vista */
@@ -591,76 +158,36 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   }
 
   /** Campos que saldrán en la tabla al momento de consultar los filtros. */
-  parametrosTablaRollos(datos) {
-    let info : any = {
-      Orden : datos.rollo_OT,
-      Rollo : datos.rollo_Id,
-      Cliente : datos.rollo_Cliente,
-      Item_Id : datos.prod_Id,
-      Item : datos.prod_Nombre,
-      Ancho : datos.rollo_Ancho,
-      Largo : datos.rollo_Largo,
-      Fuelle : datos.rollo_Fuelle,
-      Medida : datos.undMed_Id,
-      Peso: this.formatonumeros(parseFloat(datos.rollo_PesoNeto)),
-      Kg: 'Kg',
-      Material : datos.material_Id,
-      Calibre : datos.rollo_Calibre,
-      Operario : datos.rollo_Operario,
-      Fecha : datos.rollo_FechaIngreso,
-      Turno: datos.turno_Nombre,
-      Proceso : datos.proceso_Nombre,
-      PesoNumero : parseFloat(datos.rollo_PesoNeto)
-    }
-    this.mostrarColumnas();
-    this.ArrayDocumento.push(info);
-    this.consolidarRollosEliminados();
-  }
-
-  /** Consolida la información de los rollos eliminados y la carga en el PDF */
-  consolidarRollosEliminados(){
-    let Ordenes : any = [];
-    this.arrayDataConsolidada = [];
-    this.PesoTotalKg = 0;
-
-    for (let index = 0; index < this.ArrayDocumento.length; index++) {
-      if(!Ordenes.includes(this.ArrayDocumento[index].Orden)){
-        let cantidadPesos: number = 0;
-        let cantRollos: number = 0;
-
-        for (let indx = 0; indx < this.ArrayDocumento.length; indx++) {
-          if(this.ArrayDocumento[indx].Orden == this.ArrayDocumento[index].Orden) {
-            cantidadPesos += this.ArrayDocumento[indx].PesoNumero;
-            cantRollos += 1;
-          }
-        }
-        Ordenes.push(this.ArrayDocumento[index].Orden);
-        let infoConsolidada : any = {
-          OT : this.ArrayDocumento[index].Orden,
-          Cliente : this.ArrayDocumento[index].Cliente,
-          Item : this.ArrayDocumento[index].Item_Id,
-          Nombre : this.ArrayDocumento[index].Item,
-          Peso : this.formatonumeros(cantidadPesos.toFixed(2)),
-          "No Rollos" : this.formatonumeros(cantRollos.toFixed(2)),
-        }
-        this.arrayDataConsolidada.push(infoConsolidada);
-        this.PesoTotalKg += cantidadPesos;
+  parametrosTablaRollos(datos : any) {
+    datos.forEach(x => {
+      console.log(x)
+      let info : any = {
+        'Orden' : x.rollo_OT,
+        'Rollo' : x.rollo_Id,
+        'Cliente' : x.rollo_Cliente,
+        'Item_Id' : x.prod_Id,
+        'Item' : x.prod_Nombre,
+        'Ancho' : x.rollo_Ancho,
+        'Largo' : x.rollo_Largo,
+        'Fuelle' : x.rollo_Fuelle,
+        'Peso': this.formatonumeros(parseFloat(x.rollo_PesoNeto)),
+        'Unidad': (x.undMed_Id.trim() == 'Cms' && x.proceso_Nombre == 'Empaque') ? 'Kg' : x.undMed_Id,
+        'Material' : x.material_Nombre,
+        'Calibre' : x.rollo_Calibre,
+        'Operario' : x.rollo_Operario,
+        'Fecha' : x.rollo_FechaIngreso.replace('T00:00:00', ''),
+        'Turno': x.turno_Nombre,
+        'Proceso' : x.proceso_Nombre,
+        'PesoNumero' : parseFloat(x.rollo_PesoNeto),
+        'Fecha_Eliminacion' : x.rollo_FechaEliminacion.replace('T00:00:00', ''),
+        'Hora_Eliminacion' : x.rollo_HoraEliminacion,
+        'Observacion' : x.observacion == null ? '' : x.observacion,
+        'Falla' : x.falla_Nombre,
       }
-    }
-  }
-
-  /** Función que cargará los nombres de los operarios */
-  obtenerOperariosExtrusion() {
-    this.servicioBagPro.srvObtenerListaOperariosExtrusion().subscribe(dataOperarios => {
-      for (let index = 0; index < dataOperarios.length; index++) {
-        if (dataOperarios[index].nombre != 0) this.arrayOperarios.push(dataOperarios[index]);
-      }
+      this.ArrayDocumento.push(info);
+      this.mostrarColumnas();
+      this.load = true;
     });
-  }
-
-  /** NO USADA: Obtener nombres de Ultimos Clientes con OT*/
-  obtenerUltimosClientes() {
-    this.servicioBagPro.srvObtenerListaUltimosClientes(this.fechaAnterior).subscribe(dataClientes => { this.arrayClientes = dataClientes; });
   }
 
   /** Mostrar en la tabla las columnas elegidas en el Input-Select que se encuentra en la parte superior de la tabla. */
@@ -670,227 +197,148 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       { header: 'Material', field: 'Material'},
       { header: 'Operario', field: 'Operario'},
       { header: 'Turno', field: 'Turno'},
+      { header: 'Ancho', field: 'Ancho'},
+      { header: 'Largo', field: 'Largo'},
+      { header: 'Fuelle', field: 'Fuelle'},
     ];
-  }
-
-  // funcion que se encagará de llenar la tabla de los productos en el pdf
-  buildTableBody(data, columns) {
-    var body = [];
-    body.push(columns);
-    data.forEach(function(row) {
-      var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column]);
-      });
-      body.push(dataRow);
-    });
-    return body;
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información detallada de los rollos consultados en el PDF
-  table(data, columns) {
-    return {
-        table: {
-          headerRows: 1,
-          widths: [35, 35, '*', 35, '*', 30, 45, '*'],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 8,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
-        }
-    };
-  }
-
-    // Funcion que genera la tabla donde se mostrará la información consolidada de los rollos consultados en el PDF
-  table2(data, columns) {
-    return {
-        table: {
-          headerRows: 1,
-          widths: [35, '*', 35, '*', 35, 30],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 8,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
-        }
-    };
-  }
-
-  /** Exportar reporte de rollos en PDF */
-  exportarPdf() {
-    let nombre : string = this.storage_Nombre;
-      const pdfDefinicion : any = {
-        info: {
-          title: `Rollos eliminados`
-        },
-        footer: function(currentPage : any, pageCount : any) {
-          return [
-            {
-              columns: [
-                { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-              ]
-            }
-          ]
-        },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        content : [
-          {
-            columns: [
-              {
-                image : logoParaPdf,
-                width : 220,
-                height : 50
-              },
-              {
-                text: `Plasticaribe S.A.S ---- Reporte rollos eliminados (Extrusión)`,
-                alignment: 'center',
-                style: 'titulo',
-                margin: 30
-              }
-            ]
-          },
-          '\n \n',
-          {
-            text: `Fecha de creación: ${this.today}`,
-            style: 'header',
-            alignment: 'right',
-          },
-          {
-            text: `Creado por: ${this.storage_Nombre}\n\n`,
-            alignment: 'right',
-            style: 'header',
-          },
-          {
-            text: `\n Información consolidada de los rollos eliminados \n `,
-            alignment: 'center',
-            style: 'header'
-          },
-
-          this.table2(this.arrayDataConsolidada, ['OT', 'Cliente', 'Item', 'Nombre', 'Peso', 'No Rollos']),
-
-          {
-            text: `\n\n Información detallada de los rollos eliminados \n `,
-            alignment: 'center',
-            style: 'header'
-          },
-
-          this.table(this.ArrayDocumento, ['Orden', 'Rollo', 'Cliente', 'Item_Id', 'Item', 'Peso', 'Fecha', 'Operario']),
-
-          {
-            text: `\n\nCantidad de rollos: ${this.formatonumeros(this.cantidadOTs)}`,
-            alignment: 'right',
-            style: 'header',
-          },
-          {
-            text: `\nCantidad Total Kg: ${this.formatonumeros(this.PesoTotalKg)}`,
-            alignment: 'right',
-            style: 'header',
-          },
-        ],
-        styles: {
-          header: {
-            fontSize: 10,
-            bold: true
-          },
-          titulo: {
-            fontSize: 15,
-            bold: true
-          }
-        }
-      }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
-      //break;
-  }
+  }  
 
   /** Exportar reporte de rollos en excel */
   exportarExcel(){
-    this.load = false;
-    setTimeout(() => {
-      const title = `Reporte de rollos eliminados`;
-      const header = ["OT", "Rollo", "Cliente", "Nro. Item", "Nombre Item", "Peso", "Presentación", "Ancho", "Largo", "Fuelle", "Medida", "Material", "Calibre", "Operario", "Fecha", "Turno"]
-      let datos : any =[];
-      for (const item of this.ArrayDocumento) {
-        const datos1  : any = [item.Orden, item.Rollo, item.Cliente, item.Item_Id, item.Item, item.Peso, item.Kg, item.Ancho, item.Largo, item.Fuelle, item.Medida, item.Material, item.Calibre, item.Operario, item.Fecha, item.Turno];
-        datos.push(datos1);
-      }
-      let workbook = new Workbook();
-      let worksheet = workbook.addWorksheet(`Reporte de rollos eliminados`);
-      let titleRow = worksheet.addRow([title]);
-      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-      worksheet.addRow([]);
-      let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell, number) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'eeeeee' }
-        }
-        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      });
-      worksheet.mergeCells('A1:P2');
-      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      datos.forEach(d => {
-        let row = worksheet.addRow(d);
-        let peso = row.getCell(6);
-        let color = 'F1948A';
-
-        peso.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: color }
-        }
-
-      });
-      worksheet.getColumn(1).width = 10;
-      worksheet.getColumn(2).width = 10;
-      worksheet.getColumn(3).width = 50;
-      worksheet.getColumn(4).width = 10;
-      worksheet.getColumn(5).width = 50;
-      worksheet.getColumn(6).width = 10;
-      worksheet.getColumn(7).width = 15;
-      worksheet.getColumn(8).width = 10;
-      worksheet.getColumn(9).width = 10;
-      worksheet.getColumn(10).width = 10;
-      worksheet.getColumn(11).width = 10;
-      worksheet.getColumn(12).width = 10;
-      worksheet.getColumn(13).width = 10;
-      worksheet.getColumn(14).width = 30;
-      worksheet.getColumn(15).width = 12;
-      worksheet.getColumn(16).width = 20;
-      setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, `Reporte de rollos eliminados ${this.today}.xlsx`);
-        });
-        this.load = true;
-      }, 1000);
-    }, 3500);
-    setTimeout(() => { this.msj.mensajeConfirmacion(`¡Información exportada a excel!`, 'Archivo generado con éxito!') }, 4000);
+    if(this.ArrayDocumento.length > 0) {
+      this.load = false;
+      setTimeout(() => { this.loadSheetAndStyles(); }, 2000); 
+    } else this.msj.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
   }
 
-  /** Elegir formato en el que desea exportar el documento. */
-  elegirFormatoExportacion(){
-    if (this.ArrayDocumento.length > 0) {
-      Swal.fire({
-        title: '¿En que formato desea exportar la información?',
-        showDenyButton: true,
-        showCancelButton: true,
-        confirmButtonColor : '#dc3545',
-        confirmButtonText: 'Formato PDF',
-        denyButtonText: `Formato Excel`,
-      }).then((result) => {
-        if (result.isDenied) this.exportarExcel();
-        else if (result.isConfirmed) this.exportarPdf();
-      });
-    } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar al menos un registro en la tabla.');
+  //Función que cargará la hoja de cálculo y los estilos.
+  loadSheetAndStyles(){
+    let date1 : any = moment(this.formConsultaRollos.value.fechas[0]).format('DD-MM-YYYY');
+    let date2 : any = moment(this.formConsultaRollos.value.fechas[1]).format('DD-MM-YYYY');
+    let title = `Rollos Eliminados de ${date1} hasta ${date2}`;
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    let alignment = { vertical: 'middle', horizontal: 'center' };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let workbook = this.svExcel.formatoExcel(title, true)
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment);
+    this.svExcel.creacionExcel(`Reporte rollos eliminados`, workbook)
+    this.load = true;
+    this.msj.mensajeConfirmacion(`¡Información exportada a excel!`, 'Archivo generado con éxito!');
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true }; 
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel());
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let headerRow = ws.addRow(this.loadFieldsHeader());
+    
+    headerRow.eachCell((cell) => {
+      cell.fill = fill;
+      cell.border = border;
+      cell.alignment = alignment;
+      cell.font = font;
+    });
+
+    ws.mergeCells('A1:T3');
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño de las columnas del header.
+  loadSizeHeader(ws : any){
+    let widths : number[] = [5,10,10,50,10,50,10,15,10,10,10,15,10,40,20,15,30,20,20,40];
+    let columns : number[] = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]; 
+    let count : number = 0;
+    
+    columns.forEach(x => {
+      ws.getColumn(x).width = widths[count];
+      count++;
+    });
+  }
+
+  loadInfoExcel(ws : any, data : any){
+    let formatNumber: Array<number> = [6,8,9,10,12];
+    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => { 
+      let row = ws.addRow(x); 
+      let peso = row.getCell(7);
+      let color = 'F1948A';
+      peso.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: color } };
+    }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel() {
+    let info : any = [];
+    let count : number = 0;
+    for (const item of this.ArrayDocumento) {
+      count++;
+      const data  : any = [
+        count,
+        item.Orden, 
+        item.Rollo, 
+        item.Cliente, 
+        item.Item_Id, 
+        item.Item, 
+        item.Peso, 
+        item.Unidad, 
+        item.Ancho, 
+        item.Largo, 
+        item.Fuelle, 
+        item.Material, 
+        item.Calibre, 
+        item.Operario, 
+        item.Fecha, item.Turno, 
+        item.Falla, 
+        item.Fecha_Eliminacion, 
+        item.Hora_Eliminacion, 
+        item.Observacion];
+
+      info.push(data);
+    }
+    return info;
+  }
+
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let header = [
+      "N°",
+      "OT", 
+      "Rollo", 
+      "Cliente", 
+      "Item", 
+      "Referencia", 
+      "Cantidad", 
+      "Presentación", 
+      "Ancho", 
+      "Largo",
+      "Fuelle", 
+      "Material", 
+      "Calibre",
+      "Operario", 
+      "Fecha Producción", 
+      "Turno", 
+      "Falla", 
+      "Fecha Eliminación", 
+      "Hora Eliminación", 
+      "Observación"
+    ];
+    return header;
   }
 
   /** Prime NG */
