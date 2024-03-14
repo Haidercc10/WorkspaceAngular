@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +8,11 @@ import { Injectable } from '@angular/core';
 
 export class Movimientos_NominaService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http: HttpClient) { }
+
+  Post = (movement: Movimientos_Nomina) => this.http.post(`${this.rutaPlasticaribeAPI}/Movimientos_Nomina`, movement);
 
 }
 
@@ -24,5 +29,6 @@ export interface Movimientos_Nomina {
   fecha: string;
   hora: string;
   observacaion: string;
+  estado_Id: 11 | 13;
   creador_Id: number;
 }

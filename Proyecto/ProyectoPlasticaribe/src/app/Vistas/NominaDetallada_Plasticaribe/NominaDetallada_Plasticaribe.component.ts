@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
@@ -5,6 +6,7 @@ import { Table } from 'primeng/table';
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { IncapacidadesService } from 'src/app/Servicios/Incapacidades/Incapacidades.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Movimientos_Nomina, Movimientos_NominaService } from 'src/app/Servicios/Movimientos_Nomina/Movimientos_Nomina.service';
 import { NominaDetallada_PlasticaribeService, Payroll as DataPayroll } from 'src/app/Servicios/Nomina_Detallada/NominaDetallada_Plasticaribe.service';
 import { PaymentLoan, Prestamos_NominaService } from 'src/app/Servicios/Prestamos_Nomina/Prestamos_Nomina.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -51,7 +53,8 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     private msj: MensajesAplicacionService,
     private payrollService: NominaDetallada_PlasticaribeService,
     private loanService: Prestamos_NominaService,
-    private disabilityService: IncapacidadesService,) {
+    private disabilityService: IncapacidadesService,
+    private movementsPayrollService: Movimientos_NominaService,) {
   }
 
   ngOnInit() {
@@ -115,6 +118,25 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     this.validateRole = this.appComponent.ValidarRol;
   }
 
+  clearAll() {
+    this.load = false;
+    this.formPayrollWorker.reset();
+    this.payroll = [];
+    this.rangeDates = null;
+    this.selectedAreas = [];
+    this.userSelected = [];
+    this.payrollForAdvance = [];
+    this.detailsDisabilities = [];
+    this.detailsLoan = [];
+    this.detailsAdvances = [];
+    this.detailsSaving = [];
+    this.modalPayroll = false;
+    this.modalDataDisanility = false;
+    this.modalDataLoan = false;
+    this.modalDataAdvance = false;
+    this.modalDataSaving = false;
+  }
+
   getDisableDates() {
     let years: Array<number> = this.getYears();
     let months: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -147,7 +169,10 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         this.selectedAreas.forEach(d => areas += `${d}|`);
         let start: any = moment(this.rangeDates[0]).format('YYYY-MM-DD');
         let end: any = moment(this.rangeDates[1]).format('YYYY-MM-DD');
-        this.userService.GetWorkers(start, end, areas).subscribe(data => this.calculatePayroll(data));
+        this.userService.GetWorkers(start, end, areas).subscribe(data => this.calculatePayroll(data), error => {
+          this.load = false;
+          this.msj.errorHttp(`¡Ocurrió un error al obtener trabajadores para calcular la nomina!`, error);
+        });
       } else this.msj.mensajeAdvertencia(`¡Debe seleccionar minimo un área!`);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar un rango de fechas!`);
   }
@@ -598,6 +623,15 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     }, 500);
   }
 
+  fillObservationPayrollByWorker() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let news: string = this.formPayrollWorker.value.news;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.payroll[i].news = news;
+    }, 500);
+  }
+
   totalDisabilityByWorker(data: Payroll): number {
     let total: number = 0;
     total = data.valueDaysDisabilityGeneralIllines + data.valueDaysDisabilityParents + data.valueDaysDisabilityWorkAccident;
@@ -684,13 +718,25 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   }
 
   validatePayroll() {
-
+    if (this.payroll.length > 0) {
+      this.savePayroll();
+      this.savePayrollForAdvance();
+    } else this.msj.mensajeAdvertencia('No hay trabajadores para procesar la nómina');
   }
 
   savePayroll(){
+    this.load = true;
+    let count: number = 0;
     this.payroll.filter(x => !this.payrollForAdvance.map(y => y.idWorker).includes(x.idWorker)).forEach(d => {
       let payroll: DataPayroll = this.fillDataPayroll(d.idWorker, 1);
-      this.payrollService.Post(payroll).subscribe(null, error => {
+      this.payrollService.Post(payroll).subscribe(() => {
+        count++;
+        if (count == this.payroll.length) {
+          this.changeStateLoan();
+          this.createMovementsPayroll();
+          this.successPayroll();
+        }
+      }, error => {
         this.load = false;
         this.msj.errorHttp(`¡Ocurrió un error al procesar la nómina del trabajador ${d.worker}!`, error);
       });
@@ -698,9 +744,16 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   }
 
   savePayrollForAdvance(){
+    let count: number = 0;
     this.payroll.filter(x => this.payrollForAdvance.map(y => y.idWorker).includes(x.idWorker)).forEach(d => {
       let payroll: DataPayroll = this.fillDataPayroll(d.idWorker, 4);
-      this.payrollService.Post(payroll).subscribe(null, error => {
+      this.payrollService.Post(payroll).subscribe(() => {
+        count++;
+        if (count == this.payroll.length) {
+          this.createMovementsPayroll();
+          this.successPayroll();
+        }
+      }, error => {
         this.load = false;
         this.msj.errorHttp(`¡Ocurrió un error al procesar la nómina del trabajador ${d.worker}!`, error);
       });
@@ -778,7 +831,106 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   selectAllPayments(): Array<PaymentLoan> {
     let payment: Array<PaymentLoan> = [];
+    this.payroll.forEach(d => {
+      d.detailsLoans.forEach(x => {
+        payment.push({
+          idLoan: x.idLoan,
+          valuePay: x.valueQuota,
+        });
+      });
+    });
     return payment;
+  }
+
+  successPayroll() {
+    this.clearAll();
+    this.msj.mensajeConfirmacion('¡Nómina procesada correctamente!');
+  }
+
+  createMovementsPayroll() {
+    let movements: Array<Movimientos_Nomina> = this.fillMovementsPayroll();
+    movements.forEach(x => {
+      this.movementsPayrollService.Post(x).subscribe(null, (error: HttpErrorResponse) => {
+        this.load = false;
+        let msg: string = error.status == 400 ? error.error : `¡Ocurrió un error al procesar los movimientos de la nómina!`;
+        this.msj.errorHttp(msg, error);
+      });
+    });
+  }
+
+  fillMovementsPayroll(): Array<Movimientos_Nomina> {
+    let movements: Array<Movimientos_Nomina> = [];
+    this.payroll.forEach(d => {
+      movements = [movements,
+        this.fillMovementsAdvance(d.idWorker, d.detailsAdvance),
+        this.fillMovementsLoanByWorker(d.idWorker, d.detailsLoans),
+        this.fillMovementsSaveMoney(d.idWorker, d.detailsMoneySave)].reduce((a,b) => a.concat(b));
+    });
+    return movements;
+  }
+
+  fillMovementsLoanByWorker(idWorker: number, detailsLoan: Array<any>) {
+    let movements: Array<Movimientos_Nomina> = [];
+    detailsLoan.forEach(d => {
+      movements.push({
+        trabajador_Id: idWorker,
+        codigoMovimento: d.idLoan,
+        nombreMovimento: 'PRESTAMO',
+        valorTotal: d.totalLoan,
+        valorDeuda: 0,
+        valorPagado: 0,
+        valorAbonado: d.valueQuota,
+        valorFinalDeuda: 0,
+        fecha: moment().format('YYYY-MM-DD'),
+        hora: moment().format('HH:mm:ss'),
+        observacaion: '',
+        estado_Id: 11,
+        creador_Id: this.storage_Id
+      });
+    });
+    return movements;
+  }
+
+  fillMovementsAdvance(idWorker: number, detailsAdvance: Array<any>) {
+    let movements: Array<Movimientos_Nomina> = [];
+    detailsAdvance.forEach(d => {
+      movements.push({
+        trabajador_Id: idWorker,
+        codigoMovimento: d.idAdvance,
+        nombreMovimento: 'ANTICIPO',
+        valorTotal: d.valueAdvance,
+        valorDeuda: 0,
+        valorPagado: 0,
+        valorAbonado: d.valueAdvance,
+        valorFinalDeuda: 0,
+        fecha: moment().format('YYYY-MM-DD'),
+        hora: moment().format('HH:mm:ss'),
+        observacaion: '',
+        estado_Id: 11,
+        creador_Id: this.storage_Id
+      });
+    });
+    return movements;
+  }
+
+  fillMovementsSaveMoney(idWorker: number, detailsSaveMoney: Array<any>) {
+    let movements: Array<Movimientos_Nomina> = [];
+    movements.push({
+      trabajador_Id: idWorker,
+      codigoMovimento: detailsSaveMoney[0].idSaveMoney,
+      nombreMovimento: 'AHORRO',
+      valorTotal: 0,
+      valorDeuda: 0,
+      valorPagado: 0,
+      valorAbonado: detailsSaveMoney[0].totalSaveInPayroll,
+      valorFinalDeuda: 0,
+      fecha: moment().format('YYYY-MM-DD'),
+      hora: moment().format('HH:mm:ss'),
+      observacaion: '',
+      estado_Id: 13,
+      creador_Id: this.storage_Id
+    });
+    return movements;
   }
 }
 

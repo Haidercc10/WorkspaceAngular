@@ -227,7 +227,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let price: number = data.dataExtrusion.precioProducto;
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, data.pp.numeroRollo_BagPro, quantity.toString(), price.toString()).subscribe(() => {
       this.saveDataEntrace(data);
-    }, error => this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error));
+    }, error => {
+      let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == reel);
+      this.sendProductionZeus.splice(i, 1);
+      this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error);
+    });
   }
 
   validateProcess(process: string): 'EXT' | 'EMP' | 'SELLA' {
@@ -294,6 +298,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       this.sendProductionZeus[i].pp.numero_Rollo = data.numero_Rollo;
       this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
     }, error => {
+      let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == numberProduction);
+      this.sendProductionZeus.splice(i, 1);
       let errorMessage: string = `¡No fue posible crear el registro del Rollo/Bulto #${numberProduction} proveniente de 'BagPro'!`;
       this.errorMessageWhenTryUpdateReel(errorMessage, error);
     });
@@ -341,6 +347,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }
     this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), () => {
       this.load = false;
+      let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
+      this.sendProductionZeus.splice(i, 1);
       this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`, '', 1200000);
     });
   }
@@ -364,6 +372,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }
     this.dtEntracesService.srvGuardar(info).subscribe(() => this.messageConfirmationUpdateStore(), () => {
       this.load = false;
+      let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
+      this.sendProductionZeus.splice(i, 1);
       this.msj.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`, 1200000);
     });
   }

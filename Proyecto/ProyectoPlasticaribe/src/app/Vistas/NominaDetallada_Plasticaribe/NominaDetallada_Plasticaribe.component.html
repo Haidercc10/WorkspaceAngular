@@ -183,6 +183,14 @@
       </tr>
     </ng-template>
   </p-table>
+
+  <!-- BOTONES -->
+  <div class="my-4">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" type="button" label="Guardar Nomina" icon="pi pi-check" [disabled]="load || this.payroll.length <= 0" (click)="validatePayroll()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" [disabled]="load" (click)="clearAll()"></button>
+    </div>
+  </div>
 </p-card>
 
 <p-dialog [(visible)]="modalPayroll" [style]="{width: '90%', height: '80%'}" header="Editar Devengos y Deducciones" [modal]="true">
@@ -511,7 +519,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-10 col-xxl-10">
               <span class="p-float-label">
-                <textarea formControlName="news" [rows]="1" maxlength="500" pInputTextarea></textarea>
+                <textarea formControlName="news" [rows]="1" maxlength="500" pInputTextarea (keydown)="fillObservationPayrollByWorker()"></textarea>
                 <label for="news">Observación</label>
               </span>
             </div>
