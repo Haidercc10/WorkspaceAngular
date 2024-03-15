@@ -8,9 +8,9 @@ import { environment } from 'src/environments/environment';
 })
 export class SrvRollosEliminadosService {
   readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
-  
+
   constructor(private http : HttpClient,) { }
-  
+
   srvObtenerListaRollosxOT = (OT : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxOT/${OT}`);
 
   srvObtenerListaRollosxRollo = (rollo : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxRollo/${rollo}`);
@@ -18,21 +18,21 @@ export class SrvRollosEliminadosService {
   srvObtenerListaRollosxItem = (producto : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxItem/${producto}`);
 
   srvObtenerListaRollosxProceso = (proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxProceso/${proceso}`);
-    
+
   srvObtenerListaRollosxFechas = (fechaIni : any, fechaFin : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechas/${fechaIni}/${fechaFin}`);
 
   srvObtenerListaRollosxFechasxItem = (fechaIni : any, fechaFin : any, item : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxItem/${fechaIni}/${fechaFin}/${item}`);
 
   srvObtenerListaRollosxFechasxOT = (fechaIni : any, fechaFin : any, OT : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxOT/${fechaIni}/${fechaFin}/${OT}`);
-    
+
   srvObtenerListaRollosxFechasxRolloxItem = (fechaIni : any, fechaFin : any, rollo : any, item : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxItem/${fechaIni}/${fechaFin}/${rollo}/${item}`);
-    
+
   srvObtenerListaRollosxFechasxRolloxOT = (fechaIni : any, fechaFin : any, rollo : any, OT):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxOT/${fechaIni}/${fechaFin}/${rollo}/${OT}`);
 
   srvObtenerListaRollosxFechasxRolloxItemxOT = (fechaIni : any, fechaFin : any, rollo : any, item : any, OT):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxItemxOT/${fechaIni}/${fechaFin}/${rollo}/${item}/${OT}`);
-      
+
   getRollosxFechasxRolloxItemxProceso = (fecha1: any, fecha2 : any, rollo: any, item : any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxItemxProceso/${fecha1}/${fecha2}/${rollo}/${item}/${proceso}`);
-    
+
   getRollosxFechasxItemxOTxProceso = (fecha1: any, fecha2 : any, item: any, OT : any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxOTxProceso/${fecha1}/${fecha2}/${item}/${OT}/${proceso}`);
 
   getRollosxFechasxRolloxProceso = (fecha1: any, fecha2 : any, rollo: any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxProceso/${fecha1}/${fecha2}/${rollo}/${proceso}`);
@@ -41,7 +41,7 @@ export class SrvRollosEliminadosService {
 
   getRollosxFechasxProceso = (fecha1: any, fecha2 : any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxProceso/${fecha1}/${fecha2}/${proceso}`);
 
-  putFailRolls = (roll : number, fail : number) => this.http.put(`${this.rutaPlasticaribeAPI}/Rollo_Desecho/putFailRolls/${roll}/${fail}`, []);
+  putFailRolls = (roll : number, fail : number, observation: string) => this.http.put(`${this.rutaPlasticaribeAPI}/Rollo_Desecho/putFailRolls/${roll}/${fail}/${observation}`, []);
 
   getRemovedRolls = (fecha1: any, fecha2 : any, ruta : string):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/getRemovedRolls/${fecha1}/${fecha2}${ruta}`);
 

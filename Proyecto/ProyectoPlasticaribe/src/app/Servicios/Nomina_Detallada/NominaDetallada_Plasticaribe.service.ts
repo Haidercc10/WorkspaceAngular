@@ -15,6 +15,8 @@ export class NominaDetallada_PlasticaribeService {
   getReportPayroll = (date1: any, date2: any, route: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/NominaDetallada_Plasticaribe/getReportPayroll/${date1}/${date2}${route}`);
 
   Post = (payroll: Payroll) => this.http.post(`${this.rutaPlasticaribeAPI}/NominaDetallada_Plasticaribe`, payroll);
+
+  PutChangeState = (advances: Array<AdvancePayroll>) => this.http.put(`${this.rutaPlasticaribeAPI}/NominaDetallada_Plasticaribe/putChangeState`, advances);
 }
 
 export interface Payroll {
@@ -70,4 +72,9 @@ export interface Payroll {
   creador_Id: number;
   fecha: Date;
   hora: string;
+}
+
+export interface AdvancePayroll {
+  id: number;
+  idWorker: number;
 }
