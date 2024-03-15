@@ -7,7 +7,7 @@ import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { IncapacidadesService } from 'src/app/Servicios/Incapacidades/Incapacidades.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Movimientos_Nomina, Movimientos_NominaService } from 'src/app/Servicios/Movimientos_Nomina/Movimientos_Nomina.service';
-import { NominaDetallada_PlasticaribeService, Payroll as DataPayroll } from 'src/app/Servicios/Nomina_Detallada/NominaDetallada_Plasticaribe.service';
+import { NominaDetallada_PlasticaribeService, Payroll as DataPayroll, AdvancePayroll } from 'src/app/Servicios/Nomina_Detallada/NominaDetallada_Plasticaribe.service';
 import { PaymentLoan, Prestamos_NominaService } from 'src/app/Servicios/Prestamos_Nomina/Prestamos_Nomina.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
@@ -733,8 +733,8 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         count++;
         if (count == this.payroll.length) {
           this.changeStateLoan();
+          this.changeStatePayroll();
           this.createMovementsPayroll();
-          this.successPayroll();
         }
       }, error => {
         this.load = false;
@@ -819,6 +819,24 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   }
 
   changeStatePayroll() {
+    let payroll: Array<AdvancePayroll> = this.fillDataPayrollForChangeState();
+    this.payrollService.PutChangeState(payroll).subscribe(null, error => {
+      this.load = false;
+      this.msj.errorHttp(`¡Ocurrió un error al procesar la nómina!`, error);
+    });
+  }
+
+  fillDataPayrollForChangeState(): Array<AdvancePayroll> {
+    let payroll: Array<AdvancePayroll> = [];
+    this.payroll.forEach(d => {
+      d.detailsAdvance.forEach(x => {
+        payroll.push({
+          id: x.idAdvance,
+          idWorker: d.idWorker,
+        });
+      });
+    });
+    return payroll;
   }
 
   changeStateLoan() {
@@ -849,8 +867,9 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   createMovementsPayroll() {
     let movements: Array<Movimientos_Nomina> = this.fillMovementsPayroll();
+    if (movements.length == 0) this.successPayroll();
     movements.forEach(x => {
-      this.movementsPayrollService.Post(x).subscribe(null, (error: HttpErrorResponse) => {
+      this.movementsPayrollService.Post(x).subscribe(() => this.successPayroll(), (error: HttpErrorResponse) => {
         this.load = false;
         let msg: string = error.status == 400 ? error.error : `¡Ocurrió un error al procesar los movimientos de la nómina!`;
         this.msj.errorHttp(msg, error);
@@ -871,6 +890,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   fillMovementsLoanByWorker(idWorker: number, detailsLoan: Array<any>) {
     let movements: Array<Movimientos_Nomina> = [];
+    if (detailsLoan.length == 0) return [];
     detailsLoan.forEach(d => {
       movements.push({
         trabajador_Id: idWorker,
@@ -893,6 +913,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   fillMovementsAdvance(idWorker: number, detailsAdvance: Array<any>) {
     let movements: Array<Movimientos_Nomina> = [];
+    if (detailsAdvance.length == 0) return [];
     detailsAdvance.forEach(d => {
       movements.push({
         trabajador_Id: idWorker,
@@ -915,6 +936,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   fillMovementsSaveMoney(idWorker: number, detailsSaveMoney: Array<any>) {
     let movements: Array<Movimientos_Nomina> = [];
+    if (detailsSaveMoney.length == 0) return [];
     movements.push({
       trabajador_Id: idWorker,
       codigoMovimento: detailsSaveMoney[0].idSaveMoney,
@@ -1017,6 +1039,7 @@ interface Loan {
 }
 
 interface Advance {
+  idAdvance: number;
   worker: string;
   startDate: any;
   endDate: any;
