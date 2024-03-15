@@ -489,7 +489,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   searchDataTagCreated(reel: number) {
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
-      let daipita: any = (this.formDatosProduccion.value.daipita).trim();
+      let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : (this.formDatosProduccion.value.daipita).trim();
       res.forEach(data => {
         let dataTagProduction: modelTagProduction = {
           client: data.clienteNombre.trim(),
