@@ -42,13 +42,13 @@
           <!--Rango fechas-->  
           <div class="col-sm-12 col-md-6 col-xl-3">
             <span class="p-float-label">
-              <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
+              <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true"></p-calendar>
               <label for="fecha">Rango de Fechas</label>
             </span>
           </div>  
 
           <!-- Bodega -->
-          <div class="col-sm-12 col-md-6 col-xl-3">
+          <div class="col-sm-12 col-md-6 col-xl-2">
             <span class="p-float-label">
               <p-dropdown formControlName="Bodega" inputId="Bodega" [autoDisplayFirst]="false" [options]="process" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
               <label for="Bodega">Bodega</label>
@@ -56,7 +56,7 @@
           </div>
 
           <!-- Motivo -->
-          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <div class="col-sm-12 col-md-6 col-xl-3">
             <span class="p-float-label">
               <p-dropdown formControlName="Falla" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
               <label for="Falla">Motivo*</label>
@@ -80,10 +80,10 @@
           </div>
 
           <!-- Observacion -->
-          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-xl-12 col-xxl-12">
+          <div class="col-sm-12 col-md-6 col-xl-12">
             <span class="p-float-label">
               <textarea formControlName="Observacion" id="Observacion" [rows]="1" pInputTextarea></textarea>
-              <label for="textarea">Observación</label>
+              <label for="textarea">Observación*</label>
             </span>
           </div>
 
