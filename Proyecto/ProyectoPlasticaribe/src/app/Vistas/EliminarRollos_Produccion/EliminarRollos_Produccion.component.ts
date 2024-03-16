@@ -28,6 +28,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
   modalFails : boolean = false;
+  deletedRolls : Array<rollsToUpdate> = [];
 
   constructor(private AppComponent : AppComponent,
     private frmBld : FormBuilder,
@@ -45,7 +46,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.getProcess();
     this.getFails();
     this.loadRankDates();
-    this.msjAuthorizeDeleteRolls();
+    //this.msjAuthorizeDeleteRolls();
   }
 
   //Función para cargar fechas en el rango.
@@ -62,7 +63,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
       Rollo : [null],
       OT : [null],
       Falla : [null, Validators.required],
-      Observacion : [null, Validators.required],
+      Observacion : [null],
     });
   }
 
@@ -98,7 +99,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
 
   loadTable(data : any, ){
     let falla : any = this.form.value.Falla;
-    data.forEach(x => {
+    let observacion : any = this.form.value.Observacion
+     data.forEach(x => {
       if(!this.rolls.map(z => z.numeroRollo_BagPro).includes(x.numeroRollo_BagPro)) {
         this.rolls.push({
           'id' : x.id,
@@ -112,6 +114,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
           'fecha' : x.fecha,
           'proceso_Nombre' : x.proceso_Nombre,
           'falla' : falla,
+          'observacion' : observacion
         });
       }
     });
@@ -162,6 +165,17 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     }, [])
   }
 
+  loadDeletedRollsToUpdate(roll : any){
+    roll.forEach(x => {
+      this.deletedRolls.push({
+        'roll': x.numeroRollo_BagPro,
+        'fail': x.falla,
+        'observation': x.observacion,
+      });
+    });
+    console.log(this.deletedRolls)
+  }
+
   //Cantidad total consolidada por item
   totalQuantityByItem = (item: number): number => this.rollsInsert.filter(x => x.prod_Id == item).reduce((a, b) => a + b.cantidad, 0);
 
@@ -189,29 +203,30 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   //Función para eliminar los rollos seleccionados.
   deleteRolls(){
     if(this.form.valid) {
+      this.loadDeletedRollsToUpdate(this.rollsInsert);
       let count : number = 0;
-      let isError : boolean = false;
-      let observation : any = this.form.value.Observacion;
-      !observation ? '' : observation;
       this.onReject('delete');
       this.load = true;
+
       this.rollsInsert.forEach(x => {
         this.svcProdProcess.Delete(x.id).subscribe(resp => {
-          this.svDiscardRolls.putFailRolls(x.numeroRollo_BagPro, x.falla, observation).subscribe(data => {
-            count++;
-            if(count == this.rollsInsert.length) this.confirmDeleteMessage(isError);
-          }, error => { isError = true; });
+          count++;
+          if(count == this.rollsInsert.length) this.updateRolls();
         }, error => {
           this.load = false;
-          isError = true;
+          this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error eliminando rollos de Producción!`);
         });
       });
     } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe justificar el motivo de eliminación de rollos/bultos.`);
   }
 
+  updateRolls(){
+    this.svDiscardRolls.putFailRolls(this.deletedRolls).subscribe(data => { this.confirmDeleteMessage(false) }, error => { this.confirmDeleteMessage(true); });
+  }
+
   //Función para mostrar mensaje de confirmación de eliminación de rollos.
   confirmDeleteMessage(isError : boolean) {
-    if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error, verifique!`)
+    if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error actualizando la falla de los rollos!`)
     else {
       this.svcMsjs.mensajeConfirmacion(`Rollos eliminados exitosamente!`);
       setTimeout(() => { this.clearAll(); }, 1000);
@@ -228,7 +243,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   clearLabels() {
     this.form.reset();
     this.loadRankDates();
-    this.msjAuthorizeDeleteRolls();
+    //this.msjAuthorizeDeleteRolls();
   } 
     
   //Función para limpiar todo
@@ -239,11 +254,18 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.consolidatedInfo = [];
     this.load = false;
     this.loadRankDates();
-    this.msjAuthorizeDeleteRolls();
+    this.deletedRolls = [];
+    //this.msjAuthorizeDeleteRolls();
   }
 
   //Función para cerrar el dialogo de elección.
   onReject = (key : any) => this.svcMsg.clear(key);
 
   msjAuthorizeDeleteRolls = () => this.form.patchValue({ 'Observacion' : 'ELIMINACIÓN DE BULTOS/ROLLOS AUTORIZADA' })
+}
+
+export interface rollsToUpdate {
+  roll : number;
+  fail : number;
+  observation? : string;
 }
