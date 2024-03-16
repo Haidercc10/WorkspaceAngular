@@ -4,11 +4,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
-import { IncapacidadesService } from 'src/app/Servicios/Incapacidades/Incapacidades.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Movimientos_Nomina, Movimientos_NominaService } from 'src/app/Servicios/Movimientos_Nomina/Movimientos_Nomina.service';
-import { NominaDetallada_PlasticaribeService, Payroll as DataPayroll, AdvancePayroll } from 'src/app/Servicios/Nomina_Detallada/NominaDetallada_Plasticaribe.service';
+import { AdvancePayroll, Payroll as DataPayroll, NominaDetallada_PlasticaribeService } from 'src/app/Servicios/Nomina_Detallada/NominaDetallada_Plasticaribe.service';
 import { PaymentLoan, Prestamos_NominaService } from 'src/app/Servicios/Prestamos_Nomina/Prestamos_Nomina.service';
+import { DataMoneySave, SalarioTrabajadoresService } from 'src/app/Servicios/Salario_Trabajadores/Salario-Trabajadores.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -41,7 +41,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   detailsAdvances: Array<Advance> = [];
   detailsSaving: Array<Saving> = [];
   modalPayroll: boolean = false;
-  modalDataDisanility: boolean = false;
+  modalDataDisability: boolean = false;
   modalDataLoan: boolean = false;
   modalDataAdvance: boolean = false;
   modalDataSaving: boolean = false;
@@ -53,15 +53,15 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     private msj: MensajesAplicacionService,
     private payrollService: NominaDetallada_PlasticaribeService,
     private loanService: Prestamos_NominaService,
-    private disabilityService: IncapacidadesService,
-    private movementsPayrollService: Movimientos_NominaService,) {
+    private movementsPayrollService: Movimientos_NominaService,
+    private salaryWorkersService: SalarioTrabajadoresService,) {
   }
 
   ngOnInit() {
     this.readStorage();
     this.initFormPayroll();
     this.getArea();
-    this.getDisableDates();
+    // this.getDisableDates();
   }
 
   initFormPayroll() {
@@ -131,7 +131,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     this.detailsAdvances = [];
     this.detailsSaving = [];
     this.modalPayroll = false;
-    this.modalDataDisanility = false;
+    this.modalDataDisability = false;
     this.modalDataLoan = false;
     this.modalDataAdvance = false;
     this.modalDataSaving = false;
@@ -246,8 +246,17 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
       this.payroll[i].totalDiscounts = this.totalDiscounts(this.payroll[i]);
       this.payroll[i].deductions = this.totalDiscounts(this.payroll[i]);
       this.payroll[i].subTotalToPay = this.totalAccrued(this.payroll[i]) - this.totalDiscounts(this.payroll[i]);
+      this.payroll[i].detailsDisability = this.fillDetailsDisabilities(this.payroll[i].detailsDisability);
       if (count == this.payroll.length) this.load = false;
     });
+  }
+
+  fillDetailsDisabilities(disabilities: Array<Disability>) {
+    for (let i = 0; i < disabilities.length; i++) {
+      let dataDisability = this.diffDaysDisability(disabilities[i]);
+      disabilities[i].totalToPayThisPayroll = dataDisability.total.toFixed(2);
+    }
+    return disabilities;
   }
 
   calculateDaysPayroll_TotalToPay() {
@@ -290,7 +299,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     }
   }
 
-  diffDaysDisability(d: any): {} {
+  diffDaysDisability(d: any): any {
     let diffDays: number = 0;
     let total: number = 0;
     let data: any = this.disabilityBeforePayroll(d);
@@ -655,9 +664,9 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   totalAccrued(data: Payroll): number {
     let total: number = 0;
     total = data.valueDaysToPay + data.valueDaysDisabilityGeneralIllines +
-    data.valueDaysDisabilityWorkAccident + data.valueDaysDisabilityParents +
-    data.valueAdictionalDaytimeHours + data.totalValueAdictionalFee +
-    ((data.transpotationAssitance / 30) * data.daysToPay);
+      data.valueDaysDisabilityWorkAccident + data.valueDaysDisabilityParents +
+      data.valueAdictionalDaytimeHours + data.totalValueAdictionalFee +
+      ((data.transpotationAssitance / 30) * data.daysToPay);
     return total;
   }
 
@@ -676,7 +685,27 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   showDetailsDisabilities() {
     let worker: number = this.formPayrollWorker.value.idWorker;
     this.detailsDisabilities = this.payroll.find(x => x.idWorker == worker).detailsDisability;
-    this.modalDataDisanility = true;
+    this.modalDataDisability = true;
+  }
+
+  totalDaysDisability(): number {
+    return this.detailsDisabilities.reduce((a, b) => a + b.totalDays, 0);
+  }
+
+  totalPayDisabilitiInPayroll(): number {
+    return this.detailsDisabilities.reduce((a, b) => a + b.totalToPayThisPayroll, 0);
+  }
+
+  totalPayDisabilitiesInPreviusPayrolls(): number {
+    return this.detailsDisabilities.reduce((a, b) => a + b.totalToPayPreviusPayrolls, 0);
+  }
+
+  totalPayDisabilitisInNextPayrolls(): number {
+    return this.detailsDisabilities.reduce((a, b) => a + b.totalToPayNextPayroll, 0);
+  }
+
+  totalPayDisabilities(): number {
+    return this.detailsDisabilities.reduce((a, b) => a + b.totalToPay, 0);
   }
 
   showDetailsLoan() {
@@ -724,7 +753,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     } else this.msj.mensajeAdvertencia('No hay trabajadores para procesar la nómina');
   }
 
-  savePayroll(){
+  savePayroll() {
     this.load = true;
     let count: number = 0;
     this.payroll.filter(x => !this.payrollForAdvance.map(y => y.idWorker).includes(x.idWorker)).forEach(d => {
@@ -734,6 +763,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         if (count == this.payroll.length) {
           this.changeStateLoan();
           this.changeStatePayroll();
+          this.changeValueMoveySave();
           this.createMovementsPayroll();
         }
       }, error => {
@@ -743,7 +773,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     });
   }
 
-  savePayrollForAdvance(){
+  savePayrollForAdvance() {
     let count: number = 0;
     this.payroll.filter(x => this.payrollForAdvance.map(y => y.idWorker).includes(x.idWorker)).forEach(d => {
       let payroll: DataPayroll = this.fillDataPayroll(d.idWorker, 4);
@@ -883,15 +913,16 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
       movements = [movements,
         this.fillMovementsAdvance(d.idWorker, d.detailsAdvance),
         this.fillMovementsLoanByWorker(d.idWorker, d.detailsLoans),
-        this.fillMovementsSaveMoney(d.idWorker, d.detailsMoneySave)].reduce((a,b) => a.concat(b));
+        this.fillMovementsDisabilities(d.idWorker, d.detailsDisability),
+        this.fillMovementsSaveMoney(d.idWorker, d.detailsMoneySave)].reduce((a, b) => a.concat(b));
     });
     return movements;
   }
 
-  fillMovementsLoanByWorker(idWorker: number, detailsLoan: Array<any>) {
+  fillMovementsLoanByWorker(idWorker: number, detailsDisability: Array<any>) {
     let movements: Array<Movimientos_Nomina> = [];
-    if (detailsLoan.length == 0) return [];
-    detailsLoan.forEach(d => {
+    if (detailsDisability.length == 0) return [];
+    detailsDisability.forEach(d => {
       movements.push({
         trabajador_Id: idWorker,
         codigoMovimento: d.idLoan,
@@ -900,6 +931,29 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         valorDeuda: 0,
         valorPagado: 0,
         valorAbonado: d.valueQuota,
+        valorFinalDeuda: 0,
+        fecha: moment().format('YYYY-MM-DD'),
+        hora: moment().format('HH:mm:ss'),
+        observacaion: '',
+        estado_Id: 11,
+        creador_Id: this.storage_Id
+      });
+    });
+    return movements;
+  }
+
+  fillMovementsDisabilities(idWorker: number, detailsLoan: Array<Disability>) {
+    let movements: Array<Movimientos_Nomina> = [];
+    if (detailsLoan.length == 0) return [];
+    detailsLoan.forEach(d => {
+      movements.push({
+        trabajador_Id: idWorker,
+        codigoMovimento: d.idDisability,
+        nombreMovimento: 'INCAPACIDAD',
+        valorTotal: d.totalToPay,
+        valorDeuda: 0,
+        valorPagado: 0,
+        valorAbonado: d.totalToPayThisPayroll,
         valorFinalDeuda: 0,
         fecha: moment().format('YYYY-MM-DD'),
         hora: moment().format('HH:mm:ss'),
@@ -953,6 +1007,25 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
       creador_Id: this.storage_Id
     });
     return movements;
+  }
+
+  changeValueMoveySave() {
+    let dataMoneySave: Array<DataMoneySave> = this.fillValuesMoneySave();
+    this.salaryWorkersService.PutMoneySave(dataMoneySave).subscribe(null, error => {
+      this.msj.errorHttp(`¡Ocurrió un error al guardar el ahorro de cada operario!`, error);
+      this.load = false;
+    });
+  }
+
+  fillValuesMoneySave() {
+    let dataMoneySave: Array<DataMoneySave> = [];
+    this.payroll.forEach(d => {
+      dataMoneySave.push({
+        idWorker: d.idWorker,
+        value: d.saving,
+      })
+    });
+    return dataMoneySave;
   }
 }
 
@@ -1011,6 +1084,7 @@ interface Payroll {
 }
 
 interface Disability {
+  idDisability: number;
   worker: string;
   baseSalary: number;
   valueDay: number;
@@ -1023,6 +1097,7 @@ interface Disability {
   totalToPayPreviusPayrolls: number;
   totalToPayNextPayroll: number;
   totalToPay: number;
+  observation: string | null;
 }
 
 interface Loan {

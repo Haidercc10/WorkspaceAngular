@@ -530,7 +530,7 @@
   </form>
 </p-dialog>
 
-<p-dialog [(visible)]="modalDataDisanility" [style]="{width: '70%', height: 'auto'}" header="Incapacidades" [modal]="true">
+<p-dialog [(visible)]="modalDataDisability" [style]="{width: '70%', height: 'auto'}" header="Incapacidades" [modal]="true">
   <div class="m-5 my-3">
     <div class="mb-4">
       <h2 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-heart-fill"></i> Detalles de las incapacidades en la nomina del trabajador.</h2>
@@ -561,11 +561,21 @@
           <td class="text-center">{{data.typeDisability}}</td>
           <td class="text-center">{{data.startDate | date: 'yyyy-MM-dd'}}</td>
           <td class="text-center">{{data.endDate | date: 'yyyy-MM-dd'}}</td>
-          <td class="text-right">{{data.totalDays | currency: 'USD'}}</td>
+          <td class="text-right">{{data.totalDays | number}}</td>
           <td class="text-right">{{data.totalToPayThisPayroll | currency: 'USD'}}</td>
           <td class="text-right">{{data.totalToPayPreviusPayrolls | currency: 'USD'}}</td>
           <td class="text-right">{{data.totalToPayNextPayroll | currency: 'USD'}}</td>
           <td class="text-right">{{data.totalToPay | currency: 'USD'}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td colspan="5" class="text-right">Totales</td>
+          <td class="text-right">{{totalDaysDisability() | number}}</td>
+          <td class="text-right">{{totalPayDisabilitiInPayroll() | currency: 'USD'}}</td>
+          <td class="text-right">{{totalPayDisabilitiesInPreviusPayrolls() | currency: 'USD'}}</td>
+          <td class="text-right">{{totalPayDisabilitisInNextPayrolls() | currency: 'USD'}}</td>
+          <td class="text-right">{{totalPayDisabilities() | currency: 'USD'}}</td>
         </tr>
       </ng-template>
     </p-table>

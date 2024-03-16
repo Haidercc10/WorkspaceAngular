@@ -20,7 +20,7 @@ export interface Movimientos_Nomina {
   id?: number;
   trabajador_Id: number;
   codigoMovimento: number;
-  nombreMovimento: 'PRESTAMO' | 'ANTICIPO' | 'AHORRO';
+  nombreMovimento: 'PRESTAMO' | 'ANTICIPO' | 'AHORRO' | 'INCAPACIDAD';
   valorTotal: number;
   valorDeuda: number;
   valorPagado: number;
