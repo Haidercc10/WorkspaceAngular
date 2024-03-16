@@ -705,7 +705,56 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   }
 
   totalPayDisabilities(): number {
-    return this.detailsDisabilities.reduce((a, b) => a + b.totalToPay, 0);
+    return this.detailsDisabilities.reduce((a, b) => a += b.totalToPay, 0);
+  }
+
+  totalOrdinaryHoursPayroll(): number {
+    return this.payroll.reduce((a,b) => a += b.valueDaysToPay, 0);
+  }
+
+  totalDisabilitiesPayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.valueDaysDisabilityGeneralIllines + b.valueDaysDisabilityParents + b.valueDaysDisabilityWorkAccident, 0);
+  }
+
+  totalValueAdictionalFeePayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.totalValueAdictionalFee, 0);
+  }
+
+  totalTranspotationAssitancePayroll(): number {
+    return this.payroll.reduce((a, b) => a += ((b.transpotationAssitance / 30) * b.daysToPay), 0);
+  }
+
+  totalAccruedPayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.accrued, 0);
+  }
+
+  totalEPSPayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.eps, 0);
+  }
+
+  totalAFPPayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.afp, 0);
+  }
+
+  totalSavingPayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.saving, 0);
+  }
+
+  totalLoanAdvancePayroll(): number{
+    return this.payroll.reduce((a,b) => a += b.loan + b.advance, 0);
+  }
+
+  totalDeductionsPayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.deductions, 0);
+  }
+
+  subTotalToPayPayroll(): number {
+    return this.payroll.reduce((a, b) => a += b.subTotalToPay, 0);
+  }
+
+  removeWorkerFromPayroll(idWorker: number) {
+    let i: number = this.payroll.findIndex(x => x.idWorker == idWorker);
+    this.payroll.splice(i, 1);
   }
 
   showDetailsLoan() {
@@ -823,7 +872,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
       valorRecargo100: data.valueSurchagedHours100,
       tarifaADC: data.adictionalFee,
       valorTotalADCComp: data.totalValueAdictionalFee,
-      auxTransporte: data.transpotationAssitance,
+      auxTransporte: (data.transpotationAssitance / 30) * data.daysToPay,
       productividadSella: 0,
       productividadExt: 0,
       productividadMontaje: 0,
