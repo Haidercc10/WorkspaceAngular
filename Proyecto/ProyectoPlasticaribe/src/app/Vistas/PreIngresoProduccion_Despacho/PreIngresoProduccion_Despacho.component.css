@@ -2,3 +2,12 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
     display: flex;
     width: 100%;
 }
+
+::ng-deep .p-button.p-button-icon-only {
+    width: 2rem;
+    padding: 1rem 0;
+}
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+    height: 1rem;
+}

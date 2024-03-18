@@ -1,9 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import JsBarcode from 'jsbarcode';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { Table } from 'primeng/table';
 import { modelDtPreEntregaRollos } from 'src/app/Modelo/modelDtPreEntregaRollo';
 import { modelPreentregaRollos } from 'src/app/Modelo/modelPreEntregaRollo';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
@@ -37,6 +38,9 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   production: Array<OrderProduction> = [];
   productionSelected: Array<OrderProduction> = [];
   consolidatedProduction: Array<OrderProduction> = [];
+  @ViewChild('tableProduction') tableProduction: Table;
+  @ViewChild('tableProductionSelected') tableProductionSelected: Table;
+ 
 
   constructor(private appComponent: AppComponent,
     private formBuilder: FormBuilder,
@@ -464,6 +468,40 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
         }
       ]
     }
+  }
+
+  selectedFilterTable() {
+    this.load = true;
+    let data = this.tableProduction.filteredValue ? this.tableProduction.filteredValue : this.tableProduction.value;
+    
+    this.productionSelected = this.productionSelected.concat(data);
+    if(!this.tableProduction.filteredValue) this.production = []; 
+    else {
+      data.forEach(x => {
+        let index : number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
+        this.production.splice(index, 1);
+      });
+    }
+    this.getConsolidateProduction();
+    setTimeout(() => { this.load = false; console.log(this.production) }, 5);
+    
+  }
+
+  deselectedFilterTable() {
+    this.load = true;
+    let data = this.tableProductionSelected.filteredValue ? this.tableProductionSelected.filteredValue : this.tableProductionSelected.value;
+    this.production = this.production.concat(data);
+    
+    if(!this.tableProductionSelected.filteredValue) this.production = [];
+    else {
+      data.forEach(x => {
+        let index : number = this.productionSelected.findIndex(p => p.numberProduction == x.numberProduction);
+        this.productionSelected.splice(index, 1);
+      })
+    }
+    this.getConsolidateProduction();
+    setTimeout(() => { this.load = false; console.log(this.productionSelected) }, 5);
+    
   }
 }
 
