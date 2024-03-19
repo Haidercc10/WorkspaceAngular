@@ -8,7 +8,7 @@
   <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información del Inventario</h4>
 </div>
 
-<p-tabView *ngIf="!load" [scrollable]="true">
+<p-tabView (onChange)="changeTab($event)" *ngIf="!load" [scrollable]="true">
   <p-tabPanel
   header="Inventario de Despacho"
   leftIcon="pi pi-sliders-h">
@@ -378,7 +378,8 @@
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
-      scrollHeight="50rem">
+      scrollHeight="50rem"
+      [expandedRowKeys]="expandedRows">
       <ng-template pTemplate="caption">
           <div class="row g-4">
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
@@ -430,19 +431,19 @@
                           [scrollable]="true"
                           scrollHeight="30rem">
                           <ng-template pTemplate="header">
-                              <tr>
-                                  <th>#</th>
-                                  <th>Rollo</th>
-                                  <th>OT</th>
-                                  <th>Cantidad</th>
-                                  <th>Presentación</th>
-                                  <th>Peso</th>
-                                  <th>Precio</th>
-                                  <th>Etiqueta</th>
-                                  <th>Proceso</th>
-                                  <th>Turno</th>
-                                  <th>Fecha</th>
-                              </tr>
+                            <tr>
+                                <th>#</th>
+                                <th pSortableColumn="NumberProduction"><p-sortIcon field="NumberProduction"></p-sortIcon>  Rollo <p-columnFilter type="text" field="NumberProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Cantidad <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Presentation"><p-sortIcon field="Presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="Presentation" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Peso <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Price"><p-sortIcon field="Price"></p-sortIcon> Precio <p-columnFilter type="text" field="Price" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Information"><p-sortIcon field="Information"></p-sortIcon> Etiqueta <p-columnFilter type="text" field="Information" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Process"><p-sortIcon field="Process"></p-sortIcon> Proceso <p-columnFilter type="text" field="Process" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Turn"><p-sortIcon field="Turn"></p-sortIcon> Turno <p-columnFilter type="text" field="Turn" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Date"><p-sortIcon field="Date"></p-sortIcon> Fecha <p-columnFilter type="text" field="Date" display="menu"></p-columnFilter></th>
+                            </tr>
                           </ng-template>
                           <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
                               <tr>
@@ -496,7 +497,8 @@
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
-      scrollHeight="50rem">
+      scrollHeight="50rem"
+      [expandedRowKeys]="expandedRows">
       <ng-template pTemplate="caption">
           <div class="row g-4">
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
@@ -549,17 +551,17 @@
                           scrollHeight="30rem">
                           <ng-template pTemplate="header">
                               <tr>
-                                  <th>#</th>
-                                  <th>Rollo</th>
-                                  <th>OT</th>
-                                  <th>Cantidad</th>
-                                  <th>Presentación</th>
-                                  <th>Peso</th>
-                                  <th>Precio</th>
-                                  <th>Etiqueta</th>
-                                  <th>Proceso</th>
-                                  <th>Turno</th>
-                                  <th>Fecha</th>
+                                <th>#</th>
+                                <th pSortableColumn="NumberProduction"><p-sortIcon field="NumberProduction"></p-sortIcon>  Rollo <p-columnFilter type="text" field="NumberProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Cantidad <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Presentation"><p-sortIcon field="Presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="Presentation" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Peso <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Price"><p-sortIcon field="Price"></p-sortIcon> Precio <p-columnFilter type="text" field="Price" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Information"><p-sortIcon field="Information"></p-sortIcon> Etiqueta <p-columnFilter type="text" field="Information" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Process"><p-sortIcon field="Process"></p-sortIcon> Proceso <p-columnFilter type="text" field="Process" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Turn"><p-sortIcon field="Turn"></p-sortIcon> Turno <p-columnFilter type="text" field="Turn" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Date"><p-sortIcon field="Date"></p-sortIcon> Fecha <p-columnFilter type="text" field="Date" display="menu"></p-columnFilter></th>
                               </tr>
                           </ng-template>
                           <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">

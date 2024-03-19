@@ -92,6 +92,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Productos del Pedido.</h4>
   </div>
 
+  <!--Productos del pedido-->
   <p-table
     [value]="products"
     selectionMode="single"
@@ -131,6 +132,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Consolidado de Productos Elegidos</h4>
   </div>
 
+  <!--Consolidado-->
   <p-table
     [value]="consolidatedProduction"
     styleClass="p-datatable-gridlines p-datatable-sm"
@@ -172,6 +174,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos Disponibles.</h4>
   </div>
 
+  <!--Rollos disponibles-->
   <p-table
     #tableProduction
     [value]="production"
@@ -276,6 +279,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Seleccionados.</h4>
   </div>
 
+  <!--Rollos seleccionados-->
   <p-table
     #tableProductionSelected
     [value]="productionSelected"

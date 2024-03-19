@@ -83,3 +83,7 @@
 .colorTotalQuantity {
   background-color: LightGreen;
 }
+
+::ng-deep .p-column-filter-menu-button {
+  color: #db4149;
+}

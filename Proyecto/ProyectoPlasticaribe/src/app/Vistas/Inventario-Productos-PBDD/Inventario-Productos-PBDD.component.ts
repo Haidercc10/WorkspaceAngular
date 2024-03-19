@@ -24,6 +24,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   selectedColumns: Array<Columns> = [];
   selectedColumnsComparative: Array<Columns> = [];
   expandedRows: {} = {};
+  expandedRows2: {} = {};
   stockInformation_Kg: Array<StockInformation> = [];
   stockInformation_UndPaq: Array<StockInformation> = [];
   stockInformation: Array<StockInformation> = [];
@@ -106,6 +107,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.stockService.GetStockProducts_Process(process).subscribe(data => {
         if (process == 'EMP') this.stockEmpaque = this.fillStockInformation(data);
         if (process == 'SELLA') this.stockSellado = this.fillStockInformation(data);
+        console.log(this.stockSellado)
         this.fillComparativeStock(data, false);
       });
     });
@@ -324,6 +326,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
     size20.forEach(e => worksheet.getColumn(e).width = 20);
     size15.forEach(e => worksheet.getColumn(e).width = 15);
     worksheet.getColumn(1).width = 10;
+  }
+
+  //Función que se encarga de filtrar la información de la tabla
+  applyFilter = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  changeTab(e : any) {
+    const thisRef = this;
+    var index = e.index;
+    console.log(index)
+     index == 3 ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
+     index == 4 ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);    
   }
 }
 
