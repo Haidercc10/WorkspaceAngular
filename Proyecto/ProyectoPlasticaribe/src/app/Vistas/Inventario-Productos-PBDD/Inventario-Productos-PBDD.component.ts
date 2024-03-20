@@ -7,6 +7,8 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AppComponent } from 'src/app/app.component';
 import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { error } from 'console';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
@@ -41,11 +43,24 @@ export class InventarioProductosPBDDComponent implements OnInit {
   stockSellado: Array<StockInformation> = [];
   comparativeStock: Array<StockInformation> = [];
   stockDelivered_NoAvaible: Array<StockInformation> = [];
+  @ViewChild('tableRollsEmpaque') tableRollsEmpaque: Table | undefined;
+  @ViewChild('tableRollsSellado') tableRollsSellado: Table | undefined;
+  rollsAvailablesSellado : Array<any> = [];
+  rollsAvailablesEmpaque : Array<any> = [];
+  totalEmpaque : number = 0;
+  totalSellado : number = 0;
+  totalQtyEmpaque : number = 0; 
+  totalQtySellado : number = 0; 
+  loading : boolean = false;
+  indexTab : number = 0;
+  stateOptions: any[] = [{ value: 'off', icon : 'pi pi-table', title : 'Contraer filas'}, { value: 'on', icon : 'pi pi-list', title: 'Desplegar filas'}];
+  value : string = 'off';
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
     private stockService: ExistenciasProductosService,
-    private createExcelService: CreacionExcelService,) {
+    private createExcelService: CreacionExcelService,
+    private svProductionProcess : Produccion_ProcesosService) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
@@ -107,7 +122,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.stockService.GetStockProducts_Process(process).subscribe(data => {
         if (process == 'EMP') this.stockEmpaque = this.fillStockInformation(data);
         if (process == 'SELLA') this.stockSellado = this.fillStockInformation(data);
-        console.log(this.stockSellado)
+        
         this.fillComparativeStock(data, false);
       });
     });
@@ -329,15 +344,89 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función que se encarga de filtrar la información de la tabla
-  applyFilter = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+  applyFilter($event, campo : any, datos : Table) {
+    datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+    this.calculateTotalEmpaque();
+    this.calculateTotalSellado();
+  } 
 
+  //Función que se encarga de mantener expandida la información de la tabla.
   changeTab(e : any) {
-    const thisRef = this;
-    var index = e.index;
-    console.log(index)
-     index == 3 ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
-     index == 4 ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);    
+    this.indexTab = e.index;
+
+    this.indexTab == 1 ? this.loadRollsProductionAvailable() : null;
+    this.indexTab == 2 ? this.loadRollsProductionAvailable() : null; 
+    this.indexTab == 3 ? this.deployRows() : null;
+    this.indexTab == 4 ? this.deployRows() : null;
   }
+
+  //Cargar producción disponible en el area de sellado y empaque.
+  loadRollsProductionAvailable(){
+    this.rollsAvailablesEmpaque = [];
+    this.rollsAvailablesSellado = [];
+    this.loading = true;
+
+    this.svProductionProcess.getInfoProductionAvailable().subscribe(data => { 
+      this.rollsAvailablesEmpaque = data.filter(x => x.process_Id == 'EMP');
+      this.rollsAvailablesSellado = data.filter(x => x.process_Id == 'SELLA'); 
+      this.calculateTotalEmpaque(); 
+      this.calculateTotalSellado();
+      this.loading = false;
+    }, error => { 
+      this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
+      this.loading = false; 
+    });
+  }
+
+  /** Función que calcula el total de existencias y de valor que hay en la producción de empaque*/
+  calculateTotalEmpaque(){
+    setTimeout(() => {
+      this.totalEmpaque = 0;
+      this.totalQtyEmpaque = 0;
+      if(this.tableRollsEmpaque.filteredValue) {
+        this.tableRollsEmpaque.filteredValue.forEach(x => {
+          this.totalEmpaque += x.subtotal;  
+          this.totalQtyEmpaque += x.realQty;
+        }); 
+      } else {
+        this.rollsAvailablesEmpaque.forEach(x => {
+          this.totalEmpaque += x.subtotal;
+          this.totalQtyEmpaque += x.realQty;
+        }); 
+      }
+    }, 500);
+  }
+
+   /** Función que calcula el total de existencias y de valor que hay en la producción de sellado*/
+  calculateTotalSellado(){
+    setTimeout(() => {
+      this.totalSellado = 0;
+      this.totalQtySellado = 0;
+      if(this.tableRollsSellado.filteredValue) {
+        this.tableRollsSellado.filteredValue.forEach(x => {
+          if(x.process_Id == 'SELLA') {
+            this.totalSellado += x.subtotal;  
+            this.totalQtySellado += x.realQty;
+          }
+        }); 
+      } else {
+        this.rollsAvailablesSellado.forEach(x => {
+          if(x.process_Id == 'SELLA') {
+            this.totalSellado += x.subtotal;
+            this.totalQtySellado += x.realQty;
+          }  
+        }); 
+      }
+    }, 500);
+  }
+
+  deployRows(){
+    const thisRef = this;
+
+    this.indexTab == 3 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
+    this.indexTab == 4 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
+  }
+  
 }
 
 interface StockInformation {

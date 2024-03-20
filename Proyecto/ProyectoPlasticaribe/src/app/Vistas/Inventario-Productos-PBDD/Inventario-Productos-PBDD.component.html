@@ -127,6 +127,394 @@
   </p-tabPanel>
 
   <p-tabPanel
+  header="Rollo a rollo Empaque"
+  leftIcon="pi pi-database"
+  tooltip="Inventario rollo a rollo del más antiguo al más reciente en Empaque">
+  <p-table
+    #tableRollsEmpaque
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [rowHover]="true"
+    [loading]="loading"
+    [value]="rollsAvailablesEmpaque"
+    [scrollable]="true"
+    scrollHeight="50rem">
+    <ng-template pTemplate="header" style="font-size: 30px;">
+        <tr id="filtros">
+            <th></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'roll_BagPro', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ot', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'item', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'realQty', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsEmpaque)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableRollsEmpaque)"></th>
+        </tr>
+            <tr style="font-size: 30px;">
+            <th class="text-center">#</th>
+            <th class="text-center" pSortableColumn="roll_BagPro" scope="col">Rollo  <p-sortIcon field="roll_BagPro"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="ot" scope="col">OT  <p-sortIcon field="ot"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="item" scope="col">Item  <p-sortIcon field="item"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="client" scope="col">Cliente  <p-sortIcon field="client"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="reference" scope="col">Referencia  <p-sortIcon field="reference"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="realQty" scope="col">Existencias  <p-sortIcon field="realQty"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="presentation" scope="col">Unidad  <p-sortIcon field="presentation"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="date" scope="col">Fecha  <p-sortIcon field="date"></p-sortIcon></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
+        <tr>
+        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center"><b>{{inv.roll_BagPro}}</b></td>
+        <td class="text-center">{{inv.ot }}</td>
+        <td class="text-center"><b>{{inv.item }}</b></td>  
+        <td>{{inv.client }}</td>
+        <td>{{inv.reference}}</td>
+        <td class="text-center colorExis"><b>{{inv.realQty | number : '1.2-2'}}</b></td>
+        <td class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
+        <td class="text-center">{{inv.presentation}}</td>
+        <td class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
+        <td class="text-center">{{inv.date}}</td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <tr>
+            <td colspan="6" class="text-right">Disponibles</td>
+            <td class="text-center textBlue">{{totalQtyEmpaque |  number : '1.2-2'}}</td>
+            <td colspan="2" class="text-right">Total</td>
+            <td class="text-center textBlue">$ {{totalEmpaque | number : '1.2-2'}}</td>
+            <td></td>
+        </tr>
+    </ng-template>
+    </p-table>
+  </p-tabPanel>
+
+  <p-tabPanel
+  header="Bulto a bulto Sellado"
+  leftIcon="pi pi-table"
+  tooltip="Inventario bulto a bulto del más antiguo al más reciente en Sellado">
+  <p-table
+    #tableRollsSellado
+    [resizableColumns]="true"
+    [loading]="loading"
+    columnResizeMode="expand"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [rowHover]="true"
+    [value]="rollsAvailablesSellado"
+    [scrollable]="true"
+    scrollHeight="50rem">
+    <ng-template pTemplate="header" style="font-size: 30px;">
+        <tr id="filtros">
+            <th></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'roll_BagPro', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ot', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'item', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'realQty', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsSellado)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableRollsSellado)"></th>
+        </tr>
+            <tr style="font-size: 30px;">
+            <th class="text-center">#</th>
+            <th class="text-center" pSortableColumn="roll_BagPro" scope="col">Rollo  <p-sortIcon field="roll_BagPro"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="ot" scope="col">OT  <p-sortIcon field="ot"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="item" scope="col">Item  <p-sortIcon field="item"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="client" scope="col">Cliente  <p-sortIcon field="client"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="reference" scope="col">Referencia  <p-sortIcon field="reference"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="realQty" scope="col">Existencias  <p-sortIcon field="realQty"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="presentation" scope="col">Unidad  <p-sortIcon field="presentation"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="date" scope="col">Fecha  <p-sortIcon field="date"></p-sortIcon></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
+        <tr>
+        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center"><b>{{inv.roll_BagPro}}</b></td>
+        <td class="text-center">{{inv.ot }}</td>
+        <td class="text-center"><b>{{inv.item }}</b></td>  
+        <td>{{inv.client }}</td>
+        <td>{{inv.reference}}</td>
+        <td class="text-center colorExis"><b>{{inv.realQty | number : '1.2-2'}}</b></td>
+        <td class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
+        <td class="text-center">{{inv.presentation}}</td>
+        <td class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
+        <td class="text-center">{{inv.date}}</td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <tr>
+            <td colspan="6" class="text-right">Disponibles</td>
+            <td  class="text-center textBlue">{{totalQtySellado | number : '1.2-2'}}</td>
+            <td colspan="2" class="text-right">Total</td>
+            <td class="text-center textBlue">$ {{totalSellado | number : '1.2-2'}}</td>
+            <td></td>
+        </tr>
+    </ng-template>
+  </p-table>
+  </p-tabPanel> 
+
+  <p-tabPanel
+  header="Inventario Empaque"
+  leftIcon="pi pi-map"
+  tooltip="Información del Inventario de la Bodega de Empaque">
+    <p-table
+      #tableStockEmp
+      [value]="stockEmpaque"
+      [columns]="selectedColumns"
+      dataKey="item"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      [resizableColumns]="true"
+      [reorderableColumns]="true"
+      columnResizeMode="expand"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+      [scrollable]="true"
+      scrollHeight="50rem"
+      [expandedRowKeys]="expandedRows">
+      <ng-template pTemplate="caption">
+          <div class="row g-4">
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                  <p-multiSelect
+                      [options]="columns"
+                      [(ngModel)]="selectedColumns"
+                      optionLabel="header"
+                      selectedItemsLabel="{0} columnas seleccionadas"
+                      [style]="{minWidth: '330px'}"
+                      placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+              </div>
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-end">
+                <p-selectButton [options]="stateOptions" [(ngModel)]="value" optionLabel="icon" optionValue="value" (onChange)="deployRows()">
+                    <ng-template let-item pTemplate>
+                        <i [class]="item.icon"></i>
+                    </ng-template>
+                  </p-selectButton>
+                  <button class="buttonExcel mx-4" (click)="createExcel(stockEmpaque)">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                  </button>
+              </div>
+          </div>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+          <tr>
+              <th rowspan="2" class="text-center">#</th>
+              <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStockEmp, $event, col.field)"></th>
+          </tr>
+          <tr>
+              <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+              <p-sortIcon [field]="col.field"></p-sortIcon>
+              </th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+          <tr>
+              <td>
+                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                  <span class="font-bold">
+                      {{rowIndex + 1}}
+                  </span>
+              </td>
+              <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="rowexpansion" let-data>
+          <tr>
+              <td colspan="23">
+                  <div class="p-3">
+                      <p-table
+                          [value]="data.AvaibleProdution"
+                          dataKey="factura"
+                          styleClass="p-datatable-gridlines p-datatable-sm"
+                          [scrollable]="true"
+                          scrollHeight="30rem">
+                          <ng-template pTemplate="header">
+                            <tr>
+                                <th>#</th>
+                                <th pSortableColumn="NumberProduction"><p-sortIcon field="NumberProduction"></p-sortIcon>  Rollo <p-columnFilter type="text" field="NumberProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Cantidad <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Presentation"><p-sortIcon field="Presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="Presentation" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Peso <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Price"><p-sortIcon field="Price"></p-sortIcon> Precio <p-columnFilter type="text" field="Price" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Information"><p-sortIcon field="Information"></p-sortIcon> Etiqueta <p-columnFilter type="text" field="Information" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Process"><p-sortIcon field="Process"></p-sortIcon> Proceso <p-columnFilter type="text" field="Process" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Turn"><p-sortIcon field="Turn"></p-sortIcon> Turno <p-columnFilter type="text" field="Turn" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Date"><p-sortIcon field="Date"></p-sortIcon> Fecha <p-columnFilter type="text" field="Date" display="menu"></p-columnFilter></th>
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                              <tr>
+                                  <td>{{rowIndex + 1}}</td>
+                                  <td>{{details.NumberProduction}}</td>
+                                  <td>{{details.orderProduction}}</td>
+                                  <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                  <td>{{details.Presentation}}</td>
+                                  <td>{{details.Weight | number : '1.2-2'}}</td>
+                                  <td>{{details.Price | number : '1.2-2'}}</td>
+                                  <td>{{details.Information}}</td>
+                                  <td>{{details.Process}}</td>
+                                  <td>{{details.Turn}}</td>
+                                  <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                              </tr>
+                          </ng-template>
+                          <ng-template pTemplate="emptymessage">
+                              <tr>
+                                  <td colspan="11">No se encontraron registros</td>
+                              </tr>
+                          </ng-template>
+                      </p-table>
+                  </div>
+              </td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+          <tr>
+              <td colspan="7">Total</td>
+              <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockEmpaque) | currency : 'COP '}}</td>
+          </tr>
+      </ng-template>
+    </p-table>
+  </p-tabPanel>
+
+  <p-tabPanel
+  header="Inventario Sellado"
+  leftIcon="pi pi-th-large"
+  tooltip="Información del Inventario de la Bodega de Wiketiado">
+    <p-table
+      #tableStockSella
+      [value]="stockSellado"
+      [columns]="selectedColumns"
+      dataKey="item"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      [resizableColumns]="true"
+      [reorderableColumns]="true"
+      columnResizeMode="expand"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+      [scrollable]="true"
+      scrollHeight="50rem"
+      [expandedRowKeys]="expandedRows">
+      <ng-template pTemplate="caption">
+          <div class="row g-4">
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                  <p-multiSelect
+                      [options]="columns"
+                      [(ngModel)]="selectedColumns"
+                      optionLabel="header"
+                      selectedItemsLabel="{0} columnas seleccionadas"
+                      [style]="{minWidth: '330px'}"
+                      placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+              </div>
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-end">
+                  <p-selectButton [options]="stateOptions" [(ngModel)]="value" optionLabel="icon" optionValue="value" (onChange)="deployRows()">
+                    <ng-template let-item pTemplate>
+                        <i [class]="item.icon"></i>
+                    </ng-template>
+                  </p-selectButton>
+                  <button class="buttonExcel mx-4" (click)="createExcel(stockSellado)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                </button>
+              </div>
+          </div>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+          <tr>
+              <th rowspan="2" class="text-center">#</th>
+              <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStockSella, $event, col.field)"></th>
+          </tr>
+          <tr>
+              <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+              <p-sortIcon [field]="col.field"></p-sortIcon>
+              </th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+          <tr>
+              <td>
+                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                  <span class="font-bold">
+                      {{rowIndex + 1}}
+                  </span>
+              </td>
+              <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="rowexpansion" let-data>
+          <tr>
+              <td colspan="23">
+                  <div class="p-3">
+                      <p-table
+                          [value]="data.AvaibleProdution"
+                          dataKey="factura"
+                          styleClass="p-datatable-gridlines p-datatable-sm"
+                          [scrollable]="true"
+                          scrollHeight="30rem">
+                          <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="NumberProduction"><p-sortIcon field="NumberProduction"></p-sortIcon>  Rollo <p-columnFilter type="text" field="NumberProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Cantidad <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Presentation"><p-sortIcon field="Presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="Presentation" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Peso <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Price"><p-sortIcon field="Price"></p-sortIcon> Precio <p-columnFilter type="text" field="Price" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Information"><p-sortIcon field="Information"></p-sortIcon> Etiqueta <p-columnFilter type="text" field="Information" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Process"><p-sortIcon field="Process"></p-sortIcon> Proceso <p-columnFilter type="text" field="Process" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Turn"><p-sortIcon field="Turn"></p-sortIcon> Turno <p-columnFilter type="text" field="Turn" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Date"><p-sortIcon field="Date"></p-sortIcon> Fecha <p-columnFilter type="text" field="Date" display="menu"></p-columnFilter></th>
+                              </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                              <tr>
+                                  <td>{{rowIndex + 1}}</td>
+                                  <td>{{details.NumberProduction}}</td>
+                                  <td>{{details.orderProduction}}</td>
+                                  <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                  <td>{{details.Presentation}}</td>
+                                  <td>{{details.Weight | number : '1.2-2'}}</td>
+                                  <td>{{details.Price | number : '1.2-2'}}</td>
+                                  <td>{{details.Information}}</td>
+                                  <td>{{details.Process}}</td>
+                                  <td>{{details.Turn}}</td>
+                                  <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                              </tr>
+                          </ng-template>
+                          <ng-template pTemplate="emptymessage">
+                              <tr>
+                                  <td colspan="11">No se encontraron registros</td>
+                              </tr>
+                          </ng-template>
+                      </p-table>
+                  </div>
+              </td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+          <tr>
+              <td colspan="7">Total</td>
+              <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockSellado) | currency : 'COP '}}</td>
+          </tr>
+      </ng-template>
+    </p-table>
+  </p-tabPanel>
+
+  <p-tabPanel
   header="Inventario de Rollos"
   leftIcon="pi pi-database">
     <p-table
@@ -355,244 +743,6 @@
           <tr>
               <td colspan="7">Total</td>
               <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation_UndPaq) | currency : 'COP '}}</td>
-          </tr>
-      </ng-template>
-    </p-table>
-  </p-tabPanel>
-
-  <p-tabPanel
-  header="Inventario Empaque"
-  leftIcon="pi pi-map"
-  tooltip="Información del Inventario de la Bodega de Empaque">
-    <p-table
-      #tableStockEmp
-      [value]="stockEmpaque"
-      [columns]="selectedColumns"
-      dataKey="item"
-      styleClass="p-datatable-gridlines p-datatable-sm"
-      [resizableColumns]="true"
-      [reorderableColumns]="true"
-      columnResizeMode="expand"
-      responsiveLayout="scroll"
-      [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-      [scrollable]="true"
-      scrollHeight="50rem"
-      [expandedRowKeys]="expandedRows">
-      <ng-template pTemplate="caption">
-          <div class="row g-4">
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
-                  <p-multiSelect
-                      [options]="columns"
-                      [(ngModel)]="selectedColumns"
-                      optionLabel="header"
-                      selectedItemsLabel="{0} columnas seleccionadas"
-                      [style]="{minWidth: '330px'}"
-                      placeholder="Elige las columnas que quieres ver"></p-multiSelect>
-              </div>
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
-                  <button class="buttonExcel mx-4" (click)="createExcel(stockEmpaque)">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
-                  </button>
-              </div>
-          </div>
-      </ng-template>
-      <ng-template pTemplate="header" let-columns>
-          <tr>
-              <th rowspan="2" class="text-center">#</th>
-              <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStockEmp, $event, col.field)"></th>
-          </tr>
-          <tr>
-              <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
-              <p-sortIcon [field]="col.field"></p-sortIcon>
-              </th>
-          </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
-          <tr>
-              <td>
-                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                  <span class="font-bold">
-                      {{rowIndex + 1}}
-                  </span>
-              </td>
-              <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
-          </tr>
-      </ng-template>
-      <ng-template pTemplate="rowexpansion" let-data>
-          <tr>
-              <td colspan="23">
-                  <div class="p-3">
-                      <p-table
-                          [value]="data.AvaibleProdution"
-                          dataKey="factura"
-                          styleClass="p-datatable-gridlines p-datatable-sm"
-                          [scrollable]="true"
-                          scrollHeight="30rem">
-                          <ng-template pTemplate="header">
-                            <tr>
-                                <th>#</th>
-                                <th pSortableColumn="NumberProduction"><p-sortIcon field="NumberProduction"></p-sortIcon>  Rollo <p-columnFilter type="text" field="NumberProduction" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Cantidad <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Presentation"><p-sortIcon field="Presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="Presentation" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Peso <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Price"><p-sortIcon field="Price"></p-sortIcon> Precio <p-columnFilter type="text" field="Price" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Information"><p-sortIcon field="Information"></p-sortIcon> Etiqueta <p-columnFilter type="text" field="Information" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Process"><p-sortIcon field="Process"></p-sortIcon> Proceso <p-columnFilter type="text" field="Process" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Turn"><p-sortIcon field="Turn"></p-sortIcon> Turno <p-columnFilter type="text" field="Turn" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Date"><p-sortIcon field="Date"></p-sortIcon> Fecha <p-columnFilter type="text" field="Date" display="menu"></p-columnFilter></th>
-                            </tr>
-                          </ng-template>
-                          <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
-                              <tr>
-                                  <td>{{rowIndex + 1}}</td>
-                                  <td>{{details.NumberProduction}}</td>
-                                  <td>{{details.orderProduction}}</td>
-                                  <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
-                                  <td>{{details.Presentation}}</td>
-                                  <td>{{details.Weight | number : '1.2-2'}}</td>
-                                  <td>{{details.Price | number : '1.2-2'}}</td>
-                                  <td>{{details.Information}}</td>
-                                  <td>{{details.Process}}</td>
-                                  <td>{{details.Turn}}</td>
-                                  <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
-                              </tr>
-                          </ng-template>
-                          <ng-template pTemplate="emptymessage">
-                              <tr>
-                                  <td colspan="11">No se encontraron registros</td>
-                              </tr>
-                          </ng-template>
-                      </p-table>
-                  </div>
-              </td>
-          </tr>
-      </ng-template>
-      <ng-template pTemplate="footer">
-          <tr>
-              <td colspan="7">Total</td>
-              <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockEmpaque) | currency : 'COP '}}</td>
-          </tr>
-      </ng-template>
-    </p-table>
-  </p-tabPanel>
-
-  <p-tabPanel
-  header="Inventario Sellado"
-  leftIcon="pi pi-th-large"
-  tooltip="Información del Inventario de la Bodega de Wiketiado">
-    <p-table
-      #tableStockSella
-      [value]="stockSellado"
-      [columns]="selectedColumns"
-      dataKey="item"
-      styleClass="p-datatable-gridlines p-datatable-sm"
-      [resizableColumns]="true"
-      [reorderableColumns]="true"
-      columnResizeMode="expand"
-      responsiveLayout="scroll"
-      [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-      [scrollable]="true"
-      scrollHeight="50rem"
-      [expandedRowKeys]="expandedRows">
-      <ng-template pTemplate="caption">
-          <div class="row g-4">
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
-                  <p-multiSelect
-                      [options]="columns"
-                      [(ngModel)]="selectedColumns"
-                      optionLabel="header"
-                      selectedItemsLabel="{0} columnas seleccionadas"
-                      [style]="{minWidth: '330px'}"
-                      placeholder="Elige las columnas que quieres ver"></p-multiSelect>
-              </div>
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
-                  <button class="buttonExcel mx-4" (click)="createExcel(stockSellado)">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
-                  </button>
-              </div>
-          </div>
-      </ng-template>
-      <ng-template pTemplate="header" let-columns>
-          <tr>
-              <th rowspan="2" class="text-center">#</th>
-              <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStockSella, $event, col.field)"></th>
-          </tr>
-          <tr>
-              <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
-              <p-sortIcon [field]="col.field"></p-sortIcon>
-              </th>
-          </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
-          <tr>
-              <td>
-                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                  <span class="font-bold">
-                      {{rowIndex + 1}}
-                  </span>
-              </td>
-              <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
-          </tr>
-      </ng-template>
-      <ng-template pTemplate="rowexpansion" let-data>
-          <tr>
-              <td colspan="23">
-                  <div class="p-3">
-                      <p-table
-                          [value]="data.AvaibleProdution"
-                          dataKey="factura"
-                          styleClass="p-datatable-gridlines p-datatable-sm"
-                          [scrollable]="true"
-                          scrollHeight="30rem">
-                          <ng-template pTemplate="header">
-                              <tr>
-                                <th>#</th>
-                                <th pSortableColumn="NumberProduction"><p-sortIcon field="NumberProduction"></p-sortIcon>  Rollo <p-columnFilter type="text" field="NumberProduction" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Cantidad <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Presentation"><p-sortIcon field="Presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="Presentation" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Peso <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Price"><p-sortIcon field="Price"></p-sortIcon> Precio <p-columnFilter type="text" field="Price" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Information"><p-sortIcon field="Information"></p-sortIcon> Etiqueta <p-columnFilter type="text" field="Information" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Process"><p-sortIcon field="Process"></p-sortIcon> Proceso <p-columnFilter type="text" field="Process" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Turn"><p-sortIcon field="Turn"></p-sortIcon> Turno <p-columnFilter type="text" field="Turn" display="menu"></p-columnFilter></th>
-                                <th pSortableColumn="Date"><p-sortIcon field="Date"></p-sortIcon> Fecha <p-columnFilter type="text" field="Date" display="menu"></p-columnFilter></th>
-                              </tr>
-                          </ng-template>
-                          <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
-                              <tr>
-                                  <td>{{rowIndex + 1}}</td>
-                                  <td>{{details.NumberProduction}}</td>
-                                  <td>{{details.orderProduction}}</td>
-                                  <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
-                                  <td>{{details.Presentation}}</td>
-                                  <td>{{details.Weight | number : '1.2-2'}}</td>
-                                  <td>{{details.Price | number : '1.2-2'}}</td>
-                                  <td>{{details.Information}}</td>
-                                  <td>{{details.Process}}</td>
-                                  <td>{{details.Turn}}</td>
-                                  <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
-                              </tr>
-                          </ng-template>
-                          <ng-template pTemplate="emptymessage">
-                              <tr>
-                                  <td colspan="11">No se encontraron registros</td>
-                              </tr>
-                          </ng-template>
-                      </p-table>
-                  </div>
-              </td>
-          </tr>
-      </ng-template>
-      <ng-template pTemplate="footer">
-          <tr>
-              <td colspan="7">Total</td>
-              <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockSellado) | currency : 'COP '}}</td>
           </tr>
       </ng-template>
     </p-table>

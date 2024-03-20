@@ -53,4 +53,6 @@ export class Produccion_ProcesosService {
   Delete = (id: number|string): Observable<any> => this.http.delete(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/${id}`);
 
   putReversionEnvioZeus = (rollos: any[]) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putReversionEnvioZeus`, rollos);
+
+  getInfoProductionAvailable = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionAvailable`);
 }

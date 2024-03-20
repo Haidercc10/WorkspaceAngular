@@ -84,6 +84,18 @@
   background-color: LightGreen;
 }
 
-::ng-deep .p-column-filter-menu-button {
+/*::ng-deep .p-column-filter-menu-button {
   color: #db4149;
+}*/
+
+::ng-deep .p-selectbutton .p-button.p-highlight:hover {
+  background: #db4149;
+  border-color: #db4149;
+  color: #ffffff;
+}
+
+::ng-deep .p-selectbutton .p-button.p-highlight {
+  background: #db4149;
+  border-color: #db4149;
+  color: #ffffff;
 }

@@ -427,7 +427,6 @@ export class ReporteCostosOTComponent implements OnInit {
   CrearPDF(){
     let nombre : string = this.storage_Nombre;
     if (this.infoOT.valid) {
-      this.infoOT.value.ot = 123456;
       let totalKg : number = 0, totalUnd : number = 0;
       let titulo = `Reporte de Costos de la OT ${this.infoOT.value.ot}`;
       this.ArrayProcesos.forEach(item => {

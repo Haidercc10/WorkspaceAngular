@@ -215,6 +215,7 @@ import { Prestamos_NominaComponent } from './Vistas/Prestamos_Nomina/Prestamos_N
 import { IngresoDespacho_EntregaMercanciaComponent } from './Vistas/IngresoDespacho_EntregaMercancia/IngresoDespacho_EntregaMercancia.component';
 import { FormEditarPrestamosComponent } from './Vistas/FormEditarPrestamos/FormEditarPrestamos.component';
 import { Crear_FallasComponent } from './Vistas/Crear_Fallas/Crear_Fallas.component';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [
@@ -445,6 +446,7 @@ import { Crear_FallasComponent } from './Vistas/Crear_Fallas/Crear_Fallas.compon
     ListboxModule,
     ColorPickerModule,
     TriStateCheckboxModule,
+    SelectButtonModule,
   ],
 
   providers: [
