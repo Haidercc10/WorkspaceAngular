@@ -141,6 +141,13 @@
     [value]="rollsAvailablesEmpaque"
     [scrollable]="true"
     scrollHeight="50rem">
+    <ng-template pTemplate="caption">
+        <div class="row g-4">
+            <div class="d-flex justify-content-end">
+                <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="createExcelRollToRoll(rollsAvailablesEmpaque, 'EMPAQUE')"></button>
+            </div>
+        </div>
+    </ng-template>
     <ng-template pTemplate="header" style="font-size: 30px;">
         <tr id="filtros">
             <th></th>
@@ -211,6 +218,13 @@
     [value]="rollsAvailablesSellado"
     [scrollable]="true"
     scrollHeight="50rem">
+    <ng-template pTemplate="caption">
+        <div class="row g-4">
+            <div class="d-flex justify-content-end">
+                <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="createExcelRollToRoll(rollsAvailablesSellado, 'SELLADO')"></button>
+            </div>
+        </div>
+    </ng-template>
     <ng-template pTemplate="header" style="font-size: 30px;">
         <tr id="filtros">
             <th></th>

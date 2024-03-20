@@ -420,11 +420,155 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }, 500);
   }
 
+  /** Desplegar y contraer filas de la tabla. */
   deployRows(){
     const thisRef = this;
 
     this.indexTab == 3 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
     this.indexTab == 4 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
+  }
+
+  //EXCEL ROLLO A ROLLO.
+  /** Función que se encarga de crear el archivo de Excel de la producción de empaque. */
+  createExcelRollToRoll(data : any, process : string){
+    if(data.length > 0) {
+      this.load = true;
+      setTimeout(() => { this.loadSheetAndStyles(data, process); }, 2000);
+    } else this.msg.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
+  }
+
+  //Función que cargará la hoja de cálculo y los estilos.
+  loadSheetAndStyles(data : any, process : string){  
+    let title : any = `Reporte `;  
+    process == 'EMPAQUE' ? title += `rollo a rollo Empaque` : title += `bulto a bulto Sellado`;
+    title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.createExcelService.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.createExcelService.creacionExcel(title, workbook);
+    this.load = false;
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5']; 
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:K3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [5,6].forEach(x => ws.getColumn(x).width = 50);
+    [11].forEach(x => ws.getColumn(x).width = 30);
+    [2,3,4].forEach(x => ws.getColumn(x).width = 10);
+    [9].forEach(x => ws.getColumn(x).width = 8);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [7,8,10,].forEach(x => ws.getColumn(x).width = 15);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      'N°',
+      'Rollo',
+      'OT',
+      'Item', 
+      'Cliente',
+      'Referencia', 
+      'Existencias',
+      'Precio',
+      'Unidad', 
+      'Subtotal',
+      'Fecha'
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let formatNumber: Array<number> = [7,8,10];
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K']; 
+
+    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, });
+  }
+
+  //Agregar fila de totales al formato excel.
+  addTotal(info : any, process : string){
+    info.push([
+      '',
+      '',
+      '',
+      '',
+      '',
+      'DISPONIBLES',
+      process == 'EMP' ? this.totalQtyEmpaque : this.totalQtySellado,
+      '',
+      'TOTAL',
+      process == 'EMP' ? this.totalEmpaque : this.totalSellado,
+      ''
+    ]);
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.roll_BagPro,
+        x.ot,
+        x.item,
+        x.client,
+        x.reference,
+        x.realQty,
+        x.price,
+        x.presentation,
+        x.subtotal,
+        x.date,
+      ]);
+    });
+    this.addTotal(info, data[0].process_Id);
+    return info;
   }
   
 }
