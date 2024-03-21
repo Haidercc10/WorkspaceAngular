@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
+import { rollsToDelete } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -55,4 +56,6 @@ export class Produccion_ProcesosService {
   putReversionEnvioZeus = (rollos: any[]) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putReversionEnvioZeus`, rollos);
 
   getInfoProductionAvailable = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionAvailable`);
+
+  putStateDeletedRolls = (data : Array<rollsToDelete>) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateDeletedRolls`, data);
 }

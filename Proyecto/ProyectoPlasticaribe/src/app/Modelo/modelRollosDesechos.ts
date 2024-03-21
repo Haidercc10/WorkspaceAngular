@@ -1,4 +1,5 @@
 export interface modelRollosDesechos {
+  Rollo_Codigo? : number;
   Rollo_OT : number;
   Rollo_Cliente : string;
   Prod_Id : number;
@@ -21,4 +22,8 @@ export interface modelRollosDesechos {
   Proceso_Id: string;
   Turno_Id : string;
   Estado_Id : number;
+  Rollo_FechaEliminacion : any;
+  Rollo_HoraEliminacion : string;
+  Rollo_Observacion : string;
+  Falla_Id : string;
 }

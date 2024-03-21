@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { modelRollosDesechos } from 'src/app/Modelo/modelRollosDesechos';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -29,6 +30,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   @ViewChild('dt2') dt2: Table | undefined;
   modalFails : boolean = false;
   deletedRolls : Array<rollsToUpdate> = [];
+  rollsToDelete : Array<rollsToDelete> = []; 
+  arrayDiscardRolls : Array<modelRollosDesechos> = [];
 
   constructor(private AppComponent : AppComponent,
     private frmBld : FormBuilder,
@@ -103,16 +106,36 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
      data.forEach(x => {
       if(!this.rolls.map(z => z.numeroRollo_BagPro).includes(x.numeroRollo_BagPro)) {
         this.rolls.push({
-          'id' : x.id,
-          'ot' : x.ot,
-          'numeroRollo_BagPro' : x.numeroRollo_BagPro,
-          'prod_Id' : x.prod_Id,
-          'prod_Nombre' : x.prod_Nombre,
-          'cantidad' : x.cantidad,
-          'peso_Neto' : x.peso_Neto,
-          'presentacion' : x.presentacion,
-          'fecha' : x.fecha,
-          'proceso_Nombre' : x.proceso_Nombre,
+          'id': x.id,
+          'ot': x.ot,
+          'cli_Id': x.cli_Id,
+          'cli_Nombre': x.cli_Nombre,
+          'prod_Id': x.prod_Id,
+          'prod_Nombre': x.prod_Nombre,
+          'cantidad_Pedida': x.cantidad_Pedida,
+          'numero_Rollo': x.numero_Rollo,
+          'numeroRollo_BagPro': x.numeroRollo_BagPro,
+          'prod_Ancho': x.prod_Ancho,
+          'prod_Fuelle': x.prod_Fuelle,
+          'prod_Largo': x.prod_Largo,
+          'tara_Cono': x.tara_Cono,
+          'cono_Id': x.cono_Id,
+          'material_Id': x.material_Id,
+          'material_Nombre': x.material_Nombre,
+          'prod_Calibre': x.prod_Calibre,
+          'fecha': x.fecha,
+          'hora': x.hora,
+          'maquina': x.maquina,
+          'usua_Nombre': x.usua_Nombre,
+          'proceso_Id': x.proceso_Id,
+          'turno_Id': x.turno_Id,
+          'estado_Rollo': x.estado_Rollo,
+          'estado_Nombre': x.estado_Nombre,
+          'peso_Bruto': x.peso_Bruto,
+          'peso_Neto': x.peso_Neto,
+          'cantidad': x.cantidad,
+          'presentacion': x.presentacion,
+          'proceso_Nombre': x.proceso_Nombre,
           'falla' : falla,
           'observacion' : observacion
         });
@@ -165,15 +188,51 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     }, [])
   }
 
-  loadDeletedRollsToUpdate(roll : any){
+  //Función que cargará los rollos a los que se cambiará el estado a eliminado.
+  loadRollsToDelete(roll : any){
+    this.rollsToDelete = [];
     roll.forEach(x => {
-      this.deletedRolls.push({
+      this.rollsToDelete.push({
         'roll': x.numeroRollo_BagPro,
-        'fail': x.falla,
-        'observation': x.observacion,
+        'process' : x.proceso_Id,
       });
     });
-    console.log(this.deletedRolls)
+  }
+
+  //Función que va a cargar los rollos que se van a crear en la tabla rollos desechos.
+  loadDiscardRolls(roll : any){
+    this.arrayDiscardRolls = [];
+    roll.forEach(x => {
+      this.arrayDiscardRolls.push({
+        'Rollo_Codigo' : 0,
+        'Rollo_OT' : x.ot,
+        'Rollo_Cliente': x.cli_Nombre,
+        'Prod_Id' : x.prod_Id,
+        'Rollo_TotalPedidoOT' : x.cantidad_Pedida,
+        'Rollo_Id' : x.numeroRollo_BagPro,
+        'Rollo_Ancho' : x.prod_Ancho,
+        'Rollo_Largo' : x.prod_Largo,
+        'Rollo_Fuelle' : x.prod_Fuelle,
+        'UndMed_Id' : x.presentacion,
+        'Rollo_PesoBruto' : x.peso_Bruto,
+        'Rollo_PesoNeto' : x.peso_Neto,
+        'Rollo_Tara' : x.tara_Cono,
+        'Cono_Id' : x.cono_Id,
+        'Material_Id' : x.material_Id,
+        'Rollo_Calibre' : x.prod_Calibre,
+        'Rollo_FechaIngreso' : x.fecha,
+        'Rollo_Hora' : x.hora,
+        'Rollo_Maquina' : x.maquina,
+        'Rollo_Operario' : x.usua_Nombre,
+        'Proceso_Id' : x.proceso_Id,
+        'Turno_Id' : x.turno_Id,
+        'Estado_Id' : 22,
+        'Rollo_FechaEliminacion' : moment().format('YYYY-MM-DD'),
+        'Rollo_HoraEliminacion' : moment().format('HH:mm:ss'),
+        'Rollo_Observacion' : x.observacion,
+        'Falla_Id' : x.falla
+      })
+    });
   }
 
   //Cantidad total consolidada por item
@@ -203,30 +262,36 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   //Función para eliminar los rollos seleccionados.
   deleteRolls(){
     if(this.form.valid) {
-      this.loadDeletedRollsToUpdate(this.rollsInsert);
-      let count : number = 0;
+      this.loadRollsToDelete(this.rollsInsert);
+      this.loadDiscardRolls(this.rollsInsert)
       this.onReject('delete');
       this.load = true;
 
-      this.rollsInsert.forEach(x => {
-        this.svcProdProcess.Delete(x.id).subscribe(resp => {
-          count++;
-          if(count == this.rollsInsert.length) this.updateRolls();
-        }, error => {
-          this.load = false;
-          this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error eliminando rollos de Producción!`);
-        });
+      this.svcProdProcess.putStateDeletedRolls(this.rollsToDelete).subscribe(data => { this.createDiscardRolls(); }, error => {
+         this.svcMsjs.mensajeError(`Error`, `No fue posible eliminar los rollos!`);
+         this.load = false;
       });
     } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe justificar el motivo de eliminación de rollos/bultos.`);
   }
 
-  updateRolls(){
-    this.svDiscardRolls.putFailRolls(this.deletedRolls).subscribe(data => { this.confirmDeleteMessage(false) }, error => { this.confirmDeleteMessage(true); });
+  //Función que creará los rollos eliminados en la tabla rollos desechos.
+  createDiscardRolls(){
+    let count : number = 0;
+    this.arrayDiscardRolls.forEach(x => {
+      
+      this.svDiscardRolls.Post(x).subscribe(data => {
+        count++;
+        if(count == this.rollsInsert.length) this.confirmDeleteMessage(false);
+      }, error => {
+        this.confirmDeleteMessage(true);
+        this.load = false;
+      });
+    })
   }
 
   //Función para mostrar mensaje de confirmación de eliminación de rollos.
   confirmDeleteMessage(isError : boolean) {
-    if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error actualizando la falla de los rollos!`)
+    if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido eliminando los rollos seleccionados!`)
     else {
       this.svcMsjs.mensajeConfirmacion(`Rollos eliminados exitosamente!`);
       setTimeout(() => { this.clearAll(); }, 1000);
@@ -255,6 +320,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.load = false;
     this.loadRankDates();
     this.deletedRolls = [];
+    this.arrayDiscardRolls = [];
+    this.rollsToDelete = [];
     //this.msjAuthorizeDeleteRolls();
   }
 
@@ -268,4 +335,9 @@ export interface rollsToUpdate {
   roll : number;
   fail : number;
   observation? : string;
+}
+
+export interface rollsToDelete {
+  roll : number;
+  process : string;
 }

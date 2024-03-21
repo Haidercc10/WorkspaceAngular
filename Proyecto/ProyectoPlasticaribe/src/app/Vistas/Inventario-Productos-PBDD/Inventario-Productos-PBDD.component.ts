@@ -432,8 +432,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   /** Función que se encarga de crear el archivo de Excel de la producción de empaque. */
   createExcelRollToRoll(data : any, process : string){
     if(data.length > 0) {
-      this.load = true;
-      setTimeout(() => { this.loadSheetAndStyles(data, process); }, 2000);
+      setTimeout(() => { this.loadSheetAndStyles(data, process); }, 500);
     } else this.msg.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
   }
 
@@ -450,7 +449,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
     this.addNewSheet(workbook, title, fill, border, font, alignment, data);
     this.createExcelService.creacionExcel(title, workbook);
-    this.load = false;
   }
 
   //Función para agregar una nueva hoja de calculo.
