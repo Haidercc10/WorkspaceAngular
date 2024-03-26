@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Formato_Facturas_Ventas',
@@ -27,7 +31,7 @@ export class Formato_Facturas_VentasComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // this.consultarInformacion();
+    //this.consultarInformacion();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -35,7 +39,7 @@ export class Formato_Facturas_VentasComponent implements OnInit {
 
   consultarInformacion() {
     let facturas = [
-      {fac : 'RS-970191097', trm : 4099.20, valor : 29207.88 , fecha : '2023-09-01' },
+      /*{fac : 'RS-970191097', trm : 4099.20, valor : 29207.88 , fecha : '2023-09-01' },
       {fac : 'RS-970190079', trm : 4099.20, valor : 37843.45 , fecha : '2023-09-05' },
       {fac : 'RS-970192243', trm : 3929.28, valor : 32261.79 , fecha : '2023-09-18' },
       {fac : 'RS-970195770', trm : 4187.01, valor : 30563.06 , fecha : '2023-10-04' },
@@ -47,7 +51,10 @@ export class Formato_Facturas_VentasComponent implements OnInit {
       {fac : 'RS-970206192', trm : 3980.67, valor : 4239.77  , fecha : '2023-11-30' },
       {fac : 'RS-970207328', trm : 4023.21, valor : 34013.44 , fecha : '2023-12-06' },
       {fac : 'RS-970207872', trm : 3982.50, valor : 309.48   , fecha : '2023-12-12' },
-      {fac : 'RS-970207958', trm : 3990.88, valor : 1811.51  , fecha : '2023-12-13' },
+      {fac : 'RS-970207958', trm : 3990.88, valor : 1811.51  , fecha : '2023-12-13' },*/
+      {fac : 'RS 970129878', trm : 4484.74, valor : 35606.47 , fecha : '2022-10-05' },
+      {fac : 'RS 970150374', trm : 4548.5,  valor : 36040    , fecha : '2023-01-28' },
+      {fac : 'RS 970150617', trm : 4548.5,  valor : 36040    , fecha : '2023-01-30' },
     ];
 
     this.cargando = true;
@@ -175,10 +182,11 @@ export class Formato_Facturas_VentasComponent implements OnInit {
       let cientos = Math.floor(num / divisor);
       let resto = num - (cientos * divisor);
       let letras = '';
-
-      if (cientos > 0)
-        if (cientos > 1) letras = Centenas(cientos) + ' ' + strPlural;
-        else letras = strSingular;
+      
+      //if (cientos > 0) 
+        if(cientos == 1) letras = strSingular
+        else if (cientos > 1) letras = Centenas(cientos) + ' ' + strPlural;
+        //else letras = strPlural;
 
       if (resto > 0) letras += '';
 
@@ -189,8 +197,8 @@ export class Formato_Facturas_VentasComponent implements OnInit {
       let divisor = 1000;
       let cientos = Math.floor(num / divisor);
       let resto = num - (cientos * divisor);
-
-      let strMiles = Seccion(num, divisor, 'UN MIL', 'MIL');
+      
+      let strMiles = Seccion(num, divisor, 'MIL', 'MIL');
       let strCentenas = Centenas(resto);
 
       if (strMiles == '') return strCentenas;

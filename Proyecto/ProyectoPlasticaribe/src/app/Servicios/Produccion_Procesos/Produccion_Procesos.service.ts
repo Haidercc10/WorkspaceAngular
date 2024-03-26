@@ -58,4 +58,6 @@ export class Produccion_ProcesosService {
   getInfoProductionAvailable = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionAvailable`);
 
   putStateDeletedRolls = (data : Array<rollsToDelete>) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateDeletedRolls`, data);
+
+  getInfoItemsAvailables = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailables/${item}`);
 }

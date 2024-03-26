@@ -29,7 +29,6 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
   modalFails : boolean = false;
-  deletedRolls : Array<rollsToUpdate> = [];
   rollsToDelete : Array<rollsToDelete> = []; 
   arrayDiscardRolls : Array<modelRollosDesechos> = [];
 
@@ -319,7 +318,6 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.consolidatedInfo = [];
     this.load = false;
     this.loadRankDates();
-    this.deletedRolls = [];
     this.arrayDiscardRolls = [];
     this.rollsToDelete = [];
     //this.msjAuthorizeDeleteRolls();
@@ -329,12 +327,6 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   onReject = (key : any) => this.svcMsg.clear(key);
 
   msjAuthorizeDeleteRolls = () => this.form.patchValue({ 'Observacion' : 'ELIMINACIÓN DE BULTOS/ROLLOS AUTORIZADA' })
-}
-
-export interface rollsToUpdate {
-  roll : number;
-  fail : number;
-  observation? : string;
 }
 
 export interface rollsToDelete {

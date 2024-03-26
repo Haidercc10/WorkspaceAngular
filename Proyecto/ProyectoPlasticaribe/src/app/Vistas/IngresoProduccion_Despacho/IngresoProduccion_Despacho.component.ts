@@ -150,8 +150,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
             this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
           });
         } else this.msj.mensajeAdvertencia(`¡No puede Ingresar Rollos/Bultos provenientes del procesos 'WIKETIADO'!`);
-      }, () => this.lookingForDataInBagpro(production));
-      //}, () => this.warningNotFound(production));
+      //}, () => this.lookingForDataInBagpro(production));
+      }, () => this.warningNotFound(production));
     }
   }
 

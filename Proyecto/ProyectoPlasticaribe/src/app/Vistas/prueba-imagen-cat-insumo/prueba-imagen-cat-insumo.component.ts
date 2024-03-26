@@ -1,4 +1,5 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Formato_Facturas_VentasComponent } from '../Formato_Facturas_Ventas/Formato_Facturas_Ventas.component';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -20,7 +21,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   constructor() {
   }
 
+  ngAfterViewInit(): void {
+    this.load = true;
+  }
+
   ngOnInit(): void {
+    //this.formatoFacturas.consultarInformacion();
   }
 
 }

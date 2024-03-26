@@ -43,6 +43,8 @@ export class Orden_FacturacionComponent implements OnInit {
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];
   qtyToSend: number = 0;
+  pallets : Array<any> = [];
+  copyPallets : Array<any> = [];
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -614,6 +616,30 @@ export class Orden_FacturacionComponent implements OnInit {
     }
   }
 
+  getProducts2(){
+    if(this.selectedProductSaleOrder != null) {
+      this.load = true;
+      let item : any = this.selectedProductSaleOrder.id_Producto;
+      
+      this.productionProcessService.getInfoItemsAvailables(item).subscribe(data => { 
+        this.loadPallets(data);
+        this.copyPallets = data;
+       }, error => {
+        this.msj.mensajeError(`Error`, `No se encontraron rollos disponibles del item ${item}`);
+        this.load = false;
+      });
+    }
+  }
+
+  loadPallets(data : any){
+    this.pallets = data.reduce((a, b) => {
+      if(!a.map(x => x.pallet).includes(b.pallet)) a = [...a, b]
+        console.log(a);
+        return a;
+    }, []);
+    this.load = false;
+  }
+
 }
 
 interface production {
@@ -628,3 +654,4 @@ interface production {
   cuontProduction?: number;
   presentation: string;
 }
+

@@ -102,8 +102,8 @@
     [scrollable]="true"
     scrollHeight="50rem"
     dataKey="id_Producto"
-    (onRowSelect)="this.getProducts()"
-    (onRowUnselect)="this.getProducts()">
+    (onRowSelect)="this.getProducts2()"
+    (onRowUnselect)="this.getProducts2()">
     <ng-template pTemplate="header">
       <tr>
         <th>Pedido</th>
@@ -174,8 +174,84 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos Disponibles.</h4>
   </div>
 
+  <p-table 
+  [value]="pallets"
+  dataKey="pallet" 
+  [tableStyle]="{ 'min-width': '60rem' }"
+  styleClass="p-datatable-gridlines p-datatable-sm"
+   >
+   <!--Encabezado-->
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 5rem"></th>
+            <th pSortableColumn="">#</th>
+            <th pSortableColumn="">Pallet <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Id Cliente <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Cliente <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Item <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Referencia <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Cantidad <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon></th>
+        </tr>
+    </ng-template>
+    <!--Cuerpo-->
+    <ng-template pTemplate="body" let-product let-rowIndex="rowIndex" let-expanded="expanded">
+        <tr>
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="product" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+            </td>
+            <td>{{ rowIndex + 1 }}</td>
+            <td>{{ product.pallet }}</td>
+            <td>{{ product.client_Id }}</td>
+            <td>{{ product.client }}</td>
+            <td>{{ product.item }}</td>
+            <td>{{ product.reference }}</td>
+            <td>{{ product.qty }}</td>
+            <td>{{ product.presentation }}</td>
+        </tr>
+    </ng-template>
+    <!--Tabla expandida-->
+    <ng-template pTemplate="rowexpansion" let-product>
+        <tr>
+            <td colspan="9">
+                <div class="p-3">
+                    <p-table [value]="product.orders" dataKey="id">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="id">#</th>
+                                <th pSortableColumn="customer">Numero Rollo <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="date">Item <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="date">Referencia <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="date">Cantidad <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="amount">Presentación <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="status">Proceso <p-sortIcon field=""></p-sortIcon></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-order>
+                            <tr>
+                                <td>{{ order }}</td>
+                                <td>{{ order }}</td>
+                                <td>{{ order }}</td>
+                                <td>{{ order }}</td>
+                                <td>{{ order }}</td>
+                                <td>{{ order }}</td>
+                                <td>{{ order }}</td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="7">No hay rollos disponibles</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
   <!--Rollos disponibles-->
-  <p-table
+  <!--<p-table
     #tableProduction
     [value]="production"
     styleClass="p-datatable-gridlines p-datatable-sm"
@@ -273,7 +349,7 @@
         <td><p-skeleton></p-skeleton></td>
       </tr>
     </ng-template>
-  </p-table>
+  </p-table>-->
 
   <div class="my-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Seleccionados.</h4>

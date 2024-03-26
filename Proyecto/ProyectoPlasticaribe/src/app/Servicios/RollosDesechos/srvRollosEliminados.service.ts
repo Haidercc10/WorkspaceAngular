@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelRollosDesechos } from 'src/app/Modelo/modelRollosDesechos';
-import { rollsToUpdate } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -42,8 +41,6 @@ export class SrvRollosEliminadosService {
   getRollosxFechasxItemxProceso = (fecha1: any, fecha2 : any, item: any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxItemxProceso/${fecha1}/${fecha2}/${item}/${proceso}`);
 
   getRollosxFechasxProceso = (fecha1: any, fecha2 : any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxProceso/${fecha1}/${fecha2}/${proceso}`);
-
-  putFailRolls = (data : Array<rollsToUpdate>) => this.http.put(`${this.rutaPlasticaribeAPI}/Rollo_Desecho/putFailRolls`, data);
 
   getRemovedRolls = (fecha1: any, fecha2 : any, ruta : string):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/getRemovedRolls/${fecha1}/${fecha2}${ruta}`);
 
