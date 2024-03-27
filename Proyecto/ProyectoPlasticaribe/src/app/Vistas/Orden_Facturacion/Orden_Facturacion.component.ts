@@ -651,38 +651,42 @@ export class Orden_FacturacionComponent implements OnInit {
 
   //Función para seleccionar todos los pallets
   selectAllPallets() {
-    this.load = true;
+    this.loading = true;
     this.selectedPallets = this.pallets.concat(this.pallets);
     this.pallets = [];
-    setTimeout(() => { this.load = false }, 5);
+    this.loadInfoConsolidate();
+    setTimeout(() => { this.loading = false }, 5);
   }
 
   //Función para deseleccionar todos los pallets
   deselectAllPallets() {
-    this.load = true;
+    this.loading = true;
     this.pallets = this.pallets.concat(this.selectedPallets);
     this.selectedPallets = [];
-    setTimeout(() => { this.load = false }, 5);
+    this.loadInfoConsolidate();
+    setTimeout(() => { this.loading = false }, 5);
   }
 
   //Funcion para seleccionar un pallet en especifico
   selectPallet(data : any) {
-    this.load = true;
+    this.loading = true;
     let index = this.pallets.findIndex(x => x.pallet == data.pallet);
     this.selectedPallets.push(this.pallets[index]);
     this.pallets.splice(index, 1)
     this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
-    setTimeout(() => { this.load = false }, 5);
+    this.loadInfoConsolidate();
+    setTimeout(() => { this.loading = false }, 5);
   }
 
   //Funcion para deseleccionar un pallet en especifico
   deselectPallet(data : any) {
-    this.load = true;
+    this.loading = true;
     let index = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
     this.pallets.push(this.selectedPallets[index]);
     this.selectedPallets.splice(index, 1);
     this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
-    setTimeout(() => { this.load = false }, 5);
+    this.loadInfoConsolidate();
+    setTimeout(() => { this.loading = false }, 5);
   }
 
   //Función para seleccionar un rollo en especifico
@@ -701,7 +705,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.pallets[index].rolls.splice(i, 1);
     if (this.pallets[index].rolls.length == 0) this.pallets.splice(index, 1);
     this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
-    console.log(this.t2)
+    this.loadInfoConsolidate();
     setTimeout(() => { this.loading = false }, 5);
   } 
 
@@ -721,12 +725,13 @@ export class Orden_FacturacionComponent implements OnInit {
     this.selectedPallets[index].rolls.splice(i, 1);
     if (this.selectedPallets[index].rolls.length == 0) this.selectedPallets.splice(index, 1);
     this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
-    console.log(this.t1)
+    this.loadInfoConsolidate();
     setTimeout(() => { this.loading = false }, 5);
   } 
 
   //Función para cargar la información del rollo seleccionado.
   loadRoll(data : any){
+    let pedido : any = this.selectedProductSaleOrder.consecutivo;  
     return {
       'pallet' : data.pallet,
       'client_Id' : data.client_Id,
@@ -735,6 +740,7 @@ export class Orden_FacturacionComponent implements OnInit {
       'reference' : data.reference,
       'qty' : data.qty,
       'presentation' : data.presentation,
+      'saleOrder' : pedido,
       'rolls' : []
     }
   }
@@ -742,14 +748,31 @@ export class Orden_FacturacionComponent implements OnInit {
   loadInfoConsolidate(){
     this.infoConsolidate = this.selectedPallets.reduce((a, b) => {
       let item = a.find(x => x.item == b.item);
-      if(item == undefined) {
-        a.push(b);
-      } else {
-        item.qty += b.qty;
-      }
+      if(item == undefined) a.push(b);
       return a;
-    });
+    }, []);
   }
+
+  qtyConsolidateForItem(item : any) {
+    let total : number = 0
+    this.selectedPallets.forEach(x => {
+      x.rolls.forEach(y => {
+        if(y.item == item) total += y.qty;
+      });
+    });
+    return total;
+  }
+
+  qtyRollsForItem(item : any) {
+    let total : number = 0
+    this.selectedPallets.forEach(x => {
+      x.rolls.forEach(y => {
+        if(y.item == item) total++ ;
+      });
+    });
+    return total;
+  }
+  
 }
 
 interface production {

@@ -134,7 +134,7 @@
 
   <!--Consolidado-->
   <p-table
-    [value]="consolidatedProduction"
+    [value]="infoConsolidate"
     styleClass="p-datatable-gridlines p-datatable-sm"
     responsiveLayout="scroll"
     [scrollable]="true"
@@ -157,15 +157,15 @@
         <td>{{data.saleOrder}}</td>
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
-        <td>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</td>
-        <td>{{totalCountProductionByProduct(data.item) | number : '1.2-2'}}</td>
+        <td>{{qtyConsolidateForItem(data.item) | number : '1.2-2'}}</td>
+        <td>{{qtyRollsForItem(data.item) | number : '1.2-2'}}</td>
         <td>{{data.presentation}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="5">Total</td>
-        <td colspan="2">{{productionSelected.length | number : '1.2-2'}}</td>
+        <td colspan="2">{{0 | number : '1.2-2'}}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -182,7 +182,6 @@
     dataKey="pallet" 
     [tableStyle]="{ 'min-width': '60rem' }"
     styleClass="p-datatable-gridlines p-datatable-sm"
-    
     [loading]="loading">
     <!--Header-->
     <ng-template pTemplate="header">
@@ -373,7 +372,6 @@
     dataKey="pallet" 
     [tableStyle]="{ 'min-width': '60rem' }"
     styleClass="p-datatable-gridlines p-datatable-sm"
-    
     [loading]="loading"
     >
     <!--Header-->
