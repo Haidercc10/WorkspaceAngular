@@ -174,15 +174,20 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos Disponibles.</h4>
   </div>
 
+
+  <!--Pallets-->
   <p-table 
-  [value]="pallets"
-  dataKey="pallet" 
-  [tableStyle]="{ 'min-width': '60rem' }"
-  styleClass="p-datatable-gridlines p-datatable-sm"
-   >
-   <!--Encabezado-->
+    #t1
+    [value]="pallets"
+    dataKey="pallet" 
+    [tableStyle]="{ 'min-width': '60rem' }"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    
+    [loading]="loading">
+    <!--Header-->
     <ng-template pTemplate="header">
         <tr>
+            <th class="text-center" style="width: 4rem"><p-checkbox (click)="selectAllPallets()"></p-checkbox></th>
             <th style="width: 5rem"></th>
             <th pSortableColumn="">#</th>
             <th pSortableColumn="">Pallet <p-sortIcon field=""></p-sortIcon></th>
@@ -194,53 +199,58 @@
             <th pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon></th>
         </tr>
     </ng-template>
-    <!--Cuerpo-->
-    <ng-template pTemplate="body" let-product let-rowIndex="rowIndex" let-expanded="expanded">
+    <!--Body-->
+    <ng-template pTemplate="body" let-pallet let-rowIndex="rowIndex" let-expanded="expanded">
         <tr>
+            <td class="text-center"><p-checkbox (click)="selectPallet(pallet)"></p-checkbox></td>
             <td>
-                <button type="button" pButton pRipple [pRowToggler]="product" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                <button type="button" pButton pRipple [pRowToggler]="pallet" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
             </td>
             <td>{{ rowIndex + 1 }}</td>
-            <td>{{ product.pallet }}</td>
-            <td>{{ product.client_Id }}</td>
-            <td>{{ product.client }}</td>
-            <td>{{ product.item }}</td>
-            <td>{{ product.reference }}</td>
-            <td>{{ product.qty }}</td>
-            <td>{{ product.presentation }}</td>
+            <td>{{ pallet.pallet }}</td>
+            <td>{{ pallet.client_Id }}</td>
+            <td>{{ pallet.client }}</td>
+            <td>{{ pallet.item }}</td>
+            <td>{{ pallet.reference }}</td>
+            <td>{{ qtyPallets(pallet.pallet, rowIndex) | number : '1.2-2' }}</td>
+            <td>{{ pallet.presentation }}</td>
         </tr>
     </ng-template>
-    <!--Tabla expandida-->
-    <ng-template pTemplate="rowexpansion" let-product>
+    <!--Expansion-->
+    <ng-template pTemplate="rowexpansion" let-pallet>
         <tr>
-            <td colspan="9">
+            <td colspan="10">
                 <div class="p-3">
-                    <p-table [value]="product.orders" dataKey="id">
+                    <p-table [value]="pallet.rolls" dataKey="roll_BagPro">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th pSortableColumn="id">#</th>
-                                <th pSortableColumn="customer">Numero Rollo <p-sortIcon field=""></p-sortIcon></th>
-                                <th pSortableColumn="date">Item <p-sortIcon field=""></p-sortIcon></th>
-                                <th pSortableColumn="date">Referencia <p-sortIcon field=""></p-sortIcon></th>
-                                <th pSortableColumn="date">Cantidad <p-sortIcon field=""></p-sortIcon></th>
-                                <th pSortableColumn="amount">Presentación <p-sortIcon field=""></p-sortIcon></th>
-                                <th pSortableColumn="status">Proceso <p-sortIcon field=""></p-sortIcon></th>
+                                <th></th>
+                                <th pSortableColumn="">#</th>
+                                <th pSortableColumn="">Numero Rollo <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Item <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Referencia <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Cantidad <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Proceso <p-sortIcon field=""></p-sortIcon></th>
                             </tr>
                         </ng-template>
-                        <ng-template pTemplate="body" let-order>
-                            <tr>
-                                <td>{{ order }}</td>
-                                <td>{{ order }}</td>
-                                <td>{{ order }}</td>
-                                <td>{{ order }}</td>
-                                <td>{{ order }}</td>
-                                <td>{{ order }}</td>
-                                <td>{{ order }}</td>
+                        <ng-template pTemplate="body" let-roll let-rowIndex="rowIndex">
+                            <tr>  
+                                <td class="text-center">
+                                  <p-checkbox (click)="selectRoll(roll, rowIndex)" [binary]="true" inputId="binary"></p-checkbox>
+                                </td>
+                                <td>{{ rowIndex + 1 }}</td>
+                                <td>{{ roll.roll_BagPro }}</td>
+                                <td>{{ roll.item }}</td>
+                                <td>{{ roll.reference }}</td>
+                                <td>{{ roll.qty | number : '1.2-2' }}</td>
+                                <td>{{ roll.presentation }}</td>
+                                <td>{{ roll.process }}</td>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="emptymessage">
                             <tr>
-                                <td colspan="7">No hay rollos disponibles</td>
+                                <td colspan="8">No hay rollos disponibles</td>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -248,7 +258,8 @@
             </td>
         </tr>
     </ng-template>
-</p-table>
+  </p-table>
+
 
   <!--Rollos disponibles-->
   <!--<p-table
@@ -355,8 +366,94 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Seleccionados.</h4>
   </div>
 
+  <!--Pallets seleccionados-->
+  <p-table 
+    #t2
+    [value]="selectedPallets"
+    dataKey="pallet" 
+    [tableStyle]="{ 'min-width': '60rem' }"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    
+    [loading]="loading"
+    >
+    <!--Header-->
+    <ng-template pTemplate="header">
+        <tr>
+            <th class="text-center" style="width: 4rem"><p-checkbox (click)="deselectAllPallets()"></p-checkbox></th>
+            <th style="width: 5rem"></th>
+            <th pSortableColumn="">#</th>
+            <th pSortableColumn="">Pallet <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Id Cliente <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Cliente <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Item <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Referencia <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Cantidad <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon></th>
+        </tr>
+    </ng-template>
+    <!--Body-->
+    <ng-template pTemplate="body" let-pallet let-rowIndex="rowIndex" let-expanded="expanded">
+        <tr>
+            <td class="text-center"><p-checkbox (click)="deselectPallet(pallet)"></p-checkbox></td>
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="pallet" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+            </td>
+            <td>{{ rowIndex + 1 }}</td>
+            <td>{{ pallet.pallet }}</td>
+            <td>{{ pallet.client_Id }}</td>
+            <td>{{ pallet.client }}</td>
+            <td>{{ pallet.item }}</td>
+            <td>{{ pallet.reference }}</td>
+            <td>{{ qtySelectedPallets(pallet.pallet, rowIndex) | number : '1.2-2' }}</td>
+            <td>{{ pallet.presentation }}</td>
+        </tr>
+    </ng-template>
+    <!--Expansion-->
+    <ng-template pTemplate="rowexpansion" let-pallet>
+        <tr>
+            <td colspan="10">
+                <div class="p-3">
+                    <p-table [value]="pallet.rolls" dataKey="roll_BagPro">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th class="text-center"></th>
+                                <th pSortableColumn="">#</th>
+                                <th pSortableColumn="">Numero Rollo <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Item <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Referencia <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Cantidad <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon></th>
+                                <th pSortableColumn="">Proceso <p-sortIcon field=""></p-sortIcon></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-roll let-rowIndex="rowIndex">
+                            <tr>  
+                                <td class="text-center">
+                                  <p-checkbox (click)="deselectRoll(roll, rowIndex)" [binary]="true" inputId="binary"></p-checkbox>
+                                </td>
+                                <td>{{ rowIndex + 1 }}</td>
+                                <td>{{ roll.roll_BagPro }}</td>
+                                <td>{{ roll.item }}</td>
+                                <td>{{ roll.reference }}</td>
+                                <td>{{ roll.qty | number : '1.2-2'}}</td>
+                                <td>{{ roll.presentation }}</td>
+                                <td>{{ roll.process }}</td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="8">No hay rollos disponibles</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+  </p-table>
+
   <!--Rollos seleccionados-->
-  <p-table
+  <!--<p-table
     #tableProductionSelected
     [value]="productionSelected"
     styleClass="p-datatable-gridlines p-datatable-sm"
@@ -424,7 +521,7 @@
         <td colspan="6"></td>
       </tr>
     </ng-template>
-  </p-table>
+  </p-table>-->
 
   <p-table
     [value]="production"

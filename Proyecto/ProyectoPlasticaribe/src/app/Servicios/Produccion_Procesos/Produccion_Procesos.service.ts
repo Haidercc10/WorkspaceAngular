@@ -59,5 +59,7 @@ export class Produccion_ProcesosService {
 
   putStateDeletedRolls = (data : Array<rollsToDelete>) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateDeletedRolls`, data);
 
-  getInfoItemsAvailables = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailables/${item}`);
+  getInfoItemsAvailablesInPallet = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailablesInPallet/${item}`);
+
+  getInfoItemsAvailablesOutPallet = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailablesOutPallet/${item}`);
 }

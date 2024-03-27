@@ -1,6 +1,9 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { co } from '@fullcalendar/core/internal-common';
+import { log } from 'console';
 import moment from 'moment';
+import { TreeNode } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
 import { modelOrdenFacturacion } from 'src/app/Modelo/modelOrdenFacturacion';
@@ -45,6 +48,11 @@ export class Orden_FacturacionComponent implements OnInit {
   qtyToSend: number = 0;
   pallets : Array<any> = [];
   copyPallets : Array<any> = [];
+  selectedPallets : Array<any> = [];
+  loading : boolean = false;
+  @ViewChild('t1') t1: Table | undefined;
+  @ViewChild('t2') t2: Table | undefined;
+  infoConsolidate : Array<any> = [];
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -616,14 +624,20 @@ export class Orden_FacturacionComponent implements OnInit {
     }
   }
 
+  //ORDEN DE FACTURACIÓN POR PALLETS
   getProducts2(){
     if(this.selectedProductSaleOrder != null) {
-      this.load = true;
+      this.loading = true;
       let item : any = this.selectedProductSaleOrder.id_Producto;
       
-      this.productionProcessService.getInfoItemsAvailables(item).subscribe(data => { 
-        this.loadPallets(data);
-        this.copyPallets = data;
+      this.productionProcessService.getInfoItemsAvailablesOutPallet(item).subscribe(dataOut => { 
+        this.productionProcessService.getInfoItemsAvailablesInPallet(item).subscribe(dataIn => { 
+          this.pallets = dataOut.concat(dataIn);
+          console.log(this.pallets)
+          this.loading = false;
+        }, error => {
+          
+        });
        }, error => {
         this.msj.mensajeError(`Error`, `No se encontraron rollos disponibles del item ${item}`);
         this.load = false;
@@ -631,15 +645,111 @@ export class Orden_FacturacionComponent implements OnInit {
     }
   }
 
-  loadPallets(data : any){
-    this.pallets = data.reduce((a, b) => {
-      if(!a.map(x => x.pallet).includes(b.pallet)) a = [...a, b]
-        console.log(a);
-        return a;
-    }, []);
-    this.load = false;
+  qtyPallets = (pallet : number, index : number) => this.pallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a + b.qty, 0);
+
+  qtySelectedPallets = (pallet : number, index : number) => this.selectedPallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a + b.qty, 0)
+
+  //Función para seleccionar todos los pallets
+  selectAllPallets() {
+    this.load = true;
+    this.selectedPallets = this.pallets.concat(this.pallets);
+    this.pallets = [];
+    setTimeout(() => { this.load = false }, 5);
   }
 
+  //Función para deseleccionar todos los pallets
+  deselectAllPallets() {
+    this.load = true;
+    this.pallets = this.pallets.concat(this.selectedPallets);
+    this.selectedPallets = [];
+    setTimeout(() => { this.load = false }, 5);
+  }
+
+  //Funcion para seleccionar un pallet en especifico
+  selectPallet(data : any) {
+    this.load = true;
+    let index = this.pallets.findIndex(x => x.pallet == data.pallet);
+    this.selectedPallets.push(this.pallets[index]);
+    this.pallets.splice(index, 1)
+    this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    setTimeout(() => { this.load = false }, 5);
+  }
+
+  //Funcion para deseleccionar un pallet en especifico
+  deselectPallet(data : any) {
+    this.load = true;
+    let index = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
+    this.pallets.push(this.selectedPallets[index]);
+    this.selectedPallets.splice(index, 1);
+    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    setTimeout(() => { this.load = false }, 5);
+  }
+
+  //Función para seleccionar un rollo en especifico
+  selectRoll(data : any, i : number) {
+    this.loading = true;
+    let index = this.pallets.findIndex(x => x.pallet == data.pallet);
+    
+    if(this.selectedPallets.find(x => x.pallet == data.pallet) == undefined) {
+      this.selectedPallets.push(this.loadRoll(data));
+      let indice = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
+      this.selectedPallets[indice].rolls.push(data);
+    } else {
+      let indice = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
+      this.selectedPallets[indice].rolls.push(data);
+    }
+    this.pallets[index].rolls.splice(i, 1);
+    if (this.pallets[index].rolls.length == 0) this.pallets.splice(index, 1);
+    this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    console.log(this.t2)
+    setTimeout(() => { this.loading = false }, 5);
+  } 
+
+  //Función para deseleccionar un rollo en especifico
+  deselectRoll(data : any, i : number) {
+    this.loading = true;
+    let index = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
+    
+    if(this.pallets.find(x => x.pallet == data.pallet) == undefined) {
+      this.pallets.push(this.loadRoll(data));
+      let indice = this.pallets.findIndex(x => x.pallet == data.pallet);
+      this.pallets[indice].rolls.push(data);
+    } else {
+      let indice = this.pallets.findIndex(x => x.pallet == data.pallet);
+      this.pallets[indice].rolls.push(data);
+    }
+    this.selectedPallets[index].rolls.splice(i, 1);
+    if (this.selectedPallets[index].rolls.length == 0) this.selectedPallets.splice(index, 1);
+    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    console.log(this.t1)
+    setTimeout(() => { this.loading = false }, 5);
+  } 
+
+  //Función para cargar la información del rollo seleccionado.
+  loadRoll(data : any){
+    return {
+      'pallet' : data.pallet,
+      'client_Id' : data.client_Id,
+      'client' : data.client,
+      'item' : data.item,
+      'reference' : data.reference,
+      'qty' : data.qty,
+      'presentation' : data.presentation,
+      'rolls' : []
+    }
+  }
+
+  loadInfoConsolidate(){
+    this.infoConsolidate = this.selectedPallets.reduce((a, b) => {
+      let item = a.find(x => x.item == b.item);
+      if(item == undefined) {
+        a.push(b);
+      } else {
+        item.qty += b.qty;
+      }
+      return a;
+    });
+  }
 }
 
 interface production {
@@ -654,4 +764,5 @@ interface production {
   cuontProduction?: number;
   presentation: string;
 }
+
 
