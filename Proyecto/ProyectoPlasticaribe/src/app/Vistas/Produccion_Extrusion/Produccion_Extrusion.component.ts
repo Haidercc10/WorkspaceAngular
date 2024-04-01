@@ -429,8 +429,13 @@ export class Produccion_ExtrusionComponent implements OnInit {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {
           if (this.formDatosProduccion.value.maquina > 0) {
-            if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
-            else {
+            if (this.formDatosProduccion.value.pesoNeto > 0) {
+              if(this.formDatosProduccion.value.pesoNeto < 65) this.guardarProduccion();
+              else {
+                this.msj.mensajeAdvertencia(`¡El peso neto no debe ser superior a '65'.`);
+                this.cargando = false;
+              }
+            } else {
               this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
               this.cargando = false;
             }

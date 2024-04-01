@@ -126,7 +126,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
     let preIn: number = parseInt(this.barCode.split('-')[0].replace(`ENTRLL#`, ''));
     let item: number = parseInt(this.barCode.split('-')[1].replace(`ITEM#`, ''));
     this.barCode = preIn.toString();
-    this.detailsPreInService.GetInformactionAboutPreInToSendDesp_ById(preIn, item).subscribe(data => console.log(data), (error: HttpErrorResponse) => {
+    this.detailsPreInService.GetInformactionAboutPreInToSendDesp_ById(preIn, item).subscribe(data => this.updateProductionZeus(data), (error: HttpErrorResponse) => {
       let message: string = error.status == 404 ? `¡No se encontró la información del la Pre Entrega!` : `¡Ocurrió un error al buscar la información de la Pre Entrega!`;
       this.errorMessage(message, error);
     });

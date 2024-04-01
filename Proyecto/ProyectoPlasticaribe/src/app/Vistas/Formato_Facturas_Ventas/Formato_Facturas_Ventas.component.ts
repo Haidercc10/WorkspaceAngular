@@ -51,10 +51,15 @@ export class Formato_Facturas_VentasComponent implements OnInit {
       {fac : 'RS-970206192', trm : 3980.67, valor : 4239.77  , fecha : '2023-11-30' },
       {fac : 'RS-970207328', trm : 4023.21, valor : 34013.44 , fecha : '2023-12-06' },
       {fac : 'RS-970207872', trm : 3982.50, valor : 309.48   , fecha : '2023-12-12' },
-      {fac : 'RS-970207958', trm : 3990.88, valor : 1811.51  , fecha : '2023-12-13' },*/
+      {fac : 'RS-970207958', trm : 3990.88, valor : 1811.51  , fecha : '2023-12-13' },
       {fac : 'RS 970129878', trm : 4484.74, valor : 35606.47 , fecha : '2022-10-05' },
       {fac : 'RS 970150374', trm : 4548.5,  valor : 36040    , fecha : '2023-01-28' },
-      {fac : 'RS 970150617', trm : 4548.5,  valor : 36040    , fecha : '2023-01-30' },
+      {fac : 'RS 970150617', trm : 4548.5,  valor : 36040    , fecha : '2023-01-30' },*/
+      {fac : 'RS-970210731', trm : 3915.43, valor : 21508.50, fecha : '2023-12-26' },
+      {fac : 'RS-970212419', trm : 3934.13, valor : 30325.55, fecha : '2024-01-10' },
+      {fac : 'RS-970215908', trm : 3919.03, valor : 30270.96, fecha : '2024-01-30' },
+      {fac : 'RS-970216496', trm : 3915.56, valor : 30297.79, fecha : '2024-02-01' },
+      {fac : 'RS-970224227', trm : 3908.02, valor : 36798.46, fecha : '2024-03-14' },
     ];
 
     this.cargando = true;

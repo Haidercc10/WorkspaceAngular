@@ -53,6 +53,7 @@ export class Orden_FacturacionComponent implements OnInit {
   @ViewChild('t1') t1: Table | undefined;
   @ViewChild('t2') t2: Table | undefined;
   infoConsolidate : Array<any> = [];
+  selectedQty : number = 0;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -629,11 +630,12 @@ export class Orden_FacturacionComponent implements OnInit {
     if(this.selectedProductSaleOrder != null) {
       this.loading = true;
       let item : any = this.selectedProductSaleOrder.id_Producto;
+      this.pallets = [];
       
       this.productionProcessService.getInfoItemsAvailablesOutPallet(item).subscribe(dataOut => { 
         this.productionProcessService.getInfoItemsAvailablesInPallet(item).subscribe(dataIn => { 
-          this.pallets = dataOut.concat(dataIn);
-          console.log(this.pallets)
+          if(dataOut.concat(dataIn).length > 0) this.loadPallets(dataOut.concat(dataIn));
+          else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron rollos/bultos disponibles del item ${item}`);
           this.loading = false;
         }, error => {
           
@@ -645,6 +647,39 @@ export class Orden_FacturacionComponent implements OnInit {
     }
   }
 
+  //Función para cargar pallets y agregar el numero del pedido a los pallets 
+  loadPallets(data : any){
+    let saleOrder : any = this.selectedProductSaleOrder.consecutivo;
+    data.forEach(d => { d.saleOrder = saleOrder });
+    this.pallets = data;
+    setTimeout(() => { this.referencesForOT(this.pallets) }, 500); 
+  }
+
+  //Función para obtener las diferentes referencias por OT. 
+  referencesForOT(pallets : Array<any>){
+    pallets.forEach(p => {
+      let references = p.rolls.reduce((a, b) => {
+        if(!a.map(x => x.ot).includes(b.ot)) a = [...a, b];
+        return a;
+      }, []);
+      this.changeNameReferences(references, p);
+    });
+  }
+
+  //Función para cambiar el nombre de las referencias dependiendo el numero de la OT. 
+  changeNameReferences(reference : any, pallet : any) {
+    reference.forEach(r => {
+      this.bagproService.GetOrdenDeTrabajo(r.ot).subscribe(dataOT => {
+        if(dataOT.length > 0) {
+          pallet.rolls.filter(x => x.ot == r.ot).forEach(x => { 
+            x.reference = dataOT[0].producto, 
+            pallet.reference = dataOT[0].producto 
+          });
+        } 
+      }, error => console.log(`No se encontró la OT ${r.ot}`))
+    });
+  }
+
   qtyPallets = (pallet : number, index : number) => this.pallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a + b.qty, 0);
 
   qtySelectedPallets = (pallet : number, index : number) => this.selectedPallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a + b.qty, 0)
@@ -652,7 +687,7 @@ export class Orden_FacturacionComponent implements OnInit {
   //Función para seleccionar todos los pallets
   selectAllPallets() {
     this.loading = true;
-    this.selectedPallets = this.pallets.concat(this.pallets);
+    this.selectedPallets = this.selectedPallets.concat(this.pallets);
     this.pallets = [];
     this.loadInfoConsolidate();
     setTimeout(() => { this.loading = false }, 5);
@@ -731,7 +766,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   //Función para cargar la información del rollo seleccionado.
   loadRoll(data : any){
-    let pedido : any = this.selectedProductSaleOrder.consecutivo;  
+    let saleOrder : any = this.selectedProductSaleOrder.consecutivo;  
     return {
       'pallet' : data.pallet,
       'client_Id' : data.client_Id,
@@ -740,7 +775,7 @@ export class Orden_FacturacionComponent implements OnInit {
       'reference' : data.reference,
       'qty' : data.qty,
       'presentation' : data.presentation,
-      'saleOrder' : pedido,
+      'saleOrder' : saleOrder,
       'rolls' : []
     }
   }
@@ -771,6 +806,22 @@ export class Orden_FacturacionComponent implements OnInit {
       });
     });
     return total;
+  }
+  
+  totalQtySelectedRolls(){
+    let totalRolls : number = 0
+    this.selectedPallets.forEach(x => {
+      x.rolls.forEach(y => {
+        totalRolls++;
+      });
+    });
+    return totalRolls;
+  }
+
+  selectByFilter(){
+    this.loading = true;
+    
+    setTimeout(() => { this.loading = false }, 5);
   }
   
 }

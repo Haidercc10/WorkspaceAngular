@@ -18,7 +18,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   storage_Name: string | undefined;
   validateRole: number | undefined;
 
-  constructor() {
+  constructor(private formatoFacturas : Formato_Facturas_VentasComponent) {
   }
 
   ngAfterViewInit(): void {
