@@ -385,6 +385,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.rollosPesados = [];
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
       this.rollosPesados = data;
+      this.rollosPesados.sort((a, b) => b.item - a.item);
       this.cargando = false;
     }, () => this.cargando = false);
   }
@@ -406,8 +407,14 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {
           if (this.formDatosProduccion.value.maquina > 0) {
-            if (this.formDatosProduccion.value.pesoNeto > 1) this.guardarProduccion();
-            else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!`);
+            if (this.formDatosProduccion.value.pesoNeto > 1) {
+              if (this.formDatosProduccion.value.proceso == 'EMP') {
+                if (this.formDatosProduccion.value.pesoNeto <= 65) this.guardarProduccion();
+                else this.warinigMessage(`¡El peso neto debe ser menor a '65' en el proceso de EMPAQUE!`); 
+              } else {
+                this.guardarProduccion();
+              } 
+            } else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!`);
           } else this.warinigMessage(`¡La maquina no puede ser cero (0)!`);
         } else this.warinigMessage(`¡Todos los campos deben estar diligenciados!`);
       } else this.warinigMessage(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
@@ -463,9 +470,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           maquina: res.maquina,
           operario: res.operario1_Id,
           cono: res.cono_Id,
-          mostratDatosProducto: mostratDatosProducto
+          mostratDatosProducto: mostratDatosProducto,  
         });
-        this.buscarRollosPesados();
+        //this.buscarRollosPesados();
+        this.buscraOrdenTrabajo();
         this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
       }, 1000);
     }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
@@ -489,7 +497,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   searchDataTagCreated(reel: number) {
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
-      let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : (this.formDatosProduccion.value.daipita).trim();
+      let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : this.formDatosProduccion.value.daipita;
       res.forEach(data => {
         let dataTagProduction: modelTagProduction = {
           client: data.clienteNombre.trim(),

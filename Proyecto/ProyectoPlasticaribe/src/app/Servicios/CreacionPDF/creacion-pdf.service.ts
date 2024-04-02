@@ -491,7 +491,7 @@ export class TagProduction_2 {
   }
 
   private sizeBarcode(dataTag: modelTagProduction): number {
-    console.clear();
+    //console.clear();
     let sizeClient: number = dataTag.client.length;
     let sizeReference: number = dataTag.reference.length;
     let size: number = 90;
