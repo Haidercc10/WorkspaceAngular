@@ -25,7 +25,8 @@
   <p-tabView [scrollable]="true">
     <p-tabPanel
       header="Inventario de Producto Terminado"
-      leftIcon="pi pi-sliders-h">
+      leftIcon="pi pi-sliders-h"
+      *ngIf="![86,4].includes(ValidarRol)">
 
       <div class="mb-4">
         <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Productos</h4>

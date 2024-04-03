@@ -1,0 +1,16 @@
+p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
+    display: flex;
+    width: 100%;
+}
+
+p-table ::ng-deep div {
+    max-height: 30rem !important;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+    width: 2rem;
+}
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+    height: 2rem;
+}

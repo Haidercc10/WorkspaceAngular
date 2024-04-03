@@ -11,7 +11,8 @@
 <p-tabView (onChange)="changeTab($event)" *ngIf="!load" [scrollable]="true">
   <p-tabPanel
   header="Inventario de Despacho"
-  leftIcon="pi pi-sliders-h">
+  leftIcon="pi pi-sliders-h"
+  *ngIf="![86,4].includes(ValidarRol)">
     <p-table
       #tableStock
       [columns]="selectedColumns"
@@ -117,7 +118,7 @@
               </td>
           </tr>
       </ng-template>
-      <ng-template pTemplate="footer">
+      <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
           <tr>
               <td colspan="7">Total</td>
               <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation) | currency : 'COP '}}</td>
@@ -129,7 +130,8 @@
   <p-tabPanel
   header="Rollo a rollo Empaque"
   leftIcon="pi pi-database"
-  tooltip="Inventario rollo a rollo del más antiguo al más reciente en Empaque">
+  tooltip="Inventario rollo a rollo del más antiguo al más reciente en Empaque"
+  *ngIf="![86].includes(ValidarRol)">
   <p-table
     #tableRollsEmpaque
     [resizableColumns]="true"
@@ -157,9 +159,9 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'realQty', tableRollsEmpaque)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsEmpaque)"></th>
+            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tableRollsEmpaque)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsEmpaque)"></th>
+            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableRollsEmpaque)"></th>
         </tr>
             <tr style="font-size: 30px;">
@@ -170,9 +172,9 @@
             <th class="text-center" pSortableColumn="client" scope="col">Cliente  <p-sortIcon field="client"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="reference" scope="col">Referencia  <p-sortIcon field="reference"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="realQty" scope="col">Existencias  <p-sortIcon field="realQty"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
+            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="presentation" scope="col">Unidad  <p-sortIcon field="presentation"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
+            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="date" scope="col">Fecha  <p-sortIcon field="date"></p-sortIcon></th>
         </tr>
     </ng-template>
@@ -185,9 +187,9 @@
         <td>{{inv.client }}</td>
         <td>{{inv.reference}}</td>
         <td class="text-center colorExis"><b>{{inv.realQty | number : '1.2-2'}}</b></td>
-        <td class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
+        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
         <td class="text-center">{{inv.presentation}}</td>
-        <td class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
+        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
         <td class="text-center">{{inv.date}}</td>
         </tr>
     </ng-template>
@@ -195,8 +197,9 @@
         <tr>
             <td colspan="6" class="text-right">Disponibles</td>
             <td class="text-center textBlue">{{totalQtyEmpaque |  number : '1.2-2'}}</td>
-            <td colspan="2" class="text-right">Total</td>
-            <td class="text-center textBlue">$ {{totalEmpaque | number : '1.2-2'}}</td>
+            <td *ngIf="[86,4].includes(ValidarRol)" class="text-right"></td>
+            <td *ngIf="![86,4].includes(ValidarRol)" colspan="2"  class="text-right">Total</td>
+            <td *ngIf="![86,4].includes(ValidarRol)" class="text-center textBlue">$ {{totalEmpaque | number : '1.2-2'}}</td>
             <td></td>
         </tr>
     </ng-template>
@@ -206,7 +209,8 @@
   <p-tabPanel
   header="Bulto a bulto Sellado"
   leftIcon="pi pi-table"
-  tooltip="Inventario bulto a bulto del más antiguo al más reciente en Sellado">
+  tooltip="Inventario bulto a bulto del más antiguo al más reciente en Sellado"
+  *ngIf="![4].includes(ValidarRol)">
   <p-table
     #tableRollsSellado
     [resizableColumns]="true"
@@ -234,9 +238,9 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'realQty', tableRollsSellado)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsSellado)"></th>
+            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tableRollsSellado)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsSellado)"></th>
+            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableRollsSellado)"></th>
         </tr>
             <tr style="font-size: 30px;">
@@ -247,9 +251,9 @@
             <th class="text-center" pSortableColumn="client" scope="col">Cliente  <p-sortIcon field="client"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="reference" scope="col">Referencia  <p-sortIcon field="reference"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="realQty" scope="col">Existencias  <p-sortIcon field="realQty"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
+            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="presentation" scope="col">Unidad  <p-sortIcon field="presentation"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
+            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="date" scope="col">Fecha  <p-sortIcon field="date"></p-sortIcon></th>
         </tr>
     </ng-template>
@@ -262,18 +266,19 @@
         <td>{{inv.client }}</td>
         <td>{{inv.reference}}</td>
         <td class="text-center colorExis"><b>{{inv.realQty | number : '1.2-2'}}</b></td>
-        <td class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
+        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
         <td class="text-center">{{inv.presentation}}</td>
-        <td class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
+        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
         <td class="text-center">{{inv.date}}</td>
         </tr>
     </ng-template>
     <ng-template pTemplate="footer">
         <tr>
             <td colspan="6" class="text-right">Disponibles</td>
-            <td  class="text-center textBlue">{{totalQtySellado | number : '1.2-2'}}</td>
-            <td colspan="2" class="text-right">Total</td>
-            <td class="text-center textBlue">$ {{totalSellado | number : '1.2-2'}}</td>
+            <td class="text-center textBlue">{{totalQtySellado | number : '1.2-2'}}</td>
+            <td *ngIf="[86,4].includes(ValidarRol)" class="text-right"></td>
+            <td *ngIf="![86,4].includes(ValidarRol)" colspan="2" class="text-right">Total</td>
+            <td *ngIf="![86,4].includes(ValidarRol)" class="text-center textBlue">$ {{totalSellado | number : '1.2-2'}}</td>
             <td></td>
         </tr>
     </ng-template>
@@ -283,7 +288,8 @@
   <p-tabPanel
   header="Inventario Empaque"
   leftIcon="pi pi-map"
-  tooltip="Información del Inventario de la Bodega de Empaque">
+  tooltip="Información del Inventario de la Bodega de Empaque"
+  *ngIf="![86].includes(ValidarRol)">
     <p-table
       #tableStockEmp
       [value]="stockEmpaque"
@@ -407,7 +413,8 @@
   <p-tabPanel
   header="Inventario Sellado"
   leftIcon="pi pi-th-large"
-  tooltip="Información del Inventario de la Bodega de Wiketiado">
+  tooltip="Información del Inventario de la Bodega de Wiketiado"
+  *ngIf="![4].includes(ValidarRol)">
     <p-table
       #tableStockSella
       [value]="stockSellado"
@@ -519,7 +526,7 @@
               </td>
           </tr>
       </ng-template>
-      <ng-template pTemplate="footer">
+      <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
           <tr>
               <td colspan="7">Total</td>
               <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockSellado) | currency : 'COP '}}</td>
@@ -636,7 +643,7 @@
           </td>
         </tr>
       </ng-template>
-      <ng-template pTemplate="footer">
+      <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
           <tr>
               <td colspan="7">Total</td>
               <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation_Kg) | currency : 'COP '}}</td>
@@ -753,7 +760,7 @@
               </td>
           </tr>
       </ng-template>
-      <ng-template pTemplate="footer">
+      <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
           <tr>
               <td colspan="7">Total</td>
               <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation_UndPaq) | currency : 'COP '}}</td>
@@ -813,7 +820,7 @@
             'colorTotalQuantity': col.header == 'Exis. Total'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
         </tr>
       </ng-template>
-      <ng-template pTemplate="footer">
+      <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
         <tr>
           <td colspan="7">Total</td>
           <td [colSpan]="selectedColumnsComparative.length - 6">{{totalStock(comparativeStock) | currency : 'COP '}}</td>
@@ -931,7 +938,7 @@
               </td>
           </tr>
       </ng-template>
-      <ng-template pTemplate="footer">
+      <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
           <tr>
               <td colspan="7">Total</td>
               <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockDelivered_NoAvaible) | currency : 'COP '}}</td>

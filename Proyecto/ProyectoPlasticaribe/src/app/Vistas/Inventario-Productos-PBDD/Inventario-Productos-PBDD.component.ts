@@ -20,6 +20,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   load: boolean = false;
   storage_Id: number;
+  storage_Nombre: string;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
   columns: Array<Columns> = [];
@@ -65,11 +66,20 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lecturaStorage();
+    this.loadRollsProductionAvailable();
     this.getStockInformation();
+   }
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.appComponent.storage_Id;
+    this.storage_Nombre = this.appComponent.storage_Nombre;
+    this.ValidarRol = this.appComponent.storage_Rol;
   }
 
   fillColumns() {
-    this.columns = [
+     this.columns = [
       { header: 'Item', field: 'item', type: '' },
       { header: 'Cliente', field: 'client', type: '' },
       { header: 'Referencia', field: 'reference', type: '' },
@@ -94,12 +104,23 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Noviembre', field: 'november', type: 'number' },
       { header: 'Diciembre', field: 'december', type: 'number' },
     ];
-    this.selectedColumns = [...this.columns];
-    this.selectedColumnsComparative = [...this.columns];
-    this.selectedColumnsComparative.splice(10, 13);
-    this.selectedColumns.splice(10, 13);
-    this.selectedColumns.splice(4, 1);
-    this.selectedColumns.splice(4, 1);
+      if([86,4].includes(this.ValidarRol)) {
+        let cols : any = [];
+        cols.push(this.columns[4], this.columns[5]);
+        [4,5,6,8].forEach(x => this.columns.splice(x, 1));
+        this.columns.splice(8, 12);
+        this.columns.splice(4, 1);
+        this.selectedColumns = [...this.columns];
+        this.selectedColumnsComparative = [...this.columns];
+        this.selectedColumnsComparative.splice(4, 0, cols[0], cols[1]);
+      } else {
+        this.selectedColumns = [...this.columns];
+        this.selectedColumnsComparative = [...this.columns];
+        this.selectedColumnsComparative.splice(10, 13);
+        this.selectedColumns.splice(10, 13);
+        this.selectedColumns.splice(4, 1);
+        this.selectedColumns.splice(4, 1);
+      }
   }
 
   getStockInformation() {
@@ -354,10 +375,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
   changeTab(e : any) {
     this.indexTab = e.index;
 
-    this.indexTab == 1 ? this.loadRollsProductionAvailable() : null;
-    this.indexTab == 2 ? this.loadRollsProductionAvailable() : null; 
-    this.indexTab == 3 ? this.deployRows() : null;
-    this.indexTab == 4 ? this.deployRows() : null;
+    if([86,4].includes(this.ValidarRol)) this.indexTab == 1 ? this.deployRows() : null;
+    else {
+      this.indexTab == 3 ? this.deployRows() : null;
+      this.indexTab == 4 ? this.deployRows() : null;
+    }
   }
 
   //Cargar producción disponible en el area de sellado y empaque.
@@ -383,49 +405,48 @@ export class InventarioProductosPBDDComponent implements OnInit {
     setTimeout(() => {
       this.totalEmpaque = 0;
       this.totalQtyEmpaque = 0;
-      if(this.tableRollsEmpaque.filteredValue) {
-        this.tableRollsEmpaque.filteredValue.forEach(x => {
-          this.totalEmpaque += x.subtotal;  
-          this.totalQtyEmpaque += x.realQty;
-        }); 
-      } else {
-        this.rollsAvailablesEmpaque.forEach(x => {
-          this.totalEmpaque += x.subtotal;
-          this.totalQtyEmpaque += x.realQty;
-        }); 
-      }
+      if(this.tableRollsEmpaque) {
+        if(this.tableRollsEmpaque.filteredValue != undefined) this.totalsForData(this.tableRollsEmpaque.filteredValue);
+        else this.totalsForData(this.rollsAvailablesEmpaque);
+      } else this.totalsForData(this.rollsAvailablesEmpaque);
     }, 500);
   }
 
-   /** Función que calcula el total de existencias y de valor que hay en la producción de sellado*/
+  /** Función que calcula el total de existencias y de valor que hay en la producción de sellado*/
   calculateTotalSellado(){
     setTimeout(() => {
       this.totalSellado = 0;
       this.totalQtySellado = 0;
-      if(this.tableRollsSellado.filteredValue) {
-        this.tableRollsSellado.filteredValue.forEach(x => {
-          if(x.process_Id == 'SELLA') {
-            this.totalSellado += x.subtotal;  
-            this.totalQtySellado += x.realQty;
-          }
-        }); 
-      } else {
-        this.rollsAvailablesSellado.forEach(x => {
-          if(x.process_Id == 'SELLA') {
-            this.totalSellado += x.subtotal;
-            this.totalQtySellado += x.realQty;
-          }  
-        }); 
-      }
+      if(this.tableRollsSellado) {
+        if(this.tableRollsSellado.filteredValue != undefined) this.totalsForData(this.tableRollsSellado.filteredValue);
+        else this.totalsForData(this.rollsAvailablesSellado);
+      } else this.totalsForData(this.rollsAvailablesSellado);
     }, 500);
+  }
+
+  //Función para calcular los totales según la información que se le pase como parametro.
+  totalsForData(data : any){
+    data.forEach(x => {
+      if(x.process_Id == 'SELLA') {
+        this.totalSellado += x.subtotal;  
+        this.totalQtySellado += x.realQty;
+      } else if(x.process_Id == 'EMP') {
+        this.totalEmpaque += x.subtotal;
+        this.totalQtyEmpaque += x.realQty;
+      }
+    });
   }
 
   /** Desplegar y contraer filas de la tabla. */
   deployRows(){
     const thisRef = this;
-
-    this.indexTab == 3 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
-    this.indexTab == 4 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
+    
+    if([86].includes(this.ValidarRol)) this.indexTab == 1 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
+    else if([4].includes(this.ValidarRol)) this.indexTab == 1 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
+    else {
+      this.indexTab == 3 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
+      this.indexTab == 4 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
+    }
   }
 
   //EXCEL ROLLO A ROLLO.

@@ -71,7 +71,6 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { TreeTableModule } from 'primeng/treetable';
 import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
-
 import { MaterialExampleModule } from '../material.module';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
@@ -217,6 +216,7 @@ import { IngresoDespacho_EntregaMercanciaComponent } from './Vistas/IngresoDespa
 import { FormEditarPrestamosComponent } from './Vistas/FormEditarPrestamos/FormEditarPrestamos.component';
 import { Crear_FallasComponent } from './Vistas/Crear_Fallas/Crear_Fallas.component';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { OrdenFacturacion_PalletsComponent } from './Vistas/OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 
 @NgModule({
   declarations: [
@@ -353,7 +353,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
     IngresoDespacho_EntregaMercanciaComponent,
     Prestamos_NominaComponent,
     FormEditarPrestamosComponent, 
-    Crear_FallasComponent
+    Crear_FallasComponent, 
+    OrdenFacturacion_PalletsComponent
   ],
 
   imports: [
