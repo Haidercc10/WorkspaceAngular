@@ -174,7 +174,7 @@
   </p-table>
 
   <div class="my-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i>Pallets/Rollos Disponibles.</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Pallets/Rollos Disponibles.</h4>
   </div>
 
   <!--Pallets-->
@@ -191,13 +191,14 @@
             <th class="text-center" style="width: 4rem"><p-checkbox (click)="selectAllPallets()"></p-checkbox></th>
             <th style="width: 5rem"></th>
             <th pSortableColumn="">#</th>
-            <th pSortableColumn="">Pallet <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Id Cliente <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Cliente <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Item <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Referencia <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Cantidad <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="pallet"><p-sortIcon field="pallet"></p-sortIcon> Pallet <p-columnFilter type="text" field="pallet" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="client_Id"><p-sortIcon field="client_Id"></p-sortIcon> Id Cliente <p-columnFilter type="text" field="client_Id" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon> Cliente <p-columnFilter type="text" field="client" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item <p-columnFilter type="text" field="item" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter></th>
+            <th pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Cantidad <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter></th>
+            <th pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Rollos Disponibles <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
         </tr>
     </ng-template>
     <!--Body-->
@@ -215,12 +216,13 @@
             <td>{{ pallet.reference }}</td>
             <td>{{ qtyPallets(pallet.pallet, rowIndex) | number : '1.2-2' }}</td>
             <td>{{ pallet.presentation }}</td>
+            <td>{{ qtyRollsAvailables(rowIndex) }}</td>
         </tr>
     </ng-template>
     <!--Expansion-->
     <ng-template pTemplate="rowexpansion" let-pallet>
         <tr>
-            <td colspan="10">
+            <td colspan="11">
                 <div class="p-3">
                     <p-table [value]="pallet.rolls" dataKey="roll_BagPro">
                         <ng-template pTemplate="header">
@@ -266,22 +268,23 @@
         <td class="text-center"><p-button icon="pi pi-filter" [rounded]="true" severity="success" (onClick)="selectByFilter()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
         <td>
           <div class="p-inputgroup">
-            <p-inputNumber [(ngModel)]="selectedQty" type="number" [useGrouping]="true"></p-inputNumber>
-            <span class="p-inputgroup-addon cursor" pTooltip="Siguiente" tooltipPosition="top">
-              <i class="pi pi-chevron-right"></i>
+            <p-inputNumber [(ngModel)]="selectedQty" type="number" [minFractionDigits]="2" [maxFractionDigits]="2" mode="decimal" [useGrouping]="true" (keyup.enter)="selectByQuantity()"></p-inputNumber>
+            <span class="p-inputgroup-addon cursor" pTooltip="filtrar por cantidad" tooltipPosition="top" (click)="selectByQuantity()">
+              <i class="pi pi-search"></i>
             </span>
           </div>
         </td>
         <td class="text-center"></td> 
-        <td colspan="3" class="text-right">Total</td>
-        <td></td>
-        <td></td>
+        <td colspan="3" class="text-right">Total cantidad: </td>
+        <td class="text-center">{{totalQtyByItem() | number : '1.2-2'}}</td>
+        <td class="text-right">Total rollos: </td>
+        <td class="text-center">{{totalRollsAvailables()}}</td>
       </tr>
     </ng-template>
   </p-table>
 
   <div class="my-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>Pallets/Rollos Seleccionados.</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Pallets/Rollos Seleccionados.</h4>
   </div>
 
   <!--Pallets seleccionados-->
@@ -298,13 +301,14 @@
             <th class="text-center" style="width: 4rem"><p-checkbox (click)="deselectAllPallets()"></p-checkbox></th>
             <th style="width: 5rem"></th>
             <th pSortableColumn="">#</th>
-            <th pSortableColumn="">Pallet <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Id Cliente <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Cliente <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Item <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Referencia <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Cantidad <p-sortIcon field=""></p-sortIcon></th>
-            <th pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="pallet"><p-sortIcon field="pallet"></p-sortIcon> Pallet <p-columnFilter type="text" field="pallet" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="client_Id"><p-sortIcon field="client_Id"></p-sortIcon> Id Cliente <p-columnFilter type="text" field="client_Id" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon> Cliente <p-columnFilter type="text" field="client" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item <p-columnFilter type="text" field="item" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter></th>
+            <th pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Cantidad <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
+            <th pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter></th>
+            <th pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Rollos Disponibles <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
         </tr>
     </ng-template>
     <!--Body-->
@@ -322,12 +326,13 @@
             <td>{{ pallet.reference }}</td>
             <td>{{ qtySelectedPallets(pallet.pallet, rowIndex) | number : '1.2-2' }}</td>
             <td>{{ pallet.presentation }}</td>
+            <td>{{ qtySelectedRolls(rowIndex) }}</td>
         </tr>
     </ng-template>
     <!--Expansion-->
     <ng-template pTemplate="rowexpansion" let-pallet>
         <tr>
-            <td colspan="10">
+            <td colspan="11">
                 <div class="p-3">
                     <p-table [value]="pallet.rolls" dataKey="roll_BagPro">
                         <ng-template pTemplate="header">
@@ -369,6 +374,9 @@
     <!--Footer-->
     <ng-template pTemplate="footer">
       <tr>
+        <td colspan="2" class="text-right">Seleccionar:</td>
+        <td class="text-center"><p-button icon="pi pi-filter" [rounded]="true" severity="success" (onClick)="deselectByFilter()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
+        <td colspan="9"></td>
       </tr>
     </ng-template>    
   </p-table>

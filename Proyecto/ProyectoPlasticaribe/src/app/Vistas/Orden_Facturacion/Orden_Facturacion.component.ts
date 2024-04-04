@@ -500,6 +500,7 @@ export class Orden_FacturacionComponent implements OnInit {
       informationProducts.push({
         "#" : count,
         "Rollo": prod.dtOrder.numero_Rollo,
+        "OT" : prod.orderProduction,
         "Item": prod.producto.prod_Id,
         "Referencia": prod.producto.prod_Nombre,
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
@@ -507,6 +508,7 @@ export class Orden_FacturacionComponent implements OnInit {
         "Ubicación": prod.ubication == null ? '' : prod.ubication,
       });
     });
+    console.log(informationProducts);
     return informationProducts;
   }
 
@@ -571,14 +573,14 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
-    let widths: Array<string> = ['3%', '8%', '8%', '37%', '10%', '10%', '24%'];
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
+    let widths: Array<string> = ['3%', '8%', '7%', '8%', '37%', '9%', '10%', '18%'];
     return {
       margin: [0, 10],
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody(data, columns, 'Rollos Seleccionados'),
+        body: this.buildTableBody2(data, columns, 'Rollos Seleccionados'),
       },
       fontSize: 8,
       layout: {
@@ -592,6 +594,18 @@ export class Orden_FacturacionComponent implements OnInit {
   buildTableBody(data, columns, title) {
     var body = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  buildTableBody2(data, columns, title) {
+    var body = [];
+    body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];

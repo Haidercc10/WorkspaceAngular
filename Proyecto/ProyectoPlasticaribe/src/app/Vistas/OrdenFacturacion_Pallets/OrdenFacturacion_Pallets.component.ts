@@ -317,8 +317,34 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     return totalRolls;
   }
 
+  qtyRollsAvailables = (index) => this.pallets[index].rolls.length;
+
+  qtySelectedRolls = (index) => this.selectedPallets[index].rolls.length;
+
+  totalRollsAvailables() {
+    let total : number = 0;
+    this.pallets.forEach(x => total += x.rolls.length);
+    return total;
+  }
+
+  totalQtyByItem(){
+    let total : number = 0;
+    this.pallets.forEach(x => x.rolls.forEach(z => total += z.qty));
+    return total;
+  }
+
   //Función para filtrar los pallets por referencia.
   selectByFilter(){
+    this.loading = true;
+    let data = this.t1.filteredValue ? this.t1.filteredValue : this.t1.value; 
+    console.log(data)
+    this.selectedPallets = this.selectedPallets.concat(data);
+
+    setTimeout(() => { this.loading = false }, 5);
+  }
+
+  //Función para filtrar los pallets por referencia.
+  deselectByFilter(){
     this.loading = true;
     
     setTimeout(() => { this.loading = false }, 5);
@@ -327,8 +353,49 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //Función para filtrar los pallets por cantidad.
   selectByQuantity(){
     this.loading = true;
+    let sumQty : number = 0; 
+    let totalQtyByItem : number = this.totalQtyByItem();
+    let array : any = [];
+    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
     
-    setTimeout(() => { this.loading = false }, 5);
+    if(totalQtyByItem > 0) {
+      if(totalQtyByItem >= this.selectedQty) {
+        this.pallets.forEach(x => {
+          x.rolls.forEach(y => {
+            sumQty += y.qty;
+            if(sumQty <= this.selectedQty) {
+              array.find(z => z.pallet == y.pallet) == undefined ? array.push(this.loadRoll(x)) : null;
+              let index = array.findIndex(a => a.pallet == x.pallet);
+              array[index].rolls.push(y);
+            }
+          });
+        });
+        this.sendPalletsToSelected(array);
+      } else {
+        this.msj.mensajeError(`La cantidad total de rollos disponibles es menor a la cantidad seleccionada.`, `Error`);
+        this.loading = false;
+      }
+    } else {
+      this.loading = false;
+      this.msj.mensajeAdvertencia(`Debe seleccionar un item`);
+    }
+    
   }
 
+  sendPalletsToSelected(array : any){
+    this.selectedPallets = this.selectedPallets.concat(array);
+    setTimeout(() => {
+      array.forEach(x => {
+        let index = this.pallets.findIndex(y => y.pallet == x.pallet);
+        x.rolls.forEach(y => {
+          let index2 = this.pallets[index].rolls.findIndex(z => z.roll_BagPro == y.roll_BagPro);
+          this.pallets[index].rolls.splice(index2, 1);
+          if (this.pallets[index].rolls.length == 0) this.pallets.splice(index, 1);
+        });
+      });
+      this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+      this.loadInfoConsolidate();
+      this.loading = false;
+    }, 500);
+  }
 }

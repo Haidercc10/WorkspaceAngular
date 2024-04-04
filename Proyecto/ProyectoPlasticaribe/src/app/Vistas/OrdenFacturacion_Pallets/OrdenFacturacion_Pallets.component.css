@@ -14,3 +14,8 @@ p-table ::ng-deep div {
 ::ng-deep .p-button.p-button-icon-only.p-button-rounded {
     height: 2rem;
 }
+
+::ng-deep .p-inputgroup-addon {
+    background: rgb(214, 100, 106);
+    color: white;
+}    

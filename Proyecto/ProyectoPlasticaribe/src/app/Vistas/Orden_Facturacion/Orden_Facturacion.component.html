@@ -165,7 +165,7 @@
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="5">Total</td>
-        <td colspan="2">{{0 | number : '1.2-2'}}</td>
+        <td colspan="2">{{productionSelected.length | number : '1.2-2'}}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -194,6 +194,10 @@
         <th class="text-center" pSortableColumn="numberProduction">
           <p-sortIcon field="numberProduction"></p-sortIcon> Numero Rollo
           <p-columnFilter type="text" field="numberProduction" display="menu"></p-columnFilter>
+        </th>
+        <th class="text-center" pSortableColumn="orderProduction">
+          <p-sortIcon field="orderProduction"></p-sortIcon> OT
+          <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="client">
           <p-sortIcon field="client"></p-sortIcon> Id Cliente
@@ -226,14 +230,15 @@
         <td pFrozenColumn [frozen]="true" alignFrozen="left">
           <p-tableCheckbox [value]="data" (click)="selectedProduction(data)"></p-tableCheckbox>
         </td>
-        <td>{{rowIndex + 1}}</td>
-        <td>{{data.numberProduction}}</td>
-        <td>{{data.client}}</td>
+        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center">{{data.numberProduction}}</td>
+        <td class="text-center">{{data.orderProduction}}</td>
+        <td class="text-center">{{data.client}}</td>
         <td>{{data.nameClient}}</td>
-        <td>{{data.item}}</td>
+        <td class="text-center">{{data.item}}</td>
         <td>{{data.reference}}</td>
-        <td>{{data.quantity | number : '1.2-2'}}</td>
-        <td>{{data.presentation}}</td>
+        <td class="text-center">{{data.quantity | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.presentation}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
@@ -242,7 +247,7 @@
         <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="selectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
         <td><p-inputNumber [(ngModel)]="qtyToSend" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="2"> </p-inputNumber></td>
         <td class="text-center"><p-button icon="pi pi-search-plus" [rounded]="true" severity="warning" (onClick)="selectByQuantity()" pTooltip="Seleccionar por cantidad"></p-button></td>
-        <td colspan="2">Total</td>
+        <td colspan="3">Total</td>
         <td colspan="2">{{totalProduccionSearched() | number : '1.2-2'}}</td>
       </tr>
     </ng-template>
@@ -300,6 +305,10 @@
           <p-sortIcon field="numberProduction"></p-sortIcon> Numero Rollo
           <p-columnFilter type="text" field="numberProduction" display="menu"></p-columnFilter>
         </th>
+        <th class="text-center" pSortableColumn="orderProduction">
+          <p-sortIcon field="orderProduction"></p-sortIcon> OT
+          <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter>
+        </th>
         <th class="text-center" pSortableColumn="client">
           <p-sortIcon field="client"></p-sortIcon> Id Cliente
           <p-columnFilter type="text" field="client" display="menu"></p-columnFilter>
@@ -331,21 +340,22 @@
         <td pFrozenColumn [frozen]="true" alignFrozen="left">
           <p-tableCheckbox [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
         </td>
-        <td>{{rowIndex + 1}}</td>
-        <td>{{data.numberProduction}}</td>
-        <td>{{data.client}}</td>
+        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center">{{data.numberProduction}}</td>
+        <td class="text-center">{{data.orderProduction}}</td>
+        <td class="text-center">{{data.client}}</td>
         <td>{{data.nameClient}}</td>
-        <td>{{data.item}}</td>
+        <td class="text-center">{{data.item}}</td>
         <td>{{data.reference}}</td>
-        <td>{{data.quantity | number : '1.2-2'}}</td>
-        <td>{{data.presentation}}</td>
+        <td class="text-center">{{data.quantity | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.presentation}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="2">Seleccionar: </td>
         <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="deselectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
-        <td colspan="6"></td>
+        <td colspan="7"></td>
       </tr>
     </ng-template>
   </p-table>

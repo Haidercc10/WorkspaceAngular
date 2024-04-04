@@ -284,7 +284,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       this.informationAboutFact(),
       this.datosProveedorPDF(),
       this.informacionProduction(),
-      this.table(this.dataProductionInPDF(), ['Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación']),
+      this.table(this.dataProductionInPDF(), ['Rollo', 'OT', 'Item', 'Referencia', 'Cantidad', 'Presentación']),
       this.totalQuantities(),
     ];
     this.createPDFService.formatoPDF(title, content);
@@ -365,6 +365,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       let proceso: string = prod.proceso.proceso_Id;
       data.push({
         "Rollo": prod.pp.numeroRollo_BagPro,
+        'OT' : prod.pp.ot,
         'Item': prod.producto.prod_Id,
         'Referencia': prod.producto.prod_Nombre,
         'Cantidad': ['SELLA', 'WIKE'].includes(proceso) ? this.formatonumeros((prod.pp.cantidad).toFixed(2)) : this.formatonumeros((prod.pp.peso_Neto).toFixed(2)),
@@ -379,7 +380,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       margin: [0, 10],
       table: {
         headerRows: 1,
-        widths: ['10%', '10%', '50%', '20%', '10%'],
+        widths: ['10%', '10%', '10%', '50%', '10%', '10%'],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
