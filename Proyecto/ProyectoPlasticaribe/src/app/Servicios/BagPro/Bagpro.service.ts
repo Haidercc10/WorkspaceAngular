@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
+import { rollsToDelete } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -90,7 +91,10 @@ export class BagproService {
 
   PutEnvioZeusExtrusion = (rollo: number) => this.http.put<any>(`${this.rutaBagPro}/ProcExtrusion/putEnvioZeus/${rollo}`, rollo);
 
-  putReversionEnvioZeus_ProcExtrusion = (rollos: any[]) => this.http.post(`${this.rutaBagPro}/ProcSellado/putReversionEnvioZeus_ProcExtrusion`, rollos);
+  putReversionEnvioZeus_ProcExtrusion = (rollos: any[]) => this.http.post(`${this.rutaBagPro}/ProcExtrusion/putReversionEnvioZeus_ProcExtrusion`, rollos);
+
+  putObservationDeletedRolls = (data : Array<rollsToDelete>) => this.http.post(`${this.rutaBagPro}/ProcExtrusion/putObservationDeletedRolls`, data);
+
   /********************************************************** CLIENTESOT ****************************************************************/
 
   srvActualizar = (id:number|String, data:any, estado : any) => this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);

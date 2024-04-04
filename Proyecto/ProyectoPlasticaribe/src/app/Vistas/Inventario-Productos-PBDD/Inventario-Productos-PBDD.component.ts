@@ -547,7 +547,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       });
       contador++
     });
-    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, });
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
   }
 
   //Agregar fila de totales al formato excel.

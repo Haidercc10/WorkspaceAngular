@@ -4,6 +4,7 @@ import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelRollosDesechos } from 'src/app/Modelo/modelRollosDesechos';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -39,7 +40,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     private svcProcess : ProcesosService,
     private svcMsg : MessageService,
     private failsService : FallasTecnicasService,
-    private svDiscardRolls : SrvRollosEliminadosService) {
+    private svDiscardRolls : SrvRollosEliminadosService, 
+    private svBagPro : BagproService) {
     this.initForm();
     this.selectedMode = this.AppComponent.temaSeleccionado; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   }
@@ -280,17 +282,25 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
       
       this.svDiscardRolls.Post(x).subscribe(data => {
         count++;
-        if(count == this.rollsInsert.length) this.confirmDeleteMessage(false);
+        if(count == this.rollsInsert.length) this.addObservationDeletedRollsBagPro(this.rollsToDelete); //this.confirmDeleteMessage(false);
       }, error => {
-        this.confirmDeleteMessage(true);
+        this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de los rollos eliminados!`);
         this.load = false;
       });
     })
   }
 
+  //Función para agregar la observación de los rollos eliminados en BagPro.
+  addObservationDeletedRollsBagPro(rolls : any){
+    this.svBagPro.putObservationDeletedRolls(rolls).subscribe(data => { this.confirmDeleteMessage(false); }, error =>{
+      this.confirmDeleteMessage(true);
+      this.load = false;
+    })
+  }
+
   //Función para mostrar mensaje de confirmación de eliminación de rollos.
   confirmDeleteMessage(isError : boolean) {
-    if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido eliminando los rollos seleccionados!`)
+    if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido actualizando la observación de los rollos eliminados en BagPro!`);
     else {
       this.svcMsjs.mensajeConfirmacion(`Rollos eliminados exitosamente!`);
       setTimeout(() => { this.clearAll(); }, 1000);
