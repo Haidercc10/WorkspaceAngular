@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { log } from 'console';
 import moment from 'moment';
@@ -22,6 +22,11 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './OrdenFacturacion_Pallets.component.html',
   styleUrls: ['./OrdenFacturacion_Pallets.component.css']
 })
+
+@Injectable({
+  providedIn: 'root'
+})
+
 export class OrdenFacturacion_PalletsComponent implements OnInit {
 
   storage_Id: number;
@@ -189,7 +194,15 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //Función para seleccionar todos los pallets
   selectAllPallets() {
     this.loading = true;
-    this.selectedPallets = this.selectedPallets.concat(this.pallets);
+    
+    if(this.selectedPallets.length == 0) this.selectedPallets = this.pallets.concat(this.selectedPallets);
+    else {
+      this.selectedPallets.forEach(s => {
+        let index = this.pallets.findIndex(x => x.pallet == s.pallet);
+        //if(index != -1) this.pallets.splice(index, 1);
+        console.log(index)
+      })
+    }
     this.pallets = [];
     this.loadInfoConsolidate();
     setTimeout(() => { this.loading = false }, 5);
@@ -198,9 +211,24 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //Función para deseleccionar todos los pallets
   deselectAllPallets() {
     this.loading = true;
-    this.pallets = this.pallets.concat(this.selectedPallets);
+    if(this.pallets.length == 0) this.pallets = this.pallets.concat(this.selectedPallets);
+    else {
+      this.selectedPallets.forEach(s => {
+        let index = this.pallets.findIndex(x => x.pallet == s.pallet);
+        if(index == -1) {
+          this.pallets.push(s);
+          let ind = this.pallets.findIndex(x => x.pallet == s.pallet)
+          this.pallets[ind].rolls.sort((a, b) => a.roll_BagPro - b.roll_BagPro);
+        } else {
+          this.pallets[index].rolls.push(...s.rolls);
+          this.pallets[index].rolls.sort((a, b) => a.roll_BagPro - b.roll_BagPro);
+        }
+      });
+    }
+    
     this.selectedPallets = [];
     this.loadInfoConsolidate();
+    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
     setTimeout(() => { this.loading = false }, 5);
   }
 
@@ -350,16 +378,20 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     return totalRolls;
   }
 
+  //Función para cargar la cantidad de rollos disponibles.
   qtyRollsAvailables = (index) => this.pallets[index].rolls.length;
 
+  //Función para cargar la cantidad de rollos seleccionados.
   qtySelectedRolls = (index) => this.selectedPallets[index].rolls.length;
 
+  //Función para cargar el total de rollos disponibles.
   totalRollsAvailables() {
     let total : number = 0;
     this.pallets.forEach(x => total += x.rolls.length);
     return total;
   }
 
+  //Función para cargar la cantidad total por item
   totalQtyByItem(){
     let total : number = 0;
     this.pallets.forEach(x => x.rolls.forEach(z => total += z.qty));
@@ -463,6 +495,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
 
   applyFilter = ($event, campo : any, table : Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
+  //Función para validar los datos.
   validateInformation(){
     if(this.form.valid) {
       if(this.selectedPallets.length > 0) this.saveOF()
@@ -470,27 +503,26 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`Debe ingresar la información requerida del pedido`,);
   }
 
+  //Función para guardar los datos de encabezado de la OF
   saveOF(){
     this.load = true;
     let orderFact : modelOrdenFacturacion = {
       Factura: '',
-      Cli_Id: this.form.value.idClient,
+      Cli_Id: 1061, //this.form.value.idClient,
       Usua_Id: this.storage_Id,
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
       Observacion: !this.form.value.observation ? '' : (this.form.value.observation).toString().toUpperCase(),
       Estado_Id: 19
     }
-    console.log(orderFact);
-    this.saveDetailOF(orderFact)
-     
-    //this.svOrdFact.Post(orderFact).subscribe(data => { this.saveDetailOF(data); }, error => { 
-    //  let msj : string = `Ocurrió un error al crear la orden de facturación`;
-    //  this.msj.mensajeError(`Error`, msj); 
-    //  this.load = false; 
-    //});
+    this.svOrdFact.Post(orderFact).subscribe(data => { this.saveDetailOF(data); }, error => {   
+      let msj : string = `Ocurrió un error al crear la orden de facturación`;
+      this.msj.mensajeError(`Error`, msj); 
+      this.load = false; 
+    });
   }
   
+  //Función para guardar los detalles de la OF
   saveDetailOF(data : any){
     let count : number = 0; 
     let order : number = data.id;
@@ -498,24 +530,23 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     this.selectedPallets.forEach(x => {
       x.rolls.forEach(y => {
         let dtOrderFact : modelDt_OrdenFacturacion = {
-          'Id_OrdenFacturacion' : 0,
+          'Id_OrdenFacturacion' : order,
           'Numero_Rollo' : y.roll_BagPro,
           'Prod_Id' : y.item,
           'Cantidad' : y.qty,
           'Presentacion' : y.presentation,
-          'Consecutivo_Pedido' : '0', //(y.saleOrder).toString(),
+          'Consecutivo_Pedido' : (x.saleOrder).toString(),
           'Estado_Id' : 20,
         }
-        console.log(dtOrderFact);
-        console.log(x.rolls.length)
-        //this.svDetOrdFact.Post(dtOrderFact).subscribe(() => {
-          //count++;
-          //if(count == this.selectedPallets.length) this.putStatusRollsInvoice(order, data.factura);
-        //}); 
+        this.svDetOrdFact.Post(dtOrderFact).subscribe(() => {
+          count++;
+          if(count == this.selectedPallets.length) this.putStatusRollsInvoice(order, data.factura);
+        }); 
       });
     });
   }
 
+  //Función para colocar el estado de los rollos en facturado
   putStatusRollsInvoice(order: number, fact: string) {
     this.svProductionProcess.putStateForSend(order).subscribe(() => {
       this.msj.mensajeConfirmacion('Orden de facturación creada exitosamente!');
@@ -524,6 +555,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
+  //Función para limpiar campos
   clearFields(){
     this.load = false;
     this.pallets = [];
@@ -534,6 +566,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     this.infoConsolidate = [];
   }
 
+  //FUNCIONES PARA CREAR PDF
   createPDF(idOF: number, fact: string) {
     this.svDetOrdFact.GetInformacionOrderFact(idOF).subscribe(data => {
       let title: string = `Orden de Facturación N° ${idOF}`;
@@ -546,6 +579,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   contentPDF(data): any[] {
     let content: any[] = [];
     data = this.changeNameProductInPDF(data);
+    console.log(data)
     let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
     let informationProducts: Array<any> = this.getInformationProducts(data);
     content.push(this.informationClientPDF(data[0]));
@@ -609,6 +643,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
         "Presentación": prod.dtOrder.presentacion,
         "Ubicación": prod.ubication == null ? '' : prod.ubication,
+        "Pallet" :  [0, null, undefined, ''].includes(prod.pallet) ? '' : prod.pallet,
       });
     });
     return informationProducts;
@@ -675,8 +710,8 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
-    let widths: Array<string> = ['3%', '8%', '7%', '8%', '37%', '9%', '10%', '18%'];
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación', 'Pallet'];
+    let widths: Array<string> = ['3%', '7%', '7%', '7%', '35%', '8%', '10%', '17%', '6%'];
     return {
       margin: [0, 10],
       table: {
@@ -707,7 +742,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
 
   buildTableBody2(data, columns, title) {
     var body = [];
-    body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
+    body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];

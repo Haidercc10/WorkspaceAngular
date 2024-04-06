@@ -12,6 +12,7 @@ import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/Orde
 import { MessageService } from 'primeng/api';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
@@ -40,7 +41,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private dtDevolutionsService : DetallesDevolucionesProductosService,
     private orderFactService: OrdenFacturacionService,
     private messageService: MessageService,
-    private productionProcessService : Produccion_ProcesosService,) {
+    private productionProcessService : Produccion_ProcesosService,
+    private cmpOrdFact : OrdenFacturacion_PalletsComponent) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formFilters = this.frmBuilder.group({
@@ -93,7 +95,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   createPDF(id : number, fact: string, type : string){
     this.load = true;
-    if (type == 'Orden') this.orden_FacturacionComponent.createPDF(id, fact);
+    if (type == 'Orden') this.orden_FacturacionComponent.createPDF(id, fact); //this.cmpOrdFact.createPDF(id, fact);
     else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, fact);
     setTimeout(() => this.load = false, 3000);
   }
