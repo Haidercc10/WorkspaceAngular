@@ -19,3 +19,13 @@ p-table ::ng-deep div {
     background: rgb(214, 100, 106);
     color: white;
 }    
+
+::ng-deep .p-inputgroup {
+    width: 150px;
+    text-align: center;
+} 
+
+.p-datatable.p-datatable-hoverable-rows .p-datatable-tbody > tr:not(.p-highlight):hover {
+    background: #ffefef;
+    color: #d81d1d;
+}

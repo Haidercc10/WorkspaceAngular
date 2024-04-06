@@ -1,6 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { log } from 'console';
+import moment from 'moment';
 import { Table } from 'primeng/table';
+import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
+import { modelOrdenFacturacion } from 'src/app/Modelo/modelOrdenFacturacion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
@@ -31,6 +35,8 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   loading : boolean = false;
   @ViewChild('t1') t1: Table | undefined;
   @ViewChild('t2') t2: Table | undefined;
+  @ViewChild('tRowExp1') tRowExp1: Table | undefined;
+  @ViewChild('tRowExp2') tRowExp2: Table | undefined;
   infoConsolidate : Array<any> = [];
   selectedQty : number = 0;
   selectedProductSaleOrder: any = [];
@@ -179,6 +185,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
 
   qtySelectedPallets = (pallet : number, index : number) => this.selectedPallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a + b.qty, 0)
 
+  //SELECCIONAR TODO
   //Función para seleccionar todos los pallets
   selectAllPallets() {
     this.loading = true;
@@ -197,11 +204,16 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     setTimeout(() => { this.loading = false }, 5);
   }
 
+  //SELECCIONAR PALLETS
   //Funcion para seleccionar un pallet en especifico
   selectPallet(data : any) {
     this.loading = true;
     let index = this.pallets.findIndex(x => x.pallet == data.pallet);
-    this.selectedPallets.push(this.pallets[index]);
+    if(this.selectedPallets.find(x => x.pallet == data.pallet) == undefined) {
+      this.loadPalletsByPallet(this.selectedPallets, this.pallets, index, data);
+    } else {
+      this.loadPalletsSoloRoll(this.pallets, this.selectedPallets, index, data);
+    }
     this.pallets.splice(index, 1)
     this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
     this.loadInfoConsolidate();
@@ -212,13 +224,30 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   deselectPallet(data : any) {
     this.loading = true;
     let index = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
-    this.pallets.push(this.selectedPallets[index]);
+    if(this.pallets.find(x => x.pallet == data.pallet) == undefined) {
+      this.loadPalletsByPallet(this.pallets, this.selectedPallets, index, data);
+    } else {
+      this.loadPalletsSoloRoll(this.selectedPallets, this.pallets, index, data);
+    }
     this.selectedPallets.splice(index, 1);
     this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
     this.loadInfoConsolidate();
     setTimeout(() => { this.loading = false }, 5);
   }
 
+  loadPalletsByPallet(array1 : any, array2 : any, index : number, data : any){
+    array1.push(array2[index]);
+    let indice = array1.findIndex(x => x.pallet == data.pallet);
+    array1[indice].rolls.sort((a, b) => a.roll_BagPro - b.roll_BagPro);
+  }
+
+  loadPalletsSoloRoll(array1 : any, array2 : any, index : number, data : any){
+    let indice = array2.findIndex(x => x.pallet == data.pallet);
+    array2[indice].rolls.push(...array1[index].rolls);
+    array2[indice].rolls.sort((a, b) => a.roll_BagPro - b.roll_BagPro);
+  }
+
+  //SELECCIONAR SOLO ROLLOS
   //Función para seleccionar un rollo en especifico
   selectRoll(data : any, i : number) {
     this.loading = true;
@@ -226,11 +255,9 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     
     if(this.selectedPallets.find(x => x.pallet == data.pallet) == undefined) {
       this.selectedPallets.push(this.loadRoll(data));
-      let indice = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
-      this.selectedPallets[indice].rolls.push(data);
+      this.loadPalletsByRoll(this.selectedPallets, data);
     } else {
-      let indice = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
-      this.selectedPallets[indice].rolls.push(data);
+      this.loadPalletsByRoll(this.selectedPallets, data);
     }
     this.pallets[index].rolls.splice(i, 1);
     if (this.pallets[index].rolls.length == 0) this.pallets.splice(index, 1);
@@ -246,18 +273,24 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     
     if(this.pallets.find(x => x.pallet == data.pallet) == undefined) {
       this.pallets.push(this.loadRoll(data));
-      let indice = this.pallets.findIndex(x => x.pallet == data.pallet);
-      this.pallets[indice].rolls.push(data);
+      this.loadPalletsByRoll(this.pallets, data);
     } else {
-      let indice = this.pallets.findIndex(x => x.pallet == data.pallet);
-      this.pallets[indice].rolls.push(data);
+      this.loadPalletsByRoll(this.pallets, data);
     }
+
     this.selectedPallets[index].rolls.splice(i, 1);
     if (this.selectedPallets[index].rolls.length == 0) this.selectedPallets.splice(index, 1);
     this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
     this.loadInfoConsolidate();
     setTimeout(() => { this.loading = false }, 5);
   } 
+
+  //Función para seleccionar/deseleccionar los pallets y ordenarlos por rollo.
+  loadPalletsByRoll(array : any, data : any){
+    let index = array.findIndex(x => x.pallet == data.pallet);
+    array[index].rolls.push(data);
+    array[index].rolls.sort((a, b) => a.roll_BagPro - b.roll_BagPro);
+  }
 
   //Función para cargar la información del rollo seleccionado.
   loadRoll(data : any){
@@ -337,9 +370,19 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   selectByFilter(){
     this.loading = true;
     let data = this.t1.filteredValue ? this.t1.filteredValue : this.t1.value; 
-    console.log(data)
+    //console.log(data)
     this.selectedPallets = this.selectedPallets.concat(data);
-
+    console.log(this.t1.filteredValue)
+    if(!this.t1.filteredValue) this.pallets = []; 
+    else {
+      data.forEach(d => {
+        let index = this.pallets.findIndex(x => x.pallet == d.pallet);
+        this.pallets.splice(index, 1);
+      });
+      this.t1.clear();
+    }
+    this.loadInfoConsolidate();
+    this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
     setTimeout(() => { this.loading = false }, 5);
   }
 
@@ -350,6 +393,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     setTimeout(() => { this.loading = false }, 5);
   }
   
+  //SELECCIONAR POR CANTIDAD
   //Función para filtrar los pallets por cantidad.
   selectByQuantity(){
     this.loading = true;
@@ -364,30 +408,41 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
           x.rolls.forEach(y => {
             sumQty += y.qty;
             if(sumQty <= this.selectedQty) {
-              array.find(z => z.pallet == y.pallet) == undefined ? array.push(this.loadRoll(x)) : null;
-              let index = array.findIndex(a => a.pallet == x.pallet);
-              array[index].rolls.push(y);
+              if (array.find(z => z.pallet == y.pallet) == undefined) {
+                array.push(this.loadRoll(x));
+                let index = array.findIndex(a => a.pallet == y.pallet);
+                array[index].rolls.push(y);
+              } else {
+                let index = array.findIndex(a => a.pallet == y.pallet);
+                array[index].rolls.push(y);
+              }
             }
           });
         });
         this.sendPalletsToSelected(array);
       } else {
-        this.msj.mensajeError(`La cantidad total de rollos disponibles es menor a la cantidad seleccionada.`, `Error`);
+        this.msj.mensajeError(`La cantidad total de rollos disponibles es menor a la cantidad digitada.`, `Error`);
         this.loading = false;
       }
     } else {
       this.loading = false;
       this.msj.mensajeAdvertencia(`Debe seleccionar un item`);
     }
-    
   }
 
+  //Función para enviar los pallets elegidos a la lista de pallets seleccionados.
   sendPalletsToSelected(array : any){
-    this.selectedPallets = this.selectedPallets.concat(array);
+    console.log(array)
     setTimeout(() => {
       array.forEach(x => {
         let index = this.pallets.findIndex(y => y.pallet == x.pallet);
         x.rolls.forEach(y => {
+          if(this.selectedPallets.find(s => s.pallet == x.pallet) == undefined) {
+            this.selectedPallets.push(this.loadRoll(x));
+            this.loadPalletsByQuantity(x, y);
+          } else {
+            this.loadPalletsByQuantity(x, y);
+          }
           let index2 = this.pallets[index].rolls.findIndex(z => z.roll_BagPro == y.roll_BagPro);
           this.pallets[index].rolls.splice(index2, 1);
           if (this.pallets[index].rolls.length == 0) this.pallets.splice(index, 1);
@@ -397,5 +452,284 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
       this.loadInfoConsolidate();
       this.loading = false;
     }, 500);
+  }
+
+  //Función para cargar los pallets por cantidad y organizarlos por rollo
+  loadPalletsByQuantity(pallet : any, detail : any){
+    let index2 = this.selectedPallets.findIndex(z => z.pallet == pallet.pallet);
+    this.selectedPallets[index2].rolls.push(detail);
+    this.selectedPallets[index2].rolls.sort((a, b) => a.roll_BagPro - b.roll_BagPro);
+  }
+
+  applyFilter = ($event, campo : any, table : Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  validateInformation(){
+    if(this.form.valid) {
+      if(this.selectedPallets.length > 0) this.saveOF()
+      else this.msj.mensajeAdvertencia(`No hay pallets/rollos seleccionados!`,);
+    } else this.msj.mensajeAdvertencia(`Debe ingresar la información requerida del pedido`,);
+  }
+
+  saveOF(){
+    this.load = true;
+    let orderFact : modelOrdenFacturacion = {
+      Factura: '',
+      Cli_Id: this.form.value.idClient,
+      Usua_Id: this.storage_Id,
+      Fecha: moment().format('YYYY-MM-DD'),
+      Hora: moment().format('HH:mm:ss'),
+      Observacion: !this.form.value.observation ? '' : (this.form.value.observation).toString().toUpperCase(),
+      Estado_Id: 19
+    }
+    console.log(orderFact);
+    this.saveDetailOF(orderFact)
+     
+    //this.svOrdFact.Post(orderFact).subscribe(data => { this.saveDetailOF(data); }, error => { 
+    //  let msj : string = `Ocurrió un error al crear la orden de facturación`;
+    //  this.msj.mensajeError(`Error`, msj); 
+    //  this.load = false; 
+    //});
+  }
+  
+  saveDetailOF(data : any){
+    let count : number = 0; 
+    let order : number = data.id;
+
+    this.selectedPallets.forEach(x => {
+      x.rolls.forEach(y => {
+        let dtOrderFact : modelDt_OrdenFacturacion = {
+          'Id_OrdenFacturacion' : 0,
+          'Numero_Rollo' : y.roll_BagPro,
+          'Prod_Id' : y.item,
+          'Cantidad' : y.qty,
+          'Presentacion' : y.presentation,
+          'Consecutivo_Pedido' : '0', //(y.saleOrder).toString(),
+          'Estado_Id' : 20,
+        }
+        console.log(dtOrderFact);
+        console.log(x.rolls.length)
+        //this.svDetOrdFact.Post(dtOrderFact).subscribe(() => {
+          //count++;
+          //if(count == this.selectedPallets.length) this.putStatusRollsInvoice(order, data.factura);
+        //}); 
+      });
+    });
+  }
+
+  putStatusRollsInvoice(order: number, fact: string) {
+    this.svProductionProcess.putStateForSend(order).subscribe(() => {
+      this.msj.mensajeConfirmacion('Orden de facturación creada exitosamente!');
+      this.createPDF(order, fact);
+      this.clearFields();
+    }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
+  }
+
+  clearFields(){
+    this.load = false;
+    this.pallets = [];
+    this.selectedPallets = [];
+    this.form.reset();
+    this.clients = [];
+    this.products = [];
+    this.infoConsolidate = [];
+  }
+
+  createPDF(idOF: number, fact: string) {
+    this.svDetOrdFact.GetInformacionOrderFact(idOF).subscribe(data => {
+      let title: string = `Orden de Facturación N° ${idOF}`;
+      title += `${fact.length > 0 ? ` \n Factura N° ${fact}` : ''}`;
+      let content: any[] = this.contentPDF(data);
+      this.svCreatePDF.formatoPDF(title, content);
+    }, error => this.msj.mensajeError(error));
+  }
+
+  contentPDF(data): any[] {
+    let content: any[] = [];
+    data = this.changeNameProductInPDF(data);
+    let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
+    let informationProducts: Array<any> = this.getInformationProducts(data);
+    content.push(this.informationClientPDF(data[0]));
+    content.push(this.observationPDF(data[0]));
+    content.push(this.tableConsolidated(consolidatedInformation));
+    content.push(this.tableProducts(informationProducts));
+    return content;
+  }
+
+  changeNameProductInPDF(data : Array<any>) {
+    let orderProduction = data.reduce((a, b) => {
+      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+      return a;
+    }, []);
+    orderProduction.forEach(d => {
+      this.bagproService.GetOrdenDeTrabajo(d.orderProduction).subscribe(dataOrder => {
+        data.filter(x => x.orderProduction == d.orderProduction).forEach(prod => {
+          prod.Referencia = dataOrder[0].producto;
+        });
+      });
+    });
+    return data;
+  }
+
+  consolidatedInformation(data: any): Array<any> {
+    let consolidatedInformation: Array<any> = [];
+    let count: number = 0;
+    data.forEach(prod => {
+      if (!consolidatedInformation.map(x => x.Item).includes(prod.producto.prod_Id)) {
+        count++;
+        let countProduction: number = data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).length;
+        let totalQuantity: number = 0;
+        data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => totalQuantity += x.dtOrder.cantidad);
+        consolidatedInformation.push({
+          "#" : count,
+          "Pedido": prod.dtOrder.consecutivo_Pedido,
+          "Item": prod.producto.prod_Id,
+          "Referencia": prod.producto.prod_Nombre,
+          "Cant. Rollos": this.formatNumbers((countProduction)),
+          "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
+          "Presentación": prod.dtOrder.presentacion
+        });
+      }
+    });
+    return consolidatedInformation;
+  }
+
+  getInformationProducts(data: any): Array<any> {
+    let informationProducts: Array<any> = [];
+    let count: number = 0;
+    data.sort((a, b) => Number(a.dtOrder.numero_Rollo) - Number(b.dtOrder.numero_Rollo));
+    data.sort((a, b) => Number(a.producto.prod_Id) - Number(b.producto.prod_Id));
+    data.forEach(prod => {
+      count++;
+      informationProducts.push({
+        "#" : count,
+        "Rollo": prod.dtOrder.numero_Rollo,
+        "OT" : prod.orderProduction,
+        "Item": prod.producto.prod_Id,
+        "Referencia": prod.producto.prod_Nombre,
+        "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
+        "Presentación": prod.dtOrder.presentacion,
+        "Ubicación": prod.ubication == null ? '' : prod.ubication,
+      });
+    });
+    return informationProducts;
+  }
+
+  informationClientPDF(data): {} {
+    return {
+      table: {
+        widths: ['50%', '20%', '30%'],
+        body: [
+          [
+            { text: `Información detallada del Cliente`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
+          ],
+          [
+            { text: `Nombre: ${data.clientes.cli_Nombre}` },
+            { text: `ID: ${data.clientes.cli_Id}` },
+            { text: `Tipo de ID: ${data.clientes.tipoIdentificacion_Id}` },
+          ],
+          [
+            { text: `Telefono: ${data.clientes.cli_Telefono}` },
+            { text: `E-mail: ${data.clientes.cli_Email}`, colSpan: 2 },
+            {}
+          ],
+          data.datosEnvio != null ? [
+            { text: `Conductor: ${data.datosEnvio.conductor}` },
+            { text: `Placa: ${data.datosEnvio.placa}` },
+            { text: `Despachado Por: ${data.datosEnvio.creadoPor}` },
+          ] : [
+            { border: [false, false, false, false], colSpan: 3, text: '' }, {}, {}
+          ],
+          data.datosEnvio != null ? [
+            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00','')} ${data.order.hora}` },
+            { text: `Fecha de Despacho: ${(data.datosEnvio.fecha).replace('T00:00:00','')} ${(data.datosEnvio.hora)}`, colSpan: 2 }, {}
+          ] : [
+            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00','')} ${data.order.hora}`, colSpan: 3, }, {}, {}
+          ]
+        ]
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null;
+        }
+      }
+    }
+  }
+
+  tableConsolidated(data) {
+    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['5%', '7%', '8%', '40%', '10%', '20%', '10%'];
+    return {
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBody(data, columns, 'Consolidado de producto(s)'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  tableProducts(data) {
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
+    let widths: Array<string> = ['3%', '8%', '7%', '8%', '37%', '9%', '10%', '18%'];
+    return {
+      margin: [0, 10],
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBody2(data, columns, 'Rollos Seleccionados'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  buildTableBody(data, columns, title) {
+    var body = [];
+    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  buildTableBody2(data, columns, title) {
+    var body = [];
+    body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  observationPDF(data) {
+    return {
+      margin: [0, 20],
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación Orden:`, style: 'subtitulo', bold: true }],
+          [{ border: [true, false, true, true], text: `${data.order.observacion.toString().trim()}` }],
+          data.datosEnvio != null ?[{ border: [true, true, true, false], text: `Observación Despacho:`, style: 'subtitulo', bold: true }] : [{ border: [false, false, false, false], text: '' }],
+          data.datosEnvio != null ? [{ border: [true, false, true, true], text: `${data.datosEnvio.observacion.toString().trim()}` }] : [{ border: [false, false, false, false], text: '' }]
+        ]
+      },
+      fontSize: 9,
+    }
   }
 }
