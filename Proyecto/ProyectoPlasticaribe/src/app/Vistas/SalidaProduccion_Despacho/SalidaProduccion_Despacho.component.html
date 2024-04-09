@@ -25,14 +25,14 @@
     <div class="row g-4 my-5">
       <div class="col-sm-12 col-md-3">
         <span class="p-float-label">
-          <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationOrderFact()"/>
+          <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationOrderFact2()"/>
           <label for="orderFact">Orden Fact.</label>
         </span>
       </div>
 
       <div class="col-sm-12 col-md-3">
-        <span class="p-float-label">
-          <input formControlName="production" type="number" id="RolloBarCode" pInputText pAutoFocus [autofocus]="true" (keyup.enter)="getInformationProduction()"/>
+        <span class="p-float-label"> <!--type="number"-->
+          <input formControlName="production"  id="RolloBarCode" pInputText pAutoFocus [autofocus]="true" (keyup.enter)="getInformationProduction2()"/>
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>
@@ -68,6 +68,7 @@
   </form>
 
   <p-table
+    *ngIf="!load"
     [value]="sendProductionZeus"
     columnResizeMode="expand"
     styleClass="p-datatable-sm"
@@ -94,7 +95,8 @@
         <th class="text-center">Hora</th>
         <th class="text-center">Turno</th>
         <th class="text-center">Proceso</th>
-        <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>
+        <th class="text-center">Pallet</th>
+        <!--<th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>-->
         <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
       </tr>
     </ng-template>
@@ -116,7 +118,8 @@
         <td class="text-center">{{data.turno.turno_Nombre}}</td>
         <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
         <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-          <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button> 
+          <!--<p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button>--> 
+          {{data.pallet}}
         </td>
         <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
           <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
