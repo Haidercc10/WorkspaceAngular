@@ -65,11 +65,11 @@ export class ReporteProduccionComponent implements OnInit {
 
   validarProcesoPorUsuarioRegistrado() {
     if (![1, 10, 83].includes(this.ValidarRol)) {
-      if (this.ValidarRol == 7) this.areasEmpresa = ['EXTRUSION'];
-      if (this.ValidarRol == 8) this.areasEmpresa = ['SELLADO', 'Wiketiado'];
-      if (this.ValidarRol == 9) this.areasEmpresa = ['EMPAQUE'];
-      if (this.ValidarRol == 62) this.areasEmpresa = ['IMPRESION'];
-      if (this.ValidarRol == 63) this.areasEmpresa = ['ROTOGRABADO'];
+      if ([85,7].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION'];
+      if ([86,8].includes(this.ValidarRol)) this.areasEmpresa = ['SELLADO', 'Wiketiado'];
+      if ([87,9,4].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'IMPRESION'];
+      if ([88,62,4].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION', 'EMPAQUE'];
+      if ([63,89].includes(this.ValidarRol)) this.areasEmpresa = ['ROTOGRABADO'];
     } else this.areasEmpresa = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
   }
 

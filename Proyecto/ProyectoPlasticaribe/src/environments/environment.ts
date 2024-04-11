@@ -12,10 +12,10 @@ export const environment = {
   rutaZeusContabilidad: "http://192.168.0.85:9065/api",
 
   // LOCALES 1
-  rutaPlasticaribeAPI : "http://192.168.0.187:9085/api",
-  rutaBagPro : "http://192.168.0.187:9095/api",
-  // rutaZeus : "http://192.168.0.187:9055/api",
-  // rutaZeusContabilidad : "http://192.168.0.187:9065/api"
+  rutaPlasticaribeAPI : "http://192.168.0.188:9085/api",
+  rutaBagPro : "http://192.168.0.188:9095/api",
+  // rutaZeus : "http://192.168.0.188:9055/api",
+  // rutaZeusContabilidad : "http://192.168.0.188:9065/api"
 
   // LOCALES 2
   //rutaPlasticaribeAPI : "http://192.168.0.193:9085/api",

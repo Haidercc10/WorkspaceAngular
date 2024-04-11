@@ -80,6 +80,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.dt.clear();
     this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => {
       data.forEach(dataOrder => this.serchedData.push(dataOrder));
+      this.load = false;
     }, error => {
       this.load = false;
       this.msg.mensajeError(`¡No se encontró información de ordenes realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);

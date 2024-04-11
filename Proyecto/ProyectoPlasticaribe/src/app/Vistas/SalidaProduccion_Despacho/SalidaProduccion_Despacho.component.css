@@ -3,6 +3,14 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
     width: 100%;
 }
 
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+    height: 2rem;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+    width: 2rem;
+}
+
 /*================================================ BOTON IMPRIMIR ================================================*/
 .buttonPrint {
     margin: auto;

@@ -76,7 +76,8 @@
     [value]="serchedData"
     dataKey="Oc"
     [scrollable]="true"
-    scrollHeight="50rem">
+    scrollHeight="50rem"
+    *ngIf="!load">
     <ng-template pTemplate="header">
       <tr>
         <th class="text-center" pSortableColumn="or.id">

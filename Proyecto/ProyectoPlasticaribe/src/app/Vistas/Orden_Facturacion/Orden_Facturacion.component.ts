@@ -120,7 +120,8 @@ export class Orden_FacturacionComponent implements OnInit {
               orderProduction: dataProduction.pp.ot,
               numberProduction: dataProduction.pp.numeroRollo_BagPro,
               quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
-              presentation: dataProduction.pp.presentacion
+              presentation: dataProduction.pp.presentacion,
+              weight : dataProduction.pp.peso_Bruto
             });
           }
           if (countProductionAvaible.length == this.production.length) this.production = this.changeNameProduct(this.production);
@@ -232,7 +233,8 @@ export class Orden_FacturacionComponent implements OnInit {
             orderProduction: dataProduction.pp.ot,
             numberProduction: dataProduction.pp.numeroRollo_BagPro,
             quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
-            presentation: dataProduction.pp.presentacion
+            presentation: dataProduction.pp.presentacion, 
+            weight : dataProduction.pp.peso_Bruto
           });
         }
         if (countProductionAvaible.length == this.production.length) {
@@ -255,7 +257,8 @@ export class Orden_FacturacionComponent implements OnInit {
               reference: dataProduction.reference,
               numberProduction: dataProduction.numberProduction,
               quantity: dataProduction.quantity,
-              presentation: dataProduction.presentation
+              presentation: dataProduction.presentation, 
+              weight : 0
             });
           }
         });
@@ -445,9 +448,11 @@ export class Orden_FacturacionComponent implements OnInit {
     data = this.changeNameProductInPDF(data);
     let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
     let informationProducts: Array<any> = this.getInformationProducts(data);
+    
     content.push(this.informationClientPDF(data[0]));
     content.push(this.observationPDF(data[0]));
     content.push(this.tableConsolidated(consolidatedInformation));
+    content.push(this.tableTotals(data))
     content.push(this.tableProducts(informationProducts));
     return content;
   }
@@ -475,13 +480,18 @@ export class Orden_FacturacionComponent implements OnInit {
         count++;
         let cuontProduction: number = data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).length;
         let totalQuantity: number = 0;
-        data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => totalQuantity += x.dtOrder.cantidad);
+        let totalWeight: number = 0;
+        data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => {
+          totalQuantity += x.dtOrder.cantidad,
+          totalWeight += x.weight
+        }); 
         consolidatedInformation.push({
           "#" : count,
           "Pedido": prod.dtOrder.consecutivo_Pedido,
           "Item": prod.producto.prod_Id,
           "Referencia": prod.producto.prod_Nombre,
-          "Cant. Rollos": this.formatNumbers((cuontProduction)),
+          "Rollos": this.formatNumbers((cuontProduction)),
+          "Peso": this.formatNumbers((totalWeight).toFixed(2)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
           "Presentación": prod.dtOrder.presentacion
         });
@@ -503,12 +513,12 @@ export class Orden_FacturacionComponent implements OnInit {
         "OT" : prod.orderProduction,
         "Item": prod.producto.prod_Id,
         "Referencia": prod.producto.prod_Nombre,
+        "Peso" : this.formatNumbers((prod.weight).toFixed(2)),
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
         "Presentación": prod.dtOrder.presentacion,
         "Ubicación": prod.ubication == null ? '' : prod.ubication,
       });
     });
-    console.log(informationProducts);
     return informationProducts;
   }
 
@@ -555,8 +565,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableConsolidated(data) {
-    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['5%', '7%', '8%', '40%', '10%', '20%', '10%'];
+    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Rollos', 'Peso', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['5%', '7%', '8%', '38%', '10%', '10%', '12%', '10%'];
     return {
       table: {
         headerRows: 2,
@@ -573,8 +583,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
-    let widths: Array<string> = ['3%', '8%', '7%', '8%', '37%', '9%', '10%', '18%'];
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Presentación', 'Ubicación'];
+    let widths: Array<string> = ['3%', '7%', '7%', '7%', '35%', '6%', '8%', '10%', '17%'];
     return {
       margin: [0, 10],
       table: {
@@ -593,7 +603,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   buildTableBody(data, columns, title) {
     var body = [];
-    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -605,7 +615,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   buildTableBody2(data, columns, title) {
     var body = [];
-    body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
+    body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -630,6 +640,41 @@ export class Orden_FacturacionComponent implements OnInit {
       fontSize: 9,
     }
   }
+
+  // Tabla con totales finales. 
+  tableTotals(data) {
+    let qtyRolls = this.consolidatedInformation(data).reduce((a, b) => a + parseInt(b.Rollos), 0);
+    let totalWeight = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso.replace(',','')), 0); 
+    let totalQty = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Cantidad.replace(',','') ), 0); 
+    let units : any = [];
+    
+    this.consolidatedInformation(data).forEach(x => {
+      if(!units.includes(x.Presentación)) {
+        units.push(x.Presentación);
+      } 
+    });
+
+    return {
+      margin: [0, 0, 0, 0],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['5%', '7%', '8%', '38%', '10%', '10%', '12%', '10%'],
+        body: [
+          [
+            { text: ``, alignment: 'center', border: [true, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: `Totales`, alignment: 'right', bold : true, border: [false, false, false, true], },
+            { text: `${this.formatNumbers((qtyRolls))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${this.formatNumbers((totalWeight).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${this.formatNumbers((totalQty).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${units.length == 1 ? units : ``}`, alignment: '', bold : true, border: [false, false, true, true], },
+          ],
+        ],
+      }
+    }
+  }
 }
 
 interface production {
@@ -643,6 +688,7 @@ interface production {
   quantity: number;
   cuontProduction?: number;
   presentation: string;
+  weight : number;
 }
 
 
