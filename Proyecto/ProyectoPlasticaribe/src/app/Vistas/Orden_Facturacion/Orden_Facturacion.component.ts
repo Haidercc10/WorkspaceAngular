@@ -491,7 +491,8 @@ export class Orden_FacturacionComponent implements OnInit {
           "Item": prod.producto.prod_Id,
           "Referencia": prod.producto.prod_Nombre,
           "Rollos": this.formatNumbers((cuontProduction)),
-          "Peso": this.formatNumbers((totalWeight).toFixed(2)),
+          "Peso B.": this.formatNumbers((totalWeight).toFixed(2)),
+          "Peso_Bruto": this.formatNumbers((totalWeight).toFixed(2)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
           "Presentación": prod.dtOrder.presentacion
         });
@@ -514,6 +515,7 @@ export class Orden_FacturacionComponent implements OnInit {
         "Item": prod.producto.prod_Id,
         "Referencia": prod.producto.prod_Nombre,
         "Peso" : this.formatNumbers((prod.weight).toFixed(2)),
+        "Peso B." : this.formatNumbers((prod.weight).toFixed(2)),
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
         "Presentación": prod.dtOrder.presentacion,
         "Ubicación": prod.ubication == null ? '' : prod.ubication,
@@ -565,7 +567,7 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableConsolidated(data) {
-    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Rollos', 'Peso', 'Cantidad', 'Presentación'];
+    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Peso B.', 'Rollos', 'Cantidad', 'Presentación'];
     let widths: Array<string> = ['5%', '7%', '8%', '38%', '10%', '10%', '12%', '10%'];
     return {
       table: {
@@ -583,7 +585,7 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Presentación', 'Ubicación'];
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso'.replace('Peso', 'Peso B.'), 'Cantidad', 'Presentación', 'Ubicación'];
     let widths: Array<string> = ['3%', '7%', '7%', '7%', '35%', '6%', '8%', '10%', '17%'];
     return {
       margin: [0, 10],
@@ -644,7 +646,7 @@ export class Orden_FacturacionComponent implements OnInit {
   // Tabla con totales finales. 
   tableTotals(data) {
     let qtyRolls = this.consolidatedInformation(data).reduce((a, b) => a + parseInt(b.Rollos), 0);
-    let totalWeight = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso.replace(',','')), 0); 
+    let totalWeight = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso_Bruto.replace().replace(',','')), 0); 
     let totalQty = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Cantidad.replace(',','') ), 0); 
     let units : any = [];
     
@@ -666,8 +668,8 @@ export class Orden_FacturacionComponent implements OnInit {
             { text: ``, alignment: 'center', border: [false, false, false, true], },
             { text: ``, alignment: 'center', border: [false, false, false, true], },
             { text: `Totales`, alignment: 'right', bold : true, border: [false, false, false, true], },
-            { text: `${this.formatNumbers((qtyRolls))}`, alignment: '', bold : true, border: [true, false, true, true], },
             { text: `${this.formatNumbers((totalWeight).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${this.formatNumbers((qtyRolls))}`, alignment: '', bold : true, border: [true, false, true, true] },
             { text: `${this.formatNumbers((totalQty).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
             { text: `${units.length == 1 ? units : ``}`, alignment: '', bold : true, border: [false, false, true, true], },
           ],

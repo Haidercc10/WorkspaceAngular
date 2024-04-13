@@ -39,7 +39,6 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   remainingProduction: Array<production> = [];
   productionInPallet : Array<any> = [];
   productionOutPallet : Array<any> = [];
-  isError : Array<any> = [];
   count : number = 0;
   modalProductionOutPallet : boolean = false;
 
@@ -276,13 +275,13 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   totalQuantity(): number {
     let total: number = 0;
-    total = this.sendProductionZeus.reduce((acc, prod) => acc + ![undefined, null, ''].includes(prod.pp) ? (prod.pp.presentacion == 'Kg' ? prod.pp.peso_Neto : prod.pp.cantidad) : 0, 0);
+    total = this.sendProductionZeus.reduce((acc, prod) =>  acc += ![undefined, null, ''].includes(prod.pp) ? (prod.pp.presentacion == 'Kg' ? prod.pp.peso_Neto : prod.pp.cantidad) : 0, 0) 
     return total;
   }
 
   totalWeight(): number {
     let total: number = 0;
-    total = this.sendProductionZeus.reduce((acc, prod) => acc + ![undefined, null, ''].includes(prod.pp) ? (prod.pp.peso_Neto) : 0, 0);
+    total = this.sendProductionZeus.reduce((acc, prod) => acc += ![undefined, null, ''].includes(prod.pp) ? (prod.pp.peso_Neto) : 0, 0);
     return total;
   }
 
@@ -452,7 +451,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           'numberProduction': dataProduction.dtOrder.numero_Rollo,
           'quantity': dataProduction.dtOrder.cantidad,
           'presentation': dataProduction.dtOrder.presentacion, 
-          'pallet' : ![0, null, undefined, ''].includes(dataProduction.pallet) ? `ENTRLL#${dataProduction.pallet}-ITEM#${dataProduction.producto.prod_Id}` : null,
+          'pallet' : ![0, null, undefined, ''].includes(dataProduction.dtOrder.pallet_Id) ? `ENTRLL#${dataProduction.pallet}-ITEM#${dataProduction.producto.prod_Id}` : null,
         });
         if (saleOrders.length == data.length){
           setTimeout(() => this.load = false, 50);
@@ -503,6 +502,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   loadForRolls(production : any, productionOrderSearched : any, of : number){
     production = parseInt(production);
+    this.productionInPallet = [];
+    this.productionOutPallet = [];
+    this.count = 1; 
+
     if (!productionOrderSearched.includes(production)) this.warningMsj(`El rollo/bulto N° ${production} no pertenece a la orden ${of}`, ``);
     else {
       let palletFind : any[] = this.production.filter(x => x.pallet == this.production.find(x => x.numberProduction == production).pallet && ![0, null, undefined, ''].includes(x.pallet));
@@ -531,14 +534,16 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   getDataProduction2(production: number, barcodeRead : any, idPallet : any, info : any) {
     let orderFact = this.formProduction.value.orderFact;
     this.productionProcessSerivce.GetInformationAboutProductionToSend(production, orderFact).subscribe(data => {
-      this.productionInPallet.push(data);
-
-      if(this.count == data.length) {
+      data.forEach(prod => this.productionInPallet.push(prod));
+      
+      console.log(this.count, this.productionInPallet.length)
+      if(this.count == this.productionInPallet.length) {
+        
         this.productionInPallet.forEach(prod => {
           this.sendProductionZeus.push(prod);
           let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod.pp.numero_Rollo);
-          let roll : number = this.sendProductionZeus.find(x => x.pp.numero_Rollo == prod.pp.numeroRollo_BagPro);
-          this.sendProductionZeus[i].pallet = '';
+          let roll : number = this.sendProductionZeus.find(x => x.pp.numeroRollo_BagPro == prod.pp.numeroRollo_BagPro).pp.numeroRollo_BagPro;
+          this.sendProductionZeus[i].pallet = idPallet;
           this.sendProductionZeus[i].numero_RolloBagPro = roll;
           this.sendProductionZeus[i].position = this.sendProductionZeus.length;
           this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
@@ -548,9 +553,6 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       } 
     }, error => {
       this.productionOutPallet.push(info);
-      console.log(this.productionOutPallet);
-      
-      //this.errorMessage(`No se encontró información del rollo/bulto/paquete leído en la orden N° ${orderFact}`,error);
       this.modalProductionOutPallet = true;
       this.load = false;
     }); 

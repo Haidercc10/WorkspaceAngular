@@ -134,22 +134,24 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //ORDEN DE FACTURACIÓN POR PALLETS
   getProducts2(){
     if(this.selectedProductSaleOrder != null) {
-      this.loading = true;
+      this.load = true;
       let item : any = this.selectedProductSaleOrder.id_Producto;
       this.pallets = [];
       
       this.svProductionProcess.getInfoItemsAvailablesOutPallet(item).subscribe(dataOut => { 
         this.svProductionProcess.getInfoItemsAvailablesInPallet(item).subscribe(dataIn => { 
-          if(dataOut.concat(dataIn).length > 0) this.loadPallets(dataOut.concat(dataIn));
-          else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron rollos/bultos disponibles del item ${item}`);
-          this.loading = false;
+          if(dataOut.concat(dataIn).length > 0) this.loadPallets(dataOut.concat(dataIn)); 
+          else {
+            this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron rollos/bultos disponibles del item ${item}`);
+            this.load = false;
+          } 
         }, error => {
           this.msj.mensajeError(`Error`, `Ocurrió un error verificando rollos/bultos en pallets.`);
-          this.loading = false;
+          this.load = false;
         });
        }, error => {
         this.msj.mensajeError(`Error`, `Ocurrió un error verificando rollos/bultos.`);
-        this.loading = false;
+        this.load = false;
       });
     }
   }
@@ -159,7 +161,11 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     let saleOrder : any = this.selectedProductSaleOrder.consecutivo;
     data.forEach(d => { d.saleOrder = saleOrder });
     this.pallets = data;
-    setTimeout(() => { this.referencesForOT(this.pallets) }, 500); 
+    this.pallets.sort((a, b) => a.status.localeCompare(b.status));
+    setTimeout(() => { 
+      this.load = false;
+      this.referencesForOT(this.pallets);
+    }, 500); 
   }
 
   //Función para obtener las diferentes referencias por OT. 
@@ -187,14 +193,16 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     });
   }
 
-  qtyPallets = (pallet : number, index : number) => this.pallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a + b.qty, 0);
+  qtyPallets(pallet : number, index : number) {
+    return this.pallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a += b.qty, 0);
+  } 
 
-  qtySelectedPallets = (pallet : number, index : number) => this.selectedPallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a + b.qty, 0)
+  qtySelectedPallets = (pallet : number, index : number) => this.selectedPallets[index].rolls.filter(x => x.pallet == pallet).reduce((a, b) => a += b.qty, 0)
 
   //SELECCIONAR TODO
   //Función para seleccionar todos los pallets
   selectAllPallets() {
-    this.loading = true;
+    this.load = true;
 
     if(this.selectedPallets.length == 0) this.selectedPallets = this.selectedPallets.concat(this.pallets);
     else {
@@ -212,13 +220,13 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     }
     this.pallets = [];
     this.loadInfoConsolidate();
-    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
-    setTimeout(() => { this.loading = false }, 5);
+    this.pallets.sort((a, b) => a.status.localeCompare(b.status));
+    setTimeout(() => { this.load = false }, 5);
   }
 
   //Función para deseleccionar todos los pallets
   deselectAllPallets() {
-    this.loading = true;
+   this.load = true;
     if(this.pallets.length == 0) this.pallets = this.pallets.concat(this.selectedPallets);
     else {
       this.selectedPallets.forEach(s => {
@@ -236,14 +244,14 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     
     this.selectedPallets = [];
     this.loadInfoConsolidate();
-    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
-    setTimeout(() => { this.loading = false }, 5);
+    this.pallets.sort((a, b) => a.status.localeCompare(b.status));
+    setTimeout(() => {this.load = false }, 5);
   }
 
   //SELECCIONAR PALLETS
   //Funcion para seleccionar un pallet en especifico
   selectPallet(data : any) {
-    this.loading = true;
+   this.load = true;
     let index = this.pallets.findIndex(x => x.pallet == data.pallet);
     if(this.selectedPallets.find(x => x.pallet == data.pallet) == undefined) {
       this.loadPalletsByPallet(this.selectedPallets, this.pallets, index, data);
@@ -251,14 +259,14 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
       this.loadPalletsSoloRoll(this.pallets, this.selectedPallets, index, data);
     }
     this.pallets.splice(index, 1)
-    this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    this.selectedPallets.sort((a, b) => a.status.localeCompare(b.status));
     this.loadInfoConsolidate();
-    setTimeout(() => { this.loading = false }, 5);
+    setTimeout(() => {this.load = false }, 5);
   }
 
   //Funcion para deseleccionar un pallet en especifico
   deselectPallet(data : any) {
-    this.loading = true;
+   this.load = true;
     let index = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
     if(this.pallets.find(x => x.pallet == data.pallet) == undefined) {
       this.loadPalletsByPallet(this.pallets, this.selectedPallets, index, data);
@@ -266,9 +274,9 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
       this.loadPalletsSoloRoll(this.selectedPallets, this.pallets, index, data);
     }
     this.selectedPallets.splice(index, 1);
-    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    this.pallets.sort((a, b) => a.status.localeCompare(b.status));
     this.loadInfoConsolidate();
-    setTimeout(() => { this.loading = false }, 5);
+    setTimeout(() => {this.load = false }, 5);
   }
 
   loadPalletsByPallet(array1 : any, array2 : any, index : number, data : any){
@@ -286,7 +294,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //SELECCIONAR SOLO ROLLOS
   //Función para seleccionar un rollo en especifico
   selectRoll(data : any, i : number) {
-    this.loading = true;
+   this.load = true;
     let index = this.pallets.findIndex(x => x.pallet == data.pallet);
     
     if(this.selectedPallets.find(x => x.pallet == data.pallet) == undefined) {
@@ -297,14 +305,14 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     }
     this.pallets[index].rolls.splice(i, 1);
     if (this.pallets[index].rolls.length == 0) this.pallets.splice(index, 1);
-    this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    this.selectedPallets.sort((a, b) => a.status.localeCompare(b.status));
     this.loadInfoConsolidate();
-    setTimeout(() => { this.loading = false }, 5);
+    setTimeout(() => {this.load = false }, 5);
   } 
 
   //Función para deseleccionar un rollo en especifico
   deselectRoll(data : any, i : number) {
-    this.loading = true;
+   this.load = true;
     let index = this.selectedPallets.findIndex(x => x.pallet == data.pallet);
     
     if(this.pallets.find(x => x.pallet == data.pallet) == undefined) {
@@ -316,9 +324,9 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
 
     this.selectedPallets[index].rolls.splice(i, 1);
     if (this.selectedPallets[index].rolls.length == 0) this.selectedPallets.splice(index, 1);
-    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    this.pallets.sort((a, b) => a.status.localeCompare(b.status));
     this.loadInfoConsolidate();
-    setTimeout(() => { this.loading = false }, 5);
+    setTimeout(() => {this.load = false }, 5);
   } 
 
   //Función para seleccionar/deseleccionar los pallets y ordenarlos por rollo.
@@ -408,7 +416,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
 
   //Función para filtrar los pallets por referencia.
   selectByFilter(){
-    this.loading = true;
+   this.load = true;
     let data = this.t1.filteredValue ? this.t1.filteredValue : this.t1.value; 
     
     this.selectedPallets = this.selectedPallets.concat(data);
@@ -422,25 +430,25 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
       this.t1.clear();
     }
     this.loadInfoConsolidate();
-    this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
-    setTimeout(() => { this.loading = false }, 5);
+    this.selectedPallets.sort((a, b) => a.status.localeCompare(b.status));
+    setTimeout(() => {this.load = false }, 5);
   }
 
   //Función para filtrar los pallets por referencia.
   deselectByFilter(){
-    this.loading = true;
+   this.load = true;
     
-    setTimeout(() => { this.loading = false }, 5);
+    setTimeout(() => {this.load = false }, 5);
   }
   
   //SELECCIONAR POR CANTIDAD
   //Función para filtrar los pallets por cantidad.
   selectByQuantity(){
-    this.loading = true;
+   this.load = true;
     let sumQty : number = 0; 
     let totalQtyByItem : number = this.totalQtyByItem();
     let array : any = [];
-    this.pallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+    this.pallets.sort((a, b) => a.status.localeCompare(b.status));
 
     if(this.selectedProductSaleOrder.consecutivo != null) {
       if(this.selectedQty > 0) {
@@ -463,19 +471,19 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
             });
             this.sendPalletsToSelected(array);
           } else {
-            this.loading = false;
+           this.load = false;
             this.msj.mensajeError(`La cantidad total de rollos disponibles es menor a la cantidad digitada.`, `Error`);
           }
         } else {
-          this.loading = false;
+         this.load = false;
           this.msj.mensajeAdvertencia(`Debe seleccionar un item`);
         }
       } else {
-        this.loading = false;
+       this.load = false;
         this.msj.mensajeAdvertencia(`Debe digitar una cantidad mayor a '0'`);
       }
     } else {
-      this.loading = false;
+     this.load = false;
       this.msj.mensajeAdvertencia(`Debe seleccionar el item asociado al pedido!`);
     } 
   }
@@ -498,9 +506,9 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
           if (this.pallets[index].rolls.length == 0) this.pallets.splice(index, 1);
         });
       });
-      this.selectedPallets.sort((a, b) => a.pallet.localeCompare(b.pallet));
+      this.selectedPallets.sort((a, b) => a.status.localeCompare(b.status));
       this.loadInfoConsolidate();
-      this.loading = false;
+     this.load = false;
     }, 500);
   }
 
@@ -555,6 +563,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
           'Presentacion' : y.presentation,
           'Consecutivo_Pedido' : (x.saleOrder).toString(),
           'Estado_Id' : 20,
+          'Pallet_Id' : y.pallet.startsWith('FP-') ? null : parseInt(y.pallet.replace('PL-', '')),
         }
         this.svDetOrdFact.Post(dtOrderFact).subscribe(() => {
           count++;
@@ -584,6 +593,8 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     this.infoConsolidate = [];
     this.selectedQty = 0;
     this.selectedProductSaleOrder = null;
+    this.t1.clear(); 
+    this.t2.clear();
   }
 
   //FUNCIONES PARA CREAR PDF
@@ -666,7 +677,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
         "Presentación": prod.dtOrder.presentacion,
         "Ubicación": prod.ubication == null ? '' : prod.ubication,
-        "Pallet" :  [0, null, undefined, ''].includes(prod.pallet) ? '' : prod.pallet,
+        "Pallet" :  [0, null, undefined, ''].includes(prod.dtOrder.pallet_Id) ? '' : prod.dtOrder.pallet_Id,
       });
     });
     return informationProducts;

@@ -129,6 +129,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
     this.detailsPreInService.GetInformactionAboutPreInToSendDesp_ById(preIn, item).subscribe(data => this.updateProductionZeus(data), (error: HttpErrorResponse) => {
       let message: string = error.status == 404 ? `¡No se encontró la información del la Pre Entrega!` : `¡Ocurrió un error al buscar la información de la Pre Entrega!`;
       this.errorMessage(message, error);
+      this.barCode = null;
     });
   }
 
@@ -183,6 +184,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
       EntRolloProd_Observacion: this.setUbication(),
       Usua_Id: this.storage_Id,
       EntRolloProd_Hora: moment().format('H:mm:ss'),
+      Pallet_Id : data[0].pre.pre_Id
     }
     this.entraceService.srvGuardar(info).subscribe(res => this.saveDetailsEntrance(res.entRolloProd_Id, data), (error: HttpErrorResponse) => this.errorMessage(`¡Ocurrió un error al guardar la ubicación de los rollos/bultos!`, error));
   }
@@ -205,6 +207,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
         Prod_CantBolsasRestates: 0,
         Prod_CantBolsasFacturadas: 0,
         Proceso_Id: data.details.process,
+        Pallet_Id: data.pre.pre_Id
       }
       this.dtEntracesService.srvGuardar(info).subscribe(() => {
         count++;

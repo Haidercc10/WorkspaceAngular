@@ -197,15 +197,15 @@
         <tr>
             <th class="text-center" style="width: 4rem"><p-checkbox (click)="selectAllPallets()"></p-checkbox></th>
             <th class="text-center" style="width: 5rem"></th>
-            <th class="text-center" pSortableColumn="">#</th>
-            <th class="text-center" pSortableColumn="pallet"><p-sortIcon field="pallet"></p-sortIcon> Pallet <p-columnFilter type="text" field="pallet" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="client_Id"><p-sortIcon field="client_Id"></p-sortIcon> Id Cliente <p-columnFilter type="text" field="client_Id" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon> Cliente <p-columnFilter type="text" field="client" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item <p-columnFilter type="text" field="item" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Cantidad <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Rollos Disponibles <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
+            <th class="text-center">#</th>
+            <th class="text-center"> Pallet <p-columnFilter type="text" field="pallet" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Id Cliente <p-columnFilter type="text" field="client_Id" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Cliente <p-columnFilter type="text" field="client" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Item <p-columnFilter type="text" field="item" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Referencia <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Cantidad <p-columnFilter type="text" field="qty" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Presentación <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Rollos Disponibles <p-columnFilter type="text" field="qtyRolls" display="menu"></p-columnFilter></th>
         </tr>
     </ng-template>
     <!--Body-->
@@ -325,21 +325,21 @@
     responsiveLayout="scroll"
     [scrollable]="true"
     scrollHeight="50rem"
-    [loading]="loading">
+    *ngIf="!load">
     <!--Header-->
     <ng-template pTemplate="header">
         <tr>
             <th class="text-center" style="width: 4rem"><p-checkbox (click)="deselectAllPallets()"></p-checkbox></th>
             <th class="text-center" style="width: 5rem"></th>
-            <th class="text-center" pSortableColumn="">#</th>
-            <th class="text-center" pSortableColumn="pallet"><p-sortIcon field="pallet"></p-sortIcon> Pallet <p-columnFilter type="text" field="pallet" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="client_Id"><p-sortIcon field="client_Id"></p-sortIcon> Id Cliente <p-columnFilter type="text" field="client_Id" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon> Cliente <p-columnFilter type="text" field="client" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item <p-columnFilter type="text" field="item" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Cantidad <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter></th>
-            <th class="text-center" pSortableColumn=""><p-sortIcon field=""></p-sortIcon> Rollos Seleccionados <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
+            <th class="text-center">#</th>
+            <th class="text-center"> Pallet <p-columnFilter type="text" field="pallet" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Id Cliente <p-columnFilter type="text" field="client_Id" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Cliente <p-columnFilter type="text" field="client" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Item <p-columnFilter type="text" field="item" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Referencia <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Cantidad <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Presentación <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter></th>
+            <th class="text-center"> Rollos Seleccionados <p-columnFilter type="text" field="" display="menu"></p-columnFilter></th>
         </tr>
     </ng-template>
     <!--Body-->

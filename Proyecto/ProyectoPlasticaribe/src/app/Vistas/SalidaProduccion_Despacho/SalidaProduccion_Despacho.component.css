@@ -11,6 +11,10 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
     width: 2rem;
 }
 
+::ng-deep .p-dialog .p-dialog-header {
+  padding: 1.5rem 1.5rem 0 1.5rem;
+}
+
 /*================================================ BOTON IMPRIMIR ================================================*/
 .buttonPrint {
     margin: auto;
