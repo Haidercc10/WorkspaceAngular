@@ -19,6 +19,8 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepEntradaBopp as defaultSteps } from 'src/app/data';
 import { CrearBoppComponent } from '../crear-bopp/crear-bopp.component';
 import { modelBOPP } from 'src/app/Modelo/modelBOPP';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 
 @Injectable({
   providedIn: 'root'
@@ -58,6 +60,7 @@ export class EntradaBOPPComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   boppsGenericos : any = [];  /** Variable que contendrá los bopp genericos. */
   modalCrearBopp : boolean = false; /** Variable para abrir el modal que creará nuevos bopp's genericos para sociarlos al que se desea ingresar */
+  createSuppliers : boolean = false;
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -74,7 +77,9 @@ export class EntradaBOPPComponent implements OnInit {
                                       private messageService: MessageService,
                                         private shepherdService: ShepherdService,
                                           private mensajeService : MensajesAplicacionService,
-                                            private servicioBoppGenerico : BoppGenericoService,) {
+                                            private servicioBoppGenerico : BoppGenericoService,
+                                              private svPDF : CreacionPdfService,
+                                                private svMatPrima : MateriaPrimaService) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
@@ -196,12 +201,16 @@ export class EntradaBOPPComponent implements OnInit {
   crearEntrada(){
     if (this.ArrayBOPP.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla!");
     else {
+      let count : number = 0; 
       this.load = false
       for (let i = 0; i < this.ArrayBOPP.length; i++) {
         let datosBOPP = this.validarDatosBopp(this.ArrayBOPP[i]);
-        this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
+        this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(data => {
+          count++;
           this.mensajeService.mensajeConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
           this.getPrecioBOPP();
+          console.log(count, this.ArrayBOPP.length);
+          if(count == this.ArrayBOPP.length) this.crearPDF(data.bopP_FechaIngreso, data.bopP_Hora);
           this.load = true;
         }, () => this.mensajeService.mensajeError(`Error`, `Error al ingresar el rollo!`));
       }
@@ -229,6 +238,7 @@ export class EntradaBOPPComponent implements OnInit {
       BoppGen_Id : data.IdBoppGenerico,
       BOPP_CodigoDoc : this.campoRemi_Faccompra,
       BOPP_TipoDoc : this.tipoDoc,
+      Prov_Id : [0, null, undefined, ''].includes(this.FormOpcional.value.PrvId) ? 800188732 : this.FormOpcional.value.PrvId,
     }
     return datosBOPP;
   }
@@ -516,6 +526,16 @@ export class EntradaBOPPComponent implements OnInit {
       this.tipoDoc = 'REM'
       this.registrarRemisionBopp();
       setTimeout(() => this.limpiarTodosLosCampos(), 3000);
+    } else if (oc == null && factura != null && remision == null) {
+      this.campoRemi_Faccompra = factura;
+      this.tipoDoc = 'FCO'
+      this.crearEntrada();
+      setTimeout(() => this.limpiarTodosLosCampos(), 3000);
+    } else if (oc == null && factura == null && remision != null) {
+      this.campoRemi_Faccompra = remision;
+      this.tipoDoc = 'REM'
+      this.crearEntrada();
+      setTimeout(() => this.limpiarTodosLosCampos(), 3000);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
   }
 
@@ -553,4 +573,184 @@ export class EntradaBOPPComponent implements OnInit {
       this.valorTotal += item.Subtotal;
     }
   }
+
+  loadDescription = () => this.FormEntradaBOPP.patchValue({ 'Observacion' : this.FormEntradaBOPP.value.Nombre });
+
+  formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  crearPDF(date : any, hour : string){
+    this.entradaBOPPService.getEntryBOPP(date, date, hour).subscribe(data => {
+      data.forEach(d => { d.bopp = d.bopp.split('-')[0] });
+      let title: string = `Entrada de BOPP N° ${data[0].id}`;
+      let content: any[] = this.contentPDF(data);
+      this.svPDF.formatoPDF(title, content);
+    });
+  }
+
+  contentPDF(data : any){
+    let content: any[] = [];
+    let groupedBOPP : Array<any> = this.infoConsolidateBopp(data);
+    let detailsBOPP : Array<any> = this.infoDetailedBopp(data);
+
+    content.push(this.infoThird(data));
+    content.push(this.tableConsolidated(groupedBOPP));
+    content.push(this.tableTotals(groupedBOPP));
+    content.push(this.tableDetailed(detailsBOPP));
+
+    return content;
+  }
+
+  infoThird(data : any){
+    return {
+      margin: [0, 0, 0, 15],
+			table: {
+        widths : ['40%', '30%', '30%'],
+				body: [
+					[ { text: `Información de Ingreso`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {},],
+          [ 
+            { text: `OC: ${[0, undefined, null, ''].includes(this.FormOpcional.value.OrdenCompra) ? '' : this.FormOpcional.value.OrdenCompra}`, }, 
+            { text: `Factura/Remisión: ${data[0].codigo}`, },
+            { text: `Tipo Documento: ${data[0].tipoDoc}`, },
+          ],
+          [
+            { text: `Proveedor: ${data[0].proveedor}` },
+            { text: `NIT/CC: ${data[0].id_Proveedor}` },
+            { text: `Telefono: ${data[0].telefono_Proveedor}`}
+          ],
+					[
+            { text: `Usuario: ${data[0].usuario}` },
+            { text: `Fecha: ${data[0].fecha.replace('T00:00:00', '')} ${data[0].hora}`, colSpan : 2},
+            {}
+          ], 
+          [
+            { text: `Observación: ${[0, undefined, null, ''].includes(this.FormOpcional.value.Observacion) ? '' : this.FormOpcional.value.Observacion}`, colSpan : 3 },
+            {},
+            {}
+          ]
+				]
+			}, 
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null;
+        }
+      }  
+		}
+  }
+
+  infoConsolidateBopp(data : any){
+    let infoConsolidate : Array<any> = [];
+    let count : number = 0;
+    
+    data.forEach(d => {
+      if(!infoConsolidate.map(x => x.Referencia).includes(d.bopp)) {
+         console.log(infoConsolidate)
+        count++;
+        let qty : number = data.filter(x => x.bopp == d.bopp).length;
+        let totalQty : number = 0;
+        data.filter(x => x.bopp == d.bopp).forEach(x => { totalQty += x.cantidadInicial; });
+        infoConsolidate.push({
+          '#' : count,
+          'Referencia' : d.bopp,
+          'Rollos' : qty,
+          'Presentación' : 'Kg',
+          'Cantidad' : this.formatNumbers((totalQty).toFixed(2)),
+          'Precio' : this.formatNumbers((d.precio).toFixed(2)),
+          'Subtotal' : this.formatNumbers((d.precio * totalQty)),
+          
+        });
+      }
+    });
+    return infoConsolidate;
+  }
+
+  infoDetailedBopp(data : any){
+    let infoDetails : Array<any> = [];  
+    let count : number = 0;
+
+    data.forEach(d => {
+      count++;
+      infoDetails.push({
+        '#' : count,
+        'Serial' : d.serial, 
+        'Referencia' : d.bopp.split('-')[0],
+        'Micras' : `${this.formatNumbers(d.micras)} µ`,
+        'Ancho' :`${this.formatNumbers(d.ancho)} Cms` ,
+        'Cantidad' : this.formatNumbers((d.cantidadInicial).toFixed(2)),
+        'Presentación' : 'Kg',
+      });
+    });
+    return infoDetails;
+  } 
+
+  tableConsolidated(data : any){
+    let columns: Array<string> = ['#', 'Referencia', 'Rollos', 'Cantidad', 'Presentación', 'Precio', 'Subtotal' ];
+    let widths: Array<string> = ['5%', '40%', '7%', '10%', '10%', '10%', '18%'];
+    return {
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBody(data, columns, 'Consolidado de Entrada de Biorientados'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  tableDetailed(data : any){
+    let columns: Array<string> = ['#', 'Serial', 'Referencia', 'Micras', 'Ancho', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['3%', '13%', '50%', '8%', '8%', '8%', '10%'];
+    return {
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBody(data, columns, 'Detalles de Entrada de Biorientados'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  tableTotals(data : any){
+    return {
+      margin: [0, 0, 0, 20],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['5%', '40%', '7%', '10%', '10%', '10%', '18%'],
+        body: [
+          [
+            { text: ``, alignment: 'center', border: [true, false, false, true], },
+            { text: `Totales`, alignment: 'right', bold : true, border: [false, false, true, true], },
+            { text: `${data.reduce((a, b) => a += b.Rollos, 0)}`, bold : true, border: [false, false, true, true], },
+            { text: `${this.formatNumbers((data.reduce((a, b) => a += parseFloat(b.Cantidad.replaceAll(',', '')), 0)).toFixed(2))}`, bold : true, border: [false, false, true, true], },
+            { text: `Kg`, bold : true, border: [false, false, true, true], },
+            { text: ``, bold : true, border: [false, false, true, true], },
+            { text: `$ ${this.formatNumbers((data.reduce((a, b) => a += parseFloat(b.Subtotal.replaceAll(',', '')), 0)).toFixed(2))}`, bold : true, border: [false, false, true, true], },
+          ],
+        ],
+      }
+    }
+  }
+
+  buildTableBody(data, columns, title) {
+    var body = [];
+    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
 }

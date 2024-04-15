@@ -19,6 +19,7 @@ import { RemisionFacturaService } from 'src/app/Servicios/Remisiones_Facturas/re
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsEntradasMp as defaultSteps } from 'src/app/data';
+import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
 
 @Component({
   selector: 'app_pedidomateriaprima_component',
@@ -79,7 +80,8 @@ export class PedidomateriaprimaComponent implements OnInit {
                                       private ordenCompraRemisionService : OrdenCompra_RemisionService,
                                         private dtOrdenCompraService : DetallesOrdenesCompraService,
                                           private shepherdService: ShepherdService,
-                                            private msj : MensajesAplicacionService,) {
+                                            private msj : MensajesAplicacionService,
+                                              private cmpMovMatPrimas : MovimientoMPComponent) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -375,6 +377,8 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.estadoOrdenCompra();
             this.moverInventarioMP();
             this.moverInventarioTintas();
+            let data : any = { 'Id' : idFactura, Movimiento : 'FCO' }; 
+            this.cmpMovMatPrimas.entradasMateriasPrimas(data);
             setTimeout(() => this.limpiarTodosCampos(), 1500);
           }, 2000);
         }
@@ -510,6 +514,8 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.estadoOrdenCompra();
             this.moverInventarioMP();
             this.moverInventarioTintas();
+            let data : any = { 'Id' : idRemision, Movimiento : 'REM' }; 
+            this.cmpMovMatPrimas.entradasMateriasPrimas(data);
             setTimeout(() => this.limpiarTodosCampos(), 1500);
           }, 2000);
         }

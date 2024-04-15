@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
@@ -10,6 +11,11 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
+import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
+
+@Injectable({
+    providedIn: 'root'
+})
 
 @Component({
   selector: 'app-movimientoMP',
@@ -46,7 +52,8 @@ export class MovimientoMPComponent implements OnInit {
                       private bagProServices : BagproService,
                         private shepherdService: ShepherdService,
                           private mensajeService : MensajesAplicacionService,
-                            private creacionPDFService : CreacionPdfService,) {
+                            private creacionPDFService : CreacionPdfService,
+                              private cmpEntryBOPP : EntradaBOPPComponent) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo : [null, Validators.required],
@@ -166,6 +173,7 @@ export class MovimientoMPComponent implements OnInit {
         Movimiento : datos[i].movimiento,
         Tipo_Movimiento : datos[i].tipo_Movimiento,
         Fecha : datos[i].fecha,
+        Hora : datos[i].hora,
         Usuario : datos[i].usuario,
         Id_MateriaPrima : datos[i].materia_Prima_Id,
         Materia_Prima : datos[i].materia_Prima,
@@ -210,6 +218,10 @@ export class MovimientoMPComponent implements OnInit {
     else if (data.Movimiento == 'CRTINTAS') this.creacionTintas(data);
     else if (data.Movimiento == 'DEVMP') this.devolucionesMateriaPrima(data);
     else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') this.entradasMateriasPrimas(data);
+    else if (data.Movimiento == 'ENTBIO') {
+      this.cmpEntryBOPP.crearPDF(data.Fecha, data.Hora);
+      this.cargando = false;
+    } 
   }
 
   asignacionesMateriaPrima(data : any){
@@ -347,10 +359,10 @@ export class MovimientoMPComponent implements OnInit {
         }, 500);
       }
       informacionPdf = datos;
+      console.log(informacionPdf)
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
-  // Funcion que va a crear un PDF
   crearPDF(data : any){
     let movimientoOrdenesTrabajo : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
     let tituloAdicional : string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';

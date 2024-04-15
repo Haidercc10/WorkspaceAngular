@@ -18,4 +18,5 @@ export interface modelBOPP{
   BoppGen_Id : number;
   BOPP_CodigoDoc : any,
   BOPP_TipoDoc : any,
+  Prov_Id? : number;
 }

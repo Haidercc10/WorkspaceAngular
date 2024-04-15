@@ -27,7 +27,8 @@
 
   <!-- Botones que llamaran modal bopp's genéricos -->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button pButton pRipple id="crearProveedor" class="p-button-danger" label="Crear Bopp genérico" icon="pi pi-database" (click)="llamarModalCrearBopp()" pTooltip="Crea bopp's genéricos y asocialos a los rollos que deseas ingresar, dependiendo micras y ancho!" tooltipPosition="left"></button>
+    <button pButton pRipple id="crearBoppGenerico" class="p-button-danger" label="Crear Bopp genérico" icon="pi pi-database" (click)="llamarModalCrearBopp()" pTooltip="Crea bopp's genéricos y asocialos a los rollos que deseas ingresar, dependiendo micras y ancho!" tooltipPosition="top"></button>
+    <button pButton pRipple id="crearProveedor" class="p-button-danger" label="Crear Proveedor" icon="pi pi-database" (click)="createSuppliers = true" pTooltip="Crea proveedores aquí" tooltipPosition="top"></button>
   </div>
 
   <div class="mb-3">
@@ -36,7 +37,7 @@
 
   <!--Entrada opcional-->
   <div class="mb-5" id="opcional">
-    <p-accordion>
+    <p-accordion [activeIndex]="0"> 
       <p-accordionTab header="Ingresar Factura de BOPP/BOPA/Poliester">
         <br>
 
@@ -176,10 +177,18 @@
     <div class="mb-4" id="formulario2">
       <div class="row g-4">
 
+        <!-- Selección de categoria -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="Categoria" id="Categoria" optionValue="catMP_Id" [autoDisplayFirst]="false" [options]="categorias" optionLabel="catMP_Nombre"></p-dropdown>
+            <label for="Categoria">Categorias</label>
+          </span>
+        </div>
+
         <!-- Nombre BOPP -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="Nombre" id="Nombre" list="Bopp" autocomplete="off" type="text" pInputText required (change)="seleccionarBopp()"/>
+            <input formControlName="Nombre" id="Nombre" list="Bopp" autocomplete="off" type="text" pInputText required (change)="seleccionarBopp()" (keyup)="loadDescription()"/>
             <datalist id="Bopp">
               <option value={{item.nombre}} *ngFor="let item of nombresBopp">{{item.nombre}}</option>
             </datalist>
@@ -233,14 +242,6 @@
           </span>
         </div>
 
-        <!-- Selección de categoria -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
-          <span class="p-float-label">
-            <p-dropdown formControlName="Categoria" id="Categoria" optionValue="catMP_Id" [autoDisplayFirst]="false" [options]="categorias" optionLabel="catMP_Nombre"></p-dropdown>
-            <label for="Categoria">Categorias</label>
-          </span>
-        </div>
-
         <!-- Campo Descripcion -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8 col-xl-3 col-xxl-6">
           <span class="p-float-label">
@@ -252,7 +253,7 @@
          <!-- Nombre BOPP Generico -->
          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="boppGenerico" id="boppGenerico" list="BoppGen" (change)="seleccionarBoppsGenericos()" autocomplete="off" type="text" pInputText pTooltip="Elige el nombre de bopp genérico por ancho y micras asociado al rollo que deseas ingresar, si no se encuentra, por favor crealo!" required/>
+            <input formControlName="boppGenerico" id="boppGenerico" list="BoppGen" (change)="seleccionarBoppsGenericos()" (keyup.enter)="cargarBOPPTabla()" autocomplete="off" type="text" pInputText pTooltip="Elige el nombre de bopp genérico por ancho y micras asociado al rollo que deseas ingresar, si no se encuentra, por favor crealo!" required/>
             <datalist id="BoppGen">
               <option value={{item.boppGen_Id}} *ngFor="let item of boppsGenericos">{{item.boppGen_Nombre}}</option>
             </datalist>
@@ -419,5 +420,12 @@
 <p-dialog [(visible)]="modalCrearBopp" [contentStyle]="{'overflow':'visible'}" [style]="{width: '60vw'}" [resizable]="true" header="Rollo(s) asociado(s)" [modal]="true" >
   <ng-template pTemplate="content">
     <app-crear-bopp></app-crear-bopp>
+  </ng-template>
+</p-dialog>
+
+<!--Modal para crear proveedores -->
+<p-dialog [(visible)]="createSuppliers" [contentStyle]="{'overflow':'visible'}" [style]="{width: '60vw'}" [resizable]="true" header="Crear Proveedores" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-crear-proveedor></app-crear-proveedor>
   </ng-template>
 </p-dialog>
