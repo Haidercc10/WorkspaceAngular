@@ -35,3 +35,15 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
 .colorNegro {
   color: #000;
 }
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+  height: 2rem;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+  width: 2rem;
+}
+
+::ng-deep p-table .p-datatable-gridlines .p-datatable-tbody>tr>td, p-table .p-datatable-gridlines .p-datatable-thead>tr>th, p-table .p-datatable-gridlines .p-datatable-tfoot>tr>td {
+  text-align: center;
+}

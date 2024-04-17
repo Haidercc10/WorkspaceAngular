@@ -92,6 +92,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
       MpIdRetirada : ['', Validators.required],
       MpNombreRetirada: ['', Validators.required],
+      MpStockRetirada: [null, Validators.required],
       MpCantidadRetirada : [null, Validators.required],
       MpUnidadMedidaRetirada: ['', Validators.required],
       Categoria : ['', Validators.required],
@@ -106,7 +107,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.consultarCategorias();
     this.ultimoConsecutivoSolicitud();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, }); }, 3000);
+    this.FormMateriaPrimaRetiro.patchValue({ 'ProcesoRetiro' : this.validateProcess(), });
     this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada : 'Kg' });
   }
 
@@ -124,6 +125,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  validateProcess(){
+    let process : string = ``;
+    if([88,4].includes(this.ValidarRol)) process = 'IMP';
+    else if([7,85].includes(this.ValidarRol)) process = 'EXT';
+    else if([87,9].includes(this.ValidarRol)) process = 'EMP';
+    else if([89,63].includes(this.ValidarRol)) process = 'ROT'
+    else process = '';  
+    return process;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -159,7 +170,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => { this.unidadMedida = data });
 
   //Funcion que se encagará de obtener los procesos de la empresa
-  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(data => this.procesos = data.filter((item) => item.proceso_Id != 'TINTAS'));
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(data => this.procesos = data.filter((item) => [9,1,2,3].includes(item.proceso_Codigo)));
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriaPrima(){
@@ -193,6 +204,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
               cliente : datos_procesos[index].clienteNom,
               item : datos_procesos[index].clienteItemsNom,
               kg : this.kgOT,
+              kgAsignado : datos_asignacion,
               kgRestante : this.cantRestante,
             }];
           });
@@ -739,7 +751,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   }
 
   /** Función que obtendrá el ultimo Id de la solicitud */
-  ultimoConsecutivoSolicitud = () =>  this.servicioSolicitudMpExt.GetUltimaSolicitud().subscribe(data => { this.ultimoNroSolicitud = (data + 1); });
+  ultimoConsecutivoSolicitud = () =>  this.servicioSolicitudMpExt.GetUltimaSolicitud().subscribe(data => this.FormMateriaPrimaRetiro.patchValue({ Solicitud : (data + 1), }), error => { this.mensajeService.mensajeError(`Error cargando el N° de solicitud`) });
 
   /** Función para eliminar la materia prima de la solicitud de material de la base de datos. */
   eliminarMatPrimaSolicitud(mp : any) {

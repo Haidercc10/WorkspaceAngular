@@ -25,14 +25,14 @@
     <div class="row g-4 my-5">
       <div class="col-sm-12 col-md-3">
         <span class="p-float-label">
-          <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationOrderFact2()"/>
+          <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationOrderFact()"/>
           <label for="orderFact">Orden Fact.</label>
         </span>
       </div>
 
       <div class="col-sm-12 col-md-3">
-        <span class="p-float-label"> <!--type="number"-->
-          <input formControlName="production" id="RolloBarCode" pInputText pAutoFocus [autofocus]="true" (keyup.enter)="getInformationProduction2()"/>
+        <span class="p-float-label">
+          <input formControlName="production" id="RolloBarCode" type="number" pInputText pAutoFocus [autofocus]="true" (keyup.enter)="getInformationProduction()"/>
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>
@@ -92,8 +92,8 @@
         <th class="text-center">Fecha</th>
         <th class="text-center">Hora</th>
         <th class="text-center">Proceso</th>
-        <th class="text-center">Pallet</th>
-        <!--<th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>-->
+        <!--<th class="text-center">Pallet</th>-->
+        <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>
         <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
       </tr>
     </ng-template>
@@ -102,7 +102,7 @@
         <td class="text-center">{{data.position}}</td>
         <td class="text-center">{{data.pp.ot}}</td>
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
-        <td class="text-center">{{data.numero_RolloBagPro}}</td>
+        <td class="text-center">{{data.dataExtrusion.numero_RolloBagPro}}</td>
         <td class="text-center">{{data.producto.prod_Id}}</td>
         <td class="text-center">{{data.producto.prod_Nombre}}</td>
         <td class="text-center">{{(['Und', 'Paquete'].includes(data.pp.presentacion) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
@@ -112,8 +112,8 @@
         <td class="text-center">{{data.pp.hora}}</td>
         <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
         <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-          <!--<p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button>-->
-          {{data.pallet}}
+          <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button>
+          <!--{{data.pallet}}-->
         </td>
         <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
           <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>

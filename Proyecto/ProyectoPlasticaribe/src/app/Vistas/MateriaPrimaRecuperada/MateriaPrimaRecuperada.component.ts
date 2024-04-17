@@ -120,6 +120,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriasPrimasRetiradas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+      datos_materiaPrima = datos_materiaPrima.filter(x => x.catMP_Id == 10);
       for (let index = 0; index < datos_materiaPrima.length; index++) {
         let mp : any = {
           id : datos_materiaPrima[index].matPri_Id,

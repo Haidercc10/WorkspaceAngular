@@ -12,6 +12,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
 import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
+import { tableLayouts } from 'pdfmake/build/pdfmake';
 
 @Injectable({
     providedIn: 'root'
@@ -367,18 +368,17 @@ export class MovimientoMPComponent implements OnInit {
     let movimientoOrdenesTrabajo : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
     let tituloAdicional : string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';
     let titulo : string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;
-    let content : any = this.contenidoPDF(data);
+    let content : any = this.contenidoPDF(data, movimientoOrdenesTrabajo);
     this.creacionPDFService.formatoPDF(titulo, content);
     setTimeout(() => this.cargando = false, 3000);
   }
 
-  contenidoPDF(data : any){
+  contenidoPDF(data : any, movimientosOT : any[]){
     let datos : any = [];
-    datos.push(this.tituloEntradasPDF(data[0]));
-    datos.push(this.informacionProveedorPDF(data[0]));
-    datos.push(this.tituloMateriasPrimasPDF());
+    //datos.push(this.tituloEntradasPDF(data[0]));
+    datos.push(this.infoMovement(data[0]));
     datos.push(this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']));
-    datos.push(this.totalesPDF(data));
+    datos.push(movimientosOT.includes(data[0].movimiento) ? this.totalesPDF(data) : data[0].movimiento != 'CRTINTAS' ? this.totalesPDF2(data) : '');
     datos.push(this.observacionPDF(data[0]));
     return datos;
   }
@@ -420,35 +420,59 @@ export class MovimientoMPComponent implements OnInit {
     } : '';
   }
 
-  tituloMateriasPrimasPDF(){
+  infoMovement(data : any){
     return {
-      margin: [0, 15],
-      text: `Información detallada de la(s) Materia(s) Prima(s)`,
-      alignment: 'center',
-      style: 'header'
-    }
+      table: {
+        widths : ['40%', '30%', '30%'],
+				body: [
+					[ { text: `Información General del Movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {},],
+          ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ?
+          [
+            { text: `Proveedor:  ${data.proveedor}`, },
+            { text: `NIT/CC: ${data.proveedor_Id}`,  },
+            { text: `Telefono: ${data.telefono_Proveedor}`, }
+          ] : [
+                {text: ``, border: [false, false, false, false]}, 
+                {text: ``, border: [false, false, false, false]}, 
+                {text: ``, border: [false, false, false, false]} ],
+					[
+            { text: ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? `N° Orden Compra: ${data.orden_Compra}` : `OT N°: ${data.codigo}`},
+            { text: `Usuario: ${data.usuario}` },
+            { text: `Fecha: ${data.fecha.replace('T00:00:00', '')} ${data.hora}`},
+          ], 
+				]
+			}, 
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null;
+        }
+      }  
+		}
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
+      margin : [0, 15, 0, 0],
       table: {
-        headerRows: 1,
-        widths: ['10%', '40%', '15%', '10%', '10%', '15%'],
-        body: this.buildTableBody(data, columns),
+        headerRows: 2,
+        widths: ['10%', '40%', '13%', '10%', '12%', '15%'],
+        body: this.buildTableBody(data, columns, 'Información detallada de Materias Primas'),
       },
       fontSize: 8,
       layout: {
         fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
+          return (rowIndex == 0 || rowIndex == 1) ? '#CCCCCC' : null;
         }
       }
     };
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
-  buildTableBody(data : any, columns : any) {
+  buildTableBody(data : any, columns : any, title : string) {
     var body = [];
+    body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
@@ -463,16 +487,16 @@ export class MovimientoMPComponent implements OnInit {
   totalesPDF(data : any){
     return {
       table: {
-        widths: ['40%', '10%', '15%', '10%', '10%', '15%'],
+        widths: ['10%', '40%', '13%', '10%', '12%', '15%'],
         style: 'header',
         body: [
           [
+            {border: [true, false, true, true], text: `Peso Total`, bold : true, colSpan : 2 },
             {},
-            {border: [true, false, true, true], text: `Peso Total`},
-            {border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`},
+            {border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`, bold : true, },
             {},
-            {border: [true, false, true, true], text: `Valor Total`},
-            {border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`},
+            {border: [true, false, true, true], text: `Valor Total`, bold : true, },
+            {border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`, bold : true, },
           ],
         ]
       },
@@ -493,6 +517,86 @@ export class MovimientoMPComponent implements OnInit {
       },
       fontSize: 9,
     };
+  }
+
+  calcularConceptosAutomaticosPDF(data : any): any {
+    let baseGlobal: number = data.base;
+    let base: boolean = data.valor_Total >= baseGlobal;
+    let iva : number = ((data.valor_Total * data.iva) / 100);
+    let baseIVA: boolean = iva >= baseGlobal;
+    let reteFuente: number = base ? (data.valor_Total * data.reteFuente) / 100 : 0;
+    let reteIVA: number = baseIVA ? (((data.valor_Total * data.iva) / 100) * data.reteIva) / 100 : 0;
+    let reteICA: number = base ? (data.valor_Total * data.reteIca) / 100 : 0;
+    return {
+      ReteFuente: reteFuente,
+      ReteIVA: reteIVA,
+      ReteICA: reteICA,
+      ValorFinal: data.valor_Total + reteFuente + reteIVA + reteICA + iva,
+    }
+  }
+
+  totalesPDF2(datos_orden) { 
+    console.log(datos_orden);
+    let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden[0]);
+    return {
+      table: {
+        widths: ['10%', '40%', '13%', '10%', '12%', '15%'],
+        style: 'header',
+        body: [
+          [
+            
+            { border: [true, false, true, true], text: `Peso Total`, colSpan : 2, alignment: 'right', bold : true, },
+            {},
+            { border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(datos_orden))}`, bold : true,},
+            '',
+            { border: [true, false, true, true], text: `Subtotal`, bold : true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden[0].valor_Total).toFixed(2))}`, alignment: 'right', bold : true,},
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `IVA ${datos_orden[0].iva}%`, bold : true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden[0].valor_Total * datos_orden[0].iva) / 100).toFixed(2))}`, alignment: 'right', bold : true,},
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `RTE Fuente ${datos_orden[0].reteFuente}%`, bold : true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right', bold : true,},
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `RTE IVA ${datos_orden[0].reteIva}%`, bold : true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right', bold : true,},
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `RTE ICA ${datos_orden[0].reteIca}%`, bold : true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right', bold : true,},
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `Valor Total`, bold : true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right', bold : true,},
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 8,
+    }
   }
 
   // Funcion que va a devolver el valor total de la materia prima asignada

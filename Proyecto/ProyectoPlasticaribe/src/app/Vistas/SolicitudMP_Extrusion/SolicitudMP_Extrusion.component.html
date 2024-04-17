@@ -64,7 +64,7 @@
         <!-- Proceso -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="proceso">
           <span class="p-float-label">
-            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
+            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [readonly]="![1].includes(ValidarRol)" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
             <label for="Proceso">Proceso</label>
           </span>
         </div>
@@ -99,6 +99,7 @@
             <th scope="col">Cliente</th>
             <th scope="col">Item</th>
             <th scope="col">Kg Total</th>
+            <th scope="col">Kg Asignados</th>
             <th scope="col">Kg Restante</th>
         </ng-template>
         <ng-template pTemplate="body" let-ot>
@@ -107,6 +108,7 @@
             <td>{{ot.cliente}}</td>
             <td>{{ot.item}}</td>
             <td>{{ot.kg | number}}</td>
+            <td>{{ot.kgAsignado | number}}</td>
             <td [ngClass]="{'colorRojo' : ot.kgRestante <= 0 }">{{ot.kgRestante | number}}</td>
           </tr>
         </ng-template>
@@ -127,7 +129,7 @@
 
   <!-- Formulario de seleccion de materia prima  -->
   <form [formGroup]="FormMateriaPrimaRetirada">
-    <div class="mb-3" id="materiaPrima">
+    <div class="mb-5" id="materiaPrima">
       <div class="row g-4">
 
         <!-- Id Materia Prima -->
@@ -140,20 +142,27 @@
         </div>
 
         <!-- Nombre Materia Prima -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6" id="nombreMp">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4" id="nombreMp">
           <span class="p-float-label">
             <input formControlName="MpNombreRetirada" id="MP" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima(2)" required/>
             <datalist id="materiaprima">
-              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option> <!--- Stock: {{item.stock | number: '1.2-2'}}-->
+              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}} - Stock: {{item.stock | number: '1.2-2'}}</option> <!--- Stock: {{item.stock | number: '1.2-2'}}-->
             </datalist>
             <label for="MP">Materia Prima</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" id="stockMp">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="MpStockRetirada" mode="decimal" inputId="Stock" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+            <label for="Stock">Stock</label>
           </span>
         </div>
 
         <!-- Cantidad pedida -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="cantidad">
           <span class="p-float-label">
-            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal"  [showClear]="true" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
+            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal" [showClear]="true" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
           </span>
         </div>
@@ -172,7 +181,7 @@
     <!-- BOTONES -->
     <div class="mb-4" id="botones1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton pRipple id="agregarMp" label="Agregar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosMPRetirada()"></button>
+        <button pButton pRipple id="agregarMp" label="Agregar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" [disabled]="infoOrdenTrabajo.length == 0 && !this.FormMateriaPrimaRetirada.valid" (click)="validarCamposVaciosMPRetirada()"></button>
         <button pButton pRipple id="limpiarMp" label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
       </div>
     </div>
@@ -202,36 +211,40 @@
       [value]="materiasPrimasSeleccionadas">
         <ng-template pTemplate="header">
           <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Nombre</th>
-            <th scope="col" id="cantidad2">Cantidad</th>
-            <th scope="col">Und. Medida</th>
-            <th scope="col" id="quitarMP"></th>
+            <th class="text-center" scope="col">ID</th>
+            <th class="text-center" scope="col">Nombre</th>
+            <th class="text-center" scope="col" id="cantidad2">Cantidad</th>
+            <th class="text-center" scope="col">Und. Medida</th>
+            <th class="text-center" scope="col" id="quitarMP">Quitar</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimasSeleccionadas>
           <tr>
-            <td>{{materiasPrimasSeleccionadas.Id}}</td>
-            <td>{{materiasPrimasSeleccionadas.Nombre}}</td>
-            <td [pEditableColumn]="materiasPrimasSeleccionadas.Cantidad" pEditableColumnField="price" class="cursor">
-              <p-cellEditor>
-                <ng-template pTemplate="input">
-                  <input pInputText type="number" [(ngModel)]="materiasPrimasSeleccionadas.Cantidad"/>
+            <td class="text-center">{{materiasPrimasSeleccionadas.Id}}</td>
+            <td class="text-center">{{materiasPrimasSeleccionadas.Nombre}}</td>
+            <td class="text-center" [pEditableColumn]="materiasPrimasSeleccionadas.Cantidad" pEditableColumnField="price" class="cursor">
+              <p-cellEditor class="text-center">
+                <ng-template pTemplate="input" class="text-center">
+                  <input pInputText class="text-center" type="number" [(ngModel)]="materiasPrimasSeleccionadas.Cantidad"/>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{ materiasPrimasSeleccionadas.Cantidad | number : '1.2-2' }}
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
-            <td id="quitarMp" *ngIf="!esSolicitud"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas, 'quitar')"></i></td>
-            <td id="eliminarMp" *ngIf="esSolicitud"><i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas, 'eliminar')"></i></td>
+            <td class="text-center">{{materiasPrimasSeleccionadas.Und_Medida}}</td>
+            <td class="text-center" id="quitarMp" *ngIf="!esSolicitud">
+              <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Quitar material" (onClick)="mostrarEleccion(materiasPrimasSeleccionadas, 'quitar')"></p-button>
+            </td>
+            <td class="text-center" id="eliminarMp" *ngIf="esSolicitud">
+              <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Eliminar material" (onClick)="mostrarEleccion(materiasPrimasSeleccionadas, 'eliminar')"></p-button>
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="2">Total</td>
-            <td>{{calcularMateriaPrimaSolicitada()}}</td>
+            <td class="text-right" colspan="2">Total</td>
+            <td class="text-center">{{calcularMateriaPrimaSolicitada() | number : '1.2-2'}}</td>
             <td colspan="3"></td>
           </tr>
         </ng-template>
@@ -242,14 +255,10 @@
   <br>
   <div *ngIf="load">
     <div class="mb-3">
-      <div class="row g-3">
-        <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones2">
-            <button pButton pRipple id="asignar" label="Crear Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="!esSolicitud" (click)="validarCamposVaciosRetirada()"></button>
-            <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="esSolicitud" (click)="solicitudMateriaPrima()"></button>
-            <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
-          </div>
-        </div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones2">
+        <button pButton pRipple id="asignar" label="Crear Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="!esSolicitud" [disabled]="materiasPrimasSeleccionadas.length == 0" (click)="validarCamposVaciosRetirada()"></button>
+        <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="esSolicitud" [disabled]="materiasPrimasSeleccionadas.length == 0" (click)="solicitudMateriaPrima()"></button>
+        <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
       </div>
     </div>
   </div>

@@ -175,7 +175,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
   //Función que se encargará de consolidar la información de los rollos que serán reubicados.
   consolidateInformation() {
     this.groupedInfo = this.sendProductionZeus.reduce((a, b) => {
-      if (!a.map(x => x.pp.ot).includes(b.pp.ot)) a = [...a, b];
+      if (!a.map(x => x.producto.prod_Id).includes(b.producto.prod_Id)) a = [...a, b];
       return a;
     }, [])
   }
@@ -186,6 +186,8 @@ export class Ubicaciones_RollosComponent implements OnInit {
     this.onReject();
     this.load = true;
     let rolls: any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo);
+    console.log(rolls);
+    
     this.dtEntracesService.PutChangeUbicationRoll(rolls, this.setUbication()).subscribe(() => { aError = false; }, () => {
       aError = true;
       this.msj.mensajeError(`Error`, `No fue posible actualizar la ubicación de rollo(s)!`);

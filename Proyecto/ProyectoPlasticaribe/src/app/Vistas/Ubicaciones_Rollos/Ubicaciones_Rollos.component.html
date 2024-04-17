@@ -67,7 +67,6 @@
       dataKey="prod_Id">
       <ng-template pTemplate="header">
         <tr>
-          <th class="text-center" scope="col">OT</th>
           <th class="text-center" scope="col">Item</th>
           <th class="text-center" scope="col">Referencia</th>
           <th class="text-center" scope="col">Cantidad</th>
@@ -77,7 +76,6 @@
       </ng-template>
       <ng-template pTemplate="body" let-info>
         <tr>
-          <td class="text-center">{{info.pp.ot}}</td>
           <td class="text-center">{{info.producto.prod_Id}}</td>
           <td>{{info.producto.prod_Nombre}}</td>
           <td class="text-center">{{totalQuantityByItem(info.producto.prod_Id) | number : '1.2-2'}}</td>
@@ -87,7 +85,7 @@
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
-          <td colspan="3" class="text-right">Totales</td>
+          <td colspan="2" class="text-right">Totales</td>
           <td class="text-center">{{totalQuantityConsolidated() | number: '1.2-2'}}</td> 
           <td class="text-center">{{totalRollsConsolidated() | number}}</td> 
           <td></td>

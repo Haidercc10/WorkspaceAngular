@@ -93,6 +93,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.formProduction.reset();
     this.load = false;
     document.getElementById('RolloBarCode').focus();
+    this.count = 0;
+    this.productionInPallet = [];
+    this.productionOutPallet = [];
   }
 
   getDrivers() {
@@ -238,8 +241,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.productionProcessSerivce.putStateNotAvaible(orderFact).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
       let fact = this.formProduction.value.fact;
-      this.cmpOrderFactPallets.createPDF(orderFact, fact);
-      //this.orden_FacturacionComponent.createPDF(orderFact, fact);
+      //this.cmpOrderFactPallets.createPDF(orderFact, fact);
+      this.orden_FacturacionComponent.createPDF(orderFact, fact);
       this.clearFields();
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
