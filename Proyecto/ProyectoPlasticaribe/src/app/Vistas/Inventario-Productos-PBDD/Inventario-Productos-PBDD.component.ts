@@ -288,12 +288,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   createExcel(dataDocument: Array<StockInformation>) {
     if (dataDocument.length > 0) {
-      const title = `Inventario de Productos Terminados ${moment().format('YYYY-MM-DD')}`;
-      let font: any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+      const title = `Inventario Despacho Consolidado`;
+      let font: any = { name: 'Calibri', family: 4, size: 11, bold: true };
       let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-      let workbook = this.createExcelService.formatoExcel(title);
+      let workbook = this.createExcelService.formatoExcel(title, true);
       this.addPageExcel(workbook, font, border, dataDocument);
-      this.createExcelService.creacionExcel(title, workbook);
+      this.createExcelService.creacionHoja(workbook, `Inventario Despacho Rollo a Rollo`, true);
+      this.addSheetExcel2(workbook, font, border, dataDocument);
+      this.createExcelService.creacionExcel(`Inventario Productos Terminados ${moment().format('YYYY-MM-DD')}`, workbook);
     } else this.msg.mensajeAdvertencia(`¡No hay datos suficientes para crear el archivo de Excel!`);
   }
 
@@ -362,6 +364,72 @@ export class InventarioProductosPBDDComponent implements OnInit {
     size20.forEach(e => worksheet.getColumn(e).width = 20);
     size15.forEach(e => worksheet.getColumn(e).width = 15);
     worksheet.getColumn(1).width = 10;
+  }
+
+  //HOJA 2 Excel 
+  //Inventario de despacho Rollo a rollo 
+  addSheetExcel2(workbook, font, border, dataDocument: Array<StockInformation>) {
+    let sheet2 = workbook.worksheets[1];
+    this.addHeaderSheet2(sheet2, font, border);
+    sheet2.mergeCells('A1:K3');
+    sheet2.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addDataSheet2(sheet2, dataDocument);
+  }
+
+  addHeaderSheet2(worksheet, font, border) {
+    const header = ["#", "Rollo", "Item", "Cliente", "Referencia", "Existencias", "Presentación", "Precio", "Subtotal", "Ubicación", "Vendedor"];
+    let headerRow = worksheet.addRow(header);
+    headerRow.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+      cell.font = font;
+      cell.border = border;
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    });
+  }
+
+  addDataSheet2(worksheet, dataDocument: Array<StockInformation>) {
+    let dataStock = this.fillDataSheet2Excel(dataDocument);
+    dataStock.forEach(d => {
+      let row = worksheet.addRow(d);
+      let formatNumber: number[] = [6, 8, 9];
+      formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    });
+    this.changeSizeColumnsSheet2Excel(worksheet);
+  }
+
+  changeSizeColumnsSheet2Excel(worksheet) {
+    let size10: number[] = [1,2,3,8];
+    let size45: number[] = [4,5,10];
+    let size15: number[] = [6,7,9];
+    let size20: number[] = [11];
+    size45.forEach(e => worksheet.getColumn(e).width = 45);
+    size15.forEach(e => worksheet.getColumn(e).width = 15);
+    size10.forEach(e => worksheet.getColumn(e).width = 10);
+    size20.forEach(e => worksheet.getColumn(e).width = 20);
+  }
+
+  fillDataSheet2Excel(dataDocument: Array<StockInformation>): any[] {
+    let dataStock = [];
+    let count = 0;
+    dataDocument.forEach(stock => {
+      stock.AvaibleProdution.forEach(prod => {
+        count++;
+        dataStock.push([
+          count,
+          prod.NumberProduction,
+          stock.item,
+          stock.client,
+          stock.reference,
+          prod.Quantity,
+          prod.Presentation,
+          stock.price,
+          (stock.price * prod.Quantity),
+          stock.seller,
+          prod.Information,
+        ]);
+      });
+    });
+    return dataStock;
   }
 
   //Función que se encarga de filtrar la información de la tabla
