@@ -86,13 +86,13 @@
                 <th style="width: 150px" pResizableColumn>
                   <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')">
                 </th>
-                <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
+                <th style="width: 150px" pResizableColumn *ngIf="![6, 12].includes(ValidarRol)">
                   <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')">
                 </th>
                 <th style="width: 100px" pResizableColumn>
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')">
                 </th>
-                <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
+                <th style="width: 150px" pResizableColumn *ngIf="![6, 12].includes(ValidarRol)">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio_Total', 'contains')">
                 </th>
                 <th style="width: 150px" pResizableColumn *ngIf="ValidarRol == 1">
@@ -122,13 +122,13 @@
                 <th style="text-align: center;" scope="col" pSortableColumn="Cantidad">Existencias
                   <p-sortIcon field="Cantidad"></p-sortIcon>
                 </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Precio" *ngIf="ValidarRol != 6">Precio
+                <th style="text-align: center;" scope="col" pSortableColumn="Precio" *ngIf="![6, 12].includes(ValidarRol)">Precio
                   <p-sortIcon field="Precio"></p-sortIcon>
                 </th>
                 <th style="text-align: center;" scope="col" pSortableColumn="Presentacion">Unidad
                   <p-sortIcon field="Presentacion"></p-sortIcon>
                 </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total" *ngIf="ValidarRol != 6">Subtotal
+                <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total" *ngIf="![6, 12].includes(ValidarRol)">Subtotal
                   <p-sortIcon field="Precio_Total"></p-sortIcon>
                 </th>
                 <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima" *ngIf="ValidarRol == 1">Cant. Minima
@@ -160,9 +160,9 @@
                 <ng-template #azul>
                   <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
                 </ng-template>
-                <td style="text-align: center;" *ngIf="ValidarRol != 6">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
+                <td style="text-align: center;" *ngIf="![6, 12].includes(ValidarRol)">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
                 <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
-                <td style="text-align: center;" *ngIf="ValidarRol != 6"><b>{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</b></td>
+                <td style="text-align: center;" *ngIf="![6, 12].includes(ValidarRol)"><b>{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</b></td>
                 <td style="text-align: center;" pEditableColumn *ngIf="ValidarRol == 1">
                   <p-cellEditor>
                     <ng-template pTemplate="input">
@@ -180,7 +180,7 @@
             </ng-template>
 
             <!-- Footer de la tabla -->
-            <ng-template pTemplate="footer" *ngIf="ValidarRol != 6">
+            <ng-template pTemplate="footer" *ngIf="![6, 12].includes(ValidarRol)">
               <tr>
                 <td colspan="6" class="text-right">Totales</td>
                 <td colspan="4" class="text-right">{{precioTotalExistencia() | currency: 'COP $'}}</td>
@@ -214,7 +214,7 @@
         </ng-template>
 
         <ng-template pTemplate="right">
-          <div class="mb-3" *ngIf="ValidarRol != 6">
+          <div class="mb-3" *ngIf="![6, 12].includes(ValidarRol)">
             <div class="gap-2 d-grid d-md-flex justify-content-md-end" id="costoTotal">
               <p-chip label="Total Stock ${{precioTotalExistencia() | number : '1.2-2'}}"  class="mr-2"></p-chip>
             </div>
@@ -353,7 +353,7 @@
         </ng-template>
 
         <!-- Footer de la tabla -->
-        <ng-template pTemplate="footer" *ngIf="ValidarRol != 6">
+        <ng-template pTemplate="footer" *ngIf="![6, 12].includes(ValidarRol)">
           <tr>
             <td colspan="6" class="text-right">Totales</td>
             <td colspan="4" class="text-right">{{precioTotalExistencia() | currency: 'COP $'}}</td>

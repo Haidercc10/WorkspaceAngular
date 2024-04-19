@@ -159,9 +159,9 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'realQty', tableRollsEmpaque)"></th>
-            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsEmpaque)"></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tableRollsEmpaque)"></th>
-            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsEmpaque)"></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsEmpaque)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableRollsEmpaque)"></th>
         </tr>
             <tr style="font-size: 30px;">
@@ -172,9 +172,9 @@
             <th class="text-center" pSortableColumn="client" scope="col">Cliente  <p-sortIcon field="client"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="reference" scope="col">Referencia  <p-sortIcon field="reference"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="realQty" scope="col">Existencias  <p-sortIcon field="realQty"></p-sortIcon></th>
-            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)" class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="presentation" scope="col">Unidad  <p-sortIcon field="presentation"></p-sortIcon></th>
-            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)" class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="date" scope="col">Fecha  <p-sortIcon field="date"></p-sortIcon></th>
         </tr>
     </ng-template>
@@ -187,9 +187,9 @@
         <td>{{inv.client }}</td>
         <td>{{inv.reference}}</td>
         <td class="text-center colorExis"><b>{{inv.realQty | number : '1.2-2'}}</b></td>
-        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
+        <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
         <td class="text-center">{{inv.presentation}}</td>
-        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
+        <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
         <td class="text-center">{{inv.date}}</td>
         </tr>
     </ng-template>
@@ -197,9 +197,9 @@
         <tr>
             <td colspan="6" class="text-right">Disponibles</td>
             <td class="text-center textBlue">{{totalQtyEmpaque |  number : '1.2-2'}}</td>
-            <td *ngIf="[86,4].includes(ValidarRol)" class="text-right"></td>
-            <td *ngIf="![86,4].includes(ValidarRol)" colspan="2"  class="text-right">Total</td>
-            <td *ngIf="![86,4].includes(ValidarRol)" class="text-center textBlue">$ {{totalEmpaque | number : '1.2-2'}}</td>
+            <td *ngIf="[86,4,12].includes(ValidarRol)" class="text-right"></td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" colspan="2"  class="text-right">Total</td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center textBlue">$ {{totalEmpaque | number : '1.2-2'}}</td>
             <td></td>
         </tr>
     </ng-template>
@@ -238,9 +238,9 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'realQty', tableRollsSellado)"></th>
-            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsSellado)"></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tableRollsSellado)"></th>
-            <th *ngIf="![86,4].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsSellado)"></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRollsSellado)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableRollsSellado)"></th>
         </tr>
             <tr style="font-size: 30px;">
@@ -251,9 +251,9 @@
             <th class="text-center" pSortableColumn="client" scope="col">Cliente  <p-sortIcon field="client"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="reference" scope="col">Referencia  <p-sortIcon field="reference"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="realQty" scope="col">Existencias  <p-sortIcon field="realQty"></p-sortIcon></th>
-            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)" class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="presentation" scope="col">Unidad  <p-sortIcon field="presentation"></p-sortIcon></th>
-            <th *ngIf="![86,4].includes(ValidarRol)" class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)" class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="date" scope="col">Fecha  <p-sortIcon field="date"></p-sortIcon></th>
         </tr>
     </ng-template>
@@ -266,9 +266,9 @@
         <td>{{inv.client }}</td>
         <td>{{inv.reference}}</td>
         <td class="text-center colorExis"><b>{{inv.realQty | number : '1.2-2'}}</b></td>
-        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
+        <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
         <td class="text-center">{{inv.presentation}}</td>
-        <td *ngIf="![86,4].includes(ValidarRol)" class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
+        <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center"><b>$ {{inv.subtotal | number : '1.2-2'}}</b></td>
         <td class="text-center">{{inv.date}}</td>
         </tr>
     </ng-template>
@@ -276,9 +276,9 @@
         <tr>
             <td colspan="6" class="text-right">Disponibles</td>
             <td class="text-center textBlue">{{totalQtySellado | number : '1.2-2'}}</td>
-            <td *ngIf="[86,4].includes(ValidarRol)" class="text-right"></td>
-            <td *ngIf="![86,4].includes(ValidarRol)" colspan="2" class="text-right">Total</td>
-            <td *ngIf="![86,4].includes(ValidarRol)" class="text-center textBlue">$ {{totalSellado | number : '1.2-2'}}</td>
+            <td *ngIf="[86,4,12].includes(ValidarRol)" class="text-right"></td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" colspan="2" class="text-right">Total</td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center textBlue">$ {{totalSellado | number : '1.2-2'}}</td>
             <td></td>
         </tr>
     </ng-template>

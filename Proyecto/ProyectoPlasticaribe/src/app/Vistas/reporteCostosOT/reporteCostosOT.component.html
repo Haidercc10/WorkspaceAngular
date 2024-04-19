@@ -104,25 +104,25 @@
         </div>
 
         <!-- Valor Unidad Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1" >
           <span class="p-float-label">
-            <input formControlName="ValorUnidadProductoUnd" *ngIf="ValidarRol == 1" id="presentacion" type="text" [disabled] pInputText/>
+            <input formControlName="ValorUnidadProductoUnd"id="presentacion" type="text" [disabled] pInputText/>
             <label for="presentacion">$ Und Producto</label>
           </span>
         </div>
 
         <!-- Valor Kg Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1">
           <span class="p-float-label">
-            <input formControlName="ValorUnidadProductoKg" *ngIf="ValidarRol == 1" id="valorUnitProdKg" type="text" [disabled] pInputText/>
+            <input formControlName="ValorUnidadProductoKg"  id="valorUnitProdKg" type="text" [disabled] pInputText/>
             <label for="valorUnitProdKg">$ Kg Producto</label>
           </span>
         </div>
 
         <!--Valor Estimado OT -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1">
           <span class="p-float-label">
-            <input formControlName="ValorEstimadoOt" *ngIf="ValidarRol == 1" id="valorOT" type="text" [disabled] pInputText/>
+            <input formControlName="ValorEstimadoOt" id="valorOT" type="text" [disabled] pInputText/>
             <label for="valorOT">Valor OT</label>
           </span>
         </div>

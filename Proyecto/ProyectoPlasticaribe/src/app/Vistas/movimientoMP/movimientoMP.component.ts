@@ -360,7 +360,6 @@ export class MovimientoMPComponent implements OnInit {
         }, 500);
       }
       informacionPdf = datos;
-      console.log(informacionPdf)
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
@@ -375,49 +374,11 @@ export class MovimientoMPComponent implements OnInit {
 
   contenidoPDF(data : any, movimientosOT : any[]){
     let datos : any = [];
-    //datos.push(this.tituloEntradasPDF(data[0]));
     datos.push(this.infoMovement(data[0]));
     datos.push(this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']));
     datos.push(movimientosOT.includes(data[0].movimiento) ? this.totalesPDF(data) : data[0].movimiento != 'CRTINTAS' ? this.totalesPDF2(data) : '');
     datos.push(this.observacionPDF(data[0]));
     return datos;
-  }
-
-  tituloEntradasPDF(data : any){
-    return ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? {
-      margin: [0, 15],
-      text: `Información detallada del Proveedor`,
-      alignment: 'center',
-      style: 'header'
-    } : '';
-  }
-
-  informacionProveedorPDF(data : any){
-    return ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? {
-      table: {
-        widths: ['40%', '30%', '30%'],
-        style: 'header',
-        body: [
-          [
-            `ID: ${data.proveedor_Id}`,
-            `Tipo de ID: ${data.tipo_Id_Proveedor}`,
-            `Tipo de Proveedor: ${data.tipo_Proveedor}`
-          ],
-          [
-            `Nombre: ${data.proveedor}`,
-            `Telefono: ${data.telefono_Proveedor}`,
-            `Ciudad: ${data.ciudad_Proveedor}`
-          ],
-          [
-            `E-mail: ${data.correo_Proveedor}`,
-            ``,
-            ``
-          ]
-        ]
-      },
-      layout: 'lightHorizontalLines',
-      fontSize: 9,
-    } : '';
   }
 
   infoMovement(data : any){

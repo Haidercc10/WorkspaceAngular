@@ -31,10 +31,11 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lecturaStorage();
-    if (this.ValidarRol == 1 || this.ValidarRol == 60) this.ordenTrabajo = true;
+    if ([1,60].includes(this.ValidarRol)) this.ordenTrabajo = true;
     if (this.ValidarRol == 3) this.materiaPrima = true;
     if (this.ValidarRol == 61) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
+    if ([1,12].includes(this.ValidarRol)) this.inventarioAreas = true;
   }
 
   ngOnDestroy(): void {

@@ -104,7 +104,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Noviembre', field: 'november', type: 'number' },
       { header: 'Diciembre', field: 'december', type: 'number' },
     ];
-      if([86,4].includes(this.ValidarRol)) {
+      if([86,4,12].includes(this.ValidarRol)) {
         let cols : any = [];
         cols.push(this.columns[4], this.columns[5]);
         [4,5,6,8].forEach(x => this.columns.splice(x, 1));

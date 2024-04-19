@@ -280,7 +280,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   precioTotalExistencia(): number {
     let total: number = 0;
-    this.ArrayProductoZeus.forEach(d => total += d.Precio_Total);
+    this.ArrayProductoZeus.forEach(d => ![6, 12].includes(this.ValidarRol) ? total += d.Precio_Total : total = 0);
     return total;
   }
 
