@@ -43,6 +43,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   showNameBussiness: boolean = true;
   port: SerialPort;
   reader: any;
+  reference : string = ``;
+
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
 
   constructor(private frmBuilder: FormBuilder,
@@ -329,6 +331,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   buscraOrdenTrabajo() {
+    this.reference = ``;
     this.obtenerTurnos();
     this.validarProceso();
     if (this.formDatosProduccion.value.proceso) {
@@ -337,18 +340,22 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
         this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), error => {
           this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
+          this.reference = ``;
+          this.limpiarCampos();
         });
       });
     } else this.warinigMessage(`¡Debe haber seleccionado un proceso previamente!`);
   }
 
   putDataOrderProduction(data) {
+    this.reference = ``;
     this.datosOrdenTrabajo = data;
     this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
     this.buscarRollosPesados();
     data.forEach(datos => {
       this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
         dataClient.forEach(cli => {
+          this.reference = datos.producto;
           this.datosOrdenTrabajo[0].id_Cliente = cli.id_Cliente;
           this.formDatosProduccion.patchValue({
             idCliente: cli.id_Cliente,
@@ -364,6 +371,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             material: datos.material.trim(),
             anchoProducto: datos.selladoCorte_Ancho,
             presentacion: datos.presentacion,
+            daipita : this.reference.includes('DAIPITA') && this.validateProcess() == 'EMP' ? 3000 : null,
           });
           this.buscarDatosConoSeleccionado();
         });
@@ -421,8 +429,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-  datosProduccion(): modelProduccionProcesos {
+  datosProduccion(daipita : any): modelProduccionProcesos {
     let presentation = this.formDatosProduccion.value.presentacion;
+    //let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? 1 : this.formDatosProduccion.value.daipita;
+    //console.log(`datosProduccion: ${daipita}`);    
     if (presentation == 'Kilo') presentation = 'Kg';
     else if (presentation == 'Unidad') presentation = 'Und';
     let datos: modelProduccionProcesos = {
@@ -441,7 +451,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Tara_Cono: this.formDatosProduccion.value.pesoTara,
       Peso_Bruto: this.formDatosProduccion.value.pesoBruto,
       Peso_Neto: this.formDatosProduccion.value.pesoNeto,
-      Cantidad: presentation == 'Und' && this.validateProcess() == 'EMP' ? !this.formDatosProduccion.value.daipita ? 1 : this.formDatosProduccion.value.daipita : 0,
+      Cantidad: presentation == 'Und' && this.validateProcess() == 'EMP' ? [null, undefined, 0, ''].includes(daipita) ? 1 : daipita : 0,
       Peso_Teorico: 0,
       Desviacion: 0,
       Precio: this.validarPrecio(this.datosOrdenTrabajo[0]),
@@ -459,8 +469,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   guardarProduccion() {
     this.cargando = true;
-    this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
-      this.searchDataTagCreated(res.numero_Rollo);
+    let daipita : any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? null : this.formDatosProduccion.value.daipita;
+    //console.log(`guardarProduccion: ${daipita}`);
+    this.produccionProcesosService.Post(this.datosProduccion(daipita)).subscribe(res => {
+      this.searchDataTagCreated(res.numero_Rollo, daipita);
       setTimeout(() => {
         let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
         this.formDatosProduccion.reset();
@@ -470,7 +482,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           maquina: res.maquina,
           operario: res.operario1_Id,
           cono: res.cono_Id,
-          mostratDatosProducto: mostratDatosProducto,  
+          daipita: daipita,
+          mostratDatosProducto: mostratDatosProducto,
         });
         //this.buscarRollosPesados();
         this.buscraOrdenTrabajo();
@@ -495,9 +508,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     return processMapping[proceso] || proceso;
   }
 
-  searchDataTagCreated(reel: number) {
+  searchDataTagCreated(reel: number, daipita : any) {
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
-      let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : this.formDatosProduccion.value.daipita;
+      //console.log(`searchDataTagCreated: ${daipita}`);
+      //let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : this.formDatosProduccion.value.daipita;
       res.forEach(data => {
         let dataTagProduction: modelTagProduction = {
           client: data.clienteNombre.trim(),
