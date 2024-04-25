@@ -31,7 +31,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lecturaStorage();
-    if ([1,60].includes(this.ValidarRol)) this.ordenTrabajo = true;
+    if ([1,60,12].includes(this.ValidarRol)) this.ordenTrabajo = true;
     if (this.ValidarRol == 3) this.materiaPrima = true;
     if (this.ValidarRol == 61) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
@@ -63,18 +63,20 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   }
 
   //
-  cambioTab(e : any) {
+  cambioTab(e : any) {  
     var index = e.index;
     index == 0 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
-    index == 1 ?  this.facturacion = true : this.facturacion = false;
-    index == 2 ?  this.materiaPrima = true : this.materiaPrima = false;
-    index == 3 ?  this.pedidos = true : this.pedidos = false;
-    index == 4 ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
-    index == 5 ?  this.recaudos = true : this.recaudos = false;
-    index == 6 ?  this.cuentasPagar = true : this.cuentasPagar = false;
-    index == 7 ?  this.gerencia = true : this.gerencia = false;
-    index == 8 ?  this.costos = true : this.costos = false;
-    index == 9 ?  this.compras = true : this.compras = false;
-    index == 10 ?  this.inventarioAreas = true : this.inventarioAreas = false;
+    index == 1 && this.ValidarRol == 1 ? this.facturacion = true : this.facturacion = false;
+    index == 2 ? this.materiaPrima = true : this.materiaPrima = false;
+    index == 3 ? this.pedidos = true : this.pedidos = false;
+    index == 4 ? this.facturacionVendedores = true : this.facturacionVendedores = false;
+    index == 5 ? this.recaudos = true : this.recaudos = false;
+    index == 6 ? this.cuentasPagar = true : this.cuentasPagar = false;
+    index == 7 ? this.gerencia = true : this.gerencia = false;
+    index == 8 ? this.costos = true : this.costos = false;
+    index == 9 ? this.compras = true : this.compras = false;
+    index == 10 ? this.inventarioAreas = true : this.inventarioAreas = false;
+    index == 1 && this.ValidarRol == 12 ? this.inventarioAreas = true : null;
+    console.log(index, this.ValidarRol, this.inventarioAreas);
   }
 }

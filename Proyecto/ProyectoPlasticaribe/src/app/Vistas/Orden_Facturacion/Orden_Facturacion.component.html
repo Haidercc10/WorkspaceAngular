@@ -6,27 +6,36 @@
 
 <div class="contain">
   <div class="container-fluid">
-    <div class="mb-4 Titulo">
+    <div class="mb-5 Titulo">
       <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Orden de Facturación</h2>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-5">
       <hr class="colorLinea">
     </div>
   </div>
 </div>
 
 <p-card>
-  <div class="my-4">
+  <div class="my-5">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-book"></i> Datos de la orden.</h4>
   </div>
 
   <form [formGroup]="formDataOrder">
     <div class="row g-4">
+
+      <!--Type Document-->
+      <!--<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="typeDoc"  (onChange)="validateTypeDoc()" inputId="typeDoc" [autoDisplayFirst]="true" [options]="typesDoc" optionLabel="tpDoc_Nombre" optionValue="tpDoc_Id"></p-dropdown>
+          <label for="typeDoc">Tipo Documento</label>
+        </span>
+      </div>-->
+
       <!-- Sale Order -->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <input formControlName="saleOrder" id="saleOrder" type="text" pInputText (keyup.enter)="getSalesOrders()"/>
+        <span class="p-float-label"><!--[readonly]="formDataOrder.value.typeDoc == 'REPO' ? true : false"-->
+          <input formControlName="saleOrder" id="saleOrder" type="text"  pInputText (keyup.enter)="getSalesOrders()"/>
           <label for="saleOrder">Pedido</label>
         </span>
       </div>
@@ -49,7 +58,7 @@
 
       <!-- Client -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-        <span class="p-float-label">
+        <span class="p-float-label"><!--formDataOrder.value.typeDoc == 'REPO' ? false : true-->
           <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText required readonly (keyup)="getClients()" (change)="selectedClient()"/>
           <datalist id="clientes">
             <option value={{item.cli_Id}} *ngFor="let item of clients">{{item.cli_Nombre}}</option>
@@ -93,6 +102,15 @@
   </div>
 
   <!--Productos del pedido-->
+  <!--<p-toolbar styleClass="mb-4 gap-2" *ngIf="formDataOrder.value.typeDoc == 'REPO'">
+    <ng-template pTemplate="left">
+        <button pButton pRipple label="Agregar Item" icon="pi pi-plus" class="p-button-danger mr-2" (click)="modalAddItems = true"></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+    </ng-template>
+  </p-toolbar>-->
+
   <p-table
     [value]="products"
     selectionMode="single"
@@ -192,7 +210,7 @@
         </th>
         <th>#</th>
         <th class="text-center" pSortableColumn="numberProduction">
-          <p-sortIcon field="numberProduction"></p-sortIcon> Numero Rollo
+          <p-sortIcon field="numberProduction"></p-sortIcon> Rollo
           <p-columnFilter type="text" field="numberProduction" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="orderProduction">
@@ -220,8 +238,13 @@
           <p-columnFilter type="text" field="quantity" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="presentation">
-          <p-sortIcon field="presentation"></p-sortIcon> Presentación
+          <p-sortIcon field="presentation"></p-sortIcon> Medida
           <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter>
+        </th>
+        <!--Nuevo-->
+        <th class="text-center" pSortableColumn="ubication">
+          <p-sortIcon field="ubication"></p-sortIcon> Ubicación
+          <p-columnFilter type="text" field="ubication" display="menu"></p-columnFilter>
         </th>
       </tr>
     </ng-template>
@@ -239,16 +262,20 @@
         <td>{{data.reference}}</td>
         <td class="text-center">{{data.quantity | number : '1.2-2'}}</td>
         <td class="text-center">{{data.presentation}}</td>
+        <!--Nuevo-->
+        <td class="text-center">{{data.ubication}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="2">Seleccionar: </td>
         <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="selectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
-        <td><p-inputNumber [(ngModel)]="qtyToSend" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="2"> </p-inputNumber></td>
+        <td><p-inputNumber [(ngModel)]="qtyToSend" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" class="length"> </p-inputNumber></td>
         <td class="text-center"><p-button icon="pi pi-search-plus" [rounded]="true" severity="warning" (onClick)="selectByQuantity()" pTooltip="Seleccionar por cantidad"></p-button></td>
         <td colspan="3">Total</td>
-        <td colspan="2">{{totalProduccionSearched() | number : '1.2-2'}}</td>
+        <!--Nuevo-->
+        <td class="text-center">{{totalProduccionSearched() | number : '1.2-2'}}</td>
+        <td colspan="2"></td>
       </tr>
     </ng-template>
   </p-table>
@@ -302,7 +329,7 @@
         </th>
         <th>#</th>
         <th class="text-center" pSortableColumn="numberProduction">
-          <p-sortIcon field="numberProduction"></p-sortIcon> Numero Rollo
+          <p-sortIcon field="numberProduction"></p-sortIcon> Rollo
           <p-columnFilter type="text" field="numberProduction" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="orderProduction">
@@ -330,8 +357,13 @@
           <p-columnFilter type="text" field="quantity" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="presentation">
-          <p-sortIcon field="presentation"></p-sortIcon> Presentación
+          <p-sortIcon field="presentation"></p-sortIcon> Medida
           <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter>
+        </th>
+        <!--Nuevo-->
+        <th class="text-center" pSortableColumn="ubication">
+          <p-sortIcon field="ubication"></p-sortIcon> Ubicación
+          <p-columnFilter type="text" field="ubication" display="menu"></p-columnFilter>
         </th>
       </tr>
     </ng-template>
@@ -349,13 +381,16 @@
         <td>{{data.reference}}</td>
         <td class="text-center">{{data.quantity | number : '1.2-2'}}</td>
         <td class="text-center">{{data.presentation}}</td>
+        <!--Nuevo-->
+        <td class="text-center">{{data.ubication}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="2">Seleccionar: </td>
         <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="deselectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
-        <td colspan="7"></td>
+        <!--Nuevo-->
+        <td colspan="8"></td>
       </tr>
     </ng-template>
   </p-table>
@@ -395,3 +430,57 @@
   </div>
 
 </p-card>
+
+<!--Modal de agregar items al pedido-->
+<!--<p-dialog [(visible)]="modalAddItems" [style]="{width: '400px'}" [resizable]="true" header="Agregar Referencia" [modal]="true" [contentStyle]="{'overflow':'visible'}">
+  <ng-template pTemplate="content">
+    <form [formGroup]="formItems" (ngSubmit)="addItemToSaleOrder()">
+      <div class="mb-3">
+        <div class="row g-4">
+          <br><br>
+          
+          <div class="col-md-12">
+            <span class="p-float-label">
+              <input formControlName="item" id="item" type="number" pInputText required (keyup.enter)="searchProductByItem()"/>
+              <label for="item">Item</label>
+            </span>
+          </div>
+      
+          
+          <div class="col-md-12">
+            <span class="p-float-label">
+              <input formControlName="reference" id="reference" list="products" type="text" autocomplete="off" pInputText required (keyup)="searchProductByReference()" (change)="selectedProduct()"/>
+              <datalist id="products">
+                <option value={{item.prod.prod_Id}} *ngFor="let item of productsModal">{{item.prod.prod_Nombre}}</option>
+              </datalist>
+              <label for="reference">Referencia</label>
+            </span>
+          </div>
+      
+          
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="qty" inputId="qty" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+              <label for="qty">Cantidad</label>
+            </span>
+          </div>
+      
+          
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <p-dropdown formControlName="presentation" inputId="presentation" [options]="presentations" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false"></p-dropdown>
+              <label for="presentation">Presentación</label>
+            </span>
+          </div>
+
+          
+          <div class="mb-3 d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton pRipple label="Agregar Item" icon="pi pi-check-square" [disabled]="formItems.invalid" type="submit" class="p-button-danger"></button>
+            <button pButton pRipple label="Limpiar Campos" icon="pi pi-eraser" type="button" class="p-button-secondary" (click)="formItems.reset()"></button>
+          </div>
+
+        </div>
+      </div>  
+    </form>    
+  </ng-template>
+</p-dialog>--> 

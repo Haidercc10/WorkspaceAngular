@@ -4,7 +4,7 @@
   </div>
 
   <!--  -->
-  <div class="row g-2 fila-1" *ngIf="(ValidarRol == 1 || ValidarRol == 60) && !cargando">
+  <div class="row g-2 fila-1" *ngIf="[1,60,12].includes(ValidarRol) && !cargando">
     <!-- Tabla de Procesos -->
     <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="cantProcesos">
       <p-card header="">
@@ -111,7 +111,7 @@
           <div class="p-toolbar-group-start">
             <p class="font-size-15">En el mes actual se han creado un total de <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
           </div>
-          <div class="p-toolbar-group-start">
+          <div *ngIf="ValidarRol == 1" class="p-toolbar-group-start">
             <p class="font-size-15">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
           </div>
         </p-toolbar>
@@ -130,7 +130,7 @@
               <th style="max-width:8%">#</th>
               <th style="max-width:50%; min-width:30%">Material</th>
               <th style="max-width:12%; min-width:12%">Cant.</th>
-              <th style="max-width:30%; min-width:30%">Costo</th>
+              <th *ngIf="ValidarRol == 1" style="max-width:30%; min-width:30%">Costo</th>
               <th style="max-width:20%">Peso (Kg)</th>
             </tr>
           </ng-template>
@@ -139,7 +139,7 @@
               <td style="max-width:8%">{{rowIndex + 1}}</td>
               <td style="max-width:30%; min-width:30%"><b>{{item.extMaterialNom}}</b></td>
               <td style="max-width:12%; min-width:12%">{{item.cantidad | number}}</td>
-              <td style="max-width:30%; min-width:30%"><b>{{item.costo | currency : '$'}}</b></td>
+              <td *ngIf="ValidarRol == 1" style="max-width:30%; min-width:30%"><b>{{item.costo | currency : '$'}}</b></td>
               <td style="max-width:20%">{{item.peso | number}}</td>
             </tr>
           </ng-template>

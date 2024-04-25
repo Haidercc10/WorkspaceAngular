@@ -335,8 +335,8 @@ export class MovimientoMPComponent implements OnInit {
           Nombre : '',
           Cantidad : this.formatonumeros(datos[i].cantidad),
           "Presentación" : datos[i].unidad_Medida,
-          Precio : this.formatonumeros(datos[i].precio),
-          SubTotal : this.formatonumeros(datos[i].subTotal),
+          Precio : `$${this.formatonumeros(datos[i].precio)}`,
+          SubTotal : `$${this.formatonumeros(datos[i].subTotal)}`,
         }
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
@@ -348,21 +348,27 @@ export class MovimientoMPComponent implements OnInit {
           info.Id = datos[i].bopp_Id;
           info.Nombre = datos[i].bopp;
         }
-        setTimeout(() => {
+        //setTimeout(() => {
           this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
             for (let j = 0; j < datoMP.length; j++) {
               info.Precio = this.formatonumeros(datoMP[j].precio);
-              datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
-              info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
+              datos[i].subTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad);
+              info.SubTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.formatonumeros(this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad)) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
             }
           });
           this.datosPdf.push(info);
-        }, 500);
+        //}, 500);
       }
       informacionPdf = datos;
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
+  subTotalCono(cono : any, precio : number, cant : number){
+    let total : number = 0; 
+    total = precio * (cant * ((parseFloat(cono.replace('CONO ', '').replace(' CMS', '').trim().split('-')[0]) + parseFloat(cono.replace('CONO ', '').replace(' CMS', '').trim().split('-')[1])) / 2))
+    return total;
+  }
+  
   crearPDF(data : any){
     let movimientoOrdenesTrabajo : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
     let tituloAdicional : string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';
@@ -497,7 +503,6 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   totalesPDF2(datos_orden) { 
-    console.log(datos_orden);
     let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden[0]);
     return {
       table: {

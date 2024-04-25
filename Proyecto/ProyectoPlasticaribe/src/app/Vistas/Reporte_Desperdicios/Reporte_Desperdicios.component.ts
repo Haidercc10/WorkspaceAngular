@@ -145,7 +145,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
     setTimeout(() => {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, this.rutaAPI()).subscribe(data => {
-        if(this.ValidarRol != 1) data = data.filter((x) => x.id_Proceso == this.validateArea());
+        if(![12, 1].includes(this.ValidarRol)) data = data.filter((x) => x.id_Proceso == this.validateArea());
         this.arrayDesperdicios = data;
         if (data.length == 0) {
           this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
@@ -210,7 +210,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.otSeleccionada = item.OT;
     this.load = false;
     this.servicioDesperdicios.getDesperdicioxOT(item.OT).subscribe(dataDesperdicios => {
-      if(this.ValidarRol != 1) dataDesperdicios = dataDesperdicios.filter((x) => x.id_Proceso == this.validateArea());
+      if(![12, 1].includes(this.ValidarRol)) dataDesperdicios = dataDesperdicios.filter((x) => x.id_Proceso == this.validateArea());
       for (let index = 0; index < dataDesperdicios.length; index++) {
         this.llenarModal(dataDesperdicios[index]);
       }

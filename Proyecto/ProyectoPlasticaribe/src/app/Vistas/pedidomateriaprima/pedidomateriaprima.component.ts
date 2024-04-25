@@ -307,8 +307,32 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   // Funcion que va a calcular el precio total de la factura o remision
-  calcularPrecio = () => this.ArrayMateriaPrima.filter((data) => !data.Exits).reduce((a, b) => a + (b.Precio * b.Cantidad_Faltante_Editar), 0);
-  
+  calcularPrecio() {
+    let total : number = 0;
+    this.ArrayMateriaPrima.filter((data) => !data.Exits).reduce((a, b) => {
+      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) total += (b.Cantidad_Faltante_Editar * this.promedioCantidadCono(b.Nombre)) * b.Precio;
+      else total += (b.Cantidad_Faltante_Editar * b.Precio);
+      return total; 
+    }, 0);
+    return total; 
+  }
+
+  // Funcion que va a calcular el subtotal de la factura o remision
+  calcularSubtotal(id : any){
+    let total : number = 0;
+    this.ArrayMateriaPrima.filter((data) => !data.Exits && data.Id == id).reduce((a, b) => {
+      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) a += (b.Cantidad_Faltante_Editar * this.promedioCantidadCono(b.Nombre)) * b.Precio;
+      else a += (b.Cantidad_Faltante_Editar * b.Precio);
+      total = a;
+      return a; 
+    }, 0);
+    return total; 
+  }
+
+  // Funcion que va a calcular el IVA de la factura o remision
+  promedioCantidadCono(value : any){
+    return ((parseFloat(value.replace('CONO ', '').replace(' CMS', '').trim().split('-')[0]) + parseFloat(value.replace('CONO ', '').replace(' CMS', '').trim().split('-')[1])) / 2)
+  }
 
   //Funcion que validará el campo sobre el que se está colocando del consecutivo, factura o remisimos
   validarCampos(){

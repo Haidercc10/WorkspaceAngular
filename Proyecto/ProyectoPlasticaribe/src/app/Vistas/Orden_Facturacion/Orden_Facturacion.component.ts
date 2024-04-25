@@ -16,6 +16,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -36,6 +37,7 @@ export class Orden_FacturacionComponent implements OnInit {
   load: boolean = false;
   modoSeleccionado: boolean;
   formDataOrder: FormGroup;
+  formItems: FormGroup;
   clients: Array<any> = [];
   products: Array<any> = [];
   selectedProductSaleOrder: any = [];
@@ -46,6 +48,9 @@ export class Orden_FacturacionComponent implements OnInit {
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];
   qtyToSend: number = 0;
+  typesDoc : Array<string> = [];
+  modalAddItems : boolean = false;
+  productsModal : Array<any> = [];
   
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -58,7 +63,9 @@ export class Orden_FacturacionComponent implements OnInit {
     private dtOrderFactService: Dt_OrdenFacturacionService,
     private createPDFService: CreacionPdfService,
     private invZeusService: InventarioZeusService,
-    private bagproService: BagproService,) {
+    private bagproService: BagproService,
+    private svtypeDocs : TipoDocumentoService,
+  ) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
 
@@ -67,13 +74,22 @@ export class Orden_FacturacionComponent implements OnInit {
       saleOrder: [null],
       idClient: [null, Validators.required],
       client: [null, Validators.required],
-      observation: [null]
+      observation: [null],
+      typeDoc: [null]
+    });
+
+    this.formItems = this.frmBuilder.group({
+      item: [null, Validators.required],
+      reference: [null, Validators.required],
+      qty: [null, Validators.required],
+      presentation: [null, Validators.required],
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.getPresentation();
+    this.getTypesDocument();
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -121,7 +137,8 @@ export class Orden_FacturacionComponent implements OnInit {
               numberProduction: dataProduction.pp.numeroRollo_BagPro,
               quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
               presentation: dataProduction.pp.presentacion,
-              weight : dataProduction.pp.peso_Bruto
+              weight : dataProduction.pp.peso_Bruto, 
+              ubication : ![null, undefined, ''].includes(dataProduction.ubication) ? dataProduction.ubication : '',
             });
           }
           if (countProductionAvaible.length == this.production.length) this.production = this.changeNameProduct(this.production);
@@ -149,6 +166,23 @@ export class Orden_FacturacionComponent implements OnInit {
     });
     return production;
   }
+
+  getTypesDocument = () => this.svtypeDocs.srvObtenerLista().subscribe(data => { this.typesDoc = data.filter(x => ['OF', 'REPO'].includes(x.tpDoc_Id)) },);
+
+  //Función para validar el tipo de documento seleccionado.
+  validateTypeDoc(){
+    let typeDoc = this.formDataOrder.value.typeDoc;
+    
+    if(typeDoc == 'REPO') {
+      this.clearFields();
+      this.formDataOrder.patchValue({'saleOrder': 0, 'typeDoc' : 'REPO', });
+    } else {
+      this.clearFields();
+      this.formDataOrder.patchValue({'saleOrder': null, 'typeDoc' : null, });
+    } 
+  }
+
+  addItemToSaleOrder(){}
 
   getPresentation() {
     let filterPresentations: Array<string> = ['Und', 'Kg', 'Paquete', 'Rollo'];
@@ -189,28 +223,33 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   selectedProduct() {
-    let idProduct: string = this.formDataOrder.value.reference;
-    let dataProduct: any = this.products.find(x => x.prod.prod_Id == idProduct);
-    this.formDataOrder.patchValue({
-      item: dataProduct.prod.prod_Id,
-      reference: dataProduct.prod.prod_Nombre,
-      presentation: dataProduct.exis.undMed_Id
+    let idProduct: string = this.formItems.value.reference;
+    let dataProduct: any = this.productsModal.find(x => x.prod.prod_Id == idProduct);
+    this.formItems.patchValue({
+      'item': dataProduct.prod.prod_Id,
+      'reference': dataProduct.prod.prod_Nombre,
+      'presentation': dataProduct.exis.undMed_Id,
     });
-    this.searchAvaibleProduction();
   }
 
   searchProductByItem() {
-    let idProduct: number = this.formDataOrder.value.item;
+    let idProduct: number = this.formItems.value.item;
     this.productService.GetProductsById(idProduct).subscribe(data => {
       data.forEach(dataProduct => {
-        this.formDataOrder.patchValue({
-          item: dataProduct.prod.prod_Id,
-          reference: dataProduct.prod.prod_Nombre,
-          presentation: dataProduct.exis.undMed_Id
+        this.formItems.patchValue({
+          'item': dataProduct.prod.prod_Id,
+          'reference': dataProduct.prod.prod_Nombre,
+          'presentation': dataProduct.exis.undMed_Id
         });
-        this.searchAvaibleProduction();
       });
     });
+  }
+
+  searchProductByReference() {
+    let reference: string = this.formItems.value.reference;
+    if(reference.toString().length > 2) {
+      this.productService.GetProductsByName(reference).subscribe(data => this.productsModal = data);
+    }
   }
 
   searchAvaibleProduction() {
@@ -691,6 +730,7 @@ interface production {
   cuontProduction?: number;
   presentation: string;
   weight : number;
+  ubication? : string;
 }
 
 

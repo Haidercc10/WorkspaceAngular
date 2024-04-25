@@ -107,16 +107,16 @@
     <hr class="colorLinea">
   </div>
 
-  <div class="mb-4">
+  <div class="mb-5">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Materia Prima</h4>
   </div>
 
   <form [formGroup]="FormMateriaPrima">
-    <div class="mb-3" id="formularioMatPrima">
+    <div class="mb-4" id="formularioMatPrima">
       <div class="row g-4">
 
         <!-- ID de la Materia prima -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2" id="idMatPrima">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="idMatPrima">
           <span class="p-float-label">
             <p-inputNumber formControlName="Id" inputId="Id" [useGrouping]="false" (keyup.enter)="cambiarNombreMateriaPrima()" tooltipPosition="top" pTooltip="Busca el Id de la materia prima aquí!" [required]="true"></p-inputNumber>
             <label for="Id">Id</label>
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Nombre Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-4 col-xxl-4" id="nombreMatprima">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4" id="nombreMatprima">
           <span class="p-float-label">
             <input formControlName="Nombre" autocomplete="off" id="Nombre" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima()" required/>
             <datalist id="materiaprima">
@@ -143,7 +143,7 @@
         </div>
 
         <!-- Unidad medida-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="undMatPtima">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-1 col-xxl-1" id="undMatPtima">
           <span class="p-float-label">
             <p-dropdown formControlName="UndMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadesMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
             <label for="Und">Und</label>
@@ -159,7 +159,7 @@
         </div>
 
         <!-- IVA -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="ivaOrden">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-1 col-xxl-1" id="ivaOrden">
           <span class="p-float-label">
             <p-inputNumber formControlName="iva" inputId="iva" mode="decimal" [(ngModel)]="iva" (keyup)="ivaOrdenCompra()" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="iva">IVA(%)</label>
@@ -188,6 +188,7 @@
   <div class="row g-3" id="tabla2">
     <div class="table-responsive">
       <p-table
+      *ngIf="!cargando"
       #dt
       [resizableColumns]="true"
       columnResizeMode="expand"

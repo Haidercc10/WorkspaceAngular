@@ -377,7 +377,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   addHeaderSheet2(worksheet, font, border) {
-    const header = ["#", "Rollo", "Item", "Cliente", "Referencia", "Existencias", "Presentación", "Precio", "Subtotal", "Ubicación", "Vendedor"];
+    const header = ["#", "Rollo", "Item", "Cliente", "Referencia", "Existencias", "Presentación", "Precio", "Subtotal", "Vendedor", "Ubicación"];
     let headerRow = worksheet.addRow(header);
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }

@@ -170,6 +170,7 @@
             <th scope="col">Cantidad</th>
             <th scope="col">Presentación</th>
             <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
+            <th scope="col" *ngIf="ValidarRol == 1">Subtotal</th>
             <th style="width: 3rem">
               <p-tableHeaderCheckbox id="elegirTodo2" (click)="quitarTodosMateriaPrima()"></p-tableHeaderCheckbox>
             </th>
@@ -191,6 +192,7 @@
             </td>
             <td>{{ArrayMateriaPrima.Medida}}</td>
             <td *ngIf="ValidarRol == 1">{{ArrayMateriaPrima.Precio | number : '1.2-2'}}</td>
+            <td *ngIf="ValidarRol == 1">{{calcularSubtotal(ArrayMateriaPrima.Id) | number : '1.2-2'}}</td>
             <td>
               <p-tableCheckbox id="elegir2" [value]="ArrayMateriaPrima" (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
             </td>
@@ -198,7 +200,7 @@
         </ng-template>
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
-            <td colspan="4" class="text-right">Totales</td>
+            <td colspan="5" class="text-right">Totales</td>
             <td>{{calcularPrecio() | number : '1.2-2'}}</td>
             <td></td>
           </tr>

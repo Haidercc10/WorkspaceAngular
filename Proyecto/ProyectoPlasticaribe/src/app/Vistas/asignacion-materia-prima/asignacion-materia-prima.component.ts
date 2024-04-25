@@ -259,14 +259,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
     }
     if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id; 
-    else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id
+    else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
     this.categoriasSeleccionadas.push(this.FormMateriaPrimaRetirada.value.Categoria);
     this.materiasPrimasSeleccionadas.push(info);
     this.limpiarCamposMP();
   }
 
   // Funcion que va a calcular la cantidad de materia prima asignada
-  calcularMateriaPrimaAsignada = () : number => this.materiasPrimasSeleccionadas.reduce((a,b) => a + b.Cantidad, 0);
+  calcularMateriaPrimaAsignada = () : number => this.materiasPrimasSeleccionadas.filter(x => x.Categoria != 18).reduce((a,b) => a + b.Cantidad, 0);
 
   // Funcion que va a quitar la materia prima
   quitarMateriaPrima(data : any){
@@ -280,7 +280,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
     if (this.FormMateriaPrimaRetiro.valid) {
       if (this.materiasPrimasSeleccionadas.length != 0){
-        if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
+        if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima(); 
         else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, '¡El numero de la maquina no es valido!');
       } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, '¡Debe seleccionar minimo una materia prima para crear la asignación!');
     } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, '¡Debe llenar los campos vacios!');

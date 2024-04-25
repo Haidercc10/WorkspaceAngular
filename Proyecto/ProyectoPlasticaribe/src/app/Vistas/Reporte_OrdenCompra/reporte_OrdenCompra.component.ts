@@ -136,17 +136,17 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       this.dtOrdenCompraService.GetOrdenCompra(orden).subscribe(datos_orden => {
         for (let i = 0; i < datos_orden.length; i++) {
           let info : any = {
-            Id : 0,
+            Id : datos_orden[i].id,
             Id_Mp: datos_orden[i].mP_Id,
             Id_Tinta: datos_orden[i].tinta_Id,
             Id_Bopp: datos_orden[i].bopp_Id,
-            Nombre : '',
+            Nombre : datos_orden[i].material,
             Cantidad : this.formatonumeros(datos_orden[i].cantidad),
             Medida : datos_orden[i].unidad_Medida,
             Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
-            SubTotal : `$${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+            SubTotal : `$${this.formatonumeros(datos_orden[i].subTotal)}` //`$${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
           }
-          if (info.Id_Mp != 84) {
+          /*if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
             info.Nombre = datos_orden[i].mp;
           } else if (info.Id_Tinta != 2001) {
@@ -155,7 +155,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           } else if (info.Id_Bopp != 1) {
             info.Id = info.Id_Bopp;
             info.Nombre = datos_orden[i].bopp;
-          }
+          }*/
           this.datosPdf.push(info);
           this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
         }
@@ -292,7 +292,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           [
             '',
             { border: [true, false, true, true], text: `Peso Total` },
-            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`, alignment: 'right'},
+            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`},
             '',
             { border: [true, false, true, true], text: `Subtotal` },
             { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`, alignment: 'right'},
@@ -386,17 +386,17 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         }
         for (let i = 0; i < datos_orden.length; i++) {
           let info : any = {
-            Id : 0,
+            Id : datos_orden[i].id,
             Id_Mp: datos_orden[i].mP_Id,
             Id_Tinta: datos_orden[i].tinta_Id,
             Id_Bopp: datos_orden[i].bopp_Id,
-            Nombre : '',
+            Nombre : datos_orden[i].material,
             Cantidad : datos_orden[i].cantidad,
             Und_Medida : datos_orden[i].unidad_Medida,
             Precio : datos_orden[i].precio_Unitario,
-            SubTotal : (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+            SubTotal : datos_orden[i].subTotal //(datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
           };
-          if (info.Id_Mp != 84) {
+          /*if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
             info.Nombre = datos_orden[i].mp;
           } else if (info.Id_Tinta != 2001) {
@@ -405,7 +405,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           } else if (info.Id_Bopp != 1) {
             info.Id = info.Id_Bopp;
             info.Nombre = datos_orden[i].bopp;
-          }
+          }*/
           this.EditarOrdenCompra.materiasPrimasSeleccionadas.push(info);
         }
       }, () => this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`));
