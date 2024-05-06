@@ -1,0 +1,212 @@
+* {
+    text-decoration: none;
+  }
+  
+  .fondo {
+    background-image: linear-gradient(62deg, #FFCCBC 0%, #f7e4fe 100%);
+    height: 100%;
+    border-radius: 20px;
+  }
+  
+  .header h3, .header .pi, .rojo {
+    font-size: calc(var(--font-size) * 1.5rem);
+    color: var(--rojo);
+  }
+  
+  .header2 h3, .header2 .pi, .rojo {
+    font-size: calc(var(--font-size) * 1.5rem);
+    color: var(--rojoClaro);
+  }
+  
+  .header h3:hover, .header .pi:hover, .rojo:hover {
+    color: var(--rojoHover);
+  }
+  
+  .header2 h3:hover, .header2 .pi:hover, .rojo:hover {
+    color: var(--rojoHover);
+  }
+  
+  .fila-1, .fila-2, .fila-3, .fila-4 {
+    padding: 0 2%;
+  }
+  
+  p-card, p-card ::ng-deep .p-card {
+    height: 100%;
+  }
+  
+  p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+    color: var(--rojo);
+    text-align: center;
+    width: 100%;
+  }
+  
+  p-chart ::ng-deep div ::ng-deep canvas {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .bg-naranja {
+    color: black;
+    background-color: #F6D45D;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-azul {
+    color: black;
+    background-color: #83D3FF;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-amarillo {
+    color: black;
+    background-color: #F3FC20;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-verde {
+    color: black;
+    background-color: #8AFC9B;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-rojo {
+    color: black;
+    background-color: #FF7878;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-verde2 {
+    color: black;
+    background-color: #53CC48;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .imagen {
+    width: 25%;
+    height: 100%;
+  }
+  
+  @media (max-width: 600px) {
+    .p-3 {
+      padding: 0.5rem !important;
+    }
+  }
+  
+  p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
+    width: 100%;
+  }
+  
+  p-card ::ng-deep [class = "p-card p-component"] {
+    border: 3px solid #fefefe00;
+    border-radius: 20px;
+    transition: all 500ms;
+  }
+  
+  p-card ::ng-deep [class = "p-card p-component"]:hover {
+    border: 3px solid #00000008;
+    box-shadow: 0 0 20px 18px rgba(0, 0, 0, 0.2);
+    width: calc(100% + 0.1%);
+    height: calc(100% + 1%);
+  }
+  
+  .roll-in-left {
+      animation: roll-in-left 1.2s ease-out both;
+  }
+  
+  .roll-in-right {
+      animation: roll-in-right 1.2s ease-out both;
+  }
+  
+  .slide-in-elliptic-top-fwd {
+      animation: slide-in-elliptic-top-fwd 1.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+  }
+  
+  @keyframes roll-in-left {
+    0% {
+      transform: translateX(-800px) rotate(-540deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0) rotate(0deg);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes roll-in-right {
+    0% {
+      transform: translateX(800px) rotate(540deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0) rotate(0deg);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slide-in-elliptic-top-fwd {
+    0% {
+      transform: translateY(-600px) rotateX(-30deg) scale(0);
+      transform-origin: 50% 100%;
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0) rotateX(0) scale(1);
+      transform-origin: 50% 1400px;
+      opacity: 1;
+    }
+  }
+  
+  .fondo {
+    --s: 65px; /* control the size */
+    --c1: #dadee1;
+    --c2: #4a99b4;
+    --c3: #9cceb5;
+    
+    --_c: 75%,var(--c3) 52.72deg,#0000 0;
+    --_g1: conic-gradient(from -116.36deg at 25% var(--_c));
+    --_g2: conic-gradient(from   63.43deg at 75% var(--_c));
+    background:
+      var(--_g1), var(--_g1) calc(3*var(--s)) calc(var(--s)/2),
+      var(--_g2), var(--_g2) calc(3*var(--s)) calc(var(--s)/2),
+      conic-gradient(
+        var(--c2)   63.43deg ,var(--c1) 0 116.36deg,
+        var(--c2) 0 180deg   ,var(--c1) 0 243.43deg,
+        var(--c2) 0 296.15deg,var(--c1) 0);
+    background-size: calc(2*var(--s)) var(--s);
+  }
+  
+  .fondo2 {
+    --s: 65px; /* control the size */
+    --c1: #000000;
+    --c2: #5e5e5ef5;
+    --c3: #424242;
+    
+    --_c: 75%,var(--c3) 52.72deg,#0000 0;
+    --_g1: conic-gradient(from -116.36deg at 25% var(--_c));
+    --_g2: conic-gradient(from   63.43deg at 75% var(--_c));
+    background:
+      var(--_g1), var(--_g1) calc(3*var(--s)) calc(var(--s)/2),
+      var(--_g2), var(--_g2) calc(3*var(--s)) calc(var(--s)/2),
+      conic-gradient(
+        var(--c2)   63.43deg ,var(--c1) 0 116.36deg,
+        var(--c2) 0 180deg   ,var(--c1) 0 243.43deg,
+        var(--c2) 0 296.15deg,var(--c1) 0);
+    background-size: calc(2*var(--s)) var(--s);
+  }
+  
+  .costosAnios{
+    justify-content: center;
+    background-color: #d1d1d122;
+    border: 1.9px dashed #8b8b8b;
+    border-radius: 10px;
+    margin: 10px;
+  }
+  
+  .costosAniosOscuro{
+    justify-content: center;
+    background-color: #aaa2;
+    border: 1.9px dashed #d7d7d7;
+    border-radius: 10px;
+    margin: 10px;
+  }

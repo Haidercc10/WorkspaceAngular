@@ -136,3 +136,15 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
   border-radius: 10px;
   margin: 10px;
 }
+
+::ng-deep .p-card .p-card-body .p-card-content {
+  margin-bottom: 0.5rem !important;
+}
+
+::ng-deep .p-card .p-card-footer {
+  padding: 0.5rem 0 0 0;
+}
+
+::ng-deep .p-card {
+  margin-bottom: 2%;
+}

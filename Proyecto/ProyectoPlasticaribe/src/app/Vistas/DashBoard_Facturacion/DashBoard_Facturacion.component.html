@@ -70,49 +70,49 @@
     </div>
 
     <!-- Grafica y Estados de Ordenes -->
-    <div class="col-xxl-9 col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12 m-auto slide-in-elliptic-top-fwd" id="grafica">
-      <div class="p-3">
-        <p-card>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Facturación Mensual</h2>
+      <div class="col-xxl-9 col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12 m-auto slide-in-elliptic-top-fwd" id="grafica">
+        <div class="p-3">
+          <p-card>
+            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Facturación Mensual</h2>
 
-          <p-toolbar id="cambiarAnio">
-            <div class="row g-2 justify-content-center align-middle">
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5 m-auto">
-                <h5>¡Elige el año que deseas graficar!</h5>
-              </div>
+            <p-toolbar id="cambiarAnio">
+              <div class="row g-2 justify-content-center align-middle">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5 m-auto">
+                  <h5>¡Elige el año que deseas graficar!</h5>
+                </div>
 
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7">
-                <div class="row mb-4 justify-content-center">
-                  <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5">
-                    <p-dropdown class="mr-2"  [options]="anos" [(ngModel)]="anoSeleccionado"></p-dropdown>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7">
+                  <div class="row mb-4 justify-content-center">
+                    <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5">
+                      <p-dropdown class="mr-2"  [options]="anos" [(ngModel)]="anoSeleccionado"></p-dropdown>
+                    </div>
+
+                    <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-3">
+                      <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="facturacionAnio()"></button>
+                      <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="graficarDatos()"></button>
+                    </div>
                   </div>
+                </div>
+              </div>
+            </p-toolbar>
 
-                  <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-3">
-                    <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="facturacionAnio()"></button>
-                    <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="graficarDatos()"></button>
+            <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="facturasData" [options]="facturasOptions"></p-chart>
+
+            <div class="row p-2">
+              <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of facturadoAnios">
+                <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                  <div class="col-md-12">
+                    <h5>{{item.anio}}</h5>
+                  </div>
+                  <div class="col-md-12">
+                    <h5>{{item.costo | number : '1.2-2'}}</h5>
                   </div>
                 </div>
               </div>
             </div>
-          </p-toolbar>
-
-          <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="facturasData" [options]="facturasOptions"></p-chart>
-
-          <div class="row p-2">
-            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of facturadoAnios">
-              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
-                <div class="col-md-12">
-                  <h5>{{item.anio}}</h5>
-                </div>
-                <div class="col-md-12">
-                  <h5>{{item.costo | number : '1.2-2'}}</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-        </p-card>
+          </p-card>
+        </div>
       </div>
-    </div>
   </div>
 </div>
 

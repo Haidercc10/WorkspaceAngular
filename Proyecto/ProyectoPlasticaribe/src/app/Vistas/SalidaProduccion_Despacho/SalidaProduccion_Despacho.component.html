@@ -32,7 +32,7 @@
 
       <div class="col-sm-12 col-md-3">
         <span class="p-float-label">
-          <input formControlName="production" id="RolloBarCode" type="number" pInputText pAutoFocus [autofocus]="true" (keyup.enter)="getInformationProduction()"/>
+          <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getInformationProduction()"/>
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>

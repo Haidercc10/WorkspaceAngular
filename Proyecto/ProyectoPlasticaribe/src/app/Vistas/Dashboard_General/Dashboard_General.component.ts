@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
+import { Table } from 'primeng/table';
+import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
@@ -39,6 +41,7 @@ export class Dashboard_GeneralComponent implements OnInit {
   graficaCompras_Totales : any; //Variable que va a almacenar los datos que van a aparecer en las compras de plasticaribe, invergoal y inversuez
   graficaInventario_MatPrima : any; //Variable que va a almacenar los datos que van a aparecer en el inventario de materia prima
   graficaInventario_Productos : any; //Variable que va a almacenar los datos que van a aparecer en el inventario de productos
+  graficaSalidasDespacho : any
 
   facturadoAnios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada.
   cuentas_Cobrar_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por cobrar
@@ -52,11 +55,18 @@ export class Dashboard_GeneralComponent implements OnInit {
   compras_Totales : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de plasticaribe, invergoal y inversuez
   inventarioMatPrima_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de materia prima
   inventarioProductos_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de productos
+  salidasDespacho_Anios : any [] = [];
 
   anioGraficadoPlasticaribe : number [] = []; //Variable que va a almacenar los años que se han graficado para el tab de plasticaribe
   anioGraficadoInvergoal : number [] = []; //Variable que va a almacenar los años que se han graficado para el tab de invergoal
   anioGraficadoInversuez : number [] = []; //Variable que va a almacenar los años que se han graficado para el tab de inversuez
   facturasNoHabilitadas : string [] = []; //Variable que almacenará las facturas que no se deben sumar y/o mostrar
+
+  salidasDespacho : any = [];
+  modalSalidasDespacho : boolean = false;
+  @ViewChild('dt') dt : Table | undefined;
+  totalAnio : number = 0;
+  totalInfo : number = 0;
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
@@ -65,7 +75,8 @@ export class Dashboard_GeneralComponent implements OnInit {
                       private inventarioMatPrima : InventInicialDiaService,
                         private inventarioProductos : Inventario_Mes_ProductosService,
                           private shepherdService: ShepherdService,
-                            private srvFacturasGoalSuez : Facturas_Invergoal_InversuezService,) {
+                            private srvFacturasGoalSuez : Facturas_Invergoal_InversuezService,
+                              private svDetailsOF : Dt_OrdenFacturacionService, ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -115,6 +126,7 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.compras_Totales = [];
     this.inventarioMatPrima_Anios = [];
     this.inventarioProductos_Anios = [];
+    this.salidasDespacho_Anios = [];
 
     this.opcionesGrafica = this.estiloGrafica();
     this.opcionesGrafica_Pagar = this.estiloGrafica();
@@ -130,6 +142,7 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.graficaCompras_Totales = this.formatoGraficas();
     this.graficaInventario_MatPrima = this.formatoGraficas();
     this.graficaInventario_Productos = this.formatoGraficas();
+    this.graficaSalidasDespacho = this.formatoGraficas();
   }
 
   formatoGraficas(){
@@ -183,6 +196,7 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.dotsGraficaComprasTotales();
     this.BuscarDatosGraficaInventario_MatPrima();
     this.BuscarDatosGraficaInventario_Producto();
+    this.buscarDatosSalidasDespacho();
     setTimeout(() => this.cargando = false, 5000);
   }
 
@@ -684,6 +698,99 @@ export class Dashboard_GeneralComponent implements OnInit {
       fill : true,
       tension: 0.3
     });
+  }
+
+  //Función que va a colocar las cantidades en kilos de las salidas de despacho por mes. 
+  buscarDatosSalidasDespacho(){
+    let index : number = this.salidasDespacho_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      this.cargando = true;
+      this.svDetailsOF.getProductionSentMonthConsolidate(this.anioSeleccionado).subscribe(data => {
+        this.llenarGraficaSalidasDespacho(data);
+        
+        let info_Anio : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b, 0) };
+        let index2 : number = this.salidasDespacho_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+        if(index2 != -1) this.salidasDespacho_Anios[index2].costo = data.reduce((a,b) => a + b, 0);
+        else this.salidasDespacho_Anios.push(info_Anio);
+      });
+    }
+  }
+
+  //Función que va a llenar la gráfica
+  llenarGraficaSalidasDespacho(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    this.graficaSalidasDespacho.datasets.push({
+      label: `Año ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    });
+  }
+
+  filtrarTotalxAnio(anio : number) {
+    setTimeout(() => {
+      this.totalAnio = 0;
+      this.totalInfo = 0;
+      if(this.dt) {
+        if(this.dt.filteredValue) this.calcularTotalAnio(this.dt.filteredValue, anio);
+        else this.calcularTotalAnio(this.salidasDespacho, anio);
+      } else this.calcularTotalAnio(this.salidasDespacho, anio);
+    }, 500);
+  } 
+
+  calcularTotalAnio(infoTable : any, anio : number) {
+    infoTable.filter(x => x.anio == anio).forEach(x => { this.totalAnio += x.peso_Neto; });
+    infoTable.forEach(x => { this.totalInfo += x.peso_Neto; });
+  }
+
+  //Función que va a mostrar las salidas de despacho de manera consolidada por item
+  cargarSalidasDespacho(){
+      this.salidasDespacho = [];
+      this.cargando = true;
+
+      this.salidasDespacho_Anios.forEach(x => {
+        this.svDetailsOF.getProductionSentMonthDetailed(x.anio).subscribe(data => {
+          if(data.length > 0) { 
+            this.salidasDespacho = this.salidasDespacho.concat(data);
+            this.salidasDespacho.sort((a, b) => Number(b.peso_Neto) - Number(a.peso_Neto));
+            this.salidasDespacho.sort((a, b) => Number(a.numero_Mes) - Number(b.numero_Mes));
+            this.filtrarTotalxAnio(x.anio);
+            this.modalSalidasDespacho = true;
+            this.cargando = false;
+          }
+        }, error => {
+          this.msj.mensajeError(`Error`, `No fue posible consultar la información de salidas de despacho`);
+          this.cargando = false;
+        });
+      });
+  }
+
+  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
+  aplicarfiltro($event, campo : any, valorCampo : string) {
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    this.cargarTotalesxFiltro();
+  } 
+
+  //Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado.
+  cargarTotalesxFiltro(){
+    setTimeout(() => {
+      if(this.dt) {
+        if(this.dt.filteredValue) {
+          let anios = this.dt.filteredValue.reduce((a,b) => {
+            if(!a.map(x => x.anio).includes(b.anio)) a = [...a, b.anio];
+            return a;
+          }, []);
+          anios.forEach(x => { this.filtrarTotalxAnio(x) })
+          return anios;
+        }
+      }
+    }, 500);
   }
 
 }

@@ -24,7 +24,7 @@ import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/O
   styleUrls: ['./SalidaProduccion_Despacho.component.css']
 })
 
-export class SalidaProduccion_DespachoComponent implements OnInit {
+export class SalidaProduccion_DespachoComponent implements OnInit { 
 
   load: boolean = false;
   storage_Id: number;
@@ -41,6 +41,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   productionOutPallet : Array<any> = [];
   count : number = 0;
   modalProductionOutPallet : boolean = false;
+  soloRead : boolean = true;
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -140,6 +141,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     if ([null, undefined, ''].includes(orderFact.toString().trim())) this.msj.mensajeError(`¡Debe buscar la orden de facturación para ingresar los rollos/bultos a despachar!`, ``, 12000000);
     else {
       let production = parseInt(this.formProduction.value.production);
+      console.log(production);
       let productionOrderSearched = this.production.map(x => x.numberProduction);
       if (!productionOrderSearched.includes(production)) this.msj.mensajeError(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`, ``, 12000000);
       else {
@@ -151,6 +153,11 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       }
     }
   }
+
+  //Función para evitar que escriban el numero del bulto en el campo rollo leído
+  quitBarCode() {
+    setTimeout(() => { if(![1,10].includes(this.ValidarRol)) this.formProduction.patchValue({ production : '' }); }, 50);
+  } 
 
   getDataProduction(production: number) {
     let orderFact = this.formProduction.value.orderFact;

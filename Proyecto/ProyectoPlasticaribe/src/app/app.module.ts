@@ -217,6 +217,7 @@ import { FormEditarPrestamosComponent } from './Vistas/FormEditarPrestamos/FormE
 import { Crear_FallasComponent } from './Vistas/Crear_Fallas/Crear_Fallas.component';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { OrdenFacturacion_PalletsComponent } from './Vistas/OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
+import { Facturacion_Vs_IngresosDespachoComponent } from './Vistas/Facturacion_Vs_IngresosDespacho/Facturacion_Vs_IngresosDespacho.component';
 
 @NgModule({
   declarations: [
@@ -354,7 +355,8 @@ import { OrdenFacturacion_PalletsComponent } from './Vistas/OrdenFacturacion_Pal
     Prestamos_NominaComponent,
     FormEditarPrestamosComponent, 
     Crear_FallasComponent, 
-    OrdenFacturacion_PalletsComponent
+    OrdenFacturacion_PalletsComponent, 
+    Facturacion_Vs_IngresosDespachoComponent
   ],
 
   imports: [

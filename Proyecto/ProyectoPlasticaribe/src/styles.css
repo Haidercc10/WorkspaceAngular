@@ -560,3 +560,8 @@ p-avatar div span {
 .textOrange {
   color: #ff8800;
 }
+
+.read-only {
+  cursor: not-allowed; /* Cambiar el cursor a no disponible */
+}
+
