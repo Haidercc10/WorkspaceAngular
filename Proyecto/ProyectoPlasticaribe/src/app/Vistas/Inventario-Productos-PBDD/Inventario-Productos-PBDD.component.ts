@@ -9,6 +9,8 @@ import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Product
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { error } from 'console';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
@@ -56,12 +58,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
   indexTab : number = 0;
   stateOptions: any[] = [{ value: 'off', icon : 'pi pi-table', title : 'Contraer filas'}, { value: 'on', icon : 'pi pi-list', title: 'Desplegar filas'}];
   value : string = 'off';
+  itemSelected : any = {};
+  @ViewChild('tableDetails1') tableDetails1 : Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
     private stockService: ExistenciasProductosService,
     private createExcelService: CreacionExcelService,
-    private svProductionProcess : Produccion_ProcesosService) {
+    private svProductionProcess : Produccion_ProcesosService, 
+    private svInvZeus : InventarioZeusService,
+    private svMsg : MessageService,
+  ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
@@ -283,6 +290,78 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.recetas_ProductosComponent.FormProductos.patchValue({ Nombre: data.Id, });
       this.recetas_ProductosComponent.buscarProductos();
       setTimeout(() => this.recetas_ProductosComponent.cambiarNombreProducto(), 500);
+    }
+  }
+
+  //Función que mostrará un msj de confirmación para eliminación de items en la OF.
+  seeMsjEditItem(data : any, detail? : any){
+    this.load = true;
+    this.itemSelected = {};
+    this.itemSelected = data;
+    detail ? this.itemSelected.numberProduction = detail.NumberProduction : null;
+    let msg : string = ``;
+    console.log(detail);
+    
+    
+    detail ? msg = `¿Está seguro que desea colocar el bulto N° ${detail.NumberProduction} como 'NO DISPONIBLE'?` : msg = `¿Esta seguro que desea colocar todos los bultos del item '${data.item} - ${data.reference}' como 'NO DISPONIBLE'?`
+    this.svMsg.add({ severity:'warn', key:'item', summary: `Elección`, detail : msg,  sticky: true});
+  }
+
+  //Función que creará un ajuste negativo en Zeus del item que se desea colocar como 'no disponible' en Plasticaribe. 
+  sendAdjustmentZeus(data : any) {
+    if (data != null) {
+      this.load = true;
+      let unit : string = data.presentation == 'Kg' ? 'KLS' : data.presentation == 'Und' ? 'UND' : 'PAQ';
+      let qty : number = data.AvaibleProdution.reduce((a, b) => unit == 'KLS' ? a += b.Weight : a += b.Quantity, 0);
+      let item : string = data.item; 
+      let price : string = data.price;
+      let detail : string = `Ajuste desde App Plasticaribe del Item ${item} con cantidad de ${(-(qty))} ${unit}`;
+      
+      this.svInvZeus.getExistenciasProductos(data.item, unit).subscribe(dataExis => {
+        if(dataExis.length == 0 || (dataExis[0].existencias < qty)) {
+          let qtyZeus : number = dataExis.length == 0 ? 0 : dataExis[0].existencias;
+          let message : string = `La cantidad del item a ajustar en Plasticaribe "${qty.toLocaleString()} ${unit}" es mayor al stock de Zeus "${qtyZeus.toLocaleString()} ${unit}"`
+          this.msjs(`Advertencia`, message);
+        } else {
+          this.svProductionProcess.sendProductionToZeus(detail, item, unit, 0, (-(qty)).toString(), price).subscribe(dataAdjusment => {
+            this.setItemNotAvailable(data, false);
+          }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus!`); })
+        }  
+      }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus!`); });
+    } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un item!`);
+  }
+
+  //Función que actualizará el estado de los rollos a no disponible
+  setItemNotAvailable(data : any, soloPlasticaribe : boolean){
+    let index : number = this.stockInformation.findIndex(x => x.item == data.item);
+    soloPlasticaribe ? this.load = true : null;
+    let rollsAvailables : any = data.AvaibleProdution.map(x => x.NumberProduction);
+    
+    this.svProductionProcess.putChangeStateProduction(rollsAvailables, data.item, 19, 23).subscribe(data => {
+      this.stockInformation.splice(index, 1);
+      this.msjs(`Confirmación`, `Se ha actualizado el stock de la referencia ${data.item - data.reference}`);
+      this.load = false;
+    });
+  }
+
+  //Función que quitará el msj de elección
+  onReject(key : any) {
+    this.load = false;
+    this.svMsg.clear(key);
+  }
+
+  //Acortar msjs de confirmación, error y adavertencia
+  msjs(msj1 : string, msj2 : string) {
+    this.load = false;
+    switch (msj1) {
+      case 'Confirmación' :
+        return this.msg.mensajeConfirmacion(msj1, msj2);
+      case 'Advertencia' : 
+        return this.msg.mensajeAdvertencia(msj1, msj2);
+      case 'Error' : 
+        return this.msg.mensajeError(msj1, msj2);
+      default :
+        return this.msg.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`); 
     }
   }
 

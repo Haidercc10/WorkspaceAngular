@@ -50,11 +50,13 @@
           <tr>
               <th rowspan="2" class="text-center">#</th>
               <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStock, $event, col.field)"></th>
-          </tr>
+              <th *ngIf="[1].includes(ValidarRol)"></th>  
+            </tr>
           <tr>
               <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
               <p-sortIcon [field]="col.field"></p-sortIcon>
               </th>
+              <th *ngIf="[1].includes(ValidarRol)"></th>
           </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
@@ -66,19 +68,43 @@
                   </span>
               </td>
               <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
-          </tr>
+              <td *ngIf="[1].includes(ValidarRol)">
+                <p-button icon="pi pi-wrench" [rounded]="true" severity="warning" pTooltip="Ajustar item '{{data.item}} - {{data.reference}}'" (onClick)="seeMsjEditItem(data)" tooltipPosition="top"></p-button>
+              </td>
+            </tr>
       </ng-template>
       <ng-template pTemplate="rowexpansion" let-data>
           <tr>
-              <td colspan="23">
+              <td colspan="24">
                   <div class="p-3">
                       <p-table
+                          #tableDetails1
                           [value]="data.AvaibleProdution"
                           dataKey="factura"
                           styleClass="p-datatable-gridlines p-datatable-sm"
+                          [resizableColumns]="true"
+                          columnResizeMode="expand"
+                          responsiveLayout="scroll"
+                          [reorderableColumns]="true"
                           [scrollable]="true"
-                          scrollHeight="30rem">
+                          scrollHeight="30rem"
+                          [rowHover]="true"
+                          >
                           <ng-template pTemplate="header">
+                              <tr id="filtros">
+                                  <th></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'NumberProduction', tableDetails1)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'orderProduction', tableDetails1)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'Quantity', tableDetails1)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Presentation', tableDetails1)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'Weight', tableDetails1)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'Precio', tableDetails1)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Information', tableDetails1)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Process', tableDetails1)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Turn', tableDetails1)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Date', tableDetails1)"></th>
+                                  <th></th>
+                                </tr>
                               <tr>
                                   <th>#</th>
                                   <th>Rollo</th>
@@ -87,10 +113,11 @@
                                   <th>Presentación</th>
                                   <th>Peso</th>
                                   <th>Precio</th>
-                                  <th>Etiqueta</th>
+                                  <th>Ubicación</th>
                                   <th>Proceso</th>
                                   <th>Turno</th>
                                   <th>Fecha</th>
+                                  <th *ngIf="[1].includes(ValidarRol)"></th>
                               </tr>
                           </ng-template>
                           <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
@@ -106,11 +133,14 @@
                                   <td>{{details.Process}}</td>
                                   <td>{{details.Turn}}</td>
                                   <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                                  <td *ngIf="[1].includes(ValidarRol)">
+                                    <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Sacar bulto N° {{details.NumberProduction}} del item '{{data.item}} - {{data.reference}}'" (onClick)="seeMsjEditItem(data)" tooltipPosition="top"></p-button>
+                                  </td>
                               </tr>
                           </ng-template>
                           <ng-template pTemplate="emptymessage">
                               <tr>
-                                  <td colspan="11">No se encontraron registros</td>
+                                  <td colspan="12">No se encontraron registros</td>
                               </tr>
                           </ng-template>
                       </p-table>
@@ -121,7 +151,7 @@
       <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
           <tr>
               <td colspan="7">Total</td>
-              <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation) | currency : 'COP '}}</td>
+              <td [colSpan]="selectedColumns.length - 7">{{totalStock(stockInformation) | currency : 'COP '}}</td>
           </tr>
       </ng-template>
     </p-table>
@@ -947,3 +977,23 @@
     </p-table>
   </p-tabPanel>
 </p-tabView>
+
+<p-toast position="center" key="item" (onClose)="onReject('item')" [baseZIndex]="5000">
+    <ng-template let-message pTemplate="message">
+      <div class="flex flex-column" style="flex: 1">
+        <div class="text-center">
+          <i class="pi pi-exclamation-triangle font-size-48"></i>
+          <h4>{{message.summary}}</h4>
+          <p>{{message.detail}}</p>
+        </div>
+        <div class="p-fluid" style="display: flex;">
+          <div class="col-6" style="margin-right: 5px;">
+            <button type="button" pButton icon="pi pi-check" label="Sí, y ajustar zeus" class="p-button-warning" (click)="sendAdjustmentZeus(itemSelected)" pTooltip="El stock del item '{{itemSelected.item}} - {{itemSelected.reference}}' cambiará a 0, en Plasticaribe y en Zeus."></button>
+          </div>
+          <div class="col-6">
+            <button type="button" pButton icon="pi pi-times" label="Sí, solo de Plasticaribe" (click)="setItemNotAvailable(itemSelected, true)" class="p-button-secondary" pTooltip="El stock del item '{{itemSelected.item}} - {{itemSelected.reference}}' cambiará a 0, solo en Plasticaribe."></button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-toast>

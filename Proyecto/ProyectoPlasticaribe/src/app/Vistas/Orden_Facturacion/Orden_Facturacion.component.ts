@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { co } from '@fullcalendar/core/internal-common';
 import { log } from 'console';
 import moment from 'moment';
-import { TreeNode } from 'primeng/api';
+import { MessageService, TreeNode } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
 import { modelOrdenFacturacion } from 'src/app/Modelo/modelOrdenFacturacion';
@@ -51,6 +51,9 @@ export class Orden_FacturacionComponent implements OnInit {
   typesDoc : Array<string> = [];
   modalAddItems : boolean = false;
   productsModal : Array<any> = [];
+  editOrderFact : boolean = false;
+  rollSelected : any = {};
+  itemSelected : any = {};
   
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -65,11 +68,13 @@ export class Orden_FacturacionComponent implements OnInit {
     private invZeusService: InventarioZeusService,
     private bagproService: BagproService,
     private svtypeDocs : TipoDocumentoService,
+    private svMsg : MessageService,
   ) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
 
     this.formDataOrder = this.frmBuilder.group({
+      order : [null],
       fact: [null],
       saleOrder: [null],
       idClient: [null, Validators.required],
@@ -90,16 +95,19 @@ export class Orden_FacturacionComponent implements OnInit {
     this.lecturaStorage();
     this.getPresentation();
     this.getTypesDocument();
+    this.getLastOrderFact();
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  getLastOrderFact = () => this.orderFactService.getLastOrder().subscribe(data => { this.formDataOrder.patchValue({ 'order' : data + 1, }) }, error => { this.msj.mensajeError('Error', 'No fue posible consultar la última orden de facturación'); });
 
   lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
-  clearFields() {
+  clearFields(edit : boolean) {
     this.load = false;
     this.formDataOrder.reset();
     this.production = [];
@@ -107,6 +115,10 @@ export class Orden_FacturacionComponent implements OnInit {
     this.products = [];
     this.productionSelected = [];
     this.consolidatedProduction = [];
+    this.rollSelected = {};
+    this.editOrderFact = false;
+    this.selectedProductSaleOrder = null;
+    !edit ? this.getLastOrderFact() : null;
   }
 
   getClients() {
@@ -139,6 +151,7 @@ export class Orden_FacturacionComponent implements OnInit {
               presentation: dataProduction.pp.presentacion,
               weight : dataProduction.pp.peso_Bruto, 
               ubication : ![null, undefined, ''].includes(dataProduction.ubication) ? dataProduction.ubication : '',
+              inOrder : false,
             });
           }
           if (countProductionAvaible.length == this.production.length) this.production = this.changeNameProduct(this.production);
@@ -170,7 +183,7 @@ export class Orden_FacturacionComponent implements OnInit {
   getTypesDocument = () => this.svtypeDocs.srvObtenerLista().subscribe(data => { this.typesDoc = data.filter(x => ['OF', 'REPO'].includes(x.tpDoc_Id)) },);
 
   //Función para validar el tipo de documento seleccionado.
-  validateTypeDoc(){
+  /*validateTypeDoc(){
     let typeDoc = this.formDataOrder.value.typeDoc;
     
     if(typeDoc == 'REPO') {
@@ -180,7 +193,7 @@ export class Orden_FacturacionComponent implements OnInit {
       this.clearFields();
       this.formDataOrder.patchValue({'saleOrder': null, 'typeDoc' : null, });
     } 
-  }
+  }*/
 
   addItemToSaleOrder(){}
 
@@ -361,13 +374,14 @@ export class Orden_FacturacionComponent implements OnInit {
       this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
     }
     setTimeout(() => this.load = false, 5);
-  }
+  } 
 
   selectedProduction(production: production) {
     this.load = true;
     let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
     this.production.splice(index, 1);
-    this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction));
+    !this.editOrderFact ? this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction)) : this.productionSelected.sort((a, b) => +a.inOrder - +b.inOrder);
+    //this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction))
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 5);
   }
@@ -467,9 +481,9 @@ export class Orden_FacturacionComponent implements OnInit {
 
   putStatusReels(order: number, fact: string) {
     this.productionProcessService.putStateForSend(order).subscribe(() => {
-      this.msj.mensajeConfirmacion('Orden de Facturacion Guardada');
+      this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden de facturacion N° ${order} actualizada exitosamente!`) : this.msj.mensajeConfirmacion('Orden de Facturacion Guardada');
       this.createPDF(order, fact);
-      this.clearFields();
+      this.clearFields(false);
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
@@ -716,6 +730,222 @@ export class Orden_FacturacionComponent implements OnInit {
       }
     }
   }
+
+  // ************ EDITAR ORDENES DE FACTURACIÓN ************ //
+
+  //Función para obtener la orden de facturación
+  getInfoOrderFact(){
+    let of : any = this.formDataOrder.value.order;
+
+    if(![null, undefined, 0, ''].includes(of)) {
+      this.load = true;
+      this.dtOrderFactService.GetInformacionOrderFact(of).subscribe(data => {
+        if(data.length > 0) {
+          if(![3, 21].includes(data[0].order.estado_Id)) {
+            this.clearFields(true);
+            this.editOrderFact = true;
+            setTimeout(() => { this.loadInfoOrderFact(data); }, 500); 
+          } else this.msjsOF(`Advertencia`, `La orden de facturación N° ${data[0].order.id} no está disponible para editar`);
+        } else this.msjsOF(`Advertencia`, `No se encontró información de la orden de facturación N° ${data[0].order.id}`);
+      }, error => {
+        this.msj.mensajeError(`Error`, `No se encontró información de la orden de facturación N° ${of}`);
+        this.clearFields(false);
+      });
+    } else {
+      this.msj.mensajeAdvertencia(`Advertencia`, `Debe digitar una orden de facturación válida!`);
+      this.clearFields(false);
+    } 
+  }
+
+  //Función para cargar la información de la orden de facturación a editar.
+  loadInfoOrderFact(data : any){
+    data.forEach(x => {
+      this.productionSelected.push({
+        'saleOrder': x.dtOrder.consecutivo_Pedido,
+        'client' : x.clientes.cli_Id, 
+        'nameClient' : x.clientes.cli_Nombre,
+        'item': x.producto.prod_Id,
+        'reference' : x.producto.prod_Nombre,
+        'orderProduction' : x.orderProduction,
+        'numberProduction' : x.dtOrder.numero_Rollo,
+        'quantity' : x.dtOrder.cantidad,
+        'presentation' : x.dtOrder.presentacion,
+        'ubication' : x.ubication,
+        'weight' : x.weight,
+        'inOrder' : true,
+        'idDetail' : x.dtOrder.id,
+      });
+    });
+    this.loadInfoClientOrder(data[0]);
+    this.products = this.getProductsForOrderFact();
+    //this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction));
+    this.getConsolidateProduction();
+    this.load = false;
+  } 
+
+  //Función para cargar la información del cliente en la orden
+  loadInfoClientOrder(data : any){
+    this.formDataOrder.patchValue({ 
+      'order' : data.order.id,
+      'saleOrder' : data.dtOrder.consecutivo_Pedido,
+      'idClient' : data.clientes.cli_Id,
+      'client' : data.clientes.cli_Nombre,
+      'observation' : data.order.observacion,
+    });
+  }
+
+  //Función para cargar los productos de la orden
+  getProductsForOrderFact() {
+    let products = this.productionSelected.filter(x => x.inOrder).reduce((a : any, b : any) => {
+      if(!a.map(x => x.id_Producto).includes(b.item)) {
+        a.push({
+          'consecutivo' : b.saleOrder,
+          'id_Cliente' : b.client,
+          'cliente' : b.nameClient,
+          'id_Producto' : b.item,
+          'producto' : b.reference,
+          'cant_Pendiente' : b.quantity,
+          'presentacion' : b.presentation,
+        });
+      } else a[a.findIndex(x => x.id_Producto == b.item)].cant_Pendiente += b.quantity;
+      return a;
+    }, []);
+    return products;
+  }
+
+  //Función para mostrar el msj de confirmación de eliminación de rollos
+  seeMsgDeleteRolls(data : any) {
+    this.load = true;
+    this.rollSelected = {};
+    this.rollSelected = data;
+
+    this.svMsg.add({severity:'warn', key:'deleteRoll', summary:'Elección', detail: `¿Está seguro que desea eliminar el rollo N° ${data.numberProduction} de la orden N° ${this.formDataOrder.value.order}?`, sticky: true});
+  } 
+  
+  //Función para quitar msj de confirmación.
+  onReject(key : any) {
+    this.load = false;
+    this.svMsg.clear(key);
+  }
+
+  //Función para eliminar rollos de la orden 
+  deleteRollFromOrderFact(data : any){
+    this.onReject('deleteRoll');
+    this.load = true;
+    let index : any = this.productionSelected.findIndex(x => x.numberProduction == data.numberProduction);
+    
+    this.dtOrderFactService.deleteDetailOF(data.idDetail).subscribe(() => {
+      this.productionProcessService.putChangeStateProduction([data.numberProduction], data.item, 20, 23).subscribe(() => {
+        this.msjsOF(`Confirmación`, `Rollo N° ${data.numberProduction} eliminado exitosamente de la orden N° ${this.formDataOrder.value.order}!`);
+        this.productionSelected.splice(index, 1);
+        this.tableProductionSelected.clear();
+        this.getConsolidateProduction();
+      }, error => {
+        this.msjsOF(`Error`, `No fue posible actualizar el estado del rollo N° ${data.numberProduction}!`);
+        this.tableProductionSelected.clear();
+      });
+    }, error => {
+      this.msjsOF(`Error`, `Error al eliminar el rollo N° ${data.numberProduction} de la orden N° ${this.formDataOrder.value.order}`);
+      this.tableProductionSelected.clear();
+    });
+  }
+
+  //Función para eliminar items/rollos de la orden 
+  deleteItemFromOrderFact(data : any, status : number, newStatus : number){
+    this.onReject('deleteItem');
+    this.load = true;
+    let count : number = 0;
+    let rollsItemOrder : any = this.productionSelected.filter(x => x.item == data.id_Producto && x.inOrder);
+    let rollsToUpdate : any = [];
+    
+    rollsItemOrder.forEach(x => {
+      this.dtOrderFactService.deleteDetailOF(x.idDetail).subscribe(() => {
+        let indexRoll : any = this.productionSelected.findIndex(p => p.item == data.id_Producto && p.numberProduction == x.numberProduction && p.inOrder);
+        this.productionSelected.splice(indexRoll, 1);
+        rollsToUpdate.push(x.numberProduction);
+        count++
+        if(count == rollsItemOrder.length) this.changeStatusRolls(data, rollsToUpdate, status, newStatus);
+      }, error => this.msjsOF(`Error`, `No fue posible eliminar los rollos del item ${x.item}.`));  
+    });
+  }
+
+  //Función para cambiar el estado de rollos que se están sacando de la OF. 
+  changeStatusRolls(data : any, rolls : any, status : number, newStatus : number){
+    let indexItem : number = this.products.findIndex(x => x.id_Producto == data.id_Producto);
+    console.log(data, rolls, status, newStatus, indexItem);
+    
+    this.productionProcessService.putChangeStateProduction(rolls, data.id_Producto, status, newStatus).subscribe(() => {
+      this.msjsOF(`Confirmación`, `Item eliminado de la orden N° ${this.formDataOrder.value.order} exitosamente!`);
+      this.products.splice(indexItem, 1);
+      this.getConsolidateProduction();
+    }, error => { this.msjsOF(`Error`, `No fue posible actualizar el estado de los bultos del item ${data.id_Producto}.`); });
+  }
+
+  //Función que editará la orden de facturación. 
+  editOrder(){
+    let of : any = this.formDataOrder.value.order;
+    let qtyProductionSelected : number = this.productionSelected.filter(x => !x.inOrder).length; 
+    this.selectedProductSaleOrder = null;
+    this.load = true;
+    
+    this.orderFactService.getId(of).subscribe(dataOF => {
+      if(qtyProductionSelected > 0) this.addRollsToOrderFact(dataOF);
+      else {
+        this.msj.mensajeConfirmacion(`Confirmación`, `Orden N° ${this.formDataOrder.value.order} actualizada con éxito!`);
+        this.createPDF(dataOF.id, dataOF.factura);
+        this.clearFields(false);
+      }
+    }, error => { this.msjsOF(`Error`, `No se pudo consultar la orden de facturación N° ${of}`); });
+  }
+
+  //Función para insertar rollos a la orden de facturación luego de presionar el boton editar
+  addRollsToOrderFact(dataOrder : any){
+    this.selectedProductSaleOrder = null;
+    let count : number = 0; 
+    this.productionSelected.filter(x => !x.inOrder).forEach(x => {
+      let detailOF : modelDt_OrdenFacturacion = {
+        'Id_OrdenFacturacion': dataOrder.id,
+        'Numero_Rollo': x.numberProduction,
+        'Prod_Id': x.item,
+        'Cantidad': x.quantity,
+        'Presentacion': x.presentation,
+        'Consecutivo_Pedido': (x.saleOrder).toString(),
+        'Estado_Id': 20
+      }
+      this.dtOrderFactService.Post(detailOF).subscribe(data => {
+        count++;
+        if(count == this.productionSelected.filter(x => !x.inOrder).length) this.putStatusReels(dataOrder.id, dataOrder.factura);
+      }, error => { this.msjsOF(`Error`, `No fue posible agregar rollos/bultos en la orden N° ${this.formDataOrder.value.order}`); });
+    });  
+  }
+
+  //Validar el último rollo de la orden de facturación 
+  validateLastRollOfItem = (item : any) => this.productionSelected.filter(x => x.item == item).length;
+
+  //Función que mostrará un msj de confirmación para eliminación de items en la OF.
+  seeMsjDeleteItem(item : any){
+    this.load = true;
+    this.itemSelected = {};
+    this.itemSelected = item;
+
+    this.svMsg.add({ severity:'warn', key:'deleteItem', summary: `Se eliminará el item ${item.id_Producto} de la orden N° ${this.formDataOrder.value.order}`, detail: `¿Los rollos/bultos seleccionados del item volverán al inventario de despacho?`, sticky: true});
+  }
+
+  //Acortar msjs en la edición de OF.
+  msjsOF(msj1 : string, msj2 : string) {
+    this.load = false;
+    switch (msj1) {
+      case 'Confirmación' :
+        return this.msj.mensajeConfirmacion(msj1, msj2);
+      case 'Advertencia' : 
+        return this.msj.mensajeAdvertencia(msj1, msj2);
+      case 'Error' : 
+        return this.msj.mensajeError(msj1, msj2);
+      default :
+        return this.msj.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`); 
+    }
+  }
+
 }
 
 interface production {
@@ -731,6 +961,8 @@ interface production {
   presentation: string;
   weight : number;
   ubication? : string;
+  inOrder? : boolean, 
+  idDetail? : number;
 }
 
 

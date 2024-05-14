@@ -34,4 +34,5 @@ export class Dt_OrdenFacturacionService {
 
     getProductionSentMonthDetailed = (year: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getProductionSentMonthDetailed/${year}`);
 
+    deleteDetailOF = (id : any) => this.http.delete(this.rutaPlasticaribeAPI + `/Detalles_OrdenFacturacion/${id}`);
 }

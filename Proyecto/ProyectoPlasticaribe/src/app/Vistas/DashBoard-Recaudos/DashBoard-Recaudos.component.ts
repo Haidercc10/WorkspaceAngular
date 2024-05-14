@@ -115,9 +115,12 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.zeusService.GetCarteraAgrupadaVendedores(ruta).subscribe(data => this.carteraAgrupadaVendedores = data);
     this.zeusService.GetCarteraTotal(ruta).subscribe(data => {
       this.cartera = data.filter(x => x.saldo_Cartera > 0);
-      if (carteraOriginal) this.cartera = this.cartera.filter(x => x.cantidad_Dias < 1000);
+      if (carteraOriginal) {
+        this.cartera = this.cartera.filter(x => x.cantidad_Dias < 1000);
+        this.cargando = false;
+      } else this.cargando = false;
     });
-    setTimeout(() => this.cargando = false, 5000);
+    //setTimeout(() => this.cargando = false, 5000);
   }
   
   totalCartera = () => this.cartera.filter(x => x.saldo_Cartera > 0).reduce((acc, item) => acc + item.saldo_Cartera, 0);

@@ -99,3 +99,11 @@
   border-color: #db4149;
   color: #ffffff;
 }
+
+::ng-deep .p-button.p-button-icon-only {
+  width: 2rem;
+}
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+  height: 2rem;
+}
