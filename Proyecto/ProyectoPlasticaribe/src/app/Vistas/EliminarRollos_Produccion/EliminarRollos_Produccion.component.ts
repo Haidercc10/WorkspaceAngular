@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
@@ -11,6 +11,10 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
 import { AppComponent } from 'src/app/app.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-EliminarRollos_Produccion',

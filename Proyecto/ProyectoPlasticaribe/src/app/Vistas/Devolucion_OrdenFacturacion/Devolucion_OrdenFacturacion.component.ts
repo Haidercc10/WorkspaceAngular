@@ -1,24 +1,27 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { modelDevolucionProductos } from 'src/app/Modelo/modelDevolucionProductos';
 import { modelDtProductoDevuelto } from 'src/app/Modelo/modelDtProductoDevuelto';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { AppComponent } from 'src/app/app.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Devolucion_OrdenFacturacion',
   templateUrl: './Devolucion_OrdenFacturacion.component.html',
   styleUrls: ['./Devolucion_OrdenFacturacion.component.css']
-})
-
-@Injectable({
-  providedIn: 'root'
 })
 
 export class Devolucion_OrdenFacturacionComponent implements OnInit {
@@ -31,6 +34,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   production: Array<production> = [];
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];
+  fails : Array<any> = [];
+  modalFails : boolean = false;
+  
+  @ViewChild('tableOrder') tableOrder : Table | undefined;
+  @ViewChild('tableDevolution') tableDevolution : Table | undefined;
+  @ViewChild('tableConsolidate') tableConsolidate : Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -38,20 +47,25 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     private dtOrderFactService: Dt_OrdenFacturacionService,
     private createPDFService: CreacionPdfService,
     private devService: DevolucionesProductosService,
-    private dtDevService: DetallesDevolucionesProductosService,) {
+    private dtDevService: DetallesDevolucionesProductosService,
+    private svFails : FallasTecnicasService,
+    private svProduction : Produccion_ProcesosService,) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
 
     this.formDataOrder = this.frmBuilder.group({
+      order : [null, Validators.required],
       fact: [null, Validators.required],
       idClient: [null, Validators.required],
       client: [null, Validators.required],
-      observation: [null]
+      reason: [null, Validators.required],
+      observation: ['']
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.getFails();
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -66,6 +80,11 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
+  //Función para obtener las fallas técnicas.
+  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [14,13].includes(item.tipoFalla_Id)) });
+  
+  applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
   clearFields() {
     this.load = false;
     this.formDataOrder.reset();
@@ -74,29 +93,43 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.consolidatedProduction = [];
   }
 
+  clearTables(){
+    this.production = [];
+    this.productionSelected = [];
+    this.consolidatedProduction = [];
+  }
+
   searchData() {
-    let fact: any = this.formDataOrder.value.fact.trim();
-    if (![null, undefined, ''].includes(fact)) {
-      this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(fact).subscribe(data => {
-        data.forEach(dataProduction => {
-          this.production.push({
-            item: dataProduction.producto.prod_Id,
-            reference: dataProduction.producto.prod_Nombre,
-            numberProduction: dataProduction.dtOrder.numero_Rollo,
-            quantity: dataProduction.dtOrder.cantidad,
-            presentation: dataProduction.dtOrder.presentacion
+    this.clearTables();
+    let order: any = this.formDataOrder.value.order.trim();
+    let reason: any = this.formDataOrder.value.reason;
+
+    if (reason != null) {
+      if (![null, undefined, ''].includes(order)) {
+        this.load = true;
+        this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(order).subscribe(data => {
+          data.forEach(x => {
+            this.production.push({
+              'item': x.producto.prod_Id,
+              'reference': x.producto.prod_Nombre,
+              'numberProduction': x.dtOrder.numero_Rollo,
+              'quantity': x.dtOrder.cantidad,
+              'presentation': x.dtOrder.presentacion, 
+              'fail' : reason,
+            });
+            this.changeInformationFact(x);
+            this.load = false;
           });
-          this.changeInformationFact(dataProduction);
-        });
-      }, (error: HttpErrorResponse) => this.errorMessage(`¡Ocurrió un error al consultar la Orden de Facturación ${fact}!`, error));
-    } else this.msg.mensajeAdvertencia('¡El valor de la factura no es valido!');
+        }, (error: HttpErrorResponse) => {
+          this.errorMessage(`Ocurrió un error al consultar la orden de facturación ${order}!`, error);
+          this.load = false;
+        }); 
+      } else this.msg.mensajeAdvertencia('Orden de facturación no valida!');
+    } else this.msg.mensajeAdvertencia(`Debe elegir el motivo de la devolución!`);
   }
 
   changeInformationFact(data: any) {
-    this.formDataOrder.patchValue({
-      idClient: data.clientes.cli_Id,
-      client: data.clientes.cli_Nombre,
-    });
+    this.formDataOrder.patchValue({ 'idClient': data.clientes.cli_Id, 'client': data.clientes.cli_Nombre, 'fact': data.order.factura});
   }
 
   selectedProduction(production: production) {
@@ -131,6 +164,44 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  selectionForFilters(){
+    let data = this.tableOrder.filteredValue ? this.tableOrder.filteredValue : this.tableOrder.value;
+
+    if(data.length > 0) {
+      this.load = true;
+      this.productionSelected = this.productionSelected.concat(data); 
+      if(!this.tableOrder.filteredValue) this.production = [];
+      else {
+        data.forEach(x => {
+          let index : number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
+          this.production.splice(index, 1);
+        });
+        this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction));
+      }
+      this.getConsolidateProduction();
+      setTimeout(() => { this.load = false; }, 5);
+    } else this.msg.mensajeAdvertencia(`No hay datos para seleccionar!`, ``);
+  }
+
+  deselectionForFilters(){
+    let data = this.tableDevolution.filteredValue ? this.tableDevolution.filteredValue : this.tableDevolution.value;
+
+    if(data.length > 0) {
+      this.load = true;
+      this.production = this.production.concat(data); 
+      if(!this.tableDevolution.filteredValue) this.productionSelected = [];
+      else {
+        data.forEach(x => {
+          let index : number = this.productionSelected.findIndex(p => p.numberProduction == x.numberProduction);
+          this.productionSelected.splice(index, 1);
+        });
+        this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
+      }
+      this.getConsolidateProduction();
+      setTimeout(() => { this.load = false; }, 5);
+    } else this.msg.mensajeAdvertencia(`No hay datos para deseleccionar!`, ``);  
+  }
+
   getConsolidateProduction() {
     this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
       if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
@@ -153,23 +224,24 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   validateInformation() {
     if (this.formDataOrder.valid) {
       if (this.productionSelected.length > 0) {
-        if ((this.formDataOrder.value.fact).trim() != '') this.saveDev();
-        else this.msg.mensajeAdvertencia(`¡El campo 'Factura' se encuentra vacío!`);
-      } else this.msg.mensajeAdvertencia(`¡No ha seleccionado ningún rollo!`);
-    } else this.msg.mensajeAdvertencia(`¡Debe ingresar todos los datos!`);
+        if ((this.formDataOrder.value.order).trim() != '') this.saveDev();
+        else this.msg.mensajeAdvertencia(`¡El campo 'N° de Orden' se encuentra vacío!`);
+      } else this.msg.mensajeAdvertencia(`No ha seleccionado ningún rollo para devolver!`);
+    } else this.msg.mensajeAdvertencia(`Debe ingresar todos los datos!`);
   }
 
   saveDev() {
     this.load = true;
-    let order: number = this.formDataOrder.value.fact;
+    let order : number = this.formDataOrder.value.order;
     let info: modelDevolucionProductos = {
-      FacturaVta_Id: `Orden de Facturación #${order}`,
-      Cli_Id: this.formDataOrder.value.idClient,
-      DevProdFact_Fecha: moment().format('YYYY-MM-DD'),
-      DevProdFact_Hora: moment().format('HH:mm:ss'),
-      DevProdFact_Observacion: this.formDataOrder.value.observation != null ? (this.formDataOrder.value.observation).toUpperCase() : '',
-      TipoDevProdFact_Id: 1,
-      Usua_Id: this.storage_Id
+      'FacturaVta_Id': this.formDataOrder.value.fact,
+      'Cli_Id': this.formDataOrder.value.idClient,
+      'DevProdFact_Fecha': moment().format('YYYY-MM-DD'),
+      'DevProdFact_Hora': moment().format('HH:mm:ss'),
+      'DevProdFact_Observacion': this.formDataOrder.value.observation != null ? (this.formDataOrder.value.observation).toUpperCase() : '',
+      'TipoDevProdFact_Id': 1,
+      'Usua_Id': this.storage_Id, 
+      'Id_OrdenFact' : order,
     };
     this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
   }
@@ -178,34 +250,47 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     let count: number = 0;
     this.productionSelected.forEach(prod => {
       let info: modelDtProductoDevuelto = {
-        DevProdFact_Id: data.devProdFact_Id,
-        Prod_Id: prod.item,
-        DtDevProdFact_Cantidad: prod.quantity,
-        UndMed_Id: prod.presentation,
-        Rollo_Id: prod.numberProduction,
+        'DevProdFact_Id': data.devProdFact_Id,
+        'Prod_Id': prod.item,
+        'DtDevProdFact_Cantidad': prod.quantity,
+        'UndMed_Id': prod.presentation,
+        'Rollo_Id': prod.numberProduction,
+        'Falla_Id': prod.fail,
       }
       this.dtDevService.srvGuardar(info).subscribe(() => {
         count++;
-        if (count == this.productionSelected.length) this.changeStatus(data);
-      }, error => this.errorMessage(`¡Ocurrió un error guardar los detalles de la devolución!`, error));
+        if (count == this.productionSelected.length) this.changeStatus(data, info.Falla_Id);
+      }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
     });
   }
 
-  changeStatus(data: any){
-    let order: number = this.formDataOrder.value.fact;
-    let reels: Array<number> = this.productionSelected.map(x => x.numberProduction);
-    this.dtOrderFactService.PutStatusProduction(reels, order).subscribe(() => {
-      this.createPDF(data.devProdFact_Id, this.formDataOrder.value.fact);
-    }, (error) => this.errorMessage(`¡Ocurrió un error al cambiar el estado de los rollos a devolver #${order}!`, error));
+  changeStatus(data: any, fail : any){
+    let order: number = this.formDataOrder.value.order;
+    let reels: any = [];
+    this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, }) });
+    this.dtOrderFactService.PutStatusProduction(reels.map(x => x.roll), order).subscribe(() => {
+      this.updateStatusProduction(reels, data, fail);
+    }, (error) => this.errorMessage(`Ocurrió un error al cambiar el estado de los rollos en la orden N° ${order}!`, error));
   }
 
-  createPDF(idDev: number, fact: string) {
-    this.dtDevService.GetInformationDevById(idDev).subscribe(data => {
-      let title: string = `Devolución de la Orden de Facutración N° ${fact}`;
+  updateStatusProduction(rolls : any, data : any, fail){
+    let typeFail : number = this.fails.filter(x => x.falla_Id == fail)[0].tipoFalla_Id;
+    let newStatus : number = typeFail == 14 ? 29 : 19;
+    this.svProduction.putChangeStateProduction(rolls, 20, newStatus).subscribe(dataChange => {
+      this.createPDF(data, this.formDataOrder.value.order);
+    }, error => {
+      this.errorMessage(`No fue posible actualizar el estado de los rollos devueltos!`, error);
+    })
+  }
+
+  createPDF(devolution: any, fact: string) {
+    this.dtDevService.GetInformationDevById(devolution.devProdFact_Id).subscribe(data => {
+      let title: string = `Devolución N° ${devolution.devProdFact_Id} \nOF N° ${fact} | Factura N° ${devolution.facturaVta_Id}`;
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
+      this.msg.mensajeConfirmacion(`Devolución N° ${devolution.devProdFact_Id} creada exitosamente!`);
       setTimeout(() => this.clearFields(), 3000);
-    }, error => this.errorMessage(`¡Ocurrió un error al buscar información de la Devolución #${idDev}!`, error));
+    }, error => this.errorMessage(`¡Ocurrió un error al buscar información de la Devolución #${devolution.devProdFact_Id}!`, error));
   }
 
   contentPDF(data): any[] {
@@ -343,7 +428,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         widths: ['*'],
         body: [
           [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo', bold: true }],
-          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_Observacion.toString().trim()}` }]
+          [{ border: [true, false, true, true], text: `Devolución por: ${data.dtDev.falla}. ${data.dev.devProdFact_Observacion.toString().trim()}` }]
         ]
       },
       fontSize: 9,
@@ -359,4 +444,5 @@ interface production {
   quantity: number;
   cuontProduction?: number;
   presentation: string;
+  fail? : number;
 }

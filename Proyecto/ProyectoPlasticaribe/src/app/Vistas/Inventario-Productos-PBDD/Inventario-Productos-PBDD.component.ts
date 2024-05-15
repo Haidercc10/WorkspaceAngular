@@ -60,6 +60,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
   value : string = 'off';
   itemSelected : any = {};
   @ViewChild('tableDetails1') tableDetails1 : Table | undefined;
+  @ViewChild('tableExpInvEmpaque') tableExpInvEmpaque : Table | undefined;
+  @ViewChild('tableExpInvSellado') tableExpInvSellado : Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
@@ -141,7 +143,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
       this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
       this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
-      setTimeout(() => this.load = false, 2000);
+      this.load = false;
     });
   }
 
@@ -294,22 +296,21 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función que mostrará un msj de confirmación para eliminación de items en la OF.
-  seeMsjEditItem(data : any, detail? : any){
+  seeMsjEditItem(data : any, roll? : any){
     this.load = true;
     this.itemSelected = {};
     this.itemSelected = data;
-    detail ? this.itemSelected.numberProduction = detail.NumberProduction : null;
+    roll ? this.itemSelected.numberProduction = roll : null;
     let msg : string = ``;
-    console.log(detail);
     
-    
-    detail ? msg = `¿Está seguro que desea colocar el bulto N° ${detail.NumberProduction} como 'NO DISPONIBLE'?` : msg = `¿Esta seguro que desea colocar todos los bultos del item '${data.item} - ${data.reference}' como 'NO DISPONIBLE'?`
-    this.svMsg.add({ severity:'warn', key:'item', summary: `Elección`, detail : msg,  sticky: true});
+    roll ? msg = `¿Está seguro que desea colocar el bulto N° ${roll} como 'NO DISPONIBLE'?` : msg = `¿Esta seguro que desea colocar todos los bultos del item '${data.item} - ${data.reference}' como 'NO DISPONIBLE'?`
+    setTimeout(() => { this.svMsg.add({ severity:'warn', key:'item', summary: `Elección`, detail : msg,  sticky: true}); }, 200);
   }
 
   //Función que creará un ajuste negativo en Zeus del item que se desea colocar como 'no disponible' en Plasticaribe. 
   sendAdjustmentZeus(data : any) {
     if (data != null) {
+      this.onReject ('item');
       this.load = true;
       let unit : string = data.presentation == 'Kg' ? 'KLS' : data.presentation == 'Und' ? 'UND' : 'PAQ';
       let qty : number = data.AvaibleProdution.reduce((a, b) => unit == 'KLS' ? a += b.Weight : a += b.Quantity, 0);
@@ -331,16 +332,33 @@ export class InventarioProductosPBDDComponent implements OnInit {
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un item!`);
   }
 
-  //Función que actualizará el estado de los rollos a no disponible
+  //Función que actualizará el estado de los rollos de un item a no disponible
   setItemNotAvailable(data : any, soloPlasticaribe : boolean){
-    let index : number = this.stockInformation.findIndex(x => x.item == data.item);
     soloPlasticaribe ? this.load = true : null;
-    let rollsAvailables : any = data.AvaibleProdution.map(x => x.NumberProduction);
+    this.onReject ('item');
+
+    if(this.itemSelected.numberProduction) this.setRollNotAvailable(data);
+    else {
+      let index : number = this.stockInformation.findIndex(x => x.item == data.item);
+      let rollsAvailables : any = [];
+      data.AvaibleProdution.forEach(x => rollsAvailables.push({'roll': x.NumberProduction, 'item' : data.item,}) );
+      
+      this.svProductionProcess.putChangeStateProduction(rollsAvailables, 19, 23).subscribe(data => {
+        this.stockInformation.splice(index, 1);
+        this.msjs(`Confirmación`, `Se ha actualizado el stock de la referencia ${data.item - data.reference}`);
+      });
+    }
+  }
+
+   //Función que actualizará el estado de los rollos a no disponible
+  setRollNotAvailable(data : any){
+    let indexItem : number = this.stockInformation.findIndex(x => x.item == data.item);
+    let indexRoll : number = this.stockInformation[indexItem].AvaibleProdution.findIndex(x => x.NumberProduction == this.itemSelected.numberProduction)
+    let roll : any = this.itemSelected.numberProduction;
     
-    this.svProductionProcess.putChangeStateProduction(rollsAvailables, data.item, 19, 23).subscribe(data => {
-      this.stockInformation.splice(index, 1);
-      this.msjs(`Confirmación`, `Se ha actualizado el stock de la referencia ${data.item - data.reference}`);
-      this.load = false;
+    this.svProductionProcess.putChangeStateProduction([{'roll': roll, 'item' : data.item, }], 19, 23).subscribe(dataChange => {
+      this.stockInformation[indexItem].AvaibleProdution.splice(indexRoll, 1);
+      this.msjs(`Confirmación`, `El bulto N°${roll} ya NO ESTÁ DISPONIBLE en inventario!`);
     });
   }
 

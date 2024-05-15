@@ -16,22 +16,44 @@
 </div>
 
 <p-card>
+  <!--Crear Falla-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+  </div>
+
   <div class="my-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-book"></i> Datos de la Factura.</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-book"></i> Datos de facturación</h4>
   </div>
 
   <form [formGroup]="formDataOrder">
     <div class="row g-4">
-      <!-- Fact -->
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+
+       <!-- Fail -->
+       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
         <span class="p-float-label">
-          <input formControlName="fact" id="Factura" type="text" pInputText required (keyup.enter)="searchData()"/>
+          <p-dropdown formControlName="reason" inputId="reason" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+          <label for="reason">Motivo*</label>
+        </span>
+      </div>
+
+      <!-- Orden -->
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
+        <span class="p-float-label">
+          <input formControlName="order" id="Orden" type="text" pInputText required (keyup.enter)="searchData()"/>
+          <label for="Orden">N° Orden</label>
+        </span>
+      </div>
+
+      <!-- Factura -->
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
+        <span class="p-float-label">
+          <input formControlName="fact" id="Factura" type="text" pInputText required readonly/>
           <label for="Factura">Factura</label>
         </span>
       </div>
 
       <!-- Id Client -->
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="idClient" id="idClient" type="text" pInputText required readonly/>
           <label for="idClient">Id Cliente</label>
@@ -39,7 +61,7 @@
       </div>
 
       <!-- Client -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4">
         <span class="p-float-label">
           <input formControlName="client" id="Cliente" type="text" pInputText required readonly/>
           <label for="Cliente">Cliente</label>
@@ -57,23 +79,37 @@
   </form>
 
   <div class="my-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos Disponibles.</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos de la orden</h4>
   </div>
 
   <p-table
+    #tableOrder
     [value]="production"
     styleClass="p-datatable-gridlines p-datatable-sm"
+    [resizableColumns]="true"
+    columnResizeMode="expand"
     responsiveLayout="scroll"
     [scrollable]="true"
     scrollHeight="50rem"
     dataKey="numberProduction"
     [(selection)]="productionSelected"
-    *ngIf="!load">
-    <ng-template pTemplate="header">
+    *ngIf="!load"
+    [rowHover]="true"
+    [reorderableColumns]="true">
+    <ng-template pTemplate="header" >
+      <tr>
+        <th class="text-center" colspan="2"><p-button icon="pi pi-check-square" (onClick)="selectionForFilters()" [rounded]="false" severity="danger"/></th>
+        <th><input pInputText type="number" (input)="applyFilter($event, 'numberProduction', tableOrder)"></th>
+        <th><input pInputText type="number" (input)="applyFilter($event, 'item', tableOrder)"></th>
+        <th><input pInputText type="text" (input)="applyFilter($event, 'reference', tableOrder)"></th>
+        <th><input pInputText type="number" (input)="applyFilter($event, 'quantity', tableOrder)"></th>
+        <th><input pInputText type="text" (input)="applyFilter($event, 'presentation', tableOrder)"></th>
+      </tr>
       <tr>
         <th style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
           <p-checkbox (click)="selectedAllProduction()"></p-checkbox>
         </th>
+        <th>N°</th>
         <th>Numero Rollo</th>
         <th>Item</th>
         <th>Referencia</th>
@@ -81,11 +117,12 @@
         <th>Presentación</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-data>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
         <td pFrozenColumn [frozen]="true" alignFrozen="left">
           <p-tableCheckbox [value]="data" (click)="selectedProduction(data)"></p-tableCheckbox>
         </td>
+        <td>{{rowIndex + 1}}</td>
         <td>{{data.numberProduction}}</td>
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
@@ -96,23 +133,37 @@
   </p-table>
   
   <div class="my-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Seleccionados.</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos a devolver</h4>
   </div>
 
   <p-table
+    #tableDevolution
     [value]="productionSelected"
     styleClass="p-datatable-gridlines p-datatable-sm"
+    [resizableColumns]="true"
+    columnResizeMode="expand"
     responsiveLayout="scroll"
     [scrollable]="true"
     scrollHeight="50rem"
     [(selection)]="production"
     dataKey="numberProduction"
-    *ngIf="!load">
+    *ngIf="!load"
+    [reorderableColumns]="true"
+    [rowHover]="true">
     <ng-template pTemplate="header">
+      <tr>
+        <th class="text-center" colspan="2"><p-button icon="pi pi-check-square" (onClick)="deselectionForFilters()" [rounded]="false" severity="danger" /></th>
+        <th><input pInputText type="number" (input)="applyFilter($event, 'numberProduction', tableDevolution)"></th>
+        <th><input pInputText type="number" (input)="applyFilter($event, 'item', tableDevolution)"></th>
+        <th><input pInputText type="text" (input)="applyFilter($event, 'reference', tableDevolution)"></th>
+        <th><input pInputText type="number" (input)="applyFilter($event, 'quantity', tableDevolution)"></th>
+        <th><input pInputText type="text" (input)="applyFilter($event, 'presentation', tableDevolution)"></th>
+      </tr>
       <tr>
         <th style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
           <p-checkbox (click)="deselectedAllProduction()"></p-checkbox>
         </th>
+        <th>N°</th>
         <th>Numero Rollo</th>
         <th>Item</th>
         <th>Referencia</th>
@@ -120,11 +171,12 @@
         <th>Presentación</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-data>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
         <td pFrozenColumn [frozen]="true" alignFrozen="left">
           <p-tableCheckbox [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
         </td>
+        <td>{{rowIndex + 1}}</td>
         <td>{{data.numberProduction}}</td>
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
@@ -135,7 +187,7 @@
   </p-table>
   
   <div class="my-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Consolidado de Productos Elegidos</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Consolidado de items seleccionados</h4>
   </div>
 
   <p-table
@@ -147,6 +199,7 @@
     dataKey="item">
     <ng-template pTemplate="header">
       <tr>
+        <th>N°</th>
         <th>Item</th>
         <th>Referencia</th>
         <th>Cantidad</th>
@@ -154,12 +207,13 @@
         <th>Presentación</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-data>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
+        <td>{{rowIndex + 1}}</td>
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
         <td>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</td>
-        <td>{{totalCountProductionByProduct(data.item) | number : '1.2-2'}}</td>
+        <td>{{totalCountProductionByProduct(data.item) | number}}</td>
         <td>{{data.presentation}}</td>
       </tr>
     </ng-template>
@@ -173,3 +227,11 @@
   </div>
 
 </p-card>
+
+<!-- Modal fallas tecnicas -->
+<p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
+  <ng-template pTemplate="content">
+    <app-Crear_Fallas></app-Crear_Fallas>
+  </ng-template>  
+</p-dialog> 
+  

@@ -835,7 +835,8 @@ export class Orden_FacturacionComponent implements OnInit {
     let index : any = this.productionSelected.findIndex(x => x.numberProduction == data.numberProduction);
     
     this.dtOrderFactService.deleteDetailOF(data.idDetail).subscribe(() => {
-      this.productionProcessService.putChangeStateProduction([data.numberProduction], data.item, 20, 23).subscribe(() => {
+      let infoRoll : any = [{'roll': data.numberProduction, 'item': data.item }]
+      this.productionProcessService.putChangeStateProduction(infoRoll, 20, 23).subscribe(() => {
         this.msjsOF(`Confirmación`, `Rollo N° ${data.numberProduction} eliminado exitosamente de la orden N° ${this.formDataOrder.value.order}!`);
         this.productionSelected.splice(index, 1);
         this.tableProductionSelected.clear();
@@ -861,8 +862,8 @@ export class Orden_FacturacionComponent implements OnInit {
     rollsItemOrder.forEach(x => {
       this.dtOrderFactService.deleteDetailOF(x.idDetail).subscribe(() => {
         let indexRoll : any = this.productionSelected.findIndex(p => p.item == data.id_Producto && p.numberProduction == x.numberProduction && p.inOrder);
+        rollsToUpdate.push({'roll' : x.numberProduction, 'item' : data.id_Producto, });
         this.productionSelected.splice(indexRoll, 1);
-        rollsToUpdate.push(x.numberProduction);
         count++
         if(count == rollsItemOrder.length) this.changeStatusRolls(data, rollsToUpdate, status, newStatus);
       }, error => this.msjsOF(`Error`, `No fue posible eliminar los rollos del item ${x.item}.`));  
@@ -874,7 +875,7 @@ export class Orden_FacturacionComponent implements OnInit {
     let indexItem : number = this.products.findIndex(x => x.id_Producto == data.id_Producto);
     console.log(data, rolls, status, newStatus, indexItem);
     
-    this.productionProcessService.putChangeStateProduction(rolls, data.id_Producto, status, newStatus).subscribe(() => {
+    this.productionProcessService.putChangeStateProduction(rolls, status, newStatus).subscribe(() => {
       this.msjsOF(`Confirmación`, `Item eliminado de la orden N° ${this.formDataOrder.value.order} exitosamente!`);
       this.products.splice(indexItem, 1);
       this.getConsolidateProduction();

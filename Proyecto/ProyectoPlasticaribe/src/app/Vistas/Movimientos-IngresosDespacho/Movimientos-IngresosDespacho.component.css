@@ -26,3 +26,10 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
   background-color: #ff5656;
   font-size: calc(var(--font-size) * 15px);
 }
+
+.bg-warning1 {
+  color: rgb(46, 34, 0);
+  background-color: #ffd900;
+  font-size: calc(var(--font-size) * 15px);
+}
+

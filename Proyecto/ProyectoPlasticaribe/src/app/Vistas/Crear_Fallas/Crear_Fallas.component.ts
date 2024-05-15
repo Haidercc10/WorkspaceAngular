@@ -1,12 +1,12 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { EliminarRollosProduccionModule } from 'src/app/Modules/eliminar-rollos-produccion/eliminar-rollos-produccion.module';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TpFallasTecnicasService } from 'src/app/Servicios/TipoFallasTecnicas/TpFallasTecnicas.service';
 import { AppComponent } from 'src/app/app.component';
 import { EliminarRollos_ProduccionComponent } from '../EliminarRollos_Produccion/EliminarRollos_Produccion.component';
+import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +29,8 @@ export class Crear_FallasComponent implements OnInit {
     private svMsjs : MensajesAplicacionService, 
     private svTypeFails : TpFallasTecnicasService, 
     private svTechnicalFails : FallasTecnicasService, 
-    private cmDeleteRolls : EliminarRollos_ProduccionComponent) {
+    private cmDeleteRolls : EliminarRollos_ProduccionComponent, 
+    private cmpDevolutionItems : Devolucion_OrdenFacturacionComponent) {
       this.selectedMode = this.AppComponent.temaSeleccionado;
       this.loadForm();
   }
@@ -72,6 +73,8 @@ export class Crear_FallasComponent implements OnInit {
         this.load = false;
         this.cmDeleteRolls.modalFails = false;
         this.cmDeleteRolls.getFails();
+        this.cmpDevolutionItems.modalFails = false;
+        this.cmpDevolutionItems.getFails(); 
       }, error => {
         this.svMsjs.mensajeError(`Error`, `Ha ocurrido un error, por favor verifique!`);
         this.load = false;
