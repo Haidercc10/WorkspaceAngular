@@ -58,17 +58,14 @@
             columnResizeMode="expand"
             responsiveLayout="scroll"
             [rowHover]="true"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
             [scrollable]="true"
             scrollHeight="50rem"
             id="tablaProductos">
-
-            <ng-template pTemplate="caption">
+            <!--<ng-template pTemplate="caption">
               <div style="text-align:left" id="columnas">
                 <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
               </div>
-            </ng-template>
+            </ng-template>-->
 
             <!--Headers Tabla-->
             <ng-template pTemplate="header">

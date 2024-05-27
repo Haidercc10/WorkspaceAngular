@@ -105,32 +105,46 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   getInformationOrderFact(){
     let orderFact = this.formProduction.value.orderFact;
+    this.load = true;
     this.dtOrderFactService.GetInformacionOrderFactToSend(orderFact).subscribe(data => {
-      this.load = true;
       this.production = [];
       let saleOrders: Array<number> = [];
       data.forEach(dataProduction => {
         this.formProduction.patchValue({
-          fact: dataProduction.order.factura,
-          client: dataProduction.clientes.cli_Id
+          //'fact': dataProduction.order.factura,
+          'client': dataProduction.clientes.cli_Id
         });
         saleOrders.push(dataProduction.dtOrder.consecutivo_Pedido);
         this.production.push({
-          saleOrder: dataProduction.dtOrder.consecutivo_Pedido,
-          item: dataProduction.producto.prod_Id,
-          reference: dataProduction.producto.prod_Nombre,
-          numberProduction: dataProduction.dtOrder.numero_Rollo,
-          quantity: dataProduction.dtOrder.cantidad,
-          presentation: dataProduction.dtOrder.presentacion
+          'saleOrder': dataProduction.dtOrder.consecutivo_Pedido,
+          'item': dataProduction.producto.prod_Id,
+          'reference': dataProduction.producto.prod_Nombre,
+          'numberProduction': dataProduction.dtOrder.numero_Rollo,
+          'quantity': dataProduction.dtOrder.cantidad,
+          'presentation': dataProduction.dtOrder.presentacion
         });
+        
         if (saleOrders.length == data.length){
-          setTimeout(() => this.load = false, 50);
-          this.zeusService.GetFactura(saleOrders[saleOrders.length - 1]).subscribe(factura => {
-            this.orderFactService.PutFactOrder(orderFact, factura.documento).subscribe(() => {
-              this.formProduction.patchValue({ fact: factura.documento });
-              this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
-            }, error => this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error));
-          }, error => this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${orderFact}!`, error));
+          //setTimeout(() => this.load = false, 50);
+          let saleOrder : string = `${data[0].dtOrder.consecutivo_Pedido}`;
+          if(!saleOrder.startsWith('DV')) {
+            this.zeusService.GetFactura(saleOrders[saleOrders.length - 1]).subscribe(factura => {
+              this.orderFactService.PutFactOrder(orderFact, factura.documento).subscribe(() => {
+                this.formProduction.patchValue({ fact: factura.documento });
+                this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
+                this.load = false;
+              }, error => {
+                this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error);
+                this.formProduction.patchValue({ 'orderFact' : '', });
+              }); 
+            }, error => {
+              this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${orderFact}!`, error);
+              this.formProduction.patchValue({ 'orderFact' : '', });
+            });
+          } else {
+            this.msj.mensajeConfirmacion(`Orden de reposición consultada`, `¡Continue ingresando los rollos que van a ser enviados por reposición!`);
+            this.load = false;
+          } 
         }
       });
     }, error => this.errorMessage(`¡No se encontró información de la orden de facturación #${orderFact}!`,error));
@@ -138,7 +152,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   getInformationProduction() {
     let orderFact = this.formProduction.value.orderFact;
+    let fact = this.formProduction.value.fact;
     if ([null, undefined, ''].includes(orderFact.toString().trim())) this.msj.mensajeError(`¡Debe buscar la orden de facturación para ingresar los rollos/bultos a despachar!`, ``, 12000000);
+    else if ([null, undefined, ''].includes(fact.toString().trim())) this.msj.mensajeError(`No existen facturas/remisiones asociadas al pedido de la orden de facturación N° ${orderFact}`)
     else {
       let production = parseInt(this.formProduction.value.production);
       console.log(production);
@@ -156,7 +172,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   //Función para evitar que escriban el numero del bulto en el campo rollo leído
   quitBarCode() {
-    setTimeout(() => { if(![1,10].includes(this.ValidarRol)) this.formProduction.patchValue({ production : '' }); }, 50);
+    setTimeout(() => { 
+      if(![1,10].includes(this.ValidarRol)) this.formProduction.patchValue({ production : '' }); 
+      if([null, undefined, ''].includes(this.formProduction.value.fact)) this.formProduction.patchValue({ production : '' });
+    }, 50);
   } 
 
   getDataProduction(production: number) {
@@ -181,22 +200,26 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     }, error => this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`,error));
   }
 
+  //Validar los datos a guardar 
   validateDataToSave(){
-    this.remainingProduction = [];
-    let productionSearched = this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro);
-    this.production.forEach(prod => {
-      if (!productionSearched.includes(prod.numberProduction)) this.remainingProduction.push(prod);
-    });
-    if (this.formProduction.value.driver) {
-      if (!['', null, undefined].includes(this.formProduction.value.car)) {
-        if (this.formProduction.value.car.length == 6) {
-          if (this.remainingProduction.length == 0) this.saveAsgFact();
-          else this.modalProductionNotRead = true;
-        } else this.msj.mensajeAdvertencia(`¡La placa del carro debe tener 6 digitos!`);
-      } else this.msj.mensajeAdvertencia(`¡Debe llenar el campo 'Placa Carro'!`);
-    } else this.msj.mensajeAdvertencia(`¡Debe elegir un conductor!`);
+    if(this.sendProductionZeus.length > 0) {
+      this.remainingProduction = [];
+      let productionSearched = this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro);
+      this.production.forEach(prod => {
+        if (!productionSearched.includes(prod.numberProduction)) this.remainingProduction.push(prod);
+      });
+      if (this.formProduction.value.driver) {
+        if (!['', null, undefined].includes(this.formProduction.value.car)) {
+          if (this.formProduction.value.car.length == 6) {
+            if (this.remainingProduction.length == 0) this.saveAsgFact();
+            else this.modalProductionNotRead = true;
+          } else this.msj.mensajeAdvertencia(`¡La placa del carro debe tener 6 digitos!`);
+        } else this.msj.mensajeAdvertencia(`¡Debe llenar el campo 'Placa Carro'!`);
+      } else this.msj.mensajeAdvertencia(`¡Debe elegir un conductor!`);
+    } else this.msj.mensajeAdvertencia(`No hay rollos/bultos seleccionados para despachar!`);
   }
 
+  //Guardar datos de la orden de facturación en la asignación de productos a facturas.
   saveAsgFact() {
     let orderFact = this.formProduction.value.orderFact;
     this.load = true;
@@ -235,6 +258,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     });
   }
 
+  //Colocar en estado enviado la orden de facturación 
   finishSaveData() {
     let orderFact = this.formProduction.value.orderFact;
     this.orderFactService.PutStatusOrder(orderFact).subscribe(() => this.putStateReels(), error => {
@@ -243,6 +267,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     });
   }
 
+  //Función para colocar en estado NO DISPONIBLE los bultos despachados. 
   putStateReels() {
     let orderFact = this.formProduction.value.orderFact;
     this.productionProcessSerivce.putStateNotAvaible(orderFact).subscribe(() => {

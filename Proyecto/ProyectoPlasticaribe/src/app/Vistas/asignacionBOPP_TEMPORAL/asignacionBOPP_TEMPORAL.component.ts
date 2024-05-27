@@ -325,6 +325,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               if (datos_bopp[k].catMP_Id == 6) documento = 'ASIGBOPP';
               else if (datos_bopp[k].catMP_Id == 14) documento = 'ASIGBOPA';
               else if (datos_bopp[k].catMP_Id == 15) documento = 'ASIGPOLY';
+              else documento = 'ASIGBOPP';
               let datos : any = {
                 AsigBOPP_Id : idAsignacion,
                 BOPP_Id : datos_bopp[k].bopP_Id,

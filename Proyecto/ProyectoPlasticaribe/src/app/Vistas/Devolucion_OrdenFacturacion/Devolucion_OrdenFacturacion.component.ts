@@ -36,6 +36,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   consolidatedProduction: Array<production> = [];
   fails : Array<any> = [];
   modalFails : boolean = false;
+  reposition: boolean = false;
   
   @ViewChild('tableOrder') tableOrder : Table | undefined;
   @ViewChild('tableDevolution') tableDevolution : Table | undefined;
@@ -59,6 +60,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       idClient: [null, Validators.required],
       client: [null, Validators.required],
       reason: [null, Validators.required],
+      reposition : [false, Validators.required],
       observation: ['']
     });
   }
@@ -109,7 +111,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         this.load = true;
         this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(order).subscribe(data => {
           data.forEach(x => {
-            this.production.push({
+            this.production.push({  
               'item': x.producto.prod_Id,
               'reference': x.producto.prod_Nombre,
               'numberProduction': x.dtOrder.numero_Rollo,
@@ -122,14 +124,13 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           });
         }, (error: HttpErrorResponse) => {
           this.errorMessage(`Ocurrió un error al consultar la orden de facturación ${order}!`, error);
-          this.load = false;
         }); 
       } else this.msg.mensajeAdvertencia('Orden de facturación no valida!');
     } else this.msg.mensajeAdvertencia(`Debe elegir el motivo de la devolución!`);
   }
 
   changeInformationFact(data: any) {
-    this.formDataOrder.patchValue({ 'idClient': data.clientes.cli_Id, 'client': data.clientes.cli_Nombre, 'fact': data.order.factura});
+    this.formDataOrder.patchValue({ 'idClient': data.clientes.cli_Id, 'client': data.clientes.cli_Nombre, 'fact': data.order.factura });
   }
 
   selectedProduction(production: production) {
@@ -233,6 +234,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   saveDev() {
     this.load = true;
     let order : number = this.formDataOrder.value.order;
+    let reposition : boolean = this.formDataOrder.value.reposition;
     let info: modelDevolucionProductos = {
       'FacturaVta_Id': this.formDataOrder.value.fact,
       'Cli_Id': this.formDataOrder.value.idClient,
@@ -240,8 +242,10 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       'DevProdFact_Hora': moment().format('HH:mm:ss'),
       'DevProdFact_Observacion': this.formDataOrder.value.observation != null ? (this.formDataOrder.value.observation).toUpperCase() : '',
       'TipoDevProdFact_Id': 1,
-      'Usua_Id': this.storage_Id, 
-      'Id_OrdenFact' : order,
+      'Usua_Id': this.storage_Id,
+      'Id_OrdenFact': order,
+      'Estado_Id': 11,
+      'DevProdFact_Reposicion': reposition,
     };
     this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
   }
@@ -259,38 +263,36 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       }
       this.dtDevService.srvGuardar(info).subscribe(() => {
         count++;
-        if (count == this.productionSelected.length) this.changeStatus(data, info.Falla_Id);
+        if (count == this.productionSelected.length) this.changeStatus(data);
       }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
     });
   }
 
-  changeStatus(data: any, fail : any){
+  changeStatus(data: any){
     let order: number = this.formDataOrder.value.order;
     let reels: any = [];
     this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, }) });
     this.dtOrderFactService.PutStatusProduction(reels.map(x => x.roll), order).subscribe(() => {
-      this.updateStatusProduction(reels, data, fail);
+      this.updateStatusProduction(reels, data);
     }, (error) => this.errorMessage(`Ocurrió un error al cambiar el estado de los rollos en la orden N° ${order}!`, error));
   }
 
-  updateStatusProduction(rolls : any, data : any, fail){
-    let typeFail : number = this.fails.filter(x => x.falla_Id == fail)[0].tipoFalla_Id;
-    let newStatus : number = typeFail == 14 ? 29 : 19;
-    this.svProduction.putChangeStateProduction(rolls, 20, newStatus).subscribe(dataChange => {
-      this.createPDF(data, this.formDataOrder.value.order);
+  updateStatusProduction(rolls : any, data : any){
+    this.svProduction.putChangeStateProduction(rolls, 20, 24).subscribe(dataChange => {
+      this.createPDF(data.devProdFact_Id, 'creada');
     }, error => {
       this.errorMessage(`No fue posible actualizar el estado de los rollos devueltos!`, error);
     })
   }
 
-  createPDF(devolution: any, fact: string) {
-    this.dtDevService.GetInformationDevById(devolution.devProdFact_Id).subscribe(data => {
-      let title: string = `Devolución N° ${devolution.devProdFact_Id} \nOF N° ${fact} | Factura N° ${devolution.facturaVta_Id}`;
+  createPDF(devolution: any, action? : string) {
+    this.dtDevService.GetInformationDevById(devolution).subscribe(data => {
+      let title: string = `Devolución N° ${devolution} \nOF N° ${data[0].dev.id_OrdenFact} \nFactura N° ${data[0].dev.facturaVta_Id}`;
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
-      this.msg.mensajeConfirmacion(`Devolución N° ${devolution.devProdFact_Id} creada exitosamente!`);
+      this.msg.mensajeConfirmacion(`Devolución N° ${devolution} ${action} exitosamente!`);
       setTimeout(() => this.clearFields(), 3000);
-    }, error => this.errorMessage(`¡Ocurrió un error al buscar información de la Devolución #${devolution.devProdFact_Id}!`, error));
+    }, error => this.errorMessage(`¡Ocurrió un error al buscar información de la devolución #${devolution}!`, error));
   }
 
   contentPDF(data): any[] {
@@ -360,6 +362,9 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
             { text: `Telefono: ${data.cliente.cli_Telefono}` },
             { text: `E-mail: ${data.cliente.cli_Email}`, colSpan: 2 },
             {}
+          ], 
+          [
+            { text: `Fecha de ingreso de devolución: ${(data.dev.devProdFact_Fecha).replace('T00:00:00','')} ${data.dev.devProdFact_Hora}`, colSpan: 3, }, {}, {}
           ]
         ]
       },

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
@@ -11,6 +11,10 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { error } from 'console';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MessageService } from 'primeng/api';
+
+@Injectable({
+  providedIn : 'root'
+})
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
@@ -62,6 +66,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
   @ViewChild('tableDetails1') tableDetails1 : Table | undefined;
   @ViewChild('tableExpInvEmpaque') tableExpInvEmpaque : Table | undefined;
   @ViewChild('tableExpInvSellado') tableExpInvSellado : Table | undefined;
+  tabStockEmpaque : boolean = false;
+  tabStockSellado : boolean = false;
+  tabStockKg : boolean = false;
+  tabStockBulto : boolean = false;
+  tabStockComparative : boolean = false;
+  loaded : boolean = true;
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
@@ -76,8 +86,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.loadRollsProductionAvailable();
-    this.getStockInformation();
+    if([86,4].includes(this.ValidarRol)) {
+        this.loadRollsProductionAvailable();
+    }    
+    //this.getStockInformation();
+    //this.loadRollsProductionAvailable();
    }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -133,29 +146,66 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   getStockInformation() {
-    this.load = true;
-    this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
-      this.getStockProcess();
-      this.getStockDeliveredNotAvaible();
-      this.fillColumns();
-      this.stockInformation = this.fillStockInformation(data);
-      this.fillComparativeStock(data, true);
-      this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
-      this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
-      this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
-      this.load = false;
-    });
+    //if(!this.despacho) {
+      this.load = true;
+      //this.despacho = true;
+      this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
+        //this.getStockProcess();
+        //this.getStockDeliveredNotAvaible();
+        this.fillColumns();
+        this.stockInformation = this.fillStockInformation(data);
+        this.fillComparativeStock(data, true);
+        //this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
+        //this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
+        //this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
+        //this.loadRollsProductionAvailable();
+        this.load = false; 
+      });
+    //}
   }
 
-  getStockProcess(){
-    ['EMP', 'SELLA'].forEach((process: 'EMP' | 'SELLA') => {
-      this.stockService.GetStockProducts_Process(process).subscribe(data => {
-        if (process == 'EMP') this.stockEmpaque = this.fillStockInformation(data);
-        if (process == 'SELLA') this.stockSellado = this.fillStockInformation(data);
-        
+  getStockProcessSellado(){
+    if(!this.tabStockSellado) {
+      this.loading = true
+      this.stockService.GetStockProducts_Process('SELLA').subscribe(data => {
+        this.tabStockSellado = true;
+        this.stockSellado = this.fillStockInformation(data, 'SELLA');
         this.fillComparativeStock(data, false);
+        this.loading = false;
       });
-    });
+    }  
+  }
+
+  getStockProcessEmpaque(){
+    if(!this.tabStockEmpaque) {
+      console.log('Entré');
+      
+      this.loading = true
+      this.stockService.GetStockProducts_Process('EMP').subscribe(data => {
+        this.tabStockEmpaque = true;
+        this.stockEmpaque = this.fillStockInformation(data, 'EMP');
+        this.fillComparativeStock(data, false);
+        this.loading = false;
+      });
+    }
+  }
+
+  getStockInformationKg() {
+    if(!this.tabStockKg) {
+      this.loading = true
+      this.tabStockKg = true;
+      this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
+      this.loading = false
+    }
+  }
+
+  getStockInformationBulto() {
+    if(!this.tabStockBulto) {
+      this.loading = true;
+      this.tabStockBulto = true;
+      this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
+      this.loading = false;
+    }  
   }
 
   getStockDeliveredNotAvaible() {
@@ -165,21 +215,21 @@ export class InventarioProductosPBDDComponent implements OnInit {
     });
   }
 
-  fillStockInformation(data: any): Array<StockInformation> {
+  fillStockInformation(data: any, process? : string): Array<StockInformation> {
     let stockInformation: Array<StockInformation> = [];
     data.forEach(stock => {
       if (!stockInformation.map(x => x.item).includes(stock.product.item)) {
         stockInformation.push({
           item: stock.product.item,
           reference: stock.product.reference,
-          client: stock.client.cli.client,
+          client: stock.client,
           stock: stock.stock.stock,
           price: stock.stock.price,
           presentation: stock.stock.presentation,
           // subTotal: stock.stock.stockPrice,
           subTotal: (stock.stock.stock * stock.stock.price),
-          seller: stock.client.vende.name_Vende,
-          AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
+          seller: stock.seller,
+          AvaibleProdution: [], // this.fillAvaibleProduction(stock.avaible_Production),
           actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
           junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
           february: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].febrero,
@@ -193,6 +243,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           october: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].octubre,
           november: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].noviembre,
           december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,
+          process : process,
         });
       }
     });
@@ -244,15 +295,15 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.comparativeStock.push({
           item: stock.product.item,
           reference: stock.product.reference,
-          client: stock.client.cli.client,
+          client: stock.client,
           stock: avaible ? stock.stock.stock : 0,
           stockInProcess: !avaible ? stock.stock.stock : 0,
           totalStock: stock.stock.stock,
           price: stock.stock.price,
           presentation: stock.stock.presentation,
           subTotal: (stock.stock.stock * stock.stock.price),
-          seller: stock.client.vende.name_Vende,
-          AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
+          seller: stock.seller,
+          AvaibleProdution: [], //this.fillAvaibleProduction(stock.avaible_Production),
           actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
           junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
           february: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].febrero,
@@ -295,6 +346,45 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }
   }
 
+  //Función para cargar los rollos que se cargarán en cuanto se seleccione una fila 
+  loadInfoRollsAvailables(data : any){
+    this.loaded = true;
+    this.svProductionProcess.getRollsAvailablesForItem(data.item).subscribe(dataRolls => {
+      let index : number = this.stockInformation.findIndex(x => x.item == data.item);
+      this.stockInformation[index].AvaibleProdution = this.fillAvaibleProduction(dataRolls);
+      this.loaded = false;
+    }, error => { this.msjs(`Error`, `No se pudo obtener información del item N° ${data.item} en despacho.`); });
+  }
+
+  //Función para cargar los rollos que se cargarán en cuanto se seleccione el icono  
+  loadInfoRollsInAreaSellado(data : any){
+    this.loading = true;
+    let index : number = this.stockSellado.findIndex(x => x.item == data.item);
+    this.svProductionProcess.getRollsInAreaForItem(data.item, data.process).subscribe(data => {
+      this.stockSellado[index].AvaibleProdution = this.fillAvaibleProduction(data);
+      this.loading = false;
+    }, error => { this.msg.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en Sellado.`);});
+  }
+
+  loadInfoRollsInAreaEmpaque(data : any){
+    this.loading = true;
+    let index : number = this.stockEmpaque.findIndex(x => x.item == data.item);
+    this.svProductionProcess.getRollsInAreaForItem(data.item, data.process).subscribe(data => {
+      this.stockEmpaque[index].AvaibleProdution = this.fillAvaibleProduction(data);
+      this.loading = false;
+    }, error => { this.msg.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en Empaque.`); });
+  }
+
+  //Función para cargar los rollos que se cargarán en cuanto se seleccione una fila 
+  loadInfoRollsPreDelivered(data : any){
+    this.svProductionProcess.getRollsPreDeliveredForItem(data.item).subscribe(data => {
+      this.fillAvaibleProduction(data);
+    }, error => {
+      this.msg.mensajeAdvertencia(``, `No se pudo obtener información del item N° ${data.item}`);
+    })
+  }
+
+  //DES-USO
   //Función que mostrará un msj de confirmación para eliminación de items en la OF.
   seeMsjEditItem(data : any, roll? : any){
     this.load = true;
@@ -371,6 +461,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   //Acortar msjs de confirmación, error y adavertencia
   msjs(msj1 : string, msj2 : string) {
     this.load = false;
+    this.loading = false;
     switch (msj1) {
       case 'Confirmación' :
         return this.msg.mensajeConfirmacion(msj1, msj2);
@@ -539,11 +630,35 @@ export class InventarioProductosPBDDComponent implements OnInit {
   //Función que se encarga de mantener expandida la información de la tabla.
   changeTab(e : any) {
     this.indexTab = e.index;
+    if([86,4].includes(this.ValidarRol)) {
+      if(this.indexTab == 1) {
+        //this.getStockProcess();
+        this.getStockProcessEmpaque();
+        this.getStockProcessSellado();
+        this.deployRows();
+      } else null;
+      this.indexTab == 2 ? this.getStockInformationKg() : null;
+      this.indexTab == 3 ? this.getStockInformationBulto() : null;
 
-    if([86,4].includes(this.ValidarRol)) this.indexTab == 1 ? this.deployRows() : null;
-    else {
-      this.indexTab == 3 ? this.deployRows() : null;
-      this.indexTab == 4 ? this.deployRows() : null;
+    } else {
+      this.indexTab == 1 ? this.loadRollsProductionAvailable() : null;
+      this.indexTab == 2 ? this.loadRollsProductionAvailable() : null;
+      this.indexTab == 5 ? this.getStockInformationKg() : null;
+      this.indexTab == 6 ? this.getStockInformationBulto() : null;
+
+      if(this.indexTab == 3) {
+        this.getStockProcessEmpaque();
+        this.deployRows();
+      } else null;
+      if(this.indexTab == 4) {
+        this.getStockProcessSellado();
+        this.deployRows();
+      } else null;
+      if(this.indexTab == 7) {
+        this.getStockProcessEmpaque();
+        this.getStockProcessSellado();
+        this.deployRows();
+      } else null;
     }
   }
 
@@ -754,7 +869,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.addTotal(info, data[0].process_Id);
     return info;
   }
-  
 }
 
 interface StockInformation {
@@ -782,6 +896,7 @@ interface StockInformation {
   october: number,
   november: number,
   december: number,
+  process? : string,
 }
 
 interface AvaibleProdution {

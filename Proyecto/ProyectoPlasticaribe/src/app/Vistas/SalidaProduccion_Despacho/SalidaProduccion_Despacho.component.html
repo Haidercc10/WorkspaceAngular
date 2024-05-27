@@ -32,7 +32,7 @@
 
       <div class="col-sm-12 col-md-3">
         <span class="p-float-label">
-          <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getInformationProduction()"/>
+          <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus autocomplete="off" [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getInformationProduction()"/>
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>
@@ -131,7 +131,7 @@
   </p-table>
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
-    <button pButton class="p-button-danger" id="crear" type="button" label="Despachar Mercancia" icon="pi pi-send" [disabled]="formProduction.invalid && sendProductionZeus.length == 0" (click)="validateDataToSave()"></button>
+    <button pButton class="p-button-danger" id="crear" type="button" label="Despachar Mercancia" icon="pi pi-send" [disabled]="formProduction.invalid" (click)="validateDataToSave()"></button>
     <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
   </div>
 </p-card>

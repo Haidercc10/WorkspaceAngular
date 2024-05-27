@@ -11,3 +11,7 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
 ::ng-deep .p-button.p-button-icon-only.p-button-rounded {
     height: 2rem;
 }
+
+::ng-deep .field-checkbox {
+  margin-top: 0.7rem;
+}

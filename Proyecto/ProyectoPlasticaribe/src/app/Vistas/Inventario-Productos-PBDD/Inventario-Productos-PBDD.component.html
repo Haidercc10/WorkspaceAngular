@@ -8,13 +8,14 @@
   <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información del Inventario</h4>
 </div>
 
-<p-tabView (onChange)="changeTab($event)" *ngIf="!load" [scrollable]="true">
+<p-tabView (onChange)="changeTab($event)" [scrollable]="true">
   <p-tabPanel
   header="Inventario de Despacho"
   leftIcon="pi pi-sliders-h"
   *ngIf="![86,4].includes(ValidarRol)">
     <p-table
       #tableStock
+      *ngIf="!load"
       [columns]="selectedColumns"
       [value]="stockInformation"
       dataKey="item"
@@ -24,8 +25,6 @@
       columnResizeMode="expand"
       responsiveLayout="scroll"
       [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="caption">
@@ -62,7 +61,7 @@
       <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
           <tr>
               <td>
-                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                  <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadInfoRollsAvailables(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                   <span class="font-bold">
                       {{rowIndex + 1}}
                   </span>
@@ -89,6 +88,7 @@
                           [scrollable]="true"
                           scrollHeight="30rem"
                           [rowHover]="true"
+                          [loading]="loaded"
                           >
                           <ng-template pTemplate="header">
                               <tr id="filtros">
@@ -103,7 +103,7 @@
                                   <th><input pInputText type="text" (input)="applyFilter($event, 'Process', tableDetails1)"></th>
                                   <th><input pInputText type="text" (input)="applyFilter($event, 'Turn', tableDetails1)"></th>
                                   <th><input pInputText type="text" (input)="applyFilter($event, 'Date', tableDetails1)"></th>
-                                  <th></th>
+                                  <!--<th></th>-->
                               </tr>
                               <tr>
                                   <th>#</th>
@@ -117,7 +117,7 @@
                                   <th>Proceso</th>
                                   <th>Turno</th>
                                   <th>Fecha</th>
-                                  <th *ngIf="[1].includes(ValidarRol)"></th>
+                                  <!--<th *ngIf="[1].includes(ValidarRol)"></th>-->
                               </tr>
                           </ng-template>
                           <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
@@ -133,9 +133,9 @@
                                   <td>{{details.Process}}</td>
                                   <td>{{details.Turn}}</td>
                                   <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
-                                  <td *ngIf="[1].includes(ValidarRol)">
+                                  <!--<td *ngIf="[1].includes(ValidarRol)">
                                     <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Sacar bulto N° {{details.NumberProduction}} del item '{{data.item}} - {{data.reference}}' del inventario" (onClick)="seeMsjEditItem(data, details.NumberProduction)" tooltipPosition="top"></p-button>
-                                  </td>
+                                  </td>-->
                               </tr>
                           </ng-template>
                           <ng-template pTemplate="emptymessage">
@@ -331,11 +331,10 @@
       columnResizeMode="expand"
       responsiveLayout="scroll"
       [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
       scrollHeight="50rem"
-      [expandedRowKeys]="expandedRows">
+      [expandedRowKeys]="expandedRows"
+      [loading]="loading">
       <ng-template pTemplate="caption">
           <div class="row g-4">
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
@@ -375,7 +374,7 @@
       <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
           <tr>
               <td>
-                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                  <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadInfoRollsInAreaEmpaque(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                   <span class="font-bold">
                       {{rowIndex + 1}}
                   </span>
@@ -393,7 +392,7 @@
                       <p-table
                           #tableExpInvEmpaque  
                           [value]="data.AvaibleProdution"
-                          dataKey="factura"
+                          dataKey="item"
                           styleClass="p-datatable-gridlines p-datatable-sm"
                           [resizableColumns]="true"
                           columnResizeMode="expand"
@@ -401,7 +400,8 @@
                           [reorderableColumns]="true"
                           [rowHover]="true"
                           [scrollable]="true"
-                          scrollHeight="30rem">
+                          scrollHeight="30rem"
+                          >
                           <ng-template pTemplate="header">
                             <!--<tr id="filtros">
                                 <th></th>
@@ -485,11 +485,10 @@
       columnResizeMode="expand"
       responsiveLayout="scroll"
       [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
       scrollHeight="50rem"
-      [expandedRowKeys]="expandedRows">
+      [expandedRowKeys]="expandedRows"
+      [loading]="loading">
       <ng-template pTemplate="caption">
           <div class="row g-4">
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
@@ -529,7 +528,7 @@
       <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
           <tr>
               <td>
-                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                  <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadInfoRollsInAreaSellado(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                   <span class="font-bold">
                       {{rowIndex + 1}}
                   </span>
@@ -547,7 +546,6 @@
                       <p-table
                           #tableExpInvSellado  
                           [value]="data.AvaibleProdution"
-                          dataKey="factura"
                           styleClass="p-datatable-gridlines p-datatable-sm"
                           [resizableColumns]="true"
                           columnResizeMode="expand"
@@ -555,7 +553,8 @@
                           [reorderableColumns]="true"
                           [rowHover]="true"
                           [scrollable]="true"
-                          scrollHeight="30rem">
+                          scrollHeight="30rem"
+                          [loading]="loading">
                           <ng-template pTemplate="header">
                               <!--<tr id="filtros">
                                   <th></th>
@@ -637,10 +636,9 @@
       columnResizeMode="expand"
       responsiveLayout="scroll"
       [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
-      scrollHeight="50rem">
+      scrollHeight="50rem"
+      [loading]="loading">
       <ng-template pTemplate="caption">
         <div class="row g-4">
           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
@@ -673,7 +671,7 @@
       <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
         <tr>
           <td>
-            <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+            <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadInfoRollsAvailables(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
             <span class="font-bold">
               {{rowIndex + 1}}
             </span>
@@ -754,10 +752,9 @@
       columnResizeMode="expand"
       responsiveLayout="scroll"
       [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
-      scrollHeight="50rem">
+      scrollHeight="50rem"
+      [loading]="loading">
       <ng-template pTemplate="caption">
           <div class="row g-4">
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
@@ -790,7 +787,7 @@
       <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
           <tr>
               <td>
-                  <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                  <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadInfoRollsAvailables(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                   <span class="font-bold">
                       {{rowIndex + 1}}
                   </span>
@@ -872,8 +869,6 @@
       columnResizeMode="expand"
       responsiveLayout="scroll"
       [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="caption">
@@ -932,8 +927,6 @@
       columnResizeMode="expand"
       responsiveLayout="scroll"
       [rowHover]="true"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="caption">

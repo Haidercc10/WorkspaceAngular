@@ -10,6 +10,7 @@ import { modelOrdenFacturacion } from 'src/app/Modelo/modelOrdenFacturacion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -19,6 +20,7 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
+import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 
 @Component({
   selector: 'app-Orden_Facturacion',
@@ -54,6 +56,8 @@ export class Orden_FacturacionComponent implements OnInit {
   editOrderFact : boolean = false;
   rollSelected : any = {};
   itemSelected : any = {};
+  reposition : boolean = false;
+  //@ViewChild(MovimientosOrdenFacturacionComponent) movOrderFact : MovimientosOrdenFacturacionComponent;
   
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -69,6 +73,8 @@ export class Orden_FacturacionComponent implements OnInit {
     private bagproService: BagproService,
     private svtypeDocs : TipoDocumentoService,
     private svMsg : MessageService,
+    private svDevolutions : DetallesDevolucionesProductosService,
+    private movOrderFact : MovimientosOrdenFacturacionComponent,
   ) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
@@ -118,6 +124,8 @@ export class Orden_FacturacionComponent implements OnInit {
     this.rollSelected = {};
     this.editOrderFact = false;
     this.selectedProductSaleOrder = null;
+    this.reposition = false;
+    this.movOrderFact.modalReposition = false;
     !edit ? this.getLastOrderFact() : null;
   }
 
@@ -194,8 +202,6 @@ export class Orden_FacturacionComponent implements OnInit {
       this.formDataOrder.patchValue({'saleOrder': null, 'typeDoc' : null, });
     } 
   }*/
-
-  addItemToSaleOrder(){}
 
   getPresentation() {
     let filterPresentations: Array<string> = ['Und', 'Kg', 'Paquete', 'Rollo'];
@@ -440,15 +446,18 @@ export class Orden_FacturacionComponent implements OnInit {
 
   validateInformation() {
     if (this.formDataOrder.valid) {
-      if (this.productionSelected.length > 0) this.saveOrderFact();
-      else this.msj.mensajeAdvertencia(`¡No ha seleccionado ningún rollo!`);
+      if (this.productionSelected.length > 0) {
+        if(!this.reposition) this.saveOrderFact();
+        else this.validateReposition();
+      } else this.msj.mensajeAdvertencia(`¡No ha seleccionado ningún rollo!`);
     } else this.msj.mensajeAdvertencia(`¡Debe ingresar todos los datos!`);
   }
 
   saveOrderFact() {
+    if(this.reposition) this.onReject('reposition');
     this.load = true;
     let orderFact: modelOrdenFacturacion = {
-      Factura: ``,
+      Factura: [undefined, null, ''].includes(this.formDataOrder.value.fact) ? `` : this.formDataOrder.value.fact,
       Cli_Id: this.formDataOrder.value.idClient,
       Usua_Id: this.storage_Id,
       Fecha: moment().format('YYYY-MM-DD'),
@@ -489,7 +498,8 @@ export class Orden_FacturacionComponent implements OnInit {
 
   createPDF(id_OrderFact: number, fact: string) {
     this.dtOrderFactService.GetInformacionOrderFact(id_OrderFact).subscribe(data => {
-      let title: string = `Orden de Facturación N° ${id_OrderFact}`;
+      let saleOrder : string = `${data[0].dtOrder.consecutivo_Pedido}`;
+      let title: string = saleOrder.startsWith('DV') ? `Orden de Reposición N° ${id_OrderFact}` : `Orden de Facturación N° ${id_OrderFact}`;
       title += `${fact.length > 0 ? ` \n Factura N° ${fact}` : ''}`;
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
@@ -621,7 +631,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   tableConsolidated(data) {
     let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Peso B.', 'Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['5%', '7%', '8%', '38%', '10%', '10%', '12%', '10%'];
+    let widths: Array<string> = ['5%', '12%', '8%', '38%', '10%', '5%', '12%', '10%'];
     return {
       table: {
         headerRows: 2,
@@ -714,7 +724,7 @@ export class Orden_FacturacionComponent implements OnInit {
       fontSize: 8,
       bold: false,
       table: {
-        widths: ['5%', '7%', '8%', '38%', '10%', '10%', '12%', '10%'],
+        widths: ['5%', '12%', '8%', '38%', '10%', '5%', '12%', '10%'],
         body: [
           [
             { text: ``, alignment: 'center', border: [true, false, false, true], },
@@ -745,8 +755,14 @@ export class Orden_FacturacionComponent implements OnInit {
             this.clearFields(true);
             this.editOrderFact = true;
             setTimeout(() => { this.loadInfoOrderFact(data); }, 500); 
-          } else this.msjsOF(`Advertencia`, `La orden de facturación N° ${data[0].order.id} no está disponible para editar`);
-        } else this.msjsOF(`Advertencia`, `No se encontró información de la orden de facturación N° ${data[0].order.id}`);
+          } else {
+            this.msjsOF(`Advertencia`, `La orden de facturación N° ${data[0].order.id} no está disponible para editar`);
+            this.clearFields(true);
+          } 
+        } else {
+          this.msjsOF(`Advertencia`, `No se encontró información de la orden de facturación N° ${data[0].order.id}`);
+          this.clearFields(true);
+        } 
       }, error => {
         this.msj.mensajeError(`Error`, `No se encontró información de la orden de facturación N° ${of}`);
         this.clearFields(false);
@@ -829,17 +845,16 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   //Función para eliminar rollos de la orden 
-  deleteRollFromOrderFact(data : any){
+  deleteRollFromOrderFact(data : any, currentStatus : number, newStatus : number){
     this.onReject('deleteRoll');
     this.load = true;
     let index : any = this.productionSelected.findIndex(x => x.numberProduction == data.numberProduction);
     
     this.dtOrderFactService.deleteDetailOF(data.idDetail).subscribe(() => {
       let infoRoll : any = [{'roll': data.numberProduction, 'item': data.item }]
-      this.productionProcessService.putChangeStateProduction(infoRoll, 20, 23).subscribe(() => {
+      this.productionProcessService.putChangeStateProduction(infoRoll, currentStatus, newStatus).subscribe(() => {
         this.msjsOF(`Confirmación`, `Rollo N° ${data.numberProduction} eliminado exitosamente de la orden N° ${this.formDataOrder.value.order}!`);
         this.productionSelected.splice(index, 1);
-        this.tableProductionSelected.clear();
         this.getConsolidateProduction();
       }, error => {
         this.msjsOF(`Error`, `No fue posible actualizar el estado del rollo N° ${data.numberProduction}!`);
@@ -873,7 +888,6 @@ export class Orden_FacturacionComponent implements OnInit {
   //Función para cambiar el estado de rollos que se están sacando de la OF. 
   changeStatusRolls(data : any, rolls : any, status : number, newStatus : number){
     let indexItem : number = this.products.findIndex(x => x.id_Producto == data.id_Producto);
-    console.log(data, rolls, status, newStatus, indexItem);
     
     this.productionProcessService.putChangeStateProduction(rolls, status, newStatus).subscribe(() => {
       this.msjsOF(`Confirmación`, `Item eliminado de la orden N° ${this.formDataOrder.value.order} exitosamente!`);
@@ -947,6 +961,86 @@ export class Orden_FacturacionComponent implements OnInit {
     }
   }
 
+  //ORDEN DE FACTURACIÓN POR REPOSICIÓN
+  //Función para cargar info de la devolución a reponer
+  loadInfoForDevolution(devId : number){
+    this.load = true;
+    this.reposition = true;
+    this.svDevolutions.GetInformationDevById(devId).subscribe(data => {
+      this.loadInfoHeaderReposition(data);
+      this.getProductsReposition(data);
+      this.load = false;
+    }, error => {
+      this.msjsOF(`Error`, `No fue posible consultar la devolución N° ${devId}! \n${error}`)
+    });
+  }
+
+  //Función para cargar los campos de OF en base a los datos de la devolución 
+  loadInfoHeaderReposition(data : any){
+    this.formDataOrder.patchValue({
+      'fact' : data[0].dev.facturaVta_Id,
+      'saleOrder' : `DV${data[0].dev.devProdFact_Id}-OF${data[0].dev.id_OrdenFact}`,
+      'idClient' : data[0].cliente.cli_Id,
+      'client' : data[0].cliente.cli_Nombre,
+      'observation' : `REPOSICIÓN POR: ${data[0].dtDev.falla}`,
+      'typeDoc' : 'REPO',
+    });
+  }
+
+  //Función para cargar los productos de la devolución que serán repuestos. 
+  getProductsReposition(data : any) {
+    this.products = data.reduce((a : any, b : any) => {
+      console.log(b);
+      if(!a.map(x => x.id_Producto).includes(b.prod.prod_Id)) {
+        a.push({
+          'consecutivo' : `DV${data[0].dev.devProdFact_Id}-OF${data[0].dev.id_OrdenFact}`,
+          'id_Cliente' : b.cliente.cli_Id,
+          'cliente' : b.cliente.cli_Nombre,
+          'id_Producto' : b.prod.prod_Id,
+          'producto' : b.prod.prod_Nombre,
+          'cant_Pendiente' : b.dtDev.cantidad,
+          'presentacion' : b.dtDev.presentacion,
+        });
+      } else a[a.findIndex(x => x.id_Producto == b.prod.prod_Id)].cant_Pendiente += b.dtDev.cantidad;
+      console.log(a);
+      return a;
+    }, []);
+  }
+
+  //Función para cargar un item, si la devolución es por envio de item erroneo.
+  addItemForReposition(){
+    if(!this.products.map(x => x.id_Producto).includes(this.formItems.value.item)) {
+      this.modalAddItems = false;
+      this.load = true;
+      this.products.push({
+        'consecutivo' : this.formDataOrder.value.saleOrder,
+        'id_Cliente' : this.formDataOrder.value.idClient,
+        'cliente' : this.formDataOrder.value.client,
+        'id_Producto' : this.formItems.value.item,
+        'producto' : this.formItems.value.reference, 
+        'cant_Pendiente' : this.formItems.value.qty,
+        'presentacion' : this.formItems.value.presentation,
+      });
+      setTimeout(() => { 
+        this.msjsOF(`Confirmación`, `Item ${this.formItems.value.item} - ${this.formItems.value.reference} agregado exitosamente!`);
+        this.formItems.reset(); 
+      }, 200); 
+    } else this.msjsOF(`Advertencia`, `El item ${this.formItems.value.item} - ${this.formItems.value.reference} ya se encuentra cargado en la orden!`)
+  }
+
+  validateReposition() {
+    let count : number = 0;
+    this.load = true;
+    this.consolidatedProduction.forEach(x => {
+      this.products.forEach(p => {
+        if(x.item == p.id_Producto) {
+          if(x.quantity != p.cant_Pendiente) count++; 
+        }
+      });
+    });
+    (count > 0) ? this.svMsg.add({ severity:'warn', key:'reposition', summary: `Algunas cantidades a reponer son diferentes a las cantidades devueltas.`, detail: `¿Está seguro que desea realizar la reposición?`, sticky: true}) : this.saveOrderFact();
+  }
+  
 }
 
 interface production {

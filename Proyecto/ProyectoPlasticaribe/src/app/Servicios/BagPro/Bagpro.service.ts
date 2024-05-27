@@ -137,9 +137,10 @@ export class BagproService {
 
   srvObtenerListaClienteOTItems = ():Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/ClientesOtItems');
 
-  srvObtenerItemsBagproXClienteItem = (codigo : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${codigo}`);
+  srvObtenerItemsBagproXClienteItem = (codigo : any[]) => this.http.post<any>(this.rutaBagPro + `/ClientesOtItems/OtItem`, codigo);
 
   LikeReferencia = (ref : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/likeReferencia/${ref}`);
+   
   /*********************************************************** DESPERDICIO **************************************************************/
 
   srvObtenerListaDespercicios = ():Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/Procdesperdicio');

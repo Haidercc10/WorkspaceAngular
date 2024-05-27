@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
@@ -13,6 +13,10 @@ import { MessageService } from 'primeng/api';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
@@ -29,14 +33,15 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   storage_Nombre : any;
   serchedData: any[] = [];
   @ViewChild('dt') dt: Table;
-  states: Array<string> = ['PENDIENTE','DESPACHADO'];
+  states: Array<string> = ['PENDIENTE','DESPACHADO', ];
   anulledOrder: number | undefined;
+  modalReposition : boolean = false;
+  @ViewChild(Orden_FacturacionComponent) Orden_FacturacionComponent : Orden_FacturacionComponent;
 
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
     private dtOrderFactService : Dt_OrdenFacturacionService,
     private msg : MensajesAplicacionService,
-    private orden_FacturacionComponent : Orden_FacturacionComponent,
     private devolucion_OrdenFacturacionComponent : Devolucion_OrdenFacturacionComponent,
     private dtDevolutionsService : DetallesDevolucionesProductosService,
     private orderFactService: OrdenFacturacionService,
@@ -96,8 +101,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   createPDF(id : number, fact: string, type : string){
     this.load = true;
-    if (type == 'Orden') this.orden_FacturacionComponent.createPDF(id, fact); //this.cmpOrdFact.createPDF(id, fact);
-    else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, fact);
+    if (type == 'Orden') this.Orden_FacturacionComponent.createPDF(id, fact); //this.cmpOrdFact.createPDF(id, fact);
+    else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, 'exportada');
     setTimeout(() => this.load = false, 3000);
   }
 
@@ -132,5 +137,14 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       this.msg.mensajeConfirmacion(`¡Orden de facturación anulada con éxito!`);
       this.load = false;
     }, error => this.errorMessage(`¡Ocurrió un error al colocar en disponible los rollos de la orden #${this.anulledOrder}!`, error));
+  }
+
+  //
+  loadModalOrderFact(data : any){
+    if(data.type == 'Devolucion' && data.or.reposicion && data.or.Estado_Id != 18) {
+      this.Orden_FacturacionComponent.clearFields(false);
+      this.modalReposition = true;  
+      this.Orden_FacturacionComponent.loadInfoForDevolution(data.or.id);
+    } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} seleccionada no requiere reposición!`);
   }
 }

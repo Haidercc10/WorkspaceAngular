@@ -4,7 +4,7 @@
   </div>
 </div>
 
-<div class="contain">
+<div class="contain" *ngIf="!reposition">
   <div class="container-fluid">
     <div class="mb-5 Titulo">
       <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Orden de Facturación</h2>
@@ -35,7 +35,7 @@
       <!-- Order -->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
         <span class="p-float-label">
-          <input formControlName="order" id="order" type="number" pInputText (keyup.enter)="getInfoOrderFact()"/>
+          <input formControlName="order" id="order" type="number" [readonly]="reposition" pInputText (keyup.enter)="getInfoOrderFact()"/>
           <label for="order">N° Orden</label>
         </span>
       </div>
@@ -43,7 +43,7 @@
       <!-- Sale Order -->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
         <span class="p-float-label"><!--[readonly]="formDataOrder.value.typeDoc == 'REPO' ? true : false"-->
-          <input formControlName="saleOrder" id="saleOrder" type="text" [readonly]="editOrderFact" pInputText (keyup.enter)="getSalesOrders()"/>
+          <input formControlName="saleOrder" id="saleOrder" type="text" [readonly]="editOrderFact || reposition" pInputText (keyup.enter)="getSalesOrders()"/>
           <label for="saleOrder">Pedido</label>
         </span>
       </div>
@@ -98,7 +98,7 @@
       <!-- Observacion -->
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
         <span class="p-float-label">
-          <textarea formControlName="observation" [rows]="1" maxlength="200" pInputTextarea></textarea>
+          <textarea formControlName="observation" [rows]="1" [readonly]="reposition" maxlength="200" pInputTextarea></textarea>
           <label for="textarea">Observación</label>
         </span>
       </div>
@@ -110,14 +110,14 @@
   </div>
 
   <!--Productos del pedido-->
-  <!--<p-toolbar styleClass="mb-4 gap-2" *ngIf="formDataOrder.value.typeDoc == 'REPO'">
+  <p-toolbar styleClass="mb-4 gap-2" *ngIf="reposition || editOrderFact">
     <ng-template pTemplate="left">
         <button pButton pRipple label="Agregar Item" icon="pi pi-plus" class="p-button-danger mr-2" (click)="modalAddItems = true"></button>
     </ng-template>
 
     <ng-template pTemplate="right">
     </ng-template>
-  </p-toolbar>-->
+  </p-toolbar>
 
   <p-table
     [value]="products"
@@ -460,10 +460,10 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton icon="pi pi-check" label="Sí" class="p-button-warning" (click)="deleteRollFromOrderFact(rollSelected)" pTooltip="El bulto seleccionado será ELIMINADO de la orden y cambiará su estado a NO DISPONIBLE."></button>
+          <button type="button" pButton icon="pi pi-check" label="Sí, no está disponible" class="p-button-danger" (click)="deleteRollFromOrderFact(rollSelected, 20, 23)" pTooltip="El bulto seleccionado será ELIMINADO de la orden y cambiará su estado a NO DISPONIBLE."></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('deleteRoll')" class="p-button-secondary"></button>
+          <button type="button" pButton icon="pi pi-times" label="Sí, pero vuelve a inventario" (click)="deleteRollFromOrderFact(rollSelected, 20, 19)" class="p-button-warning" pTooltip="El bulto seleccionado será ELIMINADO de la orden y cambiará su estado a DISPONIBLE."></button>
         </div>
       </div>
     </div>
@@ -491,10 +491,31 @@
   </ng-template>
 </p-toast>
 
+<!--Mensaje de confirmación para eliminación de items-->
+<p-toast position="center" key="reposition" (onClose)="onReject('reposition')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton icon="pi pi-check" label="Sí" class="p-button-warning" (click)="saveOrderFact()" pTooltip="Se enviarán cantidades diferentes a la que se debían reponer."></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('reposition')" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
 <!--Modal de agregar items al pedido-->
-<!--<p-dialog [(visible)]="modalAddItems" [style]="{width: '400px'}" [resizable]="true" header="Agregar Referencia" [modal]="true" [contentStyle]="{'overflow':'visible'}">
+<p-dialog [(visible)]="modalAddItems" [style]="{width: '400px'}" [resizable]="true" header="Agregar Referencia" [modal]="true" [contentStyle]="{'overflow':'visible'}">
   <ng-template pTemplate="content">
-    <form [formGroup]="formItems" (ngSubmit)="addItemToSaleOrder()">
+    <form [formGroup]="formItems" (ngSubmit)="addItemForReposition()">
       <div class="mb-3">
         <div class="row g-4">
           <br><br>
@@ -543,4 +564,5 @@
       </div>  
     </form>    
   </ng-template>
-</p-dialog>--> 
+</p-dialog>
+

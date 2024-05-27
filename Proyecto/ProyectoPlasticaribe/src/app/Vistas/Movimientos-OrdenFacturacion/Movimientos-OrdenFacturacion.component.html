@@ -113,14 +113,14 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data>
-      <tr>
+      <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'Devolucion'}">
         <td class="text-center">{{data.or.id}}</td>
         <td class="text-center">{{data.or.factura}}</td>
         <td class="text-center">{{data.or.cli_Id}}</td>
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
         <td class="text-center">{{data.fechaHora}}</td>
         <td class="text-center">{{data.type | uppercase}}</td>
-        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': data.or.estado_Id == 19, 'bg-success1': data.or.estado_Id == 21, 'bg-warning': data.or.estado_Id == 3}">{{data.estado}}</span></td>
+        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-warning': [3,29,35].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
         <td class="text-center" *ngIf="[1].includes(validateRole)">
           <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-danger" (onClick)="confirmSendData(data.or.id)"></p-button>
         </td>
@@ -154,3 +154,8 @@
     </div>
   </ng-template>
 </p-toast>
+
+<!--Modal para crear tintas -->
+<p-dialog header="Orden de facturación por reposición" [(visible)]="modalReposition" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
+  <app-Orden_Facturacion></app-Orden_Facturacion>
+</p-dialog>

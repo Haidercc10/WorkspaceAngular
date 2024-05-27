@@ -8,4 +8,6 @@ export interface modelDevolucionProductos {
   TipoDevProdFact_Id: number;
   Usua_Id: number;
   Id_OrdenFact : number;
+  Estado_Id : number;
+  DevProdFact_Reposicion : boolean;
 }
