@@ -231,16 +231,10 @@ export class Ubicaciones_RollosComponent implements OnInit {
 
   //Sacar rollos de despacho.
   extractRollsDespacho(zeus : boolean = false){
-    let rollsBagproEmpaque : any[] = this.sendProductionZeus.filter(x => x.proceso.proceso_Nombre == 'EMPAQUE').map(x => x.pp.numeroRollo_BagPro); 
-    let rollsBagproSellado : any[] = this.sendProductionZeus.filter(x => x.proceso.proceso_Nombre == 'SELLADO').map(x => x.pp.numeroRollo_BagPro);  
     let rollsPL : any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo);
+    let errorMsj : string = 'No fue posible revertir el Envio Zeus de los rollos en Plasticaribe!';
 
-    this.productionProcessSerivce.putReversionEnvioZeus(rollsPL).subscribe(data => {
-      if(rollsBagproEmpaque.length > 0) this.updateRollsBagproEmpaque(rollsBagproEmpaque);
-      if(rollsBagproSellado.length > 0) this.updateRollsBagproSellado(rollsBagproSellado);
-      this.changeStateEntry(rollsPL, zeus);
-      console.log(rollsPL.concat(this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro)));
-    }, error => { this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos en Plasticaribe!'); });
+    this.productionProcessSerivce.putReversionEnvioZeus(rollsPL).subscribe(data => { this.changeStateEntry(rollsPL, zeus); }, error => { this.msj.mensajeError('Error', errorMsj); });
   }
 
   //.Función que actualizará el envio zeus de los rollos en procextrusion

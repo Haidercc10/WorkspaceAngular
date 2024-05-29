@@ -122,7 +122,7 @@
         <td class="text-center">{{data.type | uppercase}}</td>
         <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-warning': [3,29,35].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
         <td class="text-center" *ngIf="[1].includes(validateRole)">
-          <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-danger" (onClick)="confirmSendData(data.or.id)"></p-button>
+          <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-danger" [disabled]="data.type == 'Devolucion'" (onClick)="confirmSendData(data.or.id)"></p-button>
         </td>
         <td class="text-center">
           <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id, data.or.factura, data.type)"></p-button>

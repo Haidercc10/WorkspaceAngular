@@ -107,6 +107,12 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.carteraAgrupadaVendedores = [];
     this.cartera = [];
 
+    if(![null, undefined, ''].includes(cliente)) {
+      if(cliente.includes('&')) {
+        cliente = cliente.replace(/&/g, '%26');
+      }
+    }
+
     if (vendedor != null) ruta += `vendedor=${vendedor}`;
     if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
@@ -115,12 +121,12 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.zeusService.GetCarteraAgrupadaVendedores(ruta).subscribe(data => this.carteraAgrupadaVendedores = data);
     this.zeusService.GetCarteraTotal(ruta).subscribe(data => {
       this.cartera = data.filter(x => x.saldo_Cartera > 0);
-      if (carteraOriginal) {
-        this.cartera = this.cartera.filter(x => x.cantidad_Dias < 1000);
-        this.cargando = false;
-      } else this.cargando = false;
+      if (carteraOriginal) this.cartera = this.cartera.filter(x => x.cantidad_Dias < 1000);
+      this.cargando = false;
+    }, error => {
+      this.msj.mensajeError("Error al intentar consultar la cartera total", error.error.title);
+      this.cargando = false
     });
-    //setTimeout(() => this.cargando = false, 5000);
   }
   
   totalCartera = () => this.cartera.filter(x => x.saldo_Cartera > 0).reduce((acc, item) => acc + item.saldo_Cartera, 0);
@@ -129,13 +135,16 @@ export class DashBoardRecaudosComponent implements OnInit {
   formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 
   generarPDF(){
-    this.cargando = true;
     if (this.cartera.length > 0) {
+      this.cargando = true;
       let informacionPDF = this.seleccionarInformacionPDf();
       let titulo : string = "Cartera Plasticaribe";
       let content : any [] = this.contenidoPDF(informacionPDF);
       this.creacionPDFService.formatoPDF(titulo, content);
       setTimeout(() => this.cargando = false, 3000);
+    } else {
+      this.msj.mensajeAdvertencia("No hay datos para generar el PDF");
+      this.cargando = false;
     }
   }
 

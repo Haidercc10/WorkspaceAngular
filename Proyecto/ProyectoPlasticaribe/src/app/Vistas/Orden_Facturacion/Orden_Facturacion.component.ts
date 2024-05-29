@@ -1028,9 +1028,13 @@ export class Orden_FacturacionComponent implements OnInit {
     } else this.msjsOF(`Advertencia`, `El item ${this.formItems.value.item} - ${this.formItems.value.reference} ya se encuentra cargado en la orden!`)
   }
 
+  //Función que validará o no la creación de la OF por reposición.
   validateReposition() {
     let count : number = 0;
     this.load = true;
+    let summary : string = `Algunas cantidades a reponer son diferentes a las cantidades devueltas.`;
+    let detail : string = `¿Está seguro que desea realizar la reposición?`;
+
     this.consolidatedProduction.forEach(x => {
       this.products.forEach(p => {
         if(x.item == p.id_Producto) {
@@ -1038,7 +1042,7 @@ export class Orden_FacturacionComponent implements OnInit {
         }
       });
     });
-    (count > 0) ? this.svMsg.add({ severity:'warn', key:'reposition', summary: `Algunas cantidades a reponer son diferentes a las cantidades devueltas.`, detail: `¿Está seguro que desea realizar la reposición?`, sticky: true}) : this.saveOrderFact();
+    (count > 0) ? this.svMsg.add({ severity:'warn', key:'reposition', summary: summary, detail: detail, sticky: true}) : this.saveOrderFact();
   }
   
 }

@@ -96,6 +96,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   searchDataDevolutions(startDate: any, endDate: any, route: string){
     this.dtDevolutionsService.GetDevolutions(startDate, endDate, route).subscribe(data => {
       data.forEach(dataDevolution => this.serchedData.push(dataDevolution));
+      console.log(data);
+      
     }, () => this.load = false);
   }
 
