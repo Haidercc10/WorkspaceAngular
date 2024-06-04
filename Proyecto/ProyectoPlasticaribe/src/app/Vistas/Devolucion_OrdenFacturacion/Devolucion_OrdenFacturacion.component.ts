@@ -381,7 +381,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           ],
           [
             { text: `Usuario ingreso: ${data.usua.usua_Nombre}` },
-            { text: `Usuario revisión: ${data.dev.usua_Modifica}` },
+            { text: `Usuario revisión: ${data.usua.usua_Modifica == 0 ? '' : data.usua.usua_Modifica}` },
             { text: `Estado: ${data.estadoDv.estado_Nombre}` },
           ],
           [

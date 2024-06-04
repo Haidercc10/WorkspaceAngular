@@ -14,6 +14,8 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 import { PruebaImagenCatInsumoComponent } from '../prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
+import { GestionDevolucionesOfModule } from 'src/app/Modules/gestion-devoluciones-of/gestion-devoluciones-of.module';
+import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +40,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   anulledOrder: number | undefined;
   modalReposition : boolean = false;
   modalDevolution : boolean = false;
-  @ViewChild(PruebaImagenCatInsumoComponent) managementDevolutions : PruebaImagenCatInsumoComponent;
+  @ViewChild(Gestion_DevolucionesOFComponent) managementDevolutions : Gestion_DevolucionesOFComponent;
   @ViewChild(Orden_FacturacionComponent) Orden_FacturacionComponent : Orden_FacturacionComponent;
   
   constructor(private appComponent : AppComponent,
@@ -87,7 +89,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.serchedData = [];
     this.dt.clear();
     this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => {
-      data.forEach(dataOrder => this.serchedData.push(dataOrder));
+      if(![5,83].includes(this.validateRole)) data.forEach(dataOrder => this.serchedData.push(dataOrder));
       this.load = false;
     }, error => {
       this.load = false;
@@ -147,15 +149,19 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   //
   loadModalOrderFact(data : any){
     if(data.type == 'Devolucion' && data.or.reposicion && data.or.estado_Id == 38) {
-      this.Orden_FacturacionComponent.clearFields(false);
-      this.modalReposition = true;  
-      this.Orden_FacturacionComponent.loadInfoForDevolution(data.or.id); 
+      if([6,1].includes(this.validateRole)) {
+        this.Orden_FacturacionComponent.clearFields(false);
+        this.modalReposition = true;  
+        this.Orden_FacturacionComponent.loadInfoForDevolution(data.or.id); 
+      } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
     } else if(data.type == 'Devolucion' && [11,29].includes(data.or.estado_Id)) {
-      this.managementDevolutions.clearFields();
-      this.managementDevolutions.devolution = true;
-      this.modalDevolution = true;
-      this.managementDevolutions.form.patchValue({ dev : data.or.id, }); 
-      this.managementDevolutions.searchData();
+      if([5,1].includes(this.validateRole)) {
+        this.managementDevolutions.clearFields();
+        this.managementDevolutions.devolution = true;
+        this.modalDevolution = true;
+        this.managementDevolutions.form.patchValue({ dev : data.or.id, }); 
+        this.managementDevolutions.searchData();
+      } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para gestionar devoluciones.`);
     } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
   }
 }

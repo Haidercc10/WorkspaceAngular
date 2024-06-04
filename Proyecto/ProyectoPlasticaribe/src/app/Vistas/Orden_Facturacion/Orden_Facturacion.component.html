@@ -442,7 +442,7 @@
 
   <!--Botones-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button *ngIf="!editOrderFact" pButton class="p-button-danger" type="button" label="Crear Orden" icon="pi pi-send" [disabled]="load" (click)="validateInformation()"></button>
+    <button *ngIf="!editOrderFact" pButton class="p-button-danger" type="button" label="Crear Orden" icon="pi pi-send" [disabled]="load" (click)="validateReposition()"></button>
     <button *ngIf="editOrderFact" pButton class="p-button-danger" type="button" label="Editar Orden" icon="pi pi-pencil" [disabled]="load" (click)="editOrder()"></button>
     <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFields(false)"></button>
   </div>

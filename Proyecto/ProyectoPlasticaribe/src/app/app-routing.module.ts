@@ -55,9 +55,10 @@ export const routes: Routes = [
   { path: 'pre-ingreso-produccion', loadChildren: () => import('./Modules/pre-ingreso-produccion-despacho/pre-ingreso-produccion-despacho.module').then(m => m.PreIngresoProduccionDespachoModule) },
   { path: 'mov-preingreso-produccion', loadChildren: () => import('./Modules/movimientos-preingreso-produccion/movimientos-preingreso-produccion.module').then(m => m.MovimientosPreingresoProduccionModule) },
   { path: 'eliminar-rollos-produccion', loadChildren: () => import('./Modules/eliminar-rollos-produccion/eliminar-rollos-produccion.module').then(m => m.EliminarRollosProduccionModule) },
-
+  { path: 'gestion-devoluciones-of', loadChildren: () => import('./Modules/gestion-devoluciones-of/gestion-devoluciones-of.module').then(m => m.GestionDevolucionesOfModule) },
+  
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
-  { path: 'IngresoRollos-Extrusion', loadChildren: () => import('./Modules/ingreso-rollos/ingreso-rollos.module').then(m => m.IngresoRollosModule) },
+  { path: 'IngresoRollos-Extrusion', loadChildren: () => import('./Modules/ingreso-rollos/ingreso-rollos.module').then(m => m.IngresoRollosModule) }, 
   { path: 'Solicitud-Rollos-Bodegas', loadChildren: () => import('./Modules/solicitud-rollos/solicitud-rollos.module').then(m => m.SolicitudRollosModule) },
   { path: 'Movimientos-Solicitud-Rollos', loadChildren: () => import('./Modules/movimientos-solicitudes-rollos/movimientos-solicitudes-rollos.module').then(m => m.MovimientosSolicitudesRollosModule) },
   { path: 'Inventario-Bodegas-Rollos', loadChildren: () => import('./Modules/inventario-bodegas-rollos/inventario-bodegas-rollos.module').then(m => m.InventarioBodegasRollosModule) },

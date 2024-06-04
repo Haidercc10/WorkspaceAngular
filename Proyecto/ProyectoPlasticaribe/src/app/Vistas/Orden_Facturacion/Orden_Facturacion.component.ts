@@ -127,11 +127,11 @@ export class Orden_FacturacionComponent implements OnInit {
     this.rollSelected = {};
     this.editOrderFact = false;
     this.selectedProductSaleOrder = null;
-    this.reposition = false;
     if(this.reposition) {
-      this.movOrderFact.modalReposition = false;
       this.movOrderFact.searchData();
+      this.movOrderFact.modalReposition = false;
     }
+    this.reposition = false;
     this.movOrderFact.modalReposition = false;
     !edit ? this.getLastOrderFact() : null;
   }
@@ -497,7 +497,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   putStatusReels(order: number, fact: string) {
     this.productionProcessService.putStateForSend(order).subscribe(() => {
-      this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden de facturacion N° ${order} actualizada exitosamente!`) : this.msj.mensajeConfirmacion('Orden de Facturacion Guardada');
+      this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden N° ${order} actualizada exitosamente!`) : this.msj.mensajeConfirmacion('Orden creada exitosamente!');
       if(this.reposition) this.updateDevolution();
       this.createPDF(order, fact);
       this.clearFields(false);
@@ -1056,14 +1056,11 @@ export class Orden_FacturacionComponent implements OnInit {
     let summary : string = `Algunas cantidades a reponer son mayores a las cantidades devueltas.`;
     let detail : string = `¿Está seguro que desea realizar la reposición?`;
 
-    this.consolidatedProduction.forEach(x => {
+    this.products.forEach(p => {
       let qty : number = 0;
-      this.products.forEach(p => {
-        console.log(qty, 1);
-        qty += x.quantity;
-        console.log(qty, 2);
+      this.productionSelected.forEach(x => {
         if(x.item == p.id_Producto) {
-          console.log(qty, 3, p.cant_Pendiente);
+          qty += x.quantity;
           if(qty > p.cant_Pendiente) count++; 
         }
       });

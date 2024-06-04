@@ -1,0 +1,25 @@
+p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
+    display: flex;
+    width: 100%;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+    height: 2rem;
+}
+
+::ng-deep .field-checkbox {
+  margin-top: 0.7rem;
+}
+
+::ng-deep p-toolbar .p-toolbar {
+    justify-content: center !important;
+}
+
+::ng-deep .p-toolbar {
+    padding: 0.5rem   
+}
