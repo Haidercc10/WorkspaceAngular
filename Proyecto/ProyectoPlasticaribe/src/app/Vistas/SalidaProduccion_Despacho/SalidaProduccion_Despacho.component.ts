@@ -17,6 +17,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
+import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -42,6 +43,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   count : number = 0;
   modalProductionOutPallet : boolean = false;
   soloRead : boolean = true;
+  reposition : boolean = false; 
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -56,6 +58,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private dtOrderFactService: Dt_OrdenFacturacionService,
     private zeusService: InventarioZeusService,
     private orden_FacturacionComponent : Orden_FacturacionComponent,
+    private svDevolutions : DevolucionesProductosService,
     private cmpOrderFactPallets : OrdenFacturacion_PalletsComponent,
   ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -67,6 +70,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       fact: ['', Validators.required],
       driver: ['', Validators.required],
       car: ['', Validators.required],
+      saleOrder : [''],
     });
   }
 
@@ -97,6 +101,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.count = 0;
     this.productionInPallet = [];
     this.productionOutPallet = [];
+    this.reposition = false;
   }
 
   getDrivers() {
@@ -105,6 +110,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   getInformationOrderFact(){
     let orderFact = this.formProduction.value.orderFact;
+    this.reposition = false;
     this.load = true;
     this.dtOrderFactService.GetInformacionOrderFactToSend(orderFact).subscribe(data => {
       this.production = [];
@@ -142,7 +148,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
               this.formProduction.patchValue({ 'orderFact' : '', });
             });
           } else {
-            this.msj.mensajeConfirmacion(`Orden de reposición consultada`, `¡Continue ingresando los rollos que van a ser enviados por reposición!`);
+            this.reposition = true;
+            this.formProduction.patchValue({ 'fact': dataProduction.order.factura, 'saleOrder': dataProduction.dtOrder.consecutivo_Pedido, });
+            this.msj.mensajeConfirmacion(`Orden de reposición consultada`, `¡Ingrese los rollos que van a ser enviados por reposición!`);
             this.load = false;
           } 
         }
@@ -173,8 +181,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //Función para evitar que escriban el numero del bulto en el campo rollo leído
   quitBarCode() {
     setTimeout(() => { 
-      if(![1,10].includes(this.ValidarRol)) this.formProduction.patchValue({ production : '' }); 
-      if([null, undefined, ''].includes(this.formProduction.value.fact)) this.formProduction.patchValue({ production : '' });
+      if(![1,10].includes(this.ValidarRol)) {
+        this.formProduction.patchValue({ production : '' }); 
+        if([null, undefined, ''].includes(this.formProduction.value.fact)) this.formProduction.patchValue({ production : '' });
+      } 
     }, 50);
   } 
 
@@ -273,10 +283,24 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.productionProcessSerivce.putStateNotAvaible(orderFact).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
       let fact = this.formProduction.value.fact;
+      if(this.reposition) this.updateDevolution();
       //this.cmpOrderFactPallets.createPDF(orderFact, fact);
       this.orden_FacturacionComponent.createPDF(orderFact, fact);
       this.clearFields();
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
+  }
+
+  //Actualizar estado de devolución a CERRADA
+  updateDevolution() {
+    let dev : any = this.formProduction.value.saleOrder;
+    let date : any = moment().format('YYYY-MM-DD');
+    let hour : any = moment().format('HH:mm:ss');
+
+    dev = dev.split('-')[0].replace('DV', '');
+    console.log(dev);
+    
+    this.svDevolutions.PutStatusDevolution(dev, 18, date, hour, this.storage_Id).subscribe(data => {
+    }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar el estado de la devolución`); });
   }
 
   printTag(data: any) {

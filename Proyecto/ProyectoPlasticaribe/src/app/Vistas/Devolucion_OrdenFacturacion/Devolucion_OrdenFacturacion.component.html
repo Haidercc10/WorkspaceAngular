@@ -54,18 +54,25 @@
       <!-- Factura -->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
         <span class="p-float-label">
-          <input formControlName="fact" id="Factura" type="text" pInputText required readonly/>
+          <input formControlName="fact" id="Factura" type="text" pInputText required (keyup.enter)="searchData()"/>
           <label for="Factura">Factura</label>
         </span>
       </div>
 
-      <!-- Id Client -->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
+        <span class="p-float-label">
+          <input formControlName="roll" id="Rollo" type="text" pInputText (keyup.enter)="searchData()"/>
+          <label for="Rollo">Rollo/Bulto</label>
+        </span>
+      </div>
+
+      <!-- Id Client -->
+      <!--<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="idClient" id="idClient" type="text" pInputText required readonly/>
           <label for="idClient">Id Cliente</label>
         </span>
-      </div>
+      </div>-->
 
       <!-- Client -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
@@ -98,7 +105,7 @@
     columnResizeMode="expand"
     responsiveLayout="scroll"
     [scrollable]="true"
-    scrollHeight="50rem"
+    scrollHeight="30rem"
     dataKey="numberProduction"
     [(selection)]="productionSelected"
     *ngIf="!load"
@@ -152,7 +159,7 @@
     columnResizeMode="expand"
     responsiveLayout="scroll"
     [scrollable]="true"
-    scrollHeight="50rem"
+    scrollHeight="30rem"
     [(selection)]="production"
     dataKey="numberProduction"
     *ngIf="!load"

@@ -20,6 +20,8 @@ export class Dt_OrdenFacturacionService {
 
     GetInformationOrderFactByFactForDevolution = (id: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getInformationOrderFactByFactForDevolution/${id}`);
 
+    GetInformationOrderFactByFilters = (ruta) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/GetInformationOrderFactByFilters${ruta}`);
+
     GetOrders = (startDate: any, endsDate, ruote: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getOrders/${startDate}/${endsDate}${ruote}`);
 
     GetSendOrders = (startDate: any, endsDate, ruote: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getSendOrders/${startDate}/${endsDate}${ruote}`);
@@ -29,6 +31,8 @@ export class Dt_OrdenFacturacionService {
     Post = (data: modelDt_OrdenFacturacion) => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion`, data);
 
     PutStatusProduction = (data: Array<number>, order: number) => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/putStatusProduction/${order}`, data);
+
+    putStatusRollInOrderFact = (data: Array<any>, order: number) => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/putStatusRollInOrderFact/${order}`, data);
 
     getProductionSentMonthConsolidate = (year: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getProductionSentMonthConsolidate/${year}`);
 

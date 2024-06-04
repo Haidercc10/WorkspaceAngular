@@ -516,6 +516,12 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
+.bg-blue1 {
+  background-color: #83D3FF;
+  color: #002677;
+  font-size: calc(var(--font-size) * 14px);
+}
+
 .bg-success1 {
   color: rgb(6, 100, 3);
   background-color: palegreen;

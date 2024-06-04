@@ -14,6 +14,10 @@ import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTe
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { Table } from 'primeng/table';
+import { ThisReceiver } from '@angular/compiler';
+import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
+import { create } from 'domain';
+import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -37,10 +41,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];
   fails : Array<any> = [];
-  modalFails : boolean = false;
-  reposition: boolean = false;
+  devolution: boolean = false;
   statuses : Array<any> = [{id : 19, name : 'DISPONIBLE'}, {id : 23, name : 'NO DISPONIBLE'}];
   status : any = null;
+  qtyRollsDv : number = 0;
+  
+  //@ViewChild(MovimientosOrdenFacturacionComponent) movOF : MovimientosOrdenFacturacionComponent;
   
   @ViewChild('tableOrder') tableOrder : Table | undefined;
   @ViewChild('tableDevolution') tableDevolution : Table | undefined;
@@ -55,10 +61,11 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     private svDevolutions: DevolucionesProductosService,
     private svDetailsDevolutions: DetallesDevolucionesProductosService,
     private svFails : FallasTecnicasService,
-    private svProduction : Produccion_ProcesosService,) {
+    private svProduction : Produccion_ProcesosService,
+    private cmpDevolutions : Devolucion_OrdenFacturacionComponent, 
+    private movOF : MovimientosOrdenFacturacionComponent) {
       this.modoSeleccionado = appComponent.temaSeleccionado;
       this.validateForm();
-
   }
 
   ngOnInit() {
@@ -69,6 +76,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   validateForm(){
     this.form = this.frmBuilder.group({
       dev : [null, Validators.required],
+      orderFact : [null, Validators.required],
       fact: [null, Validators.required],
       idClient: [null, Validators.required],
       client: [null, Validators.required],
@@ -91,7 +99,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   //Función para obtener las fallas técnicas.
-  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [14,13].includes(item.tipoFalla_Id)) });
+  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [13,14,15].includes(item.tipoFalla_Id)) });
   
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
@@ -103,6 +111,13 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.productionSelected = [];
     this.consolidatedProduction = [];
     this.status = null;
+    this.qtyRollsDv = 0;
+    if(this.devolution == true) {
+      this.movOF.modalDevolution = false;
+      this.movOF.searchData();
+    }
+    this.devolution = false; 
+    
   }
 
   //Función para limpiar tablas.
@@ -116,22 +131,38 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   //Función para cargar la información de la devolución. 
   searchData() {
     this.clearTables();
-    let dev: any = this.form.value.dev.trim();
+    let dev: any = this.form.value.dev;
+    let date : any = moment().format('YYYY-MM-DD');
+    let hour : string = moment().format('HH:mm:ss');
+    this.qtyRollsDv = 0;
 
     if (![null, undefined, ''].includes(dev)) {
-      this.load = true;
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
-        data.forEach(x => {
-          this.production.push({  
-            'item': x.prod.prod_Id,
-            'reference': x.prod.prod_Nombre,
-            'numberProduction': x.dtDev.numero_Rollo,
-            'quantity': x.dtDev.cantidad,
-            'presentation': x.dtDev.presentacion, 
+        if([11,29].includes(data[0].dev.estado_Id)) {
+          this.load = true;
+          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id).subscribe(() =>{
+            this.qtyRollsDv = data.length;
+            data.forEach(x => {
+              this.production.push({  
+                'item': x.prod.prod_Id,
+                'reference': x.prod.prod_Nombre,
+                'numberProduction': x.dtDev.numero_Rollo,
+                'quantity': x.dtDev.cantidad,
+                'presentation': x.dtDev.presentacion, 
+                'statusId': 23,
+                'statusName': 'NO DISPONIBLE',
+              });
+              this.changeInformationDev(x);
+              this.load = false;
+            });
+          }, error => {
+            this.msg.mensajeError('No fue posible actualizar el estado de la devolución!', error);
+            this.clearFields();
           });
-          this.changeInformationDev(x);
-          this.load = false;
-        });
+        } else {
+          this.msg.mensajeAdvertencia(`Devolución no disponible`, `La devolución N° ${dev} se encuentra por reponer y/o cerrada!`);
+          this.clearFields();
+        }
       }, (error: HttpErrorResponse) => {
         this.errorMessage(`No fue posible consultar la devolución N° ${dev}!`, error);
       }); 
@@ -141,6 +172,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   //Función para cargar la información de la factura.
   changeInformationDev(data: any) {
     this.form.patchValue({ 
+      'orderFact': data.dev.id_OrdenFact,
       'idClient': data.cliente.cli_Id, 
       'client': data.cliente.cli_Nombre, 
       'fact': data.dev.facturaVta_Id, 
@@ -155,6 +187,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       this.load = true;
       let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
       this.production.splice(index, 1);
+      this.validateSelection(this.productionSelected, this.status, this.statuses.find(x => x.id == this.status).name, production);
       this.getConsolidateProduction();
       setTimeout(() => this.load = false, 50);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar el nuevo estado del bulto seleccionado!`);
@@ -165,10 +198,17 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.load = true;
     let index = this.productionSelected.findIndex(x => x.numberProduction == production.numberProduction);
     this.productionSelected.splice(index, 1);
+    this.validateSelection(this.production, 23, 'NO DISPONIBLE', production);
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 50);
   }
-      
+   
+  //Función para validar el estado que tendrá los bultos
+  validateSelection(data : any, statusId : any, statusName : any, production : any){
+    let index2 = data.findIndex(x => x.numberProduction == production.numberProduction);
+    data[index2].statusId = statusId;
+    data[index2].statusName = statusName;  
+  }
 
   //Función para seleccionar todos los bultos
   selectedAllProduction() {
@@ -176,6 +216,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       this.load = true;
       this.productionSelected = this.productionSelected.concat(this.production);
       this.production = [];
+      this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.id == this.status).name);
       this.getConsolidateProduction();
       setTimeout(() => this.load = false, 50);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar el nuevo estado de los bultos revisados!`);
@@ -186,8 +227,17 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.load = true;
     this.production = this.production.concat(this.productionSelected);
     this.productionSelected = [];
+    this.validateSelectionAllProduction(this.production, 23, 'NO DISPONIBLE');
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 50);
+  }
+
+  //Validar que al seleccionar/deseleccionar todos los bultos tomen el estado correspondiente 
+  validateSelectionAllProduction(data : any, statusId : number, statusName : string){
+    data.forEach(x => {
+      x.statusId = statusId, 
+      x.statusName = statusName
+    });
   }
 
   //Función para seleccionar según lo que esté filtrado en la tabla.
@@ -195,11 +245,17 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let data = this.tableOrder.filteredValue ? this.tableOrder.filteredValue : this.tableOrder.value;
 
     if(data.length > 0) {
+      console.log(data);
       this.load = true;
       this.productionSelected = this.productionSelected.concat(data); 
-      if(!this.tableOrder.filteredValue) this.production = [];
+      if(!this.tableOrder.filteredValue) {
+        this.production = [];
+        this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.id == this.status).name);
+      } 
       else {
         data.forEach(x => {
+          x.statusId = this.status, 
+          x.statusName = this.statuses.find(x => x.id == this.status).name
           let index : number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
           this.production.splice(index, 1);
         });
@@ -217,9 +273,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     if(data.length > 0) {
       this.load = true;
       this.production = this.production.concat(data); 
-      if(!this.tableDevolution.filteredValue) this.productionSelected = [];
-      else {
+      if(!this.tableDevolution.filteredValue) {
+        this.productionSelected = [];
+      } else {
         data.forEach(x => {
+          x.statusId = 23, 
+          x.statusName = 'NO DISPONIBLE'
           let index : number = this.productionSelected.findIndex(p => p.numberProduction == x.numberProduction);
           this.productionSelected.splice(index, 1);
         });
@@ -252,72 +311,79 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     return total;
   }
 
-  //CAMBIAR.
-  validateInformation() {
-    if (this.form.valid) {
-      if (this.productionSelected.length > 0) {
-        if ((this.form.value.order).trim() != '') this.saveDev();
-        else this.msg.mensajeAdvertencia(`¡El campo 'N° de Orden' se encuentra vacío!`);
-      } else this.msg.mensajeAdvertencia(`No ha seleccionado ningún rollo para devolver!`);
-    } else this.msg.mensajeAdvertencia(`Debe ingresar todos los datos!`);
+  //Función para contar los bultos consolidados por item.
+  totalCountProductionByProductStatus(item: number, status : number): number {
+    let total: number = 0;
+    total = this.productionSelected.filter(x => x.item == item && x.statusId == status).length;
+    return total;
   }
 
-  //CAMBIAR.
-  saveDev() {
+  //Función para validar la información que se va a guardar.
+  validateInformation(){
+    if(this.form.valid) {
+      if(this.productionSelected.length > 0) {
+        if(this.qtyRollsDv == this.productionSelected.length) this.updateRollsInProduction();
+        else this.msg.mensajeAdvertencia(`La cantidad de bultos/rollos seleccionados no coincide con la cantidad de bultos de la devolución!`);
+      } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar al menos un bulto!`);
+    } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe llenar todos los campos!`);
+  }
+
+  //Función para actualizar el estado de los bultos en producción procesos.
+  updateRollsInProduction(){
     this.load = true;
-    let order : number = this.form.value.order;
-    let reposition : boolean = this.form.value.reposition;
-    let info: modelDevolucionProductos = {
-      'FacturaVta_Id': this.form.value.fact,
-      'Cli_Id': this.form.value.idClient,
-      'DevProdFact_Fecha': moment().format('YYYY-MM-DD'),
-      'DevProdFact_Hora': moment().format('HH:mm:ss'),
-      'DevProdFact_Observacion': this.form.value.observation != null ? (this.form.value.observation).toUpperCase() : '',
-      'TipoDevProdFact_Id': 1,
-      'Usua_Id': this.storage_Id,
-      'Id_OrdenFact': order,
-      'Estado_Id': 11,
-      'DevProdFact_Reposicion': reposition,
-    };
-    this.svDevolutions.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
+    let rolls : any = [];
+    if(this.productionSelected.length > 0) {
+      this.productionSelected.forEach(x => { 
+        rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId });
+      });
+      this.svProduction.putChangeStateProduction(rolls).subscribe(data => {
+        this.updateRollsInOrderFact(rolls);
+      }, error => {
+        this.msg.mensajeError('No fue posible actualizar el estado de los bultos a DISPONIBLE!', error);
+        this.load = false;
+      });
+    }
   }
 
-  //CAMBIAR
-  saveDetailsFact(data: any) {
-    let count: number = 0;
-    this.productionSelected.forEach(prod => {
-      let info: modelDtProductoDevuelto = {
-        'DevProdFact_Id': data.devProdFact_Id,
-        'Prod_Id': prod.item,
-        'DtDevProdFact_Cantidad': prod.quantity,
-        'UndMed_Id': prod.presentation,
-        'Rollo_Id': prod.numberProduction,
-        'Falla_Id': prod.fail,
-      }
-      this.svDetailsDevolutions.srvGuardar(info).subscribe(() => {
-        count++;
-        if (count == this.productionSelected.length) this.changeStatus(data);
-      }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
+  //Función para actualizar el estado de los bultos en orden de facturación.
+  updateRollsInOrderFact(rolls){
+    let order : any = this.form.value.orderFact;
+    rolls.forEach(x => {
+      if(x.newStatus == 19) x.newStatus = 33;
+      else x.newStatus = 36;
+    });
+    this.dtOrderFactService.putStatusRollInOrderFact(rolls, order).subscribe(data => {
+      this.updateStatusDev();
+    }, error => {
+      this.msg.mensajeError('No fue posible actualizar el estado de los bultos en la orden de facturación!', error);
+      this.load = false;
     });
   }
 
-  //CAMBIAR.
-  changeStatus(data: any){
-    let order: number = this.form.value.order;
-    let reels: any = [];
-    this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, }) });
-    this.dtOrderFactService.PutStatusProduction(reels.map(x => x.roll), order).subscribe(() => {
-      this.updateStatusProduction(reels, data);
-    }, (error) => this.errorMessage(`Ocurrió un error al cambiar el estado de los rollos en la orden N° ${order}!`, error));
+  //Función para actualizar el estado de la devolución.
+  updateStatusDev(){
+    let dev: any = this.form.value.dev;
+    let date : any = moment().format('YYYY-MM-DD');
+    let hour : string = moment().format('HH:mm:ss');
+    let reposition : boolean = this.form.value.reposition;
+    let status : number;
+    status = this.qtyRollsDv == this.productionSelected.length ? reposition ? 38 : 18 : 29;
+    this.load = true;
+
+    this.svDevolutions.PutStatusDevolution(dev, status, date, hour, this.storage_Id).subscribe(data => {
+      this.createPDF(dev, 'actualizada');
+      //this.msg.mensajeConfirmacion('Confirmación', 'Los bultos seleccionados se actualizaron correctamente!');
+    }, error => {
+      this.msg.mensajeError('No fue posible actualizar el estado de la devolución!', error);
+      this.load = false;
+    });
   }
 
-  updateStatusProduction(rolls : any, data : any){
-    this.svProduction.putChangeStateProduction(rolls, 20, 24).subscribe(dataChange => {
-      //this.createPDF(data.devProdFact_Id, 'creada');
-    }, error => {
-      this.errorMessage(`No fue posible actualizar el estado de los rollos devueltos!`, error);
-    })
+  createPDF(dev : any, action : any){
+    this.cmpDevolutions.createPDF(dev, action);
+    this.clearFields(); 
   }
+
 }
 
 interface production {
@@ -328,6 +394,6 @@ interface production {
   cuontProduction?: number;
   presentation: string;
   fail? : number;
-  available? : number;
-  reposition? : boolean;
+  statusId? : number;
+  statusName? : string;
 }

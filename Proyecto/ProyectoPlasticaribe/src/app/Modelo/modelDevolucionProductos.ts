@@ -10,4 +10,5 @@ export interface modelDevolucionProductos {
   Id_OrdenFact : number;
   Estado_Id : number;
   DevProdFact_Reposicion : boolean;
+  UsuaModifica_Id : number;
 }

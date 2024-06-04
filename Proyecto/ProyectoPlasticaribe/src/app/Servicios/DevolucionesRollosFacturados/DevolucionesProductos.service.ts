@@ -14,4 +14,6 @@ export class DevolucionesProductosService {
   constructor(private http : HttpClient,) { }
 
   srvGuardar = (data : modelDevolucionProductos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Devolucion_ProductoFacturado', data);
+
+  PutStatusDevolution = (id : number, status : number, date : any, hour : string, user : number) => this.http.put<any>(this.rutaPlasticaribeAPI + `/Devolucion_ProductoFacturado/PutStatusDevolution/${id}/${status}/${date}/${hour}/${user}`, id);
 }

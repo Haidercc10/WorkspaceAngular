@@ -21,6 +21,8 @@ import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocume
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
+import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
+import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 
 @Component({
   selector: 'app-Orden_Facturacion',
@@ -74,6 +76,7 @@ export class Orden_FacturacionComponent implements OnInit {
     private svtypeDocs : TipoDocumentoService,
     private svMsg : MessageService,
     private svDevolutions : DetallesDevolucionesProductosService,
+    private svHeaderDevolutions : DevolucionesProductosService,
     private movOrderFact : MovimientosOrdenFacturacionComponent,
   ) {
 
@@ -125,6 +128,10 @@ export class Orden_FacturacionComponent implements OnInit {
     this.editOrderFact = false;
     this.selectedProductSaleOrder = null;
     this.reposition = false;
+    if(this.reposition) {
+      this.movOrderFact.modalReposition = false;
+      this.movOrderFact.searchData();
+    }
     this.movOrderFact.modalReposition = false;
     !edit ? this.getLastOrderFact() : null;
   }
@@ -491,9 +498,22 @@ export class Orden_FacturacionComponent implements OnInit {
   putStatusReels(order: number, fact: string) {
     this.productionProcessService.putStateForSend(order).subscribe(() => {
       this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden de facturacion N° ${order} actualizada exitosamente!`) : this.msj.mensajeConfirmacion('Orden de Facturacion Guardada');
+      if(this.reposition) this.updateDevolution();
       this.createPDF(order, fact);
       this.clearFields(false);
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
+  }
+
+  updateDevolution() {
+    let dev : any = this.formDataOrder.value.saleOrder;
+    let date : any = moment().format('YYYY-MM-DD');
+    let hour : any = moment().format('HH:mm:ss');
+
+    dev = dev.split('-')[0].replace('DV', '');
+    console.log(dev);
+    
+    this.svHeaderDevolutions.PutStatusDevolution(dev, 39, date, hour, this.storage_Id).subscribe(data => {
+    }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar la devolución`); });
   }
 
   createPDF(id_OrderFact: number, fact: string) {
@@ -851,8 +871,8 @@ export class Orden_FacturacionComponent implements OnInit {
     let index : any = this.productionSelected.findIndex(x => x.numberProduction == data.numberProduction);
     
     this.dtOrderFactService.deleteDetailOF(data.idDetail).subscribe(() => {
-      let infoRoll : any = [{'roll': data.numberProduction, 'item': data.item }]
-      this.productionProcessService.putChangeStateProduction(infoRoll, currentStatus, newStatus).subscribe(() => {
+      let infoRoll : any = [{'roll': data.numberProduction, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus}]; 
+      this.productionProcessService.putChangeStateProduction(infoRoll).subscribe(() => {
         this.msjsOF(`Confirmación`, `Rollo N° ${data.numberProduction} eliminado exitosamente de la orden N° ${this.formDataOrder.value.order}!`);
         this.productionSelected.splice(index, 1);
         this.getConsolidateProduction();
@@ -877,19 +897,19 @@ export class Orden_FacturacionComponent implements OnInit {
     rollsItemOrder.forEach(x => {
       this.dtOrderFactService.deleteDetailOF(x.idDetail).subscribe(() => {
         let indexRoll : any = this.productionSelected.findIndex(p => p.item == data.id_Producto && p.numberProduction == x.numberProduction && p.inOrder);
-        rollsToUpdate.push({'roll' : x.numberProduction, 'item' : data.id_Producto, });
+        rollsToUpdate.push({'roll' : x.numberProduction, 'item' : data.id_Producto, 'currentStatus' : status, 'newStatus' : newStatus });
         this.productionSelected.splice(indexRoll, 1);
         count++
-        if(count == rollsItemOrder.length) this.changeStatusRolls(data, rollsToUpdate, status, newStatus);
+        if(count == rollsItemOrder.length) this.changeStatusRolls(data, rollsToUpdate);
       }, error => this.msjsOF(`Error`, `No fue posible eliminar los rollos del item ${x.item}.`));  
     });
   }
 
   //Función para cambiar el estado de rollos que se están sacando de la OF. 
-  changeStatusRolls(data : any, rolls : any, status : number, newStatus : number){
+  changeStatusRolls(data : any, rolls : any){
     let indexItem : number = this.products.findIndex(x => x.id_Producto == data.id_Producto);
     
-    this.productionProcessService.putChangeStateProduction(rolls, status, newStatus).subscribe(() => {
+    this.productionProcessService.putChangeStateProduction(rolls).subscribe(() => {
       this.msjsOF(`Confirmación`, `Item eliminado de la orden N° ${this.formDataOrder.value.order} exitosamente!`);
       this.products.splice(indexItem, 1);
       this.getConsolidateProduction();
@@ -1030,15 +1050,21 @@ export class Orden_FacturacionComponent implements OnInit {
 
   //Función que validará o no la creación de la OF por reposición.
   validateReposition() {
+    console.log('1');
     let count : number = 0;
     this.load = true;
-    let summary : string = `Algunas cantidades a reponer son diferentes a las cantidades devueltas.`;
+    let summary : string = `Algunas cantidades a reponer son mayores a las cantidades devueltas.`;
     let detail : string = `¿Está seguro que desea realizar la reposición?`;
 
     this.consolidatedProduction.forEach(x => {
+      let qty : number = 0;
       this.products.forEach(p => {
+        console.log(qty, 1);
+        qty += x.quantity;
+        console.log(qty, 2);
         if(x.item == p.id_Producto) {
-          if(x.quantity != p.cant_Pendiente) count++; 
+          console.log(qty, 3, p.cant_Pendiente);
+          if(qty > p.cant_Pendiente) count++; 
         }
       });
     });

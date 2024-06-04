@@ -13,6 +13,7 @@ import { MessageService } from 'primeng/api';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
+import { PruebaImagenCatInsumoComponent } from '../prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
 
 @Injectable({
   providedIn: 'root'
@@ -36,8 +37,10 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   states: Array<string> = ['PENDIENTE','DESPACHADO', ];
   anulledOrder: number | undefined;
   modalReposition : boolean = false;
+  modalDevolution : boolean = false;
+  @ViewChild(PruebaImagenCatInsumoComponent) managementDevolutions : PruebaImagenCatInsumoComponent;
   @ViewChild(Orden_FacturacionComponent) Orden_FacturacionComponent : Orden_FacturacionComponent;
-
+  
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
     private dtOrderFactService : Dt_OrdenFacturacionService,
@@ -47,7 +50,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private orderFactService: OrdenFacturacionService,
     private messageService: MessageService,
     private productionProcessService : Produccion_ProcesosService,
-    private cmpOrdFact : OrdenFacturacion_PalletsComponent) {
+    private cmpOrdFact : OrdenFacturacion_PalletsComponent, ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formFilters = this.frmBuilder.group({
@@ -143,10 +146,16 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   //
   loadModalOrderFact(data : any){
-    if(data.type == 'Devolucion' && data.or.reposicion && data.or.Estado_Id != 18) {
+    if(data.type == 'Devolucion' && data.or.reposicion && data.or.estado_Id == 38) {
       this.Orden_FacturacionComponent.clearFields(false);
       this.modalReposition = true;  
-      this.Orden_FacturacionComponent.loadInfoForDevolution(data.or.id);
-    } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} seleccionada no requiere reposición!`);
+      this.Orden_FacturacionComponent.loadInfoForDevolution(data.or.id); 
+    } else if(data.type == 'Devolucion' && [11,29].includes(data.or.estado_Id)) {
+      this.managementDevolutions.clearFields();
+      this.managementDevolutions.devolution = true;
+      this.modalDevolution = true;
+      this.managementDevolutions.form.patchValue({ dev : data.or.id, }); 
+      this.managementDevolutions.searchData();
+    } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
   }
 }

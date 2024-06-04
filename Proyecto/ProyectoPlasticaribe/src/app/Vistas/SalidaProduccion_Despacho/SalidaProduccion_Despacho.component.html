@@ -23,26 +23,26 @@
 
   <form [formGroup]="formProduction">
     <div class="row g-4 my-5">
-      <div class="col-sm-12 col-md-3">
+      <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
           <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationOrderFact()"/>
           <label for="orderFact">Orden Fact.</label>
         </span>
       </div>
 
-      <div class="col-sm-12 col-md-3">
+      <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
           <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus autocomplete="off" [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getInformationProduction()"/>
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>
 
-      <!-- <div class="col-sm-12 col-md-3">
+       <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
-          <input formControlName="fact" type="text" id="fact" pInputText [required]="true"/>
+          <input formControlName="fact" type="text" id="fact" pInputText [required]="true" readonly/>
           <label for="fact">Factura</label>
         </span>
-      </div> -->
+      </div>
 
       <div class="col-sm-12 col-md-3">
         <span class="p-float-label">

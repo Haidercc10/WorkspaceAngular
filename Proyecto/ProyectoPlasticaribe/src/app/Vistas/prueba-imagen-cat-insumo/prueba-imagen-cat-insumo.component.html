@@ -11,7 +11,7 @@
 </div>
 
 <!--Titulo-->
-<div class="contain">
+<div class="contain" *ngIf="!devolution">
     <div class="container-fluid">
       <div class="mb-5 Titulo">
         <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Gestión de Devoluciones de Facturación</h2>
@@ -23,11 +23,6 @@
 </div>
 
 <p-card>
-    <!--Crear Falla-->
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-      <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
-    </div>
-  
     <div class="my-4">
       <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-book"></i> Datos de la devolución</h4>
     </div>
@@ -47,7 +42,7 @@
         <!--Reposition-->
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-1 col-xl-1 col-xxl-1">
           <div class="field-checkbox">
-            <p-checkbox formControlName="reposition" [binary]="true" inputId="reposition" id="reposition" pTooltip="Al checar este elemento indicas si la devolución requiere reposición o no."></p-checkbox>
+            <p-checkbox formControlName="reposition" [binary]="true" [readonly]="true" inputId="reposition" id="reposition" pTooltip="Al checar este elemento indicas si la devolución requiere reposición o no."></p-checkbox>
             <label for="reposition">Reposición</label>
           </div>
         </div>
@@ -95,13 +90,15 @@
       </div>
     </form>
   
+    <!--Titulo 1-->
     <div class="my-4">
       <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Bultos/Rollos devueltos</h4>
     </div>
   
+    <!--Cambiar estado bultos-->
     <p-toolbar styleClass="mb-2 gap-2">
       <ng-template pTemplate="left">
-        Elige el estado de los bultos devueltos
+        <b>Elige el estado de los bultos devueltos</b>
       </ng-template>
       <ng-template pTemplate="center">
         <p-dropdown optionLabel="name" [(ngModel)]="status" optionValue="id" [options]="statuses" placeholder="Elige un estado" pTooltip="Aquí podrás elegir el nuevo estado que tendrán los bultos de la devolución"/>
@@ -109,6 +106,8 @@
       <ng-template pTemplate="right">
       </ng-template>
     </p-toolbar>
+
+    <!--Tabla 1-->
     <p-table
       #tableOrder
       [value]="production"
@@ -133,9 +132,10 @@
           <th><input pInputText type="text" (input)="applyFilter($event, 'presentation', tableOrder)"></th>
         </tr>
         <tr>
-          <th style="width: 3rem"  pFrozenColumn [frozen]="true" alignFrozen="left">
-            <p-checkbox [disabled]="status == null" (click)="selectedAllProduction()"></p-checkbox>
+          <th *ngIf="status != null" style="width: 3rem"  pFrozenColumn [frozen]="true" alignFrozen="left">
+            <p-checkbox (click)="selectedAllProduction()"></p-checkbox>
           </th>
+          <th *ngIf="status == null"></th>
           <th>N°</th>
           <th>Numero Rollo</th>
           <th>Item</th>
@@ -145,10 +145,11 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-        <tr *ngIf="status != null">
-          <td pFrozenColumn [frozen]="true" alignFrozen="left">
+        <tr>
+          <td *ngIf="status != null" pFrozenColumn [frozen]="true" alignFrozen="left">
             <p-tableCheckbox [value]="data" (click)="selectedProduction(data)"></p-tableCheckbox>
           </td>
+          <td *ngIf="status == null"></td>
           <td>{{rowIndex + 1}}</td>
           <td>{{data.numberProduction}}</td>
           <td>{{data.item}}</td>
@@ -156,25 +157,16 @@
           <td>{{data.quantity | number : '1.2-2'}}</td>
           <td>{{data.presentation}}</td>
         </tr>
-        <tr *ngIf="status == null">
-          <td pFrozenColumn [frozen]="true" alignFrozen="left">
-            <p-skeleton></p-skeleton>
-          </td>
-          <td><p-skeleton></p-skeleton></td>
-          <td><p-skeleton></p-skeleton></td>
-          <td><p-skeleton></p-skeleton></td>
-          <td><p-skeleton></p-skeleton></td>
-          <td><p-skeleton></p-skeleton></td>
-          <td><p-skeleton></p-skeleton></td>
-        </tr>
       </ng-template>
       
     </p-table>
     
+    <!--Titulo 2-->
     <div class="my-4">
       <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Bultos/Rollos revisados</h4>
     </div>
   
+    <!--Tabla 2-->
     <p-table
       #tableDevolution
       [value]="productionSelected"
@@ -197,7 +189,7 @@
           <th><input pInputText type="text" (input)="applyFilter($event, 'reference', tableDevolution)"></th>
           <th><input pInputText type="number" (input)="applyFilter($event, 'quantity', tableDevolution)"></th>
           <th><input pInputText type="text" (input)="applyFilter($event, 'presentation', tableDevolution)"></th>
-          <th></th>
+          <th><input pInputText type="text" (input)="applyFilter($event, 'statusName', tableDevolution)"></th>
         </tr>
         <tr>
           <th style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
@@ -223,15 +215,17 @@
           <td>{{data.reference}}</td>
           <td>{{data.quantity | number : '1.2-2'}}</td>
           <td>{{data.presentation}}</td>
-          <th>{{data.available}}</th>
+          <td><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.statusId), 'bg-success1': [19].includes(data.statusId), 'bg-warning': [].includes(data.statusId)}">{{data.statusName}}</span></td>
         </tr>
       </ng-template>
     </p-table>
     
+    <!--Titulo 3-->
     <div class="my-4">
       <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Consolidado de items seleccionados</h4>
     </div>
   
+    <!--Tabla 3-->
     <p-table
       [value]="consolidatedProduction"
       styleClass="p-datatable-gridlines p-datatable-sm"
@@ -241,12 +235,19 @@
       dataKey="item">
       <ng-template pTemplate="header">
         <tr>
+          <th style="font-weight: 800;" class="text-center"></th>
+          <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-box"></i> Información de referencias</th>
+          <th style="font-weight: 800;" class="text-center textBlue" colspan="3"><i class="pi pi-database"></i> Informacion de rollos/bultos</th>
+        </tr>
+        <tr>
           <th>N°</th>
           <th>Item</th>
           <th>Referencia</th>
           <th>Cantidad</th>
-          <th>Cantidad Rollos</th>
           <th>Presentación</th>
+          <th>Seleccionados</th>
+          <th>Disponibles</th>
+          <th>No disponibles</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -255,16 +256,19 @@
           <td>{{data.item}}</td>
           <td>{{data.reference}}</td>
           <td>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</td>
-          <td>{{totalCountProductionByProduct(data.item) | number}}</td>
           <td>{{data.presentation}}</td>
+          <td>{{totalCountProductionByProduct(data.item) | number}}</td>
+          <td>{{totalCountProductionByProductStatus(data.item, 19) | number}}</td>
+          <td>{{totalCountProductionByProductStatus(data.item, 23) | number}}</td>
         </tr>
       </ng-template>
     </p-table>
   
     <p-divider></p-divider>
   
+    <!--Botones-->
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Actualizar Devolución" icon="pi pi-send" (click)="validateInformation()"></button>
+      <button pButton class="p-button-danger" type="button" label="Actualizar Devolución" icon="pi pi-sync" (click)="validateInformation()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
     </div>
   

@@ -433,7 +433,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       let rollsAvailables : any = [];
       data.AvaibleProdution.forEach(x => rollsAvailables.push({'roll': x.NumberProduction, 'item' : data.item,}) );
       
-      this.svProductionProcess.putChangeStateProduction(rollsAvailables, 19, 23).subscribe(data => {
+      this.svProductionProcess.putChangeStateProduction(rollsAvailables).subscribe(data => {
         this.stockInformation.splice(index, 1);
         this.msjs(`Confirmación`, `Se ha actualizado el stock de la referencia ${data.item - data.reference}`);
       });
@@ -446,7 +446,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     let indexRoll : number = this.stockInformation[indexItem].AvaibleProdution.findIndex(x => x.NumberProduction == this.itemSelected.numberProduction)
     let roll : any = this.itemSelected.numberProduction;
     
-    this.svProductionProcess.putChangeStateProduction([{'roll': roll, 'item' : data.item, }], 19, 23).subscribe(dataChange => {
+    this.svProductionProcess.putChangeStateProduction([{'roll': roll, 'item' : data.item, }]).subscribe(dataChange => {
       this.stockInformation[indexItem].AvaibleProdution.splice(indexRoll, 1);
       this.msjs(`Confirmación`, `El bulto N°${roll} ya NO ESTÁ DISPONIBLE en inventario!`);
     });
