@@ -926,7 +926,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.orderFactService.getId(of).subscribe(dataOF => {
       if(qtyProductionSelected > 0) this.addRollsToOrderFact(dataOF);
       else {
-        this.msj.mensajeConfirmacion(`Confirmación`, `Orden N° ${this.formDataOrder.value.order} actualizada con éxito!`);
+        this.msj.mensajeConfirmacion(`Confirmación`, `Orden N° ${of} actualizada con éxito!`);
         this.createPDF(dataOF.id, dataOF.factura);
         this.clearFields(false);
       }
@@ -949,9 +949,27 @@ export class Orden_FacturacionComponent implements OnInit {
       }
       this.dtOrderFactService.Post(detailOF).subscribe(data => {
         count++;
-        if(count == this.productionSelected.filter(x => !x.inOrder).length) this.putStatusReels(dataOrder.id, dataOrder.factura);
+        if(count == this.productionSelected.filter(x => !x.inOrder).length) this.updateStatusRollsAdd(dataOrder.id, dataOrder.factura);
       }, error => { this.msjsOF(`Error`, `No fue posible agregar rollos/bultos en la orden N° ${this.formDataOrder.value.order}`); });
     });  
+  }
+
+  //Actualizar el estado de los bultos agregados a la orden de facturación.
+  updateStatusRollsAdd(order : any, fact : string){
+    let production : any = this.productionSelected.filter(x => !x.inOrder);
+    let rolls : any = [];
+
+    production.forEach(x => { rolls.push({'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 20, }); }); 
+    this.productionProcessService.putChangeStateProduction(rolls).subscribe(() => { 
+      this.msj.mensajeConfirmacion(`Confirmación`, `Orden N° ${order} actualizada con éxito!`);
+      if(this.reposition) this.updateDevolution();
+      this.createPDF(order, fact);
+      this.clearFields(false); 
+    }, error => { 
+      this.msj.mensajeError(`Error`, `No fue posible actualizar el estado de los bultos.`); 
+      this.load = false;
+    });
+
   }
 
   //Validar el último rollo de la orden de facturación 
