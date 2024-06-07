@@ -327,7 +327,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let rolls : any = [];
     if(this.productionSelected.length > 0) {
       this.productionSelected.forEach(x => { 
-        rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId });
+        rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : false });
       });
       this.svProduction.putChangeStateProduction(rolls).subscribe(data => {
         this.updateRollsInOrderFact(rolls);

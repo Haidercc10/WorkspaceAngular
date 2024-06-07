@@ -327,7 +327,8 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   entradasMateriasPrimas(data : any){
-    let informacionPdf : any;
+    this.datosPdf = [];
+    let informacionPdf : any = null;
     this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
         let info : any = {
@@ -494,11 +495,13 @@ export class MovimientoMPComponent implements OnInit {
     let reteFuente: number = base ? (data.valor_Total * data.reteFuente) / 100 : 0;
     let reteIVA: number = baseIVA ? (((data.valor_Total * data.iva) / 100) * data.reteIva) / 100 : 0;
     let reteICA: number = base ? (data.valor_Total * data.reteIca) / 100 : 0;
+    console.log(reteFuente);
+    
     return {
       ReteFuente: reteFuente,
       ReteIVA: reteIVA,
       ReteICA: reteICA,
-      ValorFinal: data.valor_Total + reteFuente + reteIVA + reteICA + iva,
+      ValorFinal: data.valor_Total - (reteFuente + reteIVA + reteICA) + iva,
     }
   }
 

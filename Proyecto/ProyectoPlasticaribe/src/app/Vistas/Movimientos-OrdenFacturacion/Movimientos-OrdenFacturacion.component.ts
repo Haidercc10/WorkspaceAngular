@@ -148,6 +148,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   //
   loadModalOrderFact(data : any){
+    console.log(data);
     if(data.type == 'Devolucion' && data.or.reposicion && data.or.estado_Id == 38) {
       if([6,1].includes(this.validateRole)) {
         this.Orden_FacturacionComponent.clearFields(false);
@@ -163,5 +164,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
         this.managementDevolutions.searchData();
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para gestionar devoluciones.`);
     } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
+  }
+
+  msjDevolutions(data){
+    return `${data.type == 'Devolucion' && ![18,39].includes(data.or.estado_Id) ? 'Haz doble clic para continuar gestionando la devolución' : [18,39].includes(data.or.estado_Id) ? `La devolucion N° ${data.or.id} será repuesta en la orden N° ${data.of}` : ''}`
   }
 }

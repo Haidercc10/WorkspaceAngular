@@ -440,7 +440,7 @@ export class OcompraComponent implements OnInit {
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
-      if (solicitud.length > 0) this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
+      if (solicitud.toString().length > 0) this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
     }, () => {
       this.mensajeService.mensajeError(`Error`, `¡Error al crear la orden de compra!`);
@@ -456,11 +456,12 @@ export class OcompraComponent implements OnInit {
     let reteFuente: number = base ? (valorTotal * this.FormOrdenCompra.value.ReteFuente) / 100 : 0;
     let reteIVA: number = baseIVA ? (((valorTotal * this.iva) / 100) * this.FormOrdenCompra.value.ReteIVA) / 100 : 0;
     let reteICA: number = base ? (valorTotal * this.FormOrdenCompra.value.ReteICA) / 100 : 0;
+    
     return {
       ReteFuente: reteFuente,
       ReteIVA: reteIVA,
       ReteICA: reteICA,
-      ValorFinal: valorTotal + reteFuente + reteIVA + reteICA + iva,
+      ValorFinal: valorTotal - (reteFuente + reteIVA + reteICA) + iva,
     }
   }
 
@@ -702,11 +703,12 @@ export class OcompraComponent implements OnInit {
       ReteFuente: reteFuente,
       ReteIVA: reteIVA,
       ReteICA: reteICA,
-      ValorFinal: data.valor_Total + reteFuente + reteIVA + reteICA + iva,
+      ValorFinal: data.valor_Total - (reteFuente + reteIVA + reteICA) + iva,
     }
   }
 
   totalesPDF(datos_orden) {
+    console.log(datos_orden);
     let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden);
     return {
       table: {
@@ -876,6 +878,9 @@ export class OcompraComponent implements OnInit {
             TpDoc_Id: 'OCMP',
             Oc_Observacion: (observacion).toUpperCase(),
             IVA: this.iva,
+            ReteFuente: this.FormOrdenCompra.value.ReteFuente, 
+            ReteICA: this.FormOrdenCompra.value.ReteICA,
+            ReteIVA: this.FormOrdenCompra.value.ReteIVA, 
           }
           this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(() => this.editarDtOrdenCompa(), () => {

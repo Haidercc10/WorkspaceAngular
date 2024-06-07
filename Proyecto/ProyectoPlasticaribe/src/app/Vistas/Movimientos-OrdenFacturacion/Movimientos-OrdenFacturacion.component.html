@@ -113,7 +113,7 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data>
-      <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'Devolucion'}" pTooltip="{{data.type == 'Devolucion' && data.or.estado_Id != 18 ? 'Haz doble clic para continuar gestionando la devolución' : ''}}" tooltipPosition="top">
+      <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'Devolucion'}" pTooltip="{{msjDevolutions(data)}}" tooltipPosition="top">
         <td class="text-center">{{data.or.id}}</td>
         <td class="text-center">{{data.or.factura}}</td>
         <td class="text-center">{{data.or.cli_Id}}</td>

@@ -1,0 +1,132 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingreso de Peletizado</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="mb-5">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i>  Registro de Peletizado</h4>
+  </div> 
+
+  <!--Formulario-->
+  <form [formGroup]="form">
+    <div class="mb-3" id="formulario">
+      <div class="row g-4">
+
+        <!-- Tipo recuperado -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+              <p-dropdown formControlName="typeRecovery" inputId="typeRecovery" (onChange)="enableForm()" [autoDisplayFirst]="false" [options]="typesRecovery" optionLabel="tpRecu_Nombre" optionValue="tpRecu_Id" [required]="true" [filter]="true" filterBy="tpRecu_Nombre"></p-dropdown>
+              <label for="typeRecovery">Tipo recuperado</label>
+          </span>
+        </div>
+
+        <!-- OT -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ot" id="ot" type="number" [autofocus]="true" [useGrouping]="false" (keyup.enter)="getOrderProduction()"></p-inputNumber>
+            <label for="ot">OT</label>
+          </span>
+        </div>
+
+        <!-- Rollo/Bulto -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="roll" id="roll" type="number" [autofocus]="true" [useGrouping]="false"></p-inputNumber>
+            <label for="roll">Rollo/Bulto</label>
+          </span>
+        </div>
+
+        <!--Producto-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+          <span class="p-float-label">
+            <input formControlName="product" id="product" list="products" type="text" pInputText required/>
+            <datalist id="products">
+              <option value={{item.id}} *ngFor="let item of products">{{item.nombre}}</option>
+            </datalist>
+            <label for="product">Producto</label>
+          </span>
+        </div>
+
+        <!-- Materiales -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="material" id="material" [options]="materials" optionLabel="material_Nombre" optionValue="material_Id" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="material">Material</label>
+          </span>
+        </div>
+
+         <!-- Cantidad -->
+         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="quantity" id="quantity" type="number" [autofocus]="true" [useGrouping]="false"></p-inputNumber>
+            <label for="quantity">Cantidad</label>
+          </span>
+        </div>
+
+        <!-- Unidades -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+          <span class="p-float-label">
+            <p-dropdown formControlName="presentation" id="presentation" [options]="presentations" [readonly]="true" optionLabel="undMed_Id" optionValue="undMed_Id" [autoDisplayFirst]="true"></p-dropdown>
+            <label for="presentation">Presentación</label>
+          </span>
+        </div>
+
+        <!--Materia Prima-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-3">
+          <span class="p-float-label">
+            <input formControlName="matprima" id="matprima" list="materiaprima" type="text" pInputText required/>
+            <datalist id="materiaprima">
+              <option value={{item.matPri_Id}} *ngFor="let item of matPrimas">{{item.matPri_Nombre}}</option>
+            </datalist>
+            <label for="matprima">Materia Prima</label>
+          </span>
+        </div>
+
+        <!-- Proceso -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2" >
+          <span class="p-float-label">
+            <p-dropdown formControlName="process" id="process" [options]="process" optionLabel="proceso_Nombre" optionValue="proceso_Id" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="process">Proceso</label>
+          </span>
+        </div>
+
+        <!-- No conformidad -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="fail" id="fail" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+            <label for="fail">No conformidad</label>
+          </span>
+        </div>
+
+        <!--Observación-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-12 col-xl-12 col-xxl-5 mb-5 mb-3">
+          <span class="p-float-label">
+            <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-danger" id="agregar" type="button" label="Añadir Peletizado" [disabled]="form.invalid" icon="pi pi-send" (click)="addPeletizado()"></button>
+            <button pButton class="p-button-secondary" id="limpiarCampos" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"> </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </form>      
+</p-card>

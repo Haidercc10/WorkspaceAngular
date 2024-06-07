@@ -161,11 +161,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   getInformationProduction() {
     let orderFact = this.formProduction.value.orderFact;
     let fact = this.formProduction.value.fact;
-    if ([null, undefined, ''].includes(orderFact.toString().trim())) this.msj.mensajeError(`¡Debe buscar la orden de facturación para ingresar los rollos/bultos a despachar!`, ``, 12000000);
-    else if ([null, undefined, ''].includes(fact.toString().trim())) this.msj.mensajeError(`No existen facturas/remisiones asociadas al pedido de la orden de facturación N° ${orderFact}`)
+    if ([null, undefined, ''].includes(orderFact)) this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe buscar la orden de facturación/reposición para ingresar los rollos/bultos a despachar!`, 12000000);
+    else if ([null, undefined, ''].includes(fact.toString().trim())) this.msj.mensajeAdvertencia(`Advertencia`, `No existen facturas/remisiones asociadas al pedido de la orden de facturación N° ${orderFact}`)
     else {
       let production = parseInt(this.formProduction.value.production);
-      console.log(production);
       let productionOrderSearched = this.production.map(x => x.numberProduction);
       if (!productionOrderSearched.includes(production)) this.msj.mensajeError(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`, ``, 12000000);
       else {

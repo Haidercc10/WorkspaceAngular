@@ -88,6 +88,7 @@
   <div class="mb-3" id="tabla1">
     <div class="row g-3">
       <p-table
+      *ngIf="load"
       #dt
       [value]="arrayOrdenCompra"
       selectionMode = "multiple"

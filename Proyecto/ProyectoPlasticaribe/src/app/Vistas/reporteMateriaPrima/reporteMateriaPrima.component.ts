@@ -696,6 +696,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             BoppGen_Id: this.FormEdicionMateriaPrima.value.IdBoppGenerico == null ? this.idBoppGenerico : this.FormEdicionMateriaPrima.value.IdBoppGenerico,
             BOPP_CodigoDoc: data[i].bopP_CodigoDoc,
             BOPP_TipoDoc: data[i].bopP_TipoDoc,
+            Prov_Id : data[i].prov_Id,
           }
           this.servicioBoppGen.PutPrecioEstandar(this.idBoppGenerico, this.FormEdicionMateriaPrima.value.PrecioEstandar).subscribe();
           this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {

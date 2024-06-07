@@ -871,7 +871,7 @@ export class Orden_FacturacionComponent implements OnInit {
     let index : any = this.productionSelected.findIndex(x => x.numberProduction == data.numberProduction);
     
     this.dtOrderFactService.deleteDetailOF(data.idDetail).subscribe(() => {
-      let infoRoll : any = [{'roll': data.numberProduction, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus}]; 
+      let infoRoll : any = [{'roll': data.numberProduction, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true }]; 
       this.productionProcessService.putChangeStateProduction(infoRoll).subscribe(() => {
         this.msjsOF(`Confirmación`, `Rollo N° ${data.numberProduction} eliminado exitosamente de la orden N° ${this.formDataOrder.value.order}!`);
         this.productionSelected.splice(index, 1);
@@ -897,7 +897,7 @@ export class Orden_FacturacionComponent implements OnInit {
     rollsItemOrder.forEach(x => {
       this.dtOrderFactService.deleteDetailOF(x.idDetail).subscribe(() => {
         let indexRoll : any = this.productionSelected.findIndex(p => p.item == data.id_Producto && p.numberProduction == x.numberProduction && p.inOrder);
-        rollsToUpdate.push({'roll' : x.numberProduction, 'item' : data.id_Producto, 'currentStatus' : status, 'newStatus' : newStatus });
+        rollsToUpdate.push({'roll' : x.numberProduction, 'item' : data.id_Producto, 'currentStatus' : status, 'newStatus' : newStatus, 'envioZeus' : true });
         this.productionSelected.splice(indexRoll, 1);
         count++
         if(count == rollsItemOrder.length) this.changeStatusRolls(data, rollsToUpdate);
@@ -959,7 +959,7 @@ export class Orden_FacturacionComponent implements OnInit {
     let production : any = this.productionSelected.filter(x => !x.inOrder);
     let rolls : any = [];
 
-    production.forEach(x => { rolls.push({'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 20, }); }); 
+    production.forEach(x => { rolls.push({'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 20, 'envioZeus' : true }); }); 
     this.productionProcessService.putChangeStateProduction(rolls).subscribe(() => { 
       this.msj.mensajeConfirmacion(`Confirmación`, `Orden N° ${order} actualizada con éxito!`);
       if(this.reposition) this.updateDevolution();

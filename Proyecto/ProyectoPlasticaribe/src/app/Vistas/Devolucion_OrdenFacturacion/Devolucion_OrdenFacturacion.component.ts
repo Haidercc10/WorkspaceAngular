@@ -271,6 +271,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   saveDetailsFact(data: any) {
     let count: number = 0;
+
     this.productionSelected.forEach(prod => {
       let info: modelDtProductoDevuelto = {
         'DevProdFact_Id': data.devProdFact_Id,
@@ -290,7 +291,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   changeStatus(data: any){
     let order: number = this.formDataOrder.value.order;
     let reels: any = [];
-    this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : 20, 'newStatus' : 24}) });
+
+    this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : 23, 'newStatus' : 24, 'envioZeus' : true}) });
     this.dtOrderFactService.PutStatusProduction(reels.map(x => x.roll), order).subscribe(() => {
       this.updateStatusProduction(reels, data);
     }, (error) => this.errorMessage(`Ocurrió un error al cambiar el estado de los rollos en la orden N° ${order}!`, error));
@@ -377,7 +379,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           [
             { text: `Orden Fact: ${data.dev.id_OrdenFact}` },
             { text: `Factura: ${data.dev.facturaVta_Id}` },
-            { text: `Requiere reposición: ${data.dev.DevProdFact_Reposicion ? 'SI' : 'NO' }` },
+            { text: `Requiere reposición: ${data.dev.DevProdFact_Reposicion == true ? 'SI' : 'NO' }` },
           ],
           [
             { text: `Usuario ingreso: ${data.usua.usua_Nombre}` },

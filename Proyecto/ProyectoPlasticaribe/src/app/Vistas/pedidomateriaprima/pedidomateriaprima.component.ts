@@ -148,7 +148,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   LimpiarCampos() {
     this.load = true;
     this.FormMateriaPrimaFactura.reset();
-    this.FormMateriaPrimaFactura.patchValue({ ConsecutivoFactura : this.ultimoIdFactura, });
+    this.FormMateriaPrimaFactura.patchValue({ ConsecutivoFactura : this.ultimoIdFactura, MpFactura : '',  MpRemision : '' });
   }
 
   // Funcion que limpiará todos los campos
@@ -336,6 +336,9 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //Funcion que validará el campo sobre el que se está colocando del consecutivo, factura o remisimos
   validarCampos(){
+    console.log(this.FormMateriaPrimaFactura.value.MpRemision);
+    console.log(this.FormMateriaPrimaFactura.value.MpFactura);
+
     if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.msj.mensajeAdvertencia(`Advertencia`, "Solo debe llenar el campo Remisión o Factura.");
     else if (this.FormMateriaPrimaFactura.value.MpRemision != '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.registrarRemisionMP();
     else if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura != '') this.registrarFacturaMP();
@@ -401,6 +404,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.estadoOrdenCompra();
             this.moverInventarioMP();
             this.moverInventarioTintas();
+            this.msj.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`);
             let data : any = { 'Id' : idFactura, Movimiento : 'FCO' }; 
             this.cmpMovMatPrimas.entradasMateriasPrimas(data);
             setTimeout(() => this.limpiarTodosCampos(), 1500);
@@ -576,7 +580,7 @@ export class PedidomateriaprimaComponent implements OnInit {
           }
 
           this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(() => {
-            this.msj.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`);
+            //this.msj.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`);
             this.load = true;
            }, () => {
             this.msj.mensajeError(`Error`, `¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
@@ -608,7 +612,7 @@ export class PedidomateriaprimaComponent implements OnInit {
         }
 
         this.tintasService.srvActualizar(datos_tinta.tinta_Id, datosTintaActualizada).subscribe(() => {
-          this.msj.mensajeConfirmacion(`Confirmación`, `Registro de factura/remisión creado con exito!`);
+          //this.msj.mensajeConfirmacion(`Confirmación`, `Registro de factura/remisión creado con exito!`);
           this.load = true;
         }, () => {
           this.msj.mensajeError(`Error`,`¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Tinta}!`);

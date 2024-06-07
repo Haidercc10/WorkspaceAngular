@@ -219,6 +219,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { OrdenFacturacion_PalletsComponent } from './Vistas/OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 import { Facturacion_Vs_IngresosDespachoComponent } from './Vistas/Facturacion_Vs_IngresosDespacho/Facturacion_Vs_IngresosDespacho.component';
 import { Gestion_DevolucionesOFComponent } from './Vistas/Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
+import { Ingreso_PeletizadoComponent } from './Vistas/Ingreso_Peletizado/Ingreso_Peletizado.component';
 
 @NgModule({
   declarations: [
@@ -359,6 +360,7 @@ import { Gestion_DevolucionesOFComponent } from './Vistas/Gestion_DevolucionesOF
     OrdenFacturacion_PalletsComponent, 
     Facturacion_Vs_IngresosDespachoComponent, 
     Gestion_DevolucionesOFComponent,
+    Ingreso_PeletizadoComponent,
   ],
 
   imports: [
