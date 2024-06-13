@@ -481,8 +481,7 @@ export class OcompraComponent implements OnInit {
       this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => {
         count++;
         if (count == this.materiasPrimasSeleccionadas.length) {
-          this.GuardadoExitoso();
-          this.buscarinfoOrdenCompra(orden);
+          this.GuardadoExitoso(orden);
         }
       }, () => {
         this.mensajeService.mensajeError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
@@ -546,10 +545,13 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
-  GuardadoExitoso() {
+  GuardadoExitoso(oc : any) {
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
-    setTimeout(() => this.limpiarTodo(), 3000);
+    setTimeout(() => {
+      this.buscarinfoOrdenCompra(oc);
+      this.limpiarTodo()
+    }, 3000);
   }
 
   //Buscar informacion de la orden de compra creada
@@ -710,6 +712,7 @@ export class OcompraComponent implements OnInit {
   totalesPDF(datos_orden) {
     console.log(datos_orden);
     let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden);
+    console.log(conceptosAutomaticos);
     return {
       table: {
         widths: ['45%', '10%', '10%', '8%', '12%', '15%'],
@@ -910,7 +913,7 @@ export class OcompraComponent implements OnInit {
           this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => {
             count++;
             if (count == this.materiasPrimasSeleccionadas.length) {
-              this.GuardadoExitoso();
+              this.GuardadoExitoso(this.FormOrdenCompra.value.ConsecutivoOrden);
               this.mostrarEleccion(0, 'pdf');
             }
           }, error => {
@@ -932,7 +935,7 @@ export class OcompraComponent implements OnInit {
           this.dtOrdenCompraService.putId_DtOrdenCompra(datos_orden[0], info).subscribe(() => {
             count++;
             if (count == this.materiasPrimasSeleccionadas.length) {
-              this.GuardadoExitoso();
+              this.GuardadoExitoso(this.FormOrdenCompra.value.ConsecutivoOrden);
               this.mostrarEleccion(0, 'pdf');
             }
           }, error => {

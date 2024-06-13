@@ -331,6 +331,7 @@ export class MovimientoMPComponent implements OnInit {
     let informacionPdf : any = null;
     this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
+        
         let info : any = {
           Id : '',
           Nombre : '',
@@ -339,24 +340,32 @@ export class MovimientoMPComponent implements OnInit {
           Precio : `$${this.formatonumeros(datos[i].precio)}`,
           SubTotal : `$${this.formatonumeros(datos[i].subTotal)}`,
         }
+        console.log(datos[i].subTotal);
+        
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
           info.Nombre = datos[i].materia_Prima;
+          info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
+          info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
         } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
           info.Id = datos[i].tinta_Id;
           info.Nombre = datos[i].tinta;
+          info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
+          info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
         } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
           info.Id = datos[i].bopp_Id;
           info.Nombre = datos[i].bopp;
+          info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);      
+          info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
         }
         //setTimeout(() => {
-          this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
+          /*this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
             for (let j = 0; j < datoMP.length; j++) {
               info.Precio = this.formatonumeros(datoMP[j].precio);
               datos[i].subTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad);
               info.SubTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.formatonumeros(this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad)) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
             }
-          });
+          });*/
           this.datosPdf.push(info);
         //}, 500);
       }

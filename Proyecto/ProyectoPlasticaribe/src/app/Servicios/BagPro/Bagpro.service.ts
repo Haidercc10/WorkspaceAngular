@@ -89,6 +89,8 @@ export class BagproService {
 
   getAvaibleProduction = (item: string, notAvaible: Array<number>): Observable<any> => this.http.post(`${this.rutaBagPro}/ProcExtrusion/getAvaibleProduction/${item}`, notAvaible);
 
+  getRollProduction = (roll: number, url: string): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getRollProduction/${roll}${url}`);
+
   PutEnvioZeusExtrusion = (rollo: number) => this.http.put<any>(`${this.rutaBagPro}/ProcExtrusion/putEnvioZeus/${rollo}`, rollo);
 
   putReversionEnvioZeus_ProcExtrusion = (rollos: any[]) => this.http.post(`${this.rutaBagPro}/ProcExtrusion/putReversionEnvioZeus_ProcExtrusion`, rollos);
