@@ -25,29 +25,39 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-book"></i> Datos de facturación</h4>
   </div>
 
+  <!--Formulario-->
   <form [formGroup]="formDataOrder">
     <div class="row g-4">
 
        <!-- Fail -->
-       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
+       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="reason" inputId="reason" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
           <label for="reason">Motivo*</label>
         </span>
       </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-1">
+      <!--Reposition-->
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-1 col-xxl-1">
         <div class="field-checkbox">
           <p-checkbox formControlName="reposition" [binary]="true" inputId="reposition" id="reposition" pTooltip="Al checar este elemento indicas si la devolución requiere reposición o no."></p-checkbox>
           <label for="reposition">Reposición</label>
         </div>
       </div>
 
+      <!--Credit note-->
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-1 col-xxl-1">
+        <div class="field-checkbox">
+          <p-checkbox formControlName="creditNote" [binary]="true" inputId="creditNote" id="creditNote" pTooltip="Al checar este elemento indicas que la devolución se realizó con una nota crédito."></p-checkbox>
+          <label for="creditNote">Nota Crédito</label>
+        </div>
+      </div>
+
       <!-- Orden -->
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-1 col-xxl-1">
         <span class="p-float-label">
           <input formControlName="order" id="Orden" type="text" pInputText required (keyup.enter)="searchData()"/>
-          <label for="Orden">N° Orden Fact.</label>
+          <label for="Orden">N° Orden</label>
         </span>
       </div>
 
@@ -59,7 +69,8 @@
         </span>
       </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
+      <!--Roll-->
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="roll" id="Rollo" type="text" pInputText (keyup.enter)="searchData()"/>
           <label for="Rollo">Rollo/Bulto</label>
@@ -93,10 +104,12 @@
     </div>
   </form>
 
+  <!--Titulo 1-->
   <div class="my-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos de la orden</h4>
   </div>
 
+  <!--Tabla 1-->
   <p-table
     #tableOrder
     [value]="production"
@@ -147,10 +160,12 @@
     </ng-template>
   </p-table>
   
+  <!--Titulo 2-->
   <div class="my-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos a devolver</h4>
   </div>
 
+  <!--Tabla 2-->
   <p-table
     #tableDevolution
     [value]="productionSelected"
@@ -195,16 +210,30 @@
         <td>{{data.numberProduction}}</td>
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
-        <td>{{data.quantity | number : '1.2-2'}}</td>
+        <td [pEditableColumn]="data.quantity" class="cursor" pTooltip="Editar cantidad devuelta">
+          
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText type="number" (focusout)="outFocus(data.quantity, data.quantity2)" (focus)="onFocus()" [min]="1" [max]="data.quantity2" [(ngModel)]="data.quantity" pEditableColumnField="quantity" required/>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ data.quantity == null || data.quantity > data.quantity2 ? data.quantity2 : data.quantity | number : '1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+          
+          <!--{{data.quantity | number : '1.2-2'}}-->
+        </td>
         <td>{{data.presentation}}</td>
       </tr>
     </ng-template>
   </p-table>
   
+  <!--Titulo 3-->
   <div class="my-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Consolidado de items seleccionados</h4>
   </div>
 
+  <!--Tabla 3-->
   <p-table
     [value]="consolidatedProduction"
     styleClass="p-datatable-gridlines p-datatable-sm"
@@ -236,8 +265,9 @@
 
   <p-divider></p-divider>
 
+  <!--Botones-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button pButton class="p-button-danger" type="button" label="Crear Devolución" icon="pi pi-send" (click)="validateInformation()"></button>
+    <button pButton class="p-button-danger" type="button" label="Crear Devolución" [disabled]="fieldFocus" icon="pi pi-send" (click)="validateInformation()"></button>
     <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
   </div>
 

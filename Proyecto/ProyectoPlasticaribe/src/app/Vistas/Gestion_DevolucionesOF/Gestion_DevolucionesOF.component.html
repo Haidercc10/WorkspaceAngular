@@ -42,11 +42,19 @@
         </div>
       </div>
 
+      <!--Credit note-->
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-1 col-xxl-1">
+        <div class="field-checkbox">
+          <p-checkbox formControlName="creditNote" [binary]="true" inputId="creditNote" id="creditNote" pTooltip="Al checar este elemento indicas que la devolución se realizó con una nota crédito."></p-checkbox>
+          <label for="creditNote">Nota Crédito</label>
+        </div>
+      </div>
+
       <!-- Devolution -->
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-2 col-xl-2 col-xxl-2">
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-2 col-xl-1 col-xxl-1">
         <span class="p-float-label">
           <input formControlName="dev" id="dev" type="text" pInputText required (keyup.enter)="searchData()"/>
-          <label for="dev">N° Devolución</label>
+          <label for="dev">Devolución</label>
         </span>
       </div>
 
@@ -91,14 +99,17 @@
   </div>
 
   <!--Cambiar estado bultos-->
-  <p-toolbar styleClass="mb-2 gap-2">
+  <p-toolbar styleClass="mb-2">
     <ng-template pTemplate="left">
-      <b>Elige el estado de los rollos/bultos devueltos</b>
+      <b class="mr-2">Elige el estado de los rollos/bultos devueltos</b>
+      <p-dropdown optionLabel="estado_Nombre" [(ngModel)]="status" optionValue="estado_Id" [options]="statuses" placeholder="Elige un estado" pTooltip="Aquí podrás elegir el nuevo estado que tendrán los bultos de la devolución"/>
     </ng-template>
     <ng-template pTemplate="center">
-      <p-dropdown optionLabel="name" [(ngModel)]="status" optionValue="id" [options]="statuses" placeholder="Elige un estado" pTooltip="Aquí podrás elegir el nuevo estado que tendrán los bultos de la devolución"/>
-    </ng-template>
+        </ng-template>
     <ng-template pTemplate="right">
+        <p-button id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-success" (click)="descriptionColors($event, 'green')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+        <p-button id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-warning" (click)="descriptionColors($event, 'yellow')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+        <p-button id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-danger" (click)="descriptionColors($event, 'red')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
     </ng-template>
   </p-toolbar>
 
@@ -210,7 +221,7 @@
         <td>{{data.reference}}</td>
         <td>{{data.quantity | number : '1.2-2'}}</td>
         <td>{{data.presentation}}</td>
-        <td><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.statusId), 'bg-success1': [19].includes(data.statusId), 'bg-warning': [].includes(data.statusId)}">{{data.statusName}}</span></td>
+        <td><span class="badge" [ngClass]="{'bg-danger1': [44].includes(data.statusId), 'bg-success1': [19].includes(data.statusId), 'bg-warning1': [45].includes(data.statusId)}">{{data.statusName}}</span></td>
       </tr>
     </ng-template>
   </p-table>
@@ -232,7 +243,7 @@
       <tr>
         <th style="font-weight: 800;" class="text-center"></th>
         <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-box"></i> Información de referencias</th>
-        <th style="font-weight: 800;" class="text-center textBlue" colspan="3"><i class="pi pi-database"></i> Informacion de rollos/bultos</th>
+        <th style="font-weight: 800;" class="text-center textBlue" colspan="4"><i class="pi pi-database"></i> Informacion de rollos/bultos</th>
       </tr>
       <tr>
         <th>N°</th>
@@ -242,7 +253,8 @@
         <th>Presentación</th>
         <th>Seleccionados</th>
         <th>Disponibles</th>
-        <th>No disponibles</th>
+        <th>Reempaque</th>
+        <th>Peletizado</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -253,8 +265,9 @@
         <td>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</td>
         <td>{{data.presentation}}</td>
         <td>{{totalCountProductionByProduct(data.item) | number}}</td>
-        <td>{{totalCountProductionByProductStatus(data.item, 19) | number}}</td>
-        <td>{{totalCountProductionByProductStatus(data.item, 23) | number}}</td>
+        <td class="textGreen"><b>{{totalCountProductionByProductStatus(data.item, 19) | number}}</b></td>
+        <td class="textYellow"><b>{{totalCountProductionByProductStatus(data.item, 45) | number}}</b></td>
+        <td class="textRed"><b>{{totalCountProductionByProductStatus(data.item, 44) | number}}</b></td>
       </tr>
     </ng-template>
   </p-table>
@@ -268,3 +281,10 @@
   </div>
 
 </p-card>
+
+<!--Descripcion de los botones-->
+<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }">
+  <ng-template pTemplate>
+    <div [innerHTML]="infoColor"></div>
+  </ng-template>
+</p-overlayPanel>

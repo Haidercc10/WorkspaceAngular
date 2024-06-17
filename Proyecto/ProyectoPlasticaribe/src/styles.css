@@ -504,6 +504,12 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
+.bg-danger2 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(255, 75, 75);
+  font-size: calc(var(--font-size) * 14px);
+}
+
 .bg-secondary1 {
   color: rgb(255, 255, 255);
   background-color: rgb(102, 102, 102);
@@ -565,6 +571,10 @@ p-avatar div span {
 
 .textOrange {
   color: #ff8800;
+}
+
+.textYellow {
+  color: #dab900;
 }
 
 .read-only {

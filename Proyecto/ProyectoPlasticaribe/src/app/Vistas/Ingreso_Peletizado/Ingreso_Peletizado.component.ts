@@ -252,26 +252,29 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     let roll : any = this.form.value.roll;
     let typeRecovery : any = this.form.value.typeRecovery;
     let processField : string = this.form.value.process;
-    let ot : any = this.form.value.ot;
 
     if(![null, undefined, ''].includes(typeRecovery)) {
       if(typeRecovery == 'ROLLO') {
         if(processField != null) {
           if(![null, undefined, ''].includes(roll)) {
-            if(!this.recoveries.map(x => x.Rollo_Id).includes(roll)) {
-              let process = this.changeNameProcess(processField);
-              let url : string = process != null ? `?process=${this.changeNameProcess(process)}` : ``; 
-
-              this.svBagpro.getRollProduction(roll, url).subscribe(data => {
-                let orderBagPro : any = process == 'SELLADO' ? data.ps.ot : data.pe.ot;
-                if(ot == orderBagPro) this.addPeletizado();
-                else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no pertenece a la OT N° ${ot}`)
-              });
-            } else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
+            if(!this.recoveries.map(x => x.Rollo_Id).includes(roll)) this.searchRollBagPro(processField, roll);
+            else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
           } else this.msjs(`Advertencia`, `Debe diligenciar el campo rollo/bulto!`);
         } else this.addPeletizado();
       } else this.addPeletizado();
     } else this.msjs(`Advertencia`, `Debe seleccionar el tipo de recuperado!`);
+  }
+
+  searchRollBagPro(processField : string, roll : number){
+    let ot : any = this.form.value.ot;
+    let process = this.changeNameProcess(processField);
+    let url : string = process != null ? `?process=${this.changeNameProcess(process)}` : ``; 
+
+    this.svBagpro.getRollProduction(roll, url).subscribe(data => {
+      let orderBagPro : any = process == 'SELLADO' ? data.ps.ot : data.pe.ot;
+      if(ot == orderBagPro) this.addPeletizado();
+      else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no pertenece a la OT N° ${ot}`)
+    });        
   }
 
   //

@@ -13,6 +13,8 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { AppComponent } from 'src/app/app.component';
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 @Component({
   selector: 'app-Gestion_DevolucionesOF',
@@ -37,9 +39,11 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   consolidatedProduction: Array<production> = [];
   fails : Array<any> = [];
   devolution: boolean = false;
-  statuses : Array<any> = [{id : 19, name : 'DISPONIBLE'}, {id : 23, name : 'NO DISPONIBLE'}];
+  statuses : Array<any> = []; //[{id : 19, name : 'DISPONIBLE'}, {id : 23, name : 'NO DISPONIBLE'}, ];
   status : any = null;
   qtyRollsDv : number = 0;
+  @ViewChild('op') op: OverlayPanel | undefined;
+  infoColor : string = ``;
   
   //@ViewChild(MovimientosOrdenFacturacionComponent) movOF : MovimientosOrdenFacturacionComponent;
   
@@ -57,7 +61,9 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     private svFails : FallasTecnicasService,
     private svProduction : Produccion_ProcesosService,
     private cmpDevolutions : Devolucion_OrdenFacturacionComponent, 
-    private movOF : MovimientosOrdenFacturacionComponent) {
+    private movOF : MovimientosOrdenFacturacionComponent,
+    private svStatus : EstadosService,
+  ) {
       this.modoSeleccionado = appComponent.temaSeleccionado;
       this.validateForm();
   }
@@ -65,6 +71,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getFails();
+    this.getStatuses();
   }
 
   validateForm(){
@@ -76,6 +83,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       client: [null, Validators.required],
       reason: [null, Validators.required],
       reposition : [false, Validators.required],
+      creditNote : [false, Validators.required],
       observation: [''], 
     });
   }
@@ -92,10 +100,27 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
+  getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [19,44,45].includes(x.estado_Id)) } );
+
   //Función para obtener las fallas técnicas.
   getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [13,14,15].includes(item.tipoFalla_Id)) });
   
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  descriptionColors($event : any, color : string){
+    if (color == 'green') this.infoColor = `<b>${'VERDE:'}</b> Indica que si la devolución es con <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione como <b>${'DISPONIBLES'},</b> volverán al <b>${'INVENTARIO DE DESPACHO'}.</b>
+    <br><br> Si la devolución no tiene <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione como <b>${'DISPONIBLES'},</b> volverán al <b>${'INVENTARIO DEL AREA'}</b> en la que fueron producidos. Luego de esto <b>${'DEBE REINGRESARLOS A DESPACHO'}</b> por medio del sistema <b>${'PLASTICARIBE'}</b>.`;
+
+    if (color == 'yellow') this.infoColor = `<b>${'AMARILLO:'}</b> Indica que si la devolución es con <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione para <b>${'REEMPAQUE'}</b>, al momento de <b>${'REINGRESARLOS A DESPACHO'}</b> debe hacerse <b>${'SIN AJUSTE A ZEUS'}</b>
+    <br><br> Si la devolución no tiene <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione para <b>${'REEMPAQUE'}</b> quedarán con dicho estado, este cambiará cuando sea(n) <b>${'REEMPACADO(S) y PESADOS NUEVAMENTE EN EL SISTEMA'}</b>. Luego de esto <b>${'DEBE REINGRESARLOS A DESPACHO'}</b> por medio del sistema <b>${'PLASTICARIBE, CON AJUSTE A ZEUS'}</b>.`;
+
+    if (color == 'red') this.infoColor = `<b>${'ROJO:'}</b> Indica que el bulto/rollo definitivamente está en muy mal estado y debe ser enviado a <b>${'PELETIZADO'}</b>`;
+
+    setTimeout(() => {
+      this.op!.toggle($event);
+      $event.stopPropagation();
+    }, 500);
+  }
 
   //Función para limpiar campos
   clearFields() {
@@ -127,13 +152,14 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let dev: any = this.form.value.dev;
     let date : any = moment().format('YYYY-MM-DD');
     let hour : string = moment().format('HH:mm:ss');
+    let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
     this.qtyRollsDv = 0;
 
     if (![null, undefined, ''].includes(dev)) {
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
         if([11,29].includes(data[0].dev.estado_Id)) {
           this.load = true;
-          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id).subscribe(() =>{
+          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id, observation).subscribe(() =>{
             this.qtyRollsDv = data.length;
             data.forEach(x => {
               this.production.push({  
@@ -171,6 +197,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       'fact': data.dev.facturaVta_Id, 
       'reason' : data.dtDev.falla_Id, 
       'reposition' : data.dev.devProdFact_Reposicion,
+      'creditNote' : data.dev.devProdFact_NotaCredito,
     });
   }
 
@@ -180,7 +207,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       this.load = true;
       let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
       this.production.splice(index, 1);
-      this.validateSelection(this.productionSelected, this.status, this.statuses.find(x => x.id == this.status).name, production);
+      this.validateSelection(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre, production);
       this.getConsolidateProduction();
       setTimeout(() => this.load = false, 50);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar el nuevo estado del bulto seleccionado!`);
@@ -209,7 +236,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       this.load = true;
       this.productionSelected = this.productionSelected.concat(this.production);
       this.production = [];
-      this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.id == this.status).name);
+      this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre);
       this.getConsolidateProduction();
       setTimeout(() => this.load = false, 50);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar el nuevo estado de los bultos revisados!`);
@@ -238,17 +265,16 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let data = this.tableOrder.filteredValue ? this.tableOrder.filteredValue : this.tableOrder.value;
 
     if(data.length > 0) {
-      console.log(data);
       this.load = true;
       this.productionSelected = this.productionSelected.concat(data); 
       if(!this.tableOrder.filteredValue) {
         this.production = [];
-        this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.id == this.status).name);
+        this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre);
       } 
       else {
         data.forEach(x => {
           x.statusId = this.status, 
-          x.statusName = this.statuses.find(x => x.id == this.status).name
+          x.statusName = this.statuses.find(x => x.estado_Id == this.status).estado_Nombre
           let index : number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
           this.production.splice(index, 1);
         });
@@ -323,11 +349,12 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
 
   //Función para actualizar el estado de los bultos en producción procesos.
   updateRollsInProduction(){
+    let creditNote : boolean = this.form.value.creditNote;
     this.load = true;
     let rolls : any = [];
     if(this.productionSelected.length > 0) {
       this.productionSelected.forEach(x => { 
-        rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : false });
+        rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : creditNote ? true : x.statusId == 19 ? false : true });
       });
       this.svProduction.putChangeStateProduction(rolls).subscribe(data => {
         this.updateRollsInOrderFact(rolls);
@@ -343,7 +370,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let order : any = this.form.value.orderFact;
     rolls.forEach(x => {
       if(x.newStatus == 19) x.newStatus = 33;
-      else x.newStatus = 36;
+      else x.newStatus = x.newStatus;
     });
     this.dtOrderFactService.putStatusRollInOrderFact(rolls, order).subscribe(data => {
       this.updateStatusDev();
@@ -359,15 +386,16 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let date : any = moment().format('YYYY-MM-DD');
     let hour : string = moment().format('HH:mm:ss');
     let reposition : boolean = this.form.value.reposition;
+    let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
     let status : number;
     status = this.qtyRollsDv == this.productionSelected.length ? reposition ? 38 : 18 : 29;
     this.load = true;
 
-    this.svDevolutions.PutStatusDevolution(dev, status, date, hour, this.storage_Id).subscribe(data => {
+    this.svDevolutions.PutStatusDevolution(dev, status, date, hour, this.storage_Id, observation).subscribe(data => {
       this.createPDF(dev, 'actualizada');
       //this.msg.mensajeConfirmacion('Confirmación', 'Los bultos seleccionados se actualizaron correctamente!');
     }, error => {
-      this.msg.mensajeError('No fue posible actualizar el estado de la devolución!', error);
+      this.msg.mensajeError(`No fue posible actualizar el estado de la devolución N° ${dev}!`, error);
       this.load = false;
     });
   }

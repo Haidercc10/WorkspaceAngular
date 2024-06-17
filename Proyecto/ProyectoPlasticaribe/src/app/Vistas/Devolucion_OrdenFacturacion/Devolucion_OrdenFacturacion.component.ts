@@ -37,6 +37,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   fails : Array<any> = [];
   modalFails : boolean = false;
   reposition: boolean = false;
+  fieldFocus: boolean = false;
   
   @ViewChild('tableOrder') tableOrder : Table | undefined;
   @ViewChild('tableDevolution') tableDevolution : Table | undefined;
@@ -61,6 +62,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       client: [null, Validators.required],
       reason: [null, Validators.required],
       reposition : [false, Validators.required],
+      creditNote : [false, Validators.required ],
       roll : [''],
       observation: ['']
     });
@@ -87,6 +89,13 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [13,14,15].includes(item.tipoFalla_Id)) });
   
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  onFocus = () => this.fieldFocus = true;
+
+  outFocus(qty : number, qty2 : number) {
+    if(qty <= qty2) return this.fieldFocus = false;
+    else return this.fieldFocus = true;
+  }
 
   clearFields() {
     this.load = false;
@@ -124,7 +133,6 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       if (![null, undefined, ''].includes(this.validateUrl())) {
         this.load = true;
         this.dtOrderFactService.GetInformationOrderFactByFilters(this.validateUrl()).subscribe(dataOf => {
-          console.log(dataOf);
           this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(dataOf.id).subscribe(data => {
             data.forEach(x => {
               this.production.push({  
@@ -134,6 +142,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
                 'quantity': x.dtOrder.cantidad,
                 'presentation': x.dtOrder.presentacion, 
                 'fail' : reason,
+                'quantity2' : x.dtOrder.cantidad
               });
               this.changeInformationFact(x);
               this.load = false;
@@ -253,6 +262,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.load = true;
     let order : number = this.formDataOrder.value.order;
     let reposition : boolean = this.formDataOrder.value.reposition;
+    let creditNote : boolean = this.formDataOrder.value.creditNote;
+
     let info: modelDevolucionProductos = {
       'FacturaVta_Id': this.formDataOrder.value.fact,
       'Cli_Id': this.formDataOrder.value.idClient,
@@ -265,6 +276,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       'Estado_Id': 11,
       'DevProdFact_Reposicion': reposition,
       'UsuaModifica_Id' : 0,
+      'DevProdFact_NotaCredito' : creditNote,
     };
     this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
   }
@@ -323,6 +335,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     content.push(this.informationMovement(data[0]));
     content.push(this.informationClientPDF(data[0]));
     content.push(this.observationPDF(data[0]));
+    content.push(this.observationManagementPDF(data[0]));
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.tableProducts(informationProducts));
     return content;
@@ -379,7 +392,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           [
             { text: `Orden Fact: ${data.dev.id_OrdenFact}` },
             { text: `Factura: ${data.dev.facturaVta_Id}` },
-            { text: `Requiere reposición: ${data.dev.DevProdFact_Reposicion == true ? 'SI' : 'NO' }` },
+            { text: `Requiere Reposición: ${data.dev.DevProdFact_Reposicion == true ? 'SI' : 'NO' }`  },
           ],
           [
             { text: `Usuario ingreso: ${data.usua.usua_Nombre}` },
@@ -390,6 +403,10 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
             { text: `Fecha ingreso: ${(data.dev.devProdFact_Fecha).replace('T00:00:00','')} ${data.dev.devProdFact_Hora}`, }, 
             { text: `Fecha revisión: ${data.dev.devProdFact_FechaModificado != null ? (data.dev.devProdFact_FechaModificado).replace('T00:00:00','') : ''} ${data.dev.devProdFact_HoraModificado != null ? data.dev.devProdFact_HoraModificado : ''}`, }, 
             { text: `Fecha cierre: ${data.dev.devProdFact_FechaFinalizado != null ? (data.dev.devProdFact_FechaFinalizado).replace('T00:00:00', '') : ''} ${data.dev.devProdFact_HoraFinalizado != null ? data.dev.devProdFact_HoraFinalizado : ''}`, } 
+          ],  
+          [
+            { text: `Nota Crédito: ${data.dev.devProdFact_NotaCredito == true ? 'SI' : 'NO' }`, }, 
+            { text: `Motivo devolución: ${data.dtDev.falla}`, colSpan: 2 }, 
           ] 
         ]
       },
@@ -404,7 +421,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   informationClientPDF(data): {} {
     return {
-      margin : [0, 15, 0, 0],
+      margin : [0, 15, 0, 20],
       table: {
         widths: ['50%', '20%', '30%'],
         body: [
@@ -495,18 +512,30 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   observationPDF(data) {
     return {
-      margin: [0, 20],
       table: {
         widths: ['*'],
         body: [
           [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo', bold: true }],
-          [{ border: [true, false, true, true], text: `Devolución por: ${data.dtDev.falla}. ${data.dev.devProdFact_Observacion.toString().trim()}` }]
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_Observacion}` }]
         ]
       },
       fontSize: 9,
     }
   }
 
+  observationManagementPDF(data) {
+    return {
+      margin: [0, 0, 0, 20],
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, false, true, false], text: `Observación de revisión: `, style: 'subtitulo', bold: true }],
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionGestion == null ? '' : data.dev.devProdFact_Observacion.toString().trim()}` }]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
 }
 
 interface production {
@@ -517,4 +546,5 @@ interface production {
   cuontProduction?: number;
   presentation: string;
   fail? : number;
+  quantity2? : number;
 }
