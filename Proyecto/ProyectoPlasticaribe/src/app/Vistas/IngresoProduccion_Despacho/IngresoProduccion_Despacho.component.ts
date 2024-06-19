@@ -12,6 +12,10 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { AppComponent } from 'src/app/app.component';
 import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 
 @Component({
   selector: 'app-IngresoProduccion_Despacho',
@@ -44,10 +48,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     private msj: MensajesAplicacionService,
     private createPDFService: CreacionPdfService,
     private bagproService: BagproService,
-    private entraceService: EntradaRollosService,
+    private entraceService: EntradaRollosService, 
     private dtEntracesService: DetallesEntradaRollosService,
     private storehouseService: BodegasDespachoService,
-    private clients: SedeClienteService,) {
+    private clients: SedeClienteService,
+  ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
@@ -148,8 +153,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
             this.sendProductionZeus[i].position = this.sendProductionZeus.length;
             this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
             this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-          });
-        } else this.msj.mensajeAdvertencia(`¡No puede Ingresar Rollos/Bultos provenientes del procesos 'WIKETIADO'!`);
+          }, error => { this.msj.mensajeError(`Error`, `No fue posible consultar la OT N° ${data[0].pp.ot} en BagPro | ${error.status} ${error.statusText}`) });
+        } else this.msj.mensajeError(`Advertencia`, `No es posible ingresar rollos/bultos del proceso de 'WIKETIADO'!`);
       //}, () => this.lookingForDataInBagpro(production));
       }, () => this.warningNotFound(production));
     }
@@ -595,4 +600,5 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       { border: [true, true, true, true], alignment: 'center', text: `Ubicación`, fillColor: '#eee', bold: true },
     ]
   }
+
 }

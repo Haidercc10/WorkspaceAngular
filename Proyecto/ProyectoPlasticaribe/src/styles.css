@@ -510,6 +510,12 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
+.bg-warning2 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(255, 166, 0);
+  font-size: calc(var(--font-size) * 14px);
+}
+
 .bg-secondary1 {
   color: rgb(255, 255, 255);
   background-color: rgb(102, 102, 102);

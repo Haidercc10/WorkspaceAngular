@@ -23,3 +23,7 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
 ::ng-deep .p-toolbar {
     padding: 0.5rem   
 }
+
+::ng-deep .m-2 {
+    margin: 0 !important;
+}

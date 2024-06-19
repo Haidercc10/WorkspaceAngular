@@ -121,7 +121,7 @@
       <td class="text-center">{{data.process}}</td>
       <td class="text-center">{{data.ubication}}</td>
       <td class="text-center">
-        <span class="badge" [ngClass]="{'bg-success1': data.stateRollPP == 'DISPONIBLE', 'bg-danger1': data.stateRollPP == 'NO DISPONIBLE', 'bg-danger2': data.stateRollPP == 'PELETIZADO', 'bg-azul': data.stateRollPP == 'FACTURADO', 'bg-warning1': data.stateRollPP == 'REEMPAQUE', 'bg-secondary1' : data.stateRollPP == 'DEVUELTO' }">{{data.stateRollPP}}</span>
+        <span class="badge" [ngClass]="{'bg-success1': data.stateRollPP == 'DISPONIBLE', 'bg-danger1': data.stateRollPP == 'NO DISPONIBLE', 'bg-danger2': data.stateRollPP == 'PELETIZADO', 'bg-azul': data.stateRollPP == 'FACTURADO', 'bg-warning1': data.stateRollPP == 'REEMPAQUE', 'bg-warning2': data.stateRollPP == 'REEMPACADO', 'bg-secondary1' : data.stateRollPP == 'DEVUELTO' }">{{data.stateRollPP}}</span>
       </td>
       <td class="text-center"> {{data.date}}</td>
       <td class="text-center">{{data.hour}}</td>

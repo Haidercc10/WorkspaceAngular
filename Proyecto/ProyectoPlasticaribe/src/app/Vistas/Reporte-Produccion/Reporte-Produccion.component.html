@@ -5,18 +5,23 @@
 </div>
 
 <div class="mb-8 p-5">
-  <div class="mb-4">
+  <div class="mb-3">
     <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
+  </div>
+
+  <div class="mb-5">
+    Los campos marcados con (*) son obligatorios para realizar la consulta.
   </div>
 
   <!--Formulario de filtros-->
   <form [formGroup]="formFiltros" (ngSubmit)="consultarProduccion()">
     <div class="row g-4">
+
       <!-- RANGO DE FECHAS -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
           <p-calendar formControlName="rangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" [required]="true"></p-calendar>
-          <label for="fecha">Rango de Fechas</label>
+          <label for="fecha">Rango de Fechas*</label>
         </span>
       </div>
 
@@ -53,8 +58,8 @@
       <!-- PROCESOS -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
-          <p-dropdown formControlName="proceso" inputId="areasEmpresa" [autoDisplayFirst]="false" [options]="areasEmpresa" [required]="true"></p-dropdown>
-          <label for="areasEmpresa">Área Producción</label>
+          <p-dropdown formControlName="proceso" inputId="areasEmpresa" [autoDisplayFirst]="true" [options]="areasEmpresa" [required]="true"></p-dropdown>
+          <label for="areasEmpresa">Área Producción*</label>
         </span>
       </div>
 

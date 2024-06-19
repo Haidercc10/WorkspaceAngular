@@ -508,11 +508,11 @@ export class Orden_FacturacionComponent implements OnInit {
     let dev : any = this.formDataOrder.value.saleOrder;
     let date : any = moment().format('YYYY-MM-DD');
     let hour : any = moment().format('HH:mm:ss');
-
+    
     dev = dev.split('-')[0].replace('DV', '');
     console.log(dev);
     
-    this.svHeaderDevolutions.PutStatusDevolution(dev, 39, date, hour, this.storage_Id).subscribe(data => {
+    this.svHeaderDevolutions.PutStatusDevolution(dev, 39, date, hour, this.storage_Id, '').subscribe(data => {
     }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar la devolución`); });
   }
 

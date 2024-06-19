@@ -50,6 +50,8 @@ export class Produccion_ProcesosService {
 
   putSendZeus = (production: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEnvioZeus/${production}`, production);
 
+  putAsociateRoll = (roll1: number, roll2 : number, item : number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putAsociateRoll/${roll1}/${roll2}/${item}`, roll1);
+
   putStateAvaible = (orderFac: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoDisponible/${orderFac}`, orderFac);
 
   PutDelivered_NoAvaible = (pre: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoEntregado_NoIngresado/${pre}`, pre);

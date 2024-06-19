@@ -172,7 +172,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarTabla(data: any) {
     if (![2001, 2072, 84, 88, 89].includes(data.id)) {
-      this.valorTotal = this.valorTotal + data.precio * data.stock;
+      this.valorTotal = this.ValidarRol == 1 ? this.valorTotal + data.precio * data.stock : 0;
       this.cantInicial += data.inicial;
       this.cantEntrante += data.entrada;
       this.cantSaliente += data.salida;
@@ -193,16 +193,16 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Cant2: data.stock,
         Diferencia: data.diferencia,
         UndCant: data.presentacion,
-        PrecioUnd: data.precio,
+        PrecioUnd: this.ValidarRol == 1 ? data.precio : 0,
         PrecioEstandar: data.precioEstandar,
-        SubTotal: data.subTotal,
+        SubTotal: this.ValidarRol == 1 ? data.subTotal : 0,
         Categoria: data.categoria,
         Categoria_Id: data.categoria_Id,
       }
-      if (this.ValidarRol == 1 || this.ValidarRol == 3) this.ArrayMateriaPrima.push(info);
+      if ([1,3].includes(this.ValidarRol)) this.ArrayMateriaPrima.push(info);
       this.ArrayMateriaPrima.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
 
-      if (this.categoriasMP.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3)) {
+      if (this.categoriasMP.includes(data.categoria_Id) && ([1,3].includes(this.ValidarRol))) {
         this.polietilenos.push(info);
         this.valorTotalPolietileno += data.precio * data.stock;
         this.cantInicialPolietileno += data.inicial;
@@ -211,7 +211,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.cantExistenciasPolientileno += data.stock;
         this.cantDiferenciaPolietileno += data.diferencia;
       }
-      if (this.categoriasTintas.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3)) {
+      if (this.categoriasTintas.includes(data.categoria_Id) && ([1,3].includes(this.ValidarRol))) {
         this.tintas.push(info);
         this.valorTotalTintas += data.precio * data.stock;
         this.cantInicialTintas += data.inicial;
@@ -220,9 +220,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.cantExistenciasTintas += data.stock;
         this.cantDiferenciaTintas += data.diferencia;
       }
-      if (this.categoriasBOPP.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3 || this.ValidarRol == 4)) {
+      if (this.categoriasBOPP.includes(data.categoria_Id) && ([1,3,4,89,63].includes(this.ValidarRol))) {
         this.biorientados.push(info);
-        this.valorTotalBiorientado += data.precio * data.stock;
+        this.valorTotalBiorientado += this.ValidarRol == 1 ? data.precio * data.stock : 0;
         this.cantInicialBiorientado += data.inicial;
         this.cantEntranteBiorientado += data.entrada;
         this.cantSalienteBiorientado += data.salida;
@@ -818,8 +818,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   /** Función que cargará el inventario de bopp's agrupados si se encuentra en el tab 4 */
   cargarTabs(indexTab: any) {
-    if (indexTab == 4) { this.boppsAgrupados = true; this.boppsAgrupados_Genericos(); }
-    else this.boppsAgrupados = false;
+    if ([4,1].includes(indexTab)) { 
+      this.boppsAgrupados = true; 
+      this.boppsAgrupados_Genericos(); 
+    } else this.boppsAgrupados = false;
   }
 
   // Funcion que va a filtrar la información en la tabla de inventario

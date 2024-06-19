@@ -142,6 +142,10 @@
       <app-TomaFisicaInventario></app-TomaFisicaInventario>
     </p-tabPanel>
 
+    <p-tabPanel *ngIf="ValidarRol == 1" header="Reingreso de producción" leftIcon="pi pi-upload">
+      <app-Reingreso_Produccion></app-Reingreso_Produccion>
+    </p-tabPanel>
+
     <p-tabPanel header="Consultar Producción" leftIcon="pi pi-search">
       <app-Reporte-Produccion></app-Reporte-Produccion>
     </p-tabPanel>

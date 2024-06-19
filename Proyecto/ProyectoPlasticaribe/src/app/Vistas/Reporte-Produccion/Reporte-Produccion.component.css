@@ -51,3 +51,11 @@
     background-color: MediumSlateBlue;
     font-size: calc(var(--font-size) * 15px);
 }
+
+.text-white {
+   color : white; 
+}
+
+.text-gray {
+   color : gray;
+}

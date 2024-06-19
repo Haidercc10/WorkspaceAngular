@@ -72,6 +72,7 @@ import { TreeTableModule } from 'primeng/treetable';
 import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { MaterialExampleModule } from '../material.module';
+import { MessagesModule } from 'primeng/messages';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
@@ -221,6 +222,7 @@ import { Facturacion_Vs_IngresosDespachoComponent } from './Vistas/Facturacion_V
 import { Gestion_DevolucionesOFComponent } from './Vistas/Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
 import { Ingreso_PeletizadoComponent } from './Vistas/Ingreso_Peletizado/Ingreso_Peletizado.component';
 import { Mov_IngresoPeletizadoComponent } from './Vistas/Mov_IngresoPeletizado/Mov_IngresoPeletizado.component';
+import { Reingreso_ProduccionComponent } from './Vistas/Reingreso_Produccion/Reingreso_Produccion.component';
 
 @NgModule({
   declarations: [
@@ -362,7 +364,8 @@ import { Mov_IngresoPeletizadoComponent } from './Vistas/Mov_IngresoPeletizado/M
     Facturacion_Vs_IngresosDespachoComponent, 
     Gestion_DevolucionesOFComponent,
     Ingreso_PeletizadoComponent,
-    Mov_IngresoPeletizadoComponent
+    Mov_IngresoPeletizadoComponent,
+    Reingreso_ProduccionComponent,
   ],
 
   imports: [
@@ -457,6 +460,7 @@ import { Mov_IngresoPeletizadoComponent } from './Vistas/Mov_IngresoPeletizado/M
     ColorPickerModule,
     TriStateCheckboxModule,
     SelectButtonModule,
+    MessagesModule,
   ],
 
   providers: [

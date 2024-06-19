@@ -233,10 +233,11 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   //Función para seleccionar todos los bultos
   selectedAllProduction() {
     if(this.status) {
+      let tableDv = this.tableDevolution;
       this.load = true;
       this.productionSelected = this.productionSelected.concat(this.production);
       this.production = [];
-      this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre);
+      this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre, tableDv);
       this.getConsolidateProduction();
       setTimeout(() => this.load = false, 50);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar el nuevo estado de los bultos revisados!`);
@@ -247,14 +248,15 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.load = true;
     this.production = this.production.concat(this.productionSelected);
     this.productionSelected = [];
-    this.validateSelectionAllProduction(this.production, 23, 'NO DISPONIBLE');
+    this.validateSelectionAllProduction(this.production, 23, 'NO DISPONIBLE', this.tableDevolution);
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 50);
   }
 
   //Validar que al seleccionar/deseleccionar todos los bultos tomen el estado correspondiente 
-  validateSelectionAllProduction(data : any, statusId : number, statusName : string){
-    data.forEach(x => {
+  validateSelectionAllProduction(data : any, statusId : number, statusName : string, tableDevolution : any){
+    console.log(tableDevolution);
+    data.filter(x => !tableDevolution._value.map(y => y.numberProduction).includes(x.numberProduction)).forEach(x => {
       x.statusId = statusId, 
       x.statusName = statusName
     });
@@ -269,9 +271,8 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       this.productionSelected = this.productionSelected.concat(data); 
       if(!this.tableOrder.filteredValue) {
         this.production = [];
-        this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre);
-      } 
-      else {
+        this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre, this.tableDevolution);
+      } else {
         data.forEach(x => {
           x.statusId = this.status, 
           x.statusName = this.statuses.find(x => x.estado_Id == this.status).estado_Nombre

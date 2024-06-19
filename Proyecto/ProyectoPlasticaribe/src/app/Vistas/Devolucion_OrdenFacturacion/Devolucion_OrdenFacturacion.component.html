@@ -211,7 +211,6 @@
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
         <td [pEditableColumn]="data.quantity" class="cursor" pTooltip="Editar cantidad devuelta">
-          
           <p-cellEditor>
             <ng-template pTemplate="input">
               <input pInputText type="number" (focusout)="outFocus(data.quantity, data.quantity2)" (focus)="onFocus()" [min]="1" [max]="data.quantity2" [(ngModel)]="data.quantity" pEditableColumnField="quantity" required/>
@@ -220,7 +219,6 @@
               {{ data.quantity == null || data.quantity > data.quantity2 ? data.quantity2 : data.quantity | number : '1.2-2' }}
             </ng-template>
           </p-cellEditor>
-          
           <!--{{data.quantity | number : '1.2-2'}}-->
         </td>
         <td>{{data.presentation}}</td>

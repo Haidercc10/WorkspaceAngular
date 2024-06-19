@@ -392,7 +392,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           [
             { text: `Orden Fact: ${data.dev.id_OrdenFact}` },
             { text: `Factura: ${data.dev.facturaVta_Id}` },
-            { text: `Requiere Reposición: ${data.dev.DevProdFact_Reposicion == true ? 'SI' : 'NO' }`  },
+            { text: `Requiere Reposición: ${data.dev.devProdFact_Reposicion == true ? 'SI' : 'NO' }`  },
           ],
           [
             { text: `Usuario ingreso: ${data.usua.usua_Nombre}` },
@@ -530,7 +530,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         widths: ['*'],
         body: [
           [{ border: [true, false, true, false], text: `Observación de revisión: `, style: 'subtitulo', bold: true }],
-          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionGestion == null ? '' : data.dev.devProdFact_Observacion.toString().trim()}` }]
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionGestion == null ? '' : data.dev.devProdFact_ObservacionGestion.toString().trim()}` }]
         ]
       },
       fontSize: 9,
