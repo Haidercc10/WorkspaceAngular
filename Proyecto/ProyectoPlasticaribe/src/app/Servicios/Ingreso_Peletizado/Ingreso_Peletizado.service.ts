@@ -17,6 +17,8 @@ export class Ingreso_PeletizadoService {
 
   getEntryPeletizado = (date1 : any, date2 : any, hour : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getEntryPeletizado/${date1}/${date2}/${hour}`);
 
+  getMovementsPeletizado = (date1 : any, date2 : any, url : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getMovementsPeletizado/${date1}/${date2}${url}`);
+
   getStockPele_Grouped = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getStockPele_Grouped`);
 
   getStockPele_Details = (matprima : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getStockPele_Details/${matprima}`);

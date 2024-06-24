@@ -587,3 +587,7 @@ p-avatar div span {
   cursor: not-allowed; /* Cambiar el cursor a no disponible */
 }
 
+.stock {
+  background-color: #75baff;
+}
+

@@ -94,7 +94,7 @@
           <span class="p-float-label">
             <input formControlName="matprima" id="matprima" list="materiaprima" (change)="selectMatPrimas()" type="text" pInputText required/>
             <datalist id="materiaprima">
-              <option value={{item.matPri_Id}} *ngFor="let item of matPrimas">{{item.matPri_Nombre}}</option>
+              <option value={{item.id}} *ngFor="let item of matPrimas">{{item.matPrima}}</option>
             </datalist>
             <label for="matprima">Materia Prima*</label>
           </span>

@@ -223,6 +223,7 @@ import { Gestion_DevolucionesOFComponent } from './Vistas/Gestion_DevolucionesOF
 import { Ingreso_PeletizadoComponent } from './Vistas/Ingreso_Peletizado/Ingreso_Peletizado.component';
 import { Mov_IngresoPeletizadoComponent } from './Vistas/Mov_IngresoPeletizado/Mov_IngresoPeletizado.component';
 import { Reingreso_ProduccionComponent } from './Vistas/Reingreso_Produccion/Reingreso_Produccion.component';
+import { Inventario_PeletizadoComponent } from './Vistas/Inventario_Peletizado/Inventario_Peletizado.component';
 
 @NgModule({
   declarations: [
@@ -366,6 +367,7 @@ import { Reingreso_ProduccionComponent } from './Vistas/Reingreso_Produccion/Rei
     Ingreso_PeletizadoComponent,
     Mov_IngresoPeletizadoComponent,
     Reingreso_ProduccionComponent,
+    Inventario_PeletizadoComponent
   ],
 
   imports: [

@@ -56,6 +56,7 @@ export const routes: Routes = [
   { path: 'mov-preingreso-produccion', loadChildren: () => import('./Modules/movimientos-preingreso-produccion/movimientos-preingreso-produccion.module').then(m => m.MovimientosPreingresoProduccionModule) },
   { path: 'eliminar-rollos-produccion', loadChildren: () => import('./Modules/eliminar-rollos-produccion/eliminar-rollos-produccion.module').then(m => m.EliminarRollosProduccionModule) },
   { path: 'gestion-devoluciones-of', loadChildren: () => import('./Modules/gestion-devoluciones-of/gestion-devoluciones-of.module').then(m => m.GestionDevolucionesOfModule) },
+  { path: 'orden-facturacion-pallets', loadChildren: () => import('./Modules/orden-facturacion-pallets/orden-facturacion-pallets.module').then(m => m.OrdenFacturacionPalletsModule) },
   
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
   { path: 'IngresoRollos-Extrusion', loadChildren: () => import('./Modules/ingreso-rollos/ingreso-rollos.module').then(m => m.IngresoRollosModule) }, 

@@ -464,6 +464,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.load = false;
     this.otSeleccionada = 0;
     this.ArrayDocumento = [];
+    this.ordenesSeleccionadas = [];
     let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let fechaincial : any = moment(this.formularioOT.value.fecha).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formularioOT.value.fecha).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD');
@@ -687,6 +688,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que va abrir el modal donde se podrá editar el estado de las ordenes de trabajo
   abrirModalCambioEstado(dato? : any){
+    console.log(dato);
+    console.log(this.ordenesSeleccionadas);
+    
     if (dato != null) {
       this.ordenesSeleccionadas = [dato];
       this.otInfo = {...dato.ot};
@@ -703,41 +707,43 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que va a validar que una orden de trabajo esrá siendo eitada. Si validará si se está cambiando el estado por medio del botón con el lapiz o por medio de la selección de una o varias ot
   cambirEstadoOT() {
+    let count : number = 0;
     for (let i = 0; i < this.ordenesSeleccionadas.length; i++){
       this.estadosProcesos_OTService.PutEstadoOrdenTrabajo(this.ordenesSeleccionadas[i].ot, this.estadoModal).subscribe(() => {
-        this.cambiarEstadoOTBagpro();
+        count++
+        this.cambiarEstadoOTBagpro(i, count);
         this.modalEstadosOT = false;
       });
     }
-    setTimeout(() => {
-      this.ordenesSeleccionadas = [];
-      this.consultarInformacionOrdenesTrabajo();
-    }, 2500);
   }
 
   // Funcion que va a cambiar el estado de las ordenes de trabajo en la base de datos de bagpro
-  cambiarEstadoOTBagpro(){
+  cambiarEstadoOTBagpro(index : number, counter : number){
     let estado = this.estadoModal;
     let estadoFinal : any = '';
     if (estado == 18) estadoFinal = '1'; //Cerrada
     if (estado != 18 && estado != 3) estadoFinal = '0'; //Abierta
     if (estado == 3) estadoFinal = '4'; //Anulada
-    for (let i = 0; i < this.ordenesSeleccionadas.length; i++) {
-      this.servicioBagPro.srvObtenerListaClienteOT_Item(this.ordenesSeleccionadas[i].ot).subscribe(datos_ot => {
-        for (let i = 0; i < datos_ot.length; i++) {
-          const data : any = {
-            item : this.ordenesSeleccionadas[i].ot,
-            clienteNom : datos_ot[i].clienteNom,
-            clienteItemsNom : datos_ot[i].clienteItemsNom,
-            usrCrea : datos_ot[i].usrCrea,
-            estado : estadoFinal,
-          }
-          this.servicioBagPro.srvActualizar(this.ordenesSeleccionadas[i].ot, data, estadoFinal).subscribe(() => {
-            this.msj.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
-          });
+    
+    this.servicioBagPro.srvObtenerListaClienteOT_Item(this.ordenesSeleccionadas[index].ot).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        const data : any = {
+          item : datos_ot[i].item,
+          clienteNom : datos_ot[i].clienteNom,
+          clienteItemsNom : datos_ot[i].clienteItemsNom,
+          usrCrea : datos_ot[i].usrCrea,
+          estado : estadoFinal,
         }
-      });
-    }
+        this.servicioBagPro.srvActualizar(datos_ot[i].item, data, estadoFinal).subscribe(() => {
+          //console.log(counter, this.ordenesSeleccionadas.length, datos_ot.length);
+          if (counter == this.ordenesSeleccionadas.length) {
+            this.msj.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
+            setTimeout(() => { this.consultarInformacionOrdenesTrabajo(); }, 500);
+          }
+        });
+      }
+    });
+
   }
 
   // cierra el modal de cambio de estado de ordenes de trabajo
