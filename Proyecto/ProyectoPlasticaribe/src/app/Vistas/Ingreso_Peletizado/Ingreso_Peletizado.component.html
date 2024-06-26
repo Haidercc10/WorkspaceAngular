@@ -63,15 +63,6 @@
         </div>
 
         <!--Producto-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-3">
-          <span class="p-float-label">
-            <input formControlName="product" id="product" list="products" type="text" (change)="selectProduct()" [readonly]="true" (keydown)="getProduct()" pInputText required/>
-            <datalist id="products">
-              <option value={{item.prod_Id}} *ngFor="let item of products">{{item.prod_Nombre}}</option>
-            </datalist>
-            <label for="product">Producto*</label>
-          </span>
-        </div>
 
         <!-- Materiales -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">

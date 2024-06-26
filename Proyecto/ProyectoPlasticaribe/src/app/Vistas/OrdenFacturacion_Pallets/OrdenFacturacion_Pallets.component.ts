@@ -534,7 +534,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     this.load = true;
     let orderFact : modelOrdenFacturacion = {
       Factura: '',
-      Cli_Id: 1061, //this.form.value.idClient,
+      Cli_Id: this.form.value.idClient,
       Usua_Id: this.storage_Id,
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),

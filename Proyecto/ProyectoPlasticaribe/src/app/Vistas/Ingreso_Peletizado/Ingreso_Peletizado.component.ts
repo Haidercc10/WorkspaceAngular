@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { clear, error, log } from 'console';
 import { create } from 'domain';
@@ -18,6 +18,10 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { TipoRecuperadoService } from 'src/app/Servicios/TipoRecuperado/tipoRecuperado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Ingreso_Peletizado',
@@ -48,6 +52,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   rolls : any = [];
   typeRecoveries : any = [];
   disableField : boolean = true;
+  failsProcess : any = [];
 
   constructor(private AppComponent : AppComponent, 
     private svMaterials : MaterialProductoService, 
@@ -116,11 +121,15 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     this.form.get('process')?.enable();
   }
 
+  //Habilitar tipo de recuperado y no conformidad
   enableTypeRecovery() {
     this.getTypesRecovery(this.validateOptions(this.form.value.process));
     this.form.get('typeRecovery')?.enable();
+    this.fails = this.failsProcess;
+    this.fails = this.fails.filter(x => x.tipoFalla_Id == this.changeFailsForProcess(this.form.value.process));
   } 
 
+  //Habilitar formulario 
   enableForm() {
     this.form.enable();
     this.form.get('roll')?.reset();
@@ -133,10 +142,10 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   getTypesRecovery = (types : any[]) => this.svTypesRecovery.GetTodo().subscribe(data => { this.typesRecovery = data.filter(x => types.includes(x.tpRecu_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los tipos de recuperados. | ${error}`); });
 
   //Función para obtener los tipos de fallas/no conformidades. 
-  getFails = () => this.svFails.srvObtenerLista().subscribe(data => { this.fails = data.filter(x => ![1,12].includes(x.tipoFalla_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
+  getFails = () => this.svFails.srvObtenerLista().subscribe(data => { this.failsProcess = data.filter(x => [16,17,18,19,20].includes(x.tipoFalla_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
 
   //Función para obtener los procesos.
-  getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => { this.process = data.filter(x => [6,5,9,1,2,7,3,4,15].includes(x.proceso_Codigo)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los procesos. | ${error}`); });
+  getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => { this.process = data.filter(x => [3,4,15,2,1].includes(x.proceso_Codigo)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los procesos. | ${error}`); });
 
   //Función para obtener las diferentes presentaciones
   getUnits = () => this.svUnits.srvObtenerLista().subscribe(data => { this.presentations = data.filter(x => x.undMed_Id == 'Kg'); }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las presentaciones. | ${error}`); })
@@ -152,8 +161,8 @@ export class Ingreso_PeletizadoComponent implements OnInit {
         this.matPrimas = data.filter(x => x.matPrima.includes(material)); 
         console.log(this.matPrimas);
         if(this.matPrimas.length > 0) {
-          this.disableField = true;
-          this.msjs(`Advertencia`, `Debe asociar un peletizado de la lista!`);
+          this.form.patchValue({'mpId' : null, 'matprima' : null})
+          this.msjs(`Advertencia`, `Debe asociar una materia prima recuperada de la lista!`);
         } else this.msjs(`Advertencia`, `No se encontró un peletizado asociado al material ${material}`);
       } else this.msjs(`Advertencia`, `No se encontraron peletizados!`);
     }, error => { 
@@ -176,7 +185,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   //Función para mostrar el mostrar el nombre de la materia prima en el campo
   selectMatPrimas(){
     let mp : any = this.form.value.matprima;
-    this.form.patchValue({ 'mp': mp, 'matprima' : this.matPrimas.find(x => x.id == mp).matPrima });
+    this.form.patchValue({ 'mpId': mp, 'matprima' : this.matPrimas.find(x => x.id == mp).matPrima });
   }
 
   //Función para obtener los productos
@@ -298,6 +307,23 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     }
   }
 
+  changeFailsForProcess(process : string){
+    switch (process) {
+      case 'EXT' :
+        return 17;
+      case 'IMP' :
+        return 18;
+      case 'SELLA' :
+        return 20;
+      case 'ROT' :
+        return 19;
+      case 'MATPRIMA' :
+        return 16;  
+      default :
+        return 1;   
+    }
+  }
+
   //
   validateForm(){
     let roll : any = this.form.value.roll;
@@ -332,7 +358,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   addPeletizado(){
     if(this.form.valid) {
       this.recoveries.push({
-        'Rollo_Id': this.form.value.roll,
+        'Rollo_Id': [null, undefined, ''].includes(this.form.value.roll) ? 0 : (this.form.value.roll) ,
         'TpRecu_Id': this.form.value.typeRecovery,
         'TpRecu_Nombre': this.typesRecovery.find(x => x.tpRecu_Id == this.form.value.typeRecovery).tpRecu_Nombre,
         'OT': this.form.value.ot,
@@ -340,7 +366,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
         'Prod_Nombre' : this.form.value.product,
         'MatPri_Id': this.form.value.mpId,
         'MatPri_Nombre': this.form.value.matprima,
-        'Estado_Id': 41,
+        'Estado_Id': 19,
         'Material_Id': this.form.value.material,
         'Material_Nombre' : this.materials.find(x => x.material_Id == this.form.value.material).material_Nombre,
         'Falla_Id': this.form.value.fail,

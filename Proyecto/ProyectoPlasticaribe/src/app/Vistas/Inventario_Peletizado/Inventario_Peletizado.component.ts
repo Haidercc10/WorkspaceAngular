@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 import { Ingreso_PeletizadoService } from 'src/app/Servicios/Ingreso_Peletizado/Ingreso_Peletizado.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Inventario_Peletizado',
@@ -14,14 +15,20 @@ export class Inventario_PeletizadoComponent implements OnInit {
   recoveries : any = [];
   peletizados : any = [];
   detailsPele : any = [];
+  modoSeleccionado: boolean = false;
   @ViewChild('tableRecoveries') tableRecoveries: Table | undefined;
   @ViewChild('tablePeletizados') tablePeletizados: Table | undefined;
+  @ViewChild('tableDetails') tableDetails: Table | undefined;
+  
 
   constructor(
+    private AppComponent : AppComponent, 
     private svIngPele : Ingreso_PeletizadoService, 
     private svMatPrima : MateriaPrimaService,
     private msj : MensajesAplicacionService,
-  ) { }
+  ) { 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.inventoryPeletizados();
@@ -29,10 +36,12 @@ export class Inventario_PeletizadoComponent implements OnInit {
   }
 
   inventoryMaterialRecovery(){
+    this.load = true;
     this.recoveries = [];
 
     this.svMatPrima.getPeletizados().subscribe(data => { this.recoveries = data; }, error => {
       this.msj.mensajeError(`Error`, `Error al consultar los materiales recuperados | ${error.status} ${error.statusText}`);
+      this.load = false;
     })
   }
 
@@ -41,11 +50,12 @@ export class Inventario_PeletizadoComponent implements OnInit {
 
     this.svIngPele.getStockPele_Grouped().subscribe(data => { 
       data.details = [];
-      console.log(data);
       this.peletizados = data; 
+      this.load = false;
     }, error => {
       this.msj.mensajeError(`Error`, `Error al consultar información de la bodega de peletizados | ${error.status} ${error.statusText}`);
-    })
+      this.load = false;
+    });
   }
 
   loadDetailsPeletizados(data : any){
@@ -66,6 +76,8 @@ export class Inventario_PeletizadoComponent implements OnInit {
   totalQtyStock = (data) => data._value.reduce((a, b) => a += b.stock, 0);
 
   totalPrice = (data) => data._value.reduce((a, b) => a += b.subtotal, 0);
+
+  exportPDF(){}
 
 }
 

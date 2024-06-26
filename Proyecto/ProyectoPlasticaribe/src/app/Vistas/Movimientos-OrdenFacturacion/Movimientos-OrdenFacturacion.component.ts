@@ -13,8 +13,6 @@ import { MessageService } from 'primeng/api';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
-import { PruebaImagenCatInsumoComponent } from '../prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
-import { GestionDevolucionesOfModule } from 'src/app/Modules/gestion-devoluciones-of/gestion-devoluciones-of.module';
 import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
 
 @Injectable({
@@ -101,15 +99,19 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   searchDataDevolutions(startDate: any, endDate: any, route: string){
     this.dtDevolutionsService.GetDevolutions(startDate, endDate, route).subscribe(data => {
       data.forEach(dataDevolution => this.serchedData.push(dataDevolution));
-      console.log(data);
-      
     }, () => this.load = false);
   }
 
   createPDF(id : number, fact: string, type : string){
     this.load = true;
-    if (type == 'Orden') this.Orden_FacturacionComponent.createPDF(id, fact); //this.cmpOrdFact.createPDF(id, fact);
-    else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, 'exportada');
+    if (type == 'Orden') {
+      this.dtOrderFactService.GetInformacionOrderFact(id).subscribe(data => {
+        let pallet : boolean = data.some(x => x.dtOrder.pallet_Id != null);
+        !pallet ? this.Orden_FacturacionComponent.createPDF(id, fact) : this.cmpOrdFact.createPDF(id, fact);
+      }, error => {
+        this.msg.mensajeError(`Error`, `Error al consultar la OF N° ${id} | ${error.status} ${error.statusText}`);
+      });
+    } else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, 'exportada');
     setTimeout(() => this.load = false, 3000);
   }
 

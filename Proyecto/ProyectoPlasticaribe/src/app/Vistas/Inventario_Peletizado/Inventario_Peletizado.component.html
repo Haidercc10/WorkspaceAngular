@@ -5,12 +5,34 @@
   </div>
 </div>
 
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Inventario de Peletizado</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
 <p-card>
   <p-tabView [scrollable]="true">
+
     <!--Tabla Bodega Pele-->
     <p-tabPanel
       header="Inventario bodega de peletizado"
-      leftIcon="pi pi-sliders-h" >
+      leftIcon="pi pi-slack" >
+
+      <!--Exportar-->
+      <p-toolbar styleClass="mb-2">
+        <ng-template pTemplate="left"></ng-template>
+        <ng-template pTemplate="center"></ng-template>
+        <ng-template pTemplate="right">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="exportPDF()"></button>
+        </ng-template>
+      </p-toolbar>
+
       <p-table 
         #tablePeletizados
         [value]="peletizados" 
@@ -20,7 +42,9 @@
         [scrollable]="true"
         scrollHeight="50rem"
         [tableStyle]="{ 'min-width': '50rem' }"
-        dataKey="id_MatPrima">
+        dataKey="id_MatPrima"
+        [rowHover]="true"
+        *ngIf="!load">
         <ng-template pTemplate="header">
             <tr>
               <th></th>
@@ -56,7 +80,7 @@
                 <td class="text-center" [ngClass]="{'textGreen': data.stock > 0, 'textRed': data.stock == 0, }"><b>{{ data.stock | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{ data.presentation }}</td>
                 <td class="text-center">$ {{ data.price | number : '1.2-2'}}</td>
-                <td class="text-center"><b>$ {{ data.subtotal | number : '1.2-2'}}</b></td>
+                <td class="text-center" [ngClass]="{'textBlue': data.subtotal > 0, 'textRed': data.subtotal == 0, }"><b>$ {{ data.subtotal | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{ data.category }}</td>
             </tr>
         </ng-template>
@@ -65,37 +89,41 @@
               <td colspan="9">
                   <div class="p-3">
                     <p-table 
+                      #tableDetails
                       [value]="data.details" 
+                      [rowHover]="true"
                       styleClass="p-datatable-gridlines p-datatable-sm">
                       <ng-template pTemplate="header">
                           <tr>
                               <th>#</th>
-                              <th pSortableColumn="id">Codigo <p-sortIcon field="price" /></th>
-                              <th pSortableColumn="customer">Tipo Recuperado <p-sortIcon field="customer" /></th>
-                              <th pSortableColumn="customer">Cantidad <p-sortIcon field="customer" /></th>
-                              <th pSortableColumn="date">OT <p-sortIcon field="date" /></th>
-                              <th pSortableColumn="amount">Item <p-sortIcon field="amount" /></th>
-                              <th pSortableColumn="status">Referencia <p-sortIcon field="status" /></th>
-                              <th pSortableColumn="status">Material <p-sortIcon field="status" /></th>
-                              <th pSortableColumn="status">Proceso <p-sortIcon field="status" /></th>
+                              <th class="text-center" pSortableColumn="entries.ingPel_Id">Codigo <p-sortIcon field="entries.ingPel_Id" /></th>
+                              <th class="text-center" pSortableColumn="recovery">Tipo Recuperado <p-sortIcon field="recovery" /></th>
+                              <th class="text-center" pSortableColumn="entries.ingPel_Cantidad">Peso (Kg)<p-sortIcon field="entries.ingPel_Cantidad" /></th>
+                              <th class="text-center" pSortableColumn="entries.ot">OT <p-sortIcon field="entries.ot" /></th>
+                              <th class="text-center" pSortableColumn="product.item">Item <p-sortIcon field="product.item" /></th>
+                              <th class="text-center" pSortableColumn="product.reference">Referencia <p-sortIcon field="product.reference" /></th>
+                              <th class="text-center" pSortableColumn="material.material">Material <p-sortIcon field="material.material" /></th>
+                              <th class="text-center" pSortableColumn="process.status">Proceso <p-sortIcon field="process.status" /></th>
+                              <th class="text-center" pSortableColumn="entries.ingPel_FechaIngreso">Fecha <p-sortIcon field="entries.ingPel_FechaIngreso" /></th>
                           </tr>
                       </ng-template>
                       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                           <tr>
-                              <td>{{ rowIndex + 1 }}</td>
-                              <td>{{ data.entries.ingPel_Id }}</td>
-                              <td>{{ data.type_Recovery.id }}</td>
-                              <td><b>{{ data.entries.ingPel_Cantidad }}</b></td>
-                              <td>{{ data.entries.ot }}</td>
-                              <td>{{ data.product.item }}</td>
+                              <td class="text-center">{{ rowIndex + 1 }}</td>
+                              <td class="text-center">{{ data.entries.ingPel_Id }}</td>
+                              <td class="text-center">{{ data.type_Recovery.recovery }}</td>
+                              <td class="text-center"><b>{{ data.entries.ingPel_Cantidad | number : '1.2-2'}}</b></td>
+                              <td class="text-center">{{ data.entries.ot }}</td>
+                              <td class="text-center">{{ data.product.item }}</td>
                               <td>{{ data.product.reference }}</td>
-                              <td>{{ data.material.material }}</td>
-                              <td>{{ data.process.status }}</td>
+                              <td class="text-center">{{ data.material.material }}</td>
+                              <td class="text-center">{{ data.process.status }}</td>
+                              <td class="text-center">{{ data.entries.ingPel_FechaIngreso | date : 'dd/MM/yyyy' }}</td>
                           </tr>
                       </ng-template>
                       <ng-template pTemplate="emptymessage">
                           <tr>
-                              <td colspan="9">No existen registros asociados</td>
+                              <td colspan="10">No existen registros asociados</td>
                           </tr>
                       </ng-template>
                     </p-table>  
@@ -107,8 +135,9 @@
           <tr>
             <td class="text-center" colspan="4"></td>
             <td class="text-center textGreen">{{ totalQtyStock(tablePeletizados) | number : '1.2-2'}}</td>
-            <td class="text-center" colspan="2"></td>
-            <td class="text-center textGreen">$ {{ totalQtyStock(tablePeletizados) | number : '1.2-2'}}</td>
+            <td class="text-center">Kg</td>
+            <td class="text-center"></td>
+            <td class="text-center textBlue">$ {{ totalPrice(tablePeletizados) | number : '1.2-2'}}</td>
             <td></td>
           </tr>  
         </ng-template >
@@ -118,7 +147,17 @@
     <!--Tabla Recuperados-->
     <p-tabPanel
       header="Inventario de materiales recuperados"
-      leftIcon="pi pi-sliders-h" >
+      leftIcon="pi pi-database" >
+
+      <!--Exportar-->
+      <p-toolbar styleClass="mb-2">
+        <ng-template pTemplate="left"></ng-template>
+        <ng-template pTemplate="center"></ng-template>
+        <ng-template pTemplate="right">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="exportPDF()"></button>
+        </ng-template>
+      </p-toolbar>
+
       <!--Tabla-->
       <p-table 
         #tableRecoveries
@@ -128,7 +167,9 @@
         columnResizeMode="expand"
         [scrollable]="true"
         scrollHeight="50rem"
-        [tableStyle]="{ 'min-width': '50rem' }">
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [rowHover]="true"
+        *ngIf="!load">
         <ng-template pTemplate="header">
             <tr>
               <th></th>
@@ -159,7 +200,7 @@
                 <td class="text-center" [ngClass]="{'textGreen': data.stock > 0, 'textRed': data.stock == 0, }"><b>{{ data.stock | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{ data.presentation }}</td>
                 <td class="text-center">$ {{ data.price | number : '1.2-2'}}</td>
-                <td class="text-center"><b>$ {{ data.subtotal | number : '1.2-2'}}</b></td>
+                <td class="text-center" [ngClass]="{'textBlue': data.subtotal > 0, 'textRed': data.subtotal == 0, }"><b>$ {{ data.subtotal | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{ data.category }}</td>
             </tr>
         </ng-template>
@@ -167,8 +208,9 @@
           <tr>
             <td class="text-center" colspan="3"></td>
             <td class="text-center textGreen">{{ totalQtyStock(tableRecoveries) | number : '1.2-2'}}</td>
-            <td class="text-center" colspan="2"></td>
-            <td class="text-center textGreen">$ {{ totalPrice(tableRecoveries) | number : '1.2-2'}}</td>
+            <td class="text-center">Kg</td>
+            <td class="text-center"></td>
+            <td class="text-center textBlue">$ {{ totalPrice(tableRecoveries) | number : '1.2-2'}}</td>
             <td></td>
           </tr>  
         </ng-template >

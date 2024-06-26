@@ -268,21 +268,24 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
       this.dtBgRollosService.GetInfoRollo(this.detallesSolicitud[i].Rollo, this.detallesSolicitud[i].BodegaActual).subscribe(data => {
         for (let j = 0; j < data.length; j++) {
           let info : modelDtBodegasRollos = {
-            BgRollo_Id : data[j].bgRollo_Id,
-            Codigo : data[j].codigo,
-            BgRollo_OrdenTrabajo : data[j].bgRollo_OrdenTrabajo,
-            Prod_Id : data[j].prod_Id,
-            DtBgRollo_Rollo : data[j].dtBgRollo_Rollo,
-            DtBgRollo_Cantidad : data[j].dtBgRollo_Cantidad,
-            UndMed_Id : data[j].undMed_Id,
-            BgRollo_BodegaActual : this.detallesSolicitud[i].BodegaSiguiente,
-            DtBgRollo_Extrusion : this.detallesSolicitud[i].BodegaSiguiente == 'EXT' || (data[j].dtBgRollo_Extrusion && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
-            DtBgRollo_ProdIntermedio : this.detallesSolicitud[i].BodegaSiguiente == 'BGPI' || (data[j].dtBgRollo_ProdIntermedio && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
-            DtBgRollo_Impresion : this.detallesSolicitud[i].BodegaSiguiente == 'IMP' || (data[j].dtBgRollo_Impresion && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
-            DtBgRollo_Rotograbado : this.detallesSolicitud[i].BodegaSiguiente == 'ROT' || (data[j].dtBgRollo_Rotograbado && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
-            DtBgRollo_Sellado : this.detallesSolicitud[i].BodegaSiguiente == 'SELLA' || (data[j].dtBgRollo_Sellado && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
-            DtBgRollo_Corte : this.detallesSolicitud[i].BodegaSiguiente == 'CORTE' || (data[j].dtBgRollo_Corte && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
-            DtBgRollo_Despacho : this.detallesSolicitud[i].BodegaSiguiente == 'DESP' || (data[j].dtBgRollo_Despacho && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            BgRollo_Id: data[j].bgRollo_Id,
+            Codigo: data[j].codigo,
+            BgRollo_OrdenTrabajo: data[j].bgRollo_OrdenTrabajo,
+            Prod_Id: data[j].prod_Id,
+            DtBgRollo_Rollo: data[j].dtBgRollo_Rollo,
+            DtBgRollo_Cantidad: data[j].dtBgRollo_Cantidad,
+            UndMed_Id: data[j].undMed_Id,
+            BgRollo_BodegaActual: this.detallesSolicitud[i].BodegaSiguiente,
+            DtBgRollo_Extrusion: this.detallesSolicitud[i].BodegaSiguiente == 'EXT' || (data[j].dtBgRollo_Extrusion && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_ProdIntermedio: this.detallesSolicitud[i].BodegaSiguiente == 'BGPI' || (data[j].dtBgRollo_ProdIntermedio && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Impresion: this.detallesSolicitud[i].BodegaSiguiente == 'IMP' || (data[j].dtBgRollo_Impresion && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Rotograbado: this.detallesSolicitud[i].BodegaSiguiente == 'ROT' || (data[j].dtBgRollo_Rotograbado && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Sellado: this.detallesSolicitud[i].BodegaSiguiente == 'SELLA' || (data[j].dtBgRollo_Sellado && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Corte: this.detallesSolicitud[i].BodegaSiguiente == 'CORTE' || (data[j].dtBgRollo_Corte && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Despacho: this.detallesSolicitud[i].BodegaSiguiente == 'DESP' || (data[j].dtBgRollo_Despacho && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            Estado_Id: 0,
+            BgRollo_BodegaInicial: '',
+            DtBgRollo_Ubicacion: ''
           }
           this.dtBgRollosService.Put(data[j].codigo, info).subscribe(() => {
             numDatos += 1;

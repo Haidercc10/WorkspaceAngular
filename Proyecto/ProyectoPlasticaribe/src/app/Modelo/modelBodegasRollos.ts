@@ -5,4 +5,5 @@ export interface modelBodegasRollos {
   BgRollo_FechaModifica? : any;
   BgRollo_HoraModifica? : string;
   BgRollo_Observacion : string;
+  Usua_Id : number;
 }

@@ -1,7 +1,3 @@
-span{
-  color: #db4149;
-}
-
 .d-grid {
   padding-bottom: 1%;
 }
@@ -79,3 +75,66 @@ p-calendar ::ng-deep span button span {
 .deshabilitado{
   visibility: hidden;
 }
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+  height: 2rem;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+    width: 2rem;
+}
+
+.bg-Extrusion {
+  color: white;
+  background-color: palevioletred;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Impresion {
+  color: white;
+  background-color: DarkCyan;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Rotograbado {
+  color: white;
+  background-color: DarkSeaGreen;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Doblado {
+  color: white;
+  background-color: LightSalmon;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Laminado {
+  color: white;
+  background-color: Orange;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Corte {
+  color: white;
+  background-color: Khaki;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Empaque {
+  color: white;
+  background-color: DarkKhaki;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Sellado {
+  color: white;
+  background-color: CornflowerBlue;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Wiketiado {
+  color: white;
+  background-color: MediumSlateBlue;
+  font-size: calc(var(--font-size) * 15px);
+}
+

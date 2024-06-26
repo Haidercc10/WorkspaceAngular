@@ -151,6 +151,8 @@ export const routes: Routes = [
   /*************************************************************** PELETIZADO *************************************************************************************************/
   { path: 'ingreso-peletizado', loadChildren: () => import('./Modules/ingreso-peletizado/ingreso-peletizado.module').then(m => m.IngresoPeletizadoModule) },
   { path: 'mov-ingreso-peletizado', loadChildren: () => import('./Modules/mov-ingreso-peletizado/mov-ingreso-peletizado.module').then(m => m.MovIngresoPeletizadoModule) },
+  { path: 'inventario-peletizado', loadChildren: () => import('./Modules/inventario-peletizado/inventario-peletizado.module').then(m => m.InventarioPeletizadoModule) },
+
 ]
 
 @NgModule({

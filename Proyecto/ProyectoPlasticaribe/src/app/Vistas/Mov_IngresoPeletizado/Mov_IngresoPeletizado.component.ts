@@ -10,6 +10,7 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import moment from 'moment';
 import { Ingreso_PeletizadoService } from 'src/app/Servicios/Ingreso_Peletizado/Ingreso_Peletizado.service';
+import { Ingreso_PeletizadoComponent } from '../Ingreso_Peletizado/Ingreso_Peletizado.component';
 
 @Component({
   selector: 'app-Mov_IngresoPeletizado',
@@ -42,6 +43,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
     private createPDFService: CreacionPdfService,
     private svMatPrima : MateriaPrimaService,
     private svIngPele : Ingreso_PeletizadoService,
+    private cmpEntryPeletizado : Ingreso_PeletizadoComponent,
   ) { 
     this.selectedMode = this.appComponent.temaSeleccionado;
     this.initForm();
@@ -107,7 +109,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   }
 
   searchInPeletizado(){
-    this.dataFound = [];
+    this.entries = [];
 
     if((this.form.value.rankDates).length == 2) {
       let date1 : any = moment(this.form.value.rankDates[0]).format('YYYY-MM-DD');
@@ -115,8 +117,8 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
       this.load = true;
 
       this.svIngPele.getMovementsPeletizado(date1, date2, this.validateUrl()).subscribe(data => {
-        this.dataFound = data;
-        console.log(data);
+        this.entries = data;
+        this.load = false;
       }, error => this.msg.mensajeError(`Error`, `No se ha podido consultar el ingreso de peletizado!`));
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe elegir 2 fechas para consultar!`);
   }
@@ -140,5 +142,8 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
 
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  totalQty = () => this.entries.reduce((a, b) => a += b.ing.ingPel_Cantidad, 0);
+  totalQty = () => this.entries.reduce((a, b) => a += b.entries.ingPel_Cantidad, 0);
+
+  viewEntryPDF = (data) => this.cmpEntryPeletizado.createPDF(data.entries.ingPel_FechaIngreso, data.entries.ingPel_FechaIngreso, data.entries.ingPel_HoraIngreso, `exportado`);
+
 }

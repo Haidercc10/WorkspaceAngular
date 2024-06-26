@@ -21,6 +21,8 @@ export class Detalle_BodegaRollosService {
 
   GetInfoRollo = (rollo : number, bodega : string) :Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInfoRollo/${rollo}/${bodega}`);
 
+  getRollo = (rollo : number, bodega : string) :Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollo/${rollo}/${bodega}`);
+
   GetRollosDisponibles = (bodega : string, ot : number, ruta : any) : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollosDisponibles/${bodega}/${ot}/${ruta}`);
 
   GetInventarioRollos = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventarioRollos`);
