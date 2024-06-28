@@ -33,7 +33,7 @@
 
   <p-tabView [scrollable]="true" id="seleccionInventarios">
     <!-- INVENTARIO TOTAL -->
-    <p-tabPanel
+    <!--<p-tabPanel
       header="Inventario Total"
       leftIcon="pi pi-th-large"
       tooltip="Información del Inventario de Todas las Bodega"
@@ -63,7 +63,7 @@
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'BodegaActual', 'contains', dtTotal)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
-              <tr class="font-size-16" id="titulos">
+              <tr>
                 <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
                 <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
                 <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
@@ -104,10 +104,10 @@
           </p-table>
         </div>
       </div>
-    </p-tabPanel>
+    </p-tabPanel>-->
 
     <!-- EXTRUSIÓN -->
-    <p-tabPanel
+    <!--<p-tabPanel
       header="Extrusión"
       leftIcon="pi pi-bolt"
       tooltip="Información del Inventario de la Bodega de Extrusión">
@@ -169,7 +169,7 @@
         </p-table>
         </div>
       </div>
-    </p-tabPanel>
+    </p-tabPanel>-->
 
     <!-- PRODUCTO INTERMEDIO -->
     <p-tabPanel
@@ -237,7 +237,7 @@
     </p-tabPanel>
 
     <!-- IMPRESIÓN -->
-    <p-tabPanel
+    <!--<p-tabPanel
       header="Impresión"
       leftIcon="pi pi-print"
       tooltip="Información del Inventario de la Bodega de Impresión">
@@ -299,10 +299,10 @@
           </p-table>
         </div>
       </div>
-    </p-tabPanel>
+    </p-tabPanel>-->
 
     <!-- ROTOGRABADO -->
-    <p-tabPanel
+    <!--<p-tabPanel
       header="Rotograbado"
       leftIcon="pi pi-print"
       tooltip="Información del Inventario de la Bodega de Rotograbado">
@@ -364,10 +364,10 @@
           </p-table>
         </div>
       </div>
-    </p-tabPanel>
+    </p-tabPanel>-->
 
     <!-- SELLADO -->
-    <p-tabPanel
+    <!--<p-tabPanel
       header="Sellado"
       leftIcon="pi pi-tags"
       tooltip="Información del Inventario de la Bodega de Sellado">
@@ -429,10 +429,10 @@
           </p-table>
         </div>
       </div>
-    </p-tabPanel>
+    </p-tabPanel>-->
 
     <!-- DESPACHO -->
-    <p-tabPanel
+    <!--<p-tabPanel
       header="Despacho"
       leftIcon="pi pi-truck"
       tooltip="Información del Inventario de la Bodega de Despacho">
@@ -494,7 +494,7 @@
           </p-table>
         </div>
       </div>
-    </p-tabPanel>
+    </p-tabPanel>-->
   </p-tabView>
 </p-card>
 

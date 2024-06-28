@@ -84,17 +84,20 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           Bodega: data[i].bgRollo_BodegaActual,
           BodegaActual: data[i].proceso_Nombre,
         }
-        this.inventarioTotal.push(info);
-        if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
+        //this.inventarioTotal.push(info);
+        //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
         if (data[i].bgRollo_BodegaActual == 'BGPI') this.inventarioProductoIntermedio.push(info);
-        if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
-        if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
-        if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
-        if (data[i].bgRollo_BodegaActual == 'DESP') this.inventarioDespacho.push(info);
+        //if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
+        //if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
+        //if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
+        //if (data[i].bgRollo_BodegaActual == 'DESP') this.inventarioDespacho.push(info);
         num += 1;
         if (num == data.length) this.cargando = false;
       }
-    }, () => this.cargando = false);
+    }, error => {
+       this.msj.mensajeError(`Error`, `No fue posible cargar el inventario de rollos`); 
+       this.cargando = false
+    });
   }
 
   // Funcion que va a consultar los detalles de las ordenes de trabajo

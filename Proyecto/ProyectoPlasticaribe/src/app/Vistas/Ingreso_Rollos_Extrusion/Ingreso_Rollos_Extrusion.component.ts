@@ -114,7 +114,6 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
           this.cargando = true;
 
           this.dtBgRollosService.getRollo(rollo, area).subscribe(dataPl => {
-            console.log(dataPl);
             if(dataPl.length == 0) {
               this.bagProService.getRollProduction(rollo, `?process=${proceso.toUpperCase()}`).subscribe(data => {
                 if(data != null) this.agregarRollo(data);
@@ -185,7 +184,13 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   quitarRolloTabla(item : any){
     this.cargando = true;
     
-    //this.GrupoProductos();
+    setTimeout(() => {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `Se quitó el rollo N° ${item.rollo} de la tabla!`);
+      let index = this.rollosIngresar.findIndex(x => x.rollo == item.rollo && x.ot == item.ot);
+      this.rollosIngresar.splice(index, 1);
+      this.cargando = false;
+      this.cargarUltimoRollo();
+    }, 500); 
   }
 
   // Funcion que va a crear los rollos en la base de datos
@@ -369,7 +374,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody2(data, columns, 'Información detalle de rollos ingresados'),
+        body: this.buildTableBody2(data, columns, 'Información detallada de rollos ingresados'),
       },
       fontSize: 8,
       layout: {

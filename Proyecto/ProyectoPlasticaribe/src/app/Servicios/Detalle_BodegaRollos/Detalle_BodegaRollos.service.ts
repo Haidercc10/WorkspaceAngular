@@ -35,6 +35,8 @@ export class Detalle_BodegaRollosService {
 
   Put = (id : any, data : modelDtBodegasRollos) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/${id}`, data);
 
+  putRollsStore = (status : any, process : any, data : any[]) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/putRollsStore/${status}/${process}`, data);
+
   Delete = (id : any) => this.http.delete(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/${id}`);
 
   GetIdRollo = (rollo : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getIdRollo/${rollo}`);
