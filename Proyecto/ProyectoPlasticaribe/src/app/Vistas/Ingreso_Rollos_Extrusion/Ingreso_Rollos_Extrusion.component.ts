@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -15,6 +15,10 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsBodegas as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Ingreso_Rollos_Extrusion',
@@ -40,6 +44,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   procesos : any = []; //Variable que cargará los procesos.
   ubicaciones : any = ['IZQUIERDA', 'DERECHA'];
   @ViewChild('dt') dt : Table | undefined; 
+
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -100,7 +105,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   }
 
   //Función para obtener los procesos.
-  getProcesos = () => this.svProcesos.srvObtenerLista().subscribe(data => { this.procesos = data.filter(x => [1,2,3,4,9].includes(x.proceso_Codigo)) }, error => { this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); });
+  getProcesos = () => this.svProcesos.srvObtenerLista().subscribe(data => { this.procesos = data.filter(x => [1,2,3,9,7].includes(x.proceso_Codigo)) }, error => { this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); });
 
   aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
@@ -158,6 +163,17 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     if(![undefined, null].includes(data)) {
       this.FormConsultarRollos.patchValue({ 'Item' : data.item, 'Referencia' : `${data.item} - ${data.referencia}`, 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null });
     } else this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null });
+  }
+
+  getRolloOrdenProduccion(){
+    let ot : any = this.FormConsultarRollos.value.Proceso;
+    let area :  string = this.FormConsultarRollos.value.Proceso;
+    let proceso : string = this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
+    this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null });
+     
+    this.bagProService.GetDatosRollosPesados(ot, proceso).subscribe(data => {
+      console.log(data);
+    });
   }
 
   msjs(msj1 : string, msj2 : string){

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
@@ -34,6 +35,8 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   inventarioDespacho : any [] = []; //Variable que almacenará la información del inventario de la bodega de despacho
   inventarioDetallado : any [] = []; //Vaariable que almacenará la información del inventario detallado
   inventario : boolean = false; //Variablq que validará si se ve el modal de los rollos o no
+  
+  @ViewChild('dtProductoIntermedio') dtProductoIntermedio: Table | undefined;
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -132,156 +135,148 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   aplicarfiltro = ($event : any, campo : any, valorCampo : string, tabla : any) => tabla!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a calcular la cantidad total de kg que hay
-  calcularTotalKg(data : any) : number{
-    if (data.length == 0) return 0;
+  calcularTotalKg(){
     let total : number = 0;
-    total = data.reduce((a,b) => a + b.Cantidad);
+    total = this.inventarioProductoIntermedio.reduce((a,b) => a + b.Cantidad, 0);
     return total;
   }
 
-  calcularTotalRollos(data : any) : number{
-    if (data.length == 0) return 0;
+  calcularTotalRollos(){
     let total : number = 0;
-    total = data.reduce((a,b) => a + b.Rollos);
+    total = this.inventarioProductoIntermedio.reduce((a,b) => a + b.Rollos, 0);
     return total;
   }
 
   // Funcion que va a crear un archivo de excel
   crearExcel(num : number){
-    this.cargando = true;
-    let datos : any [] = [];
-    let infoDocumento : any [] = [];
-    let title : string = ``;
+    if(this.inventarioProductoIntermedio.length > 0) {
+      this.cargando = true;
+      let datos : any [] = [];
+      let infoDocumento : any [] = [];
+      let title : string = ``;
 
-    if (num == 1) {
-      title = `Inventario Bodegas - ${this.today}`;
-      datos = this.inventarioTotal;
-    } else if (num == 2) {
-      title = `Inventario Bodega Extrusión - ${this.today}`;
-      datos = this.inventarioExtrusion;
-    } else if (num == 3) {
-      title = `Inventario Bodega Producto Intermedio - ${this.today}`;
-      datos = this.inventarioProductoIntermedio;
-    } else if (num == 4) {
-      title = `Inventario Bodega Impresión - ${this.today}`;
-      datos = this.inventarioImpresion;
-    } else if (num == 5) {
-      title = `Inventario Bodega Rotograbado - ${this.today}`;
-      datos = this.inventarioRotograbado;
-    } else if (num == 6) {
-      title = `Inventario Bodega Sellado - ${this.today}`;
-      datos = this.inventarioSellado;
-    } else if (num == 7) {
-      title = `Inventario Bodega Despacho - ${this.today}`;
-      datos = this.inventarioDespacho;
-    }
-    setTimeout(() => {
-      const header = ["Orden Trabajo", "Item", "Referencia", "Cantidad Kg", "Presentación", "Cantidad Rollos", "Bodega Actual"]
-      for (const item of datos) {
-        const datos1  : any = [item.Orden, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Rollos, item.BodegaActual];
-        infoDocumento.push(datos1);
+      if (num == 1) {
+        title = `Inventario Bodegas - ${this.today}`;
+        datos = this.inventarioTotal;
+      } else if (num == 2) {
+        title = `Inventario Bodega Extrusión - ${this.today}`;
+        datos = this.inventarioExtrusion;
+      } else if (num == 3) {
+        title = `Inventario Bodega Producto Intermedio - ${this.today}`;
+        datos = this.inventarioProductoIntermedio;
+      } else if (num == 4) {
+        title = `Inventario Bodega Impresión - ${this.today}`;
+        datos = this.inventarioImpresion;
+      } else if (num == 5) {
+        title = `Inventario Bodega Rotograbado - ${this.today}`;
+        datos = this.inventarioRotograbado;
+      } else if (num == 6) {
+        title = `Inventario Bodega Sellado - ${this.today}`;
+        datos = this.inventarioSellado;
+      } else if (num == 7) {
+        title = `Inventario Bodega Despacho - ${this.today}`;
+        datos = this.inventarioDespacho;
       }
-      let workbook = new Workbook();
-      const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(title);
-      worksheet.addImage(imageId1, 'A1:B3');
-      let titleRow = worksheet.addRow([title]);
-      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-      worksheet.addRow([]);
-      worksheet.addRow([]);
-      let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'eeeeee' }
-        }
-        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      });
-      worksheet.mergeCells('A1:G3');
-      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      infoDocumento.forEach(d => {
-        let row = worksheet.addRow(d);
-        row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      });
-      worksheet.getColumn(1).width = 20;
-      worksheet.getColumn(2).width = 20;
-      worksheet.getColumn(3).width = 60;
-      worksheet.getColumn(4).width = 30;
-      worksheet.getColumn(5).width = 15;
-      worksheet.getColumn(6).width = 20;
-      worksheet.getColumn(7).width = 30;
       setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, title + `.xlsx`);
+        const header = ["Orden Trabajo", "Item", "Referencia", "Cantidad Kg", "Presentación", "Cantidad Rollos", "Bodega Actual"]
+        for (const item of datos) {
+          const datos1  : any = [item.Orden, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Rollos, item.BodegaActual];
+          infoDocumento.push(datos1);
+        }
+        let workbook = new Workbook();
+        const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+        let worksheet = workbook.addWorksheet(title);
+        worksheet.addImage(imageId1, 'A1:B3');
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell) => {
+          cell.fill = {  type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' }}
+          cell.font = { name: 'Calibri', family: 4, size: 12, bold: true }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        this.cargando = false;
-        this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del !` + title);
-      }, 1000);
-    }, 1500);
+        worksheet.mergeCells('A1:G3');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getCell('A1').value = title;
+        worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 16, bold: true };
+        infoDocumento.forEach(d => {
+          let row = worksheet.addRow(d);
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        });
+        let widths : any = [20, 20, 60, 31, 15, 20, 30];
+        let count : number = 0;
+        widths.forEach(x => {
+          count++
+          worksheet.getColumn(count).width = x;
+        }); 
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, title + `.xlsx`);
+          });
+          this.cargando = false;
+          this.msj.mensajeConfirmacion(`Confirmación`, `${title} exportado exitosamente!` );
+        }, 1000);
+      }, 1500);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No se puede crear el archivo Excel porque no hay datos para exportar`);
+    
   }
 
   // Funcion que va a crear un excel de los detalles
   crearExcelDetallado(){
-    this.cargando = true;
-    this.inventario = false;
-    let datos : any [] = this.inventarioDetallado;
-    let infoDocumento : any [] = [];
-    let title : string = `Inventario Detallado`;
+    if (this.inventarioDetallado.length > 0) {
+      this.cargando = true;
+      this.inventario = false;
+      let datos : any [] = this.inventarioDetallado;
+      let infoDocumento : any [] = [];
+      let title : string = `Inventario detallado OT N° ${this.inventarioDetallado[0].Orden}`;
 
-    setTimeout(() => {
-      const header = ["Rollo", "Orden Trabajo", "Item", "Referencia", "Cantidad", "Presentación", "Fecha Ingreso", "Extrusión", "Producto Intermedio", "Impresión", "Rotograbado", "Sellado", "Despacho"]
-      for (const item of datos) {
-        const datos1  : any = [item.Rollo, item.Orden, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Fecha, item.Extrusion, item.ProductoIntermedio, item.Impresion, item.Rotograbado, item.Sellado, item.Despacho];
-        infoDocumento.push(datos1);
-      }
-      let workbook = new Workbook();
-      const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(title);
-      worksheet.addImage(imageId1, 'A1:B3');
-      let titleRow = worksheet.addRow([title]);
-      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-      worksheet.addRow([]);
-      worksheet.addRow([]);
-      let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'eeeeee' }
-        }
-        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      });
-      worksheet.mergeCells('A1:M3');
-      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      infoDocumento.forEach(d => {
-        let row = worksheet.addRow(d);
-        row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      });
-      worksheet.getColumn(1).width = 20;
-      worksheet.getColumn(2).width = 20;
-      worksheet.getColumn(3).width = 20;
-      worksheet.getColumn(4).width = 60;
-      worksheet.getColumn(5).width = 20;
-      worksheet.getColumn(6).width = 15;
-      worksheet.getColumn(7).width = 15;
-      worksheet.getColumn(8).width = 15;
-      worksheet.getColumn(9).width = 20;
-      worksheet.getColumn(10).width = 15;
-      worksheet.getColumn(11).width = 15;
-      worksheet.getColumn(12).width = 15;
-      worksheet.getColumn(13).width = 15;
       setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, title + `.xlsx`);
+        const header = ["Rollo", "Orden Trabajo", "Item", "Referencia", "Cantidad", "Presentación", "Fecha Ingreso", "Extrusión", "Producto Intermedio", "Impresión", "Rotograbado", "Sellado", "Despacho"]
+        for (const item of datos) {
+          const datos1  : any = [item.Rollo, item.Orden, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Fecha, item.Extrusion, item.ProductoIntermedio, item.Impresion, item.Rotograbado, item.Sellado, item.Despacho];
+          infoDocumento.push(datos1);
+        }
+        let workbook = new Workbook();
+        const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+        let worksheet = workbook.addWorksheet(title);
+        worksheet.addImage(imageId1, 'A1:B3');
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'eeeeee' }
+          }
+          cell.font = { name: 'Calibri', family: 4, size: 12, bold: true }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        this.cargando = false;
-        this.inventario = true;
-        this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del !` + title);
-      }, 1000);
-    }, 1500);
+        worksheet.mergeCells('A1:M3');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getCell('A1').value = title;
+        worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 16, bold: true };
+        infoDocumento.forEach(d => {
+          let row = worksheet.addRow(d);
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        });
+
+        let widths : any = [15,10,15,60,15,15,15,15,25,12,15,12,12]
+        let count : number = 0;
+        widths.forEach(x => {
+          count++
+          worksheet.getColumn(count).width = x;
+        }); 
+
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, title + `.xlsx`);
+          });
+          this.cargando = false;
+          this.inventario = true;
+          this.msj.mensajeConfirmacion(`Confirmación`, `${title} exportado exitosamente!`);
+        }, 1000);
+      }, 1500);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No se puede crear el archivo Excel porque no hay datos para exportar`);
+    
   }
 }
+

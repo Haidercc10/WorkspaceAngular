@@ -53,20 +53,21 @@
             <label for="Rollo">N° Rollo</label>
           </span>
         </div>
-        
+
+         <!-- OT -->
+         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-1">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i> 
+            <input formControlName="OrdenTrabajo" id="ordenTrabajo" (keyup.enter)="getRolloOrdenProduccion()" type="number" pInputText required/>
+            <label for="ordenTrabajo">OT</label>
+          </span>
+        </div>
+
         <!-- Ultimo Rollo Ingresado-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <input formControlName="Ultimo_Rollo" id="Ultimo_Rollo" [readonly]="true" type="number" pInputText required/>
             <label for="Ultimo_Rollo">Ult. rollo</label>
-          </span>
-        </div>
-
-         <!-- OT -->
-         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-1"> 
-          <span class="p-float-label">
-            <input formControlName="OrdenTrabajo" [readonly]="true" id="ordenTrabajo" type="number" pInputText required/>
-            <label for="ordenTrabajo">OT</label>
           </span>
         </div>
 

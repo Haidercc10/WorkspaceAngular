@@ -107,3 +107,7 @@ p-dialog ::ng-deep .p-dialog-header span {
 .negrita{
   font-weight: bold;
 }
+
+::ng-deep .p-toolbar {
+  padding: 0.5rem   
+}

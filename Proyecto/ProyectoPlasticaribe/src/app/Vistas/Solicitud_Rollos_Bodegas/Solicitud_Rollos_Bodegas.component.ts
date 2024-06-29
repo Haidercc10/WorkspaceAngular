@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -16,6 +16,10 @@ import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollo
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudRollos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Solicitud_Rollos_Bodegas',
@@ -310,7 +314,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         'SolRollo_FechaSolicitud': moment().format('YYYY-MM-DD'),
         'SolRollo_HoraSolicitud': moment().format('H:mm:ss'),
         'Usua_Respuesta': this.storage_Id,
-        'Estado_Id': 31,
+        'Estado_Id': 48,
         'TpSol_Id': this.devolucionRollos ? 2 : 1,
         'SolRollo_Observacion': this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion.toUpperCase(),
         'SolRollo_FechaRespuesta': moment().format('YYYY-MM-DD'),

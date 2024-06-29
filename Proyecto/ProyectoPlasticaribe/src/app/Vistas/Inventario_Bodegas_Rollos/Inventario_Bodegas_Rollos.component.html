@@ -9,7 +9,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Rollos Por Bodega</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Bodega de Rollos</h2>
     </div>
 
     <div class="mb-4">
@@ -23,10 +23,10 @@
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
-  <p-toolbar styleClass="mb-5 gap-3">
+  <p-toolbar styleClass="mb-3 gap-3">
     <div class="row" style="width: 100%;">
-      <div class="col p-2">
-        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="crearExcel(1)"></button>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="crearExcel(3)"></button>
       </div>
     </div>
   </p-toolbar>
@@ -177,9 +177,9 @@
       leftIcon="pi pi-th-large"
       tooltip="Información del Inventario de la Bodega de Producto Intermedio">
       <div class="mb-3" *ngIf="!cargando">
-        <div class="row g-3 font-size-14" id="table">
+        <div class="row g-3" id="table">
           <p-table
-            #dtProductoIntemedio
+            #dtProductoIntermedio
             [value]="inventarioProductoIntermedio"
             [resizableColumns]="true"
             columnResizeMode="expand"
@@ -190,45 +190,46 @@
             [scrollable]="true"
             scrollHeight="50rem">
             <ng-template pTemplate="header" >
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(3)"></button></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtProductoIntemedio)"></th>
+              <tr>
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtProductoIntermedio)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
-                <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
-                <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
-                <th pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
-                <th pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
-                <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
-                <th pSortableColumn="Rollos">Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
-                <th pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
+              <tr>
+                <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+                <th class="text-center" pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Rollos">Cantidad Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
+                <th class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
               <tr>
                 <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
-                <td class="negrita">{{data.Orden}}</td>
-                <td>{{data.Item}}</td>
-                <td class="negrita">{{data.Referencia}}</td>
-                <td class="negrita">{{data.Cantidad | number : '1.2-2'}}</td>
-                <td>{{data.Presentacion}}</td>
-                <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
-                <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+                <td class="text-center negrita">{{data.Orden}}</td>
+                <td class="text-center">{{data.Item}}</td>
+                <td class="negrita negrita">{{data.Referencia}}</td>
+                <td class="text-center negrita textGreen">{{data.Cantidad | number : '1.2-2'}}</td>
+                <td class="text-center">{{data.Presentacion}}</td>
+                <td class="text-center negrita textGreen">{{data.Rollos}}</td>
+                <td class="text-center" style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="4">Totales: </td>
-                <td>{{calcularTotalKg(inventarioProductoIntermedio) | number : '1.2-2'}}</td>
-                <td>Kg</td>
-                <td colspan="2">{{calcularTotalRollos(inventarioProductoIntermedio) | number : '1.2-2'}}</td>
+                <td class="text-right" colspan="4">Totales: </td>
+                <td class="text-center textGreen">{{calcularTotalKg() | number : '1.2-2'}}</td>
+                <td class="text-center">Kg</td>
+                <td class="text-center textGreen">{{calcularTotalRollos()}}</td>
+                <td></td>
               </tr>
             </ng-template>
           </p-table>
@@ -498,7 +499,7 @@
   </p-tabView>
 </p-card>
 
-<p-dialog [(visible)]="inventario" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="inventario" [style]="{width: '85vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <p-table
       #dtDetallado
