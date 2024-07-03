@@ -137,7 +137,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   getBodegas(){
     this.procesosService.srvObtenerLista().subscribe(data => {
       this.bodegasSolicitadas = data.filter(x => ['BGPI'].includes(x.proceso_Id));
-      this.bodegasSolicitantes = data.filter(x => ['EXT', 'SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+      this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
     });
   }
 

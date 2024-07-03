@@ -43,4 +43,6 @@ export class Detalle_BodegaRollosService {
   
   getMovementsStore = (date1 : any, date2 : any, url : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getMovementsStore/${date1}/${date2}${url}`);
 
+  getRollsForOT = (ot : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollsForOT/${ot}`);
+
 }

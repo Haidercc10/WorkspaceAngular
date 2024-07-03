@@ -488,9 +488,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       this.dt_Biorientados.filteredValue != null ? datos = this.dt_Biorientados.filteredValue : datos = this.biorientados; //Biorientado filtrada y no filtrado
       title = `Inventario Biorientados - ${this.today}`;
     }
-
-    if (this.boppsAgrupados) this.exportarExcel2();
-    else {
+    //if (this.boppsAgrupados) this.exportarExcel2();
+    //else {
       setTimeout(() => {
         const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
         for (const item of datos) {
@@ -552,10 +551,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             fs.saveAs(blob, title + `.xlsx`);
           });
           this.load = true;
-          this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del !` + title);
+          this.msj.mensajeConfirmacion(`Confirmación`, `Se ha exportado el ` + title + `!`);
         }, 1000);
       }, 1500);
-    }
+    //}
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
@@ -817,8 +816,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   /** Función que cargará el inventario de bopp's agrupados si se encuentra en el tab 4 */
-  cargarTabs(indexTab: any) {
-    if ([4,1].includes(indexTab)) { 
+  cargarTabs(event) {
+    let tab : any = event.originalEvent.srcElement.innerText;
+    if (tab == 'Bopps agrupados') { 
       this.boppsAgrupados = true; 
       this.boppsAgrupados_Genericos(); 
     } else this.boppsAgrupados = false;

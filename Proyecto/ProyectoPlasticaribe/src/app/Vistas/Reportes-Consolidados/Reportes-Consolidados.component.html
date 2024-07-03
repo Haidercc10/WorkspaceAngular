@@ -4,7 +4,7 @@
 
       <!-- FACTURACIÓN -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,96].includes(ValidarRol)"
         header="Facturación"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Facturacion-Detallada *ngIf="facturacion"></app-Reporte-Facturacion-Detallada>
@@ -44,7 +44,7 @@
 
       <!-- FACTURACIÓN DE ITEMS -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,96].includes(ValidarRol)"
         header="Facturación de Items"
         leftIcon="pi pi-sliders-h">
         <app-Reporte_FacturacionZeus *ngIf="facturacionItems"></app-Reporte_FacturacionZeus>
@@ -52,7 +52,7 @@
 
       <!-- PEDIDOS -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,96].includes(ValidarRol)"
         header="Pedidos"
         leftIcon="pi pi-sliders-h">
         <app-ReportePedidos_Zeus *ngIf="pedidos" [reporteConsolidado]="true"></app-ReportePedidos_Zeus>
@@ -60,7 +60,7 @@
 
       <!-- INVENTARIO PRODUCTOS TERMINADOS -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,96].includes(ValidarRol)"
         header="Inventario"
         leftIcon="pi pi-sliders-h">
         <app-modal-generar-inventario-zeus *ngIf="inventarioProductos" [reporteConsolidado]="true"></app-modal-generar-inventario-zeus>
@@ -68,7 +68,7 @@
 
       <!-- ESTADISTICA DE VENTAS -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,96].includes(ValidarRol)"
         header="Estadisticas Ventas"
         leftIcon="pi pi-sliders-h">
         <app-Reporte_EstadisticasVentas></app-Reporte_EstadisticasVentas>

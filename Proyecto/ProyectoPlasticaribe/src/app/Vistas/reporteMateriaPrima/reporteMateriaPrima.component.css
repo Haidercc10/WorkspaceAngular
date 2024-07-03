@@ -59,3 +59,24 @@ p-dialog ::ng-deep .p-dialog-header span {
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
 }
+
+::ng-deep p-toolbar .p-toolbar {
+  justify-content: space-between !important;
+}
+
+::ng-deep .p-toolbar {
+  padding: 0.5rem   
+}
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+  height: 2rem;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+  width: 2rem;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+  width: 2rem;
+  height: 2rem;
+}

@@ -40,17 +40,19 @@ export class ReportesConsolidadosComponent implements OnInit {
   }
 
   //
-  cambioTab(e : any) {
-    var index = e.index;
-    index == 0 ?  this.facturacion = true : this.facturacion = false;
-    index == 1 ?  this.consolidadoProduccionAreas = true : this.consolidadoProduccionAreas = false;
-    index == 2 ?  this.produccionDetallada = true : this.produccionDetallada = false;
-    index == 3 ?  this.cartera = true : this.cartera = false;
-    index == 4 ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
-    index == 5 ?  this.facturacionItems = true : this.facturacionItems = false;
-    index == 6 ?  this.pedidos = true : this.pedidos = false;
-    index == 7 ?  this.inventarioProductos = true : this.inventarioProductos = false;
-    index == 8 ?  this.estadisticasVentas = true : this.estadisticasVentas = false;
+  cambioTab(event : any) {
+    //var index = e.index;
+    let tab : any = event.originalEvent.srcElement.innerText;
+    //console.log(index);
+    tab == `Facturación` ?  this.facturacion = true : this.facturacion = false;
+    tab == `Consolidado Producción` ?  this.consolidadoProduccionAreas = true : this.consolidadoProduccionAreas = false;
+    tab == `Produccion Detallada` ?  this.produccionDetallada = true : this.produccionDetallada = false;
+    tab == `Cartera` ?  this.cartera = true : this.cartera = false;
+    tab == `Facturación Vendedores` ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
+    tab == `Facturación de Items` ?  this.facturacionItems = true : this.facturacionItems = false;
+    tab == `Pedidos` ?  this.pedidos = true : this.pedidos = false;
+    tab == `Inventario` ?  this.inventarioProductos = true : this.inventarioProductos = false;
+    tab == `Estadisticas Ventas` ?  this.estadisticasVentas = true : this.estadisticasVentas = false;
   }
 
 }

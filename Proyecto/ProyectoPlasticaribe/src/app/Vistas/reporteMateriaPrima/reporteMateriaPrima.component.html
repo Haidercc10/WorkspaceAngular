@@ -31,38 +31,27 @@
   </div>
 
   <p-toolbar>
-    <div class="row g-3" style="width: 100%;">
-      <div class="col-md-6 text-left">
-        <span class="p-float-label" id="rango-fechas">
-          <!-- Rango de Fechas -->
-          <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
-          <label for="FechaInicial">Rango de Fechas</label>
-        </span>
-      </div>
-
-      <div class="col-md-6">
-        <div class="row g-2">
-          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-            <button pButton pRipple pTooltip="Consultar Inventario" label="Buscar" icon="pi pi-search" class="p-button-danger" id="consultar" (click)="consultarInventario()"></button>
-          </div>
-          <!-- Con existencias -->
-          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-            <button pButton pRipple pTooltip="Materias primas con existencias" label="Stock" icon="pi pi-eject" class="p-button-warning" id="con-existencias" (click)="existenciasMayorCero()"></button>
-          </div>
-          <!-- Nueva materias prima -->
-          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-            <button *ngIf="ValidarRol == 1" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-success" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
-          </div>
-          <!-- Exportar excel -->
-          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-            <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel" class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
-          </div>
+      <ng-template pTemplate="left">
+        <div class="mr-2">
+          <span class="p-float-label" id="rango-fechas">
+            <!-- Rango de Fechas -->
+            <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Rango de Fechas</label>
+          </span>
         </div>
-      </div>
-    </div>
+        <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger" id="consultar" (click)="consultarInventario()"></button>
+      </ng-template>
+      <ng-template pTemplate="right">
+        <!-- Con existencias -->
+        <button pButton pRipple pTooltip="Materias primas con existencias" label="Stock" icon="pi pi-eject" class="p-button-warning mr-2" id="con-existencias" (click)="existenciasMayorCero()"></button>
+        <!-- Nueva materias prima -->
+        <button *ngIf="ValidarRol == 1" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-danger mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
+        <!-- Exportar excel -->
+        <button pButton pRipple label="Exportar a excel inventario de todos los materiales" pTooltip="Exportar a excel" icon="pi pi-file-excel" class="p-button-success" id="exportar1" label="Exportar" (click)="exportarExcel(1)"></button>            
+      </ng-template>
   </p-toolbar>
 
-  <p-tabView id="materias-primas" (onChange)="cargarTabs($event.index)">
+  <p-tabView id="materias-primas" (onChange)="cargarTabs($event)">
     <!-- Materias Primas -->
     <p-tabPanel
       header="Materias Primas"
@@ -73,9 +62,8 @@
         <div class="row g-3 font-size-14" id="table">
           <!-- Buscador de columnas -->
           <p-toolbar>
-            <div id="rowToolbar" class="row g-3">
-              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
-                <p-multiSelect
+            <ng-template pTemplate="left">
+              <p-multiSelect
                 [options]="columnas"
                 [(ngModel)]="_columnasSeleccionada"
                 optionLabel="header"
@@ -84,8 +72,10 @@
                 pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
                 tooltipPosition="top">
                 </p-multiSelect>
-              </div>
-            </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+              <button pButton pRipple pTooltip="Exportar a excel inventario de todos los materiales" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" label="Exportar" (click)="exportarExcel(2)"></button>
+            </ng-template>
           </p-toolbar>
           <p-table
             #dt
@@ -128,7 +118,7 @@
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
                 <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(ArrayMateriaPrima) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -146,9 +136,8 @@
         <div class="row g-3 font-size-14" id="table">
           <!-- Buscador de columnas -->
           <p-toolbar>
-            <div id="rowToolbar" class="row g-3">
-              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
-                <p-multiSelect
+            <ng-template pTemplate="left">
+              <p-multiSelect
                 [options]="columnas"
                 [(ngModel)]="_columnasSeleccionada"
                 optionLabel="header"
@@ -157,8 +146,10 @@
                 pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
                 tooltipPosition="top">
                 </p-multiSelect>
-              </div>
-            </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+              <button pButton pRipple pTooltip="Exportar a excel inventario de polietilenos" icon="pi pi-file-excel" class="p-button-outlined p-button-success" label="Exportar" id="exportar3" (click)="exportarExcel(3)"></button>
+            </ng-template>
           </p-toolbar>
           <p-table
             #dt_Polientileno
@@ -201,7 +192,7 @@
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
                 <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(polietilenos) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(3)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -213,15 +204,14 @@
     <p-tabPanel
       header="Tintas"
       leftIcon="pi pi-palette"
-      tooltip="Información del Inventario de los Polietilenos"
+      tooltip="Información del Inventario de las tintas"
       *ngIf="![63,89,4].includes(ValidarRol)">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
           <!-- Buscador de columnas -->
           <p-toolbar>
-            <div id="rowToolbar" class="row g-3">
-              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
-                <p-multiSelect
+            <ng-template pTemplate="left">
+              <p-multiSelect
                 [options]="columnas"
                 [(ngModel)]="_columnasSeleccionada"
                 optionLabel="header"
@@ -230,8 +220,10 @@
                 pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
                 tooltipPosition="top">
                 </p-multiSelect>
-              </div>
-            </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+              <button pButton pRipple pTooltip="Exportar a excel inventario de tintas" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportarExcel(4)"></button>
+            </ng-template>
           </p-toolbar>
           <p-table
             #dt_Tintas
@@ -274,7 +266,7 @@
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
                 <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(tintas) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(4)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -291,9 +283,8 @@
         <div class="row g-3 font-size-14" id="table">
           <!-- Buscador de columnas -->
           <p-toolbar>
-            <div id="rowToolbar" class="row g-3">
-              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
-                <p-multiSelect
+            <ng-template pTemplate="left">
+              <p-multiSelect
                 [options]="columnas"
                 [(ngModel)]="_columnasSeleccionada"
                 optionLabel="header"
@@ -302,8 +293,10 @@
                 pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
                 tooltipPosition="top">
                 </p-multiSelect>
-              </div>
-            </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+              <button pButton pRipple pTooltip="Exportar a excel inventario de biorientados detallados" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportarExcel(5)"></button>
+            </ng-template>
           </p-toolbar>
           <p-table
             #dt_Biorientados
@@ -346,7 +339,7 @@
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
                 <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(biorientados) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(5)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -362,6 +355,13 @@
       *ngIf="[1,3,4,89,63].includes(this.ValidarRol)">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
+          <p-toolbar>
+            <ng-template pTemplate="left">
+            </ng-template>
+            <ng-template pTemplate="right">
+              <button pButton pRipple pTooltip="Exportar a excel inventario de biorientados genéricos agrupados" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportarExcel2()"></button>
+            </ng-template>
+          </p-toolbar>
           <p-table
             #dt_BoppGenerico
             [value]="arrayBopps"
@@ -436,7 +436,7 @@
               <tr id="totales">
                 <td colspan="7" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
                 <td class="text-left">{{stockTotalBopps | number: '1.2-2'}}</td>
-                <td colspan="2" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" label="Exportar" class="p-button-success" (click)="exportarExcel2()" id="exportar4"></button></td>
+                <td colspan="2" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>

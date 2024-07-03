@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelBodegasRollos } from 'src/app/Modelo/modelBodegasRollos';
 import { modelDtBodegasRollos } from 'src/app/Modelo/modelDtBodegasRollos';
@@ -44,8 +45,10 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   procesos : any = []; //Variable que cargará los procesos.
   ubicaciones : any = ['IZQUIERDA', 'DERECHA'];
   @ViewChild('dt') dt : Table | undefined; 
-
-
+  loadModal : boolean = false;
+  rollosOT : any = [];
+  rollosSeleccionados : any = [];
+  
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
                   private mensajeService : MensajesAplicacionService,
@@ -54,13 +57,15 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
                         private bgRollosService : Bodegas_RollosService,
                           private dtBgRollosService : Detalle_BodegaRollosService,
                             private svProcesos : ProcesosService, 
-                              private svPDF : CreacionPdfService) {
+                              private svPDF : CreacionPdfService,
+                              private msg : MessageService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
       Proceso : [null, Validators.required], 
       OrdenTrabajo: [null, Validators.required],
       Rollo : [null],
+      Peso : [null],
       Item : [null, Validators.required],
       Referencia: [null, Validators.required],
       Ubicacion : [null, Validators.required],
@@ -101,6 +106,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   limpiarCampos(){
     this.FormConsultarRollos.reset();
     this.rollosIngresar = [];
+    this.rollosOT = [];
+    this.rollosSeleccionados = [];
     this.cargando = false;
   }
 
@@ -150,10 +157,10 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       data.proceso_Id = this.FormConsultarRollos.value.Proceso;
       this.rollosIngresar.unshift(data); 
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `El rollo N° ${bulto} ha sido agregado a la tabla correctamente`);
-      this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Item' : data.item, 'Referencia' : `${data.item} - ${data.referencia}`, 'Rollo' : null });
+      this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Item' : data.item, 'Referencia' : `${data.item} - ${data.referencia}`, 'Rollo' : null, 'Peso' : data.peso, });
       this.cargando = false; 
     } else {
-      this.msjs(`Advertencia`, `El rollo N° ${bulto} ya ha sido ingresado`);
+      this.msjs(`Advertencia`, `El rollo N° ${bulto} ya se encuentra agregado en la tabla`);
       this.cargarUltimoRollo();
     } 
   }
@@ -161,23 +168,84 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   cargarUltimoRollo(){
     let data = this.rollosIngresar[0];
     if(![undefined, null].includes(data)) {
-      this.FormConsultarRollos.patchValue({ 'Item' : data.item, 'Referencia' : `${data.item} - ${data.referencia}`, 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null });
-    } else this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null });
+      this.FormConsultarRollos.patchValue({ 'Item' : data.item, 'Referencia' : `${data.item} - ${data.referencia}`, 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null, 'Peso' : data.peso, });
+    } else this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null, });
+    this.cargando = false;
   }
 
   getRolloOrdenProduccion(){
-    let ot : any = this.FormConsultarRollos.value.Proceso;
-    let area :  string = this.FormConsultarRollos.value.Proceso;
-    let proceso : string = this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
-    this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null });
-     
-    this.bagProService.GetDatosRollosPesados(ot, proceso).subscribe(data => {
-      console.log(data);
-    });
+    if(this.FormConsultarRollos.value.Ubicacion) {
+      if(this.FormConsultarRollos.value.Proceso) {
+        if(this.FormConsultarRollos.value.OrdenTrabajo) {
+          if(this.FormConsultarRollos.value.Peso) {
+            let ot : any = this.FormConsultarRollos.value.OrdenTrabajo;
+            let area :  string = this.FormConsultarRollos.value.Proceso;
+            let proceso : string = this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
+            let peso : number = this.FormConsultarRollos.value.Peso;
+            this.rollosSeleccionados = [];
+            this.rollosOT = [];
+            this.cargando = true;
+
+            this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
+
+            this.dtBgRollosService.getRollsForOT(ot).subscribe(dataPl => {
+              this.bagProService.getAvailablesRollsOT(ot, proceso, dataPl).subscribe(data => {
+                if(data.length > 0) this.cargarRolloSemejante(data, peso, dataPl);
+                else {
+                  this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontró información de la orden N° ${ot} en el proceso ${proceso.toUpperCase()} en BagPro!`);
+                  this.cargarUltimoRollo();
+                } 
+              }, error => {
+                this.msjs(error.status == 400 ? `Advertencia` : `Error`, error.status == 400 ? `No se encontraron rollos pesados de la OT N° ${ot} en el proceso de ${proceso.toUpperCase()} BagPro!` : `Error en la busqueda de la OT N° ${ot} en BagPro!`); 
+                this.cargarUltimoRollo();
+              });
+            }, error => {
+                this.mensajeService.mensajeError(`Error`, `No fue posible consultar la OT N° ${ot} en la bodega de rollos`)
+                this.cargarUltimoRollo();
+            });
+          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Para consultar un rollo por OT debe llenar el campo 'PESO'`);
+        }  else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'OT'`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'PROCESO'`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'UBICACIÓN'`);
+  }
+
+  cargarRolloSemejante(data : any, peso : number, dataInStore : any){
+    data.sort((a, b) => a.extnetokg - b.extnetokg);
+    let count : number = 0
+
+    for (let index = 0; index < data.length; index++) {
+      if(!this.rollosIngresar.map(x => x.rollo).includes(data[index].item) && 
+          (data[index].extnetokg >= (peso - 5)  && data[index].extnetokg <= (peso + 5)) && 
+            !dataInStore.map(x => x).includes(data[index].item)) {
+        this.FormConsultarRollos.patchValue({ 'Rollo' : data[index].item, });
+        this.cargarRolloTabla();
+        break;
+      } else count++;   
+    }
+    if(count == data.length) {
+      this.cargarUltimoRollo();
+      this.loadModal = true;
+      this.rollosOT = data.filter(x => !this.rollosIngresar.map(x => x.rollo).includes(x.item));
+    } 
+    this.cargando = false;
+  }
+
+  onRowSelect(event: any) {
+    setTimeout(() => {
+      this.loadModal = false;
+      this.FormConsultarRollos.patchValue({ 'Rollo' : event.data.item, });
+      this.cargarRolloTabla();
+    }, 500);
+  }
+
+  onRowUnselect(event: any) {
+    //this.loadModal = false;
+    //this.msg.add({ severity: 'info', summary: 'Rollo Seleccionado', detail: event.data.item });
+    this.FormConsultarRollos.patchValue({ 'Rollo' : null, });
   }
 
   msjs(msj1 : string, msj2 : string){
-    this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null });
+    this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
     this.cargando = false;
 
     switch (msj1) {
@@ -303,7 +371,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
           "Item": d.item,
           "Referencia": d.referencia,
           "Rollos" : cantRegistros,
-          "Peso": pesoTotal,
+          "Peso": pesoTotal.toFixed(2),
           "Presentación" : d.presentacion,
         });
       }

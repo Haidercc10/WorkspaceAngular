@@ -206,3 +206,11 @@ a:hover {
 ::ng-deep p-multiselect div[class*="p-multiselect p-component"]{
   width: 100%;
 }
+
+::ng-deep p-toolbar .p-toolbar {
+  justify-content: space-between !important;
+}
+
+::ng-deep .p-toolbar {
+  padding: 0.5rem   
+}

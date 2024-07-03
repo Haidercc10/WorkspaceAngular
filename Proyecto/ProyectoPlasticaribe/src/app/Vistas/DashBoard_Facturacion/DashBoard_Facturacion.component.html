@@ -11,7 +11,7 @@
   </div>
 
   <!-- Cards de Costos -->
-  <div class="row g-3 text-center fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
+  <div class="row g-3 text-center fila-1" *ngIf="[1,6,60].includes(ValidarRol)">
     <div class="col-xxl-3 col-xl-4 col-lg-5 col-md-12 col-sm-12 col-xs-12" id="facturacion">
       <div class="p-3 roll-in-left">
         <p-card>

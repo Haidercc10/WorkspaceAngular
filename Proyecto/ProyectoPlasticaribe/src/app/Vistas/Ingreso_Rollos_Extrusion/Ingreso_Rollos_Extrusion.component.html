@@ -63,8 +63,17 @@
           </span>
         </div>
 
+        <!-- Peso -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-1">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i> 
+            <input formControlName="Peso" id="Peso" (keyup.enter)="getRolloOrdenProduccion()" type="number" pInputText required/>
+            <label for="Peso">Peso</label>
+          </span>
+        </div>
+
         <!-- Ultimo Rollo Ingresado-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-1">
           <span class="p-float-label">
             <input formControlName="Ultimo_Rollo" id="Ultimo_Rollo" [readonly]="true" type="number" pInputText required/>
             <label for="Ultimo_Rollo">Ult. rollo</label>
@@ -75,7 +84,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-3">
           <span class="p-float-label">
             <input formControlName="Referencia" [readonly]="true" id="Referencia" type="text" pInputText required/>
-            <label for="Referencia">Referencia</label>
+            <label for="Referencia">Ult. Referencia</label>
           </span>
         </div>
 
@@ -94,8 +103,8 @@
     <div class="mb-3">
       <div class="row g-3">
         <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-          <button pButton pRipple class="p-button-secondary" icon="pi pi-eraser" label="Limpiar campos" id="botones1"></button>
-          <button pButton pRipple class="p-button-outlined p-button-secondary" icon="pi pi-eraser" label="Limpiar todo" id="botones1"></button>
+          <button pButton pRipple class="p-button-secondary" icon="pi pi-eraser" type="button" label="Limpiar campos" (click)="limpiarForm()" id="botones1"></button>
+          <button pButton pRipple class="p-button-outlined p-button-secondary" type="button" icon="pi pi-eraser" (click)="limpiarCampos()" label="Limpiar todo" id="botones1"></button>
         </div>
       </div>
     </div>
@@ -208,3 +217,43 @@
     </div>
   </div>
 </p-card>
+
+<p-dialog [(visible)]="loadModal" [style]="{width: '60vw'}" [resizable]="false" header="No se encontraron rollos de la OT con peso semejante al consultado, elija uno de la lista." [modal]="true">
+    
+    <div class="mb-4">
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de rollos pesados</h4>
+    </div>
+    
+    <p-table 
+    [value]="rollosOT" 
+    [tableStyle]="{ 'min-width': '50rem' }" 
+    styleClass="p-datatable-sm"
+    selectionMode="single" 
+    [(selection)]="rollosSeleccionados" 
+    dataKey="item" 
+    (onRowSelect)="onRowSelect($event)" 
+    (onRowUnselect)="onRowUnselect($event)" >
+      <ng-template pTemplate="header">
+          <tr>
+              <th class="text-center">N°</th>
+              <th class="text-center">Rollo</th>
+              <th class="text-center">OT</th>
+              <th class="text-center">Item</th>
+              <th class="text-center">Referencia</th>
+              <th class="text-center">Peso</th>
+              <th class="text-center">Proceso</th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+          <tr class="cursor" [pSelectableRow]="data">
+              <td class="text-center">{{ rowIndex + 1 }}</td>
+              <td class="text-center"><b>{{ data.item }}</b></td>
+              <td class="text-center">{{ data.ot }}</td>
+              <td class="text-center">{{ data.clienteItem }}</td>
+              <td><b>{{ data.clienteItemNombre }}</b></td>
+              <td class="text-center"><b>{{ data.extnetokg }}</b></td>
+              <td class="text-center">{{ data.nomStatus }}</td>
+          </tr>
+      </ng-template>
+    </p-table>  
+</p-dialog>

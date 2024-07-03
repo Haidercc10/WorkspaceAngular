@@ -6,9 +6,7 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
-import { error } from 'console';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MessageService } from 'primeng/api';
 
@@ -87,7 +85,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     if([86,4].includes(this.ValidarRol)) {
-        this.loadRollsProductionAvailable();
+      this.loadRollsProductionAvailable();
     }    
     //this.getStockInformation();
     //this.loadRollsProductionAvailable();

@@ -109,7 +109,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   // Funcion que va a consultar los vendedores
   consultarVendedores(){
     this.usuariosService.GetVendedores().subscribe(data => {
-      if ([1,6].includes(this.ValidarRol)) this.Vendedores = data;
+      if ([1,6,96].includes(this.ValidarRol)) this.Vendedores = data;
       if (this.ValidarRol == 2) {
         this.Vendedores = data.filter(x => x.usua_Id == this.storage_Id);
         let Id_Vendedor : string = `${this.Vendedores[0].usua_Id}`;
