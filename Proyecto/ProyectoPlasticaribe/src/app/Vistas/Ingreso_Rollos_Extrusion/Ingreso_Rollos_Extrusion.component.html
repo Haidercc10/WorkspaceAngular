@@ -32,8 +32,16 @@
         <!--Ubicación-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="Ubicacion" id="Ubicacion" [options]="ubicaciones" [autoDisplayFirst]="false"></p-dropdown>
+            <p-dropdown formControlName="Ubicacion" id="Ubicacion" [options]="ubications" optionValue="ubR_Id" optionLabel="ubR_Nombre" (onChange)="getSubUbications()" [autoDisplayFirst]="false"></p-dropdown>
             <label for="Ubicacion">Ubicacion*</label>
+          </span>
+        </div>
+
+        <!--Sub ubicación-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="SubUbicacion" id="SubUbicacion" [options]="subUbications" optionValue="ubR_SubId" optionLabel="ubR_SubNombre" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="SubUbicacion">Sub Ubicacion</label>
           </span>
         </div>
 
@@ -72,8 +80,8 @@
           </span>
         </div>
 
-        <!-- Ultimo Rollo Ingresado-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-1">
+        <!-- Ultimo Rollo agregado-->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <input formControlName="Ultimo_Rollo" id="Ultimo_Rollo" [readonly]="true" type="number" pInputText required/>
             <label for="Ultimo_Rollo">Ult. rollo</label>
@@ -81,12 +89,12 @@
         </div>
 
         <!--Referencia-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-3">
+        <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-3">
           <span class="p-float-label">
             <input formControlName="Referencia" [readonly]="true" id="Referencia" type="text" pInputText required/>
             <label for="Referencia">Ult. Referencia</label>
           </span>
-        </div>
+        </div>-->
 
         <!-- Observacion -->
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-4 col-xxl-12">
@@ -187,7 +195,9 @@
               'bg-Impresion': data.proceso == 'IMPRESION',
               'bg-Rotograbado': data.proceso == 'ROTOGRABADO',
               'bg-Sellado': data.proceso == 'SELLADO',
-              'bg-Despacho': data.proceso == 'DESPACHO'}">{{data.proceso}}</span>
+              'bg-Despacho': data.proceso == 'DESPACHO', 
+              'bg-Empaque': data.proceso == 'EMPAQUE', 
+              'bg-Laminado': data.proceso == 'LAMINADO'}">{{data.proceso}}</span>
             </td>
             <td class="text-center"><b>{{data.ubicacion}}</b></td>
             <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
@@ -209,6 +219,7 @@
         </ng-template>
     </p-table>
   </div>
+
   <!-- Botones -->
   <div *ngIf="!cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">

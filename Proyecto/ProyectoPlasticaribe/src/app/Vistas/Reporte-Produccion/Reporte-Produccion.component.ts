@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -8,6 +8,9 @@ import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.s
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
+import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 
 @Component({
   selector: 'app-Reporte-Produccion',
@@ -29,6 +32,9 @@ export class ReporteProduccionComponent implements OnInit {
   productos: any[] = [];
   produccion: any[] = [];
   rollosSeleccionados: any[] = [];
+  traceability : boolean = false;
+  @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
+  selectedRoll : any = null;
 
   constructor(private AppComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -36,7 +42,8 @@ export class ReporteProduccionComponent implements OnInit {
     private msj: MensajesAplicacionService,
     private productosService: ProductoService,
     private svcPDF: CreacionPdfService, 
-    private svcExcel : CreacionExcelService) {
+    private svcExcel : CreacionExcelService, 
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
@@ -86,6 +93,7 @@ export class ReporteProduccionComponent implements OnInit {
     this.produccion = [];
     this.clientes = [];
     this.productos = [];
+    this.selectedRoll = null;
   }
 
   // Funcion que se encargaá de buscar los clientes
@@ -611,4 +619,14 @@ export class ReporteProduccionComponent implements OnInit {
     concatCells.forEach(cell => worksheet.mergeCells(cell));
   }
 
+  //*Función para cargar el modal de movimientos.
+  searchMovements(data : any){
+    this.cargando = true;
+    setTimeout(() => {
+      this.traceability = true;
+      this.selectedRoll = data.rollo;
+      this.cmpMovRolls.searchMovements(data, `Produccion`);
+      this.cargando = false;
+    }, 500);
+  } 
 }

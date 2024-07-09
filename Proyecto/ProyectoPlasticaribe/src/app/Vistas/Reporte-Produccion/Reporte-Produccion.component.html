@@ -157,7 +157,7 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowIndex="rowIndex" let-data>
-      <tr>
+      <tr class="cursor" (dblclick)="searchMovements(data)" pTooltip="Haz doble clic para ver la trazabilidad del rollo/bulto" tooltipPosition="top">
         <td>
           <p-tableCheckbox [value]="data" *ngIf="['SELLADO', 'EMPAQUE'].includes(data.proceso) && (data.envioZeus).trim() == '0' && [1].includes(ValidarRol)"></p-tableCheckbox>
           <span class="pl-4">{{rowIndex + 1}}</span>
@@ -198,3 +198,8 @@
   </p-table>
 
 </div>
+
+<p-dialog header="Trazabilidad rollo/bulto N° {{selectedRoll}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="traceability" [style]="{width: '85%'}" [modal]="true" >
+  <app-Movimientos_Rollos></app-Movimientos_Rollos>
+</p-dialog>
+  

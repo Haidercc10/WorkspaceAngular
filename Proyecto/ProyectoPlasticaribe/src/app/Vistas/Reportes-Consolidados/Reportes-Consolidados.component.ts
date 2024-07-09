@@ -46,7 +46,7 @@ export class ReportesConsolidadosComponent implements OnInit {
     //console.log(index);
     tab == `Facturación` ?  this.facturacion = true : this.facturacion = false;
     tab == `Consolidado Producción` ?  this.consolidadoProduccionAreas = true : this.consolidadoProduccionAreas = false;
-    tab == `Produccion Detallada` ?  this.produccionDetallada = true : this.produccionDetallada = false;
+    tab == `Producción Detallada` ?  this.produccionDetallada = true : this.produccionDetallada = false;
     tab == `Cartera` ?  this.cartera = true : this.cartera = false;
     tab == `Facturación Vendedores` ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
     tab == `Facturación de Items` ?  this.facturacionItems = true : this.facturacionItems = false;

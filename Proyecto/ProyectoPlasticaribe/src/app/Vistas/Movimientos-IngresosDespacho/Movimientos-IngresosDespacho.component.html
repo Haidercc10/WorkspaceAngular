@@ -109,7 +109,7 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-    <tr>
+    <tr class="cursor" (dblclick)="searchMovements(data)">
       <td><p-tableCheckbox [value]="data" *ngIf="data.stateRollPP == 'DISPONIBLE'" ></p-tableCheckbox></td>
       <td class="text-center">{{rowIndex + 1 | number}}</td>
       <td class="text-center"><b>{{data.orderProduction}}</b></td>
@@ -131,4 +131,8 @@
 
 <p-dialog header="Actualizar ubicaciones" [(visible)]="modal" [modal]="true" [style]="{ width: '85vw' }" [resizable]="false">
   <app-Ubicaciones_Rollos></app-Ubicaciones_Rollos>
-</p-dialog>      
+</p-dialog>  
+
+<p-dialog header="Trazabilidad rollo/bulto N° {{selectedRoll}}" [(visible)]="traceability" [modal]="true" [style]="{ width: '85vw' }" [resizable]="false">
+  <app-Movimientos_Rollos></app-Movimientos_Rollos>
+</p-dialog>

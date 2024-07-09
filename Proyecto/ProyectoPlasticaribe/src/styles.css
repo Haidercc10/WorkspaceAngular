@@ -516,6 +516,12 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
+.bg-warning3 {
+  color: rgb(84, 90, 0);
+  background-color: rgb(241, 255, 47);
+  font-size: calc(var(--font-size) * 14px);
+}
+
 .bg-secondary1 {
   color: rgb(255, 255, 255);
   background-color: rgb(102, 102, 102);
@@ -534,9 +540,27 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
+.bg-blue2 {
+  background-color: #25b3ff;
+  color: #002677;
+  font-size: calc(var(--font-size) * 14px);
+}
+
 .bg-success1 {
   color: rgb(6, 100, 3);
   background-color: palegreen;
+  font-size: calc(var(--font-size) * 14px);
+}
+
+.bg-success2 {
+  color: rgb(6, 100, 3);
+  background-color: rgb(0, 255, 0);
+  font-size: calc(var(--font-size) * 14px);
+}
+
+.bg-success3 {
+  color: rgb(255, 255, 255);
+  background-color: #36962e;
   font-size: calc(var(--font-size) * 14px);
 }
 

@@ -8,6 +8,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
 import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
+import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
 
 @Injectable({
   providedIn : 'root'
@@ -31,6 +32,9 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   @ViewChild('table') table: Table | undefined;
   modal : boolean = false;
   dataSelected : any = [];
+  traceability : boolean = false;
+  @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
+  selectedRoll : any = null;
   
   @ViewChild(Ubicaciones_RollosComponent) ubicationRolls : Ubicaciones_RollosComponent;
 
@@ -388,6 +392,17 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     this.dataSelected = this.dataSearched.filter(x => x.stateRollPP == 'DISPONIBLE');
     setTimeout(() => { this.load = false; }, 50);
   }
+
+  //*Movimientos de rollos/bultos que pasaron por despacho
+  searchMovements(data : any){
+    this.load = true;
+    setTimeout(() => {
+      this.traceability = true;
+      this.selectedRoll = data.production;
+      this.cmpMovRolls.searchMovements(data, `Despacho`);
+      this.load = false;
+    }, 500);
+  }  
 }
 
 export interface dataDesp {

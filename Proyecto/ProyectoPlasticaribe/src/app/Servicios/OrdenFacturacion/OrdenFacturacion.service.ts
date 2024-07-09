@@ -18,6 +18,8 @@ export class OrdenFacturacionService {
 
     getLastOrder = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/getLastOrder`);
 
+    getMovementsInvoices = (invoice : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/getMovementsInvoices/${invoice}`);
+
     Post = (data : modelOrdenFacturacion) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/OrdenFacturacion`, data);
 
     PutStatusOrder = (fact: number) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putStatusOrder/${fact}`, fact);

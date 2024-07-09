@@ -156,10 +156,8 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   getPeletizadosForMaterial(material : any) {
     this.matPrimas = [];
     this.svMatPrimas.getPeletizados().subscribe(data => { 
-      console.log(data);
       if(data.length > 0) {
         this.matPrimas = data.filter(x => x.matPrima.includes(material)); 
-        console.log(this.matPrimas);
         if(this.matPrimas.length > 0) {
           this.form.patchValue({'mpId' : null, 'matprima' : null})
           this.msjs(`Advertencia`, `Debe asociar una materia prima recuperada de la lista!`);
@@ -270,15 +268,13 @@ export class Ingreso_PeletizadoComponent implements OnInit {
 
   //
   loadFieldsForRoll(data : any){
-    let processField : any = this.form.value.process;
-    let process : string = processField == 'SELLA' ? data.ps.nomStatus : data.pe.nomStatus;
     this.load = false;
-
+    this.getPeletizadosForParameters(data);
     this.form.patchValue({
-      'ot' : parseInt(data.ot.item),
-      'item' : process == 'SELLADO' ? data.ps.referencia.trim() : data.pe.clienteItem.trim(), 
-      'product' : process == 'SELLADO' ? data.ps.nomReferencia.trim() : data.pe.clienteItemNombre.trim(),
-      'material' : parseInt(data.ot.extMaterial.trim()),
+      'ot' : data.ot,
+      'item' : data.item, 
+      'product' : data.referencia,
+      'material' : data.id_Material,
     });
     this.getProduct();
   }
@@ -348,7 +344,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     let url : string = process != null ? `?process=${this.changeNameProcess(process)}` : ``; 
 
     this.svBagpro.getRollProduction(roll, url).subscribe(data => {
-      let orderBagPro : any = process == 'SELLADO' ? data.ps.ot : data.pe.ot;
+      let orderBagPro : any = data.ot;
       if(ot == orderBagPro) this.addPeletizado();
       else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no pertenece a la OT N° ${ot}`)
     });        

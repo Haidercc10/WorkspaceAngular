@@ -1,0 +1,58 @@
+
+  <p-table 
+   [columns]="cols" 
+   [value]="movements" 
+   [tableStyle]="{ 'min-width': '50rem' }"
+   [resizableColumns]="true"
+   columnResizeMode="expand"
+   styleClass="p-datatable-gridlines p-datatable-sm"
+   responsiveLayout="scroll"
+   [rowHover]="true"
+   [scrollable]="true"
+   scrollHeight="50rem">
+      <ng-template pTemplate="header" let-columns>
+          <tr>
+              <th>Ver</th>
+              <th *ngFor="let col of columns">
+                  {{ col.header }}
+              </th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+          <tr>
+              <td><button pButton pRipple icon="pi pi-eye" [disabled]="['PRODUCCIÓN', 'INGRESO DESPACHO'].includes(rowData.type)" class="p-button-rounded p-button-danger mr-2" (click)="downloadPDF(rowData)" style="width: 30px; height: 30px;" pTooltip="Haz clic para descargar el documento" positionTooltip="top"></button></td>
+              <td><b>{{rowData.type}}</b></td>
+              <td>{{rowData.id}}</td>
+              <td><b>{{rowData.rollBagPro}}</b></td>
+              <td>{{rowData.item}}</td>
+              <td>{{rowData.reference}}</td>
+              <td><b>{{rowData.qty | number : '1.2-2'}}</b></td>
+              <td>{{rowData.presentation}}</td>
+              <td>{{rowData.date}}</td>
+              <td>{{rowData.hour}}</td>
+              <td><b>{{rowData.userName}}</b></td>
+              <td>
+                <span class="badge" [ngClass]="{
+                    'bg-success1': rowData.status == 'DISPONIBLE', 
+                    'bg-danger1': rowData.status == 'NO DISPONIBLE', 
+                    'bg-danger2': rowData.status == 'PELETIZADO', 
+                    'bg-blue1': rowData.status == 'FACTURADO', 
+                    'bg-warning1': rowData.status == 'REEMPAQUE', 
+                    'bg-warning2': rowData.status == 'REEMPACADO', 
+                    'bg-secondary1' : rowData.status == 'DEVUELTO',
+                    'bg-success2' : rowData.status == 'ENVIADO',
+                    'bg-success3' : rowData.status == 'CERRADA',
+                    'bg-blue2' : rowData.status == 'INGRESADO'
+                    }">
+                 {{rowData.status}}
+                </span>
+              </td>
+              <td>{{rowData.observation}}</td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="12"><h6 class="bold">No existen movimientos adicionales</h6></td>
+        </tr>
+      </ng-template>  
+  </p-table>

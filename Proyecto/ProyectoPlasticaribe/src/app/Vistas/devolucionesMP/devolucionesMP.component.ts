@@ -165,45 +165,56 @@ export class DevolucionesMPComponent implements OnInit {
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarDevolucion(){
-    let esError : boolean = false;
+    //let esError : boolean = false;
     if (this.materiasPrimasRetiradas.length > 0) {
+      this.load = true;
       const datosDevolucion : any = {
-        DevMatPri_OrdenTrabajo : this.FormDevolucion.value.ot,
-        DevMatPri_Fecha : this.today,
-        DevMatPri_Hora : moment().format('H:mm:ss'),
-        DevMatPri_Motivo : this.FormDevolucion.value.MpObservacion,
-        Usua_Id : this.storage_Id,
+        'DevMatPri_OrdenTrabajo' : this.FormDevolucion.value.ot,
+        'DevMatPri_Fecha' : this.today,
+        'DevMatPri_Hora' : moment().format('H:mm:ss'),
+        'DevMatPri_Motivo' : this.FormDevolucion.value.MpObservacion,
+        'Usua_Id' : this.storage_Id,
       }
-      this.devolucionService.srvGuardar(datosDevolucion).subscribe(() => { esError = false; } , () => { esError = true; this.mensajeService.mensajeError(`Error`, `¡Error al crear la devolución de materia prima!`)} );
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar minimo una materia prima para devolver!`);
-    setTimeout(() => { if (!esError) this.creacionDevolucionMateriaPrima(); }, 100);  
+      this.devolucionService.srvGuardar(datosDevolucion).subscribe(data => { 
+        //esError = false; 
+        this.creacionDevolucionMateriaPrima(data.devMatPri_Id);
+      } , () => { 
+        //esError = true; 
+        this.load = false;
+        this.mensajeService.mensajeError(`Error`, `Error al crear la devolución de materia prima!`)} );
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar minimo una materia prima para devolver!`);
+    //setTimeout(() => { if (!esError) this.creacionDevolucionMateriaPrima(); }, 100);  
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
-  creacionDevolucionMateriaPrima(){
-    this.devolucionService.srvObtenerUltimaDevolucion().subscribe(datos_devolucion => {
+  creacionDevolucionMateriaPrima(devolucion : number){
+    //this.devolucionService.srvObtenerUltimaDevolucion().subscribe(datos_devolucion => {
+      let count : number = 0; 
       for (let i = 0; i < this.materiasPrimasRetiradas.length; i++) {
         if (this.materiasPrimasRetiradas[i].Cantidad > 0 && !this.materiasPrimasRetiradas[i].Exits) {
           const datosDevolucionMp : any = {
-            DevMatPri_Id : datos_devolucion.devMatPri_Id,
-            MatPri_Id : this.materiasPrimasRetiradas[i].Id_MateriaPrima,
-            Tinta_Id : this.materiasPrimasRetiradas[i].Id_Tinta,
-            BOPP_Id : this.materiasPrimasRetiradas[i].Id_Bopp,
-            DtDevMatPri_CantidadDevuelta : this.materiasPrimasRetiradas[i].Cantidad_Devuelta,
-            UndMed_Id : this.materiasPrimasRetiradas[i].Unidad_Medida,
-            Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
+            'DevMatPri_Id' : devolucion,
+            'MatPri_Id' : this.materiasPrimasRetiradas[i].Id_MateriaPrima,
+            'Tinta_Id' : this.materiasPrimasRetiradas[i].Id_Tinta,
+            'BOPP_Id' : this.materiasPrimasRetiradas[i].Id_Bopp,
+            'DtDevMatPri_CantidadDevuelta' : this.materiasPrimasRetiradas[i].Cantidad_Devuelta,
+            'UndMed_Id' : this.materiasPrimasRetiradas[i].Unidad_Medida,
+            'Proceso_Id' : this.materiasPrimasRetiradas[i].Proceso,
           }
-          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`));
+          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(data => {
+            count++;
+            if (count == this.materiasPrimasRetiradas.length){
+              this.moverInventarioMpAgregada();
+              this.moverInventarioTintas();
+              this.moverInventarioBopp();
+              this.actualizarEntradasMP();
+              setTimeout(() => this.limpiarTodosCampos(), 1500);
+            }
+          }, () => {
+            this.mensajeService.mensajeError(`Error`, `No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`);
+          }); 
         }
       }
-    });
-    setTimeout(() => {
-      this.moverInventarioMpAgregada();
-      this.moverInventarioTintas();
-      this.moverInventarioBopp();
-      this.actualizarEntradasMP();
-      setTimeout(() => this.limpiarTodosCampos(), 1000);
-    }, (50 * this.materiasPrimasRetiradas.length));
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima devuelta

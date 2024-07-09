@@ -11,6 +11,9 @@ import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes-Consolidados.component';
+import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
+import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
+import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -37,6 +40,10 @@ export class DashBoardRecaudosComponent implements OnInit {
   vendedores : any [] = []; //Variable que almacenará la información de los vendedores
   clientes : any [] = []; //Variable que almacenará la información de los clientes
   FormFiltros : FormGroup;
+  traceability : boolean = false;
+  cols : any = [];
+  movements : any = []; 
+  invoiceSelected : any = null; 
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : ZeusContabilidadService,
@@ -46,7 +53,10 @@ export class DashBoardRecaudosComponent implements OnInit {
                         private frmBuilder : FormBuilder,
                           private vendedorService : UsuarioService,
                             private msj : MensajesAplicacionService,
-                              private creacionPDFService : CreacionPdfService,) {
+                              private creacionPDFService : CreacionPdfService,
+                                private svOF : OrdenFacturacionService,
+                                  private cmpOF : Orden_FacturacionComponent,
+                                    private cmpDevolutions : Devolucion_OrdenFacturacionComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormFiltros = this.frmBuilder.group({
@@ -338,4 +348,64 @@ export class DashBoardRecaudosComponent implements OnInit {
     if (this.FormFiltros.value.Cliente) informacion = informacion.filter(x => x.nombre_CLiente == this.FormFiltros.value.Cliente);
     return informacion;
   }
+
+  //* FUNCIONES PARA MOVIMIENTOS DE FACTURA (OF, DESPACHO, DV)
+  // Carga el header y body de la tabla.
+  loadColumnsTable(){
+    this.cols = [];
+    this.cols = [
+      { field: 'type', header: 'Movimiento', type : 'text' },
+      { field: 'id', header: 'Id' , type : 'number' },
+      { field: 'date', header: 'Fecha', type : 'text' },
+      { field: 'hour', header: 'Hora', type : 'text' },
+      { field: 'userName', header: 'Usuario', type : 'text' },
+      { field: 'status', header: 'Estado', type : 'text' },
+      { field: 'observation', header: 'Observación', type : 'text' },
+    ];
+  }
+
+  //Busca los movimientos de las facturas en plasticaribe.
+  searchMovementsInvoicesPl(data){
+    this.invoiceSelected = data.num_Factura;
+    this.movements = [];
+    this.cargando = true;
+    this.svOF.getMovementsInvoices(data.num_Factura).subscribe(dataPl => {
+      if(dataPl.length > 0) {
+        this.traceability = true;
+        this.loadColumnsTable();
+        this.movements = dataPl;
+        this.movements.sort((a, b) => a.date.localeCompare(b.date));
+        this.movements.sort((a, b) => a.hour > b.hour);
+        this.cargando = false;
+      } else this.messages(`Advertencia`, `No se encontraron movimientos para la factura N° ${data.num_Factura}`);
+    }, error => {
+      this.messages(`Error`, `Se encontraron errores consultando información de la factura N° ${data.num_Factura}`);
+    });
+  }
+
+  //Muestra msjs dependiendo el tipo de msj.
+  messages(msj1 : string, msj2 : string){
+    this.cargando = false;
+    switch (msj1) {
+      case 'Confirmación':
+        return this.msj.mensajeConfirmacion(msj1, msj2);
+      case 'Advertencia':
+        return this.msj.mensajeAdvertencia(msj1, msj2);
+      case 'Error':
+        return this.msj.mensajeError(msj1, msj2);
+      default: 
+        this.msj.mensajeAdvertencia(msj1, msj2);
+        break;
+    }
+  }
+
+  //Descarga un pdf dependiendo el tipo de movimiento
+  downloadPDF(data : any){
+    this.cargando = true;
+    if(data.type == `ORDEN FACTURACIÓN`) this.cmpOF.createPDF(data.id, ``);
+    else if(data.type == `SALIDA DESPACHO`) this.cmpOF.createPDF(parseInt(data.observation.replace(`Orden de Facturación #`, ``)), data.id);
+    else if(data.type == `DEVOLUCIÓN`) this.cmpDevolutions.createPDF(data.id, `exportada`);
+    setTimeout(() => { this.cargando = false }, 1000);
+  }
+
 }

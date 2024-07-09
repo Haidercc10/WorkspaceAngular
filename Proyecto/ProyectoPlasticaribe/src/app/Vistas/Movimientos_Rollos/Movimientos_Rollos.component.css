@@ -1,0 +1,16 @@
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+    height: 2rem;
+  }
+  
+  ::ng-deep .p-button.p-button-icon-only {
+    width: 2rem;
+  }
+  
+  ::ng-deep .p-button.p-button-icon-only {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .negrita {
+    font-weight: 800;
+  }

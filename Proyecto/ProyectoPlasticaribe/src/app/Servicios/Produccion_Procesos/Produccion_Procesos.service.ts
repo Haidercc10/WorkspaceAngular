@@ -71,4 +71,6 @@ export class Produccion_ProcesosService {
   getInfoItemsAvailablesInPallet = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailablesInPallet/${item}`);
 
   getInfoItemsAvailablesOutPallet = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailablesOutPallet/${item}`);
+
+  getMovementsRolls = (rollBp : number, item : number, rollPl : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getMovementsRolls/${rollBp}/${item}/${rollPl}`);
 }

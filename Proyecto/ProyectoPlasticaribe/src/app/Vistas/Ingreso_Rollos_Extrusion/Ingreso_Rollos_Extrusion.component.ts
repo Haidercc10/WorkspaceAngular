@@ -13,6 +13,7 @@ import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.s
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_BodegaRollos/Ubicaciones_BodegaRollos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsBodegas as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -48,6 +49,9 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   loadModal : boolean = false;
   rollosOT : any = [];
   rollosSeleccionados : any = [];
+
+  ubications : Array<any> = [];
+  subUbications : Array<any> = [];
   
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -58,7 +62,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
                           private dtBgRollosService : Detalle_BodegaRollosService,
                             private svProcesos : ProcesosService, 
                               private svPDF : CreacionPdfService,
-                              private msg : MessageService) {
+                                private msg : MessageService, 
+                                  private svUbicationsStore : Ubicaciones_BodegaRollosService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
@@ -66,8 +71,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       OrdenTrabajo: [null, Validators.required],
       Rollo : [null],
       Peso : [null],
-      Item : [null, Validators.required],
-      Referencia: [null, Validators.required],
+      Item : [null],
+      SubUbicacion: [null],
       Ubicacion : [null, Validators.required],
       Ultimo_Rollo : [null, Validators.required],
       Observacion : [''],
@@ -78,6 +83,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.lecturaStorage();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.getProcesos();
+    this.getAllUbicationsStore();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -100,7 +106,9 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   }
 
   // funcion que va a limpiar los campos del formulario
-  limpiarForm = () => this.FormConsultarRollos.reset();
+  limpiarForm() {
+    this.FormConsultarRollos.reset();
+  } 
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
@@ -109,6 +117,24 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.rollosOT = [];
     this.rollosSeleccionados = [];
     this.cargando = false;
+  }
+
+  getAllUbicationsStore() {
+    this.svUbicationsStore.getUbications().subscribe(data => { 
+      console.log(data)
+      this.ubicaciones = data;
+      this.ubications = data.reduce((a, b) => {
+        if(!a.map(x => x.ubR_Id).includes(b.ubR_Id)) a = [...a, b];
+          return a;
+      }, []); 
+    }, error => {
+      this.mensajeService.mensajeError(`Error`, `No fue posible cargar las ubicaciones | ${error.status} ${error.statusText}`)
+    }); 
+  }
+
+  getSubUbications() {
+    let ubication : any = this.FormConsultarRollos.value.Ubicacion;
+    this.subUbications = this.ubicaciones.filter(x => x.ubR_Id == ubication);
   }
 
   //Función para obtener los procesos.
@@ -152,12 +178,15 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
   agregarRollo(data : any){
     let bulto : any = data.rollo;
+    let subUbicacion : any = [undefined, null].includes(this.FormConsultarRollos.value.SubUbicacion) ? 0 : this.FormConsultarRollos.value.SubUbicacion;
+    console.log(subUbicacion);
+    console.log(this.ubicaciones);
     if(!this.rollosIngresar.map(x => x.rollo).includes(bulto)) {
-      data.ubicacion = this.FormConsultarRollos.value.Ubicacion;
+      data.ubicacion = this.ubicaciones.find(x => x.ubR_Id == this.FormConsultarRollos.value.Ubicacion && x.ubR_SubId == subUbicacion).ubR_Nomenclatura;
       data.proceso_Id = this.FormConsultarRollos.value.Proceso;
       this.rollosIngresar.unshift(data); 
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `El rollo N° ${bulto} ha sido agregado a la tabla correctamente`);
-      this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Item' : data.item, 'Referencia' : `${data.item} - ${data.referencia}`, 'Rollo' : null, 'Peso' : data.peso, });
+      this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null, 'Peso' : data.peso, });
       this.cargando = false; 
     } else {
       this.msjs(`Advertencia`, `El rollo N° ${bulto} ya se encuentra agregado en la tabla`);
@@ -168,8 +197,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   cargarUltimoRollo(){
     let data = this.rollosIngresar[0];
     if(![undefined, null].includes(data)) {
-      this.FormConsultarRollos.patchValue({ 'Item' : data.item, 'Referencia' : `${data.item} - ${data.referencia}`, 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null, 'Peso' : data.peso, });
-    } else this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null, });
+      this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null, 'Peso' : data.peso, });
+    } else this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null, });
     this.cargando = false;
   }
 
@@ -186,7 +215,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
             this.rollosOT = [];
             this.cargando = true;
 
-            this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
+            this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
 
             this.dtBgRollosService.getRollsForOT(ot).subscribe(dataPl => {
               this.bagProService.getAvailablesRollsOT(ot, proceso, dataPl).subscribe(data => {
@@ -245,7 +274,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   }
 
   msjs(msj1 : string, msj2 : string){
-    this.FormConsultarRollos.patchValue({ 'Item' : null, 'Referencia' : null, 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
+    this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
     this.cargando = false;
 
     switch (msj1) {
