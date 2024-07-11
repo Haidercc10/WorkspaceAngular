@@ -11,6 +11,8 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import moment from 'moment';
 import { Ingreso_PeletizadoService } from 'src/app/Servicios/Ingreso_Peletizado/Ingreso_Peletizado.service';
 import { Ingreso_PeletizadoComponent } from '../Ingreso_Peletizado/Ingreso_Peletizado.component';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { Salidas_PeletizadoComponent } from '../Salidas_Peletizado/Salidas_Peletizado.component';
 
 @Component({
   selector: 'app-Mov_IngresoPeletizado',
@@ -25,25 +27,27 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   selectedMode: boolean = false;
   products: any[] = [];
   dataSearched: Array<dataDesp> = [];
-  @ViewChild('tableEntries') tableEntries: Table | undefined;
-  @ViewChild('tableOutputs') tableOutputs: Table | undefined;
+  @ViewChild('tableData1') tableData1: Table | undefined;
+  @ViewChild('tableData2') tableData2: Table | undefined;
   modal : boolean = false;
   dataSelected : any = [];
   materiasPrimas : any [] = [];
   typesMovements : any = ['ENTRADA', 'SALIDA']; 
   dataFound : any = [];
+  statuses : any = [];
   entries : any = [];
-  outputs : any = [];
+  outputs : any = []
 
   constructor(
     private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
     private productsService: ProductoService,
     private msg: MensajesAplicacionService,
-    private createPDFService: CreacionPdfService,
     private svMatPrima : MateriaPrimaService,
     private svIngPele : Ingreso_PeletizadoService,
-    private cmpEntryPeletizado : Ingreso_PeletizadoComponent,
+    private cmpEntries : Ingreso_PeletizadoComponent,
+    private svStatus : EstadosService,
+    private cmpOutputs : Salidas_PeletizadoComponent,
   ) { 
     this.selectedMode = this.appComponent.temaSeleccionado;
     this.initForm();
@@ -53,33 +57,38 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
     this.readStorage();
     this.getMatPrimas();
     this.loadRankDates();
+    this.getStatuses();
   }
 
+  //*Leer storage del navegador.  
   readStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.validateRole = this.appComponent.storage_Rol;
   }
 
-  //Función para cargar fechas en el rango.
+  //*Función para cargar fechas en el rango.
   loadRankDates(){
     let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
     this.form.patchValue({ 'rankDates' : [initialDate, new Date()] });
   }
 
+  //*Función que inicializa el formulario.
   initForm() {
     this.form = this.frmBuilder.group({
       orderProduction: [null],
       rankDates : [null, Validators.required],
       mpId: [null],
       mpName: [null],
-      production: [null],
+      status: [null],
       typeMov : [null], 
     });
   }
 
+  //* Limpiar campos y tablas
   clearFields() {
     this.products = [];
     this.dataSearched = [];
+    this.dataFound = [];
     this.form.reset();
     this.load = false;
   }
@@ -96,20 +105,23 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
       reference: this.products.find(x => x.prod_Id == producto).prod_Nombre
     });
   }
+
+  //* Función para obtener los estados.
+  getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11,26,19,23].includes(x.estado_Id)) }, error => { this.msg.mensajeError(`Error`, `No se cargaron los estados`) });
   
+  //* Función para obtener las materias primas.
   getMatPrimas = () => this.svMatPrima.GetInventarioMateriasPrimas().subscribe(datos => this.materiasPrimas = datos);
   
   // Funcion que le va a colocar el nombre a la materia prima seleccionada
   changeMaterial(){
     let id : number = this.form.value.mpName;
     let matprima : any = this.materiasPrimas.filter((item) => item.id_Materia_Prima == id);
-    console.log(matprima);
     
     this.form.patchValue({ 'mpId' : id, 'mpName' : matprima[0].nombre_Materia_Prima, });
   }
 
   searchInPeletizado(){
-    this.entries = [];
+    this.dataFound = [];
 
     if((this.form.value.rankDates).length == 2) {
       let date1 : any = moment(this.form.value.rankDates[0]).format('YYYY-MM-DD');
@@ -117,7 +129,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
       this.load = true;
 
       this.svIngPele.getMovementsPeletizado(date1, date2, this.validateUrl()).subscribe(data => {
-        this.entries = data;
+        this.dataFound = data;
         this.load = false;
       }, error => this.msg.mensajeError(`Error`, `No se ha podido consultar el ingreso de peletizado!`));
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe elegir 2 fechas para consultar!`);
@@ -126,13 +138,13 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   validateUrl(){
     let ot: any = this.form.value.orderProduction;
     let mp: any = this.form.value.mpId;
-    let roll : any = this.form.value.roll;
+    let status : any = this.form.value.status;
     let typeMov : any = this.form.value.typeMov;
     let url : string = ``;
 
     if(ot != null) url += `ot=${ot}`;
     if(mp != null) url.length > 0 ? url += `&mp=${mp}` : url += `mp=${mp}`;
-    if(roll != null) url.length > 0 ? url += `&roll=${roll}` : url += `roll=${roll}`;
+    if(status != null) url.length > 0 ? url += `&status=${status}` : url += `status=${status}`;
     if(typeMov != null) url.length > 0 ? url += `&typeMov=${typeMov}` : url += `typeMov=${typeMov}`;
 
     if(url.length > 0) url = `?${url}`;
@@ -142,8 +154,8 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
 
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  totalQty = () => this.entries.reduce((a, b) => a += b.entries.ingPel_Cantidad, 0);
+  totalQty = () => this.dataFound.reduce((a, b) => a += b.mov.qty, 0);
 
-  viewEntryPDF = (data) => this.cmpEntryPeletizado.createPDF(data.entries.ingPel_FechaIngreso, data.entries.ingPel_FechaIngreso, data.entries.ingPel_HoraIngreso, `exportado`);
+  viewPDF = (data) => data.typeMov == 'ENTRADA' ? this.cmpEntries.createPDF(data.mov.date, data.mov.date, data.mov.hour, `exportado`) : this.cmpOutputs.createPDF(data.mov.code, `exportado`);
 
 }

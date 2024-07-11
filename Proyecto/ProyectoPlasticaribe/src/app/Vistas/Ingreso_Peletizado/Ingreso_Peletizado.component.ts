@@ -119,6 +119,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   disableForm(){
     this.form.disable();
     this.form.get('process')?.enable();
+    this.form.get('quantity')?.enable();
   }
 
   //Habilitar tipo de recuperado y no conformidad
@@ -152,7 +153,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
 
   //Función para obtener las materias primas.
   //getMatPrimas = () => this.svMatPrimas.srvObtenerLista().subscribe(data => { this.matPrimas = data.filter(x => [10,4].includes(x.catMP_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las materias primas. | ${error}`); });
- 
+  
   getPeletizadosForMaterial(material : any) {
     this.matPrimas = [];
     this.svMatPrimas.getPeletizados().subscribe(data => { 
@@ -378,6 +379,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
         'IngPel_FechaIngreso': null,
         'IngPel_HoraIngreso': (moment().format('HH:mm:ss')),
         'Usua_Modifica': 0,
+        'IngPel_Codigo': 0,
       });
       this.clearFields();
     } else this.msjs(`Advertencia`, `Hay campos requeridos vacios en el formulario`);
@@ -408,21 +410,25 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   //
   savePeletizados(){
     let count : number = 0;
-
     if(this.recoveries.length > 0) {
       this.load = true;
+      this.svIngPeletizado.getLastCodeEntry().subscribe(code => {
+      code += 1;  
       this.recoveries.forEach(x => {
-        this.updateProperties(x);
-        this.svIngPeletizado.Post(x).subscribe(data => {
-          count++;
-          if(this.recoveries.length == count) this.confirmRecordPele(data.ingPel_FechaIngreso, data.ingPel_FechaIngreso, data.ingPel_HoraIngreso);
-        }, error => { this.msjs(`Error`, `Error al intentar guardar registros de recuperado!`); });
-      });
+        this.updateProperties(x, code);
+          this.svIngPeletizado.Post(x).subscribe(data => {
+            count++;
+            if(this.recoveries.length == count) {
+              this.createPDF(data.ingPel_FechaIngreso, data.ingPel_FechaIngreso, data.ingPel_HoraIngreso, `creado`);
+            } 
+          }, error => { this.msjs(`Error`, `Error al intentar guardar registros de recuperado!`); });
+        })
+      }, error => { this.msjs(`Error`, `Se encontraron errores en la búsqueda del ultimo código de ingreso de Peletizado.`) });
     } else this.msjs(`Advertencia`, `No hay datos para registrar!`);
   } 
   
   //Función para eliminar propiedades del objeto que crea el registro en la base de datos y que no son necesarios
-  updateProperties(data : any){
+  updateProperties(data : any, codeIn){
     delete data.TpRecu_Nombre,
     delete data.Prod_Nombre
     delete data.MatPri_Nombre
@@ -430,11 +436,11 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     delete data.Falla_Nombre,
     delete data.Proceso_Nombre,
     data.IngPel_FechaIngreso = moment().format('YYYY-MM-DD'),
-    data.IngPel_HoraIngreso = moment().format('HH:mm:ss')
+    data.IngPel_HoraIngreso = moment().format('HH:mm:ss'), 
+    data.IngPel_Codigo = codeIn;
   }
-
-  confirmRecordPele = (date1 : any, date2 : any, hour : string) => this.createPDF(date1, date2, hour, `creado`);
-
+  
+  //confirmRecordPele = (date1 : any, date2 : any, hour : string) => this.createPDF(date1, date2, hour, `creado`);
   validateOptions(process : any){
     switch (process) {
       case 'MATPRIMA':
@@ -444,16 +450,19 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     }
   }
 
+  //*FUNCIONES PARA EXPORTAR PDF.
+  //Función para crear un PDF en base al registro creado.
   createPDF(date1 : any, date2 : any, hour : any, action? : string) {
     this.svIngPeletizado.getEntryPeletizado(date1, date2, hour).subscribe(data => {
-      let title: string = `Ingreso de Peletizado N° ${data[0].entries.ingPel_Id}-${data[data.length - 1].entries.ingPel_Id}`;
+      let title: string = `Ingreso de Peletizado N° ${data[0].entries.ingPel_Codigo}`;
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
       this.msjs(`Confirmación`, `Ingreso de Peletizado ${action} exitosamente!`);
       setTimeout(() => this.clearAll(), 3000);
-    }, error => this.msjs(`Error`, `Error al consultar el ingreso de peletizado N° ${0}! | ${error.error}`));
+    }, error => this.msjs(`Error`, `Error al consultar el ingreso de peletizado N° ${0} | ${error.status} ${error.statusText}`));
   }
 
+  //Función para colocar la información registrada en el PDF.
   contentPDF(data): any[] {
     let content: any[] = [];
     let consolidatedInformation: Array<any> = this.consolidatedInfoPDF(data);
@@ -465,6 +474,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     return content;
   }
 
+  //Funcion para colocar el encabezado de los materiales en la tabla 1
   consolidatedInfoPDF(data: any): Array<any> {
     let consolidatedInfo: Array<any> = [];
     let count: number = 0;
@@ -487,6 +497,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
     return consolidatedInfo;
   }
 
+  //Funcion para colocar los detalles de los materiales en la tabla 2 
   getInfoMaterialsPDF(data: any): Array<any> {
     let infoProducts: Array<any> = [];
     let count: number = 0;
@@ -504,7 +515,6 @@ export class Ingreso_PeletizadoComponent implements OnInit {
         "Presentación" : d.entries.undMed_Id,
       });
     });
-    infoProducts.sort((a, b) => a.Id - b.Id);
     return infoProducts;
   }
 
@@ -628,9 +638,9 @@ export class Ingreso_PeletizadoComponent implements OnInit {
 
   //Función para limpiar campos
   clearFields(){
+    this.load = false;
     this.disableForm(); 
     this.form.reset();
-    this.load = false;
     this.disableField = false;
   }
 
@@ -638,6 +648,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
   clearAll(){
     this.clearFields();
     this.recoveries = [];
+    this.load = false;
   }
 
   //Función para mostrar los diferentes tipos de msjs.
@@ -658,6 +669,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
 
 interface modelIngreso_Peletizado {
   IngPel_Id? : number;
+  IngPel_Codigo : number;
   Rollo_Id? : number;
   TpRecu_Id : string;
   TpRecu_Nombre? : string;

@@ -9,4 +9,6 @@ export interface modelSalidas_Peletizado {
     SalPel_HoraAprobado: string;
     Estado_Id: number;
     SalPel_Observacion? : string;
+    Usua_Aprueba : number;
+    UndMed_Id : string;
 }

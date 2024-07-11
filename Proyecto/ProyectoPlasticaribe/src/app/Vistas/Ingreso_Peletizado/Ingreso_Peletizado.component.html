@@ -45,9 +45,17 @@
               <label for="typeRecovery">Tipo recuperado*</label>
           </span>
         </div>
+
+        <!-- No conformidad -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="fail" id="fail" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+            <label for="fail">No conformidad*</label>
+          </span>
+        </div>
         
         <!-- OT -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="ot" id="ot" type="number" (keyup.enter)="getOrderProduction()" [useGrouping]="false" [readonly]="form.value.process == null" pTooltip="{{form.value.process == null ? 'Debe llenar los campos TIPO RECUPERADO Y PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
             <label for="ot">OT</label>
@@ -55,28 +63,18 @@
         </div>
 
         <!-- Rollo/Bulto -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="roll" id="roll" type="number" (keyup.enter)="getRollProduction()" [readonly]="form.value.process == null || form.value.typeRecovery != 'ROLLO'" [useGrouping]="false" pTooltip="{{form.value.process == null ? 'Debe llenar los campos TIPO RECUPERADO Y PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
             <label for="roll">Rollo/Bulto</label>
           </span>
         </div>
 
-        <!--Producto-->
-
         <!-- Materiales -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="material" id="material" [readonly]="true" [options]="materials" optionLabel="material_Nombre" optionValue="material_Id" [autoDisplayFirst]="false"></p-dropdown>
             <label for="material">Material*</label>
-          </span>
-        </div>
-
-         <!-- Cantidad -->
-         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="quantity" id="quantity" type="number" [autofocus]="true" [useGrouping]="true" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
-            <label for="quantity">Peso (Kg)*</label>
           </span>
         </div>
 
@@ -91,16 +89,16 @@
           </span>
         </div>
 
-        <!-- No conformidad -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <!-- Cantidad -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
-            <p-dropdown formControlName="fail" id="fail" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
-            <label for="fail">No conformidad*</label>
+            <p-inputNumber formControlName="quantity" id="quantity" type="number" [useGrouping]="true" (keyup.enter)="validateForm()" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+            <label for="quantity">Peso (Kg)*</label>
           </span>
         </div>
 
         <!--Observación-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-12 col-xl-12 col-xxl-10">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-12 col-xl-12 col-xxl-8">
           <span class="p-float-label">
             <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>

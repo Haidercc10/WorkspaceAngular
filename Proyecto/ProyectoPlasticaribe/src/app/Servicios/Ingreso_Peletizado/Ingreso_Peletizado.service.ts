@@ -15,6 +15,8 @@ export class Ingreso_PeletizadoService {
   
   GetId = (id : any): Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/${id}`);
 
+  getLastCodeEntry = (): Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getLastCodeEntry`);
+
   getEntryPeletizado = (date1 : any, date2 : any, hour : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getEntryPeletizado/${date1}/${date2}/${hour}`);
 
   getMovementsPeletizado = (date1 : any, date2 : any, url : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getMovementsPeletizado/${date1}/${date2}${url}`);
@@ -25,4 +27,5 @@ export class Ingreso_PeletizadoService {
 
   Post = (data : any): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Ingreso_Peletizado', data);
 
+  putEntryPeletizado = (pelets : any): Observable<any> => this.http.put(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/putEntryPeletizado`, pelets)
 }

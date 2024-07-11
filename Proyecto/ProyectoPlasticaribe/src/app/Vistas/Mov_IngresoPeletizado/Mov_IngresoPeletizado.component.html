@@ -44,22 +44,22 @@
     
         <!-- MP -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-            <span class="p-float-label">
-              <input formControlName="mpName" id="Nombre" list="mp" type="text" pInputText (change)="changeMaterial()"/>
-              <datalist id="mp">
-                <option value={{item.id_Materia_Prima}} *ngFor="let item of materiasPrimas">{{item.nombre_Materia_Prima}}</option>
-              </datalist>
-              <label for="Orden">Materia Prima</label>
-            </span>
-          </div>
-    
-        <!-- PRODUCTION -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
-            <span class="p-float-label">
-            <p-inputNumber formControlName="production" [useGrouping]="false" inputId="production" [required]="true"></p-inputNumber>
-            <label for="production">Rollo/Bulto</label>
-            </span>
+          <span class="p-float-label">
+            <input formControlName="mpName" id="Nombre" list="mp" type="text" pInputText (change)="changeMaterial()"/>
+            <datalist id="mp">
+              <option value={{item.id_Materia_Prima}} *ngFor="let item of materiasPrimas">{{item.nombre_Materia_Prima}}</option>
+            </datalist>
+            <label for="Orden">Materia Prima</label>
+          </span>
         </div>
+    
+        <!-- STATUS -->
+        <div class="col-sm-12 col-md-6 col-xl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="status" inputId="status" [autoDisplayFirst]="false" [options]="statuses" optionValue="estado_Id" optionLabel="estado_Nombre"></p-dropdown>
+            <label for="status">Estado</label>
+          </span>
+       </div>
 
         <!-- TYPE MOV. -->
         <div class="col-sm-12 col-md-6 col-xl-2">
@@ -84,133 +84,153 @@
       <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-table"></i> Tabla de registros consultados</h2>
     </div>
 
-    <div class="row g-4">
       <!-- ENTRADAS -->
-      <div class="col-sm-12 col-md-6 px-5"> 
+      <div class="row g-4">
+        <div class="col-sm-12 col-md-6 px-5"> 
 
-        <p-toolbar styleClass="mb-2">
-          <ng-template pTemplate="left">
-          </ng-template>
-          <ng-template pTemplate="center">
-             <b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-upload"></i> Entradas de Peletizado</b>
-          </ng-template>
-          <ng-template pTemplate="right">
-          </ng-template>
-        </p-toolbar>
+          <p-toolbar styleClass="mb-2">
+            <ng-template pTemplate="left">
+            </ng-template>
+            <ng-template pTemplate="center">
+               <b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-upload"></i> Entradas a bodega de Peletizado</b>
+            </ng-template>
+            <ng-template pTemplate="right">
+            </ng-template>
+          </p-toolbar>
 
-        <p-table 
-          #tableEntries
-          [value]="entries"
-          [resizableColumns]="true"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [rowHover]="true"
-          [scrollable]="true"
-          scrollHeight="50rem"
-          *ngIf="!load">
-          <ng-template pTemplate="header">
-            <tr class="font-size-16" id="filtros">
-              <th></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'entries.ingPel_Id', tableEntries)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'type_Recovery.id', tableEntries)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.matPrima', tableEntries)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'entries.ingPel_Cantidad', tableEntries)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'entries.ingPel_FechaIngreso', tableEntries)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'statuses.status', tableEntries)"></th>
-              <th></th>
-            </tr>
-            <tr>
-              <th class="text-center">#</th>
-              <th class="text-center">Id</th>
-              <th class="text-center">Recuperado</th>
-              <th class="text-center">Material</th> 
-              <th class="text-center">Peso</th>
-              <th class="text-center">Fecha</th>
-              <th class="text-center">Estado</th>
-              <th class="text-center">Ver</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-            <tr class="cursor" pTooltip="Haz clic ">
-              <td class="text-center">{{rowIndex + 1}}</td>
-              <td class="text-center">{{ data.entries.ingPel_Id }}</td>
-              <td class="text-center"><b>{{ data.type_Recovery.id }}</b></td>
-              <td>{{ data.matPrimas.id }} - {{ data.matPrimas.matPrima }}</td>
-              <td class="text-center"><b>{{ data.entries.ingPel_Cantidad | number : '1.2-2' }}</b></td>
-              <td class="text-center">{{ data.entries.ingPel_FechaIngreso | date : 'dd/MM/yyyy' }}</td>
-              <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.statuses.id), 'bg-success1': [19].includes(data.statuses.id) }">{{ data.statuses.status }}</span> </td>
-              <td class="text-center"><p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewEntryPDF(data)"></p-button>
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <tr>
-              <td colspan="4" class="text-right">Cantidad Total</td>
-              <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
-              <td colspan="3"></td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-  
-      <!-- SALIDAS -->
-      <div class="col-sm-12 col-md-6 px-5"> 
+          <p-table 
+            #tableData1
+            [value]="entries"
+            [resizableColumns]="true"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [scrollable]="true"
+            scrollHeight="50rem"2
+            *ngIf="!load">
+            <ng-template pTemplate="header">
+              <tr class="font-size-16" id="filtros">
+                <th></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.id', tableData1)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.recovery_Id', tableData1)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.id', tableData1)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.matPrima', tableData1)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.qty', tableData1)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.date', tableData1)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'data.status', tableData1)"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <th style="font-weight: 800;" class="text-center"></th>
+                <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-slack"></i> Información Recuperado</th>
+                <th style="font-weight: 800;" class="text-center textBlue" colspan="2"><i class="pi pi-box"></i> Mat. Prima asociada</th>
+                <th style="font-weight: 800;" class="text-center textOrange" colspan="4"></th>
+              </tr>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Id</th>
+                <th class="text-center">Nombre</th>
+                <th class="text-center">Peso (Kg)</th>
+                <th class="text-center">Id </th> 
+                <th class="text-center">Nombre</th>
+                <th class="text-center">Fecha</th>
+                <th class="text-center">Estado</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                <td class="text-center">{{rowIndex + 1}}</td>
+                <td class="text-center">{{ data.mov.id }}</td> 
+                <td class="text-center"><b>{{ data.mov.recovery_Id }}</b></td> 
+                <td class="text-center">{{ data.matPrimas.id }}</td> 
+                <td>{{ data.matPrimas.matPrima }}</td> 
+                <td class="text-center"><b>{{ data.mov.qty | number : '1.2-2' }}</b></td> 
+                <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }} {{ data.mov.hour }}</td> 
+                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id) }">{{ data.status }}</span> </td> <!--Estado-->
+                <td class="text-center">
+                  <p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewPDF(data)"></p-button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="5" class="text-right">Cantidad Total</td>
+                <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
+                <td colspan="3"></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
 
-        <p-toolbar styleClass="mb-2">
-          <ng-template pTemplate="left">
-          </ng-template>
-          <ng-template pTemplate="center">
-           <b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-download"></i> Salidas de Material Recuperado</b>
-          </ng-template>
-          <ng-template pTemplate="right">
-          </ng-template>
-        </p-toolbar>
+        <div class="col-sm-12 col-md-6 px-5"> 
 
-        <p-table 
-          #dtFacturacion
-          [value]="outputs"
-          [resizableColumns]="true"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [rowHover]="true"
-          [scrollable]="true"
-          scrollHeight="500px"
-          *ngIf="!load">
-          <ng-template pTemplate="header">
-            <tr class="font-size-16" id="filtros">
-              <th></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', tableOutputs)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', tableOutputs)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', tableOutputs)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', tableOutputs)"></th>
-            </tr>
-            <tr>
-              <th>#</th>
-              <th>Id</th>
-              <th>Recuperado</th>
-              <th>Cantidad</th>
-              <th>Presentación</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-data  let-rowIndex="rowIndex">
-            <tr class="cursor" pTooltip="Haz clic ">
-              <td>{{rowIndex + 1}}</td>
-              <td>{{ '' }}</td>
-              <td>{{ '' }}</td>
-              <td>{{ '' }}</td>
-              <td>{{ '' }}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <tr>
-              <td colspan="3" class="text-right">Cantidad Total</td>
-              <td>{{0 | number : '1.2-2'}}</td>
-              <td></td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-    </div>
+          <p-toolbar styleClass="mb-2">
+            <ng-template pTemplate="left">
+            </ng-template>
+            <ng-template pTemplate="center">
+              <b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-download"></i> Salidas de bodega de Peletizado</b>
+            </ng-template>
+            <ng-template pTemplate="right">
+            </ng-template>
+          </p-toolbar>
+
+          <p-table 
+            #tableData2
+            [value]="outputs"
+            [resizableColumns]="true"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            *ngIf="!load">
+            <ng-template pTemplate="header">
+              <tr class="font-size-16" id="filtros">
+                <th></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.id', tableData2)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.id', tableData2)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.matPrima', tableData2)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.qty', tableData2)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.date', tableData2)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'data.status', tableData2)"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Codigo Mov.</th>
+                <th class="text-center">Id Mat. Prima</th> 
+                <th class="text-center">Mat. Prima</th>
+                <th class="text-center">Peso (Kg)</th>
+                <th class="text-center">Fecha</th>
+                <th class="text-center">Estado</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                <td class="text-center">{{rowIndex + 1}}</td>
+                <td class="text-center">{{ data.mov.code }}</td>
+                <td class="text-center">{{ data.matPrimas.id }}</td> 
+                <td>{{ data.matPrimas.matPrima }}</td> 
+                <td class="text-center"><b>{{ data.mov.qty | number : '1.2-2' }}</b></td> 
+                <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }} {{ data.mov.hour }}</td> 
+                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id) }">{{ data.status }}</span> </td> <!--Estado-->
+                <td class="text-center">
+                  <p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewPDF(data)"></p-button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="4" class="text-right">Cantidad Total</td>
+                <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
+                <td colspan="3"></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>  
     
   </p-card>  
   
