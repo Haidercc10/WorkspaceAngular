@@ -17,16 +17,16 @@
 </div>
 
 <p-card>
-  <!--Titulo formulario-->
+  <!--*Titulo formulario-->
   <div class="mb-4">
     <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-filter"></i> Filtros de Búsqueda</h2>
   </div>
 
-  <!--Formulario de busqueda-->
+  <!--*Formulario de busqueda-->
   <form [formGroup]="form" (ngSubmit)="getMovements()">
     <div class="row g-4 my-4">
 
-      <!--RANGO DE FECHAS-->
+      <!--*RANGO DE FECHAS-->
       <div class="col-sm-12 col-md-6 col-xl-2">
           <span class="p-float-label">
             <p-calendar formControlName="rankDates" inputId="fecha" selectionMode="range" [showIcon]="true"></p-calendar>
@@ -34,7 +34,7 @@
           </span>
       </div>  
   
-      <!-- OT -->
+      <!--* OT -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
           <p-inputNumber formControlName="orderProduction" [useGrouping]="false" inputId="orderProduction" [required]="true"></p-inputNumber>
@@ -42,7 +42,7 @@
           </span>
       </div>
   
-      <!-- ITEM -->
+      <!--* ITEM -->
       <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-4">
         <span class="p-float-label">
           <input formControlName="reference" id="prod" list="producto" type="text" pInputText (change)="selectedProduct()" (keydown)="searchProduct()"/>
@@ -53,7 +53,7 @@
         </span>
       </div>
   
-      <!-- PRODUCTION -->
+      <!--* PRODUCTION -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
           <p-inputNumber formControlName="production" [useGrouping]="false" inputId="production" [required]="true"></p-inputNumber>
@@ -61,7 +61,7 @@
           </span>
       </div>
 
-      <!-- TYPE MOV. -->
+      <!--* TYPE MOV. -->
       <div class="col-sm-12 col-md-6 col-xl-2">
          <span class="p-float-label">
            <p-dropdown formControlName="typeMov" inputId="typeMov" [autoDisplayFirst]="false" [options]="typesMovements"></p-dropdown>
@@ -69,7 +69,7 @@
          </span>
       </div>
 
-      <!--BUTTONS-->
+      <!--* BUTTONS-->
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
@@ -79,16 +79,31 @@
 
   <p-divider></p-divider>
 
-  <!--Titulo tabla-->
+  <!--* Titulo tabla-->
   <div class="mb-4">
     <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-table"></i> Tabla de registros consultados</h2>
   </div>
 
+  <!--* Tablas-->
   <div class="row g-4">
-    <!-- ENTRADAS -->
+
+    <div class="col-sm-12 col-md-6 col-xxl-6">
+
+      <!--* Titulo ENTRADA -->
+      <p-toolbar styleClass="mb-2">
+        <ng-template pTemplate="left">
+        </ng-template>
+        <ng-template pTemplate="center">
+          <h2><b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-download"></i> Entradas a bodega</b></h2>
+        </ng-template>
+        <ng-template pTemplate="right">
+        </ng-template>
+      </p-toolbar>
+
+      <!--* ENTRADAS -->
       <p-table 
-        #tableMov
-        [value]="dataFound"
+        #tableMovIn
+        [value]="dataFoundIn"
         [resizableColumns]="true"
         styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll"
@@ -99,14 +114,13 @@
         <ng-template pTemplate="header">
           <tr class="font-size-16" id="filtros">
             <th></th>
-            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'roll', tableMov)"></th>
-            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot', tableMov)"></th>
-            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item', tableMov)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableMov)"></th>
-            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'quantity', tableMov)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'status', tableMov)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableMov)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'typeMov', tableMov)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'roll', tableMovIn)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot', tableMovIn)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item', tableMovIn)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableMovIn)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'quantity', tableMovIn)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableMovIn)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'status', tableMovIn)"></th>
             <th></th>
           </tr>
           <tr>
@@ -116,9 +130,8 @@
             <th class="text-center">Item</th> 
             <th class="text-center">Referencia</th> 
             <th class="text-center">Peso (Kg)</th>
-            <th class="text-center">Estado</th>
             <th class="text-center">Fecha</th>
-            <th class="text-center">Tipo Mov.</th>
+            <th class="text-center">Estado</th>
             <th class="text-center">Ver</th>
           </tr>
         </ng-template>
@@ -129,22 +142,89 @@
             <td class="text-center">{{ data.ot }}</td>
             <td class="text-center"><b>{{ data.item }}</b></td>
             <td>{{ data.reference }}</td>
-            <td class="text-center"><b>{{ data.quantity | number : '1.2-2' }}</b></td>
-            <td class="text-center"><span class="badge" [ngClass]="{'bg-blue1': ['SOLICITADO'].includes(data.status), 'bg-success1': ['DISPONIBLE'].includes(data.status), 'bg-danger1': ['NO DISPONIBLE'].includes(data.status) }">{{ data.status }}</span> </td>
-            <td class="text-center">{{ data.date | date : 'dd/MM/yyyy' }} {{data.hour}}</td>
-            <td class="text-center" [ngClass]="{'textGreen': data.typeMov == 'ENTRADA', 'textRed': data.typeMov == 'SALIDA' }"><b>{{ data.typeMov }}</b></td>
-            <td class="text-center"><p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewEntryPDF(data)"></p-button>
-            </td>
+            <td class="text-center" [ngClass]="{'textGreen': ['DISPONIBLE'].includes(data.status), 'textRed': ['NO DISPONIBLE'].includes(data.status) }"><b>{{ data.quantity | number : '1.2-2' }}</b></td>
+            <td class="text-center">{{ data.date | date : 'dd/MM/yyyy' }}</td>
+            <td class="text-center"><span class="badge" [ngClass]="{'bg-success1': ['DISPONIBLE'].includes(data.status), 'bg-danger1': ['NO DISPONIBLE'].includes(data.status) }">{{ data.status }}</span> </td>
+            <td class="text-center"><p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewEntryPDF(data)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="5" class="text-right">Cantidad Total</td>
-            <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
-            <td colspan="4"></td>
+            <td class="text-center">{{totalQty(dataFoundIn) | number : '1.2-2'}}</td>
+            <td colspan="3"></td>
           </tr>
         </ng-template>
       </p-table>
+    </div>
+    
+    <div class="col-sm-12 col-md-6 col-xxl-6">
+      
+       <!--* Titulo SALIDAS -->
+       <p-toolbar styleClass="mb-2">
+        <ng-template pTemplate="left">
+        </ng-template>
+        <ng-template pTemplate="center">
+          <h2><b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-download"></i> Salidas de bodega</b></h2>
+        </ng-template>
+        <ng-template pTemplate="right">
+        </ng-template>
+      </p-toolbar>
+
+      <!--* SALIDAS-->
+      <p-table 
+        #tableMovOut
+        [value]="dataFoundOut"
+        [resizableColumns]="true"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        *ngIf="!load">
+        <ng-template pTemplate="header">
+          <tr class="font-size-16" id="filtros">
+            <th></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'roll', tableMovOut)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot', tableMovOut)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item', tableMovOut)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableMovOut)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'quantity', tableMovOut)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableMovOut)"></th>
+            <th></th>
+          </tr>
+          <tr>
+            <th class="text-center">#</th>
+            <th class="text-center">Rollo</th>
+            <th class="text-center">OT</th>
+            <th class="text-center">Item</th> 
+            <th class="text-center">Referencia</th> 
+            <th class="text-center">Peso (Kg)</th>
+            <th class="text-center">Fecha</th>
+            <th class="text-center">Ver</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+          <tr class="cursor">
+            <td class="text-center">{{rowIndex + 1}}</td>
+            <td class="text-center"><b>{{ data.roll }}</b></td>
+            <td class="text-center">{{ data.ot }}</td>
+            <td class="text-center"><b>{{ data.item }}</b></td>
+            <td>{{ data.reference }}</td>
+            <td class="text-center textRed"><b>{{ data.quantity | number : '1.2-2' }}</b></td>
+            <td class="text-center">{{ data.date | date : 'dd/MM/yyyy' }}</td>
+            <td class="text-center"><p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewEntryPDF(data)"></p-button></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5" class="text-right">Cantidad Total</td>
+            <td class="text-center textRed">{{totalQty(dataFoundOut) | number : '1.2-2'}}</td>
+            <td colspan="2"></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </div>
   
 </p-card>  

@@ -84,7 +84,7 @@
       <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-table"></i> Tabla de registros consultados</h2>
     </div>
 
-      <!-- ENTRADAS -->
+      <!--* ENTRADAS -->
       <div class="row g-4">
         <div class="col-sm-12 col-md-6 px-5"> 
 
@@ -92,7 +92,7 @@
             <ng-template pTemplate="left">
             </ng-template>
             <ng-template pTemplate="center">
-               <b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-upload"></i> Entradas a bodega de Peletizado</b>
+              <h2><b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-download"></i> Entradas a bodega de Peletizado</b></h2>
             </ng-template>
             <ng-template pTemplate="right">
             </ng-template>
@@ -106,70 +106,71 @@
             responsiveLayout="scroll"
             [rowHover]="true"
             [scrollable]="true"
-            scrollHeight="50rem"2
+            scrollHeight="50rem"
             *ngIf="!load">
             <ng-template pTemplate="header">
               <tr class="font-size-16" id="filtros">
                 <th></th>
+                <th></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.id', tableData1)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.recovery_Id', tableData1)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.qty', tableData1)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.id', tableData1)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.matPrima', tableData1)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.qty', tableData1)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.date', tableData1)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'data.status', tableData1)"></th>
-                <th></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.date', tableData1)"></th>
               </tr>
               <tr>
-                <th style="font-weight: 800;" class="text-center"></th>
+                <th style="font-weight: 800;" class="text-center" colspan="2"></th>
                 <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-slack"></i> Información Recuperado</th>
-                <th style="font-weight: 800;" class="text-center textBlue" colspan="2"><i class="pi pi-box"></i> Mat. Prima asociada</th>
-                <th style="font-weight: 800;" class="text-center textOrange" colspan="4"></th>
+                <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-box"></i> Mat. Prima asociada</th>
+                <th style="font-weight: 800;" class="text-center" colspan="4"></th>
               </tr>
               <tr>
                 <th class="text-center">#</th>
-                <th class="text-center">Id</th>
-                <th class="text-center">Nombre</th>
-                <th class="text-center">Peso (Kg)</th>
-                <th class="text-center">Id </th> 
-                <th class="text-center">Nombre</th>
-                <th class="text-center">Fecha</th>
-                <th class="text-center">Estado</th>
-                <th></th>
+                <th>Ver</th>
+                <th class="text-center" pSortableColumn="mov.id"><p-sortIcon field="mov.id"></p-sortIcon> Id</th>
+                <th class="text-center" pSortableColumn="mov.recovery_Id"><p-sortIcon field="mov.recovery_Id"></p-sortIcon> Nombre</th>
+                <th class="text-center" pSortableColumn="mov.qty"><p-sortIcon field="mov.qty"></p-sortIcon> Peso (Kg)</th>
+                <th class="text-center" pSortableColumn="mov.id"><p-sortIcon field="mov.id"></p-sortIcon> Id </th> 
+                <th class="text-center" pSortableColumn="mov.matPrima"><p-sortIcon field="mov.matPrima"></p-sortIcon> Nombre</th>
+                <th class="text-center" pSortableColumn="mov.status"><p-sortIcon field="mov.status"></p-sortIcon> Estado</th>
+                <th class="text-center" pSortableColumn="mov.date"><p-sortIcon field="mov.date"></p-sortIcon> Fecha</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
               <tr>
                 <td class="text-center">{{rowIndex + 1}}</td>
-                <td class="text-center">{{ data.mov.id }}</td> 
-                <td class="text-center"><b>{{ data.mov.recovery_Id }}</b></td> 
-                <td class="text-center">{{ data.matPrimas.id }}</td> 
-                <td>{{ data.matPrimas.matPrima }}</td> 
-                <td class="text-center"><b>{{ data.mov.qty | number : '1.2-2' }}</b></td> 
-                <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }} {{ data.mov.hour }}</td> 
-                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id) }">{{ data.status }}</span> </td> <!--Estado-->
                 <td class="text-center">
                   <p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewPDF(data)"></p-button>
                 </td>
+                <td class="text-center">{{ data.mov.id }}</td> 
+                <td class="text-center">{{ data.mov.recovery_Id }}</td>
+                <td class="text-center"><b>{{ data.mov.qty | number : '1.2-2' }}</b></td>  
+                <td class="text-center">{{ data.matPrimas.id }}</td> 
+                <td><b>{{ data.matPrimas.matPrima }}</b></td> 
+                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id), 'bg-warning1': [49].includes(data.mov.status_Id) }">{{ data.status }}</span></td>
+                <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }}</td> 
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="5" class="text-right">Cantidad Total</td>
-                <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
-                <td colspan="3"></td>
+                <td colspan="4" class="text-right">Cantidad Total</td>
+                <td class="text-center">{{totalQty(entries) | number : '1.2-2'}}</td>
+                <td colspan="4"></td>
               </tr>
             </ng-template>
           </p-table>
         </div>
 
+        <!--* SALIDAS-->
         <div class="col-sm-12 col-md-6 px-5"> 
 
           <p-toolbar styleClass="mb-2">
             <ng-template pTemplate="left">
             </ng-template>
             <ng-template pTemplate="center">
-              <b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-download"></i> Salidas de bodega de Peletizado</b>
+              <b class="mr-2" [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-cloud-upload"></i> Salidas de bodega de Peletizado</b>
             </ng-template>
             <ng-template pTemplate="right">
             </ng-template>
@@ -188,43 +189,48 @@
             <ng-template pTemplate="header">
               <tr class="font-size-16" id="filtros">
                 <th></th>
+                <th></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.id', tableData2)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.id', tableData2)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrimas.matPrima', tableData2)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.qty', tableData2)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'mov.date', tableData2)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'data.status', tableData2)"></th>
-                <th></th>
+              </tr>
+              <tr>
+                <th style="font-weight: 800;" class="text-center" colspan="3"></th>
+                <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-box"></i> Mat. Prima Recuperada</th>
+                <th style="font-weight: 800;" class="text-center" colspan="2"></th>
               </tr>
               <tr>
                 <th class="text-center">#</th>
-                <th class="text-center">Codigo Mov.</th>
-                <th class="text-center">Id Mat. Prima</th> 
-                <th class="text-center">Mat. Prima</th>
-                <th class="text-center">Peso (Kg)</th>
-                <th class="text-center">Fecha</th>
-                <th class="text-center">Estado</th>
-                <th></th>
+                <th>Ver</th>
+                <th class="text-center" pSortableColumn="mov.id"><p-sortIcon field="mov.id"></p-sortIcon> N° Mov.</th>
+                <th class="text-center" pSortableColumn="matPrimas.id"><p-sortIcon field="matPrimas.id"></p-sortIcon> Id</th> 
+                <th class="text-center" pSortableColumn="matPrimas.matPrima"><p-sortIcon field="matPrimas.matPrima"></p-sortIcon> Nombre</th>
+                <th class="text-center" pSortableColumn="mov.qty"><p-sortIcon field="mov.qty"></p-sortIcon> Peso (Kg)</th>
+                <th class="text-center" pSortableColumn="mov.date"><p-sortIcon field="mov.date"></p-sortIcon> Estado</th>
+                <th class="text-center" pSortableColumn="mov.status"><p-sortIcon field="mov.status"></p-sortIcon> Fecha</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-              <tr>
+              <tr [ngClass]="{'cursor' : [11].includes(data.mov.status_Id), }" (dblclick)="loadModalRecovery(data)" >
                 <td class="text-center">{{rowIndex + 1}}</td>
+                <td class="text-center">
+                  <p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewPDF(data)"></p-button>
+                </td>
                 <td class="text-center">{{ data.mov.code }}</td>
                 <td class="text-center">{{ data.matPrimas.id }}</td> 
                 <td>{{ data.matPrimas.matPrima }}</td> 
                 <td class="text-center"><b>{{ data.mov.qty | number : '1.2-2' }}</b></td> 
-                <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }} {{ data.mov.hour }}</td> 
                 <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id) }">{{ data.status }}</span> </td> <!--Estado-->
-                <td class="text-center">
-                  <p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewPDF(data)"></p-button>
-                </td>
+                <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }}</td> 
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="4" class="text-right">Cantidad Total</td>
-                <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
+                <td colspan="5" class="text-right">Cantidad Total</td>
+                <td class="text-center">{{totalQty(outputs) | number : '1.2-2'}}</td>
                 <td colspan="3"></td>
               </tr>
             </ng-template>
@@ -233,4 +239,8 @@
       </div>  
     
   </p-card>  
+
+  <p-dialog header="Recuperado de Materia Prima" [(visible)]="modal" [modal]="true" [style]="{ width: '90vw' }" [draggable]="false" [resizable]="false">
+    <app_MateriaPrimaRecuperada></app_MateriaPrimaRecuperada>
+  </p-dialog>
   

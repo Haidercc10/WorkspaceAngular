@@ -1,4 +1,4 @@
-<div class="contain">
+<div class="contain" *ngIf="title">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <!-- principal -->
@@ -141,8 +141,6 @@
       columnResizeMode="expand"
       styleClass="p-datatable-gridlines p-datatable-sm"
       responsiveLayout="scroll"
-      [paginator]="true"
-      [rows]="20"
       [rowHover]="true"
       [value]="ArrayMateriaPrima">
         <ng-template pTemplate="header">
@@ -158,9 +156,21 @@
           <tr>
             <td>{{materiaPrima.Id}}</td>
             <td>{{materiaPrima.Nombre}}</td>
-            <td>{{materiaPrima.Cant | number}}</td>
+            <td [pEditableColumn]="materiaPrima.Cant" class="cursor" pTooltip="Editar cantidad a ingresar">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="number" (focusout)="outFocus(materiaPrima.Cant, materiaPrima.Cant2)" (focus)="onFocus()" [min]="1" [max]="materiaPrima.Cant2" [(ngModel)]="materiaPrima.Cant" pEditableColumnField="Cant" required/>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ materiaPrima.Cant == null || materiaPrima.Cant > materiaPrima.Cant2 ? materiaPrima.Cant2 : materiaPrima.Cant | number : '1.2-2' }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <!--<td>{{materiaPrima.Cant | number}}</td>-->
             <td>{{materiaPrima.UndCant}}</td>
-            <td id="quitarMp"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiaPrima)"></i></td>
+            <td id="quitarMp">
+              <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="mostrarEleccion(materiaPrima)"></p-button>
+            </td>
           </tr>
         </ng-template>
       </p-table>
@@ -171,7 +181,7 @@
   <br>
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton id="crear" class="p-button-danger" type="button" label="Registrar Recuperado" icon="pi pi-check" (click)="registrarRecuperado()"></button>
+      <button pButton id="crear" class="p-button-danger" type="button" label="Registrar Recuperado" [disabled]="fieldFocus" icon="pi pi-check" (click)="registrarRecuperado()"></button>
       <button pButton id="limpiarTodo" class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"></button>
     </div>
   </div>

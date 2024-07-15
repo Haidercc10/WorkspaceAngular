@@ -3,8 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
-import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
-import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
@@ -13,6 +11,7 @@ import { Ingreso_PeletizadoService } from 'src/app/Servicios/Ingreso_Peletizado/
 import { Ingreso_PeletizadoComponent } from '../Ingreso_Peletizado/Ingreso_Peletizado.component';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Salidas_PeletizadoComponent } from '../Salidas_Peletizado/Salidas_Peletizado.component';
+import { MateriaPrimaRecuperadaComponent } from '../MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 
 @Component({
   selector: 'app-Mov_IngresoPeletizado',
@@ -37,6 +36,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   statuses : any = [];
   entries : any = [];
   outputs : any = []
+  @ViewChild(MateriaPrimaRecuperadaComponent) cmpRecovery : MateriaPrimaRecuperadaComponent;
 
   constructor(
     private appComponent: AppComponent,
@@ -53,6 +53,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
     this.initForm();
   }
 
+  //*
   ngOnInit() {
     this.readStorage();
     this.getMatPrimas();
@@ -93,11 +94,13 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
     this.load = false;
   }
 
+  //*
   searchProduct() {
     let nombre: string = this.form.value.reference;
     this.productsService.obtenerItemsLike(nombre).subscribe(resp => this.products = resp);
   }
 
+  //*
   selectedProduct() {
     let producto: any = this.form.value.reference;
     this.form.patchValue({
@@ -112,7 +115,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   //* Función para obtener las materias primas.
   getMatPrimas = () => this.svMatPrima.GetInventarioMateriasPrimas().subscribe(datos => this.materiasPrimas = datos);
   
-  // Funcion que le va a colocar el nombre a la materia prima seleccionada
+  //* Funcion que le va a colocar el nombre a la materia prima seleccionada
   changeMaterial(){
     let id : number = this.form.value.mpName;
     let matprima : any = this.materiasPrimas.filter((item) => item.id_Materia_Prima == id);
@@ -120,8 +123,10 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
     this.form.patchValue({ 'mpId' : id, 'mpName' : matprima[0].nombre_Materia_Prima, });
   }
 
+  //*
   searchInPeletizado(){
-    this.dataFound = [];
+    this.entries = [];
+    this.outputs = [];
 
     if((this.form.value.rankDates).length == 2) {
       let date1 : any = moment(this.form.value.rankDates[0]).format('YYYY-MM-DD');
@@ -129,12 +134,20 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
       this.load = true;
 
       this.svIngPele.getMovementsPeletizado(date1, date2, this.validateUrl()).subscribe(data => {
-        this.dataFound = data;
+        this.entries = data.filter(x => x.typeMov == 'ENTRADA');
+        this.outputs = data.filter(x => x.typeMov == 'SALIDA');
         this.load = false;
-      }, error => this.msg.mensajeError(`Error`, `No se ha podido consultar el ingreso de peletizado!`));
-    } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe elegir 2 fechas para consultar!`);
+      }, error => {
+        this.msg.mensajeError(`Error`, `No se ha podido consultar el ingreso de peletizado!`);
+        this.load = false;
+      }); 
+    } else {
+      this.msg.mensajeAdvertencia(`Advertencia`, `Debe elegir 2 fechas para consultar!`);
+      this.load = false;
+    } 
   }
 
+  //*
   validateUrl(){
     let ot: any = this.form.value.orderProduction;
     let mp: any = this.form.value.mpId;
@@ -152,10 +165,25 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
     return url;
   }
 
+  //*
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  totalQty = () => this.dataFound.reduce((a, b) => a += b.mov.qty, 0);
+  //*
+  totalQty = (data) => data.reduce((a, b) => a += b.mov.qty, 0);
 
+  //*
   viewPDF = (data) => data.typeMov == 'ENTRADA' ? this.cmpEntries.createPDF(data.mov.date, data.mov.date, data.mov.hour, `exportado`) : this.cmpOutputs.createPDF(data.mov.code, `exportado`);
 
+  //*
+  loadModalRecovery(data){
+    if(data.status == 'PENDIENTE') {
+      this.modal = true
+      this.cmpRecovery.title = false
+      this.cmpRecovery.ArrayMateriaPrima = [];
+
+      this.cmpRecovery.FormMateriaPrimaRecuperada.patchValue({ 'usuarioId' : this.storage_Id, 'usuarioNombre' : this.storage_Id, 'ConsecutivoSalida' : data.mov.id, 'MpObservacion' : `Salida de peletizado N° ${data.mov.id}` })
+      this.cmpRecovery.FormMateriaPrima.disable();
+      this.cmpRecovery.ArrayMateriaPrima.push({ 'Id' : data.matPrimas.id, 'Nombre' : data.matPrimas.matPrima, 'Cant' : data.mov.qty, 'UndCant' : 'Kg', 'Cant2' : data.mov.qty, });
+    } else this.modal = false;
+  }
 }

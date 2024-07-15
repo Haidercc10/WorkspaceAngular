@@ -23,12 +23,14 @@ export class Mov_BodegaRollosComponent implements OnInit {
   selectedMode: boolean = false;
   products: any[] = [];
   dataSearched: Array<any> = [];
-  @ViewChild('tableMov') tableMov: Table | undefined;
+  @ViewChild('tableMovIn') tableMovIn: Table | undefined;
+  @ViewChild('tableMovOut') tableMovOut: Table | undefined;
   modal : boolean = false;
   dataSelected : any = [];
   materiasPrimas : any [] = [];
   typesMovements : any = ['ENTRADA', 'SALIDA']; 
-  dataFound : any = [];
+  dataFoundIn : any = [];
+  dataFoundOut : any = [];
   //@ViewChild(Ingreso_Rollos_ExtrusionComponent) cmpEntryStore : Ingreso_Rollos_ExtrusionComponent
 
   constructor(
@@ -68,26 +70,33 @@ export class Mov_BodegaRollosComponent implements OnInit {
 
   //Función para obtener los movimientos de entradas y solicitudes de rollos
   getMovements(){
-    this.dataFound = [];
-    this.dataFound = [];
+    this.dataFoundIn = [];
+    this.dataFoundOut = [];
+    this.load = true;
 
     if((this.form.value.rankDates).length == 2) {
       let date1 : any = moment(this.form.value.rankDates[0]).format('YYYY-MM-DD');
       let date2 : any = moment(this.form.value.rankDates[1]).format('YYYY-MM-DD');
-      this.load = true;
 
       this.svDetStoreRolls.getMovementsStore(date1, date2, this.validateUrl()).subscribe(data => {
-        this.dataFound = data;
+        this.dataFoundIn = data.filter(x => x.typeMov == 'ENTRADA');
+        this.dataFoundOut = data.filter(x => x.typeMov == 'SALIDA');
         this.load = false;
-      }, error => this.msg.mensajeError(`Error`, `No se ha podido consultar los movimientos de la bodega!`));
-    } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe elegir 2 fechas para consultar!`);
+      }, error => {
+        this.msg.mensajeError(`Error`, `No se ha podido consultar los movimientos de la bodega!`);
+        this.load = false;
+      }); 
+    } else {
+      this.msg.mensajeAdvertencia(`Advertencia`, `Debe elegir 2 fechas para consultar!`);
+      this.load = false;
+    } 
   }
 
   //Validar la url se pasará como parametro en el metodo que consulta el API.
   validateUrl(){
     let ot: any = this.form.value.orderProduction;
     let item: any = this.form.value.item;
-    let roll : any = this.form.value.roll;
+    let roll : any = this.form.value.production;
     let typeMov : any = this.form.value.typeMov;
     let url : string = ``;
 
@@ -104,8 +113,8 @@ export class Mov_BodegaRollosComponent implements OnInit {
   //Función para limpiar los campos y las tablas. 
   clearFields(){
     this.form.reset();
-    this.dataFound = [];
-    this.dataFound = [];
+    this.dataFoundIn = [];
+    this.dataFoundOut = [];
     this.loadRankDates();
   }
 
@@ -122,7 +131,7 @@ export class Mov_BodegaRollosComponent implements OnInit {
   }
 
 
-  totalQty = () => this.dataFound.reduce((a, b) => a += b.quantity, 0);
+  totalQty = (data) => data.reduce((a, b) => a += b.quantity, 0);
 
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 

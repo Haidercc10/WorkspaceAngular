@@ -62,3 +62,11 @@
   ::ng-deep .d-grid {
     padding-bottom: 0%;
   }
+
+  ::ng-deep p-toolbar .p-toolbar {
+    justify-content: space-between !important;
+  }
+
+  ::ng-deep .p-toolbar {
+      padding: 0.2rem   
+  }

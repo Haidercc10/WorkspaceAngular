@@ -18,5 +18,5 @@ export class Salidas_PeletizadoService {
 
     Put = (id : any, data : any) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Salidas_Peletizado/${id}`, data);
 
-    putStatusOutput = (id : any, data : any) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/putStatusOutput/Salidas_Peletizado/${id}`, data);
+    putStatusOutput = (id : any, user : any, data? : any[]) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/putStatusOutput/Salidas_Peletizado/${id}/${user}`, data);
 }

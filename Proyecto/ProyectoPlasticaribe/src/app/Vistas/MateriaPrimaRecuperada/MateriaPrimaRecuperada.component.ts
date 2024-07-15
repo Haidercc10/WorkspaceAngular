@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -8,11 +8,16 @@ import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recupe
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.service';
+import { Salidas_PeletizadoService } from 'src/app/Servicios/Salidas_Peletizado/Salidas_Peletizado.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsRecuperado as defaultSteps } from 'src/app/data';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app_MateriaPrimaRecuperada',
@@ -49,6 +54,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   modalMode : boolean = false;
+  fieldFocus : boolean = false;
+  title : boolean = true;
   
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -61,10 +68,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                               private turnosService : TurnosService,
                                 private messageService: MessageService,
                                   private shepherdService: ShepherdService,
-                                    private mensajeService : MensajesAplicacionService,) {
+                                    private mensajeService : MensajesAplicacionService,
+                                      private svOutputsPele : Salidas_PeletizadoService,) {
+
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
-      ConsecutivoFactura : ['', Validators.required],
+      ConsecutivoSalida : ['', Validators.required],
       MpingresoFecha: ['', Validators.required],
       usuarioNombre: ['', Validators.required],
       usuarioId: ['', Validators.required],
@@ -138,7 +147,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos => this.unidadMedida = datos.map(x => x.undMed_Id));
 
   //Funcion que se encargará de buscary almacenar todos los usuarios
-  obtenerUsuarios = () => this.usuarioService.srvObtenerListaUsuario().subscribe(datos => this.usuarios = datos.filter(x => x.rolUsu_Id == 3));
+  obtenerUsuarios = () => this.usuarioService.srvObtenerListaUsuario().subscribe(datos => this.usuarios = datos.filter(x => [3,1].includes(x.rolUsu_Id) && [123456789,112,4169].includes(x.usua_Id)));
 
   //Funcion que traerá la información del usuario seleccionado
   llenarUsuarioSeleccionado(){
@@ -198,6 +207,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       Nombre : nombreMateriaPrima,
       Cant : cantidad,
       UndCant : presentacion,
+      Cant2 : cantidad,
     }
     if(productoExt.Cant > 0) {
       this.ArrayMateriaPrima.push(productoExt);
@@ -222,11 +232,26 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         }
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Id, datosMP).subscribe(() => {
           count++;
-          if (count == this.ArrayMateriaPrima.length) this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Inventario de materia prima actualizado con éxito!`);
-          this.limpiarTodosCampos();
+          if (count == this.ArrayMateriaPrima.length) {
+            let output : any = this.FormMateriaPrimaRecuperada.value.ConsecutivoSalida;
+            if(output) this.updateOutputPeletizado();
+            else {
+              this.mensajeService.mensajeConfirmacion(`Confirmación`, `Inventario de materia prima actualizado con éxito!`);
+              this.limpiarTodosCampos();
+            }
+          } 
         });
       }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`));
     }
+  }
+
+  updateOutputPeletizado(){
+    let output : any = this.FormMateriaPrimaRecuperada.value.ConsecutivoSalida;
+    this.svOutputsPele.putStatusOutput(output, this.storage_Id).subscribe(data => {
+      this.limpiarTodosCampos();
+    }, error => {
+      this.mensajeService.mensajeError(`Error`, `Error al actualizar la salida de peletizado N° ${output}`);
+    });
   }
 
   // Funcion que limpiará todos los campos
@@ -276,4 +301,11 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   /** Función para quitar mensaje de elección */
   onReject = () => this.messageService.clear('recuperado');
+
+  onFocus = () => this.fieldFocus = true;
+
+  outFocus(qty : number, qty2 : number) {
+    if(qty <= qty2) return this.fieldFocus = false;
+    else return this.fieldFocus = true;
+  }
 }
