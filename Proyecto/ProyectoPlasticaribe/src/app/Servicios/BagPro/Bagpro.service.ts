@@ -99,6 +99,8 @@ export class BagproService {
 
   getAvailablesRollsOT = (ot: string, process : string, notAvaible: Array<number>): Observable<any> => this.http.post(`${this.rutaBagPro}/ProcExtrusion/getAvailablesRollsOT/${ot}/${process}`, notAvaible);
 
+  GetInformactionProductionForTag = (production: number): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getInformactionProductionForTag/${production}`);
+
   /********************************************************** CLIENTESOT ****************************************************************/
 
   srvActualizar = (id:number|String, data:any, estado : any) => this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);
@@ -133,9 +135,9 @@ export class BagproService {
 
   GetOrdenDeTrabajo = (ot : number):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/GetOrdenDeTrabajo/${ot}`);
   
-  GetInformactionProductionForTag = (production: number): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getInformactionProductionForTag/${production}`);
-
   PutOrdenTrabajo = (orden : number, data : modelOrden_Trabajo_BagPro) => this.http.put(`${this.rutaBagPro}/ClientesOt/putOrdenTrabajo/${orden}`, data);
+
+  getClientsForOT = (ot: number): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ClientesOt/getClientsForOT/${ot}`);
 
   /**************************************************************** CLIENTESOTITEM *******************************************************/
 

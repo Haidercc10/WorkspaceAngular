@@ -100,7 +100,7 @@
     <hr class="Linea">
   </div>
 
-  <!-- Inicio titulo tabla producto -->
+  <!--* titulo tabla 1 -->
   <div class="mb-4">
     <div class="row g-3">
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
@@ -109,7 +109,7 @@
     </div>
   </div>
 
-  <!--Inicio tabla Rollos creados en OT -->
+  <!--* tabla 1 -->
   <div class="mb-3">
     <div class="row g-3 font-size-14" id="tabla1">
       <p-table
@@ -134,6 +134,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Producto', dt)"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Cantidad', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Presentacion', dt)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Ubicacion', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Proceso', dt)"></th>
           </tr>
           <tr>
@@ -146,6 +147,7 @@
             <th scope="col">Referencia</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Presentacion</th>
+            <th scope="col">Ubicación</th>
             <th scope="col">Bodega</th>
           </tr>
         </ng-template>
@@ -160,6 +162,7 @@
             <td>{{rollo.Producto}}</td>
             <td><b>{{rollo.Cantidad | number}}</b></td>
             <td>{{rollo.Presentacion}}</td>
+            <td><b>{{rollo.Ubicacion}}</b></td>
             <td> <span class="badge" 
               [ngClass]="{'bg-Extrusion': rollo.Proceso == 'Extrusion',
               'bg-ProductoIntermedio': rollo.Proceso == 'Producto Intermedio',
@@ -173,16 +176,17 @@
     </div>
   </div>
 
+  <!--* Linea -->
   <div class="mb-4">
     <hr class="Linea">
   </div>
 
-  <!-- Inicio titulo tabla producto -->
+  <!--* titulo tabla 2 -->
   <div class="mb-4" *ngIf="!cargando">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de rollos solicitados</h4>
   </div>
 
-  <!--Inicio tabla Rollos a Insertar -->
+  <!--* tabla 2 -->
   <div class="mb-3">
     <div class="row g-3" id="tabla2">
       <p-table
@@ -207,6 +211,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Producto', dt2)"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Cantidad', dt2)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Presentacion', dt2)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Ubicacion', dt2)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Proceso', dt2)"></th>
           </tr>
           <tr>
@@ -219,6 +224,7 @@
             <th scope="col">Refencia</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Presentación</th>
+            <th scope="col">Ubicación</th>
             <th scope="col">Bodega</th>
           </tr>
         </ng-template>
@@ -233,6 +239,7 @@
             <td>{{rollo.Producto}}</td>
             <td><b>{{rollo.Cantidad | number : '1.2-2'}}</b></td>
             <td>{{rollo.Presentacion}}</td>
+            <td><b>{{rollo.Ubicacion}}</b></td>
             <td>
               <span class="badge" 
               [ngClass]="{'bg-Extrusion': rollo.Proceso == 'Extrusion',
@@ -248,16 +255,17 @@
     </div>
   </div>
 
+  <!--* Linea -->
   <div class="mb-4" *ngIf="!cargando">
     <hr class="Linea">
   </div>
 
-  <!-- Inicio titulo tabla consolidado -->
+  <!-- * tabla 3 -->
   <div class="mb-4" *ngIf="!cargando">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Consolidado Productos</h4>
   </div>
 
-  <!--Inicio tabla Rollos consolidados -->
+  <!--* titulo tabla 3 -->
   <div class="mb-3" *ngIf="!cargando">
     <div class="row g-3" id="tabla3">
       <div class="table-responsive">
@@ -306,7 +314,7 @@
     </div>
   </div>
 
-  <!-- Botones -->
+  <!--* Botones -->
   <div class="bajarPagina" *ngIf="!cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Crear Solicitud" icon="pi pi-check" (click)="ingresarRollos()"></button>

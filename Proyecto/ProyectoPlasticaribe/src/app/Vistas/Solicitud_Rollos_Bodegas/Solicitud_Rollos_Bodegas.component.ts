@@ -137,7 +137,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   getBodegas(){
     this.procesosService.srvObtenerLista().subscribe(data => {
       this.bodegasSolicitadas = data.filter(x => ['BGPI'].includes(x.proceso_Id));
-      this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+      this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT'].includes(x.proceso_Id));
     });
   }
 
@@ -174,7 +174,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       this.consolidadoProductos = [];
 
       this.dtBgRollosService.GetRollosDisponibles(bodega, ot, ruta).subscribe(data => data.forEach(item => this.llenarRollosIngresar(item)), err => {
-        this.mensajeService.mensajeError(`¡Error!`, `¡${err.error}!`);
+        this.mensajeService.mensajeError(`Error`, `${err.status} ${err.statusText}!`);
         this.cargando = false;
       });
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos 'Bodega' y 'OT'`);
@@ -182,6 +182,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   // Funcion que va a llenar los rollos que estan disponibles para ser ingresados
   llenarRollosIngresar(data : any){
+    console.log(data);
     if(!this.rollosIngresar.map(x => x.Rollo).includes(data.rollo)) {
       let info : any = {
         Ot : data.ot,
@@ -190,6 +191,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         Producto : data.referencia,
         Cantidad : parseFloat(data.cantidad),
         Presentacion : data.presentacion,
+        Ubicacion : data.ubicacion,
         Proceso : data.bodega,
       }
       this.rollosConsultados.push(info);

@@ -23,15 +23,7 @@
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
-  <p-toolbar styleClass="mb-3 gap-3">
-    <div class="row" style="width: 100%;">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
-        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="crearExcel(3)"></button>
-      </div>
-    </div>
-  </p-toolbar>
-
-  <p-tabView [scrollable]="true" id="seleccionInventarios">
+  <p-tabView [scrollable]="true" id="seleccionInventarios" (onChange)="changeTab($event)">
     <!-- INVENTARIO TOTAL -->
     <!--<p-tabPanel
       header="Inventario Total"
@@ -171,11 +163,21 @@
       </div>
     </p-tabPanel>-->
 
-    <!-- PRODUCTO INTERMEDIO -->
+    <!--* PRODUCTO INTERMEDIO -->
     <p-tabPanel
       header="Producto Intermedio"
       leftIcon="pi pi-th-large"
       tooltip="Información del Inventario de la Bodega de Producto Intermedio">
+
+      <!--* Botón Excel-->
+      <p-toolbar styleClass="mb-3 gap-3">
+        <div class="row" style="width: 100%;">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+            <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="crearExcel(3)"></button>
+          </div>
+        </div>
+      </p-toolbar>
+      
       <div class="mb-3" *ngIf="!cargando">
         <div class="row g-3" id="table">
           <p-table
@@ -193,6 +195,7 @@
               <tr>
                 <th></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains', dtProductoIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtProductoIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtProductoIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtProductoIntermedio)"></th>
@@ -203,6 +206,7 @@
               <tr>
                 <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
                 <th class="text-center" pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cliente">Cliente <p-sortIcon field="Cliente"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
@@ -215,8 +219,9 @@
               <tr>
                 <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
                 <td class="text-center negrita">{{data.Orden}}</td>
-                <td class="text-center">{{data.Item}}</td>
-                <td class="negrita negrita">{{data.Referencia}}</td>
+                <td>{{data.Cliente}}</td>
+                <td class="text-center negrita">{{data.Item}}</td>
+                <td>{{data.Referencia}}</td>
                 <td class="text-center negrita textGreen">{{data.Cantidad | number : '1.2-2'}}</td>
                 <td class="text-center">{{data.Presentacion}}</td>
                 <td class="text-center negrita textGreen">{{data.Rollos}}</td>
@@ -225,11 +230,103 @@
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td class="text-right" colspan="4">Totales: </td>
+                <td class="text-right" colspan="5">Totales: </td>
                 <td class="text-center textGreen">{{calcularTotalKg() | number : '1.2-2'}}</td>
                 <td class="text-center">Kg</td>
                 <td class="text-center textGreen">{{calcularTotalRollos()}}</td>
                 <td></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!--* PRODUCTO INTERMEDIO DETALLADO -->
+    <p-tabPanel
+      header="Producto Intermedio Detallado"
+      leftIcon="pi pi-th-large"
+      tooltip="Información del Inventario de la Bodega de Producto Intermedio detallado por rollo">
+
+      <!--* Botón Excel Detallado-->
+      <p-toolbar styleClass="mb-3 gap-3">
+        <div class="row" style="width: 100%;">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+            <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar2" (click)="createExcel()"></button>
+          </div>
+        </div>
+      </p-toolbar>
+
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3" id="table">
+          <p-table
+            #dtDetailsProdIntermedio
+            [value]="inventoryRolls"
+            [(selection)]="selectedRolls" 
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            dataKey="roll"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [paginator]="true"
+            [rows]="20"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
+            <ng-template pTemplate="header" >
+              <tr>
+                <th colspan="2"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'roll', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'initialWarehouse', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'client', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'item', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'reference', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'qty', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentation', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ubication', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'actualWarehouse', 'contains', dtDetailsProdIntermedio)"></th>
+              </tr>
+              <tr>
+                <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+                <th style="width: 4rem"><p-tableHeaderCheckbox click="selectionAll()" /></th>
+                <th class="text-center" pSortableColumn="roll">Rollo <p-sortIcon field="roll"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="initialWarehouse">Bod. Inicial <p-sortIcon field="initialWarehouse"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="ot">Orden Trabajo <p-sortIcon field="ot"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="client">Cliente <p-sortIcon field="client"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="item">Item <p-sortIcon field="item"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="reference">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="qty">Cantidad <p-sortIcon field="qty"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="presentation">Presentación <p-sortIcon field="presentation"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="ubication">Ubicación <p-sortIcon field="ubication"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="actualWarehouse">Bod. Actual <p-sortIcon field="actualWarehouse"></p-sortIcon></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
+                <td class="text-center"><p-tableCheckbox [value]="data" (click)="selectionOne(data)" /></td>
+                <td class="text-center">{{data.roll}}</td>
+                <td class="text-center">{{data.initialWarehouse}}</td>
+                <td class="text-center"><b>{{data.ot}}</b></td>
+                <td>{{data.client}}</td>
+                <td class="text-center">{{data.item }}</td>
+                <td>{{data.reference}}</td>
+                <td class="text-center textGreen"><b>{{data.qty | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.presentation}}</td>
+                <td class="text-center"><b>{{data.ubication}}</b></td>
+                <td class="text-center">{{data.actualWarehouse}}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td class="text-right" colspan="7">Totales: </td>
+                <td class="text-center textGreen">{{qtyTotal() | number : '1.2-2'}}</td>
+                <td class="text-center">Kg</td>
+                <td class="text-center" colspan="2"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -517,11 +614,13 @@
           <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcelDetallado()"></button></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollo', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtDetallado)"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Fecha', 'contains', dtDetallado)"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Ubicacion', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Extrusion', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ProductoIntermedio', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Impresion', 'contains', dtDetallado)"></th>
@@ -533,11 +632,13 @@
           <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
           <th pSortableColumn="Rollo">Rollo <p-sortIcon field="Rollo"></p-sortIcon></th>
           <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+          <th pSortableColumn="Cliente">Cliente <p-sortIcon field="Cliente"></p-sortIcon></th>
           <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
           <th pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
           <th pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
           <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
           <th pSortableColumn="Fecha">Fecha <p-sortIcon field="Fecha"></p-sortIcon></th>
+          <th pSortableColumn="Ubicacion">Ubicación <p-sortIcon field="Ubicacion"></p-sortIcon></th>
           <th pSortableColumn="Extrusion">Extrusión <p-sortIcon field="Extrusion"></p-sortIcon></th>
           <th pSortableColumn="ProductoIntermedio">Prod. Intermedio <p-sortIcon field="ProductoIntermedio"></p-sortIcon></th>
           <th pSortableColumn="Impresion">Impresión <p-sortIcon field="Impresion"></p-sortIcon></th>
@@ -551,11 +652,13 @@
           <td pFrozenColumn alignFrozen="left" [frozen]="true"><b>{{rowIndex + 1}}</b></td>
           <td>{{data.Rollo}}</td>
           <td>{{data.Orden}}</td>
+          <td>{{data.Cliente}}</td>
           <td>{{data.Item}}</td>
           <td>{{data.Referencia}}</td>
           <td>{{data.Cantidad | number : '1.2-2'}}</td>
           <td>{{data.Presentacion}}</td>
           <td>{{data.Fecha}}</td>
+          <td>{{data.Ubicacion}}</td>
           <td>{{data.Extrusion}}</td>
           <td>{{data.ProductoIntermedio}}</td>
           <td>{{data.Impresion}}</td>

@@ -4,6 +4,8 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
@@ -35,13 +37,18 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   inventarioDespacho : any [] = []; //Variable que almacenará la información del inventario de la bodega de despacho
   inventarioDetallado : any [] = []; //Vaariable que almacenará la información del inventario detallado
   inventario : boolean = false; //Variablq que validará si se ve el modal de los rollos o no
+  inventoryRolls : any = []; 
+  selectedRolls : any = [];
   
   @ViewChild('dtProductoIntermedio') dtProductoIntermedio: Table | undefined;
+  @ViewChild('dtDetailsProdIntermedio') dtDetailsProdIntermedio: Table | undefined;
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
                   private msj : MensajesAplicacionService,
-                    private bgRollosService : Detalle_BodegaRollosService,) {
+                    private bgRollosService : Detalle_BodegaRollosService,
+                      private svExcel : CreacionExcelService, 
+                        private svBagpro : BagproService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -49,6 +56,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.lecturaStorage();
     this.consultarInventario();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.calcularTotalRollos();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -74,29 +82,37 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   consultarInventario(){
     let num : number = 0;
     this.cargando = true;
+    this.inventarioProductoIntermedio = [];
+
     this.bgRollosService.GetInventarioRollos().subscribe(data => {
       if (data.length == 0) this.cargando = false;
-      for (let i = 0; i < data.length; i++) {
-        let info : any = {
-          Orden: data[i].bgRollo_OrdenTrabajo,
-          Item: data[i].prod_Id,
-          Referencia: data[i].prod_Nombre,
-          Cantidad: data[i].cantidad,
-          Presentacion: data[i].undMed_Id,
-          Rollos: data[i].rollos,
-          Bodega: data[i].bgRollo_BodegaActual,
-          BodegaActual: data[i].proceso_Nombre,
+      else {
+        for (let i = 0; i < data.length; i++) {
+          this.svBagpro.getClientsForOT(data[i].bgRollo_OrdenTrabajo).subscribe(dataBagpro => {
+            let info : any = {
+              Orden: data[i].bgRollo_OrdenTrabajo,
+              Cliente : dataBagpro[0],
+              Item: data[i].prod_Id,
+              Referencia: data[i].prod_Nombre,
+              Cantidad: data[i].cantidad,
+              Presentacion: data[i].undMed_Id,
+              Rollos: data[i].rollos,
+              Bodega: data[i].bgRollo_BodegaActual,
+              BodegaActual: data[i].proceso_Nombre,
+            }
+            //this.inventarioTotal.push(info);
+            //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
+            if (data[i].bgRollo_BodegaActual == 'BGPI') this.inventarioProductoIntermedio.push(info);
+            //if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
+            //if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
+            //if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
+            //if (data[i].bgRollo_BodegaActual == 'DESP') this.inventarioDespacho.push(info);
+            num += 1;
+            if (num == data.length) this.cargando = false;
+          });
         }
-        //this.inventarioTotal.push(info);
-        //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
-        if (data[i].bgRollo_BodegaActual == 'BGPI') this.inventarioProductoIntermedio.push(info);
-        //if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
-        //if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
-        //if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
-        //if (data[i].bgRollo_BodegaActual == 'DESP') this.inventarioDespacho.push(info);
-        num += 1;
-        if (num == data.length) this.cargando = false;
       }
+      
     }, error => {
        this.msj.mensajeError(`Error`, `No fue posible cargar el inventario de rollos`); 
        this.cargando = false
@@ -113,10 +129,12 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
         let info : any = {
           Rollo: data[i].dtBgRollo_Rollo,
           Orden: data[i].bgRollo_OrdenTrabajo,
+          Cliente : this.inventarioProductoIntermedio.find(x => x.Orden == data[i].bgRollo_OrdenTrabajo).Cliente,
           Item: data[i].prod_Id,
           Referencia: data[i].prod_Nombre,
           Cantidad: data[i].dtBgRollo_Cantidad,
           Presentacion: data[i].undMed_Id,
+          Ubicacion : data[i].dtBgRollo_Ubicacion,
           Fecha: data[i].bgRollo_FechaEntrada.replace('T00:00:00', ''),
           Extrusion: data[i].dtBgRollo_Extrusion ? 'SI' : 'NO',
           ProductoIntermedio: data[i].dtBgRollo_ProdIntermedio ? 'SI' : 'NO',
@@ -137,13 +155,19 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   // Funcion que va a calcular la cantidad total de kg que hay
   calcularTotalKg(){
     let total : number = 0;
-    total = this.inventarioProductoIntermedio.reduce((a,b) => a + b.Cantidad, 0);
+    if(this.dtProductoIntermedio) {
+      if(this.dtProductoIntermedio.filteredValue) total = this.dtProductoIntermedio.filteredValue.reduce((a, b) => a += b.Cantidad, 0);
+      else total = this.inventarioProductoIntermedio.reduce((a,b) => a += b.Cantidad, 0);
+    } else total = this.inventarioProductoIntermedio.reduce((a,b) => a += b.Cantidad, 0);
     return total;
   }
 
   calcularTotalRollos(){
     let total : number = 0;
-    total = this.inventarioProductoIntermedio.reduce((a,b) => a + b.Rollos, 0);
+    if(this.dtProductoIntermedio) {
+      if(this.dtProductoIntermedio.filteredValue) total = this.dtProductoIntermedio.filteredValue.reduce((a, b) => a += b.Rollos, 0);
+      else total = this.inventarioProductoIntermedio.reduce((a, b) => a += b.Rollos, 0);
+    } else total = this.inventarioProductoIntermedio.reduce((a, b) => a += b.Rollos, 0);
     return total;
   }
 
@@ -178,9 +202,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
         datos = this.inventarioDespacho;
       }
       setTimeout(() => {
-        const header = ["Orden Trabajo", "Item", "Referencia", "Cantidad Kg", "Presentación", "Cantidad Rollos", "Bodega Actual"]
+        const header = ["Orden Trabajo", "Cliente", "Item", "Referencia", "Cantidad Kg", "Presentación", "Cantidad Rollos", "Bodega Actual"]
         for (const item of datos) {
-          const datos1  : any = [item.Orden, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Rollos, item.BodegaActual];
+          const datos1  : any = [item.Orden, item.Cliente, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Rollos, item.BodegaActual];
           infoDocumento.push(datos1);
         }
         let workbook = new Workbook();
@@ -193,15 +217,15 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           cell.font = { name: 'Calibri', family: 4, size: 12, bold: true }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:G3');
+        worksheet.mergeCells('A1:H3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         worksheet.getCell('A1').value = title;
         worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 16, bold: true };
         infoDocumento.forEach(d => {
           let row = worksheet.addRow(d);
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
-        let widths : any = [20, 20, 60, 31, 15, 20, 30];
+        let widths : any = [20, 50, 20, 50, 31, 15, 20, 30];
         let count : number = 0;
         widths.forEach(x => {
           count++
@@ -230,9 +254,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       let title : string = `Inventario detallado OT N° ${this.inventarioDetallado[0].Orden}`;
 
       setTimeout(() => {
-        const header = ["Rollo", "Orden Trabajo", "Item", "Referencia", "Cantidad", "Presentación", "Fecha Ingreso", "Extrusión", "Producto Intermedio", "Impresión", "Rotograbado", "Sellado", "Despacho"]
+        const header = ["Rollo", "OT", "Cliente", "Item", "Referencia", "Cantidad", "Presentación", "Fecha Ingreso", "Ubicación", "Extrusión", "Producto Intermedio", "Impresión", "Rotograbado", "Sellado", "Despacho"]
         for (const item of datos) {
-          const datos1  : any = [item.Rollo, item.Orden, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Fecha, item.Extrusion, item.ProductoIntermedio, item.Impresion, item.Rotograbado, item.Sellado, item.Despacho];
+          const datos1  : any = [item.Rollo, item.Orden, item.Cliente, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Fecha, item.Ubicacion, item.Extrusion, item.ProductoIntermedio, item.Impresion, item.Rotograbado, item.Sellado, item.Despacho];
           infoDocumento.push(datos1);
         }
         let workbook = new Workbook();
@@ -249,7 +273,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           cell.font = { name: 'Calibri', family: 4, size: 12, bold: true }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:M3');
+        worksheet.mergeCells('A1:O3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         worksheet.getCell('A1').value = title;
         worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 16, bold: true };
@@ -258,7 +282,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
 
-        let widths : any = [15,10,15,60,15,15,15,15,25,12,15,12,12]
+        let widths : any = [15,10,50,15,50,15,15,15,15,15,25,12,15,12,12]
         let count : number = 0;
         widths.forEach(x => {
           count++
@@ -276,7 +300,201 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
         }, 1000);
       }, 1500);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `No se puede crear el archivo Excel porque no hay datos para exportar`);
-    
   }
+
+  //* 
+  searchInventoryRolls(){
+    this.inventoryRolls = [];
+    this.cargando = true;
+
+    this.bgRollosService.getInventoryAvailable().subscribe(data => {
+      this.cargando = false;
+      this.inventoryRolls = data;
+      this.inventoryRolls.forEach(x => x.client = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Cliente );
+    }, error => {
+      this.msj.mensajeError(`Error`, `No fue posible consultar el inventario de rollos disponibles`);
+      this.cargando = false;
+    });
+  }
+
+  //* Función que va muestra el inv. de rollos por OT/Detallado actualizado 
+  changeTab(event : any){
+    let tab : any = event.originalEvent.srcElement.innerText;
+
+    if(tab == 'Producto Intermedio') this.consultarInventario();
+    if(tab == 'Producto Intermedio Detallado') this.searchInventoryRolls();
+  }
+
+  //*Función que muestra la cantidad total en inventario de lo que haya en la tabla al instante
+  qtyTotal(){
+    let total : number = 0;
+    //setTimeout(() => {
+      if(this.dtDetailsProdIntermedio) {
+        if(this.dtDetailsProdIntermedio.filteredValue) total = this.dtDetailsProdIntermedio.filteredValue.reduce((a, b) => a += b.qty, 0);
+        else total = this.inventoryRolls.reduce((a, b) => a += b.qty, 0);
+      } else total = this.inventoryRolls.reduce((a, b) => a += b.qty, 0);
+      return total;
+    //}, 500);
+  }
+
+  //*Función que muestra la cantidad total de rollos que hay en inventario
+  qtyTotalRolls(){
+    let total : number = 0;
+    //setTimeout(() => {
+      if(this.dtDetailsProdIntermedio) {
+        if(this.dtDetailsProdIntermedio.filteredValue) total = this.dtDetailsProdIntermedio.filteredValue.length;
+        else total = this.inventoryRolls.length;
+      } else total = this.inventoryRolls.length;
+      return total;
+    //}, 500);
+  }
+
+  selectionAll(){
+    console.log(this.selectedRolls);
+  }
+
+  selectionOne(data){
+    console.log(data);
+    console.log(this.selectedRolls);
+  }
+
+  //* Función para crear excel de rollo a rollo detallado.
+  createExcel(){
+    let data : any = [];
+    if(this.dtDetailsProdIntermedio) { 
+      if(this.dtDetailsProdIntermedio.filteredValue) data = this.dtDetailsProdIntermedio.filteredValue;
+      else data = this.inventoryRolls; 
+    } else data = this.inventoryRolls; 
+     
+    if(data.length > 0) {
+      this.cargando = true;
+      setTimeout(() => { this.loadSheetAndStyles(data); }, 500);
+      setTimeout(() => { this.cargando = false; }, 1000);
+    } else this.msj.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
+  }
+
+  //Función que cargará la hoja de cálculo y los estilos.
+  loadSheetAndStyles(data : any){  
+    let title : any = `Inventario bodega de rollos ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5']; 
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:I3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [6,4].forEach(x => ws.getColumn(x).width = 50);
+    [2,3,5,8].forEach(x => ws.getColumn(x).width = 10);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [7,9].forEach(x => ws.getColumn(x).width = 15);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      'N°',
+      'Rollo',
+      'OT',
+      'Cliente',
+      'Item', 
+      'Referencia', 
+      'Cantidad',
+      'Unidad',
+      'Ubicación'
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let formatNumber: Array<number> = [7];
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I']; 
+
+    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //Agregar fila de totales al formato excel.
+  addTotal(info : any){
+    info.push([
+      '',
+      '',
+      '',
+      '',
+      '',
+      'DISPONIBLE',
+      this.qtyTotal(),
+      'TOTAL ROLLOS',
+      this.qtyTotalRolls(),
+    ]);
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.roll,
+        x.ot,
+        x.client,
+        x.item,
+        x.reference,
+        x.qty,
+        x.presentation,
+        x.ubication,
+      ]);
+    });
+    this.addTotal(info);
+    return info;
+  }
+
 }
 

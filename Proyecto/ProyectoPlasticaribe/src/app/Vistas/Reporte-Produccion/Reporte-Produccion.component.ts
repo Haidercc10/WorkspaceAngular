@@ -72,7 +72,7 @@ export class ReporteProduccionComponent implements OnInit {
 
   validarProcesoPorUsuarioRegistrado() {
     if (![1, 10, 83, 12].includes(this.ValidarRol)) {
-      if ([85,7].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION'];
+      if ([85,7,95].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION'];
       if ([86,8].includes(this.ValidarRol)) this.areasEmpresa = ['SELLADO', 'Wiketiado'];
       if ([87,9,4].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'IMPRESION'];
       if ([88,62,4].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION', 'EMPAQUE'];

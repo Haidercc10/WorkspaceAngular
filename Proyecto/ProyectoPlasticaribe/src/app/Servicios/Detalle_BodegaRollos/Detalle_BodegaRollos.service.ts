@@ -45,4 +45,5 @@ export class Detalle_BodegaRollosService {
 
   getRollsForOT = (ot : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollsForOT/${ot}`);
 
+  getInventoryAvailable = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventoryAvailable`);
 }

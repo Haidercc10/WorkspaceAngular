@@ -67,7 +67,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
-      Proceso : [null, Validators.required], 
+      Proceso : ['EXT', Validators.required], 
       OrdenTrabajo: [null, Validators.required],
       Rollo : [null],
       Peso : [null],
@@ -107,12 +107,14 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
   // funcion que va a limpiar los campos del formulario
   limpiarForm() {
-    this.FormConsultarRollos.reset();
+    this.FormConsultarRollos.reset()
+    this.FormConsultarRollos.patchValue({ Proceso : 'EXT' });
   } 
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
     this.FormConsultarRollos.reset();
+    this.FormConsultarRollos.patchValue({ Proceso : 'EXT' });
     this.rollosIngresar = [];
     this.rollosOT = [];
     this.rollosSeleccionados = [];
@@ -121,7 +123,6 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
   getAllUbicationsStore() {
     this.svUbicationsStore.getUbications().subscribe(data => { 
-      console.log(data)
       this.ubicaciones = data;
       this.ubications = data.reduce((a, b) => {
         if(!a.map(x => x.ubR_Id).includes(b.ubR_Id)) a = [...a, b];
@@ -138,7 +139,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   }
 
   //Función para obtener los procesos.
-  getProcesos = () => this.svProcesos.srvObtenerLista().subscribe(data => { this.procesos = data.filter(x => [1,2,3,9,7].includes(x.proceso_Codigo)) }, error => { this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); });
+  getProcesos = () => this.svProcesos.srvObtenerLista().subscribe(data => { this.procesos = data.filter(x => [1/*,2,3,9,7*/].includes(x.proceso_Codigo)) }, error => { this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); });
 
   aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
@@ -179,8 +180,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   agregarRollo(data : any){
     let bulto : any = data.rollo;
     let subUbicacion : any = [undefined, null].includes(this.FormConsultarRollos.value.SubUbicacion) ? 0 : this.FormConsultarRollos.value.SubUbicacion;
-    console.log(subUbicacion);
-    console.log(this.ubicaciones);
+    
     if(!this.rollosIngresar.map(x => x.rollo).includes(bulto)) {
       data.ubicacion = this.ubicaciones.find(x => x.ubR_Id == this.FormConsultarRollos.value.Ubicacion && x.ubR_SubId == subUbicacion).ubR_Nomenclatura;
       data.proceso_Id = this.FormConsultarRollos.value.Proceso;
