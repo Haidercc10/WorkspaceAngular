@@ -20,7 +20,7 @@
 
 <p-card class="font-size-14">
   <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+    <p-button icon="pi pi-eye" label="Ver Plano Bodega" styleClass="p-button-rounded p-button-warning" (click)="warehouse = true" tooltipPosition="top"></p-button>
   </div>
 
   <p-tabView [scrollable]="true" id="seleccionInventarios" (onChange)="changeTab($event)">
@@ -252,6 +252,7 @@
       <p-toolbar styleClass="mb-3 gap-3">
         <div class="row" style="width: 100%;">
           <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+            <button pButton pRipple label="Cambiar Ubicación" [disabled]="selectedRolls.length == 0" icon="pi pi-arrow-right-arrow-left"class="p-button-outlined p-button-success" id="reubicar" (click)="changeUbications = true"></button>
             <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar2" (click)="createExcel()"></button>
           </div>
         </div>
@@ -275,10 +276,11 @@
             [rows]="20"
             [rowsPerPageOptions]="[10, 20, 50, 100]"
             [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            *ngIf="!cargando">
             <ng-template pTemplate="header" >
               <tr>
-                <th colspan="2"></th>
+                <th colspan="2"><p-button class="p-button-rounded" severity="danger" icon="pi pi-eraser" type="button" label="Limpiar" [disabled]="selectedRolls.length == 0" (click)="deselectionAll()" pTooltip="Limpiar selección de rollos de la tabla" tooltipPosition="top"></p-button></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'roll', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'initialWarehouse', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains', dtDetailsProdIntermedio)"></th>
@@ -292,7 +294,7 @@
               </tr>
               <tr>
                 <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
-                <th style="width: 4rem"><p-tableHeaderCheckbox click="selectionAll()" /></th>
+                <th class="text-center" style="width: 4rem"><p-checkbox (click)="selectionAll()"></p-checkbox></th>
                 <th class="text-center" pSortableColumn="roll">Rollo <p-sortIcon field="roll"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="initialWarehouse">Bod. Inicial <p-sortIcon field="initialWarehouse"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="ot">Orden Trabajo <p-sortIcon field="ot"></p-sortIcon></th>
@@ -308,7 +310,7 @@
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
               <tr>
                 <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
-                <td class="text-center"><p-tableCheckbox [value]="data" (click)="selectionOne(data)" /></td>
+                <td class="text-center"><p-tableCheckbox [value]="data"/></td>
                 <td class="text-center">{{data.roll}}</td>
                 <td class="text-center">{{data.initialWarehouse}}</td>
                 <td class="text-center"><b>{{data.ot}}</b></td>
@@ -323,7 +325,7 @@
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td class="text-right" colspan="7">Totales: </td>
+                <td class="text-right" colspan="8">Totales: </td>
                 <td class="text-center textGreen">{{qtyTotal() | number : '1.2-2'}}</td>
                 <td class="text-center">Kg</td>
                 <td class="text-center" colspan="2"></td>
@@ -670,3 +672,109 @@
     </p-table>
   </ng-template>
 </p-dialog>
+
+<p-dialog [(visible)]="warehouse" [style]="{width: '35vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Plano bodega de rollos" [modal]="true" styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <img src="../assets/Background/BODEGA-ROLLOS-PL.jpg"/>
+  </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="changeUbications" [style]="{width: '70vw'}" [resizable]="true" header="Reubicación de rollos" [modal]="true">
+  <br>
+  <form [formGroup]="form">
+    <div class="mb-3">
+      <div class="row g-4">
+       
+         <!--* Ubicación-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="ubication" id="Ubicacion" [options]="ubications" optionValue="ubR_Id" optionLabel="ubR_Nombre" (onChange)="getSubUbications()" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="ubication">Ubicación*</label>
+          </span>
+        </div>
+  
+        <!--* Sub ubicación-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="subUbication" id="subUbication" [options]="subUbications" optionValue="ubR_SubId" optionLabel="ubR_SubNombre" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="subUbication">Sub Ubicación*</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-4 col-xxl-8">
+          <span class="p-float-label">
+            <textarea formControlName="observation" [rows]="1" pInputTextarea></textarea>
+            <label for="textarea">Motivo de reubicación*</label>
+          </span>
+        </div>
+
+      </div>
+    </div> 
+    <!--* Botones-->
+    <div class="mb-3">
+      <div class="row g-3">
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+          <button pButton pRipple class="p-button-danger" icon="pi pi-check" [disabled]="form.invalid" type="button" label="Reubicar rollos" (click)="reubicateRolls()" id="botones1"></button>
+          <button pButton pRipple class="p-button-outlined p-button-secondary" type="button" icon="pi pi-eraser" label="Limpiar campos" (click)="clearFields()" id="botones2"></button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <p-divider></p-divider>
+
+  <!--* Tabla de rollos a reubicar-->
+  <p-table 
+    #tableReubication
+    [value]="selectedRolls" 
+    [tableStyle]="{ 'min-width': '50rem' }" 
+    styleClass="p-datatable-sm"
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    responsiveLayout="scroll"
+    [rowHover]="true">
+      <ng-template pTemplate="header">
+          <tr>
+            <th></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'roll', 'contains', tableReubication)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains', tableReubication)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'client', 'contains', tableReubication)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'item', 'contains', tableReubication)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'reference', 'contains', tableReubication)"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'qty', 'contains', tableReubication)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentation', 'contains', tableReubication)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ubication', 'contains', tableReubication)"></th>
+            <th></th>
+          </tr>
+          <tr>
+              <th class="text-center">N°</th>
+              <th class="text-center">Rollo</th>
+              <th class="text-center">OT</th>
+              <th class="text-center">Cliente</th>
+              <th class="text-center">Item</th>
+              <th class="text-center">Referencia</th>
+              <th class="text-center">Peso</th>
+              <th class="text-center">Unidad</th>
+              <th class="text-center">Ubicación</th>
+              <th class="text-center">Quitar</th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+          <tr class="cursor">
+              <td class="text-center">{{ rowIndex + 1 }}</td>
+              <td class="text-center"><b>{{ data.roll }}</b></td>
+              <td class="text-center">{{ data.ot }}</td>
+              <td>{{ data.client }}</td>
+              <td class="text-center"><b>{{ data.item }}</b></td>
+              <td>{{ data.reference }}</td>
+              <td class="text-center textGreen"><b>{{ data.qty }}</b></td>
+              <td class="text-center">{{ 'Kg' }}</td>
+              <td class="text-center">{{ data.ubication }}</td>
+              <td class="text-center"><p-button class="p-button-rounded" severity="danger" icon="pi pi-trash" type="button" (click)="quitRoll(data)"></p-button></td>
+          </tr>
+      </ng-template>
+  </p-table>  
+</p-dialog>
+
+
+

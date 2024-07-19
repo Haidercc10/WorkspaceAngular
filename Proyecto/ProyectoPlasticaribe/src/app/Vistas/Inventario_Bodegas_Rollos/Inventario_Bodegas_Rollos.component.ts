@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
@@ -8,6 +9,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_BodegaRollos/Ubicaciones_BodegaRollos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsInvenatarioBodegas as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -39,26 +41,37 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   inventario : boolean = false; //Variablq que validará si se ve el modal de los rollos o no
   inventoryRolls : any = []; 
   selectedRolls : any = [];
-  
+  warehouse : boolean = false;
+  changeUbications : boolean = false; 
+  form : FormGroup;
+  ubications : Array<any> = [];
+  subUbications : Array<any> = [];
+  allUbications : Array<any> = [];
+
   @ViewChild('dtProductoIntermedio') dtProductoIntermedio: Table | undefined;
   @ViewChild('dtDetailsProdIntermedio') dtDetailsProdIntermedio: Table | undefined;
+  @ViewChild('tableReubication') tableReubication: Table | undefined;
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
                   private msj : MensajesAplicacionService,
                     private bgRollosService : Detalle_BodegaRollosService,
                       private svExcel : CreacionExcelService, 
-                        private svBagpro : BagproService) {
+                        private svBagpro : BagproService, 
+                          private formBuilder : FormBuilder, 
+                            private svUbicationsStore : Ubicaciones_BodegaRollosService, 
+                              private svDetailsStore : Detalle_BodegaRollosService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.initForm();
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.consultarInventario();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    this.calcularTotalRollos();
+    this.getAllUbicationsStore();
   }
-
+  
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
@@ -73,6 +86,90 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
+  }
+
+  //*
+  initForm(){
+    this.form = this.formBuilder.group({
+      ubication : [null, Validators.required],
+      subUbication : [null],
+      observation : [null, Validators.required]
+    });
+  }
+
+  //*
+  clearFields(){
+    this.form.reset();
+  }
+
+  //*
+  getAllUbicationsStore() {
+    this.svUbicationsStore.getUbications().subscribe(data => { 
+      this.allUbications = data;
+      this.ubications = data.reduce((a, b) => {
+        if(!a.map(x => x.ubR_Id).includes(b.ubR_Id)) a = [...a, b];
+          return a;
+      }, []); 
+    }, error => {
+      this.msj.mensajeError(`Error`, `No fue posible cargar las ubicaciones | ${error.status} ${error.statusText}`)
+    }); 
+  }
+
+  //*
+  getSubUbications() {
+    let ubication : any = this.form.value.ubication;
+    this.subUbications = this.allUbications.filter(x => x.ubR_Id == ubication);
+  }
+
+  //*
+  quitRoll(data : any){
+    this.cargando = true; 
+    let index : any = this.selectedRolls.findIndex(x => x.roll == data.roll);
+    this.msj.mensajeAdvertencia(`Advertencia`, `Se ha quitado el rollo N° ${data.roll} de la tabla.`);
+    this.selectedRolls.splice(index, 1);
+    if(this.selectedRolls.length == 0) this.changeUbications = false;
+    setTimeout(() => { this.cargando = false; }, 1000);
+  }
+
+  //*
+  selectionAll(){
+    this.cargando = true;
+    if(this.dtDetailsProdIntermedio) {
+      if(this.dtDetailsProdIntermedio.filteredValue) this.selectedRolls = this.selectedRolls.concat(this.dtDetailsProdIntermedio.filteredValue);
+      else this.selectedRolls = this.selectedRolls.concat(this.inventoryRolls);
+    } else this.selectedRolls = this.selectedRolls.concat(this.inventoryRolls);
+    console.log(this.selectedRolls);
+    setTimeout(() => { this.cargando = false; }, 5);
+  }
+
+  deselectionAll(){
+    this.cargando = true;
+    this.selectedRolls = [];
+    setTimeout(() => { this.cargando = false; }, 5);
+  }
+
+  //*
+  reubicateRolls(){
+    this.cargando = true;
+    let subUbication : any = [undefined, null].includes(this.form.value.subUbication) ? 0 : this.form.value.subUbication;
+    let newUbication : any = this.allUbications.find(x => x.ubR_Id == this.form.value.ubication && x.ubR_SubId == subUbication).ubR_Nomenclatura;
+    let observation : any = `El día ${moment().format(`YYYY-MM-DD`)}, el usuario ${this.storage_Nombre} realiza cambio de ubicación hacía ${newUbication} por el siguiente motivo: ${this.form.value.observation}`; 
+    
+    this.svDetailsStore.putUbicationRoll(newUbication, observation, this.selectedRolls.map(x => x.roll)).subscribe(data => {
+      this.changeUbications = false;
+      setTimeout(() => { this.clearAfterReubication(); }, 1500); 
+    }, error => {
+      this.msj.mensajeError(`Error`, `Error actualizando la ubicación de los rollos | ${error.status} ${error.statusText}`);
+      this.cargando = false;
+    });
+  }
+
+  clearAfterReubication(){
+    this.msj.mensajeConfirmacion(`Confirmación`, `Ubicación de rollos actualizada exitosamente!`);
+    this.cargando = false;
+    this.form.reset();
+    this.selectedRolls = [];
+    this.searchInventoryRolls();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -241,7 +338,6 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
         }, 1000);
       }, 1500);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `No se puede crear el archivo Excel porque no hay datos para exportar`);
-    
   }
 
   // Funcion que va a crear un excel de los detalles
@@ -349,15 +445,8 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     //}, 500);
   }
 
-  selectionAll(){
-    console.log(this.selectedRolls);
-  }
 
-  selectionOne(data){
-    console.log(data);
-    console.log(this.selectedRolls);
-  }
-
+  //? CREACIÓN DE FORMATO EXCEL
   //* Función para crear excel de rollo a rollo detallado.
   createExcel(){
     let data : any = [];
