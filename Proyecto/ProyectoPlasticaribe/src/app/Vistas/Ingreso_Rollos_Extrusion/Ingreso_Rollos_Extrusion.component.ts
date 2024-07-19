@@ -426,7 +426,6 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         "Ubicación" : d.ubicacion,
       });
     });
-    info.sort((a, b) => a.OT - b.OT);
     return info;
   }
 
@@ -481,7 +480,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   //Tabla con materiales recuperados ingresados detallados
   tablaDetallesPDF(data) {
     let columns: Array<string> = ['#', 'Rollo', 'Bodega', 'Ubicación', 'OT', 'Item', 'Referencia', 'Peso', 'Presentación'];
-    let widths: Array<string> = ['3%', '8%', '6%', '10%', '7%', '7%', '42%', '7%', '10%'];
+    let widths: Array<string> = ['3%', '8%', '6%', '12%', '7%', '7%', '40%', '7%', '10%'];
     return {
       margin: [0, 20],
       table: {

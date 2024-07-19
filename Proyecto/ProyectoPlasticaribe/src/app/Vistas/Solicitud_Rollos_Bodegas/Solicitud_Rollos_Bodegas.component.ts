@@ -62,7 +62,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
-      OrdenTrabajo: [null, Validators.required],
+      OrdenTrabajo: [null],
       Rollo : [null],
       Observacion : [''],
       BodegaSolicitada : ['BGPI', Validators.required],
@@ -137,7 +137,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   getBodegas(){
     this.procesosService.srvObtenerLista().subscribe(data => {
       this.bodegasSolicitadas = data.filter(x => ['BGPI'].includes(x.proceso_Id));
-      this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT'].includes(x.proceso_Id));
+      this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
     });
   }
 
@@ -177,7 +177,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         this.mensajeService.mensajeError(`Error`, `${err.status} ${err.statusText}!`);
         this.cargando = false;
       });
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos 'Bodega' y 'OT'`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos OT y/o Rollo`);
   }
 
   // Funcion que va a llenar los rollos que estan disponibles para ser ingresados
@@ -273,7 +273,55 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   qtyTotal = () =>  this.rollosIngresar.reduce((a, b) => a += b.Cantidad, 0);
 
-  // Funcion que permitirá ver el total de lo escogido para cada producto
+  //*
+  searchForRolls(){
+    let roll : any = this.FormConsultarRollos.value.Rollo;
+
+    if(roll) {
+      this.cargando = true;
+      this.dtBgRollosService.getRollForOut(roll).subscribe(data => {
+        if(data.length > 0) this.loadTableForRoll(data);
+        else {
+          this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontro información del rollo N° ${roll}`);
+          this.FormConsultarRollos.patchValue({ Rollo : null});
+          this.cargando = false;
+        }
+      }, error => {
+        this.mensajeService.mensajeError(`Error`, `Se encontraron errores al consultar el rollo N° ${roll} | ${error.status} ${error.statusText}`);
+        this.FormConsultarRollos.patchValue({ Rollo : null});
+        this.cargando = false;
+      });
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe digitar el número del rollo`);
+    
+  }
+
+  //*
+  loadTableForRoll(data : any){
+    this.cargando = false;
+    this.FormConsultarRollos.patchValue({ Rollo : null});
+    let process : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    let newProcess : any = this.bodegasSolicitantes.find(x => x.proceso_Id == process).proceso_Nombre;
+
+    if(!this.rollosIngresar.map(x => x.Rollo).includes(data[0].rollo)) {
+      data.forEach(x => {
+        this.rollosIngresar.unshift({
+          'Ot' : x.ot,
+          'Rollo' : parseInt(x.rollo),
+          'Id_Producto' : x.item,
+          'Producto' : x.referencia,
+          'Cantidad' : parseFloat(x.cantidad),
+          'Presentacion' : x.presentacion,
+          'Ubicacion' : x.ubicacion,
+          'Proceso' : newProcess,
+        });
+      });
+      this.groupProducts();
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `El rollo N° '${data[0].rollo}' ha sido agregado a la tabla de 'ROLLOS SOLICITADOS'!`)
+    } else this.mensajeService.mensajeAdvertencia(`El rollo N° ${data[0].rollo} ya se encuentra agregado en la tabla!`);
+    
+  }
+
+  //! DES-USADA Funcion que permitirá ver el total de lo escogido para cada producto 
   GrupoProductos(){
     let producto : any = [];
     this.consolidadoProductos = [];
@@ -309,7 +357,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   // Funcion que va a crear los rollos en la base de datos
   ingresarRollos(){
-    if (this.rollosIngresar.length > 0 && this.FormConsultarRollos.valid){
+    if (this.rollosIngresar.length > 0){
       this.cargando = true;
       const info : modelSolicitudRollos = {
         'Usua_Id': this.storage_Id,

@@ -57,7 +57,7 @@
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="OrdenTrabajo" id="ordenTrabajo" (keyup.enter)="consultarRollos()" type="number" pInputText required/>
-            <label for="ordenTrabajo">OT*</label>
+            <label for="ordenTrabajo">OT</label>
           </span>
         </div>
 
@@ -65,7 +65,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="Rollo" id="Rollo" type="number" pInputText/>
+            <input formControlName="Rollo" id="Rollo" type="number" (keyup.enter)="searchForRolls()" pInputText/>
             <label for="Rollo">N° Rollo</label>
           </span>
         </div>
@@ -127,7 +127,7 @@
           *ngIf="!cargando">
         <ng-template pTemplate="header">
           <tr>
-            <th></th>
+            <th colspan="2"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Ot', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Rollo', dt)"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Id_Producto', dt)"></th>
@@ -138,6 +138,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Proceso', dt)"></th>
           </tr>
           <tr>
+            <th>#</th>
             <th style="width: 3rem">
               <p-checkbox id="elegirRollos" (click)="seleccionarTodosRollos()"></p-checkbox>
             </th>
@@ -151,8 +152,9 @@
             <th scope="col">Bodega</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-rollo>
+        <ng-template pTemplate="body" let-rollo let-rowIndex="rowIndex">
           <tr>
+            <td>{{rowIndex + 1}}</td>
             <td>
               <p-tableCheckbox [value]="rollo" id="elegirRollo" (click)="llenarRollosAIngresar(rollo)"></p-tableCheckbox>
             </td>
@@ -204,7 +206,7 @@
         *ngIf="!cargando">
         <ng-template pTemplate="header">
           <tr>
-            <th></th>
+            <th colspan="2"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Ot', dt2)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Rollo', dt2)"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Id_Producto', dt2)"></th>
@@ -215,6 +217,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Proceso', dt2)"></th>
           </tr>
           <tr>
+            <th>#</th>
             <th style="width: 3rem">
               <p-checkbox id="elegirRollos2" (click)="quitarTodosRollos()"></p-checkbox>
             </th>
@@ -228,8 +231,9 @@
             <th scope="col">Bodega</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-rollo>
+        <ng-template pTemplate="body" let-rowIndex="rowIndex" let-rollo >
           <tr *ngIf="!rollo.exits">
+            <td>{{rowIndex + 1}}</td>
             <td>
               <p-tableCheckbox [value]="rollo" id="elegirRollo2" (click)="quitarRollosAIngresar(rollo)"></p-tableCheckbox>
             </td>
@@ -275,24 +279,24 @@
         columnResizeMode="expand"
         styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll"
-        [paginator]="true"
-        [rows]="20"
         [rowHover]="true"
         [value]="consolidadoProductos"
         [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
+            <th>#</th>
             <th scope="col">OT</th>
             <th scope="col">Item</th>
-            <th scope="col">Producto</th>
+            <th scope="col">Referencia</th>
             <th scope="col">N° Rollos</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Presentación</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-grupoProductos>
+        <ng-template pTemplate="body" let-grupoProductos let-rowIndex="rowIndex">
           <tr>
+            <td>{{rowIndex + 1}}</td>
             <td>{{grupoProductos.Ot}}</td>
             <td>{{grupoProductos.Id_Producto}}</td>
             <td>{{grupoProductos.Producto}}</td>
@@ -303,13 +307,13 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="3" class="text-right">Totales</td>
+            <td colspan="4" class="text-right">Totales</td>
             <td>{{qtyTotalRolls() | number}}</td>
             <td>{{qtyTotal() | number : '1.2-2'}}</td>
             <td>Kg</td>
           </tr>
         </ng-template>
-      </p-table>
+        </p-table>
       </div>
     </div>
   </div>
@@ -317,7 +321,7 @@
   <!--* Botones -->
   <div class="bajarPagina" *ngIf="!cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Crear Solicitud" icon="pi pi-check" (click)="ingresarRollos()"></button>
+      <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Crear Solicitud" icon="pi pi-check" [disabled]="rollosIngresar.length == 0" (click)="ingresarRollos()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
   </div>
