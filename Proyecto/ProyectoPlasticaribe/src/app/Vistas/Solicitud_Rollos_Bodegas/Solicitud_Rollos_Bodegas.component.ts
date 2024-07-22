@@ -1,17 +1,24 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
+import { log } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
 import { modelDtSolicitudRollos } from 'src/app/Modelo/modelDtSolicitudRollos';
+import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
+import { modelProduccion_Procesos } from 'src/app/Modelo/modelProduccion_Procesos';
 import { modelSolicitudRollos } from 'src/app/Modelo/modelSolicitudRollos';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { Detalles_SolicitudRollosService } from 'src/app/Servicios/Detalles_SolicitudRollos/Detalles_SolicitudRollos.service';
 import { Formato_DocumentosService } from 'src/app/Servicios/Formato_Documentos/Formato_Documentos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudRollos as defaultSteps } from 'src/app/data';
@@ -58,7 +65,10 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                           private dtBgRollosService : Detalle_BodegaRollosService,
                             private dtSolicitudRollosService : Detalles_SolicitudRollosService,
                               private formatoDocsService : Formato_DocumentosService,
-                                private svPDF : CreacionPdfService) {
+                                private svPDF : CreacionPdfService, 
+                                  private svProduction : Produccion_ProcesosService, 
+                                    private svBagpro : BagproService,
+                                      private svSedesClients : SedeClienteService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
@@ -414,6 +424,66 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       this.mensajeService.mensajeError(`Ha ocurrido un error al actualizar los rollos en la bodega`, `${error.status} ${error.statusText}`);
       this.cargando = false;
     });
+  }
+
+  //* Función que creará el registro de producción de BagPro en Plasticaribe
+  createProductionInPL(){
+    this.rollosIngresar.forEach(d => {
+      this.svBagpro.getInformationRoll(d.Rollo, d.Ot).subscribe(data => {
+        this.svSedesClients.GetSedeClientexNitBagPro(data[0].nitClient).subscribe(dataSede => {
+          this.sendDataProductionPL(d, data, dataSede);
+        }, error => {
+          this.sendDataProductionPL(d, data, null);
+        });
+        //});
+      }, error => {
+
+      });
+    });
+  }
+
+  sendDataProductionPL(d : any, data : any, dataSede : any){
+    this.svProduction.Post(this.dataProduction(d, data, dataSede)).subscribe(dataPL => {
+
+    });
+  }
+
+  dataProduction(d : any, data : any, dataSede : any){
+    let production : modelProduccionProcesos = {
+      'Numero_Rollo': 0,
+      'Prod_Id': d.Id_Producto,
+      'Cli_Id': ![undefined, null].includes(dataSede) ? dataSede.length > 0 ? dataSede[0].id_Cliente : 1 : 1,
+      'Operario1_Id': 1516,
+      'Operario2_Id': 0,
+      'Operario3_Id': 0,
+      'Operario4_Id': 0,
+      'Pesado_Entre': 1,
+      'Maquina': data[0].production.maquina,
+      'Cono_Id': data[0].production.extCono2,
+      'Ancho_Cono': data[0].production.extConoC,
+      'Tara_Cono': data[0].production.extTara,
+      'Peso_Bruto': data[0].production.extBruto,
+      'Peso_Neto': d.Cantidad,
+      'Cantidad': d.Cantidad,
+      'Peso_Teorico': 0,
+      'Desviacion': 0,
+      'Precio': 0,
+      'Presentacion': d.Presentacion,
+      'Proceso_Id': 'EXT',
+      'Turno_Id': data[0].production.turno,
+      'Envio_Zeus': false,
+      'Datos_Etiqueta': '',
+      'Fecha': data[0].production.fecha,
+      'Hora': data[0].production.hora,
+      'Creador_Id': 123456789,
+      'NumeroRollo_BagPro': d.Rollo,
+      'Rollo_Asociado': null,
+      'Observacion': `${moment().format('YYYY-MM-DD')}: REGISTRO CREADO DESDE LA BODEGA DE ROLLOS DE PLASTICARIBE POR CONCEPTO DE SOLICITUD PARA DESPACHO.`,
+      'OT': d.Ot,
+      'Estado_Rollo' : 19, 
+      'PrecioVenta_Producto' : data[0].price,
+    }
+    return production;
   }
 
   aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');

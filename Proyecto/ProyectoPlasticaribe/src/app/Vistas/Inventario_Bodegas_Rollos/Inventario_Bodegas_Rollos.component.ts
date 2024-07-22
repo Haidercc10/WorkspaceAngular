@@ -91,6 +91,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   //*
   initForm(){
     this.form = this.formBuilder.group({
+      roll : [null],
       ubication : [null, Validators.required],
       subUbication : [null],
       observation : [null, Validators.required]
@@ -131,7 +132,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     setTimeout(() => { this.cargando = false; }, 1000);
   }
 
-  //*
+  //!
   selectionAll(){
     this.cargando = true;
     if(this.dtDetailsProdIntermedio) {
@@ -142,6 +143,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     setTimeout(() => { this.cargando = false; }, 5);
   }
 
+  //!
   deselectionAll(){
     this.cargando = true;
     this.selectedRolls = [];
@@ -149,19 +151,65 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //*
+  searchForRolls(){
+    let roll : any = this.form.value.roll;
+
+    if(roll) {
+      this.cargando = true;
+      this.svDetailsStore.getRollForOut(roll).subscribe(data => {
+        if(data.length > 0) this.loadTableForRoll(data);
+        else {
+          this.msj.mensajeAdvertencia(`Advertencia`, `No se encontro información del rollo N° ${roll}`);
+          this.form.patchValue({ roll : null});
+          this.cargando = false;
+        }
+      }, error => {
+        this.msj.mensajeError(`Error`, `Se encontraron errores al consultar el rollo N° ${roll} | ${error.status} ${error.statusText}`);
+        this.form.patchValue({ roll : null});
+        this.cargando = false;
+      });
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe digitar el número del rollo`);
+  }
+
+  //*
+  loadTableForRoll(data : any){
+    this.cargando = false;
+    this.form.patchValue({ roll : null});
+
+    if(!this.selectedRolls.map(x => x.Rollo).includes(data[0].rollo)) {
+      data.forEach(x => {
+        this.selectedRolls.unshift({
+          'roll' : x.rollo,
+          'ot' : parseInt(x.ot),
+          'item' : x.item,
+          'reference' : x.referencia,
+          'qty' : parseFloat(x.cantidad),
+          'presentation' : x.presentacion,
+          'ubication' : x.ubicacion,
+        });
+      });
+      //this.groupProducts();
+      this.msj.mensajeConfirmacion(`Confirmación`, `El rollo N° '${data[0].rollo}' ha sido agregado a la tabla!`)
+    } else this.msj.mensajeAdvertencia(`El rollo N° ${data[0].rollo} ya se encuentra agregado en la tabla!`);
+  }
+
+  //*
   reubicateRolls(){
-    this.cargando = true;
-    let subUbication : any = [undefined, null].includes(this.form.value.subUbication) ? 0 : this.form.value.subUbication;
-    let newUbication : any = this.allUbications.find(x => x.ubR_Id == this.form.value.ubication && x.ubR_SubId == subUbication).ubR_Nomenclatura;
-    let observation : any = `El día ${moment().format(`YYYY-MM-DD`)}, el usuario ${this.storage_Nombre} realiza cambio de ubicación hacía ${newUbication} por el siguiente motivo: ${this.form.value.observation}`; 
+    if(this.selectedRolls.length > 0) {
+      this.cargando = true;
+      let subUbication : any = [undefined, null].includes(this.form.value.subUbication) ? 0 : this.form.value.subUbication;
+      let newUbication : any = this.allUbications.find(x => x.ubR_Id == this.form.value.ubication && x.ubR_SubId == subUbication).ubR_Nomenclatura;
+      let observation : any = `El día ${moment().format(`YYYY-MM-DD`)}, el usuario ${this.storage_Nombre} realiza cambio de ubicación hacía ${newUbication} por el siguiente motivo: ${this.form.value.observation}`; 
+      
+      this.svDetailsStore.putUbicationRoll(newUbication, observation, this.selectedRolls.map(x => x.roll)).subscribe(data => {
+        this.changeUbications = false;
+        setTimeout(() => { this.clearAfterReubication(); }, 1500); 
+      }, error => {
+        this.msj.mensajeError(`Error`, `Error actualizando la ubicación de los rollos | ${error.status} ${error.statusText}`);
+        this.cargando = false;
+      });
+    } else this.msj.mensajeAdvertencia(`Debe cargar mínimo un rollo a reubicar!`)
     
-    this.svDetailsStore.putUbicationRoll(newUbication, observation, this.selectedRolls.map(x => x.roll)).subscribe(data => {
-      this.changeUbications = false;
-      setTimeout(() => { this.clearAfterReubication(); }, 1500); 
-    }, error => {
-      this.msj.mensajeError(`Error`, `Error actualizando la ubicación de los rollos | ${error.status} ${error.statusText}`);
-      this.cargando = false;
-    });
   }
 
   clearAfterReubication(){

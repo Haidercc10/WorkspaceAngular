@@ -26,4 +26,6 @@ export interface modelProduccion_Procesos {
      Fecha : any;
      Hora : any;
      Creador_Id : number;
+     Rollo_Asociado? : number;
+     Observacion? : string;
 }

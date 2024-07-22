@@ -28,4 +28,8 @@ export interface modelProduccionProcesos {
     Hora: string;
     Creador_Id: number;
     NumeroRollo_BagPro?: number;
+    Rollo_Asociado?: number;
+    Observacion?: string;
+    Estado_Rollo? : number;
+    PrecioVenta_Producto? : number;
 }
