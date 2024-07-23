@@ -73,4 +73,6 @@ export class Produccion_ProcesosService {
   getInfoItemsAvailablesOutPallet = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailablesOutPallet/${item}`);
 
   getMovementsRolls = (rollBp : number, item : number, rollPl : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getMovementsRolls/${rollBp}/${item}/${rollPl}`);
+
+  PostMassive = (data: Array<modelProduccionProcesos>): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/massiveInsertFromStoreRolls`, data);
 }

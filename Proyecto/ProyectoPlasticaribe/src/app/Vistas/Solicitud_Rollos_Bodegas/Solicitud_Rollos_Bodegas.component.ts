@@ -55,6 +55,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   @ViewChild('dt') dt : Table | undefined; 
   @ViewChild('dt2') dt2 : Table | undefined; 
   @ViewChild('dt3') dt3 : Table | undefined; 
+  count : number = 0;
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -168,6 +169,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.cargando = false;
     this.devolucionRollos = false;
     this.FormConsultarRollos.patchValue({ Devolucion : false, Observacion : `` });
+    this.count = 0;
   }
 
   // Funcion que va a consultar los rollos mediante los parametros pasados por el usuario
@@ -262,6 +264,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     setTimeout(() => { this.cargando = false; }, 50);
   }
 
+  //*
   groupProducts(){
     this.consolidadoProductos = this.rollosIngresar.reduce((a, b) => {
       if(!a.map(x => x.Ot).includes(b.Ot)) a = [...a, b];
@@ -270,6 +273,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.orderTables();
   }
 
+  //*
   orderTables(){
     this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
     this.consolidadoProductos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
@@ -413,13 +417,15 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       }
   }
 
+  //*
   actualizarBodegaRollos(idSolicitud : number){
     let rolls : any = [];
     let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
 
     this.rollosIngresar.forEach(x => rolls.push({ 'Rollo' : x.Rollo,  'OT' : x.Ot, }));
     this.dtBgRollosService.putRollsStore(23, bodegaSolicitante, rolls).subscribe(data => {
-      this.createPDF(idSolicitud, `creada`);
+      //this.createPDF(idSolicitud, `creada`);
+      this.createProductionInPL(idSolicitud, `creada`);
     }, error => {
       this.mensajeService.mensajeError(`Ha ocurrido un error al actualizar los rollos en la bodega`, `${error.status} ${error.statusText}`);
       this.cargando = false;
@@ -427,27 +433,44 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   }
 
   //* Función que creará el registro de producción de BagPro en Plasticaribe
-  createProductionInPL(){
-    this.rollosIngresar.forEach(d => {
-      this.svBagpro.getInformationRoll(d.Rollo, d.Ot).subscribe(data => {
-        this.svSedesClients.GetSedeClientexNitBagPro(data[0].nitClient).subscribe(dataSede => {
-          this.sendDataProductionPL(d, data, dataSede);
+  createProductionInPL(solicitud : number, action : string){
+    let wareHouseSelected : any = this.FormConsultarRollos.value.BodegaSolicitante;
+
+    if(wareHouseSelected == 'DESP') {
+      let rollsExtrusion : any = [];
+      let count = 0;
+      this.rollosIngresar.forEach(d => {
+        this.svBagpro.getInformationRoll(d.Rollo, d.Ot).subscribe(data => {
+          this.svSedesClients.GetSedeClientexNitBagPro(data[0].nitClient).subscribe(dataSede => {
+            count++
+            rollsExtrusion.push(this.dataProduction(d, data, dataSede));
+            if(this.rollosIngresar.length == count) this.sendDataProductionPL(rollsExtrusion, solicitud);
+          }, error => {
+            this.mensajeService.mensajeError(`Error`, `No se encontró información del cliente ${data[0].nitClient} | ${error.status} ${error.statusText}`);
+            this.cargando = false;
+          });
+          //});
         }, error => {
-          this.sendDataProductionPL(d, data, null);
+          this.mensajeService.mensajeError(`Error`, `Ha ocurrido un error al consultar la información del rollo N° ${d.Rollo} | ${error.status} ${error.statusText}`);
+          this.cargando = false;
         });
-        //});
-      }, error => {
-
       });
+    } else {
+      this.createPDF(solicitud, action);
+    }
+  }
+
+  //*Función que crea el registro en la tabla de producción.
+  sendDataProductionPL(rolls, solicitud : number){
+    this.svProduction.PostMassive(rolls).subscribe(dataPL => {
+       this.createPDF(solicitud, `creada`);
+    }, error => {
+      this.cargando = false;
+      this.mensajeService.mensajeError(`Error`, `No fue posible registrar los rollos en producción | ${error.status} ${error.statusText}`);
     });
   }
 
-  sendDataProductionPL(d : any, data : any, dataSede : any){
-    this.svProduction.Post(this.dataProduction(d, data, dataSede)).subscribe(dataPL => {
-
-    });
-  }
-
+  //* Función que coloca todos los datos necesarios para crear el registro. 
   dataProduction(d : any, data : any, dataSede : any){
     let production : modelProduccionProcesos = {
       'Numero_Rollo': 0,
@@ -478,17 +501,19 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       'Creador_Id': 123456789,
       'NumeroRollo_BagPro': d.Rollo,
       'Rollo_Asociado': null,
-      'Observacion': `${moment().format('YYYY-MM-DD')}: REGISTRO CREADO DESDE LA BODEGA DE ROLLOS DE PLASTICARIBE POR CONCEPTO DE SOLICITUD PARA DESPACHO.`,
+      'Observacion': `${moment().format('YYYY-MM-DD')} - ${moment().format('HH:mm:ss')} : REGISTRO CREADO DESDE LA BODEGA DE ROLLOS DE PLASTICARIBE POR CONCEPTO DE SOLICITUD PARA DESPACHO.`,
       'OT': d.Ot,
       'Estado_Rollo' : 19, 
       'PrecioVenta_Producto' : data[0].price,
     }
+    console.log(production);
     return production;
   }
 
+  //*
   aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  
+  //*
   createPDF(id : number, action : string) {
     this.dtSolicitudRollosService.GetInformacionSolicitud(id).subscribe(data => {
       let title: string = `Solicitud de rollos N° ${id}`;
@@ -499,6 +524,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     }, error => this.mensajeService.mensajeError(`Error`, `Error al consultar la solicitud de rollos N° ${id} | ${error.status} ${error.statusText}`));
   }
 
+  //*
   contentPDF(data): any[] {
     let content: any[] = [];
     let consolidatedInformation: Array<any> = this.getSolicitudPDF(data);
@@ -510,6 +536,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     return content;
   }
 
+  //*
   getSolicitudPDF(data: any): Array<any> {
     let info: Array<any> = [];
     let contador: number = 0;
@@ -534,6 +561,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     return info;
   }
 
+  //*
   getDetalleSolicitudPDF(data: any): Array<any> {
     let info: Array<any> = [];
     let count: number = 0;
@@ -651,6 +679,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     }
   }
 
+  //*
   buildTableBody1(data, columns, title) {
     var body = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
@@ -663,6 +692,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     return body;
   }
 
+  //*
   buildTableBody2(data, columns, title) {
     var body = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
