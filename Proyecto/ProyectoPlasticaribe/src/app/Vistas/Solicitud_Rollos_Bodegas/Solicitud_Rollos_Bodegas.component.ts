@@ -55,7 +55,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   @ViewChild('dt') dt : Table | undefined; 
   @ViewChild('dt2') dt2 : Table | undefined; 
   @ViewChild('dt3') dt3 : Table | undefined; 
-  count : number = 0;
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -169,7 +168,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.cargando = false;
     this.devolucionRollos = false;
     this.FormConsultarRollos.patchValue({ Devolucion : false, Observacion : `` });
-    this.count = 0;
   }
 
   // Funcion que va a consultar los rollos mediante los parametros pasados por el usuario
@@ -194,7 +192,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   // Funcion que va a llenar los rollos que estan disponibles para ser ingresados
   llenarRollosIngresar(data : any){
-    console.log(data);
     if(!this.rollosIngresar.map(x => x.Rollo).includes(data.rollo)) {
       let info : any = {
         Ot : data.ot,
@@ -264,7 +261,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     setTimeout(() => { this.cargando = false; }, 50);
   }
 
-  //*
+  //*Función para agrupar por OT las cantidades de rollos que se seleccionen. 
   groupProducts(){
     this.consolidadoProductos = this.rollosIngresar.reduce((a, b) => {
       if(!a.map(x => x.Ot).includes(b.Ot)) a = [...a, b];
@@ -273,21 +270,25 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.orderTables();
   }
 
-  //*
+  //*Función para ordenar la tabla de rollos a ingresar y consolidado.
   orderTables(){
     this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
     this.consolidadoProductos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
   }
 
+  //*
   qtyConsolidateForOrder = (ot : number) => this.rollosIngresar.filter(x => x.Ot == ot).reduce((a, b) => a += b.Cantidad, 0);
   
+  //*
   qtyRollsConsolidateForOrder = (ot : number) => this.rollosIngresar.filter(x => x.Ot == ot).length;
 
+  //*
   qtyTotalRolls = () => this.rollosIngresar.length;
 
+  //*
   qtyTotal = () =>  this.rollosIngresar.reduce((a, b) => a += b.Cantidad, 0);
 
-  //*
+  //*Función que busca los rollos a los que se les va a dar salida.
   searchForRolls(){
     let roll : any = this.FormConsultarRollos.value.Rollo;
 
@@ -309,14 +310,14 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     
   }
 
-  //*
+  //*Función que carga los rollos a la tabla.
   loadTableForRoll(data : any){
     this.cargando = false;
     this.FormConsultarRollos.patchValue({ Rollo : null});
     let process : any = this.FormConsultarRollos.value.BodegaSolicitante;
     let newProcess : any = this.bodegasSolicitantes.find(x => x.proceso_Id == process).proceso_Nombre;
 
-    if(!this.rollosIngresar.map(x => x.Rollo).includes(data[0].rollo)) {
+    if(!this.rollosIngresar.map(x => x.Rollo).includes(data[0].rollo) && !this.rollosConsultados.map(x => x.Rollo).includes(data[0].rollo)) {
       data.forEach(x => {
         this.rollosIngresar.unshift({
           'Ot' : x.ot,
@@ -332,7 +333,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       this.groupProducts();
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `El rollo N° '${data[0].rollo}' ha sido agregado a la tabla de 'ROLLOS SOLICITADOS'!`)
     } else this.mensajeService.mensajeAdvertencia(`El rollo N° ${data[0].rollo} ya se encuentra agregado en la tabla!`);
-    
   }
 
   //! DES-USADA Funcion que permitirá ver el total de lo escogido para cada producto 
@@ -424,7 +424,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
     this.rollosIngresar.forEach(x => rolls.push({ 'Rollo' : x.Rollo,  'OT' : x.Ot, }));
     this.dtBgRollosService.putRollsStore(23, bodegaSolicitante, rolls).subscribe(data => {
-      //this.createPDF(idSolicitud, `creada`);
       this.createProductionInPL(idSolicitud, `creada`);
     }, error => {
       this.mensajeService.mensajeError(`Ha ocurrido un error al actualizar los rollos en la bodega`, `${error.status} ${error.statusText}`);
@@ -449,15 +448,12 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
             this.mensajeService.mensajeError(`Error`, `No se encontró información del cliente ${data[0].nitClient} | ${error.status} ${error.statusText}`);
             this.cargando = false;
           });
-          //});
         }, error => {
           this.mensajeService.mensajeError(`Error`, `Ha ocurrido un error al consultar la información del rollo N° ${d.Rollo} | ${error.status} ${error.statusText}`);
           this.cargando = false;
         });
       });
-    } else {
-      this.createPDF(solicitud, action);
-    }
+    } else this.createPDF(solicitud, action);
   }
 
   //*Función que crea el registro en la tabla de producción.

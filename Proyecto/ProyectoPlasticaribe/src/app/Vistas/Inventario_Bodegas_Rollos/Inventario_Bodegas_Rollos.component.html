@@ -179,6 +179,7 @@
         </div>
       </p-toolbar>
       
+      <!--*Tabla 1-->
       <div class="mb-3" *ngIf="!cargando">
         <div class="row g-3" id="table">
           <p-table
@@ -200,7 +201,9 @@
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtProductoIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtProductoIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtProductoIntermedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Material', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains', dtProductoIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Unidad', 'contains', dtProductoIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtProductoIntermedio)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
@@ -210,9 +213,11 @@
                 <th class="text-center" pSortableColumn="Cliente">Cliente <p-sortIcon field="Cliente"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
-                <th class="text-center" pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
-                <th class="text-center" pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
-                <th class="text-center" pSortableColumn="Rollos">Cantidad Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cantidad">Cantidad (Kg)<p-sortIcon field="Cantidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Material">Material <p-sortIcon field="Material"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Ancho">Ancho <p-sortIcon field="Ancho"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Unidad">Unidad <p-sortIcon field="Unidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Rollos">Cant. Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
                 <th class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
               </tr>
             </ng-template>
@@ -224,7 +229,9 @@
                 <td class="text-center negrita">{{data.Item}}</td>
                 <td>{{data.Referencia}}</td>
                 <td class="text-center negrita textGreen">{{data.Cantidad | number : '1.2-2'}}</td>
-                <td class="text-center">{{data.Presentacion}}</td>
+                <td class="text-center">{{data.Material}}</td>
+                <td class="text-center"><b>{{data.Ancho | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.Unidad}}</td>
                 <td class="text-center negrita textGreen">{{data.Rollos}}</td>
                 <td class="text-center" style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
               </tr>
@@ -234,6 +241,7 @@
                 <td class="text-right" colspan="5">Totales: </td>
                 <td class="text-center textGreen">{{calcularTotalKg() | number : '1.2-2'}}</td>
                 <td class="text-center">Kg</td>
+                <td class="text-center" colspan="2"></td>
                 <td class="text-center textGreen">{{calcularTotalRollos()}}</td>
                 <td></td>
               </tr>
@@ -259,6 +267,7 @@
         </div>
       </p-toolbar>
 
+      <!--*Tabla 2-->
       <div class="mb-3" *ngIf="!cargando">
         <div class="row g-3" id="table">
           <p-table
@@ -290,7 +299,9 @@
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'item', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'reference', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'qty', 'contains', dtDetailsProdIntermedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentation', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'material', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'broad', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'unit', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ubication', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'actualWarehouse', 'contains', dtDetailsProdIntermedio)"></th>
               </tr>
@@ -303,8 +314,10 @@
                 <th class="text-center" pSortableColumn="client">Cliente <p-sortIcon field="client"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="item">Item <p-sortIcon field="item"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="reference">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
-                <th class="text-center" pSortableColumn="qty">Cantidad <p-sortIcon field="qty"></p-sortIcon></th>
-                <th class="text-center" pSortableColumn="presentation">Presentación <p-sortIcon field="presentation"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="qty">Cantidad (Kg) <p-sortIcon field="qty"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="material">Material <p-sortIcon field="material"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="broad">Ancho <p-sortIcon field="broad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="unit">Unidad <p-sortIcon field="unit"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="ubication">Ubicación <p-sortIcon field="ubication"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="actualWarehouse">Bod. Actual <p-sortIcon field="actualWarehouse"></p-sortIcon></th>
               </tr>
@@ -313,14 +326,16 @@
               <tr>
                 <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
                 <!--!<td class="text-center"><p-tableCheckbox [value]="data"/></td>-->
-                <td class="text-center">{{data.roll}}</td>
+                <td class="text-center"><b>{{data.roll}}</b></td>
                 <td class="text-center">{{data.initialWarehouse}}</td>
                 <td class="text-center"><b>{{data.ot}}</b></td>
                 <td>{{data.client}}</td>
-                <td class="text-center">{{data.item }}</td>
+                <td class="text-center"><b>{{data.item }}</b></td>
                 <td>{{data.reference}}</td>
                 <td class="text-center textGreen"><b>{{data.qty | number : '1.2-2'}}</b></td>
-                <td class="text-center">{{data.presentation}}</td>
+                <td class="text-center">{{data.material}}</td>
+                <td class="text-center"><b>{{data.broad | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.unit}}</td>
                 <td class="text-center"><b>{{data.ubication}}</b></td>
                 <td class="text-center">{{data.actualWarehouse}}</td>
               </tr>
@@ -330,7 +345,7 @@
                 <td class="text-right" colspan="7">Totales: </td>
                 <td class="text-center textGreen">{{qtyTotal() | number : '1.2-2'}}</td>
                 <td class="text-center">Kg</td>
-                <td class="text-center" colspan="2"></td>
+                <td class="text-center" colspan="4"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -600,6 +615,7 @@
   </p-tabView>
 </p-card>
 
+<!--* Inventario detallado de rollos por OT -->
 <p-dialog [(visible)]="inventario" [style]="{width: '85vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <p-table
@@ -675,12 +691,14 @@
   </ng-template>
 </p-dialog>
 
+<!--* Imagen del plano de la bodega de rollos -->
 <p-dialog [(visible)]="warehouse" [style]="{width: '35vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Plano bodega de rollos" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <img src="../assets/Background/BODEGA-ROLLOS-PL.jpg"/>
   </ng-template>
 </p-dialog>
 
+<!--* Modal cambios de ubicación de rollo -->
 <p-dialog [(visible)]="changeUbications" [style]="{width: '70vw'}" [resizable]="true" header="Reubicación de rollos" [modal]="true">
   <br>
   <!--* Formulario-->

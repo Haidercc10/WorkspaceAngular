@@ -234,17 +234,24 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       else {
         for (let i = 0; i < data.length; i++) {
           this.svBagpro.getClientsForOT(data[i].bgRollo_OrdenTrabajo).subscribe(dataBagpro => {
+            console.log(dataBagpro);
+            
             let info : any = {
               Orden: data[i].bgRollo_OrdenTrabajo,
-              Cliente : dataBagpro[0],
+              Cliente : dataBagpro[0].clienteNom,
               Item: data[i].prod_Id,
               Referencia: data[i].prod_Nombre,
               Cantidad: data[i].cantidad,
               Presentacion: data[i].undMed_Id,
+              Material : dataBagpro[0].extMaterialNom,
+              Ancho: dataBagpro[0].extAcho1,
+              Unidad : dataBagpro[0].extUnidadesNom,
               Rollos: data[i].rollos,
               Bodega: data[i].bgRollo_BodegaActual,
               BodegaActual: data[i].proceso_Nombre,
             }
+            console.log(info);
+            
             //this.inventarioTotal.push(info);
             //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
             if (data[i].bgRollo_BodegaActual == 'BGPI') this.inventarioProductoIntermedio.push(info);
@@ -454,7 +461,12 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.bgRollosService.getInventoryAvailable().subscribe(data => {
       this.cargando = false;
       this.inventoryRolls = data;
-      this.inventoryRolls.forEach(x => x.client = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Cliente );
+      this.inventoryRolls.forEach(x => {
+        x.client = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Cliente, 
+        x.material = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Material,
+        x.broad = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Ancho, 
+        x.unit = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Unidad
+      });
     }, error => {
       this.msj.mensajeError(`Error`, `No fue posible consultar el inventario de rollos disponibles`);
       this.cargando = false;
