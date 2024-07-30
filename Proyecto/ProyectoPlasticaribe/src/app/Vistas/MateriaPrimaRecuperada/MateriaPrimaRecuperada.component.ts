@@ -74,7 +74,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       ConsecutivoSalida : ['', Validators.required],
-      MpingresoFecha: ['', Validators.required],
+      MpingresoFecha: [null, Validators.required],
       usuarioNombre: ['', Validators.required],
       usuarioId: ['', Validators.required],
       MpObservacion : ['', Validators.required],
@@ -152,7 +152,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   //Funcion que traerá la información del usuario seleccionado
   llenarUsuarioSeleccionado(){
     let usuarioSelccionado : string = this.FormMateriaPrimaRecuperada.value.usuarioNombre;
-    this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: this.usuarios.find(x => x.usua_Id == usuarioSelccionado).usua_Id, });
+    this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: this.usuarios.find(x => x.usua_Id == usuarioSelccionado).usua_Id, usuarioNombre: this.usuarios.find(x => x.usua_Id == usuarioSelccionado).usua_Id, });
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante

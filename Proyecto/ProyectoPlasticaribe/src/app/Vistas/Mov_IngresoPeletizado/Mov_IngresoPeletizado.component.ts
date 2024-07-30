@@ -92,6 +92,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
     this.dataFound = [];
     this.form.reset();
     this.load = false;
+    this.loadRankDates();
   }
 
   //*
@@ -150,7 +151,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   //*
   validateUrl(){
     let ot: any = this.form.value.orderProduction;
-    let mp: any = this.form.value.mpId;
+    let mp: any = this.form.value.mpName;
     let status : any = this.form.value.status;
     let typeMov : any = this.form.value.typeMov;
     let url : string = ``;
@@ -169,19 +170,20 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   //*
-  totalQty = (data) => data.reduce((a, b) => a += b.mov.qty, 0);
+  totalQty = (data) => data.reduce((a, b) => a += b.mov.initialQty, 0);
 
   //*
   viewPDF = (data) => data.typeMov == 'ENTRADA' ? this.cmpEntries.createPDF(data.mov.date, data.mov.date, data.mov.hour, `exportado`) : this.cmpOutputs.createPDF(data.mov.code, `exportado`);
 
   //*
   loadModalRecovery(data){
-    if(data.status == 'PENDIENTE') {
+    if(data.status == 'PENDIENTE') {  
       this.modal = true
       this.cmpRecovery.title = false
       this.cmpRecovery.ArrayMateriaPrima = [];
-
-      this.cmpRecovery.FormMateriaPrimaRecuperada.patchValue({ 'usuarioId' : this.storage_Id, 'usuarioNombre' : this.storage_Id, 'ConsecutivoSalida' : data.mov.id, 'MpObservacion' : `Salida de peletizado N° ${data.mov.id}` })
+      let user : any = this.cmpRecovery.usuarios.find(x => x.usua_Id == this.storage_Id).usua_Id;
+      
+      this.cmpRecovery.FormMateriaPrimaRecuperada.patchValue({ 'usuarioId' : this.storage_Id, 'usuarioNombre' : user, 'ConsecutivoSalida' : data.mov.id, 'MpObservacion' : `Salida de peletizado N° ${data.mov.id}`, 'MpingresoFecha' : new Date() })
       this.cmpRecovery.FormMateriaPrima.disable();
       this.cmpRecovery.ArrayMateriaPrima.push({ 'Id' : data.matPrimas.id, 'Nombre' : data.matPrimas.matPrima, 'Cant' : data.mov.qty, 'UndCant' : 'Kg', 'Cant2' : data.mov.qty, });
     } else this.modal = false;

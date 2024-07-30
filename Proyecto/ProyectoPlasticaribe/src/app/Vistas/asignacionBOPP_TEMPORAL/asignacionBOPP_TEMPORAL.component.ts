@@ -123,6 +123,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     if (this.ordenesTrabajo.length == 0) {
       this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
         this.detallesAsignacionBOPPService.GetBiorientadoAsignado(parseInt(ordenTrabajo)).subscribe(cantidadAsignada => {
+          console.log(datos_OT);
+          
           for (const item of datos_OT) {
             this.arrayOT.push(ordenTrabajo);
             if ([null, '', '0'].includes(item.estado)) {
@@ -161,7 +163,9 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               this.ordenesTrabajo.push(infoOT);
               this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
               this.cantidadKG += item.datosotKg;
-            } else if ([1,4].includes(item.estado)) this.msj.mensajeAdvertencia(`¡Advertencia!`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
+            } else if (['1','4'].includes(item.estado)) {
+              this.msj.mensajeAdvertencia(`Advertencia`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
+            }
           }
         });
       });

@@ -25,7 +25,7 @@ export class Detalle_BodegaRollosService {
 
   GetRollosDisponibles = (bodega : string, ot : number, ruta : any) : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollosDisponibles/${bodega}/${ot}/${ruta}`);
 
-  GetInventarioRollos = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventarioRollos`);
+  GetInventarioRollos = (url? : string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventarioRollos${url}`);
 
   GetInventarioRollos_OrdenTrabajo = (orden : number, bodega : string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventarioRollos_OrdenTrabajo/${orden}/${bodega}`);
 
@@ -47,7 +47,7 @@ export class Detalle_BodegaRollosService {
 
   getRollsForOT = (ot : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollsForOT/${ot}`);
 
-  getInventoryAvailable = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventoryAvailable`);
+  getInventoryAvailable = (url? : string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventoryAvailable${url}`);
 
   getRollForOut = (roll : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollForOut/${roll}`);
 

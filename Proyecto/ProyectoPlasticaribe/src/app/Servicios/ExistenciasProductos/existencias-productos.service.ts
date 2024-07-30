@@ -25,7 +25,7 @@ export class ExistenciasProductosService {
 
   GetStockProducts_AvaibleProduction = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_AvaibleProduction`);
 
-  GetStockProducts_Process = (process: 'EMP' | 'SELLA' | 'WIKE'): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_Process/${process}`);
+  GetStockProducts_Process = (process: 'EMP' | 'SELLA' | 'WIKE' | 'EXT'): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_Process/${process}`);
 
   GetStockDelivered_NoAvaible = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockDelivered_NoAvaible`);
 

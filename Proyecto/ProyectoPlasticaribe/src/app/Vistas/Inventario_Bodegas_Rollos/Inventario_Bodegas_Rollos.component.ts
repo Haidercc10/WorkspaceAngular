@@ -49,6 +49,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   allUbications : Array<any> = [];
 
   @ViewChild('dtProductoIntermedio') dtProductoIntermedio: Table | undefined;
+  @ViewChild('dtRotograbado') dtRotograbado: Table | undefined;
   @ViewChild('dtDetailsProdIntermedio') dtDetailsProdIntermedio: Table | undefined;
   @ViewChild('tableReubication') tableReubication: Table | undefined;
 
@@ -67,9 +68,22 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.consultarInventario();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.getAllUbicationsStore();
+  }
+
+  validateRol(){
+    if([95].includes(this.ValidarRol)) {
+      this.inventarioProductoIntermedio = [];
+      this.consultarInventario(`?wareHouse=${'BGPI'}`);
+    } else if([89].includes(this.ValidarRol)) {
+      this.inventarioRotograbado = [];
+      this.consultarInventario(`?wareHouse=${'ROT'}`);
+    } else if([1].includes(this.ValidarRol)) {
+      this.inventarioProductoIntermedio = [];
+      this.inventarioRotograbado = [];
+      this.consultarInventario('');
+    } 
   }
   
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -77,6 +91,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+    this.validateRol();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -224,18 +239,19 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   formatonumeros = (number: any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 
   // Funcion que va a buscar la información de los inventarios de las bodegas
-  consultarInventario(){
+  consultarInventario(process? : string){
     let num : number = 0;
     this.cargando = true;
-    this.inventarioProductoIntermedio = [];
+    //this.inventarioProductoIntermedio = [];
+    //this.inventarioRotograbado = [];
 
-    this.bgRollosService.GetInventarioRollos().subscribe(data => {
+    this.bgRollosService.GetInventarioRollos(process).subscribe(data => {
+      console.log(data);
+      
       if (data.length == 0) this.cargando = false;
       else {
         for (let i = 0; i < data.length; i++) {
           this.svBagpro.getClientsForOT(data[i].bgRollo_OrdenTrabajo).subscribe(dataBagpro => {
-            console.log(dataBagpro);
-            
             let info : any = {
               Orden: data[i].bgRollo_OrdenTrabajo,
               Cliente : dataBagpro[0].clienteNom,
@@ -250,13 +266,11 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
               Bodega: data[i].bgRollo_BodegaActual,
               BodegaActual: data[i].proceso_Nombre,
             }
-            console.log(info);
-            
             //this.inventarioTotal.push(info);
             //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
             if (data[i].bgRollo_BodegaActual == 'BGPI') this.inventarioProductoIntermedio.push(info);
             //if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
-            //if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
+            if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
             //if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
             //if (data[i].bgRollo_BodegaActual == 'DESP') this.inventarioDespacho.push(info);
             num += 1;
@@ -272,16 +286,17 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   // Funcion que va a consultar los detalles de las ordenes de trabajo
-  consultarDetallesInventario(orden : number, bodega : string){
+  consultarDetallesInventario(cliente : any, orden : number, bodega : string){
     let num : number = 0;
     this.inventarioDetallado = [];
+    
     this.bgRollosService.GetInventarioRollos_OrdenTrabajo(orden, bodega).subscribe(data => {
       this.inventario = true;
       for (let i = 0; i < data.length; i++) {
         let info : any = {
           Rollo: data[i].dtBgRollo_Rollo,
           Orden: data[i].bgRollo_OrdenTrabajo,
-          Cliente : this.inventarioProductoIntermedio.find(x => x.Orden == data[i].bgRollo_OrdenTrabajo).Cliente,
+          Cliente : cliente,
           Item: data[i].prod_Id,
           Referencia: data[i].prod_Nombre,
           Cantidad: data[i].dtBgRollo_Cantidad,
@@ -305,21 +320,23 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   aplicarfiltro = ($event : any, campo : any, valorCampo : string, tabla : any) => tabla!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a calcular la cantidad total de kg que hay
-  calcularTotalKg(){
+  calcularTotalKg(table, arrayProcess){
     let total : number = 0;
-    if(this.dtProductoIntermedio) {
-      if(this.dtProductoIntermedio.filteredValue) total = this.dtProductoIntermedio.filteredValue.reduce((a, b) => a += b.Cantidad, 0);
-      else total = this.inventarioProductoIntermedio.reduce((a,b) => a += b.Cantidad, 0);
-    } else total = this.inventarioProductoIntermedio.reduce((a,b) => a += b.Cantidad, 0);
+
+    if(table) {
+      if(table.filteredValue) total = table.filteredValue.reduce((a, b) => a += b.Cantidad, 0);
+      else total = arrayProcess.reduce((a,b) => a += b.Cantidad, 0);
+    } else total = arrayProcess.reduce((a,b) => a += b.Cantidad, 0);
     return total;
   }
 
-  calcularTotalRollos(){
+  calcularTotalRollos(table, arrayProcess){
     let total : number = 0;
-    if(this.dtProductoIntermedio) {
-      if(this.dtProductoIntermedio.filteredValue) total = this.dtProductoIntermedio.filteredValue.reduce((a, b) => a += b.Rollos, 0);
-      else total = this.inventarioProductoIntermedio.reduce((a, b) => a += b.Rollos, 0);
-    } else total = this.inventarioProductoIntermedio.reduce((a, b) => a += b.Rollos, 0);
+    
+    if(table) {
+      if(table.filteredValue) total = table.filteredValue.reduce((a, b) => a += b.Rollos, 0);
+      else total = arrayProcess.reduce((a, b) => a += b.Rollos, 0);
+    } else total = arrayProcess.reduce((a, b) => a += b.Rollos, 0);
     return total;
   }
 
@@ -457,15 +474,28 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   searchInventoryRolls(){
     this.inventoryRolls = [];
     this.cargando = true;
+    let process : string = ``;
+    let array : any = [];
 
-    this.bgRollosService.getInventoryAvailable().subscribe(data => {
+    if([95].includes(this.ValidarRol)) {
+      process = `?process=${'BGPI'}`;
+      array = this.inventarioProductoIntermedio;
+    } else if([89].includes(this.ValidarRol)) {
+      process = `?process=${'ROT'}`;
+      array = this.inventarioRotograbado;
+    } else {
+      process = process;
+      array = this.inventarioProductoIntermedio.concat(this.inventarioRotograbado);
+    } 
+    console.log(array);
+    this.bgRollosService.getInventoryAvailable(process).subscribe(data => {
       this.cargando = false;
       this.inventoryRolls = data;
       this.inventoryRolls.forEach(x => {
-        x.client = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Cliente, 
-        x.material = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Material,
-        x.broad = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Ancho, 
-        x.unit = this.inventarioProductoIntermedio.find(z => z.Orden == x.ot).Unidad
+        x.client = array.find(z => z.Orden == x.ot).Cliente, 
+        x.material = array.find(z => z.Orden == x.ot).Material,
+        x.broad = array.find(z => z.Orden == x.ot).Ancho, 
+        x.unit = array.find(z => z.Orden == x.ot).Unidad
       });
     }, error => {
       this.msj.mensajeError(`Error`, `No fue posible consultar el inventario de rollos disponibles`);
@@ -476,9 +506,17 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   //* Función que va muestra el inv. de rollos por OT/Detallado actualizado 
   changeTab(event : any){
     let tab : any = event.originalEvent.srcElement.innerText;
-
-    if(tab == 'Producto Intermedio') this.consultarInventario();
-    if(tab == 'Producto Intermedio Detallado') this.searchInventoryRolls();
+    
+    if(tab == 'Producto Intermedio') {
+      this.inventarioProductoIntermedio = [];
+      this.consultarInventario(`?wareHouse=${'BGPI'}`);
+    } else if(tab == 'Inventario Detallado') {
+      this.inventoryRolls = [];
+      this.searchInventoryRolls();
+    } else if(tab == 'Rotograbado') {
+      this.inventarioRotograbado = [];
+      this.consultarInventario(`?wareHouse=${'ROT'}`);
+    } 
   }
 
   //*Función que muestra la cantidad total en inventario de lo que haya en la tabla al instante

@@ -17,12 +17,12 @@
   </div>
   
   <p-card>
-    <!--Titulo formulario-->
+    <!--* Titulo formulario-->
     <div class="mb-4">
       <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-filter"></i> Filtros de Búsqueda</h2>
     </div>
 
-    <!--Formulario de busqueda-->
+    <!--* Formulario de busqueda-->
     <form [formGroup]="form" (ngSubmit)="searchInPeletizado()">
       <div class="row g-4 my-4">
 
@@ -79,7 +79,7 @@
 
     <p-divider></p-divider>
 
-    <!--Titulo tabla-->
+    <!--* Titulo tabla-->
     <div class="mb-4">
       <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-table"></i> Tabla de registros consultados</h2>
     </div>
@@ -146,10 +146,10 @@
                 </td>
                 <td class="text-center">{{ data.mov.id }}</td> 
                 <td class="text-center">{{ data.mov.recovery_Id }}</td>
-                <td class="text-center"><b>{{ data.mov.qty | number : '1.2-2' }}</b></td>  
+                <td class="text-center"><b>{{ data.mov.initialQty | number : '1.2-2' }}</b></td>  
                 <td class="text-center">{{ data.matPrimas.id }}</td> 
                 <td><b>{{ data.matPrimas.matPrima }}</b></td> 
-                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id), 'bg-warning1': [49].includes(data.mov.status_Id) }">{{ data.status }}</span></td>
+                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id), 'bg-warning1': [49].includes(data.mov.status_Id), }">{{ data.status }}</span></td>
                 <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }}</td> 
               </tr>
             </ng-template>
@@ -223,7 +223,7 @@
                 <td class="text-center">{{ data.matPrimas.id }}</td> 
                 <td>{{ data.matPrimas.matPrima }}</td> 
                 <td class="text-center"><b>{{ data.mov.qty | number : '1.2-2' }}</b></td> 
-                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id) }">{{ data.status }}</span> </td> <!--Estado-->
+                <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [23].includes(data.mov.status_Id), 'bg-danger2': [11].includes(data.mov.status_Id), 'bg-success1': [19].includes(data.mov.status_Id), 'bg-blue1': [26].includes(data.mov.status_Id) }">{{ data.status }}</span> </td> <!--Estado-->
                 <td class="text-center">{{ data.mov.date | date : 'dd/MM/yyyy' }}</td> 
               </tr>
             </ng-template>

@@ -139,7 +139,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   }
 
   //Función para obtener los procesos.
-  getProcesos = () => this.svProcesos.srvObtenerLista().subscribe(data => { this.procesos = data.filter(x => [1/*,2,3,9,7*/].includes(x.proceso_Codigo)) }, error => { this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); });
+  getProcesos = () => this.svProcesos.srvObtenerLista().subscribe(data => { this.procesos = data.filter(x => [1,/*2,3,9,7*/].includes(x.proceso_Codigo)) }, error => { this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); });
 
   aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 

@@ -71,6 +71,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getFails();
+    console.log(this.fieldFocus);
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');

@@ -373,6 +373,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
         'IngPel_Area1': false,
         'IngPel_Area2': false,
         'IngPel_Cantidad': this.form.value.quantity,
+        'IngPel_CantInicial': this.form.value.quantity,
         'UndMed_Id': 'Kg',
         'IngPel_Observacion': [null, undefined].includes(this.form.value.observation) ? '' : this.form.value.observation,
         'Usua_Id': this.storage_Id,
@@ -511,7 +512,7 @@ export class Ingreso_PeletizadoComponent implements OnInit {
         'OT' : d.entries.ot,
         "Id" : d.entries.matPri_Id,
         "Material": d.matPrimas.matPrima,
-        "Peso": this.formatNumbers((d.entries.ingPel_Cantidad).toFixed(2)),
+        "Peso": this.formatNumbers((d.entries.IngPel_CantInicial).toFixed(2)),
         "Presentación" : d.entries.undMed_Id,
       });
     });
@@ -688,6 +689,7 @@ interface modelIngreso_Peletizado {
   IngPel_Area1 : boolean;
   IngPel_Area2 : boolean;
   IngPel_Cantidad : number;
+  IngPel_CantInicial : number;
   UndMed_Id : string;
   IngPel_Observacion : string;
   Usua_Id : number;
@@ -696,4 +698,5 @@ interface modelIngreso_Peletizado {
   Usua_Modifica : number;
   IngPel_FechaModifica? : any;
   IngPel_HoraModifica? : string;
+
 }

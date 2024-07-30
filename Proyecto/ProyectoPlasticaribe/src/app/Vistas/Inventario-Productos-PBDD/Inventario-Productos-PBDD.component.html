@@ -623,6 +623,159 @@
   </p-tabPanel>
 
   <p-tabPanel
+  header="Inventario Extrusión"
+  leftIcon="pi pi-th-large"
+  tooltip="Información de los rollos solicitados por despacho a bodega de rollos"
+  *ngIf="![4,86].includes(ValidarRol)">
+    <p-table
+      #tableStockExt
+      [value]="stockExtrusion"
+      [columns]="selectedColumns"
+      dataKey="item"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      [resizableColumns]="true"
+      [reorderableColumns]="true"
+      columnResizeMode="expand"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="50rem"
+      [expandedRowKeys]="expandedRows"
+      [loading]="loading">
+      <ng-template pTemplate="caption">
+          <div class="row g-4">
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                  <p-multiSelect
+                      [options]="columns"
+                      [(ngModel)]="selectedColumns"
+                      optionLabel="header"
+                      selectedItemsLabel="{0} columnas seleccionadas"
+                      [style]="{minWidth: '330px'}"
+                      placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+              </div>
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-end">
+                  <p-selectButton [options]="stateOptions" [(ngModel)]="value" optionLabel="icon" optionValue="value" (onChange)="deployRows()">
+                    <ng-template let-item pTemplate>
+                        <i [class]="item.icon"></i>
+                    </ng-template>
+                  </p-selectButton>
+                  <button class="buttonExcel mx-4" (click)="createExcel(stockExtrusion)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                </button>
+              </div>
+          </div>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+          <tr>
+              <th rowspan="2" class="text-center">#</th>
+              <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStockExt, $event, col.field)"></th>
+              <!--<th *ngIf="[1].includes(ValidarRol)"></th>-->     
+          </tr>
+          <tr>
+              <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+              <p-sortIcon [field]="col.field"></p-sortIcon>
+              </th>
+              <!--<th *ngIf="[1].includes(ValidarRol)"></th> -->  
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+          <tr>
+              <td>
+                  <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadInfoRollsInAreaExtrusion(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                  <span class="font-bold">
+                      {{rowIndex + 1}}
+                  </span>
+              </td>
+              <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+              <!--<td *ngIf="[1].includes(ValidarRol)">
+                <p-button icon="pi pi-wrench" [rounded]="true" severity="warning" pTooltip="Ajustar item '{{data.item}} - {{data.reference}}'" (onClick)="seeMsjEditItem(data)" tooltipPosition="top"></p-button>
+              </td>-->
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="rowexpansion" let-data>
+          <tr>
+              <td colspan="23">
+                  <div class="p-3">
+                      <p-table
+                          #tableExpInvSellado  
+                          [value]="data.AvaibleProdution"
+                          styleClass="p-datatable-gridlines p-datatable-sm"
+                          [resizableColumns]="true"
+                          columnResizeMode="expand"
+                          responsiveLayout="scroll"
+                          [reorderableColumns]="true"
+                          [rowHover]="true"
+                          [scrollable]="true"
+                          scrollHeight="30rem"
+                          [loading]="loading">
+                          <ng-template pTemplate="header">
+                              <!--<tr id="filtros">
+                                  <th></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'NumberProduction', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'orderProduction', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'Quantity', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Presentation', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'Weight', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="number" (input)="applyFilter($event, 'Precio', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Information', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Process', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Turn', tableExpInvSellado)"></th>
+                                  <th><input pInputText type="text" (input)="applyFilter($event, 'Date', tableExpInvSellado)"></th>
+                                  <th *ngIf="[1].includes(ValidarRol)"></th>
+                              </tr>-->
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="NumberProduction"><p-sortIcon field="NumberProduction"></p-sortIcon>  Rollo <p-columnFilter type="text" field="NumberProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Cantidad <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Presentation"><p-sortIcon field="Presentation"></p-sortIcon> Presentación <p-columnFilter type="text" field="Presentation" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Weight"><p-sortIcon field="Weight"></p-sortIcon> Peso <p-columnFilter type="text" field="Weight" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Price"><p-sortIcon field="Price"></p-sortIcon> Precio <p-columnFilter type="text" field="Price" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Information"><p-sortIcon field="Information"></p-sortIcon> Etiqueta <p-columnFilter type="text" field="Information" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Process"><p-sortIcon field="Process"></p-sortIcon> Proceso <p-columnFilter type="text" field="Process" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Turn"><p-sortIcon field="Turn"></p-sortIcon> Turno <p-columnFilter type="text" field="Turn" display="menu"></p-columnFilter></th>
+                                <th pSortableColumn="Date"><p-sortIcon field="Date"></p-sortIcon> Fecha <p-columnFilter type="text" field="Date" display="menu"></p-columnFilter></th>
+                                <!--<th *ngIf="[1].includes(ValidarRol)"></th>-->
+                              </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                              <tr>
+                                  <td>{{rowIndex + 1}}</td>
+                                  <td>{{details.NumberProduction}}</td>
+                                  <td>{{details.orderProduction}}</td>
+                                  <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                  <td>{{details.Presentation}}</td>
+                                  <td>{{details.Weight | number : '1.2-2'}}</td>
+                                  <td>{{details.Price | number : '1.2-2'}}</td>
+                                  <td>{{details.Information}}</td>
+                                  <td>{{details.Process}}</td>
+                                  <td>{{details.Turn}}</td>
+                                  <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                                  <!--<td *ngIf="[1].includes(ValidarRol)">
+                                    <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Sacar bulto N° {{details.NumberProduction}} del item '{{data.item}} - {{data.reference}}' del inventario" (onClick)="seeMsjEditItem(data, details.NumberProduction)" tooltipPosition="top"></p-button>
+                                  </td>-->
+                              </tr>
+                          </ng-template>
+                          <ng-template pTemplate="emptymessage">
+                              <tr>
+                                  <td colspan="11">No se encontraron registros</td>
+                              </tr>
+                          </ng-template>
+                      </p-table>
+                  </div>
+              </td>
+          </tr>
+      </ng-template>
+      <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">
+          <tr>
+              <td colspan="7">Total</td>
+              <td [colSpan]="selectedColumns.length - 5">{{totalStock(stockSellado) | currency : 'COP '}}</td>
+          </tr>
+      </ng-template>
+    </p-table>
+  </p-tabPanel>
+
+  <p-tabPanel
   header="Inventario de Rollos"
   leftIcon="pi pi-database">
     <p-table

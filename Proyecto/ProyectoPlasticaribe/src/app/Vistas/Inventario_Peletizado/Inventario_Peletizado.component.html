@@ -19,20 +19,21 @@
 <p-card>
   <p-tabView [scrollable]="true">
 
-    <!--Tabla Bodega Pele-->
+    <!--* Tabla Bodega Pele-->
     <p-tabPanel
       header="Inventario bodega de peletizado"
       leftIcon="pi pi-slack" >
 
-      <!--Exportar-->
+      <!--* Exportar-->
       <p-toolbar styleClass="mb-2">
         <ng-template pTemplate="left"></ng-template>
         <ng-template pTemplate="center"></ng-template>
         <ng-template pTemplate="right">
-          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="exportPDF()"></button>
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="createExcel(peletizados, 'bodega de peletizado')"></button>
         </ng-template>
       </p-toolbar>
 
+      <!--* Tabla peletizado-->
       <p-table 
         #tablePeletizados
         [value]="peletizados" 
@@ -144,21 +145,21 @@
       </p-table>
     </p-tabPanel>
   
-    <!--Tabla Recuperados-->
+    <!--* Tabla Recuperados-->
     <p-tabPanel
       header="Inventario de materiales recuperados"
       leftIcon="pi pi-database" >
 
-      <!--Exportar-->
+      <!--* Exportar-->
       <p-toolbar styleClass="mb-2">
         <ng-template pTemplate="left"></ng-template>
         <ng-template pTemplate="center"></ng-template>
         <ng-template pTemplate="right">
-          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="exportPDF()"></button>
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="createExcel(recoveries, 'materiales recuperados')"></button>
         </ng-template>
       </p-toolbar>
 
-      <!--Tabla-->
+      <!--* Tabla-->
       <p-table 
         #tableRecoveries
         [value]="recoveries" 

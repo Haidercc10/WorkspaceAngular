@@ -25,7 +25,9 @@ export class Ingreso_PeletizadoService {
 
   getStockPele_Details = (matprima : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getStockPele_Details/${matprima}`);
 
+  getStockForRecovery = (matprima : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/getStockForRecovery/${matprima}`);
+
   Post = (data : any): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Ingreso_Peletizado', data);
 
-  putEntryPeletizado = (pelets : any): Observable<any> => this.http.put(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/putEntryPeletizado`, pelets)
+  putEntryPeletizado = (data : any): Observable<any> => this.http.put(this.rutaPlasticaribeAPI + `/Ingreso_Peletizado/putEntryPeletizado`, data)
 }

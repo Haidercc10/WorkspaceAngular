@@ -36,9 +36,12 @@ export class Salidas_PeletizadoComponent implements OnInit {
   peletsAvailables : Array<any> = [];
   peletsSelected : Array<any> = [];
   peletsConsolidated : Array<any> = [];
+  peletsAvailablesGrouped : Array<any> = [];
+  peletsComplete : Array<any> = [];
   @ViewChild('dt1') dt1 : Table | undefined;
   @ViewChild('dt2') dt2 : Table | undefined;
   @ViewChild('dt3') dt3 : Table | undefined;
+  fieldFocus : boolean = false;
 
   constructor(private AppComponent : AppComponent, 
     private frmBuilder : FormBuilder,
@@ -58,7 +61,6 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.lecturaStorage();
     this.getRecoveries();
     this.getPresentations();
-    this.createPDF(10, ``)
   }
 
   lecturaStorage() {
@@ -90,6 +92,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.peletsSelected = [];
     this.peletsConsolidated = [];
     this.form.patchValue({ presentation : 'Kg' });
+    this.peletsAvailablesGrouped = [];
   }
 
   getRecoveries = () => this.svRecoveries.srvObtenerLista().subscribe(data => { this.recoveries = data.filter(x => [10,4].includes(x.catMP_Id)) }, error => { this.msj.mensajeError(`Error al consultar las materias primas. | ${error.status} ${error.statusText}`); });
@@ -106,6 +109,8 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.peletsAvailables = [];
     this.peletsSelected = [];
     this.peletsConsolidated = [];
+    this.peletsAvailablesGrouped = [];
+    this.fieldFocus = false;
 
     if(this.form.valid) {
       if(this.form.value.qty <= 0) {
@@ -117,7 +122,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
       this.svEntryPeletizado.getStockPele_Details(mp).subscribe(data => {
         this.loadDataTable(data);
       }, error => {
-        error.status == 400 ? this.msj.mensajeAdvertencia(`No se encontraron registro de peletizado asociados a ${this.form.value.recovery}`) : this.msj.mensajeError(`Error consultando ${this.form.value.recovery} en la bodega de Peletizado | ${error.status}`);
+        error.status == 400 ? this.msj.mensajeAdvertencia(`No se encontraron registros de peletizado asociados a ${this.form.value.recovery}`) : this.msj.mensajeError(`Error consultando ${this.form.value.recovery} en la bodega de Peletizado | ${error.status}`);
         this.load = false;
       });
     } else this.msj.mensajeAdvertencia(`Debe llenar los campos requeridos`);
@@ -133,12 +138,30 @@ export class Salidas_PeletizadoComponent implements OnInit {
         'item' : x.product.item,
         'reference' : x.product.reference,
         'weight' : x.entries.ingPel_Cantidad,
+        'weight2' : x.entries.ingPel_Cantidad,
         'material' : x.material.material,
+        'idMatPrima' : x.matPrimas.id,
+        'matPrima' : x.matPrimas.matPrima, 
+        'status' : x.statuses.id,
+        'statusName' : x.statuses.status,
+        'unit' : x.matPrimas.presentation
       });
     });
+    //this.peletsComplete = this.peletsAvailables;
+    //console.log(this.peletsAvailables);
+    
+    this.consolidatePeletizado();
     this.load = false;
   }
 
+  onFocus = () => this.fieldFocus = true;
+
+  outFocus(qty : number, qty2 : number) {
+    if(qty <= qty2) return this.fieldFocus = false;
+    else return this.fieldFocus = true;
+  }
+
+  //!
   selectPeletizados(data){
     this.load = true;
     let index : number = this.peletsAvailables.findIndex(x => x.code == data.code);
@@ -147,6 +170,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  //!
   deselectPeletizados(data){
     this.load = true;
     let index : number = this.peletsSelected.findIndex(x => x.code == data.code);
@@ -155,6 +179,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  //!
   selectAllPeletizados(){
     this.load = true;
     this.peletsSelected = this.peletsSelected.concat(this.peletsAvailables);
@@ -163,6 +188,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  //!
   deselectAllPeletizados(){
     this.load = true;
     this.peletsAvailables = this.peletsAvailables.concat(this.peletsSelected);
@@ -171,22 +197,39 @@ export class Salidas_PeletizadoComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
-  consolidatePeletizado(){
-    this.peletsConsolidated = this.peletsSelected.reduce((a,b) => {
-      if(!a.map(x => x.typeRecovery).includes(b.typeRecovery)) a = [...a, b];
-      //else {
-      //  let index = a.findIndex(x => x.typeRecovery == b.typeRecovery);
-      //  a[index].weight += b.weight;
-      //} 
+  groupedPeletizado(){
+    this.peletsAvailablesGrouped = this.peletsAvailables.reduce((a,b) => {
+      
       return a;
+    }, []);
+  }
+
+  //!
+  consolidatePeletizado(){
+    this.peletsConsolidated = this.peletsAvailables.reduce((array, object) => {
+      let info : any = {
+        'id' : object.idMatPrima, 
+        'material' : object.matPrima, 
+        'qty' : object.weight, 
+        'qty2' : object.weight2,
+        'presentation' : object.unit, 
+        'category' : 'RECUPERADO', 
+      }  
+      const searchedObject = array.find(x => x.id == info.id);
+      if(searchedObject) {
+        searchedObject.qty += info.qty;
+        searchedObject.qty2 += info.qty2;
+      } 
+      else array.push(info);
+      return array;
     }, []);
   }
 
   validateFields(){
     if(this.form.valid) {
-      if(this.peletsSelected.length > 0) {
+      if(this.peletsConsolidated.length > 0) {
         if(this.form.value.qty <= 0) {
-          this.msj.mensajeAdvertencia(`Advertencia`, `La cantidad de recuperado no puede ser mayor a 0`);
+          this.msj.mensajeAdvertencia(`Advertencia`, `La cantidad de recuperado no puede ser menor a 0`);
           return;
         }
         this.load = true;
@@ -209,34 +252,60 @@ export class Salidas_PeletizadoComponent implements OnInit {
       'Usua_Aprueba': 0,
       'UndMed_Id': 'Kg',
     }
-    this.svOutputsPeletizado.Post(output).subscribe(data => { this.saveDetailsOutput(data.salPel_Id); }, error => {
+    this.svOutputsPeletizado.Post(output).subscribe(data => { this.calculatePeleToAssign(data.salPel_Id); }, error => {
       this.msj.mensajeError(`Error`, `No se pudo crear la salida de peletizado`);
       this.load = false;
     });
   }
 
-  saveDetailsOutput(idOutput : number){
+  calculatePeleToAssign(idOutput : number){
+    let recoveries : any = [];
+    let qtySelected : number = this.peletsConsolidated[0].qty; 
+    let rest : number = this.peletsConsolidated[0].qty; 
+    let currentQty : number = 0; 
+
+    for (let index = 0; index < this.peletsAvailables.length; index++) {
+      const x = this.peletsAvailables[index];
+      currentQty += x.weight; 
+      if(currentQty <= qtySelected) {
+        recoveries.push({'code' : x.code, 'quantity' : x.weight, 'typeRecovery' : x.typeRecovery, 'unit' : x.unit }); //
+        rest -= x.weight;
+        if(rest <= 0) break;
+      } else {
+        recoveries.push({'code' : x.code, 'quantity' : rest, 'typeRecovery' : x.typeRecovery, 'unit' : x.unit });
+        rest -= x.weight;
+        if(rest <= 0) break;
+      } 
+    }
+    this.saveDetailsOutput(idOutput, recoveries);
+  }
+
+  saveDetailsOutput(idOutput : number, recoveries){
     let count : number = 0;
-    this.peletsSelected.forEach(ps => {
+
+    recoveries.forEach(x => {
       let details : modelDetalles_SalidasPeletizado = {
-        SalPel_Id: idOutput,
-        IngPel_Id: ps.code,
-        TpRecu_Id: ps.typeRecovery,
-        DtSalPel_Peso: ps.weight,
-        UndMed_Id: 'Kg'
+        'SalPel_Id': idOutput,
+        'IngPel_Id': x.code,
+        'TpRecu_Id': x.typeRecovery,
+        'DtSalPel_Peso': x.quantity,
+        'UndMed_Id': x.unit
       }
       this.svDetailsOutputsPeletizado.Post(details).subscribe(data => {
         count++;
-        if(this.peletsSelected.length == count) this.updateStatusEntryPele(idOutput);
+        if(recoveries.length == count) this.updateStatusEntryPele(idOutput, recoveries);
       }, error => {
         this.msj.mensajeError(`Error`, `No se pudo crear el detalle de la salida de peletizado`);
         this.load = false;
       });
+      console.log('details', details);
     });
   }
 
-  updateStatusEntryPele(idOutput : number){
-    this.svEntryPeletizado.putEntryPeletizado(this.peletsSelected.map(x => x.code)).subscribe(data => {
+  updateStatusEntryPele(idOutput : number, recoveries : any){
+    console.log(idOutput, recoveries);
+    
+    this.svEntryPeletizado.putEntryPeletizado(recoveries).subscribe(data => {
       this.createPDF(idOutput, `creada`);
     }, error => { 
       this.msj.mensajeError(`Error`, `Error al intentar actualizar el estado de los recuperados seleccionados`); 
@@ -462,12 +531,16 @@ export class Salidas_PeletizadoComponent implements OnInit {
     return body;
   }
 
+  //!
   weightTypesRecoveries = (data) => this.peletsSelected.filter(x => x.typeRecovery == data.typeRecovery).reduce((a, b) => a += b.weight, 0);
 
+  //!
   qtyTypesRecoveries = (data) => this.peletsSelected.filter(x => x.typeRecovery == data.typeRecovery).length;
 
+  //!
   weightTotal = () => this.peletsSelected.reduce((a, b) => a += b.weight, 0);
 
+  //!
   qtyTotal = () => this.peletsSelected.length;
 
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');

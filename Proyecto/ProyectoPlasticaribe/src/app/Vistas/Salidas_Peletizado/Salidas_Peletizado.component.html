@@ -32,7 +32,7 @@
       <div class="mb-3" id="">
         <div class="row g-4">
   
-          <!-- Recuperado -->
+          <!--* Recuperado -->
           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
             <span class="p-input-icon-left p-float-label">
               <i class="pi pi-search"></i>
@@ -44,7 +44,7 @@
             </span>
           </div>
   
-          <!-- Cantidad -->
+          <!--* Cantidad -->
           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
             <span class="p-float-label">
               <p-inputNumber formControlName="qty" [useGrouping]="true" inputId="qty" autocomplete="off" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
@@ -52,7 +52,7 @@
             </span>
           </div>
   
-          <!-- Presentación -->
+          <!--* Presentación -->
           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
             <span class="p-float-label">
               <p-dropdown formControlName="presentation" inputId="presentation" [autoDisplayFirst]="true" [options]="presentations" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
@@ -60,7 +60,7 @@
             </span>
           </div>
   
-          <!-- Observación -->
+          <!--* Observación -->
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
             <span class="p-float-label">
               <textarea formControlName="observation" [rows]="1" inputId="observation" pInputTextarea></textarea>
@@ -68,7 +68,7 @@
             </span>
           </div>
   
-          <!--Botones-->
+          <!--* Botones-->
           <div id="">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button pButton pRipple label="Consultar" type="submit" icon="pi pi-search" class="p-button-danger" [disabled]="!form.valid"></button>
@@ -99,12 +99,11 @@
       <div class="row g-3 font-size-14" id="tabla1">
         <p-table
             #dt1
-            [value]="peletsAvailables"
-            styleClass="p-datatable-sm"
+            [value]="peletsConsolidated"
+            styleClass="p-datatable-sm p-datatable-gridlines"
             responsiveLayout="scroll"
             [rowHover]="true"
-            dataKey="code"
-            [(selection)]="peletsSelected"
+            dataKey="id"
             [scrollable]="true"
             scrollHeight="50rem"
             [resizableColumns]="true"
@@ -113,63 +112,60 @@
           <ng-template pTemplate="header">
             <tr>
               <th></th>
-              <th></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'code', dt1)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'typeRecovery', dt1)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'roll', dt1)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot', dt1)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item', dt1)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', dt1)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'weight', dt1)"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'material', dt1)"></th>
+              <th class="text-center" colspan="2">Información de Recuperado</th>
+              <th class="text-center" colspan="3">Información Stock Bodega Peletizado</th>
             </tr>
             <tr>
-              <td>#</td>
-              <th style="width: 3rem">
+              <th class="text-center">#</th>
+              <!--<th style="width: 3rem">
                 <p-checkbox id="" (click)="selectAllPeletizados()"></p-checkbox>
-              </th>
-              <th class="text-center" scope="col">Codigo</th>
-              <th class="text-center" scope="col">Tipo Recuperado</th>
-              <th class="text-center" scope="col">Rollo/Bulto</th>
-              <th class="text-center" scope="col">OT</th>
-              <th class="text-center" scope="col">Item</th>
-              <th class="text-center" scope="col">Referencia</th>
-              <th class="text-center" scope="col">Cantidad (Kg)</th>
-              <th class="text-center" scope="col">Material</th>
+              </th>-->
+              <th class="text-center" scope="col">Id </th>
+              <th class="text-center" scope="col">Nombre</th>
+              <th class="text-center" scope="col">Cantidad</th>
+              <th class="text-center" scope="col">Presentación</th>
+              <th class="text-center" scope="col">Categoria</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
             <tr>
               <td>{{rowIndex + 1}}</td>
-              <td>
+              <!--<td>
                 <p-tableCheckbox [value]="data" (click)="selectPeletizados(data)" id=""></p-tableCheckbox>
+              </td>-->
+              <td class="text-center"><b>{{data.id}}</b></td>
+              <td class="text-center">{{data.material}}</td>
+              
+              <td [pEditableColumn]="data.qty" class="cursor" pTooltip="Editar cantidad" class="text-center">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input pInputText type="number" (focusout)="outFocus(data.qty, data.qty2)" (focus)="onFocus()" (keyup.enter)="outFocus(data.qty, data.qty2)" [min]="1" [max]="data.qty2" [(ngModel)]="data.qty" pEditableColumnField="qty" required/>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ data.qty == null || data.qty > data.qty2 ? data.qty2 : data.qty | number : '1.2-2' }}
+                  </ng-template>
+                </p-cellEditor>
               </td>
-              <td class="text-center">{{data.code}}</td>
-              <td class="text-center"><b>{{data.typeRecovery}}</b></td>
-              <td class="text-center">{{data.roll}}</td>
-              <td class="text-center"><b>{{data.ot}}</b></td>
-              <td class="text-center">{{data.item}}</td>
-              <td>{{data.reference}}</td>
-              <td class="text-center"><b>{{data.weight | number : '1.2-2'}}</b></td>
-              <td class="text-center">{{data.material}}</td> 
+              <td class="text-center">{{data.presentation}}</td>
+              <td class="text-center"><span class="badge" [ngClass]="{'bg-success1': ['RECUPERADO'].includes(data.category), }">{{ data.category }}</span></td> 
             </tr>
           </ng-template>
         </p-table>
       </div>
     </div>
 
-    <!--* Linea 1 -->
-    <div class="mb-4">
+    <!--! Linea 1 -->
+    <!--<div class="mb-4">
       <hr class="Linea">
-    </div>
+    </div>-->
 
-    <!--* Titulo 2 -->
-    <div class="mb-4" *ngIf="!load">
+    <!--! Titulo 2 -->
+    <!--<div class="mb-4" *ngIf="!load">
       <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de recuperados seleccionados</h4>
-    </div>
+    </div>-->
 
-    <!--* Tabla 2 -->
-    <div class="mb-3">
+    <!--! Tabla 2 -->
+    <!--<div class="mb-3">
       <div class="row g-3" id="tabla1">
         <p-table
             #dt2
@@ -194,7 +190,7 @@
                 <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot', dt1)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item', dt1)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', dt1)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'weight', dt1)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'qty', dt1)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'material', dt1)"></th>
               </tr>
               <tr>
@@ -224,26 +220,26 @@
                 <td class="text-center"><b>{{data.ot}}</b></td>
                 <td class="text-center">{{data.item}}</td>
                 <td>{{data.reference}}</td>
-                <td class="text-center"><b>{{data.weight | number : '1.2-2'}}</b></td>
+                <td class="text-center"><b>{{data.qty | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{data.material}}</td> 
               </tr>
             </ng-template>
         </p-table>
       </div>
-    </div>
+    </div>-->
 
-    <!--* Linea 2 -->
-    <div class="mb-4" *ngIf="!load">
+    <!--! Linea 2 -->
+    <!--<div class="mb-4" *ngIf="!load">
       <hr class="Linea">
-    </div>
+    </div>-->
 
-    <!--* Titulo 3 -->
-    <div class="mb-4" *ngIf="!load">
+    <!--! Titulo 3 -->
+    <!--<div class="mb-4" *ngIf="!load">
       <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Consolidado por tipo de recuperado</h4>
-    </div>
+    </div>-->
 
-    <!--* Tabla 3 -->
-    <div class="mb-3" *ngIf="!load">
+    <!--! Tabla 3 -->
+    <!--<div class="mb-3" *ngIf="!load">
       <div class="row g-3" id="tabla3">
         <div class="table-responsive">
           <p-table
@@ -271,7 +267,7 @@
               <td class="text-center">{{rowIndex + 1}}</td>
               <td class="text-center">{{data.typeRecovery }}</td>
               <td class="text-center">{{qtyTypesRecoveries(data)}}</td>
-              <td class="text-center">{{weightTypesRecoveries(data) | number : '1.2-2'}}</td>
+              <td class="text-center">{{qtyTypesRecoveries(data) | number : '1.2-2'}}</td>
               <td class="text-center">{{'Kg'}}</td>
             </tr>
           </ng-template>
@@ -279,20 +275,20 @@
             <tr>
               <td colspan="2" class="text-right">Totales</td>
               <td class="text-center">{{qtyTotal() | number}}</td>
-              <td class="text-center">{{weightTotal() | number : '1.2-2'}}</td>
+              <td class="text-center">{{qtyTotal() | number : '1.2-2'}}</td>
               <td class="text-center">Kg</td>
             </tr>
           </ng-template>
         </p-table>
         </div>
       </div>
-    </div>
+    </div>-->
 
     <!--* Botones -->
     <div *ngIf="!load">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Generar salida" icon="pi pi-send" (click)="validateFields()"></button>
-        <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="clearAll()"></button>
+        <button pButton class="p-button-danger" id="ingresarRollo" type="button" [disabled]="fieldFocus" label="Generar salida" icon="pi pi-send" (click)="validateFields()"></button>
+        <button pButton class="p-button-secondary" id="limpiarTodo" type="button" [disabled]="fieldFocus" label="Limpiar Todo" icon="pi pi-eraser" (click)="clearAll()"></button>
       </div>
     </div>
   </p-card>

@@ -40,12 +40,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
   @ViewChild('tableStock_UndPaq') tableStock_UndPaq: Table | undefined;
   @ViewChild('tableStockEmp') tableStockEmp: Table | undefined;
   @ViewChild('tableStockSella') tableStockSella: Table | undefined;
+  @ViewChild('tableStockExt') tableStockExt: Table | undefined;
   @ViewChild('comparativeTable') comparativeTable: Table | undefined;
   @ViewChild('tableStockDelivered_NoAvaible') tableStockDelivered_NoAvaible: Table | undefined;
   recetaProducto: boolean = false;
   @ViewChild(Recetas_ProductosComponent) recetas_ProductosComponent: Recetas_ProductosComponent | undefined;
   stockEmpaque: Array<StockInformation> = [];
   stockSellado: Array<StockInformation> = [];
+  stockExtrusion: Array<StockInformation> = [];
   comparativeStock: Array<StockInformation> = [];
   stockDelivered_NoAvaible: Array<StockInformation> = [];
   @ViewChild('tableRollsEmpaque') tableRollsEmpaque: Table | undefined;
@@ -66,6 +68,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   @ViewChild('tableExpInvSellado') tableExpInvSellado : Table | undefined;
   tabStockEmpaque : boolean = false;
   tabStockSellado : boolean = false;
+  tabStockExtrusion : boolean = false;
   tabStockKg : boolean = false;
   tabStockBulto : boolean = false;
   tabStockComparative : boolean = false;
@@ -174,10 +177,20 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }  
   }
 
+  getStockProcessExtrusion(){
+    if(!this.tabStockExtrusion) {
+      this.loading = true
+      this.stockService.GetStockProducts_Process('EXT').subscribe(data => {
+        this.tabStockExtrusion = true;
+        this.stockExtrusion = this.fillStockInformation(data, 'EXT');
+        this.fillComparativeStock(data, false);
+        this.loading = false;
+      });
+    }  
+  }
+
   getStockProcessEmpaque(){
     if(!this.tabStockEmpaque) {
-      console.log('Entré');
-      
       this.loading = true
       this.stockService.GetStockProducts_Process('EMP').subscribe(data => {
         this.tabStockEmpaque = true;
@@ -369,6 +382,15 @@ export class InventarioProductosPBDDComponent implements OnInit {
     let index : number = this.stockEmpaque.findIndex(x => x.item == data.item);
     this.svProductionProcess.getRollsInAreaForItem(data.item, data.process).subscribe(data => {
       this.stockEmpaque[index].AvaibleProdution = this.fillAvaibleProduction(data);
+      this.loading = false;
+    }, error => { this.msg.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en Empaque.`); });
+  }
+
+  loadInfoRollsInAreaExtrusion(data : any){
+    this.loading = true;
+    let index : number = this.stockExtrusion.findIndex(x => x.item == data.item);
+    this.svProductionProcess.getRollsInAreaForItem(data.item, data.process).subscribe(data => {
+      this.stockExtrusion[index].AvaibleProdution = this.fillAvaibleProduction(data);
       this.loading = false;
     }, error => { this.msg.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en Empaque.`); });
   }
@@ -641,8 +663,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
     } else {
       this.indexTab == 1 ? this.loadRollsProductionAvailable() : null;
       this.indexTab == 2 ? this.loadRollsProductionAvailable() : null;
-      this.indexTab == 5 ? this.getStockInformationKg() : null;
-      this.indexTab == 6 ? this.getStockInformationBulto() : null;
+      this.indexTab == 5 ? this.getStockProcessExtrusion() : null;
+      this.indexTab == 6 ? this.getStockInformationKg() : null;
+      this.indexTab == 7 ? this.getStockInformationBulto() : null;
 
       if(this.indexTab == 3) {
         this.getStockProcessEmpaque();
@@ -652,7 +675,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.getStockProcessSellado();
         this.deployRows();
       } else null;
-      if(this.indexTab == 7) {
+
+      if(this.indexTab == 8) {
         this.getStockProcessEmpaque();
         this.getStockProcessSellado();
         this.deployRows();
