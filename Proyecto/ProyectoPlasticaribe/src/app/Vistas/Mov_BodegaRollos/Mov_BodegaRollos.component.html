@@ -7,7 +7,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }">Movimientos Bodega de Rollos</h2>
+      <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }">Movimientos Bodega de Rollos {{currentStore}}</h2>
     </div>
 
     <div class="mb-4">
@@ -35,7 +35,7 @@
       </div>  
   
       <!--* OT -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl">
           <span class="p-float-label">
           <p-inputNumber formControlName="orderProduction" [useGrouping]="false" inputId="orderProduction" [required]="true"></p-inputNumber>
           <label for="orderProduction">OT</label>
@@ -43,7 +43,7 @@
       </div>
   
       <!--* ITEM -->
-      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-4">
+      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-3">
         <span class="p-float-label">
           <input formControlName="reference" id="prod" list="producto" type="text" pInputText (change)="selectedProduct()" (keydown)="searchProduct()"/>
           <datalist id="producto">
@@ -54,7 +54,7 @@
       </div>
   
       <!--* PRODUCTION -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl">
           <span class="p-float-label">
           <p-inputNumber formControlName="production" [useGrouping]="false" inputId="production" [required]="true"></p-inputNumber>
           <label for="production">Rollo/Bulto</label>
@@ -67,6 +67,14 @@
            <p-dropdown formControlName="typeMov" inputId="typeMov" [autoDisplayFirst]="false" [options]="typesMovements"></p-dropdown>
            <label for="typeMov">Tipo Movimiento</label>
          </span>
+      </div>
+
+      <!--* PROCESS-->
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="process" id="process" [readonly]="![95,1].includes(ValidarRol)" [options]="process" optionLabel="proceso_Nombre" optionValue="proceso_Id" [autoDisplayFirst]="true"></p-dropdown>
+          <label for="process">Proceso</label>
+        </span>
       </div>
 
       <!--* BUTTONS-->

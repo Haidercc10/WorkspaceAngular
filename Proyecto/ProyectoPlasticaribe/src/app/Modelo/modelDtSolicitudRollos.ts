@@ -9,4 +9,5 @@ export interface modelDtSolicitudRollos {
   DtSolRollo_Cantidad : number;
   Prod_Id : number;
   UndMed_Id : string;
+  Falla_Id? : number;
 }

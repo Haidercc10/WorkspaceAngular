@@ -15,6 +15,8 @@ export class Ubicaciones_BodegaRollosService {
     getUbications = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Ubicaciones_BodegaRollos');
 
     getCode = (code : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ubicaciones_BodegaRollos/${code}`);
+    
+    getUbicationsForProcess = (process : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Ubicaciones_BodegaRollos/getUbicationsForProcess/${process}`);
   
     putUbication = (code : number, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Ubicaciones_BodegaRollos/${code}`, data);
 

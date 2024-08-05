@@ -47,11 +47,16 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   ubications : Array<any> = [];
   subUbications : Array<any> = [];
   allUbications : Array<any> = [];
+  inventarioCalidad : any [] = [];
+  currentStore : string = ``;
 
   @ViewChild('dtProductoIntermedio') dtProductoIntermedio: Table | undefined;
   @ViewChild('dtRotograbado') dtRotograbado: Table | undefined;
   @ViewChild('dtDetailsProdIntermedio') dtDetailsProdIntermedio: Table | undefined;
   @ViewChild('tableReubication') tableReubication: Table | undefined;
+  @ViewChild('dtCalidad') dtCalidad: Table | undefined;
+  @ViewChild('dtImpresion') dtImpresion: Table | undefined;
+  @ViewChild('dtSellado') dtSellado: Table | undefined;
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -72,18 +77,40 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.getAllUbicationsStore();
   }
 
+  //*
   validateRol(){
     if([95].includes(this.ValidarRol)) {
       this.inventarioProductoIntermedio = [];
+      this.inventarioCalidad = [];
       this.consultarInventario(`?wareHouse=${'BGPI'}`);
+      this.consultarInventario(`?wareHouse=${'CALIDAD'}`);
+      this.currentStore = ``;
     } else if([89].includes(this.ValidarRol)) {
       this.inventarioRotograbado = [];
       this.consultarInventario(`?wareHouse=${'ROT'}`);
+      this.currentStore = `Rotograbado`;
+    } else if([86].includes(this.ValidarRol)) {
+      this.inventarioSellado = [];
+      this.currentStore = `Sellado`;
+      this.consultarInventario(`?wareHouse=${'SELLA'}`);
+    } else if([4].includes(this.ValidarRol)) {
+      this.inventarioSellado = [];
+      this.currentStore = `Impresión`;
+      this.consultarInventario(`?wareHouse=${'IMP'}`);
     } else if([1].includes(this.ValidarRol)) {
-      this.inventarioProductoIntermedio = [];
-      this.inventarioRotograbado = [];
+      this.clearInventories();
       this.consultarInventario('');
+      this.currentStore = ``;
     } 
+  }
+
+  //*
+  clearInventories() {
+    this.inventarioProductoIntermedio = [];
+    this.inventarioRotograbado = [];
+    this.inventarioCalidad = [];
+    this.inventarioSellado = [];
+    this.inventarioImpresion = [];
   }
   
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -147,31 +174,13 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     setTimeout(() => { this.cargando = false; }, 1000);
   }
 
-  //!
-  selectionAll(){
-    this.cargando = true;
-    if(this.dtDetailsProdIntermedio) {
-      if(this.dtDetailsProdIntermedio.filteredValue) this.selectedRolls = this.selectedRolls.concat(this.dtDetailsProdIntermedio.filteredValue);
-      else this.selectedRolls = this.selectedRolls.concat(this.inventoryRolls);
-    } else this.selectedRolls = this.selectedRolls.concat(this.inventoryRolls);
-    console.log(this.selectedRolls);
-    setTimeout(() => { this.cargando = false; }, 5);
-  }
-
-  //!
-  deselectionAll(){
-    this.cargando = true;
-    this.selectedRolls = [];
-    setTimeout(() => { this.cargando = false; }, 5);
-  }
-
   //*
   searchForRolls(){
     let roll : any = this.form.value.roll;
 
     if(roll) {
       this.cargando = true;
-      this.svDetailsStore.getRollForOut(roll).subscribe(data => {
+      this.svDetailsStore.getRollForOut(roll, 'BGPI').subscribe(data => {
         if(data.length > 0) this.loadTableForRoll(data);
         else {
           this.msj.mensajeAdvertencia(`Advertencia`, `No se encontro información del rollo N° ${roll}`);
@@ -227,6 +236,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     
   }
 
+  //*
   clearAfterReubication(){
     this.msj.mensajeConfirmacion(`Confirmación`, `Ubicación de rollos actualizada exitosamente!`);
     this.cargando = false;
@@ -242,12 +252,8 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   consultarInventario(process? : string){
     let num : number = 0;
     this.cargando = true;
-    //this.inventarioProductoIntermedio = [];
-    //this.inventarioRotograbado = [];
 
     this.bgRollosService.GetInventarioRollos(process).subscribe(data => {
-      console.log(data);
-      
       if (data.length == 0) this.cargando = false;
       else {
         for (let i = 0; i < data.length; i++) {
@@ -269,9 +275,10 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
             //this.inventarioTotal.push(info);
             //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
             if (data[i].bgRollo_BodegaActual == 'BGPI') this.inventarioProductoIntermedio.push(info);
-            //if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
+            if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
             if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
-            //if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
+            if (data[i].bgRollo_BodegaActual == 'CALIDAD') this.inventarioCalidad.push(info);
+            if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
             //if (data[i].bgRollo_BodegaActual == 'DESP') this.inventarioDespacho.push(info);
             num += 1;
             if (num == data.length) this.cargando = false;
@@ -301,6 +308,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           Referencia: data[i].prod_Nombre,
           Cantidad: data[i].dtBgRollo_Cantidad,
           Presentacion: data[i].undMed_Id,
+          Bodega_Actual : data[i].bgRollo_BodegaActual,
           Ubicacion : data[i].dtBgRollo_Ubicacion,
           Fecha: data[i].bgRollo_FechaEntrada.replace('T00:00:00', ''),
           Extrusion: data[i].dtBgRollo_Extrusion ? 'SI' : 'NO',
@@ -309,6 +317,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           Rotograbado: data[i].dtBgRollo_Rotograbado ? 'SI' : 'NO',
           Sellado: data[i].dtBgRollo_Sellado ? 'SI' : 'NO',
           Despacho: data[i].dtBgRollo_Despacho ? 'SI' : 'NO',
+          Calidad: data[i].dtBgRollo_Calidad ? 'SI' : 'NO',
         }
         this.inventarioDetallado.push(info);
         if (num == data.length) this.cargando = false;
@@ -474,33 +483,48 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   searchInventoryRolls(){
     this.inventoryRolls = [];
     this.cargando = true;
-    let process : string = ``;
+
+    this.searchProcessData().process.forEach(y => {
+      this.bgRollosService.getInventoryAvailable(y).subscribe(data => {
+        this.cargando = false;
+        this.inventoryRolls = this.inventoryRolls.concat(data);
+        
+        this.inventoryRolls.forEach(x => {
+          x.client = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Cliente, 
+          x.material = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Material,
+          x.broad = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Ancho, 
+          x.unit = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Unidad
+        });
+      }, error => {
+        this.msj.mensajeError(`Error`, `No fue posible consultar el inventario de rollos disponibles`);
+        this.cargando = false;
+      });
+    });  
+    
+  }
+
+  //*
+  searchProcessData(){
+    let process : any = [];
     let array : any = [];
 
     if([95].includes(this.ValidarRol)) {
-      process = `?process=${'BGPI'}`;
-      array = this.inventarioProductoIntermedio;
+      process = [`?process=${'BGPI'}`, `?process=${'CALIDAD'}`];
+      array = this.inventarioProductoIntermedio.concat(this.inventarioCalidad);
     } else if([89].includes(this.ValidarRol)) {
-      process = `?process=${'ROT'}`;
+      process = [`?process=${'ROT'}`];
       array = this.inventarioRotograbado;
+    } else if([86].includes(this.ValidarRol)) {
+      process = [`?process=${'SELLA'}`];
+      array = this.inventarioSellado;
+    } else if([4].includes(this.ValidarRol)) {
+      process = [`?process=${'IMP'}`];
+      array = this.inventarioImpresion;
     } else {
-      process = process;
-      array = this.inventarioProductoIntermedio.concat(this.inventarioRotograbado);
+      process = [''];
+      array = this.inventarioProductoIntermedio.concat(this.inventarioRotograbado).concat(this.inventarioCalidad).concat(this.inventarioImpresion).concat(this.inventarioSellado);
     } 
-    console.log(array);
-    this.bgRollosService.getInventoryAvailable(process).subscribe(data => {
-      this.cargando = false;
-      this.inventoryRolls = data;
-      this.inventoryRolls.forEach(x => {
-        x.client = array.find(z => z.Orden == x.ot).Cliente, 
-        x.material = array.find(z => z.Orden == x.ot).Material,
-        x.broad = array.find(z => z.Orden == x.ot).Ancho, 
-        x.unit = array.find(z => z.Orden == x.ot).Unidad
-      });
-    }, error => {
-      this.msj.mensajeError(`Error`, `No fue posible consultar el inventario de rollos disponibles`);
-      this.cargando = false;
-    });
+    return { 'dataInv' : array, 'process' : process, }
   }
 
   //* Función que va muestra el inv. de rollos por OT/Detallado actualizado 
@@ -516,7 +540,16 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     } else if(tab == 'Rotograbado') {
       this.inventarioRotograbado = [];
       this.consultarInventario(`?wareHouse=${'ROT'}`);
-    } 
+    } else if(tab == 'Calidad') {
+      this.inventarioCalidad = [];
+      this.consultarInventario(`?wareHouse=${'CALIDAD'}`);
+    } else if(tab == 'Impresión') {
+      this.inventarioImpresion = [];
+      this.consultarInventario(`?wareHouse=${'IMP'}`);
+    } else if(tab == 'Sellado') {
+      this.inventarioSellado = [];
+      this.consultarInventario(`?wareHouse=${'SELLA'}`);
+    }    
   }
 
   //*Función que muestra la cantidad total en inventario de lo que haya en la tabla al instante
@@ -542,7 +575,6 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       return total;
     //}, 500);
   }
-
 
   //? CREACIÓN DE FORMATO EXCEL
   //* Función para crear excel de rollo a rollo detallado.

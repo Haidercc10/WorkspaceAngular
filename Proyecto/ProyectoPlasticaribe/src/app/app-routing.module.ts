@@ -61,10 +61,11 @@ export const routes: Routes = [
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
   { path: 'IngresoRollos-Extrusion', loadChildren: () => import('./Modules/ingreso-rollos/ingreso-rollos.module').then(m => m.IngresoRollosModule) }, 
   { path: 'Solicitud-Rollos-Bodegas', loadChildren: () => import('./Modules/solicitud-rollos/solicitud-rollos.module').then(m => m.SolicitudRollosModule) },
+  { path: 'dev-bodega-rollos', loadChildren: () => import('./Modules/devolucion-bodega-rollos/devolucion-bodega-rollos.module').then(m => m.DevolucionBodegaRollosModule) },
   { path: 'Movimientos-Solicitud-Rollos', loadChildren: () => import('./Modules/movimientos-solicitudes-rollos/movimientos-solicitudes-rollos.module').then(m => m.MovimientosSolicitudesRollosModule) },
   { path: 'Inventario-Bodegas-Rollos', loadChildren: () => import('./Modules/inventario-bodegas-rollos/inventario-bodegas-rollos.module').then(m => m.InventarioBodegasRollosModule) },
   { path: 'mov-bodega-rollos', loadChildren: () => import('./Modules/mov-bodega-rollos/mov-bodega-rollos.module').then(m => m.MovBodegaRollosModule) },
-
+  
   // {path: 'AsignacionRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
   // {path: 'ReporteRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.
   // {path: 'Inventario-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component: Inventario_ExtrusionComponent},

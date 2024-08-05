@@ -285,7 +285,8 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
             DtBgRollo_Despacho: this.detallesSolicitud[i].BodegaSiguiente == 'DESP' || (data[j].dtBgRollo_Despacho && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
             Estado_Id: 0,
             BgRollo_BodegaInicial: '',
-            DtBgRollo_Ubicacion: ''
+            DtBgRollo_Ubicacion: '',
+            DtBgRollo_Calidad: false
           }
           this.dtBgRollosService.Put(data[j].codigo, info).subscribe(() => {
             numDatos += 1;

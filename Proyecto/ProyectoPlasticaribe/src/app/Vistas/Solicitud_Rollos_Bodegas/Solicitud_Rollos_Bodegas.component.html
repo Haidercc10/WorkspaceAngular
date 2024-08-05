@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Solicitud de Rollos</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">{{ title }}</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -47,13 +47,13 @@
         <!-- Bodega Solicitante -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
           <span class="p-float-label">
-            <p-dropdown formControlName="BodegaSolicitante" inputId="BodegaSolicitante" optionValue="proceso_Id" optionLabel="proceso_Nombre" [options]="devolucionRollos ? bodegasSolicitadas : bodegasSolicitantes" [required]="true"></p-dropdown>
+            <p-dropdown formControlName="BodegaSolicitante" inputId="BodegaSolicitante" optionValue="proceso_Id" optionLabel="proceso_Nombre" [options]="devolucionRollos ? bodegaCalidad : bodegasSolicitantes" [required]="true"></p-dropdown>
             <label for="BodegaSolicitante">Bodega Solicitante*</label>
           </span>
         </div>
 
         <!-- Consultar Orden de Trabajo -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="OrdenTrabajo" id="ordenTrabajo" (keyup.enter)="consultarRollos()" type="number" pInputText required/>
@@ -62,20 +62,34 @@
         </div>
 
         <!-- Numero de Rollo -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Rollo" id="Rollo" type="number" (keyup.enter)="searchForRolls()" pInputText/>
             <label for="Rollo">N° Rollo</label>
           </span>
         </div>
-
-        <!-- Devolución -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="devolucion">
-          <div class="field-checkbox">
-            <p-checkbox formControlName="Devolucion" [readonly]="true" [(ngModel)]="devolucionRollos" label="Devolución" [binary]="true"></p-checkbox>
+        
+        <ng-container *ngIf="devolucionRollos; then DV else SOL"></ng-container>
+         <ng-template #DV>
+          <!-- Devolución -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="devolucion">
+            <div class="field-checkbox">
+              <p-checkbox formControlName="Devolucion" [(ngModel)]="devolucionRollos" [binary]="true" [readonly]="true" inputId="Devolucion"></p-checkbox>
+                <label for="Devolucion"><p-chip label="Devolución por Calidad" icon="pi pi-undo"></p-chip></label>
+            </div>
           </div>
-        </div>
+  
+          <!-- Falla -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="Falla" inputId="Falla" optionValue="falla_Id" optionLabel="falla_Nombre" [readonly]="!devolucionRollos" [options]="devolucionRollos ? fails2 : fails1" [required]="true" [autoDisplayFirst]="true"></p-dropdown>
+              <label for="Falla">Falla Técnica</label>
+            </span>
+          </div>
+         </ng-template>
+         <ng-template #SOL></ng-template>
+        
 
         <!-- Observacion -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-6 col-xxl-12" id="observacion">
@@ -104,7 +118,7 @@
   <div class="mb-4">
     <div class="row g-3">
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
-        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de rollos disponibles</h4>
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i>{{ devolucionRollos ? ' Tabla de rollos consultados' : ' Tabla de rollos disponibles' }}  </h4>
       </div>
     </div>
   </div>
@@ -171,7 +185,8 @@
               'bg-Impresion': rollo.Proceso == 'Impresion',
               'bg-Rotograbado': rollo.Proceso == 'Rotograbado',
               'bg-Sellado': rollo.Proceso == 'Sellado',
-              'bg-Despacho': rollo.Proceso == 'Despacho'}">{{rollo.Proceso | uppercase}}</span>
+              'bg-Despacho': rollo.Proceso == 'Despacho', 
+              'bg-Calidad': rollo.Proceso == 'Calidad'}">{{rollo.Proceso | uppercase}}</span>
           </tr>
         </ng-template>
       </p-table>
@@ -185,7 +200,7 @@
 
   <!--* titulo tabla 2 -->
   <div class="mb-4" *ngIf="!cargando">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de rollos solicitados</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> {{ devolucionRollos ? ' Tabla de rollos a devolver' : ' Tabla de rollos solicitados' }} </h4>
   </div>
 
   <!--* tabla 2 -->
@@ -251,7 +266,8 @@
               'bg-Impresion': rollo.Proceso == 'Impresion',
               'bg-Rotograbado': rollo.Proceso == 'Rotograbado',
               'bg-Sellado': rollo.Proceso == 'Sellado',
-              'bg-Despacho': rollo.Proceso == 'Despacho'}">{{rollo.Proceso | uppercase}}</span>
+              'bg-Despacho': rollo.Proceso == 'Despacho', 
+              'bg-Calidad': rollo.Proceso == 'Calidad'}">{{rollo.Proceso | uppercase}}</span>
             </td>
           </tr>
         </ng-template>
@@ -266,7 +282,7 @@
 
   <!-- * tabla 3 -->
   <div class="mb-4" *ngIf="!cargando">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Consolidado Productos</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> {{ devolucionRollos ? ' Consolidado de productos a devolver' : ' Consolidado de productos solicitados' }}</h4>
   </div>
 
   <!--* titulo tabla 3 -->
@@ -321,7 +337,7 @@
   <!--* Botones -->
   <div class="bajarPagina" *ngIf="!cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Crear Solicitud" icon="pi pi-check" [disabled]="rollosIngresar.length == 0" (click)="ingresarRollos()"></button>
+      <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Generar {{devolucionRollos ? 'Devolución' : 'Salida'}}" icon="pi pi-check" [disabled]="rollosIngresar.length == 0" (click)="ingresarRollos()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
   </div>

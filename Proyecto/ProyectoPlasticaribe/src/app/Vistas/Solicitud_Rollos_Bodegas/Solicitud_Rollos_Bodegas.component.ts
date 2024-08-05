@@ -1,5 +1,6 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ShepherdService } from 'angular-shepherd';
 import { log } from 'console';
 import moment from 'moment';
@@ -14,12 +15,14 @@ import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { Detalles_SolicitudRollosService } from 'src/app/Servicios/Detalles_SolicitudRollos/Detalles_SolicitudRollos.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { Formato_DocumentosService } from 'src/app/Servicios/Formato_Documentos/Formato_Documentos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
+import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_BodegaRollos/Ubicaciones_BodegaRollos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudRollos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -55,6 +58,13 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   @ViewChild('dt') dt : Table | undefined; 
   @ViewChild('dt2') dt2 : Table | undefined; 
   @ViewChild('dt3') dt3 : Table | undefined; 
+  fails1 : any = [];
+  fails2 : any = [];
+  bodegaCalidad : any = [];
+  ubications : any = [];
+  url : any = ``;
+  currentStore : string = ``;
+  title : string = ``;
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -68,23 +78,30 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                                 private svPDF : CreacionPdfService, 
                                   private svProduction : Produccion_ProcesosService, 
                                     private svBagpro : BagproService,
-                                      private svSedesClients : SedeClienteService) {
+                                      private svSedesClients : SedeClienteService, 
+                                        private svFails : FallasTecnicasService, 
+                                          private svUbications : Ubicaciones_BodegaRollosService, 
+                                            private router : Router,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
       OrdenTrabajo: [null],
       Rollo : [null],
       Observacion : [''],
-      BodegaSolicitada : ['BGPI', Validators.required],
+      BodegaSolicitada : [null, Validators.required],
       BodegaSolicitante : [null, Validators.required],
-      Devolucion : [false]
+      Devolucion : [false], 
+      Falla : [1, Validators.required],
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    //this.obternerBodegas();
+    this.getFails();
     this.getBodegas();
+    this.getUbications();
+    this.url = this.router.url;
+    this.validateProcess();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -107,11 +124,27 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  // Funcion que va a consultar las bodegas de los que se van a solicitar rollos
+  //Función para obtener las fallas técnicas.
+  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { 
+    this.fails1 = datos.filter((item) => [1].includes(item.tipoFalla_Id));
+    this.fails2 = datos.filter((item) => [14].includes(item.tipoFalla_Id));
+  });
+
+  getUbications = () => this.svUbications.getUbications().subscribe(datos => this.ubications = datos);
+
+  //*
+  validateProcess(){
+    if(this.url == '/dev-bodega-rollos') {
+      this.devolucionRollos = true;
+      this.FormConsultarRollos.patchValue({ Devolucion : true });
+    } 
+  }
+
+  //! EN DES USO Funcion que va a consultar las bodegas de los que se van a solicitar rollos
   obternerBodegas(){
     this.procesosService.srvObtenerLista().subscribe(data => {
       switch (this.ValidarRol){
-        case 64: //PRODUCTO INTERMEDIO
+        case 64: //EXTRUSION
           this.bodegasSolicitadas = data.filter(item => ['EXT'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['BGPI'].includes(item.proceso_Id));
           this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'BGPI' });
@@ -146,16 +179,58 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   //Función para obtener las bodegas solicitada y solicitante.
   getBodegas(){
     this.procesosService.srvObtenerLista().subscribe(data => {
-      this.bodegasSolicitadas = data.filter(x => ['BGPI'].includes(x.proceso_Id));
-      this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+      switch (this.ValidarRol) {
+        case 95:
+            this.bodegasSolicitadas = data.filter(x => ['BGPI', 'CALIDAD'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+            this.bodegasSolicitantes.reverse();
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'BGPI' });
+            this.currentStore = ``;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Salida de Rollos ${this.currentStore}`
+            break
+        case 86:
+            this.bodegasSolicitadas = data.filter(x => ['SELLA'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['DESP'].includes(x.proceso_Id));
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'SELLA' }); 
+            this.currentStore = this.bodegasSolicitadas.find(x => x.proceso_Id == 'SELLA').proceso_Nombre;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Salida de Rollos ${this.currentStore}`  
+            break;
+        case 4:
+            this.bodegasSolicitadas = data.filter(x => ['IMP'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['DESP', 'SELLA'].includes(x.proceso_Id));
+            this.bodegasSolicitantes.reverse();
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'IMP' });
+            this.currentStore = this.bodegasSolicitadas.find(x => x.proceso_Id == 'IMP').proceso_Nombre;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Salida de Rollos ${this.currentStore}`     
+            break;
+        case 89:
+            this.bodegasSolicitadas = data.filter(x => ['ROT'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['IMP', 'SELLA'].includes(x.proceso_Id));
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'ROT' });  
+            this.currentStore = this.bodegasSolicitadas.find(x => x.proceso_Id == 'ROT').proceso_Nombre;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Salida de Rollos ${this.currentStore}`   
+            break;    
+        default: 
+            this.bodegasSolicitadas = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.currentStore = ``;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Salida de Rollos ${this.currentStore}`
+          break;
+      }
     });
   }
 
   // funcion que va a limpiar los campos del formulario
   limpiarForm() {
+    console.log(this.FormConsultarRollos.value.Falla);
     this.FormConsultarRollos.reset();
-    this.devolucionRollos = false;
-    this.FormConsultarRollos.patchValue({ Devolucion : false, Observacion : `` });
+    this.url == '/dev-bodega-rollos' ? this.devolucionRollos = true : false;
+    this.FormConsultarRollos.patchValue({ Devolucion : this.devolucionRollos ? true : false, Observacion : ``, Falla : 1,  });
   }
 
   // Funcion que va a limpiar todos los campos
@@ -166,8 +241,8 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.consolidadoProductos = [];
     this.informacionPdf = [];
     this.cargando = false;
-    this.devolucionRollos = false;
-    this.FormConsultarRollos.patchValue({ Devolucion : false, Observacion : `` });
+    this.url == '/dev-bodega-rollos' ? this.devolucionRollos = true : false;
+    this.FormConsultarRollos.patchValue({ Devolucion : this.devolucionRollos ? true : false, Observacion : ``, Falla : 1, });
   }
 
   // Funcion que va a consultar los rollos mediante los parametros pasados por el usuario
@@ -184,7 +259,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       this.consolidadoProductos = [];
 
       this.dtBgRollosService.GetRollosDisponibles(bodega, ot, ruta).subscribe(data => data.forEach(item => this.llenarRollosIngresar(item)), err => {
-        this.mensajeService.mensajeError(`Error`, `${err.status} ${err.statusText}!`);
+        this.mensajeService.mensajeError(`Error`, `No se encontró información disponible de la OT N° ${ot} en la Bodega solicitada | ${err.status} ${err.statusText}!`);
         this.cargando = false;
       });
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos OT y/o Rollo`);
@@ -217,9 +292,11 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   llenarRollosAIngresar(item : any){
     this.cargando = true;
     let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    
     this.rollosConsultados.splice(this.rollosConsultados.findIndex((data) => data.Rollo == item.Rollo), 1);
     let index = this.rollosIngresar.findIndex((data) => data.Rollo == item.Rollo);
-    this.rollosIngresar[index].Proceso = this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre;
+    this.rollosIngresar[index].Proceso = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre;
+    this.rollosIngresar[index].Ubicacion = this.ubications.find(x => x.proceso_Id == bodegaSolicitante).ubR_Nomenclatura;
     this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
     this.groupProducts();
     setTimeout(() => { this.cargando = false; }, 50);
@@ -229,7 +306,11 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   seleccionarTodosRollos(){
     this.cargando = true;
     let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
-    this.rollosConsultados.forEach(x => x.Proceso = this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre); 
+    
+    this.rollosConsultados.forEach(x => {
+      x.Proceso = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre,
+      x.Ubicacion = this.ubications.find(x => x.proceso_Id == bodegaSolicitante).ubR_Nomenclatura
+    });  
     this.rollosIngresar = this.rollosIngresar.concat(this.rollosConsultados);
     this.rollosConsultados = [];  
     this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
@@ -241,9 +322,10 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   quitarRollosAIngresar(item : any){
     this.cargando = true;
     let bodegaSolicitada : any = this.FormConsultarRollos.value.BodegaSolicitada;
+
     this.rollosIngresar.splice(this.rollosIngresar.findIndex(data => data.Rollo == item.Rollo), 1);
     let index = this.rollosConsultados.findIndex((data) => data.Rollo == item.Rollo);
-    this.rollosConsultados[index].Proceso = this.bodegasSolicitadas.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre;
+    this.rollosConsultados[index].Proceso = this.devolucionRollos ? this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre : this.bodegasSolicitadas.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre;
     this.rollosConsultados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
     this.groupProducts();
     setTimeout(() => { this.cargando = false; }, 50);
@@ -253,7 +335,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   quitarTodosRollos(){
     this.cargando = true;
     let bodegaSolicitada : any = this.FormConsultarRollos.value.BodegaSolicitada;
-    this.rollosIngresar.forEach(x => x.Proceso = this.bodegasSolicitadas.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre); 
+    this.rollosIngresar.forEach(x => x.Proceso = this.devolucionRollos ? this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre : this.bodegasSolicitadas.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre); 
     this.rollosConsultados = this.rollosConsultados.concat(this.rollosIngresar);
     this.rollosIngresar = [];
     this.rollosConsultados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
@@ -291,23 +373,27 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   //*Función que busca los rollos a los que se les va a dar salida.
   searchForRolls(){
     let roll : any = this.FormConsultarRollos.value.Rollo;
+    let process : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    let selectedProcess : any = this.FormConsultarRollos.value.BodegaSolicitada;
+    let newProcess : any = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == process).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == process).proceso_Nombre;
 
-    if(roll) {
-      this.cargando = true;
-      this.dtBgRollosService.getRollForOut(roll).subscribe(data => {
-        if(data.length > 0) this.loadTableForRoll(data);
-        else {
-          this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontro información del rollo N° ${roll}`);
+    if(this.rollosIngresar.length == 0 || newProcess == this.rollosIngresar[0].Proceso) {
+      if(roll) {
+        this.cargando = true;
+        this.dtBgRollosService.getRollForOut(roll, selectedProcess).subscribe(data => {
+          if(data.length > 0) this.loadTableForRoll(data);
+          else {
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontro información del rollo N° ${roll}`);
+            this.FormConsultarRollos.patchValue({ Rollo : null});
+            this.cargando = false;
+          }
+        }, error => {
+          this.mensajeService.mensajeError(`Error`, `Se encontraron errores al consultar el rollo N° ${roll} | ${error.status} ${error.statusText}`);
           this.FormConsultarRollos.patchValue({ Rollo : null});
           this.cargando = false;
-        }
-      }, error => {
-        this.mensajeService.mensajeError(`Error`, `Se encontraron errores al consultar el rollo N° ${roll} | ${error.status} ${error.statusText}`);
-        this.FormConsultarRollos.patchValue({ Rollo : null});
-        this.cargando = false;
-      });
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe digitar el número del rollo`);
-    
+        });
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe digitar el número del rollo`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible realizar una asignación a varias bodegas solicitantes!`);
   }
 
   //*Función que carga los rollos a la tabla.
@@ -315,7 +401,8 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.cargando = false;
     this.FormConsultarRollos.patchValue({ Rollo : null});
     let process : any = this.FormConsultarRollos.value.BodegaSolicitante;
-    let newProcess : any = this.bodegasSolicitantes.find(x => x.proceso_Id == process).proceso_Nombre;
+    let newProcess : any = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == process).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == process).proceso_Nombre;
+    let newUbication : any = this.ubications.find(x => x.proceso_Id == process).ubR_Nomenclatura;
 
     if(!this.rollosIngresar.map(x => x.Rollo).includes(data[0].rollo) && !this.rollosConsultados.map(x => x.Rollo).includes(data[0].rollo)) {
       data.forEach(x => {
@@ -326,7 +413,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
           'Producto' : x.referencia,
           'Cantidad' : parseFloat(x.cantidad),
           'Presentacion' : x.presentacion,
-          'Ubicacion' : x.ubicacion,
+          'Ubicacion' : newUbication,
           'Proceso' : newProcess,
         });
       });
@@ -378,7 +465,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         'SolRollo_FechaSolicitud': moment().format('YYYY-MM-DD'),
         'SolRollo_HoraSolicitud': moment().format('H:mm:ss'),
         'Usua_Respuesta': this.storage_Id,
-        'Estado_Id': 48,
+        'Estado_Id': this.devolucionRollos ? 24 : 48,
         'TpSol_Id': this.devolucionRollos ? 2 : 1,
         'SolRollo_Observacion': this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion.toUpperCase(),
         'SolRollo_FechaRespuesta': moment().format('YYYY-MM-DD'),
@@ -405,7 +492,8 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
           'DtSolRollo_Cantidad': this.rollosIngresar[i].Cantidad,
           'UndMed_Id': this.rollosIngresar[i].Presentacion,
           'Prod_Id': this.rollosIngresar[i].Id_Producto,
-          'SolRollo_Id': id
+          'SolRollo_Id': id, 
+          'Falla_Id' : this.devolucionRollos ? this.FormConsultarRollos.value.Falla : 1,
         }
         this.dtSolicitudRollosService.Post(info).subscribe(() => {
           numRollos += 1
@@ -419,10 +507,10 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   //*
   actualizarBodegaRollos(idSolicitud : number){
-    let rolls : any = [];
+    let rolls : any = []; 
     let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
 
-    this.rollosIngresar.forEach(x => rolls.push({ 'Rollo' : x.Rollo,  'OT' : x.Ot, }));
+    this.rollosIngresar.forEach(x => rolls.push({ 'Rollo' : x.Rollo,  'OT' : x.Ot, 'Ubicacion' : x.Ubicacion}));
     this.dtBgRollosService.putRollsStore(23, bodegaSolicitante, rolls).subscribe(data => {
       this.createProductionInPL(idSolicitud, `creada`);
     }, error => {
@@ -512,10 +600,10 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   //*
   createPDF(id : number, action : string) {
     this.dtSolicitudRollosService.GetInformacionSolicitud(id).subscribe(data => {
-      let title: string = `Solicitud de rollos N° ${id}`;
+      let title: string = this.devolucionRollos ? `Devolución de rollos N° ${id}` : `Solicitud de rollos N° ${id}`;
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
-      this.mensajeService.mensajeConfirmacion(`Confirmación`, `Solicitud de rollos a bodega ${action} exitosamente!`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, this.devolucionRollos ? `Devolución de rollos a bodega ${action} exitosamente` : `Solicitud de rollos a bodega ${action} exitosamente!`);
       setTimeout(() => this.limpiarCampos(), 3000);
     }, error => this.mensajeService.mensajeError(`Error`, `Error al consultar la solicitud de rollos N° ${id} | ${error.status} ${error.statusText}`));
   }
@@ -592,13 +680,13 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
           ],
           [
             { text: `N° Solicitud: ${data.solicitud}` },
-            { text: `Tipo Solicitud: ${data.tipo_Solicitud}` },
+            { text: `Falla: ${data.falla}` },
             { text: `Estado: ${data.estado}` },
           ],
           [
-            { text: `Usuario ingreso: ${data.usuario}` },
-            { text: `Fecha ingreso: ${data.fecha_Solicitud.replace('T00:00:00', '')}` },
-            { text: `Hora ingreso: ${data.hora_Solicitud}` },
+            { text: `Usuario registro: ${data.usuario}` },
+            { text: `Fecha registro: ${data.fecha_Solicitud.replace('T00:00:00', '')}` },
+            { text: `Hora registro: ${data.hora_Solicitud}` },
           ],
           [
             { text: `Observación: ${data.observacion}`, colSpan: 3, fontSize: 9, }, {}, {}

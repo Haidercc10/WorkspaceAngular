@@ -1,6 +1,7 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
+import { log } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
@@ -49,9 +50,12 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   loadModal : boolean = false;
   rollosOT : any = [];
   rollosSeleccionados : any = [];
-
+  procesos2 : any = [];
+  title : string = ``;
   ubications : Array<any> = [];
   subUbications : Array<any> = [];
+  loadModalAvailables : boolean = false;
+  rollsAvailables : any = [];
   
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -67,7 +71,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
-      Proceso : ['EXT', Validators.required], 
+      Proceso : ['EXT', Validators.required],
+      Bodega_Actual : [null, Validators.required],  
       OrdenTrabajo: [null, Validators.required],
       Rollo : [null],
       Peso : [null],
@@ -83,6 +88,24 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.lecturaStorage();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.getProcesos();
+    //this.loadCurrentWareHouse();
+  }
+
+  //*
+  loadCurrentWareHouse(){
+    if([95,1].includes(this.ValidarRol))  {
+      this.FormConsultarRollos.patchValue({ Bodega_Actual : 'BGPI' });
+      this.title = ``;
+    } else if([89].includes(this.ValidarRol)) {
+      this.FormConsultarRollos.patchValue({ Bodega_Actual : 'ROT' });
+      this.title = this.procesos2.find(x => x.proceso_Id == 'ROT').proceso_Nombre;
+    } else if([86].includes(this.ValidarRol)) {
+      this.FormConsultarRollos.patchValue({ Bodega_Actual : 'SELLA' });
+      this.title = this.procesos2.find(x => x.proceso_Id == 'SELLA').proceso_Nombre;
+    } else if([4].includes(this.ValidarRol)) {
+      this.FormConsultarRollos.patchValue({ Bodega_Actual : 'IMP' });
+      this.title = this.procesos2.find(x => x.proceso_Id == 'IMP').proceso_Nombre;
+    } 
     this.getAllUbicationsStore();
   }
 
@@ -109,12 +132,14 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   limpiarForm() {
     this.FormConsultarRollos.reset()
     this.FormConsultarRollos.patchValue({ Proceso : 'EXT' });
+    this.loadCurrentWareHouse();
   } 
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
     this.FormConsultarRollos.reset();
     this.FormConsultarRollos.patchValue({ Proceso : 'EXT' });
+    this.loadCurrentWareHouse();
     this.rollosIngresar = [];
     this.rollosOT = [];
     this.rollosSeleccionados = [];
@@ -122,7 +147,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   }
 
   getAllUbicationsStore() {
-    this.svUbicationsStore.getUbications().subscribe(data => { 
+    let bodega_Actual : any = this.FormConsultarRollos.value.Bodega_Actual;
+    this.svUbicationsStore.getUbicationsForProcess(bodega_Actual).subscribe(data => { 
       this.ubicaciones = data;
       this.ubications = data.reduce((a, b) => {
         if(!a.map(x => x.ubR_Id).includes(b.ubR_Id)) a = [...a, b];
@@ -139,7 +165,15 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   }
 
   //Función para obtener los procesos.
-  getProcesos = () => this.svProcesos.srvObtenerLista().subscribe(data => { this.procesos = data.filter(x => [1,/*2,3,9,7*/].includes(x.proceso_Codigo)) }, error => { this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); });
+  getProcesos() {
+    this.svProcesos.srvObtenerLista().subscribe(data => { 
+      this.procesos = data.filter(x => [1].includes(x.proceso_Codigo));
+      this.procesos2 = data.filter(x => [2,3,4,13,16].includes(x.proceso_Codigo));
+      this.loadCurrentWareHouse(); 
+    }, error => { 
+      this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); 
+    });
+  } 
 
   aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
@@ -148,8 +182,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       if(this.FormConsultarRollos.value.Proceso) {
         if(this.FormConsultarRollos.value.Rollo) {
           let rollo : number = this.FormConsultarRollos.value.Rollo;
-          let area :  string = this.FormConsultarRollos.value.Proceso;
-          let proceso : string = this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
+          let area :  string = [95].includes(this.ValidarRol) ? this.FormConsultarRollos.value.Proceso : this.FormConsultarRollos.value.Bodega_Actual;
+          let proceso : string = [95].includes(this.ValidarRol) ? this.procesos.find(x => x.proceso_Id == area).proceso_Nombre : this.procesos2.find(x => x.proceso_Id == area).proceso_Nombre;
           this.cargando = true;
 
           this.dtBgRollosService.getRollo(rollo, area).subscribe(dataPl => {
@@ -184,6 +218,9 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     if(!this.rollosIngresar.map(x => x.rollo).includes(bulto)) {
       data.ubicacion = this.ubicaciones.find(x => x.ubR_Id == this.FormConsultarRollos.value.Ubicacion && x.ubR_SubId == subUbicacion).ubR_Nomenclatura;
       data.proceso_Id = this.FormConsultarRollos.value.Proceso;
+      data.bodega_Actual = this.FormConsultarRollos.value.Bodega_Actual;
+      data.bodega = this.procesos2.find(x => x.proceso_Id == data.bodega_Actual).proceso_Nombre;
+      
       this.rollosIngresar.unshift(data); 
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `El rollo N° ${bulto} ha sido agregado a la tabla correctamente`);
       this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null, 'Peso' : data.peso, });
@@ -208,8 +245,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         if(this.FormConsultarRollos.value.OrdenTrabajo) {
           if(this.FormConsultarRollos.value.Peso) {
             let ot : any = this.FormConsultarRollos.value.OrdenTrabajo;
-            let area :  string = this.FormConsultarRollos.value.Proceso;
-            let proceso : string = this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
+            let area :  string = [95].includes(this.ValidarRol) ? this.FormConsultarRollos.value.Proceso : this.FormConsultarRollos.value.Bodega_Actual;
+            let proceso : string = [95].includes(this.ValidarRol) ? this.procesos.find(x => x.proceso_Id == area).proceso_Nombre : this.procesos2.find(x => x.proceso_Id == area).proceso_Nombre;
             let peso : number = this.FormConsultarRollos.value.Peso;
             this.rollosSeleccionados = [];
             this.rollosOT = [];
@@ -336,17 +373,19 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         'DtBgRollo_Rollo': x.rollo,
         'DtBgRollo_Cantidad': x.peso,
         'UndMed_Id': x.unidad,
-        'BgRollo_BodegaActual': 'BGPI',
-        'DtBgRollo_Extrusion': x.proceso_Id == 'EXT' ? true : false,
+        'BgRollo_BodegaActual': x.bodega_Actual,
+        'DtBgRollo_Extrusion': true,
         'DtBgRollo_ProdIntermedio': true,
-        'DtBgRollo_Impresion': x.proceso_Id == 'IMP' ? true : false,
-        'DtBgRollo_Rotograbado': x.proceso_Id == 'ROT' ? true : false,
-        'DtBgRollo_Sellado': x.proceso_Id == 'SELLA' ? true : false,
-        'DtBgRollo_Corte': x.proceso_Id == 'CORTE' ? true : false,
+        'DtBgRollo_Impresion': x.bodega_Actual == 'IMP' ? true : false,
+        'DtBgRollo_Rotograbado': x.bodega_Actual == 'ROT' ? true : false,
+        'DtBgRollo_Sellado': x.bodega_Actual == 'SELLA' ? true : false,
+        'DtBgRollo_Corte': x.bodega_Actual == 'CORTE' ? true : false,
         'DtBgRollo_Despacho': false,
+        'DtBgRollo_Calidad': x.bodega_Actual == 'CALIDAD' ? true : false,
         'Estado_Id': 19,
         'BgRollo_BodegaInicial': x.proceso_Id,
-        'DtBgRollo_Ubicacion': x.ubicacion
+        'DtBgRollo_Ubicacion': x.ubicacion, 
+        'BgRollo_BodegaIngreso': x.bodega_Actual,
       }
       this.dtBgRollosService.Post(info).subscribe(() => {
         numRollos++;
@@ -421,8 +460,9 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         "Item": d.item,
         "Referencia": d.referencia,
         "Peso": d.cantidad,
-        "Presentación" : d.presentacion,
-        "Bodega" : d.bodega_Inicial,
+        "Und" : d.presentacion,
+        "Proceso" : d.bodega_Inicial,
+        "Bodega" : d.bodega_Ingreso,
         "Ubicación" : d.ubicacion,
       });
     });
@@ -479,8 +519,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
   //Tabla con materiales recuperados ingresados detallados
   tablaDetallesPDF(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'Bodega', 'Ubicación', 'OT', 'Item', 'Referencia', 'Peso', 'Presentación'];
-    let widths: Array<string> = ['3%', '8%', '6%', '12%', '7%', '7%', '40%', '7%', '10%'];
+    let columns: Array<string> = ['#', 'Rollo', 'Proceso', 'Bodega', 'Ubicación', 'OT', 'Item', 'Referencia', 'Peso', 'Und'];
+    let widths: Array<string> = ['3%', '8%', '7%', '6%', '12%', '7%', '7%', '40%', '7%', '3%'];
     return {
       margin: [0, 20],
       table: {
@@ -533,7 +573,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
   buildTableBody2(data, columns, title) {
     var body = [];
-    body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
+    body.push([{ colSpan: 10, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];

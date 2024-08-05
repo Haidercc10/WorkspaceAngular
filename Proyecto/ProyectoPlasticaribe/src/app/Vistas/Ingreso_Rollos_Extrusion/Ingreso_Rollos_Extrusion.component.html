@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Ingreso Bodega Rollos</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Ingreso Bodega Rollos {{title}}</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -29,6 +29,22 @@
     <div class="mb-3" id="formulario">
       <div class="row g-4">
 
+         <!-- Proceso Inicial -->
+         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="Proceso" id="proceso" [readonly]="true" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id" [autoDisplayFirst]="true"></p-dropdown>
+            <label for="proceso">Proceso Inicial*</label>
+          </span>
+        </div>
+
+        <!-- Proceso -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="Bodega_Actual" id="Bodega_Actual" [readonly]="![95,1].includes(ValidarRol)" (onChange)="getAllUbicationsStore()" [options]="procesos2" optionLabel="proceso_Nombre" optionValue="proceso_Id" [autoDisplayFirst]="true"></p-dropdown>
+            <label for="Bodega_Actual">Bodega Actual*</label>
+          </span>
+        </div>
+
         <!--Ubicación-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
@@ -41,19 +57,11 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="SubUbicacion" id="SubUbicacion" [options]="subUbications" optionValue="ubR_SubId" optionLabel="ubR_SubNombre" [autoDisplayFirst]="false"></p-dropdown>
-            <label for="SubUbicacion">Sub Ubicacion</label>
+            <label for="SubUbicacion">Sub Ubicación</label>
           </span>
         </div>
 
-        <!-- Proceso -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
-          <span class="p-float-label">
-            <p-dropdown formControlName="Proceso" id="proceso" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id" [autoDisplayFirst]="true"></p-dropdown>
-            <label for="proceso">Proceso*</label>
-          </span>
-        </div>
-
-        <!-- Numero de Rollo -->
+        <!--Numero de Rollo -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
@@ -84,20 +92,12 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <input formControlName="Ultimo_Rollo" id="Ultimo_Rollo" [readonly]="true" type="number" pInputText required/>
-            <label for="Ultimo_Rollo">Ult. rollo</label>
+            <label for="Ultimo_Rollo">Ult. Rollo</label>
           </span>
         </div>
 
-        <!--Referencia-->
-        <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-3">
-          <span class="p-float-label">
-            <input formControlName="Referencia" [readonly]="true" id="Referencia" type="text" pInputText required/>
-            <label for="Referencia">Ult. Referencia</label>
-          </span>
-        </div>-->
-
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-4 col-xxl-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-10 col-xxl-10">
           <span class="p-float-label">
             <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -161,6 +161,7 @@
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'peso', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'unidad', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'proceso', dt)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'bodega', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'ubicacion', dt)"></th>
             <th></th>
           </tr>
@@ -173,7 +174,8 @@
             <th class="text-center">Referencia</th>
             <th class="text-center">Peso</th>
             <th class="text-center">Unidad</th>
-            <th class="text-center">Proceso</th>
+            <th class="text-center">Proceso Inicial</th>
+            <th class="text-center">Bodega Actual</th>
             <th class="text-center">Ubicación</th>
             <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
           </tr>
@@ -199,6 +201,7 @@
               'bg-Empaque': data.proceso == 'EMPAQUE', 
               'bg-Laminado': data.proceso == 'LAMINADO'}">{{data.proceso}}</span>
             </td>
+            <td class="text-center">{{data.bodega}}</td>
             <td class="text-center"><b>{{data.ubicacion}}</b></td>
             <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
               <p-button icon="pi pi-trash" [rounded]="true" (click)="quitarRolloTabla(data)" severity="danger"></p-button>
@@ -214,7 +217,7 @@
           <tr>
             <td class="text-right" colspan="6">Totales</td>
             <td class="text-center textBlue">{{pesoTotal() | number : '1.2-2'}}</td>
-            <td colspan="4"></td>
+            <td colspan="5"></td>
           </tr>
         </ng-template>
     </p-table>
@@ -229,7 +232,7 @@
   </div>
 </p-card>
 
-<p-dialog [(visible)]="loadModal" [style]="{width: '60vw'}" [resizable]="false" header="No se encontraron rollos de la OT con peso semejante al consultado, elija uno de la lista." [modal]="true">
+<p-dialog [(visible)]="loadModal" [style]="{width: '60vw'}" [resizable]="false" header="Busqueda de rollos por OT y Peso" [modal]="true">
     
     <div class="mb-4">
       <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de rollos pesados</h4>

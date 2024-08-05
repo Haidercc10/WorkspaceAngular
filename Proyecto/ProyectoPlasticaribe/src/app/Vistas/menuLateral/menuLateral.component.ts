@@ -206,7 +206,7 @@ export class MenuLateralComponent implements OnInit {
                   if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
                 } else if (element.label == `Productos`) {
                   if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]);
-                }
+                } 
                 this.display = false;
               }
             });

@@ -14,7 +14,9 @@ export interface modelDtBodegasRollos {
   DtBgRollo_Sellado : boolean;
   DtBgRollo_Corte : boolean;
   DtBgRollo_Despacho : boolean;
+  DtBgRollo_Calidad : boolean;
   Estado_Id : number;
   BgRollo_BodegaInicial : string;
   DtBgRollo_Ubicacion : string;
+  BgRollo_BodegaIngreso? : boolean;
 }

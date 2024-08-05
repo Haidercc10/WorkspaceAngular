@@ -9,7 +9,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Bodega de Rollos</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Bodega de Rollos {{currentStore}}</h2>
     </div>
 
     <div class="mb-4">
@@ -168,7 +168,7 @@
     <p-tabPanel
       *ngIf="[95,1].includes(ValidarRol)"
       header="Producto Intermedio"
-      leftIcon="pi pi-th-large"
+      leftIcon="pi pi-box"
       tooltip="Información del Inventario de la Bodega de Producto Intermedio">
 
       <!--* Botón Excel-->
@@ -340,6 +340,270 @@
       </div>
     </p-tabPanel>
 
+    <!--* CALIDAD -->
+    <p-tabPanel
+      *ngIf="[95,1].includes(ValidarRol)"
+      header="Calidad"
+      leftIcon="pi pi-check-square"
+      tooltip="Información del Inventario de la Bodega de Productos por Calidad">
+
+      <!--* Botón Excel-->
+      <p-toolbar styleClass="mb-3 gap-3">
+        <div class="row" style="width: 100%;">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+            <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="crearExcel(5)"></button>
+          </div>
+        </div>
+      </p-toolbar>
+
+      <!--* Tabla-->
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3 font-size-14" id="table">
+          <p-table
+            #dtRotograbado
+            [value]="inventarioCalidad"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            dataKey="Orden"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Material', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Unidad', 'contains', dtCalidad)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtCalidad)"></th>
+                <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+              </tr>
+              <tr>
+                <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+                <th class="text-center" pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cliente">Cliente <p-sortIcon field="Cliente"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cantidad">Cantidad (Kg)<p-sortIcon field="Cantidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Material">Material <p-sortIcon field="Material"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Ancho">Ancho <p-sortIcon field="Ancho"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Unidad">Unidad <p-sortIcon field="Unidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Rollos">Cant. Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
+                <th class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
+                <td class="text-center negrita">{{data.Orden}}</td>
+                <td>{{data.Cliente}}</td>
+                <td class="text-center negrita">{{data.Item}}</td>
+                <td>{{data.Referencia}}</td>
+                <td class="text-center negrita textGreen">{{data.Cantidad | number : '1.2-2'}}</td>
+                <td class="text-center">{{data.Material}}</td>
+                <td class="text-center"><b>{{data.Ancho | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.Unidad}}</td>
+                <td class="text-center negrita textGreen">{{data.Rollos}}</td>
+                <td class="text-center" style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Cliente, data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td class="text-right" colspan="5">Totales: </td>
+                <td class="text-center textGreen">{{calcularTotalKg(dtCalidad, inventarioCalidad) | number : '1.2-2'}}</td>
+                <td class="text-center">Kg</td>
+                <td class="text-center" colspan="2"></td>
+                <td class="text-center textGreen">{{calcularTotalRollos(dtCalidad, inventarioCalidad)}}</td>
+                <td></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!--* IMPRESIÓN -->
+    <p-tabPanel
+      *ngIf="[4,1].includes(ValidarRol)"
+      header="Impresión"
+      leftIcon="pi pi-print"
+      tooltip="Información del Inventario de la Bodega de Productos por Calidad">
+
+      <!--* Botón Excel-->
+      <p-toolbar styleClass="mb-3 gap-3">
+        <div class="row" style="width: 100%;">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+            <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="crearExcel(4)"></button>
+          </div>
+        </div>
+      </p-toolbar>
+
+      <!--* Tabla -->
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3 font-size-14" id="table">
+          <p-table
+            #dtImpresion
+            [value]="inventarioImpresion"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            dataKey="Orden"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Material', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Unidad', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtImpresion)"></th>
+                <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+              </tr>
+              <tr>
+                <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+                <th class="text-center" pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cliente">Cliente <p-sortIcon field="Cliente"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cantidad">Cantidad (Kg)<p-sortIcon field="Cantidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Material">Material <p-sortIcon field="Material"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Ancho">Ancho <p-sortIcon field="Ancho"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Unidad">Unidad <p-sortIcon field="Unidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Rollos">Cant. Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
+                <th class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
+                <td class="text-center negrita">{{data.Orden}}</td>
+                <td>{{data.Cliente}}</td>
+                <td class="text-center negrita">{{data.Item}}</td>
+                <td>{{data.Referencia}}</td>
+                <td class="text-center negrita textGreen">{{data.Cantidad | number : '1.2-2'}}</td>
+                <td class="text-center">{{data.Material}}</td>
+                <td class="text-center"><b>{{data.Ancho | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.Unidad}}</td>
+                <td class="text-center negrita textGreen">{{data.Rollos}}</td>
+                <td class="text-center" style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Cliente, data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td class="text-right" colspan="5">Totales: </td>
+                <td class="text-center textGreen">{{calcularTotalKg(dtImpresion, inventarioImpresion) | number : '1.2-2'}}</td>
+                <td class="text-center">Kg</td>
+                <td class="text-center" colspan="2"></td>
+                <td class="text-center textGreen">{{calcularTotalRollos(dtImpresion, inventarioImpresion)}}</td>
+                <td></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!--* SELLADO -->
+    <p-tabPanel
+      *ngIf="[86,1].includes(ValidarRol)"
+      header="Sellado"
+      leftIcon="pi pi-tags"
+      tooltip="Información del Inventario de la Bodega de Rollos de Sellado">
+
+      <!--* Botón Excel-->
+      <p-toolbar styleClass="mb-3 gap-3">
+        <div class="row" style="width: 100%;">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+            <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="crearExcel(6)"></button>
+          </div>
+        </div>
+      </p-toolbar>
+
+      <!--* Tabla -->
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3 font-size-14" id="table">
+          <p-table
+            #dtSellado
+            [value]="inventarioSellado"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            dataKey="Orden"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains', dtSellado)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtSellado)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Material', 'contains', dtSellado)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains', dtSellado)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Unidad', 'contains', dtSellado)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtSellado)"></th>
+                <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+              </tr>
+              <tr>
+                <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+                <th class="text-center" pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cliente">Cliente <p-sortIcon field="Cliente"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Cantidad">Cantidad (Kg)<p-sortIcon field="Cantidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Material">Material <p-sortIcon field="Material"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Ancho">Ancho <p-sortIcon field="Ancho"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Unidad">Unidad <p-sortIcon field="Unidad"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="Rollos">Cant. Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
+                <th class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
+                <td class="text-center negrita">{{data.Orden}}</td>
+                <td>{{data.Cliente}}</td>
+                <td class="text-center negrita">{{data.Item}}</td>
+                <td>{{data.Referencia}}</td>
+                <td class="text-center negrita textGreen">{{data.Cantidad | number : '1.2-2'}}</td>
+                <td class="text-center">{{data.Material}}</td>
+                <td class="text-center"><b>{{data.Ancho | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.Unidad}}</td>
+                <td class="text-center negrita textGreen">{{data.Rollos}}</td>
+                <td class="text-center" style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Cliente, data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td class="text-right" colspan="5">Totales: </td>
+                <td class="text-center textGreen">{{calcularTotalKg(dtSellado, inventarioSellado) | number : '1.2-2'}}</td>
+                <td class="text-center">Kg</td>
+                <td class="text-center" colspan="2"></td>
+                <td class="text-center textGreen">{{calcularTotalRollos(dtSellado, inventarioSellado)}}</td>
+                <td></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+
     <!--* PRODUCTO INTERMEDIO DETALLADO -->
     <p-tabPanel
       header="Inventario Detallado"
@@ -442,205 +706,11 @@
       </div>
     </p-tabPanel>
 
-    <!-- IMPRESIÓN -->
-    <!--<p-tabPanel
-      header="Impresión"
-      leftIcon="pi pi-print"
-      tooltip="Información del Inventario de la Bodega de Impresión">
-      <div class="mb-3" *ngIf="!cargando">
-        <div class="row g-3 font-size-14" id="table">
-          <p-table
-            #dtImpresion
-            [value]="inventarioImpresion"
-            [resizableColumns]="true"
-            columnResizeMode="expand"
-            styleClass="p-datatable-gridlines p-datatable-sm"
-            responsiveLayout="scroll"
-            [rowHover]="true"
-            dataKey="Orden"
-            [scrollable]="true"
-            scrollHeight="50rem">
-            <ng-template pTemplate="header" >
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(4)"></button></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtImpresion)"></th>
-                <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
-              </tr>
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
-                <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
-                <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
-                <th pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
-                <th pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
-                <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
-                <th pSortableColumn="Rollos">Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
-                <th pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-              <tr>
-                <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
-                <td class="negrita">{{data.Orden}}</td>
-                <td>{{data.Item}}</td>
-                <td class="negrita">{{data.Referencia}}</td>
-                <td class="negrita">{{data.Cantidad | number : '1.2-2'}}</td>
-                <td>{{data.Presentacion}}</td>
-                <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
-                <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
-              <tr>
-                <td colspan="4">Totales: </td>
-                <td>{{calcularTotalKg(inventarioImpresion) | number : '1.2-2'}}</td>
-                <td>Kg</td>
-                <td colspan="2">{{calcularTotalRollos(inventarioImpresion) | number : '1.2-2'}}</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-      </div>
-    </p-tabPanel>-->
-
-    <!-- SELLADO -->
-    <!--<p-tabPanel
-      header="Sellado"
-      leftIcon="pi pi-tags"
-      tooltip="Información del Inventario de la Bodega de Sellado">
-      <div class="mb-3" *ngIf="!cargando">
-        <div class="row g-3 font-size-14" id="table">
-          <p-table
-            #dtSellado
-            [value]="inventarioSellado"
-            [resizableColumns]="true"
-            columnResizeMode="expand"
-            styleClass="p-datatable-gridlines p-datatable-sm"
-            responsiveLayout="scroll"
-            [rowHover]="true"
-            dataKey="Orden"
-            [scrollable]="true"
-            scrollHeight="50rem">
-            <ng-template pTemplate="header" >
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(6)"></button></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtSellado)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtSellado)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtSellado)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtSellado)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtSellado)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtSellado)"></th>
-                <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
-              </tr>
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
-                <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
-                <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
-                <th pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
-                <th pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
-                <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
-                <th pSortableColumn="Rollos">Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
-                <th pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-              <tr>
-                <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
-                <td class="negrita">{{data.Orden}}</td>
-                <td>{{data.Item}}</td>
-                <td class="negrita">{{data.Referencia}}</td>
-                <td class="negrita">{{data.Cantidad | number : '1.2-2'}}</td>
-                <td>{{data.Presentacion}}</td>
-                <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
-                <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
-              <tr>
-                <td colspan="4">Totales: </td>
-                <td>{{calcularTotalKg(inventarioSellado) | number : '1.2-2'}}</td>
-                <td>Kg</td>
-                <td colspan="2">{{calcularTotalRollos(inventarioSellado) | number : '1.2-2'}}</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-      </div>
-    </p-tabPanel>-->
-
-    <!-- DESPACHO -->
-    <!--<p-tabPanel
-      header="Despacho"
-      leftIcon="pi pi-truck"
-      tooltip="Información del Inventario de la Bodega de Despacho">
-      <div class="mb-3" *ngIf="!cargando">
-        <div class="row g-3 font-size-14" id="table">
-          <p-table
-            #dtDespacho
-            [value]="inventarioDespacho"
-            [resizableColumns]="true"
-            columnResizeMode="expand"
-            styleClass="p-datatable-gridlines p-datatable-sm"
-            responsiveLayout="scroll"
-            [rowHover]="true"
-            dataKey="Orden"
-            [scrollable]="true"
-            scrollHeight="50rem">
-            <ng-template pTemplate="header" >
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(7)"></button></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtDespacho)"></th>
-                <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
-              </tr>
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
-                <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
-                <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
-                <th pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
-                <th pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
-                <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
-                <th pSortableColumn="Rollos">Rollos <p-sortIcon field="Rollos"></p-sortIcon></th>
-                <th pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-              <tr>
-                <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
-                <td class="negrita">{{data.Orden}}</td>
-                <td>{{data.Item}}</td>
-                <td class="negrita">{{data.Referencia}}</td>
-                <td class="negrita">{{data.Cantidad | number : '1.2-2'}}</td>
-                <td>{{data.Presentacion}}</td>
-                <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
-                <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
-              <tr>
-                <td colspan="4">Totales: </td>
-                <td>{{calcularTotalKg(inventarioDespacho) | number : '1.2-2'}}</td>
-                <td>Kg</td>
-                <td colspan="2">{{calcularTotalRollos(inventarioDespacho) | number : '1.2-2'}}</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-      </div>
-    </p-tabPanel>-->
   </p-tabView>
 </p-card>
 
-<!--* Inventario detallado de rollos por OT -->
-<p-dialog [(visible)]="inventario" [style]="{width: '85vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
+<!--* Inventario detallado de rollos por OT y Bodega-->
+<p-dialog [(visible)]="inventario" [style]="{width: '90vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <p-table
       #dtDetallado
@@ -665,30 +735,34 @@
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Fecha', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Ubicacion', 'contains', dtDetallado)"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Bodega_Actual', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Extrusion', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ProductoIntermedio', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Impresion', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rotograbado', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Sellado', 'contains', dtDetallado)"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Calidad', 'contains', dtDetallado)"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Despacho', 'contains', dtDetallado)"></th>
         </tr>
         <tr>
           <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
           <th pSortableColumn="Rollo">Rollo <p-sortIcon field="Rollo"></p-sortIcon></th>
-          <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+          <th pSortableColumn="Orden">OT <p-sortIcon field="Orden"></p-sortIcon></th>
           <th pSortableColumn="Cliente">Cliente <p-sortIcon field="Cliente"></p-sortIcon></th>
           <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
           <th pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
           <th pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
           <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
           <th pSortableColumn="Fecha">Fecha <p-sortIcon field="Fecha"></p-sortIcon></th>
+          <th pSortableColumn="Bodega_Actual">Bodega Actual <p-sortIcon field="Bodega_Actual"></p-sortIcon></th>
           <th pSortableColumn="Ubicacion">Ubicación <p-sortIcon field="Ubicacion"></p-sortIcon></th>
-          <th pSortableColumn="Extrusion">Extrusión <p-sortIcon field="Extrusion"></p-sortIcon></th>
-          <th pSortableColumn="ProductoIntermedio">Prod. Intermedio <p-sortIcon field="ProductoIntermedio"></p-sortIcon></th>
-          <th pSortableColumn="Impresion">Impresión <p-sortIcon field="Impresion"></p-sortIcon></th>
-          <th pSortableColumn="Rotograbado">Rotograbado <p-sortIcon field="Rotograbado"></p-sortIcon></th>
-          <th pSortableColumn="Sellado">Sellado <p-sortIcon field="Sellado"></p-sortIcon></th>
-          <th pSortableColumn="Despacho">Despacho <p-sortIcon field="Despacho"></p-sortIcon></th>
+          <th pSortableColumn="Extrusion">EXT <p-sortIcon field="Extrusion"></p-sortIcon></th>
+          <th pSortableColumn="ProductoIntermedio">PROD. INTERM. <p-sortIcon field="ProductoIntermedio"></p-sortIcon></th>
+          <th pSortableColumn="Impresion">IMP <p-sortIcon field="Impresion"></p-sortIcon></th>
+          <th pSortableColumn="Rotograbado">ROTO <p-sortIcon field="Rotograbado"></p-sortIcon></th>
+          <th pSortableColumn="Sellado">SELLA <p-sortIcon field="Sellado"></p-sortIcon></th>
+          <th pSortableColumn="Calidad">CALIDAD <p-sortIcon field="Calidad"></p-sortIcon></th>
+          <th pSortableColumn="Despacho">DESPACHO <p-sortIcon field="Despacho"></p-sortIcon></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -702,12 +776,14 @@
           <td>{{data.Cantidad | number : '1.2-2'}}</td>
           <td>{{data.Presentacion}}</td>
           <td>{{data.Fecha}}</td>
+          <td>{{data.Bodega_Actual}}</td>
           <td>{{data.Ubicacion}}</td>
           <td>{{data.Extrusion}}</td>
           <td>{{data.ProductoIntermedio}}</td>
           <td>{{data.Impresion}}</td>
           <td>{{data.Rotograbado}}</td>
           <td>{{data.Sellado}}</td>
+          <td>{{data.Calidad}}</td>
           <td>{{data.Despacho}}</td>
         </tr>
       </ng-template>

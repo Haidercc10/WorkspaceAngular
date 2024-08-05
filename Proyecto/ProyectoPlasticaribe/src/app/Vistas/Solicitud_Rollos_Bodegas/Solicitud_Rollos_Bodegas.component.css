@@ -125,3 +125,9 @@ p-calendar ::ng-deep span button span {
   background-color: rgb(0, 119, 255);
   font-size: calc(var(--font-size) * 15px);
 }
+
+.bg-Calidad {
+  color: rgb(94, 80, 0);
+  background-color: rgb(229, 233, 0);
+  font-size: calc(var(--font-size) * 15px);
+}
