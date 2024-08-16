@@ -62,7 +62,7 @@ export class Produccion_ProcesosService {
 
   Delete = (id: number|string): Observable<any> => this.http.delete(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/${id}`);
 
-  putReversionEnvioZeus = (rollos: any[]) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putReversionEnvioZeus`, rollos);
+  putReversionEnvioZeus = (observation : string, rollos: any[]) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putReversionEnvioZeus/${observation}`, rollos);
 
   getInfoProductionAvailable = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionAvailable`);
 
@@ -76,5 +76,5 @@ export class Produccion_ProcesosService {
 
   PostMassive = (data: Array<modelProduccionProcesos>): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/massiveInsertFromStoreRolls`, data);
 
-  getInformationDispatch = (production : number, item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationDispatch/${production}/${item}`);
+  getInformationDispatch = (production : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationDispatch/${production}`);
 }

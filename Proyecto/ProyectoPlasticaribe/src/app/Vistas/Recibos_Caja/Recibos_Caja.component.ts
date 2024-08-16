@@ -131,11 +131,10 @@ export class Recibos_CajaComponent implements OnInit {
         }
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-        let worksheet = workbook.addWorksheet(title);
+        let worksheet = workbook.addWorksheet();
         worksheet.addImage(imageId1, 'A1:C3');
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
+        //let titleRow = worksheet.addRow([title]);
+        //titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell) => {
@@ -148,6 +147,8 @@ export class Recibos_CajaComponent implements OnInit {
         });
         worksheet.mergeCells('A1:L3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 16, bold: true };
+        worksheet.getCell('A1').value = title;
         infoDocumento.forEach(d => {
           let row = worksheet.addRow(d);
           row.getCell(6).numFmt = '""#,##0.00;[Black]\-""#,##0.00';

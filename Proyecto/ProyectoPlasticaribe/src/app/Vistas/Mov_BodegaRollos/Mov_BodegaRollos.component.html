@@ -118,7 +118,12 @@
         [rowHover]="true"
         [scrollable]="true"
         scrollHeight="50rem"
-        *ngIf="!load">
+        *ngIf="!load"
+        [paginator]="true"
+        [rows]="50"
+        [rowsPerPageOptions]="[10, 20, 30, 50, 100, 200]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
         <ng-template pTemplate="header">
           <tr class="font-size-16" id="filtros">
             <th></th>
@@ -150,9 +155,9 @@
             <td class="text-center">{{ data.ot }}</td>
             <td class="text-center"><b>{{ data.item }}</b></td>
             <td>{{ data.reference }}</td>
-            <td class="text-center" [ngClass]="{'textGreen': ['DISPONIBLE'].includes(data.status), 'textRed': ['NO DISPONIBLE'].includes(data.status) }"><b>{{ data.quantity | number : '1.2-2' }}</b></td>
+            <td class="text-center" [ngClass]="{'textGreen': ['DISPONIBLE'].includes(data.status), 'textRed': ['NO DISPONIBLE'].includes(data.status), 'textYellow': ['DEVUELTO'].includes(data.status) }"><b>{{ data.quantity | number : '1.2-2' }}</b></td>
             <td class="text-center">{{ data.date | date : 'dd/MM/yyyy' }}</td>
-            <td class="text-center"><span class="badge" [ngClass]="{'bg-success1': ['DISPONIBLE'].includes(data.status), 'bg-danger1': ['NO DISPONIBLE'].includes(data.status) }">{{ data.status }}</span> </td>
+            <td class="text-center"><span class="badge" [ngClass]="{'bg-success1': ['DISPONIBLE'].includes(data.status), 'bg-danger1': ['NO DISPONIBLE'].includes(data.status), 'bg-warning3': ['DEVUELTO'].includes(data.status) }">{{ data.status }}</span> </td>
             <td class="text-center"><p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewEntryPDF(data)"></p-button></td>
           </tr>
         </ng-template>
@@ -189,7 +194,12 @@
         [rowHover]="true"
         [scrollable]="true"
         scrollHeight="50rem"
-        *ngIf="!load">
+        *ngIf="!load"
+        [paginator]="true"
+        [rows]="50"
+        [rowsPerPageOptions]="[10, 20, 30, 50, 100, 200]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
         <ng-template pTemplate="header">
           <tr class="font-size-16" id="filtros">
             <th></th>

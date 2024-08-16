@@ -51,6 +51,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   currentStore : string = ``;
 
   @ViewChild('dtProductoIntermedio') dtProductoIntermedio: Table | undefined;
+  @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
   @ViewChild('dtRotograbado') dtRotograbado: Table | undefined;
   @ViewChild('dtDetailsProdIntermedio') dtDetailsProdIntermedio: Table | undefined;
   @ViewChild('tableReubication') tableReubication: Table | undefined;
@@ -88,7 +89,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     } else if([89].includes(this.ValidarRol)) {
       this.inventarioRotograbado = [];
       this.consultarInventario(`?wareHouse=${'ROT'}`);
-      this.currentStore = `Rotograbado`;
+      this.currentStore = `Rotograbado`;  
     } else if([86].includes(this.ValidarRol)) {
       this.inventarioSellado = [];
       this.currentStore = `Sellado`;
@@ -183,7 +184,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       this.svDetailsStore.getRollForOut(roll, 'BGPI').subscribe(data => {
         if(data.length > 0) this.loadTableForRoll(data);
         else {
-          this.msj.mensajeAdvertencia(`Advertencia`, `No se encontro información del rollo N° ${roll}`);
+          this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró información del rollo N° ${roll}`);
           this.form.patchValue({ roll : null});
           this.cargando = false;
         }
@@ -308,7 +309,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           Referencia: data[i].prod_Nombre,
           Cantidad: data[i].dtBgRollo_Cantidad,
           Presentacion: data[i].undMed_Id,
-          Bodega_Actual : data[i].bgRollo_BodegaActual,
+          Bodega_Actual : data[i].proceso_Nombre,
           Ubicacion : data[i].dtBgRollo_Ubicacion,
           Fecha: data[i].bgRollo_FechaEntrada.replace('T00:00:00', ''),
           Extrusion: data[i].dtBgRollo_Extrusion ? 'SI' : 'NO',
@@ -549,6 +550,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     } else if(tab == 'Sellado') {
       this.inventarioSellado = [];
       this.consultarInventario(`?wareHouse=${'SELLA'}`);
+    } else if(tab == 'Extrusión') {
+      this.inventarioExtrusion = [];
+      this.consultarInventario(`?wareHouse=${'EXT'}`);
     }    
   }
 

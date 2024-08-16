@@ -182,8 +182,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       if(this.FormConsultarRollos.value.Proceso) {
         if(this.FormConsultarRollos.value.Rollo) {
           let rollo : number = this.FormConsultarRollos.value.Rollo;
-          let area :  string = [95].includes(this.ValidarRol) ? this.FormConsultarRollos.value.Proceso : this.FormConsultarRollos.value.Bodega_Actual;
-          let proceso : string = [95].includes(this.ValidarRol) ? this.procesos.find(x => x.proceso_Id == area).proceso_Nombre : this.procesos2.find(x => x.proceso_Id == area).proceso_Nombre;
+          let area :  string =  this.FormConsultarRollos.value.Proceso;
+          let proceso : string =  this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
           this.cargando = true;
 
           this.dtBgRollosService.getRollo(rollo, area).subscribe(dataPl => {
@@ -245,8 +245,13 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         if(this.FormConsultarRollos.value.OrdenTrabajo) {
           if(this.FormConsultarRollos.value.Peso) {
             let ot : any = this.FormConsultarRollos.value.OrdenTrabajo;
-            let area :  string = [95].includes(this.ValidarRol) ? this.FormConsultarRollos.value.Proceso : this.FormConsultarRollos.value.Bodega_Actual;
-            let proceso : string = [95].includes(this.ValidarRol) ? this.procesos.find(x => x.proceso_Id == area).proceso_Nombre : this.procesos2.find(x => x.proceso_Id == area).proceso_Nombre;
+            let area : any = this.FormConsultarRollos.value.Proceso;
+            console.log(area);
+            
+            let proceso : string = this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
+             console.log(this.procesos);
+             
+             console.log(proceso);
             let peso : number = this.FormConsultarRollos.value.Peso;
             this.rollosSeleccionados = [];
             this.rollosOT = [];
@@ -255,6 +260,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
             this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
 
             this.dtBgRollosService.getRollsForOT(ot).subscribe(dataPl => {
+              console.log(proceso.toUpperCase(), ot, dataPl);
+              
               this.bagProService.getAvailablesRollsOT(ot, proceso, dataPl).subscribe(data => {
                 if(data.length > 0) this.cargarRolloSemejante(data, peso, dataPl);
                 else {

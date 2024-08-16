@@ -33,7 +33,7 @@ export class Mov_BodegaRollosComponent implements OnInit {
   modal : boolean = false;
   dataSelected : any = [];
   materiasPrimas : any [] = [];
-  typesMovements : any = ['ENTRADA', 'SALIDA', 'DEVOLUCIÓN']; 
+  typesMovements : any = ['ENTRADA', 'SALIDA', 'DEVOLUCION']; 
   dataFoundIn : any = [];
   dataFoundOut : any = [];
   currentStore : string = ``;
@@ -125,7 +125,8 @@ export class Mov_BodegaRollosComponent implements OnInit {
       let date2 : any = moment(this.form.value.rankDates[1]).format('YYYY-MM-DD');
 
       this.svDetStoreRolls.getMovementsStore(date1, date2, this.validateUrl()).subscribe(data => {
-        this.dataFoundIn = data.filter(x => x.typeMov == 'ENTRADA');
+        console.log(data);
+        this.dataFoundIn = data.filter(x => ['ENTRADA', 'DEVOLUCION'].includes(x.typeMov));
         this.dataFoundOut = data.filter(x => x.typeMov == 'SALIDA');
         this.load = false;
       }, error => {
@@ -184,6 +185,9 @@ export class Mov_BodegaRollosComponent implements OnInit {
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   viewEntryPDF(data) {
-    data.typeMov == 'SALIDA' ? this.cmpOutputStore.createPDF(data.movement, `exportada`) : this.cmpEntryStore.createPDF(data.movement, `exportada`);
+   if(['SALIDA', 'DEVOLUCION'].includes(data.typeMov)) {
+    data.typeMov == 'DEVOLUCION' ? this.cmpOutputStore.devolucionRollos = true : this.cmpOutputStore.devolucionRollos = false;
+    this.cmpOutputStore.createPDF(data.movement, `exportada`);
+   } else this.cmpEntryStore.createPDF(data.movement, `exportada`);
   }
 }

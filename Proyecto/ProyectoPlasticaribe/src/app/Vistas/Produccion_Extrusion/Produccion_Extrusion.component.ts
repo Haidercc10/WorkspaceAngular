@@ -372,6 +372,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
             anchoProducto: datos.selladoCorte_Ancho,
             presentacion: datos.presentacion
           });
+          
           this.buscarDatosConoSeleccionado();
         });
       });

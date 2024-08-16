@@ -65,6 +65,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   url : any = ``;
   currentStore : string = ``;
   title : string = ``;
+  modalFails : boolean = false; 
 
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
@@ -92,6 +93,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       BodegaSolicitante : [null, Validators.required],
       Devolucion : [false], 
       Falla : [1, Validators.required],
+      Peso : [null]
     });
   }
 
@@ -215,8 +217,8 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
             this.title = this.devolucionRollos ? `Devolución de Rollos` : `Salida de Rollos ${this.currentStore}`   
             break;    
         default: 
-            this.bodegasSolicitadas = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
-            this.bodegasSolicitantes = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+            this.bodegasSolicitadas = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP', 'CALIDAD'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP', 'CALIDAD'].includes(x.proceso_Id));
             this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
             this.currentStore = ``;
             this.title = this.devolucionRollos ? `Devolución de Rollos` : `Salida de Rollos ${this.currentStore}`
@@ -252,13 +254,14 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       let rollo : number = this.FormConsultarRollos.value.Rollo;
       let bodega : string = this.FormConsultarRollos.value.BodegaSolicitada;
       let ruta : string = rollo != null ? `?rollo=${rollo}` : '';
+      ruta.length > 0 ? ruta += `&bodegaIngreso=${'N/A'}` : ruta = `?bodegaIngreso=${'N/A'}`
 
       this.cargando = true;
       this.rollosConsultados = [];
       this.rollosIngresar = [];
       this.consolidadoProductos = [];
 
-      this.dtBgRollosService.GetRollosDisponibles(bodega, ot, ruta).subscribe(data => data.forEach(item => this.llenarRollosIngresar(item)), err => {
+      this.dtBgRollosService.GetRollosDisponibles(bodega, ot, this.devolucionRollos ? 23 : 19, ruta).subscribe(data => data.forEach(item => this.llenarRollosIngresar(item)), err => {
         this.mensajeService.mensajeError(`Error`, `No se encontró información disponible de la OT N° ${ot} en la Bodega solicitada | ${err.status} ${err.statusText}!`);
         this.cargando = false;
       });
@@ -510,8 +513,8 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     let rolls : any = []; 
     let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
 
-    this.rollosIngresar.forEach(x => rolls.push({ 'Rollo' : x.Rollo,  'OT' : x.Ot, 'Ubicacion' : x.Ubicacion}));
-    this.dtBgRollosService.putRollsStore(23, bodegaSolicitante, rolls).subscribe(data => {
+    this.rollosIngresar.forEach(x => rolls.push({ 'Rollo' : x.Rollo, 'OT' : x.Ot, 'Ubicacion' : x.Ubicacion, }));
+    this.dtBgRollosService.putRollsStore(this.devolucionRollos ? 19 : 23, bodegaSolicitante, rolls).subscribe(data => {
       this.createProductionInPL(idSolicitud, `creada`);
     }, error => {
       this.mensajeService.mensajeError(`Ha ocurrido un error al actualizar los rollos en la bodega`, `${error.status} ${error.statusText}`);
@@ -585,7 +588,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       'Creador_Id': 123456789,
       'NumeroRollo_BagPro': d.Rollo,
       'Rollo_Asociado': null,
-      'Observacion': `REGISTRO DE ROLLO PRODUCIDO EN BAGPRO EL DIA ${moment().format('YYYY-MM-DD')} ${moment().format('HH:mm:ss')} HA SIDO CREADO DESDE LA BODEGA DE ROLLOS DE PLASTICARIBE POR CONCEPTO DE SOLICITUD PARA DESPACHO.`,
+      'Observacion': `REGISTRO DE ROLLO PRODUCIDO EN BAGPRO. EL DIA ${moment().format('YYYY-MM-DD')} ${moment().format('HH:mm:ss')} HA SIDO CREADO DESDE LA BODEGA DE ROLLOS DE PLASTICARIBE POR CONCEPTO DE SOLICITUD PARA DESPACHO.`,
       'OT': d.Ot,
       'Estado_Rollo' : 19, 
       'PrecioVenta_Producto' : data[0].price,

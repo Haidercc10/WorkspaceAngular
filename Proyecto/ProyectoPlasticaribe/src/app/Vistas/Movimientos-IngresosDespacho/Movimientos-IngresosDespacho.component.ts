@@ -35,6 +35,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   traceability : boolean = false;
   @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
   selectedRoll : any = null;
+  action : string = '';
   
   @ViewChild(Ubicaciones_RollosComponent) ubicationRolls : Ubicaciones_RollosComponent;
 
@@ -384,6 +385,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   loadModal(validateTraslate : boolean) {
     this.modal = true;
     validateTraslate ? this.ubicationRolls.traslate = true : this.ubicationRolls.traslate = false; 
+    validateTraslate ? this.action = `Traslado/Salida de rollos` : this.action = `Actualizar ubicaciones de rollos`;
     this.ubicationRolls.loadRolls();
   }
 

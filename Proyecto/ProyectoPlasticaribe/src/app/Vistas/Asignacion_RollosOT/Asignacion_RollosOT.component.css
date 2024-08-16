@@ -1,0 +1,134 @@
+
+.tabla1{
+    display: flex;
+  }
+  
+  .p-input-icon-left {
+    width: 100%;
+  }
+  
+  p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+    display: flex;
+    width: 100%;
+  }
+  
+  p-calendar ::ng-deep span button {
+    background-color: var(--rojo);
+    border: 0;
+    transition: all 1s;
+  }
+  
+  p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+    background: var(--rojoHover);
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button {
+    background: #fff0;
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button:hover {
+    background: #fff0;
+  }
+  
+  p-calendar ::ng-deep span button span {
+    display: block;
+  }
+  
+  ::ng-deep .p-card {
+    align-items: center;
+    margin: auto;
+    width: 90%;
+    height: 100%;
+    padding: 2%;
+    border-radius: 10px;
+    box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 5%;
+  }
+  
+  ::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+    display: flex;
+    width: 100%;
+  }
+  
+  ::ng-deep .d-grid {
+    padding-bottom: 0.5%;
+  }
+  
+  ::ng-deep .field-checkbox {
+    margin-top: 0.7rem;
+  } 
+  
+  
+  
+  .bg-Extrusion {
+    color: white;
+    background-color: palevioletred;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Impresion {
+    color: white;
+    background-color: DarkCyan;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Rotograbado {
+    color: white;
+    background-color: DarkSeaGreen;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Doblado {
+    color: white;
+    background-color: LightSalmon;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Laminado {
+    color: white;
+    background-color: Orange;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Corte {
+    color: white;
+    background-color: Khaki;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Empaque {
+    color: white;
+    background-color: DarkKhaki;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Sellado {
+    color: white;
+    background-color: CornflowerBlue;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Wiketiado {
+    color: white;
+    background-color: MediumSlateBlue;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-ProductoIntermedio {
+    color: rgb(0, 59, 15);
+    background-color: palegreen;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Despacho {
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 119, 255);
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-Calidad {
+    color: rgb(94, 80, 0);
+    background-color: rgb(229, 233, 0);
+    font-size: calc(var(--font-size) * 15px);
+  }
+  

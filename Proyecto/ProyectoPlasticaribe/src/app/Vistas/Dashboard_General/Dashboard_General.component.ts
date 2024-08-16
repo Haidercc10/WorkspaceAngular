@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
@@ -67,6 +68,7 @@ export class Dashboard_GeneralComponent implements OnInit {
   @ViewChild('dt') dt : Table | undefined;
   totalAnio : number = 0;
   totalInfo : number = 0;
+  dataMonths : any = [];
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
@@ -76,7 +78,8 @@ export class Dashboard_GeneralComponent implements OnInit {
                         private inventarioProductos : Inventario_Mes_ProductosService,
                           private shepherdService: ShepherdService,
                             private srvFacturasGoalSuez : Facturas_Invergoal_InversuezService,
-                              private svDetailsOF : Dt_OrdenFacturacionService, ) {
+                              private svDetailsOF : Dt_OrdenFacturacionService, 
+                                private bagProService : BagproService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -130,7 +133,7 @@ export class Dashboard_GeneralComponent implements OnInit {
 
     this.opcionesGrafica = this.estiloGrafica();
     this.opcionesGrafica_Pagar = this.estiloGrafica();
-    this.graficaFacturacion = this.formatoGraficas();
+    this.graficaFacturacion = this.formatoGraficas2();
     this.graficaCuentas_Cobrar = this.formatoGraficas();
     this.graficaCuentas_Pagar_Plasticaribe = this.formatoGraficas();
     this.graficaCuentas_Pagar_Invergoal = this.formatoGraficas();
@@ -152,12 +155,19 @@ export class Dashboard_GeneralComponent implements OnInit {
     };
   }
 
+  formatoGraficas2(){
+    return {
+      labels: [/*'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'*/],
+      datasets: [],
+    }
+  }
+
   estiloGrafica(){
     return {
       stacked: false,
       plugins: {
         legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
-        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+        tooltip: { titleFont: { size: 30, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
@@ -186,8 +196,9 @@ export class Dashboard_GeneralComponent implements OnInit {
   // Funcion que va a llamar a las funciones que se encargaran de llenar las graficas
   llenarGraficas(){
     this.cargando = true;
+    this.calcularKilosFacturadosMes();
     this.consultarFacturasNoHabilitadas();
-    this.BuscarDatosGraficaFacturacion();
+    //this.BuscarDatosGraficaFacturacion();
     this.BuscarDatosGraficaCuentas_Cobrar();
     this.BuscarDatosGraficaCuentas_Pagar();
     this.BuscarDatosGrafica_Compras('0');
@@ -197,7 +208,7 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.BuscarDatosGraficaInventario_MatPrima();
     this.BuscarDatosGraficaInventario_Producto();
     this.buscarDatosSalidasDespacho();
-    setTimeout(() => this.cargando = false, 5000);
+    setTimeout(() => this.cargando = false, 10000);
   }
 
   // Funcion que va a buscar los datos que trandrá la grafica de facturacion
@@ -222,7 +233,10 @@ export class Dashboard_GeneralComponent implements OnInit {
             i == 10 ? parseFloat(info.Valor) : costoMeses[10],
             i == 11 ? parseFloat(info.Valor) : costoMeses[11],
           ];
-          if (i == 11) this.llenarGraficaFacturacion(costoMeses);
+          if (i == 11) {
+            this.llenarGraficaFacturacion(costoMeses, 'Facturación ');
+            console.log(costoMeses);
+          } 
           let info_Anio : any = { anio: this.anioSeleccionado, costo: parseFloat(info.Valor) };
           let index2 : number = this.facturadoAnios.findIndex(item => item.anio == this.anioSeleccionado);
           if (index2 != -1) this.facturadoAnios[index2].costo += parseFloat(info.Valor);
@@ -232,11 +246,51 @@ export class Dashboard_GeneralComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
   }
 
+  //*
+  calcularKilosFacturadosMes(){
+    let index : number = this.facturadoAnios.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      this.dataMonths = [`Enero: ${0}`, `Febrero: ${0}`, `Marzo: ${0}`, `Abril: ${0}`, `Mayo: ${0}`, `Junio: ${0}`, `Julio: ${0}`, `Agosto ${0}`, `Septiembre: ${0}`, `Octubre: ${0}`, `Noviembre: ${0}`, `Diciembre: ${0}`];
+      let count : number = 0;
+      this.zeusService.KilosFacturadosMes(`${this.anioSeleccionado}`).subscribe(data => {
+        for (let index = 0; index < data.length; index++) {
+          let production : any = [];
+          data[index].filter(x => !['903'].includes(x.item)).forEach(x => { 
+            production.push({ 'item' : x.item, 'unit' : x.und, 'qty' : x.qty }); 
+          });
+
+          this.bagProService.CalcularKilosItem(production.filter(z => ['UND', 'PAQ'].includes(z.unit))).subscribe(dataPL => { 
+            this.dataMonths = [
+              index == 0 ?  `Enero \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[0], 
+              index == 1 ?  `Febrero \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[1], 
+              index == 2 ?  `Marzo \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[2], 
+              index == 3 ?  `Abril \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[3], 
+              index == 4 ?  `Mayo \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[4], 
+              index == 5 ?  `Junio \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[5], 
+              index == 6 ?  `Julio \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[6], 
+              index == 7 ?  `Agosto \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[7], 
+              index == 8 ?  `Septiembre \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[8], 
+              index == 9 ?  `Octubre \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[9], 
+              index == 10 ? `Noviembre \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[10], 
+              index == 11 ? `Diciembre \n◆ Kilos Despachados: ${(parseFloat(dataPL.filter(x => ![null].includes(x)).reduce((a, b) => a += b.weight, 0).toFixed(2)) + parseFloat(data[index].filter(x => !['903'].includes(x.item) && ['KLS'].includes(x.und)).reduce((a, b) => a += b.qty, 0))).toLocaleString()} `: this.dataMonths[11], 
+            ]
+            count++
+            if(this.dataMonths.length == count) {
+              //this.llenarGraficaFacturacion(dataMonths, 'Kilos ');
+              this.graficaFacturacion.labels = this.dataMonths;
+              this.BuscarDatosGraficaFacturacion();
+            };
+          });
+        }
+      });
+    }
+  }
+
   // Funcion que va a llenar la grafica de facturacion
-  llenarGraficaFacturacion(data){
+  llenarGraficaFacturacion(data, title? : any){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     this.graficaFacturacion.datasets.push({
-      label: `Año ${this.anioSeleccionado}`,
+      label: title += `${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
       borderColor: color.substring(0, 4),

@@ -23,6 +23,11 @@
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>-->
 
+  <!--Crear Falla-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+  </div>
+
   <div class="mb-3">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Rollos</h4>
   </div>
@@ -60,6 +65,14 @@
             <label for="ordenTrabajo">OT</label>
           </span>
         </div>
+
+        <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i> 
+            <input formControlName="Peso" id="Peso" type="number" pInputText required/>
+            <label for="Peso">Peso</label>
+          </span>
+        </div>-->
 
         <!-- Numero de Rollo -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
@@ -342,3 +355,13 @@
     </div>
   </div>
 </p-card>
+
+<!--* Modal fallas tecnicas -->
+<p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
+  <ng-template pTemplate="content">
+    <div class="mb-2">
+      <i class="pi pi-exclamation-triangle"></i> <b> Nota:</b> Luego de colocar el nombre y descripción de la falla, el tipo debe ser Devolución Calidad.
+    </div>
+    <app-Crear_Fallas></app-Crear_Fallas>
+  </ng-template>  
+</p-dialog> 

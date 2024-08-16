@@ -4,6 +4,36 @@
   </div>
 </div>
 
+<div *ngIf="traslate">
+  <form [formGroup]="form">
+    <div class="row g-4 my-4">
+      
+      <!--* Usuario -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre" optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <label for="user">Usuario Solicitante</label>
+        </span>
+      </div>
+
+      <!--* Observación -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-9 col-xl-9 col-xxl-9">
+        <span class="p-float-label">
+          <textarea formControlName="observation" [rows]="1" inputId="observation" pInputTextarea [required]="true"></textarea>
+          <label for="observation">Observación</label>
+        </span>
+      </div>
+
+      <!--* Botones-->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2" *ngIf="traslate">
+        <button pButton class="p-button-danger m-2" type="button" label="Confirmar Traslado/Salida" icon="pi pi-send" [disabled]="groupedInfo.length != 1 || !form.valid" (click)="viewConfirmMessage('traslate')"></button>
+        <button pButton class="p-button-secondary m-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+      </div>
+
+    </div>
+  </form>  
+</div>
+
 <div *ngIf="!traslate">
   <!--Campos-->
   <div class="row my-5 g-4 justify-content-center">
@@ -96,11 +126,6 @@
   </div>
 </div>
 
-<!--Botones-->
-<div class="d-grid gap-2 d-md-flex justify-content-md-center my-2" *ngIf="traslate">
-  <button pButton class="p-button-danger m-2" type="button" label="Confirmar Traslado/Salida" icon="pi pi-send" [disabled]="groupedInfo.length != 1" (click)="viewConfirmMessage('traslate')"></button>
-  <button pButton class="p-button-secondary m-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
-</div>
 
 <!--Linea-->
 <div class="mb-4">

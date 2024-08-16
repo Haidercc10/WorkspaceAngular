@@ -23,7 +23,7 @@ export class Detalle_BodegaRollosService {
 
   getRollo = (rollo : number, bodega : string) :Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollo/${rollo}/${bodega}`);
 
-  GetRollosDisponibles = (bodega : string, ot : number, ruta : any) : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollosDisponibles/${bodega}/${ot}/${ruta}`);
+  GetRollosDisponibles = (bodega : string, ot : number, status : number, ruta : any) : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getRollosDisponibles/${bodega}/${ot}/${status}${ruta}`);
 
   GetInventarioRollos = (url? : string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventarioRollos${url}`);
 
@@ -34,7 +34,7 @@ export class Detalle_BodegaRollosService {
   Post = (data : modelDtBodegasRollos) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos`, data);
 
   Put = (id : any, data : modelDtBodegasRollos) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/${id}`, data);
-
+  
   putRollsStore = (status : any, process : any, data : any[]) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/putRollsStore/${status}/${process}`, data);
 
   putUbicationRoll = (ubication : any, observation : any, data : any[]) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos/putUbicationRoll/${ubication}/${observation}`, data);

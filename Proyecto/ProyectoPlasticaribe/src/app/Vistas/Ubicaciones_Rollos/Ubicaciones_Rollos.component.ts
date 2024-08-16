@@ -10,6 +10,9 @@ import { AppComponent } from 'src/app/app.component';
 import { dataDesp, MovimientosIngresosDespachoComponent } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-Ubicaciones_Rollos',
@@ -42,6 +45,8 @@ export class Ubicaciones_RollosComponent implements OnInit {
   message: string = '';
   action: string = '';
   msgTooltip: string = '';
+  form !: FormGroup;
+  users : any = [];
 
   constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,
@@ -51,14 +56,28 @@ export class Ubicaciones_RollosComponent implements OnInit {
     private storehouseService: BodegasDespachoService,
     private messageService: MessageService,
     private compMovInDespacho : MovimientosIngresosDespachoComponent,
-    private svInvZeus : InventarioZeusService) {
+    private svInvZeus : InventarioZeusService,
+    private frmBuilder : FormBuilder,
+    private svUsers : UsuarioService,
+  ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
+    this.initForm();
   }
 
   ngOnInit() {
     this.readStorage();
     this.getStorehouse();
+    this.getUsers();
   }
+
+  initForm(){
+    this.form = this.frmBuilder.group({
+      user : [null, Validators.required],
+      observation : [null, Validators.required]
+    })
+  }
+
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 121, 3124, 9128].includes(x.usua_Id)); });
 
   //Leer storage del navegador.
   readStorage() {
@@ -133,6 +152,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
     this.cubes = [];
     this.cubeSelected = null;
     this.groupedInfo = [];
+    this.form.reset();
   }
 
   //Remover rollos de la tabla.
@@ -210,13 +230,14 @@ export class Ubicaciones_RollosComponent implements OnInit {
 
   //.Función que enviará el ajuste de existencias negativo a Zeus .
   sendNegativeAdjustmentZeus() {
-    if (this.groupedInfo.length > 1) this.msj.mensajeAdvertencia('Solo se puede enviar un ajuste a Zeus por rollo!');
+    if (this.groupedInfo.length > 1) this.msj.mensajeAdvertencia('Solo se puede enviar un ajuste a Zeus por item!');
     else {
+      let user : string = this.users.find(x => x.usua_Id == this.form.value.user).usua_Nombre;
       this.onReject();
       this.load = true
       this.groupedInfo.forEach(x => {
         let unit : string = x.pp.presentacion == 'Kg' ? 'KLS' : x.pp.presentacion == 'Und' ? 'UND' : 'PAQ';
-        let detailAdjustment : string = `Ajuste desde App Plasticaribe para la OT N° ${x.pp.ot}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}`;
+        let detailAdjustment : string = `Ajuste desde App Plasticaribe solicitado por ${user}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}, por el motivo ${this.form.value.observation}`;
         this.svInvZeus.getExistenciasProductos(x.producto.prod_Id, unit).subscribe(data => {
           if(data[0].existencias < 1 || data.length == 0) this.extractRollsDespacho(false);
           else {
@@ -232,9 +253,13 @@ export class Ubicaciones_RollosComponent implements OnInit {
   //Sacar rollos de despacho.
   extractRollsDespacho(zeus : boolean = false){
     let rollsPL : any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo);
+    let user : string = this.users.find(x => x.usua_Id == this.form.value.user).usua_Nombre;
+    let observation : string = this.form.value.observation;
+    
+    let description : string = `${moment().format('YYYY-MM-DD')} ${moment().format('HH:mm:ss')}: ${user} solicita ajuste por motivo: ${observation}`;
     let errorMsj : string = 'No fue posible revertir el Envio Zeus de los rollos en Plasticaribe!';
 
-    this.productionProcessSerivce.putReversionEnvioZeus(rollsPL).subscribe(data => { this.changeStateEntry(rollsPL, zeus); }, error => { this.msj.mensajeError('Error', errorMsj); });
+    this.productionProcessSerivce.putReversionEnvioZeus(description, rollsPL).subscribe(data => { this.changeStateEntry(rollsPL, zeus); }, error => { this.msj.mensajeError('Error', errorMsj); });
   }
 
   //.Función que actualizará el envio zeus de los rollos en procextrusion

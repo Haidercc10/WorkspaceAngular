@@ -148,6 +148,8 @@ export class BagproService {
   srvObtenerItemsBagproXClienteItem = (codigo : any[]) => this.http.post<any>(this.rutaBagPro + `/ClientesOtItems/OtItem`, codigo);
 
   LikeReferencia = (ref : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/likeReferencia/${ref}`);
+
+  CalcularKilosItem = (items : any[]) => this.http.post<any>(this.rutaBagPro + `/ClientesOtItems/CalcularKilosItem`, items);
    
   /*********************************************************** DESPERDICIO **************************************************************/
 

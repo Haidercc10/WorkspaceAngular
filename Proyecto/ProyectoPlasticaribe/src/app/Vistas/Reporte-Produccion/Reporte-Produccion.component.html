@@ -117,7 +117,6 @@
         <th class="text-center">#</th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'rollo')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'orden')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'idCliente')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'cliente')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'item')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'referencia')"></th>
@@ -127,6 +126,7 @@
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'turno')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'fecha')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'hora')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'operario')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'maquina')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'envioZeus')"></th>
         <th alignFrozen="right" pFrozenColumn [frozen]="true">
@@ -141,18 +141,18 @@
         <th><p-tableHeaderCheckbox *ngIf="[1].includes(ValidarRol)"></p-tableHeaderCheckbox></th>
         <th pSortableColumn="rollo"> <p-sortIcon field="rollo"></p-sortIcon> Bulto </th>
         <th pSortableColumn="orden"> <p-sortIcon field="orden"></p-sortIcon> OT </th>
-        <th pSortableColumn="idCliente"> <p-sortIcon field="idCliente"></p-sortIcon> Id Cliente </th>
         <th pSortableColumn="cliente"> <p-sortIcon field="cliente"></p-sortIcon> Cliente </th>
         <th pSortableColumn="item"> <p-sortIcon field="item"></p-sortIcon> Item </th>
         <th pSortableColumn="referencia"> <p-sortIcon field="referencia"></p-sortIcon> Referencia </th>
-        <th pSortableColumn="cantidad"> <p-sortIcon field="cantidad"></p-sortIcon> Peso Bruto / QTY </th>
-        <th pSortableColumn="peso"> <p-sortIcon field="peso"></p-sortIcon> Peso Neto </th>
-        <th pSortableColumn="presentacion"> <p-sortIcon field="presentacion"></p-sortIcon> Presentación </th>
-        <th pSortableColumn="turno"> <p-sortIcon field="turno"></p-sortIcon> Turno </th>
+        <th pSortableColumn="cantidad"> <p-sortIcon field="cantidad"></p-sortIcon> Cant. </th>
+        <th pSortableColumn="peso"> <p-sortIcon field="peso"></p-sortIcon> P. Neto </th>
+        <th pSortableColumn="presentacion"> <p-sortIcon field="presentacion"></p-sortIcon> Und </th>
         <th pSortableColumn="fecha"> <p-sortIcon field="fecha"></p-sortIcon> Fecha </th>
         <th pSortableColumn="hora"> <p-sortIcon field="hora"></p-sortIcon> Hora </th>
-        <th pSortableColumn="maquina"> <p-sortIcon field="maquina"></p-sortIcon> Maquina </th>
-        <th pSortableColumn="envioZeus"> <p-sortIcon field="envioZeus"></p-sortIcon> Envío Zeus </th>
+        <th pSortableColumn="operario"> <p-sortIcon field="operario"></p-sortIcon> Operario </th>
+        <th pSortableColumn="turno"> <p-sortIcon field="turno"></p-sortIcon> Turno </th>
+        <th pSortableColumn="maquina"> <p-sortIcon field="maquina"></p-sortIcon> Maq. </th>
+        <th pSortableColumn="envioZeus"> <p-sortIcon field="envioZeus"></p-sortIcon> Zeus </th>
         <th pSortableColumn="proceso" alignFrozen="right" pFrozenColumn [frozen]="true"> <p-sortIcon field="proceso"></p-sortIcon> Área </th>
       </tr>
     </ng-template>
@@ -164,16 +164,16 @@
         </td>
         <td>{{data.rollo}}</td>
         <td>{{data.orden}}</td>
-        <td>{{data.idCliente}}</td>
         <td>{{data.cliente}}</td>
         <td>{{data.item}}</td>
         <td>{{data.referencia}}</td>
         <td>{{data.cantidad | number : '1.2-2'}}</td>
         <td>{{data.peso | number : '1.2-2'}}</td>
         <td>{{data.presentacion}}</td>
-        <td>{{data.turno}}</td>
         <td>{{data.fecha | date : 'YYYY-MM-dd'}}</td>
         <td>{{data.hora}}</td>
+        <td>{{data.operario}}</td>
+        <td>{{data.turno}}</td>
         <td>{{data.maquina}}</td>
         <td>{{data.envioZeus}}</td>
         <td alignFrozen="right" pFrozenColumn [frozen]="true"><span class="badge" [ngClass]="{'bg-Extrusion': data.proceso == 'EXTRUSION',
@@ -189,10 +189,10 @@
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
-        <td colspan="7" class="text-left">Totales</td>
+        <td colspan="6" class="text-left">Totales</td>
         <td>{{totalCantidadConsultada() | number : '1.2-2'}}</td>
         <td>{{totalPesoConsultado() | number : '1.2-2'}}</td>
-        <td colspan="7"></td>
+        <td colspan="8"></td>
       </tr>
     </ng-template>
   </p-table>

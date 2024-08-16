@@ -8,7 +8,7 @@ export interface modelPrecargue_Despacho {
     Pcd_Observacion : string;
     Estado_Id : number;
     Pcd_FechaModifica : any;
-    cd_HoraModifica : string;
+    Pcd_HoraModifica : string;
     Usua_Modifica : number;
     Pcd_ObservacionModifica : string;
 }

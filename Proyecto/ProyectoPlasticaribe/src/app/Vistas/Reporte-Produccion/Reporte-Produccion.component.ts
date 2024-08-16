@@ -523,7 +523,7 @@ export class ReporteProduccionComponent implements OnInit {
   //.Información de la producción.
   infoProduction(){
     let info : any = [];
-    this.produccion.forEach(d => info.push([d.orden, d.rollo, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, d.turno, d.fecha.replace('T00:00:00', ''), d.hora, d.proceso, d.maquina, d.envioZeus == 1 ? 'SI' : 'NO',]));
+    this.produccion.forEach(d => info.push([d.orden, d.rollo, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, d.turno, d.fecha.replace('T00:00:00', ''), d.hora, d.proceso, d.maquina, d.envioZeus == 1 ? 'SI' : 'NO', d.operario]));
     return info;
   }
 
@@ -537,22 +537,22 @@ export class ReporteProduccionComponent implements OnInit {
   //.Agregar encabezado a la hoja del excel.
   addHeaderPage(worksheet, font, border, fill) {
     
-    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5']
-    worksheet.addRow(['OT', 'Rollo', 'Cliente', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Unidad', 'Turno', 'Fecha', 'Hora', 'Proceso', 'Maquina', 'Envio Zeus', ]);
+    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5']
+    worksheet.addRow(['OT', 'Rollo', 'Cliente', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Unidad', 'Turno', 'Fecha', 'Hora', 'Proceso', 'Maquina', 'Envio Zeus', 'Operario']);
     
     rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
     rowHeader.forEach(x => worksheet.getCell(x).font = font);
     rowHeader.forEach(x => worksheet.getCell(x).border = border);
 
-    let concatCells : any = ['A1:N3'];
+    let concatCells : any = ['A1:O3'];
     this.stylesPage(worksheet, concatCells, []);
   }
 
   //.Estilos de la hoja del excel.
   stylesPage(worksheet, concatCells, formatNumber) {
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    [1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].forEach(x => worksheet.getColumn(x).width = 12);
-    [3,5].forEach(x => worksheet.getColumn(x).width = 50)
+    [1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14].forEach(x => worksheet.getColumn(x).width = 12);
+    [3,5,15].forEach(x => worksheet.getColumn(x).width = 50)
     concatCells.forEach(cell => worksheet.mergeCells(cell));
   }
 

@@ -18,6 +18,8 @@ import { ThisReceiver } from '@angular/compiler';
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { create } from 'domain';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -55,6 +57,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   constructor(private formatoFacturas : Formato_Facturas_VentasComponent, 
     private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
+    private zeusService : InventarioZeusService,
+    private bagProService : BagproService,
    ) {
       this.modoSeleccionado = appComponent.temaSeleccionado;
       
@@ -63,6 +67,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   ngOnInit() {
   }
 
+  
 }
 
 interface production {
@@ -76,3 +81,4 @@ interface production {
   statusId? : number;
   statusName? : string;
 }
+
