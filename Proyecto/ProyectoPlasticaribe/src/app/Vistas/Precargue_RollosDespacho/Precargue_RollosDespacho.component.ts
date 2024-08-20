@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { log } from 'console';
 import moment from 'moment';
@@ -12,6 +12,10 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+
+@Injectable({
+  providedIn : `root`
+})
 
 @Component({
   selector: 'app-Precargue_RollosDespacho',
@@ -118,15 +122,16 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   //*
   searchRolls(){
     let roll : number = this.form.value.roll;
-    let client : any = this.form.value.idClient;
+    //let client : any = this.form.value.idClient;
+    //let clients : any = this.clients.find(x => x.idcliente == client);
 
     if(this.form.valid) {
-      if(this.rollsToDispatch.length > 0) {
-        if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
-          this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
-          return;
-        }
-      }
+      //if(this.rollsToDispatch.length > 0) {
+      //  if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
+      //    this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
+      //    return;
+      //  }
+      //}
       this.load = true;
       this.svProduction.getInformationDispatch(roll).subscribe(data => {
         if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {

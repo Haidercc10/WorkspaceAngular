@@ -48,13 +48,13 @@
         </span>
       </div>
 
-      <!-- Fact -->
-      <!-- <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+      <!-- Preload Dispatch -->
+       <!--<div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
         <span class="p-float-label">
-          <input formControlName="fact" id="Factura" type="text" pInputText required/>
-          <label for="Factura">Factura</label>
+          <input formControlName="preload" id="preload" type="text" type="number" (keyup.enter)="getPreloadForId()" pInputText required/>
+          <label for="preload">N° Precargue</label>
         </span>
-      </div> -->
+      </div>--> 
 
       <!-- Id Client -->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
@@ -65,7 +65,7 @@
       </div>
 
       <!-- Client -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-5">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-5">
         <span class="p-float-label"><!--formDataOrder.value.typeDoc == 'REPO' ? false : true-->
           <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText required readonly (keyup)="getClients()" (change)="selectedClient()"/>
           <datalist id="clientes">
@@ -133,7 +133,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th class="text-center">Pedido</th>
-        <th class="text-center">Id Cliente</th>
+        <th class="text-center">Nit</th>
         <th class="text-center">Cliente</th>
         <th class="text-center">Item</th>
         <th class="text-center">Referencia</th>
@@ -149,7 +149,7 @@
         <td>{{data.cliente}}</td>
         <td class="text-center">{{data.id_Producto}}</td>
         <td>{{data.producto}}</td>
-        <td class="text-center">{{data.cant_Pendiente | number : '1.2-2'}}</td>
+        <td class="text-center"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
         <td class="text-center">{{data.presentacion}}</td>
         <th class="text-center" *ngIf="editOrderFact">
           <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="seeMsjDeleteItem(data)" pTooltip="Eliminar item {{data.id_Producto}} - {{data.producto}} de la orden." tooltipPosition="top"></p-button>
@@ -176,6 +176,8 @@
         <th class="text-center">Pedido</th>
         <th class="text-center">Item</th>
         <th class="text-center">Referencia</th>
+        <th class="text-center">Peso Bruto</th>
+        <th class="text-center">Peso Neto</th>
         <th class="text-center">Cantidad</th>
         <th class="text-center">Cantidad Rollos</th>
         <th class="text-center">Presentación</th>
@@ -187,14 +189,16 @@
         <td class="text-center">{{data.saleOrder}}</td>
         <td class="text-center">{{data.item}}</td>
         <td class="text-center">{{data.reference}}</td>
-        <td class="text-center">{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</td>
+        <td class="text-center">{{totalWeightByProduct(data.item) | number : '1.2-2'}}</td>
+        <td class="text-center">{{totalNetWeightByProduct(data.item) | number : '1.2-2'}}</td>
+        <td class="text-center"><b>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</b></td>
         <td class="text-center">{{totalCountProductionByProduct(data.item)}}</td>
         <td class="text-center">{{data.presentation}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
-        <td class="text-right" colspan="5">Total rollos</td>
+        <td class="text-right" colspan="7">Total rollos</td>
         <td class="text-center">{{productionSelected.length}}</td>
         <td></td>
       </tr>
@@ -231,10 +235,10 @@
           <p-sortIcon field="orderProduction"></p-sortIcon> OT
           <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter>
         </th>
-        <th class="text-center" pSortableColumn="client">
-          <p-sortIcon field="client"></p-sortIcon> Id Cliente
+        <!--<th class="text-center" pSortableColumn="client">
+          <p-sortIcon field="client"></p-sortIcon> Nit
           <p-columnFilter type="text" field="client" display="menu"></p-columnFilter>
-        </th>
+        </th>-->
         <th class="text-center" pSortableColumn="nameClient">
           <p-sortIcon field="nameClient"></p-sortIcon> Cliente
           <p-columnFilter type="text" field="nameClient" display="menu"></p-columnFilter>
@@ -248,14 +252,22 @@
           <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="quantity">
-          <p-sortIcon field="quantity"></p-sortIcon> Cantidad
+          <p-sortIcon field="quantity"></p-sortIcon> Cant.
           <p-columnFilter type="text" field="quantity" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="presentation">
-          <p-sortIcon field="presentation"></p-sortIcon> Medida
+          <p-sortIcon field="presentation"></p-sortIcon> Und
           <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter>
         </th>
         <!--Nuevo-->
+        <th class="text-center" pSortableColumn="weight">
+          <p-sortIcon field="weight"></p-sortIcon> P. Bruto
+          <p-columnFilter type="text" field="weight" display="menu"></p-columnFilter>
+        </th>
+        <th class="text-center" pSortableColumn="netWeight">
+          <p-sortIcon field="netWeight"></p-sortIcon> P. Neto
+          <p-columnFilter type="text" field="netWeight" display="menu"></p-columnFilter>
+        </th>
         <th class="text-center" pSortableColumn="ubication">
           <p-sortIcon field="ubication"></p-sortIcon> Ubicación
           <p-columnFilter type="text" field="ubication" display="menu"></p-columnFilter>
@@ -270,13 +282,15 @@
         <td class="text-center">{{rowIndex + 1}}</td>
         <td class="text-center">{{data.numberProduction}}</td>
         <td class="text-center">{{data.orderProduction}}</td>
-        <td class="text-center">{{data.client}}</td>
+        <!--<td class="text-center">{{data.client}}</td>-->
         <td class="text-center">{{data.nameClient}}</td>
         <td class="text-center">{{data.item}}</td>
         <td class="text-center">{{data.reference}}</td>
-        <td class="text-center">{{data.quantity | number : '1.2-2'}}</td>
+        <td class="text-center textBlue"><b>{{data.quantity | number : '1.2-2'}}</b></td>
         <td class="text-center">{{data.presentation}}</td>
         <!--Nuevo-->
+        <td class="text-center">{{data.weight | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.netWeight | number : '1.2-2'}}</td>
         <td class="text-center">{{data.ubication}}</td>
       </tr>
     </ng-template>
@@ -286,10 +300,10 @@
         <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="selectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
         <td><p-inputNumber [(ngModel)]="qtyToSend" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" class="length"> </p-inputNumber></td>
         <td class="text-center"><p-button icon="pi pi-search-plus" [rounded]="true" severity="warning" (onClick)="selectByQuantity()" pTooltip="Seleccionar por cantidad"></p-button></td>
-        <td colspan="3">Total</td>
+        <td class="text-right" colspan="2">Total</td>
         <!--Nuevo-->
         <td class="text-center">{{totalProduccionSearched() | number : '1.2-2'}}</td>
-        <td colspan="2"></td>
+        <td colspan="4"></td>
       </tr>
     </ng-template>
   </p-table>
@@ -339,7 +353,7 @@
     [rowHover]="true">
     <ng-template pTemplate="header">
       <tr>
-        <th *ngIf="!editOrderFact" style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
+        <th *ngIf="!editOrderFact && !preloadDispatch" style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
           <p-checkbox (click)="deselectedAllProduction()"></p-checkbox>
         </th>
         <th *ngIf="editOrderFact" style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left"></th>
@@ -352,10 +366,10 @@
           <p-sortIcon field="orderProduction"></p-sortIcon> OT
           <p-columnFilter type="text" field="orderProduction" display="menu"></p-columnFilter>
         </th>
-        <th class="text-center" pSortableColumn="client">
-          <p-sortIcon field="client"></p-sortIcon> Id Cliente
+        <!--<th class="text-center" pSortableColumn="client">
+          <p-sortIcon field="client"></p-sortIcon> Nit
           <p-columnFilter type="text" field="client" display="menu"></p-columnFilter>
-        </th>
+        </th>-->
         <th class="text-center" pSortableColumn="nameClient">
           <p-sortIcon field="nameClient"></p-sortIcon> Cliente
           <p-columnFilter type="text" field="nameClient" display="menu"></p-columnFilter>
@@ -369,14 +383,22 @@
           <p-columnFilter type="text" field="reference" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="quantity">
-          <p-sortIcon field="quantity"></p-sortIcon> Cantidad
+          <p-sortIcon field="quantity"></p-sortIcon> Cant.
           <p-columnFilter type="text" field="quantity" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="presentation">
-          <p-sortIcon field="presentation"></p-sortIcon> Medida
+          <p-sortIcon field="presentation"></p-sortIcon> Und
           <p-columnFilter type="text" field="presentation" display="menu"></p-columnFilter>
         </th>
         <!--Nuevo-->
+        <th class="text-center" pSortableColumn="weight">
+          <p-sortIcon field="weight"></p-sortIcon> P. Bruto
+          <p-columnFilter type="text" field="weight" display="menu"></p-columnFilter>
+        </th>
+        <th class="text-center" pSortableColumn="netWeight">
+          <p-sortIcon field="netWeight"></p-sortIcon> P. Neto
+          <p-columnFilter type="text" field="netWeight" display="menu"></p-columnFilter>
+        </th>
         <th class="text-center" pSortableColumn="ubication">
           <p-sortIcon field="ubication"></p-sortIcon> Ubicación
           <p-columnFilter type="text" field="ubication" display="menu"></p-columnFilter>
@@ -385,28 +407,35 @@
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
-        <td  pFrozenColumn [frozen]="true" alignFrozen="left">
-          <p-tableCheckbox *ngIf="!editOrderFact && !data.inOrder" [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
-          <p-tableCheckbox *ngIf="editOrderFact && !data.inOrder" [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
-          <p-button *ngIf="editOrderFact && data.inOrder" icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="seeMsgDeleteRolls(data)"></p-button>
-        </td>
+        <ng-container *ngIf="!preloadDispatch then NoPreload; else Preload" ></ng-container>
+          <ng-template #NoPreload>
+            <td pFrozenColumn [frozen]="true" alignFrozen="left">
+              <p-tableCheckbox *ngIf="!editOrderFact && !data.inOrder" [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
+              <p-tableCheckbox *ngIf="editOrderFact && !data.inOrder" [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
+              <p-button *ngIf="editOrderFact && data.inOrder" icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="seeMsgDeleteRolls(data)"></p-button>
+            </td>
+          </ng-template>
+          <ng-template #Preload>
+        </ng-template>
         <td class="text-center">{{rowIndex + 1}}</td>
         <td class="text-center">{{data.numberProduction}}</td>
         <td class="text-center">{{data.orderProduction}}</td>
-        <td class="text-center">{{data.client}}</td>
+        <!--<td class="text-center">{{data.client}}</td>-->
         <td class="text-center">{{data.nameClient}}</td>
         <td class="text-center">{{data.item}}</td>
         <td class="text-center">{{data.reference}}</td>
-        <td class="text-center">{{data.quantity | number : '1.2-2'}}</td>
+        <td class="text-center textBlue"><b>{{data.quantity | number : '1.2-2'}}</b></td>
         <td class="text-center">{{data.presentation}}</td>
+        <td class="text-center">{{data.weight | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.netWeight | number : '1.2-2'}}</td>
         <td class="text-center">{{data.ubication}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
-      <tr *ngIf="!editOrderFact">
+      <tr *ngIf="!editOrderFact && !preloadDispatch">
         <td colspan="2">Seleccionar: </td>
         <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="deselectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
-        <td colspan="8"></td>
+        <td colspan="9"></td>
       </tr>
     </ng-template>
   </p-table>

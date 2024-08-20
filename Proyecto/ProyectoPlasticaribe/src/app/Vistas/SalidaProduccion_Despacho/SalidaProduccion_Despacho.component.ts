@@ -18,6 +18,7 @@ import { AppComponent } from 'src/app/app.component';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
+import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -44,6 +45,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   modalProductionOutPallet : boolean = false;
   soloRead : boolean = true;
   reposition : boolean = false; 
+  preload : boolean = false;
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -60,6 +62,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private orden_FacturacionComponent : Orden_FacturacionComponent,
     private svDevolutions : DevolucionesProductosService,
     private cmpOrderFactPallets : OrdenFacturacion_PalletsComponent,
+    private svDtlPreload : Detalles_PrecargueDespachoService, 
   ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
@@ -108,6 +111,16 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.usuariosService.GetConsdutores().subscribe(data => this.drivers = data);
   }
 
+  /*getInformationPreload(){
+    let preload : number = this.formProduction.value.preload;
+
+    this.svDtlPreload.getPreloadId(preload).subscribe(data => {
+      this.formProduction.patchValue({ orderFact : data[0].of });
+    }, error => {
+      this.msj.mensajeError(`Error`, ``);
+    });
+  }*/
+
   getInformationOrderFact(){
     let orderFact = this.formProduction.value.orderFact;
     this.reposition = false;
@@ -139,6 +152,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
                 this.formProduction.patchValue({ fact: factura.documento });
                 this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
                 this.load = false;
+                //Carga la info de la OF en la tabla. 
               }, error => {
                 this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error);
                 this.formProduction.patchValue({ 'orderFact' : '', });

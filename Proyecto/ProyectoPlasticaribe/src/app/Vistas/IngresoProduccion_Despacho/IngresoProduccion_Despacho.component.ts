@@ -155,8 +155,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
             this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
           }, error => { this.msj.mensajeError(`Error`, `No fue posible consultar la OT N° ${data[0].pp.ot} en BagPro | ${error.status} ${error.statusText}`) });
         } else this.msj.mensajeError(`Advertencia`, `No es posible ingresar rollos/bultos del proceso de 'WIKETIADO'!`);
-      }, () => this.lookingForDataInBagpro(production));
-      //}, () => this.warningNotFound(production));
+      //}, () => this.lookingForDataInBagpro(production));
+      }, () => this.warningNotFound(production));
     }
   }
 

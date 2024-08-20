@@ -23,6 +23,7 @@ import { AppComponent } from 'src/app/app.component';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
+import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 
 @Component({
   selector: 'app-Orden_Facturacion',
@@ -59,6 +60,7 @@ export class Orden_FacturacionComponent implements OnInit {
   rollSelected : any = {};
   itemSelected : any = {};
   reposition : boolean = false;
+  preloadDispatch : boolean = false;
   //@ViewChild(MovimientosOrdenFacturacionComponent) movOrderFact : MovimientosOrdenFacturacionComponent;
   
   constructor(private appComponent: AppComponent,
@@ -78,6 +80,7 @@ export class Orden_FacturacionComponent implements OnInit {
     private svDevolutions : DetallesDevolucionesProductosService,
     private svHeaderDevolutions : DevolucionesProductosService,
     private movOrderFact : MovimientosOrdenFacturacionComponent,
+    private svDtlPreload : Detalles_PrecargueDespachoService,
   ) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
@@ -89,7 +92,8 @@ export class Orden_FacturacionComponent implements OnInit {
       idClient: [null, Validators.required],
       client: [null, Validators.required],
       observation: [null],
-      typeDoc: [null]
+      typeDoc: [null], 
+      preload : [null]
     });
 
     this.formItems = this.frmBuilder.group({
@@ -134,6 +138,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.reposition = false;
     this.movOrderFact.modalReposition = false;
     !edit ? this.getLastOrderFact() : null;
+    this.preloadDispatch = false;
   }
 
   getClients() {
@@ -143,37 +148,41 @@ export class Orden_FacturacionComponent implements OnInit {
 
   getProducts() {
     if (this.selectedProductSaleOrder != null) {
-      let idProduct: number = this.selectedProductSaleOrder.id_Producto;
-      this.productionProcessService.GetAvaibleProduction(idProduct).subscribe(data => {
-        this.load = true;
-        let count: number = 0;
-        this.production = [];
-        let countProductionAvaible = data.reduce((a, b) => {
-          if (!a.map(x => x.pp.numeroRollo_BagPro).includes(b.pp.numeroRollo_BagPro)) a = [...a, b];
-          return a;
-        }, []);
-        data.forEach(dataProduction => {
-          if (!this.productionSelected.filter(y => y.item == dataProduction.prod.prod_Id).map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
-            this.production.push({
-              saleOrder: this.formDataOrder.value.saleOrder,
-              client: dataProduction.clientes.cli_Id,
-              nameClient: dataProduction.clientes.cli_Nombre,
-              item: dataProduction.prod.prod_Id,
-              reference: dataProduction.prod.prod_Nombre,
-              orderProduction: dataProduction.pp.ot,
-              numberProduction: dataProduction.pp.numeroRollo_BagPro,
-              quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
-              presentation: dataProduction.pp.presentacion,
-              weight : dataProduction.pp.peso_Bruto, 
-              ubication : ![null, undefined, ''].includes(dataProduction.ubication) ? dataProduction.ubication : '',
-              inOrder : false,
-            });
-          }
-          if (countProductionAvaible.length == this.production.length) this.production = this.changeNameProduct(this.production);
-          count++;
-          if (count == data.length) this.load = false;
-        });
-      }, error => this.msj.mensajeError(`¡No se encontró produción disponible del Item ${idProduct}!`, `Error: ${error.error.title} | Status: ${error.status}`));
+     // if(!this.preloadDispatch) {
+        let idProduct: number = this.selectedProductSaleOrder.id_Producto;
+        this.productionProcessService.GetAvaibleProduction(idProduct).subscribe(data => {
+          this.load = true;
+          let count: number = 0;
+          this.production = [];
+          let countProductionAvaible = data.reduce((a, b) => {
+            if (!a.map(x => x.pp.numeroRollo_BagPro).includes(b.pp.numeroRollo_BagPro)) a = [...a, b];
+            return a;
+          }, []);
+          data.forEach(dataProduction => {
+            if (!this.productionSelected.filter(y => y.item == dataProduction.prod.prod_Id).map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
+              this.production.push({
+                saleOrder: this.formDataOrder.value.saleOrder,
+                client: dataProduction.clientes.cli_Id,
+                nameClient: dataProduction.clientes.cli_Nombre,
+                item: dataProduction.prod.prod_Id,
+                reference: dataProduction.prod.prod_Nombre,
+                orderProduction: dataProduction.pp.ot,
+                numberProduction: dataProduction.pp.numeroRollo_BagPro,
+                quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
+                presentation: dataProduction.pp.presentacion,
+                weight : dataProduction.pp.peso_Bruto, 
+                netWeight : dataProduction.pp.peso_Neto,
+                ubication : ![null, undefined, ''].includes(dataProduction.ubication) ? dataProduction.ubication : '',
+                inOrder : false,
+              });
+            }
+            if (countProductionAvaible.length == this.production.length) this.production = this.changeNameProduct(this.production);
+            count++;
+            if (count == data.length) this.load = false;
+          });
+        }, error => this.msj.mensajeError(`¡No se encontró produción disponible del Item ${idProduct}!`, `Error: ${error.error.title} | Status: ${error.status}`));
+  
+      //} else this.msjsOF(`Advertencia`, `No es posible seleccionar items en una 'ORDEN DE FACTURACIÓN' por 'PRECARGUE DE DESPACHO'`)
     } else {
       this.selectedProductSaleOrder = null;
       this.production = [];
@@ -217,12 +226,15 @@ export class Orden_FacturacionComponent implements OnInit {
     });
   }
 
-  getSalesOrders() {
+  getSalesOrders(/*info? : any*/) {
     let saleOrder: number = this.formDataOrder.value.saleOrder;
     this.invZeusService.getPedidosXConsecutivo(saleOrder).subscribe(data => {
       this.selectedProductSaleOrder = null;
       this.products = data.filter(x => x.cant_Pendiente > 0);
-      if (this.products.length > 0) this.getClientFromSaleOrder();
+      if (this.products.length > 0) {
+        this.getClientFromSaleOrder();
+        //if(this.preloadDispatch) this.comparationSaleOrder_Preload(info);
+      } 
       else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
     }, error => this.msj.mensajeError(`¡No se encontró información del pedido consultado!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
@@ -299,7 +311,8 @@ export class Orden_FacturacionComponent implements OnInit {
             numberProduction: dataProduction.pp.numeroRollo_BagPro,
             quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
             presentation: dataProduction.pp.presentacion, 
-            weight : dataProduction.pp.peso_Bruto
+            weight : dataProduction.pp.peso_Bruto,
+            netWeight : dataProduction.pp.peso_Neto,
           });
         }
         if (countProductionAvaible.length == this.production.length) {
@@ -323,7 +336,8 @@ export class Orden_FacturacionComponent implements OnInit {
               numberProduction: dataProduction.numberProduction,
               quantity: dataProduction.quantity,
               presentation: dataProduction.presentation, 
-              weight : 0
+              weight : 0,
+              netWeight : 0,
             });
           }
         });
@@ -436,6 +450,18 @@ export class Orden_FacturacionComponent implements OnInit {
   totalProduccionSearched(): number {
     let total: number = 0;
     total = this.production.reduce((a, b) => a += b.quantity, 0);
+    return total;
+  }
+
+  totalWeightByProduct(item: number): number {
+    let total: number = 0;
+    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.weight);
+    return total;
+  }
+
+  totalNetWeightByProduct(item: number): number {
+    let total: number = 0;
+    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.netWeight);
     return total;
   }
 
@@ -564,10 +590,14 @@ export class Orden_FacturacionComponent implements OnInit {
         let cuontProduction: number = data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).length;
         let totalQuantity: number = 0;
         let totalWeight: number = 0;
+        let totalNetWeight : number = 0;
         data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => {
           totalQuantity += x.dtOrder.cantidad,
-          totalWeight += x.weight
+          totalWeight += x.weight,
+          totalNetWeight += x.netWeight
         }); 
+        console.log(totalNetWeight);
+        
         consolidatedInformation.push({
           "#" : count,
           "Pedido": prod.dtOrder.consecutivo_Pedido,
@@ -576,8 +606,10 @@ export class Orden_FacturacionComponent implements OnInit {
           "Rollos": this.formatNumbers((cuontProduction)),
           "Peso B.": this.formatNumbers((totalWeight).toFixed(2)),
           "Peso_Bruto": this.formatNumbers((totalWeight).toFixed(2)),
+          "Peso N.": this.formatNumbers((totalNetWeight).toFixed(2)),
+          "Peso_Neto": this.formatNumbers((totalNetWeight).toFixed(2)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
-          "Presentación": prod.dtOrder.presentacion
+          "Unidad": prod.dtOrder.presentacion
         });
       }
     });
@@ -600,7 +632,7 @@ export class Orden_FacturacionComponent implements OnInit {
         "Peso" : this.formatNumbers((prod.weight).toFixed(2)),
         "Peso B." : this.formatNumbers((prod.weight).toFixed(2)),
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
-        "Presentación": prod.dtOrder.presentacion,
+        "Unidad": prod.dtOrder.presentacion,
         "Ubicación": prod.ubication == null ? '' : prod.ubication,
       });
     });
@@ -650,8 +682,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableConsolidated(data) {
-    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Peso B.', 'Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['5%', '12%', '8%', '38%', '10%', '5%', '12%', '10%'];
+    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Peso B.', 'Peso N.', 'Rollos', 'Cantidad', 'Unidad'];
+    let widths: Array<string> = ['2%', '12%', '6%', '40%', '8%', '8%', '5%', '12%', '7%'];
     return {
       table: {
         headerRows: 2,
@@ -668,14 +700,14 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso'.replace('Peso', 'Peso B.'), 'Cantidad', 'Presentación', 'Ubicación'];
-    let widths: Array<string> = ['3%', '7%', '7%', '7%', '35%', '6%', '8%', '10%', '17%'];
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso'.replace('Peso', 'Peso B.'), 'Cantidad', 'Unidad', 'Ubicación'];
+    let widths: Array<string> = ['3%', '7%', '7%', '7%', '38%', '6%', '8%', '7%', '17%'];
     return {
       margin: [0, 10],
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody2(data, columns, 'Rollos Seleccionados'),
+        body: this.buildTableBody(data, columns, 'Rollos Seleccionados'),
       },
       fontSize: 8,
       layout: {
@@ -687,18 +719,6 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title) {
-    var body = [];
-    body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
-    body.push(columns);
-    data.forEach(function (row) {
-      var dataRow = [];
-      columns.forEach((column) => dataRow.push(row[column].toString()));
-      body.push(dataRow);
-    });
-    return body;
-  }
-
-  buildTableBody2(data, columns, title) {
     var body = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
@@ -730,12 +750,13 @@ export class Orden_FacturacionComponent implements OnInit {
   tableTotals(data) {
     let qtyRolls = this.consolidatedInformation(data).reduce((a, b) => a + parseInt(b.Rollos), 0);
     let totalWeight = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso_Bruto.replace().replace(',','')), 0); 
+    let totalNetWeight = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso_Neto.replace().replace(',','')), 0); 
     let totalQty = this.consolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Cantidad.replace(',','') ), 0); 
     let units : any = [];
     
     this.consolidatedInformation(data).forEach(x => {
-      if(!units.includes(x.Presentación)) {
-        units.push(x.Presentación);
+      if(!units.includes(x.Unidad)) {
+        units.push(x.Unidad);
       } 
     });
 
@@ -744,7 +765,7 @@ export class Orden_FacturacionComponent implements OnInit {
       fontSize: 8,
       bold: false,
       table: {
-        widths: ['5%', '12%', '8%', '38%', '10%', '5%', '12%', '10%'],
+        widths: ['2%', '12%', '6%', '40%', '8%', '8%', '5%', '12%', '7%'],
         body: [
           [
             { text: ``, alignment: 'center', border: [true, false, false, true], },
@@ -752,6 +773,7 @@ export class Orden_FacturacionComponent implements OnInit {
             { text: ``, alignment: 'center', border: [false, false, false, true], },
             { text: `Totales`, alignment: 'right', bold : true, border: [false, false, false, true], },
             { text: `${this.formatNumbers((totalWeight).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${this.formatNumbers((totalNetWeight).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
             { text: `${this.formatNumbers((qtyRolls))}`, alignment: '', bold : true, border: [true, false, true, true] },
             { text: `${this.formatNumbers((totalQty).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
             { text: `${units.length == 1 ? units : ``}`, alignment: '', bold : true, border: [false, false, true, true], },
@@ -810,6 +832,7 @@ export class Orden_FacturacionComponent implements OnInit {
         'weight' : x.weight,
         'inOrder' : true,
         'idDetail' : x.dtOrder.id,
+        'netWeight' : x.netWeight,
       });
     });
     this.loadInfoClientOrder(data[0]);
@@ -1085,6 +1108,89 @@ export class Orden_FacturacionComponent implements OnInit {
     });
     (count > 0) ? this.svMsg.add({ severity:'warn', key:'reposition', summary: summary, detail: detail, sticky: true}) : this.saveOrderFact();
   }
+
+  //* PRECARGUE DE DESPACHO
+  getPreloadForId(){
+    let preload : number = this.formDataOrder.value.preload;
+    let saleOrder : number = this.formDataOrder.value.saleOrder;
+    
+    if(!this.editOrderFact) {
+      if(!this.reposition) {
+        if(![null, 0, undefined, ''].includes(this.formDataOrder.value.preload)) {
+          if(![null, 0, undefined, ''].includes(this.formDataOrder.value.saleOrder)) {
+            this.load = true;
+            this.svDtlPreload.getPreloadId(preload).subscribe(data => {
+              this.preloadDispatch = true;
+              this.loadTableItemsSelected(data, saleOrder);
+              this.loadInfoClientPreload(data);
+              this.getSalesOrders(/*data*/);
+              this.load = false;
+            }, error => {
+              this.msjsOF(`Error`, [400, 404].includes(error.status) ? `No se encontró la orden de precargue N° ${preload} | \n${error.status} ${error.statusText}` : `No fue posible consultar la orden de despacho N° ${preload} | \n${error.status} ${error.statusText}`);
+            });
+          } else this.msjsOF(`Advertencia`, `Debe ingresar un N° de Pedido!`);
+        } else this.msjsOF(`Advertencia`, `El N° de precargue no es válido!`);
+      } else this.msjsOF(`Advertencia`, `No se pueden generar ORDENES DE REPOSICIÓN con PRECARGUE DE ROLLOS!`);
+    } else this.msjsOF(`Advertencia`, `No se puede precargar una orden que está siendo editada!`);
+  }
+
+  loadTableItemsSelected(data : any, saleOrder : any){
+    data.forEach(x => {
+      this.productionSelected.push({
+        'saleOrder': saleOrder,
+        'item': x.item,
+        'reference': x.reference,
+        'quantity': x.qty,
+        'presentation': x.und,
+        'weight': x.weight,
+        'client' : x.idClient,
+        'nameClient' : x.client,
+        'orderProduction' : x.ot,
+        'numberProduction' : x.roll,
+        'ubication' : x.ubication,
+        'netWeight' : x.netWeight,
+      })
+    });
+    this.getConsolidateProduction();
+  }
+
+  loadInfoClientPreload(data){
+    this.formDataOrder.patchValue({'idClient' : data[0].idClient, 'client' : data[0].client, })
+  }
+
+  loadProductsPreload(data : any, saleOrder : any){
+    this.products = data.reduce((a : any, b : any) => {
+      if(!a.map(x => x.id_Producto).includes(b.item)) {
+        a.push({
+          'consecutivo' : saleOrder,
+          'id_Cliente' : b.idClient,
+          'cliente' : b.client,
+          'id_Producto' : b.item,
+          'producto' : b.reference,
+          'cant_Pendiente' : b.qty,
+          'presentacion' : b.und,
+        });
+      } else a[a.findIndex(x => x.id_Producto == b.item)].cant_Pendiente += b.qty;
+      return a;
+    }, []);
+  }
+
+  comparationSaleOrder_Preload(info : any){
+    let array : any = [];
+
+    this.products.forEach(x => {
+      info.forEach(y => {
+        if(x.id_Producto == y.item) {
+          if(!array.includes(y.item)) {
+            array.push(y.item);
+          }
+        }
+      });
+    });
+    if(array.length == this.products.length) {
+      console.log(1);
+    }
+  }
   
 }
 
@@ -1103,6 +1209,7 @@ interface production {
   ubication? : string;
   inOrder? : boolean, 
   idDetail? : number;
+  netWeight : number;
 }
 
 

@@ -19,6 +19,8 @@ export class Detalles_PrecargueDespachoService {
     
       getPreloadId = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/getPreloadId/${id}`);
 
+      getMovementsPreload = (date1 : any, date2 : any, url? : string):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/getMovementsPreload/${date1}/${date2}${url}`);
+
       Post = (data : modelDetalles_PrecargueDespacho): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Detalles_PrecargueDespacho', data);
     
       Put = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/${id}`, data);
