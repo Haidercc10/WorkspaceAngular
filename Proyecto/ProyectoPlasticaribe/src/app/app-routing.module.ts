@@ -47,6 +47,7 @@ export const routes: Routes = [
   /*************************************************************** PRODUCCION *************************************************************************************************/
   { path: 'produccion-procesos', loadChildren: () => import('./Modules/produccion-extrusion/produccion-extrusion.module').then(m => m.ProduccionExtrusionModule) },
   { path: 'produccion-sellado', loadChildren: () => import('./Modules/produccion-sellado/produccion-sellado.module').then(m => m.ProduccionSelladoModule) },
+  { path: 'reempaque-sellado', loadChildren: () => import('./Modules/reempaque-sellado/reempaque-sellado.module').then(m => m.ReempaqueSelladoModule) },
   { path: 'ingreso-despacho', loadChildren: () => import('./Modules/ingreso-produccion-despacho/ingreso-produccion-despacho.module').then(m => m.IngresoProduccionDespachoModule) },
   { path: 'despacho-mercancia', loadChildren: () => import('./Modules/salida-produccion-despacho/salida-produccion-despacho.module').then(m => m.SalidaProduccionDespachoModule) },
   { path: 'orden-facturacion', loadChildren: () => import('./Modules/orden-facturacion/orden-facturacion.module').then(m => m.OrdenFacturacionModule) },

@@ -76,5 +76,8 @@ export class Produccion_ProcesosService {
 
   PostMassive = (data: Array<modelProduccionProcesos>): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/massiveInsertFromStoreRolls`, data);
 
-  getInformationDispatch = (production : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationDispatch/${production}`);
+  getInformationDispatch = (production : number, client : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationDispatch/${production}/${client}`);
+
+  getOrderFactForPreload = (of : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getOrderFactForPreload/${of}`);
+
 }

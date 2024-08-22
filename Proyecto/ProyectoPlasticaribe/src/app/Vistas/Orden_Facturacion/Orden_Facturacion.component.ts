@@ -24,6 +24,7 @@ import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFactur
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
+import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
 
 @Component({
   selector: 'app-Orden_Facturacion',
@@ -62,6 +63,11 @@ export class Orden_FacturacionComponent implements OnInit {
   reposition : boolean = false;
   preloadDispatch : boolean = false;
   //@ViewChild(MovimientosOrdenFacturacionComponent) movOrderFact : MovimientosOrdenFacturacionComponent;
+  modalSaleOrderVsPreload : boolean = false;
+  comparativeProduct : any = [];
+  comparativePreload : any = [];
+  @ViewChild('tablePreload') tablePreload: Table;
+  @ViewChild('tableSaleOrder') tableSaleOrder: Table;
   
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -81,6 +87,7 @@ export class Orden_FacturacionComponent implements OnInit {
     private svHeaderDevolutions : DevolucionesProductosService,
     private movOrderFact : MovimientosOrdenFacturacionComponent,
     private svDtlPreload : Detalles_PrecargueDespachoService,
+    private svPreload : Precargue_DespachoService
   ) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
@@ -148,7 +155,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   getProducts() {
     if (this.selectedProductSaleOrder != null) {
-     // if(!this.preloadDispatch) {
+      if(!this.preloadDispatch) {
         let idProduct: number = this.selectedProductSaleOrder.id_Producto;
         this.productionProcessService.GetAvaibleProduction(idProduct).subscribe(data => {
           this.load = true;
@@ -181,8 +188,7 @@ export class Orden_FacturacionComponent implements OnInit {
             if (count == data.length) this.load = false;
           });
         }, error => this.msj.mensajeError(`¡No se encontró produción disponible del Item ${idProduct}!`, `Error: ${error.error.title} | Status: ${error.status}`));
-  
-      //} else this.msjsOF(`Advertencia`, `No es posible seleccionar items en una 'ORDEN DE FACTURACIÓN' por 'PRECARGUE DE DESPACHO'`)
+      } else this.msjsOF(`Advertencia`, `No es posible seleccionar items en una 'ORDEN DE FACTURACIÓN' por 'PRECARGUE DE DESPACHO'`)
     } else {
       this.selectedProductSaleOrder = null;
       this.production = [];
@@ -226,20 +232,29 @@ export class Orden_FacturacionComponent implements OnInit {
     });
   }
 
-  getSalesOrders(/*info? : any*/) {
+  getSalesOrders(info? : any) {
     let saleOrder: number = this.formDataOrder.value.saleOrder;
-    this.invZeusService.getPedidosXConsecutivo(saleOrder).subscribe(data => {
-      this.selectedProductSaleOrder = null;
-      this.products = data.filter(x => x.cant_Pendiente > 0);
-      if (this.products.length > 0) {
-        this.getClientFromSaleOrder();
-        //if(this.preloadDispatch) this.comparationSaleOrder_Preload(info);
-      } 
-      else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
-    }, error => this.msj.mensajeError(`¡No se encontró información del pedido consultado!`, `Error: ${error.error.title} | Status: ${error.status}`));
+    
+    //if ([null, undefined, ''].includes(preload)) {
+      this.invZeusService.getPedidosXConsecutivo(saleOrder).subscribe(data => {
+        this.selectedProductSaleOrder = null;
+        this.products = data.filter(x => x.cant_Pendiente > 0);
+        if (this.products.length > 0) {
+          this.getClientFromSaleOrder(info);
+        } else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
+      }, error => this.msj.mensajeError(`¡No se encontró información del pedido consultado!`, `Error: ${error.error.title} | Status: ${error.status}`));
+    //} else this.msj.mensajeAdvertencia(`Advertencia`, `No es posible buscar pedidos en ORDENES DE FACTURACIÓN con PRECARGUE DE DESPACHO!`);
   }
 
-  getClientFromSaleOrder() {
+  clearSomeFields(){
+    this.production = [];
+    this.productionSelected = [];
+    this.consolidatedProduction = [];
+    this.formDataOrder.patchValue({ preload : null });
+    this.preloadDispatch = false;
+  }
+
+  getClientFromSaleOrder(info : any) {
     let idthird: string = this.products[0].id_Cliente;
     this.invZeusService.getClientByIdThird(idthird).subscribe(data => {
       data.forEach(cli => {
@@ -248,6 +263,7 @@ export class Orden_FacturacionComponent implements OnInit {
           client: cli.razoncial,
         });
       });
+      info != null ? this.comparationSaleOrder_Preload(info) : this.clearSomeFields();
     }, error => this.msj.mensajeError(`¡No se encontró información del cliente asociado al pedido!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
@@ -471,6 +487,24 @@ export class Orden_FacturacionComponent implements OnInit {
     return total;
   }
 
+  totalTotalNetWeightProducts(): number {
+    let total: number = 0;
+    this.productionSelected.forEach(x => total += x.netWeight);
+    return total;
+  }
+
+  totalTotalWeightProducts(): number {
+    let total: number = 0;
+    this.productionSelected.forEach(x => total += x.weight);
+    return total;
+  }
+
+  totalTotalProducts(): number {
+    let total: number = 0;
+    this.productionSelected.forEach(x => total += x.quantity);
+    return total;
+  }
+
   totalCountProductionByProduct(item: number): number {
     let total: number = 0;
     total = this.productionSelected.filter(x => x.item == item).length;
@@ -525,6 +559,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.productionProcessService.putStateForSend(order).subscribe(() => {
       this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden N° ${order} actualizada exitosamente!`) : this.msj.mensajeConfirmacion('Orden creada exitosamente!');
       if(this.reposition) this.updateDevolution();
+      if(this.preloadDispatch) this.updateOrderPreload();
       this.createPDF(order, fact);
       this.clearFields(false);
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
@@ -540,6 +575,20 @@ export class Orden_FacturacionComponent implements OnInit {
     
     this.svHeaderDevolutions.PutStatusDevolution(dev, 39, date, hour, this.storage_Id, '').subscribe(data => {
     }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar la devolución`); });
+  }
+
+  updateOrderPreload(){
+    let of : any = this.formDataOrder.value.orderFact;
+    let preload : any = this.formDataOrder.value.preload;
+    let observation : any = this.formDataOrder.value.observation
+    let updatedInfo : any = [];
+
+    updatedInfo.push({ 'of' : of, 'user' : this.storage_Id, 'observation' : observation, 'status' : 26 });
+    this.svPreload.putPreloadDispatch(preload, updatedInfo).subscribe(data => {
+
+    }, error => {
+
+    });
   }
 
   createPDF(id_OrderFact: number, fact: string) {
@@ -1113,23 +1162,21 @@ export class Orden_FacturacionComponent implements OnInit {
   getPreloadForId(){
     let preload : number = this.formDataOrder.value.preload;
     let saleOrder : number = this.formDataOrder.value.saleOrder;
-    
+
     if(!this.editOrderFact) {
       if(!this.reposition) {
-        if(![null, 0, undefined, ''].includes(this.formDataOrder.value.preload)) {
-          if(![null, 0, undefined, ''].includes(this.formDataOrder.value.saleOrder)) {
+        if(![null, 0, undefined, ''].includes(preload)) {
+          if(![null, 0, undefined, ''].includes(saleOrder)) {
             this.load = true;
             this.svDtlPreload.getPreloadId(preload).subscribe(data => {
-              this.preloadDispatch = true;
-              this.loadTableItemsSelected(data, saleOrder);
-              this.loadInfoClientPreload(data);
-              this.getSalesOrders(/*data*/);
+              this.clearTables();
+              this.getSalesOrders(data);
               this.load = false;
             }, error => {
               this.msjsOF(`Error`, [400, 404].includes(error.status) ? `No se encontró la orden de precargue N° ${preload} | \n${error.status} ${error.statusText}` : `No fue posible consultar la orden de despacho N° ${preload} | \n${error.status} ${error.statusText}`);
             });
-          } else this.msjsOF(`Advertencia`, `Debe ingresar un N° de Pedido!`);
-        } else this.msjsOF(`Advertencia`, `El N° de precargue no es válido!`);
+          } else this.msjsOF(`Advertencia`, `Debe asociar un número de pedido!`);
+        } else this.msjsOF(`Advertencia`, `El número de precargue no es válido!`);
       } else this.msjsOF(`Advertencia`, `No se pueden generar ORDENES DE REPOSICIÓN con PRECARGUE DE ROLLOS!`);
     } else this.msjsOF(`Advertencia`, `No se puede precargar una orden que está siendo editada!`);
   }
@@ -1140,8 +1187,8 @@ export class Orden_FacturacionComponent implements OnInit {
         'saleOrder': saleOrder,
         'item': x.item,
         'reference': x.reference,
-        'quantity': x.qty,
-        'presentation': x.und,
+        'quantity': x.quantity,
+        'presentation': x.presentation,
         'weight': x.weight,
         'client' : x.idClient,
         'nameClient' : x.client,
@@ -1154,10 +1201,11 @@ export class Orden_FacturacionComponent implements OnInit {
     this.getConsolidateProduction();
   }
 
-  loadInfoClientPreload(data){
-    this.formDataOrder.patchValue({'idClient' : data[0].idClient, 'client' : data[0].client, })
+  loadInfoClientPreload(data, saleOrder){
+    this.formDataOrder.patchValue({'idClient' : data[0].idClient, 'client' : data[0].client, 'preload' : data[0].movement, 'saleOrder' : saleOrder });
   }
 
+  //! EN DES USO
   loadProductsPreload(data : any, saleOrder : any){
     this.products = data.reduce((a : any, b : any) => {
       if(!a.map(x => x.id_Producto).includes(b.item)) {
@@ -1177,19 +1225,43 @@ export class Orden_FacturacionComponent implements OnInit {
 
   comparationSaleOrder_Preload(info : any){
     let array : any = [];
+    this.comparativeProduct = [];
+    this.comparativePreload = [];
+
+    this.comparativeProduct = this.products;
+    this.comparativePreload = info.reduce((a, b) => {
+      if(!a.map(x => x.item).includes(b.item)) a.push(b);
+      else  a[a.findIndex(x => x.item == b.item)].quantity += b.quantity;
+      return a;
+    }, []);
 
     this.products.forEach(x => {
       info.forEach(y => {
         if(x.id_Producto == y.item) {
-          if(!array.includes(y.item)) {
-            array.push(y.item);
-          }
+          if(!array.includes(y.item)) array.push(y.item);
         }
       });
     });
+    
     if(array.length == this.products.length) {
-      console.log(1);
-    }
+      this.msj.mensajeConfirmacion(`Confirmación`, `El precargue de rollos se asoció exitosamente al pedido`);
+      this.preloadDispatch = true;
+      this.loadInfoClientPreload(info, this.formDataOrder.value.saleOrder);
+      this.loadTableItemsSelected(info, this.formDataOrder.value.saleOrder);
+    } else {
+      this.clearTables();
+      this.msj.mensajeAdvertencia(`Advertencia`, `Existen diferencias entre el pedido y el precargue consultados, verifique!`);
+      setTimeout(() => { this.modalSaleOrderVsPreload = true; }, 1500); 
+    } 
+  }
+
+  clearTables(){
+    this.preloadDispatch = false;
+    this.formDataOrder.patchValue({'idClient' : null, 'client' : null, });
+    this.productionSelected = [];
+    this.production = [];
+    this.products = [];
+    this.consolidatedProduction = [];
   }
   
 }

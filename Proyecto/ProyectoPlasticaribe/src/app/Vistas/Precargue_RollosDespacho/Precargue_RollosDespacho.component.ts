@@ -122,7 +122,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   //*
   searchRolls(){
     let roll : number = this.form.value.roll;
-    //let client : any = this.form.value.idClient;
+    let client : any = this.form.value.idClient;
     //let clients : any = this.clients.find(x => x.idcliente == client);
 
     if(this.form.valid) {
@@ -133,7 +133,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       //  }
       //}
       this.load = true;
-      this.svProduction.getInformationDispatch(roll).subscribe(data => {
+      this.svProduction.getInformationDispatch(roll, client).subscribe(data => {
         if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
           this.rollsToDispatch.unshift(data[0]);
           this.consolidateItems();
@@ -172,6 +172,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     setTimeout(() => {
       this.msjs(`Advertencia`, `Se quitó el rollo N° ${data.roll} de la tabla!`);
       let index = this.rollsToDispatch.findIndex(x => x.rollo == data.roll && x.ot == data.ot);
+      console.log(index);
       this.rollsToDispatch.splice(index, 1);
       this.load = false;
       this.consolidateItems();
@@ -291,8 +292,10 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         let weight: number = 0;
         data.filter(x => x.item == d.item).forEach(x => {
           weight += x.weight,
-          quantity += x.qty
+          quantity += x.quantity
         });
+        console.log(data);
+        
         info.push({
           "#": contador,
           "Item": d.item,
@@ -300,7 +303,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
           "Rollos" : cantRegistros,
           "Peso": weight.toFixed(2),
           "Cantidad" : quantity.toFixed(2),
-          "Und" : d.und,
+          "Und" : d.presentation,
         });
       }
     });
@@ -320,8 +323,8 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         "Item": d.item,
         "Referencia": d.reference,
         "Peso": d.weight,
-        "Cantidad" : d.qty, 
-        "Und" : d.und,
+        "Cantidad" : d.quantity, 
+        "Und" : d.presentation,
       });
     });
     return info;

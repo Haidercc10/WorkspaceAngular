@@ -19,6 +19,7 @@ import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturaci
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
+import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -62,7 +63,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private orden_FacturacionComponent : Orden_FacturacionComponent,
     private svDevolutions : DevolucionesProductosService,
     private cmpOrderFactPallets : OrdenFacturacion_PalletsComponent,
-    private svDtlPreload : Detalles_PrecargueDespachoService, 
+    private svDtlPreload : Detalles_PrecargueDespachoService,
+    private svPreload : Precargue_DespachoService 
   ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
@@ -74,6 +76,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       driver: ['', Validators.required],
       car: ['', Validators.required],
       saleOrder : [''],
+      preload : [null]
     });
   }
 
@@ -111,15 +114,24 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.usuariosService.GetConsdutores().subscribe(data => this.drivers = data);
   }
 
-  /*getInformationPreload(){
+  getInformationPreload(){
+    this.load = true;
     let preload : number = this.formProduction.value.preload;
-
-    this.svDtlPreload.getPreloadId(preload).subscribe(data => {
-      this.formProduction.patchValue({ orderFact : data[0].of });
+    
+    this.svPreload.GetIdPrecargue_Despacho(preload).subscribe(data => {
+      this.productionProcessSerivce.getOrderFactForPreload(data.oF_Id).subscribe(dataOF => {
+        this.formProduction.patchValue({ 'orderFact' : data.oF_Id });
+        this.sendProductionZeus = dataOF;
+        this.load = false;
+      }, error => {
+        this.msj.mensajeError(`Error`, `Error en la consulta de la orden de facturación asociada al precargue N° ${preload}`);
+        this.load = false;
+      });
     }, error => {
-      this.msj.mensajeError(`Error`, ``);
+      this.msj.mensajeError(`Error`, `Se encontraron errores en la consulta del precargue N° ${preload}`);
+      this.load = false;
     });
-  }*/
+  }
 
   getInformationOrderFact(){
     let orderFact = this.formProduction.value.orderFact;

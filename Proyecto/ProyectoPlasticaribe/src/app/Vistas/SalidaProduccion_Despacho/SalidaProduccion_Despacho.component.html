@@ -23,15 +23,26 @@
 
   <form [formGroup]="formProduction">
     <div class="row g-4 my-5">
+
       <div class="col-sm-12 col-md-2">
-        <span class="p-float-label">
+        <span class="p-input-icon-left p-float-label">
+          <i class="pi pi-search"></i>
+          <input formControlName="preload" type="number" id="preload" required pInputText (keyup.enter)="getInformationPreload()"/>
+          <label for="preload">N° Precargue</label>
+        </span>
+      </div>
+
+      <div class="col-sm-12 col-md-2">
+        <span class="p-input-icon-left p-float-label">
+          <i class="pi pi-search"></i>
           <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationOrderFact()"/>
           <label for="orderFact">Orden Fact.</label>
         </span>
       </div>
 
       <div class="col-sm-12 col-md-2">
-        <span class="p-float-label">
+        <span class="p-input-icon-left p-float-label">
+          <i class="pi pi-search"></i>
           <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus autocomplete="off" [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getInformationProduction()"/>
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
@@ -44,14 +55,14 @@
         </span>
       </div>
 
-      <div class="col-sm-12 col-md-3">
+      <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
           <p-dropdown formControlName="driver" inputId="production" [autoDisplayFirst]="false" [options]="drivers" optionLabel="nombre" optionValue="id" [required]="true" [filter]="true" filterBy="nombre"></p-dropdown>
           <label for="operario">Conductores</label>
         </span>
       </div>
 
-      <div class="col-sm-12 col-md-3">
+      <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
           <input formControlName="car" type="text" id="car" pInputText required/>
           <label for="car">Placa Carro</label>
@@ -93,7 +104,7 @@
         <th class="text-center">Hora</th>
         <th class="text-center">Proceso</th>
         <!--<th class="text-center">Pallet</th>-->
-        <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>
+        <!--<th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>-->
         <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
       </tr>
     </ng-template>
@@ -111,10 +122,10 @@
         <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
         <td class="text-center">{{data.pp.hora}}</td>
         <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
-        <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-          <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button>
+        <!--<td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+          <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button>-->
           <!--{{data.pallet}}-->
-        </td>
+        <!--</td>-->
         <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
           <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
         </td>
@@ -125,7 +136,7 @@
         <td class="text-right" colspan="6">Totales</td>
         <td class="text-center">{{totalQuantity() | number : '1.2-2'}}</td>
         <td class="text-center">{{totalWeight() | number : '1.2-2'}}</td>
-        <td colspan="6"></td>
+        <td colspan="5"></td>
       </tr>
     </ng-template>
   </p-table>

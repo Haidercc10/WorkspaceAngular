@@ -231,6 +231,7 @@ import { Precargue_RollosDespachoComponent } from './Vistas/Precargue_RollosDesp
 import { Devolucion_BodegaRollosComponent } from './Vistas/Devolucion_BodegaRollos/Devolucion_BodegaRollos.component';
 import { Asignacion_RollosOTComponent } from './Vistas/Asignacion_RollosOT/Asignacion_RollosOT.component';
 import { Mov_PrecargueDespachoComponent } from './Vistas/Mov_PrecargueDespacho/Mov_PrecargueDespacho.component';
+import { Reempaque_ProduccionComponent } from './Vistas/Reempaque_Produccion/Reempaque_Produccion.component';
 
 @NgModule({
   declarations: [
@@ -382,6 +383,7 @@ import { Mov_PrecargueDespachoComponent } from './Vistas/Mov_PrecargueDespacho/M
     Devolucion_BodegaRollosComponent,
     Asignacion_RollosOTComponent,
     Mov_PrecargueDespachoComponent,
+    Reempaque_ProduccionComponent,
   ],
 
   imports: [
