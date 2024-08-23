@@ -96,6 +96,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Reempaque_ProduccionComponent } from './Vistas/Reempaque_Produccion/Reempaque_Produccion.component';
 
 @NgModule({
   declarations: [
@@ -115,6 +116,7 @@ import { AppComponent } from './app.component';
     Produccion_SelladoComponent,
     Produccion_ExtrusionComponent,
     Movimientos_DespachoComponent,
+    Reempaque_ProduccionComponent,
   ],
 
   imports: [

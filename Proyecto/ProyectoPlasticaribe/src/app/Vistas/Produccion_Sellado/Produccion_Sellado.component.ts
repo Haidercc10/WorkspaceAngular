@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
@@ -45,6 +46,8 @@ export class Produccion_SelladoComponent implements OnInit {
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol
   maquinaConsultada: number;
   operariosConsultados: any = [];
+  url : any = ``;
+  repacking : boolean = false;
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -55,7 +58,9 @@ export class Produccion_SelladoComponent implements OnInit {
     private svcProdProcesos: Produccion_ProcesosService,
     private svcCrearPDF: TagProduction_2,
     private svcSedes: SedeClienteService,
-    private rePrintService: ReImpresionEtiquetasService,) {
+    private rePrintService: ReImpresionEtiquetasService,
+    private router : Router
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
   }
@@ -63,8 +68,10 @@ export class Produccion_SelladoComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getTurnos();
-    this.getOperarios();
     this.cargarTurnoActual();
+    this.url = this.router.url;
+    if(this.url == '/reempaque-sellado') this.repacking = true;
+    this.getOperarios();
     // this.getPuertoSerial();
   }
 
@@ -154,7 +161,14 @@ export class Produccion_SelladoComponent implements OnInit {
   getTurnos = () => this.svcTurnos.srvObtenerLista().subscribe(data => this.turnos = data);
 
   //Función que carga los operarios de sellado
-  getOperarios = () => this.svcUsuarios.GetOperariosProduccion().subscribe(d => this.operarios = d.filter(x => x.area_Id == 10));
+  getOperarios() {
+    this.svcUsuarios.GetOperariosProduccion().subscribe(d => { 
+      if(this.repacking) {
+        this.operarios = d.filter(x => x.usua_Id == 0); 
+        this.formSellado.patchValue({ 'idOperario': [0] });
+      } else this.operarios = d.filter(x => x.area_Id == 10 && x.usua_Id != 0); 
+    });
+  }
 
   //Función que carga el turno actual.
   cargarTurnoActual() {
@@ -177,6 +191,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.cargarTurnoActual();
     this.cantBultoEstandar = 0;
     this.medida = '';
+    if(this.repacking) this.formSellado.patchValue({ 'idOperario': [0]  });
   }
 
   //Función que filtra la info de la tabla
@@ -285,6 +300,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.cargando = true;
     this.getPuertoSerial();
     this.buscarOT(true);
+    if(this.repacking) this.formSellado.patchValue({ idOperario : [0] });
     setTimeout(() => {
       if (this.formSellado.valid) {
         if (this.formSellado.value.ot != null && this.formSellado.value.ot != '') {
@@ -338,11 +354,11 @@ export class Produccion_SelladoComponent implements OnInit {
       'Numero_Rollo': 0,
       'Prod_Id': orden.id_Producto,
       'Cli_Id': orden.nitCliente,
-      'Operario1_Id': this.formSellado.value.idOperario[0],
-      'Operario2_Id': this.formSellado.value.idOperario[1] == undefined ? 0 : this.formSellado.value.idOperario[1],
-      'Operario3_Id': this.formSellado.value.idOperario[2] == undefined ? 0 : this.formSellado.value.idOperario[2],
-      'Operario4_Id': this.formSellado.value.idOperario[3] == undefined ? 0 : this.formSellado.value.idOperario[3],
-      'Pesado_Entre': (this.formSellado.value.idOperario).length,
+      'Operario1_Id': this.repacking ? 0 : this.formSellado.value.idOperario[0],
+      'Operario2_Id': this.repacking ? 0 : this.formSellado.value.idOperario[1] == undefined ? 0 : this.formSellado.value.idOperario[1],
+      'Operario3_Id': this.repacking ? 0 : this.formSellado.value.idOperario[2] == undefined ? 0 : this.formSellado.value.idOperario[2],
+      'Operario4_Id': this.repacking ? 0 : this.formSellado.value.idOperario[3] == undefined ? 0 : this.formSellado.value.idOperario[3],
+      'Pesado_Entre': this.repacking ? 0 : (this.formSellado.value.idOperario).length,
       'Maquina': this.formSellado.value.maquina,
       'Cono_Id': 'N/A',
       'Ancho_Cono': 0,
@@ -435,7 +451,7 @@ export class Produccion_SelladoComponent implements OnInit {
         'presentationItem2': medida != 'Kg' ? `${medida}(s)` : 'Kg',
         'productionProcess': (dataRollo).toUpperCase(),
         'showNameBussiness': true,
-        'operator': operario[0].usua_Nombre,
+        'operator': operario[0].usua_Nombre == '0' ? '' : operario[0].usua_Nombre,
         'copy': reimpresion,
         'dataTagForClient': datosEtiqueta == '' ? `${this.ordenesTrabajo[0].selladoCorte_Etiqueta_Ancho} X ${this.ordenesTrabajo[0].selladoCorte_Etiqueta_Largo}` : datosEtiqueta,
         showDataTagForClient: this.formSellado.value.mostratDatosProducto,

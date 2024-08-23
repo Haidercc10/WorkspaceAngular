@@ -9,8 +9,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de
-        Sellado</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">{{repacking ? 'Rempaque de Sellado' : 'Ingresar Producción de Sellado'}}</h2>
     </div>
     <!--Linea-->
     <div class="mb-4">
@@ -31,7 +30,7 @@
     <div class="row g-4 my-4 mb-5">
 
       <!-- OT -->
-      <div class="col-sm-12 col-md-6 col-xl-1">
+      <div class="col-sm-12 col-md-6 col-xl-{{repacking ? 2 : 1}}">
         <span class="p-float-label">
           <p-inputNumber formControlName="ot" id="ot" (keyup.enter)="buscarOT()" type="number"
             [useGrouping]="false"></p-inputNumber>
@@ -49,7 +48,7 @@
       </div>
 
       <!-- Operario -->
-      <div class="col-sm-12 col-md-6 col-xl-4">
+      <div class="col-sm-12 col-md-6 col-xl-4" *ngIf="!repacking">
         <span class="p-float-label">
           <p-multiSelect formControlName="idOperario" inputId="operario" [options]="operarios" optionLabel="usua_Nombre"
             optionValue="usua_Id"></p-multiSelect>
@@ -66,7 +65,7 @@
       </div>
 
       <!--Cantidad Und/Paq-->
-      <div class="col-sm-12 col-md-6 col-xl-1">
+      <div class="col-sm-12 col-md-6 col-xl-{{repacking ? 2 : 1}}">
         <span class="p-float-label">
           <p-inputNumber formControlName="cantUnd" (onInput)="calcularPesoTeorico()" id="cantUnd" type="number"
             [maxFractionDigits]="2" [readonly]="esSoloLectura" [useGrouping]="false"
@@ -101,8 +100,8 @@
           </span>
         </div>-->
 
-      <!-- Turno -->
-      <div class="col-sm-12 col-md-6 col-xl-1 mb-3">
+      <!-- Proceso -->
+      <div class="col-sm-12 col-md-6 col-xl-{{repacking ? 2 : 1}} mb-3">
         <span class="p-float-label">
           <p-dropdown formControlName="proceso" inputId="procesos" [options]="procesos" optionValue="Id"
             optionLabel="Nombre"></p-dropdown>
@@ -255,6 +254,10 @@
         <ng-container
           *ngIf="data.operario1 != '0' && data.operario2 == '0' && data.operario3 == '0' && data.operario4 == '0'">
           <td>{{data.operario1}}</td>
+        </ng-container>
+        <ng-container
+          *ngIf="data.operario1 == '0' && data.operario2 == '0' && data.operario3 == '0' && data.operario4 == '0'">
+          <td><b>REEMPAQUE</b></td>
         </ng-container>
         <td class="text-center">{{data.cantidadUnd}}</td>
         <td class="text-center">{{data.presentacion1}}</td>
