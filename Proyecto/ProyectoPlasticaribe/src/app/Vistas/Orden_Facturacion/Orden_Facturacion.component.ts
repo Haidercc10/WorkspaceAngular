@@ -263,7 +263,7 @@ export class Orden_FacturacionComponent implements OnInit {
           client: cli.razoncial,
         });
       });
-      info != null ? this.comparationSaleOrder_Preload(info) : this.clearSomeFields();
+      //info != null ? this.comparationSaleOrder_Preload(info) : this.clearSomeFields();
     }, error => this.msj.mensajeError(`¡No se encontró información del cliente asociado al pedido!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 

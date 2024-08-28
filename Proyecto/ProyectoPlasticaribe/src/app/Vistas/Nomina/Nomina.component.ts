@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -12,6 +12,11 @@ import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticarib
 import { Tipos_NominaService } from 'src/app/Servicios/Tipos_Nomina/Tipos_Nomina.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsNomina as defaultSteps } from 'src/app/data';
+import { Nomina_CorteComponent } from '../Nomina_Corte/Nomina_Corte.component';
+
+@Injectable({
+  providedIn : 'root'
+})
 
 @Component({
   selector: 'app-Nomina',
@@ -43,6 +48,8 @@ export class NominaComponent implements OnInit {
   detalladoxBultos: any[] = []; /** Variable que cargará en el formato excel la nomina detallada por bultos para cada operario */
   nominaIngresada: any[] = []; /** Variable que almacenará la información de la nomina de ingresos */
   tiposNomina: any[] = []; /** Variable que almacenará la información de los tipos de nomina */
+  @ViewChild(Nomina_CorteComponent) cmpNomina_Corte : Nomina_CorteComponent;
+  activeTab : string = `Sellado`;
 
   constructor(private AppComponent: AppComponent,
     private servicioBagPro: BagproService,
@@ -59,6 +66,12 @@ export class NominaComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerTiposNominas();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.validateActiveTab();
+  }
+
+  validateActiveTab(){
+    if(this.ValidarRol == 4) this.activeTab = `Corte`; 
+    console.log(this.activeTab);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -127,6 +140,7 @@ export class NominaComponent implements OnInit {
   consultarNominas() {
     if ([1, 65].includes(this.ValidarRol)) this.consultarNominaIngresada();
     this.consultarNominasIngresosDespacho();
+    
     this.load = false;
     this.totalNominaSellado = 0;
     this.arraySellado = [];
@@ -134,7 +148,11 @@ export class NominaComponent implements OnInit {
     let fechaInicial: any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
     let fechaFinal: any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
 
+    this.cmpNomina_Corte.rankDates = [fechaInicial, fechaFinal];  
+    this.cmpNomina_Corte.searchPayRoll();
+
     this.servicioBagPro.GetNominaSelladoAcumuladaItem(fechaInicial, fechaFinal).subscribe(data => {
+      console.log(data);
       for (let index = 0; index < data.length; index++) {
         let info: any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
 
@@ -172,8 +190,8 @@ export class NominaComponent implements OnInit {
       info.PrecioNoche = parseFloat(info.PrecioNoche.toString().replace(',', '.')),
       info.detalle = [];
 
-
       array = this.arraySellado.findIndex(item => item.Cedula == info.Cedula);
+      console.log(array);
       
       if (array >= 0) {
         this.arraySellado[array].detalle.push(info);
@@ -311,6 +329,34 @@ export class NominaComponent implements OnInit {
         this.detalladoxBultos.sort((a, b) => Number(a.Cedula) - Number(b.Cedula));
       }
     });
+  }
+
+  changeTab(event : any){
+    let tab : any = event.originalEvent.srcElement.innerText;
+    
+    if(tab == 'Sellado') this.activeTab = `Sellado`;
+    else if(tab == 'Nomina Ingresada') this.activeTab = `Nomina Ingresada`;
+    else if(tab == 'Corte') this.activeTab = `Corte`;
+  }  
+
+  validateExportPDF(){
+    console.log(this.activeTab);
+    if(['Sellado', 'Nomina Ingresada'].includes(this.activeTab)) {
+      this.createPDF();
+    } else {
+      if(this.cmpNomina_Corte.payRollConsolidate.length > 0) this.cmpNomina_Corte.createPDF();
+      else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos de la nómina de corte para exportar a PDF.`);
+    }
+  }
+
+  validateExportExcel(){
+    console.log(this.activeTab);
+    if(['Sellado', 'Nomina Ingresada'].includes(this.activeTab)) {
+      this.createExcel();
+    } else {
+      if(this.cmpNomina_Corte.payRollConsolidate.length > 0) this.cmpNomina_Corte.createExcel();
+      else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos de la nómina de corte para exportar a Excel.`);
+    }
   }
 
   createExcel() {

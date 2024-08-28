@@ -103,6 +103,9 @@ export class BagproService {
 
   getInformationRoll = (production: number, ot : string): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getInformationRoll/${production}/${ot}`);
 
+  getPayRollCourt = (date1 : any, date2 : any): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getPayRollCourt/${date1}/${date2}`);
+
+
   /********************************************************** CLIENTESOT ****************************************************************/
 
   srvActualizar = (id:number|String, data:any, estado : any) => this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);

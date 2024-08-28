@@ -328,6 +328,7 @@ export class Produccion_SelladoComponent implements OnInit {
     setTimeout(() => {
       if (this.formSellado.valid) {
         if (this.formSellado.value.ot != null && this.formSellado.value.ot != '') {
+          console.log(this.ordenesTrabajo.length);
           if (this.ordenesTrabajo.length > 0) {
             if (this.formSellado.value.maquina > 0) {
               if (this.formSellado.value.idOperario != null) {
@@ -382,7 +383,7 @@ export class Produccion_SelladoComponent implements OnInit {
       'Operario2_Id': this.repacking ? 0 : this.formSellado.value.idOperario[1] == undefined ? 0 : this.formSellado.value.idOperario[1],
       'Operario3_Id': this.repacking ? 0 : this.formSellado.value.idOperario[2] == undefined ? 0 : this.formSellado.value.idOperario[2],
       'Operario4_Id': this.repacking ? 0 : this.formSellado.value.idOperario[3] == undefined ? 0 : this.formSellado.value.idOperario[3],
-      'Pesado_Entre': this.repacking ? 0 : (this.formSellado.value.idOperario).length,
+      'Pesado_Entre': this.repacking ? 1 : (this.formSellado.value.idOperario).length,
       'Maquina': this.formSellado.value.maquina,
       'Cono_Id': 'N/A',
       'Ancho_Cono': 0,

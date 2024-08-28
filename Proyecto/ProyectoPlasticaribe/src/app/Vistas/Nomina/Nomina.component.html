@@ -45,20 +45,21 @@
       </div>
 
       <div class="col justify-content-end text-right">
-        <button pButton pRipple label="Exportar a PDF" icon="pi pi-file-pdf" class="p-button-danger mx-2" id="exportar" pTooltip="" (click)="createPDF()"></button>
-        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success mx-2" id="exportar" pTooltip="" (click)="createExcel()"></button>
+        <button pButton pRipple label="Exportar a PDF" icon="pi pi-file-pdf" class="p-button-danger mx-2" id="exportar" pTooltip="" (click)="validateExportPDF()"></button>
+        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success mx-2" id="exportar" pTooltip="" (click)="validateExportExcel()"></button>
       </div>
     </div>
   </p-toolbar>
 
   <!--Tabs para nóminas sectorizadas-->
-  <p-tabView id="tabs">
+  <p-tabView id="tabs" [scrollable]="true" (onChange)="changeTab($event)">
 
     <!-- Nomina Sellado -->
     <p-tabPanel
       header="Sellado"
       leftIcon="pi pi-tags"
-      tooltip="Información de la Nómina de Sellado">
+      tooltip="Información de la Nómina de Sellado"
+      *ngIf="![4].includes(ValidarRol)">
       <div class="mb-3" *ngIf="load">
         <p-tabView id="tabs">
           <!-- Nomina de Sellado con Todos los rollos/bultos que se han pesado -->
@@ -304,6 +305,16 @@
       </div>
     </p-tabPanel>
 
+    <!--* Nomina de corte-->
+    <p-tabPanel
+      header="Corte"
+      leftIcon="pi pi-table"
+      tooltip="Información de la Nómina de Corte">
+        <div class="row g-3 font-size-14" id="table1">
+          <app-Nomina_Corte></app-Nomina_Corte>
+        </div>
+      </p-tabPanel>
+
     <!-- Nomina Ingresada -->
     <p-tabPanel
       header="Nomina Ingresada"
@@ -406,10 +417,9 @@
         </ng-template>
       </p-table>
     </p-tabPanel>
-
   </p-tabView>
 
-  <!-- tabla detallada por operario(s) -->
+  <!--* tabla detallada por operario(s) de sellado-->
   <p-dialog [(visible)]="modalSellado" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles de la nómina del operario {{operario}}" [modal]="true" styleClass="p-fluid">
     <ng-template pTemplate="content">
       <p-table
