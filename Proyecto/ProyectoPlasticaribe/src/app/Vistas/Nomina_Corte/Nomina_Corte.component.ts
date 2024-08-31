@@ -1,4 +1,3 @@
-import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -6,6 +5,7 @@ import { AppComponent } from 'src/app/app.component';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { FestivosService } from 'src/app/Servicios/Festivos/Festivos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
@@ -35,6 +35,8 @@ export class Nomina_CorteComponent implements OnInit {
   @ViewChild('dtDetailsModal') dtDetailsModal: Table | undefined;
   operator : string = ``;
   activeOperators : any = [];
+  festivos : any = [];
+
 
   constructor(private AppComponent: AppComponent,
     private svBagPro : BagproService,
@@ -42,12 +44,44 @@ export class Nomina_CorteComponent implements OnInit {
     private svExcel : CreacionExcelService,
     private svUsers : UsuarioService,
     private svPDF : CreacionPdfService, 
+    private svFestivos : FestivosService
   ) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.getActiveUsers();
+    this.festivos = [
+       "2024-01-01T00:00:00",
+       "2024-01-08T00:00:00",
+       "2024-03-24T00:00:00",
+       "2024-03-25T00:00:00",
+       "2024-03-28T00:00:00",
+       "2024-03-29T00:00:00",
+       "2024-03-31T00:00:00",
+       "2024-05-01T00:00:00",
+       "2024-05-13T00:00:00",
+       "2024-06-03T00:00:00",
+       "2024-06-10T00:00:00",
+       "2024-07-01T00:00:00",
+       "2024-07-20T00:00:00",
+       "2024-08-07T00:00:00",
+       "2024-08-19T00:00:00",
+       "2024-10-14T00:00:00",
+       "2024-11-04T00:00:00",
+       "2024-11-11T00:00:00",
+       "2024-12-08T00:00:00",
+       "2024-12-25T00:00:00",
+    ]
+    this.getHolidays();
+  }
+
+  getHolidays(){
+    this.svFestivos.getFestivos().subscribe(data => {
+      console.log(data);
+    }, error => {
+      console.log(error);
+    })
   }
 
   getActiveUsers = () => this.svUsers.getOperatorsCourt().subscribe(data => { this.activeOperators = data; });
@@ -70,16 +104,41 @@ export class Nomina_CorteComponent implements OnInit {
       let date2 : any = moment(this.rankDates[1]).format('YYYY-MM-DD');
 
       this.svBagPro.getPayRollCourt(date1, date2).subscribe(data => {
-        this.load = false;
-        console.log(data);
-        this.productionCourtDetails = data.filter(x => this.activeOperators.includes(x.operator));
-        this.productionCourt = data.filter(x => this.activeOperators.includes(x.operator));
-        this.hiddenProduction = data.filter(x => this.activeOperators.includes(x.operator));
-        
-        this.consolidatePayRoll();
-        this.loadTableDetails();
-      }, error => {
+        data.forEach(x => {
+          if(this.festivos.includes(x.date)) {
+            if(x.value_Day == 86.46) {
+              x.value_Day = x.value_Sunday;
+              x.value_Night = x.value_Sunday; 
+              x.value_Production = x.value_Sunday;
+              x.value_Pay = x.value_Sunday * x.weight; 
+              x.sunday = 'SI';
+            } else if(x.value_Day == 132.08) {
+              x.value_Day = x.value_Sunday;
+              x.value_Night = x.value_Sunday; 
+              x.value_Production = x.value_Sunday; 
+              x.value_Pay = x.value_Sunday * x.weight; 
+              x.sunday = 'SI';
+            } else if(x.value_Day == 120.88) {
+              x.value_Day = x.value_Sunday;
+              x.value_Night = x.value_Sunday; 
+              x.value_Production = x.value_Sunday; 
+              x.value_Pay = x.value_Sunday * x.weight;
+              x.sunday = 'SI';
+            }
+          }
+      });
+      
+      this.load = false;
+      this.productionCourtDetails = data.filter(x => this.activeOperators.includes(x.operator));
+      this.productionCourt = data.filter(x => this.activeOperators.includes(x.operator));
+      this.hiddenProduction = data.filter(x => this.activeOperators.includes(x.operator));
+  
+      this.consolidatePayRoll();
+      this.loadTableDetails();
 
+      }, error => {
+        this.load = false;
+        this.msj.mensajeError(`Error`, `Ocurrió un error al consultar la nómina de corte | ${error.status} ${error.statusText}`)
       });
     }
   }
@@ -95,16 +154,14 @@ export class Nomina_CorteComponent implements OnInit {
       }
       return a;
     }, []);
-    
   }
 
   loadTableDetails(){
     this.hiddenProduction.forEach(z => {
       
       let index = this.payRollConsolidate.findIndex(x => x.operator.includes(z.operator));
-      if(index != 1) {
+      if(index != -1) {
         if(!this.payRollConsolidate[index].details.map(x => x.item).includes(z.item)){
-          console.log(index, z.operator);
           this.payRollConsolidate[index].details.push({
             'item' : z.item,
             'reference' : z.reference,
@@ -183,7 +240,7 @@ export class Nomina_CorteComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5']; 
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5','N5','O5']; 
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
     
@@ -191,7 +248,7 @@ export class Nomina_CorteComponent implements OnInit {
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:M3');
+    ws.mergeCells('A1:O3');
 
     this.loadSizeHeader(ws);
   }
@@ -200,10 +257,10 @@ export class Nomina_CorteComponent implements OnInit {
   loadSizeHeader(ws : any){
     [2,6].forEach(x => ws.getColumn(x).width = 50);
     [11,2].forEach(x => ws.getColumn(x).width = 30);
-    [3,5,4,13].forEach(x => ws.getColumn(x).width = 10);
+    [3,5,4,13,15].forEach(x => ws.getColumn(x).width = 10);
     [12].forEach(x => ws.getColumn(x).width = 8);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [7,8,10,9].forEach(x => ws.getColumn(x).width = 15);
+    [7,8,10,9,14].forEach(x => ws.getColumn(x).width = 15);
   }
 
  //Función para cargar los nombres de las columnas del header
@@ -221,7 +278,9 @@ export class Nomina_CorteComponent implements OnInit {
       'Subtotal',
       'Fecha',
       'Turno',
-      'Domingo'
+      'Domingo', 
+      'Material',
+      'Impreso' 
     ];
     return headerRow;
   }
@@ -244,7 +303,9 @@ export class Nomina_CorteComponent implements OnInit {
         x.value_Pay,
         `${x.date.replace('T00:00:00', ` ${x.hour}`)} `,
         x.turn,
-        x.sunday ? 'SI' : 'NO'
+        x.sunday ? 'SI' : 'NO',
+        x.material,
+        x.printed
       ]);
     });
     this.addTotal(info);
@@ -255,7 +316,7 @@ export class Nomina_CorteComponent implements OnInit {
   loadInfoExcel(ws : any, data : any, border : any, alignment : any){
     let formatNumber: Array<number> = [7,8,10];
     let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M']; 
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O']; 
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(x => {
@@ -283,6 +344,8 @@ export class Nomina_CorteComponent implements OnInit {
       '',
       'TOTAL',
       this.hiddenProduction.reduce((a, b) => a += b.value_Pay, 0),
+      '',
+      '',
       '',
       '',
       ''
@@ -517,7 +580,7 @@ export class Nomina_CorteComponent implements OnInit {
         colSpan: 5,
         table: {
           headerRows: 1,
-          widths : ['5%', '10%', '10%', '10%', '10%', '5%', '5%', '10%', '8%', '10%', '12%', '5%'],
+          widths : ['3%', '10%', '10%', '10%', '8%', '9%', '4%', '10%', '7%', '10%', '10%', '10%'],
           body: this.dataDetailsProductionPDF(order, dataProduction),
         },
         fontSize: 9,
@@ -549,13 +612,13 @@ export class Nomina_CorteComponent implements OnInit {
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.hour },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.roll },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: this.formatNumbers((x.weight).toFixed(2)) },
-        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: 'Kg' },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.material == 'RECUPERADO' ? 'RECUP' : x.material },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.machine },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.sunday ? 'SI' : 'NO' },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.turn },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: `$ ${this.formatNumbers((x.value_Production).toFixed(2))}`  },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: `$ ${this.formatNumbers((x.value_Pay).toFixed(2))}`  },
-        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.send_Zeus },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.printed },
       ]);
     });
     return data;
@@ -568,13 +631,13 @@ export class Nomina_CorteComponent implements OnInit {
       { border: [false, true, false, true], alignment: 'center', text: `Hora`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Bulto`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Peso`, fillColor: '#eee', bold: true },
-      { border: [false, true, false, true], alignment: 'center', text: `Und`, fillColor: '#eee', bold: true },
+      { border: [false, true, false, true], alignment: 'center', text: `Material`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `MQ`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Dom.`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Turno`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Valor`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Total`, fillColor: '#eee', bold: true },
-      { border: [false, true, true, true], alignment: 'center', text: `Zeus`, fillColor: '#eee', bold: true },
+      { border: [false, true, true, true], alignment: 'center', text: `Impreso`, fillColor: '#eee', bold: true },
     ]
   }
 

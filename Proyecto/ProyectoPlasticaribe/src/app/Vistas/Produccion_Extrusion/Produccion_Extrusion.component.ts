@@ -19,6 +19,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { RePrint } from '../Produccion_Sellado/Produccion_Sellado.component';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-Produccion_Extrusion',
@@ -48,6 +49,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
   dataRePrint: Array<RePrint> = [];
   selectedMode: boolean = false;
   @ViewChild('dtRePrint') dtRePrint: Table;
+  url : string = ``; 
+  rebobinado : boolean = false;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -63,7 +66,9 @@ export class Produccion_ExtrusionComponent implements OnInit {
     private clientsService: SedeClienteService,
     private processService: ProcesosService,
     private orderProductionsService: Orden_TrabajoService,
-    private rePrintService: ReImpresionEtiquetasService,) {
+    private rePrintService: ReImpresionEtiquetasService,
+    private svRouter : Router, 
+  ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
@@ -96,13 +101,16 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.url = this.svRouter.url;
+    if(this.url = `/rebobinado-corte`) this.rebobinado = true;
+    console.log(this.url);
     this.lecturaStorage();
     this.obtenerUnidadMedida();
     this.obtenerConos();
     this.getProcess();
     this.validarProceso();
     this.obtenerOperarios();
-    setTimeout(() => this.buscarPuertos(), 1000);
+    //setTimeout(() => this.buscarPuertos(), 1000);
   }
 
   //Función que filtra la info de la tabla 
@@ -168,6 +176,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
       this.obtenerOperarios();
     }
     this.obtenerTurnos();
+    console.log(this.proceso);
+    
   }
 
   chargeSerialPorts() {
@@ -487,6 +497,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
+      Rebobinado: this.rebobinado ? true : false,
     }
     return datos; 
   }

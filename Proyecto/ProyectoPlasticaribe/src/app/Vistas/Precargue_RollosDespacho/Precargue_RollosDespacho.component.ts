@@ -126,12 +126,12 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     //let clients : any = this.clients.find(x => x.idcliente == client);
 
     if(this.form.valid) {
-      //if(this.rollsToDispatch.length > 0) {
-      //  if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
-      //    this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
-      //    return;
-      //  }
-      //}
+      if(this.rollsToDispatch.length > 0) {
+        if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
+          this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
+          return;
+        }
+      }
       this.load = true;
       this.svProduction.getInformationDispatch(roll, client).subscribe(data => {
         if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {

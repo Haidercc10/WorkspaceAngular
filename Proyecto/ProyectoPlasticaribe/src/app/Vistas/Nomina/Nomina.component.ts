@@ -189,10 +189,8 @@ export class NominaComponent implements OnInit {
       info.PrecioDia = parseFloat(info.PrecioDia.toString().replace(',', '.')),
       info.PrecioNoche = parseFloat(info.PrecioNoche.toString().replace(',', '.')),
       info.detalle = [];
-
+      console.log(info.Cedula);
       array = this.arraySellado.findIndex(item => item.Cedula == info.Cedula);
-      console.log(array);
-      
       if (array >= 0) {
         this.arraySellado[array].detalle.push(info);
         this.arraySellado[array].PagoTotal += parseFloat(info.PagoTotal);
@@ -276,6 +274,7 @@ export class NominaComponent implements OnInit {
 
   /** Cargará el modal de sellado al momento de seleccionar un operario en la columna ver detalle de la tabla */
   cargarModalSellado(item: any, persona: string, envioZeus: Array<string>) {
+    console.log(item, persona);
     this.modalSellado = true;
     this.detallesNomina = [];
     let fechaInicial: any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
@@ -284,6 +283,7 @@ export class NominaComponent implements OnInit {
     this.servicioBagPro.GetNominaSelladoDetalladaItemPersona(fechaInicial, fechaFinal, item, persona).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         let info: any = JSON.parse(`{${data[i].replaceAll("'", '"')}}`);
+        console.log(info);
         if (envioZeus.includes(info.EnvioZeus)) {
           info.Fecha = info.Fecha.replace(' 0:00:00', '').replace(' 12:00:00', ''),
           info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
@@ -294,6 +294,7 @@ export class NominaComponent implements OnInit {
           info.Cantidad_Total = parseFloat(info.Cantidad_Total.toString().replace(',', '.'));
           this.operario = info.Operario;
           this.detallesNomina.push(info);
+          console.log(this.detallesNomina); 
         }
       }
     });

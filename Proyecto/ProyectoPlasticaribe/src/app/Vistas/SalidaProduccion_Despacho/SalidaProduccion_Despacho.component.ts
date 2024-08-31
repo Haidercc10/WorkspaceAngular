@@ -47,6 +47,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   soloRead : boolean = true;
   reposition : boolean = false; 
   preload : boolean = false;
+  preSendProductionZeus : any[] = [];
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -121,8 +122,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.svPreload.GetIdPrecargue_Despacho(preload).subscribe(data => {
       this.productionProcessSerivce.getOrderFactForPreload(data.oF_Id).subscribe(dataOF => {
         this.formProduction.patchValue({ 'orderFact' : data.oF_Id });
-        this.sendProductionZeus = dataOF;
+        this.preSendProductionZeus = dataOF;
         this.load = false;
+        this.getInformationOrderFact();
       }, error => {
         this.msj.mensajeError(`Error`, `Error en la consulta de la orden de facturación asociada al precargue N° ${preload}`);
         this.load = false;
@@ -164,6 +166,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
                 this.formProduction.patchValue({ fact: factura.documento });
                 this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
                 this.load = false;
+                this.sendProductionZeus = this.preSendProductionZeus;
                 //Carga la info de la OF en la tabla. 
               }, error => {
                 this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error);

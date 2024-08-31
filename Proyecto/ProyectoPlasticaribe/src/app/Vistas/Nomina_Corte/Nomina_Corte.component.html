@@ -179,7 +179,7 @@
   </p-tabView>-->
 
   <!--* tabla detallada por operario(s) -->
-  <p-dialog [(visible)]="modal" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles de la nómina del operario {{operator}}" [modal]="true" styleClass="p-fluid">
+  <p-dialog [(visible)]="modal" [style]="{width: '80vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles de la nómina del operario {{operator}}" [modal]="true" styleClass="p-fluid">
     <ng-template pTemplate="content">
       <p-table
         #dtDetailsModal
@@ -197,6 +197,9 @@
             <th></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', dtDetailsModal)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'roll', dtDetailsModal)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'material', dtDetailsModal)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'printed', dtDetailsModal)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'laminate', dtDetailsModal)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'weight', dtDetailsModal)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'machine', dtDetailsModal)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', dtDetailsModal)"></th>
@@ -210,11 +213,14 @@
             <th>#</th>
             <th pSortableColumn="date">Fecha<p-sortIcon field="date"></p-sortIcon></th>
             <th pSortableColumn="roll">Rollo <p-sortIcon field="roll"></p-sortIcon></th>
+            <th pSortableColumn="material">Material <p-sortIcon field="material"></p-sortIcon></th>
+            <th pSortableColumn="printed">Impreso <p-sortIcon field="printed"></p-sortIcon></th>
+            <th pSortableColumn="laminate">Laminado <p-sortIcon field="laminate"></p-sortIcon></th>
             <th pSortableColumn="weight">Peso <p-sortIcon field="weight"></p-sortIcon></th>
             <th pSortableColumn="">Und <p-sortIcon field=""></p-sortIcon></th>
             <th pSortableColumn="machine">Maquina <p-sortIcon field="machine"></p-sortIcon></th>
             <th pSortableColumn="turn">Turno <p-sortIcon field="turn"></p-sortIcon></th>
-            <th pSortableColumn="sunday">Domingo <p-sortIcon field="sunday"></p-sortIcon></th>
+            <th pSortableColumn="sunday">Domingo/Festivo <p-sortIcon field="sunday"></p-sortIcon></th>
             <th pSortableColumn="value_Production">Precio <p-sortIcon field="value_Production"></p-sortIcon></th>
             <th pSortableColumn="value_Pay">Total <p-sortIcon field="value_Pay"></p-sortIcon></th>
             <th pSortableColumn="send_Zeus">Envio Zeus <p-sortIcon field="send_Zeus"></p-sortIcon></th>
@@ -225,6 +231,9 @@
             <td><b>{{rowIndex + 1}}</b></td>
             <td>{{data.date | date : 'dd-MM-yyyy'}} {{data.hour}}</td>
             <td>{{data.roll}}</td>
+            <td><b>{{data.material}}</b></td>
+            <td>{{data.printed}}</td>
+            <td>{{data.laminate}}</td>
             <td><b>{{data.weight | number : '1.2-2'}}</b></td>
             <td>{{'Kg'}}</td>
             <td>{{data.machine}}</td>

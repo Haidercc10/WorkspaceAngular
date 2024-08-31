@@ -27,7 +27,7 @@
       <div class="col-sm-12 col-md-2">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
-          <input formControlName="preload" type="number" id="preload" required pInputText (keyup.enter)="getInformationPreload()"/>
+          <input formControlName="preload" type="number" id="preload" pInputText (keyup.enter)="getInformationPreload()"/>
           <label for="preload">N° Precargue</label>
         </span>
       </div>
@@ -110,7 +110,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
-        <td class="text-center">{{data.position}}</td>
+        <td class="text-center">{{data.position == 0 ? rowIndex + 1 : data.position}}</td>
         <td class="text-center">{{data.pp.ot}}</td>
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
         <td class="text-center">{{data.dataExtrusion.numero_RolloBagPro}}</td>

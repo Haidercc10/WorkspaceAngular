@@ -32,4 +32,5 @@ export interface modelProduccionProcesos {
     Observacion?: string;
     Estado_Rollo? : number;
     PrecioVenta_Producto? : number;
+    Rebobinado? : boolean;
 }

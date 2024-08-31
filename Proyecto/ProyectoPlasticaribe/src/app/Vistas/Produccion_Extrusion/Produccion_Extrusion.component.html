@@ -8,7 +8,8 @@
     <!-- Navegador fin de parte superior -->
     <div class="container-fluid">
         <div class="mb-4 Titulo">
-        <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de {{proceso}}</h2>
+        <h2 *ngIf="!rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de {{proceso}}</h2>
+        <h2 *ngIf="rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Rebobinado de Corte</h2>
         </div>
         <div class="mb-4">
         <hr class="colorLinea">
@@ -22,7 +23,7 @@
     </div>
 
     <form [formGroup]="formDatosProduccion">
-        <div class="row g-4 my-4">
+        <div class="row g-3 my-4">
             <!-- PROCESO -->
             <div class="col-sm-12 col-md-2" *ngIf="ValidarRol == 1">
                 <span class="p-float-label">
@@ -48,7 +49,7 @@
             </div>
 
             <!-- OPERARIO -->
-            <div class="col-sm-12 col-md-3 col-xl-3">
+            <div class="col-sm-12 col-md-3 col-xl-2">
                 <span class="p-float-label">
                     <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
                     <label for="operario">Operario</label>
@@ -90,16 +91,16 @@
             <!-- PESO BRUTO -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
-                    <label for="pesoBruto">Bruto Kg</label>
+                    <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4" [required]="true"></p-inputNumber>
+                    <label for="pesoBruto">Bruto Kg</label> <!--[readonly]="true" -->
                 </span>
             </div>
 
             <!-- PESO NETO -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="pesoNeto" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
-                    <label for="pesoNeto">Neto Kg</label>
+                    <p-inputNumber formControlName="pesoNeto" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4"  [required]="true"></p-inputNumber>
+                    <label for="pesoNeto">Neto Kg</label> <!--[readonly]="true"-->
                 </span>
             </div>
 
@@ -164,7 +165,7 @@
     </form>
 
     <div class="mb-4">
-        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Pesado</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Pesados</h4>
     </div>
 
     <p-table #dtProduccion
