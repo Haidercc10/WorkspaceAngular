@@ -27,4 +27,5 @@ export interface modelProduccionProcesos {
     Fecha : any;
     Hora : string;
     Creador_Id : number;
+    Rebobinado? : boolean;
 }

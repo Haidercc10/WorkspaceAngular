@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
@@ -44,6 +45,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   port: SerialPort;
   reader: any;
   reference : string = ``;
+  url : string = ``; 
+  rebobinado : boolean = false;
 
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
 
@@ -61,7 +64,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     private clientsService: SedeClienteService,
     private processService: ProcesosService,
     private orderProductionsService: Orden_TrabajoService,
-    private rePrintService: ReImpresionEtiquetasService,) {
+    private rePrintService: ReImpresionEtiquetasService,
+    private svRouter : Router,
+  ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
@@ -94,6 +99,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.url = this.svRouter.url;
+    if(this.url = `/rebobinado-corte`) this.rebobinado = true;
+    console.log(this.rebobinado);
+    
     this.lecturaStorage();
     this.obtenerUnidadMedida();
     this.obtenerConos();
@@ -463,6 +472,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
+      Rebobinado : this.rebobinado ? true : false,
     }
     return datos;
   }

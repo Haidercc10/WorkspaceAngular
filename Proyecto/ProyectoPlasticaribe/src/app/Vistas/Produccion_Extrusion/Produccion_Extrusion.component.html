@@ -8,8 +8,8 @@
     <!-- Navegador fin de parte superior -->
     <div class="container-fluid">
         <div class="mb-4 Titulo">
-            <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de
-                {{proceso}}</h2>
+            <h2 *ngIf="!rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de {{proceso}}</h2>
+            <h2 *ngIf="rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Rebobinado de Corte</h2>
         </div>
         <div class="mb-4">
             <hr class="colorLinea">
@@ -53,7 +53,7 @@
             </div>
 
             <!-- OPERARIO -->
-            <div class="col-sm-12 col-md-3 col-xl-3">
+            <div class="col-sm-12 col-md-3 col-xl-2">
                 <span class="p-float-label">
                     <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false"
                         [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true"
@@ -102,7 +102,7 @@
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
                     <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal"
-                        [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                        [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber> 
                     <label for="pesoBruto">Bruto Kg</label>
                 </span>
             </div>

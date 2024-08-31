@@ -97,6 +97,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Reempaque_ProduccionComponent } from './Vistas/Reempaque_Produccion/Reempaque_Produccion.component';
+import { Rebobinados_CorteComponent } from './Vistas/Rebobinados_Corte/Rebobinados_Corte.component';
 
 @NgModule({
   declarations: [
@@ -117,6 +118,7 @@ import { Reempaque_ProduccionComponent } from './Vistas/Reempaque_Produccion/Ree
     Produccion_ExtrusionComponent,
     Movimientos_DespachoComponent,
     Reempaque_ProduccionComponent,
+    Rebobinados_CorteComponent,
   ],
 
   imports: [
