@@ -84,6 +84,7 @@
                     <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'weight', dt)"></th>
                     <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
                     <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'value_Pay', dt)"></th>
+                    <th></th>
                   </tr>
                   <!--Encabezado-->
                   <tr id="campos">
@@ -91,9 +92,11 @@
                     <th class="text-center" >#</th>
                     <th class="text-center" pSortableColumn="operator" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="operator"></p-sortIcon></th>
                     <th class="text-center" id="inicial" pSortableColumn="position_Job" pReorderableColumn scope="col">Cargo <p-sortIcon field="position_Job"></p-sortIcon></th>
+                    <th class="text-center" scope="col" pSortableColumn="">Rollos Pesados <p-sortIcon field="weight"></p-sortIcon> </th>
                     <th class="text-center" scope="col" pSortableColumn="weight">Cant. Producida (Kg) <p-sortIcon field="weight"></p-sortIcon> </th>
                     <th class="text-center" scope="col" pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon> </th>
                     <th class="text-center" id="entrada" pSortableColumn="value_Pay" pReorderableColumn scope="col">Valor a pagar<p-sortIcon field="value_Pay"></p-sortIcon></th>
+                    <th class="text-center">Exportar</th>
                   </tr>
                 </ng-template>
                 <!--Cuerpo Tabla 1 -->
@@ -105,23 +108,28 @@
                     <td class="text-center">{{rowIndex + 1}}</td>
                     <td class="text-center"><b>{{nomina.operator}}</b></td>
                     <td class="text-center">{{nomina.position_Job }}</td>
+                    <td class="text-center"><b>{{qtyRecordsOperator(nomina.operator) }}</b></td>
                     <td class="text-center"><b>{{nomina.weight | number : '1.2-2' }}</b></td>
                     <td class="text-center">{{ 'Kg' }}</td>
                     <td class="text-center"> <b style="color: #00a2ff;">$ {{nomina.value_Pay | number : '1.2-2'}}</b></td>
+                    <td class="text-center">
+                      <button pButton (click)="createExcel(nomina.operator)" type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Exportar producción del empleado {{nomina.operator}}" icon="pi pi-file-excel"></button>
+                    </td>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="footer">
                   <tr>
-                    <td colspan="4" class="text-right">Total Producido</td>
+                    <td colspan="5" class="text-right">Total Producido</td>
                     <td class="text-center"><b>{{calcTotalProduction() | number : '1.2-2'}}</b></td>
                     <td class="text-right">Total a pagar</td>
                     <td class="text-center" id="total"><b style="color: #00a2ff;">$ {{calcTotalPay() | number : '1.2-2'}}</b></td>
+                    <td></td>
                   </tr>
                 </ng-template>
                 <!--Tabla 2-->
                 <ng-template pTemplate="rowexpansion" let-nomina>
                   <tr>
-                    <td colspan="7">
+                    <td colspan="9">
                       <div class="p-3">
                         <p-table
                         [value]="nomina.details"
@@ -134,6 +142,7 @@
                               <th pSortableColumn="reference"> Referencia <p-sortIcon field="reference"></p-sortIcon></th>
                               <th pSortableColumn="weight">Cant.Producida <p-sortIcon field="weight"></p-sortIcon></th>
                               <th pSortableColumn=""> Und <p-sortIcon field=""></p-sortIcon></th>
+                              <th pSortableColumn=""> Registros <p-sortIcon field=""></p-sortIcon></th>
                               <th pSortableColumn="turn"> Turno <p-sortIcon field="turn"></p-sortIcon></th>
                               <th pSortableColumn="value_Sunday"> Precio Domingo <p-sortIcon field="value_Sunday"></p-sortIcon></th>
                               <th pSortableColumn="value_Day"> Precio Día <p-sortIcon field="value_Day"></p-sortIcon></th>
@@ -149,6 +158,7 @@
                               <td>{{ details.reference }}</td>
                               <td><b>{{ details.weight | number : '1.2-2' }}</b></td>
                               <td>{{ 'Kg' }}</td>
+                              <td><b>{{ qtyRecordsOperatorItem(details.operator, details.item) }}</b></td>
                               <td><b>{{ details.turn }}</b></td>
                               <td>$ {{ details.value_Sunday | number : '1.2-2'}}</td>
                               <td>$ {{ details.value_Day | number : '1.2-2'}}</td>

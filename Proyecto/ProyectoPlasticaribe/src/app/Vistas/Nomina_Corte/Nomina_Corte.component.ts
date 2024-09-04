@@ -36,6 +36,7 @@ export class Nomina_CorteComponent implements OnInit {
   operator : string = ``;
   activeOperators : any = [];
   festivos : any = [];
+  infoExcel : any [] = [];
 
 
   constructor(private AppComponent: AppComponent,
@@ -73,7 +74,7 @@ export class Nomina_CorteComponent implements OnInit {
        "2024-12-08T00:00:00",
        "2024-12-25T00:00:00",
     ]
-    this.getHolidays();
+    //this.getHolidays();
   }
 
   getHolidays(){
@@ -196,19 +197,31 @@ export class Nomina_CorteComponent implements OnInit {
 
   calcTotalProduction = () => this.payRollConsolidate.reduce((a, b) => a += b.weight, 0);
 
+  qtyRecordsOperatorItem = (operator : any, item : any) => this.hiddenProduction.filter(x => x.operator == operator && x.item == item).length;
+  
+  qtyRecordsOperator = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator).length;
+
   //* FORMATO EXCEL
-  createExcel(){
+  createExcel(operator? : any){
+    this.infoExcel = [];
     if(this.hiddenProduction.length > 0) {
       this.load = true;
-      this.hiddenProduction.sort((a, b) => a.operator.localeCompare(b.operator))
-      setTimeout(() => { this.loadSheetAndStyles(this.hiddenProduction);  }, 500);
+      if(operator == undefined) this.infoExcel = this.hiddenProduction;
+      else this.infoExcel = this.hiddenProduction.filter(x => x.operator == operator);
+      this.infoExcel.sort((a, b) => a.operator.localeCompare(b.operator))
+      setTimeout(() => {
+        this.loadSheetAndStyles(this.infoExcel, operator);  
+      }, 1500); 
     } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar!`);
   }
 
   //Función que cargará la hoja de cálculo y los estilos.
-  loadSheetAndStyles(data : any){  
+  loadSheetAndStyles(data : any, operator : any){  
     let title : any = `Nómina de Corte`;
-    title += ` ${moment().format('DD-MM-YYYY')}`
+    let date1 : any = moment(this.rankDates[0]).format('YYYY-MM-DD');
+    let date2 : any = moment(this.rankDates[1]).format('YYYY-MM-DD');
+    operator != undefined ? title += ` ${operator}` : title = title;
+    date1 == date2 ? title += ` ${date1}` : title += ` ${date1} - ${date2}`;
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
@@ -217,7 +230,7 @@ export class Nomina_CorteComponent implements OnInit {
 
     this.addNewSheet(workbook, title, fill, border, font, alignment, data);
     this.svExcel.creacionHoja(workbook, `Nómina Consolidada Corte`, false);
-    this.addGroupedSheet(workbook, fill, font, border, this.groupedInfoExcel(), 2)
+    this.addGroupedSheet(workbook, fill, font, border, this.groupedInfoExcel(operator), 2)
     this.svExcel.creacionExcel(title, workbook);
     this.load = false;
   }
@@ -278,7 +291,7 @@ export class Nomina_CorteComponent implements OnInit {
       'Subtotal',
       'Fecha',
       'Turno',
-      'Domingo', 
+      'Dom/Fest', 
       'Material',
       'Impreso' 
     ];
@@ -340,10 +353,10 @@ export class Nomina_CorteComponent implements OnInit {
       '',
       '',
       'KG PRODUCIDOS',
-      this.hiddenProduction.reduce((a, b) => a += b.weight, 0),
+      this.infoExcel.reduce((a, b) => a += b.weight, 0),
       '',
       'TOTAL',
-      this.hiddenProduction.reduce((a, b) => a += b.value_Pay, 0),
+      this.infoExcel.reduce((a, b) => a += b.value_Pay, 0),
       '',
       '',
       '',
@@ -390,9 +403,11 @@ export class Nomina_CorteComponent implements OnInit {
   }
 
   //.Información agrupada de la hoja 2: Reporte de producción consolidado.
-  groupedInfoExcel(){
+  groupedInfoExcel(operator : any){
     let info : any = [];
-    info = this.payRollConsolidate.reduce((acc, obj) => {
+    let data : any = operator == undefined ? this.payRollConsolidate : this.payRollConsolidate.filter(x => x.operator == operator);
+
+    info = data.reduce((acc, obj) => {
       if(!acc.map(x => x[0]).includes(obj.operator)) {
         acc = [...acc, [obj.operator, obj.position_Job, obj.weight, 'Kg', obj.value_Pay]]
       }

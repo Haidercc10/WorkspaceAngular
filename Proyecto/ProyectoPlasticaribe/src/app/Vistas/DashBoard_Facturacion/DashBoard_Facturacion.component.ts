@@ -96,7 +96,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
       this.zeusService.ValorTotalFacturadoHoy().subscribe(datos_facturacion => this.totalFacturadoDia = datos_facturacion);
       this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
         if (moment().month() == 7 && this.anoSeleccionado == 2023) this.totalFacuturadoMes = (datos_facturacion + 6249600 + 12091700);
-        else if (moment().month() == 7 && this.anoSeleccionado == 2024) this.totalFacuturadoMes = (datos_facturacion - 709073187 - 0);
+        else if (moment().month() == 7 && this.anoSeleccionado == 2024) this.totalFacuturadoMes = (datos_facturacion - 709073187 + 17726829.68);
         else this.totalFacuturadoMes = datos_facturacion;
       }); 
       this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => this.totalIvaVentaMes = datos_facturacion);
@@ -110,7 +110,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
       let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
       this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
         if (this.anoSeleccionado == 2023 && mes == '08') this.totalFacturadoanio += (datos_facturacion + 6249600 + 12091700);
-        else if (this.anoSeleccionado == 2024 && mes == '08') this.totalFacturadoanio += (datos_facturacion - 709073187 - 0);
+        else if (this.anoSeleccionado == 2024 && mes == '08') this.totalFacturadoanio += (datos_facturacion - 709073187 + 17726829.68);
         else this.totalFacturadoanio += datos_facturacion;
       });
     }
@@ -133,7 +133,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
             i == 4 ? parseFloat(info.Valor) : costoMeses[4],
             i == 5 ? parseFloat(info.Valor) : costoMeses[5],
             i == 6 ? parseFloat(info.Valor) : costoMeses[6],
-            i == 7 ? this.anoSeleccionado == 2024 ? (parseFloat(info.Valor) - 709073187 - 0) : parseFloat(info.Valor) : costoMeses[7],
+            i == 7 ? this.anoSeleccionado == 2024 ? (parseFloat(info.Valor) - 709073187 + 17726829.68) : parseFloat(info.Valor) : costoMeses[7],
             i == 8 ? this.anoSeleccionado == 2023 ? (parseFloat(info.Valor) + 6249600 + 12091700) : parseFloat(info.Valor) : costoMeses[8],
             i == 9 ? parseFloat(info.Valor) : costoMeses[9],
             i == 10 ? parseFloat(info.Valor) : costoMeses[10],
