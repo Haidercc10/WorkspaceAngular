@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { modelSolicitudRollos } from 'src/app/Modelo/modelSolicitudRollos';
 import { environment } from 'src/environments/environment';
 
-@Injectable()
+@Injectable({
+    providedIn : 'root'
+})
+
 export class Servicios_ProduccionService {
 
     readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;

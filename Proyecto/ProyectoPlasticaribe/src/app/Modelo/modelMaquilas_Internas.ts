@@ -1,5 +1,6 @@
 export interface modelMaquilas_Internas {
-    MaqInt_Id : number;
+    MaqInt_Codigo : number; 
+    MaqInt_Id? : number;
     MaqInt_OT : number;
     Prod_Id : number;
     Cono_Id : string;
@@ -19,4 +20,5 @@ export interface modelMaquilas_Internas {
     MaqInt_FechaRegistro : any;
     MaqInt_HoraRegistro : string;
     Creador_Id : number;
+    MaqInt_Observacion : string;
 }

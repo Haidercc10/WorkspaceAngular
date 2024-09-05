@@ -322,7 +322,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que valida la entrada del registro
   validarEntrada() {
     this.cargando = true;
-    //this.getPuertoSerial();
+    this.getPuertoSerial();
     this.buscarOT(true);
     if(this.repacking) this.formSellado.patchValue({ idOperario : [0] });
     setTimeout(() => {

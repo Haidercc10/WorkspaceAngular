@@ -38,15 +38,15 @@
         <!--* Servicio-->
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="process" inputId="process" [autoDisplayFirst]="true" [options]="process" optionLabel="Proceso_Nombre" optionValue="Proceso_Id"></p-dropdown>
-            <label for="process">Servicio</label>
+            <p-dropdown formControlName="service" inputId="service" [required]="true" [autoDisplayFirst]="true" [options]="services" optionLabel="svcProd_Nombre" optionValue="svcProd_Id"></p-dropdown>
+            <label for="service">Servicio</label>
           </span>
         </div>
 
         <!--* ORDEN DE TRABAJO -->
         <div class="col-sm-12 col-md-2 col-xl-1">
           <span class="p-float-label">
-              <input formControlName="ot" id="ot" type="number" pAutoFocus [autofocus]="true" pInputText required/>
+              <input formControlName="ot" id="ot" type="number" pAutoFocus [autofocus]="true" (keyup.enter)="searchOT()" pInputText required/>
               <label for="ot">OT</label>
           </span>
         </div>
@@ -78,7 +78,7 @@
         <!--* CONO -->
         <div class="col-sm-12 col-md-3 col-xl-2">
             <span class="p-float-label">
-                <p-dropdown formControlName="cono" inputId="cono" [options]="conos" optionLabel="cono_Id" optionValue="cono_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                <p-dropdown formControlName="cono" (onChange)="buscarDatosConoSeleccionado()" inputId="cono" [options]="conos" optionLabel="cono_Id" optionValue="cono_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                 <label for="cono">Cono</label>
             </span>
         </div>
@@ -102,7 +102,7 @@
         <!--* PESO BRUTO -->
         <div class="col-sm-12 col-md-2 col-xl-1">
             <span class="p-float-label">
-                <p-inputNumber formControlName="weight" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="weight" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4"></p-inputNumber>
                 <label for="pesoBruto">Bruto Kg</label> 
             </span>
         </div>
@@ -110,7 +110,7 @@
         <!--* PESO NETO -->
         <div class="col-sm-12 col-md-2 col-xl-1">
             <span class="p-float-label">
-                <p-inputNumber formControlName="netWeight" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="netWeight" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4"></p-inputNumber>
                 <label for="pesoNeto">Neto Kg</label>
             </span>
         </div>
@@ -133,57 +133,116 @@
 
         <!--* BOTONES-->
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" id="crear" type="button" label="Agregar Servicio" icon="pi pi-send" [disabled]="load"></button>
-          <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" ></button>
+          <button pButton class="p-button-danger" id="crear" type="button" label="Agregar Servicio" icon="pi pi-send" (click)="addService()" [disabled]="load || !form.valid"></button>
+          <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" (click)="clearFields()" icon="pi pi-eraser" ></button>
         </div>
 
-        <p-divider></p-divider>
       </div>
     </div>    
+
   </form>
 
+  <p-divider></p-divider>
+
   <!--* Orden de Producción-->
-  <div class="row my-3">
-    <div class="mb-5">
+  <div class="row my-3 mb-5">
+    <div class="mb-3">
       <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Información de Orden de Producción</h4>
     </div>
 
     <p-table
       [value]="dataOrderProduction"
       columnResizeMode="expand"
+      styleClass="p-datatable-sm p-datatable-gridlines"
+      responsiveLayout="scroll"
+      [rowHover]="true">
+        <ng-template pTemplate="header">
+            <tr>
+                <th class="text-center">Cliente</th>
+                <th class="text-center">Item</th>
+                <th class="text-center">Referencia</th>
+                <th class="text-center">Unidad</th>
+                <th class="text-center">Ancho 1</th>
+                <th class="text-center">Ancho 2</th>
+                <th class="text-center">Ancho 3</th>
+                <th class="text-center">Unidad</th>
+                <th class="text-center">Calibre</th>
+                <th class="text-center">Material</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+            <tr>
+                <td class="text-center">{{ data.client }}</td>
+                <td class="text-center">{{ data.item }}</td>
+                <td class="text-center">{{ data.reference }}</td>
+                <td class="text-center">{{ data.unit }}</td>
+                <td class="text-center">{{ data.broad1 | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.broad2 | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.broad3 | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.unitExtrusion }}</td>
+                <td class="text-center">{{ data.calibre | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.material }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+  </div>
+
+  <div class="class mb-5">
+    <p-divider></p-divider>
+  </div>
+  
+
+  <!--* Servicios-->
+  <div class="row my-3">
+    <div class="mb-3">
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Información de servicios agregados</h4>
+    </div>
+
+    <p-table
+      [value]="loadedServices"
+      columnResizeMode="expand"
       styleClass="p-datatable-sm"
       responsiveLayout="scroll"
       [rowHover]="true">
         <ng-template pTemplate="header">
             <tr>
-                <th>Cliente</th>
-                <th>Item</th>
-                <th>Referencia</th>
-                <th>Unidad</th>
-                <th>Ancho 1</th>
-                <th>Ancho 2</th>
-                <th>Ancho 3</th>
-                <th>Unidad</th>
-                <th>Calibre</th>
-                <th>Material</th>
+                <th class="text-center">#</th>
+                <th class="text-center">Operario</th>
+                <th class="text-center">Servicio</th>
+                <th class="text-center">Fecha</th>
+                <th class="text-center">Solicitante</th>
+                <th class="text-center">Peso Bruto</th>
+                <th class="text-center">Peso Neto</th>
+                <th class="text-center">Unidad</th>
+                <th class="text-center">Valor Servicio</th>
+                <th class="text-center">Subtotal</th>
+                <th class="text-center"></th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-data>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
             <tr>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
-                <td>{{''}}</td>
+                <td class="text-center">{{ rowIndex + 1 }}</td>
+                <td class="text-center"><b>{{ data.operator }}</b></td>
+                <td class="text-center">{{ data.service }}</td>
+                <td class="text-center">{{ data.date }}</td>
+                <td class="text-center"><b>{{ data.requestedBy }}</b></td>
+                <td class="text-center">{{ data.weight | number : '1.2-2'}}</td>
+                <td class="text-center"><b>{{ data.netWeight | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{ data.unit }}</td>
+                <td class="text-center">{{ data.valueService | number : '1.2-2' }}</td>
+                <td class="text-center textBlue"><b>{{ data.subTotal | number : '1.2-2' }}</b></td>
+                <td class="text-center">
+                  <button pButton (click)="quitService(data.operator)" type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Quitar servicio del empleado {{data.operator}}" icon="pi pi-trash"></button>
+                </td>
             </tr>
         </ng-template>
     </p-table>
-
-    <p-divider></p-divider>
   </div>
+
+  <!--* Botones-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <button pButton class="p-button-danger" id="crear" type="button" label="Generar Entrada" icon="pi pi-send" (click)="createInternalMaquila()" [disabled]="load || loadedServices.length == 0"></button>
+    <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" (click)="clearAll()" icon="pi pi-eraser" ></button>
+  </div>
+  
 </p-card>  
