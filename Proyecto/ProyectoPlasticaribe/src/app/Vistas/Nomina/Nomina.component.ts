@@ -71,7 +71,6 @@ export class NominaComponent implements OnInit {
 
   validateActiveTab(){
     if(this.ValidarRol == 4) this.activeTab = `Corte`; 
-    console.log(this.activeTab);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -152,7 +151,6 @@ export class NominaComponent implements OnInit {
     this.cmpNomina_Corte.searchPayRoll();
 
     this.servicioBagPro.GetNominaSelladoAcumuladaItem(fechaInicial, fechaFinal).subscribe(data => {
-      console.log(data);
       for (let index = 0; index < data.length; index++) {
         let info: any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
 
@@ -189,7 +187,7 @@ export class NominaComponent implements OnInit {
       info.PrecioDia = parseFloat(info.PrecioDia.toString().replace(',', '.')),
       info.PrecioNoche = parseFloat(info.PrecioNoche.toString().replace(',', '.')),
       info.detalle = [];
-      console.log(info.Cedula);
+
       array = this.arraySellado.findIndex(item => item.Cedula == info.Cedula);
       if (array >= 0) {
         this.arraySellado[array].detalle.push(info);
@@ -274,7 +272,6 @@ export class NominaComponent implements OnInit {
 
   /** Cargará el modal de sellado al momento de seleccionar un operario en la columna ver detalle de la tabla */
   cargarModalSellado(item: any, persona: string, envioZeus: Array<string>) {
-    console.log(item, persona);
     this.modalSellado = true;
     this.detallesNomina = [];
     let fechaInicial: any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
@@ -283,7 +280,6 @@ export class NominaComponent implements OnInit {
     this.servicioBagPro.GetNominaSelladoDetalladaItemPersona(fechaInicial, fechaFinal, item, persona).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         let info: any = JSON.parse(`{${data[i].replaceAll("'", '"')}}`);
-        console.log(info);
         if (envioZeus.includes(info.EnvioZeus)) {
           info.Fecha = info.Fecha.replace(' 0:00:00', '').replace(' 12:00:00', ''),
           info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
@@ -294,7 +290,6 @@ export class NominaComponent implements OnInit {
           info.Cantidad_Total = parseFloat(info.Cantidad_Total.toString().replace(',', '.'));
           this.operario = info.Operario;
           this.detallesNomina.push(info);
-          console.log(this.detallesNomina); 
         }
       }
     });
@@ -341,7 +336,6 @@ export class NominaComponent implements OnInit {
   }  
 
   validateExportPDF(){
-    console.log(this.activeTab);
     if(['Sellado', 'Nomina Ingresada'].includes(this.activeTab)) {
       this.createPDF();
     } else {
@@ -351,7 +345,6 @@ export class NominaComponent implements OnInit {
   }
 
   validateExportExcel(){
-    console.log(this.activeTab);
     if(['Sellado', 'Nomina Ingresada'].includes(this.activeTab)) {
       this.createExcel();
     } else {

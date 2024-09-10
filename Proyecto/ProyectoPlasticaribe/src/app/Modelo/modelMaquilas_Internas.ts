@@ -14,6 +14,7 @@ export interface modelMaquilas_Internas {
     Maquina : number;
     Operario_Id : number;
     MaqInt_Fecha : any;
+    MaqInt_Hora : string;
     Proceso_Id : string;
     Estado_Id : number;
     SvcProd_Id : number;
@@ -21,4 +22,8 @@ export interface modelMaquilas_Internas {
     MaqInt_HoraRegistro : string;
     Creador_Id : number;
     MaqInt_Observacion : string;
+    Material_Id : number;
+    Turno_Id : string;
+    Impreso : boolean;
+    MaqInt_ValorPago : number;
 }

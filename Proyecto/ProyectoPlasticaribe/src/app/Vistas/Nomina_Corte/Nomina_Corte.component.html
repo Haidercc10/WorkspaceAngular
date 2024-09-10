@@ -79,12 +79,23 @@
                   <tr class="font-size-16" id="filtros">
                     <th></th>
                     <th></th>
-                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'operator', dt)"></th>
+                    <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'operator', dt)"></th>
                     <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'position_Job', dt)"></th>
-                    <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'weight', dt)"></th>
-                    <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
-                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'value_Pay', dt)"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
                     <th></th>
+                  </tr>
+                  <tr>
+                    <th style="font-weight: 800;" class="text-center" colspan="2"></th>
+                    <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Empleado</th>
+                    <th style="font-weight: 800;" class="text-center textGreen" colspan="3"><i class="pi pi-box"></i> Informacion Produccion</th>
+                    <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-database"></i> Informacion Servicios</th>
+                    <th style="font-weight: 800;" class="text-center textBlue" colspan="2"><i class="pi pi-dollar"></i> Informacion Pago</th>
                   </tr>
                   <!--Encabezado-->
                   <tr id="campos">
@@ -92,9 +103,12 @@
                     <th class="text-center" >#</th>
                     <th class="text-center" pSortableColumn="operator" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="operator"></p-sortIcon></th>
                     <th class="text-center" id="inicial" pSortableColumn="position_Job" pReorderableColumn scope="col">Cargo <p-sortIcon field="position_Job"></p-sortIcon></th>
-                    <th class="text-center" scope="col" pSortableColumn="">Rollos Pesados <p-sortIcon field="weight"></p-sortIcon> </th>
-                    <th class="text-center" scope="col" pSortableColumn="weight">Cant. Producida (Kg) <p-sortIcon field="weight"></p-sortIcon> </th>
-                    <th class="text-center" scope="col" pSortableColumn="">Presentación <p-sortIcon field=""></p-sortIcon> </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Rollos Producción <p-sortIcon field=""></p-sortIcon> </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Cant. Producida (Kg) <p-sortIcon field=""></p-sortIcon> </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Valor Producido ($) <p-sortIcon field=""></p-sortIcon> </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Rollos Servicios <p-sortIcon field=""></p-sortIcon> </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Cant. Servicios (Kg) <p-sortIcon field=""></p-sortIcon> </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Valor Servicios ($) <p-sortIcon field=""></p-sortIcon> </th>
                     <th class="text-center" id="entrada" pSortableColumn="value_Pay" pReorderableColumn scope="col">Valor a pagar<p-sortIcon field="value_Pay"></p-sortIcon></th>
                     <th class="text-center">Exportar</th>
                   </tr>
@@ -108,9 +122,12 @@
                     <td class="text-center">{{rowIndex + 1}}</td>
                     <td class="text-center"><b>{{nomina.operator}}</b></td>
                     <td class="text-center">{{nomina.position_Job }}</td>
-                    <td class="text-center"><b>{{qtyRecordsOperator(nomina.operator) }}</b></td>
-                    <td class="text-center"><b>{{nomina.weight | number : '1.2-2' }}</b></td>
-                    <td class="text-center">{{ 'Kg' }}</td>
+                    <td class="text-center textGreen"><b>{{qtyRecordsOperatorProduction(nomina.operator) }}</b></td>
+                    <td class="text-center textGreen"><b>{{qtyProductionOperator(nomina.operator)| number : '1.2-2' }}</b></td>
+                    <td class="text-center textGreen"><b>$ {{calcTotalPayOperatorProduction(nomina.operator) | number : '1.2-2' }}</b></td>
+                    <td class="text-center">{{qtyRecordsOperatorServices(nomina.operator) }}</td>
+                    <td class="text-center">{{qtyServicesOperator(nomina.operator) | number : '1.2-2' }}</td>
+                    <td class="text-center">$ {{calcTotalPayOperatorService(nomina.operator) | number : '1.2-2' }}</td>
                     <td class="text-center"> <b style="color: #00a2ff;">$ {{nomina.value_Pay | number : '1.2-2'}}</b></td>
                     <td class="text-center">
                       <button pButton (click)="createExcel(nomina.operator)" type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Exportar producción del empleado {{nomina.operator}}" icon="pi pi-file-excel"></button>
@@ -119,9 +136,13 @@
                 </ng-template>
                 <ng-template pTemplate="footer">
                   <tr>
-                    <td colspan="5" class="text-right">Total Producido</td>
-                    <td class="text-center"><b>{{calcTotalProduction() | number : '1.2-2'}}</b></td>
-                    <td class="text-right">Total a pagar</td>
+                    <td colspan="4" class="text-right">Total Producción y Servicios</td>
+                    <td class="text-center textGreen"><b>{{calcNumberRollsProduction()}}</b></td>
+                    <td class="text-center textGreen"><b>{{calcTotalProduction() | number : '1.2-2'}}</b></td>
+                    <td class="text-center textGreen"><b>{{calcTotalPayProduction() | number : '1.2-2'}}</b></td>
+                    <td class="text-center"><b>{{calcNumberRollsServices()}}</b></td>
+                    <td class="text-center"><b>{{calcTotalServices() | number : '1.2-2'}}</b></td>
+                    <td class="text-center"><b>{{calcTotalPayServices() | number : '1.2-2'}}</b></td>
                     <td class="text-center" id="total"><b style="color: #00a2ff;">$ {{calcTotalPay() | number : '1.2-2'}}</b></td>
                     <td></td>
                   </tr>
@@ -129,7 +150,7 @@
                 <!--Tabla 2-->
                 <ng-template pTemplate="rowexpansion" let-nomina>
                   <tr>
-                    <td colspan="9">
+                    <td colspan="12">
                       <div class="p-3">
                         <p-table
                         [value]="nomina.details"
@@ -138,8 +159,9 @@
                           <ng-template pTemplate="header">
                             <tr>
                               <th pSortableColumn="operator"> Operario <p-sortIcon field="operator"></p-sortIcon></th>
+                              <th pSortableColumn="concept"> Concepto <p-sortIcon field="concept"></p-sortIcon></th>
                               <th pSortableColumn="item"> Item <p-sortIcon field="item"></p-sortIcon></th>
-                              <th pSortableColumn="reference"> Referencia <p-sortIcon field="reference"></p-sortIcon></th>
+                              <th pSortableColumn="reference"> Referencia/Servicio <p-sortIcon field="reference"></p-sortIcon></th>
                               <th pSortableColumn="weight">Cant.Producida <p-sortIcon field="weight"></p-sortIcon></th>
                               <th pSortableColumn=""> Und <p-sortIcon field=""></p-sortIcon></th>
                               <th pSortableColumn=""> Registros <p-sortIcon field=""></p-sortIcon></th>
@@ -154,6 +176,13 @@
                           <ng-template pTemplate="body" let-details>
                             <tr>
                               <td>{{ details.operator }}</td>
+                              <td>
+                                <span class="badge" 
+                                  [ngClass]="{
+                                    'bg-success1': details.concept == 'PRODUCCION',
+                                    'bg-warning1': details.concept == 'MAQUILA',
+                                  }">{{details.concept}}</span>
+                              </td>  
                               <td><b>{{ details.item }}</b></td>
                               <td>{{ details.reference }}</td>
                               <td><b>{{ details.weight | number : '1.2-2' }}</b></td>
@@ -164,12 +193,12 @@
                               <td>$ {{ details.value_Day | number : '1.2-2'}}</td>
                               <td>$ {{ details.value_Night | number : '1.2-2' }}</td>
                               <td><b>$ {{ details.value_Pay | number : '1.2-2' }}</b></td>
-                              <td class="text-center"><button pButton type="button" (click)="loadModal(details.operator, details.item)" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{details.operator}}" icon="pi pi-eye"></button></td>
+                              <td class="text-center"><button pButton type="button" (click)="loadModal(details.operator, details.item)" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detallado de producción del empleado {{details.operator}}" icon="pi pi-eye"></button></td>
                             </tr>
                           </ng-template>
                           <ng-template pTemplate="emptymessage">
                             <tr>
-                              <td colspan="6">No se encontraron registros</td>
+                              <td colspan="13">No se encontraron registros</td>
                             </tr>
                           </ng-template>
                         </p-table>
@@ -222,7 +251,7 @@
           <tr>
             <th>#</th>
             <th pSortableColumn="date">Fecha<p-sortIcon field="date"></p-sortIcon></th>
-            <th pSortableColumn="roll">Rollo <p-sortIcon field="roll"></p-sortIcon></th>
+            <th pSortableColumn="roll">N° Rollo/Maquila <p-sortIcon field="roll"></p-sortIcon></th>
             <th pSortableColumn="material">Material <p-sortIcon field="material"></p-sortIcon></th>
             <th pSortableColumn="printed">Impreso <p-sortIcon field="printed"></p-sortIcon></th>
             <th pSortableColumn="laminate">Laminado <p-sortIcon field="laminate"></p-sortIcon></th>
@@ -242,7 +271,7 @@
             <td>{{data.date | date : 'dd-MM-yyyy'}} {{data.hour}}</td>
             <td>{{data.roll}}</td>
             <td><b>{{data.material}}</b></td>
-            <td>{{data.printed}}</td>
+            <td>{{data.printed }}</td>
             <td>{{data.laminate}}</td>
             <td><b>{{data.weight | number : '1.2-2'}}</b></td>
             <td>{{'Kg'}}</td>

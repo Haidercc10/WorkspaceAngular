@@ -21,6 +21,8 @@ export class Maquilas_InternasService {
 
         getInternalsMaquilasForCode = (code : any) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Maquilas_Internas/getInternalsMaquilasForCode/${code}`);
     
+        getMovMaquilas = (date1 : any, date2 : any, url? : string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Maquilas_Internas/getMovMaquilas/${date1}/${date2}${url}`);
+    
         Post = (data : modelMaquilas_Internas) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Maquilas_Internas`, data);
     
         Put = (id : any, data : any) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Maquilas_Internas/${id}`, data);

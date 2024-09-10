@@ -92,9 +92,9 @@ export class CrearProveedorComponent implements OnInit {
       Prov_Email : email,
       Prov_Fecha : moment().format('YYYY-MM-DD'),
       Prov_Hora : moment().format('H:mm:ss'),
-      ReteFuente : this.FormCrearProveedor.value.ReteIva,
+      ReteFuente : this.FormCrearProveedor.value.ReteFuente,
       ReteICA : this.FormCrearProveedor.value.ReteIca,
-      ReteIVA : this.FormCrearProveedor.value.ReteFuente,
+      ReteIVA : this.FormCrearProveedor.value.ReteIva,
     }
 
     this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(() => {

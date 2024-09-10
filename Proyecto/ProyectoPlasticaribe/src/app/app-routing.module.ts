@@ -60,6 +60,7 @@ export const routes: Routes = [
   { path: 'gestion-devoluciones-of', loadChildren: () => import('./Modules/gestion-devoluciones-of/gestion-devoluciones-of.module').then(m => m.GestionDevolucionesOfModule) },
   { path: 'orden-facturacion-pallets', loadChildren: () => import('./Modules/orden-facturacion-pallets/orden-facturacion-pallets.module').then(m => m.OrdenFacturacionPalletsModule) },
   { path: 'maquilas-internas', loadChildren: () => import('./Modules/maquilas-internas/maquilas-internas.module').then(m => m.MaquilasInternasModule) },
+  { path: 'mov-maquilas-internas', loadChildren: () => import('./Modules/mov-maquilas-internas/mov-maquilas-internas-routing.module').then(m => m.MovMaquilasInternasRoutingModule) },
 
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
   { path: 'IngresoRollos-Extrusion', loadChildren: () => import('./Modules/ingreso-rollos/ingreso-rollos.module').then(m => m.IngresoRollosModule) }, 

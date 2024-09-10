@@ -1,6 +1,4 @@
-span{
-    color: #db4149;
-  }
+
   
   #table td, th{
     font-size: calc(var(--font-size) * 13px);

@@ -6,6 +6,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { FestivosService } from 'src/app/Servicios/Festivos/Festivos.service';
+import { Maquilas_InternasService } from 'src/app/Servicios/Maquilas_Internas/Maquilas_Internas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
@@ -44,8 +45,9 @@ export class Nomina_CorteComponent implements OnInit {
     private msj : MensajesAplicacionService,
     private svExcel : CreacionExcelService,
     private svUsers : UsuarioService,
-    private svPDF : CreacionPdfService, 
-    private svFestivos : FestivosService
+    private svPDF : CreacionPdfService,  
+    private svFestivos : FestivosService,
+    private svInternalMaquilas : Maquilas_InternasService,
   ) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
@@ -104,6 +106,7 @@ export class Nomina_CorteComponent implements OnInit {
       let date1 : any = moment(this.rankDates[0]).format('YYYY-MM-DD');
       let date2 : any = moment(this.rankDates[1]).format('YYYY-MM-DD');
 
+      this.getServicesOperators(date1, date2);
       this.svBagPro.getPayRollCourt(date1, date2).subscribe(data => {
         data.forEach(x => {
           if(this.festivos.includes(x.date)) {
@@ -130,13 +133,12 @@ export class Nomina_CorteComponent implements OnInit {
       });
       
       this.load = false;
-      this.productionCourtDetails = data.filter(x => this.activeOperators.includes(x.operator));
-      this.productionCourt = data.filter(x => this.activeOperators.includes(x.operator));
-      this.hiddenProduction = data.filter(x => this.activeOperators.includes(x.operator));
-  
+      this.productionCourtDetails = this.productionCourtDetails.concat(data.filter(x => this.activeOperators.includes(x.operator)));
+      this.productionCourt = this.productionCourt.concat(data.filter(x => this.activeOperators.includes(x.operator)));
+      this.hiddenProduction = this.hiddenProduction.concat(data.filter(x => this.activeOperators.includes(x.operator)));
       this.consolidatePayRoll();
       this.loadTableDetails();
-
+      //console.log(this.productionCourt);
       }, error => {
         this.load = false;
         this.msj.mensajeError(`Error`, `Ocurrió un error al consultar la nómina de corte | ${error.status} ${error.statusText}`)
@@ -173,6 +175,7 @@ export class Nomina_CorteComponent implements OnInit {
             'turn' : z.turn,  
             'weight' : z.weight,
             'value_Pay' : z.value_Pay,
+            'concept' : z.concept
           });
         } else {
           let index2 = this.payRollConsolidate[index].details.findIndex(x => x.item == z.item);
@@ -190,16 +193,52 @@ export class Nomina_CorteComponent implements OnInit {
     this.infoModal = this.hiddenProduction.filter(x => x.operator == operator && x.item == item);
   }
 
+  getServicesOperators(date1 : any, date2 : any){
+    this.svInternalMaquilas.getMovMaquilas(date1, date2, ``).subscribe(data => {
+      //console.log(data);
+      this.productionCourt = this.productionCourt.concat(data);
+      this.hiddenProduction = this.hiddenProduction.concat(data);
+      console.log(this.productionCourt);
+      
+    }, error => {
+      console.log(error);
+    });
+  }
+
   /** Filtrar la tabla detallada del modal de sellado */
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   calcTotalPay = () => this.payRollConsolidate.reduce((a, b) => a += b.value_Pay, 0);
 
-  calcTotalProduction = () => this.payRollConsolidate.reduce((a, b) => a += b.weight, 0);
+  calcTotalPayOperatorProduction = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'PRODUCCION').reduce((a, b) => a += b.value_Pay, 0);
+  
+  calcTotalPayOperatorService = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'MAQUILA').reduce((a, b) => a += b.value_Pay, 0);
+
+  
 
   qtyRecordsOperatorItem = (operator : any, item : any) => this.hiddenProduction.filter(x => x.operator == operator && x.item == item).length;
   
   qtyRecordsOperator = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator).length;
+
+  qtyRecordsOperatorProduction = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'PRODUCCION').length;
+
+  qtyRecordsOperatorServices = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'MAQUILA').length;
+  
+  qtyProductionOperator = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'PRODUCCION').reduce((a, b) => a += b.weight, 0);
+
+  qtyServicesOperator = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'MAQUILA').reduce((a, b) => a += b.weight, 0);
+
+  calcNumberRollsProduction = () => this.hiddenProduction.filter(x => x.concept == 'PRODUCCION').length;
+
+  calcNumberRollsServices = () => this.hiddenProduction.filter(x => x.concept == 'MAQUILA').length;
+
+  calcTotalProduction = () => this.hiddenProduction.filter(x => x.concept == 'PRODUCCION').reduce((a, b) => a += b.weight, 0);
+
+  calcTotalServices = () => this.hiddenProduction.filter(x => x.concept == 'MAQUILA').reduce((a, b) => a += b.weight, 0);
+
+  calcTotalPayProduction = () => this.hiddenProduction.filter(x => x.concept == 'PRODUCCION').reduce((a, b) => a += b.value_Pay, 0);
+
+  calcTotalPayServices = () => this.hiddenProduction.filter(x => x.concept == 'MAQUILA').reduce((a, b) => a += b.value_Pay, 0);
 
   //* FORMATO EXCEL
   createExcel(operator? : any){

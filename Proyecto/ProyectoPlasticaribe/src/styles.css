@@ -613,6 +613,20 @@ p-avatar div span {
   color: #dab900;
 }
 
+.textDay {
+  color: #dab900;
+  font-weight: 800;
+  border : #dab900;
+  background-color: #f59e0b1f;
+}
+
+.textNight {
+  color: #fff;
+  font-weight: 800;
+  border : #0b213f;
+  background-color: #0b213f;
+}
+
 .read-only {
   cursor: not-allowed; /* Cambiar el cursor a no disponible */
 }
