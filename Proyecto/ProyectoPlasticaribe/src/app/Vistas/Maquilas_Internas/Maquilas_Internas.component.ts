@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -14,6 +14,10 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { Servicios_ProduccionService } from 'src/app/Servicios/Servicios_Produccion/Servicios_Produccion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+
+@Injectable({
+  providedIn : 'root'
+})
 
 @Component({
   selector: 'app-Maquilas_Internas',
@@ -71,6 +75,49 @@ export class Maquilas_InternasComponent implements OnInit {
     this.getServices();
     this.getCurrentTurn();
     this.getMaterials();
+    //setTimeout(() => this.buscarPuertos(), 1000);
+  }
+
+  async buscarPuertos() {
+    try {
+      const port: SerialPort = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      this.chargeDataFromSerialPort(port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
+      else this.msj.mensajeError(ex);
+    }
+  }
+
+  async chargeDataFromSerialPort(port: SerialPort) {
+    let reader;
+    let keepReading: boolean = true;
+    while (port.readable && keepReading) {
+      reader = port.readable.getReader();
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            reader.releaseLock();
+            break;
+          }
+          if (value) {
+            let valor = this.ab2str(value);
+            valor = valor.replace(/[^\d.-]/g, '');
+            if (!this.load) {
+              this.form.patchValue({
+                'weight': valor,
+                'netWeight' : valor - this.form.get('weightTare').value
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        reader.releaseLock();
+      }
+    }
   }
 
   getHollidays2024(){
@@ -246,7 +293,7 @@ export class Maquilas_InternasComponent implements OnInit {
   }
 
   //Función que obtiene los puertos seriales
-  async getPuertoSerial() {
+  /*async getPuertoSerial() {
     try {
       const port = await navigator.serial.requestPort();
       await port.open({ baudRate: 9600 });
@@ -255,10 +302,10 @@ export class Maquilas_InternasComponent implements OnInit {
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No se encontró báscula conectada!');
       else this.msj.mensajeError(ex);
     }
-  }
+  }*/
 
   //Función que lee los datos del puerto serial
-  async cargarDatosPuertoSerial(port: any) {
+  /*async cargarDatosPuertoSerial(port: any) {
     let reader;
     let keepReading: boolean = true;
     setTimeout(async () => {
@@ -288,7 +335,7 @@ export class Maquilas_InternasComponent implements OnInit {
         reader.releaseLock();
       }
     }
-  }
+  }*/
 
   //Función que convierte un buffer a un valor
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
@@ -326,6 +373,7 @@ export class Maquilas_InternasComponent implements OnInit {
     
     if(ot == this.dataOrderProduction[0].ot) {
       let operator : any = this.form.get('operator').value;
+      let nameOperator : any = this.operators.find(x => x.usua_Id == operator).usua_Nombre;
       let service : any = this.form.get('service').value;
       let date : any = moment().format('YYYY-MM-DD');
       let valueService : any = this.holidays.map(x => x).includes(date) ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDomFest : 
@@ -354,12 +402,11 @@ export class Maquilas_InternasComponent implements OnInit {
         'materialId' : this.dataOrderProduction[0].materialId, 
         'printed' : this.dataOrderProduction[0].printed
       });
-
-      this.msj.mensajeConfirmacion(`Confirmación`, `Se agregó correctamente el servicio al operario ${this.operators.find(x => x.usua_Id == operator).usua_Nombre}`);
-      this.form.patchValue({ weight : null, netWeight : null, observation : null });
+      this.msj.mensajeConfirmacion(`Confirmación`, `Se agregó correctamente el servicio al operario ${nameOperator}`);
+      //this.form.patchValue({ weight : null, netWeight : null, observation : null });
     } else {
       this.msj.mensajeAdvertencia(`La OT del servicio no coincide con la OT seleccionada!`);
-      this.form.patchValue({ weight : null, netWeight : null, observation : null })
+      //this.form.patchValue({ weight : null, netWeight : null, observation : null })
     } 
   }
 
@@ -548,7 +595,7 @@ export class Maquilas_InternasComponent implements OnInit {
   //Función que consolida la información por mat. primas
   tableConsolidatedPDF(data) {
     let columns: Array<string> = ['#', 'Id', 'Operario', 'Registros', 'Peso', 'Presentación', 'Valor'];
-    let widths: Array<string> = ['5%', '5%', '30%', '20%', '10%', '15%', '15%'];
+    let widths: Array<string> = ['5%', '10%', '30%', '15%', '10%', '15%', '15%'];
     return {
       table: {
         headerRows: 2,
@@ -567,7 +614,7 @@ export class Maquilas_InternasComponent implements OnInit {
   //Tabla con materiales recuperados ingresados detallados
   tableMaterialsPDF(data) {
     let columns: Array<string> = ['#', 'Operario', 'Servicio', 'Solicita', 'OT', 'Peso', 'Und', 'Valor', 'Subtotal'];
-    let widths: Array<string> = ['3%', '18%', '35%', '7%', '7%', '7%', '4%', '8%', '10%'];
+    let widths: Array<string> = ['3%', '18%', '35%', '7%', '7%', '6%', '3%', '8%', '12%'];
     return {
       margin: [0, 10],
       table: {
@@ -590,16 +637,16 @@ export class Maquilas_InternasComponent implements OnInit {
       fontSize: 8,
       bold: false,
       table: {
-        widths: ['5%', '5%', '30%', '20%', '10%', '15%', '15%'],
+        widths: ['5%', '10%', '30%', '15%', '10%', '15%', '15%'],
         body: [
           [
             { text: ``, bold : true, border: [true, false, false, true], },
             { text: ``, bold : true, border: [false, false, false, true], },
-            { text: `Totales`, alignment: 'right', bold : true, border: [true, false, false, true], },
-            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseInt(b.Registros), 0)))}`, bold : true, border: [false, false, true, true], },
+            { text: `Totales`, alignment: 'right', bold : true, border: [false, false, false, true], },
+            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseInt(b.Registros), 0)))}`, bold : true, border: [true, false, true, true], },
             { text: `${this.formatonumeros((data.reduce((a, b) => a += parseFloat(b.Peso.replaceAll(',', '')), 0)).toFixed(2))}`, bold : true, border: [false, false, true, true], },
             { text: `Kg`, bold : true, border: [false, false, true, true], },
-            { text: `$ ${this.formatonumeros((data.reduce((a, b) => a += parseFloat(b.Valor.replace('$ ', '').replace(',', '')), 0)))}`, bold : true, border: [false, false, true, true], },
+            { text: `$ ${this.formatonumeros((data.reduce((a, b) => a += parseFloat(b.Valor.replace('$ ', '').replace(',', '')), 0)).toFixed(2))}`, bold : true, border: [false, false, true, true], },
           ],
         ],
       }

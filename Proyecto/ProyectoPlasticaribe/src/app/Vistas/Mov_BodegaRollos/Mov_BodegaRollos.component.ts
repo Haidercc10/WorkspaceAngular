@@ -147,7 +147,6 @@ export class Mov_BodegaRollosComponent implements OnInit {
     let typeMov : any = this.form.value.typeMov;
     let process : any = this.form.value.process;
     let url : string = ``;
-    
 
     if(ot != null) url += `ot=${ot}`;
     if(item != null) url.length > 0 ? url += `&item=${item}` : url += `item=${item}`;

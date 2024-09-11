@@ -21,8 +21,8 @@
 
     <div class="col-sm-12 col-md-6 col-xl-1">
       <span class="p-input-icon-left p-float-label">
-        <i class="{{turn == 'NOCHE' ? 'textDay pi pi-sun' : 'textNight pi pi-moon'}}"></i>
-        <input [(ngModel)]="turn" id="turnos" type="text" readonly pInputText class="{{turn == 'NOCHE' ? 'textDay' : 'textNight'}}"/>
+        <i class="{{turn == 'DIA' ? 'textDay pi pi-sun' : 'textNight pi pi-moon'}}"></i>
+        <input [(ngModel)]="turn" id="turnos" type="text" readonly pInputText class="{{turn == 'DIA' ? 'textDay' : 'textNight'}}"/>
         <label for="turnos"> Turno</label>
       </span>
     </div>
@@ -216,23 +216,25 @@
       columnResizeMode="expand"
       styleClass="p-datatable-sm"
       responsiveLayout="scroll"
-      [rowHover]="true">
+      [resizableColumns]="true"
+      [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="50rem">
         <ng-template pTemplate="header">
             <tr class="font-size-16" id="">
               <th></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Solicitud', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Fecha', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Estado', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'BgSolicitada', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'BgSolicitante', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Tipo', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Fecha', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Estado', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'BgSolicitada', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'BgSolicitante', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'operator', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'service', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'requestedBy', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'weight', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'netWeight', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'valueService', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subTotal', 'contains')"></th>
               <th></th>
             </tr>
-          
             <tr>
                 <th class="text-center">#</th>
                 <th class="text-center">Operario</th>
@@ -272,5 +274,6 @@
     <button pButton class="p-button-danger" id="crear" type="button" label="Generar Entrada" icon="pi pi-send" (click)="createInternalMaquila()" [disabled]="load || loadedServices.length == 0"></button>
     <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" (click)="clearAll()" icon="pi pi-eraser" ></button>
   </div>
+  
   
 </p-card>  

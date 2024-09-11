@@ -110,7 +110,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.getProcess();
     this.validarProceso();
     this.obtenerOperarios();
-    //setTimeout(() => this.buscarPuertos(), 1000);
+    setTimeout(() => this.buscarPuertos(), 1000);
   }
 
   //Función que filtra la info de la tabla 
