@@ -144,7 +144,6 @@
                     <td class="text-center"><b>{{calcTotalServices() | number : '1.2-2'}}</b></td>
                     <td class="text-center"><b>{{calcTotalPayServices() | number : '1.2-2'}}</b></td>
                     <td class="text-center" id="total"><b style="color: #00a2ff;">$ {{calcTotalPay() | number : '1.2-2'}}</b></td>
-                    <td></td>
                   </tr>
                 </ng-template>
                 <!--Tabla 2-->
@@ -158,23 +157,23 @@
                         styleClass="p-datatable-gridlines p-datatable-sm">
                           <ng-template pTemplate="header">
                             <tr>
+                              <th>Ver</th>
                               <th pSortableColumn="operator"> Operario <p-sortIcon field="operator"></p-sortIcon></th>
                               <th pSortableColumn="concept"> Concepto <p-sortIcon field="concept"></p-sortIcon></th>
                               <th pSortableColumn="item"> Item <p-sortIcon field="item"></p-sortIcon></th>
                               <th pSortableColumn="reference"> Referencia/Servicio <p-sortIcon field="reference"></p-sortIcon></th>
-                              <th pSortableColumn="weight">Cant.Producida <p-sortIcon field="weight"></p-sortIcon></th>
-                              <th pSortableColumn=""> Und <p-sortIcon field=""></p-sortIcon></th>
+                              <th pSortableColumn="weight">Cant.Producida (Kg)<p-sortIcon field="weight"></p-sortIcon></th>
                               <th pSortableColumn=""> Registros <p-sortIcon field=""></p-sortIcon></th>
                               <th pSortableColumn="turn"> Turno <p-sortIcon field="turn"></p-sortIcon></th>
                               <th pSortableColumn="value_Sunday"> Precio Domingo <p-sortIcon field="value_Sunday"></p-sortIcon></th>
                               <th pSortableColumn="value_Day"> Precio Día <p-sortIcon field="value_Day"></p-sortIcon></th>
                               <th pSortableColumn="value_Night"> Precio Noche <p-sortIcon field="value_Night"></p-sortIcon></th>
                               <th pSortableColumn="value_Pay"> Pago Total <p-sortIcon field="value_Pay"></p-sortIcon></th>
-                              <th>Ver</th>
                             </tr>
                           </ng-template>
                           <ng-template pTemplate="body" let-details>
                             <tr>
+                              <td class="text-center"><button pButton type="button" (click)="loadModal(details.operator, details.item)" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detallado de producción del empleado {{details.operator}}" icon="pi pi-eye"></button></td>
                               <td>{{ details.operator }}</td>
                               <td>
                                 <span class="badge" 
@@ -186,19 +185,17 @@
                               <td><b>{{ details.item }}</b></td>
                               <td>{{ details.reference }}</td>
                               <td><b>{{ details.weight | number : '1.2-2' }}</b></td>
-                              <td>{{ 'Kg' }}</td>
                               <td><b>{{ qtyRecordsOperatorItem(details.operator, details.item) }}</b></td>
                               <td><b>{{ details.turn }}</b></td>
                               <td>$ {{ details.value_Sunday | number : '1.2-2'}}</td>
                               <td>$ {{ details.value_Day | number : '1.2-2'}}</td>
                               <td>$ {{ details.value_Night | number : '1.2-2' }}</td>
                               <td><b>$ {{ details.value_Pay | number : '1.2-2' }}</b></td>
-                              <td class="text-center"><button pButton type="button" (click)="loadModal(details.operator, details.item)" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detallado de producción del empleado {{details.operator}}" icon="pi pi-eye"></button></td>
                             </tr>
                           </ng-template>
                           <ng-template pTemplate="emptymessage">
                             <tr>
-                              <td colspan="13">No se encontraron registros</td>
+                              <td colspan="12">No se encontraron registros</td>
                             </tr>
                           </ng-template>
                         </p-table>

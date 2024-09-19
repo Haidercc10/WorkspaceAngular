@@ -48,6 +48,7 @@ export class Maquilas_InternasComponent implements OnInit {
   materials : any = [];
   holidays : any = [];
   realServices : any = [];
+  selectedService : any = null;
 
   constructor(
     private AppComponent : AppComponent,
@@ -199,8 +200,6 @@ export class Maquilas_InternasComponent implements OnInit {
 
   //Función para cargar fechas en el campo. 
   loadDate(){
-    console.log(moment().add(7, 'd'));
-    
     this.form.patchValue({ 'date' : new Date(moment().add(1, 'd').format('YYYY-MM-DD')) });
   }
 
@@ -208,21 +207,19 @@ export class Maquilas_InternasComponent implements OnInit {
 
   applyFilter = ($event, campo : any, valorCampo : string) => this.dtServices!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  searchOT(){
-    let ot : any = this.form.value.ot;
+  searchOT(order? : any){
+    let ot : any = order ? order : this.form.value.ot;
     this.dataOrderProduction = [];
     this.realServices = [];
     this.load = true;
    
     this.svBagPro.GetOrdenDeTrabajo(ot).subscribe(data => {
-      console.log(data);
       let nitCliente : any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
       this.svSedes.GetSedeClientexNitBagPro(nitCliente).subscribe(sede => {
         let printed : boolean = data[0].id_Tinta1 == 1 ? false : true;
-        console.log(printed);
         this.realServices = this.services.filter(x => x.material_Id == data[0].id_Material && x.impreso == printed);
+        this.form.patchValue({ service : this.selectedService })
         
-        this.load = false;
         this.dataOrderProduction.push({
           'ot' : data[0].numero_Orden, 
           'client' : sede[0].cliente, 
@@ -237,9 +234,10 @@ export class Maquilas_InternasComponent implements OnInit {
           'materialId' : data[0].id_Material,
           'material' : data[0].material.trim(),
           'broadItem' : data[0].selladoCorte_Ancho,
-          'printed' : data[0].id_Tinta1 != 1 ? true : false,
+          'printed' : printed,
         });
         this.buscarDatosConoSeleccionado();
+        this.getAddedServices(ot);
       }, error => {
         this.load = false;
         this.msj.mensajeAdvertencia(error.status.toString().startsWith('4') ? `El cliente Identificado con NIT/CC N° ${nitCliente}, no está creado!` : `Error consultando el cliente N° ${nitCliente}`)
@@ -250,6 +248,16 @@ export class Maquilas_InternasComponent implements OnInit {
       this.msj.mensajeError(error.status.toString().startsWith('4') ? `La OT N° ${ot} no existe` : `Error consultando la OT N° ${ot}`);
       this.clearFields();
     });    
+  }
+
+  getAddedServices(ot : any){
+    this.svInternalMaquila.getInternalsMaquilasForOT(ot).subscribe(data => {
+      this.loadedServices = data;
+      this.load = false;
+    }, error => {
+      this.msj.mensajeError(`Error`, `No fue posible consultar la información de la maquila por OT | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });
   }
 
   buscarDatosConoSeleccionado() {
@@ -343,7 +351,7 @@ export class Maquilas_InternasComponent implements OnInit {
   addService(){
     //this.getPuertoSerial();
     this.load = true;
-    this.form.patchValue({ 'weight' : 300.9, 'netWeight' : 300.9 - this.form.get('weightTare').value });
+    this.form.patchValue({ 'weight' : 15.9, 'netWeight' : 15.9 - this.form.get('weightTare').value });
     let weight : number = this.form.get('weight').value;
     let netWeight : number = this.form.get('netWeight').value;
     let today : any = moment().format('YYYY-MM-DD');
@@ -359,7 +367,8 @@ export class Maquilas_InternasComponent implements OnInit {
         if(![0, null, undefined, ''].includes(weight)) {
           if(![0, null, undefined, ''].includes(netWeight)) {
             if(days <= 0) {
-              this.loadServicesTable(weight, netWeight);
+              this.createInternalMaquila();
+              //this.loadServicesTable(weight, netWeight);
             } else this.msj.mensajeAdvertencia(`La fecha de servicio no puede ser mayor a la fecha actual`);
           } else this.msj.mensajeAdvertencia(`El peso neto es inválido!`);
         } else this.msj.mensajeAdvertencia(`El peso bruto es inválido!`);
@@ -380,7 +389,7 @@ export class Maquilas_InternasComponent implements OnInit {
                                this.turn == 'DIA' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDia : 
                                this.turn == 'NOCHE' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorNoche : 0;
 
-      this.loadedServices.push({
+      this.loadedServices.unshift({
         'operatorId' : operator, 
         'operator' : this.operators.find(x => x.usua_Id == operator).usua_Nombre,
         'serviceId' : service,
@@ -410,7 +419,24 @@ export class Maquilas_InternasComponent implements OnInit {
     } 
   }
 
-  quitService(data : any){
+  getTotalPay(){
+    let data : any = this.dtServices ? this.dtServices.filteredValue ? this.dtServices.filteredValue : this.loadedServices : this.loadedServices;
+    return data.reduce((a, b) => a += b.value_Pay, 0);
+  }
+
+  getTotalWeight(){
+    let data : any = this.dtServices ? this.dtServices.filteredValue ? this.dtServices.filteredValue : this.loadedServices : this.loadedServices;
+    return data.reduce((a, b) => a += b.weight, 0);
+  }
+
+  getTotalNetWeight(){
+    let data : any = this.dtServices ? this.dtServices.filteredValue ? this.dtServices.filteredValue : this.loadedServices : this.loadedServices;
+    return data.reduce((a, b) => a += b.netWeight, 0);
+  }
+
+  quitService(data : any, ri){
+    //console.log((this.loadedServices.length - 1) - ri + 1)
+    //console.log((this.loadedServices.length - 1), ri + 1)
     let index : number = this.loadedServices.findIndex(x => x.operatorId == data.operatorId);
     this.load = true;
     setTimeout(() => {
@@ -438,55 +464,62 @@ export class Maquilas_InternasComponent implements OnInit {
   }
 
   createInternalMaquila(){
-    this.load = true;
-    let count : number = 0;
-    this.svInternalMaquila.getLastCodeMaquila().subscribe(code => {
-      console.log(code);
-      this.loadedServices.forEach(x => {
+    let ot : any = this.form.value.ot;
+    this.selectedService = null;
+    
+    if(ot == this.dataOrderProduction[0].ot) {
+      this.load = true;
+      let operator : any = this.form.get('operator').value;
+      let service : any = this.form.get('service').value;
+      let nameOperator : any = this.operators.find(x => x.usua_Id == operator).usua_Nombre;
+      let date : any = moment().format('YYYY-MM-DD');
+      let valueService : any = this.holidays.map(x => x).includes(date) ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDomFest : 
+                               this.turn == 'DIA' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDia : 
+                               this.turn == 'NOCHE' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorNoche : 0;
+
+      this.svInternalMaquila.getLastCodeMaquila().subscribe(code => {
         let info : modelMaquilas_Internas = {
           'MaqInt_Codigo': code + 1,
-          'MaqInt_OT': x.ot,
-          'Prod_Id': x.item,
-          'Cono_Id': x.cono,
-          'Ancho_Cono': x.broadCono,
-          'Tara_Cono': x.tareCono,
-          'Peso_Bruto': x.weight,
-          'Peso_Neto': x.netWeight,
-          'Cantidad': x.netWeight,
-          'Presentacion': x.unit,
+          'MaqInt_OT': ot,
+          'Prod_Id': this.dataOrderProduction[0].item,
+          'Cono_Id': this.form.value.cono,
+          'Ancho_Cono': this.form.value.broadCono,
+          'Tara_Cono': this.form.value.weightTare,
+          'Peso_Bruto': this.form.value.weight,
+          'Peso_Neto': this.form.value.netWeight,
+          'Cantidad': this.form.value.netWeight,
+          'Presentacion': 'Kg',
           'MaqInt_Medida': '',
-          'Maquina': x.machine,
-          'Operario_Id': x.operatorId,
-          'MaqInt_Fecha': x.date,
+          'Maquina': this.form.value.machine,
+          'Operario_Id': this.form.value.operator,
+          'MaqInt_Fecha': moment().format('YYYY-MM-DD'),
+          'MaqInt_Hora': moment().format('HH:mm:ss'),
           'Proceso_Id': 'CORTE',
           'Estado_Id': 41,
-          'SvcProd_Id': x.serviceId,
+          'SvcProd_Id': this.form.value.service,
           'MaqInt_FechaRegistro': moment().format('YYYY-MM-DD'),
           'MaqInt_HoraRegistro': moment().format('HH:mm:ss'),
           'Creador_Id': this.storage_Id,
-          'MaqInt_Observacion': x.observation,
-          'MaqInt_Hora': moment().format('HH:mm:ss'),
-          'Material_Id': x.materialId,
+          'MaqInt_Observacion': this.form.value.observation,
+          'Material_Id': this.dataOrderProduction[0].materialId,
           'Turno_Id': this.turn,
-          'Impreso': x.printed,
-          'MaqInt_ValorPago': x.valueService
+          'Impreso': this.dataOrderProduction[0].printed,
+          'MaqInt_ValorPago': valueService
         }
         this.svInternalMaquila.Post(info).subscribe(data => {
-          count++
-          if(count == this.loadedServices.length) {
-            this.msj.mensajeConfirmacion(`Confirmación`, `Se crearon los servicios de maquila interna exitosamente!`);
-            this.createPDF(code + 1, 'creado');
-            setTimeout(() => { this.clearAll(); }, 1000); 
-          } 
+          this.selectedService = data.svcProd_Id;
+          let info : any = { 'ot': data.maqInt_OT, 'service' : data.svcProd_Id, 'machine' : data.maquina, 'operator' : data.operario_Id, 'cono' : data.cono_Id }
+          this.msj.mensajeConfirmacion(`Confirmación`, `Se creó el servicio de maquila interna de ${nameOperator} exitosamente!`);
+          this.createPDF(code + 1, info, 'creado');
         }, error => {
           this.msj.mensajeError(`Error`, `No fue posible crear el servicio de maquila | ${error.status} ${error.statusText}`);
           this.load = false;
         });
-      });
-    }, error => {
-        this.msj.mensajeError(`Error`, `Error al obtener el último consecutivo de maquilas. | ${error.status} ${error.statusText}`);
-        this.load = false;
-    });
+      }, error => {
+          this.msj.mensajeError(`Error`, `Error al obtener el último consecutivo de maquilas. | ${error.status} ${error.statusText}`);
+          this.load = false;
+      });                         
+    } else this.msj.mensajeAdvertencia(`La OT del servicio no coincide con la Información de la Orden de Producción!`);
   }
 
   getCurrentTurn() {
@@ -495,13 +528,16 @@ export class Maquilas_InternasComponent implements OnInit {
 
   //*FUNCIONES PARA EXPORTAR PDF.
   //Función para crear un PDF en base al registro creado.
-  createPDF(code : any, action? : string) {
+  createPDF(code : any, info : any, action? : string) {
     this.svInternalMaquila.getInternalsMaquilasForCode(code).subscribe(data => {
       let title: string = `Maquila Interna N° ${data[0].code}`;
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
-      //this.msj.mensajeConfirmacion(`Confirmación`, `Maquila Interna ${action} exitosamente!`);
-      setTimeout(() => this.clearAll(), 3000);
+      setTimeout(() => {
+        this.clearAll();
+        this.form.patchValue(info);
+        setTimeout(() => { this.searchOT(data[0].ot) }, 2000);
+      }, 1500);
     }, error => this.msj.mensajeError(`Error`, `Error al consultar el consecutivo de la maquila N° ${code} | ${error.status} ${error.statusText}`));
   }
 

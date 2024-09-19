@@ -51,6 +51,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   @ViewChild('dtRePrint') dtRePrint: Table;
   url : string = ``; 
   rebobinado : boolean = false;
+  anchoProducto : number = 0;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -97,12 +98,13 @@ export class Produccion_ExtrusionComponent implements OnInit {
       proceso: [null, Validators.required],
       anchoProducto: [null],
       mostratDatosProducto: [false],
+      edicionAnchoProducto: [false]
     });
   }
 
   ngOnInit() {
-    this.url = this.svRouter.url;
-    if(this.url = `/rebobinado-corte`) this.rebobinado = true;
+    //this.url = this.svRouter.url;
+    //if(this.url = `/rebobinado-corte`) this.rebobinado = true;
     console.log(this.url);
     this.lecturaStorage();
     this.obtenerUnidadMedida();
@@ -110,7 +112,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.getProcess();
     this.validarProceso();
     this.obtenerOperarios();
-    setTimeout(() => this.buscarPuertos(), 1000);
+    //setTimeout(() => this.buscarPuertos(), 1000);
   }
 
   //Función que filtra la info de la tabla 
@@ -349,6 +351,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
     return tara;
   }
 
+  EditarAncho(){
+    this.buscarDatosConoSeleccionado();
+  }
+
   buscraOrdenTrabajo() {
     if (this.formDatosProduccion.value.proceso) {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
@@ -380,9 +386,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
             calibre: datos.calibre_Extrusion,
             material: datos.material.trim(),
             anchoProducto: datos.selladoCorte_Ancho,
-            presentacion: datos.presentacion
+            presentacion: datos.presentacion,
           });
-          
           this.buscarDatosConoSeleccionado();
         });
       });
@@ -434,28 +439,49 @@ export class Produccion_ExtrusionComponent implements OnInit {
   validarDatos() {
     this.cargando = true;
     this.obtenerTurnos();
-    this.buscraOrdenTrabajo();
+    this.anchoProducto = this.formDatosProduccion.value.anchoProducto;
+    let ot = this.formDatosProduccion.value.ordenTrabajo;
+    let tara : number = this.formDatosProduccion.value.pesoTara;  
+    //this.buscraOrdenTrabajo();
+    this.formDatosProduccion.patchValue({ pesoBruto : 10, pesoNeto : 10 - tara });
+    
     // this.buscarPuertos();
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
-        if (this.formDatosProduccion.valid) {
-          if (this.formDatosProduccion.value.maquina > 0) {
-            if (this.formDatosProduccion.value.pesoNeto > 0) {
-              if(this.formDatosProduccion.value.pesoNeto < 65) this.guardarProduccion();
-              else {
-                this.msj.mensajeAdvertencia(`¡El peso neto no debe ser superior a '65'.`);
+        if(ot == this.datosOrdenTrabajo[0].numero_Orden) {
+          if (this.formDatosProduccion.valid) {
+            if (this.formDatosProduccion.value.maquina > 0) {
+              if (this.formDatosProduccion.value.pesoNeto > 0) {
+                if(this.formDatosProduccion.value.pesoNeto < 65) { 
+                  if(this.proceso == 'EMPAQUE') {
+                    if(this.formDatosProduccion.value.anchoProducto > 0) {
+                      this.guardarProduccion();
+                    } else {
+                      this.msj.mensajeAdvertencia(`El ancho del producto terminado no puede ser '0', verifique`);
+                      this.cargando = false;
+                    }
+                  } else {
+                    this.cargando = false;
+                    this.guardarProduccion();
+                  }
+                } else {
+                  this.msj.mensajeAdvertencia(`¡El peso neto no debe ser superior a '65'.`);
+                  this.cargando = false;
+                }
+              } else {
+                this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
                 this.cargando = false;
               }
             } else {
-              this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
+              this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
               this.cargando = false;
             }
           } else {
-            this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
+            this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
             this.cargando = false;
           }
         } else {
-          this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
+          this.msj.mensajeAdvertencia(`¡La orden de trabajo no corresponde a la seleccionada!`);
           this.cargando = false;
         }
       } else {

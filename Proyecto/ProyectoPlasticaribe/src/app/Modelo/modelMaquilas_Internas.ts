@@ -9,7 +9,7 @@ export interface modelMaquilas_Internas {
     Peso_Bruto : number;
     Peso_Neto : number;
     Cantidad : number;
-    Presentacion : number;
+    Presentacion : string;
     MaqInt_Medida : string;
     Maquina : number;
     Operario_Id : number;

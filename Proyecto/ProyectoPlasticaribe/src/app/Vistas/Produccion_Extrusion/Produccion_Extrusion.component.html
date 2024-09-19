@@ -56,6 +56,23 @@
                     <label for="operario">Operario</label>
                 </span>
             </div>
+
+            <!--EDITAR ANCHO PRODUCTO -->
+            <div class="col-sm-12 col-md-6 col-xl field-checkbox">
+                <p-checkbox formControlName="edicionAnchoProducto" [binary]="true" inputId="binary" id="edicionAnchoProducto"
+                  pTooltip="Al activar este campo podrá editar el ancho del item/producto."
+                  tooltipPosition="top"></p-checkbox>
+                <label for="edicionAnchoProducto">Editar Ancho</label>
+              </div>
+            
+             <!-- ANCHO PRODUCTO -->
+             <div class="col-sm-12 col-md-2 col-xl-1">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="anchoProducto" (keyup)="EditarAncho()" inputId="anchoProducto" mode="decimal" [readonly]="formDatosProduccion.value.edicionAnchoProducto == false" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="anchoProducto">Ancho Item</label>
+                </span>
+            </div>
+
             <!-- DAIPITA -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
@@ -64,7 +81,6 @@
                 </span>
             </div>
 
-            
             <!-- CONO -->
             <div class="col-sm-12 col-md-3 col-xl-2">
                 <span class="p-float-label">
@@ -88,6 +104,7 @@
                     <label for="pesoTara">Tara Kg</label>
                 </span>
             </div>
+            
             <!-- PESO BRUTO -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
@@ -122,6 +139,7 @@
             [rowHover]="true">
                 <ng-template pTemplate="header">
                     <tr>
+                        <th>OT</th>
                         <th>Id Cliente</th>
                         <th>Cliente</th>
                         <th>Item</th>
@@ -138,6 +156,7 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                     <tr>
+                        <td>{{data.numero_Orden}}</td>
                         <td>{{data.id_Cliente}}</td>
                         <td>{{data.cliente}}</td>
                         <td>{{data.id_Producto}}</td>
