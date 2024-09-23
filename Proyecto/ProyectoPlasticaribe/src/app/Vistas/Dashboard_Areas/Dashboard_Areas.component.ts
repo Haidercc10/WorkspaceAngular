@@ -24,23 +24,25 @@ export class Dashboard_AreasComponent implements OnInit {
   graficaExtrusionProducido : any; //Variable que va a almacenar lo producido por el area de extrusion
   graficaImpresionProducido : any; //Variable que va a almacenar lo producido por el area de impresion
   graficaRotograbadoProducido : any; //Variable que va a almacenar lo producido por el area de rotograbado
-  graficaDobladoProducido : any; //Variable que va a almacenar lo producido por el area de doblado
+  //graficaDobladoProducido : any; //Variable que va a almacenar lo producido por el area de doblado
   graficaLaminadoProducido : any; //Variable que va a almacenar lo producido por el area de laminado
   graficaCorteProducido : any; //Variable que va a almacenar lo producido por el area de corte
   graficaEmpaqueProducido : any; //Variable que va a almacenar lo producido por el area de empaque
   graficaSelladoProducido : any; //Variable que va a almacenar lo producido por el area de sellado
   graficaWiketiadoProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
+  graficaCamisillasProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
   aniosGraficados : number [] = []; //Variable que va a almacenar los años que se han graficado
 
   totalAnios_Extrusion : any [] = []; 
   totalAnios_Impresion : any [] = [];
   totalAnios_Rotograbado : any [] = [];
-  totalAnios_Doblado : any [] = [];
+  //totalAnios_Doblado : any [] = [];
   totalAnios_Laminado : any [] = [];
   totalAnios_Corte : any [] = [];
   totalAnios_Empaque : any [] = [];
   totalAnios_Sellado : any [] = [];
   totalAnios_Wiketiado : any [] = [];
+  totalAnios_Camisillas : any [] = [];
 
   constructor(private shepherdService: ShepherdService,
                 private paginaPrincial : PaginaPrincipalComponent,
@@ -120,12 +122,13 @@ export class Dashboard_AreasComponent implements OnInit {
     this.graficaExtrusionProducido = this.formatoGraficas();
     this.graficaImpresionProducido = this.formatoGraficas();
     this.graficaRotograbadoProducido = this.formatoGraficas();
-    this.graficaDobladoProducido = this.formatoGraficas();
+    //this.graficaDobladoProducido = this.formatoGraficas();
     this.graficaLaminadoProducido = this.formatoGraficas();
     this.graficaCorteProducido = this.formatoGraficas();
     this.graficaEmpaqueProducido = this.formatoGraficas();
     this.graficaSelladoProducido = this.formatoGraficas();
     this.graficaWiketiadoProducido = this.formatoGraficas();
+    this.graficaCamisillasProducido = this.formatoGraficas();
   }
 
   // Funcion que colocará el formato que debe tener la tabla y la cantidad de puntos que tendrá
@@ -197,11 +200,12 @@ export class Dashboard_AreasComponent implements OnInit {
     if (['EXTRUSION', 'DESP_EXTRUSION'].includes(area)) this.graficaExtrusionProducido.datasets.push(info);
     else if (['IMPRESION', 'DESP_IMPRESION'].includes(area)) this.graficaImpresionProducido.datasets.push(info);
     else if (['ROTOGRABADO', 'DESP_ROTOGRABADO'].includes(area)) this.graficaRotograbadoProducido.datasets.push(info);
-    else if (['DOBLADO', 'DESP_DOBLADO'].includes(area)) this.graficaDobladoProducido.datasets.push(info);
+    //else if (['DOBLADO', 'DESP_DOBLADO'].includes(area)) this.graficaDobladoProducido.datasets.push(info);
     else if (['LAMINADO', 'DESP_LAMINADO'].includes(area)) this.graficaLaminadoProducido.datasets.push(info);
     else if (['CORTE', 'DESP_CORTADORES'].includes(area)) this.graficaCorteProducido.datasets.push(info);
     else if (['EMPAQUE', 'DESP_EMPAQUE'].includes(area)) this.graficaEmpaqueProducido.datasets.push(info);
     else if (['SELLADO', 'DESP_SELLADO'].includes(area)) this.graficaSelladoProducido.datasets.push(info);
+    else if (['CAMISILLA'].includes(area)) this.graficaCamisillasProducido.datasets.push(info);
     else if (['Wiketiado'].includes(area)) this.graficaWiketiadoProducido.datasets.push(info);
   }
 
@@ -210,22 +214,24 @@ export class Dashboard_AreasComponent implements OnInit {
     this.totalAnios_Extrusion = [];
     this.totalAnios_Impresion = [];
     this.totalAnios_Rotograbado = [];
-    this.totalAnios_Doblado = [];
+    //this.totalAnios_Doblado = [];
     this.totalAnios_Laminado = [];
     this.totalAnios_Corte = [];
     this.totalAnios_Empaque = [];
     this.totalAnios_Sellado = [];
     this.totalAnios_Wiketiado = [];
+    this.totalAnios_Camisillas = [];
     this.aniosGraficados.forEach(anio => {
       this.totalAnios_Extrusion.push(this.formatoTotales(this.graficaExtrusionProducido, anio));
       this.totalAnios_Impresion.push(this.formatoTotales(this.graficaImpresionProducido, anio));
       this.totalAnios_Rotograbado.push(this.formatoTotales(this.graficaRotograbadoProducido, anio));
-      this.totalAnios_Doblado.push(this.formatoTotales(this.graficaDobladoProducido, anio));
+      //this.totalAnios_Doblado.push(this.formatoTotales(this.graficaDobladoProducido, anio));
       this.totalAnios_Laminado.push(this.formatoTotales(this.graficaLaminadoProducido, anio));
       this.totalAnios_Corte.push(this.formatoTotales(this.graficaCorteProducido, anio));
       this.totalAnios_Empaque.push(this.formatoTotales(this.graficaEmpaqueProducido, anio));
       this.totalAnios_Sellado.push(this.formatoTotales(this.graficaSelladoProducido, anio));
       this.totalAnios_Wiketiado.push(this.formatoTotales(this.graficaWiketiadoProducido, anio));
+      this.totalAnios_Camisillas.push(this.formatoTotales(this.graficaCamisillasProducido, anio));
     });
   }
 

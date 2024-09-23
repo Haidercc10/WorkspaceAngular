@@ -103,10 +103,10 @@
     <!-- DOBLADO -->
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="doblado">
       <p-card>
-        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> DOBLADO</h2>
-        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaDobladoProducido" [options]="opcionesGrafica"></p-chart>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> CAMISILLA</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCamisillasProducido" [options]="opcionesGrafica"></p-chart>
         <div class="row p-2">
-          <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of totalAnios_Doblado">
+          <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of totalAnios_Camisillas">
             <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
               <div class="col-md-12">
                 <h5>{{item.Anio}}</h5>
