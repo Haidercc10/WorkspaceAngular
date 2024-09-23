@@ -8,8 +8,8 @@
     <!-- Navegador fin de parte superior -->
     <div class="container-fluid">
         <div class="mb-4 Titulo">
-            <h2 *ngIf="!rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de {{proceso}}</h2>
-            <h2 *ngIf="rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Rebobinado de Corte</h2>
+            <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de {{proceso}}</h2> <!--*ngIf="!rebobinado"-->
+            <!--<h2 *ngIf="rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Rebobinado de Corte</h2>-->
         </div>
         <div class="mb-4">
             <hr class="colorLinea">
@@ -38,7 +38,7 @@
             <!-- ORDEN DE TRABAJO -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <input formControlName="ordenTrabajo" id="ot" (keyup.enter)="buscraOrdenTrabajo()" type="text"
+                    <input formControlName="ordenTrabajo" id="ot" (keyup.enter)="buscraOrdenTrabajo(true)" type="text"
                         pAutoFocus [autofocus]="true" pInputText required />
                     <label for="ot">OT</label>
                 </span>
@@ -61,12 +61,20 @@
                     <label for="operario">Operario</label>
                 </span>
             </div>
-
-            <!-- DAIPITA -->
-            <div class="col-sm-12 col-md-2 col-xl-1">
+            
+             <!--EDITAR ANCHO PRODUCTO -->
+             <div class="col-sm-12 col-md-6 col-xl field-checkbox">
+                <p-checkbox formControlName="edicionAnchoProducto" [binary]="true" inputId="binary" id="edicionAnchoProducto"
+                  pTooltip="Al activar este campo podrá editar el ancho del item/producto."
+                  tooltipPosition="top"></p-checkbox>
+                <label for="edicionAnchoProducto">Editar Ancho</label>
+              </div>
+            
+             <!-- ANCHO PRODUCTO -->
+             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="daipita" inputId="daipita"></p-inputNumber>
-                    <label for="daipita">Daipita</label>
+                    <p-inputNumber formControlName="anchoProducto" (keyup)="EditarAncho()" inputId="anchoProducto" mode="decimal" [readonly]="formDatosProduccion.value.edicionAnchoProducto == false" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="anchoProducto">Ancho Item</label>
                 </span>
             </div>
 
@@ -116,6 +124,14 @@
                 </span>
             </div>
 
+            <!-- DAIPITA -->
+            <div class="col-sm-12 col-md-2 col-xl-1">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="daipita" inputId="daipita"></p-inputNumber>
+                    <label for="daipita">Daipita</label>
+                </span>
+            </div>
+
             <!-- MOSTRAR DATOS PRODUCTO -->
             <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
                 <p-checkbox formControlName="mostratDatosProducto" [binary]="true" inputId="binary" id="saldo"
@@ -132,6 +148,7 @@
                 responsiveLayout="scroll" [rowHover]="true">
                 <ng-template pTemplate="header">
                     <tr>
+                        <th>OT</th>
                         <th>Id Cliente</th>
                         <th>Cliente</th>
                         <th>Item</th>
@@ -148,6 +165,7 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                     <tr>
+                        <td>{{data.numero_Orden}}</td>
                         <td>{{data.id_Cliente}}</td>
                         <td>{{data.cliente}}</td>
                         <td>{{data.id_Producto}}</td>
@@ -181,7 +199,7 @@
 
     <div class="mb-4">
         <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
-            Rollos Pesado</h4>
+            Rollos Producidos</h4>
     </div>
 
     <p-table #dtProduccion
