@@ -4,7 +4,7 @@
 
       <!-- FACTURACIÓN -->
       <p-tabPanel
-        *ngIf="[1,6,96].includes(ValidarRol)"
+        *ngIf="[1,6,96,69].includes(ValidarRol)"
         header="Facturación"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Facturacion-Detallada *ngIf="facturacion"></app-Reporte-Facturacion-Detallada>
@@ -28,7 +28,7 @@
 
       <!-- CARTERA -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,69].includes(ValidarRol)"
         header="Cartera"
         leftIcon="pi pi-sliders-h">
         <app-DashBoard-Recaudos *ngIf="cartera"></app-DashBoard-Recaudos>
