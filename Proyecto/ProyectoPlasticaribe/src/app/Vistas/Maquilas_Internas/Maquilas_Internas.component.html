@@ -223,7 +223,6 @@
         <ng-template pTemplate="header">
             <tr class="font-size-16" id="">
               <th></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, '', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'operator', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'service', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', 'contains')"></th>
@@ -233,7 +232,7 @@
               <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'valueService', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subTotal', 'contains')"></th>
-              <th></th>
+              <!--<th></th>-->
             </tr>
             <tr>
                 <th class="text-center">#</th>
@@ -246,7 +245,7 @@
                 <th class="text-center">Unidad</th>
                 <th class="text-center">Valor Servicio</th>
                 <th class="text-center">Subtotal</th>
-                <th class="text-center">Ver</th>
+                <!--<th class="text-center">Ver</th>-->
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -261,9 +260,9 @@
                 <td class="text-center">{{ data.unit }}</td>
                 <td class="text-center">{{ data.value | number : '1.2-2' }}</td>
                 <td class="text-center textBlue"><b>{{ data.weight * data.value | number : '1.2-2' }}</b></td>
-                <td class="text-center">
+                <!--<td class="text-center">
                   <button pButton (click)="createPDF(data.code, ' exportado')" type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver movimientos de la OT N° {{data.ot}}" icon="pi pi-file-pdf"></button>
-                </td>
+                </td>-->
             </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -274,7 +273,7 @@
             <td class="text-center">Kg</td>
             <td></td>
             <td class="text-center">{{ getTotalPay() | number : '1.2-2'}}</td>
-            <td></td>
+            <!--<td></td>-->
           </tr>
         </ng-template>
     </p-table>

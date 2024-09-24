@@ -178,8 +178,6 @@ export class Produccion_ExtrusionComponent implements OnInit {
       this.obtenerOperarios();
     }
     this.obtenerTurnos();
-    console.log(this.proceso);
-    
   }
 
   chargeSerialPorts() {

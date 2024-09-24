@@ -562,7 +562,7 @@ export class Orden_FacturacionComponent implements OnInit {
       if(this.preloadDispatch) this.updateOrderPreload();
       this.createPDF(order, fact);
       this.clearFields(false);
-    }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
+    }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollos seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
   updateDevolution() {

@@ -160,22 +160,24 @@ export class DashboardOTComponent implements OnInit {
     this.produccionAreasService.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
       this.procesosOrdenesMes = [];
       produccionAreas.forEach(areas => {
-        let metaMesActual : number = this.metaMesActual(areas);
-        let produccionMesActual : number = this.produccionMesActual(areas);
-        let datos : any = {
-          Orden : this.ordenArrayProcesosOrdenesMes((areas.proceso_Nombre).toUpperCase()),
-          Id : areas.id,
-          Area : (areas.proceso_Nombre).toUpperCase(),
-          Anio : areas.anio_Produccion,
-          Meta_Produccion : metaMesActual,
-          Produccion : produccionMesActual,
-          Porcentaje : this.porcentajeProgresoMetaProduccion(areas),
-          rangoSlider : this.rangoSliderPorcentajeProcesos(this.porcentajeProgresoMetaProduccion(areas)),
-          PorcentajeMeta : (produccionMesActual / metaMesActual) * 100,
-          PorcentajeMensual : this.porcentajeProgresoMetaProduccion(areas),
+        if(!['Doblado'].includes(areas.proceso_Nombre)) {
+          let metaMesActual : number = this.metaMesActual(areas);
+          let produccionMesActual : number = this.produccionMesActual(areas);
+          let datos : any = {
+            Orden : this.ordenArrayProcesosOrdenesMes((areas.proceso_Nombre).toUpperCase()),
+            Id : areas.id,
+            Area : (areas.proceso_Nombre).toUpperCase(),
+            Anio : areas.anio_Produccion,
+            Meta_Produccion : metaMesActual,
+            Produccion : produccionMesActual,
+            Porcentaje : this.porcentajeProgresoMetaProduccion(areas),
+            rangoSlider : this.rangoSliderPorcentajeProcesos(this.porcentajeProgresoMetaProduccion(areas)),
+            PorcentajeMeta : (produccionMesActual / metaMesActual) * 100,
+            PorcentajeMensual : this.porcentajeProgresoMetaProduccion(areas),
+          }
+          this.procesosOrdenesMes.push(datos);
+          this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
         }
-        this.procesosOrdenesMes.push(datos);
-        this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
       });
     });
   }

@@ -350,6 +350,7 @@ export class Maquilas_InternasComponent implements OnInit {
 
   addService(){
     //this.getPuertoSerial();
+    this.getCurrentTurn();
     this.load = true;
     this.form.patchValue({ 'weight' : 15.9, 'netWeight' : 15.9 - this.form.get('weightTare').value });
     let weight : number = this.form.get('weight').value;
@@ -367,8 +368,10 @@ export class Maquilas_InternasComponent implements OnInit {
         if(![0, null, undefined, ''].includes(weight)) {
           if(![0, null, undefined, ''].includes(netWeight)) {
             if(days <= 0) {
-              this.createInternalMaquila();
-              //this.loadServicesTable(weight, netWeight);
+              if(this.turn) {
+                this.createInternalMaquila();
+                //this.loadServicesTable(weight, netWeight);
+              } else this.msj.mensajeAdvertencia(`No hay un turno seleccionafo!`);
             } else this.msj.mensajeAdvertencia(`La fecha de servicio no puede ser mayor a la fecha actual`);
           } else this.msj.mensajeAdvertencia(`El peso neto es inválido!`);
         } else this.msj.mensajeAdvertencia(`El peso bruto es inválido!`);
@@ -510,7 +513,8 @@ export class Maquilas_InternasComponent implements OnInit {
           this.selectedService = data.svcProd_Id;
           let info : any = { 'ot': data.maqInt_OT, 'service' : data.svcProd_Id, 'machine' : data.maquina, 'operator' : data.operario_Id, 'cono' : data.cono_Id }
           this.msj.mensajeConfirmacion(`Confirmación`, `Se creó el servicio de maquila interna de ${nameOperator} exitosamente!`);
-          this.createPDF(code + 1, info, 'creado');
+          this.researchOT(info);
+          //this.createPDF(code + 1, info, 'creado');
         }, error => {
           this.msj.mensajeError(`Error`, `No fue posible crear el servicio de maquila | ${error.status} ${error.statusText}`);
           this.load = false;
@@ -522,8 +526,16 @@ export class Maquilas_InternasComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`La OT del servicio no coincide con la Información de la Orden de Producción!`);
   }
 
+  researchOT(info){
+    setTimeout(() => {
+      this.clearAll();
+      this.form.patchValue(info);
+      setTimeout(() => { this.searchOT(info.ot) }, 1500);
+    }, 500);
+  }
+
   getCurrentTurn() {
-    this.svBagPro.GetHorarioProceso('EMPAQUE').subscribe(turn => { this.turn = turn.toString(); console.log(this.turn) });
+    this.svBagPro.GetHorarioProceso('EMPAQUE').subscribe(turn => { this.turn = turn.toString(); }, error => { this.msj.mensajeError(`Error`, `Errores encontrados al consultar los turno.`) });
   }
 
   //*FUNCIONES PARA EXPORTAR PDF.
