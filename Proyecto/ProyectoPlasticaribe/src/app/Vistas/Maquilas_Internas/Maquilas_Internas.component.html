@@ -1,0 +1,287 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Maquilas Internas</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+
+    <div class="col-sm-12 col-md-6 col-xl-1">
+      <span class="p-input-icon-left p-float-label">
+        <i class="{{turn == 'DIA' ? 'textDay pi pi-sun' : 'textNight pi pi-moon'}}"></i>
+        <input [(ngModel)]="turn" id="turnos" type="text" readonly pInputText class="{{turn == 'DIA' ? 'textDay' : 'textNight'}}"/>
+        <label for="turnos"> Turno</label>
+      </span>
+    </div>
+  </div>
+
+  <div class="mb-5">
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-pencil"></i> <b> Diligenciar campos</b></h4>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="mb-3" id="formulario">
+      <div class="row g-4">
+
+        <!--* Proceso-->
+        <!--<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="process" inputId="process" [autoDisplayFirst]="true" [options]="process" optionLabel="Proceso_Nombre" optionValue="Proceso_Id"></p-dropdown>
+            <label for="process">Area Solicitante</label>
+          </span>
+        </div>-->
+
+        <!--* ORDEN DE TRABAJO -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+          <span class="p-float-label">
+              <input formControlName="ot" id="ot" type="number" pAutoFocus [autofocus]="true" (keyup.enter)="searchOT()" pInputText required/>
+              <label for="ot">OT</label>
+          </span>
+        </div>
+
+        <!--* Servicio-->
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+          <span class="p-float-label">
+            <p-dropdown formControlName="service" inputId="service1" [autoDisplayFirst]="false" [options]="realServices" optionLabel="svcProd_Nombre" optionValue="svcProd_Id" [required]="true" [filter]="true" filterBy="svcProd_Nombre"></p-dropdown>
+            <label for="service1">Servicio</label>
+          </span>
+        </div>
+
+        <!--* MAQUINA -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="machine" inputId="Maquina" [required]="true"></p-inputNumber>
+                <label for="Maquina">Maquina</label>
+            </span>
+        </div>
+
+        <!--* OPERARIO -->
+        <div class="col-sm-12 col-md-3 col-xl-2">
+            <span class="p-float-label">
+                <p-dropdown formControlName="operator" inputId="operario" [autoDisplayFirst]="false" [options]="operators" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+                <label for="operario">Operario</label>
+            </span>
+        </div>
+
+         <!--* MEDIDA -->
+         <!--<div class="col-sm-12 col-md-2 col-xl-2">
+          <span class="p-float-label">
+              <input formControlName="measureUnit" id="measureUnit" type="text" pAutoFocus [autofocus]="true" pInputText required/>
+              <label for="measureUnit">OT</label>
+          </span>
+        </div>-->
+
+        <!--* CONO -->
+        <div class="col-sm-12 col-md-3 col-xl-1">
+            <span class="p-float-label">
+                <p-dropdown formControlName="cono" (onChange)="buscarDatosConoSeleccionado()" inputId="cono" [options]="conos" optionLabel="cono_Id" optionValue="cono_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                <label for="cono">Cono</label>
+            </span>
+        </div>
+
+        <!--* ANCHO CONO -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="broadCono" inputId="anchoCono" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                <label for="anchoCono">Ancho Cono</label>
+            </span>
+        </div>
+
+        <!--* TARA -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="weightTare" inputId="pesoTara" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                <label for="pesoTara">Tara Kg</label>
+            </span>
+        </div>
+
+        <!--* PESO BRUTO -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="weight" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4"></p-inputNumber>
+                <label for="pesoBruto">Bruto Kg</label> 
+            </span>
+        </div>
+
+        <!--* PESO NETO -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="netWeight" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4"></p-inputNumber>
+                <label for="pesoNeto">Neto Kg</label>
+            </span>
+        </div>
+
+        <!--*FECHA-->
+        <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-calendar formControlName="date" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Fecha Servicio</label>
+          </span>
+        </div>-->
+
+        <!--* OBSERVACIÓN -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-8 col-xxl-12" id="observacion">
+          <span class="p-float-label">
+            <textarea formControlName="observation" [rows]="1" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
+        </div>
+      </div>
+    </div>    
+
+  </form>
+
+  <p-divider></p-divider>
+
+  <!--* Orden de Producción-->
+  <div class="row my-3 mb-5">
+    <div class="mb-3">
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> <b> Información de la Orden de Producción</b></h4>
+    </div>
+
+    <p-table
+      [value]="dataOrderProduction"
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm p-datatable-gridlines"
+      responsiveLayout="scroll"
+      [rowHover]="true">
+        <ng-template pTemplate="header">
+            <tr>
+                <th class="text-center">OT</th>
+                <th class="text-center">Cliente</th>
+                <th class="text-center">Item</th>
+                <th class="text-center">Referencia</th>
+                <th class="text-center">Unidad</th>
+                <th class="text-center">Ancho 1</th>
+                <th class="text-center">Ancho 2</th>
+                <th class="text-center">Ancho 3</th>
+                <th class="text-center">Unidad</th>
+                <th class="text-center">Calibre</th>
+                <th class="text-center">Material</th>
+                <th class="text-center">Impreso</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+            <tr>
+                <td class="text-center">{{ data.ot }}</td>
+                <td class="text-center">{{ data.client }}</td>
+                <td class="text-center">{{ data.item }}</td>
+                <td class="text-center">{{ data.reference }}</td>
+                <td class="text-center">{{ data.unit }}</td>
+                <td class="text-center">{{ data.broad1 | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.broad2 | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.broad3 | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.unitExtrusion }}</td>
+                <td class="text-center">{{ data.calibre | number : '1.2-2'}}</td>
+                <td class="text-center">{{ data.material }}</td>
+                <td class="text-center">{{ data.printed ? 'SI' : 'NO' }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+  </div>
+
+   <!--* BOTONES-->
+   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Servicio" icon="pi pi-send" (click)="addService()" [disabled]="load || !form.valid || dataOrderProduction.length == 0"></button>
+    <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" (click)="clearFields()" icon="pi pi-eraser" ></button>
+  </div>
+
+  <div class="class mb-5">
+    <p-divider></p-divider>
+  </div>
+  
+
+  <!--* Servicios-->
+  <div class="row my-3">
+    <div class="mb-3">
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><b><i class="pi pi-table"></i> Información de servicios agregados</b></h4>
+    </div>
+
+    <p-table
+      #dtServices
+      [value]="loadedServices"
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm"
+      responsiveLayout="scroll"
+      [resizableColumns]="true"
+      [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="50rem">
+        <ng-template pTemplate="header">
+            <tr class="font-size-16" id="">
+              <th></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'operator', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'service', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'requestedBy', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'weight', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'netWeight', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'valueService', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subTotal', 'contains')"></th>
+              <!--<th></th>-->
+            </tr>
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Operario</th>
+                <th class="text-center">Servicio</th>
+                <th class="text-center">Fecha</th>
+                <th class="text-center">Solicitante</th>
+                <th class="text-center">Peso Bruto</th>
+                <th class="text-center">Peso Neto</th>
+                <th class="text-center">Unidad</th>
+                <th class="text-center">Valor Servicio</th>
+                <th class="text-center">Subtotal</th>
+                <!--<th class="text-center">Ver</th>-->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <tr>
+                <td class="text-center">{{ (loadedServices.length - 1) - rowIndex + 1 }}</td>
+                <td class="text-center"><b>{{ data.operator }}</b></td>
+                <td class="text-center">{{ data.service }}</td>
+                <td class="text-center">{{ data.dateService | date : 'dd/MM/yyy' }} {{ data.hourSave}}</td>
+                <td class="text-center"><b>{{ data.requestedBy }}</b></td>
+                <td class="text-center">{{ data.weight | number : '1.2-2'}}</td>
+                <td class="text-center"><b>{{ data.netWeight | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{ data.unit }}</td>
+                <td class="text-center">{{ data.value | number : '1.2-2' }}</td>
+                <td class="text-center textBlue"><b>{{ data.weight * data.value | number : '1.2-2' }}</b></td>
+                <!--<td class="text-center">
+                  <button pButton (click)="createPDF(data.code, ' exportado')" type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver movimientos de la OT N° {{data.ot}}" icon="pi pi-file-pdf"></button>
+                </td>-->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td class="text-right" colspan="5">Totales</td>
+            <td class="text-center">{{ getTotalWeight() | number : '1.2-2' }}</td>
+            <td class="text-center">{{ getTotalNetWeight() | number : '1.2-2' }}</td>
+            <td class="text-center">Kg</td>
+            <td></td>
+            <td class="text-center">{{ getTotalPay() | number : '1.2-2'}}</td>
+            <!--<td></td>-->
+          </tr>
+        </ng-template>
+    </p-table>
+  </div>
+
+  <!--* Botones-->
+  <!--<div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <button pButton class="p-button-danger" id="crear" type="button" label="Generar Entrada" icon="pi pi-send" (click)="createInternalMaquila()" [disabled]="load || loadedServices.length == 0"></button>
+    <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" (click)="clearAll()" icon="pi pi-eraser" ></button>
+  </div>-->
+</p-card>  
