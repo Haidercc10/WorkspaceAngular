@@ -485,3 +485,37 @@ p-avatar div span {
 }
 
 /* DISEÑO BOTONES */
+
+.textRed {
+  color: palevioletred
+}
+
+.textBlue {
+  color: rgb(0, 153, 255);
+}
+
+.textGreen {
+  color: rgb(0, 216, 0);
+}
+
+.textOrange {
+  color: #ff8800;
+}
+
+.textYellow {
+  color: #dab900;
+}
+
+.textDay {
+  color: #dab900;
+  font-weight: 800;
+  border : #dab900;
+  background-color: #f59e0b1f;
+}
+
+.textNight {
+  color: #fff;
+  font-weight: 800;
+  border : #0b213f;
+  background-color: #0b213f;
+}

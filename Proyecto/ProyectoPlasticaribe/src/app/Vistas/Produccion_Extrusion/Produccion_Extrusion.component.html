@@ -24,7 +24,7 @@
     </div>
 
     <form [formGroup]="formDatosProduccion">
-        <div class="row g-4 my-4">
+        <div class="row g-4 my-3">
             <!-- PROCESO -->
             <div class="col-sm-12 col-md-2" *ngIf="ValidarRol == 1">
                 <span class="p-float-label">
@@ -140,6 +140,14 @@
                 <label for="saldo">Mostrar Datos Etiqueta</label>
             </div>
 
+            <!--* REBOBINADO -->
+            <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
+                <p-checkbox formControlName="rebobinado" [binary]="true" inputId="binary" id="rebobinado" [readonly]="proceso != 'Empaque'"
+                    pTooltip="Al activar este campo el valor de la producción del item incrementa, ya que se toma como revisión de bobina."
+                    tooltipPosition="top"></p-checkbox>
+                <label for="rebobinado"><b>Rebobinado</b></label>
+            </div>
+
             <p-divider></p-divider>
         </div>
 
@@ -155,6 +163,7 @@
                         <th>Referencia</th>
                         <th>Turno</th>
                         <th>Total Pesar</th>
+                        <th>Total Producido</th>
                         <th>Ancho 1</th>
                         <th>Ancho 2</th>
                         <th>Ancho 3</th>
@@ -171,7 +180,8 @@
                         <td>{{data.id_Producto}}</td>
                         <td>{{data.producto}}</td>
                         <td>{{data.turno}}</td>
-                        <td>{{data.peso_Neto | number : '1.2-2'}}</td>
+                        <td class="textBlue"><b>{{data.peso_Neto | number : '1.2-2'}}</b></td>
+                        <td><b>{{ sumarPesoNeto() | number : '1.2-2'}}</b></td>
                         <td>{{proceso != 'Empaque' ? (data.ancho1_Extrusion | number : '1.2-2') :
                             (data.selladoCorte_Ancho | number : '1.2-2')}}</td>
                         <td>{{proceso != 'Empaque' ? (data.ancho2_Extrusion | number : '1.2-2') :
@@ -192,7 +202,7 @@
             <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción"
                 icon="pi pi-send" (click)="validarDatos()" [disabled]="cargando"></button>
             <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos"
-                icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+                icon="pi pi-eraser" (click)="limpiarCampos(true)"></button>
             <!-- <button pButton class="p-button-success" id="concetar" type="button" label="Conectar Báscula" icon="pi pi-box" (click)="buscarPuertos()" [disabled]="formDatosProduccion.value.pesoNeto != null"></button> -->
         </div>
     </form>

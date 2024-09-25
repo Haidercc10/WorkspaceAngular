@@ -1,5 +1,5 @@
 
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -26,7 +26,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
   styleUrls: ['./Maquilas_Internas.component.css']
 })
 
-export class Maquilas_InternasComponent implements OnInit {
+export class Maquilas_InternasComponent implements OnInit, OnDestroy {
 
   load : boolean = false; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
@@ -50,6 +50,8 @@ export class Maquilas_InternasComponent implements OnInit {
   holidays : any = [];
   realServices : any = [];
   selectedService : any = null;
+  reader: any;
+  port : SerialPort;
 
   constructor(
     private AppComponent : AppComponent,
@@ -80,11 +82,26 @@ export class Maquilas_InternasComponent implements OnInit {
     setTimeout(() => this.buscarPuertos(), 1000);
   }
 
+  async ngOnDestroy() {
+    this.reader.releaseLock();
+    this.reader.cancel();
+    await this.port.close();
+    console.log('Maquilas')
+  }
+
+  chargeSerialPorts() {
+    navigator.serial.getPorts().then((ports) => {
+      ports.forEach((port) => {
+        port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
+      });
+    });
+  }
+
   async buscarPuertos() {
+    this.port = await navigator.serial.requestPort();
     try {
-      const port: SerialPort = await navigator.serial.requestPort();
-      await port.open({ baudRate: 9600 });
-      this.chargeDataFromSerialPort(port);
+      await this.port.open({ baudRate: 9600 });
+      this.chargeDataFromSerialPort(this.port);
     } catch (ex) {
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
       else this.msj.mensajeError(ex);
@@ -92,15 +109,14 @@ export class Maquilas_InternasComponent implements OnInit {
   }
 
   async chargeDataFromSerialPort(port: SerialPort) {
-    let reader;
     let keepReading: boolean = true;
     while (port.readable && keepReading) {
-      reader = port.readable.getReader();
+      this.reader = port.readable.getReader();
       try {
         while (true) {
-          const { value, done } = await reader.read();
+          const { value, done } = await this.reader.read();
           if (done) {
-            reader.releaseLock();
+            this.reader.releaseLock();
             break;
           }
           if (value) {
@@ -115,9 +131,9 @@ export class Maquilas_InternasComponent implements OnInit {
           }
         }
       } catch (error) {
-        console.log(error);
+        this.msj.mensajeError(error);
       } finally {
-        reader.releaseLock();
+        this.reader.releaseLock();
       }
     }
   }

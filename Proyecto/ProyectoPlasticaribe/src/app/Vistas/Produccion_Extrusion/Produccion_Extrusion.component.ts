@@ -47,7 +47,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   reference : string = ``;
   nuevoAnchoProducto : number = null;
   //url : string = ``; 
-  //rebobinado : boolean = false;
+  rebobinado : boolean = false;
 
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
 
@@ -97,6 +97,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       anchoProducto: [null],
       mostratDatosProducto: [false],
       edicionAnchoProducto : [false],
+      rebobinado : [false],
     });
   }
 
@@ -118,6 +119,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.reader.releaseLock();
     this.reader.cancel();
     await this.port.close();
+    console.log('Producción')
   }
 
   errorMessage(message: string, error: HttpErrorResponse) {
@@ -218,7 +220,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   eliminarDiacriticos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
-  limpiarCampos() {
+  limpiarCampos(consulta : boolean) {
     this.cargando = false;
     let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
     this.formDatosProduccion.reset();
@@ -227,7 +229,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.datosOrdenTrabajo = [];
     this.rollosPesados = [];
     this.validarProceso();
-    this.nuevoAnchoProducto = null;
+    consulta ? this.nuevoAnchoProducto = null : null;
   }
 
   getProcess() {
@@ -359,7 +361,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), error => {
           this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
           this.reference = ``;
-          this.limpiarCampos();
+          this.limpiarCampos(consulta);
         });
       });
     } else this.warinigMessage(`¡Debe haber seleccionado un proceso previamente!`);
@@ -387,10 +389,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             undExtrusion: datos.und_Extrusion.trim(),
             calibre: datos.calibre_Extrusion,
             material: datos.material.trim(),
-            anchoProducto: consulta ? this.proceso != 'Empaque' ? (datos.ancho1_Extrusion + datos.ancho2_Extrusion + datos.ancho3_Extrusion) : datos.selladoCorte_Ancho :  this.nuevoAnchoProducto ,
+            anchoProducto: consulta ? this.proceso != 'Empaque' ? (datos.ancho1_Extrusion + datos.ancho2_Extrusion + datos.ancho3_Extrusion) : datos.selladoCorte_Ancho : this.nuevoAnchoProducto,
             presentacion: datos.presentacion,
             daipita : this.reference.includes('DAIPITA') && this.validateProcess() == 'EMP' ? 3000 : null,
-            edicionAnchoProducto : consulta ? false : true,
+            edicionAnchoProducto : false,
+            rebobinado : false,
           });
           this.buscarDatosConoSeleccionado();
         });
@@ -493,17 +496,18 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
-      Rebobinado : false, //this.rebobinado ? true : false,
+      Rebobinado : this.formDatosProduccion.value.rebobinado,
     }
     return datos;
   }
 
   guardarProduccion() {
     this.cargando = true;
+    let rebobinado : boolean = this.formDatosProduccion.value.rebobinado;
     let daipita : any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? null : this.formDatosProduccion.value.daipita;
     //console.log(`guardarProduccion: ${daipita}`);
     this.produccionProcesosService.Post(this.datosProduccion(daipita)).subscribe(res => {
-      this.searchDataTagCreated(res.numero_Rollo, daipita);
+      this.searchDataTagCreated(res.numero_Rollo, daipita, rebobinado);
       setTimeout(() => {
         let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
         let anchoProducto : number = this.formDatosProduccion.value.anchoProducto;
@@ -519,6 +523,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           'mostratDatosProducto': mostratDatosProducto,
           'anchoProducto' : anchoProducto,
           'edicionAnchoProducto' : edicionAnchoProducto,
+          'rebobinado' : false
         });
         this.nuevoAnchoProducto = this.formDatosProduccion.value.anchoProducto;
         //this.buscarRollosPesados();
@@ -544,7 +549,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     return processMapping[proceso] || proceso;
   }
 
-  searchDataTagCreated(reel: number, daipita : any) {
+  searchDataTagCreated(reel: number, daipita : any, rebobinado : boolean) {
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
       //console.log(`searchDataTagCreated: ${daipita}`);
       //let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : this.formDatosProduccion.value.daipita;
@@ -568,7 +573,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           productionProcess: data.nomStatus.trim(),
           showNameBussiness: this.showNameBussiness,
           showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
-          operator: data.operador,
+          operator: rebobinado ? `${data.operador + ' RB'}` : `${data.operador}`
         }
         this.createPDFService.createTagProduction(dataTagProduction);
       });
