@@ -157,6 +157,7 @@ export class DashboardOTComponent implements OnInit {
   }
 
   consultarPesoProducidoOrdenes(){
+    //let camisilla : any = {};
     this.produccionAreasService.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
       this.procesosOrdenesMes = [];
       produccionAreas.forEach(areas => {
@@ -179,6 +180,9 @@ export class DashboardOTComponent implements OnInit {
           this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
         }
       });
+      //camisilla = this.procesosOrdenesMes[0];
+      //this.procesosOrdenesMes.splice(0, 1)
+      //this.procesosOrdenesMes.splice(4, 0, camisilla);
     });
   }
 
@@ -233,17 +237,20 @@ export class DashboardOTComponent implements OnInit {
       case 'SELLADO':
         orden = 4;
         break;
-      case 'ROTOGRABADO':
+      case 'CAMISILLA':
         orden = 5;
-        break;
-      case 'LAMINADO':
+        break;  
+      case 'ROTOGRABADO':
         orden = 6;
         break;
-      case 'WIKETIADO':
+      case 'LAMINADO':
         orden = 7;
         break;
-      case 'DOBLADO':
+      case 'WIKETIADO':
         orden = 8;
+        break;
+      case 'DOBLADO':
+        orden = 9;
         break;  
       default:
         break;
