@@ -70,7 +70,7 @@ function createWindow() {
     if (details.deviceType === 'serial' && details.origin === 'file://') return true;
   });
 
-  // appWin.webContents.openDevTools();
+   appWin.webContents.openDevTools();
 
   appWin.on("closed", () => appWin = null);
 

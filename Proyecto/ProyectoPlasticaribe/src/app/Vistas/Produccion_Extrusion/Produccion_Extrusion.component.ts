@@ -432,11 +432,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   validarDatos() {
     //this.buscraOrdenTrabajo();
-    //let pesoTara : number = this.formDatosProduccion.value.pesoTara
-    //this.formDatosProduccion.patchValue({ pesoBruto: 10, pesoNeto: 10 - pesoTara });
+    console.log(this.formDatosProduccion)
     let ot : any = this.formDatosProduccion.value.ordenTrabajo;
-
     this.cargando = true;
+    
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {

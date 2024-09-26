@@ -21,7 +21,7 @@ export const routes: Routes = [
   {path: 'produccion-procesos', loadChildren: () => import('./Modules/produccion-extrusion/produccion-extrusion.module').then(m => m.ProduccionExtrusionModule)},
   {path: 'produccion-sellado', loadChildren: () => import('./Modules/produccion-sellado/produccion-sellado.module').then(m => m.ProduccionSelladoModule)},
   {path: 'reempaque-sellado', loadChildren: () => import('./Modules/reempaque-sellado/reempaque-sellado.module').then(m => m.ReempaqueSelladoModule)},
-  {path: 'rebobinado-corte', loadChildren: () => import('./Modules/rebobinados-corte/rebobinados-corte.module').then(m => m.RebobinadosCorteModule)}, 
+  //{path: 'rebobinado-corte', loadChildren: () => import('./Modules/rebobinados-corte/rebobinados-corte.module').then(m => m.RebobinadosCorteModule)}, 
   {path: 'maquilas-internas', loadChildren: () => import('./Modules/maquilas-internas/maquilas-internas.module').then(m => m.MaquilasInternasModule) },
   {path: 'mov-maquilas-internas', loadChildren: () => import('./Modules/mov-maquilas-internas/mov-maquilas-internas-routing.module').then(m => m.MovMaquilasInternasRoutingModule) },
 
