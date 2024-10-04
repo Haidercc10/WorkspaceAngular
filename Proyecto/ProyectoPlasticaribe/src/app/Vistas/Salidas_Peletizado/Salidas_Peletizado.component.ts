@@ -22,6 +22,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
   templateUrl: './Salidas_Peletizado.component.html',
   styleUrls: ['./Salidas_Peletizado.component.css']
 })
+
 export class Salidas_PeletizadoComponent implements OnInit {
 
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -61,6 +62,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.lecturaStorage();
     this.getRecoveries();
     this.getPresentations();
+    console.clear()
   }
 
   lecturaStorage() {
@@ -73,7 +75,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.form = this.frmBuilder.group({
       recoveryId : [null, Validators.required],
       recovery : [null, Validators.required],
-      qty : [null, Validators.required],
+      qty : [25, Validators.required],
       presentation : [null, Validators.required],
       observation : [null],
     });
@@ -82,7 +84,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
   clearFields(){
     this.load = false;
     this.form.reset();
-    this.form.patchValue({ presentation : 'Kg' });
+    this.form.patchValue({ qty : 25, presentation : 'Kg' });
   }
 
   clearAll(){
@@ -91,7 +93,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.peletsAvailables = [];
     this.peletsSelected = [];
     this.peletsConsolidated = [];
-    this.form.patchValue({ presentation : 'Kg' });
+    this.form.patchValue({ qty : 25, presentation : 'Kg' });
     this.peletsAvailablesGrouped = [];
   }
 
@@ -144,12 +146,11 @@ export class Salidas_PeletizadoComponent implements OnInit {
         'matPrima' : x.matPrimas.matPrima, 
         'status' : x.statuses.id,
         'statusName' : x.statuses.status,
-        'unit' : x.matPrimas.presentation
+        'unit' : x.matPrimas.presentation, 
       });
     });
     //this.peletsComplete = this.peletsAvailables;
     //console.log(this.peletsAvailables);
-    
     this.consolidatePeletizado();
     this.load = false;
   }
@@ -197,14 +198,6 @@ export class Salidas_PeletizadoComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
-  groupedPeletizado(){
-    this.peletsAvailablesGrouped = this.peletsAvailables.reduce((a,b) => {
-      
-      return a;
-    }, []);
-  }
-
-  //!
   consolidatePeletizado(){
     this.peletsConsolidated = this.peletsAvailables.reduce((array, object) => {
       let info : any = {
@@ -219,26 +212,36 @@ export class Salidas_PeletizadoComponent implements OnInit {
       if(searchedObject) {
         searchedObject.qty += info.qty;
         searchedObject.qty2 += info.qty2;
-      } 
-      else array.push(info);
+        searchedObject.quantity += info.quantity;
+        searchedObject.merma1 += info.merma1;
+        searchedObject.merma2 += info.merma2;        
+      } else array.push(info);
       return array;
     }, []);
   }
 
+  //Validar campos para crear la entrada/salida 
   validateFields(){
     if(this.form.valid) {
       if(this.peletsConsolidated.length > 0) {
-        if(this.form.value.qty <= 0) {
-          this.msj.mensajeAdvertencia(`Advertencia`, `La cantidad de recuperado no puede ser menor a 0`);
-          return;
-        }
-        this.load = true;
-        this.saveHeaderOutput();
+        if(this.form.value.recoveryId == this.peletsConsolidated[0].id) {
+          if(this.form.value.qty > this.peletsConsolidated[0].qty) {
+            this.msj.mensajeAdvertencia(`Advertencia`, `La cantidad de recuperado no puede ser mayor a ${this.peletsConsolidated[0].qty}`);
+            return;
+          }
+          if(this.form.value.qty <= 0) {
+            this.msj.mensajeAdvertencia(`Advertencia`, `La cantidad de recuperado no puede ser menor a 0`);
+            return;
+          }
+          this.saveHeaderOutput();
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `El material de la tabla debe coincidir con el del campo 'recuperado' del formulario`);
       } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar mínimo un registro de peletizado en la tabla!`);
     }  else this.msj.mensajeAdvertencia(`Advertencia`, `Hay campos vacíos en el formulario!`);
   }
 
+  //Guardar encabezado de peletizado.
   saveHeaderOutput(){
+    this.load = true;
     let output : modelSalidas_Peletizado = {
       'MatPri_Id': this.form.value.recoveryId,
       'SalPel_Peso': this.form.value.qty,
@@ -258,28 +261,38 @@ export class Salidas_PeletizadoComponent implements OnInit {
     });
   }
 
+  //Calcular peletizado a asignar. 
   calculatePeleToAssign(idOutput : number){
     let recoveries : any = [];
-    let qtySelected : number = this.peletsConsolidated[0].qty; 
+    let qtySelected : number = this.form.value.qty; //this.peletsConsolidated[0].qty; 
     let rest : number = this.peletsConsolidated[0].qty; 
     let currentQty : number = 0; 
-
+    
     for (let index = 0; index < this.peletsAvailables.length; index++) {
       const x = this.peletsAvailables[index];
-      currentQty += x.weight; 
-      if(currentQty <= qtySelected) {
-        recoveries.push({'code' : x.code, 'quantity' : x.weight, 'typeRecovery' : x.typeRecovery, 'unit' : x.unit }); //
-        rest -= x.weight;
-        if(rest <= 0) break;
+      currentQty += x.weight; //50 
+      console.log(currentQty, qtySelected);
+      if(currentQty <= qtySelected) { //50 <= 150 SI // 25 <= 100 SI // 75 <= 40 SI // 60 <= 35 NO
+        console.log(1);
+        recoveries.push({'code' : x.code, 'quantity' : x.weight, 'typeRecovery' : x.typeRecovery, 'unit' : x.unit }); //50 //25 //40
+        currentQty -= x.weight;  // 50 - 50 = 0   // 25 - 25 = 0    // 40 - 40 = 0   // 
+        qtySelected -= x.weight; //150 - 50 = 100 // 100 - 25 = 75  // 75 - 40 = 35  //
+        rest -= x.weight;        //207 - 50 = 157 // 157 - 25 = 132 // 132 - 40 = 92 //
+        if(qtySelected <= 0) break;
       } else {
-        recoveries.push({'code' : x.code, 'quantity' : rest, 'typeRecovery' : x.typeRecovery, 'unit' : x.unit });
+        console.log(2);
+        recoveries.push({'code' : x.code, 'quantity' : qtySelected, 'typeRecovery' : x.typeRecovery, 'unit' : x.unit });
+        currentQty -= x.weight;  // 60 - 35 = 25 //
+        qtySelected -= x.weight; // 35 - 60 = -25
         rest -= x.weight;
-        if(rest <= 0) break;
-      } 
+        if(qtySelected <= 0) break;
+      }
     }
+    console.log(recoveries);
     this.saveDetailsOutput(idOutput, recoveries);
   }
 
+  //Guardar detalles de la salida.
   saveDetailsOutput(idOutput : number, recoveries){
     let count : number = 0;
 
@@ -298,13 +311,11 @@ export class Salidas_PeletizadoComponent implements OnInit {
         this.msj.mensajeError(`Error`, `No se pudo crear el detalle de la salida de peletizado`);
         this.load = false;
       });
-      console.log('details', details);
     });
   }
 
+  //Actualizar estado de los recuperados seleccionados.
   updateStatusEntryPele(idOutput : number, recoveries : any){
-    console.log(idOutput, recoveries);
-    
     this.svEntryPeletizado.putEntryPeletizado(recoveries).subscribe(data => {
       this.createPDF(idOutput, `creada`);
     }, error => { 
@@ -315,7 +326,6 @@ export class Salidas_PeletizadoComponent implements OnInit {
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
 
   //*FUNCIONES PARA EXPORTAR PDF.
   //Función para crear un PDF en base al registro creado.

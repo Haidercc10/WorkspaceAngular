@@ -20,7 +20,7 @@
   <!--* Card-->
   <p-card>
     <div class="mb-3">
-      <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i>  Registro de Peletizado</h4>
+      <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i>  Material Recuperado</h4>
     </div> 
     <!--* Nota-->
     <div class="mb-5">
@@ -89,7 +89,7 @@
     <div class="mb-4">
       <div class="row g-3">
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
-          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de recuperados disponibles</h4>
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de materiales asociados</h4>
         </div>
       </div>
     </div>
@@ -122,7 +122,9 @@
               </th>-->
               <th class="text-center" scope="col">Id </th>
               <th class="text-center" scope="col">Nombre</th>
-              <th class="text-center" scope="col">Cantidad</th>
+              <th class="text-center" scope="col">Cant. Actual</th>
+              <!--<th class="text-center" scope="col">Cant. Utilizada</th>
+              <th class="text-center" scope="col">Cant. Merma</th>-->
               <th class="text-center" scope="col">Presentación</th>
               <th class="text-center" scope="col">Categoria</th>
             </tr>
@@ -135,8 +137,8 @@
               </td>-->
               <td class="text-center"><b>{{data.id}}</b></td>
               <td class="text-center">{{data.material}}</td>
-              
-              <td [pEditableColumn]="data.qty" class="cursor" pTooltip="Editar cantidad" class="text-center">
+              <!--<td class="text-center">{{data.qty | number : '1.2-2'}}</td>-->
+             <td [pEditableColumn]="data.qty" class="cursor" pTooltip="Editar cantidad" class="text-center">
                 <p-cellEditor>
                   <ng-template pTemplate="input">
                     <input pInputText type="number" (focusout)="outFocus(data.qty, data.qty2)" (focus)="onFocus()" (keyup.enter)="outFocus(data.qty, data.qty2)" [min]="1" [max]="data.qty2" [(ngModel)]="data.qty" pEditableColumnField="qty" required/>
@@ -146,6 +148,16 @@
                   </ng-template>
                 </p-cellEditor>
               </td>
+              <!--<td [pEditableColumn]="data.merma1" class="cursor" pTooltip="Editar cantidad" class="text-center">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input pInputText type="number" (focusout)="outFocus(data.merma1, data.merma2)" (focus)="onFocus()" (keyup.enter)="outFocus(data.merma1, data.merma2)" [min]="1" [max]="data.merma2" [(ngModel)]="data.merma1" pEditableColumnField="merma1" required/>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ data.merma1 == null || data.merma1 > data.merma2 ? data.merma2 : data.merma1 | number : '1.2-2' }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>-->
               <td class="text-center">{{data.presentation}}</td>
               <td class="text-center"><span class="badge" [ngClass]="{'bg-success1': ['RECUPERADO'].includes(data.category), }">{{ data.category }}</span></td> 
             </tr>
@@ -287,8 +299,8 @@
     <!--* Botones -->
     <div *ngIf="!load">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="ingresarRollo" type="button" [disabled]="fieldFocus" label="Generar salida" icon="pi pi-send" (click)="validateFields()"></button>
-        <button pButton class="p-button-secondary" id="limpiarTodo" type="button" [disabled]="fieldFocus" label="Limpiar Todo" icon="pi pi-eraser" (click)="clearAll()"></button>
+        <button pButton class="p-button-danger" id="ingresarRollo" type="button" [disabled]="" label="Generar salida" icon="pi pi-send" (click)="validateFields()"></button>
+        <button pButton class="p-button-secondary" id="limpiarTodo" type="button" [disabled]="" label="Limpiar Todo" icon="pi pi-eraser" (click)="clearAll()"></button>
       </div>
     </div>
   </p-card>

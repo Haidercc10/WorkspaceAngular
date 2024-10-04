@@ -178,6 +178,7 @@ export class DashboardOTComponent implements OnInit {
           }
           this.procesosOrdenesMes.push(datos);
           this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
+          console.log(this.procesosOrdenesMes);
         }
       });
       //camisilla = this.procesosOrdenesMes[0];
@@ -216,7 +217,7 @@ export class DashboardOTComponent implements OnInit {
     else if (mesActual == 7) produccionMesActual = data.producido_Julio;
     else if (mesActual == 8) produccionMesActual = data.producido_Agosto;
     else if (mesActual == 9) produccionMesActual = data.producido_Septiembre;
-    else if (mesActual == 10) produccionMesActual = data.producido_Octubre;
+    else if (mesActual == 10) produccionMesActual = data.producido_OCtubre;
     else if (mesActual == 11) produccionMesActual = data.producido_Noviembre;
     else if (mesActual == 12) produccionMesActual = data.producido_Diciembre;
     return produccionMesActual;
@@ -258,7 +259,7 @@ export class DashboardOTComponent implements OnInit {
     return orden;
   }
 
-  porcentajeProgresoMetaProduccion(data : any) : number {
+    porcentajeProgresoMetaProduccion(data : any) : number {
     let diasCorridos : number = parseInt(moment().format('DD')) - 1;
     let diasMes : number = moment().daysInMonth();
     let horaCorrida : number = moment().hour();

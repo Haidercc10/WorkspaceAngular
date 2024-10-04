@@ -45,13 +45,13 @@ export class CrearMateriaprimaComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.obtenerNombreCategoriasMp();
     this.obtenerProceedor();
   }
 
    //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
-   obtenerNombreCategoriasMp = () => this.categoriMpService.srvObtenerLista().subscribe(datos => this.nombreCategoriasMP = datos);
+  obtenerNombreCategoriasMp = () => this.categoriMpService.srvObtenerLista().subscribe(datos => this.nombreCategoriasMP = datos);
 
   /** Limpiar campos al momento de crear la mat. prima. */
   limpiarCampos = () => this.materiPrima.reset();

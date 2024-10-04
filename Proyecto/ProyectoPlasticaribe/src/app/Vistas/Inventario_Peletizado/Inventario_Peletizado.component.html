@@ -26,7 +26,9 @@
 
       <!--* Exportar-->
       <p-toolbar styleClass="mb-2">
-        <ng-template pTemplate="left"></ng-template>
+        <ng-template pTemplate="left">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-refresh" (click)="inventoryPeletizados()" pTooltip="Refrescar Inventario" positionTooltip="top"></button>
+        </ng-template>
         <ng-template pTemplate="center"></ng-template>
         <ng-template pTemplate="right">
           <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="createExcel(peletizados, 'bodega de peletizado')"></button>
@@ -152,7 +154,9 @@
 
       <!--* Exportar-->
       <p-toolbar styleClass="mb-2">
-        <ng-template pTemplate="left"></ng-template>
+        <ng-template pTemplate="left">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-refresh" (click)="inventoryMaterialRecovery()" pTooltip="Refrescar Inventario" positionTooltip="top"></button>
+        </ng-template>
         <ng-template pTemplate="center"></ng-template>
         <ng-template pTemplate="right">
           <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="createExcel(recoveries, 'materiales recuperados')"></button>

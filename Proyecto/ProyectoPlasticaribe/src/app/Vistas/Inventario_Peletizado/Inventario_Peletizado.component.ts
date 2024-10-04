@@ -42,21 +42,25 @@ export class Inventario_PeletizadoComponent implements OnInit {
     this.load = true;
     this.recoveries = [];
 
-    this.svMatPrima.getPeletizados().subscribe(data => { this.recoveries = data; }, error => {
+    this.svMatPrima.getPeletizados().subscribe(data => { 
+      this.recoveries = data; 
+      this.load = false;
+    }, error => {
       this.msj.mensajeError(`Error`, `Error al consultar los materiales recuperados | ${error.status} ${error.statusText}`);
       this.load = false;
     })
   }
 
   inventoryPeletizados(){
+    this.load = true;
     this.peletizados = [];
-
+    
     this.svIngPele.getStockPele_Grouped().subscribe(data => { 
       data.details = [];
       this.peletizados = data; 
       this.load = false;
     }, error => {
-      if(error.status == 400) this.msj.mensajeAdvertencia( `Advertencia`, `No se encontraron materiales en la bodega de peletizado`);
+      if(error.status == 400) this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron materiales en la bodega de peletizado`);
       else this.msj.mensajeError( `Error`, `Error al consultar información de la bodega de peletizados | ${error.status} ${error.statusText}`);
       this.load = false;
     });
@@ -81,15 +85,15 @@ export class Inventario_PeletizadoComponent implements OnInit {
 
   totalPrice = (data) => data._value.reduce((a, b) => a += b.subtotal, 0);
 
-  totalExcelStock = (data) => data.reduce((a, b) => a += b.stock, 0);
+  totalExcelStock = (data) => data.reduce((a, b) => a += b[4], 0);
 
-  totalExcelPrice = (data) => data.reduce((a, b) => a += b.subtotal, 0);
+  totalExcelPrice = (data) => data.reduce((a, b) => a += b[7], 0);
 
   //* Función para crear excel de rollo a rollo detallado.
   createExcel(data : any, warehouse : string){
     if(data.length > 0) {
       this.load = true;
-      setTimeout(() => { this.loadSheetAndStyles(data, warehouse); }, 500);
+      setTimeout(() => { this.loadSheetAndStyles(data, warehouse); }, 1500);
       setTimeout(() => { this.load = false; }, 1000);
     } else this.msj.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
   }
@@ -102,9 +106,10 @@ export class Inventario_PeletizadoComponent implements OnInit {
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
     let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
     let workbook = this.svExcel.formatoExcel(title, true);
-
-    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
-    this.svExcel.creacionExcel(title, workbook);
+    setTimeout(() => {
+      this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+      this.svExcel.creacionExcel(title, workbook);
+    }, 1000);
   }
 
   //Función para agregar una nueva hoja de calculo.
@@ -182,6 +187,7 @@ export class Inventario_PeletizadoComponent implements OnInit {
 
   //Agregar fila de totales al formato excel.
   addTotal(info : any){
+    console.log(info);
     info.push([
       '',
       '',

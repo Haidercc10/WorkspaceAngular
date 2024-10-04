@@ -18,7 +18,8 @@
 <p-card>
   <!--Crear Falla-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+    <button pButton pRipple class="p-button-danger" icon="pi pi-box" label="Crear Recuperado" id="botones1" (click)="loadModalRecovery()"></button>
+    <button pButton pRipple class="p-button-danger p-button-outlined" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones2" (click)="modalFails = true"></button>
   </div>
 
   <div class="mb-5">
@@ -39,12 +40,12 @@
         </div>
 
         <!-- Tipo recuperado -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <!--<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
-              <p-dropdown formControlName="typeRecovery" inputId="typeRecovery" (onChange)="enableForm()" [autoDisplayFirst]="false" [options]="typesRecovery" optionLabel="tpRecu_Nombre" optionValue="tpRecu_Id" [required]="true" [filter]="true" filterBy="tpRecu_Nombre"></p-dropdown>
+              <p-dropdown formControlName="typeRecovery" inputId="typeRecovery" (onChange)="enableTypeRecovery(2)" [autoDisplayFirst]="false" [options]="typesRecovery" optionLabel="tpRecu_Nombre" optionValue="tpRecu_Id" [required]="true" [filter]="true" filterBy="tpRecu_Nombre"></p-dropdown>
               <label for="typeRecovery">Tipo recuperado*</label>
           </span>
-        </div>
+        </div>-->
 
         <!-- No conformidad -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
@@ -55,17 +56,17 @@
         </div>
         
         <!-- OT -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ot" id="ot" type="number" (keyup.enter)="getOrderProduction()" [useGrouping]="false" [readonly]="form.value.process == null" pTooltip="{{form.value.process == null ? 'Debe llenar los campos TIPO RECUPERADO Y PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
-            <label for="ot">OT</label>
+            <p-inputNumber formControlName="ot" id="ot" type="number" (keyup.enter)="searchDocument()" [useGrouping]="false" [readonly]="form.value.process == null" pTooltip="{{form.value.process == null ? 'Debe llenar el campo PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
+            <label for="ot">OT/Doc.</label>
           </span>
         </div>
 
         <!-- Rollo/Bulto -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="roll" id="roll" type="number" (keyup.enter)="getRollProduction()" [readonly]="form.value.process == null || form.value.typeRecovery != 'ROLLO'" [useGrouping]="false" pTooltip="{{form.value.process == null ? 'Debe llenar los campos TIPO RECUPERADO Y PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
+            <p-inputNumber formControlName="roll" id="roll" type="number" (keyup.enter)="getRollProduction()" [readonly]="form.value.process == null" [useGrouping]="false" pTooltip="{{form.value.process == null ? 'Debe llenar el campo PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
             <label for="roll">Rollo/Bulto</label>
           </span>
         </div>
@@ -98,7 +99,7 @@
         </div>
 
         <!--Observación-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-12 col-xl-12 col-xxl-8">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -189,7 +190,7 @@
    <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" id="agregar" type="button" [disabled]="recoveries.length == 0" label="Registrar Peletizado" icon="pi pi-send" (click)="savePeletizados()"></button>
-      <button pButton class="p-button-secondary" id="limpiarCampos" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearAll()"> </button>
+      <button pButton class="p-button-secondary" id="limpiarCampos" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="clearAll()"> </button>
     </div>
   </div>
 
@@ -222,4 +223,74 @@
     </div>
   </ng-template>
 </p-toast>
+
+<!-- Modal Para Crear Materias Primas -->
+<p-dialog [(visible)]="modalRecovery" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Crear Recuperado" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-crear-materiaprima></app-crear-materiaprima>
+  </ng-template>
+</p-dialog>
+
+<!--* Modal para cargar bultos peletizado -->
+<p-dialog [(visible)]="modalPeletizado" [style]="{width: '90vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Productos no conformes" [modal]="true">
+  <div class="mb-4">
+    <p-table
+      #dtPeletizado
+      *ngIf="!load"
+      [value]="peletizado"
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center">#</th>
+            <th class="text-center">Recuperado</th>
+            <th class="text-center">OT</th>
+            <th class="text-center">Rollo</th>
+            <th class="text-center">Item</th>
+            <th class="text-center">Referencia</th>
+            <th class="text-center">Material</th>
+            <th class="text-center">Peso</th>
+            <th class="text-center">Mat. Prima</th>
+            <th class="text-center">Proceso</th>
+            <th class="text-center">No conformidad</th>
+            <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+          <tr>
+            <td class="text-center">{{rowIndex + 1}}</td>
+            <td class="text-center"><b>{{data.TpRecu_Id}}</b></td>
+            <td class="text-center">{{data.OT}}</td>
+            <td class="text-center">{{data.Rollo_Id}}</td>
+            <td class="text-center">{{data.Prod_Id}}</td>
+            <td class="text-center"><b>{{data.Prod_Nombre}}</b></td>
+            <td class="text-center">{{data.Material_Nombre}}</td>
+            <td class="text-center"><b>{{data.IngPel_Cantidad | number : '1.2-2'}}</b></td>
+            <td class="text-center">{{data.MatPri_Nombre}}</td>
+            <td class="text-center">{{data.Proceso_Nombre | uppercase}}</td>
+            <td class="text-center"><b>{{data.Falla_Nombre}}</b></td>
+            <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+              <p-button icon="pi pi-trash" [rounded]="true" (click)="confirmQuitRecord(rowIndex)" severity="danger"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="12"><h6 class="bold">No hay registros agregados.</h6></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td class="text-right" colspan="7">Totales</td>
+            <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
+            <td colspan="4"></td>
+          </tr>
+        </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
 

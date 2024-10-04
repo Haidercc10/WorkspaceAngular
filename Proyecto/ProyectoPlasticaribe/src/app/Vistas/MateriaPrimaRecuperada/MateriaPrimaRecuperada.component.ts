@@ -14,6 +14,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsRecuperado as defaultSteps } from 'src/app/data';
+import { Mov_IngresoPeletizadoComponent } from '../Mov_IngresoPeletizado/Mov_IngresoPeletizado.component';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,7 @@ import { defaultStepOptions, stepsRecuperado as defaultSteps } from 'src/app/dat
   templateUrl: './MateriaPrimaRecuperada.component.html',
   styleUrls: ['./MateriaPrimaRecuperada.component.css']
 })
+
 export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   public FormMateriaPrimaRecuperada !: FormGroup;
@@ -56,6 +58,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   modalMode : boolean = false;
   fieldFocus : boolean = false;
   title : boolean = true;
+  load : boolean = false; //Variable para validar que salga o no la imagen de carga
+  outputsToUpdate : any [] = []; //
   
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -69,7 +73,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                                 private messageService: MessageService,
                                   private shepherdService: ShepherdService,
                                     private mensajeService : MensajesAplicacionService,
-                                      private svOutputsPele : Salidas_PeletizadoService,) {
+                                      private svOutputsPele : Salidas_PeletizadoService,
+                                        private cmpMovIngPele : Mov_IngresoPeletizadoComponent) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
@@ -159,6 +164,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   registrarRecuperado(){
     if (this.ArrayMateriaPrima.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
     else {
+      this.load = true;
       const datosRec : any = {
         RecMp_FechaIngreso : this.today,
         Usua_Id : this.storage_Id,
@@ -170,7 +176,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         Turno_Id : this.FormMateriaPrimaRecuperada.value.Turno,
         Usua_Operador: this.FormMateriaPrimaRecuperada.value.usuarioId,
       }
-      this.recuperadoService.srvGuardar(datosRec).subscribe((data) => this.obtenerUltimoIdRecuperado(data.recMp_Id), () => this.mensajeService.mensajeError(`Error`, `¡Error al ingresar el peletizado!`));
+      this.recuperadoService.srvGuardar(datosRec).subscribe((data) => {
+        this.obtenerUltimoIdRecuperado(data.recMp_Id)
+      }), error => {
+        this.mensajeService.mensajeError(`Error`, `Error al ingresar el registro de Recuperado | ${error.status} ${error.statusText}`);
+        this.load = false;
+      }
     }
   }
 
@@ -234,7 +245,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           count++;
           if (count == this.ArrayMateriaPrima.length) {
             let output : any = this.FormMateriaPrimaRecuperada.value.ConsecutivoSalida;
-            if(output) this.updateOutputPeletizado();
+            if(output) this.updateOutputPeletizado(this.outputsToUpdate);
             else {
               this.mensajeService.mensajeConfirmacion(`Confirmación`, `Inventario de materia prima actualizado con éxito!`);
               this.limpiarTodosCampos();
@@ -245,20 +256,25 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     }
   }
 
-  updateOutputPeletizado(){
-    let output : any = this.FormMateriaPrimaRecuperada.value.ConsecutivoSalida;
-    this.svOutputsPele.putStatusOutput(output, this.storage_Id).subscribe(data => {
+  updateOutputPeletizado(outputs : any){
+    //let output : any = this.FormMateriaPrimaRecuperada.value.ConsecutivoSalida;
+    this.svOutputsPele.putStatusOutput(this.storage_Id, outputs).subscribe(data => {
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se creó la entrada de recuperado exitosamente!`);
       this.limpiarTodosCampos();
     }, error => {
-      this.mensajeService.mensajeError(`Error`, `Error al actualizar la salida de peletizado N° ${output}`);
+      this.mensajeService.mensajeError(`Error`, `Error al actualizar la salida de peletizado`);
     });
   }
 
   // Funcion que limpiará todos los campos
   limpiarTodosCampos(){
+    this.load = false;
     this.FormMateriaPrimaRecuperada.reset();
     this.FormMateriaPrima.reset();
     this.ArrayMateriaPrima = [];
+    this.cmpMovIngPele.modal = false;
+    this.cmpMovIngPele.searchInPeletizado();
+    this.outputsToUpdate = [];
   }
 
   // Función para quitar un producto de la tabla
