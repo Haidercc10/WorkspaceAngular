@@ -15,12 +15,135 @@
   </div>
 </div>
 
+
 <p-card>
   <!--Crear Falla-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
     <button pButton pRipple class="p-button-danger" icon="pi pi-box" label="Crear Recuperado" id="botones1" (click)="loadModalRecovery()"></button>
-    <button pButton pRipple class="p-button-danger p-button-outlined" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones2" (click)="modalFails = true"></button>
+    <button pButton pRipple class="p-button-danger p-button-outlined" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones2" (click)="loadModalFails()"></button>
   </div>
+
+  <!--* Ingreso de bultos/rollos a peletizado desde despacho -->
+  <div class="mb-5" id="opcional">
+    <p-accordion> 
+      <p-accordionTab header="Gestionar envío de rollos/bultos a peletizado">
+        <br>
+        <!--* Peletizado-->
+        <div class="mb-4"> 
+          <form [formGroup]="optForm">
+            <div class="mb-5" id="formulario">
+              <div class="row g-4">
+
+                <!-- DV -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="dv" id="ot" type="number" (keyup.enter)="loadDevolutionsPeletizado()" [useGrouping]="false"></p-inputNumber>
+                    <label for="ot">Documento</label>
+                  </span>
+                </div>
+
+                <!--Observación-->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-10 col-xl-10 col-xxl-10">
+                  <span class="p-float-label">
+                    <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
+                    <label for="textarea">Observación</label>
+                  </span>
+                </div>
+
+              </div>
+            </div>  
+          </form>
+
+          <p-divider></p-divider>
+
+          <div class="mb-3">
+            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-table"></i> <b> Consolidado</b></h4>
+          </div> 
+        
+          <p-table
+            #dtPeletizado
+            *ngIf="!load"
+            [value]="groupPeletizado"
+            selectionMode="single"
+            [(selection)]="selectedItem"
+            columnResizeMode="expand"
+            styleClass="p-datatable-sm p-datatable-gridlines"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            dataKey="item"
+            (onRowSelect)="this.getDataDispatch()"
+            (onRowUnselect)="this.getDataDispatch()">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="text-center">#</th>
+                  <th class="text-center">Item</th>
+                  <th class="text-center">Referencia</th>
+                  <th class="text-center">Material</th>
+                  <th class="text-center">Pigmento</th>
+                  <th class="text-center">Peso (Kg)</th>
+                  <th class="text-center">Peso real (Kg)</th>
+                  <th class="text-center">Diferencia (Kg)</th>
+                  <th class="text-center">Cant. Rollos/Bultos</th>
+                  <th class="text-center">Id Mat. Prima</th>
+                  <th class="text-center">Mat. Prima</th>
+                  <th class="text-center">No conformidad</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" >
+                <tr class="cursor" [pSelectableRow]="data">
+                  <td class="text-center">{{rowIndex + 1}}</td>
+                  <td class="text-center">{{data.item}}</td>
+                  <td class="text-center"><b>{{data.reference}}</b></td>
+                  <td class="text-center">{{data.material}}</td>
+                  <td class="text-center">{{data.pigment}}</td>
+                  <td class="text-center"><b>{{data.weight | number : '1.2-2'}}</b></td>
+                  <td [pEditableColumn]="data.weight2" class="cursor" pTooltip="Editar cantidad" class="text-center">
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <input pInputText 
+                        type="number" 
+                        (focusout)="outFocus(data.weight2, data.weight3, rowIndex, data)" 
+                        (focus)="onFocus()" 
+                        (keyup.enter)="outFocus(data.weight2, data.weight3, rowIndex, data)" 
+                        [min]="1" 
+                        [max]="data.weight3" 
+                        [(ngModel)]="data.weight2" 
+                        pEditableColumnField="weight2" required/>
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        {{ data.weight2 == null || data.weight2 > data.weight3 ? data.weight3 : data.weight2 | number : '1.2-2' }}
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td class="text-center"><b>{{data.diff | number : '1.2-2'}}</b></td>
+                  <td class="text-center">{{qtyRollsByItem(data.item)}}</td>
+                  <td class="text-center">{{data.matPrima_Id}}</td>
+                  <td class="text-center">{{data.matPrima}}</td>
+                  <td class="text-center"><b>{{data.fail}}</b></td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7"><h6 class="bold">No hay registros agregados.</h6></td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="footer">
+                <tr>
+                  <td class="text-right" colspan="5">Totales</td>
+                  <td class="text-center">{{totalBadProducts() | number : '1.2-2'}}</td>
+                  <td class="text-center">{{totalBadProductsGrouped2() | number : '1.2-2'}}</td>
+                  <td class="text-center">{{totalDiffBadProductsGrouped3() | number : '1.2-2'}}</td>
+                  <td class="text-center">{{qtyTotalRolls()}}</td>
+                  <td colspan="3"></td>
+                </tr>
+              </ng-template>
+          </p-table>
+        </div>
+      </p-accordionTab>
+    </p-accordion>
+  </div>      
 
   <div class="mb-5">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i>  Registro de Peletizado</h4>
@@ -50,7 +173,7 @@
         <!-- No conformidad -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="fail" id="fail" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+            <p-dropdown formControlName="fail" id="fail" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [autoDisplayFirst]="false"></p-dropdown>
             <label for="fail">No conformidad*</label>
           </span>
         </div>
@@ -58,7 +181,7 @@
         <!-- OT -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ot" id="ot" type="number" (keyup.enter)="searchDocument()" [useGrouping]="false" [readonly]="form.value.process == null" pTooltip="{{form.value.process == null ? 'Debe llenar el campo PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
+            <p-inputNumber formControlName="ot" id="ot" type="number" (keyup.enter)="searchDocument()" [useGrouping]="false" [readonly]="form.value.process == null || !dispatch" pTooltip="{{form.value.process == null || !dispatch ? 'Debe llenar el campo PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
             <label for="ot">OT/Doc.</label>
           </span>
         </div>
@@ -98,8 +221,24 @@
           </span>
         </div>
 
+        <!-- Peso -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="quantityDoc" id="quantity" type="number" [useGrouping]="true" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+            <label for="quantity">Peso Doc. (Kg)</label>
+          </span>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="diff" id="diff" type="number" [useGrouping]="true" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+            <label for="diff">Diferencia (Kg)</label>
+          </span>
+        </div>
+
         <!--Observación-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-10 col-xl-10 col-xxl-10">
           <span class="p-float-label">
             <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -231,66 +370,20 @@
   </ng-template>
 </p-dialog>
 
-<!--* Modal para cargar bultos peletizado -->
+<!--* Modal para cargar bultos peletizado desde las DV -->
 <p-dialog [(visible)]="modalPeletizado" [style]="{width: '90vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Productos no conformes" [modal]="true">
   <div class="mb-4">
-    <p-table
-      #dtPeletizado
-      *ngIf="!load"
-      [value]="peletizado"
-      columnResizeMode="expand"
-      styleClass="p-datatable-sm"
-      responsiveLayout="scroll"
-      [rowHover]="true"
-      [scrollable]="true"
-      scrollHeight="50rem">
-        <ng-template pTemplate="header">
-          <tr>
-            <th class="text-center">#</th>
-            <th class="text-center">Recuperado</th>
-            <th class="text-center">OT</th>
-            <th class="text-center">Rollo</th>
-            <th class="text-center">Item</th>
-            <th class="text-center">Referencia</th>
-            <th class="text-center">Material</th>
-            <th class="text-center">Peso</th>
-            <th class="text-center">Mat. Prima</th>
-            <th class="text-center">Proceso</th>
-            <th class="text-center">No conformidad</th>
-            <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-          <tr>
-            <td class="text-center">{{rowIndex + 1}}</td>
-            <td class="text-center"><b>{{data.TpRecu_Id}}</b></td>
-            <td class="text-center">{{data.OT}}</td>
-            <td class="text-center">{{data.Rollo_Id}}</td>
-            <td class="text-center">{{data.Prod_Id}}</td>
-            <td class="text-center"><b>{{data.Prod_Nombre}}</b></td>
-            <td class="text-center">{{data.Material_Nombre}}</td>
-            <td class="text-center"><b>{{data.IngPel_Cantidad | number : '1.2-2'}}</b></td>
-            <td class="text-center">{{data.MatPri_Nombre}}</td>
-            <td class="text-center">{{data.Proceso_Nombre | uppercase}}</td>
-            <td class="text-center"><b>{{data.Falla_Nombre}}</b></td>
-            <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-              <p-button icon="pi pi-trash" [rounded]="true" (click)="confirmQuitRecord(rowIndex)" severity="danger"></p-button>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="12"><h6 class="bold">No hay registros agregados.</h6></td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="footer">
-          <tr>
-            <td class="text-right" colspan="7">Totales</td>
-            <td class="text-center">{{totalQty() | number : '1.2-2'}}</td>
-            <td colspan="4"></td>
-          </tr>
-        </ng-template>
-    </p-table>
+    <p class="mb-4"><i class="pi pi-exclamation-triangle"></i> <b> Nota: </b> El campo peso real es EDITABLE, debe colocar el equivalente al peso de los rollos/bultos de la devolución</p>     
+    
+    <!--Botones de registro-->
+    <div class="mb-3">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" id="agregar" type="button" [disabled]="fieldFocus" label="Registrar Peletizado" icon="pi pi-send" (click)="savePeletizadosByDev()"></button>
+        <button pButton class="p-button-secondary" id="limpiarCampos" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="clearModalPeletizado()"> </button>
+      </div>
+    </div>
   </div>
 </p-dialog>
+
+
 

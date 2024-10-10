@@ -20,6 +20,7 @@ import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/O
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
+import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -109,6 +110,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.productionInPallet = [];
     this.productionOutPallet = [];
     this.reposition = false;
+    this.preload = false;
   }
 
   getDrivers() {
@@ -124,14 +126,15 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         this.formProduction.patchValue({ 'orderFact' : data.oF_Id });
         this.preSendProductionZeus = dataOF;
         this.load = false;
+        this.preload = true;
         this.getInformationOrderFact();
       }, error => {
         this.msj.mensajeError(`Error`, `Error en la consulta de la orden de facturación asociada al precargue N° ${preload}`);
-        this.load = false;
+        this.clearFields();
       });
     }, error => {
-      this.msj.mensajeError(`Error`, `Se encontraron errores en la consulta del precargue N° ${preload}`);
-      this.load = false;
+      this.msj.mensajeError(`Error`, `Se encontraron errores en la consulta del precargue N° ${preload} | ${error.status} ${error.statusText}`);
+      this.clearFields();
     });
   }
 
@@ -171,10 +174,12 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
               }, error => {
                 this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error);
                 this.formProduction.patchValue({ 'orderFact' : '', });
+                this.preload = false;
               }); 
             }, error => {
               this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${orderFact}!`, error);
               this.formProduction.patchValue({ 'orderFact' : '', });
+              this.preload = false;
             });
           } else {
             this.reposition = true;
@@ -190,6 +195,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   getInformationProduction() {
     let orderFact = this.formProduction.value.orderFact;
     let fact = this.formProduction.value.fact;
+
     if ([null, undefined, ''].includes(orderFact)) this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe buscar la orden de facturación/reposición para ingresar los rollos/bultos a despachar!`, 12000000);
     else if ([null, undefined, ''].includes(fact.toString().trim())) this.msj.mensajeAdvertencia(`Advertencia`, `No existen facturas/remisiones asociadas al pedido de la orden de facturación N° ${orderFact}`)
     else {
@@ -308,10 +314,12 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //Función para colocar en estado NO DISPONIBLE los bultos despachados. 
   putStateReels() {
     let orderFact = this.formProduction.value.orderFact;
+    let preload = this.formProduction.value.preload;
     this.productionProcessSerivce.putStateNotAvaible(orderFact).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
       let fact = this.formProduction.value.fact;
       if(this.reposition) this.updateDevolution();
+      if(this.preload) this.updatePreload(preload, orderFact);
       //this.cmpOrderFactPallets.createPDF(orderFact, fact);
       this.orden_FacturacionComponent.createPDF(orderFact, fact);
       this.clearFields();
@@ -329,6 +337,14 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     
     this.svDevolutions.PutStatusDevolution(dev, 18, date, hour, this.storage_Id).subscribe(data => {
     }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar el estado de la devolución`); });
+  }
+
+  //Actualizar estado del precargue
+  updatePreload(preload : number, of : number){
+    let info : any = [{ 'of' : of, 'user' : this.storage_Id, 'observation' : '', 'status' : 5 }]; 
+    this.svPreload.putPreloadDispatch(preload, info).subscribe(data => {}, e => {
+      this.msj.mensajeError(`Error`, `No fue posible actualizar el estado del precargue N° ${preload} | ${e.status} ${e.statusText}`);
+    });
   }
 
   printTag(data: any) {

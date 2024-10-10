@@ -386,6 +386,8 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     this.modal = true;
     validateTraslate ? this.ubicationRolls.traslate = true : this.ubicationRolls.traslate = false; 
     validateTraslate ? this.action = `Traslado/Salida de rollos` : this.action = `Actualizar ubicaciones de rollos`;
+    this.ubicationRolls.fails = [];
+    this.ubicationRolls.getFails();
     this.ubicationRolls.loadRolls();
   }
 

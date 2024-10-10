@@ -62,7 +62,7 @@ export class Produccion_ProcesosService {
 
   Delete = (id: number|string): Observable<any> => this.http.delete(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/${id}`);
 
-  putReversionEnvioZeus = (observation : string, rollos: any[]) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putReversionEnvioZeus/${observation}`, rollos);
+  putReversionEnvioZeus = (fail : number, observation : string, rollos: any[]) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putReversionEnvioZeus/${fail}/${observation}`, rollos);
 
   getInfoProductionAvailable = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionAvailable`);
 
@@ -79,5 +79,7 @@ export class Produccion_ProcesosService {
   getInformationDispatch = (production : number, client : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationDispatch/${production}/${client}`);
 
   getOrderFactForPreload = (of : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getOrderFactForPreload/${of}`);
+
+  getOtSentToPeletizado = (ot : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getOtSentToPeletizado/${ot}`);
 
 }

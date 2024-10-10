@@ -13,6 +13,7 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import moment from 'moment';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 
 @Component({
   selector: 'app-Ubicaciones_Rollos',
@@ -47,6 +48,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
   msgTooltip: string = '';
   form !: FormGroup;
   users : any = [];
+  fails : any = [];
 
   constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,
@@ -59,6 +61,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
     private svInvZeus : InventarioZeusService,
     private frmBuilder : FormBuilder,
     private svUsers : UsuarioService,
+    private svFails : FallasTecnicasService,
   ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
     this.initForm();
@@ -73,11 +76,12 @@ export class Ubicaciones_RollosComponent implements OnInit {
   initForm(){
     this.form = this.frmBuilder.group({
       user : [null, Validators.required],
+      fail : [null, Validators.required],
       observation : [null, Validators.required]
     })
   }
 
-  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 121, 3124, 9128, 115, 113].includes(x.usua_Id)); });
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 121, 3124, 115, 113].includes(x.usua_Id)); });
 
   //Leer storage del navegador.
   readStorage() {
@@ -254,12 +258,13 @@ export class Ubicaciones_RollosComponent implements OnInit {
   extractRollsDespacho(zeus : boolean = false){
     let rollsPL : any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo);
     let user : string = this.users.find(x => x.usua_Id == this.form.value.user).usua_Nombre;
+    let fail : number = this.form.value.fail;
     let observation : string = this.form.value.observation;
     
     let description : string = `${moment().format('YYYY-MM-DD')} ${moment().format('HH:mm:ss')}: ${user} solicita ajuste por motivo: ${observation}`;
     let errorMsj : string = 'No fue posible revertir el Envio Zeus de los rollos en Plasticaribe!';
 
-    this.productionProcessSerivce.putReversionEnvioZeus(description, rollsPL).subscribe(data => { this.changeStateEntry(rollsPL, zeus); }, error => { this.msj.mensajeError('Error', errorMsj); });
+    this.productionProcessSerivce.putReversionEnvioZeus(fail, description, rollsPL).subscribe(data => { this.changeStateEntry(rollsPL, zeus); }, error => { this.msj.mensajeError('Error', errorMsj); });
   }
 
   //.Función que actualizará el envio zeus de los rollos en procextrusion
@@ -324,5 +329,8 @@ export class Ubicaciones_RollosComponent implements OnInit {
 
   //Función para filtrar la tabla de rollos a eliminar.
   applyFilter = ($event, campo: any, valorCampo: string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  //Función para obtener las fallas técnicas.
+  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 23) });
 
 }

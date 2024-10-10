@@ -178,21 +178,26 @@ export class EntradaBOPPComponent implements OnInit {
         this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Ya existe un bopp con el serial ${datosBopp.Serial}, por favor colocar un serial distinto!`);
         this.load = true;
       } else {
-        this.categoriaService.srvObtenerListaPorId(datosBopp.Cat_Id).subscribe(datos_categorias => {
-          datosBopp.Cat = datos_categorias.catMP_Nombre;          
-          let index = this.boppsGenericos.findIndex((item) => item.boppGen_Id == datosBopp.IdBoppGenerico);
-          if(index == -1) {
-            this.load = true;
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe elegir un bopp genérico válido`);
-          } else {
-            datosBopp.Subtotal = parseInt(datosBopp.Precio) * parseInt(datosBopp.CantKg);
-            this.ArrayBOPP.push(datosBopp);
-            this.calcularValores();
-            this.limpiarCampos();
-            this.getPrecioBOPP();
-            this.load = true;
-          }
-        });
+        if(!this.ArrayBOPP.map(x => x.Serial).includes(datosBopp.Serial)) {
+          this.categoriaService.srvObtenerListaPorId(datosBopp.Cat_Id).subscribe(datos_categorias => {
+            datosBopp.Cat = datos_categorias.catMP_Nombre;          
+            let index = this.boppsGenericos.findIndex((item) => item.boppGen_Id == datosBopp.IdBoppGenerico);
+            if(index == -1) {
+              this.load = true;
+              this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe elegir un bopp genérico válido`);
+            } else {
+              datosBopp.Subtotal = parseInt(datosBopp.Precio) * parseInt(datosBopp.CantKg);
+              this.ArrayBOPP.push(datosBopp);
+              this.calcularValores();
+              this.limpiarCampos();
+              this.getPrecioBOPP();
+              this.load = true;
+            }
+          });
+        } else {
+          this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe un BOPP con serial N° ${datosBopp.Serial} cargado en la tabla!`);
+          this.load = true;
+        }
       }
     });
   }

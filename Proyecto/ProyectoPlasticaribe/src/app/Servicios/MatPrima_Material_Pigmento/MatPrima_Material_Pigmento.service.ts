@@ -13,4 +13,5 @@ export class MatPrima_Material_PigmentoService {
 
   getPeletizadoForMaterialPigment = (material : number, pigment : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/MatPrima_Material_Pigmento/getPeletizadoForMaterialPigment/${material}/${pigment}`);
 
+  Post = (data : any) => this.http.post<any>(this.rutaPlasticaribeAPI + `/MatPrima_Material_Pigmento`, data);
 }

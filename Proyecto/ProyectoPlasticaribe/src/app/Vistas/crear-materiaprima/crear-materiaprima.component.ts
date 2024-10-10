@@ -2,9 +2,12 @@ import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MpProveedorService } from 'src/app/Servicios/MateriaPrima_Proveedor/MpProveedor.service';
+import { MatPrima_Material_PigmentoService } from 'src/app/Servicios/MatPrima_Material_Pigmento/MatPrima_Material_Pigmento.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 
 @Injectable({
@@ -24,13 +27,20 @@ export class CrearMateriaprimaComponent implements OnInit {
   unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
   estado = []; //Variable que va a almacenar todos los tipos de estados de documentos
   proveedores = []; /** Array para cargar los proveedores de materia prima. */
+  materials = [];
+  pigments = [];
+  recovery : boolean = false;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private frmBuilderMateriaPrima : FormBuilder,
                     private proveedorservices : ProveedorService,
                       private proveedorMPService : MpProveedorService,
-                        private mensajeService : MensajesAplicacionService,) {
+                        private mensajeService : MensajesAplicacionService,
+                          private svMaterials : MaterialProductoService, 
+                            private svPigments : PigmentoProductoService,
+                              private svMMP : MatPrima_Material_PigmentoService,
+                        ) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
       mpNombre: ['', Validators.required],
@@ -42,12 +52,16 @@ export class CrearMateriaprimaComponent implements OnInit {
       Stock : ['', Validators.required],
       mpUnidadMedida : ['', Validators.required],
       MpObservacion : ['', Validators.required],
+      mpPigment : [null], 
+      mpMaterial : [null]
     });
   }
 
   ngOnInit() {
     this.obtenerNombreCategoriasMp();
     this.obtenerProceedor();
+    this.getMaterials();
+    this.getPigments();
   }
 
    //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
@@ -79,8 +93,9 @@ export class CrearMateriaprimaComponent implements OnInit {
       MatPri_Hora : moment().format('H:mm:ss'),
     }
 
-    this.materiaPrimaService.srvGuardar(datosMP).subscribe(() => {
-      this.mensajeService.mensajeConfirmacion('¡Materia Prima creada con éxito!', '');
+    this.materiaPrimaService.srvGuardar(datosMP).subscribe(data => {
+      this.mensajeService.mensajeConfirmacion('Materia Prima creada con éxito');
+      if(this.recovery) this.createRecovery(data.matPri_Id)
       setTimeout(() => { this.materiPrima.reset(); }, 1000);
     }, () => this.mensajeService.mensajeError(`¡Mensaje Error!`, 'Falló al crear la materia prima, verifique!'));
   }
@@ -98,6 +113,24 @@ export class CrearMateriaprimaComponent implements OnInit {
   cargarDescripcion(){
     let mtpNombre : any = this.materiPrima.value.MpNombre;
     this.materiPrima.patchValue({ mpDescripcion: mtpNombre })
+  }
+
+  //Cargar materiales
+  getMaterials = () => this.svMaterials.srvObtenerLista().subscribe(data => this.materials = data);
+
+  //Cargar pigmentos
+  getPigments = () => this.svPigments.srvObtenerLista().subscribe(data => this.pigments = data);
+
+  //Crear materia prima recuperada
+  createRecovery(matprima : any){
+    let info : any = {
+      'MatPri_Id' : matprima,
+      'Material_Id' : this.materiPrima.value.mpMaterial,
+      'Pigmt_Id' : this.materiPrima.value.mpPigment,
+    }
+    this.svMMP.Post(info).subscribe(data => { console.log('Registro creado con exito.'); }, error => {
+       this.mensajeService.mensajeError(`Error al crear la relación entre recuperado, material y pigmento | ${error.status} ${error.statusText}`);
+    });
   }
 
 }

@@ -132,12 +132,8 @@
           <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
             <tr>
               <td>{{rowIndex + 1}}</td>
-              <!--<td>
-                <p-tableCheckbox [value]="data" (click)="selectPeletizados(data)" id=""></p-tableCheckbox>
-              </td>-->
               <td class="text-center"><b>{{data.id}}</b></td>
               <td class="text-center">{{data.material}}</td>
-              <!--<td class="text-center">{{data.qty | number : '1.2-2'}}</td>-->
              <td [pEditableColumn]="data.qty" class="cursor" pTooltip="Editar cantidad" class="text-center">
                 <p-cellEditor>
                   <ng-template pTemplate="input">
@@ -148,16 +144,6 @@
                   </ng-template>
                 </p-cellEditor>
               </td>
-              <!--<td [pEditableColumn]="data.merma1" class="cursor" pTooltip="Editar cantidad" class="text-center">
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="number" (focusout)="outFocus(data.merma1, data.merma2)" (focus)="onFocus()" (keyup.enter)="outFocus(data.merma1, data.merma2)" [min]="1" [max]="data.merma2" [(ngModel)]="data.merma1" pEditableColumnField="merma1" required/>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{ data.merma1 == null || data.merma1 > data.merma2 ? data.merma2 : data.merma1 | number : '1.2-2' }}
-                  </ng-template>
-                </p-cellEditor>
-              </td>-->
               <td class="text-center">{{data.presentation}}</td>
               <td class="text-center"><span class="badge" [ngClass]="{'bg-success1': ['RECUPERADO'].includes(data.category), }">{{ data.category }}</span></td> 
             </tr>

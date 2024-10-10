@@ -35,6 +35,23 @@
           <label for="mpValor">Precio Unitario</label>
         </span>
       </div>
+
+      <!-- CATEGORIA  -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" *ngIf="recovery">
+        <span class="p-float-label">
+          <p-dropdown formControlName="mpMaterial" inputId="mpMaterial" optionValue="material_Id" [autoDisplayFirst]="false" [options]="materials" optionLabel="material_Nombre"></p-dropdown>
+          <label for="mpMaterial">Material</label>
+        </span>
+      </div>
+
+      <!-- CATEGORIA  -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" *ngIf="recovery">
+        <span class="p-float-label">
+          <p-dropdown formControlName="mpPigment" inputId="mpPigment" optionValue="pigmt_Id" [autoDisplayFirst]="false" [options]="pigments" optionLabel="pigmt_Nombre"></p-dropdown>
+          <label for="mpPigment">Pigmento</label>
+        </span>
+      </div>
+
     </div>
   </div>
 

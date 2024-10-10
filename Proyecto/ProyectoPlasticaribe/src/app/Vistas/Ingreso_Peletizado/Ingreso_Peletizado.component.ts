@@ -21,6 +21,8 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { CrearMateriaprimaComponent } from '../crear-materiaprima/crear-materiaprima.component';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { Crear_FallasComponent } from '../Crear_Fallas/Crear_Fallas.component';
 
 @Injectable({
   providedIn: 'root'
@@ -61,8 +63,16 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   reader: any;
   modalRecovery : boolean = false;
   @ViewChild(CrearMateriaprimaComponent) createRecovery : CrearMateriaprimaComponent;
+  @ViewChild(Crear_FallasComponent) cmpCreateFails : Crear_FallasComponent;
   modalPeletizado : boolean = false;
   peletizado : any = [];
+  groupPeletizado : any = [];
+  tipoDoc : string = ``; 
+  fieldFocus : boolean = false;
+  optForm !: FormGroup;
+  management : boolean = false;
+  selectedItem : any = null;
+  dispatch : boolean = false;
 
   constructor(private AppComponent : AppComponent, 
     private svMaterials : MaterialProductoService, 
@@ -81,10 +91,12 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     private svPeleMaterialPigmto : MatPrima_Material_PigmentoService,
     private svDetailsAssign : DetallesAsignacionService,
     private svDevolutions : DetallesDevolucionesProductosService,
+    private svProdProcess : Produccion_ProcesosService,
     //private createRecovery : CrearMateriaprimaComponent,
   ) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
+    this.optionalForm();
   }
 
   ngOnInit() {
@@ -98,6 +110,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     //this.createPDF('2024-06-13', '2024-06-13', '14:55:49', 'creada');
   }
 
+  //* BASCULA
   async ngOnDestroy() {
     this.reader.releaseLock();
     this.reader.cancel();
@@ -140,7 +153,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
             if (!this.load) {
               this.form.patchValue({
                 quantity: valor,
-                //pesoNeto: valor - this.form.value.pesoTara,
+                diference: valor - this.form.value.weight
               });
             }
           }
@@ -157,6 +170,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  //*NAVEGADOR
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
@@ -164,8 +182,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  //*FORMULARIOS
 
   //Función para inicializar el formulario.
   initForm(){
@@ -183,6 +200,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       product : [null, Validators.required], 
       mpId : [null, Validators.required],
       matprima : [null, Validators.required],
+      quantityDoc : [null, Validators.required], 
+      diff : [null, Validators.required],
     });
     //this.disableForm();
   }
@@ -208,6 +227,29 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     this.form.get('roll')?.reset();
   }
 
+  //Cargar campos en función de los datos la OT. 
+  loadFieldsForOT(data : any){
+    //console.log(this.matPrimas.filter(x => x.matPri_Nombre.includes(data.material)));
+    this.getPeletizadosForParameters(data);
+    this.form.patchValue({
+      'otValidate' : data.numero_Orden,
+      'item' :  data.id_Producto, 
+      'product' : data.producto,
+      'material' : parseInt(data.id_Material),
+    });
+    this.load = false;
+  }
+
+  //Formulario opcional para gestionar devoluciones. 
+  optionalForm(){
+    this.optForm = this.FrmBuilder.group({
+      dv : [null, Validators.required],
+      observation : [null],
+    });
+  }
+
+  //* OBTENER INFO INICIAL
+
   //Función para obtener los diferentes tipos de materiales. 
   getMaterials = () => this.svMaterials.srvObtenerLista().subscribe(data => { this.materials = data }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los materiales. | ${error}`); });
 
@@ -215,7 +257,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   getTypesRecovery = (types : any[]) => this.svTypesRecovery.GetTodo().subscribe(data => { this.typesRecovery = data.filter(x => types.includes(x.tpRecu_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los tipos de recuperados. | ${error}`); });
 
   //Función para obtener los tipos de fallas/no conformidades. 
-  getFails = () => this.svFails.srvObtenerLista().subscribe(data => { this.failsProcess = data.filter(x => [16,17,18,19,20,21,22].includes(x.tipoFalla_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
+  getFails = () => this.svFails.srvObtenerLista().subscribe(data => { this.failsProcess = data.filter(x => [13,14,16,17,18,19,20,21,22,].includes(x.tipoFalla_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
 
   //Función para obtener los procesos.
   getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => { this.process = data.filter(x => [3,4,15,2,1,14].includes(x.proceso_Codigo)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los procesos. | ${error}`); });
@@ -223,6 +265,14 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   //Función para obtener las diferentes presentaciones
   getUnits = () => this.svUnits.srvObtenerLista().subscribe(data => { this.presentations = data.filter(x => x.undMed_Id == 'Kg'); }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las presentaciones. | ${error}`); })
 
+  //*MODALES
+
+  loadModalFails(){
+    this.modalFails = true;
+    setTimeout(() => {
+      this.cmpCreateFails.typeFails = this.cmpCreateFails.typeFails.filter(x => [16,17,18,19,20,21].includes(x.tipoFalla_Id));
+    }, 1500);
+  }
 
   //Cargar modal para crear recuperado
   loadModalRecovery() {
@@ -230,12 +280,48 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.createRecovery.nombreCategoriasMP = this.createRecovery.nombreCategoriasMP.filter(x => x.catMP_Id == 10);
       this.createRecovery.materiPrima.patchValue({ 'mpCategoria' : 10 });
+      this.createRecovery.recovery = true;
+      this.fieldFocus = false;
     }, 2000);
     
   }
   //Función para obtener las materias primas.
   //getMatPrimas = () => this.svMatPrimas.srvObtenerLista().subscribe(data => { this.matPrimas = data.filter(x => [10,4].includes(x.catMP_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las materias primas. | ${error}`); });
   
+  //*FUNCIONES EN EL PROCESO
+
+  searchDocument(){
+    let process : any = this.form.value.process;
+    let ot : any = this.form.value.ot;
+
+    if(process == 'MATPRIMA') this.getOrderProduction();
+    else if (process == 'DESP' && ot.toString().length >= 5) this.getOrderProduction();
+    else if (process == 'DESP') this.loadDevolutionsPeletizado();
+    else this.getOrderProduction();
+  }
+
+  //Función para obtener datos de la OT
+  getOrderProduction(){
+    let ot : any = this.form.value.ot;
+    let process : any = this.form.value.process;
+    this.load = true;
+
+    if(![null, undefined, ''].includes(ot)) {
+      //if(ot.toString().length > 5) {
+        this.svBagpro.GetOrdenDeTrabajo(ot).subscribe(data => {
+          if(data.length > 0) {
+            if(process == 'MATPRIMA') this.getAssignedOrders(ot, data[0]);
+            else if(process == 'DESP') this.loadOtWithPeletizado(data[0]);
+            else this.loadFieldsForOT(data[0]);
+          }
+        }, error => { 
+          this.msjs(`Error`, `Error consultando la OT/Doc N° ${ot} | ${error.status} ${error.statusText}`);
+          this.clearSoloFields(); 
+        });
+      //} else this.msjs(`Advertencia`, `La orden de trabajo no puede tener menos de 6 digitos!`);
+    } else this.msjs(`Advertencia`, `Orden de trabajo no válida!`);
+  }
+
   getPeletizadosForMaterial(material : any) {
     this.matPrimas = [];
     this.svMatPrimas.getPeletizados().subscribe(data => { 
@@ -284,56 +370,36 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     this.form.patchValue({ 'item': product, 'product': this.products[index].prod_Nombre });
   }
 
-  searchDocument(){
-    let process : any = this.form.value.process;
-    if(process == 'MATPRIMA') this.getOrderProduction();
-    else if (process == 'DESP') this.loadDevolutionsPeletizado();
-    else this.getOrderProduction();
-  }
-
-  //Función para obtener datos de la OT
-  getOrderProduction(){
-    let ot : any = this.form.value.ot;
-    let process : any = this.form.value.process;
+  loadDevolutionsPeletizado(){
+    let dv : any = this.optForm.value.dv;
     this.load = true;
 
-    if(![null, undefined, ''].includes(ot)) {
-      //if(ot.toString().length > 5) {
-        this.svBagpro.GetOrdenDeTrabajo(ot).subscribe(data => {
-          if(data.length > 0) {
-            if(process == 'MATPRIMA') this.getAssignedOrders(ot, data[0]);
-            else this.loadFieldsForOT(data[0]);
-          }
-        }, error => { 
-          this.msjs(`Error`, `Error consultando la OT/Doc N° ${ot} | ${error.status} ${error.statusText}`);
-          this.clearSoloFields(); 
-        });
-      //} else this.msjs(`Advertencia`, `La orden de trabajo no puede tener menos de 6 digitos!`);
-    } else this.msjs(`Advertencia`, `Orden de trabajo no válida!`);
-  }
-
-  //Cargar campos en función de los datos la OT. 
-  loadFieldsForOT(data : any){
-    //console.log(this.matPrimas.filter(x => x.matPri_Nombre.includes(data.material)));
-    this.getPeletizadosForParameters(data);
-    this.form.patchValue({
-      'otValidate' : data.numero_Orden,
-      'item' :  data.id_Producto, 
-      'product' : data.producto,
-      'material' : parseInt(data.id_Material),
-    });
-    this.load = false;
-  }
-
-  loadDevolutionsPeletizado(){
-    let dv : any = this.form.value.ot;
     this.svDevolutions.getInfoDvForPeletizadoById(dv).subscribe(data => {
-      this.modalPeletizado = true;
-      console.log(data);
+      if(data.length > 0) {
+        this.msjs(`Confirmación`, `La devolución N° ${dv} contiene rollos/bultos para peletizado!`);
+        this.dispatch = true;
+        this.load = false;
+        this.peletizado = data;
+        this.consolidatePeletizado();
+      } else {
+        this.msjs(`Advertencia`, `No se encontraron rollos/bultos para peletizado de la devolución N° ${dv}`);
+        this.clearFields();
+      } 
     }, error => {
       this.modalPeletizado = false;
-      console.log(error);
+      this.msjs(`Error`, `Error consultando la devolución N° ${dv} | ${error.status} ${error.statusText}`);
     })
+  }
+
+  loadOtWithPeletizado(info : any){
+    this.svProdProcess.getOtSentToPeletizado(this.form.value.ot).subscribe(data => {
+      if(data.length > 0) {
+        this.msjs(`Confirmación`, `La orden ${this.form.value.ot} cuenta con rollos a peletizar!`);
+        this.loadFieldsForOT(info);
+      } else this.msjs(`Advertencia`, `La orden ${this.form.value.ot} no cuenta con rollos a peletizar!`);
+    }, error => {
+      this.msjs(`Error`, `Error al intentar recuperar registros de rollos/bultos para peletizado!`);
+    });
   }
 
   clearSoloFields(){
@@ -349,6 +415,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       product : null, 
       mpId : null,
       matprima : null,
+      quantityDoc : null,
+      diff : null, 
     });
     //this.disableField = false;
   }
@@ -383,6 +451,30 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       'material' : data.id_Material,
     });
     this.getProduct();
+  }
+
+  selectProduction(data){
+
+  }
+
+  selectAllProduction(){
+    
+  }
+
+  quitProduction(){
+
+  }
+
+  onFocus = () => this.fieldFocus = true;
+
+  outFocus(qty : number, qty2 : number, i, data) {
+    if(qty <= qty2 && qty > 0) {
+      this.groupPeletizado[i].diff = data.weight3 - data.weight2;
+      return this.fieldFocus = false;
+    } else {
+      this.groupPeletizado[i].diff = data.weight3 - data.weight2;
+      return this.fieldFocus = true;
+    } 
   }
 
   //
@@ -422,7 +514,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       case 'MATPRIMA' :
         return [16, 22];
       case 'DESP' :
-        return [21, 22];    
+        return [13, 14, 21, 22];    
       default :
         return [1];   
     }
@@ -461,6 +553,27 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     }, error => {
       this.msjs(`Error`, `Error al consultar el Rollo N° ${roll} | ${error.error}`);
     });        
+  }
+
+  //*FUNCIONES DE ADICIÓN
+
+  getDataDispatch(){
+    this.form.patchValue({ process : 'DESP', })
+    this.enableTypeRecovery();
+    setTimeout(() => {
+      this.form.patchValue({
+        'fail' : this.selectedItem.fail_Id, 
+        'ot' : this.optForm.value.dv,
+        'otValidate' : this.optForm.value.dv,
+        'item' : this.selectedItem.item,
+        'product' : this.selectedItem.reference,
+        'material' : this.selectedItem.id_Material,
+        'mpId' : this.selectedItem.matPrima_Id, 
+        'matprima' : this.selectedItem.matPrima, 
+        'quantityDoc' : this.selectedItem.weight, 
+      })
+    }, 1000);
+    
   }
 
   //
@@ -539,6 +652,49 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       }, error => { this.msjs(`Error`, `Se encontraron errores en la búsqueda del ultimo código de ingreso de Peletizado.`) });
     } else this.msjs(`Advertencia`, `No hay datos para registrar!`);
   } 
+
+  savePeletizadosByDev(){
+    let count : number = 0;
+    if(this.groupPeletizado.length > 0) {
+      this.load = true;
+      this.svIngPeletizado.getLastCodeEntry().subscribe(code => {
+      code += 1;  
+        this.groupPeletizado.forEach(x => {
+          this.svIngPeletizado.Post(this.recordIn(x, code)).subscribe(data => {
+            count++;
+            if(this.recoveries.length == count) {
+              this.createPDF(data.ingPel_FechaIngreso, data.ingPel_FechaIngreso, data.ingPel_HoraIngreso, `creado`);
+            } 
+          }, error => { this.msjs(`Error`, `Error al intentar guardar registros de recuperado por devolución!`); });
+        })
+      }, error => { this.msjs(`Error`, `Se encontraron errores en la búsqueda del ultimo código de ingreso de Peletizado.`) });
+    } else this.msjs(`Advertencia`, `No hay datos para registrar!`);
+  } 
+
+  recordIn(data, codeIn){
+    let model : modelIngreso_Peletizado = {
+      IngPel_Codigo: codeIn,
+      TpRecu_Id: 'ROLLO',
+      Prod_Id: data.item,
+      MatPri_Id: data.matPrima_Id,
+      Estado_Id: 19,
+      Material_Id: data.id_Material,
+      Falla_Id: data.fail_Id,
+      Proceso_Id: 'DESP',
+      IngPel_Area1: false,
+      IngPel_Area2: false,
+      IngPel_Cantidad: data.weight2,
+      IngPel_CantInicial: data.weight2,
+      UndMed_Id: 'Kg',
+      IngPel_Observacion: '',
+      Usua_Id: this.storage_Id,
+      IngPel_FechaIngreso: moment().format('YYYY-MM-DD'),
+      IngPel_HoraIngreso: moment().format('HH:mm:ss'),
+      Usua_Modifica: 0
+    }
+    return model
+  }
+
   
   //Función para eliminar propiedades del objeto que crea el registro en la base de datos y que no son necesarios
   updateProperties(data : any, codeIn){
@@ -765,6 +921,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   clearAll(){
     this.clearFields();
     this.recoveries = [];
+    this.peletizado = [];
+    this.groupPeletizado = [];
     this.load = false;
   }
 
@@ -786,12 +944,71 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   //Valida que la OT tenga asignaciones de material. 
   getAssignedOrders(ot : any, info : any){
     this.svDetailsAssign.GetPolietilenoAsignada(parseInt(ot)).subscribe(data => {
-      if(data > 0) this.loadFieldsForOT(info);
+      if(data.length > 0) this.loadFieldsForOT(info);
       else this.msjs(`Advertencia`, `La OT N° ${ot} no tiene asignaciones registradas!`);
     }), error => {
       this.msjs(`Error`, `No se encontró información de asignaciones de la OT N° ${ot} | ${error.status} ${error.statusText}`);
     };
   }
+
+  //Peletizados agrupados del modal.
+  consolidatePeletizado(){
+    this.groupPeletizado = this.peletizado.reduce((a, b) => {
+      if(!a.map(x => x.item).includes(b.item)) {
+        a.push({
+          'item' : b.item,
+          'reference' : b.reference, 
+          'weight' : b.weight,
+          'weight2' : b.weight2,
+          'weight3' : b.weight3,
+          'diff' : b.weight3 - b.weight2,
+          'id_Material' : b.id_Material,
+          'material' : b.material,
+          'matPrima_Id' : b.matPrima_Id,
+          'matPrima' : b.matPrima, 
+          'id_Pigmento_Extrusion' : b.id_Pigmento_Extrusion,
+          'pigment' : b.pigment,
+          'fail_Id' : b.fail_Id,
+          'fail' : b.fail
+        });
+      } else {
+        a.find(x => x.item == b.item).weight += b.weight;
+        a.find(x => x.item == b.item).weight2 += b.weight2;
+        a.find(x => x.item == b.item).weight3 += b.weight3;
+      } 
+      return a;
+    }, []);
+  }
+
+  //quitar peletizados del modal.
+  quitPeletizado(index : any){
+    this.load = true;
+    setTimeout(() => {
+      this.peletizado.splice(index, 1);
+      this.consolidatePeletizado();
+      this.load = false;
+    }, 1000);
+  }
+
+  //Limpiar información del modal
+  clearModalPeletizado(){
+    this.peletizado = [];
+    this.groupPeletizado = [];
+  }
+
+  //Total productos no conformes 
+  totalBadProducts = () => this.peletizado.reduce((a, b) => a += b.weight, 0);
+
+  //Total productos no conformes agrupados
+  totalBadProductsGrouped1 = () => this.groupPeletizado.reduce((a, b) => a += b.weight, 0);
+
+  totalBadProductsGrouped2 = () => this.groupPeletizado.reduce((a, b) => a += b.weight2, 0);
+  
+  totalDiffBadProductsGrouped3 = () => this.groupPeletizado.reduce((a, b) => a += b.diff, 0);
+
+  qtyRollsByItem = (item : number) => this.peletizado.filter(x => x.item == item).length;
+
+  qtyTotalRolls = () => this.peletizado.length;
 }
 
 interface modelIngreso_Peletizado {

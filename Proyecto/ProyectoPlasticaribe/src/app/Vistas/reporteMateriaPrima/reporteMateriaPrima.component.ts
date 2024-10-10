@@ -253,7 +253,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
     this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(data => {
       for (let i = 0; i < data.length; i++) {
-        this.materiaPrimaService.GetInventario(fecha, fechaFinal, data[i].id_Materia_Prima).subscribe(datos => datos.forEach(data => this.cargarTabla(data)));
+        this.materiaPrimaService.GetInventario(fecha, fechaFinal, data[i].id_Materia_Prima).subscribe(datos => {
+          datos.forEach(data => this.cargarTabla(data));
+        }); 
       }
     });
     setTimeout(() => {

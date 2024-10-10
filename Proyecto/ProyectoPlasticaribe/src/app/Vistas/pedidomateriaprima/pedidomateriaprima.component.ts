@@ -577,6 +577,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             CatMP_Id : datos_materiaPrima.catMP_Id,
             MatPri_Precio : datos_materiaPrima.matPri_Precio,
             TpBod_Id : datos_materiaPrima.tpBod_Id,
+            MatPri_PrecioEstandar : datos_materiaPrima.matPri_PrecioEstandar,
           }
 
           this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(() => {
@@ -608,7 +609,8 @@ export class PedidomateriaprimaComponent implements OnInit {
           CatMP_Id : datos_tinta.catMP_Id,
           Tinta_Precio : datos_tinta.tinta_Precio,
           TpBod_Id : datos_tinta.tpBod_Id,
-          tinta_InvInicial : datos_tinta.tinta_InvInicial,
+          Tinta_InvInicial : datos_tinta.tinta_InvInicial,
+          Tinta_PrecioEstandar : datos_tinta.tinta_PrecioEstandar,
         }
 
         this.tintasService.srvActualizar(datos_tinta.tinta_Id, datosTintaActualizada).subscribe(() => {

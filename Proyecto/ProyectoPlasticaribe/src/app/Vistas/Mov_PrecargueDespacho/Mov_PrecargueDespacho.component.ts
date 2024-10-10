@@ -105,7 +105,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
       this.searchedData = data;
       this.load = false;
     }, error => {
-      this.msjs(`Error`, `Error al consultar los datos de Precargue.`);
+      this.msjs(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
     });
   }
 

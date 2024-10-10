@@ -16,8 +16,16 @@
         </span>
       </div>
 
+      <!--* Motivo -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="fail" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+          <label for="Falla">Motivo*</label>
+        </span>
+      </div>
+
       <!--* Observación -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-9 col-xl-9 col-xxl-9">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
         <span class="p-float-label">
           <textarea formControlName="observation" [rows]="1" inputId="observation" pInputTextarea [required]="true"></textarea>
           <label for="observation">Observación</label>

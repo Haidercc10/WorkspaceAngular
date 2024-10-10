@@ -150,23 +150,27 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.columnas = [];
     this.columnasSeleccionada = [];
     let count : number = 0;
+    let items : any = [];
 
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_Existencias => {
       this.clienteOtItems.srvObtenerItemsBagproXClienteItem(datos_Existencias.map(x => parseInt(x.codigo))).subscribe(datos_Cliente => {
         for (let j = 0; j < datos_Cliente.length; j++) {
-          this.invMesProductoService.GetCantidadMes_Producto(datos_Cliente[j].clienteItems, datos_Cliente[j].ptPresentacionNom).subscribe(datos_Inventario => {
-            for (let k = 0; k < datos_Inventario.length; k++) {
-              let item = datos_Inventario[k].id;
-              let und = datos_Inventario[k].und;
-              let existencias : any = datos_Existencias.find(x => x.codigo == item && x.presentacion == und);
-              this.llenarArrayProductos(0, datos_Inventario[k], existencias, datos_Cliente[j]);
-              count++
-              if(count == datos_Inventario.length) {
-                this.load = true;
-                this.invPlasticaribe.getStockInformation();
-              }
-            } 
-          });
+          if(!items.includes(datos_Cliente[j].clienteItems)) {
+            items.push(datos_Cliente[j].clienteItems)
+            this.invMesProductoService.GetCantidadMes_Producto(datos_Cliente[j].clienteItems, datos_Cliente[j].ptPresentacionNom).subscribe(datos_Inventario => {
+              for (let k = 0; k < datos_Inventario.length; k++) {
+                let item = datos_Inventario[k].id;
+                let und = datos_Inventario[k].und;
+                let existencias : any = datos_Existencias.find(x => x.codigo == item && x.presentacion == und);
+                this.llenarArrayProductos(0, datos_Inventario[k], existencias, datos_Cliente[j]);
+                count++
+                if(count == datos_Inventario.length) {
+                  this.load = true;
+                  this.invPlasticaribe.getStockInformation();
+                }
+              } 
+            });
+          }
         }
       });
     });
@@ -199,6 +203,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       'Diciembre' : 0,//inv.diciembre,
       'ValidarCantMinima': exi.existencias <= inv.cant_Minima ? 1 : 0,
     }
+    
     this.ArrayProductoZeus.push(info);
     this.ArrayProductoZeus.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
     this.ArrayProductoZeus.sort((a,b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima)); 

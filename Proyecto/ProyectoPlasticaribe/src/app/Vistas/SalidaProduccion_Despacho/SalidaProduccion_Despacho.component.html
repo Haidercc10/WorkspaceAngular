@@ -110,7 +110,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
-        <td class="text-center">{{data.position == 0 ? rowIndex + 1 : data.position}}</td>
+        <td class="text-center">{{data.position == 0 ? sendProductionZeus.length - rowIndex : data.position}}</td>
         <td class="text-center">{{data.pp.ot}}</td>
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
         <td class="text-center">{{data.dataExtrusion.numero_RolloBagPro}}</td>

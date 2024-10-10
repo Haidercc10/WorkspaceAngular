@@ -39,6 +39,9 @@ export const routes: Routes = [
   { path: 'factura-rollos-productos', loadChildren: () => import('./Modules/despachar-rollos/despachar-rollos.module').then(m => m.DespacharRollosModule) },
   { path: 'devolucion-rollos-productos', loadChildren: () => import('./Modules/devolucion-rollos/devolucion-rollos.module').then(m => m.DevolucionRollosModule) },
   { path: 'reporte-despacho', loadChildren: () => import('./Modules/movimientos-despacho/movimientos-despacho.module').then(m => m.MovimientosDespachoModule) },
+  { path: 'precargue-rollos-despacho', loadChildren: () => import('./Modules/precargue-rollos/precargue-rollos.module').then(m => m.PrecargueRollosModule) },
+  { path: 'mov-precargue-rollos', loadChildren: () => import('./Modules/mov-precargue-rollos/mov-precargue-rollos.module').then(m => m.MovPrecargueRollosModule) },
+  
 
   /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
   { path: 'ordenes-trabajo', loadChildren: () => import('./Modules/orden-trabajo/orden-trabajo.module').then(m => m.OrdenTrabajoModule) },

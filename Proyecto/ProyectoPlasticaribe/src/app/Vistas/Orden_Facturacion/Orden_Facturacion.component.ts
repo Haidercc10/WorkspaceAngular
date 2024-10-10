@@ -578,16 +578,18 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   updateOrderPreload(){
-    let of : any = this.formDataOrder.value.orderFact;
+    let of : any = this.formDataOrder.value.order;
     let preload : any = this.formDataOrder.value.preload;
-    let observation : any = this.formDataOrder.value.observation
+    let observation : any = this.formDataOrder.value.observation == null ? '' : this.formDataOrder.value.observation
     let updatedInfo : any = [];
 
     updatedInfo.push({ 'of' : of, 'user' : this.storage_Id, 'observation' : observation, 'status' : 26 });
+    console.log(updatedInfo);
+    
     this.svPreload.putPreloadDispatch(preload, updatedInfo).subscribe(data => {
-
+      console.log(data);
     }, error => {
-
+      this.msjsOF('Error', `Ocurrió un error actualizando los datos del precargue N° ${preload} | ${error.status} ${error.statusText}`);
     });
   }
 

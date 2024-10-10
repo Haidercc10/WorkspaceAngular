@@ -158,8 +158,12 @@ export class Salidas_PeletizadoComponent implements OnInit {
   onFocus = () => this.fieldFocus = true;
 
   outFocus(qty : number, qty2 : number) {
-    if(qty <= qty2) return this.fieldFocus = false;
-    else return this.fieldFocus = true;
+    this.consolidatePeletizado();
+    if(qty <= qty2) {
+      return this.fieldFocus = false;
+    } else {
+      return this.fieldFocus = true;
+    } 
   }
 
   //!
