@@ -1,29 +1,28 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { log } from 'console';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
 import { modelDetalles_PrecargueDespacho } from 'src/app/Modelo/modelDetalles_PrecargueDespacho';
+import { modelDetalles_Reposiciones } from 'src/app/Modelo/modelDetalles_Reposiciones';
 import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
+import { modelReposiciones } from 'src/app/Modelo/modelReposiciones';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
+import { Detalles_ReposicionesService } from 'src/app/Servicios/Detalles_Reposiciones/Detalles_Reposiciones.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-
-@Injectable({
-  providedIn : `root`
-})
+import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones.service';
 
 @Component({
-  selector: 'app-Precargue_RollosDespacho',
-  templateUrl: './Precargue_RollosDespacho.component.html',
-  styleUrls: ['./Precargue_RollosDespacho.component.css']
+  selector: 'app-Reposiciones',
+  templateUrl: './Reposiciones.component.html',
+  styleUrls: ['./Reposiciones.component.css']
 })
 
-export class Precargue_RollosDespachoComponent implements OnInit {
+export class ReposicionesComponent implements OnInit {
 
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -44,8 +43,8 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     private msj : MensajesAplicacionService,
     private svProducts : ProductoService,
     private svProduction : Produccion_ProcesosService,
-    private svPreload : Precargue_DespachoService,
-    private svDetailsPreload : Detalles_PrecargueDespachoService,
+    private svRepo : ReposicionesService,
+    private svDtlRepo : Detalles_ReposicionesService,
     private svPDF : CreacionPdfService,  
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -78,19 +77,19 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     })
   }
 
-  //*
+  //* Función para buscar clientes por nombre
   searchClientsByName() {
     let name = this.form.value.client;
     this.svZeus.getClientByName(name).subscribe(data => this.clients = data);
   }
 
-  //*
+  //* Función para seleccionar clientes
   selectClient() {
     let client = this.clients.find(x => x.idcliente == this.form.value.client);
     this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, });
   }
 
-  //*
+  //* Función para buscar productos por nombre
   searchProduct() {
     let nombre: string = this.form.value.reference;
     this.svProducts.obtenerItemsLike(nombre).subscribe(resp => this.products = resp);
@@ -129,7 +128,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     if(this.form.valid) {
       if(this.rollsToDispatch.length > 0) {
         if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
-          this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
+          this.msjs(`Advertencia`, `La reposición solo puede tener un cliente!`);
           return;
         }
       }
@@ -145,7 +144,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         [400, 404].includes(error.status) ? this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.msjs(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
         this.form.patchValue({ roll : null });
       });
-    } else this.msjs(`Advertencia`, `Debe llenar todos los campos`);
+    } else this.msjs(`Advertencia`, `Debe llenar todos los campos!`);
   }
 
   //*
@@ -184,40 +183,39 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   //*
-  savePreload(){
+  saveReposition(){
     if(this.rollsToDispatch.length > 0) {
       this.load = true;
-      let info : modelPrecargue_Despacho = {
+      let info : modelReposiciones = {
         Cli_Id: this.form.value.idClient,
-        OF_Id: 4472, //OF GENERICA
-        Pcd_FechaCrea: moment().format('YYYY-MM-DD'),
-        Pcd_HoraCrea: moment().format('HH:mm:ss'),
+        Rep_FechaCrea: moment().format('YYYY-MM-DD'),
+        Rep_HoraCrea: moment().format('HH:mm:ss'),
         Usua_Crea: this.storage_Id,
-        Pcd_Observacion: this.form.value.observation,
+        Rep_Observacion: this.form.value.observation,
         Estado_Id: 11,
-        Pcd_FechaModifica: moment().format('YYYY-MM-DD'),
-        Pcd_HoraModifica: moment().format('HH:mm:ss'),
-        Usua_Modifica: 0,
-        Pcd_ObservacionModifica: '',
+        Rep_FechaSalida: moment().format('YYYY-MM-DD'),
+        Rep_HoraSalida: moment().format('HH:mm:ss'),
+        Usua_Salida: 0,
+        Rep_ObservacionSalida: '',
       };
-      this.svPreload.Post(info).subscribe(data => { this.saveDetailsPreload(data.pcd_Id); }, error => { 
+      this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id); }, error => { 
         this.msjs(`Error`, `Error guardando el encabezado del precargue de despacho`); 
       });
     }
   }
 
   //*
-  saveDetailsPreload(id : number){
+  saveDetailsReposition(id : number){
     let count : number = 0;
     this.rollsToDispatch.forEach(x => {
-      let info : modelDetalles_PrecargueDespacho = {
-        'Pcd_Id': id,
+      let info : modelDetalles_Reposiciones = {
+        'Rep_Id': id,
         'Prod_Id': x.item,
-        'DtlPcd_Rollo': x.roll,
-        'DtlPcd_Cantidad': x.qty,
+        'DtlRep_Rollo': x.roll,
+        'DtlRep_Cantidad': x.qty,
         'UndMed_Id': x.unit,
       }
-      this.svDetailsPreload.Post(info).subscribe(data => {
+      this.svDtlRepo.Post(info).subscribe(data => {
         count += 1;
         if(count == this.rollsToDispatch.length) this.updateStatusRolls(id);
       });
@@ -227,7 +225,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   //*
   updateStatusRolls(id : number){
     let rolls : Array<any> = [];
-    this.rollsToDispatch.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 50, 'envioZeus' : true }));
+    this.rollsToDispatch.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 39, 'envioZeus' : true }));
     this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => { 
       this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados`); 
     });
@@ -262,11 +260,11 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   }
 
   createPDF(id : number, action : string) {
-    this.svDetailsPreload.getPreloadId(id).subscribe(data => {
-      let title: string = `Orden de Precargue N° ${id}`;
+    this.svDtlRepo.getRepositionId(id).subscribe(data => {
+      let title: string = `Reposición de carta N° ${id}`;
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
-      this.msjs(`Confirmación`, `Orden de precargue N° ${id} ${action} exitosamente!`);
+      this.msjs(`Confirmación`, `Reposición de carta N° ${id} ${action} exitosamente!`);
       setTimeout(() => this.clearAll(), 3000);
     }, error => this.msjs(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`));
   }
@@ -295,7 +293,6 @@ export class Precargue_RollosDespachoComponent implements OnInit {
           weight += x.weight,
           quantity += x.quantity
         });
-        console.log(data);
         
         info.push({
           "#": contador,
@@ -344,20 +341,20 @@ export class Precargue_RollosDespachoComponent implements OnInit {
             { text: `Información general del movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
           ],
           [
-            { text: `Orden Fact.: ${data.of == 4472 ? '' : data.of}`}, 
+            { text: `Reposición: ${data.id}`}, 
             { text: `Usuario ingreso: ${data.user1}` },
             { text: `Fecha ingreso: ${data.date1.replace('T00:00:00', '')} ${data.hour1}` },
           ],
           [
             { text: `Estado: ${data.status}`}, 
-            { text: `Usuario Modifica: ${data.user2 == 0 ? '' : data.user2}` },
-            { text: `Fecha Modifica: ${date1 == date2 ? '' : date2} ${data.hour1 == data.hour2 ? '' : data.hour2}` },
+            { text: `Usuario Salida: ${data.user2 == 0 ? '' : data.user2}` },
+            { text: `Fecha Salida: ${date1 == date2 ? '' : date2} ${data.hour1 == data.hour2 ? '' : data.hour2}` },
           ],
           [
-            { text: `Observación Precargue: ${data.observation1 == null ? '' : data.observation1}`, colSpan: 3, fontSize: 9, }, {}, {}
+            { text: `Observación Reposición: ${data.observation1 == null ? '' : data.observation1}`, colSpan: 3, fontSize: 9, }, {}, {}
           ],
           [
-            { text: `Observación Orden Fact.: ${data.observation2 == null ? '' : data.observation2}`, colSpan: 3, fontSize: 9, }, {}, {}
+            { text: `Observación Salida.: ${data.observation2 == null ? '' : data.observation2}`, colSpan: 3, fontSize: 9, }, {}, {}
           ], 
         ]
       },
@@ -454,4 +451,5 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     });
     return body;
   }
+
 }

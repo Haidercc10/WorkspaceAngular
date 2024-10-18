@@ -79,7 +79,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
   //*
   searchClientsByName() {
     let name = this.form.value.client;
-    this.svZeus.getClientByName(name).subscribe(data => this.clients = data);
+    this.svZeus.getClientByName(name).subscribe(data => this.clients = data);    
   }
 
   //*

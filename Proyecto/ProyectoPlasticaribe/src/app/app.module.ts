@@ -236,6 +236,7 @@ import { Nomina_CorteComponent } from './Vistas/Nomina_Corte/Nomina_Corte.compon
 import { Rebobinados_CorteComponent } from './Vistas/Rebobinados_Corte/Rebobinados_Corte.component';
 import { Maquilas_InternasComponent } from './Vistas/Maquilas_Internas/Maquilas_Internas.component';
 import { MovMaquilas_InternasComponent } from './Vistas/MovMaquilas_Internas/MovMaquilas_Internas.component';
+import { ReposicionesComponent } from './Vistas/Reposiciones/Reposiciones.component';
 
 @NgModule({
   declarations: [
@@ -392,6 +393,7 @@ import { MovMaquilas_InternasComponent } from './Vistas/MovMaquilas_Internas/Mov
     Rebobinados_CorteComponent,
     Maquilas_InternasComponent,
     MovMaquilas_InternasComponent,
+    ReposicionesComponent,
   ],
 
   imports: [

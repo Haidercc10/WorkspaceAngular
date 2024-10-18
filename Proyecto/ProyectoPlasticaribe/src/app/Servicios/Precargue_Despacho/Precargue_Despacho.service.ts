@@ -12,7 +12,6 @@ export class Precargue_DespachoService {
 readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;  
 
 constructor(private http : HttpClient) { }
-
     
   getAll = ():Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Precargue_Despacho`);
 
