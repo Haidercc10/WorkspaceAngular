@@ -1,21 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Table } from 'exceljs';
 import moment from 'moment';
-import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Precargue_RollosDespachoComponent } from '../Precargue_RollosDespacho/Precargue_RollosDespacho.component';
+import { Detalles_ReposicionesService } from 'src/app/Servicios/Detalles_Reposiciones/Detalles_Reposiciones.service';
+import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 
 @Component({
-  selector: 'app-Mov_PrecargueDespacho',
-  templateUrl: './Mov_PrecargueDespacho.component.html',
-  styleUrls: ['./Mov_PrecargueDespacho.component.css']
+  selector: 'app-Mov_Reposiciones',
+  templateUrl: './Mov_Reposiciones.component.html',
+  styleUrls: ['./Mov_Reposiciones.component.css']
 })
-export class Mov_PrecargueDespachoComponent implements OnInit {
+export class Mov_ReposicionesComponent implements OnInit {
 
   form !: FormGroup;
   load: boolean = false;
@@ -36,8 +37,8 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     private svStatuses: EstadosService,
     private svMsjs : MensajesAplicacionService,
     private svZeus : InventarioZeusService,
-    private svDtlPreload : Detalles_PrecargueDespachoService,
-    private cmpPreload : Precargue_RollosDespachoComponent,
+    private svDtlRepositions : Detalles_ReposicionesService,
+    private cmpRepostions : ReposicionesComponent,
   ) {
       this.initForm();
       this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -101,11 +102,11 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     let date1 : any = moment(this.form.value.startDate).format('YYYY-MM-DD');
     let date2 : any = moment(this.form.value.endDate).format('YYYY-MM-DD');
 
-    this.svDtlPreload.getMovementsPreload(date1, date2, this.validateUrl()).subscribe(data => {
+    this.svDtlRepositions.getMovementsReposition(date1, date2, this.validateUrl()).subscribe(data => {
       this.searchedData = data;
       this.load = false;
     }, error => {
-      this.msjs(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
+      this.msjs(`Error`, `Error al consultar los datos de la reposición | ${error.status} ${error.statusText}.`);
     });
   }
 
@@ -143,6 +144,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
 
   //*
   createPDF(id : number){
-    this.cmpPreload.createPDF(id, `descargado`);
+    this.cmpRepostions.createPDF(id, `descargado`);
   }
+
 }

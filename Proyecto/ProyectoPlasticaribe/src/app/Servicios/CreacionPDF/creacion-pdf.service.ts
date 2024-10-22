@@ -15,6 +15,8 @@ import { referenceWike } from './referenciaWiketiado';
 
 export class CreacionPdfService {
 
+  title : any;
+
   constructor(private rePrintService: ReImpresionEtiquetasService,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
     private encriptacion: EncriptacionService,) { }
@@ -23,6 +25,7 @@ export class CreacionPdfService {
   private formatNumbers = (number: string) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   formatoPDF(titulo: string, content: any, headerAdicional: any = {}) {
+    this.title = titulo; 
     let today: any = moment().format('YYYY-MM-DD');
     let hour: any = moment().format('HH:mm:ss');
     const pdfDefinicion: any = {
@@ -44,8 +47,8 @@ export class CreacionPdfService {
           margin: [20, 8, 20, 0],
           columns: [
             { image: logoParaPdf, width: 150, height: 30, margin: [20, 25, 80, 10] },
-            this.empresaFechaHoraTituloPDF(titulo, today, hour),
-            this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
+            this.title == null ? null : this.empresaFechaHoraTituloPDF(titulo, today, hour),
+            this.title == null ? null : this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
           ]
         },
         this.lineaHeaderFooterPDF([false, true, false, false]),

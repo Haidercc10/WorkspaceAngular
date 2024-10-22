@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
@@ -15,6 +15,10 @@ import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Reposiciones',
@@ -53,6 +57,7 @@ export class ReposicionesComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    //this.createPDF(1, `creada`);
   }
 
   //*
@@ -192,14 +197,15 @@ export class ReposicionesComponent implements OnInit {
         Rep_HoraCrea: moment().format('HH:mm:ss'),
         Usua_Crea: this.storage_Id,
         Rep_Observacion: this.form.value.observation,
-        Estado_Id: 11,
+        Estado_Id: 5,
         Rep_FechaSalida: moment().format('YYYY-MM-DD'),
         Rep_HoraSalida: moment().format('HH:mm:ss'),
-        Usua_Salida: 0,
+        Usua_Salida: this.storage_Id,
         Rep_ObservacionSalida: '',
       };
       this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id); }, error => { 
-        this.msjs(`Error`, `Error guardando el encabezado del precargue de despacho`); 
+        this.msjs(`Error`, `Error guardando el encabezado de la reposición | ${error. status} ${error. statusText}` ); 
+        this.load = false;
       });
     }
   }
@@ -225,10 +231,43 @@ export class ReposicionesComponent implements OnInit {
   //*
   updateStatusRolls(id : number){
     let rolls : Array<any> = [];
-    this.rollsToDispatch.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 39, 'envioZeus' : true }));
+    this.rollsToDispatch.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 23, 'envioZeus' : true }));
     this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => { 
-      this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados`); 
+      this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados | ${error.status} ${error.statusText}`); 
     });
+  }
+
+  sendAdjustmentZeus() {
+    let counter : number = 0;
+    if (this.rollsConsolidate.length > 0) {
+      //this.load = true;
+      this.rollsConsolidate.forEach(data => {
+        let unity : string = data.unit == 'Kg' ? 'KLS' : data.unit == 'Und' ? 'UND' : 'PAQ';
+        let qty : number = this.qtyTotalItem(data);
+        let item : string = data.item; 
+        let price : string = data.price;
+        let detail : string = `Ajuste desde App Plasticaribe por concepto de PRUEBA DE REPOSICION al Item ${item} con cantidad de ${(-(qty))} ${unity}`;
+        console.log(item, price, detail, qty);
+        this.svZeus.getExistenciasProductos(data.item, unity).subscribe(dataExis => {
+          if(dataExis.length == 0 || (dataExis[0].existencias < qty || !dataExis)) {
+            let qtyZeus : number = dataExis.length == 0 ? 0 : dataExis[0].existencias;
+            let message : string = `La cantidad del item ${data.item} en Plasticaribe "${qty.toLocaleString()} ${unity}" es mayor al stock de Zeus "${qtyZeus.toLocaleString()} ${unity}"`
+            this.msjs(`Advertencia`, message);
+          } else {
+            this.svProduction.sendProductionToZeus(detail, item, unity, 0, (-(qty)).toString(), price).subscribe(dataAdjusment => {
+              if(dataAdjusment.body.includes('<code>SUCESS</code>')) {
+                counter++;
+                if(counter == this.rollsConsolidate.length) this.saveReposition();
+              }
+              console.log(dataAdjusment);
+            }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus | ${error.status} ${error.statusText }`); })
+          }  
+        }, error => { 
+          console.log(3);
+          this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus! | ${error.status} ${error.statusText}`); 
+        });
+      });
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay rollos agregados!`);  
   }
 
   clearFields(){
@@ -261,22 +300,26 @@ export class ReposicionesComponent implements OnInit {
 
   createPDF(id : number, action : string) {
     this.svDtlRepo.getRepositionId(id).subscribe(data => {
-      let title: string = `Reposición de carta N° ${id}`;
+      let title: string = null; //`Carta de Reposición N° ${id}`;
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
-      this.msjs(`Confirmación`, `Reposición de carta N° ${id} ${action} exitosamente!`);
+      this.msjs(`Confirmación`, `Carta de Reposición N° ${id} ${action} exitosamente!`);
       setTimeout(() => this.clearAll(), 3000);
-    }, error => this.msjs(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`));
+    }, error => this.msjs(`Error`, `Error al consultar la reposición N° ${id} | ${error.status} ${error.statusText}`));
   }
 
   contentPDF(data): any[] {
     let content: any[] = [];
     let consolidatedInformation: Array<any> = this.getInfoGroupedPDF(data);
     let informationProducts: Array<any> = this.getInfoDetailsPDF(data);
-    content.push(this.infoMovementPDF(data[0]));
+
+    content.push(this.infoDate(data[0]));
+    content.push(this.infoClient(data[0]));
+    //content.push(this.infoMovementPDF(data[0]));
     content.push(this.tablaGroupedPDF(consolidatedInformation));
     content.push(this.tableTotals(consolidatedInformation))
     content.push(this.tablaDetailsPDF(informationProducts));
+    content.push(this.infoAtte());
     return content;
   }
 
@@ -328,10 +371,89 @@ export class ReposicionesComponent implements OnInit {
     return info;
   }
 
+  infoClient(data : any){
+    return {
+      margin : [0, 0, 0, 15],
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            { text: `Señor(a)(es):`, alignment: '', fontSize: 12, bold: true, border: [false, false, false, false], },
+          ],
+          [
+            { text: `E.S.M`, alignment: '', fontSize: 11, bold: true, border: [false, false, false, false], },
+          ],
+          [
+            { text: `${data.client}`, alignment: '', fontSize: 11, bold: true, border: [false, false, false, false], },
+          ],
+          [
+            { text: ``, alignment: '', fontSize: 11, bold: true, border: [false, false, false, false], },
+          ], 
+          [
+            { text: ``, alignment: '', fontSize: 11, bold: true, border: [false, false, false, false], },
+          ], 
+          [
+            { text: `Por medio de la presente reposición N° 00${data.movement} se hace entrega de la(s) siguiente(s) referencias:`, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+        ]
+      },
+    }
+  }
+
+  infoDate(data : any){
+    return {
+      margin : [0, 0, 0, 45],
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            { text: `Barranquilla, ${moment(data.date1.replace('T00:00:00', '')).format('LLLL').replace(' 0:00', '')}`, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+        ]
+      },
+    }
+  }
+
+  infoAtte(){
+    return {
+      margin : [0, 0, 0, 0],
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            { text: `Atentamente:`, alignment: '', bold : true, fontSize: 12, border: [false, false, false, false], },
+          ],
+          [
+            { text: ``, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+          [
+            { text: ``, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+          [
+            { text: ``, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+          [
+            { text: ``, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+          [
+            { text: ``, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+          [
+            { text: `_________________`, alignment: '', fontSize: 12, border: [false, false, false, false], },
+          ],
+          [
+            { text: `GERENCIA GENERAL`, alignment: '', bold : true, fontSize: 10, border: [false, false, false, false], },
+          ],
+        ]
+      },
+    }
+  }
+
   //Función que muestra una tabla con la información general del ingreso.
   infoMovementPDF(data : any): {} {
     let date1 : any = data.date1.replace('T00:00:00', '');
     let date2 : any = data.date2.replace('T00:00:00', '');
+    
     return {
       margin : [0, 0, 0, 20],
       table: {
@@ -341,9 +463,9 @@ export class ReposicionesComponent implements OnInit {
             { text: `Información general del movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
           ],
           [
-            { text: `Reposición: ${data.id}`}, 
-            { text: `Usuario ingreso: ${data.user1}` },
-            { text: `Fecha ingreso: ${data.date1.replace('T00:00:00', '')} ${data.hour1}` },
+            { text: `Reposición N°: ${data.movement}`}, 
+            { text: `Usuario: ${data.user1}` },
+            { text: `Fecha Doc: ${data.date1.replace('T00:00:00', '')} ${data.hour1}` },
           ],
           [
             { text: `Estado: ${data.status}`}, 
@@ -375,7 +497,7 @@ export class ReposicionesComponent implements OnInit {
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody1(data, columns, 'Consolidado de rollos precargados por Item'),
+        body: this.buildTableBody1(data, columns, 'Consolidado por Item'),
       },
       fontSize: 8,
       layout: {
@@ -391,11 +513,11 @@ export class ReposicionesComponent implements OnInit {
     let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Und'];
     let widths: Array<string> = ['5%', '9%', '9%', '8%', '45%', '8%', '10%', '6%'];
     return {
-      margin: [0, 20],
+      margin: [0, 20, 0, 45],
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody2(data, columns, 'Información detallada de rollos precargados'),
+        body: this.buildTableBody2(data, columns, 'Información detallada de rollos/bultos'),
       },
       fontSize: 8,
       layout: {

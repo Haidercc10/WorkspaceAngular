@@ -212,7 +212,6 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process', dt)"></th>
             <th></th>
           </tr>
-          
           <tr>
             <th class="text-center">#</th>
             <th class="text-center">Rollo</th>
@@ -258,7 +257,7 @@
   <!--* Botones -->
   <div *ngIf="!load">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollsToDispatch.length == 0" type="button" label="Generar Precargue" icon="pi pi-check" (click)="saveReposition()"></button>
+      <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollsToDispatch.length == 0" type="button" label="Generar Reposición" icon="pi pi-check" (click)="saveReposition()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar todo" icon="pi pi-eraser" (click)="clearAll()"></button>
     </div>
   </div>
