@@ -52,7 +52,9 @@ export class Produccion_ProcesosService {
 
   putAsociateRoll = (roll1: number, roll2 : number, item : number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putAsociateRoll/${roll1}/${roll2}/${item}`, roll1);
 
-  putStateAvaible = (orderFac: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoDisponible/${orderFac}`, orderFac);
+  putStateAvaible = (orderFac: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoDisponible/${orderFac}`, orderFac) ;
+
+  putAvailableFromReposition = (repo: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putAvailableFromReposition/${repo}`, repo);
 
   PutDelivered_NoAvaible = (pre: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoEntregado_NoIngresado/${pre}`, pre);
 

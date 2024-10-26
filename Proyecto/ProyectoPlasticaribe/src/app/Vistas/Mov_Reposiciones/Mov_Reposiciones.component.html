@@ -142,10 +142,11 @@
           <td class="text-center">{{data.date1 | date : 'dd/MM/yyyy'}} {{data.hour1}}</td>
           <td class="text-center"><b>{{'REPOSICIÓN'}}</b></td>
           <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
-                                                                  'bg-success1': [5].includes(data.statusId), 
+                                                                  'bg-success1': [5].includes(data.statusId),
+                                                                  'bg-warning1': [3].includes(data.statusId), 
                                                                   }">{{data.status}}</span></td>
           <td class="text-center" *ngIf="[1].includes(ValidarRol)">
-            <p-button icon="pi pi-ban" [disabled]="true" styleClass="p-button-rounded p-button-warning" (onClick)="discardPreload()"></p-button>
+            <p-button icon="pi pi-ban" [disabled]="ValidarRol != 1 || [3,5].includes(data.statusId)" styleClass="p-button-rounded p-button-warning" (onClick)="viewMsgAnullation(data)"></p-button>
           </td>
           <td class="text-center">
             <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger" (onClick)="createPDF(data.movement)"></p-button>
@@ -155,7 +156,25 @@
     </p-table>
   </p-card>
 
-  <p-dialog header="Orden de facturación por precargue" [(visible)]="modal" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
-  </p-dialog>
+  <!--Mensaje de confirmación para eliminación de items-->
+  <p-toast position="center" key="reposition" (onClose)="onReject('reposition')" [baseZIndex]="5000">
+    <ng-template let-message pTemplate="message">
+      <div class="flex flex-column" style="flex: 1">
+        <div class="text-center">
+          <i class="pi pi-exclamation-triangle font-size-48"></i>
+          <h4>{{message.summary}}</h4>
+          <p>{{message.detail}}</p>
+        </div>
+        <div class="p-fluid" style="display: flex;">
+          <div class="col-6" style="margin-right: 5px;">
+            <button type="button" pButton icon="pi pi-check" label="Sí" class="p-button-warning" (click)="sendPositiveAdjustment()" pTooltip="Los rollos/bultos volverán a inventario de despacho y zeus"></button>
+          </div>
+          <div class="col-6">
+            <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('reposition')" class="p-button-secondary"></button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-toast>
   
   

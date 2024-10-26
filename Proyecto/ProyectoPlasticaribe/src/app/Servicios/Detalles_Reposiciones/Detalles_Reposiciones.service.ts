@@ -25,4 +25,6 @@ export class Detalles_ReposicionesService {
     
       Put = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Detalles_Reposiciones/${id}`, data);
 
+      Delete = (id : any) => this.http.delete(this.rutaPlasticaribeAPI + `/Detalles_Reposiciones/${id}`);
+
 }

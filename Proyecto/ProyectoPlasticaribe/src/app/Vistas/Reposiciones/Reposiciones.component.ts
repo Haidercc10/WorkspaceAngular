@@ -1,6 +1,7 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
 import { modelDetalles_PrecargueDespacho } from 'src/app/Modelo/modelDetalles_PrecargueDespacho';
 import { modelDetalles_Reposiciones } from 'src/app/Modelo/modelDetalles_Reposiciones';
@@ -40,6 +41,9 @@ export class ReposicionesComponent implements OnInit {
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
+  edition : boolean = false; //
+  rollsSelected : any = {};
+  action : string = `Generar`;
 
   constructor(private AppComponent : AppComponent, 
     private fmBuild : FormBuilder,
@@ -50,10 +54,11 @@ export class ReposicionesComponent implements OnInit {
     private svRepo : ReposicionesService,
     private svDtlRepo : Detalles_ReposicionesService,
     private svPDF : CreacionPdfService,  
+    private msg : MessageService, 
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
-   }
+  }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -72,6 +77,7 @@ export class ReposicionesComponent implements OnInit {
 
   initForm(){
     this.form = this.fmBuild.group({
+      repo : [null],
       roll : [null],
       //process : [null],
       //item : [null, Validators.required], 
@@ -124,7 +130,67 @@ export class ReposicionesComponent implements OnInit {
     } else this.msjs(`Advertencia`, `Debe llenar el campo ITEM`);
   }
 
-  //*
+  //* Función para editar reposiciones.
+  searchRepositions(movement? : number){
+    this.rollsToDispatch = [];
+    this.rollsConsolidate = [];
+    this.edition = false;
+    this.action = `Generar`;
+    let repo : number = !movement ? this.form.value.repo : movement;
+
+    if(repo) {
+      this.load = true;
+      this.svDtlRepo.getRepositionId(repo).subscribe(data => {
+        if(!movement && data.statusId == 5) {
+          this.msjs(`Advertencia`, `La reposición N° ${repo} ya se encuentra cerrada!`);
+          this.load = false;
+          return;
+        } 
+        this.edition = true;
+        this.loadTable(data);
+        this.loadClient(data[0]);
+        this.consolidateItems();
+        this.action = `Editar`;
+        
+      }, error => {
+        this.msjs(`Error`, `Error consultando la reposición N° ${repo} | ${error.status} ${error.statusText}`);
+      });
+    } else this.msjs(`Advertencia`, `Debe digitar el N° de la Reposición`);
+  }
+
+  //* Función para cargar tabla con los registros a editar.
+  loadTable(data : any){
+    data.forEach(x => {
+      this.rollsToDispatch.push({
+        'roll' : x.roll,
+        'rollPl' : x.codeDetail,
+        'item' : x.item,
+        'reference' : x.reference,
+        'idClient' : x.idClient,
+        'client' : x.client,
+        'qty' : x.quantity,
+        'weight' : x.weight,
+        'unit' : x.presentation,
+        'ot' : x.ot,
+        'processId' : x.processId,
+        'process' : x.process,
+        'price' : x.price,
+        'inRepo' : true,
+      });
+    });
+    this.load = false;
+  }
+
+  //* Función para cargar los datos del encabezado de la reposición
+  loadClient(data : any){
+    this.form.patchValue({
+      'client' : data.client,
+      'idClient' : data.idClient,
+      'observation' : data.observation1,
+    });
+  }
+
+  //* Función para buscar rollo a rollo lo que se le va a reponer al cliente. 
   searchRolls(){
     let roll : number = this.form.value.roll;
     let client : any = this.form.value.idClient;
@@ -139,6 +205,7 @@ export class ReposicionesComponent implements OnInit {
       }
       this.load = true;
       this.svProduction.getInformationDispatch(roll, client).subscribe(data => {
+        console.log(data[0]);
         if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
           this.rollsToDispatch.unshift(data[0]);
           this.consolidateItems();
@@ -152,7 +219,7 @@ export class ReposicionesComponent implements OnInit {
     } else this.msjs(`Advertencia`, `Debe llenar todos los campos!`);
   }
 
-  //*
+  //* Función para consolidar los items en la primera tabla.
   consolidateItems(){
     this.rollsConsolidate = this.rollsToDispatch.reduce((acc, value) => {
       let find = acc.find(x => x.item == value.item);
@@ -197,14 +264,14 @@ export class ReposicionesComponent implements OnInit {
         Rep_HoraCrea: moment().format('HH:mm:ss'),
         Usua_Crea: this.storage_Id,
         Rep_Observacion: this.form.value.observation,
-        Estado_Id: 5,
+        Estado_Id: 11,
         Rep_FechaSalida: moment().format('YYYY-MM-DD'),
         Rep_HoraSalida: moment().format('HH:mm:ss'),
         Usua_Salida: this.storage_Id,
         Rep_ObservacionSalida: '',
       };
       this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id); }, error => { 
-        this.msjs(`Error`, `Error guardando el encabezado de la reposición | ${error. status} ${error. statusText}` ); 
+        this.msjs(`Error`, `Error guardando el encabezado de la reposición | ${error.status} ${error.statusText}`); 
         this.load = false;
       });
     }
@@ -223,15 +290,15 @@ export class ReposicionesComponent implements OnInit {
       }
       this.svDtlRepo.Post(info).subscribe(data => {
         count += 1;
-        if(count == this.rollsToDispatch.length) this.updateStatusRolls(id);
+        if(count == this.rollsToDispatch.length) this.updateStatusRolls(id, this.rollsToDispatch);
       });
     });
   }
 
   //*
-  updateStatusRolls(id : number){
+  updateStatusRolls(id : number, bults : any){
     let rolls : Array<any> = [];
-    this.rollsToDispatch.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 23, 'envioZeus' : true }));
+    bults.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 23, 'envioZeus' : true }));    
     this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => { 
       this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados | ${error.status} ${error.statusText}`); 
     });
@@ -240,26 +307,26 @@ export class ReposicionesComponent implements OnInit {
   sendAdjustmentZeus() {
     let counter : number = 0;
     if (this.rollsConsolidate.length > 0) {
-      //this.load = true;
+      this.load = true;
       this.rollsConsolidate.forEach(data => {
         let unity : string = data.unit == 'Kg' ? 'KLS' : data.unit == 'Und' ? 'UND' : 'PAQ';
         let qty : number = this.qtyTotalItem(data);
         let item : string = data.item; 
         let price : string = data.price;
-        let detail : string = `Ajuste desde App Plasticaribe por concepto de PRUEBA DE REPOSICION al Item ${item} con cantidad de ${(-(qty))} ${unity}`;
-        console.log(item, price, detail, qty);
+        let detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${(-(qty))} ${unity}`;
+
         this.svZeus.getExistenciasProductos(data.item, unity).subscribe(dataExis => {
           if(dataExis.length == 0 || (dataExis[0].existencias < qty || !dataExis)) {
             let qtyZeus : number = dataExis.length == 0 ? 0 : dataExis[0].existencias;
             let message : string = `La cantidad del item ${data.item} en Plasticaribe "${qty.toLocaleString()} ${unity}" es mayor al stock de Zeus "${qtyZeus.toLocaleString()} ${unity}"`
             this.msjs(`Advertencia`, message);
+            return;
           } else {
             this.svProduction.sendProductionToZeus(detail, item, unity, 0, (-(qty)).toString(), price).subscribe(dataAdjusment => {
               if(dataAdjusment.body.includes('<code>SUCESS</code>')) {
                 counter++;
                 if(counter == this.rollsConsolidate.length) this.saveReposition();
               }
-              console.log(dataAdjusment);
             }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus | ${error.status} ${error.statusText }`); })
           }  
         }, error => { 
@@ -268,6 +335,148 @@ export class ReposicionesComponent implements OnInit {
         });
       });
     } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay rollos agregados!`);  
+  }
+
+  //* Función para mostrar el msj de confirmación de eliminación de rollos
+  msgDeleteRolls(data : any) {
+    this.load = true;
+    this.rollsSelected = {};
+    this.rollsSelected = data;
+    console.log(this.rollsSelected);
+    this.msg.add({ severity:'warn', key:'deleteRoll', summary:'Elección', detail: `¿Está seguro que desea eliminar el rollo/bulto N° ${data.roll} de la carta N° ${this.form.value.repo}?`, sticky: true});
+  }
+
+  //* Función para eliminar rollos de una reposición
+  deleteRollsFromReposition(data: any, currentStatus : any, newStatus : any){
+    this.onReject('deleteRoll');
+    this.load = true;
+    let index : any = this.rollsToDispatch.findIndex(x => x.roll == data.roll);
+    let roll : number = this.rollsSelected.rollPl;
+    
+    this.svDtlRepo.Delete(roll).subscribe(dataRep => {
+      let infoRoll : any = [{'roll': data.roll, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true }]; 
+      this.svProduction.putChangeStateProduction(infoRoll).subscribe(() => {
+        this.msjs(`Confirmación`, `Se eliminó el rollo N° ${data.roll} de la reposición N° ${this.form.value.repo}!`);
+        this.rollsToDispatch.splice(index, 1);
+        this.load = false;
+        this.consolidateItems();
+      }, error => {
+        this.msjs(`Error`, `No fue posible actualizar el estado del rollo N° ${data.roll} en producción | ${error.status} ${error.statusText}`);
+        this.load = false;
+      });
+    }, error => {
+      this.msjs(`Error`, `Error al eliminar el rollo N° ${data.roll} de la reposición N° ${this.form.value.repo} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });
+  }
+
+  //? Funciones para quitar rollo de la reposición y 
+  //? realizar ajuste para que vuelvan a inventario Zeus y PL 
+
+  //* Función que hará un ajuste positivo a Zeus al rollo que se elimine de la reposición.
+  sendPositiveAdjustment(data : any){
+    this.onReject('deleteRoll');
+    data = this.rollsSelected;
+
+    let unity : string = data.unit == 'Kg' ? 'KLS' : data.unit == 'Und' ? 'UND' : 'PAQ';
+    let qty : number = data.qty;
+    let item : string = data.item; 
+    let price : string = data.price;
+    let detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${((qty))} ${unity}`;
+
+    this.svProduction.sendProductionToZeus(detail, item, unity, 0, ((qty)).toString(), price).subscribe(dataAdjusment => {
+      this.deleteRollsFromReposition(data, 23, 19)
+    }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste positivo a Zeus | ${error.status} ${error.statusText}`); })
+  }
+
+  //*Función para actualizar el estado de los rollos de agregados a la reposición 
+  updateStatusRoll(data : any){
+    let roll : any = [];
+    roll.push({'roll' : data.roll, 'item' : data.item, 'currentStatus' : 23, 'newStatus' : 19, 'envioZeus' : true });
+    this.svProduction.putChangeStateProduction(roll).subscribe(data => { 
+     }, error => { 
+      this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados | ${error.status} ${error.statusText}`); 
+    });
+  }
+
+  //? Funciones para agregar bultos a la reposición, si hay 2 o menos items se crea ajuste en Zeus.
+  addRollsToReposition(){
+    let repo : any = this.form.value.repo; 
+    let count : number = 0;
+    let rolls : any = [];
+    rolls = this.rollsToDispatch.filter(x => !x.inRepo);
+    if(rolls.length > 0) {
+      rolls.forEach(x => {
+        let info : modelDetalles_Reposiciones = {
+          'Rep_Id': repo,
+          'Prod_Id': x.item,
+          'DtlRep_Rollo': x.roll,
+          'DtlRep_Cantidad': x.qty,
+          'UndMed_Id': x.unit,
+        }
+        this.svDtlRepo.Post(info).subscribe(data => {
+          count++
+          if(rolls.length == count) this.updateStatusRolls(repo, rolls);
+        }, error => {
+          this.msj.mensajeError(`Error`, `Error al agregar rollos a la reposición | ${error.status} ${error.statusText}`)
+        });
+      });
+    } else {
+      this.createPDF(repo, `actualizada`);
+    }
+  }
+
+  loadFunction(){
+    let repo : any = this.form.value.repo; 
+    if(repo) {
+      let rolls : any = [];
+      this.rollsToDispatch.filter(x => !x.inRepo).forEach(x => {
+        if(!rolls.map(z => z.item).includes(x.item)) {
+          rolls.push({
+            'roll' : x.roll,
+            'rollPl' : x.rollPl,
+            'item' : x.item,
+            'reference' : x.reference,
+            'idClient' : x.idClient,
+            'client' : x.client,
+            'qty' : x.qty,
+            'weight' : x.weight,
+            'unit' : x.unit,
+            'ot' : x.ot,
+            'processId' : x.processId,
+            'process' : x.process,
+            'price' : x.price,
+            'inRepo' : false,
+          });
+        } else {
+          let index : number = rolls.findIndex(y => y.item == x.item);
+          rolls[index].qty += x.qty;
+        }
+      });
+      if(rolls.length > 0) this.adjustmentZeus(rolls);
+      else this.addRollsToReposition();
+    } else this.msjs(`Advertencia`, `Debe digitar un número de reposición válido!`);
+  }
+
+  adjustmentZeus(data : any){
+    let count : number = 0;
+    data.forEach(x => {
+      let unity : string = x.unit == 'Kg' ? 'KLS' : x.unit == 'Und' ? 'UND' : 'PAQ';
+      let qty : number = x.qty;
+      let item : string = x.item; 
+      let price : string = x.price;
+      let detail : string = `Ajuste desde App Plasticaribe realizado por el usuario ${this.storage_Nombre} por concepto de REPOSICION al Item ${item} con cantidad de ${(-(qty))} ${unity}`;
+
+      this.svProduction.sendProductionToZeus(detail, item, unity, 0, (-(qty)).toString(), price).subscribe(dataAdjusment => {
+        count++
+        if(data.length == count) this.addRollsToReposition();
+      }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste positivo a Zeus | ${error.status} ${error.statusText}`); })
+    });
+  }
+
+  onReject(key : any){
+    this.load = false;
+    this.msg.clear(key);
   }
 
   clearFields(){
@@ -281,6 +490,7 @@ export class ReposicionesComponent implements OnInit {
     this.rollsConsolidate = [];
     this.searchIn = null;
     this.load = false;
+    this.action = `Generar`;
   }
 
   //* Función para acortar msjs 
@@ -300,7 +510,7 @@ export class ReposicionesComponent implements OnInit {
 
   createPDF(id : number, action : string) {
     this.svDtlRepo.getRepositionId(id).subscribe(data => {
-      let title: string = null; //`Carta de Reposición N° ${id}`;
+      let title: string = null; 
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
       this.msjs(`Confirmación`, `Carta de Reposición N° ${id} ${action} exitosamente!`);

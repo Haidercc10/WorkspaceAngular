@@ -3,19 +3,20 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Table } from 'exceljs';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
-import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { Precargue_RollosDespachoComponent } from '../Precargue_RollosDespacho/Precargue_RollosDespacho.component';
 import { Detalles_ReposicionesService } from 'src/app/Servicios/Detalles_Reposiciones/Detalles_Reposiciones.service';
 import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-Mov_Reposiciones',
   templateUrl: './Mov_Reposiciones.component.html',
   styleUrls: ['./Mov_Reposiciones.component.css']
 })
+
 export class Mov_ReposicionesComponent implements OnInit {
 
   form !: FormGroup;
@@ -27,9 +28,11 @@ export class Mov_ReposicionesComponent implements OnInit {
   searchedData: any[] = [];
   @ViewChild('dt') dt: Table;
   modal : boolean = false;
-
+  rollsFromRepo : any = [];
+  rollsConsolidates : any = [];
   clients : any = [];
   statuses : any = [];
+  selectedRepo : any = {};
 
   constructor(
     private appComponent: AppComponent,
@@ -39,6 +42,8 @@ export class Mov_ReposicionesComponent implements OnInit {
     private svZeus : InventarioZeusService,
     private svDtlRepositions : Detalles_ReposicionesService,
     private cmpRepostions : ReposicionesComponent,
+    private svProduction : Produccion_ProcesosService,
+    private msg : MessageService,
   ) {
       this.initForm();
       this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -57,7 +62,7 @@ export class Mov_ReposicionesComponent implements OnInit {
   }
 
   //*
-  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11,5].includes(x.estado_Id))  }, error => { this.msjs(`Error`, `Error al consultar los estados.`) });
+  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11,5,3].includes(x.estado_Id))  }, error => { this.msjs(`Error`, `Error al consultar los estados.`) });
 
   //*
   initForm(){
@@ -96,7 +101,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     this.loadRankDates();
   }
 
-  //*
+  //*Función para consultar los movimientos de reposiciones
   searchData(){
     this.load = true;
     let date1 : any = moment(this.form.value.startDate).format('YYYY-MM-DD');
@@ -110,7 +115,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     });
   }
 
-  //*
+  //* Validar la URL que se enviará al API para consultar.
   validateUrl(){
     let id: any = this.form.value.id;
     let status: any = this.form.value.status;
@@ -125,7 +130,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     return url;
   }
 
-  //*
+  //* Función para validar los mensajes a mostrar
   msjs(msj1 : string, msj2 : string){
     this.load = false;
     switch (msj1) {
@@ -140,11 +145,69 @@ export class Mov_ReposicionesComponent implements OnInit {
     }``
   }
 
-  discardPreload(){}
+  //*Función para mostrar el msj de confirmación de eliminación de rollos
+  viewMsgAnullation(data : any) {
+    this.load = true;
+    this.selectedRepo = {};
+    this.selectedRepo = data;
+    this.cmpRepostions.searchRepositions(data.movement);
+    setTimeout(() => { 
+      this.rollsConsolidates = this.cmpRepostions.rollsConsolidate; 
+      console.log(this.rollsConsolidates);
+    }, 1000);
+    this.msg.add({severity:'warn', key:'reposition', summary:'Elección', detail: `¿Está seguro que desea anular la reposición N° ${data.movement}?`, sticky: true});
+  } 
+  
+  //* Función para quitar msj de confirmación.
+  onReject(key : any) {
+    this.load = false;
+    this.msg.clear(key);
+  }
+
+  //* Función para anular la reposición y cambiar estado DISPONIBLE los rollos.
+  discardReposition(){
+    let data : any = {};
+    data = this.selectedRepo;
+    this.load = true;
+    this.svProduction.putAvailableFromReposition(data.movement).subscribe(() => {
+      this.msjs(`Confirmación`, `Reposición N° ${data.movement} anulada exitosamente!`);
+      this.onReject('reposition');
+    }, error => {
+      this.msjs(`Error`, `Error al actualizar el estado de los rollos | ${error.status} ${error.statusText}.`);
+      this.load = false;
+    });
+  }
 
   //*
   createPDF(id : number){
     this.cmpRepostions.createPDF(id, `descargado`);
   }
+
+  sendAdjustment(data : any){
+    this.cmpRepostions.sendPositiveAdjustment(data);
+  }
+
+  //*
+  sendPositiveAdjustment(){
+    let count : number = 0
+    this.onReject('reposition');
+    //data = this.rollsSelected;
+
+    this.rollsConsolidates.forEach(data => {
+      let unity : string = data.unit == 'Kg' ? 'KLS' : data.unit == 'Und' ? 'UND' : 'PAQ';
+      let qty : number = data.qty;
+      let item : string = data.item; 
+      let price : string = data.price;
+      let detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${((qty))} ${unity}`;
+
+      this.svProduction.sendProductionToZeus(detail, item, unity, 0, ((qty)).toString(), price).subscribe(dataAdjusment => {
+        count++
+        if(this.rollsConsolidates.length == count) this.discardReposition();
+      }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste positivo a Zeus | ${error.status} ${error.statusText}`); });
+    });
+  }
+
+
+
 
 }
