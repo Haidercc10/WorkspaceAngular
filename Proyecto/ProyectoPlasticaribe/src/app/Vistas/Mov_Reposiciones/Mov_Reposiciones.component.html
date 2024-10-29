@@ -131,6 +131,7 @@
           </th>
           <th class="text-center" *ngIf="[1].includes(ValidarRol)">Anular Doc.</th>
           <th class="text-center" id="ver3">Ver</th>
+          <th class="text-center" id="finalizar">Finalizar</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -150,6 +151,9 @@
           </td>
           <td class="text-center">
             <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger" (onClick)="createPDF(data.movement)"></p-button>
+          </td>
+          <td class="text-center">
+            <p-button id="botonFinalizar" icon="pi pi-check-square" styleClass="p-button-rounded p-button-success" [disabled]="![11].includes(data.statusId)" (onClick)="viewMsgFinishRepo(data)"></p-button>
           </td>
         </tr>
       </ng-template>
@@ -171,6 +175,26 @@
           </div>
           <div class="col-6">
             <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('reposition')" class="p-button-secondary"></button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-toast>
+
+  <p-toast position="center" key="finishReposition" (onClose)="onReject('finishReposition')" [baseZIndex]="5000">
+    <ng-template let-message pTemplate="message">
+      <div class="flex flex-column" style="flex: 1">
+        <div class="text-center">
+          <i class="pi pi-exclamation-triangle font-size-48"></i>
+          <h4>{{message.summary}}</h4>
+          <p>{{message.detail}}</p>
+        </div>
+        <div class="p-fluid" style="display: flex;">
+          <div class="col-6" style="margin-right: 5px;">
+            <button type="button" pButton icon="pi pi-check" label="Sí" class="p-button-warning" (click)="finishRepo(selectedRepo)" pTooltip="Los rollos/bultos volverán a inventario de despacho y zeus"></button>
+          </div>
+          <div class="col-6">
+            <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('finishReposition')" class="p-button-secondary"></button>
           </div>
         </div>
       </div>

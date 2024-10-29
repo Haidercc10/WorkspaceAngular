@@ -19,11 +19,13 @@ export class ReposicionesService {
       getId = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Reposiciones/${id}`);
     
       GetIdRepositions = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Reposiciones/GetIdRepositions/${id}`);
+
+      getLastReposition = () : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Reposiciones/getLastReposition`);
     
       Post = (data : modelReposiciones): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Reposiciones', data);
     
       Put = (id : any, data : modelReposiciones) => this.http.put(this.rutaPlasticaribeAPI + `/Reposiciones/${id}`, data);
     
-      putRepositions = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Reposiciones/putRepositions/${id}`, data);
+      putReposition = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Reposiciones/putReposition/${id}`, data);
 
 }

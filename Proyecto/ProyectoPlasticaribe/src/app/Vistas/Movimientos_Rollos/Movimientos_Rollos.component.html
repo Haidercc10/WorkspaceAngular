@@ -1,4 +1,8 @@
 
+  <div class="mb-4 text-center">
+    <h5>El estado actual del rollo/bulto es <b> {{currentStatus}}</b></h5>
+  </div>
+
   <p-table 
    [columns]="cols" 
    [value]="movements" 
@@ -33,7 +37,7 @@
               <td><b>{{rowData.userName}}</b></td>
               <td>
                 <span class="badge" [ngClass]="{
-                    'bg-success1': rowData.status == 'DISPONIBLE', 
+                    'bg-success1': rowData.status == 'PRODUCIDO', 
                     'bg-danger1': rowData.status == 'NO DISPONIBLE', 
                     'bg-danger2': rowData.status == 'PELETIZADO', 
                     'bg-blue1': rowData.status == 'FACTURADO', 
@@ -41,8 +45,10 @@
                     'bg-warning2': rowData.status == 'REEMPACADO', 
                     'bg-secondary1' : rowData.status == 'DEVUELTO',
                     'bg-success2' : rowData.status == 'ENVIADO',
-                    'bg-success3' : rowData.status == 'CERRADA',
-                    'bg-blue2' : rowData.status == 'INGRESADO'
+                    'bg-success3' : rowData.status == 'DEVUELTO CONFORME',
+                    'bg-blue2' : rowData.status == 'INGRESADO',
+                    'bg-blue3' : rowData.status == 'PRECARGADO',
+                    'bg-warning3': rowData.status == 'DEVUELTO NO CONFORME'
                     }">
                  {{rowData.status}}
                 </span>

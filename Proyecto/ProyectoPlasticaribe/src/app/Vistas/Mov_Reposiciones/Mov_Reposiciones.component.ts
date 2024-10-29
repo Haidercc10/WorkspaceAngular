@@ -10,6 +10,7 @@ import { Detalles_ReposicionesService } from 'src/app/Servicios/Detalles_Reposic
 import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { MessageService } from 'primeng/api';
+import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones.service';
 
 @Component({
   selector: 'app-Mov_Reposiciones',
@@ -41,6 +42,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     private svMsjs : MensajesAplicacionService,
     private svZeus : InventarioZeusService,
     private svDtlRepositions : Detalles_ReposicionesService,
+    private svRepo : ReposicionesService,
     private cmpRepostions : ReposicionesComponent,
     private svProduction : Produccion_ProcesosService,
     private msg : MessageService,
@@ -166,12 +168,13 @@ export class Mov_ReposicionesComponent implements OnInit {
 
   //* Función para anular la reposición y cambiar estado DISPONIBLE los rollos.
   discardReposition(){
+    this.onReject('reposition');
     let data : any = {};
     data = this.selectedRepo;
     this.load = true;
     this.svProduction.putAvailableFromReposition(data.movement).subscribe(() => {
       this.msjs(`Confirmación`, `Reposición N° ${data.movement} anulada exitosamente!`);
-      this.onReject('reposition');
+      this.searchData();
     }, error => {
       this.msjs(`Error`, `Error al actualizar el estado de los rollos | ${error.status} ${error.statusText}.`);
       this.load = false;
@@ -180,7 +183,7 @@ export class Mov_ReposicionesComponent implements OnInit {
 
   //*
   createPDF(id : number){
-    this.cmpRepostions.createPDF(id, `descargado`);
+    this.cmpRepostions.createPDF(id, `descargada`);
   }
 
   sendAdjustment(data : any){
@@ -207,7 +210,29 @@ export class Mov_ReposicionesComponent implements OnInit {
     });
   }
 
+  finishRepo(data : any){
+    this.onReject('finishReposition');
+    this.load = true;
+    let info : any = [{ 'user' : this.storage_Id, 'status' : 5 }]
+    this.svRepo.putReposition(data.movement, info).subscribe(() => {
+      this.msjs(`Confirmación`, `Reposición N° ${data.movement} finalizada exitosamente!`);
+      this.load = false;
+    }, error => {
+      this.msjs(`Error`, `Error al finalizar la reposición N° ${data.movement} | ${error.status} ${error.statusText}.`);
+      this.load = false;
+    });
+  }
 
-
-
+  //*Función para mostrar el msj de confirmación de eliminación de rollos
+  viewMsgFinishRepo(data : any) {
+    this.load = true;
+    this.selectedRepo = {};
+    this.selectedRepo = data;
+    this.cmpRepostions.searchRepositions(data.movement);
+    setTimeout(() => { 
+      this.rollsConsolidates = this.cmpRepostions.rollsConsolidate; 
+      console.log(this.rollsConsolidates);
+    }, 1000);
+    this.msg.add({severity:'warn', key:'finishReposition', summary:'Elección', detail: `¿Está seguro que desea finalizar la reposición N° ${data.movement}?`, sticky: true});
+  }
 }

@@ -47,7 +47,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="client" id="client" list="list" type="text" readonly="edition" pInputText required (keyup)="searchClientsByName()" (change)="selectClient()"/>
+            <input formControlName="client" id="client" list="list" type="text" pInputText required (keyup)="searchClientsByName()" (change)="selectClient()"/>
             <datalist id="list">
               <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
             </datalist>

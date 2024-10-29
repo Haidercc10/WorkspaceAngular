@@ -18,6 +18,7 @@ export class Movimientos_RollosComponent implements OnInit {
   load : boolean = true;
   movements : Array<any> = [];
   cols !: any;
+  currentStatus : string = ``;
 
   constructor(private AppComponent : AppComponent,
     private svProduction : Produccion_ProcesosService,
@@ -53,8 +54,9 @@ export class Movimientos_RollosComponent implements OnInit {
   searchMovements(data : any, type : string){
     this.movements = [];
     this.load = true;
-    console.log(data);
-    let rolloPl : any =  type == `Produccion` ? data.observacion == null ? 0 : data.observacion.replace(`Rollo #`, ``) : data.productionPL;
+    this.currentStatus = ``;
+    let rolloPl : any = type == `Produccion` ? data.observacion == null ? 0 : data.observacion.replace(`Rollo #`, ``) : data.productionPL;
+
     type == `Produccion` ? rolloPl == 0 ? rolloPl = 0 : rolloPl = rolloPl.replace(`en PBDD.dbo.Produccion_Procesos`, ``) : rolloPl = rolloPl; 
     rolloPl = parseInt(rolloPl);
     let rollBagpro : any = type == `Produccion` ? data.rollo : data.production;
@@ -62,6 +64,7 @@ export class Movimientos_RollosComponent implements OnInit {
     this.svProduction.getMovementsRolls(rollBagpro, data.item, rolloPl).subscribe(dataPl => {
       if(dataPl.length > 0) {
         this.movements = dataPl;
+        this.currentStatus = this.movements[0].state;
         this.movements.sort((a, b) => a.date.localeCompare(b.date));
         this.load = false;
       } //else this.messages(`Advertencia`, `No se encontró información del rollo/bulto N° ${data.rollo}`);

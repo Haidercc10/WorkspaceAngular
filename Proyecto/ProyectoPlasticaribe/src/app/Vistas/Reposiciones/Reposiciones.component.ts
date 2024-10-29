@@ -44,6 +44,7 @@ export class ReposicionesComponent implements OnInit {
   edition : boolean = false; //
   rollsSelected : any = {};
   action : string = `Generar`;
+  lastRepo : number = null;
 
   constructor(private AppComponent : AppComponent, 
     private fmBuild : FormBuilder,
@@ -62,6 +63,7 @@ export class ReposicionesComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.getLastReposition();
     //this.createPDF(1, `creada`);
   }
 
@@ -74,6 +76,15 @@ export class ReposicionesComponent implements OnInit {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
+
+  getLastReposition() {
+    this.svRepo.getLastReposition().subscribe(repo => { 
+      this.lastRepo = repo;
+      this.form.patchValue({ 'repo' : this.lastRepo }); 
+    }, error => { 
+      this.msj.mensajeError(`Error`, `${error.status} ${error.statusText}`); 
+    })
+  } 
 
   initForm(){
     this.form = this.fmBuild.group({
@@ -117,33 +128,37 @@ export class ReposicionesComponent implements OnInit {
 
   //*
   getItem(){
-    this.load = true;
     let item : any = this.form.value.item;
     if(item) {
+      this.load = true;
       this.svProducts.GetProductsById(item).subscribe(data => {
         this.form.patchValue({ 'item': item, 'reference': data[0].prod.prod_Nombre, });
         this.load = false;
       }, error => {
-        this.msjs(`Error`, `No se encontró el item N° ${item}`);
+        this.msjs(`Error`, `No se encontró el item N° ${item} | ${error.status} ${error.statusText}`);
         this.form.patchValue({ 'item': null, 'reference': null, });
+        this.load = false;
       });
     } else this.msjs(`Advertencia`, `Debe llenar el campo ITEM`);
   }
 
   //* Función para editar reposiciones.
   searchRepositions(movement? : number){
+    console.log(movement);
     this.rollsToDispatch = [];
     this.rollsConsolidate = [];
     this.edition = false;
     this.action = `Generar`;
     let repo : number = !movement ? this.form.value.repo : movement;
-
+    console.log(repo);
     if(repo) {
       this.load = true;
       this.svDtlRepo.getRepositionId(repo).subscribe(data => {
-        if(!movement && data.statusId == 5) {
-          this.msjs(`Advertencia`, `La reposición N° ${repo} ya se encuentra cerrada!`);
+        console.log(data);
+        if((!movement && data[0].statusId == 5) || data[0].statusId == 3) {
+          this.msjs(`Advertencia`, `La reposición N° ${repo} no se encuentra disponible!`);
           this.load = false;
+          this.clearFields();
           return;
         } 
         this.edition = true;
@@ -151,11 +166,10 @@ export class ReposicionesComponent implements OnInit {
         this.loadClient(data[0]);
         this.consolidateItems();
         this.action = `Editar`;
-        
       }, error => {
         this.msjs(`Error`, `Error consultando la reposición N° ${repo} | ${error.status} ${error.statusText}`);
       });
-    } else this.msjs(`Advertencia`, `Debe digitar el N° de la Reposición`);
+    } else this.msjs(`Advertencia`, `Debe digitar el N° de la reposición`);
   }
 
   //* Función para cargar tabla con los registros a editar.
@@ -194,7 +208,6 @@ export class ReposicionesComponent implements OnInit {
   searchRolls(){
     let roll : number = this.form.value.roll;
     let client : any = this.form.value.idClient;
-    //let clients : any = this.clients.find(x => x.idcliente == client);
 
     if(this.form.valid) {
       if(this.rollsToDispatch.length > 0) {
@@ -482,6 +495,7 @@ export class ReposicionesComponent implements OnInit {
   clearFields(){
     this.form.reset();
     this.load = false;
+    this.getLastReposition();
   }
 
   clearAll(){
@@ -491,6 +505,8 @@ export class ReposicionesComponent implements OnInit {
     this.searchIn = null;
     this.load = false;
     this.action = `Generar`;
+    this.edition = false;
+    this.getLastReposition();
   }
 
   //* Función para acortar msjs 
@@ -552,8 +568,8 @@ export class ReposicionesComponent implements OnInit {
           "Item": d.item,
           "Referencia": d.reference,
           "Rollos" : cantRegistros,
-          "Peso": weight.toFixed(2),
-          "Cantidad" : quantity.toFixed(2),
+          "Peso": this.formatonumeros(weight.toFixed(2)),
+          "Cantidad" : this.formatonumeros(quantity.toFixed(2)),
           "Und" : d.presentation,
         });
       }
@@ -573,8 +589,8 @@ export class ReposicionesComponent implements OnInit {
         "OT": d.ot,
         "Item": d.item,
         "Referencia": d.reference,
-        "Peso": d.weight,
-        "Cantidad" : d.quantity, 
+        "Peso": this.formatonumeros(d.weight),
+        "Cantidad" : this.formatonumeros(d.quantity), 
         "Und" : d.presentation,
       });
     });
