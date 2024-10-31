@@ -60,6 +60,7 @@
             <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-table"></i> <b> Consolidado</b></h4>
           </div> 
         
+          <!--* Tabla con información de devolución-->
           <p-table
             #dtPeletizado
             *ngIf="!load"
@@ -83,8 +84,8 @@
                   <th class="text-center">Material</th>
                   <th class="text-center">Pigmento</th>
                   <th class="text-center">Peso (Kg)</th>
-                  <th class="text-center">Peso real (Kg)</th>
-                  <th class="text-center">Diferencia (Kg)</th>
+                  <!--<th class="text-center">Peso real (Kg)</th>
+                  <th class="text-center">Diferencia (Kg)</th>-->
                   <th class="text-center">Cant. Rollos/Bultos</th>
                   <th class="text-center">Id Mat. Prima</th>
                   <th class="text-center">Mat. Prima</th>
@@ -99,7 +100,7 @@
                   <td class="text-center">{{data.material}}</td>
                   <td class="text-center">{{data.pigment}}</td>
                   <td class="text-center"><b>{{data.weight | number : '1.2-2'}}</b></td>
-                  <td [pEditableColumn]="data.weight2" class="cursor" pTooltip="Editar cantidad" class="text-center">
+                  <!--<td [pEditableColumn]="data.weight2" class="cursor" pTooltip="Editar cantidad" class="text-center">
                     <p-cellEditor>
                       <ng-template pTemplate="input">
                         <input pInputText 
@@ -117,7 +118,7 @@
                       </ng-template>
                     </p-cellEditor>
                   </td>
-                  <td class="text-center"><b>{{data.diff | number : '1.2-2'}}</b></td>
+                  <td class="text-center"><b>{{data.diff | number : '1.2-2'}}</b></td>-->
                   <td class="text-center">{{qtyRollsByItem(data.item)}}</td>
                   <td class="text-center">{{data.matPrima_Id}}</td>
                   <td class="text-center">{{data.matPrima}}</td>
@@ -181,7 +182,7 @@
         <!-- OT -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ot" id="ot" type="number" (keyup.enter)="searchDocument()" [useGrouping]="false" [readonly]="form.value.process == null || !dispatch" pTooltip="{{form.value.process == null || !dispatch ? 'Debe llenar el campo PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
+            <p-inputNumber formControlName="ot" id="ot" type="number" (keyup.enter)="searchDocument()" [useGrouping]="false" [readonly]="form.value.process == null" pTooltip="{{form.value.process == null || !dispatch ? 'Debe llenar el campo PROCESO' : null}}" tooltipPosition="top"></p-inputNumber>
             <label for="ot">OT/Doc.</label>
           </span>
         </div>
@@ -280,7 +281,7 @@
           <tr>
             <th class="text-center">#</th>
             <th class="text-center">Recuperado</th>
-            <th class="text-center">OT</th>
+            <th class="text-center">OT/Doc.</th>
             <th class="text-center">Rollo</th>
             <th class="text-center">Item</th>
             <th class="text-center">Referencia</th>

@@ -85,6 +85,7 @@
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference')"></th>
       <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'production')"></th>
       <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'quantity')"></th>
+      <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'weight')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ubication')"></th>
@@ -100,6 +101,7 @@
       <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
       <th class="text-center" pSortableColumn="production"><p-sortIcon field="production"></p-sortIcon> Rollo</th>
       <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cantidad</th>
+      <th class="text-center" pSortableColumn=""><p-sortIcon field="weight"></p-sortIcon> Peso</th>
       <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
       <th class="text-center" pSortableColumn="process"><p-sortIcon field="process"></p-sortIcon> Proceso</th>
       <th class="text-center" pSortableColumn="ubication"><p-sortIcon field="ubication"></p-sortIcon> Ubicación</th>
@@ -117,11 +119,21 @@
       <td>{{data.reference}}</td>
       <td class="text-center">{{data.production}}</td>
       <td class="text-center">{{data.quantity | number: '1.2-2'}}</td>
+      <td class="text-center">{{data.weight | number: '1.2-2'}}</td>
       <td class="text-center">{{data.presentation}}</td>
       <td class="text-center">{{data.process}}</td>
       <td class="text-center">{{data.ubication}}</td>
       <td class="text-center">
-        <span class="badge" [ngClass]="{'bg-success1': data.stateRollPP == 'DISPONIBLE', 'bg-danger1': data.stateRollPP == 'NO DISPONIBLE', 'bg-danger2': data.stateRollPP == 'PELETIZADO', 'bg-azul': data.stateRollPP == 'FACTURADO', 'bg-warning1': data.stateRollPP == 'REEMPAQUE', 'bg-warning2': data.stateRollPP == 'REEMPACADO', 'bg-secondary1' : data.stateRollPP == 'DEVUELTO', 'bg-blue3' : data.stateRollPP == 'DEVUELTO CONFORME' }">{{data.stateRollPP}}</span>
+        <span class="badge" [ngClass]="{'bg-success1': data.stateRollPP == 'DISPONIBLE', 
+                                        'bg-danger1': data.stateRollPP == 'NO DISPONIBLE', 
+                                        'bg-danger2': data.stateRollPP == 'PELETIZADO', 
+                                        'bg-azul': data.stateRollPP == 'FACTURADO', 
+                                        'bg-warning1': data.stateRollPP == 'REEMPAQUE', 
+                                        'bg-warning2': data.stateRollPP == 'REEMPACADO', 
+                                        'bg-secondary1' : data.stateRollPP == 'DEVUELTO', 
+                                        'bg-blue3' : data.stateRollPP == 'DEVUELTO CONFORME',
+                                        'bg-blue2' : data.stateRollPP == 'EN REPOSICION',
+                                       }">{{data.stateRollPP}}</span>
       </td>
       <td class="text-center"> {{data.date}}</td>
       <td class="text-center">{{data.hour}}</td>

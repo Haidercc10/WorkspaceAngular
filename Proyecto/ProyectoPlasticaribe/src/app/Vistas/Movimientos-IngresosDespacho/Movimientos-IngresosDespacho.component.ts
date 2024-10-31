@@ -132,6 +132,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
         reference: data.product.prod_Nombre,
         production: data.detailsProduction.numeroRollo_BagPro,
         quantity: data.details.dtEntRolloProd_Cantidad,
+        weight : data.details.undMed_Rollo == 'Kg' ? data.detailsProduction.peso_Bruto : data.detailsProduction.peso_Neto,  
         presentation: data.details.undMed_Rollo,
         date: (data.ent.entRolloProd_Fecha).replace('T00:00:00', ''),
         hour: (data.ent.entRolloProd_Hora).length == 7 ? `0${data.ent.entRolloProd_Hora}` : data.ent.entRolloProd_Hora,
@@ -175,13 +176,18 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       if (!consolidatedInformation.map(x => x.Item).includes(prod.item)) {
         let cuontProduction: number = data.filter(x => x.item == prod.item).length;
         let totalQuantity: number = 0;
-        data.filter(x => x.item == prod.item).forEach(x => totalQuantity += x.quantity);
+        let totalWeight : number = 0;
+        data.filter(x => x.item == prod.item).forEach(x => {
+          totalQuantity += x.quantity, 
+          totalWeight += x.weight
+        });
         count++;
         consolidatedInformation.push({
           "#": { text: this.formatNumbers(count), alignment: 'right', fontSize: 8 },
           "Item": prod.item,
           "Referencia": prod.reference,
           "Cant. Rollos": { text: this.formatNumbers((cuontProduction)), alignment: 'right', fontSize: 8 },
+          "Peso": { text: this.formatNumbers((totalWeight).toFixed(2)), alignment: 'right', fontSize: 8 },
           "Cantidad": { text: this.formatNumbers((totalQuantity).toFixed(2)), alignment: 'right', fontSize: 8 },
           "Presentación": prod.presentation
         });
@@ -201,6 +207,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
         "Item": { text: prod.item, alignment: 'right', fontSize: 7 },
         "Referencia": prod.reference,
         "Cantidad": { text: this.formatNumbers((prod.quantity).toFixed(2)), alignment: 'right', fontSize: 7 },
+        "Peso": { text: this.formatNumbers((prod.weight).toFixed(2)), alignment: 'right', fontSize: 7 },
         "Presentación": prod.presentation,
         "Ubicación": prod.ubication
       });
@@ -209,8 +216,8 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   }
 
   tableConsolidated(data) {
-    let columns: Array<string> = ['#', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['5%', '10%', '50%', '10%', '15%', '10%'];
+    let columns: Array<string> = ['#', 'Item', 'Referencia', 'Cant. Rollos', 'Peso', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['5%', '10%', '45%', '10%', '10%', '10%', '10%'];
     return {
       margin: [0, 5],
       table: {
@@ -228,8 +235,8 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
-    let widths: Array<string> = ['5%', '7%', '7%', '40%', '8%', '10%', '23%'];
+    let columns: Array<string> = ['#', 'Rollo', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Presentación',  'Ubicación'];
+    let widths: Array<string> = ['4%', '7%', '7%', '36%', '10%', '8%', '10%', '18%'];
     return {
       margin: [0, 5],
       table: {
@@ -249,8 +256,8 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
 
   buildTableBody(data, columns, title: string, type: 'COLIDATED' | 'DETAIL') {
     var body = [];
-    if (type == 'COLIDATED') body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
-    else body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    if (type == 'COLIDATED') body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    else body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -424,4 +431,5 @@ export interface dataDesp {
   productionPL : number;
   stateRollPP : string;
   price : number;
+  weight? : number;
 }

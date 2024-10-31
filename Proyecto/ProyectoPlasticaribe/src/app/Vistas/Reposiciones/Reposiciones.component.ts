@@ -737,7 +737,7 @@ export class ReposicionesComponent implements OnInit {
   //Tabla con materiales recuperados ingresados detallados
   tablaDetailsPDF(data) {
     let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Und'];
-    let widths: Array<string> = ['5%', '9%', '9%', '8%', '45%', '8%', '10%', '6%'];
+    let widths: Array<string> = ['5%', '8%', '8%', '8%', '45%', '8%', '10%', '8%'];
     return {
       margin: [0, 20, 0, 45],
       table: {

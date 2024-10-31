@@ -352,17 +352,15 @@ export class Maquilas_InternasComponent implements OnInit {
     //this.getPuertoSerial();
     this.getCurrentTurn();
     this.load = true;
+    let days : number = 0;
     this.form.patchValue({ 'weight' : 15.9, 'netWeight' : 15.9 - this.form.get('weightTare').value });
     let weight : number = this.form.get('weight').value;
     let netWeight : number = this.form.get('netWeight').value;
     let today : any = moment().format('YYYY-MM-DD');
-    let dateSelected : any = this.form.get('date').value;
-
-    let initDate = moment([moment(today).year(), moment(today).month() + 1, moment(today).date()]); 
-    let endDate = moment([moment(dateSelected).year(), moment(dateSelected).month() + 1, moment(dateSelected).date()]); 
-
-    let days = endDate.diff(initDate, 'days');
-
+    let dateSelected : any = moment(this.form.get('date').value).format('YYYY-MM-DD');
+    
+    days = moment(dateSelected).diff(moment(today), 'days');
+    
     setTimeout(() => {
       if(this.form.valid) {
         if(![0, null, undefined, ''].includes(weight)) {
@@ -371,7 +369,7 @@ export class Maquilas_InternasComponent implements OnInit {
               if(this.turn) {
                 this.createInternalMaquila();
                 //this.loadServicesTable(weight, netWeight);
-              } else this.msj.mensajeAdvertencia(`No hay un turno seleccionafo!`);
+              } else this.msj.mensajeAdvertencia(`No hay un turno seleccionado!`);
             } else this.msj.mensajeAdvertencia(`La fecha de servicio no puede ser mayor a la fecha actual`);
           } else this.msj.mensajeAdvertencia(`El peso neto es inválido!`);
         } else this.msj.mensajeAdvertencia(`El peso bruto es inválido!`);

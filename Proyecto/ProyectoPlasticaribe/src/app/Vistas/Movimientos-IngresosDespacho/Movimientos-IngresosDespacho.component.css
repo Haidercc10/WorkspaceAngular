@@ -33,3 +33,9 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
   font-size: calc(var(--font-size) * 15px);
 }
 
+.bg-warning3 {
+  color: rgb(84, 90, 0);
+  background-color: rgb(241, 255, 47);
+  font-size: calc(var(--font-size) * 14px);
+}
+

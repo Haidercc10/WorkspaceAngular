@@ -92,6 +92,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     private svDetailsAssign : DetallesAsignacionService,
     private svDevolutions : DetallesDevolucionesProductosService,
     private svProdProcess : Produccion_ProcesosService,
+    private svDtlDv_Products : DetallesDevolucionesProductosService
     //private createRecovery : CrearMateriaprimaComponent,
   ) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -152,8 +153,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
             valor = valor.replace(/[^\d.-]/g, '');
             if (!this.load) {
               this.form.patchValue({
-                quantity: valor,
-                diference: valor - this.form.value.weight
+                'quantity': valor,
+                'diff': valor - this.form.value.weight
               });
             }
           }
@@ -298,6 +299,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     else if (process == 'DESP' && ot.toString().length >= 5) this.getOrderProduction();
     else if (process == 'DESP') this.loadDevolutionsPeletizado();
     else this.getOrderProduction();
+    console.log(ot, process);
   }
 
   //Función para obtener datos de la OT
@@ -418,6 +420,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       quantityDoc : null,
       diff : null, 
     });
+    this.selectedItem = null;
     //this.disableField = false;
   }
 
@@ -573,7 +576,6 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
         'quantityDoc' : this.selectedItem.weight, 
       })
     }, 1000);
-    
   }
 
   //
@@ -695,6 +697,14 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     return model
   }
 
+  //* Actualizar rollos enviados a peletizado desde una DV.
+  putStatusRollsFromDv(id : number) {
+    this.svDtlDv_Products.updateStatusRollsFromPele(id).subscribe(data => {
+      console.log(data);
+    }, error => {
+      this.msjs(`Error`, `No se pudo actualizar el estado de los rollos de la devolución N° ${id} | ${error.status} ${error.statusText}`);
+    });
+  } 
   
   //Función para eliminar propiedades del objeto que crea el registro en la base de datos y que no son necesarios
   updateProperties(data : any, codeIn){
@@ -924,6 +934,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     this.peletizado = [];
     this.groupPeletizado = [];
     this.load = false;
+    this.optForm.reset();
+    this.selectedItem = null;
   }
 
   //Función para mostrar los diferentes tipos de msjs.

@@ -23,4 +23,5 @@ export class DetallesDevolucionesProductosService {
 
   getInfoDvForPeletizadoById = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_ProductoFacturado/getInfoDvForPeletizadoById/${id}`);
 
+  updateStatusRollsFromPele = (id: number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/DetalleDevolucion_ProductoFacturado/updateStatusRollsFromPele/${id}`, data);
 }
