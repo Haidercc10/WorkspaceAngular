@@ -369,16 +369,14 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     //this.getPuertoSerial();
     this.getCurrentTurn();
     this.load = true;
+    let days : number = 0;
     //this.form.patchValue({ 'weight' : 15.9, 'netWeight' : 15.9 - this.form.get('weightTare').value });
     let weight : number = this.form.get('weight').value;
     let netWeight : number = this.form.get('netWeight').value;
     let today : any = moment().format('YYYY-MM-DD');
-    let dateSelected : any = this.form.get('date').value;
+    let dateSelected : any = moment(this.form.get('date').value).format('YYYY-MM-DD');
 
-    let initDate = moment([moment(today).year(), moment(today).month() + 1, moment(today).date()]); 
-    let endDate = moment([moment(dateSelected).year(), moment(dateSelected).month() + 1, moment(dateSelected).date()]); 
-
-    let days = endDate.diff(initDate, 'days');
+    days = moment(dateSelected).diff(moment(today), 'days');
 
     setTimeout(() => {
       if(this.form.valid) {
@@ -441,7 +439,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
 
   getTotalPay(){
     let data : any = this.dtServices ? this.dtServices.filteredValue ? this.dtServices.filteredValue : this.loadedServices : this.loadedServices;
-    return data.reduce((a, b) => a += b.value_Pay, 0);
+    return data.reduce((a, b) => a += b.value * b.weight, 0);
   }
 
   getTotalWeight(){

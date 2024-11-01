@@ -24,8 +24,7 @@ export const routes: Routes = [
   //{path: 'rebobinado-corte', loadChildren: () => import('./Modules/rebobinados-corte/rebobinados-corte.module').then(m => m.RebobinadosCorteModule)}, 
   {path: 'maquilas-internas', loadChildren: () => import('./Modules/maquilas-internas/maquilas-internas.module').then(m => m.MaquilasInternasModule) },
   {path: 'mov-maquilas-internas', loadChildren: () => import('./Modules/mov-maquilas-internas/mov-maquilas-internas-routing.module').then(m => m.MovMaquilasInternasRoutingModule) },
-
-  
+  { path: 'reporte_produccion', loadChildren: () => import('./Modules/reporte-produccion/reporte-produccion.module').then(m => m.ReporteProduccionModule) },
 ]
 
 @NgModule({

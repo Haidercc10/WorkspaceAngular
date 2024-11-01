@@ -258,8 +258,8 @@
                 <td class="text-center">{{ data.weight | number : '1.2-2'}}</td>
                 <td class="text-center"><b>{{ data.netWeight | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{ data.unit }}</td>
-                <td class="text-center">{{ data.value | number : '1.2-2' }}</td>
-                <td class="text-center textBlue"><b>{{ data.weight * data.value | number : '1.2-2' }}</b></td>
+                <td class="text-center">${{ data.value | number : '1.2-2' }}</td>
+                <td class="text-center textBlue"><b>${{ data.weight * data.value | number : '1.2-2' }}</b></td>
                 <!--<td class="text-center">
                   <button pButton (click)="createPDF(data.code, ' exportado')" type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver movimientos de la OT N° {{data.ot}}" icon="pi pi-file-pdf"></button>
                 </td>-->
@@ -272,7 +272,7 @@
             <td class="text-center">{{ getTotalNetWeight() | number : '1.2-2' }}</td>
             <td class="text-center">Kg</td>
             <td></td>
-            <td class="text-center">{{ getTotalPay() | number : '1.2-2'}}</td>
+            <td class="text-center">${{ getTotalPay() | number : '1.2-2'}}</td>
             <!--<td></td>-->
           </tr>
         </ng-template>
