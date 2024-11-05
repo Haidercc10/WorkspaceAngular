@@ -92,7 +92,7 @@ export class MenuLateralComponent implements OnInit {
   mostrarMenuLateral() {
     let ruta : any = this.router.url;
     this.display = true;
-    if([85,7,3,8,86,63,89,62,4,88].includes(this.ValidarRol)) {
+    if([85,7,3,8,86,63,89,62,4,88,12].includes(this.ValidarRol)) {
       setTimeout(() => {
         this.categorias.forEach(x => {
           if([85,7,3,8,86,63,89,62,4,88].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);

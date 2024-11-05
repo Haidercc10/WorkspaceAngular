@@ -73,6 +73,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   management : boolean = false;
   selectedItem : any = null;
   dispatch : boolean = false;
+  typeMov : any = ['DEVOLUCIÓN', 'AJUSTE']; //Función que contendrá el tipo de movimiento del consecutivo buscado 
 
   constructor(private AppComponent : AppComponent, 
     private svMaterials : MaterialProductoService, 
@@ -197,12 +198,12 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       quantity : [null, Validators.required],
       observation : [null], 
       process : [null, Validators.required],
-      item : [null, Validators.required],
-      product : [null, Validators.required], 
+      item : [100163, ],
+      product : ['NO APLICA', ], 
       mpId : [null, Validators.required],
       matprima : [null, Validators.required],
-      quantityDoc : [null, Validators.required], 
-      diff : [null, Validators.required],
+      quantityDoc : [null], 
+      diff : [null],
     });
     //this.disableForm();
   }
@@ -244,6 +245,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   //Formulario opcional para gestionar devoluciones. 
   optionalForm(){
     this.optForm = this.FrmBuilder.group({
+      typeDoc : [null, Validators.required],
       dv : [null, Validators.required],
       observation : [null],
     });
@@ -252,7 +254,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   //* OBTENER INFO INICIAL
 
   //Función para obtener los diferentes tipos de materiales. 
-  getMaterials = () => this.svMaterials.srvObtenerLista().subscribe(data => { this.materials = data }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los materiales. | ${error}`); });
+  getMaterials = () => this.svMaterials.srvObtenerLista().subscribe(data => { this.materials = data.filter(x => ![1].includes(x.material_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los materiales. | ${error}`); });
 
   //Función para obtener los tipos de recuperado
   getTypesRecovery = (types : any[]) => this.svTypesRecovery.GetTodo().subscribe(data => { this.typesRecovery = data.filter(x => types.includes(x.tpRecu_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los tipos de recuperados. | ${error}`); });
@@ -324,7 +326,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     } else this.msjs(`Advertencia`, `Orden de trabajo no válida!`);
   }
 
-  getPeletizadosForMaterial(material : any) {
+  getPeletizadosForMaterial(material? : any) {
+    console.log(material);
+    material = material == undefined ? this.materials.find(x => x.material_Id == this.form.value.material).material_Nombre : material;
+    
+    console.log(this.form);
     this.matPrimas = [];
     this.svMatPrimas.getPeletizados().subscribe(data => { 
       if(data.length > 0) {
@@ -413,8 +419,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       //fail : null,
       quantity : null,
       observation : null, 
-      item : null,
-      product : null, 
+      item : 100163,
+      product : 'NO APLICA', 
       mpId : null,
       matprima : null,
       quantityDoc : null,
@@ -561,8 +567,10 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   //*FUNCIONES DE ADICIÓN
 
   getDataDispatch(){
+    this.load = true;
     this.form.patchValue({ process : 'DESP', })
     this.enableTypeRecovery();
+    let index : number = this.groupPeletizado.findIndex(x => x.item == this.selectedItem.item);
     setTimeout(() => {
       this.form.patchValue({
         'fail' : this.selectedItem.fail_Id, 
@@ -574,8 +582,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
         'mpId' : this.selectedItem.matPrima_Id, 
         'matprima' : this.selectedItem.matPrima, 
         'quantityDoc' : this.selectedItem.weight, 
-      })
-    }, 1000);
+        'quantity' : 30,
+        'diff' : 30 - this.selectedItem.weight,
+      });
+      this.load = false;
+    }, 500);
   }
 
   //
@@ -585,7 +596,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
         'Rollo_Id': [null, undefined, ''].includes(this.form.value.roll) ? 0 : (this.form.value.roll) ,
         'TpRecu_Id': [null, undefined, ''].includes(this.form.value.roll) ? 'PELETIZADO' : 'ROLLO',
         'TpRecu_Nombre': [null, undefined, ''].includes(this.form.value.roll) ? 'PELETIZADO' : 'ROLLO PRODUCCION',
-        'OT': this.form.value.ot,
+        'OT': [null, undefined, ''].includes(this.form.value.ot) ? 0 : this.form.value.ot,
         'Prod_Id': this.form.value.item,
         'Prod_Nombre' : this.form.value.product,
         'MatPri_Id': this.form.value.mpId,
@@ -645,6 +656,9 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       this.recoveries.forEach(x => {
         this.updateProperties(x, code);
           this.svIngPeletizado.Post(x).subscribe(data => {
+            if(x.OT) {
+              if(x.OT.toString().length > 1 && x.OT.toString().length < 5) this.putStatusRollsFromDv(x.OT);
+            }  
             count++;
             if(this.recoveries.length == count) {
               this.createPDF(data.ingPel_FechaIngreso, data.ingPel_FechaIngreso, data.ingPel_HoraIngreso, `creado`);
@@ -702,7 +716,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     this.svDtlDv_Products.updateStatusRollsFromPele(id).subscribe(data => {
       console.log(data);
     }, error => {
-      this.msjs(`Error`, `No se pudo actualizar el estado de los rollos de la devolución N° ${id} | ${error.status} ${error.statusText}`);
+      console.log(error);
+      //this.msjs(`Error`, `No se pudo actualizar el estado de los rollos de la devolución N° ${id} | ${error.status} ${error.statusText}`);
     });
   } 
   
@@ -924,12 +939,14 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     this.load = false;
     //this.disableForm(); 
     this.form.reset();
+    this.form.patchValue({ 'item': 100163, 'product' : 'NO APLICA' });
     //this.disableField = false;
   }
 
   //Función para limpiar todo.
   clearAll(){
     this.clearFields();
+    this.form.patchValue({ 'item': 100163, 'product' : 'NO APLICA' });
     this.recoveries = [];
     this.peletizado = [];
     this.groupPeletizado = [];

@@ -98,7 +98,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       this.inventarioSellado = [];
       this.currentStore = `Impresión`;
       this.consultarInventario(`?wareHouse=${'IMP'}`);
-    } else if([1].includes(this.ValidarRol)) {
+    } else if([1,12].includes(this.ValidarRol)) {
       this.clearInventories();
       this.consultarInventario('');
       this.currentStore = ``;

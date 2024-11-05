@@ -1,9 +1,11 @@
+<!--*Cargando-->
 <div class="d-flex justify-content-center overlay" *ngIf="load">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
 
+<!--*Titulo-->
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
@@ -15,35 +17,44 @@
   </div>
 </div>
 
-
+<!--* Formularios del módulo.-->
 <p-card>
-  <!--Crear Falla-->
+  <!--* Crear Falla / Crear Recuperado -->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
     <button pButton pRipple class="p-button-danger" icon="pi pi-box" label="Crear Recuperado" id="botones1" (click)="loadModalRecovery()"></button>
     <button pButton pRipple class="p-button-danger p-button-outlined" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones2" (click)="loadModalFails()"></button>
   </div>
 
-  <!--* Ingreso de bultos/rollos a peletizado desde despacho -->
+  <!--* Cargue opcional de bultos/rollos -->
   <div class="mb-5" id="opcional">
     <p-accordion> 
       <p-accordionTab header="Gestionar envío de rollos/bultos a peletizado">
         <br>
-        <!--* Peletizado-->
+        
         <div class="mb-4"> 
+          <!--* Formulario 1 -->
           <form [formGroup]="optForm">
             <div class="mb-5" id="formulario">
               <div class="row g-4">
 
-                <!-- DV -->
+                <!--* Tipo Documento -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-inputNumber formControlName="dv" id="ot" type="number" (keyup.enter)="loadDevolutionsPeletizado()" [useGrouping]="false"></p-inputNumber>
-                    <label for="ot">Documento</label>
+                    <p-dropdown formControlName="typeDoc" id="material" [options]="typeMov" [autoDisplayFirst]="true"></p-dropdown>
+                    <label for="material">Tipo Doc.*</label>
                   </span>
                 </div>
 
-                <!--Observación-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-10 col-xl-10 col-xxl-10">
+                <!--* DV -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="dv" id="ot" type="number" (keyup.enter)="loadDevolutionsPeletizado()" [useGrouping]="false"></p-inputNumber>
+                    <label for="ot">Documento*</label>
+                  </span>
+                </div>
+
+                <!--* Observación-->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8 col-xl-8 col-xxl-8">
                   <span class="p-float-label">
                     <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
                     <label for="textarea">Observación</label>
@@ -127,15 +138,13 @@
               </ng-template>
               <ng-template pTemplate="emptymessage">
                 <tr>
-                  <td colspan="7"><h6 class="bold">No hay registros agregados.</h6></td>
+                  <td colspan="10"><h6 class="bold">No hay registros agregados.</h6></td>
                 </tr>
               </ng-template>
               <ng-template pTemplate="footer">
                 <tr>
                   <td class="text-right" colspan="5">Totales</td>
                   <td class="text-center">{{totalBadProducts() | number : '1.2-2'}}</td>
-                  <td class="text-center">{{totalBadProductsGrouped2() | number : '1.2-2'}}</td>
-                  <td class="text-center">{{totalDiffBadProductsGrouped3() | number : '1.2-2'}}</td>
                   <td class="text-center">{{qtyTotalRolls()}}</td>
                   <td colspan="3"></td>
                 </tr>
@@ -150,7 +159,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i>  Registro de Peletizado</h4>
   </div> 
 
-  <!--Formulario-->
+  <!--* Formulario 2 - Ingreso de rollos a peletizado -->
   <form [formGroup]="form">
     <div class="mb-3" id="formulario">
       <div class="row g-4">
@@ -198,7 +207,7 @@
         <!-- Materiales -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="material" id="material" [readonly]="true" [options]="materials" optionLabel="material_Nombre" optionValue="material_Id" [autoDisplayFirst]="false"></p-dropdown>
+            <p-dropdown formControlName="material" id="material" (onChange)="getPeletizadosForMaterial()" [options]="materials" optionLabel="material_Nombre" optionValue="material_Id" [autoDisplayFirst]="false"></p-dropdown>
             <label for="material">Material*</label>
           </span>
         </div>
@@ -214,7 +223,7 @@
           </span>
         </div>
 
-        <!-- Cantidad -->
+        <!-- Peso bascula -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
             <p-inputNumber formControlName="quantity" id="quantity" type="number" [useGrouping]="true" (keyup.enter)="validateForm()" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
@@ -222,7 +231,7 @@
           </span>
         </div>
 
-        <!-- Peso -->
+        <!-- Peso Doc. -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
             <p-inputNumber formControlName="quantityDoc" id="quantity" type="number" [useGrouping]="true" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
@@ -230,7 +239,7 @@
           </span>
         </div>
 
-        <!-- Cantidad -->
+        <!-- Diferencia -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
             <p-inputNumber formControlName="diff" id="diff" type="number" [useGrouping]="true" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
@@ -336,7 +345,7 @@
 
 </p-card>
 
-<!-- Modal fallas tecnicas -->
+<!--* Modal fallas tecnicas -->
 <p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
   <ng-template pTemplate="content">
     <app-Crear_Fallas></app-Crear_Fallas>
@@ -372,11 +381,10 @@
 </p-dialog>
 
 <!--* Modal para cargar bultos peletizado desde las DV -->
-<p-dialog [(visible)]="modalPeletizado" [style]="{width: '90vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Productos no conformes" [modal]="true">
+<!--<p-dialog [(visible)]="modalPeletizado" [style]="{width: '90vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Productos no conformes" [modal]="true">
   <div class="mb-4">
-    <p class="mb-4"><i class="pi pi-exclamation-triangle"></i> <b> Nota: </b> El campo peso real es EDITABLE, debe colocar el equivalente al peso de los rollos/bultos de la devolución</p>     
-    
-    <!--Botones de registro-->
+    <p class="mb-4"><i class="pi pi-exclamation-triangle"></i> <b> Nota: </b> El campo peso real es EDITABLE, debe colocar el equivalente al peso de los rollos/bultos de la devolución</p>
+    Botones de registro
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" id="agregar" type="button" [disabled]="fieldFocus" label="Registrar Peletizado" icon="pi pi-send" (click)="savePeletizadosByDev()"></button>
@@ -384,7 +392,7 @@
       </div>
     </div>
   </div>
-</p-dialog>
+</p-dialog>-->
 
 
 

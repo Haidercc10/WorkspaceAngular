@@ -32,8 +32,8 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.lecturaStorage();
     if ([1,60,12].includes(this.ValidarRol)) this.ordenTrabajo = true;
-    if (this.ValidarRol == 3) this.materiaPrima = true;
-    if (this.ValidarRol == 61) this.pedidos = true;
+    if ([3,12].includes(this.ValidarRol)) this.materiaPrima = true;
+    if ([61,12].includes(this.ValidarRol)) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
     if ([1,12].includes(this.ValidarRol)) this.inventarioAreas = true;
     if ([6].includes(this.ValidarRol)) this.facturacion = true;
@@ -77,9 +77,10 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 8 ? this.costos = true : this.costos = false;
     index == 9 ? this.compras = true : this.compras = false;
     index == 10 ? this.inventarioAreas = true : this.inventarioAreas = false;
-    index == 1 && this.ValidarRol == 12 ? this.inventarioAreas = true : null;
+    index == 1 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
     index == 0 && this.ValidarRol == 6 ? this.facturacion = true : null;
     index == 1 && this.ValidarRol == 6 ? this.pedidos = true : null;
-    console.log(index, this.ValidarRol, this.inventarioAreas);
+    index == 2 && this.ValidarRol == 12 ? this.pedidos = true : null;
+    index == 3 && this.ValidarRol == 12 ? this.inventarioAreas = true : null;
   }
 }
