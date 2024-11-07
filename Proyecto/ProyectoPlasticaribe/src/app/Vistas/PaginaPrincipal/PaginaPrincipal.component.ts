@@ -77,10 +77,11 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 8 ? this.costos = true : this.costos = false;
     index == 9 ? this.compras = true : this.compras = false;
     index == 10 ? this.inventarioAreas = true : this.inventarioAreas = false;
-    index == 1 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
+    index == 1 && this.ValidarRol == 12 ? this.facturacion = true : null;
     index == 0 && this.ValidarRol == 6 ? this.facturacion = true : null;
     index == 1 && this.ValidarRol == 6 ? this.pedidos = true : null;
-    index == 2 && this.ValidarRol == 12 ? this.pedidos = true : null;
-    index == 3 && this.ValidarRol == 12 ? this.inventarioAreas = true : null;
+    index == 2 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
+    index == 3 && this.ValidarRol == 12 ? this.pedidos = true : null;
+    index == 4 && this.ValidarRol == 12 ? this.inventarioAreas = true : null;
   }
 }

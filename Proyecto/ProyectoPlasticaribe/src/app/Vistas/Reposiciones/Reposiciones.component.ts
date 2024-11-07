@@ -95,6 +95,7 @@ export class ReposicionesComponent implements OnInit {
       //reference : [null, Validators.required],
       idClient : [null, Validators.required], 
       client : [null, Validators.required],
+      //clientStock : [false, ],
       observation : [null,], 
     })
   }

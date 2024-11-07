@@ -466,6 +466,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a exportar a excel la información de las materias primas. Recibirá un número para diferenciar con que informacion se llenará el archivo
   exportarExcel(num: number) {
+    if([4,89].includes(this.ValidarRol)) num = 5; 
+    
     this.load = false;
     let datos: any[] = [];
     let infoDocumento: any[] = [];

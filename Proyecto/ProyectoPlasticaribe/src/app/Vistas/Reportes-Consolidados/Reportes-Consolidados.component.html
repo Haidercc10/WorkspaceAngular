@@ -4,7 +4,7 @@
 
       <!-- FACTURACIÓN -->
       <p-tabPanel
-        *ngIf="[1,6,96,69].includes(ValidarRol)"
+        *ngIf="[1,6,96,69,12].includes(ValidarRol)"
         header="Facturación"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Facturacion-Detallada *ngIf="facturacion"></app-Reporte-Facturacion-Detallada>
@@ -12,7 +12,7 @@
 
       <!-- PRODUCCION -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,12].includes(ValidarRol)"
         header="Consolidado Producción"
         leftIcon="pi pi-sliders-h">
         <app-Dashboard_Areas *ngIf="consolidadoProduccionAreas"></app-Dashboard_Areas>

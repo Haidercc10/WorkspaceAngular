@@ -344,7 +344,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
           'Item' : x.Item, 
           'Referencia' : x.Referencia,
           'No_Conformidades' : x.No_Conformidades,
-          'Cantidad' : this.dialog ? this.calculateTotalOT(x.OT) : x.Cantidad,
+          'Cantidad' : this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(x.OT)).toFixed()) : x.Cantidad,
           'Presentacion' : 'Kg' 
         }
         info.push(object);
@@ -400,7 +400,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
    //Cantidad total pesada en desperdicios en el PDF.
   totalInfo(){
     return {
-      text: `\nCantidad total: ${this.dialog ? this.calculateTotalOT(this.otSeleccionada) : this.calculateTotal()} KLS`,
+      text: `\nCantidad total: ${this.dialog ? this.formatonumeros(this.calculateTotalOT(this.otSeleccionada).toFixed()) : this.formatonumeros(this.calculateTotal().toFixed())} KLS`,
       alignment: 'right',
       style: 'header', 
       fontSize : 10, 

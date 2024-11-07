@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -23,7 +23,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
   styleUrls: ['./Salidas_Peletizado.component.css']
 })
 
-export class Salidas_PeletizadoComponent implements OnInit {
+export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
 
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   load : boolean = false;
@@ -43,6 +43,8 @@ export class Salidas_PeletizadoComponent implements OnInit {
   @ViewChild('dt2') dt2 : Table | undefined;
   @ViewChild('dt3') dt3 : Table | undefined;
   fieldFocus : boolean = false;
+  port: SerialPort;
+  reader: any;
 
   constructor(private AppComponent : AppComponent, 
     private frmBuilder : FormBuilder,
@@ -62,8 +64,66 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.lecturaStorage();
     this.getRecoveries();
     this.getPresentations();
-    console.clear()
+    setTimeout(() => this.buscarPuertos(), 1000);
+    //console.clear()
   }
+
+  async ngOnDestroy() {
+    this.reader.releaseLock();
+    this.reader.cancel();
+    await this.port.close();
+  }
+
+  //*Funciones para cargar el puerto serial y mostrar el peso de la bascula.
+  chargeSerialPorts() {
+    navigator.serial.getPorts().then((ports) => {
+      ports.forEach((port) => {
+        port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
+      });
+    });
+  }
+
+  async buscarPuertos() {
+    this.port = await navigator.serial.requestPort();
+    try {
+      await this.port.open({ baudRate: 9600 });
+      this.chargeDataFromSerialPort(this.port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
+      else this.msj.mensajeError(ex);
+    }
+  }
+
+  async chargeDataFromSerialPort(port: SerialPort) {
+    let keepReading: boolean = true;
+    while (port.readable && keepReading) {
+      this.reader = port.readable.getReader();
+      try {
+        while (true) {
+          const { value, done } = await this.reader.read();
+          if (done) {
+            this.reader.releaseLock();
+            break;
+          }
+          if (value) {
+            let valor = this.ab2str(value);
+            valor = valor.replace(/[^\d.-]/g, '');
+            if (!this.load) {
+              this.form.patchValue({
+                'qty': valor,
+              });
+            }
+          }
+        }
+      } catch (error) {
+        this.msj.mensajeError(error);
+      } finally {
+        this.reader.releaseLock();
+      }
+    }
+  }
+
+  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
@@ -75,7 +135,7 @@ export class Salidas_PeletizadoComponent implements OnInit {
     this.form = this.frmBuilder.group({
       recoveryId : [null, Validators.required],
       recovery : [null, Validators.required],
-      qty : [25, Validators.required],
+      qty : [null, Validators.required],
       presentation : [null, Validators.required],
       observation : [null],
     });
