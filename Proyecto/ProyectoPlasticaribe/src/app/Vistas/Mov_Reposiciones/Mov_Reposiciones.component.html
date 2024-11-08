@@ -124,6 +124,7 @@
             <p-sortIcon field="date1"></p-sortIcon> Fecha
             <p-columnFilter type="text" field="date1" display="menu"></p-columnFilter>
           </th>
+          <th class="text-center"> Observación</th>
           <th class="text-center"> Tipo Doc.</th>
           <th class="text-center" pSortableColumn="status">
             <p-sortIcon field="status"></p-sortIcon> Estado
@@ -141,7 +142,11 @@
           <td class="text-center">{{data.idClient}}</td>
           <td class="text-center"><b>{{data.client}}</b></td>
           <td class="text-center">{{data.date1 | date : 'dd/MM/yyyy'}} {{data.hour1}}</td>
+          <td class="text-center">
+            <button id="editar" pRipple pButton (click)="viewObservation($event, data)" [disabled]="data.observation1 == null" icon="pi pi-fw pi-eye" label="Observación" class="p-button-success p-button-outlined" pTooltip="Haz clic para ver la observación de la reposición"></button>
+          </td>
           <td class="text-center"><b>{{'REPOSICIÓN'}}</b></td>
+          
           <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
                                                                   'bg-success1': [5].includes(data.statusId),
                                                                   'bg-warning1': [3].includes(data.statusId), 
@@ -200,5 +205,11 @@
       </div>
     </ng-template>
   </p-toast>
+
+  <p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" [showCloseIcon]="true">
+    <ng-template pTemplate>
+      <div><i class="pi pi-pencil"></i> {{observation}}</div>
+    </ng-template>
+  </p-overlayPanel>
   
   

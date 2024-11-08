@@ -11,6 +11,7 @@ import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { MessageService } from 'primeng/api';
 import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones.service';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 @Component({
   selector: 'app-Mov_Reposiciones',
@@ -34,6 +35,8 @@ export class Mov_ReposicionesComponent implements OnInit {
   clients : any = [];
   statuses : any = [];
   selectedRepo : any = {};
+  @ViewChild('op') op: OverlayPanel | undefined;
+  observation : any = null;
 
   constructor(
     private appComponent: AppComponent,
@@ -100,6 +103,7 @@ export class Mov_ReposicionesComponent implements OnInit {
   clearFields(){
     this.form.reset();
     this.searchedData = [];
+    this.observation = null;
     this.loadRankDates();
   }
 
@@ -156,8 +160,8 @@ export class Mov_ReposicionesComponent implements OnInit {
     setTimeout(() => { 
       this.rollsConsolidates = this.cmpRepostions.rollsConsolidate; 
       console.log(this.rollsConsolidates);
-    }, 1000);
-    this.msg.add({severity:'warn', key:'reposition', summary:'Elección', detail: `¿Está seguro que desea anular la reposición N° ${data.movement}?`, sticky: true});
+      this.msg.add({severity:'warn', key:'reposition', summary:'Elección', detail: `¿Está seguro que desea anular la reposición N° ${data.movement}?`, sticky: true});
+    }, 2500);
   } 
   
   //* Función para quitar msj de confirmación.
@@ -172,7 +176,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     let data : any = {};
     data = this.selectedRepo;
     this.load = true;
-    this.svProduction.putAvailableFromReposition(data.movement).subscribe(() => {
+    this.svProduction.putAvailableFromReposition(data.movement, this.storage_Id).subscribe(() => {
       this.msjs(`Confirmación`, `Reposición N° ${data.movement} anulada exitosamente!`);
       this.searchData();
     }, error => {
@@ -186,6 +190,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     this.cmpRepostions.createPDF(id, `descargada`);
   }
 
+  //*
   sendAdjustment(data : any){
     this.cmpRepostions.sendPositiveAdjustment(data);
   }
@@ -198,17 +203,18 @@ export class Mov_ReposicionesComponent implements OnInit {
 
     this.rollsConsolidates.forEach(data => {
       let unity : string = data.unit == 'Kg' ? 'KLS' : data.unit == 'Und' ? 'UND' : 'PAQ';
-      let qty : number = data.qty;
+      //let qty : number = data.qty;
       let item : string = data.item; 
       let price : string = data.price;
-      let detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${((qty))} ${unity}`;
-
-      this.svProduction.sendProductionToZeus(detail, item, unity, 0, ((qty)).toString(), price).subscribe(dataAdjusment => {
+      let detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${(this.cmpRepostions.qtyTotalItem(data))} ${unity}`;
+      
+      this.svProduction.sendProductionToZeus(detail, item, unity, 0, (this.cmpRepostions.qtyTotalItem(data)).toString(), price).subscribe(dataAdjusment => {
         count++
         if(this.rollsConsolidates.length == count) this.discardReposition();
       }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste positivo a Zeus | ${error.status} ${error.statusText}`); });
     });
   }
+
 
   finishRepo(data : any){
     this.onReject('finishReposition');
@@ -235,4 +241,15 @@ export class Mov_ReposicionesComponent implements OnInit {
     }, 1000);
     this.msg.add({severity:'warn', key:'finishReposition', summary:'Elección', detail: `¿Está seguro que desea finalizar la reposición N° ${data.movement}?`, sticky: true});
   }
+
+  viewObservation($event, data : any){
+    this.observation = data.observation1;
+    if (this.observation != null) {
+      setTimeout(() => {
+        this.op!.toggle($event); 
+        $event.stopPropagation();
+      }, 500);
+    }
+  }   
 }
+
