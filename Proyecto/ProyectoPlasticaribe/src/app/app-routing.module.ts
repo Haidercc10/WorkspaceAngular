@@ -24,7 +24,14 @@ export const routes: Routes = [
   //{path: 'rebobinado-corte', loadChildren: () => import('./Modules/rebobinados-corte/rebobinados-corte.module').then(m => m.RebobinadosCorteModule)}, 
   {path: 'maquilas-internas', loadChildren: () => import('./Modules/maquilas-internas/maquilas-internas.module').then(m => m.MaquilasInternasModule) },
   {path: 'mov-maquilas-internas', loadChildren: () => import('./Modules/mov-maquilas-internas/mov-maquilas-internas-routing.module').then(m => m.MovMaquilasInternasRoutingModule) },
-  { path: 'reporte_produccion', loadChildren: () => import('./Modules/reporte-produccion/reporte-produccion.module').then(m => m.ReporteProduccionModule) },
+  {path: 'reporte_produccion', loadChildren: () => import('./Modules/reporte-produccion/reporte-produccion.module').then(m => m.ReporteProduccionModule) },
+
+  /*************************************************************** PELETIZADO *************************************************************************************************/
+  { path: 'ingreso-peletizado', loadChildren: () => import('./Modules/ingreso-peletizado/ingreso-peletizado.module').then(m => m.IngresoPeletizadoModule) },
+  { path: 'mov-ingreso-peletizado', loadChildren: () => import('./Modules/mov-ingreso-peletizado/mov-ingreso-peletizado.module').then(m => m.MovIngresoPeletizadoModule) },
+  { path: 'inventario-peletizado', loadChildren: () => import('./Modules/inventario-peletizado/inventario-peletizado.module').then(m => m.InventarioPeletizadoModule) },
+  { path: 'salidas-peletizado', loadChildren: () => import('./Modules/salidas-peletizado/salidas-peletizado.module').then(m => m.SalidasPeletizadoModule) },
+  { path: 'mp-recuperada', loadChildren: () => import('./Modules/materia-prima-recuperada/materia-prima-recuperada.module').then(m => m.MateriaPrimaRecuperadaModule) },
 ]
 
 @NgModule({

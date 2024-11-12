@@ -5,4 +5,5 @@ export interface modelDtProductoDevuelto {
   UndMed_Id : string;
   Rollo_Id : number;
   Usua_Id : number;
+  Falla_Id? : number;
 }

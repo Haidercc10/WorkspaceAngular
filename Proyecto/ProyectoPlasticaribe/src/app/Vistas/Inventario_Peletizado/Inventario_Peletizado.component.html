@@ -1,0 +1,225 @@
+
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Inventario de Peletizado</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <p-tabView [scrollable]="true">
+
+    <!--* Tabla Bodega Pele-->
+    <p-tabPanel
+      header="Inventario bodega de peletizado"
+      leftIcon="pi pi-slack" >
+
+      <!--* Exportar-->
+      <p-toolbar styleClass="mb-2">
+        <ng-template pTemplate="left">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-refresh" (click)="inventoryPeletizados()" pTooltip="Refrescar Inventario" positionTooltip="top"></button>
+        </ng-template>
+        <ng-template pTemplate="center"></ng-template>
+        <ng-template pTemplate="right">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="createExcel(peletizados, 'bodega de peletizado')"></button>
+        </ng-template>
+      </p-toolbar>
+
+      <!--* Tabla peletizado-->
+      <p-table 
+        #tablePeletizados
+        [value]="peletizados" 
+        responsiveLayout="scroll"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        dataKey="id_MatPrima"
+        [rowHover]="true"
+        *ngIf="!load">
+        <ng-template pTemplate="header">
+            <tr>
+              <th></th>
+              <th></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'id_MatPrima', tablePeletizados)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrima', tablePeletizados)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'stock', tablePeletizados)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tablePeletizados)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tablePeletizados)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tablePeletizados)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'category', tablePeletizados)"></th>
+            </tr>
+            <tr>
+                <th></th>
+                <th class="text-center" >#</th>
+                <th class="text-center" pSortableColumn="id" pReorderableColumn><p-sortIcon field="id_MatPrima"></p-sortIcon> Id</th>
+                <th class="text-center" pSortableColumn="matPrima" pReorderableColumn><p-sortIcon field="matPrima"></p-sortIcon> Material</th>
+                <th class="text-center" pSortableColumn="stock" pReorderableColumn><p-sortIcon field="stock"></p-sortIcon> Stock</th>
+                <th class="text-center" pSortableColumn="presentation" pReorderableColumn><p-sortIcon field="presentation"></p-sortIcon> Unidad</th>
+                <th class="text-center" pSortableColumn="price" pReorderableColumn><p-sortIcon field="price"></p-sortIcon> Precio</th>
+                <th class="text-center" pSortableColumn="subtotal" pReorderableColumn><p-sortIcon field="subtotal"></p-sortIcon> Subtotal</th>
+                <th class="text-center" pSortableColumn="category" pReorderableColumn><p-sortIcon field="category"></p-sortIcon> Categoria</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-expanded="expanded" let-data let-rowIndex="rowIndex">
+            <tr>
+                <td class="text-center">
+                  <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadDetailsPeletizados(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                </td>
+                <td class="text-center">{{ rowIndex + 1 }}</td>
+                <td class="text-center">{{ data.id_MatPrima }}</td>
+                <td><b>{{ data.matPrima }}</b></td>
+                <td class="text-center" [ngClass]="{'textGreen': data.stock > 0, 'textRed': data.stock == 0, }"><b>{{ data.stock | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{ data.presentation }}</td>
+                <td class="text-center">$ {{ data.price | number : '1.2-2'}}</td>
+                <td class="text-center" [ngClass]="{'textBlue': data.subtotal > 0, 'textRed': data.subtotal == 0, }"><b>$ {{ data.subtotal | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{ data.category }}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-data>
+          <tr>
+              <td colspan="9">
+                  <div class="p-3">
+                    <p-table 
+                      #tableDetails
+                      [value]="data.details" 
+                      [rowHover]="true"
+                      styleClass="p-datatable-gridlines p-datatable-sm">
+                      <ng-template pTemplate="header">
+                          <tr>
+                              <th>#</th>
+                              <th class="text-center" pSortableColumn="entries.ingPel_Id">Codigo <p-sortIcon field="entries.ingPel_Id" /></th>
+                              <th class="text-center" pSortableColumn="recovery">Tipo Recuperado <p-sortIcon field="recovery" /></th>
+                              <th class="text-center" pSortableColumn="entries.ingPel_Cantidad">Peso (Kg)<p-sortIcon field="entries.ingPel_Cantidad" /></th>
+                              <th class="text-center" pSortableColumn="entries.ot">OT <p-sortIcon field="entries.ot" /></th>
+                              <th class="text-center" pSortableColumn="product.item">Item <p-sortIcon field="product.item" /></th>
+                              <th class="text-center" pSortableColumn="product.reference">Referencia <p-sortIcon field="product.reference" /></th>
+                              <th class="text-center" pSortableColumn="material.material">Material <p-sortIcon field="material.material" /></th>
+                              <th class="text-center" pSortableColumn="process.status">Proceso <p-sortIcon field="process.status" /></th>
+                              <th class="text-center" pSortableColumn="entries.ingPel_FechaIngreso">Fecha <p-sortIcon field="entries.ingPel_FechaIngreso" /></th>
+                          </tr>
+                      </ng-template>
+                      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+                          <tr>
+                              <td class="text-center">{{ rowIndex + 1 }}</td>
+                              <td class="text-center">{{ data.entries.ingPel_Id }}</td>
+                              <td class="text-center">{{ data.type_Recovery.recovery }}</td>
+                              <td class="text-center"><b>{{ data.entries.ingPel_Cantidad | number : '1.2-2'}}</b></td>
+                              <td class="text-center">{{ data.entries.ot }}</td>
+                              <td class="text-center">{{ data.product.item }}</td>
+                              <td>{{ data.product.reference }}</td>
+                              <td class="text-center">{{ data.material.material }}</td>
+                              <td class="text-center">{{ data.process.status }}</td>
+                              <td class="text-center">{{ data.entries.ingPel_FechaIngreso | date : 'dd/MM/yyyy' }}</td>
+                          </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                          <tr>
+                              <td colspan="10">No existen registros asociados</td>
+                          </tr>
+                      </ng-template>
+                    </p-table>  
+                  </div>
+              </td>
+          </tr>
+      </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td class="text-center" colspan="4"></td>
+            <td class="text-center textGreen">{{ totalQtyStock(tablePeletizados) | number : '1.2-2'}}</td>
+            <td class="text-center">Kg</td>
+            <td class="text-center"></td>
+            <td class="text-center textBlue">$ {{ totalPrice(tablePeletizados) | number : '1.2-2'}}</td>
+            <td></td>
+          </tr>  
+        </ng-template >
+      </p-table>
+    </p-tabPanel>
+  
+    <!--* Tabla Recuperados-->
+    <p-tabPanel
+      header="Inventario de materiales recuperados"
+      leftIcon="pi pi-database" >
+
+      <!--* Exportar-->
+      <p-toolbar styleClass="mb-2">
+        <ng-template pTemplate="left">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-refresh" (click)="inventoryMaterialRecovery()" pTooltip="Refrescar Inventario" positionTooltip="top"></button>
+        </ng-template>
+        <ng-template pTemplate="center"></ng-template>
+        <ng-template pTemplate="right">
+          <button pButton pRipple class="p-button-outlined p-button-success" icon="pi pi-file-excel" label="Exportar Inventario" id="" (click)="createExcel(recoveries, 'materiales recuperados')"></button>
+        </ng-template>
+      </p-toolbar>
+
+      <!--* Tabla-->
+      <p-table 
+        #tableRecoveries
+        [value]="recoveries" 
+        responsiveLayout="scroll"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [rowHover]="true"
+        *ngIf="!load">
+        <ng-template pTemplate="header">
+            <tr>
+              <th></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'id', tableRecoveries)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'matPrima', tableRecoveries)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'stock', tableRecoveries)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation', tableRecoveries)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRecoveries)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', tableRecoveries)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'category', tableRecoveries)"></th>
+            </tr>
+            <tr>
+                <th class="text-center" >#</th>
+                <th class="text-center" pSortableColumn="id" pReorderableColumn><p-sortIcon field="id"></p-sortIcon> Id</th>
+                <th class="text-center" pSortableColumn="matPrima" pReorderableColumn><p-sortIcon field="matPrima"></p-sortIcon> Material</th>
+                <th class="text-center" pSortableColumn="stock" pReorderableColumn><p-sortIcon field="stock"></p-sortIcon> Stock</th>
+                <th class="text-center" pSortableColumn="presentation" pReorderableColumn><p-sortIcon field="presentation"></p-sortIcon> Unidad</th>
+                <th class="text-center" pSortableColumn="price" pReorderableColumn><p-sortIcon field="price"></p-sortIcon> Precio</th>
+                <th class="text-center" pSortableColumn="subtotal" pReorderableColumn><p-sortIcon field="subtotal"></p-sortIcon> Subtotal</th>
+                <th class="text-center" pSortableColumn="category" pReorderableColumn><p-sortIcon field="category"></p-sortIcon> Categoria</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <tr>
+                <td class="text-center">{{ rowIndex + 1 }}</td>
+                <td class="text-center">{{ data.id }}</td>
+                <td><b>{{ data.matPrima }}</b></td>
+                <td class="text-center" [ngClass]="{'textGreen': data.stock > 0, 'textRed': data.stock == 0, }"><b>{{ data.stock | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{ data.presentation }}</td>
+                <td class="text-center">$ {{ data.price | number : '1.2-2'}}</td>
+                <td class="text-center" [ngClass]="{'textBlue': data.subtotal > 0, 'textRed': data.subtotal == 0, }"><b>$ {{ data.subtotal | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{ data.category }}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td class="text-center" colspan="3"></td>
+            <td class="text-center textGreen">{{ totalQtyStock(tableRecoveries) | number : '1.2-2'}}</td>
+            <td class="text-center">Kg</td>
+            <td class="text-center"></td>
+            <td class="text-center textBlue">$ {{ totalPrice(tableRecoveries) | number : '1.2-2'}}</td>
+            <td></td>
+          </tr>  
+        </ng-template >
+      </p-table>
+    </p-tabPanel>
+  </p-tabView>
+</p-card>

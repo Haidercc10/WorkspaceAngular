@@ -2,8 +2,13 @@ export interface modelDevolucionProductos {
   FacturaVta_Id : string
   Cli_Id : number;
   DevProdFact_Fecha : any;
+  DevProdFact_Hora? : string;
   DevProdFact_Observacion : string;
   TipoDevProdFact_Id : number;
   Usua_Id : number;
-  DevProd_Hora : string;
+  Id_OrdenFact : number;
+  Estado_Id : number;
+  DevProdFact_Reposicion : boolean;
+  UsuaModifica_Id : number;
+  DevProdFact_NotaCredito : boolean;
 }

@@ -49,6 +49,8 @@ export class MateriaPrimaService {
 
   GetPolietilenos = (nombre : any) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getPolietilenos/${nombre}`);
 
+  getPeletizados = () : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getPeletizados`);
+
   srvAgregar = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
 
   srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);

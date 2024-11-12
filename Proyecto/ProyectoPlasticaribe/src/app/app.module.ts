@@ -100,6 +100,15 @@ import { Reempaque_ProduccionComponent } from './Vistas/Reempaque_Produccion/Ree
 import { Rebobinados_CorteComponent } from './Vistas/Rebobinados_Corte/Rebobinados_Corte.component';
 import { Maquilas_InternasComponent } from './Vistas/Maquilas_Internas/Maquilas_Internas.component';
 import { MovMaquilas_InternasComponent } from './Vistas/MovMaquilas_Internas/MovMaquilas_Internas.component';
+import { Crear_FallasComponent } from './Vistas/Crear_Fallas/Crear_Fallas.component';
+import { Devolucion_OrdenFacturacionComponent } from './Vistas/Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
+import { CrearMateriaprimaComponent } from './Vistas/crear-materiaprima/crear-materiaprima.component';
+import { EliminarRollos_ProduccionComponent } from './Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
+import { Ingreso_PeletizadoComponent } from './Vistas/Ingreso_Peletizado/Ingreso_Peletizado.component';
+import { Inventario_PeletizadoComponent } from './Vistas/Inventario_Peletizado/Inventario_Peletizado.component';
+import { Mov_IngresoPeletizadoComponent } from './Vistas/Mov_IngresoPeletizado/Mov_IngresoPeletizado.component';
+import { Salidas_PeletizadoComponent } from './Vistas/Salidas_Peletizado/Salidas_Peletizado.component';
+import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 
 @NgModule({
   declarations: [
@@ -123,6 +132,15 @@ import { MovMaquilas_InternasComponent } from './Vistas/MovMaquilas_Internas/Mov
     Rebobinados_CorteComponent,
     Maquilas_InternasComponent,
     MovMaquilas_InternasComponent,
+    Crear_FallasComponent, 
+    Devolucion_OrdenFacturacionComponent, 
+    CrearMateriaprimaComponent, 
+    EliminarRollos_ProduccionComponent,
+    Ingreso_PeletizadoComponent, 
+    Inventario_PeletizadoComponent,
+    Mov_IngresoPeletizadoComponent,
+    Salidas_PeletizadoComponent,
+    MateriaPrimaRecuperadaComponent
   ],
 
   imports: [

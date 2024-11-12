@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { modelRollosDesechos } from 'src/app/Modelo/modelRollosDesechos';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -40,6 +41,8 @@ export class SrvRollosEliminadosService {
   getRollosxFechasxItemxProceso = (fecha1: any, fecha2 : any, item: any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxItemxProceso/${fecha1}/${fecha2}/${item}/${proceso}`);
 
   getRollosxFechasxProceso = (fecha1: any, fecha2 : any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxProceso/${fecha1}/${fecha2}/${proceso}`);
+
+  Post = (data : modelRollosDesechos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Rollo_Desecho', data);
 }
 
 

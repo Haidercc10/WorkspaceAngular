@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
+import { rollsToDelete } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -69,6 +70,10 @@ export class BagproService {
   GetDatosRollosPesados = (orden : string, proceso : string) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getDatosRollosPesados/${orden}/${proceso}`);
 
   GetInformactionProductionForTag = (production: number): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getInformactionProductionForTag/${production}`);
+
+  getRollProduction = (roll: number, url: string): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getRollProduction/${roll}${url}`);
+
+  putObservationDeletedRolls = (data : Array<rollsToDelete>) => this.http.post(`${this.rutaBagPro}/ProcExtrusion/putObservationDeletedRolls`, data);
 
   /********************************************************** CLIENTESOT ****************************************************************/
 
