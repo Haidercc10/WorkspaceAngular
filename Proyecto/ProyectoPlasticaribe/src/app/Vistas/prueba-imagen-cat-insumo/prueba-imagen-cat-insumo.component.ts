@@ -20,6 +20,7 @@ import { create } from 'domain';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -59,6 +60,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     private frmBuilder: FormBuilder,
     private zeusService : InventarioZeusService,
     private bagProService : BagproService,
+    private svExistProducts : ExistenciasProductosService
    ) {
       this.modoSeleccionado = appComponent.temaSeleccionado;
       
@@ -67,6 +69,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   ngOnInit() {
     
     this.dates();
+    this.items();
   }
 
   dates(){
@@ -399,6 +402,17 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       newDates.push(date);
     });
     console.log(newDates);
+  }
+
+  items(){
+    this.zeusService.getInventoryZeus().subscribe(data => {
+      this.svExistProducts.getInventoryProducts(data).subscribe(data2 => {
+        console.log(data2);
+      }, error => {
+        console.log(error, 2);
+      })
+      console.log(data);
+    }, error => console.log(error))
   }
   
 }

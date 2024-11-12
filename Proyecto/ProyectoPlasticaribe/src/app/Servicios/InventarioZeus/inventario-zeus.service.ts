@@ -50,6 +50,8 @@ export class InventarioZeusService {
 
   GetItemsByNumber = (number: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Articulos/getItemsByNumber/${number}`);
 
+  
+
   /************************************************************ EXISTENCIAS **************************************************************/
   srvObtenerExistenciasZeus(): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias');
@@ -74,6 +76,8 @@ export class InventarioZeusService {
   GetPrecioUltimoPrecioFacturado(producto: string, presentacion: string): Observable<any> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/getPrecioUltimoPrecioFacturado/${producto}/${presentacion}`);
   }
+
+  getInventoryZeus = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/existencias/getInventoryZeus`);
 
   /************************************************************ DOCUMENTOS ITEMS **************************************************************/
 

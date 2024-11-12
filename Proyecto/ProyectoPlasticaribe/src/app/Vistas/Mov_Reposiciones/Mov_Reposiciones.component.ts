@@ -236,12 +236,13 @@ export class Mov_ReposicionesComponent implements OnInit {
     this.selectedRepo = data;
     this.cmpRepostions.searchRepositions(data.movement);
     setTimeout(() => { 
-      this.rollsConsolidates = this.cmpRepostions.rollsConsolidate; 
+      this.rollsConsolidates = this.cmpRepostions.rollsConsolidate;   
       console.log(this.rollsConsolidates);
     }, 1000);
     this.msg.add({severity:'warn', key:'finishReposition', summary:'Elección', detail: `¿Está seguro que desea finalizar la reposición N° ${data.movement}?`, sticky: true});
   }
 
+  //*Función para mostrar la observación de la orden de reposición. 
   viewObservation($event, data : any){
     this.observation = data.observation1;
     if (this.observation != null) {
