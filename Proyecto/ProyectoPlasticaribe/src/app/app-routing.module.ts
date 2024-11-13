@@ -32,6 +32,7 @@ export const routes: Routes = [
   { path: 'inventario-peletizado', loadChildren: () => import('./Modules/inventario-peletizado/inventario-peletizado.module').then(m => m.InventarioPeletizadoModule) },
   { path: 'salidas-peletizado', loadChildren: () => import('./Modules/salidas-peletizado/salidas-peletizado.module').then(m => m.SalidasPeletizadoModule) },
   { path: 'mp-recuperada', loadChildren: () => import('./Modules/materia-prima-recuperada/materia-prima-recuperada.module').then(m => m.MateriaPrimaRecuperadaModule) },
+  { path: 'reporte-recuperado-mp', loadChildren: () => import('./Modules/movimientos-recuperado/movimientos-recuperado.module').then(m => m.MovimientosRecuperadoModule) },
 ]
 
 @NgModule({

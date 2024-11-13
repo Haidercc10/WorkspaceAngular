@@ -116,8 +116,8 @@
         <ng-template pTemplate="body" let-rowData let-registros let-columns="columns">
           <tr>
             <td *ngFor="let col of columns">{{rowData[col.field]}}</td>
-            <td (click)="validarModal(rowData, 'DIA')">{{registros.cantDia | number}}</td>
-            <td (click)="validarModal(rowData, 'NOCHE')">{{registros.cantNoche | number}}</td>
+            <td (click)="validarModal(rowData, 'DIA')" [ngClass]="{cursor: registros.cantDia > 0 }"><b>{{registros.cantDia | number : '1.2-2'}}</b></td>
+            <td (click)="validarModal(rowData, 'NOCHE')" [ngClass]="{cursor: registros.cantNoche > 0 }"><b>{{registros.cantNoche | number : '1.2-2'}}</b></td>
           </tr>
         </ng-template>
       </p-table>

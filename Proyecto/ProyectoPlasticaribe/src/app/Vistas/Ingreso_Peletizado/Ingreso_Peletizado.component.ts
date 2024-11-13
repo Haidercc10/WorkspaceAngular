@@ -155,7 +155,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
             if (!this.load) {
               this.form.patchValue({
                 'quantity': valor,
-                'diff': valor - this.form.value.weight
+                'diff': valor - this.form.value.quantityDoc
               });
             }
           }
@@ -202,7 +202,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       product : ['NO APLICA', ], 
       mpId : [null, Validators.required],
       matprima : [null, Validators.required],
-      quantityDoc : [null], 
+      quantityDoc : [0], 
       diff : [null],
     });
     //this.disableForm();
@@ -217,10 +217,13 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
 
   //Habilitar tipo de recuperado y no conformidad
   enableTypeRecovery() {
+    console.log(this.form.value.process);
     this.getTypesRecovery(this.validateOptions(this.form.value.process));
     //this.form.get('typeRecovery')?.enable();
     this.fails = this.failsProcess;
     this.fails = this.fails.filter(x => this.changeFailsForProcess(this.form.value.process).includes(x.tipoFalla_Id));
+    console.log(this.fails);
+    
   } 
 
   //Habilitar formulario 
@@ -257,10 +260,14 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   getMaterials = () => this.svMaterials.srvObtenerLista().subscribe(data => { this.materials = data.filter(x => ![1].includes(x.material_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los materiales. | ${error}`); });
 
   //Función para obtener los tipos de recuperado
-  getTypesRecovery = (types : any[]) => this.svTypesRecovery.GetTodo().subscribe(data => { this.typesRecovery = data.filter(x => types.includes(x.tpRecu_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los tipos de recuperados. | ${error}`); });
+  getTypesRecovery(types : any[]) {
+    this.svTypesRecovery.GetTodo().subscribe(data => { 
+      this.typesRecovery = data.filter(x => types.includes(x.tpRecu_Id)) 
+    }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los tipos de recuperados. | ${error}`); });
+  } 
 
   //Función para obtener los tipos de fallas/no conformidades. 
-  getFails = () => this.svFails.srvObtenerLista().subscribe(data => { this.failsProcess = data.filter(x => [13,14,16,17,18,19,20,21,22,].includes(x.tipoFalla_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
+  getFails = () => this.svFails.srvObtenerLista().subscribe(data => { this.failsProcess = data.filter(x => [13,14,16,17,18,19,20,21,22].includes(x.tipoFalla_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
 
   //Función para obtener los procesos.
   getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => { this.process = data.filter(x => [3,4,15,2,1,14].includes(x.proceso_Codigo)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los procesos. | ${error}`); });
@@ -523,7 +530,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       case 'MATPRIMA' :
         return [16, 22];
       case 'DESP' :
-        return [13, 14, 21, 22];    
+        return [13, 15, 14, 21, 22];    
       default :
         return [1];   
     }
@@ -568,9 +575,10 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
 
   getDataDispatch(){
     this.load = true;
-    this.form.patchValue({ process : 'DESP', })
+    this.form.patchValue({ process : 'DESP', });
     this.enableTypeRecovery();
     let index : number = this.groupPeletizado.findIndex(x => x.item == this.selectedItem.item);
+
     setTimeout(() => {
       this.form.patchValue({
         'fail' : this.selectedItem.fail_Id, 
@@ -582,11 +590,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
         'mpId' : this.selectedItem.matPrima_Id, 
         'matprima' : this.selectedItem.matPrima, 
         'quantityDoc' : this.selectedItem.weight, 
-        'quantity' : 30,
-        'diff' : 30 - this.selectedItem.weight,
+        //'quantity' : 30,
+        //'diff' : this. - this.selectedItem.weight,
       });
       this.load = false;
-    }, 500);
+    }, 1000);
   }
 
   //
@@ -740,7 +748,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
       case 'MATPRIMA':
         return ['MEZCLA']; 
       case 'DESP':
-        return ['ROLLO', 'BULTO']; 
+        return ['ROLLO', 'BULTO', 'DESPEDICIO', 'PELETIZADO']; 
       case 'SELLA':
         return ['BULTO', 'DESPEDICIO'];    
       default: 

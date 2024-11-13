@@ -109,6 +109,8 @@ import { Inventario_PeletizadoComponent } from './Vistas/Inventario_Peletizado/I
 import { Mov_IngresoPeletizadoComponent } from './Vistas/Mov_IngresoPeletizado/Mov_IngresoPeletizado.component';
 import { Salidas_PeletizadoComponent } from './Vistas/Salidas_Peletizado/Salidas_Peletizado.component';
 import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
+import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
+import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
 
 @NgModule({
   declarations: [
@@ -140,7 +142,9 @@ import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada
     Inventario_PeletizadoComponent,
     Mov_IngresoPeletizadoComponent,
     Salidas_PeletizadoComponent,
-    MateriaPrimaRecuperadaComponent
+    MateriaPrimaRecuperadaComponent, 
+    Reporte_RecuperadoMPComponent,
+    Modal_RptRecuperadoMPComponent
   ],
 
   imports: [
