@@ -192,6 +192,8 @@ export class InventarioZeusService {
 
   KilosFacturadosMes = (year : any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/KilosFacturadosMes/${year}`);
 
+  getFacturacionPorItem = (item : any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getFacturacionPorItem/${item}`);
+
   //*********************************************************************** TRANSAC ******************************************************************************/
   GetRecibosCaja = (fecha1: any, fecha2: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 

@@ -48,22 +48,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   statuses : Array<any> = [{id : 19, name : 'DISPONIBLE'}, {id : 23, name : 'NO DISPONIBLE'}];
   status : any = null;
   qtyRollsDv : number = 0;
-  
+  inventory : any = [];
+  dataPL : Array<any> = [];
+  dataZeus : Array<any> = [];
+  modal : boolean = false;
+  item : any = {};
   //@ViewChild(MovimientosOrdenFacturacionComponent) movOF : MovimientosOrdenFacturacionComponent;
   
   @ViewChild('tableOrder') tableOrder : Table | undefined;
-  @ViewChild('tableDevolution') tableDevolution : Table | undefined;
-  @ViewChild('tableConsolidate') tableConsolidate : Table | undefined;
+  @ViewChild('tableZeus') tableZeus : Table | undefined;
+  @ViewChild('tablePL') tablePL : Table | undefined;
+  @ViewChild('dt') dt : Table | undefined;
+
 
   constructor(private formatoFacturas : Formato_Facturas_VentasComponent, 
     private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
     private zeusService : InventarioZeusService,
     private bagProService : BagproService,
-    private svExistProducts : ExistenciasProductosService
+    private svExistProducts : ExistenciasProductosService, 
+    private dtOrderFact : Dt_OrdenFacturacionService,
    ) {
-      this.modoSeleccionado = appComponent.temaSeleccionado;
-      
+      this.modoSeleccionado = appComponent.temaSeleccionado; 
   }
 
   ngOnInit() {
@@ -405,16 +411,51 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   items(){
+    this.load = true;
     this.zeusService.getInventoryZeus().subscribe(data => {
       this.svExistProducts.getInventoryProducts(data).subscribe(data2 => {
-        console.log(data2);
+        this.inventory = data2;
+        this.load = false;
       }, error => {
+        this.load = false;
         console.log(error, 2);
       })
-      console.log(data);
-    }, error => console.log(error))
+    }, error => {
+      this.load = false;
+      console.log(error, 1);
+    });
   }
   
+  applyFilter = ($event, campo: any, data: Table) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+  
+  getModal(info : any){
+    this.dataPL = [];
+    this.dataZeus = [];
+    this.item = {};
+    this.item = { 'item' : info.item, 'reference' : info.reference };
+    console.log(this.item);
+    this.load = true;
+    this.zeusService.getFacturacionPorItem(info.item).subscribe(data => { 
+      this.dataZeus = data;
+      this.dataZeus.sort((a,b) => a.date.localeCompare(b.date))
+      this.dtOrderFact.getDetailsForItem(info.item).subscribe(data2 => {
+        this.dataPL = data2;
+      }, err => {
+        console.log(err);
+      });
+     }, error => {
+      console.log(error);
+     });
+     setTimeout(() => { 
+      this.modal = true;
+      this.load = false; 
+    }, 1500);
+  }
+
+  qtyTotalZeus = () => this.dataZeus.reduce((acc, item) => acc + item.qty, 0);  
+
+  qtyTotalPlasticaribe = () => this.dataPL.reduce((acc, item) => acc + item.qty, 0);  
+
 }
 
 interface production {
