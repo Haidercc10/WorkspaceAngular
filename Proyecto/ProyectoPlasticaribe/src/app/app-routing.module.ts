@@ -94,6 +94,7 @@ export const routes: Routes = [
     children: [{ path: 'items', canActivate: [VistasPermisosGuard], data: { nombre: 'Inventario Areas' }, component: Inventario_AreasComponent },]
   },
   { path: 'reporte-inv-areas', canActivate: [VistasPermisosGuard], data: { nombre: 'Reporte de Inventarios' }, component: Reporte_InventarioAreasComponent },
+  { path: 'diferencias-inventario', loadChildren: () => import('./Modules/diferencias-inventario/diferencias-inventario.module').then(m => m.DiferenciasInventarioModule) },
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   // {path: 'opedidoproducto', component: OpedidoproductoComponent},

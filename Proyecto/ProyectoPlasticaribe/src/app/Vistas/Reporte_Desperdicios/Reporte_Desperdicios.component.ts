@@ -147,6 +147,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, this.rutaAPI()).subscribe(data => {
         if(![12, 1].includes(this.ValidarRol)) data = data.filter((x) => x.id_Proceso == this.validateArea());
         this.arrayDesperdicios = data;
+        console.log(this.arrayDesperdicios);
+        
         if (data.length == 0) {
           this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
           this.load = true;
@@ -344,7 +346,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
           'Item' : x.Item, 
           'Referencia' : x.Referencia,
           'No_Conformidades' : x.No_Conformidades,
-          'Cantidad' : this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(x.OT)).toFixed()) : x.Cantidad,
+          'Cantidad' : this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(x.OT)).toFixed()) : this.formatonumeros(parseFloat(x.Cantidad).toFixed(2)),
           'Presentacion' : 'Kg' 
         }
         info.push(object);
@@ -400,7 +402,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
    //Cantidad total pesada en desperdicios en el PDF.
   totalInfo(){
     return {
-      text: `\nCantidad total: ${this.dialog ? this.formatonumeros(this.calculateTotalOT(this.otSeleccionada).toFixed()) : this.formatonumeros(this.calculateTotal().toFixed())} KLS`,
+      text: `\nCantidad total: ${this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(this.otSeleccionada)).toFixed(2)) : this.formatonumeros(parseFloat(this.calculateTotal()).toFixed(2))} KLS`,
       alignment: 'right',
       style: 'header', 
       fontSize : 10, 
@@ -421,7 +423,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
            { text : ``, border : [false, false, false, false], }, 
            { text : ``, border : [false, false, false, false], }, 
            { text : `Cantidad Total`, border : [true, false, true, true], fontSize : 8, bold : true, alignment: 'right', }, 
-           { text :`${this.dialog ? this.calculateTotalOT(this.otSeleccionada) : this.calculateTotal()}`, border : [true, false, true, true], fontSize : 8, bold : true,}, 
+           { text :`${this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(this.otSeleccionada)).toFixed(2)) : this.formatonumeros(parseFloat(this.calculateTotal()).toFixed(2))}`, border : [true, false, true, true], fontSize : 8, bold : true,}, 
            { text : 'Kg', border : [true, false, true, true], fontSize : 8, bold : true,}
           ],
         ]
@@ -456,10 +458,11 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
   //Función para calcular la cantidad total.
-  calculateTotal = () => this.arrayDesperdicios.reduce((acc, item) => acc + item.cantidad, 0);
-
+  calculateTotal() {
+    return this.arrayDesperdicios.reduce((acc, item) => acc += item.cantidad, 0);
+  } 
   //Función para calcular la cantidad total por orden de trabajo en el PDF.
-  calculateTotalOT = (ot : number) => this.arrayDesperdicios.filter(x => x.ot == ot).reduce((acc, item) => acc + item.cantidad, 0);
+  calculateTotalOT = (ot : number) => this.arrayDesperdicios.filter(x => x.ot == ot).reduce((acc, item) => acc += item.cantidad, 0);
 
   //Función para calcular la cantidad total de no conformidades en el PDF.
   calculateNoConformityOT = (ot : number) => this.arrayDesperdicios.filter(x => x.ot == ot).length;

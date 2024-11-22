@@ -238,6 +238,7 @@ import { Maquilas_InternasComponent } from './Vistas/Maquilas_Internas/Maquilas_
 import { MovMaquilas_InternasComponent } from './Vistas/MovMaquilas_Internas/MovMaquilas_Internas.component';
 import { ReposicionesComponent } from './Vistas/Reposiciones/Reposiciones.component';
 import { Mov_ReposicionesComponent } from './Vistas/Mov_Reposiciones/Mov_Reposiciones.component';
+import { Diferencias_InventarioComponent } from './Vistas/Diferencias_Inventario/Diferencias_Inventario.component';
 
 @NgModule({
   declarations: [
@@ -396,6 +397,7 @@ import { Mov_ReposicionesComponent } from './Vistas/Mov_Reposiciones/Mov_Reposic
     MovMaquilas_InternasComponent,
     ReposicionesComponent,
     Mov_ReposicionesComponent,
+    Diferencias_InventarioComponent
   ],
 
   imports: [

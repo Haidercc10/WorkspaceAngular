@@ -16,7 +16,6 @@
 </div>
 
 <div class="contain">
-    
     <div class="container-fluid">
         <div class="mb-4 Titulo">
         <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Diferencias de Inventario</h2>
@@ -28,6 +27,23 @@
 </div>
 
 <p-card>
+
+    <!--Cambiar estado bultos-->
+    <p-toolbar styleClass="mb-2">
+      <ng-template pTemplate="left">
+        <p-button id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-warning" (click)="descriptionColors($event, 'yellow')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+        <div class="justify-content-md-end">
+          <p-button id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-danger" (click)="descriptionColors($event, 'red')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="center">
+
+      </ng-template>
+      <ng-template pTemplate="right">
+        <button pButton pRipple id="exportar" label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportExcel()"></button>
+      </ng-template>
+    </p-toolbar>
+    
     <p-table
         #dt
         [value]="inventory"
@@ -37,39 +53,38 @@
         [rowHover]="true">
         <ng-template pTemplate="header">
             <tr>
-                <th></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'item', dt)"></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'reference', dt)"></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'qtyPL', dt)"></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'qtyZeus', dt)"></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'difference', dt)"></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'genericQty', dt)"></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'presentationPL', dt)"></th>
+                <th class=""></th>
+                <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'item', dt)"></th>
+                <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'reference', dt)"></th>
+                <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'qtyZeus', dt)"></th>
+                <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'qtyPL', dt)"></th>
+                <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'difference', dt)"></th>
+                <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'genericQty', dt)"></th>
+                <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'presentationPL', dt)"></th>
             </tr>    
             <tr>
-                <th>#</th>
-                <th pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
-                <th pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
-                <th pSortableColumn="qtyPL"><p-sortIcon field="qtyPL"></p-sortIcon> Stock Plasticaribe</th>
-                <th pSortableColumn="qtyZeus"><p-sortIcon field="qtyZeus"></p-sortIcon> Stock Zeus</th>
-                <th pSortableColumn="difference"><p-sortIcon field="difference"></p-sortIcon> Diferencia</th>
-                <th pSortableColumn="genericQty"><p-sortIcon field="genericQty"></p-sortIcon> Cant. Rollo/Bulto</th>
-                <th pSortableColumn="presentationPL"><p-sortIcon field="presentationPL"></p-sortIcon> Und</th>
+                <th class="text-center">#</th>
+                <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
+                <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
+                <th class="text-center" pSortableColumn="qtyZeus"><p-sortIcon field="qtyZeus"></p-sortIcon> Stock Zeus</th>
+                <th class="text-center" pSortableColumn="qtyPL"><p-sortIcon field="qtyPL"></p-sortIcon> Stock Plasticaribe</th>
+                <th class="text-center" pSortableColumn="difference"><p-sortIcon field="difference"></p-sortIcon> Diferencia</th>
+                <th class="text-center" pSortableColumn="genericQty"><p-sortIcon field="genericQty"></p-sortIcon> Cant. Rollo/Bulto</th>
+                <th class="text-center" pSortableColumn="presentationPL"><p-sortIcon field="presentationPL"></p-sortIcon> Und</th>
                 <!--<th>Precio</th>
                 <th>Subtotal</th>-->
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-            <tr class="cursor" (dblclick)="getModal(data)">
-                <td>{{rowIndex + 1}}</td>
-                <td>{{data.item}}</td>
-                <td><b>{{data.reference}}</b></td>
-                <td>{{data.qtyPL | number : '1.2-2'}}</td>
-                <td>{{data.qtyZeus | number : '1.2-2'}}</td>
-                <td [ngClass]="{'textYellow' : data.difference > 0, 
-                                'textRed' : data.difference < 0, }"><b>{{data.difference | number : '1.2-2'}}</b></td>
-                <td>{{data.genericQty | number : '1.2-2'}}</td>
-                <td>{{data.presentationPL}}</td>
+            <tr class="cursor" (dblclick)="getModal(data)" pTooltip="Haz doble clic sobre la fila para ver más información de los movimientos del item selccionado">
+                <td class="text-center">{{rowIndex + 1}}</td>
+                <td class="text-center">{{data.item}}</td>
+                <td class=""><b>{{data.reference}}</b></td>
+                <td class="text-center">{{data.qtyZeus | number : '1.2-2'}}</td>
+                <td class="text-center">{{data.qtyPL | number : '1.2-2'}}</td>
+                <td class="text-center" [ngClass]="{'textYellow' : data.difference > 0,'textRed' : data.qtyPL > data.qtyZeus, }"><b>{{data.difference | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.genericQty | number : '1.2-2'}}</td>
+                <td class="text-center">{{data.presentationPL}}</td>
                 <!--<td>$ {{data.price | number : '1.2-2'}}</td>
                 <td>$ {{data.subtotal | number : '1.2-2'}}</td>-->
             </tr>
@@ -92,7 +107,7 @@
                 </p-toolbar>
                 
                 <p-table 
-                  #tablePL
+                  #tableZeus
                   [value]="dataZeus"
                   [resizableColumns]="true"
                   styleClass="p-datatable-gridlines p-datatable-sm"
@@ -104,6 +119,7 @@
                   <ng-template pTemplate="header">
                     <tr class="font-size-16" id="filtros">
                       <th></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'type', tableZeus)"></th>
                       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'doc', tableZeus)"></th>
                       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date', tableZeus)"></th>
                       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'fact', tableZeus)"></th>
@@ -114,6 +130,7 @@
                     </tr>
                     <tr>
                       <th class="text-center">#</th>
+                      <th class="text-center" pSortableColumn="doc"><p-sortIcon field="doc"></p-sortIcon> Tipo</th> 
                       <th class="text-center" pSortableColumn="doc"><p-sortIcon field="doc"></p-sortIcon> Cons.</th> 
                       <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
                       <th class="text-center" pSortableColumn="fact"><p-sortIcon field="fact"></p-sortIcon> Doc.</th>
@@ -126,25 +143,26 @@
                   <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                     <tr>
                       <td class="text-center">{{rowIndex + 1}}</td>
-                      <td class="text-center">{{data.doc}}</td>
-                      <td class="text-center">{{ data.date | date : 'dd/MM/yyyy'}}</td> 
+                      <td class="text-center">{{data.type }}</td>
+                      <td class="text-center">{{data.doc }}</td>
+                      <td class="text-center">{{data.date | date : 'dd/MM/yyyy'}}</td> 
                       <td class="text-center">{{ data.fact }}</td> 
-                      <td class="text-center">{{ data.client }}</td> 
-                      <td class="text-center">{{ data.qty | number : '1.2-2'}}</td>
+                      <td>{{ data.client }}</td> 
+                      <td class="text-center" [ngClass]="{ 'textRed' : data.qty < 0, }"><b>{{ data.qty | number : '1.2-2'}}</b></td>
                       <td class="text-center">{{ data.presentation }}</td>
                       <td>{{ data.observation }}</td>
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="emptymessage">
                     <tr>
-                      <td colspan="7">
+                      <td colspan="9">
                         <h6 class="bold">No existen movimientos asociados.</h6>
                       </td>
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="footer">
                     <tr>
-                      <td colspan="5" class="text-right">Cantidad Total</td>
+                      <td colspan="7" class="text-right">Cantidad Total</td>
                       <td class="text-center">{{qtyTotalZeus() | number : '1.2-2'}}</td>
                       <td class="text-center"></td>
                     </tr>
@@ -193,7 +211,6 @@
                     <th class="text-center" pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon> Cliente</th>
                     <th class="text-center" pSortableColumn="qty"><p-sortIcon field="qty"></p-sortIcon> Cant.</th>
                     <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Und</th>
-                    
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -202,8 +219,8 @@
                     <td class="text-center">{{data.doc}}</td>
                     <td class="text-center">{{ data.date | date : 'dd/MM/yyyy' }}</td> 
                     <td class="text-center">{{ data.fact }}</td> 
-                    <td class="text-center">{{ data.client }}</td> 
-                    <td class="text-center">{{ data.qty | number : '1.2-2'}}</td>
+                    <td>{{ data.client }}</td> 
+                    <td class="text-center"><b>{{ data.qty | number : '1.2-2'}}</b></td>
                     <td class="text-center">{{ data.presentation }}</td> 
                   </tr>
                 </ng-template>
@@ -226,6 +243,13 @@
           </div>  
     </p-dialog>
 </p-card>
+
+<!--Descripcion de los botones-->
+<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }">
+  <ng-template pTemplate>
+    <div [innerHTML]="infoColor"></div>
+  </ng-template>
+</p-overlayPanel>
 
 
 
