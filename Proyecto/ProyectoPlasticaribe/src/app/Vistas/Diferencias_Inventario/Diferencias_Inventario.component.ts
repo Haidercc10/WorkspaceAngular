@@ -9,6 +9,8 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-Diferencias_Inventario',
@@ -29,11 +31,14 @@ export class Diferencias_InventarioComponent implements OnInit {
   modal : boolean = false;
   item : any = {};
   infoColor : any = ``; 
+  stockInformation : any = [];
+  modal2 : boolean = false;
   
   @ViewChild('tableZeus') tableZeus : Table | undefined;
   @ViewChild('tablePL') tablePL : Table | undefined;
   @ViewChild('dt') dt : Table | undefined;
   @ViewChild('op') op: OverlayPanel | undefined;
+  @ViewChild('tableDetails1') tableDetails1: OverlayPanel | undefined;
 
   constructor(private zeusService : InventarioZeusService,
                 private svExistProducts : ExistenciasProductosService, 
@@ -41,6 +46,7 @@ export class Diferencias_InventarioComponent implements OnInit {
                     private svcExcel : CreacionExcelService,
                       private msjs : MensajesAplicacionService,
                         private svBagPro : BagproService,
+                          private svProductionProcess : Produccion_ProcesosService
                     ) { }
 
   ngOnInit() {
@@ -58,13 +64,13 @@ export class Diferencias_InventarioComponent implements OnInit {
             i.client = dataBagPro.filter(x => x.clienteItems == i.item)[0].clienteNom;
           });
           this.load = false;
-        }, error => {
+        }, e => {
           this.load = false;
-          console.log(error, 1);
+          console.log(e, 1);
         })
-      }, error => {
+      }, err => {
         this.load = false;
-        console.log(error, 2);
+        console.log(err, 2);
       })
     }, error => {
       this.load = false;
@@ -96,6 +102,38 @@ export class Diferencias_InventarioComponent implements OnInit {
       this.modal = true;
       this.load = false; 
     }, 1500);
+  }
+  //Función para cargar los rollos que se cargarán en cuanto se seleccione una fila 
+  loadInfoRollsAvailables(data : any){
+    this.stockInformation = [];
+    this.load = true;
+    this.item = {};
+    this.item = { 'item' : data.item, 'reference' : data.reference };
+    this.svProductionProcess.getRollsAvailablesForItem(data.item).subscribe(dataRolls => {
+      this.stockInformation = this.fillAvaibleProduction(dataRolls);
+      this.modal2 = true;
+      this.load = false;
+    }, error => { this.msjs.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en despacho.`); });
+  }
+
+  fillAvaibleProduction(data: any): Array<AvaibleProdution> {
+    let AvaibleProdution: Array<AvaibleProdution> = [];
+    data.forEach(stock => {
+      AvaibleProdution.push({
+        'NumberProduction': stock.number_BagPro,
+        'Quantity': stock.quantity,
+        'Weight': stock.weight,
+        'Presentation': stock.presentation,
+        'Process': stock.process,
+        'Date': stock.date,
+        'Hour': stock.hour,
+        'Price': stock.sellPrice,
+        'Turn': stock.turn.turno_Nombre,
+        'Information': stock.information,
+        'orderProduction': stock.orderProduction,
+      });
+    });
+    return AvaibleProdution;
   }
 
   qtyTotalZeus = () => this.dataZeus.reduce((acc, item) => acc + item.qty, 0);  
@@ -298,4 +336,18 @@ export class Diferencias_InventarioComponent implements OnInit {
     [8].forEach(x => worksheet.getColumn(x).width = 70);
     concatCells.forEach(cell => worksheet.mergeCells(cell));
   }
+}
+
+interface AvaibleProdution {
+  NumberProduction: number;
+  Quantity: number,
+  Weight: number,
+  Presentation: string,
+  Process: string,
+  Date: any,
+  Hour: string,
+  Price: number,
+  Turn: string,
+  Information: string,
+  orderProduction: number,
 }
