@@ -56,13 +56,17 @@
               <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'difference', dt)"></th>
               <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'genericQty', dt)"></th>
               <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'presentationPL', dt)"></th>
+              <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'price', dt)"></th>
+              <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'subtotal', dt)"></th>
               <th class=""></th>
           </tr> 
           <tr>
             <th style="font-weight: 800;" class="text-center"></th>
             <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-database"></i> Información del Producto</th>
             <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-box"></i> Stock</th>
-            <th style="font-weight: 800;" class="text-center" colspan="4"></th>
+            <th style="font-weight: 800;" class="text-center"></th>
+            <th style="font-weight: 800;" class="text-center">Cantidad</th>
+            <th style="font-weight: 800;" class="text-center" colspan="3"></th>
           </tr>   
           <tr>
               <th class="text-center">#</th>
@@ -72,11 +76,11 @@
               <th class="text-center" pSortableColumn="qtyZeus"><p-sortIcon field="qtyZeus"></p-sortIcon> Zeus</th>
               <th class="text-center" pSortableColumn="qtyPL"><p-sortIcon field="qtyPL"></p-sortIcon> Plasticaribe</th>
               <th class="text-center" pSortableColumn="difference"><p-sortIcon field="difference"></p-sortIcon> Diferencia</th>
-              <th class="text-center" pSortableColumn="genericQty"><p-sortIcon field="genericQty"></p-sortIcon> Cant. Estandar</th>
+              <th class="text-center" pSortableColumn="genericQty"><p-sortIcon field="genericQty"></p-sortIcon> Estandar</th>
               <th class="text-center" pSortableColumn="presentationPL"><p-sortIcon field="presentationPL"></p-sortIcon> Und</th>
+              <th class="text-center" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
+              <!--<th class="text-center" pSortableColumn="subtotal"><p-sortIcon field="subtotal"></p-sortIcon>Subtotal</th>-->
               <th class="text-center"> Ver</th>
-              <!--<th>Precio</th>
-              <th>Subtotal</th>-->
           </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -90,11 +94,12 @@
               <td class="text-center" [ngClass]="{'textYellow' : data.difference > 0,'textRed' : data.qtyPL > data.qtyZeus, }"><b>{{data.difference | number : '1.2-2'}}</b></td>
               <td class="text-center">{{data.genericQty | number : '1.2-2'}}</td>
               <td class="text-center">{{data.presentationPL}}</td>
+              <td class="text-center">$ {{data.price | number : '1.2-2'}}</td>
+              <!--<td>$ {{data.subtotal | number : '1.2-2'}}</td>-->
               <td class="text-center">
                 <p-button id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-danger" [style]="{ width: '28px', height: '28px' }" (click)="loadInfoRollsAvailables(data)"></p-button>    
               </td>
-              <!--<td>$ {{data.price | number : '1.2-2'}}</td>
-              <td>$ {{data.subtotal | number : '1.2-2'}}</td>-->
+              
           </tr>
       </ng-template>
   </p-table>

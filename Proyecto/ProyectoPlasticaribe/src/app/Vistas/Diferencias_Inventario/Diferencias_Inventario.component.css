@@ -23,3 +23,7 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
 ::ng-deep p-toolbar .p-toolbar {
     justify-content: space-between !important;
 }
+
+::ng-deep .p-card {
+    width: 95%;
+}

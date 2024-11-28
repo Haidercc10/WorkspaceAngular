@@ -89,9 +89,10 @@ export class Diferencias_InventarioComponent implements OnInit {
     this.load = true;
     this.zeusService.getFacturacionPorItem(info.item).subscribe(data => { 
       this.dataZeus = data;
-      this.dataZeus.sort((a,b) => a.date.localeCompare(b.date))
+      this.dataZeus.sort((a,b) => b.date.localeCompare(a.date));
       this.dtOrderFact.getDetailsForItem(info.item).subscribe(data2 => {
         this.dataPL = data2;
+        this.dataPL.sort((a,b) => b.date.localeCompare(a.date));
       }, err => {
         console.log(err);
       });
@@ -140,7 +141,7 @@ export class Diferencias_InventarioComponent implements OnInit {
 
   qtyTotalPlasticaribe = () => this.dataPL.reduce((acc, item) => acc + item.qty, 0);  
 
-  //*Exportar formato excel de  inventario
+  //*Exportar formato excel del inventario
   exportExcel(){
     if(this.inventory.length > 0) {
       this.load = true;
@@ -169,34 +170,34 @@ export class Diferencias_InventarioComponent implements OnInit {
   //.Información de la producción.
   infoProduction(){
     let info : any = [];
-    this.inventory.forEach(d => info.push([d.item, d.client, d.reference, d.qtyZeus, d.qtyPL, d.difference, d.genericQty, d.presentationPL]));    
+    this.inventory.forEach(d => info.push([d.item, d.client, d.reference, d.qtyZeus, d.qtyPL, d.difference, d.genericQty, d.presentationPL, d.price]));    
     return info;
   }
 
   //.Agregar información a la hoja del excel.
   addInfoExcel(worksheet : any, data : any) {
-    let formatNumber: Array<number> = [4,5,6,7];
+    let formatNumber: Array<number> = [4,5,6,7,9];
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(d => worksheet.addRow(d));
   }
 
   //.Agregar encabezado a la hoja del excel.
   addHeaderPage(worksheet, font, border, fill) {
-    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5']
-    worksheet.addRow(['Item', 'Cliente', 'Referencia', 'Cant. Zeus', 'Cant. Plasticaribe', 'Diferencia', 'Cant. Rollo/Bulto', 'Presentación',]);
+    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5']
+    worksheet.addRow(['Item', 'Cliente', 'Referencia', 'Cant. Zeus', 'Cant. Plasticaribe', 'Diferencia', 'Cant. Rollo/Bulto', 'Presentación', 'Precio']);
     
     rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
     rowHeader.forEach(x => worksheet.getCell(x).font = font);
     rowHeader.forEach(x => worksheet.getCell(x).border = border);
 
-    let concatCells : any = ['A1:H3'];
+    let concatCells : any = ['A1:I3'];
     this.stylesPage(worksheet, concatCells, []);
   }
 
   //.Estilos de la hoja del excel.
   stylesPage(worksheet, concatCells, formatNumber) {
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    [1,4,6].forEach(x => worksheet.getColumn(x).width = 15);
+    [1,4,6,9].forEach(x => worksheet.getColumn(x).width = 15);
     [2,3].forEach(x => worksheet.getColumn(x).width = 50);
     [5,7,8].forEach(x => worksheet.getColumn(x).width = 20);
     concatCells.forEach(cell => worksheet.mergeCells(cell));
@@ -206,7 +207,6 @@ export class Diferencias_InventarioComponent implements OnInit {
   //colores rojo y amarillo de las cantidades.
   descriptionColors($event : any, color : string){
     if (color == 'yellow') this.infoColor = `<b>${'AMARILLO:'}</b> Indica que el item <b>tiene mayor cantidad en Zeus</b> que en Plasticaribe `;
-
     if (color == 'red') this.infoColor = `<b>${'ROJO:'}</b> Indica que <b>la cantidad en Plasticaribe es mayor</b> que en Zeus.`;
 
     setTimeout(() => {
