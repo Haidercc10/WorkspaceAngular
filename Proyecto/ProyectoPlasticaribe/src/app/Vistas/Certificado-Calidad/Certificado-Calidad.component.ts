@@ -351,10 +351,16 @@ export class CertificadoCalidadComponent implements OnInit {
             { border: [false, true, true, false], text: `${datos.referencia}` },
           ],
           [
-            { border: [true, false, false, true], text: `Cliente`, bold: true },
-            { border: [false, false, true, true], text: `${datos.cliente}` },
-            { border: [false, false, false, true], text: `Cantidad`, bold: true },
-            { border: [false, false, true, true], text: `${this.formatonumeros(datos.cantidad_Producir.toFixed(2))} ${datos.presentacion_Producto}` },
+            { border: [true, false, false, false], text: `Cliente`, bold: true },
+            { border: [false, false, true, false], text: `${datos.cliente}` },
+            { border: [false, false, false, false], text: `Cantidad`, bold: true },
+            { border: [false, false, true, false], text: `${this.formatonumeros(datos.cantidad_Producir.toFixed(2))} ${datos.presentacion_Producto}` },
+          ],
+          [
+            { border: [true, false, false, true], text: `Fecha Orden`, bold: true },
+            { border: [false, false, true, true], text: `${datos.fecha_Orden.replace('T00:00:00', '')}` },
+            { border: [true, false, false, true], text: `Fecha Fin Produccion`, bold: true },
+            { border: [false, false, true, true], text: `${datos.fecha_Fin_Produccion.replace('T00:00:00', '')}` },
           ],
         ]
       },

@@ -2,6 +2,7 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { log } from 'console';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
 import { modelDetalles_PrecargueDespacho } from 'src/app/Modelo/modelDetalles_PrecargueDespacho';
 import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
@@ -37,6 +38,8 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
+  editMode : boolean = false;
+  rollsSelected : any = {};
 
   constructor(private AppComponent : AppComponent, 
     private fmBuild : FormBuilder,
@@ -46,7 +49,8 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     private svProduction : Produccion_ProcesosService,
     private svPreload : Precargue_DespachoService,
     private svDetailsPreload : Detalles_PrecargueDespachoService,
-    private svPDF : CreacionPdfService,  
+    private svPDF : CreacionPdfService, 
+    private msg : MessageService, 
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
@@ -68,6 +72,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
 
   initForm(){
     this.form = this.fmBuild.group({
+      doc : [null],
       roll : [null],
       //process : [null],
       //item : [null, Validators.required], 
@@ -244,6 +249,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     this.rollsConsolidate = [];
     this.searchIn = null;
     this.load = false;
+    this.editMode = false;
   }
 
   //* Función para acortar msjs 
@@ -260,6 +266,86 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         return this.msj.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`); 
     }
   }
+/*
+  getLastPreload = () => this.svPreload.getLastPreload().subscribe(data => this.form.patchValue({ 'doc': data.pcd_Id }), error => { this.msj.mensajeError(`Error`, `Error al consultar el último consecutivo del precargue.`) });
+
+  searchPreload(){
+    let preload : number = this.form.value.doc;
+
+    if(preload){
+      this.editMode = true;
+      this.load = true;
+      this.rollsToDispatch = [];
+      this.rollsConsolidate = [];
+
+      this.svDetailsPreload.getPreloadId(preload).subscribe(data => {
+        if(data) {
+          this.rollsToDispatch = data;
+          this.rollsToDispatch.forEach(x =>{
+            x.qty = x.quantity, 
+            x.unit = x.presentation
+          });
+          this.loadInformationDispatch(data);
+        } else {
+          this.msjs(`Advertencia`, `No se encontró la orden de precargue N° ${preload}`);
+          this.load = false;
+        } 
+      }, error => {
+        this.msjs(`Error`, `Error al consultar la orden de precargue N° ${preload} | ${error.status} ${error.statusText}`);
+        this.load = false;
+      });
+    }
+  }
+
+  loadInformationDispatch(data : any){
+    this.load = false;
+    this.form.patchValue({
+      'idClient': data[0].idClient,
+      'client': data[0].client,
+      'observation': data[0].observation1,
+    });
+    this.consolidateItems();
+  }
+
+  //* Función para mostrar el msj de confirmación de eliminación de rollos
+  msgDeleteRolls(data : any) {
+    this.load = true;
+    this.rollsSelected = {};
+    this.rollsSelected = data;
+    console.log(this.rollsSelected);
+    this.msg.add({ severity:'warn', key:'deleteRoll', summary:'Elección', detail: `¿Está seguro que desea quitar/eliminar el rollo/bulto N° ${data.roll}?`, sticky: true});
+  }
+
+  
+  onReject(key : any){
+    this.load = false;
+    this.msg.clear(key);
+  }
+
+  //* Función para eliminar rollos de una reposición
+  deleteRollsFromReposition(data: any, currentStatus : any, newStatus : any){
+    this.onReject('deleteRoll');
+    this.load = true;
+    let index : any = this.rollsToDispatch.findIndex(x => x.roll == data.roll);
+    let roll : number = this.rollsSelected.rollPl;
+    console.log(index, roll, newStatus, currentStatus);
+    
+    /*this.svDetailsPreload.Delete(roll).subscribe(dataPreload => {
+      let infoRoll : any = [{'roll': data.roll, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true }]; 
+      this.svProduction.putChangeStateProduction(infoRoll).subscribe(() => {
+        this.msjs(`Confirmación`, `Se eliminó el rollo N° ${data.roll} de la reposición N° ${this.form.value.repo}!`);
+        this.rollsToDispatch.splice(index, 1);
+        this.load = false;
+        this.consolidateItems();
+      }, error => {
+        this.msjs(`Error`, `No fue posible actualizar el estado del rollo N° ${data.roll} en producción | ${error.status} ${error.statusText}`);
+        this.load = false;
+      });
+    }, error => {
+      this.msjs(`Error`, `Error al eliminar el rollo N° ${data.roll} de la reposición N° ${this.form.value.repo} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });*/
+  //}
 
   createPDF(id : number, action : string) {
     this.svDetailsPreload.getPreloadId(id).subscribe(data => {
@@ -295,7 +381,6 @@ export class Precargue_RollosDespachoComponent implements OnInit {
           weight += x.weight,
           quantity += x.quantity
         });
-        console.log(data);
         
         info.push({
           "#": contador,

@@ -170,7 +170,8 @@ export class Diferencias_InventarioComponent implements OnInit {
   //.Información de la producción.
   infoProduction(){
     let info : any = [];
-    this.inventory.forEach(d => info.push([d.item, d.client, d.reference, d.qtyZeus, d.qtyPL, d.difference, d.genericQty, d.presentationPL, d.price]));    
+    this.inventory.forEach(d => info.push([d.item, d.client, d.reference, d.qtyZeus, d.qtyPL, d.difference, d.genericQty, d.presentationPL, d.price]));
+    console.log(info);  
     return info;
   }
 

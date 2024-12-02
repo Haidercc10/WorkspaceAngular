@@ -278,7 +278,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     });
     this.ArrayPedidos.push(info);
     this.datosExcel = this.ArrayPedidos;
-
+    console.log(this.ArrayPedidos);
+    
     let pedidos = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo);
     let cantidad = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo && parseFloat(item.existencias) >= parseFloat(item.cant_Pendiente));
 
@@ -379,10 +380,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
       let datos : any =[];
       for (const item of this.datosExcel) {
-        const datos1 : any = [item.consecutivo, item.cliente, item.id_Producto, item.producto, item.cant_Pedida, item.cant_Pendiente, item.cant_Facturada, item.existencias, item.presentacion, item.precioUnidad, item.estado, item.vendedor, item.orden_Compra_CLiente, item.costo_Cant_Pendiente, item.costo_Cant_Total, item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT ];
+        const datos1 : any = [item.consecutivo, item.cliente, item.id_Producto, item.producto, parseFloat(item.cant_Pedida).toFixed(2), parseFloat(item.cant_Pendiente).toFixed(2) , parseFloat(item.cant_Facturada).toFixed(2), parseFloat(item.existencias).toFixed(2), item.presentacion, parseFloat(item.precioUnidad).toFixed(2), item.estado, item.vendedor, item.orden_Compra_CLiente, parseFloat(item.costo_Cant_Pendiente).toFixed(2), parseFloat(item.costo_Cant_Total).toFixed(2), item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT ];
         datos.push(datos1);
       }
-
+      console.log(datos);
       let workbook = new Workbook();
       const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
       let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
@@ -400,6 +401,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
       datos.forEach(d => {
+        d[4] = parseFloat(d[4].toString().replace(',', '.'));
+        d[5] = parseFloat(d[5].toString().replace(',', '.'));
+        d[6] = parseFloat(d[6].toString().replace(',', '.'));
+        d[7] = parseFloat(d[7].toString().replace(',', '.'));
+        d[9] = parseFloat(d[9].toString().replace(',', '.'));
+        d[13] = parseFloat(d[13].toString().replace(',', '.'));
+        d[14] = parseFloat(d[14].toString().replace(',', '.'));
+        
         let row = worksheet.addRow(d);
         row.alignment = { horizontal : 'center' }
         row.getCell(5).numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
@@ -444,6 +453,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         if (row.getCell(11).value == 'Pendiente') colorEstadoPedido = 'FF7F71'
         else if (row.getCell(11).value == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
         row.getCell(11).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoPedido }, }
+
+        console.log(worksheet.getColumn(5));
+        
 
         worksheet.getColumn(1).width = 12;
         worksheet.getColumn(2).width = 60;

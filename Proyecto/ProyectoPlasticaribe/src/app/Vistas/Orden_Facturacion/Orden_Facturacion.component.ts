@@ -1173,6 +1173,7 @@ export class Orden_FacturacionComponent implements OnInit {
             this.svDtlPreload.getPreloadId(preload).subscribe(data => {
               this.clearTables();
               this.getSalesOrders(data);
+              
               this.load = false;
             }, error => {
               this.msjsOF(`Error`, [400, 404].includes(error.status) ? `No se encontró la orden de precargue N° ${preload} | \n${error.status} ${error.statusText}` : `No fue posible consultar la orden de despacho N° ${preload} | \n${error.status} ${error.statusText}`);
@@ -1231,12 +1232,27 @@ export class Orden_FacturacionComponent implements OnInit {
     this.comparativePreload = [];
 
     this.comparativeProduct = this.products;
+
     this.comparativePreload = info.reduce((a, b) => {
-      if(!a.map(x => x.item).includes(b.item)) a.push(b);
-      else  a[a.findIndex(x => x.item == b.item)].quantity += b.quantity;
+      if(!a.map(x => x.item).includes(b.item)) {
+        a.push({
+          'saleOrder': 0,
+          'item': b.item,
+          'reference': b.reference,
+          'quantity': b.quantity,
+          'presentation': b.presentation,
+          'weight': b.weight,
+          'client' : b.idClient,
+          'nameClient' : b.client,
+          'orderProduction' : b.ot,
+          'numberProduction' : b.roll,
+          'ubication' : b.ubication,
+          'netWeight' : b.netWeight,
+        }) 
+      } else a[a.findIndex(x => x.item == b.item)].quantity += b.quantity;
       return a;
     }, []);
-
+    
     this.products.forEach(x => {
       info.forEach(y => {
         if(x.id_Producto == y.item) {
@@ -1244,7 +1260,7 @@ export class Orden_FacturacionComponent implements OnInit {
         }
       });
     });
-    
+
     if(array.length == this.products.length) {
       this.msj.mensajeConfirmacion(`Confirmación`, `El precargue de rollos se asoció exitosamente al pedido`);
       this.preloadDispatch = true;
@@ -1254,7 +1270,7 @@ export class Orden_FacturacionComponent implements OnInit {
       this.clearTables();
       this.msj.mensajeAdvertencia(`Advertencia`, `Existen diferencias entre el pedido y el precargue consultados, verifique!`);
       setTimeout(() => { this.modalSaleOrderVsPreload = true; }, 1500); 
-    } 
+    }
   }
 
   clearTables(){

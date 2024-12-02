@@ -18,6 +18,8 @@ constructor(private http : HttpClient) { }
   getId = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Precargue_Despacho/${id}`);
 
   GetIdPrecargue_Despacho = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Precargue_Despacho/GetIdPrecargue_Despacho/${id}`);
+  
+  getLastPreload = () : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Reposiciones/getLastReposition`);
 
   Post = (data : modelPrecargue_Despacho): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Precargue_Despacho', data);
 
