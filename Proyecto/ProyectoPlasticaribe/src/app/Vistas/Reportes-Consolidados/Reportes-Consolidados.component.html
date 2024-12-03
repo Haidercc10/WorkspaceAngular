@@ -12,7 +12,7 @@
 
       <!-- PRODUCCION -->
       <p-tabPanel
-        *ngIf="[1,6,12].includes(ValidarRol)"
+        *ngIf="[1,6,12,94].includes(ValidarRol)"
         header="Consolidado Producción"
         leftIcon="pi pi-sliders-h">
         <app-Dashboard_Areas *ngIf="consolidadoProduccionAreas"></app-Dashboard_Areas>
@@ -20,7 +20,7 @@
 
       <!-- PRODUCCIÓN DETALLADA -->
       <p-tabPanel
-        *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12].includes(ValidarRol)"
+        *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12,94].includes(ValidarRol)"
         header="Producción Detallada"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Produccion *ngIf="produccionDetallada"></app-Reporte-Produccion>

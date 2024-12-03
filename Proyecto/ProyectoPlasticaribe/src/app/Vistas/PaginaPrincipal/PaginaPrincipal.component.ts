@@ -31,11 +31,11 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lecturaStorage();
-    if ([1,60,12].includes(this.ValidarRol)) this.ordenTrabajo = true;
+    if ([1,60,12,94].includes(this.ValidarRol)) this.ordenTrabajo = true;
     if ([3,12].includes(this.ValidarRol)) this.materiaPrima = true;
     if ([61,12].includes(this.ValidarRol)) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
-    if ([1,12].includes(this.ValidarRol)) this.inventarioAreas = true;
+    if ([1,12,94].includes(this.ValidarRol)) this.inventarioAreas = true;
     if ([6].includes(this.ValidarRol)) this.facturacion = true;
   }
 
@@ -83,5 +83,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 2 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
     index == 3 && this.ValidarRol == 12 ? this.pedidos = true : null;
     index == 4 && this.ValidarRol == 12 ? this.inventarioAreas = true : null;
+    index == 0 && this.ValidarRol == 94 ? this.ordenTrabajo = true : null;
+    index == 1 && this.ValidarRol == 94 ? this.inventarioAreas = true : null;
   }
 }
