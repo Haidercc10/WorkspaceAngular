@@ -891,6 +891,121 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.addTotal(info, data[0].process_Id);
     return info;
   }
+
+  comparativeExcel(){
+    if(this.comparativeStock.length > 0) {
+      setTimeout(() => { this.loadSheetAndStyles2(this.comparativeStock); }, 500);
+    } else this.msg.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
+  }
+
+   //Función que cargará la hoja de cálculo y los estilos.
+   loadSheetAndStyles2(data : any){  
+    let title : any = `Inventario comparativo de productos`;  
+    title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.createExcelService.formatoExcel(title, true);
+
+    this.addNewSheet2(workbook, title, fill, border, font, alignment, data);
+    this.createExcelService.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet2(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle2(worksheet, title, fontTitle, alignment);
+    this.loadHeader2(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel2(worksheet, this.dataExcel2(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle2(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader2(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5']; 
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader2());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:I3');
+
+    this.loadSizeHeader2(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader2(ws : any){
+    [5,6,7].forEach(x => ws.getColumn(x).width = 25);
+    [3,4].forEach(x => ws.getColumn(x).width = 50);
+    [9].forEach(x => ws.getColumn(x).width = 50);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [2,7,8].forEach(x => ws.getColumn(x).width = 15);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader2(){
+    let headerRow = [
+      'N°',
+      'Item',
+      'Cliente',
+      'Referencia', 
+      'Exist. Despacho',
+      'Exist. Area', 
+      'Exist. Total',  
+      'Unidad', 
+      'Vendedor'
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel2(ws : any, data : any, border : any, alignment : any){
+    let formatNumber: Array<number> = [5,6,7];
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I',]; 
+
+    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+    //row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel2(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.item,
+        x.client,
+        x.reference,
+        x.stock,
+        x.stockInProcess,
+        x.totalStock,
+        x.presentation,
+        x.seller,
+      ]);
+    });
+    return info;
+  }
 }
 
 interface StockInformation {
