@@ -36,7 +36,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     if ([61,12].includes(this.ValidarRol)) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
     if ([1,12,94].includes(this.ValidarRol)) this.inventarioAreas = true;
-    if ([6].includes(this.ValidarRol)) this.facturacion = true;
+    if ([6,12].includes(this.ValidarRol)) this.facturacion = true;
   }
 
   ngOnDestroy(): void {
@@ -67,7 +67,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   cambioTab(e : any) {  
     var index = e.index;
     index == 0 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
-    index == 1 && this.ValidarRol == 1 ? this.facturacion = true : this.facturacion = false;
+    index == 1 && [1,12,60].includes(this.ValidarRol) ? this.facturacion = true : this.facturacion = false;
     index == 2 ? this.materiaPrima = true : this.materiaPrima = false;
     index == 3 ? this.pedidos = true : this.pedidos = false;
     index == 4 ? this.facturacionVendedores = true : this.facturacionVendedores = false;
@@ -77,12 +77,11 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 8 ? this.costos = true : this.costos = false;
     index == 9 ? this.compras = true : this.compras = false;
     index == 10 ? this.inventarioAreas = true : this.inventarioAreas = false;
-    index == 1 && this.ValidarRol == 12 ? this.facturacion = true : null;
+    //index == 1 && this.ValidarRol == 12 ? this.facturacion = true : null;
     index == 0 && this.ValidarRol == 6 ? this.facturacion = true : null;
     index == 1 && this.ValidarRol == 6 ? this.pedidos = true : null;
-    index == 2 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
-    index == 3 && this.ValidarRol == 12 ? this.pedidos = true : null;
-    index == 4 && this.ValidarRol == 12 ? this.inventarioAreas = true : null;
+    //index == 2 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
+    //index == 3 && this.ValidarRol == 12 ? this.pedidos = true : null;
     index == 0 && this.ValidarRol == 94 ? this.ordenTrabajo = true : null;
     index == 1 && this.ValidarRol == 94 ? this.inventarioAreas = true : null;
   }

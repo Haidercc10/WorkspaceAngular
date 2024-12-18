@@ -137,7 +137,7 @@ export class NominaComponent implements OnInit {
 
   /** Función para consultar las nomina de sellado */
   consultarNominas() {
-    if ([1, 65].includes(this.ValidarRol)) this.consultarNominaIngresada();
+    if ([1, 65, 12].includes(this.ValidarRol)) this.consultarNominaIngresada();
     this.consultarNominasIngresosDespacho();
     
     this.load = false;

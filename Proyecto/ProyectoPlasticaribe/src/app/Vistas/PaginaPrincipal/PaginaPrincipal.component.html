@@ -46,7 +46,7 @@
         header="Facturación Vendedores"
         leftIcon="pi pi-chart-line"
         tooltip="Información de la Facturación Mensual y las Ordenes de Trabajo"
-        *ngIf="[1,60].includes(ValidarRol)">
+        *ngIf="[1,60,12].includes(ValidarRol)">
         <app-ReporteFacturacion_Vendedores *ngIf="facturacionVendedores"></app-ReporteFacturacion_Vendedores>
       </p-tabPanel>
 
@@ -55,7 +55,7 @@
         header="Recaudos"
         leftIcon="pi pi-shopping-cart"
         tooltip="Información sobre los reacudos de la empresa"
-        *ngIf="[1,61,69].includes(ValidarRol)">
+        *ngIf="[1,61,69,12].includes(ValidarRol)">
         <app-DashBoard-Recaudos *ngIf="recaudos"></app-DashBoard-Recaudos>
       </p-tabPanel>
 
@@ -64,7 +64,7 @@
         header="Cuentas Por Pagar"
         leftIcon="pi pi-wallet"
         tooltip="Información sobre las cuentas por pagar de la empresa"
-        *ngIf="[1].includes(ValidarRol)">
+        *ngIf="[1,12].includes(ValidarRol)">
         <app-Dashboard_CuentasPagar *ngIf="cuentasPagar"></app-Dashboard_CuentasPagar>
       </p-tabPanel>
 
@@ -73,7 +73,7 @@
         header="Gerencia"
         leftIcon="pi pi-chart-line"
         tooltip="Información general"
-        *ngIf="[1].includes(ValidarRol)">
+        *ngIf="[1,12].includes(ValidarRol)">
         <app-Dashboard_General *ngIf="gerencia"></app-Dashboard_General>
       </p-tabPanel>
 
@@ -82,7 +82,7 @@
         header="Costos"
         leftIcon="pi pi-money-bill"
         tooltip="Información general sobre los costos fijos y variables"
-        *ngIf="[1].includes(ValidarRol)">
+        *ngIf="[1,12].includes(ValidarRol)">
         <app-Dashboard_Costos *ngIf="costos"></app-Dashboard_Costos>
       </p-tabPanel>
 
@@ -91,7 +91,7 @@
         header="Compras"
         leftIcon="pi pi-credit-card"
         tooltip="Información general sobre las compras de la empresa"
-        *ngIf="[1].includes(ValidarRol)">
+        *ngIf="[1,12].includes(ValidarRol)">
         <app-Dashboard_Compras *ngIf="compras"></app-Dashboard_Compras>
       </p-tabPanel>
 

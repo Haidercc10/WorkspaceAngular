@@ -28,7 +28,7 @@
 
       <!-- CARTERA -->
       <p-tabPanel
-        *ngIf="[1,6,69].includes(ValidarRol)"
+        *ngIf="[1,6,69,12].includes(ValidarRol)"
         header="Cartera"
         leftIcon="pi pi-sliders-h">
         <app-DashBoard-Recaudos *ngIf="cartera"></app-DashBoard-Recaudos>
@@ -36,7 +36,7 @@
 
       <!-- VENTAS VENDEDORES -->
       <p-tabPanel
-        *ngIf="[1,6].includes(ValidarRol)"
+        *ngIf="[1,6,12].includes(ValidarRol)"
         header="Facturación Vendedores"
         leftIcon="pi pi-sliders-h">
         <app-ReporteFacturacion_Vendedores *ngIf="facturacionVendedores"></app-ReporteFacturacion_Vendedores>
@@ -44,7 +44,7 @@
 
       <!-- FACTURACIÓN DE ITEMS -->
       <p-tabPanel
-        *ngIf="[1,6,96].includes(ValidarRol)"
+        *ngIf="[1,6,96,12].includes(ValidarRol)"
         header="Facturación de Items"
         leftIcon="pi pi-sliders-h">
         <app-Reporte_FacturacionZeus *ngIf="facturacionItems"></app-Reporte_FacturacionZeus>
@@ -68,7 +68,7 @@
 
       <!-- ESTADISTICA DE VENTAS -->
       <p-tabPanel
-        *ngIf="[1,6,96].includes(ValidarRol)"
+        *ngIf="[1,6,96,12].includes(ValidarRol)"
         header="Estadisticas Ventas"
         leftIcon="pi pi-sliders-h">
         <app-Reporte_EstadisticasVentas></app-Reporte_EstadisticasVentas>
