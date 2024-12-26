@@ -19,6 +19,7 @@ import { defaultStepOptions, stepsVerPedidos as defaultSteps } from 'src/app/dat
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { DepartamentosMunicipiosColombiaService } from 'src/app/Servicios/DepartamentosMunicipiosColombia/DepartamentosMunicipiosColombia.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -66,6 +67,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   vendedorSeleccionado : any;
   departamentoSeleccionado : any = [];
   municipioSeleccionado : any;
+  test : any = [];
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -75,7 +77,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                         private estadosProcesos_OTService : EstadosProcesos_OTService,
                           private shepherdService: ShepherdService,
                             private msj : MensajesAplicacionService,
-                              private deparMuniciosColService : DepartamentosMunicipiosColombiaService,) {
+                              private deparMuniciosColService : DepartamentosMunicipiosColombiaService,
+                                private svBagpro : BagproService, ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -143,13 +146,16 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
           if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-        } else if ([1, 96, 6, 10, 60, 61, 12].includes(this.ValidarRol)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
+        } else if ([1, 96, 6, 10, 60, 61, 12].includes(this.ValidarRol)) {
+          this.llenarArrayPedidosZeus(datos_pedidos[i], i);
+          this.loadOtInCustomerOrder(datos_pedidos[i], datos_pedidos.length);
+        } 
       }
     });
     setTimeout(() => {
       this.getClientes();
       this.getVendedores();
-      this.cargando = false;
+      //this.cargando = false;
       this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
       const thisRef = this;
       this.ArrayPedidos.forEach((pedido) => thisRef.expandedRows[pedido.consecutivo] = true);
@@ -213,6 +219,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       cant_Facturada: datos.cant_Facturada.toFixed(2),
       existencias: parseFloat(datos.existencias).toFixed(2),
       presentacion: datos.presentacion,
+      presentacion2: datos.presentacion == 'KLS' ? 'Kilo' : datos.presentacion == 'UND' ? 'Unidad' : datos.presentacion == 'PAQ' ? 'Paquete' : '',
       estado: datos.estado,
       vendedor: datos.vendedor,
       idVendedor: datos.id_Vendedor,
@@ -230,7 +237,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       CantPedidaUnd_OT : '',
       Zeus : 1,
     };
-    this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
+    
+    /*this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         if (parseInt(datos.id_Producto) == datos_orden[i].prod_Id) {
           info.OT = datos_orden[i].estProcOT_OrdenTrabajo;
@@ -275,10 +283,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           info.CantPedidaUnd_OT = datos_orden[i].estProcOT_CantidadPedidaUnd;
         }
       }
-    });
+    });*/
     this.ArrayPedidos.push(info);
     this.datosExcel = this.ArrayPedidos;
-    console.log(this.ArrayPedidos);
     
     let pedidos = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo);
     let cantidad = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo && parseFloat(item.existencias) >= parseFloat(item.cant_Pendiente));
@@ -309,6 +316,59 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       }
     }
     this.pedidosOriginales = this.ArrayPedidos;
+  }
+
+  /*test(datos_pedidos){
+    this.ArrayPedidos.forEach(x => {
+      let date1 = moment(x.fecha_Creacion).subtract(3, 'd').format('YYYY-MM-DD');
+      let date2 = moment(x.fecha_Creacion).add(3, 'd').format('YYYY-MM-DD');
+      this.svBagpro.getOtsForCustomerOrders1(date1, date2, x.id_Producto, x.presentacion2, x.nitCliente).subscribe(dataOts => {
+        console.log(dataOts, x.consecutivo);
+        x.OT = dataOts.item;
+      }, error => { console.log(error); });
+    });
+    console.log(this.ArrayPedidos);
+    
+  }*/
+
+  loadOtInCustomerOrder(data, lenght) {
+    console.log(this.ArrayPedidos);
+    this.test.push({
+      'date1' : moment(data.fecha_Creacion).subtract(8, 'd').format('YYYY-MM-DD'),
+      'date2' : moment(data.fecha_Creacion).add(8, 'd').format('YYYY-MM-DD'),
+      'item' : data.id_Producto,
+      'consecutivo' : (data.consecutivo).toString().trim(),
+    });
+    if (this.test.length == lenght) {
+      let count : number = 0;
+      let count2 : number = 0;
+        this.estadosProcesos_OTService.getOtsForSalesOrder(this.test).subscribe(dataOts => {
+          dataOts.forEach(x => {
+            if(x != null) {
+              let index : number = this.ArrayPedidos.findIndex((item) => item.consecutivo == x.consecutivo && item.id_Producto == x.item.toString()); 
+              if(index) {
+                this.ArrayPedidos[index].OT = x.ot;
+                this.ArrayPedidos[index].Estado_OT = x.status;
+                if(x.extrusion > 0) this.ArrayPedidos[index].Proceso_OT = `Extrusión ${this.formatonumeros(x.extrusion.toFixed(2))} Kg`;
+                if(x.impresión > 0) this.ArrayPedidos[index].Proceso_OT = `Impresión ${this.formatonumeros(x.impresión.toFixed(2))} Kg`;
+                if(x.rotograbado > 0) this.ArrayPedidos[index].Proceso_OT = `Rotograbado ${this.formatonumeros(x.rotograbado.toFixed(2))} Kg`;
+                if(x.laminado > 0) this.ArrayPedidos[index].Proceso_OT = `Laminado ${this.formatonumeros(x.laminado.toFixed(2))} Kg`;
+                if(x.corte > 0) this.ArrayPedidos[index].Proceso_OT = `Corte ${this.formatonumeros(x.corte.toFixed(2))} Kg`;
+                if(x.doblado > 0) this.ArrayPedidos[index].Proceso_OT = `Doblado ${this.formatonumeros(x.doblado.toFixed(2))} Kg`;
+                if(x.empaque > 0) this.ArrayPedidos[index].Proceso_OT = `Empaque ${this.formatonumeros(x.empaque.toFixed(2))} Kg`;
+                if(x.selladoKg > 0) this.ArrayPedidos[index].Proceso_OT = `Sellado ${this.formatonumeros(x.selladoUnd.toFixed(2))} Und - ${this.formatonumeros(x.selladoKg.toFixed(2))} Kg`;
+                if(x.wiketiadoKg > 0) this.ArrayPedidos[index].Proceso_OT = `Wiketiado ${this.formatonumeros(x.wiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(x.wiketiadoKg.toFixed(2))} Kg`;
+                count2++
+              }
+            }
+            count += 1;
+            if(dataOts.length == count) {
+              this.cargando = false;
+            } 
+          });
+        }, error => { console.log(error); });
+      //});
+    }  
   }
 
   // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos
@@ -383,7 +443,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         const datos1 : any = [item.consecutivo, item.cliente, item.id_Producto, item.producto, parseFloat(item.cant_Pedida).toFixed(2), parseFloat(item.cant_Pendiente).toFixed(2) , parseFloat(item.cant_Facturada).toFixed(2), parseFloat(item.existencias).toFixed(2), item.presentacion, parseFloat(item.precioUnidad).toFixed(2), item.estado, item.vendedor, item.orden_Compra_CLiente, parseFloat(item.costo_Cant_Pendiente).toFixed(2), parseFloat(item.costo_Cant_Total).toFixed(2), item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT ];
         datos.push(datos1);
       }
-      console.log(datos);
+      //console.log(datos);
       let workbook = new Workbook();
       const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
       let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
@@ -454,9 +514,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         else if (row.getCell(11).value == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
         row.getCell(11).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoPedido }, }
 
-        console.log(worksheet.getColumn(5));
+        //console.log(worksheet.getColumn(5));
         
-
         worksheet.getColumn(1).width = 12;
         worksheet.getColumn(2).width = 60;
         worksheet.getColumn(3).width = 15;

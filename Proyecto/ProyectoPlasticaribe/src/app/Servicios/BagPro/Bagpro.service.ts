@@ -144,6 +144,10 @@ export class BagproService {
 
   getClientsForOT = (ot: number): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ClientesOt/getClientsForOT/${ot}`);
 
+  getOtsForCustomerOrders1 = (date1: any, date2 : any, item : number, presentation : string, idClient : number, consecutivo : string): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ClientesOt/getOtsForCustomerOrders1/${date1}/${date2}/${item}/${presentation}/${idClient}/${consecutivo}`);
+
+  getOtsForCustomerOrders2 = (pedidos : any[]) => this.http.post<any>(`${this.rutaBagPro}/ClientesOt/getOtsForCustomerOrders2`, pedidos);
+  
   /**************************************************************** CLIENTESOTITEM *******************************************************/
 
   srvObtenerListaClienteOTItems = ():Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/ClientesOtItems');

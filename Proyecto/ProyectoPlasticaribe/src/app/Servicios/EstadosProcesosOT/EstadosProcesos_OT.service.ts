@@ -28,6 +28,8 @@ export class EstadosProcesos_OTService {
 
   GetOrdenesMes_Estados = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOrdenesMes_Estados`);
 
+  getOtsForSalesOrder = (customerSales : any[]) => this.http.post<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOtsForSalesOrder`, customerSales);
+
   srvActualizarPorOT = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/ActualizacionFallaObservacion/${id}`, data);
 
   PutEstadoOrdenTrabajo = (ot : any, estado : any) => this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/putEstadoOrden/${ot}?estadoOt=${estado}`, estado);
