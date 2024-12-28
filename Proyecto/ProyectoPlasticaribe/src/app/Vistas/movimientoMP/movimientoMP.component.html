@@ -111,17 +111,25 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Tipo_Movimiento', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Usuario', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Proveedor', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Id_MateriaPrima', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Materia_Prima', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Cantidad', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Precio', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'SubTotal', 'contains')"></th>
             <th></th>
           </tr>
           <tr>
-            <th scope="col">OT / COD. DOCUMENTO</th>
-            <th scope="col">Tipo de Movimiento</th>
+            <th scope="col">OT / DOC.</th>
+            <th scope="col">Tipo Mov</th>
             <th scope="col">Fecha Registro</th>
             <th scope="col">Registrado Por:</th>
+            <th scope="col">Proveedor</th>
+            <th scope="col">Id</th>
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Subtotal</th>
             <th scope="col" id="exportar1">Ver</th>
           </tr>
         </ng-template>
@@ -131,20 +139,24 @@
             <td>{{data.Tipo_Movimiento}}</td>
             <td>{{data.Fecha | date : 'yyyy-MM-dd'}}</td>
             <td>{{data.Usuario}}</td>
+            <td>{{data.Proveedor}}</td>
+            <td>{{data.Id_MateriaPrima}}</td>
             <td>{{data.Materia_Prima}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
+            <td>{{data.Precio | number : '1.2-2'}}</td>
+            <td>{{data.SubTotal | number : '1.2-2'}}</td>
             <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="5" class="text-right">Total Kg de Polietilenos Asignados</td>
-            <td colspan="2">{{calcularTotalMaterialPrima(movimientosPolietilenos) | number : '1.0-2'}}</td>
+            <td colspan="7" class="text-right">Total Kg de Polietilenos Asignados</td>
+            <td colspan="4">{{calcularTotalMaterialPrima(movimientosPolietilenos) | number : '1.0-2'}}</td>
           </tr>
           <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="3"></td>
+            <td colspan="7"></td>
           </tr>
         </ng-template>
       </p-table>
@@ -171,17 +183,25 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Tipo_Movimiento', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Usuario', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Proveedor', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Id_Tinta', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Tinta', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Cantidad', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Precio', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Subtotal', 'contains')"></th>
             <th></th>
           </tr>
           <tr>
             <th scope="col">OT / Tinta Creada</th>
-            <th scope="col">Tipo de Movimiento</th>
+            <th scope="col">Tipo Mov.</th>
             <th scope="col">Fecha Registro</th>
             <th scope="col">Registrado Por:</th>
+            <th scope="col">Proveedor</th>
+            <th scope="col">Id</th>
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Subtotal</th>
             <th scope="col">Ver</th>
           </tr>
         </ng-template>
@@ -191,20 +211,24 @@
             <td>{{data.Tipo_Movimiento}}</td>
             <td>{{data.Fecha | date : 'yyyy-MM-dd'}}</td>
             <td>{{data.Usuario}}</td>
+            <td>{{data.Proveedor}}</td>
+            <td>{{data.Id_Tinta}}</td>
             <td>{{data.Tinta}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
+            <td>{{data.Precio | number : '1.2-2'}}</td>
+            <td>{{data.SubTotal | number : '1.2-2'}}</td>
             <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="5" class="text-right">Total Kg de Tintas Asignadas</td>
-            <td colspan="2">{{calcularTotalMaterialPrima(movimientosTintas) | number : '1.0-2'}}</td>
+            <td colspan="7" class="text-right">Total Kg de Tintas Asignadas</td>
+            <td colspan="4">{{calcularTotalMaterialPrima(movimientosTintas) | number : '1.0-2'}}</td>
           </tr>
           <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="3"></td>
+            <td colspan="7"></td>
           </tr>
         </ng-template>
       </p-table>
@@ -231,17 +255,25 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Tipo_Movimiento', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Usuario', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Proveedor', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Id', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Bopp', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Cantidad', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Precio', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'SubTotal', 'contains')"></th>
             <th></th>
           </tr>
           <tr>
-            <th scope="col">OT / COD. DOCUMENTO</th>
-            <th scope="col">Tipo de Movimiento</th>
+            <th scope="col">OT / DOC.</th>
+            <th scope="col">Tipo Mov.</th>
             <th scope="col">Fecha Registro</th>
             <th scope="col">Registrado Por:</th>
+            <th scope="col">Proveedor</th>
+            <th scope="col">Id</th>
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Subtotal</th>
             <th scope="col">Ver</th>
           </tr>
         </ng-template>
@@ -251,20 +283,24 @@
             <td>{{data.Tipo_Movimiento}}</td>
             <td>{{data.Fecha | date : 'yyyy-MM-dd'}}</td>
             <td>{{data.Usuario}}</td>
+            <td>{{data.Proveedor}}</td>
+            <td>{{data.Id_Bopp}}</td>
             <td>{{data.Bopp}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
+            <td>{{data.Precio | number : '1.2-2'}}</td>
+            <td>{{data.SubTotal | number : '1.2-2'}}</td>
             <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="5" class="text-right">Total Kg de Biorientados Asignados</td>
-            <td colspan="2">{{calcularTotalMaterialPrima(movimientosBiorientados) | number : '1.0-2'}}</td>
+            <td colspan="7" class="text-right">Total Kg de Biorientados Asignados</td>
+            <td colspan="4">{{calcularTotalMaterialPrima(movimientosBiorientados) | number : '1.0-2'}}</td>
           </tr>
           <tr>
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="3"></td>
+            <td colspan="7"></td>
           </tr>
         </ng-template>
       </p-table>

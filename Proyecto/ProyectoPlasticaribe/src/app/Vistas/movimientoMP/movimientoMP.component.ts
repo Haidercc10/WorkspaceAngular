@@ -165,6 +165,7 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   llenarMateriasPrimasConsultadas(datos){
+    console.log(datos);
     this.cargando = true;
     let count : number = 0;
     for (let i = 0; i < datos.length; i++) {
@@ -185,7 +186,8 @@ export class MovimientoMPComponent implements OnInit {
         Cantidad : datos[i].cantidad,
         Presentacion : datos[i].presentacion,
         Precio : datos[i].precio,
-        SubTotal : datos[i].subTotal,
+        SubTotal : (datos[i].cantidad * datos[i].precio),
+        Proveedor : datos[i].proveedor
       };
       this.agrupacionMateriasPrimas(datos[i], info);
       count++;

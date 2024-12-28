@@ -20,6 +20,7 @@ import { AppComponent } from 'src/app/app.component';
 import { RePrint } from '../Produccion_Sellado/Produccion_Sellado.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { log } from 'node:console';
 
 @Component({
   selector: 'app-Produccion_Extrusion',
@@ -193,20 +194,24 @@ export class Produccion_ExtrusionComponent implements OnInit {
       const port: SerialPort = await navigator.serial.requestPort();
       await port.open({ baudRate: 9600 });
       this.chargeDataFromSerialPort(port);
+      console.log(port);
     } catch (ex) {
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
-      else this.msj.mensajeError(ex);
+      else {
+        this.msj.mensajeError(ex);
+        console.log(ex);
+      } 
     }
   }
 
   async chargeDataFromSerialPort(port: SerialPort) {
     let reader;
-    let keepReading: boolean = true;
+    let keepReading: boolean = true;   
     while (port.readable && keepReading) {
       reader = port.readable.getReader();
       try {
         while (true) {
-          const { value, done } = await reader.read();
+          const { value, done } = reader.read();
           if (done) {
             reader.releaseLock();
             break;
@@ -234,6 +239,28 @@ export class Produccion_ExtrusionComponent implements OnInit {
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   eliminarDiacriticos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+  async test(){
+    try {
+      const port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      this.testReadData(port); 
+      console.log(1, port);
+    } catch (error) {
+      console.log(2, error);
+    } finally {
+      console.log(`Finally`);
+      
+    }
+  }
+
+  async testReadData(port : SerialPort){
+    console.log(1.1, port.readable);
+    while (port.readable) {
+      const reader = port.readable.getReader();
+      console.log(reader);
+    }
+  }
 
   limpiarCampos() {
     this.cargando = false;
