@@ -31,12 +31,12 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lecturaStorage();
-    if ([1,60,12,94].includes(this.ValidarRol)) this.ordenTrabajo = true;
-    if ([3,12].includes(this.ValidarRol)) this.materiaPrima = true;
-    if ([61,12].includes(this.ValidarRol)) this.pedidos = true;
+    if ([1,60,12,94,85].includes(this.ValidarRol)) this.ordenTrabajo = true;
+    if ([3,12,85].includes(this.ValidarRol)) this.materiaPrima = true;
+    if ([61,12,85].includes(this.ValidarRol)) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
-    if ([1,12,94].includes(this.ValidarRol)) this.inventarioAreas = true;
-    if ([6,12].includes(this.ValidarRol)) this.facturacion = true;
+    if ([1,12,94,85].includes(this.ValidarRol)) this.inventarioAreas = true;
+    if ([6,12,96].includes(this.ValidarRol)) this.facturacion = true;
   }
 
   ngOnDestroy(): void {
@@ -78,11 +78,14 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 9 ? this.compras = true : this.compras = false;
     index == 10 ? this.inventarioAreas = true : this.inventarioAreas = false;
     //index == 1 && this.ValidarRol == 12 ? this.facturacion = true : null;
-    index == 0 && this.ValidarRol == 6 ? this.facturacion = true : null;
-    index == 1 && this.ValidarRol == 6 ? this.pedidos = true : null;
+    index == 0 && [12,96].includes(this.ValidarRol) ? this.facturacion = true : null;
+    index == 1 && [12,96].includes(this.ValidarRol) ? this.pedidos = true : null;
     //index == 2 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
     //index == 3 && this.ValidarRol == 12 ? this.pedidos = true : null;
     index == 0 && this.ValidarRol == 94 ? this.ordenTrabajo = true : null;
     index == 1 && this.ValidarRol == 94 ? this.inventarioAreas = true : null;
+    index == 1 && [85,].includes(this.ValidarRol) ? this.materiaPrima = true : null;
+    index == 2 && [85,].includes(this.ValidarRol) ? this.pedidos = true : null;
+    index == 3 && [85,].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
   }
 }

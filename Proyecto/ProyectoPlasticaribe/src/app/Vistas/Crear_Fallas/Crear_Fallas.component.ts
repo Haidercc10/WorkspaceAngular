@@ -7,6 +7,8 @@ import { TpFallasTecnicasService } from 'src/app/Servicios/TipoFallasTecnicas/Tp
 import { AppComponent } from 'src/app/app.component';
 import { EliminarRollos_ProduccionComponent } from '../EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
+import { IngresoProduccion_DespachoComponent } from '../IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
+import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +32,9 @@ export class Crear_FallasComponent implements OnInit {
     private svTypeFails : TpFallasTecnicasService, 
     private svTechnicalFails : FallasTecnicasService, 
     private cmDeleteRolls : EliminarRollos_ProduccionComponent, 
-    private cmpDevolutionItems : Devolucion_OrdenFacturacionComponent) {
+    private cmpDevolutionItems : Devolucion_OrdenFacturacionComponent, 
+    private cmpUbicationsRolls : Ubicaciones_RollosComponent,
+  ) {
       this.selectedMode = this.AppComponent.temaSeleccionado;
       this.loadForm();
   }
@@ -75,6 +79,9 @@ export class Crear_FallasComponent implements OnInit {
         this.cmDeleteRolls.getFails();
         this.cmpDevolutionItems.modalFails = false;
         this.cmpDevolutionItems.getFails(); 
+        this.cmpDevolutionItems.modalFails = false;
+        this.cmpUbicationsRolls.getFails(); 
+        setTimeout(() => { this.form.reset(); }, 2000);
       }, error => {
         this.svMsjs.mensajeError(`Error`, `Ha ocurrido un error, por favor verifique!`);
         this.load = false;
@@ -90,7 +97,6 @@ export class Crear_FallasComponent implements OnInit {
     this.form.patchValue({ 'description' : fail, });
   }
 
-  
 }
 
 export interface fails {

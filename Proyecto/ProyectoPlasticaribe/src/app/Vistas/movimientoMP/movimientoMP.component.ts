@@ -13,6 +13,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
 import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
 import { tableLayouts } from 'pdfmake/build/pdfmake';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Injectable({
     providedIn: 'root'
@@ -45,6 +46,8 @@ export class MovimientoMPComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   cantRestante : number = 0;
   cantAsignada : number = 0;
+  movements : any = [];
+  activeTab : any = `Materias Primas`;
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -54,7 +57,8 @@ export class MovimientoMPComponent implements OnInit {
                         private shepherdService: ShepherdService,
                           private mensajeService : MensajesAplicacionService,
                             private creacionPDFService : CreacionPdfService,
-                              private cmpEntryBOPP : EntradaBOPPComponent) {
+                              private cmpEntryBOPP : EntradaBOPPComponent, 
+                                private svExcel : CreacionExcelService,) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo : [null, Validators.required],
@@ -603,4 +607,141 @@ export class MovimientoMPComponent implements OnInit {
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
   }
+
+  //Función que exportará un formato excel con los datos de los clientes
+  exportExcel(data : any){
+    this.activeTab == `Materias Primas` ? data = this.movimientosPolietilenos :
+    this.activeTab == `Tintas` ? data = this.movimientosTintas :
+    this.activeTab == `Biorientados` ? data = this.movimientosBiorientados : data = [];
+
+    if(data.length > 0) {
+      setTimeout(() => { this.loadSheetAndStyles(data, this.activeTab); }, 500);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data : any, typeData : string){  
+    let title : any = `Movimientos ${typeData}`;  
+    title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5']; 
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:J3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [2,7,9,10].forEach(x => ws.getColumn(x).width = 10);
+    [4,].forEach(x => ws.getColumn(x).width = 15);
+    [8].forEach(x => ws.getColumn(x).width = 50);
+    [3,5,6].forEach(x => ws.getColumn(x).width = 40);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      'N°',
+      'OT/Doc',
+      'Tipo Mov.',
+      'Fecha Registro', 
+      'Usuario',
+      'Proveedor', 
+      'Id',
+      'Material',
+      'Cantidad', 
+      'Precio',
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J']; 
+    
+    let formatNumber: Array<number> = [9];
+    let formatNumber$: Array<number> = [10];
+    formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    formatNumber$.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
+    
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.Codigo,
+        x.Tipo_Movimiento,
+        x.Fecha.replace('T00:00:00', ''),
+        x.Usuario,
+        x.Proveedor,
+        this.activeTab == `Materias Primas` ? x.Id_MateriaPrima :
+        this.activeTab == `Tintas` ? x.Id_Tinta :
+        this.activeTab == `Biorientados` ? x.Id_Bopp : null,
+        this.activeTab == `Materias Primas` ? x.Materia_Prima :
+        this.activeTab == `Tintas` ? x.Tinta :
+        this.activeTab == `Biorientados` ? x.Bopp : null,
+        x.Cantidad,
+        x.Precio
+      ]);
+    });
+    return info;
+  }
+
+  changeTab(event : any){
+    let tab : any = event.originalEvent.srcElement.innerText;
+    
+    if(tab == 'Materias Primas') this.activeTab = `Materias Primas`;
+    else if(tab == 'Tintas') this.activeTab = `Tintas`;
+    else if(tab == 'Biorientados') this.activeTab = `Biorientados`;
+  } 
+
 }

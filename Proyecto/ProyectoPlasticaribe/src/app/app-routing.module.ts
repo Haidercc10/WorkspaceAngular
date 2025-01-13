@@ -159,6 +159,7 @@ export const routes: Routes = [
   { path: 'reporte-produccion', loadChildren: () => import('./Modules/reporte-produccion/reporte-produccion.module').then(m => m.ReporteProduccionModule) },
   { path: 'reportes-generales', loadChildren: () => import('./Modules/reportes-consolidados/reportes-consolidados.module').then(m => m.ReportesConsolidadosModule) },
   { path: 'reporte-facturacion-clientes', loadChildren: () => import('./Modules/reporte-facturacion-clientes/reporte-facturacion-clientes.module').then(m => m.ReporteFacturacionClientesModule) },
+  { path: 'reporte-clientes', loadChildren: () => import('./Modules/reporte-clientes/reporte-clientes.module').then(m => m.ReporteClientesModule) },
   
   /*************************************************************** PELETIZADO *************************************************************************************************/
   { path: 'ingreso-peletizado', loadChildren: () => import('./Modules/ingreso-peletizado/ingreso-peletizado.module').then(m => m.IngresoPeletizadoModule) },

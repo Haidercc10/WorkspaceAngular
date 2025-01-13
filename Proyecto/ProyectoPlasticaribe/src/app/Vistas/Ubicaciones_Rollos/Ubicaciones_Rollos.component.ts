@@ -49,6 +49,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
   form !: FormGroup;
   users : any = [];
   fails : any = [];
+  modalFails : boolean = false;
 
   constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,

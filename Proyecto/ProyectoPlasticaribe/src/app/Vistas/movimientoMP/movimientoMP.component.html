@@ -85,15 +85,20 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <button pButton id="export" class="p-button-outlined p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportExcel(movements)"></button>
       </div>
     </div>
   </form>
 
-  <p-tabView id="tab">
+  <p-tabView id="tab" (onChange)="changeTab($event)">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      
+    </div>
     <p-tabPanel
       header="Materias Primas"
       leftIcon="pi pi-th-large"
       tooltip="Información de movimientos de las Materias Primas">
+      
       <p-table
         #dt1
         [resizableColumns]="true"
@@ -116,7 +121,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Materia_Prima', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Cantidad', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Precio', 'contains')"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'SubTotal', 'contains')"></th>
+            <!--<th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'SubTotal', 'contains')"></th>-->
             <th></th>
           </tr>
           <tr>
@@ -129,7 +134,7 @@
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Precio</th>
-            <th scope="col">Subtotal</th>
+            <!--<th scope="col">Subtotal</th>-->
             <th scope="col" id="exportar1">Ver</th>
           </tr>
         </ng-template>
@@ -144,19 +149,19 @@
             <td>{{data.Materia_Prima}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
             <td>{{data.Precio | number : '1.2-2'}}</td>
-            <td>{{data.SubTotal | number : '1.2-2'}}</td>
-            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+            <!--<td>{{data.SubTotal | number : '1.2-2'}}</td>-->
+            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="7" class="text-right">Total Kg de Polietilenos Asignados</td>
-            <td colspan="4">{{calcularTotalMaterialPrima(movimientosPolietilenos) | number : '1.0-2'}}</td>
+            <td colspan="3">{{calcularTotalMaterialPrima(movimientosPolietilenos) | number : '1.0-2'}}</td>
           </tr>
           <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="7"></td>
+            <td colspan="6"></td>
           </tr>
         </ng-template>
       </p-table>
@@ -188,7 +193,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Tinta', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Cantidad', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Precio', 'contains')"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Subtotal', 'contains')"></th>
+            <!--<th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Subtotal', 'contains')"></th>-->
             <th></th>
           </tr>
           <tr>
@@ -201,7 +206,7 @@
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Precio</th>
-            <th scope="col">Subtotal</th>
+            <!--<th scope="col">Subtotal</th>-->
             <th scope="col">Ver</th>
           </tr>
         </ng-template>
@@ -216,19 +221,19 @@
             <td>{{data.Tinta}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
             <td>{{data.Precio | number : '1.2-2'}}</td>
-            <td>{{data.SubTotal | number : '1.2-2'}}</td>
-            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+            <!--<td>{{data.SubTotal | number : '1.2-2'}}</td>-->
+            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="7" class="text-right">Total Kg de Tintas Asignadas</td>
-            <td colspan="4">{{calcularTotalMaterialPrima(movimientosTintas) | number : '1.0-2'}}</td>
+            <td colspan="3">{{calcularTotalMaterialPrima(movimientosTintas) | number : '1.0-2'}}</td>
           </tr>
           <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="7"></td>
+            <td colspan="6"></td>
           </tr>
         </ng-template>
       </p-table>
@@ -260,7 +265,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Bopp', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Cantidad', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Precio', 'contains')"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'SubTotal', 'contains')"></th>
+            <!--<th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'SubTotal', 'contains')"></th>-->
             <th></th>
           </tr>
           <tr>
@@ -273,7 +278,7 @@
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Precio</th>
-            <th scope="col">Subtotal</th>
+            <!--<th scope="col">Subtotal</th>-->
             <th scope="col">Ver</th>
           </tr>
         </ng-template>
@@ -288,19 +293,19 @@
             <td>{{data.Bopp}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
             <td>{{data.Precio | number : '1.2-2'}}</td>
-            <td>{{data.SubTotal | number : '1.2-2'}}</td>
-            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+            <!--<td>{{data.SubTotal | number : '1.2-2'}}</td>-->
+            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="7" class="text-right">Total Kg de Biorientados Asignados</td>
-            <td colspan="4">{{calcularTotalMaterialPrima(movimientosBiorientados) | number : '1.0-2'}}</td>
+            <td colspan="3">{{calcularTotalMaterialPrima(movimientosBiorientados) | number : '1.0-2'}}</td>
           </tr>
           <tr>
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="7"></td>
+            <td colspan="6"></td>
           </tr>
         </ng-template>
       </p-table>

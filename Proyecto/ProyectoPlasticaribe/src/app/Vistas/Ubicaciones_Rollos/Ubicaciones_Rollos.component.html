@@ -7,7 +7,12 @@
 <div *ngIf="traslate">
   <form [formGroup]="form">
     <div class="row g-4 my-4">
-      
+
+      <!--* Crear falla -->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+      </div>
+
       <!--* Usuario -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
@@ -228,3 +233,10 @@
     </div>
   </ng-template>
 </p-toast>
+
+<!-- Modal fallas tecnicas -->
+<p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
+  <ng-template pTemplate="content">
+    <app-Crear_Fallas></app-Crear_Fallas>
+  </ng-template>  
+</p-dialog> 

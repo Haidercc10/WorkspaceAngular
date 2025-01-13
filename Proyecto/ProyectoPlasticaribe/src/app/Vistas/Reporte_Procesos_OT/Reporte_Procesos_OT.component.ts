@@ -151,7 +151,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         let datos : any =[];
 
         for (const item of this.ArrayDocumento) {
-          const datos1  : any = [item.usu, item.ot, item.Mp, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.cantUnd, item.und, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicio, item.fechaFinal];
+          const datos1  : any = [item.usu, item.ot, item.mp, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.cantUnd, item.und, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicio, item.fechaFinal];
           datos.push(datos1);
         }
         let workbook = new Workbook();

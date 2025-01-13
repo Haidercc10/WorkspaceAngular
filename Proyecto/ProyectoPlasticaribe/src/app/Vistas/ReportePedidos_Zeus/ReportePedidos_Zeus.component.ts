@@ -146,7 +146,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
           if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-        } else if ([1, 96, 6, 10, 60, 61, 12].includes(this.ValidarRol)) {
+        } else if ([1, 96, 6, 10, 60, 61, 12, 85].includes(this.ValidarRol)) {
           this.llenarArrayPedidosZeus(datos_pedidos[i], i);
           this.loadOtInCustomerOrder(datos_pedidos[i], datos_pedidos.length);
         } 
@@ -179,6 +179,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.columnas = [
       { header: 'Pedido', field: 'consecutivo', tipo: '' },
       { header: 'Cliente', field: 'cliente', tipo: '' },
+      { header: 'Ciudad', field: 'ciudad', tipo: '' },
       { header: 'Item', field: 'id_Producto', tipo: '' },
       { header: 'Producto', field: 'producto', tipo: '' },
       { header: 'Cant. Pedida', field: 'cant_Pedida', tipo: 'numero' },
@@ -332,7 +333,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   }*/
 
   loadOtInCustomerOrder(data, lenght) {
-    console.log(this.ArrayPedidos);
     this.test.push({
       'date1' : moment(data.fecha_Creacion).subtract(8, 'd').format('YYYY-MM-DD'),
       'date2' : moment(data.fecha_Creacion).add(8, 'd').format('YYYY-MM-DD'),
@@ -436,17 +436,17 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     else {
       this.cargando = true;
       const title = `Reporte de Pedidos Zeus - ${this.today}`;
-      const header = ["N° Pedido", "Cliente", "Id Producto", "Producto", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
+      const header = ["N° Pedido", "Cliente", "Ciudad", "Id Producto", "Producto", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
 
       let datos : any =[];
       for (const item of this.datosExcel) {
-        const datos1 : any = [item.consecutivo, item.cliente, item.id_Producto, item.producto, parseFloat(item.cant_Pedida).toFixed(2), parseFloat(item.cant_Pendiente).toFixed(2) , parseFloat(item.cant_Facturada).toFixed(2), parseFloat(item.existencias).toFixed(2), item.presentacion, parseFloat(item.precioUnidad).toFixed(2), item.estado, item.vendedor, item.orden_Compra_CLiente, parseFloat(item.costo_Cant_Pendiente).toFixed(2), parseFloat(item.costo_Cant_Total).toFixed(2), item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT ];
+        const datos1 : any = [item.consecutivo, item.cliente, item.ciudad, item.id_Producto, item.producto, parseFloat(item.cant_Pedida).toFixed(2), parseFloat(item.cant_Pendiente).toFixed(2) , parseFloat(item.cant_Facturada).toFixed(2), parseFloat(item.existencias).toFixed(2), item.presentacion, parseFloat(item.precioUnidad).toFixed(2), item.estado, item.vendedor, item.orden_Compra_CLiente, parseFloat(item.costo_Cant_Pendiente).toFixed(2), parseFloat(item.costo_Cant_Total).toFixed(2), item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT ];
         datos.push(datos1);
       }
       //console.log(datos);
       let workbook = new Workbook();
       const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
+      let worksheet = workbook.addWorksheet(`Reporte Pedidos Zeus - ${this.today}`);
       worksheet.addImage(imageId1, 'A1:C3');
       let titleRow = worksheet.addRow([title]);
       titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
@@ -457,98 +457,99 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
         cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
       });
-      worksheet.mergeCells('A1:T3');
+      worksheet.mergeCells('A1:U3');
       worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
       datos.forEach(d => {
-        d[4] = parseFloat(d[4].toString().replace(',', '.'));
         d[5] = parseFloat(d[5].toString().replace(',', '.'));
         d[6] = parseFloat(d[6].toString().replace(',', '.'));
         d[7] = parseFloat(d[7].toString().replace(',', '.'));
-        d[9] = parseFloat(d[9].toString().replace(',', '.'));
-        d[13] = parseFloat(d[13].toString().replace(',', '.'));
+        d[8] = parseFloat(d[8].toString().replace(',', '.'));
+        d[10] = parseFloat(d[10].toString().replace(',', '.'));
         d[14] = parseFloat(d[14].toString().replace(',', '.'));
+        d[15] = parseFloat(d[15].toString().replace(',', '.'));
         
         let row = worksheet.addRow(d);
         row.alignment = { horizontal : 'center' }
-        row.getCell(5).numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(5).font = {color : {'argb' : 'FF7F71'}, 'name': 'Calibri', 'bold' : true, 'size': 11};
+        row.getCell(6).numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(6).font = {color : {'argb' : 'FF7F71'}, 'name': 'Calibri', 'bold' : true, 'size': 11};
 
-        row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(14).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         row.getCell(15).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(16).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
 
         let colorEstadoPedido : string, colorEstadoOT : string;
         // OT con Estado
-        if (row.getCell(20).value == 17) {
+        if (row.getCell(21).value == 17) {
           colorEstadoOT = '8AFC9B';
-          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(20).value = "Terminada";
-        } else if (row.getCell(20).value == 18) {
+          row.getCell(21).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(21).value = "Terminada";
+        } else if (row.getCell(21).value == 18) {
           colorEstadoOT = '53CC48';
-          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(20).value = "Cerrada";
-        } else if (row.getCell(20).value == 3) {
+          row.getCell(21).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(21).value = "Cerrada";
+        } else if (row.getCell(21).value == 3) {
           colorEstadoOT = 'FF7878';
-          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(20).value = "Anulado";
-        } else if (row.getCell(20).value == 14) {
+          row.getCell(21).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(21).value = "Anulado";
+        } else if (row.getCell(21).value == 14) {
           colorEstadoOT = '83D3FF';
-          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(20).value = "Asignada";
-        } else if (row.getCell(20).value == 16) {
+          row.getCell(21).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(21).value = "Asignada";
+        } else if (row.getCell(21).value == 16) {
           colorEstadoOT = 'F3FC20;';
-          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(20).value = "En proceso";
-        } else if (row.getCell(20).value == 15) {
+          row.getCell(21).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(21).value = "En proceso";
+        } else if (row.getCell(21).value == 15) {
           colorEstadoOT = 'F6D45D';
-          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(20).value = "Abierta";
+          row.getCell(21).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(21).value = "Abierta";
         } else colorEstadoOT = 'FFFFFF';
 
         /** Estado Pedido*/
-        if (row.getCell(11).value == 'Pendiente') colorEstadoPedido = 'FF7F71'
-        else if (row.getCell(11).value == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
-        row.getCell(11).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoPedido }, }
+        if (row.getCell(12).value == 'Pendiente') colorEstadoPedido = 'FF7F71'
+        else if (row.getCell(12).value == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
+        row.getCell(12).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoPedido }, }
 
         //console.log(worksheet.getColumn(5));
         
         worksheet.getColumn(1).width = 12;
         worksheet.getColumn(2).width = 60;
-        worksheet.getColumn(3).width = 15;
-        worksheet.getColumn(4).width = 60;
-        worksheet.getColumn(5).width = 15;
+        worksheet.getColumn(3).width = 30;
+        worksheet.getColumn(4).width = 15;
+        worksheet.getColumn(5).width = 60;
         worksheet.getColumn(6).width = 15;
         worksheet.getColumn(7).width = 15;
-        worksheet.getColumn(8).width = 18;
-        worksheet.getColumn(9).width = 15;
+        worksheet.getColumn(8).width = 15;
+        worksheet.getColumn(9).width = 18;
         worksheet.getColumn(10).width = 15;
-        worksheet.getColumn(11).width = 20;
-        worksheet.getColumn(12).width = 50;
-        worksheet.getColumn(13).width = 25;
-        worksheet.getColumn(14).width = 20;
+        worksheet.getColumn(11).width = 15;
+        worksheet.getColumn(12).width = 30;
+        worksheet.getColumn(13).width = 50;
+        worksheet.getColumn(14).width = 25;
         worksheet.getColumn(15).width = 20;
-        worksheet.getColumn(16).width = 15;
+        worksheet.getColumn(16).width = 20;
         worksheet.getColumn(17).width = 15;
         worksheet.getColumn(18).width = 15;
-        worksheet.getColumn(19).width = 40;
-        worksheet.getColumn(20).width = 30;
+        worksheet.getColumn(19).width = 15;
+        worksheet.getColumn(20).width = 40;
+        worksheet.getColumn(21).width = 30;
       });
       setTimeout(() => {
         workbook.xlsx.writeBuffer().then((data) => {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, `Reporte de Pedidos Zeus - ${this.today}.xlsx`);
+          fs.saveAs(blob, `Reporte Pedidos Zeus - ${this.today}.xlsx`);
         });
         setTimeout(() => {
           this.msj.mensajeConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!');
           this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
-        }, 3100);
+        }, 3500);
         this.datosExcel = this.ArrayPedidos;
         this.cargando = false;
-      }, 2000);
+      }, 2500);
     }
   }
 
@@ -559,6 +560,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       arrayDatos.push([
         datos[i].consecutivo,
         datos[i].cliente,
+        datos[i].ciudad,
         datos[i].producto,
         datos[i].cant_Pedida,
         datos[i].cant_Pendiente,

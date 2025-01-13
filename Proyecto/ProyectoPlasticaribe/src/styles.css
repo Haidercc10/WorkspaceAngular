@@ -640,3 +640,8 @@ p-avatar div span {
 .stock {
   background-color: #75baff;
 }
+
+::ng-deep .view-button {
+  height: 30px;
+  width: 30px;
+}
