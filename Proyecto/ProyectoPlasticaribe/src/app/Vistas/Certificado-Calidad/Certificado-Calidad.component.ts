@@ -165,6 +165,7 @@ export class CertificadoCalidadComponent implements OnInit {
         });
         this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(datos => {
           this.calcularParametrosCuantitativos(datos, ot);
+          console.log(datos, ot);
           this.llenarParametrosCualitativos(datos, ot);
         });
         this.cargando = false;
@@ -177,23 +178,23 @@ export class CertificadoCalidadComponent implements OnInit {
     this.parametrosCuantitativos = [
       {
         Nombre : `Calibre`,
-        UndMedida : orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
+        UndMedida : 'µm',
         Nominal : orden != null ? orden.nominal_Calibre : dataBagpro != null ? parseFloat(dataBagpro.extCalibre) : 0,
-        Tolerancia : orden != null ? orden.tolerancia_Calibre : 0,
+        Tolerancia : 10, //orden != null ? orden.tolerancia_Calibre : 0, 
         Minimo : orden != null ? orden.minimo_Calibre : 0,
         Maximo : orden != null ? orden.maximo_Calibre : 0,
       },
       {
         Nombre : `Ancho Frente`,
-        UndMedida : orden != null ? orden.unidad_AnchoFrente.trim() : 'N/E',
+        UndMedida : orden != null ? orden.unidad_AnchoFrente.trim() : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
         Nominal : orden != null ? orden.nominal_AnchoFrente : dataBagpro != null ? parseFloat(dataBagpro.ptAnchopt) : 0,
-        Tolerancia : orden != null ? orden.tolerancia_AnchoFrente : 0,
+        Tolerancia : 1, //orden != null ? orden.tolerancia_AnchoFrente : 0,
         Minimo : orden != null ? orden.minimo_AnchoFrente : 0,
         Maximo : orden != null ? orden.maximo_AnchoFrente : 0,
       },
       {
         Nombre : `Ancho Fuelle`,
-        UndMedida : orden != null ? orden.unidad_AnchoFuelle.trim() : 'N/E',
+        UndMedida : orden != null ? orden.unidad_AnchoFuelle.trim() : dataBagpro != null && parseFloat(dataBagpro.ptFuelle) > 0 ? dataBagpro.extUnidadesNom.trim() : 'N/E',
         Nominal : orden != null ? orden.nominal_AnchoFuelle : dataBagpro != null ? parseFloat(dataBagpro.ptFuelle) : 0,
         Tolerancia : orden != null ? orden.tolerancia_AnchoFuelle : 0,
         Minimo : orden != null ? orden.minimo_AnchoFuelle : 0,
@@ -201,9 +202,9 @@ export class CertificadoCalidadComponent implements OnInit {
       },
       {
         Nombre : `Largo / Repetición`,
-        UndMedida : orden != null ? orden.unidad_LargoRepeticion.trim() : 'N/E',
+        UndMedida : orden != null ? orden.unidad_LargoRepeticion.trim() : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
         Nominal : orden != null ? orden.nominal_LargoRepeticion : dataBagpro != null ? parseFloat(dataBagpro.ptLargopt) : 0,
-        Tolerancia : orden != null ? orden.tolerancia_LargoRepeticion : 0,
+        Tolerancia : 1, //orden != null ? orden.tolerancia_LargoRepeticion : 0,
         Minimo : orden != null ? orden.minimo_LargoRepeticion : 0,
         Maximo : orden != null ? orden.maximo_LargoRepeticion : 0,
       },
@@ -239,27 +240,27 @@ export class CertificadoCalidadComponent implements OnInit {
     this.paramertosCualitativos = [
       {
         Nombre : `Material`,
-        Resulatado : orden != null ? orden.material : '',
+        Resulatado : orden != null ? orden.material : dataBagpro.extMaterialNom.trim(),
       },
       {
         Nombre : `Resistencia`,
-        Resulatado : orden != null ? orden.resistencia : 'N/A',
+        Resulatado : 'Alta', //orden != null ? orden.resistencia : 'N/A',
       },
       {
         Nombre : `Sellabilidad`,
-        Resulatado : orden != null ? orden.sellabilidad : '',
+        Resulatado : 'Alta', //orden != null ? orden.sellabilidad : '',
       },
       {
         Nombre : `Transparencia`,
-        Resulatado : orden != null ? orden.transparencia : 'N/A',
+        Resulatado : 'Alta', //orden != null ? orden.transparencia : 'N/A',
       },
       {
         Nombre : `Tratado`,
-        Resulatado : orden != null ? orden.tratado : dataBagpro != null ? ![1, 2].includes(dataBagpro.extTratado) ? 'Si' : 'No' : 'N/A',
+        Resulatado : orden != null ? orden.tratado : dataBagpro != null ? ['1', '2', '0', null].includes(dataBagpro.extTratado.trim()) ? 'No' : 'Sí' : 'N/A',
       },
       {
         Nombre : `Impresión`,
-        Resulatado : orden != null ? orden.impresion : dataBagpro != null ? dataBagpro.impTinta1.trim() == '1' ? 'Si' : 'No' : 'N/A',
+        Resulatado : orden != null ? orden.impresion : dataBagpro != null ? dataBagpro.impTinta1.trim() == '1' ? 'No' : 'Sí' : 'N/A',
       },
     ];
   }
@@ -347,14 +348,14 @@ export class CertificadoCalidadComponent implements OnInit {
           [
             { border: [true, true, false, false], text: `Orden / Lote`, bold: true },
             { border: [false, true, false, false], text: `${datos.orden_Trabajo}` },
-            { border: [true, true, false, false], text: `Referencia`, bold: true },
-            { border: [false, true, true, false], text: `${datos.referencia}` },
+            { border: [true, true, false, false], text: `Item`, bold: true },
+            { border: [false, true, true, false], text: `${datos.item}` },
           ],
           [
             { border: [true, false, false, false], text: `Cliente`, bold: true },
             { border: [false, false, true, false], text: `${datos.cliente}` },
-            { border: [false, false, false, false], text: `Cantidad`, bold: true },
-            { border: [false, false, true, false], text: `${this.formatonumeros(datos.cantidad_Producir.toFixed(2))} ${datos.presentacion_Producto}` },
+            { border: [false, false, false, false], text: `Referencia`, bold: true },
+            { border: [false, false, true, false], text: `${datos.referencia}` },
           ],
           [
             { border: [true, false, false, true], text: `Fecha Orden`, bold: true },
@@ -396,7 +397,7 @@ export class CertificadoCalidadComponent implements OnInit {
       this.parametroCuantitativoAnchoFrentePDF(datos),
       this.parametroCuantitativoAnchoFuellePDF(datos),
       this.parametroCuantitativoLargoRepeticionPDF(datos),
-      this.parametroCuantitativoCofPDF(datos)
+      //this.parametroCuantitativoCofPDF(datos)
     ];
     return {
       margin: [8, 0],
@@ -422,7 +423,7 @@ export class CertificadoCalidadComponent implements OnInit {
   parametroCuantitativoAnchoFrentePDF(datos : any) : any [] {
     return [
       { text: 'Ancho Frente', fontSize: 9, bold : true },
-      { text: `${datos.unidad_AnchoFrente}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_AnchoFrente == 0 ? 'N/E' : datos.unidad_AnchoFrente}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_AnchoFrente}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_AnchoFrente}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.minimo_AnchoFrente}`, fontSize: 9, alignment: 'center' },
@@ -433,7 +434,7 @@ export class CertificadoCalidadComponent implements OnInit {
   parametroCuantitativoAnchoFuellePDF(datos : any) : any [] {
     return [
       { text: 'Ancho Fuelle', fontSize: 9, bold : true },
-      { text: `${datos.unidad_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_AnchoFuelle == 0 ? 'N/E' : datos.unidad_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.minimo_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
@@ -444,7 +445,7 @@ export class CertificadoCalidadComponent implements OnInit {
   parametroCuantitativoLargoRepeticionPDF(datos : any) : any [] {
     return [
       { text: 'Largo / Repetición', fontSize: 9, bold : true },
-      { text: `${datos.unidad_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_LargoRepeticion == 0 ? 'N/E' : datos.unidad_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.minimo_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
