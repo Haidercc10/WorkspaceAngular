@@ -11,6 +11,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
 import { firmaJefeCalidad } from './FirmaJefeCalidad';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,7 @@ export class CertificadoCalidadComponent implements OnInit {
   materiales : string [] = []; //Variable que almacenará la información de los materiales
   parametrosCuantitativos : any [] = []; //Variable que almacenará la información de los parametros cuantitativos de la orden de trabajo
   paramertosCualitativos : any [] = []; //Variable que almacenará la información de los parametros cualitativos de la orden de trabajo
+  clients : any = [];
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -47,7 +49,8 @@ export class CertificadoCalidadComponent implements OnInit {
                       private undMedService : UnidadMedidaService,
                         private bagproService : BagproService,
                           private shepherdService: ShepherdService,
-                            private creacionPDFService : CreacionPdfService,){
+                            private creacionPDFService : CreacionPdfService,
+                              private svZeus : InventarioZeusService){
 
     this.FormOrden = this.frmBuilder.group({
       Orden : [null, Validators.required],
@@ -81,6 +84,19 @@ export class CertificadoCalidadComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  searchClientsByName(){
+    let client : any = this.FormOrden.value.Cliente;
+    this.svZeus.getClientByName(client).subscribe(data => { this.clients = data; });
+  }
+
+  selectClient() {
+    let client = this.clients.find(x => x.razoncial == this.FormOrden.value.Cliente);
+    setTimeout(() => {
+      console.log(client);
+      this.FormOrden.patchValue({ 'Cliente': client.razoncial, });
+    }, 500);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -178,7 +194,7 @@ export class CertificadoCalidadComponent implements OnInit {
     this.parametrosCuantitativos = [
       {
         Nombre : `Calibre`,
-        UndMedida : 'µm',
+        UndMedida : dataBagpro != null ? dataBagpro.extMaterialNom.trim() == 'BOPP' ? 'µm' : 'Mils Pulg' : 'N/E', //orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
         Nominal : orden != null ? orden.nominal_Calibre : dataBagpro != null ? parseFloat(dataBagpro.extCalibre) : 0,
         Tolerancia : 10, //orden != null ? orden.tolerancia_Calibre : 0, 
         Minimo : orden != null ? orden.minimo_Calibre : 0,

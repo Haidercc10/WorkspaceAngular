@@ -79,6 +79,8 @@ export class ReporteProduccionComponent implements OnInit {
       if ([63,89].includes(this.ValidarRol)) this.areasEmpresa = ['ROTOGRABADO', 'LAMINADO'];
       if ([75].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION'];
       if ([80].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE'];
+      if ([94].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
+      if ([97].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
     } else this.areasEmpresa = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
   }
 

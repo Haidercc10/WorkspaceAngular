@@ -55,7 +55,7 @@
       <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
       <button pButton class="p-button-danger" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="dataSearched.length == 0" (click)="createPDF()"></button>
-      <button pButton class="p-button-success p-button-outlined" type="button" label="Cambiar ubicación" (click)="loadModal(false)" icon="pi pi-arrow-right-arrow-left" *ngIf="validateRole == 1" [disabled]="dataSelected.length == 0" pTooltip="Desde aquí podrás cambiar la ubicación de los rollos que selecciones en la tabla"></button>
+      <button pButton class="p-button-success p-button-outlined" type="button" label="Cambiar ubicación" (click)="loadModal(false)" icon="pi pi-arrow-right-arrow-left" *ngIf="[97,1].includes(validateRole)" [disabled]="dataSelected.length == 0" pTooltip="Desde aquí podrás cambiar la ubicación de los rollos que selecciones en la tabla"></button>
       <button pButton class="p-button-danger p-button-outlined" type="button" label="Trasladar/Sacar Rollos" (click)="loadModal(true)" icon="pi pi-sort-alt" *ngIf="validateRole == 1" [disabled]="dataSelected.length == 0" pTooltip="Aquí podrás trasladar o sacar de la bódega de despacho los rollos que selecciones en la tabla"></button>
 
     </div>
@@ -90,6 +90,7 @@
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ubication')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'stateRollPP')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'user')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hour')"></th>
     </tr>
@@ -102,10 +103,11 @@
       <th class="text-center" pSortableColumn="production"><p-sortIcon field="production"></p-sortIcon> Rollo</th>
       <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cantidad</th>
       <th class="text-center" pSortableColumn=""><p-sortIcon field="weight"></p-sortIcon> Peso</th>
-      <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
+      <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Und.</th>
       <th class="text-center" pSortableColumn="process"><p-sortIcon field="process"></p-sortIcon> Proceso</th>
       <th class="text-center" pSortableColumn="ubication"><p-sortIcon field="ubication"></p-sortIcon> Ubicación</th>
       <th class="text-center" pSortableColumn="stateRollPP"><p-sortIcon field="stateRollPP"></p-sortIcon> Estado</th>
+      <th class="text-center" pSortableColumn="user"><p-sortIcon field="user"></p-sortIcon> Usuario</th>
       <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
       <th class="text-center" pSortableColumn="hour"><p-sortIcon field="hour"></p-sortIcon> Hora</th>
     </tr>
@@ -135,6 +137,7 @@
                                         'bg-blue2' : data.stateRollPP == 'EN REPOSICION',
                                        }">{{data.stateRollPP}}</span>
       </td>
+      <td class="text-center"> {{data.user}}</td>
       <td class="text-center"> {{data.date}}</td>
       <td class="text-center">{{data.hour}}</td>
     </tr>
