@@ -202,7 +202,7 @@ export class CertificadoCalidadComponent implements OnInit {
       },
       {
         Nombre : `Ancho Frente`,
-        UndMedida : orden != null ? orden.unidad_AnchoFrente.trim() : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
+        UndMedida : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_AnchoFrente.trim() : 'N/E',
         Nominal : orden != null ? orden.nominal_AnchoFrente : dataBagpro != null ? parseFloat(dataBagpro.ptAnchopt) : 0,
         Tolerancia : 1, //orden != null ? orden.tolerancia_AnchoFrente : 0,
         Minimo : orden != null ? orden.minimo_AnchoFrente : 0,
@@ -210,7 +210,7 @@ export class CertificadoCalidadComponent implements OnInit {
       },
       {
         Nombre : `Ancho Fuelle`,
-        UndMedida : orden != null ? orden.unidad_AnchoFuelle.trim() : dataBagpro != null && parseFloat(dataBagpro.ptFuelle) > 0 ? dataBagpro.extUnidadesNom.trim() : 'N/E',
+        UndMedida : dataBagpro != null && parseFloat(dataBagpro.ptFuelle) > 0 ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_AnchoFuelle.trim() : 'N/E',
         Nominal : orden != null ? orden.nominal_AnchoFuelle : dataBagpro != null ? parseFloat(dataBagpro.ptFuelle) : 0,
         Tolerancia : orden != null ? orden.tolerancia_AnchoFuelle : 0,
         Minimo : orden != null ? orden.minimo_AnchoFuelle : 0,
@@ -218,7 +218,7 @@ export class CertificadoCalidadComponent implements OnInit {
       },
       {
         Nombre : `Largo / Repetición`,
-        UndMedida : orden != null ? orden.unidad_LargoRepeticion.trim() : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
+        UndMedida : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_LargoRepeticion.trim() : 'N/E',
         Nominal : orden != null ? orden.nominal_LargoRepeticion : dataBagpro != null ? parseFloat(dataBagpro.ptLargopt) : 0,
         Tolerancia : 1, //orden != null ? orden.tolerancia_LargoRepeticion : 0,
         Minimo : orden != null ? orden.minimo_LargoRepeticion : 0,
@@ -253,10 +253,12 @@ export class CertificadoCalidadComponent implements OnInit {
 
   // Funcion que va a llenar los paramatros cualitativos de la orden de trabajo
   llenarParametrosCualitativos(orden : any, dataBagpro : any = null){
+    console.log(orden.material, dataBagpro.extMaterialNom.trim());
+    
     this.paramertosCualitativos = [
       {
         Nombre : `Material`,
-        Resulatado : orden != null ? orden.material : dataBagpro.extMaterialNom.trim(),
+        Resulatado : dataBagpro != null ? dataBagpro.extMaterialNom.trim() : orden.material,
       },
       {
         Nombre : `Resistencia`,

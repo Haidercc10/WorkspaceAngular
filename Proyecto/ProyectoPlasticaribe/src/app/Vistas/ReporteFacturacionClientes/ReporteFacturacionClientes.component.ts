@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
@@ -30,7 +31,8 @@ export class ReporteFacturacionClientesComponent implements OnInit {
   constructor(private appComponent: AppComponent,
     private zeusInvService: InventarioZeusService,
     private frmBuilder: FormBuilder,
-    private msg: MensajesAplicacionService,) {
+    private msg: MensajesAplicacionService,
+    private svExcel: CreacionExcelService) {
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
 
@@ -243,6 +245,145 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     this.billsPerClient.forEach(bill => total += bill.finalSubTotal);
     return total;
   }
+  //Función que exportará un formato excel con los datos de los clientes
+  exportExcel(){
+    console.log(this.billsPerClient);
+    if(this.billsPerClient.length > 0) {
+      setTimeout(() => { this.loadSheetAndStyles(this.billsPerClient); }, 500);
+    } else this.msg.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data : any){  
+    let title : any = `Reporte de Facturación de Clientes`;  
+    title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5']; 
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:I3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [4,9].forEach(x => ws.getColumn(x).width = 40);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [2,3,5,9,8,6,7].forEach(x => ws.getColumn(x).width = 15);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      'N°',
+      'Factura',
+      'NIT/CC',
+      'Razón Social',
+      'Fecha',
+      'Valor', 
+      'Descuento',
+      'Iva', 
+      'Subtotal',
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let contador : any = 6;
+    let formatNumber: Array<number> = [6,7,8,9];
+    formatNumber.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
+    let row : any = ['A','B','C','D','E','F','G','H','I']; 
+    
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    }); 
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.bill,
+        x.id_Client,
+        x.client,
+        x.date,
+        x.subTotal, 
+        x.subTotalDiscount,
+        x.subTotalIVA,
+        x.finalSubTotal,
+      ]);
+    });
+    this.addTotal(info);
+    return info;
+  }
+
+  //Agregar fila de totales al formato excel.
+  addTotal(info : any){
+    info.push([
+      '',
+      '',
+      '',
+      '',
+      'TOTAL',
+      this.qtySubTotal(),
+      this.qtyDiscount(),
+      this.qtyIva(),
+      this.qtyTotal()
+    ]);
+  }
+
+  qtyTotal = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.finalSubTotal, 0);
+
+  qtyIva = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.subTotalIVA, 0);
+
+  qtyDiscount = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.subTotalDiscount, 0);
+  
+  qtySubTotal = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.subTotal, 0);
+
 }
 
 interface BillsClient {

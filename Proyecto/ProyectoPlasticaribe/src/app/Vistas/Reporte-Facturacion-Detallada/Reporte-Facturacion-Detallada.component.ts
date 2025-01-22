@@ -214,7 +214,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   totalFacturas(){
     let total : number = 0;
     this.dataFacturacion.forEach(fac => {
-      if (fac.recibo != 'DEVOLUCIÓN') total += fac.suma;
+      if (fac.recibo != 'DEVOLUCIÓN') total += fac.subTotal;
     });
     return total;
   }

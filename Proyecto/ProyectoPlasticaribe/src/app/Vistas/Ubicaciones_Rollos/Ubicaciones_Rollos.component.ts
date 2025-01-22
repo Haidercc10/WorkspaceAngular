@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -14,6 +14,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import moment from 'moment';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Ubicaciones_Rollos',
@@ -82,7 +86,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
     })
   }
 
-  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 121, 3124, 115, 113].includes(x.usua_Id)); });
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 121, 3124, 115, 113, 3145, 3142].includes(x.usua_Id)); });
 
   //Leer storage del navegador.
   readStorage() {

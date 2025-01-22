@@ -85,6 +85,9 @@ export class InventarioZeusService {
   GetValorFacturadoHoy() {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/FacturaDeCliente/ValorFacturadoHoy`);
   }
+
+  getDataFactura = (fact : string) => this.http.get<any>(this.rutaInventarioZeusAPI + `/FacturaDeCliente/getDataFactura/${fact}`);
+  
   /************************************************************ MOVIMIENTOS ITEMS **************************************************************/
   GetFacturacionMensual(fecha1: any, fecha2: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionMensual/${fecha1}/${fecha2}`);

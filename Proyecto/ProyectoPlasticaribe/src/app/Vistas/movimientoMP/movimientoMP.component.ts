@@ -218,6 +218,7 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a validar el tipo de movimiento para crear el pdf
   validarTipoMovimiento(data : any){
+    console.log(data);
     this.datosPdf = [];
     this.cargando = true;
     let movAsignaciones : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS'];

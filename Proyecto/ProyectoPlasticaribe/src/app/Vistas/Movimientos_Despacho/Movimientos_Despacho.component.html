@@ -79,60 +79,60 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Registros consultados</h4>
   </div>
 
-  <p-table [value]="dataDespacho" dataKey="factura" [tableStyle]="{ 'min-width': '60rem' }">
+  <p-table [value]="dataDespacho" dataKey="id_Conductor" [tableStyle]="{ 'min-width': '60rem' }">
     <ng-template pTemplate="header">
       <tr>
         <th style="width: 5rem"></th>
-        <th scope="col">Factura <p-sortIcon field="factura" id="sort"></p-sortIcon></th>
-        <th scope="col">Cliente <p-sortIcon field="cliente"></p-sortIcon></th>
+        <th scope="col">Id Conductor <p-sortIcon field="id_Conductor"></p-sortIcon></th>
         <th scope="col">Conductor <p-sortIcon field="conductor"></p-sortIcon></th>
         <th scope="col">Placa Camión <p-sortIcon field="placa"></p-sortIcon></th>
-        <th scope="col">Peso Neto <p-sortIcon field="PesoTotal"></p-sortIcon></th>
+        <th scope="col">Valor Total <p-sortIcon field="total"></p-sortIcon></th>
+        <th scope="col">Valor Contado <p-sortIcon field=""></p-sortIcon></th>
         <th scope="col">Fecha <p-sortIcon field="fecha"></p-sortIcon></th>
-        <th scope="col">Hora <p-sortIcon field="hora"></p-sortIcon></th>
         <th scope="col">Ver</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-data let-expanded="expanded">
+    <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
       <tr>
         <td>
           <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
         </td>
-        <td>{{data.factura}}</td>
-        <td>{{data.cliente}}</td>
-        <td>{{data.conductor}}</td>
+        <td>{{data.id_Conductor}}</td>
+        <td><b>{{data.conductor}}</b></td>
         <td>{{data.placa}}</td>
-        <td>{{data.pesoTotal | number : '1.2-2'}}</td>
+        <td><b>${{totalDispatch(data, rowIndex) | number : '1.2-2'}}</b></td>
+        <td>${{totalCounting(data, rowIndex) | number : '1.2-2'}}</td>
         <td>{{data.fecha | date : 'yyyy-MM-dd'}}</td>
-        <td>{{data.hora}}</td>
         <td>
-          <button pButton type="button" id="pdf" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="PDF" icon="pi pi-file-pdf" (click)="createPDF(data)"></button>
+          <button pButton type="button" id="pdf" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="PDF" icon="pi pi-file-pdf" (click)="createPDF(data, rowIndex)"></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="rowexpansion" let-data>
       <tr>
-        <td colspan="10">
+        <td colspan="8">
           <div class="p-3">
-            <p-table [value]="data.details" dataKey="id">
+            <p-table [value]="data.details" dataKey="id_Conductor" >
               <ng-template pTemplate="header">
                 <tr>
-                  <th scope="col">Item <p-sortIcon field="item"></p-sortIcon></th>
-                  <th scope="col">Referencia <p-sortIcon field="referencia"></p-sortIcon></th>
-                  <th scope="col">Rollo <p-sortIcon field="rollo"></p-sortIcon></th>
-                  <th scope="col">Peso Neto <p-sortIcon field="peso"></p-sortIcon></th>
-                  <th scope="col">Cantidad <p-sortIcon field="cantidad"></p-sortIcon></th>
-                  <th scope="col">Presentación <p-sortIcon field="presentacion"></p-sortIcon></th>
+                  <th scope="col">#</th>
+                  <th scope="col">Factura<p-sortIcon field="factura"></p-sortIcon></th>
+                  <th scope="col">Nit/CC <p-sortIcon field="idCliente"></p-sortIcon></th>
+                  <th scope="col">Cliente <p-sortIcon field="cliente"></p-sortIcon></th>
+                  <th scope="col">Valor <p-sortIcon field="valor"></p-sortIcon></th>
+                  <th scope="col">Forma Pago<p-sortIcon field="forma_Pago"></p-sortIcon></th>
+                  <th scope="col">Peso Bruto <p-sortIcon field="peso_Bruto"></p-sortIcon></th>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="body" let-product>
+              <ng-template pTemplate="body" let-product let-rowIndex="rowIndex">
                 <tr>
-                  <td>{{product.item}}</td>
-                  <td>{{product.referencia}}</td>
-                  <td>{{product.rollo}}</td>
-                  <td>{{product.peso | number : '1.2-2'}}</td>
-                  <td>{{product.cantidad | number : '1.2-2'}}</td>
-                  <td>{{product.presentacion}}</td>
+                  <td>{{rowIndex + 1}}</td>
+                  <td><b>{{product.factura}}</b></td>
+                  <td>{{product.idCliente}}</td>
+                  <td><b>{{product.cliente}}</b></td>
+                  <td>${{product.valor | number : '1.2-2'}}</td>
+                  <td><b>{{product.forma_Pago }}</b></td>
+                  <td>{{product.peso_Bruto | number : '1.2-2'}}</td>
                 </tr>
               </ng-template>
               <ng-template pTemplate="emptymessage">

@@ -584,6 +584,7 @@ export class EntradaBOPPComponent implements OnInit {
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   crearPDF(date : any, hour : string){
+    date = date.replace('T00:00:00', '') 
     this.entradaBOPPService.getEntryBOPP(date, date, hour).subscribe(data => {
       data.forEach(d => { d.bopp = d.bopp.split('-')[0] });
       let title: string = `Entrada de BOPP N° ${data[0].id}`;
@@ -658,11 +659,10 @@ export class EntradaBOPPComponent implements OnInit {
           '#' : count,
           'Referencia' : d.bopp,
           'Rollos' : qty,
-          'Presentación' : 'Kg',
+          'Unidad' : 'Kg',
           'Cantidad' : this.formatNumbers((totalQty).toFixed(2)),
           'Precio' : this.formatNumbers((d.precio).toFixed(2)),
-          'Subtotal' : this.formatNumbers((d.precio * totalQty)),
-          
+          'Subtotal' : this.formatNumbers((d.precio * totalQty).toFixed(2)),
         });
       }
     });
@@ -682,15 +682,15 @@ export class EntradaBOPPComponent implements OnInit {
         'Micras' : `${this.formatNumbers(d.micras)} µ`,
         'Ancho' :`${this.formatNumbers(d.ancho)} Cms` ,
         'Cantidad' : this.formatNumbers((d.cantidadInicial).toFixed(2)),
-        'Presentación' : 'Kg',
+        'Unidad' : 'Kg',
       });
     });
     return infoDetails;
   } 
 
   tableConsolidated(data : any){
-    let columns: Array<string> = ['#', 'Referencia', 'Rollos', 'Cantidad', 'Presentación', 'Precio', 'Subtotal' ];
-    let widths: Array<string> = ['5%', '40%', '7%', '10%', '10%', '10%', '18%'];
+    let columns: Array<string> = ['#', 'Referencia', 'Rollos', 'Cantidad', 'Unidad', 'Precio', 'Subtotal' ];
+    let widths: Array<string> = ['4%', '50%', '6%', '10%', '6%', '9%', '15%'];
     return {
       table: {
         headerRows: 2,
@@ -707,7 +707,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   tableDetailed(data : any){
-    let columns: Array<string> = ['#', 'Serial', 'Referencia', 'Micras', 'Ancho', 'Cantidad', 'Presentación'];
+    let columns: Array<string> = ['#', 'Serial', 'Referencia', 'Micras', 'Ancho', 'Cantidad', 'Unidad'];
     let widths: Array<string> = ['3%', '13%', '50%', '8%', '8%', '8%', '10%'];
     return {
       table: {
@@ -730,7 +730,7 @@ export class EntradaBOPPComponent implements OnInit {
       fontSize: 8,
       bold: false,
       table: {
-        widths: ['5%', '40%', '7%', '10%', '10%', '10%', '18%'],
+        widths: ['4%', '50%', '6%', '10%', '6%', '9%', '15%'],
         body: [
           [
             { text: ``, alignment: 'center', border: [true, false, false, true], },

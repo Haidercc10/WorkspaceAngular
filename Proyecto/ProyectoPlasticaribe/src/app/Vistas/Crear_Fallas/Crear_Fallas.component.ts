@@ -79,7 +79,7 @@ export class Crear_FallasComponent implements OnInit {
         this.cmDeleteRolls.getFails();
         this.cmpDevolutionItems.modalFails = false;
         this.cmpDevolutionItems.getFails(); 
-        this.cmpDevolutionItems.modalFails = false;
+        this.cmpUbicationsRolls.modalFails = false;
         this.cmpUbicationsRolls.getFails(); 
         setTimeout(() => { this.form.reset(); }, 2000);
       }, error => {
