@@ -181,7 +181,7 @@ export class CertificadoCalidadComponent implements OnInit {
         });
         this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(datos => {
           this.calcularParametrosCuantitativos(datos, ot);
-          console.log(datos, ot);
+          console.log(datos);
           this.llenarParametrosCualitativos(datos, ot);
         });
         this.cargando = false;
@@ -191,6 +191,7 @@ export class CertificadoCalidadComponent implements OnInit {
 
   // Funcion que va a calcular los datos del parametro cuantitativo
   calcularParametrosCuantitativos(orden : any, dataBagpro : any = null){
+    console.log(111);
     this.parametrosCuantitativos = [
       {
         Nombre : `Calibre`,
@@ -252,9 +253,7 @@ export class CertificadoCalidadComponent implements OnInit {
   }
 
   // Funcion que va a llenar los paramatros cualitativos de la orden de trabajo
-  llenarParametrosCualitativos(orden : any, dataBagpro : any = null){
-    console.log(orden.material, dataBagpro.extMaterialNom.trim());
-    
+  llenarParametrosCualitativos(orden : any, dataBagpro : any){
     this.paramertosCualitativos = [
       {
         Nombre : `Material`,

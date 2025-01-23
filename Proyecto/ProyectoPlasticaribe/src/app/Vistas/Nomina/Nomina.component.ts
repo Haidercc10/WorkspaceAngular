@@ -367,7 +367,7 @@ export class NominaComponent implements OnInit {
       this.addPageConsilidateExcel(workbook, fill, font, border, this.dataPageOneExcel(), 1);
       this.createExcelService.creacionHoja(workbook, `Nomina Total Detallada`);
       this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageTwoExcel(), 2, ['0', '1']);
-      this.createExcelService.creacionHoja(workbook, `Nomina Recibida en Despacho`, false);
+      this.createExcelService.creacionHoja(workbook, `Nomina Recibida/No Recibida en Despacho`, false);
       this.addPageConsilidateExcel(workbook, fill, font, border, this.dataPageThreeExcel(), 3);
       this.createExcelService.creacionHoja(workbook, `Nomina Recibida en Despacho Detallada`);
       this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageFourExcel(), 4, ['1']);
@@ -378,7 +378,7 @@ export class NominaComponent implements OnInit {
 
   dataPageOneExcel(): Array<any> {
     let data = [];
-    this.arraySellado.forEach(d => data.push([d.Cedula, d.Operario, d.Cargo, d.PagoTotal]));
+    this.nominaDespacho.forEach(d => data.push([d.Cedula, d.Operario, d.Cargo, d.PagoTotal]));
     return data;
   }
 
@@ -390,7 +390,7 @@ export class NominaComponent implements OnInit {
 
   dataPageThreeExcel(): Array<any> {
     let data = [];
-    this.nominaDespacho.forEach(d => data.push([d.Cedula, d.Operario, d.Cargo, d.PagoTotal]));
+    this.arraySellado.forEach(d => data.push([d.Cedula, d.Operario, d.Cargo, d.PagoTotal]));
     return data;
   }
 

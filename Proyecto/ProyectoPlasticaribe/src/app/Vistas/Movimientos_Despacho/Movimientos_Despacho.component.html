@@ -89,7 +89,8 @@
         <th scope="col">Valor Total <p-sortIcon field="total"></p-sortIcon></th>
         <th scope="col">Valor Contado <p-sortIcon field=""></p-sortIcon></th>
         <th scope="col">Fecha <p-sortIcon field="fecha"></p-sortIcon></th>
-        <th scope="col">Ver</th>
+        <th scope="col">Planilla <p-sortIcon field="fecha"></p-sortIcon></th>
+        <th scope="col">Generar/Ver</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
@@ -103,14 +104,16 @@
         <td><b>${{totalDispatch(data, rowIndex) | number : '1.2-2'}}</b></td>
         <td>${{totalCounting(data, rowIndex) | number : '1.2-2'}}</td>
         <td>{{data.fecha | date : 'yyyy-MM-dd'}}</td>
-        <td>
-          <button pButton type="button" id="pdf" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="PDF" icon="pi pi-file-pdf" (click)="createPDF(data, rowIndex)"></button>
+        <td>{{data.planilla}}</td>
+        <td class="text-center">
+          <button *ngIf="data.planilla == null" pButton type="button" id="planilla" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Generar Planilla" icon="pi pi-plus" (click)="createSpreadSheet(data, rowIndex)"></button>
+          <button *ngIf="data.planilla != null" pButton type="button" id="pdf" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver Planilla" icon="pi pi-file-pdf" (click)="createPDF(data.planilla)"></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="rowexpansion" let-data>
       <tr>
-        <td colspan="8">
+        <td colspan="9">
           <div class="p-3">
             <p-table [value]="data.details" dataKey="id_Conductor" >
               <ng-template pTemplate="header">

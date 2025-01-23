@@ -378,11 +378,11 @@ export class ReporteFacturacionClientesComponent implements OnInit {
 
   qtyTotal = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.finalSubTotal, 0);
 
-  qtyIva = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.subTotalIVA, 0);
+  qtyIva = () => this.billsPerClient.filter(x => x.subTotalIVA > 0).reduce((a,b) => a += b.subTotalIVA, 0);
 
-  qtyDiscount = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.subTotalDiscount, 0);
+  qtyDiscount = () => this.billsPerClient.filter(x => x.subTotalDiscount > 0).reduce((a,b) => a += b.subTotalDiscount, 0);
   
-  qtySubTotal = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.subTotal, 0);
+  qtySubTotal = () => this.billsPerClient.filter(x => x.subTotal > 0).reduce((a,b) => a += b.subTotal, 0);
 
 }
 
