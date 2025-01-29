@@ -1228,7 +1228,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   comparationSaleOrder_Preload(info : any){
     let array : any = [];
-    this.comparativeProduct = [];
+    /*this.comparativeProduct = [];
     this.comparativePreload = [];
 
     this.comparativeProduct = this.products;
@@ -1251,7 +1251,7 @@ export class Orden_FacturacionComponent implements OnInit {
         }) 
       } else a[a.findIndex(x => x.item == b.item)].quantity += b.quantity;
       return a;
-    }, []);
+    }, []);*/
     
     this.products.forEach(x => {
       info.forEach(y => {
@@ -1261,15 +1261,15 @@ export class Orden_FacturacionComponent implements OnInit {
       });
     });
 
-    if(array.length == this.products.length) {
+    if(array.length > 0) {
       this.msj.mensajeConfirmacion(`Confirmación`, `El precargue de rollos se asoció exitosamente al pedido`);
       this.preloadDispatch = true;
       this.loadInfoClientPreload(info, this.formDataOrder.value.saleOrder);
       this.loadTableItemsSelected(info, this.formDataOrder.value.saleOrder);
     } else {
       this.clearTables();
-      this.msj.mensajeAdvertencia(`Advertencia`, `Existen diferencias entre el pedido y el precargue consultados, verifique!`);
-      setTimeout(() => { this.modalSaleOrderVsPreload = true; }, 1500); 
+      this.msj.mensajeAdvertencia(`Advertencia`, `El precargue debe tener al menos un item/referencia del pedido, verifique!`);
+      //setTimeout(() => { this.modalSaleOrderVsPreload = true; }, 1500); 
     }
   }
 

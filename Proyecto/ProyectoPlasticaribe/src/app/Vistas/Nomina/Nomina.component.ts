@@ -367,7 +367,7 @@ export class NominaComponent implements OnInit {
       this.addPageConsilidateExcel(workbook, fill, font, border, this.dataPageOneExcel(), 1);
       this.createExcelService.creacionHoja(workbook, `Nomina Total Detallada`);
       this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageTwoExcel(), 2, ['0', '1']);
-      this.createExcelService.creacionHoja(workbook, `Nomina Recibida/No Recibida en Despacho`, false);
+      this.createExcelService.creacionHoja(workbook, `Nomina Recibida y No Recibida en Despacho`, false);
       this.addPageConsilidateExcel(workbook, fill, font, border, this.dataPageThreeExcel(), 3);
       this.createExcelService.creacionHoja(workbook, `Nomina Recibida en Despacho Detallada`);
       this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageFourExcel(), 4, ['1']);

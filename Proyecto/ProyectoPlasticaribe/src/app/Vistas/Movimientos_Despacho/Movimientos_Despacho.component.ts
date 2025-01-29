@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
 import { modelDetalles_PlanillaDespacho } from 'src/app/Modelo/modelDetalles_PlanillaDespacho';
 import { modelPlanillas_Despacho } from 'src/app/Modelo/modelPlanillas_Despacho';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { DetallesPlanillaDespachoService } from 'src/app/Servicios/Detalles_PlanillaDespacho/detalles-planilla-despacho.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -27,8 +30,13 @@ export class Movimientos_DespachoComponent implements OnInit {
   ValidarRol: number;
   modoSeleccionado: boolean = false;
   formSearchDespacho: FormGroup;
+  form: FormGroup;
   drivers: any[] = [];
   dataDespacho: any[] = [];
+  modal : boolean = false;
+  codePlanilla : number = 0;
+  statuses : Array<any> = [];
+  @ViewChild('dt') dt: Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -40,6 +48,8 @@ export class Movimientos_DespachoComponent implements OnInit {
     private svSpreadsheets : PlanillasDespachoService,
     private svDetailsSpreadSheets : DetallesPlanillaDespachoService,
     private svAsgDispatch : AsignacionProductosFacturaService,
+    private svStatuses : EstadosService,
+    private msg : MessageService, 
   ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -50,11 +60,20 @@ export class Movimientos_DespachoComponent implements OnInit {
       driver: [null],
       car: [null],
     });
+
+    this.form = this.frmBuilder.group({
+      date: [null],
+      observation: [null],
+      counting: [null],
+      status: [null],
+      hour: [null],
+    });
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.getDrivers();
+    this.getStatuses();
   }
 
   lecturaStorage() {
@@ -114,6 +133,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     return route;
   }
 
+  //Función para crear el encabezado de las planillas
   createSpreadSheet(data : any, index : number){
     this.load = true;
     let info : modelPlanillas_Despacho = {
@@ -141,6 +161,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     });
   }
 
+  //Función para crear el detalle de las planillas
   createDetailsSpreadSheet(dataPlanilla : any, data : any,  index : number){
     let count : number = 0;
     this.dataDespacho[index].details.forEach(x => {
@@ -167,6 +188,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     });
   }
 
+  //Función para actualizar los mov. de despacho
   updateMovementsDispatch(codeSpreadSheet : number, codeDispatchs : any){
     this.svAsgDispatch.putMovementsDispatch(codeSpreadSheet, codeDispatchs).subscribe(() => {
       this.load = false;
@@ -179,24 +201,121 @@ export class Movimientos_DespachoComponent implements OnInit {
     });
   }
 
+  //Función para mostrar el valor total en pesos del despacho.
   totalDispatch(data, index): number {
     let total: number = 0;
     total = this.dataDespacho[index].details.reduce((acc, x) => acc += x.valor, 0);
     return total;
   }
 
+  //Función para mostrar el valor total en pesos de contado del despacho.
   totalCounting(data, index): number {
     let total: number = 0;
     total = this.dataDespacho[index].details.filter(x => x.forma_Pago == 'CONTADO').reduce((acc, x) => acc += x.valor, 0);
     return total;
   }
 
-  totalQuantity(data, index): number {
-    let total: number = 0;
-    total = this.dataDespacho[index].pesoTotal;
+  //Valor total cargado en camiones.
+  totalValueDispatch(){
+    let total = 0;
+    this.dataDespacho.forEach(x => { 
+      x.details.forEach(z => { total += z.valor; });
+    });
     return total;
   }
 
+  //Valor total a recaudar por facturas de contado. 
+  totalValueCounting(){
+    let total = 0;
+    this.dataDespacho.forEach(x => { 
+      x.details.forEach(z => { 
+        if(z.forma_Pago == 'CONTADO') total += z.valor; 
+      });
+    });
+    return total;
+  }
+
+  //Función para aplicar filtro en columnas
+  applyFilter = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  //Función para editar planillas por Id. 
+  editSpreadSheet(data : any){
+    this.codePlanilla = 0;
+    this.svDetailsSpreadSheets.getSpreadSheetforId(data.planilla).subscribe(dataSp => {
+      if(dataSp[0].status == 'CERRADA') this.msj.mensajeAdvertencia(`Advertencia`, `La planilla ya se encuentra cerrada!`);
+      else {
+        this.modal = true;
+        this.codePlanilla = data.planilla;
+        this.loadDataInModal(dataSp);
+      }
+    }, error => {
+      if([404, 400].includes(error.status)) this.msj.mensajeAdvertencia(`Advertencia`, `No hay planillas asociadas a este movimiento.`)
+      else this.msj.mensajeError(`Error`, `Error al consultar la planilla | ${error.status} ${error.statusText}`);
+    });
+  }
+
+  //Función para cargar los datos de la planilla en el modal.
+  loadDataInModal(data : any){
+    this.form.patchValue({
+      date : new Date(),
+      counting : data[0].planilla.pla_ValorRecibido, 
+      status : data[0].planilla.estado_Id, 
+      observation : data[0].planilla.pla_Observacion, 
+      hour : moment().format('HH:mm:ss'),
+    });
+  }
+
+  //Función para actualizar la planilla. 
+  updateSpreadSheetReceived(){
+    this.onReject('update');
+    this.load = true;
+    let date : any = moment(this.form.value.date).format('YYYY-MM-DD');
+    this.form.patchValue({ 'date' : date, 'hour' : moment().format('HH:mm:ss') });
+    
+    this.svSpreadsheets.putSpreadSheetForId(this.codePlanilla, this.form.value).subscribe(data => {
+      this.load = false;
+      this.msj.mensajeConfirmacion(`Confirmación`, `Planilla N° ${this.codePlanilla} actualizada correctamente!`);
+      this.modal = false;
+      this.createPDF(this.codePlanilla);
+    }, error => {
+      this.msj.mensajeError(`Error`, `Error al actualizar la planilla recibida N° ${this.codePlanilla} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });
+  }
+
+  //Función para limpiar los campos del modal en la planilla. 
+  clearFieldsModal(){
+    this.form.patchValue({
+      date : new Date(), 
+      counting  : 0, 
+      status : null, 
+      observation : '',
+      hour : moment().format('HH:mm:ss'),
+    })
+  }
+
+  //Función que mostrará un msj en las filas de mov. que tengan planillas asociadas. 
+  msgRowSpreadSheets(data : any){
+    return data.planilla == null ? '' : `Haz doble clic para actualizar la planilla N° ${data.planilla}`;
+  }
+
+   //Función que mostrará un msj de confirmación para la actualización de planillas.
+   viewMsjUpdateSpreadSheet(){
+    this.load = true;
+    let msg : string = `Está seguro(a) que desea actualizar la información de la planilla N° ${this.codePlanilla}`;
+    setTimeout(() => { this.msg.add({ severity:'warn', key:'update', summary: `Elección`, detail : msg,  sticky: true}); }, 200);
+  }
+
+  //Función que quitará el msj de elección
+  onReject(key : any) {
+    this.load = false;
+    this.msg.clear(key);
+  }
+
+  //Función para cargar estados.
+  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(resp => this.statuses = resp.filter(x => [11, 18].includes(x.estado_Id)));
+
+  //Función para mostrar la planilla después de que se crea. 
   createPDF(planilla : number) {
     this.load = true;
     this.svDetailsSpreadSheets.getSpreadSheetforId(planilla).subscribe(data => {
@@ -213,7 +332,14 @@ export class Movimientos_DespachoComponent implements OnInit {
     });
   }
 
+  //Función que muestra los datos generales de la planilla. 
   datosClientePDF(data: any) {
+    let date : any = data.planilla.pla_Fecha.replace('T00:00:00', '');
+    let hour : string = data.planilla.pla_Hora;
+    let dateReceived : any = data.planilla.pla_FechaRecepcion.replace('T00:00:00', ''); 
+    let hourReceived : string = data.planilla.pla_HoraRecepcion; 
+    console.log(hour,data);
+    
     return {
       margin: 5,
       table: {
@@ -231,16 +357,16 @@ export class Movimientos_DespachoComponent implements OnInit {
             { text: `Valor contado: $${this.formatonumeros(data.planilla.pla_ValorContado)}`, border: [true, true, true, true] },
           ],
           [
-            { text: `Fecha planilla: ${data.planilla.pla_Fecha.replace('T00:00:00', `- ${data.planilla.pla_Hora}`)}`, border: [true, true, false, true] },
-            { text: `Fecha recepción: ${data.planilla.pla_Fecha == data.planilla.pla_FechaRecepcion ? '' : data.planilla.pla_FechaRecepcion + ' - ' + data.planilla.pla_HoraRecepcion}`, border: [true, true, true, true] },
+            { text: `Fecha planilla: ${date.replace('T00:00:00', '') + ' ' + hour}`, border: [true, true, false, true] },
+            { text: `Fecha recepción: ${date == dateReceived && hour == hourReceived ? '' : dateReceived + ' ' + hourReceived}`, border: [true, true, true, true] },
           ],
           [
             { text: `Estado planilla: ${data.status}`, border: [true, true, false, true] },
-            { text: `Generado por: ${data.userName}`, border: [true, true, true, true] },
+            { text: `Valor contado recepcionado: $${this.formatonumeros(data.planilla.pla_ValorRecibido)}`, border: [true, true, true, true] },
           ],
           [
-            { text: `Peso bruto total: ${data.planilla.pla_PesoTotal}`, border: [true, true, false, true] },
-            { text: `Valor contado recepcionado: ${data.planilla.pla_ValorRecibido}`, border: [true, true, true, true] },
+            { text: `Peso bruto total: ${this.formatonumeros(data.planilla.pla_PesoTotal)} KLS`, border: [true, true, false, true] },
+            { text: `Generado por: ${data.userName}`, border: [true, true, true, true] },
           ],
           [
             { text: `Observacion: ${data.planilla.pla_Observacion}`, colSpan : 2, border: [true, true, true, true] },
@@ -257,6 +383,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     }
   }
 
+  //Función que muestra la información consolidad de la planilla. 
   dataProductionInPDF(dataPla) {
     let data: any = [];
     let count: number = 1;
@@ -269,11 +396,12 @@ export class Movimientos_DespachoComponent implements OnInit {
         'Forma Pago': x.details.dtPla_FormaPago,
         'Valor': this.formatonumeros((x.details.dtPla_ValorFactura).toFixed(2)),
         'Peso Bruto': this.formatonumeros((x.details.dtPla_PesoBruto).toFixed(2))
-      })
+      });
     });
     return data;
   }
 
+  //Función que crea la tabla de donde se encuentran las facturas despachadas. 
   table(data, columns) {
     return {
       margin: [0, 15, 0, 0],
@@ -291,6 +419,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     };
   }
 
+  //Función que contruye el cuerpo de la tabla
   buildTableBody(data, columns, title) {
     var body = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
@@ -305,6 +434,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     return body;
   }
 
+  //Función que muestra los totales. 
   totalQuantities(data) {
     return {
       //colSpan: 2,
@@ -326,7 +456,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     }
   }
 
-  // Tabla con textos finales. 
+  // Tabla con firmas de entrega y recibo. 
   infoAtte() {
     return {
       margin: [40, 80],

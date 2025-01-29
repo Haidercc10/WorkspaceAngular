@@ -144,9 +144,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
     this.inventarioZeusService.GetPedidos().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
-        if (this.ValidarRol == 2){
-          if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-        } else if ([1, 96, 6, 10, 60, 61, 12, 85, 97].includes(this.ValidarRol)) {
+        //if (this.ValidarRol == 2){
+        //  if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
+        /*} else*/ if ([1, 96, 6, 10, 60, 61, 12, 85, 97, 2].includes(this.ValidarRol)) {
           this.llenarArrayPedidosZeus(datos_pedidos[i], i);
           this.loadOtInCustomerOrder(datos_pedidos[i], datos_pedidos.length);
         } 

@@ -84,7 +84,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
   // Funcion que va a consultar la información de los vendedores
   consultarVendedores(){
-    if ([1,60,6].includes(this.ValidarRol)) this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
+    if ([1,60,6,2].includes(this.ValidarRol)) this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
     else if (this.ValidarRol == 2) this.vendedores = [ { usua_Id : this.storage_Id, usua_Nombre : this.storage_Nombre, } ];
   }
 

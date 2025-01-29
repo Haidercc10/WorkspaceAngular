@@ -109,8 +109,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   // Funcion que va a consultar los vendedores
   consultarVendedores(){
     this.usuariosService.GetVendedores().subscribe(data => {
-      if ([1,6,96,12].includes(this.ValidarRol)) this.Vendedores = data;
-      if (this.ValidarRol == 2) {
+      if ([1,6,96,12,2].includes(this.ValidarRol)) this.Vendedores = data;
+      /*if (this.ValidarRol == 2) {
         this.Vendedores = data.filter(x => x.usua_Id == this.storage_Id);
         let Id_Vendedor : string = `${this.Vendedores[0].usua_Id}`;
         if (Id_Vendedor.length == 1) Id_Vendedor = `00${Id_Vendedor}`;
@@ -119,7 +119,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           Vendedor: this.Vendedores[0].usua_Nombre,
           Id_Vendedor : Id_Vendedor,
         });
-      }
+      }*/
     });
   }
 

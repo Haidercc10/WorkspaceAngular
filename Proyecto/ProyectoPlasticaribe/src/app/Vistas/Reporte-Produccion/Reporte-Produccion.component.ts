@@ -71,16 +71,16 @@ export class ReporteProduccionComponent implements OnInit {
   }
 
   validarProcesoPorUsuarioRegistrado() {
-    if (![1, 10, 83, 12].includes(this.ValidarRol)) {
+    if (![1, 10, 83, 12, 2].includes(this.ValidarRol)) {
       if ([85,7,95,74].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION'];
-      if ([86,8].includes(this.ValidarRol)) this.areasEmpresa = ['SELLADO', 'Wiketiado', 'CAMISILLA'];
+      if ([86,8].includes(this.ValidarRol)) this.areasEmpresa = ['SELLADO', 'Wiketiado', 'CAMISILLA', 'IMPRESION'];
       if ([87,9,4].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'IMPRESION'];
       if ([88,62,4].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION', 'EMPAQUE'];
       if ([63,89].includes(this.ValidarRol)) this.areasEmpresa = ['ROTOGRABADO', 'LAMINADO'];
       if ([75].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION'];
       if ([80].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE'];
-      if ([94].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
-      if ([97].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
+      if ([94].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION', 'SELLADO', 'Wiketiado', 'CAMISILLA', 'IMPRESION'];
+      if ([97].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA', 'EXTRUSION'];
     } else this.areasEmpresa = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
   }
 

@@ -104,7 +104,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.ObternerFallas();
     this.obtenerEstados();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    setTimeout(() => this.validarVendedor(), 500);
+    //setTimeout(() => this.validarVendedor(), 500);
   }
 
   tutorial(){
@@ -137,7 +137,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
     this.otSeleccionada = 0;
-    this.validarVendedor();
+    //this.validarVendedor();
   }
 
   // Funcion que exportará a excel todo el contenido de la tabla

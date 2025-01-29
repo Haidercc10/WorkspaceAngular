@@ -22,7 +22,7 @@
         <!-- Id Vendedores -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="Id_Vendedor">
           <span class="p-float-label">
-            <input formControlName="Id_Vendedor" id="Id_Vendedor" [readonly]="true" type="text" pInputText autocomplete="off"/>
+            <input formControlName="Id_Vendedor" id="Id_Vendedor" type="text" pInputText autocomplete="off"/>
             <label for="Id_Vendedor">Id Vendedor</label>
           </span>
         </div>
@@ -30,7 +30,7 @@
         <!-- Vendedores -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="Vendedor">
           <span class="p-float-label">
-            <input formControlName="Vendedor" id="Vendedor" [readonly]="ValidarRol == 2" list="vendedores" (change)="llenarVendedor()" type="text" pInputText autocomplete="off"/>
+            <input formControlName="Vendedor" id="Vendedor" list="vendedores" (change)="llenarVendedor()" type="text" pInputText autocomplete="off"/>
             <datalist id="vendedores">
               <option value={{item.usua_Nombre}} *ngFor="let item of Vendedores">{{item.usua_Nombre}}</option>
             </datalist>

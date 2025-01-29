@@ -67,7 +67,7 @@
 
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="consultar" type="submit" label="Consultar" icon="pi pi-check"></button>
+        <button pButton class="p-button-danger" id="consultar" type="submit" label="Consultar" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"> </button>
       </div>
     </div>
@@ -79,22 +79,41 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Registros consultados</h4>
   </div>
 
-  <p-table [value]="dataDespacho" dataKey="id_Conductor" [tableStyle]="{ 'min-width': '60rem' }">
+  <p-table #dt 
+  [value]="dataDespacho" 
+  dataKey="id_Conductor" 
+  [tableStyle]="{ 'min-width': '60rem' }"
+  [resizableColumns]="true"
+  responsiveLayout="scroll"
+  [rowHover]="true"
+  [scrollable]="true"
+  scrollHeight="50rem">
     <ng-template pTemplate="header">
       <tr>
+        <th></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'id_Conductor', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'conductor', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'placa', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'total', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'contado', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'fecha', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'planilla', 'contains')"></th>
+        <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+      </tr>
+      <tr>
         <th style="width: 5rem"></th>
-        <th scope="col">Id Conductor <p-sortIcon field="id_Conductor"></p-sortIcon></th>
-        <th scope="col">Conductor <p-sortIcon field="conductor"></p-sortIcon></th>
-        <th scope="col">Placa Camión <p-sortIcon field="placa"></p-sortIcon></th>
-        <th scope="col">Valor Total <p-sortIcon field="total"></p-sortIcon></th>
-        <th scope="col">Valor Contado <p-sortIcon field=""></p-sortIcon></th>
-        <th scope="col">Fecha <p-sortIcon field="fecha"></p-sortIcon></th>
-        <th scope="col">Planilla <p-sortIcon field="fecha"></p-sortIcon></th>
-        <th scope="col">Generar/Ver</th>
+        <th scope="col" pSortableColumn="id_Conductor">Id Conductor <p-sortIcon field="id_Conductor"></p-sortIcon></th>
+        <th scope="col" pSortableColumn="conductor">Conductor <p-sortIcon field="conductor"></p-sortIcon></th>
+        <th scope="col" pSortableColumn="placa">Placa Camión <p-sortIcon field="placa"></p-sortIcon></th>
+        <th scope="col" pSortableColumn="">Valor Total <p-sortIcon field=""></p-sortIcon></th>
+        <th scope="col" pSortableColumn="">Valor Contado <p-sortIcon field=""></p-sortIcon></th>
+        <th scope="col" pSortableColumn="fecha">Fecha <p-sortIcon field="fecha"></p-sortIcon></th>
+        <th scope="col" pSortableColumn="planilla">N° Planilla <p-sortIcon field="planilla"></p-sortIcon></th>
+        <th scope="col" pSortableColumn="" pFrozenColumn alignFrozen="right" [frozen]="true">Crear/Ver Planilla</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
-      <tr>
+      <tr [ngClass]="{'cursor' : data.planilla != null }" (dblclick)="editSpreadSheet(data)" pTooltip="{{msgRowSpreadSheets(data)}}" tooltipPosition="top">
         <td>
           <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
         </td>
@@ -105,7 +124,7 @@
         <td>${{totalCounting(data, rowIndex) | number : '1.2-2'}}</td>
         <td>{{data.fecha | date : 'yyyy-MM-dd'}}</td>
         <td>{{data.planilla}}</td>
-        <td class="text-center">
+        <td class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">
           <button *ngIf="data.planilla == null" pButton type="button" id="planilla" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Generar Planilla" icon="pi pi-plus" (click)="createSpreadSheet(data, rowIndex)"></button>
           <button *ngIf="data.planilla != null" pButton type="button" id="pdf" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver Planilla" icon="pi pi-file-pdf" (click)="createPDF(data.planilla)"></button>
         </td>
@@ -140,7 +159,7 @@
               </ng-template>
               <ng-template pTemplate="emptymessage">
                 <tr>
-                  <td colspan="6">No hay rollos para esta factura.</td>
+                  <td colspan="7">No hay facturas asoaciadas a este movimiento.</td>
                 </tr>
               </ng-template>
             </p-table>
@@ -148,6 +167,79 @@
         </td>
       </tr>
     </ng-template>
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="4" class="text-right">Totales</td>
+        <td class="textBlue">${{ totalValueDispatch() | number : '1.2-2' }}</td>
+        <td class="textBlue">${{ totalValueCounting() | number : '1.2-2'}}</td>
+        <td colspan="3"></td>
+      </tr>
+    </ng-template>
   </p-table>
 
 </p-card>
+
+<!--Modal para editar las planillas -->
+<p-dialog [(visible)]="modal" [contentStyle]="{'overflow':'visible'}" [style]="{width: '80vw'}" [resizable]="true" header="Edición de Planilla N° {{codePlanilla}}" [modal]="true" >
+  <ng-template pTemplate="content">
+    <form [formGroup]="form">
+      <div class="row g-4 my-3">
+
+        
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-calendar formControlName="date" inputId="date" [showIcon]="true"></p-calendar>
+            <label for="date">Fecha de recepción</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="counting" id="counting" [minFractionDigits]="2" [readonly]=""></p-inputNumber>
+            <label for="counting">Valor recepcionado</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="status" inputId="status" optionValue="estado_Id" optionLabel="estado_Nombre" [autoDisplayFirst]="true" [options]="statuses"></p-dropdown>
+            <label for="status">Estado</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-6 col-xxl-6">
+          <span class="p-float-label">
+            <textarea formControlName="observation" [rows]="1" inputId="observation" pInputTextarea></textarea>
+            <label for="observation">Observación</label>
+          </span>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-success" id="consultar" type="submit" label="Actualizar Planilla" (click)="viewMsjUpdateSpreadSheet()" icon="pi pi-refresh"></button>
+          <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFieldsModal()"> </button>
+        </div>
+
+      </div>
+    </form>    
+  </ng-template>
+</p-dialog>
+
+<p-toast position="center" key="update" (onClose)="onReject('update')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton icon="pi pi-check" label="Sí" class="p-button-success" (click)="updateSpreadSheetReceived()"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('update')" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
