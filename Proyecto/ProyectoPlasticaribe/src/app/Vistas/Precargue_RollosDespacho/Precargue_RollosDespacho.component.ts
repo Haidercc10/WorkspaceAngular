@@ -74,6 +74,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     this.form = this.fmBuild.group({
       doc : [null],
       roll : [null],
+      clientStock : [false, ],
       //process : [null],
       //item : [null, Validators.required], 
       //reference : [null, Validators.required],
@@ -129,27 +130,38 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   searchRolls(){
     let roll : number = this.form.value.roll;
     let client : any = this.form.value.idClient;
+    let clientReal : any;
+    let clientStock : boolean = this.form.value.clientStock;
+    let count : number = 0;
     //let clients : any = this.clients.find(x => x.idcliente == client);
 
     if(this.form.valid) {
-      if(this.rollsToDispatch.length > 0) {
+      clientStock ? clientReal = [1061, 1035] : clientReal = [client];
+      if(this.rollsToDispatch.length > 0 && !clientStock) {
         if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
           this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
           return;
         }
       }
       this.load = true;
-      this.svProduction.getInformationDispatch(roll, client).subscribe(data => {
-        if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
-          this.rollsToDispatch.unshift(data[0]);
-          this.consolidateItems();
-          this.msjs(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
-          this.form.patchValue({ roll : null });
-        } else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
-      }, error => {
-        [400, 404].includes(error.status) ? this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.msjs(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
-        this.form.patchValue({ roll : null });
+      clientReal.forEach(cr => {
+        this.svProduction.getInformationDispatch(roll, cr).subscribe(data => {
+          if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
+            this.rollsToDispatch.unshift(data[0]);
+            this.consolidateItems();
+            this.msjs(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
+            this.form.patchValue({ roll : null });
+          } else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
+          return;
+        }, error => {
+          count += 1;
+          if(count == clientReal.length) {
+            [400, 404].includes(error.status) ? this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.msjs(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
+            this.form.patchValue({ roll : null });
+          }
+        });
       });
+      
     } else this.msjs(`Advertencia`, `Debe llenar todos los campos`);
   }
 
@@ -477,7 +489,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   //Tabla con materiales recuperados ingresados detallados
   tablaDetailsPDF(data) {
     let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Und'];
-    let widths: Array<string> = ['5%', '9%', '9%', '8%', '45%', '8%', '10%', '6%'];
+    let widths: Array<string> = ['5%', '9%', '8%', '8%', '45%', '8%', '10%', '7%'];
     return {
       margin: [0, 20],
       table: {

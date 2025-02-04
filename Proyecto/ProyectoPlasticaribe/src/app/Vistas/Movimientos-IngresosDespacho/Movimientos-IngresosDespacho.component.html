@@ -55,7 +55,7 @@
       <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
       <button pButton class="p-button-danger" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="dataSearched.length == 0" (click)="createPDF()"></button>
-      <button pButton class="p-button-success p-button-outlined" type="button" label="Cambiar ubicación" (click)="loadModal(false)" icon="pi pi-arrow-right-arrow-left" *ngIf="[97,1].includes(validateRole)" [disabled]="dataSelected.length == 0" pTooltip="Desde aquí podrás cambiar la ubicación de los rollos que selecciones en la tabla"></button>
+      <button pButton class="p-button-success p-button-outlined" type="button" label="Cambiar ubicación" (click)="loadModal(false)" icon="pi pi-arrow-right-arrow-left" *ngIf="[97,1,83,10].includes(validateRole)" [disabled]="dataSelected.length == 0" pTooltip="Desde aquí podrás cambiar la ubicación de los rollos que selecciones en la tabla"></button>
       <button pButton class="p-button-danger p-button-outlined" type="button" label="Trasladar/Sacar Rollos" (click)="loadModal(true)" icon="pi pi-sort-alt" *ngIf="validateRole == 1" [disabled]="dataSelected.length == 0" pTooltip="Aquí podrás trasladar o sacar de la bódega de despacho los rollos que selecciones en la tabla"></button>
 
     </div>

@@ -19,5 +19,5 @@ export class AsignacionProductosFacturaService {
 
   srvGuardar = (data : modelAsigProductosFacturas): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta', data);
   
-  putMovementsDispatch = (id: number, data: any) => this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/putMovementsDispatch/${id}`, data);
+  putMovementsDispatch = (id: number, addSpreadSheet : boolean, data: any) => this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/putMovementsDispatch/${id}/${addSpreadSheet}`, data);
 }

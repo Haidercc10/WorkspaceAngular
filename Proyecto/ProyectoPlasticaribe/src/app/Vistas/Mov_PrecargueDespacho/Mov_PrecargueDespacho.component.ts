@@ -139,7 +139,9 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     }``
   }
 
-  discardPreload(){}
+  discardPreload(){
+    
+  }
 
   //*
   createPDF(id : number){

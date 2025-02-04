@@ -14,11 +14,12 @@ export class PlanillasDespachoService {
     constructor(private http : HttpClient) { }
     
       getAll = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Planillas_Despacho`);
-    
+
+      getId = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Planillas_Despacho/${id}`);
+
       Post = (data : modelPlanillas_Despacho): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Planillas_Despacho', data);
 
       Put = (id : number, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Planillas_Despacho/${id}`, data);
 
-      putSpreadSheetForId = (id : number, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Planillas_Despacho/putSpreadSheetForId/${id}`, data);
-
+      putSpreadSheetForId = (id : number, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Planillas_Despacho/putSpreadSheetForId/${id}`, data);    
 }

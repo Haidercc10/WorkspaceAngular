@@ -134,27 +134,31 @@
       <tr>
         <td colspan="9">
           <div class="p-3">
-            <p-table [value]="data.details" dataKey="id_Conductor" >
+            <p-table [value]="data.details" dataKey="id_Conductor" styleClass="p-datatable-gridlines p-datatable-sm">
               <ng-template pTemplate="header">
                 <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Factura<p-sortIcon field="factura"></p-sortIcon></th>
+                  <th class="text-center" scope="col"></th><!--<button pButton pRipple label="Agregar" icon="pi pi-plus" class="p-button-danger mr-2"></button>-->
+                  <th scope="col">Factura <p-sortIcon field="factura"></p-sortIcon></th>
                   <th scope="col">Nit/CC <p-sortIcon field="idCliente"></p-sortIcon></th>
                   <th scope="col">Cliente <p-sortIcon field="cliente"></p-sortIcon></th>
                   <th scope="col">Valor <p-sortIcon field="valor"></p-sortIcon></th>
                   <th scope="col">Forma Pago<p-sortIcon field="forma_Pago"></p-sortIcon></th>
                   <th scope="col">Peso Bruto <p-sortIcon field="peso_Bruto"></p-sortIcon></th>
+                  <th class="text-center" *ngIf="data.planilla != null" scope="col">Actualizar N° Planilla</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-product let-rowIndex="rowIndex">
                 <tr>
-                  <td>{{rowIndex + 1}}</td>
+                  <td class="text-center">{{rowIndex + 1}}</td>
                   <td><b>{{product.factura}}</b></td>
                   <td>{{product.idCliente}}</td>
                   <td><b>{{product.cliente}}</b></td>
                   <td>${{product.valor | number : '1.2-2'}}</td>
                   <td><b>{{product.forma_Pago }}</b></td>
                   <td>{{product.peso_Bruto | number : '1.2-2'}}</td>
+                  <td *ngIf="data.planilla != null" class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">
+                    <button pButton type="button" (click)="viewModal(data, product, rowIndex)" id="planilla" style="width: 30px; height: 30px;" class="p-button-warning p-button-rounded" pTooltip="Actualizar Planilla a Factura N° {{product.factura}}" pTooltipPosition="top" icon="pi pi-refresh"></button>
+                  </td>  <!--(click)="viewMsjQuitFactura(data, product, rowIndex)"-->
                 </tr>
               </ng-template>
               <ng-template pTemplate="emptymessage">
@@ -178,6 +182,20 @@
   </p-table>
 
 </p-card>
+
+<p-dialog [(visible)]="modalUpdateSpreadsheet" [contentStyle]="{'overflow':'visible'}" [style]="{width: '25vw'}" [resizable]="true" header="Actualizar Número de Planilla" [modal]="true" >
+  <ng-template pTemplate="content">
+    <br>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="username" class="font-semibold w-6rem">Nueva Planilla</label>
+      <p-inputNumber id="username" class="flex-auto" [(ngModel)]="spreadSheet" [required]="true" autocomplete="off"></p-inputNumber>
+    </div>
+    <div class="flex justify-content-end gap-2">
+      <p-button icon="pi pi-times" label="Cancelar" severity="secondary" (onClick)="modalUpdateSpreadsheet = false" />
+      <p-button icon="pi pi-check" label="Guardar" [disabled]="spreadSheet == null || spreadSheet == 0" severity="danger" (onClick)="updateSpreadSheetForFact()" />
+    </div>
+  </ng-template>
+</p-dialog>    
 
 <!--Modal para editar las planillas -->
 <p-dialog [(visible)]="modal" [contentStyle]="{'overflow':'visible'}" [style]="{width: '80vw'}" [resizable]="true" header="Edición de Planilla N° {{codePlanilla}}" [modal]="true" >
@@ -238,6 +256,26 @@
         </div>
         <div class="col-6">
           <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('update')" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<p-toast position="center" key="anulled" (onClose)="onReject('anulled')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton icon="pi pi-check" label="Sí" class="p-button-success" (click)="deleteFactFromSpreadSheet(dataSpreadSheet, dataDetails, indice)"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('anulled')" class="p-button-secondary"></button>
         </div>
       </div>
     </div>

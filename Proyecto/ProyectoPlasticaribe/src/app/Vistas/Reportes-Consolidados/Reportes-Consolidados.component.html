@@ -4,7 +4,7 @@
 
       <!-- FACTURACIÓN -->
       <p-tabPanel
-        *ngIf="[1,6,96,69,12,97].includes(ValidarRol)"
+        *ngIf="[1,6,96,69,12,97,2].includes(ValidarRol)"
         header="Facturación"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Facturacion-Detallada *ngIf="facturacion"></app-Reporte-Facturacion-Detallada>
@@ -20,7 +20,7 @@
 
       <!-- PRODUCCIÓN DETALLADA -->
       <p-tabPanel
-        *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12,94,97,2].includes(ValidarRol)"
+        *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12,94,97,2,76,77,81].includes(ValidarRol)"
         header="Producción Detallada"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Produccion *ngIf="produccionDetallada"></app-Reporte-Produccion>

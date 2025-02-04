@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
+import { log } from 'node:console';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelDetalles_PlanillaDespacho } from 'src/app/Modelo/modelDetalles_PlanillaDespacho';
@@ -37,6 +38,11 @@ export class Movimientos_DespachoComponent implements OnInit {
   codePlanilla : number = 0;
   statuses : Array<any> = [];
   @ViewChild('dt') dt: Table | undefined;
+  dataSpreadSheet : any = {};
+  dataDetails : any = {};
+  indice : number;
+  modalUpdateSpreadsheet : boolean = false;
+  spreadSheet : number = null;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -90,6 +96,8 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.formSearchDespacho.reset();
     this.load = false;
     this.dataDespacho = [];
+    this.dataDetails = [];
+    this.dataSpreadSheet = [] 
   }
 
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -179,7 +187,7 @@ export class Movimientos_DespachoComponent implements OnInit {
         count++
         if(count == this.dataDespacho[index].details.length) {
           //this.load = false;
-          this.updateMovementsDispatch(dataPlanilla.pla_Id, this.dataDespacho[index].details.map(x => x.codigoSalida))
+          this.updateMovementsDispatch(dataPlanilla.pla_Id, this.dataDespacho[index].details[0].codigos)
         }
       }, error => {
         this.msj.mensajeError(`Error`, `Error al crear los detalles de la planilla de despacho | ${error.status} ${error.statusText}`);
@@ -190,11 +198,37 @@ export class Movimientos_DespachoComponent implements OnInit {
 
   //Función para actualizar los mov. de despacho
   updateMovementsDispatch(codeSpreadSheet : number, codeDispatchs : any){
-    this.svAsgDispatch.putMovementsDispatch(codeSpreadSheet, codeDispatchs).subscribe(() => {
+    this.svAsgDispatch.putMovementsDispatch(codeSpreadSheet, true, codeDispatchs).subscribe(() => {
       this.load = false;
       this.createPDF(codeSpreadSheet);
       this.msj.mensajeConfirmacion(`Confirmación`, `Se creó exitosamente la planilla de despacho N° ${codeSpreadSheet}`);
       setTimeout(() => { this.searchMovements(); }, 500);
+    }, error => {
+      this.msj.mensajeError(`Error`, `Error al actualizar los movimientos de despacho | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });
+  }
+
+  deleteFactFromSpreadSheet(data : any, details : any, index : number){
+    this.onReject('anulled');
+    let indx : number = this.dataDespacho.findIndex(x => x.planilla == data.planilla);
+    
+    this.svAsgDispatch.putMovementsDispatch(data.planilla, false, details.codigos).subscribe(() => {
+      this.svDetailsSpreadSheets.getId(details.codigoDetail).subscribe(dataPL => {
+        this.svDetailsSpreadSheets.Delete(dataPL.dtPla_Codigo).subscribe(() => {
+          this.load = false;
+          this.dataDespacho[indx].details.splice(index, 1);
+          this.msj.mensajeConfirmacion(`Confirmación`, `Se retiró la factura N° ${details.factura} de la planilla N° ${data.planilla} exitosamente!`);
+          this.createPDF(data.planilla);
+          //setTimeout(() => { this.searchMovements(); }, 500);
+        }, error => {
+          this.msj.mensajeError(`Error`, `Error al eliminar la factura N° ${details.factura} de la planilla N° ${data.planilla} | ${error.status} ${error.statusText}`);
+          this.load = false;
+        });
+      }, error => {
+        this.msj.mensajeError(`Error`, `Error al consultar el detalle de la planilla | ${error.status} ${error.statusText}`);
+        this.load = false;
+      });
     }, error => {
       this.msj.mensajeError(`Error`, `Error al actualizar los movimientos de despacho | ${error.status} ${error.statusText}`);
       this.load = false;
@@ -283,6 +317,29 @@ export class Movimientos_DespachoComponent implements OnInit {
     });
   }
 
+  updateSpreadSheetForFact(){
+    this.load = true;
+    this.modalUpdateSpreadsheet = false;
+    let detail : number = this.dataDetails.codigoDetail;
+    let indx : number = this.dataDespacho.findIndex(x => x.planilla == this.dataSpreadSheet.planilla);
+    
+    this.svSpreadsheets.getId(this.spreadSheet).subscribe(dataSp => {
+      this.svDetailsSpreadSheets.Put(detail, this.spreadSheet, this.dataDetails.codigos).subscribe(() => {
+        this.dataDespacho[indx].details.splice(this.indice, 1);
+
+        this.msj.mensajeConfirmacion(`Confirmación`, `Planilla N° ${this.spreadSheet} actualizada correctamente!`);
+        this.createPDF(this.spreadSheet);
+        this.load = false;
+      }, error => {
+       this.msj.mensajeError(`Error`, `Error al actualizar el movimiento seleccionado a la planilla N° ${this.spreadSheet} | ${error.status} ${error.statusText}`);
+       this.load = false;
+      });
+    }, error => {
+      this.msj.mensajeError(`Error`, `No se encontró la planilla N° ${this.spreadSheet} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });
+  }
+
   //Función para limpiar los campos del modal en la planilla. 
   clearFieldsModal(){
     this.form.patchValue({
@@ -291,7 +348,7 @@ export class Movimientos_DespachoComponent implements OnInit {
       status : null, 
       observation : '',
       hour : moment().format('HH:mm:ss'),
-    })
+    });
   }
 
   //Función que mostrará un msj en las filas de mov. que tengan planillas asociadas. 
@@ -304,6 +361,27 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.load = true;
     let msg : string = `Está seguro(a) que desea actualizar la información de la planilla N° ${this.codePlanilla}`;
     setTimeout(() => { this.msg.add({ severity:'warn', key:'update', summary: `Elección`, detail : msg,  sticky: true}); }, 200);
+  }
+
+  viewModal(data : any, details : any, index : number) {
+    this.modalUpdateSpreadsheet = true;
+    this.dataSpreadSheet = data;
+    this.dataDetails = details;
+    this.indice = index;
+    this.spreadSheet = null;
+    console.log(data, details, index);
+  }
+
+  //Función que mostrará un msj de confirmación para la actualización de planillas.
+  viewMsjQuitFactura(data : any, details : any, index : number){
+    this.dataSpreadSheet = data;
+    this.dataDetails = details;
+    this.indice = index;
+    this.load = true;
+    
+    console.log(this.dataSpreadSheet, this.dataDetails, index);
+    let msg : string = `Está seguro(a) que desea retirar la factura N° ${details.factura} de la planilla N° ${data.planilla}`;
+    setTimeout(() => { this.msg.add({ severity:'warn', key:'anulled', summary: `Elección`, detail : msg,  sticky: true}); }, 200);
   }
 
   //Función que quitará el msj de elección
@@ -322,7 +400,6 @@ export class Movimientos_DespachoComponent implements OnInit {
       let title = `Planilla de Despacho No. ${planilla}`;
       let content = [
         this.datosClientePDF(data[0]),
-        //this.informacionProduction(),
         this.table(this.dataProductionInPDF(data), ['No.', 'Factura', 'NIT/CC', 'Cliente', 'Valor', 'Forma Pago', 'Peso Bruto']),
         this.totalQuantities(data[0]),
         this.infoAtte(),
