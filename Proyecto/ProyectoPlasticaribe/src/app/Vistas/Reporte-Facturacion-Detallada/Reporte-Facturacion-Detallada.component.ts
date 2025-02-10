@@ -428,7 +428,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         fontSize: 8,
         bold: true,
         table: {
-          widths: ['12%', '8%', '8%', '39%', '5%', '8%', '10%', '10%'],
+          widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
           body: [
             [
               { text: `Fecha`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
@@ -508,11 +508,19 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     let clientes : any[] = this.infoPdf.filter(x => x.idVendedor == vendedores.id);  
     clientes.sort((a, b) => a.cliente > b.cliente ? 1 : a.cliente < b.cliente ? -1 : 0);
     let clientesVendedor : any[] = [];
+    let count = 0;
     for (let index = 0; index < clientes.length; index++) {
+      
       if(!clientesVendedor.includes(clientes[index].factura)){
         clientesVendedor.push(clientes[index].factura);
         data.push(this.tablaClientesVendedor(clientes[index]));
       }
+      count++
+      let cantFacturasCliente : number = clientes.filter(x => x.cliente == clientes[index].cliente).length; 
+      if(count == cantFacturasCliente) {
+        data.push(this.tablaTotalesCliente(clientes, clientes[index].cliente));
+        count = 0;
+      } 
     }
     return data;
   }
@@ -537,6 +545,30 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return data;
   }
 
+  //.Función que colocará los totales de la factura.
+  tablaTotalesCliente(items : any, cliente : any){  
+    return {
+     margin: [0, 0],
+       fontSize: 8,
+       bold: false,
+       table: {
+         widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
+         body: [
+           [
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: `left`, border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: `Total Cliente`, alignment: 'left', border: [false, true, false, false], bold : true, color : 'green'}, 
+             { text: `$${this.formatonumeros(items.filter(x => x.cliente == cliente).reduce((a,b) => a += b.valorTotal, 0))}`, alignment: 'left', border: [false, true, false, false], bold : true, color : 'green' }
+           ],
+         ],
+       }  
+    } 
+  }
+
   //Función que cargará items que compró cada cliente y las facturas asociadas.
   getItemsClientesVendedor(clientes : any){
     let data : any = [];
@@ -545,6 +577,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     for (let index = 0; index < items.length; index++) {
       data.push(this.tablaItemsClientesVendedor(items[index]));
     }
+    data.push(this.tablaTotalesFactura(items));
     return data;
   }
 
@@ -555,7 +588,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
        fontSize: 8,
        bold: false,
        table: {
-         widths: ['12%', '8%', '8%', '39%', '5%', '8%', '10%', '10%'],
+         widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
          body: [
            [
              { text: `${items.fecha}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
@@ -566,6 +599,30 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
              { text: `${this.formatonumeros(items.cantidad)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
              { text: `${this.formatonumeros(items.precio)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
              { text: `${this.formatonumeros(items.valorTotal)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`},
+           ],
+         ],
+       }  
+    } 
+  }
+
+  //.Función que colocará los totales de la factura.
+  tablaTotalesFactura(items : any){  
+    return {
+     margin: [0, 0],
+       fontSize: 8,
+       bold: false,
+       table: {
+         widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
+         body: [
+           [
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: `left`, border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
+             { text: `Total Factura`, alignment: 'left', border: [false, false, false, false], bold : true, }, 
+             { text: `$${this.formatonumeros(items.reduce((a,b) => a += b.valorTotal, 0),)}`, alignment: 'left', border: [false, false, false, false], bold : true, }
            ],
          ],
        }  

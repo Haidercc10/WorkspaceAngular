@@ -84,4 +84,5 @@ export class Produccion_ProcesosService {
 
   getOtSentToPeletizado = (ot : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getOtSentToPeletizado/${ot}`);
 
+  getRolls = (date1 : any, date2 : any, url? : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRolls/${date1}/${date2}${url}`);
 }

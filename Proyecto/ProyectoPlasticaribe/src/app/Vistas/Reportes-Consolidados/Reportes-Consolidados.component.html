@@ -20,7 +20,7 @@
 
       <!-- PRODUCCIÓN DETALLADA -->
       <p-tabPanel
-        *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12,94,97,2,76,77,81].includes(ValidarRol)"
+        *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12,94,97,2,76,77,81,5].includes(ValidarRol)"
         header="Producción Detallada"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Produccion *ngIf="produccionDetallada"></app-Reporte-Produccion>
@@ -72,7 +72,14 @@
         header="Estadisticas Ventas"
         leftIcon="pi pi-sliders-h">
         <app-Reporte_EstadisticasVentas></app-Reporte_EstadisticasVentas>
-     </p-tabPanel>
+      </p-tabPanel>
+
+      <p-tabPanel
+        *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12,94,97,2,76,77,81,5].includes(ValidarRol)"
+        header="Rollos/Bultos"
+        leftIcon="pi pi-sliders-h">
+        <app-rollos-pesados *ngIf="rollos_bultos"></app-rollos-pesados>
+      </p-tabPanel>
 
     </p-tabView>
   </div>

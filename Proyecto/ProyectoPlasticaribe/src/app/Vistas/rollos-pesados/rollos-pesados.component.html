@@ -1,0 +1,186 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+    <div style="margin: auto;">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  </div>
+  
+    <div class="my-4">
+        <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-book"></i> Filtros de Búsqueda</h4>
+        <p><i class="pi pi-exclamation-triangle"></i><b> Nota:</b> Sí no hay ningún campo diligenciado, se mostrarán <b>los rollos pesados el día de hoy.</b></p> 
+      </div>
+    
+      <form [formGroup]="form">
+        <div class="row my-5 g-4 justify-content-center">
+
+          <!-- START DATE -->
+          <div class="col-xs-12 col-sm-12 col-md-2 col-lg-3 col-xl-3 col-xxl-3">
+            <span class="p-float-label">
+              <p-calendar formControlName="start" inputId="start" [showIcon]="true"></p-calendar>
+              <label for="start">Fecha Inicial</label>
+            </span>
+          </div>
+    
+          <!-- END DATE -->
+          <div class="col-xs-12 col-sm-12 col-md-2 col-lg-3 col-xl-3 col-xxl-3">
+            <span class="p-float-label">
+              <p-calendar formControlName="end" inputId="end" [showIcon]="true"></p-calendar>
+              <label for="end">Fecha Final</label>
+            </span>
+          </div>
+
+          <!-- PROCESS -->
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="process" inputId="process" [options]="process" optionValue="proceso_Id" optionLabel="proceso_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+              <label for="process">Proceso</label>
+            </span>
+          </div>
+          
+        </div>
+      </form>
+  
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton id="consultar" class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="findRolls()"></button>
+          <button pButton id="limpiarTodo" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+          <!--<button pButton id="export" class="p-button-outlined p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportExcel()"></button>-->
+        </div>
+      </div>
+  
+      
+    <!--* Linea 1 -->
+    <div class="mb-4">
+        <hr class="Linea">
+    </div>
+
+    <!--* Titulo Items -->
+    <div class="mb-4">
+        <div class="row g-3">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
+            <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-list"></i> Información consolidada</h4>
+        </div>
+        </div>
+    </div>
+
+    <!--* Tabla Items -->
+    <div class="mb-3">
+        <div class="row g-3 font-size-14" id="tabla1">
+        <p-table
+            #tableConsolidate
+            [value]="rollsConsolidate"
+            styleClass="p-datatable-sm p-datatable-gridlines"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            dataKey="0"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            *ngIf="!load">
+            <ng-template pTemplate="header">
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Fecha</th>
+                <th class="text-center" scope="col">En Producción</th>
+                <th class="text-center" scope="col">En Despacho</th>
+                <th class="text-center" scope="col">Precargado</th>
+                <th class="text-center" scope="col">Facturados</th>
+                <th class="text-center" scope="col">No disponible</th>
+                <th class="text-center" scope="col">Devuelto</th>
+                <th class="text-center" scope="col">Peletizado</th>
+                <th class="text-center" scope="col">Eliminados</th>
+                <th class="text-center" scope="col">Total Rollos</th>
+            </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <tr>
+                <td>{{rowIndex + 1}}</td>
+                <td class="text-center">{{data.date}}</td>
+                <td class="text-center">{{InProduction(rolls, data.date)}}</td>
+                <td class="text-center">{{InDispatch(rolls, data.date)}}</td>
+                <td class="text-center">{{Precharged(rolls, data.date)}}</td>
+                <td class="text-center">{{InFact(rolls, data.date)}}</td>
+                <td class="text-center">{{NotAvailable(rolls, data.date)}}</td>
+                <td class="text-center">{{eliminated(rolls, data.date)}}</td>
+                <td class="text-center">{{Devolution(rolls, data.date)}}</td>
+                <td class="text-center">{{Peletizado(rolls, data.date)}}</td>
+                <td class="text-center">{{Total(rolls, data.date)}}</td>
+            </tr>
+            </ng-template>
+        </p-table>
+        </div>
+    </div>
+
+    <!--* Linea 2  -->
+    <div class="mb-5">
+        <hr class="Linea">
+    </div>
+
+    <!--* titulo tabla rollos -->
+    <div class="mb-4">
+        <div class="row g-3">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
+            <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-list"></i> Información detallada de rollos/bultos </h4>
+        </div>
+        </div>
+    </div>
+
+      <p-table 
+      #tableRolls 
+      [value]="rolls" 
+      *ngIf="!load" 
+      [resizableColumns]="true" 
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm" 
+      responsiveLayout="scroll" 
+      [rowHover]="true" 
+      [scrollable]="true"
+      scrollHeight="50rem">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center">#</th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'rollo', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'item', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'reference', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'qty', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'presentation', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'process', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'fecha', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'status', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'envio_Zeus', tableRolls)"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'dateElimination', tableRolls)"></th>
+        </tr>
+        <tr>
+          <th></th>
+          <th class="text-center" pSortableColumn="rollo"><p-sortIcon field="rollo"></p-sortIcon> Rollo</th>
+          <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
+          <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
+          <th class="text-center" pSortableColumn="qty"><p-sortIcon field="qty"></p-sortIcon> Cantidad</th>
+          <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Und</th>
+          <th class="text-center" pSortableColumn="process"><p-sortIcon field="process"></p-sortIcon> Proceso</th>
+          <th class="text-center" pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha</th>
+          <th class="text-center" pSortableColumn="status"><p-sortIcon field="status"></p-sortIcon> Estado</th>
+          <th class="text-center" pSortableColumn="envio_Zeus"><p-sortIcon field="envio_Zeus"></p-sortIcon> Despacho</th>
+          <th class="text-center" pSortableColumn="dateElimination"><p-sortIcon field="dateElimination"></p-sortIcon> Fecha Eliminado</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowIndex="rowIndex" let-data>
+        <tr class="cursor" (dblclick)="searchMovements(data)" pTooltip="Haz doble clic para ver la trazabilidad del rollo/bulto" tooltipPosition="top">
+          <td class="text-center">{{(rolls.length - 1) - rowIndex + 1}}</td>
+          <td class="text-center"><b>{{data.rollo}}</b></td>
+          <td class="text-center">{{data.item}}</td>
+          <td class="">{{data.reference}}</td>
+          <td class="text-center"><b>{{data.qty | number : '1.2-2'}}</b></td>
+          <td class="text-center">{{data.presentation}}</td>
+          <td class="text-center"><b>{{data.process}}</b></td>
+          <td class="text-center">{{data.fecha}}</td>
+          <td class="text-center"><b>{{data.status}}</b></td>
+          <td class="text-center">{{data.envio_Zeus}}</td>
+          <td class="text-center">{{data.dateElimination}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+  <p-dialog header="Trazabilidad rollo/bulto N° {{selectedRoll}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="traceability" [style]="{width: '85%'}" [modal]="true" >
+    <app-Movimientos_Rollos></app-Movimientos_Rollos>
+  </p-dialog>

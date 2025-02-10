@@ -240,6 +240,7 @@ import { ReposicionesComponent } from './Vistas/Reposiciones/Reposiciones.compon
 import { Mov_ReposicionesComponent } from './Vistas/Mov_Reposiciones/Mov_Reposiciones.component';
 import { Diferencias_InventarioComponent } from './Vistas/Diferencias_Inventario/Diferencias_Inventario.component';
 import { ReporteClientesComponent } from './Vistas/reporte-clientes/reporte-clientes.component';
+import { RollosPesadosComponent } from './Vistas/rollos-pesados/rollos-pesados.component';
 
 @NgModule({
   declarations: [
@@ -399,7 +400,8 @@ import { ReporteClientesComponent } from './Vistas/reporte-clientes/reporte-clie
     ReposicionesComponent,
     Mov_ReposicionesComponent,
     Diferencias_InventarioComponent,
-    ReporteClientesComponent
+    ReporteClientesComponent,
+    RollosPesadosComponent
   ],
 
   imports: [

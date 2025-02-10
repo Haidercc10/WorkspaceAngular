@@ -110,10 +110,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Área', field: 'stockInProcess', type: 'number' },
       { header: 'Exis. Total', field: 'totalStock', type: 'number' },
       { header: 'Precio', field: 'price', type: 'number' },
-      { header: 'Presentación', field: 'presentation', type: '' },
+      { header: 'Und', field: 'presentation', type: '' },
       { header: 'SubTotal', field: 'subTotal', type: 'number' },
       { header: 'Vendedor', field: 'seller', type: '' },
-      { header: 'Mes Actual', field: 'actualMonth', type: 'number' },
+      { header: 'Ciudad', field: 'cityClient', type: '' },
+      { header: 'Cant. Estandar', field: 'qtyStandard', type: 'number' },
+      { header: 'Peso Bruto', field: 'weight', type: 'number' },
+      { header: 'Unidades Producto', field: 'unityProducts', type: '' },
+      /*{ header: 'Mes Actual', field: 'actualMonth', type: 'number' },
       { header: 'Enero', field: 'junuary', type: 'number' },
       { header: 'Febrero', field: 'february', type: 'number' },
       { header: 'Marzo', field: 'march', type: 'number' },
@@ -125,9 +129,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Septiembre', field: 'september', type: 'number' },
       { header: 'Octubre', field: 'october', type: 'number' },
       { header: 'Noviembre', field: 'november', type: 'number' },
-      { header: 'Diciembre', field: 'december', type: 'number' },
+      { header: 'Diciembre', field: 'december', type: 'number' },*/
     ];
-      if([86,4,12].includes(this.ValidarRol)) {
+      /*if([86,4].includes(this.ValidarRol)) {
         let cols : any = [];
         cols.push(this.columns[4], this.columns[5]);
         [4,5,6,8].forEach(x => this.columns.splice(x, 1));
@@ -136,14 +140,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.selectedColumns = [...this.columns];
         this.selectedColumnsComparative = [...this.columns];
         this.selectedColumnsComparative.splice(4, 0, cols[0], cols[1]);
-      } else {
+      } else {*/
         this.selectedColumns = [...this.columns];
         this.selectedColumnsComparative = [...this.columns];
-        this.selectedColumnsComparative.splice(10, 13);
-        this.selectedColumns.splice(10, 13);
+        //this.selectedColumnsComparative.splice(10, 13);
+        //this.selectedColumns.splice(10, 13);
         this.selectedColumns.splice(4, 1);
         this.selectedColumns.splice(4, 1);
-      }
+      //}
   }
 
   getStockInformation() {
@@ -240,8 +244,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
           // subTotal: stock.stock.stockPrice,
           subTotal: (stock.stock.stock * stock.stock.price),
           seller: stock.seller,
+          cityClient : stock.cityClient, 
+          weight : stock.weight, 
+          qtyStandard : stock.qtyStandard,
+          unityProducts : stock.count,
           AvaibleProdution: [], // this.fillAvaibleProduction(stock.avaible_Production),
-          actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
+          /*actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
           junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
           february: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].febrero,
           march: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].marzo,
@@ -253,7 +261,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           september: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].septiembre,
           october: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].octubre,
           november: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].noviembre,
-          december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,
+          december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,*/
           process : process,
         });
       }
@@ -314,8 +322,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
           presentation: stock.stock.presentation,
           subTotal: (stock.stock.stock * stock.stock.price),
           seller: stock.seller,
+          cityClient : stock.cityClient, 
+          weight : stock.weight, 
+          qtyStandard : stock.qtyStandard,
+          unityProducts : stock.count,
           AvaibleProdution: [], //this.fillAvaibleProduction(stock.avaible_Production),
-          actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
+          /*actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
           junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
           february: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].febrero,
           march: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].marzo,
@@ -327,7 +339,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           september: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].septiembre,
           october: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].octubre,
           november: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].noviembre,
-          december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,
+          december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,*/
         });
       } else {
         let i: number = this.comparativeStock.findIndex(x => x.item == stock.product.item);
@@ -496,27 +508,30 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   createExcel(dataDocument: Array<StockInformation>) {
     if (dataDocument.length > 0) {
-      const title = `Inventario Despacho Consolidado`;
-      let font: any = { name: 'Calibri', family: 4, size: 11, bold: true };
-      let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-      let workbook = this.createExcelService.formatoExcel(title, true);
-      this.addPageExcel(workbook, font, border, dataDocument);
-      this.createExcelService.creacionHoja(workbook, `Inventario Despacho Rollo a Rollo`, true);
-      this.addSheetExcel2(workbook, font, border, dataDocument);
-      this.createExcelService.creacionExcel(`Inventario Productos Terminados ${moment().format('YYYY-MM-DD')}`, workbook);
+      setTimeout(() => {
+        const title = `Inventario Despacho Consolidado`;
+        let font: any = { name: 'Calibri', family: 4, size: 11, bold: true };
+        let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        let workbook = this.createExcelService.formatoExcel(title, true);
+      
+        this.addPageExcel(workbook, font, border, dataDocument);
+        //this.createExcelService.creacionHoja(workbook, `Inventario Despacho Rollo a Rollo`, true);
+        //this.addSheetExcel2(workbook, font, border, dataDocument);
+        this.createExcelService.creacionExcel(`Inventario Productos Terminados ${moment().format('YYYY-MM-DD')}`, workbook);
+      }, 1000);
     } else this.msg.mensajeAdvertencia(`¡No hay datos suficientes para crear el archivo de Excel!`);
   }
 
   addPageExcel(workbook, font, border, dataDocument: Array<StockInformation>) {
     let pageOne = workbook.worksheets[0];
     this.addHeaderPageOne(pageOne, font, border);
-    pageOne.mergeCells('A1:T3');
+    pageOne.mergeCells('A1:L3');
     pageOne.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
     this.addDataExcel(pageOne, dataDocument);
   }
 
   addHeaderPageOne(worksheet, font, border) {
-    const header = ["Item", "Cliente", "Referencia", "Existencias", "Precio", "Subtotal", "Presentación", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const header = ["Item", "Cliente", "Ciudad", "Referencia", "Existencias", "Cant. Estandar", "Presentación", "Unidades Producto", "Peso Bruto Total", "Precio", "Subtotal", "Vendedor", /*"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"*/];
     let headerRow = worksheet.addRow(header);
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
@@ -529,7 +544,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     let dataStock = this.fillDataExcel(dataDocument);
     dataStock.forEach(d => {
       let row = worksheet.addRow(d);
-      let formatNumber: number[] = [4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+      let formatNumber: number[] = [5, 6, 9, 10, 11];
       formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     });
     this.changeSizeColumnsExcel(worksheet);
@@ -541,13 +556,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
       dataStock.push([
         stock.item,
         stock.client,
+        stock.cityClient, 
         stock.reference,
         stock.stock,
+        stock.qtyStandard,
+        stock.presentation,
+        stock.unityProducts,
+        stock.weight, 
         stock.price,
         stock.subTotal,
-        stock.presentation,
         stock.seller,
-        stock.junuary,
+        /*stock.junuary,
         stock.february,
         stock.march,
         stock.april,
@@ -558,17 +577,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
         stock.september,
         stock.october,
         stock.november,
-        stock.december,
+        stock.december,*/
       ]);
     });
     return dataStock;
   }
 
   changeSizeColumnsExcel(worksheet) {
-    let size60: number[] = [2, 3, 8];
-    let size20: number[] = [4, 5, 6, 7];
-    let size15: number[] = [1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-    size60.forEach(e => worksheet.getColumn(e).width = 60);
+    let size55: number[] = [2, 4, 12];
+    let size20: number[] = [3, 8];
+    let size15: number[] = [1, 6, 5, 7, 9, 10, 11];
+    size55.forEach(e => worksheet.getColumn(e).width = 55);
     size20.forEach(e => worksheet.getColumn(e).width = 20);
     size15.forEach(e => worksheet.getColumn(e).width = 15);
     worksheet.getColumn(1).width = 10;
@@ -1019,8 +1038,12 @@ interface StockInformation {
   presentation: string,
   subTotal: number,
   seller: string,
+  cityClient : string,
+  weight : number,
+  qtyStandard : number,
+  unityProducts : number,
   AvaibleProdution: Array<AvaibleProdution>,
-  actualMonth: number,
+  /*actualMonth: number,
   junuary: number,
   february: number,
   march: number,
@@ -1032,7 +1055,7 @@ interface StockInformation {
   september: number,
   october: number,
   november: number,
-  december: number,
+  december: number,*/
   process? : string,
 }
 

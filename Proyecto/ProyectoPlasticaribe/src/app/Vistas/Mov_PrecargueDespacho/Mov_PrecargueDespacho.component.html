@@ -146,7 +146,8 @@
         <td class="text-center">{{data.date1 | date : 'dd/MM/yyyy'}} {{data.hour1}}</td>
         <td class="text-center"><b>{{'PRECARGUE'}}</b></td>
         <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
-                                                                'bg-success1': [5].includes(data.statusId), 
+                                                                'bg-success1': [5].includes(data.statusId),
+                                                                'bg-blue1': [26].includes(data.statusId), 
                                                                 }">{{data.status}}</span></td>
         <td class="text-center" *ngIf="[1].includes(ValidarRol)">
           <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-warning" (onClick)="discardPreload()"></p-button>

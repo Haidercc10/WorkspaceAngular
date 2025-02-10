@@ -51,7 +51,7 @@ export class Movimientos_RollosComponent implements OnInit {
   }
 
   //Función para cargar el modal de movimientos.
-  searchMovements(data : any, type : string){
+  searchMovements(data : any, type : string, numberRollPL? : number){
     this.movements = [];
     this.load = true;
     this.currentStatus = ``;
@@ -60,6 +60,7 @@ export class Movimientos_RollosComponent implements OnInit {
     type == `Produccion` ? rolloPl == 0 ? rolloPl = 0 : rolloPl = rolloPl.replace(`en PBDD.dbo.Produccion_Procesos`, ``) : rolloPl = rolloPl; 
     rolloPl = parseInt(rolloPl);
     let rollBagpro : any = type == `Produccion` ? data.rollo : data.production;
+    numberRollPL != null ? rolloPl = numberRollPL : rolloPl = rolloPl;
     
     this.svProduction.getMovementsRolls(rollBagpro, data.item, rolloPl).subscribe(dataPl => {
       if(dataPl.length > 0) {
