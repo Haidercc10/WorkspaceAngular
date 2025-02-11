@@ -89,13 +89,14 @@
                     <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
                     <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, '', dt)"></th>
                     <th></th>
+                    <th></th>
                   </tr>
                   <tr>
                     <th style="font-weight: 800;" class="text-center" colspan="2"></th>
                     <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Empleado</th>
                     <th style="font-weight: 800;" class="text-center textGreen" colspan="3"><i class="pi pi-box"></i> Informacion Produccion</th>
                     <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-database"></i> Informacion Servicios</th>
-                    <th style="font-weight: 800;" class="text-center textBlue" colspan="2"><i class="pi pi-dollar"></i> Informacion Pago</th>
+                    <th style="font-weight: 800;" class="text-center textBlue" colspan="3"><i class="pi pi-dollar"></i> Informacion Pago</th>
                   </tr>
                   <!--Encabezado-->
                   <tr id="campos">
@@ -103,13 +104,14 @@
                     <th class="text-center" >#</th>
                     <th class="text-center" pSortableColumn="operator" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="operator"></p-sortIcon></th>
                     <th class="text-center" id="inicial" pSortableColumn="position_Job" pReorderableColumn scope="col">Cargo <p-sortIcon field="position_Job"></p-sortIcon></th>
-                    <th class="text-center" scope="col" pSortableColumn="">Rollos Producción <p-sortIcon field=""></p-sortIcon> </th>
-                    <th class="text-center" scope="col" pSortableColumn="">Cant. Producida (Kg) <p-sortIcon field=""></p-sortIcon> </th>
-                    <th class="text-center" scope="col" pSortableColumn="">Valor Producido ($) <p-sortIcon field=""></p-sortIcon> </th>
-                    <th class="text-center" scope="col" pSortableColumn="">Rollos Servicios <p-sortIcon field=""></p-sortIcon> </th>
-                    <th class="text-center" scope="col" pSortableColumn="">Cant. Servicios (Kg) <p-sortIcon field=""></p-sortIcon> </th>
-                    <th class="text-center" scope="col" pSortableColumn="">Valor Servicios ($) <p-sortIcon field=""></p-sortIcon> </th>
-                    <th class="text-center" id="entrada" pSortableColumn="value_Pay" pReorderableColumn scope="col">Valor a pagar<p-sortIcon field="value_Pay"></p-sortIcon></th>
+                    <th class="text-center" scope="col" pSortableColumn="">Rollos Producción </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Cant. Producida (Kg) </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Valor Producido ($) </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Rollos Servicios </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Cant. Servicios (Kg) </th>
+                    <th class="text-center" scope="col" pSortableColumn="">Valor Servicios ($) </th>
+                    <th class="text-center" id="entrada" pSortableColumn="" pReorderableColumn scope="col">Valor a pagar</th>
+                    <th class="text-center" id="entrada" pSortableColumn="" pReorderableColumn scope="col">Valor Total</th>
                     <th class="text-center">Exportar</th>
                   </tr>
                 </ng-template>
@@ -128,7 +130,8 @@
                     <td class="text-center">{{qtyRecordsOperatorServices(nomina.operator) }}</td>
                     <td class="text-center">{{qtyServicesOperator(nomina.operator) | number : '1.2-2' }}</td>
                     <td class="text-center">$ {{calcTotalPayOperatorService(nomina.operator) | number : '1.2-2' }}</td>
-                    <td class="text-center"> <b style="color: #00a2ff;">$ {{nomina.value_Pay | number : '1.2-2'}}</b></td>
+                    <td class="text-center"> <b style="color: #00a2ff;">$ {{calcTotalPayOperatorProductionZeus(nomina.operator) | number : '1.2-2'}}</b></td>
+                    <td class="text-center"> <b class="textOrange">$ {{nomina.value_Pay | number : '1.2-2'}}</b></td>
                     <td class="text-center">
                       <button pButton (click)="createExcel(nomina.operator)" type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Exportar producción del empleado {{nomina.operator}}" icon="pi pi-file-excel"></button>
                     </td>
@@ -143,13 +146,15 @@
                     <td class="text-center"><b>{{calcNumberRollsServices()}}</b></td>
                     <td class="text-center"><b>{{calcTotalServices() | number : '1.2-2'}}</b></td>
                     <td class="text-center"><b>{{calcTotalPayServices() | number : '1.2-2'}}</b></td>
-                    <td class="text-center" id="total"><b style="color: #00a2ff;">$ {{calcTotalPay() | number : '1.2-2'}}</b></td>
+                    <td class="text-center" id="total"> <b style="color: #00a2ff;">$ {{calcTotalPayZeus() | number : '1.2-2'}}</b></td>
+                    <td class="text-center" id="total"><b class="textOrange">$ {{calcTotalPay() | number : '1.2-2'}}</b></td>
+                    <td></td>
                   </tr>
                 </ng-template>
                 <!--Tabla 2-->
                 <ng-template pTemplate="rowexpansion" let-nomina>
                   <tr>
-                    <td colspan="12">
+                    <td colspan="13">
                       <div class="p-3">
                         <p-table
                         [value]="nomina.details"
@@ -163,7 +168,7 @@
                               <th pSortableColumn="item"> Item <p-sortIcon field="item"></p-sortIcon></th>
                               <th pSortableColumn="reference"> Referencia/Servicio <p-sortIcon field="reference"></p-sortIcon></th>
                               <th pSortableColumn="weight">Cant.Producida (Kg)<p-sortIcon field="weight"></p-sortIcon></th>
-                              <th pSortableColumn=""> Registros <p-sortIcon field=""></p-sortIcon></th>
+                              <th pSortableColumn=""> Registros </th>
                               <th pSortableColumn="turn"> Turno <p-sortIcon field="turn"></p-sortIcon></th>
                               <th pSortableColumn="value_Sunday"> Precio Domingo <p-sortIcon field="value_Sunday"></p-sortIcon></th>
                               <th pSortableColumn="value_Day"> Precio Día <p-sortIcon field="value_Day"></p-sortIcon></th>
@@ -195,7 +200,7 @@
                           </ng-template>
                           <ng-template pTemplate="emptymessage">
                             <tr>
-                              <td colspan="12">No se encontraron registros</td>
+                              <td colspan="13">No se encontraron registros</td>
                             </tr>
                           </ng-template>
                         </p-table>
@@ -253,7 +258,7 @@
             <th pSortableColumn="printed">Impreso <p-sortIcon field="printed"></p-sortIcon></th>
             <th pSortableColumn="laminate">Laminado <p-sortIcon field="laminate"></p-sortIcon></th>
             <th pSortableColumn="weight">Peso <p-sortIcon field="weight"></p-sortIcon></th>
-            <th pSortableColumn="">Und <p-sortIcon field=""></p-sortIcon></th>
+            <th pSortableColumn="">Und </th>
             <th pSortableColumn="machine">Maquina <p-sortIcon field="machine"></p-sortIcon></th>
             <th pSortableColumn="turn">Turno <p-sortIcon field="turn"></p-sortIcon></th>
             <th pSortableColumn="sunday">Domingo/Festivo <p-sortIcon field="sunday"></p-sortIcon></th>
@@ -277,7 +282,7 @@
             <td>{{data.sunday ? 'SI' : 'NO'}}</td>
             <td>$ {{data.value_Production | number : '1.2-2'}}</td>
             <td><b>$ {{data.value_Pay | number : '1.2-2'}}</b></td>
-            <td>{{data.send_Zeus ? 'SI' : 'NO'}}</td>
+            <td>{{data.send_Zeus == '1' ? 'SI' : 'NO'}}</td>
           </tr>
         </ng-template>
       </p-table>

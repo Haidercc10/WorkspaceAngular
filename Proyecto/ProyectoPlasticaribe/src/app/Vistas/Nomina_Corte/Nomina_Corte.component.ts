@@ -38,7 +38,7 @@ export class Nomina_CorteComponent implements OnInit {
   activeOperators : any = [];
   festivos : any = [];
   infoExcel : any [] = [];
-
+  productionInDispatch : any[] = [];
 
   constructor(private AppComponent: AppComponent,
     private svBagPro : BagproService,
@@ -125,6 +125,7 @@ export class Nomina_CorteComponent implements OnInit {
     this.productionCourt = [];
     this.hiddenProduction = [];
     this.productionCourtDetails = [];
+    this.productionInDispatch = [];
 
     if (this.rankDates.length == 2) {
       this.load = true;
@@ -161,6 +162,7 @@ export class Nomina_CorteComponent implements OnInit {
       this.productionCourtDetails = this.productionCourtDetails.concat(data.filter(x => this.activeOperators.includes(x.operator)));
       this.productionCourt = this.productionCourt.concat(data.filter(x => this.activeOperators.includes(x.operator)));
       this.hiddenProduction = this.hiddenProduction.concat(data.filter(x => this.activeOperators.includes(x.operator)));
+      this.productionInDispatch = this.productionInDispatch.concat(data.filter(x => this.activeOperators.includes(x.operator) && x.send_Zeus == '1'));
       this.consolidatePayRoll();
       this.loadTableDetails();
       //console.log(this.productionCourt);
@@ -172,14 +174,16 @@ export class Nomina_CorteComponent implements OnInit {
   }
 
   consolidatePayRoll(){
+    console.log(this.productionInDispatch);
     this.payRollConsolidate = this.productionCourt.reduce((a, b) => {
       if(!a.map(x => x.operator).includes(b.operator)) {
-        let obj = { 'operator': b.operator, 'value_Pay': b.value_Pay, 'weight': b.weight, 'position_Job' : b.position_Job, 'item' : b.item, 'details' : [] };
+        let obj = { 'operator': b.operator, 'value_Pay': b.value_Pay, 'weight': b.weight, 'position_Job' : b.position_Job, 'item' : b.item, 'value_Pay_Zeus' : 0, 'details' : [] };
         a.push(obj);
       } else {
         a[a.map(x => x.operator).indexOf(b.operator)].value_Pay += b.value_Pay;
         a[a.map(x => x.operator).indexOf(b.operator)].weight += b.weight;
       }
+      //console.log(a);
       return a;
     }, []);
   }
@@ -223,6 +227,7 @@ export class Nomina_CorteComponent implements OnInit {
       //console.log(data);
       this.productionCourt = this.productionCourt.concat(data);
       this.hiddenProduction = this.hiddenProduction.concat(data);
+      this.productionInDispatch = this.productionInDispatch.concat(data);
       console.log(this.productionCourt);
       
     }, error => {
@@ -233,14 +238,17 @@ export class Nomina_CorteComponent implements OnInit {
   /** Filtrar la tabla detallada del modal de sellado */
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
+  
+  calcTotalPayOperatorProductionZeus = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator &&  x.send_Zeus == '1').reduce((a, b) => a += b.value_Pay, 0);
+
   calcTotalPay = () => this.payRollConsolidate.reduce((a, b) => a += b.value_Pay, 0);
+
+  calcTotalPayZeus = () => this.hiddenProduction.filter(x => x.send_Zeus == '1').reduce((a, b) => a += b.value_Pay, 0);
 
   calcTotalPayOperatorProduction = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'PRODUCCION').reduce((a, b) => a += b.value_Pay, 0);
   
   calcTotalPayOperatorService = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator && x.concept == 'MAQUILA').reduce((a, b) => a += b.value_Pay, 0);
-
   
-
   qtyRecordsOperatorItem = (operator : any, item : any) => this.hiddenProduction.filter(x => x.operator == operator && x.item == item).length;
   
   qtyRecordsOperator = (operator : any) => this.hiddenProduction.filter(x => x.operator == operator).length;
@@ -273,9 +281,10 @@ export class Nomina_CorteComponent implements OnInit {
       if(operator == undefined) this.infoExcel = this.hiddenProduction;
       else this.infoExcel = this.hiddenProduction.filter(x => x.operator == operator);
       this.infoExcel.sort((a, b) => a.operator.localeCompare(b.operator))
+      console.log(this.infoExcel);
       setTimeout(() => {
         this.loadSheetAndStyles(this.infoExcel, operator);  
-      }, 1500); 
+      }, 3000); 
     } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar!`);
   }
 
@@ -291,9 +300,8 @@ export class Nomina_CorteComponent implements OnInit {
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
     let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
     let workbook = this.svExcel.formatoExcel(title, true);
-
     this.addNewSheet(workbook, title, fill, border, font, alignment, data);
-    this.svExcel.creacionHoja(workbook, `Nómina Consolidada Corte`, false);
+    this.svExcel.creacionHoja(workbook, `Nómina consolidada de Corte`, false);
     this.addGroupedSheet(workbook, fill, font, border, this.groupedInfoExcel(operator), 2)
     this.svExcel.creacionExcel(title, workbook);
     this.load = false;
@@ -317,7 +325,7 @@ export class Nomina_CorteComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5','N5','O5']; 
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5','N5','O5','P5']; 
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
     
@@ -325,7 +333,7 @@ export class Nomina_CorteComponent implements OnInit {
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:O3');
+    ws.mergeCells('A1:P3');
 
     this.loadSizeHeader(ws);
   }
@@ -333,7 +341,7 @@ export class Nomina_CorteComponent implements OnInit {
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws : any){
     [2,6].forEach(x => ws.getColumn(x).width = 50);
-    [11,2].forEach(x => ws.getColumn(x).width = 30);
+    [11,2,16].forEach(x => ws.getColumn(x).width = 30);
     [3,5,4,13,15].forEach(x => ws.getColumn(x).width = 10);
     [12].forEach(x => ws.getColumn(x).width = 8);
     [1].forEach(x => ws.getColumn(x).width = 5);
@@ -357,7 +365,8 @@ export class Nomina_CorteComponent implements OnInit {
       'Turno',
       'Dom/Fest', 
       'Material',
-      'Impreso' 
+      'Impreso',
+      'Ingresado a Despacho' 
     ];
     return headerRow;
   }
@@ -382,7 +391,8 @@ export class Nomina_CorteComponent implements OnInit {
         x.turn,
         x.sunday ? 'SI' : 'NO',
         x.material,
-        x.printed
+        x.printed, 
+        x.send_Zeus == '1' ? 'SI' : 'NO'
       ]);
     });
     this.addTotal(info);
@@ -393,7 +403,7 @@ export class Nomina_CorteComponent implements OnInit {
   loadInfoExcel(ws : any, data : any, border : any, alignment : any){
     let formatNumber: Array<number> = [7,8,10];
     let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O']; 
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']; 
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(x => {
@@ -441,27 +451,20 @@ export class Nomina_CorteComponent implements OnInit {
   addGroupedHeader(worksheet, font, border, fill) {
     worksheet.addRow([]);
     worksheet.addRow([]);
-    let rowHeader : any = ['A4', 'B4', 'C4', 'D4', 'E4', ];
-    worksheet.addRow(['Operario', 'Cargo', 'Producción', 'Presentación', 'Valor a Pagar',]);
+    let rowHeader : any = ['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4'];
+    worksheet.addRow(['Operario', 'Cargo', 'Producción Total', 'Producción Ingresada a Despacho', 'Presentación', 'Valor Ingresado a Despacho', 'Valor Total']);
     
     rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
     rowHeader.forEach(x => worksheet.getCell(x).font = font);
     rowHeader.forEach(x => worksheet.getCell(x).border = border);
 
-    let concatCells : any = ['A1:E3'];
+    let concatCells : any = ['A1:G3'];
     this.stylesGroupedPage(worksheet, concatCells, []);
   }
 
   //.Agregar información a la hoja 2: Reporte de producción consolidado.
-  addGroupedExcel(worksheet : any, data : any) {
-    let formatNumber: Array<number> = [3, 5];
-    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    data.forEach(d => worksheet.addRow(d));
-  }
-
-  //.Agregar información a la hoja 2: Reporte de producción consolidado.
   addGroupedInfoExcel(worksheet : any, data : any) {
-    let formatNumber: Array<number> = [3,5];
+    let formatNumber: Array<number> = [3, 4, 7, 6];
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(d => worksheet.addRow(d));
   }
@@ -473,10 +476,15 @@ export class Nomina_CorteComponent implements OnInit {
 
     info = data.reduce((acc, obj) => {
       if(!acc.map(x => x[0]).includes(obj.operator)) {
-        acc = [...acc, [obj.operator, obj.position_Job, obj.weight, 'Kg', obj.value_Pay]]
+        console.log(obj.value_Pay_Zeus);
+        let valueInDispatch :  number = this.productionInDispatch.filter(x => x.operator == obj.operator && x.send_Zeus == '1').reduce((a,b) => a += b.value_Pay, 0);
+        let weightInDispatch :  number = this.productionInDispatch.filter(x => x.operator == obj.operator && x.send_Zeus == '1').reduce((a,b) => a += b.weight, 0);
+        console.log(valueInDispatch);
+        acc = [...acc, [obj.operator, obj.position_Job, obj.weight, weightInDispatch, 'Kg', valueInDispatch, obj.value_Pay, ]]
       }
       return acc;
     }, [])
+    this.addTotalConsolidate(info)
     //this.produccion.forEach(d => info.push([d.orden, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, ]));
     return info;
   }
@@ -484,9 +492,22 @@ export class Nomina_CorteComponent implements OnInit {
   //.Estilos de la hoja 2: Reporte de producción consolidado..
   stylesGroupedPage(worksheet, concatCells, formatNumber) {
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    [1].forEach(x => worksheet.getColumn(x).width = 30);
-    [2,3,4,5].forEach(x => worksheet.getColumn(x).width = 20)
+    [1,4,6].forEach(x => worksheet.getColumn(x).width = 30);
+    [2,3,5,7].forEach(x => worksheet.getColumn(x).width = 20)
     concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //Agregar fila de totales al formato excel.
+  addTotalConsolidate(info : any){
+    info.push([
+      '',
+      'KG PRODUCIDOS',
+      this.infoExcel.reduce((a, b) => a += b.weight, 0),
+      this.infoExcel.filter(x => x.send_Zeus == '1').reduce((a, b) => a += b.weight, 0),
+      'Kg',
+      this.infoExcel.filter(x => x.send_Zeus == '1').reduce((a, b) => a += b.value_Pay, 0),
+      this.infoExcel.reduce((a, b) => a += b.value_Pay, 0),
+    ]);
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -519,22 +540,26 @@ export class Nomina_CorteComponent implements OnInit {
     let count: number = 0;
 
     this.payRollConsolidate.forEach(x => {
+      let valueInDispatch :  number = this.productionInDispatch.filter(y => y.operator == x.operator && y.send_Zeus == '1').reduce((a,b) => a += b.value_Pay, 0);
+      let weightInDispatch :  number = this.productionInDispatch.filter(y => y.operator == x.operator && y.send_Zeus == '1').reduce((a,b) => a += b.weight, 0);
+
       consolidatedInfo.push({
         '#' : count += 1,
         'Operario' : x.operator,
         'Cargo' : x.position_Job,
-        'Producción' : this.formatNumbers((x.weight).toFixed(2)),
-        'Presentación' : 'Kg',
-        'Valor a Pagar' : `$ ${this.formatNumbers((x.value_Pay).toFixed(2))}` ,
+        'Producción Total' : this.formatNumbers((x.weight).toFixed(2)),
+        'Producción Ingresada' : this.formatNumbers((weightInDispatch).toFixed(2)),
+        'Unidad' : 'Kg',
+        'Valor a Pagar' : `$ ${this.formatNumbers((valueInDispatch).toFixed(2))}`,
+        'Valor Total' : `$ ${this.formatNumbers((x.value_Pay).toFixed(2))}`,
       }); 
     });
-
     return consolidatedInfo;
   }
 
   tableConsolidated(data) {
-    let columns: Array<string> = ['#', 'Operario', 'Cargo', 'Producción', 'Presentación', 'Valor a Pagar'];
-    let widths: Array<string> = ['5%', '35%', '15%', '20%', '10%', '15%'];
+    let columns: Array<string> = ['#', 'Operario', 'Cargo', 'Producción Total', 'Producción Ingresada', 'Unidad', 'Valor Total', 'Valor a Pagar'];
+    let widths: Array<string> = ['2%', '20%', '13%', '15%', '18%', '6%', '13%', '13%'];
     return {
       table: {
         headerRows: 2,
@@ -552,7 +577,7 @@ export class Nomina_CorteComponent implements OnInit {
 
   buildTableBody(data, columns, title: string) {
     var body = [];
-    body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
+    body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -565,15 +590,18 @@ export class Nomina_CorteComponent implements OnInit {
   tableSubTotal() {
     let total: number = 0;
     let weight: number = 0;
-
+    let valueInDispatch :  number = this.productionInDispatch.filter(x => x.send_Zeus == '1').reduce((a,b) => a += b.value_Pay, 0);
+    let weightInDispatch :  number = this.productionInDispatch.filter(x => x.send_Zeus == '1').reduce((a,b) => a += b.weight, 0);
+   
     this.payRollConsolidate.forEach(x => {
       total += x.value_Pay
       weight += x.weight;
-    } );
+    });
+
     return {
       margin: [0, 0, 0, 20],
       table: {
-        widths: ['5%', '35%', '15%', '20%', '10%', '15%'],
+        widths: ['2%', '20%', '13%', '15%', '18%', '6%', '13%', '13%'],
         style: 'header',
         body: [
           [
@@ -581,8 +609,10 @@ export class Nomina_CorteComponent implements OnInit {
             '',
             '',      
             { border: [true, false, true, true], text: `${this.formatNumbers((weight).toFixed(2))}`,  fontSize: 8, bold: true },
-            { border: [true, false, true, true], text: `Total Nomina`, fontSize: 8, bold: true, alignment: 'right', },
+            { border: [true, false, true, true], text: `${this.formatNumbers((weightInDispatch).toFixed(2))}`,  fontSize: 8, bold: true },
+            { border: [true, false, true, true], text: `Kg`, fontSize: 8, bold: true, alignment: 'right', },
             { border: [true, false, true, true], text: `$ ${this.formatNumbers((total).toFixed(2))}`, fontSize: 8, bold: true },
+            { border: [true, false, true, true], text: `$ ${this.formatNumbers((valueInDispatch).toFixed(2))}`, fontSize: 8, bold: true },
           ],
         ]
       }
@@ -642,7 +672,7 @@ export class Nomina_CorteComponent implements OnInit {
 
   informationOperatorPDF(operator: any, countOperator: number){
     let totalQuantity: number = 0;
-    this.hiddenProduction.filter(y => y.operator == operator).forEach(y => totalQuantity += y.value_Pay);
+    this.hiddenProduction.filter(y => y.operator == operator && y.send_Zeus == '1').forEach(y => totalQuantity += y.value_Pay);
     let dataOperator: Array<any> = this.hiddenProduction.filter(x => x.operator == operator);
     return [
       { border: [true, true, false, true], text: countOperator, fillColor: '#ccc', bold: true },
@@ -659,7 +689,7 @@ export class Nomina_CorteComponent implements OnInit {
         colSpan: 5,
         table: {
           headerRows: 1,
-          widths : ['3%', '10%', '10%', '10%', '8%', '9%', '4%', '10%', '7%', '10%', '10%', '10%'],
+          widths : ['3%', '10%', '9%', '10%', '7%', '9%', '4%', '6%', '7%', '10%', '10%', '10%', '6%'],
           body: this.dataDetailsProductionPDF(order, dataProduction),
         },
         fontSize: 9,
@@ -698,6 +728,7 @@ export class Nomina_CorteComponent implements OnInit {
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: `$ ${this.formatNumbers((x.value_Production).toFixed(2))}`  },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: `$ ${this.formatNumbers((x.value_Pay).toFixed(2))}`  },
         { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.printed },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.send_Zeus == '1' ? 'SI' : 'NO' },
       ]);
     });
     return data;
@@ -716,9 +747,9 @@ export class Nomina_CorteComponent implements OnInit {
       { border: [false, true, false, true], alignment: 'center', text: `Turno`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Valor`, fillColor: '#eee', bold: true },
       { border: [false, true, false, true], alignment: 'center', text: `Total`, fillColor: '#eee', bold: true },
-      { border: [false, true, true, true], alignment: 'center', text: `Impreso`, fillColor: '#eee', bold: true },
+      { border: [false, true, false, true], alignment: 'center', text: `Impreso`, fillColor: '#eee', bold: true },
+      { border: [false, true, true, true], alignment: 'center', text: `Zeus`, fillColor: '#eee', bold: true },
     ]
   }
-
 }
 

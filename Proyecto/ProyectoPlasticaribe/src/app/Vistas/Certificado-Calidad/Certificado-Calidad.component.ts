@@ -376,9 +376,9 @@ export class CertificadoCalidadComponent implements OnInit {
           ],
           [
             { border: [true, false, false, true], text: `Fecha Orden`, bold: true },
-            { border: [false, false, true, true], text: `${datos.fecha_Orden.replace('T00:00:00', '')}` },
+            { border: [false, false, true, true], text: `${datos.fecha_Orden == null ? '' : datos.fecha_Orden.replace('T00:00:00', '')}` },
             { border: [true, false, false, true], text: `Fecha Fin Produccion`, bold: true },
-            { border: [false, false, true, true], text: `${datos.fecha_Fin_Produccion.replace('T00:00:00', '')}` },
+            { border: [false, false, true, true], text: `${datos.fecha_Fin_Produccion == null ? '' : datos.fecha_Fin_Produccion.replace('T00:00:00', '')}` },
           ],
         ]
       },
