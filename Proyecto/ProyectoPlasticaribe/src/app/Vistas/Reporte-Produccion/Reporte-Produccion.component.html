@@ -58,7 +58,7 @@
       <!-- PROCESOS -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
-          <p-dropdown formControlName="proceso" inputId="areasEmpresa" [autoDisplayFirst]="false" [options]="areasEmpresa" [required]="true"></p-dropdown>
+          <p-dropdown formControlName="proceso" inputId="areasEmpresa" [autoDisplayFirst]="false" [options]="areasEmpresa" (onChange)="validarProceso()" [required]="true"></p-dropdown>
           <label for="areasEmpresa">Área Producción*</label>
         </span>
       </div>
@@ -81,15 +81,25 @@
           </label>
         </div>
       </div>
-
-        <!-- Maquina -->
-        <!--<div class="col-sm-12 col-md-6 col-xl-3">
-          <span class="p-float-label">
-            <input formControlName="Maquina" id="machine" type="text" pInputText/>
-            <label for="machine">OT</label>
-          </span>
-      </div>-->
+      
+      <!-- OPERARIO -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+            <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+            <label for="operario">Operario</label>
+        </span>
       </div>
+
+      <!-- Maquina -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <input formControlName="Maquina" id="machine" type="text" pInputText/>
+          <label for="machine">Maquina</label>
+        </span>
+      </div>
+
+    </div>
+    
     <!-- BOTONES -->
     <div class="row my-4">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -115,8 +125,8 @@
   [scrollable]="true"
   scrollHeight="50rem"
   [paginator]="true"
-  [rows]="10"
-  [rowsPerPageOptions]="[10, 20, 50, 100]"
+  [rows]="30"
+  [rowsPerPageOptions]="[10, 20, 30, 50, 100, 200]"
   [showCurrentPageReport]="true"
   currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
     <ng-template pTemplate="header">

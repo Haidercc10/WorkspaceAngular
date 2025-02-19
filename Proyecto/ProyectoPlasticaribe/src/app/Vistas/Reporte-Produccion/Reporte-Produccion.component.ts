@@ -11,6 +11,7 @@ import { AppComponent } from 'src/app/app.component';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-Reporte-Produccion',
@@ -35,6 +36,9 @@ export class ReporteProduccionComponent implements OnInit {
   traceability : boolean = false;
   @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
   selectedRoll : any = null;
+  area : any = null;
+  operarios : any = [];
+  operariosTotales : any = [];
 
   constructor(private AppComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -43,6 +47,7 @@ export class ReporteProduccionComponent implements OnInit {
     private productosService: ProductoService,
     private svcPDF: CreacionPdfService, 
     private svcExcel : CreacionExcelService, 
+    private svOperators : UsuarioService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -56,14 +61,15 @@ export class ReporteProduccionComponent implements OnInit {
       producto: [null],
       Turno: [null],
       EnvioZeus: [null],
-      //Maquina : [null],
-      //Operario : [null]
+      Maquina : [null],
+      operario : [null]
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.validarProcesoPorUsuarioRegistrado();
+    this.obtenerOperarios();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -155,6 +161,8 @@ export class ReporteProduccionComponent implements OnInit {
     let cliente = this.formFiltros.value.idCliente;
     let producto = this.formFiltros.value.idProducto;
     let turno = this.formFiltros.value.Turno;
+    let maquina = this.formFiltros.value.Maquina;
+    let operario = this.formFiltros.value.operario;
     let envioZeus = this.formFiltros.value.EnvioZeus == null ? 'Todo' : this.formFiltros.value.EnvioZeus ? '1' : '0';
 
     if (orden != null) ruta += `orden=${orden}`;
@@ -163,6 +171,8 @@ export class ReporteProduccionComponent implements OnInit {
     if (producto != null) ruta.length > 0 ? ruta += `&producto=${producto}` : ruta += `producto=${producto}`;
     if (turno != null) ruta.length > 0 ? ruta += `&turno=${turno}` : ruta += `turno=${turno}`;
     if (envioZeus != null) ruta.length > 0 ? ruta += `&envioZeus=${envioZeus}` : ruta += `envioZeus=${envioZeus}`;
+    if (maquina != null) ruta.length > 0 ? ruta += `&maquina=${maquina}` : ruta += `maquina=${maquina}`;
+    if (operario != null) ruta.length > 0 ? ruta += `&operario=${operario}` : ruta += `operario=${operario}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
     return ruta;
   }
@@ -170,14 +180,22 @@ export class ReporteProduccionComponent implements OnInit {
   // Funcion que se encargará de sumar la cantidad o peso bruto de la información de producción
   totalCantidadConsultada() {
     let total: number = 0;
-    this.produccion.forEach(x => total += x.cantidad);
+    if(this.dt) {
+      if(this.dt.filteredValue) {
+        this.dt.filteredValue.forEach(z => total += z.cantidad);
+      } else this.produccion.forEach(x => total += x.cantidad);
+    } else this.produccion.forEach(x => total += x.cantidad);
     return total;
   }
 
   // Funcion que se encargará de sumar el peso neto de la información de producción
   totalPesoConsultado() {
     let total: number = 0;
-    this.produccion.forEach(x => total += x.peso);
+    if(this.dt) {
+      if(this.dt.filteredValue) {
+        this.dt.filteredValue.forEach(z => total += z.peso);
+      } else this.produccion.forEach(x => total += x.peso);
+    } else this.produccion.forEach(x => total += x.peso);
     return total;
   }
 
@@ -221,7 +239,8 @@ export class ReporteProduccionComponent implements OnInit {
     this.cargando = true;
     let date1: any = moment(this.formFiltros.value.rangoFechas[0]).format("DD/MM/YYYY");
     let date2: any = moment(this.formFiltros.value.rangoFechas[1]).format("DD/MM/YYYY");
-    let data: any = this.produccion;
+    let data: any = []
+    this.dt ? this.dt.filteredValue ? data = this.dt.filteredValue : data = this.produccion : data = this.produccion;;
     let title: string = `Informe de producción \nDel ${date1} al ${date2}`;
     let content: any[] = this.contentPDF(data);
 
@@ -355,11 +374,14 @@ export class ReporteProduccionComponent implements OnInit {
   //Tabla que carga los detalles de la produccion por cliente, ot e item. 
   tableDetailsRolls(data: any) {
     let info: any = [];
-    let rollos: any[] = this.produccion.filter(x => x.cliente == data.cliente && x.orden == data.orden && x.item == data.item);
+    let validateInfo : any = [];
+    
+    this.dt ? this.dt.filteredValue ? validateInfo = this.dt.filteredValue : validateInfo = this.produccion : validateInfo = this.produccion;
+    let rollos: any[] = validateInfo.filter(x => x.cliente == data.cliente && x.orden == data.orden && x.item == data.item);
     rollos.forEach(x => {
       info.push(this.detailsProduction(x));
     });
-    info.push(this.tableTotalOrders(data));
+    info.push(this.tableTotalOrders(data, validateInfo));
     return info;
   }
 
@@ -392,7 +414,7 @@ export class ReporteProduccionComponent implements OnInit {
   }
 
   //. Tabla de totales por orden de trabajo
-  tableTotalOrders(data: any) {
+  tableTotalOrders(data : any, info : any) {
     return {
       margin: [0, 0],
       fontSize: 8,
@@ -402,7 +424,7 @@ export class ReporteProduccionComponent implements OnInit {
         body: [
           [
             { text: ``, alignment: 'center', border: [false, false, false, false], },
-            { text: `Bultos: ${this.totalRows(data.orden)}`, alignment: 'center', border: [false, true, false, false], bold: true, },
+            { text: `Bultos: ${this.totalRows(data.orden, info)}`, alignment: 'center', border: [false, true, false, false], bold: true, },
             { text: ['SELLADO', 'Wiketiado'].includes(data.proceso) ? `${this.formatonumeros(this.totalQty(data.orden).toFixed(2))}` : `${this.formatonumeros(this.totalWeightReal(data.orden).toFixed(2))}`, alignment: 'center', bold: true, border: [false, true, false, false], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
@@ -432,9 +454,9 @@ export class ReporteProduccionComponent implements OnInit {
             { text: ``, alignment: 'center', border: [false, false, false, false], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
-            { text: ['SELLADO', 'Wiketiado'].includes(data[data.length - 1].proceso) ? `${this.formatonumeros(this.totalFinalTeoricWeight().toFixed(2))}` : `${this.formatonumeros(this.totalFinalGrossWeight().toFixed(2))}`, alignment: 'center', bold: true, border: [false, false, false, true], },
+            { text: ['SELLADO', 'Wiketiado'].includes(data[data.length - 1].proceso) ? `${this.formatonumeros(this.totalFinalTeoricWeight(data).toFixed(2))}` : `${this.formatonumeros(this.totalFinalGrossWeight(data).toFixed(2))}`, alignment: 'center', bold: true, border: [false, false, false, true], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
-            { text: `${this.formatonumeros(this.totalFinalWeightReal().toFixed(2))}`, alignment: 'center', bold: true, border: [false, false, false, true], },
+            { text: `${this.formatonumeros(this.totalFinalWeightReal(data).toFixed(2))}`, alignment: 'center', bold: true, border: [false, false, false, true], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
             { text: ``, alignment: 'center', border: [false, false, false, false], },
@@ -473,33 +495,51 @@ export class ReporteProduccionComponent implements OnInit {
   }
 
   //. Total cantidades por cliente y orden de trabajo.
-  totalQty = (ot: any) => this.produccion.filter(x => x.orden == ot).reduce((total, item) => total + item.cantidad, 0);
+  totalQty(ot: any) {
+    let data : any = null;
+    this.dt ? this.dt.filteredValue ? data = this.dt.filteredValue : data = this.produccion : data = this.produccion;
+    return data.filter(x => x.orden == ot).reduce((total, item) => total + item.cantidad, 0);
+  } 
 
   //. Total peso teorico por cliente y orden de trabajo.
-  totalWeightTeoric = (ot: any) => this.produccion.filter(x => x.orden == ot).reduce((total, item) => total + item.pesoTeorico, 0);
+  totalWeightTeoric(ot: any) {
+    let data : any = null;
+    this.dt ? this.dt.filteredValue ? data = this.dt.filteredValue : data = this.produccion : data = this.produccion;
+    return data.filter(x => x.orden == ot).reduce((total, item) => total + item.pesoTeorico, 0);    
+  } 
 
   //. Total peso bruto por cliente y orden de trabajo.
-  totalWeight = (ot: any) => this.produccion.filter(x => x.orden == ot).reduce((total, item) => total + item.cantidad, 0);
+  totalWeight(ot: any) {
+    let data : any = null;
+    this.dt ? this.dt.filteredValue ? data = this.dt.filteredValue : data = this.produccion : data = this.produccion;
+    return data.filter(x => x.orden == ot).reduce((total, item) => total + item.cantidad, 0);    
+  } 
 
   //. Total peso neto por cliente y orden de trabajo.
-  totalWeightReal = (ot: any) => this.produccion.filter(x => x.orden == ot).reduce((total, item) => total + item.peso, 0);
+  totalWeightReal(ot: any) {
+    let data : any = null;
+    this.dt ? this.dt.filteredValue ? data = this.dt.filteredValue : data = this.produccion : data = this.produccion;
+    return data.filter(x => x.orden == ot).reduce((total, item) => total + item.peso, 0);   
+  } 
 
   //. Total final peso bruto por cliente y orden de trabajo.
-  totalFinalGrossWeight = () => this.produccion.reduce((total, item) => total + item.cantidad, 0);
+  totalFinalGrossWeight = (data : any) => data.reduce((total, item) => total + item.cantidad, 0);
 
   //. Total final peso teorico por cliente y orden de trabajo.
-  totalFinalTeoricWeight = () => this.produccion.reduce((total, item) => total + item.pesoTeorico, 0);
+  totalFinalTeoricWeight = (data : any) => data.reduce((total, item) => total + item.pesoTeorico, 0);
 
   //. Total final peso neto por cliente y orden de trabajo.
-  totalFinalWeightReal = () => this.produccion.reduce((total, item) => total + item.peso, 0);
+  totalFinalWeightReal = (data : any) => data.reduce((total, item) => total + item.peso, 0);
 
   //. Cantidad de bultos por orden de trabajo. 
-  totalRows = (ot: any) => this.produccion.filter(x => x.orden == ot).length;
+  totalRows = (ot: any, data : any) => data.filter(x => x.orden == ot).length;
 
   //.Excel
   //. Función utilizada para descargar el formato excel
   exportExcel(){
-    if(this.produccion.length > 0) {
+    let data : any = [];
+    this.dt ? this.dt.filteredValue ? data = this.dt.filteredValue : data = this.produccion : data = this.produccion;
+    if(data.length > 0) {
       let date1 : any = moment(this.formFiltros.value.rangoFechas[0]).format('DD-MM-YYYY'); 
       let date2 : any = moment(this.formFiltros.value.rangoFechas[1]).format('DD-MM-YYYY'); 
       this.cargando = true;
@@ -509,9 +549,11 @@ export class ReporteProduccionComponent implements OnInit {
         let font : any = { size: 12, bold: true, alignment: 'center', name : 'Calibri' };
         let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         let workbook = this.svcExcel.formatoExcel(title, true);
-        this.addSheet(workbook, fill, font, border, this.infoProduction(), 1);
+        this.addSheet(workbook, fill, font, border, this.infoProduction(data), 1);
         this.svcExcel.creacionHoja(workbook, `Reporte Producción Consolidado`, false);
-        this.addGroupedSheet(workbook, fill, font, border, this.groupedInfoExcel(), 2);
+        this.addGroupedSheet(workbook, fill, font, border, this.groupedInfoExcel(data), 2);
+        this.svcExcel.creacionHoja(workbook, `Reporte Producción Operario`, false);
+        this.addOperatorSheet(workbook, fill, font, border, this.operatorInfoExcel(data), 3);
         this.svcExcel.creacionExcel(`Reporte Producción de ${date1} a ${date2}`, workbook);
         this.cargando = false;  
       }, 2000);
@@ -527,22 +569,21 @@ export class ReporteProduccionComponent implements OnInit {
   }
 
   //.Información de la producción.
-  infoProduction(){
+  infoProduction(data){
     let info : any = [];
-    this.produccion.forEach(d => info.push([d.orden, d.rollo, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, d.turno, d.fecha.replace('T00:00:00', ''), d.hora, d.proceso, d.maquina, d.envioZeus == 1 ? 'SI' : 'NO', d.operario]));
+    data.forEach(d => info.push([d.orden, d.rollo, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, d.turno, d.fecha.replace('T00:00:00', ''), d.hora, d.proceso, d.maquina, d.envioZeus == 1 ? 'SI' : 'NO', d.operario]));
     return info;
   }
 
-  //.Agregar información a la hoja del excel.
+  //.Agregar información a la hoja 1 del excel.
   addInfoExcel(worksheet : any, data : any) {
     let formatNumber: Array<number> = [7];
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(d => worksheet.addRow(d));
   }
 
-  //.Agregar encabezado a la hoja del excel.
+  //.Agregar encabezado a la hoja 1 del excel.
   addHeaderPage(worksheet, font, border, fill) {
-    
     let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5']
     worksheet.addRow(['OT', 'Rollo', 'Cliente', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Unidad', 'Turno', 'Fecha', 'Hora', 'Proceso', 'Maquina', 'Envio Zeus', 'Operario']);
     
@@ -554,7 +595,7 @@ export class ReporteProduccionComponent implements OnInit {
     this.stylesPage(worksheet, concatCells, []);
   }
 
-  //.Estilos de la hoja del excel.
+  //.Estilos de la hoja 1 del excel.
   stylesPage(worksheet, concatCells, formatNumber) {
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     [1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14].forEach(x => worksheet.getColumn(x).width = 12);
@@ -600,11 +641,9 @@ export class ReporteProduccionComponent implements OnInit {
   }
 
   //.Información agrupada de la hoja 2: Reporte de producción consolidado.
-  groupedInfoExcel(){
+  groupedInfoExcel(data : any){
     let info : any = [];
-    info = this.produccion.reduce((acc, ot) => {
-      console.log(acc);
-      console.log(ot)
+    info = data.reduce((acc, ot) => {
       if(!acc.map(x => x[0]).includes(ot.orden)) {
         acc = [...acc, [ot.orden, ot.cliente, ot.item, ot.referencia, ot.peso, ot.cantidad, ot.presentacion]]
       } else {
@@ -623,6 +662,80 @@ export class ReporteProduccionComponent implements OnInit {
     [1, 2, 5, 6, 7].forEach(x => worksheet.getColumn(x).width = 12);
     [2, 4].forEach(x => worksheet.getColumn(x).width = 50)
     concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+   //Hoja 3 Agrupada
+   addOperatorSheet(workbook, fill , font, border, data : any, pageNumber : number){
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addOperatorHeader(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addGroupedInfoExcel(page, data);
+  }
+
+   //.Agregar encabezado de la hoja 2: Reporte de producción consolidado.
+   addOperatorHeader(worksheet, font, border, fill) {
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let rowHeader : any = ['A4', 'B4', 'C4', 'D4',];
+    worksheet.addRow(['Operario', 'Peso', 'Cantidad', 'Unidad', ]);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:D3'];
+    this.stylesOperatorPage(worksheet, concatCells, []);
+  }
+
+  //.Estilos de la hoja 2: Reporte de producción consolidado por operario.
+  stylesOperatorPage(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1].forEach(x => worksheet.getColumn(x).width = 30);
+    [2, 3, 4].forEach(x => worksheet.getColumn(x).width = 20);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //.Información agrupada de la hoja 3: Reporte de producción consolidado por operario.
+  operatorInfoExcel(data : any){
+    let info : any = [];
+    info = data.reduce((acc, ot) => {
+      if(!acc.map(x => x[0]).includes(ot.operario)) {
+          acc = [...acc, [ot.operario, ot.peso, ot.cantidad, 'Kg']];
+      } else {
+        acc[acc.map(x => x[0]).indexOf(ot.operario)][1] += ot.peso;
+        acc[acc.map(x => x[0]).indexOf(ot.operario)][2] += ot.cantidad;
+      }
+      return acc;
+    }, []);
+    this.addTotalOperators(info);
+    return info;
+  }
+
+  //Agregar fila de totales al formato excel en la hoja 3.
+  addTotalOperators(info : any){
+    let data : any = info;
+    let count : number = 0;
+    let weight : number = 0;
+    let qty : number = 0;
+ 
+    data.forEach(x => {
+      weight += x[1];
+      qty += x[2];
+
+      if((data.length - 1) == count) info.push(['TOTAL', weight, qty, 'Kg']);
+      count++;
+    })
+  }
+
+  //Función que cargará todos los operarios al iniciar el modulo.
+  obtenerOperarios = () => this.svOperators.GetOperariosProduccion().subscribe(data => { this.operariosTotales = data; }, error => this.msj.mensajeError(error));
+
+  //Función que cargará los operarios dependiendo el area de producción seleccionada.
+  validarProceso(){
+    this.operarios = [];
+    let area : any = this.formFiltros.value.proceso; 
+    area == 'CAMISILLA' ? area = 'SELLADO' : area = area; 
+    this.operarios = this.operariosTotales.filter(x => x.area_Nombre == area);
   }
 
   //*Función para cargar el modal de movimientos.

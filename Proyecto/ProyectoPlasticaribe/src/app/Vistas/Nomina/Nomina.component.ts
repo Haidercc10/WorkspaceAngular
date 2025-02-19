@@ -365,12 +365,12 @@ export class NominaComponent implements OnInit {
       let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
       let workbook = this.createExcelService.formatoExcel(title, false);
       this.addPageConsilidateExcel(workbook, fill, font, border, this.dataPageOneExcel(), 1);
-      this.createExcelService.creacionHoja(workbook, `Nomina Total Detallada`);
-      this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageTwoExcel(), 2, ['0', '1']);
-      this.createExcelService.creacionHoja(workbook, `Nomina Recibida y No Recibida en Despacho`, false);
-      this.addPageConsilidateExcel(workbook, fill, font, border, this.dataPageThreeExcel(), 3);
       this.createExcelService.creacionHoja(workbook, `Nomina Recibida en Despacho Detallada`);
-      this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageFourExcel(), 4, ['1']);
+      this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageTwoExcel(), 2, ['1']);
+      this.createExcelService.creacionHoja(workbook, `Nomina Producción Total Sellado Consolidada`, false);
+      this.addPageConsilidateExcel(workbook, fill, font, border, this.dataPageThreeExcel(), 3);
+      this.createExcelService.creacionHoja(workbook, `Nomina Producción Total Detallada`);
+      this.addPageDetailsExcel(workbook, fill, font, border, this.dataPageFourExcel(), 4, ['0', '1']);
       this.createExcelService.creacionExcel(`Nómina de Sellado de ${fechaInicial} a ${fechaFinal}`, workbook);
       this.load = true;
     }, 2000);

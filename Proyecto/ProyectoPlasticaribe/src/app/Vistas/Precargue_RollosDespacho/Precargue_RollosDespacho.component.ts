@@ -151,7 +151,10 @@ export class Precargue_RollosDespachoComponent implements OnInit {
             this.consolidateItems();
             this.msjs(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
             this.form.patchValue({ roll : null });
-          } else this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
+          } else {
+            this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
+            this.form.patchValue({ roll : null });
+          } 
           return;
         }, error => {
           count += 1;
