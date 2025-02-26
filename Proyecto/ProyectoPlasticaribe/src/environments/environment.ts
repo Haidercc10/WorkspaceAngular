@@ -12,16 +12,16 @@ export const environment = {
   //rutaZeusContabilidad: "http://192.168.0.85:9065/api",
 
   // LOCALES 1
-  rutaPlasticaribeAPI : "http://192.168.0.176:9085/api",
-  rutaBagPro : "http://192.168.0.176:9095/api",
-  rutaZeus : "http://192.168.0.176:9055/api",
-  rutaZeusContabilidad : "http://192.168.0.176:9065/api"
+  rutaPlasticaribeAPI : "http://192.168.0.154:9085/api",
+  rutaBagPro : "http://192.168.0.154:9095/api",
+  rutaZeus : "http://192.168.0.154:9055/api",
+  rutaZeusContabilidad : "http://192.168.0.154:9065/api"
 
   // LOCALES 2
-  //rutaPlasticaribeAPI : "http://192.168.0.193:9085/api",
-  // rutaBagPro : "http://192.168.0.193:9095/api",
-  // rutaZeus : "http://192.168.0.193:9075/api",
-  // rutaZeusContabilidad : "http://192.168.0.193:9055/api",
+  //rutaPlasticaribeAPI : "http://192.168.0.154:9085/api",
+  // rutaBagPro : "http://192.168.0.154:9095/api",
+  // rutaZeus : "http://192.168.0.154:9075/api",
+  // rutaZeusContabilidad : "http://192.168.0.154:9055/api",
 };
 
 /*

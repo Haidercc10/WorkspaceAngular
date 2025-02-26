@@ -4,7 +4,7 @@
   </div>
 
   <!--  -->
-  <div class="row g-2 fila-1" *ngIf="[1,60,12,94,85].includes(ValidarRol) && !cargando">
+  <div class="row g-2 fila-1" *ngIf="[1,60,12,94,85,98].includes(ValidarRol) && !cargando">
     <!-- Tabla de Procesos -->
     <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="cantProcesos">
       <p-card header="">
@@ -152,7 +152,7 @@
   </div>
 
   <!-- Tablas de Ordenes de Trabajo -->
-  <div class="row g-2 fila-2" *ngIf="[1,60,12,2].includes(ValidarRol) && !cargando">
+  <div class="row g-2 fila-2" *ngIf="[1,60,12,2,98].includes(ValidarRol) && !cargando">
 
     <!-- Ranking de Clientes que más han comprado-->
     <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-left" id="clientesCompras">
@@ -267,7 +267,7 @@
 
   </div>
 
-  <div class="row g-2 fila-3" *ngIf="[1,60,12,2].includes(ValidarRol) && !cargando">
+  <div class="row g-2 fila-3" *ngIf="[1,60,12,2,98].includes(ValidarRol) && !cargando">
 
     <!-- Ranking de Clientes -->
     <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-bottom" id="RankingClientes">

@@ -255,6 +255,7 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   getClientFromSaleOrder(info : any) {
+    console.log(info);
     let idthird: string = this.products[0].id_Cliente;
     this.invZeusService.getClientByIdThird(idthird).subscribe(data => {
       data.forEach(cli => {
@@ -584,7 +585,6 @@ export class Orden_FacturacionComponent implements OnInit {
     let updatedInfo : any = [];
 
     updatedInfo.push({ 'of' : of, 'user' : this.storage_Id, 'observation' : observation, 'status' : 26 });
-    console.log(updatedInfo);
     
     this.svPreload.putPreloadDispatch(preload, updatedInfo).subscribe(data => {
       console.log(data);
@@ -1142,7 +1142,6 @@ export class Orden_FacturacionComponent implements OnInit {
 
   //Función que validará o no la creación de la OF por reposición.
   validateReposition() {
-    console.log('1');
     let count : number = 0;
     this.load = true;
     let summary : string = `Algunas cantidades a reponer son mayores a las cantidades devueltas.`;
@@ -1171,7 +1170,7 @@ export class Orden_FacturacionComponent implements OnInit {
           if(![null, 0, undefined, ''].includes(saleOrder)) {
             this.load = true;
             this.svDtlPreload.getPreloadId(preload).subscribe(data => {
-              this.clearTables();
+              //this.clearTables();
               this.getSalesOrders(data);
               
               this.load = false;

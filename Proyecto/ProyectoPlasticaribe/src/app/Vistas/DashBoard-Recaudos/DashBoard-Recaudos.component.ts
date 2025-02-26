@@ -14,6 +14,7 @@ import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes
 import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -56,7 +57,8 @@ export class DashBoardRecaudosComponent implements OnInit {
                               private creacionPDFService : CreacionPdfService,
                                 private svOF : OrdenFacturacionService,
                                   private cmpOF : Orden_FacturacionComponent,
-                                    private cmpDevolutions : Devolucion_OrdenFacturacionComponent,) {
+                                    private cmpDevolutions : Devolucion_OrdenFacturacionComponent,
+                                      private svExcel : CreacionExcelService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormFiltros = this.frmBuilder.group({
@@ -164,7 +166,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     for (let i = 0; i < vendedores.length; i++) {
       data.push([
         {
-          margin: [5, -10, 5, 5],
+          margin: [5, 0, 5, 5],
           text: `${vendedores[i].id} - ${vendedores[i].nombre}`,
           bold: true,
           fontSize: 11,
@@ -408,4 +410,260 @@ export class DashBoardRecaudosComponent implements OnInit {
     setTimeout(() => { this.cargando = false }, 1000);
   }
 
+  exportExcel(){
+    if(this.cartera.length > 0) {
+      this.cargando = true;
+      setTimeout(() => {
+        let title : string = `Cartera Total Plasticaribe`;
+        let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+        let font : any = { size: 10, bold: true, alignment: 'center', name : 'Calibri' };
+        let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        let workbook = this.svExcel.formatoExcel(title, true);
+        this.addSheet2(workbook, fill, font, border, this.infoProduction2(), 1);
+        this.svExcel.creacionHoja(workbook, `Cartera por Clientes`, false);
+        this.addGroupedSheet2(workbook, fill, font, border, this.groupedInfoExcel2(), 2);
+        this.svExcel.creacionHoja(workbook, `Cartera por Vendedores`, false);
+        this.addGroupedSheet3(workbook, fill, font, border, this.groupedInfoExcel3(), 3);
+        this.svExcel.creacionExcel(`Cartera ${moment().format('DD-MM-YYYY')}`, workbook);
+        this.cargando = false;  
+      }, 2000);
+    } else this.msj.mensajeAdvertencia(`No hay registros para exportar!`);
+  }
+
+  //.Agregar hoja al formato excel.
+  addSheet2(workbook, fill , font, border, data : any, pageNumber : number) {
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addHeaderPage2(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addInfoExcel2(page, data);
+  }
+
+  //.Información de la producción.
+  infoProduction2(){
+    let info : any = [];
+    this.cartera.sort((a,b) => a.id_Vendedor - b.id_Vendedor);
+    this.cartera.forEach(d => {
+      let plazo1 : any = d.saldoPlazo1 == -1 ? '' : d.saldoPlazo1;
+      let plazo2 : any = d.saldoPlazo2 == -1 ? '' : d.saldoPlazo2;
+      let plazo3 : any = d.saldoPlazo3 == -1 ? '' : d.saldoPlazo3;
+      let plazo4 : any = d.saldoPlazo4 == -1 ? '' : d.saldoPlazo4;
+      let plazo5 : any = d.saldoPlazo5 == -1 ? '' : d.saldoPlazo5;
+      info.push([d.id_Cliente, d.nombre_CLiente, d.ciudad_Cliente, d.direccion_Cliente, d.telefono_Cliente, d.plazo_De_Pago, d.num_Factura, d.id_Fecha, d.fecha_Vencimiento, d.cantidad_Dias, plazo1, plazo2, plazo3, plazo4, plazo5, d.id_Vendedor, d.nombre_Vendedor  ]);
+    });
+    this.addTotalSheet1(info);
+    return info;
+  }
+
+  //.Agregar información a la hoja del excel.
+  addInfoExcel2(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [11, 12, 13, 14, 15];
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q']; 
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+
+    data.forEach(d => {
+      worksheet.addRow(d) 
+      row.forEach(r => {
+        worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+      });
+      contador++
+    });
+    row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Agregar encabezado a la hoja del excel.
+  addHeaderPage2(worksheet, font, border, fill) {
+    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5', 'P5', 'Q5' ]
+    worksheet.addRow(['NIT-CC', 'Cliente', 'Ciudad', 'Dirección', 'Teléfono', 'Plazo', 'Factura', 'Fecha', 'Fecha Vencimiento', 'Dias', '1-30 Dias', '31-60 Dias', '61-90 Dias', '91-120 Dias', '+120 Dias', 'Codigo', 'Asesor Comercial']);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:Q3'];
+    this.stylesPage2(worksheet, concatCells, []);
+  }
+
+  //.Estilos de la hoja del excel.
+  stylesPage2(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [6,10,16].forEach(x => worksheet.getColumn(x).width = 6);
+    [1,8].forEach(x => worksheet.getColumn(x).width = 12);
+    [7,11,12,13,14,15,5].forEach(x => worksheet.getColumn(x).width = 20);
+    [9,3].forEach(x => worksheet.getColumn(x).width = 20);
+    [4].forEach(x => worksheet.getColumn(x).width = 30);
+    [2,17].forEach(x => worksheet.getColumn(x).width = 45);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //Totalizado hoja 1
+  addTotalSheet1(info) {
+    let data : any = info;
+    let count : number = 0;
+    let t1 : number = 0, t2 : number = 0, t3 : number = 0, t4 : number = 0, t5 : number = 0;
+ 
+    data.forEach(x => {
+      let total1 = [null, undefined, '', -1].includes(x[10]) ? t1 += 0 : t1 += x[10];
+      let total2 = [null, undefined, '', -1].includes(x[11]) ? t2 += 0 : t2 += x[11];
+      let total3 = [null, undefined, '', -1].includes(x[12]) ? t3 += 0 : t3 += x[12];
+      let total4 = [null, undefined, '', -1].includes(x[13]) ? t4 += 0 : t4 += x[13];
+      let total5 = [null, undefined, '', -1].includes(x[14]) ? t5 += 0 : t5 += x[14];
+
+      if((data.length - 1) == count) info.push(['', '', '', '', '', '', '', '', '', 'TOTAL', total1, total2, total3, total4, total5, '', '']);
+      count++;
+    })
+  }
+
+  //Hoja 2 Agrupada
+  addGroupedSheet2(workbook, fill , font, border, data : any, pageNumber : number){
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addGroupedHeader2(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addGroupedInfoExcel2(page, data);
+  }
+
+  //.Agregar encabezado de la hoja 2: .
+  addGroupedHeader2(worksheet, font, border, fill) {
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let rowHeader : any = ['A4', 'B4', 'C4', 'D4', 'E4', ]
+    worksheet.addRow(['NIT-CC', 'Razón Social', 'Código', 'Asesor Comercial', 'Subtotal']);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:E3'];
+    this.stylesGroupedPage2(worksheet, concatCells, []);
+  }
+
+  //.Agregar información a la hoja 2: .
+  addGroupedExcel2(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [6];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  //.Agregar información a la hoja 2: .
+  addGroupedInfoExcel2(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [5];
+    let contador : any = 5;
+    let row : any = ['A','B','C','D','E',]; 
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+
+    data.forEach(d => {
+      worksheet.addRow(d)
+      row.forEach(r => {
+        worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+      });
+      contador++
+    });
+    row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Información agrupada de la hoja 2: .
+  groupedInfoExcel2(){
+    let info : any = [];
+    this.carteraAgrupadaClientes.forEach(d => info.push([d.idcliente, d.razoncial, d.idvende, d.nombvende, d.subTotal]));
+    this.addTotalSheetClients(info);
+    return info;
+  }
+
+  //.Estilos de la hoja 2: .
+  stylesGroupedPage2(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1,3,5].forEach(x => worksheet.getColumn(x).width = 20);
+    [2,4].forEach(x => worksheet.getColumn(x).width = 45);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //.Totales de la hoja 2: .
+  addTotalSheetClients(info){
+    let data : any = info;
+    let count : number = 0;
+    let total : number = 0;
+ 
+    data.forEach(x => {
+      total += x[4];
+      if((data.length - 1) == count) info.push(['', '', '', 'TOTAL', total]);
+      count++;
+    })
+  }
+
+  //Hoja 3 Agrupada
+  addGroupedSheet3(workbook, fill , font, border, data : any, pageNumber : number){
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addGroupedHeader3(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addGroupedInfoExcel3(page, data);
+  }
+
+  //.Agregar encabezado de la hoja 3.
+  addGroupedHeader3(worksheet, font, border, fill) {
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let rowHeader : any = ['A4', 'B4', 'C4', ]
+    worksheet.addRow(['Codigo', 'Asesor Comercial', 'Total']);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:C3'];
+    this.stylesGroupedPage3(worksheet, concatCells, []);
+  }
+
+  //.Agregar información a la hoja 3.
+  addGroupedExcel3(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [3];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  //.Agregar información a la hoja 3.
+  addGroupedInfoExcel3(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [3];
+    let contador : any = 5;
+    let row : any = ['A','B','C',]; 
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+
+    data.forEach(d => {
+      worksheet.addRow(d)
+      row.forEach(r => {
+        worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+      });
+      contador++
+    });
+    row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Información agrupada de la hoja 3.
+  groupedInfoExcel3(){
+    let info : any = [];
+    this.carteraAgrupadaVendedores.forEach(d => info.push([d.idvende, d.nombvende, d.subTotal]));
+    this.addTotalSheetSales(info);
+    return info;
+  }
+
+  //.Estilos de la hoja 3.
+  stylesGroupedPage3(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1,3].forEach(x => worksheet.getColumn(x).width = 20);
+    [2].forEach(x => worksheet.getColumn(x).width = 45);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //Totalizado hoja 3
+  addTotalSheetSales(info) {
+    let data : any = info;
+    let count : number = 0;
+    let total : number = 0;
+ 
+    data.forEach(x => {
+      total += x[2];
+      if((data.length - 1) == count) info.push(['', 'TOTAL', total]);
+      count++;
+    });
+  }
 }
+

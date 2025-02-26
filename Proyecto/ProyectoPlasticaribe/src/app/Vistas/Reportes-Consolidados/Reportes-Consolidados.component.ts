@@ -32,7 +32,7 @@ export class ReportesConsolidadosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.facturacion = true;
-    if ([4,85,86,87,88,89,12,95,75,80,12,74,94,2,76,77,81,5].includes(this.ValidarRol)) this.produccionDetallada = true;
+    if ([4,85,86,87,88,89,12,95,75,80,12,74,94,2,76,77,81,5,98].includes(this.ValidarRol)) this.produccionDetallada = true;
     if ([94].includes(this.ValidarRol)) this.consolidadoProduccionAreas = true;
 
   }

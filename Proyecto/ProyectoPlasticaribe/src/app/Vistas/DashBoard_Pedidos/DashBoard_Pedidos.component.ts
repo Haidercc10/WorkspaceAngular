@@ -58,7 +58,7 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    if ([1,60,61,6,12,96,85,97,2].includes(this.ValidarRol)) this.tiempoExcedido();
+    if ([1,60,61,6,12,96,85,97,2,98].includes(this.ValidarRol)) this.tiempoExcedido();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
       this.multiAxisOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];

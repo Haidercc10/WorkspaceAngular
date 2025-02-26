@@ -31,11 +31,11 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lecturaStorage();
-    if ([1,60,12,94,85,2].includes(this.ValidarRol)) this.ordenTrabajo = true;
+    if ([1,60,12,94,85,2,98].includes(this.ValidarRol)) this.ordenTrabajo = true;
     if ([3,12,85].includes(this.ValidarRol)) this.materiaPrima = true;
     if ([61,12,85,97].includes(this.ValidarRol)) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
-    if ([1,12,94,85].includes(this.ValidarRol)) this.inventarioAreas = true;
+    if ([1,12,94,85,98].includes(this.ValidarRol)) this.inventarioAreas = true;
     if ([6,12,96,97].includes(this.ValidarRol)) this.facturacion = true;
   }
 
@@ -67,7 +67,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   cambioTab(e : any) {  
     var index = e.index;
     index == 0 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
-    index == 1 && [1,12,60].includes(this.ValidarRol) ? this.facturacion = true : this.facturacion = false;
+    index == 1 && [1,12,60,98].includes(this.ValidarRol) ? this.facturacion = true : this.facturacion = false;
     index == 2 ? this.materiaPrima = true : this.materiaPrima = false;
     index == 3 ? this.pedidos = true : this.pedidos = false;
     index == 4 ? this.facturacionVendedores = true : this.facturacionVendedores = false;
@@ -89,5 +89,6 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 3 && [85,].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
     index == 2 && [97].includes(this.ValidarRol) ? this.gerencia = true : null;
     index == 2 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
+    index == 4 && [98].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
   }
 }

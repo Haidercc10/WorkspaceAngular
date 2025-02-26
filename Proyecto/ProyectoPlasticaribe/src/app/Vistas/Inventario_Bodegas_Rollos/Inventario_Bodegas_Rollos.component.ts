@@ -98,7 +98,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       this.inventarioSellado = [];
       this.currentStore = `Impresión`;
       this.consultarInventario(`?wareHouse=${'IMP'}`);
-    } else if([1,12].includes(this.ValidarRol)) {
+    } else if([1,12,98].includes(this.ValidarRol)) {
       this.clearInventories();
       this.consultarInventario('');
       this.currentStore = ``;
@@ -119,7 +119,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
-    this.validateRol();
+    setTimeout(() => { this.validateRol(); }, 500);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -535,24 +535,31 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     if(tab == 'Producto Intermedio') {
       this.inventarioProductoIntermedio = [];
       this.consultarInventario(`?wareHouse=${'BGPI'}`);
+      this.currentStore = ``;
     } else if(tab == 'Inventario Detallado') {
       this.inventoryRolls = [];
       this.searchInventoryRolls();
+      this.currentStore = ` Detallado`;
     } else if(tab == 'Rotograbado') {
       this.inventarioRotograbado = [];
       this.consultarInventario(`?wareHouse=${'ROT'}`);
+      this.currentStore = ` Rotograbado`;
     } else if(tab == 'Calidad') {
       this.inventarioCalidad = [];
       this.consultarInventario(`?wareHouse=${'CALIDAD'}`);
+      this.currentStore = ` Calidad`;
     } else if(tab == 'Impresión') {
       this.inventarioImpresion = [];
       this.consultarInventario(`?wareHouse=${'IMP'}`);
+      this.currentStore = ` Impresión`;
     } else if(tab == 'Sellado') {
       this.inventarioSellado = [];
       this.consultarInventario(`?wareHouse=${'SELLA'}`);
+      this.currentStore = ` Sellado`;
     } else if(tab == 'Extrusión') {
       this.inventarioExtrusion = [];
       this.consultarInventario(`?wareHouse=${'EXT'}`);
+      this.currentStore = ` Extrusión`;
     }    
   }
 

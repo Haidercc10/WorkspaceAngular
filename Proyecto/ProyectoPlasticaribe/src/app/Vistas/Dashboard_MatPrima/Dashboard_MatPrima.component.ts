@@ -135,7 +135,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.totalExtruidoMes = 0;
     this.materiasPrimasMasUtilizadasCrearTintaMes = [];
 
-    if([1,3,60,12,85].includes(this.ValidarRol)) {
+    if([1,3,60,12,85,98].includes(this.ValidarRol)) {
       this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
         for (let i = 0; i < datos_materiaPrima.length; i++) {
           if (datos_materiaPrima[i].id_Materia_Prima != 84 && datos_materiaPrima[i].id_Materia_Prima != 2001 && datos_materiaPrima[i].id_Materia_Prima != 449) {
