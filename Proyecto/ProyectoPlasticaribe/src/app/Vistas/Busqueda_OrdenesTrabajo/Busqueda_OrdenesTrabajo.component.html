@@ -130,6 +130,7 @@
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" id="crear" type="submit" label="Consultar" icon="pi pi-check"></button>
       <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+      <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportExcel()"></button>
     </div>
   </div>
 </form>
@@ -150,8 +151,8 @@
   [showCurrentPageReport]="true"
   currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
   [paginator]="true"
-  [rows]="20"
-  [rowsPerPageOptions]="[10, 20, 50, 100, ordenesConsultadas.length]"
+  [rows]="15"
+  [rowsPerPageOptions]="[10, 15, 20, 50, 100, ordenesConsultadas.length]"
   *ngIf="!cargando">
   <ng-template pTemplate="caption">
     <p-multiSelect
@@ -166,7 +167,7 @@
   <ng-template pTemplate="header" let-columns>
     <tr>
       <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field)"></th>
-      <th rowspan="2" pFrozenColumn alignFrozen="right" [frozen]="true">Crear Orden</th>
+      <!--<th rowspan="2" pFrozenColumn alignFrozen="right" [frozen]="true">Crear Orden</th>-->
     </tr>
     <tr>
       <th *ngFor="let col of columnasSeleccionadas" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
@@ -177,7 +178,7 @@
   <ng-template pTemplate="body" let-data let-columns="columns">
     <tr (dblclick)="crearOrdenTrabajo(data)" class="no-seleccionable cursor">
       <td [pEditableColumn]="data" class="cursor" *ngFor="let col of columns">
-        <p-cellEditor *ngIf="['Cantidad', 'Precio'].includes(col.header)">
+        <p-cellEditor *ngIf="['Cantidad', 'Precio'].includes(col.header)"> <!---->
           <ng-template pTemplate="input">
             <p-inputNumber [style]="{'min-width' : '100px'}" [(ngModel)]="data[col.field]" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           </ng-template>
@@ -191,9 +192,9 @@
         </span>
       </td>
       
-      <td pFrozenColumn alignFrozen="right" [frozen]="true" class="text-center">
+      <!--<td pFrozenColumn alignFrozen="right" [frozen]="true" class="text-center">
         <p-button icon="pi pi-plus" [rounded]="true" severity="success" (onClick)="crearCopiaOrdenTrabajo(data)"></p-button>
-      </td>
+      </td>-->
     </tr>
   </ng-template>
 </p-table>

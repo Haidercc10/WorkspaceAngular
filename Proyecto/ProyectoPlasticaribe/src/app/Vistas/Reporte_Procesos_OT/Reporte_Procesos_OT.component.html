@@ -155,7 +155,7 @@
             </div>
 
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4 text-center" id="cambiarEstados">
-              <button *ngIf="ValidarRol == 1 && storage_Id != 101"pButton icon="pi pi-pencil" label="Cambiar Estado" class="p-button-success p-mr-2" [disabled]="ordenesSeleccionadas.length == 0" (click)="abrirModalCambioEstado()"></button>
+              <button *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101" pButton icon="pi pi-pencil" label="Cambiar Estado" class="p-button-success p-mr-2" [disabled]="ordenesSeleccionadas.length == 0" (click)="abrirModalCambioEstado()"></button>
             </div>
 
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4 text-right" id="botonesColores">
@@ -215,7 +215,7 @@
               <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
             </tr>
             <tr class="font-size-13" id="columnas">
-              <th pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo" *ngIf="ValidarRol == 1 && storage_Id != 101"></p-tableHeaderCheckbox></th>
+              <th pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo" *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableHeaderCheckbox></th>
               <th scope="col" pResizableColumn pSortableColumn="ot" id="ordenTrabajo">OT <p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="cli">Cliente <p-sortIcon field="cli"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="prod">Producto <p-sortIcon field="prod"></p-sortIcon></th>
@@ -241,7 +241,7 @@
           <ng-template pTemplate="body" let-data let-columns="columns">
             <tr style="cursor: pointer; cursor: hand;">
               <td pFrozenColumn>
-                <p-tableCheckbox [value]="data" *ngIf="ValidarRol == 1 && storage_Id != 101"></p-tableCheckbox>
+                <p-tableCheckbox [value]="data" *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableCheckbox>
               </td>
               <td (click)="reporteOT(data.ot)"><b>{{data.ot}}</b></td>
               <td>{{data.cli}}</td>

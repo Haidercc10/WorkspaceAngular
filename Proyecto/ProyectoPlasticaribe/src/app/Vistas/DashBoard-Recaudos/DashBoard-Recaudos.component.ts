@@ -665,5 +665,83 @@ export class DashBoardRecaudosComponent implements OnInit {
       count++;
     });
   }
+
+  //Hoja 4 Agrupada
+  addGroupedSheet4(workbook, fill , font, border, data : any, pageNumber : number){
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addGroupedHeader4(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addGroupedInfoExcel4(page, data);
+  }
+
+  //.Agregar encabezado de la hoja 3.
+  addGroupedHeader4(worksheet, font, border, fill) {
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let rowHeader : any = ['A4', 'B4', 'C4', ]
+    worksheet.addRow(['Asesor', 'Asesor Comercial', 'Total']);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:C3'];
+    this.stylesGroupedPage4(worksheet, concatCells, []);
+  }
+
+  //.Agregar información a la hoja 3.
+  addGroupedExcel4(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [3];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  //.Agregar información a la hoja 3.
+  addGroupedInfoExcel4(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [3];
+    let contador : any = 5;
+    let row : any = ['A','B','C',]; 
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+
+    data.forEach(d => {
+      worksheet.addRow(d)
+      row.forEach(r => {
+        worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+      });
+      contador++
+    });
+    row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Información agrupada de la hoja 3.
+  groupedInfoExcel4(){
+    let info : any = [];
+    this.carteraAgrupadaVendedores.forEach(d => info.push([d.idvende, d.nombvende, d.subTotal]));
+    this.addTotalSheetSales(info);
+    return info;
+  }
+
+  //.Estilos de la hoja 3.
+  stylesGroupedPage4(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1,3].forEach(x => worksheet.getColumn(x).width = 20);
+    [2].forEach(x => worksheet.getColumn(x).width = 45);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //Totalizado hoja 3
+  addTotalSheetSales4(info) {
+    let data : any = info;
+    let count : number = 0;
+    let total : number = 0;
+ 
+    data.forEach(x => {
+      total += x[2];
+      if((data.length - 1) == count) info.push(['', 'TOTAL', total]);
+      count++;
+    });
+  }
+
+
 }
 

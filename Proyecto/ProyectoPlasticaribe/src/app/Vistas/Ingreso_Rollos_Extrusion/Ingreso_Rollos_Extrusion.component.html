@@ -163,6 +163,8 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'proceso', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'bodega', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'ubicacion', dt)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'fecha', dt)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'maquina', dt)"></th>
             <th></th>
           </tr>
           <tr>
@@ -177,6 +179,8 @@
             <th class="text-center">Proceso Inicial</th>
             <th class="text-center">Bodega Actual</th>
             <th class="text-center">Ubicación</th>
+            <th class="text-center">Fecha Fab.</th>
+            <th class="text-center">Maquina</th>
             <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
           </tr>
         </ng-template>
@@ -203,6 +207,8 @@
             </td>
             <td class="text-center">{{data.bodega}}</td>
             <td class="text-center"><b>{{data.ubicacion}}</b></td>
+            <td class="text-center"><b>{{data.fecha}}</b></td>
+            <td class="text-center"><b>{{data.maquina}}</b></td>
             <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
               <p-button icon="pi pi-trash" [rounded]="true" (click)="quitarRolloTabla(data)" severity="danger"></p-button>
             </td>
@@ -210,14 +216,14 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="12"><h6 class="bold">No hay rollos agregados.</h6></td>
+            <td colspan="14"><h6 class="bold">No hay rollos agregados.</h6></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td class="text-right" colspan="6">Totales</td>
             <td class="text-center textBlue">{{pesoTotal() | number : '1.2-2'}}</td>
-            <td colspan="5"></td>
+            <td colspan="7"></td>
           </tr>
         </ng-template>
     </p-table>

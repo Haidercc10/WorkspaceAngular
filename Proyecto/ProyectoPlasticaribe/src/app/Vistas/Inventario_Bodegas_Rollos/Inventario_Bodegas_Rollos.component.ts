@@ -80,7 +80,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
 
   //*
   validateRol(){
-    if([95].includes(this.ValidarRol)) {
+    /*if([95].includes(this.ValidarRol)) {
       this.inventarioProductoIntermedio = [];
       this.inventarioCalidad = [];
       this.consultarInventario(`?wareHouse=${'BGPI'}`);
@@ -90,7 +90,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       this.inventarioRotograbado = [];
       this.consultarInventario(`?wareHouse=${'ROT'}`);
       this.currentStore = `Rotograbado`;  
-    } else if([86].includes(this.ValidarRol)) {
+    } else if([86, 94].includes(this.ValidarRol)) {
       this.inventarioSellado = [];
       this.currentStore = `Sellado`;
       this.consultarInventario(`?wareHouse=${'SELLA'}`);
@@ -98,11 +98,11 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       this.inventarioSellado = [];
       this.currentStore = `Impresión`;
       this.consultarInventario(`?wareHouse=${'IMP'}`);
-    } else if([1,12,98].includes(this.ValidarRol)) {
+    } else if([1,12,98].includes(this.ValidarRol)) {*/
       this.clearInventories();
       this.consultarInventario('');
       this.currentStore = ``;
-    } 
+    /*}*/
   }
 
   //*
@@ -269,9 +269,13 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
               Material : dataBagpro[0].extMaterialNom,
               Ancho: dataBagpro[0].extAcho1,
               Unidad : dataBagpro[0].extUnidadesNom,
+              Color : dataBagpro[0].extPigmentoNom,
+              Calibre : dataBagpro[0].extCalibre,
+              Precio : dataBagpro[0].datosValorKg,
               Rollos: data[i].rollos,
               Bodega: data[i].bgRollo_BodegaActual,
               BodegaActual: data[i].proceso_Nombre,
+              //Fecha_Rollo: dataBagpro[i].fabrication_Day
             }
             //this.inventarioTotal.push(info);
             //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
@@ -495,6 +499,12 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           x.material = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Material,
           x.broad = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Ancho, 
           x.unit = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Unidad
+          x.caliber = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Calibre,
+          x.color = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Color,
+          x.value = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Precio,
+          x.unit = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Unidad, 
+          x.date = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Fecha_Rollo, 
+          x.daysInventory = x.dayFabrication == null ? 0 : moment().diff(moment(x.dayFabrication), 'days')
         });
       }, error => {
         this.msj.mensajeError(`Error`, `No fue posible consultar el inventario de rollos disponibles`);
@@ -509,7 +519,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     let process : any = [];
     let array : any = [];
 
-    if([95].includes(this.ValidarRol)) {
+    /*if([95].includes(this.ValidarRol)) {
       process = [`?process=${'BGPI'}`, `?process=${'CALIDAD'}`];
       array = this.inventarioProductoIntermedio.concat(this.inventarioCalidad);
     } else if([89].includes(this.ValidarRol)) {
@@ -521,10 +531,10 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     } else if([4].includes(this.ValidarRol)) {
       process = [`?process=${'IMP'}`];
       array = this.inventarioImpresion;
-    } else {
+    } else {*/
       process = [''];
       array = this.inventarioProductoIntermedio.concat(this.inventarioRotograbado).concat(this.inventarioCalidad).concat(this.inventarioImpresion).concat(this.inventarioSellado);
-    } 
+   //} 
     return { 'dataInv' : array, 'process' : process, }
   }
 
@@ -634,7 +644,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5']; 
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5','N5','O5','P5','Q5']; 
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
     
@@ -642,7 +652,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:I3');
+    ws.mergeCells('A1:Q3');
 
     this.loadSizeHeader(ws);
   }
@@ -650,9 +660,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws : any){
     [6,4].forEach(x => ws.getColumn(x).width = 50);
-    [2,3,5,8].forEach(x => ws.getColumn(x).width = 10);
+    [2,3,5,7,9,11,13,14].forEach(x => ws.getColumn(x).width = 10);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [7,9].forEach(x => ws.getColumn(x).width = 15);
+    [8,10,12,15,16,17].forEach(x => ws.getColumn(x).width = 15);
   }
 
  //Función para cargar los nombres de las columnas del header
@@ -665,7 +675,15 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       'Item', 
       'Referencia', 
       'Cantidad',
+      'Precio Kg',
       'Unidad',
+      'Material',
+      'Calibre',
+      'Color',
+      'Ancho',
+      'Medida',
+      'Días en Bodega',
+      'Fecha Fabricación',
       'Ubicación'
     ];
     return headerRow;
@@ -673,9 +691,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
 
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws : any, data : any, border : any, alignment : any){
-    let formatNumber: Array<number> = [7];
+    let formatNumber: Array<number> = [7,8,11,13];
     let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I']; 
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q']; 
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(x => {
@@ -702,6 +720,14 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       this.qtyTotal(),
       'TOTAL ROLLOS',
       this.qtyTotalRolls(),
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      ''
     ]);
   }
 
@@ -718,7 +744,15 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
         x.item,
         x.reference,
         x.qty,
+        x.value,
         x.presentation,
+        x.material,
+        x.caliber,
+        x.color,
+        x.broad,
+        x.unit,
+        x.daysInventory,
+        x.dayFabrication != null ? x.dayFabrication.replace('T00:00:00', '') : '',
         x.ubication,
       ]);
     });

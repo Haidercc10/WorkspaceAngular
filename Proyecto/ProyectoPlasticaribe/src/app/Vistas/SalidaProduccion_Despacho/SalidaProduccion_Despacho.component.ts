@@ -339,10 +339,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar el estado de la devolución`); });
   }
 
-  //Actualizar estado del precargue
+  //Actualizar estado del/los precargues por OF. 
   updatePreload(preload : number, of : number){
     let info : any = [{ 'of' : of, 'user' : this.storage_Id, 'observation' : '', 'status' : 5 }]; 
-    this.svPreload.putPreloadDispatch(preload, info).subscribe(data => {}, e => {
+    this.svPreload.putPreloadForOrderFact(of, info).subscribe(data => {}, e => {
       this.msj.mensajeError(`Error`, `No fue posible actualizar el estado del precargue N° ${preload} | ${e.status} ${e.statusText}`);
     });
   }

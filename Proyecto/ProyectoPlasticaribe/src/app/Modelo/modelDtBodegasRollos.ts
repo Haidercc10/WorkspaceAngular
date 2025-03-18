@@ -19,4 +19,6 @@ export interface modelDtBodegasRollos {
   BgRollo_BodegaInicial : string;
   DtBgRollo_Ubicacion : string;
   BgRollo_BodegaIngreso? : boolean;
+  DtBgRollo_FechaFab? : any;
+  DtBgRollo_Maq? : number; 
 }

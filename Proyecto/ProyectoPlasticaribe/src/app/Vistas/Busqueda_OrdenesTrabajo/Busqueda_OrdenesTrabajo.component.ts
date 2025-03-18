@@ -12,6 +12,8 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
 import { Orden_TrabajoComponent } from '../Orden_Trabajo/Orden_Trabajo.component';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 
 @Component({
   selector: 'app-Busqueda_OrdenesTrabajo',
@@ -43,7 +45,9 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     private msj : MensajesAplicacionService,
     private zeusService : InventarioZeusService,
     private orden_TrabajoComponent : Orden_TrabajoComponent,
-    private svcSedes : SedeClienteService,) {
+    private svcSedes : SedeClienteService,
+    private svExcel : CreacionExcelService,
+  ) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
@@ -166,7 +170,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   }
 
   llenarColumnas_BusquedaPorItem(){
-    this.ordenesConsultadas.sort((a,b) => Number(b.ordenTrabajo) - Number(a.ordenTrabajo));
+    //this.ordenesConsultadas.sort((a,b) => Number(b.ordenTrabajo) - Number(a.ordenTrabajo));
     this.ordenesConsultadas = this.ordenesConsultadas.reduce((a,b) => {
       if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
       return a;
@@ -203,6 +207,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   }
 
   llenarColumnas_BusquedaPorOT(){
+    this.ordenesConsultadas.sort((a,b) => Number(a.ordenTrabajo) - Number(b.ordenTrabajo));
     this.columnas = [
       { header: 'OT', field: 'ordenTrabajo', tipo: 'text' },
       { header: 'Fecha', field: 'fechaCreacion', tipo: 'date' },
@@ -258,5 +263,100 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     }, 1000);
     setTimeout(() => this.orden_TrabajoComponent.guardarOt(), 2500);
   }
+
+  exportExcel(){
+    if(this.ordenesConsultadas.length > 0) {
+      this.cargando = true;
+      setTimeout(() => {
+        let title : string = `Ordenes de Trabajo`;
+        let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+        let font : any = { size: 10, bold: true, alignment: 'center', name : 'Calibri' };
+        let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        let workbook = this.svExcel.formatoExcel(title, true);
+        this.addSheet(workbook, fill, font, border, this.infoProduction2(), 1);
+        this.svExcel.creacionHoja(workbook, `OTs`, false);
+        this.svExcel.creacionExcel(`Ordenes de Trabajo ${moment().format('DD-MM-YYYY')}`, workbook);
+        this.cargando = false;  
+      }, 2000);
+    } else this.msj.mensajeAdvertencia(`No hay registros para exportar!`);
+  }
   
+    //.Agregar hoja al formato excel.
+    addSheet(workbook, fill , font, border, data : any, pageNumber : number) {
+      let page = workbook.worksheets[pageNumber - 1];
+      this.addHeaderPage2(page, font, border, fill);
+      page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      this.addInfoExcel2(page, data);
+    }
+  
+    //.Información de la producción.
+    infoProduction2(){
+      let info : any = [];
+      //this.ordenesConsultadas.sort((a,b) => a.id_Vendedor - b.id_Vendedor);
+      this.ordenesConsultadas.forEach(d => {
+        info.push([d.ordenTrabajo, d.item, d.fechaCreacion.replace('T00:00:00', ''), d.fecha_Despacho.replace('T00:00:00', ''), d.cliente, d.formato_Extrusion + d.ancho_Extrusion + d.calibre_Extrusion + d.pigmento_Extrusion, d.kilos, d.referencia, d.ancho, d.peso_Metro, d.rodillo, d.material, d.maquinas.toString(), d.color_1, d.color_2, d.color_3, d.color_4, d.color_5, d.color_6, d.color_7, d.color_8, d.anchoReal, d.fuelle_Izquierdo, d.fuelle_Derecho, d.largo, d.fuelle_Fondo, d.tipo_Sellado, d.cant_Unidades ]);
+      });
+      //this.addTotalSheet1(info);
+      return info;
+    }
+  
+    //.Agregar información a la hoja del excel.
+    addInfoExcel2(worksheet : any, data : any) {
+      let formatNumber: Array<number> = [7,9,10,22,23,24,25,26,28];
+      let contador : any = 6;
+      let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB']; 
+      formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+  
+      data.forEach(d => {
+        worksheet.addRow(d) 
+        row.forEach(r => {
+          worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        });
+        contador++
+      });
+      //row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+    }
+  
+    //.Agregar encabezado a la hoja del excel.
+    addHeaderPage2(worksheet, font, border, fill) {
+      let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5','M5','N5','O5','P5','Q5','R5','S5','T5','U5','V5','W5','X5','Y5','Z5','AA5','AB5']
+      worksheet.addRow(['Consecutivo', 'Item', 'Fecha', 'Fecha Despacho', 'Cliente', 'Referencia a Extruir', 'Kilos', 'Nombre Referencia', 'Ancho Final', 'PM', 'Rodillo', 'Material', 'Maquinas', 
+        'Color 1', 'Color 2', 'Color 3', 'Color 4', 'Color 5', 'Color 6', 'Color 7', 'Color 8', 'Ancho', 'F. Izquierdo', 'F. Derecho', 'Largo', 'F. Fondo', 'Tipo Sellado', 'Cant. Unidades' ]);
+      
+      rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+      rowHeader.forEach(x => worksheet.getCell(x).font = font);
+      rowHeader.forEach(x => worksheet.getCell(x).border = border);
+  
+      let concatCells : any = ['A1:AB3'];
+      this.stylesPage2(worksheet, concatCells, []);
+    }
+  
+    //.Estilos de la hoja del excel.
+    stylesPage2(worksheet, concatCells, formatNumber) {
+      formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+      [1,3,22,23,24].forEach(x => worksheet.getColumn(x).width = 12);
+      [6].forEach(x => worksheet.getColumn(x).width = 60);
+      [5,8].forEach(x => worksheet.getColumn(x).width = 50);
+      [4,12,13,27,28].forEach(x => worksheet.getColumn(x).width = 15);
+      [2,7,9,10,11,14,15,16,17,18,19,20,21,22,23,24,25,26].forEach(x => worksheet.getColumn(x).width = 10);
+      concatCells.forEach(cell => worksheet.mergeCells(cell));
+    }
+  
+    //Totalizado hoja 1
+    addTotalSheet1(info) {
+      let data : any = info;
+      let count : number = 0;
+      let t1 : number = 0, t2 : number = 0, t3 : number = 0, t4 : number = 0, t5 : number = 0;
+   
+      data.forEach(x => {
+        let total1 = [null, undefined, '', -1].includes(x[10]) ? t1 += 0 : t1 += x[10];
+        let total2 = [null, undefined, '', -1].includes(x[11]) ? t2 += 0 : t2 += x[11];
+        let total3 = [null, undefined, '', -1].includes(x[12]) ? t3 += 0 : t3 += x[12];
+        let total4 = [null, undefined, '', -1].includes(x[13]) ? t4 += 0 : t4 += x[13];
+        let total5 = [null, undefined, '', -1].includes(x[14]) ? t5 += 0 : t5 += x[14];
+  
+        if((data.length - 1) == count) info.push(['', '', '', '', '', '', '', '', '', 'TOTAL', total1, total2, total3, total4, total5, '', '']);
+        count++;
+      })
+    }
 }

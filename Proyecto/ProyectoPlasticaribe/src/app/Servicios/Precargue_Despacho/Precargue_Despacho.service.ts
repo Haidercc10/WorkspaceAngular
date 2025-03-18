@@ -27,4 +27,6 @@ constructor(private http : HttpClient) { }
 
   putPreloadDispatch = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Precargue_Despacho/putPreloadDispatch/${id}`, data);
 
+  putPreloadForOrderFact = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Precargue_Despacho/putPreloadForOrderFact/${id}`, data);
+
 }

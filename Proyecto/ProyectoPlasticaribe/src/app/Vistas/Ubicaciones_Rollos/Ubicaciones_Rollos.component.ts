@@ -248,8 +248,9 @@ export class Ubicaciones_RollosComponent implements OnInit {
         let unit : string = x.pp.presentacion == 'Kg' ? 'KLS' : x.pp.presentacion == 'Und' ? 'UND' : 'PAQ';
         let detailAdjustment : string = `Ajuste desde App Plasticaribe solicitado por ${user}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}, por el motivo ${this.form.value.observation}`;
         this.svInvZeus.getExistenciasProductos(x.producto.prod_Id, unit).subscribe(data => {
-          if(data[0].existencias < 1 || data.length == 0) this.extractRollsDespacho(false);
-          else {
+          if(data[0].existencias < 1 || data.length == 0) {
+            this.extractRollsDespacho(false);
+          } else {
             this.productionProcessSerivce.sendProductionToZeus(detailAdjustment, x.producto.prod_Id, unit, 0, (-(this.totalQuantityByItem(x.producto.prod_Id))).toString(), x.pp.precio.toString()).subscribe(data => { 
               this.extractRollsDespacho(true); 
             }, error => {this.msj.mensajeError('Error', 'No fue posible enviar el ajuste a Zeus!'); });

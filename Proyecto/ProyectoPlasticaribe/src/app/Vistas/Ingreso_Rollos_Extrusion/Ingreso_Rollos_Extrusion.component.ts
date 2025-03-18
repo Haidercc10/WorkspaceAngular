@@ -393,6 +393,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         'BgRollo_BodegaInicial': x.proceso_Id,
         'DtBgRollo_Ubicacion': x.ubicacion, 
         'BgRollo_BodegaIngreso': x.bodega_Actual,
+        'DtBgRollo_FechaFab': x.fecha,
+        'DtBgRollo_Maq': x.maquina,
       }
       this.dtBgRollosService.Post(info).subscribe(() => {
         numRollos++;

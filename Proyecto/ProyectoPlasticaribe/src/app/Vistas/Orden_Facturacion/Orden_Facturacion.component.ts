@@ -583,14 +583,19 @@ export class Orden_FacturacionComponent implements OnInit {
     let preload : any = this.formDataOrder.value.preload;
     let observation : any = this.formDataOrder.value.observation == null ? '' : this.formDataOrder.value.observation
     let updatedInfo : any = [];
+    let arrayPreload : any = [];
 
     updatedInfo.push({ 'of' : of, 'user' : this.storage_Id, 'observation' : observation, 'status' : 26 });
-    
-    this.svPreload.putPreloadDispatch(preload, updatedInfo).subscribe(data => {
-      console.log(data);
-    }, error => {
-      this.msjsOF('Error', `Ocurrió un error actualizando los datos del precargue N° ${preload} | ${error.status} ${error.statusText}`);
+    arrayPreload = [...new Set(this.productionSelected.map(x => x.preload))];
+
+    arrayPreload.forEach(pre => {
+      this.svPreload.putPreloadDispatch(pre, updatedInfo).subscribe(data => {
+        console.log(data);
+      }, error => {
+        this.msjsOF('Error', `Ocurrió un error actualizando los datos del precargue N° ${preload} | ${error.status} ${error.statusText}`);
+      });
     });
+    
   }
 
   createPDF(id_OrderFact: number, fact: string) {
@@ -1172,7 +1177,6 @@ export class Orden_FacturacionComponent implements OnInit {
             this.svDtlPreload.getPreloadId(preload).subscribe(data => {
               //this.clearTables();
               this.getSalesOrders(data);
-              
               this.load = false;
             }, error => {
               this.msjsOF(`Error`, [400, 404].includes(error.status) ? `No se encontró la orden de precargue N° ${preload} | \n${error.status} ${error.statusText}` : `No fue posible consultar la orden de despacho N° ${preload} | \n${error.status} ${error.statusText}`);
@@ -1198,6 +1202,7 @@ export class Orden_FacturacionComponent implements OnInit {
         'numberProduction' : x.roll,
         'ubication' : x.ubication,
         'netWeight' : x.netWeight,
+        'preload' : x.movement,
       })
     });
     this.getConsolidateProduction();
@@ -1299,6 +1304,7 @@ interface production {
   inOrder? : boolean, 
   idDetail? : number;
   netWeight : number;
+  preload? : number;
 }
 
 

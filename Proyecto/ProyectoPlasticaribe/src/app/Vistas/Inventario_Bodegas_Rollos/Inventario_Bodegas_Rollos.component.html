@@ -166,7 +166,7 @@
 
     <!--* PRODUCTO INTERMEDIO -->
     <p-tabPanel
-      *ngIf="[95,1,12,98].includes(ValidarRol)"
+      *ngIf="[95,1,12,98,95,89,86,94,4,85,2].includes(ValidarRol)"
       header="Producto Intermedio"
       leftIcon="pi pi-box"
       tooltip="Información del Inventario de la Bodega de Producto Intermedio">
@@ -342,7 +342,7 @@
 
     <!--* ROTOGRABADO -->
     <p-tabPanel
-      *ngIf="[89,1,12,98].includes(ValidarRol)"
+      *ngIf="[89,1,12,98,2].includes(ValidarRol)"
       header="Rotograbado"
       leftIcon="pi pi-print"
       tooltip="Información del Inventario de la Bodega de Rotograbado">
@@ -430,7 +430,7 @@
 
     <!--* CALIDAD -->
     <p-tabPanel
-      *ngIf="[95,1,12,98].includes(ValidarRol)"
+      *ngIf="[95,1,12,98,2].includes(ValidarRol)"
       header="Calidad"
       leftIcon="pi pi-check-square"
       tooltip="Información del Inventario de la Bodega de Productos por Calidad">
@@ -518,7 +518,7 @@
 
     <!--* IMPRESIÓN -->
     <p-tabPanel
-      *ngIf="[4,1,12,98].includes(ValidarRol)"
+      *ngIf="[4,1,12,98,2].includes(ValidarRol)"
       header="Impresión"
       leftIcon="pi pi-print"
       tooltip="Información del Inventario de la Bodega de Productos por Calidad">
@@ -606,7 +606,7 @@
 
     <!--* SELLADO -->
     <p-tabPanel
-      *ngIf="[86,1,12,98].includes(ValidarRol)"
+      *ngIf="[86,1,12,98,94,2].includes(ValidarRol)"
       header="Sellado"
       leftIcon="pi pi-tags"
       tooltip="Información del Inventario de la Bodega de Rollos de Sellado">
@@ -734,15 +734,19 @@
                   <!--!<p-button class="p-button-rounded" severity="danger" icon="pi pi-eraser" type="button" label="Limpiar" [disabled]="selectedRolls.length == 0" (click)="deselectionAll()" pTooltip="Limpiar selección de rollos de la tabla" tooltipPosition="top"></p-button>-->
                 </th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'roll', 'contains', dtDetailsProdIntermedio)"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'initialWarehouse', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'client', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'item', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'reference', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'qty', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'value', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'material', 'contains', dtDetailsProdIntermedio)"></th>
+                <th *ngIf="[1,12].includes(ValidarRol)"><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'caliber', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'color', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'broad', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'unit', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'daysInventory', 'contains', dtDetailsProdIntermedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dayFabrication', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ubication', 'contains', dtDetailsProdIntermedio)"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'actualWarehouse', 'contains', dtDetailsProdIntermedio)"></th>
               </tr>
@@ -750,15 +754,19 @@
                 <th class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
                 <!--!<th class="text-center" style="width: 4rem"><p-checkbox (click)="selectionAll()"></p-checkbox></th>-->
                 <th class="text-center" pSortableColumn="roll">Rollo <p-sortIcon field="roll"></p-sortIcon></th>
-                <th class="text-center" pSortableColumn="initialWarehouse">Bod. Inicial <p-sortIcon field="initialWarehouse"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="ot">Orden Trabajo <p-sortIcon field="ot"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="client">Cliente <p-sortIcon field="client"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="item">Item <p-sortIcon field="item"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="reference">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
-                <th class="text-center" pSortableColumn="qty">Cantidad (Kg) <p-sortIcon field="qty"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="qty">Peso (Kg) <p-sortIcon field="qty"></p-sortIcon></th>
+                <th *ngIf="[1,12].includes(ValidarRol)" class="text-center" pSortableColumn="value">Valor U. <p-sortIcon field="value"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="material">Material <p-sortIcon field="material"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="caliber">Calibre <p-sortIcon field="caliber"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="color">Color <p-sortIcon field="color"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="broad">Ancho <p-sortIcon field="broad"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="unit">Unidad <p-sortIcon field="unit"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="daysInventory">Días Inv. <p-sortIcon field="daysInventory"></p-sortIcon></th>
+                <th class="text-center" pSortableColumn="dayFabrication">Fecha Producido <p-sortIcon field="dayFabrication"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="ubication">Ubicación <p-sortIcon field="ubication"></p-sortIcon></th>
                 <th class="text-center" pSortableColumn="actualWarehouse">Bod. Actual <p-sortIcon field="actualWarehouse"></p-sortIcon></th>
               </tr>
@@ -768,25 +776,29 @@
                 <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
                 <!--!<td class="text-center"><p-tableCheckbox [value]="data"/></td>-->
                 <td class="text-center"><b>{{data.roll}}</b></td>
-                <td class="text-center">{{data.initialWarehouse}}</td>
                 <td class="text-center"><b>{{data.ot}}</b></td>
                 <td>{{data.client}}</td>
                 <td class="text-center"><b>{{data.item }}</b></td>
                 <td>{{data.reference}}</td>
                 <td class="text-center textGreen"><b>{{data.qty | number : '1.2-2'}}</b></td>
+                <td *ngIf="[1,12].includes(ValidarRol)" class="text-center"><b>${{data.value | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{data.material}}</td>
+                <td class="text-center">{{data.caliber | number : '1.2-2'}}</td>
+                <td class="text-center">{{data.color}}</td>
                 <td class="text-center"><b>{{data.broad | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{data.unit}}</td>
+                <td class="text-center textRed">{{data.daysInventory}}</td>
+                <td class="text-center">{{data.dayFabrication | date : 'dd/MM/yyyy'}}</td>
                 <td class="text-center"><b>{{data.ubication}}</b></td>
                 <td class="text-center">{{data.actualWarehouse}}</td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td class="text-right" colspan="7">Totales: </td>
+                <td class="text-right" colspan="6">Totales: </td>
                 <td class="text-center textGreen">{{qtyTotal() | number : '1.2-2'}}</td>
                 <td class="text-center">Kg</td>
-                <td class="text-center" colspan="4"></td>
+                <td class="text-center" colspan=""></td>
               </tr>
             </ng-template>
           </p-table>
