@@ -124,3 +124,12 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
   background-color: #F3FC20;
   font-size: calc(var(--font-size) * 15px);
 }
+
+::ng-deep .p-button.p-button-icon-only {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+  height: 2.5rem;
+}

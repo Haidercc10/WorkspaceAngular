@@ -28,4 +28,5 @@ export interface modelProduccionProcesos {
     Hora : string;
     Creador_Id : number;
     Rebobinado? : boolean;
+    Etiqueta_Trazabilidad? : number;
 }

@@ -5,9 +5,11 @@ import { Router } from '@angular/router';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
+import { modelTrazabilidad_Produccion } from 'src/app/Modelo/modelTrazabilidad_Produccion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
 import { TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -15,6 +17,7 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { ReImpresionEtiquetasService } from 'src/app/Servicios/ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
+import { TrazabilidadProduccionService } from 'src/app/Servicios/Trazabilidad_Produccion/trazabilidad-produccion.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -48,6 +51,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   nuevoAnchoProducto : number = null;
   //url : string = ``; 
   rebobinado : boolean = false;
+  maquinas : any = [];
+  rolls : any = [];
+  orderProduction : number = null;
+  modalRolls : boolean = false;
+  @ViewChild('dt1') dt1: Table | undefined;
 
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
 
@@ -66,6 +74,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     private processService: ProcesosService,
     private orderProductionsService: Orden_TrabajoService,
     private rePrintService: ReImpresionEtiquetasService,
+    private svMachines : MaquinasService,
+    private svTraceability : TrazabilidadProduccionService,
     //private svRouter : Router,
   ) {
 
@@ -98,6 +108,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       mostratDatosProducto: [false],
       edicionAnchoProducto : [false],
       rebobinado : [false],
+      etiquetaAsociada : [null, ],
+      procesoAnterior : [null, ],
+      otAlterna : [null,],
     });
   }
 
@@ -105,15 +118,20 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     //this.url = this.svRouter.url;
     //if(this.url = `/rebobinado-corte`) this.rebobinado = true;
     //console.log(this.rebobinado);
-    
     this.lecturaStorage();
     this.obtenerUnidadMedida();
     this.obtenerConos();
     this.getProcess();
     this.validarProceso();
     this.obtenerOperarios();
-    setTimeout(() => this.buscarPuertos(), 1000);
+    setTimeout(() => {
+      this.buscarPuertos()
+      this.getMachines();
+    }, 1000); 
   }
+
+  //Función para obtener las maquinas
+  getMachines = () => this.svMachines.getAllMachines().subscribe(data => { this.maquinas = data.filter(x => x.proceso_Id == this.validateProcess()) }, err => {});
 
   async ngOnDestroy() {
     this.reader.releaseLock();
@@ -130,6 +148,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   warinigMessage(message: string) {
     this.cargando = false;
     this.msj.mensajeAdvertencia(message);
+  }
+
+  exitMessage(message: string) {
+    this.cargando = false;
+    this.msj.mensajeConfirmacion(message);
   }
 
   aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dtProduccion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -234,7 +257,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   getProcess() {
     this.processService.srvObtenerLista().subscribe(res => {
-      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP'].includes(x.proceso_Id)).forEach(process => {
+      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP', 'MATPRIMA'].includes(x.proceso_Id)).forEach(process => {
         this.process.push({
           order: this.sortArrayProcess(process.proceso_Nombre),
           proceso_Id: process.proceso_Id,
@@ -254,7 +277,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       'DOBLADO': 4,
       'LAMINADO': 5,
       'CORTE': 6,
-      'EMPAQUE': 7
+      'EMPAQUE': 7, 
+      'MATPRIMA' : 8,
     };
     num = processMapping[process.toUpperCase()];
     return num;
@@ -357,13 +381,13 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     if (this.formDatosProduccion.value.proceso) {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
-      this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), () => {
+      //this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), () => {
         this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), error => {
           this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
           this.reference = ``;
           this.limpiarCampos(consulta);
         });
-      });
+      //});
     } else this.warinigMessage(`¡Debe haber seleccionado un proceso previamente!`);
   }
 
@@ -372,33 +396,43 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.datosOrdenTrabajo = data;
     this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
     this.buscarRollosPesados();
+    this.msjTotalProduction(data)
     data.forEach(datos => {
       this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
         dataClient.forEach(cli => {
           this.reference = datos.producto;
           this.datosOrdenTrabajo[0].id_Cliente = cli.id_Cliente;
           this.formDatosProduccion.patchValue({
-            idCliente: cli.id_Cliente,
-            cliente: datos.cliente,
-            item: datos.id_Producto,
-            referencia: datos.producto,
-            pesoExtruir: datos.peso_Neto,
-            ancho1: this.proceso != 'Empaque' ? datos.ancho1_Extrusion : datos.selladoCorte_Ancho,
-            ancho2: this.proceso != 'Empaque' ? datos.ancho2_Extrusion : datos.selladoCorte_Largo,
-            ancho3: this.proceso != 'Empaque' ? datos.ancho3_Extrusion : datos.selladoCorte_Fuelle,
-            undExtrusion: datos.und_Extrusion.trim(),
-            calibre: datos.calibre_Extrusion,
-            material: datos.material.trim(),
-            anchoProducto: consulta ? this.proceso != 'Empaque' ? (datos.ancho1_Extrusion + datos.ancho2_Extrusion + datos.ancho3_Extrusion) : datos.selladoCorte_Ancho : this.nuevoAnchoProducto,
-            presentacion: datos.presentacion,
-            daipita : this.reference.includes('DAIPITA') && this.validateProcess() == 'EMP' ? 3000 : null,
-            edicionAnchoProducto : false,
-            rebobinado : false,
+            'idCliente': cli.id_Cliente,
+            'cliente': datos.cliente,
+            'item': datos.id_Producto,
+            'referencia': datos.producto,
+            'pesoExtruir': datos.peso_Neto,
+            'ancho1': this.proceso != 'Empaque' ? datos.ancho1_Extrusion : datos.selladoCorte_Ancho,
+            'ancho2': this.proceso != 'Empaque' ? datos.ancho2_Extrusion : datos.selladoCorte_Largo,
+            'ancho3': this.proceso != 'Empaque' ? datos.ancho3_Extrusion : datos.selladoCorte_Fuelle,
+            'undExtrusion': datos.und_Extrusion.trim(),
+            'calibre': datos.calibre_Extrusion,
+            'material': datos.material.trim(),
+            'anchoProducto': consulta ? this.proceso != 'Empaque' ? (datos.ancho1_Extrusion + datos.ancho2_Extrusion + datos.ancho3_Extrusion) : datos.selladoCorte_Ancho : this.nuevoAnchoProducto,
+            'presentacion': datos.presentacion,
+            'daipita' : this.reference.includes('DAIPITA') && this.validateProcess() == 'EMP' ? 3000 : null,
+            'edicionAnchoProducto' : false,
+            'rebobinado' : false,
           });
           this.buscarDatosConoSeleccionado();
         });
       });
     });
+  }
+
+  msjTotalProduction(data : any){
+    let sales : number = data[0].peso_Neto;
+    let packed : number = this.sumarPesoNeto();
+    let unit : string = data[0].presentacion;
+
+    if(packed > sales) this.warinigMessage(`La orden está sobrepasada. Se solicitaron ${sales.toLocaleString()} y se han producido ${packed.toLocaleString()} ${unit}.`);
+    else if(packed == sales) this.warinigMessage(`La cantidad solicitada es igual a la cantidad producida, verifique antes de continuar!`);
   }
 
   validarPrecio(datosOrden: any): number {
@@ -434,6 +468,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     //this.buscraOrdenTrabajo();
     console.log(this.formDatosProduccion)
     let ot : any = this.formDatosProduccion.value.ordenTrabajo;
+    let oldProcess : any = this.formDatosProduccion.value.procesoAnterior;
+    let tag : any = this.formDatosProduccion.value.etiquetaAsociada;
     this.cargando = true;
     
     setTimeout(() => {
@@ -442,25 +478,60 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           if(ot == this.datosOrdenTrabajo[0].numero_Orden) {
             if (this.formDatosProduccion.value.maquina > 0) {
               if (this.formDatosProduccion.value.pesoNeto > 1) {
-                if (this.formDatosProduccion.value.proceso == 'EMP') {
-                  if (this.formDatosProduccion.value.pesoNeto <= 65) {
-                    if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
-                      this.guardarProduccion();
-                    } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`);
-                  } else this.warinigMessage(`¡El peso neto debe ser menor a '65' en el proceso de EMPAQUE!`); 
-                } else {
-                  if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
-                    this.guardarProduccion();
-                  } else this.warinigMessage(`¡Debe digitar un ancho de item válido!`);
-                } 
+                  if (this.formDatosProduccion.value.proceso == 'EMP') {
+                    if (this.formDatosProduccion.value.pesoNeto <= 65) {
+                      if(tag) {
+                        if(tag.toString().length >= 6) {
+                          if(oldProcess) {
+                            if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
+                              if(oldProcess == 'MATPRIMA') {
+                                this.guardarProduccion();
+                              } else {
+                                this.searchOldTag(tag, oldProcess);
+                              } 
+                            } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`);
+                          } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`);
+                        } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`);
+                      } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`);
+                    } else this.warinigMessage(`¡El peso neto debe ser menor a '65' en el proceso de EMPAQUE!`); 
+                  } else {
+                    if(this.formDatosProduccion.value.proceso == 'EXT') {
+                      this.guardarProduccion(); 
+                    } else {
+                      if(tag) {
+                        if(tag.toString().length >= 6) {
+                          if(oldProcess) {
+                            if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
+                              if(oldProcess == 'MATPRIMA') {
+                                this.guardarProduccion();
+                              } else {
+                                this.searchOldTag(tag, oldProcess);
+                              } 
+                            } else this.warinigMessage(`¡Debe digitar un ancho de item válido!`);
+                          } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`);
+                        } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`);
+                      } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`);
+                    }
+                  } 
               } else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!`);
             } else this.warinigMessage(`¡La maquina no puede ser cero (0)!`);
           } else this.warinigMessage(`¡La OT que desea registrar no coincide con la consultada previamente!`);
-        } else this.warinigMessage(`¡Todos los campos deben estar diligenciados!`);
+        } else this.warinigMessage(`¡Todos los campos   deben estar diligenciados!`);
       } else this.warinigMessage(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
     }, 500);
   }
 
+  //
+  searchOldTag(tag : number, process : any){
+    this.bagproService.getRollProduction(tag, `?process=${this.changeNameProcess(process)}`).subscribe(data => {
+      if(data) this.guardarProduccion(data);
+      else this.warinigMessage(`La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`);
+    }, error => {
+      this.warinigMessage(`No se encontró información de la etiqueta asociada | ${error.status} ${error.statusText}`);
+    });
+  }
+
+  //
   datosProduccion(daipita : any): modelProduccionProcesos {
     let presentation = this.formDatosProduccion.value.presentacion;
     //let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? 1 : this.formDatosProduccion.value.daipita;
@@ -496,40 +567,52 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
       Rebobinado : this.formDatosProduccion.value.rebobinado,
+      Etiqueta_Trazabilidad : this.formDatosProduccion.value.etiquetaAsociada,
     }
     return datos;
   }
 
-  guardarProduccion() {
+  msjsOldProcess = () => 'Selecciona el proceso madre de donde provino el rollo con el que se realizó esta producción';
+
+  msjsOldRoll = () => 'Presiona "Enter" para cargar el modal de rollos madre.';
+
+  msjsAltOT = () => 'Coloca el número de OT alternativa y presiona enter, para seleccionar un rollo madre de esta producción';
+  
+
+  guardarProduccion(infoEtiquetaAsociada? : any) {
     this.cargando = true;
     let rebobinado : boolean = this.formDatosProduccion.value.rebobinado;
     let daipita : any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? null : this.formDatosProduccion.value.daipita;
     //console.log(`guardarProduccion: ${daipita}`);
     this.produccionProcesosService.Post(this.datosProduccion(daipita)).subscribe(res => {
-      this.searchDataTagCreated(res.numero_Rollo, daipita, rebobinado);
+      this.searchDataTagCreated(res.numero_Rollo, daipita, rebobinado, res, infoEtiquetaAsociada);
       setTimeout(() => {
-        let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
+        let mostrarDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
         let anchoProducto : number = this.formDatosProduccion.value.anchoProducto;
         let edicionAnchoProducto : boolean = this.formDatosProduccion.value.edicionAnchoProducto;
         this.formDatosProduccion.reset();
         this.validarProceso();
-        this.formDatosProduccion.patchValue({
-          'ordenTrabajo': res.ot,
-          'maquina': res.maquina,
-          'operario': res.operario1_Id,
-          'cono': res.cono_Id,
-          'daipita': daipita,
-          'mostratDatosProducto': mostratDatosProducto,
-          'anchoProducto' : anchoProducto,
-          'edicionAnchoProducto' : edicionAnchoProducto,
-          'rebobinado' : false
-        });
+        this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita)
         this.nuevoAnchoProducto = this.formDatosProduccion.value.anchoProducto;
         //this.buscarRollosPesados();
         this.buscraOrdenTrabajo(false);
         this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
       }, 1000);
     }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
+  }
+
+  loadDataInFields(productionPL : any, dataProduct : boolean, broadProduct : number, editBroadProduct : boolean, daipita){
+    this.formDatosProduccion.patchValue({
+      'ordenTrabajo': productionPL.ot,
+      'maquina': productionPL.maquina,
+      'operario': productionPL.operario1_Id,
+      'cono': productionPL.cono_Id,
+      'daipita': daipita,
+      'mostratDatosProducto': dataProduct,
+      'anchoProducto' : broadProduct,
+      'edicionAnchoProducto' : editBroadProduct,
+      'rebobinado' : false
+    });
   }
 
   validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
@@ -548,33 +631,37 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     return processMapping[proceso] || proceso;
   }
 
-  searchDataTagCreated(reel: number, daipita : any, rebobinado : boolean) {
+  searchDataTagCreated(reel: number, daipita : any, rebobinado : boolean, dataProductionProcess : any, infoTagAssociated? : any) {
+    let motherProcess : string = this.formDatosProduccion.value.procesoAnterior
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
       //console.log(`searchDataTagCreated: ${daipita}`);
       //let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : this.formDatosProduccion.value.daipita;
       res.forEach(data => {
         let dataTagProduction: modelTagProduction = {
-          client: data.clienteNombre.trim(),
-          item: data.clienteItem.trim(),
-          reference: data.clienteItemNombre.trim(),
-          width: data.extancho,
-          height: data.extlargo,
-          bellows: data.extfuelle,
-          und: data.extunidad.trim(),
-          cal: data.calibre,
-          orderProduction: data.ot.trim(),
-          material: data.material.trim(),
-          quantity: this.validateProcess() != 'EMP' ? data.extBruto : [0, '', null, undefined].includes(daipita) ? data.extBruto : data.extnetokg,
-          quantity2: this.validateProcess() != 'EMP' ? data.extnetokg : [0, '', null, undefined].includes(daipita) ? data.extnetokg : daipita,
-          reel: data.item,
-          presentationItem1: [0, '', null, undefined].includes(daipita) ? 'Kg Bruto' : this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
-          presentationItem2: [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
-          productionProcess: data.nomStatus.trim(),
-          showNameBussiness: this.showNameBussiness,
-          showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
-          operator: rebobinado ? `${data.operador + ' RB'}` : `${data.operador}`
+          'client': data.clienteNombre.trim(),
+          'item': data.clienteItem.trim(),
+          'reference': data.clienteItemNombre.trim(),
+          'width': data.extancho,
+          'height': data.extlargo,
+          'bellows': data.extfuelle,
+          'und': data.extunidad.trim(),
+          'cal': data.calibre,
+          'orderProduction': data.ot.trim(),
+          'material': data.material.trim(),
+          'quantity': this.validateProcess() != 'EMP' ? data.extBruto : [0, '', null, undefined].includes(daipita) ? data.extBruto : data.extnetokg,
+          'quantity2': this.validateProcess() != 'EMP' ? data.extnetokg : [0, '', null, undefined].includes(daipita) ? data.extnetokg : daipita,
+          'reel': data.item,
+          'presentationItem1': [0, '', null, undefined].includes(daipita) ? 'Kg Bruto' : this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
+          'presentationItem2': [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
+          'productionProcess': data.nomStatus.trim(),
+          'showNameBussiness': this.showNameBussiness,
+          'showDataTagForClient': this.formDatosProduccion.value.mostratDatosProducto,
+          'operator': rebobinado ? `${data.operador + ' RB'}` : `${data.operador}`
         }
+        this.createTraceability(dataProductionProcess, res, motherProcess, infoTagAssociated);
         this.createPDFService.createTagProduction(dataTagProduction);
+      }, error => {
+        console.log(error);
       });
     });
   }
@@ -607,4 +694,132 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.createPDFService.createTagProduction(dataTagProduction);
   }
 
+  //Modelo de trazabilidad
+  modelTraceability(productionPL : any, produccionBagPro : any, motherProcess : string, infoTagAssociated? : any){
+    let info : modelTrazabilidad_Produccion = {
+      'Trz_Etiqueta': produccionBagPro[0].item,
+      'Trz_Ot': productionPL.ot,
+      'Prod_Id': productionPL.prod_Id,
+      'Cli_Id': productionPL.cli_Id,
+      'Proceso_Id': productionPL.proceso_Id,
+      'Trz_Fecha': productionPL.fecha,
+      'Trz_Hora': productionPL.hora,
+      'Trz_PesoNeto': productionPL.peso_Neto,
+      'Trz_PesoBruto': productionPL.peso_Bruto, 
+      'Trz_Cantidad': productionPL.cantidad,
+      'Presentacion': productionPL.presentacion,
+      'Trz_Maquina': productionPL.maquina,
+      'Operario_1': productionPL.operario1_Id,
+      'Operario_2': productionPL.operario2_Id == null ? 0 : productionPL.operario2_Id,
+      'Operario_3': productionPL.operario3_Id == null ? 0 : productionPL.operario3_Id,
+      'Operario_4': productionPL.operario4_Id == null ? 0 : productionPL.operario4_Id,
+      'Trz_EtiquetaAnterior': infoTagAssociated ? infoTagAssociated.rollo : this.formDatosProduccion.value.etiquetaAsociada,
+      'Trz_OtAnterior': infoTagAssociated ? infoTagAssociated.ot : null,
+      'Prod_Anterior': infoTagAssociated ? infoTagAssociated.item : 1,
+      'Proceso_Anterior': motherProcess,
+    } 
+    return info;
+  }
+
+  //Crear registro de trazabilidad. 
+  createTraceability(productionProcess : any, infoTagBagPro : any, motherProcess : string, infoTagAssociated : number){
+    this.svTraceability.PostTraceability(this.modelTraceability(productionProcess, infoTagBagPro, motherProcess, infoTagAssociated)).subscribe(trace => {
+    }, error => {
+      this.msj.mensajeError(`Error`, `Error al crear el registro de trazabilidad | ${error.status} ${error.statusText}`);
+      this.cargando = false;
+    });
+  }
+
+  //Cambiar nombre de proceso de bagpro a plasticaribe
+  changeNameProcess(process : string){
+    switch (process) {
+      case 'EXT' :
+        return 'EXTRUSION';
+      case 'IMP' :
+        return 'IMPRESION';
+      case 'LAM' :
+        return 'LAMINADO';
+      case 'CORTE' :
+        return 'CORTE';
+      case 'DBLD' :
+        return 'DOBLADO';
+      case 'EMP' :
+        return 'EMPAQUE';
+      case 'SELLA' :
+        return 'SELLADO';
+      case 'ROT' :
+        return 'ROTOGRABADO';
+      case 'MATPRIMA' :
+        return 'MATPRIMA';
+      default :
+        return ''; 
+    }
+  }
+
+  //Cambiar nombre de proceso de plasticaribe a bagpro
+  changeProcessInverse(process : string){
+    switch (process) {
+      case 'EXTRUSION' :
+        return 'EXT';
+      case 'IMPRESION' :
+        return 'IMP';
+      case 'LAMINADO' :
+        return 'LAM';
+      case 'CORTE' :
+        return 'CORTE';
+      case 'DOBLADO' :
+        return 'DBLD';
+      case 'EMPAQUE' :
+        return 'EMP';
+      case 'SELLADO' :
+        return 'SELLA';
+      case 'ROTOGRABADO' :
+        return 'ROT';
+      case 'MATPRIMA' :
+        return 'MATPRIMA';
+      default :
+        return ''; 
+    }
+  }
+
+  //Validar información de rollos por OT
+  validateOrderProduction(typeOT : string){
+    this.rolls = [];
+    let ot : number = typeOT == 'altern' ? ![null, '', undefined].includes(this.formDatosProduccion.value.otAlterna) ? this.formDatosProduccion.value.otAlterna : this.formDatosProduccion.value.ordenTrabajo : this.formDatosProduccion.value.ordenTrabajo;
+    let motherProcess : string = this.formDatosProduccion.value.procesoAnterior;
+    this.orderProduction = null;
+
+    if (ot && motherProcess) {
+      this.cargando = true;
+      this.bagproService.GetObtenerDatosxProcesos(ot, this.changeNameProcess(motherProcess)).subscribe(data => {
+        if(data) {
+          this.modalRolls = true;
+          this.rolls = data;
+          this.cargando = false;
+          this.orderProduction = ot;
+        } else {
+          this.warinigMessage(`No se encontraron rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)}`);
+          this.orderProduction = ot;
+        }
+      }, error => { this.errorMessage(`Error al consultar rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)}`, error); });
+    } else this.warinigMessage(`Debe diligenciar los campos 'Proceso Madre' y 'OT'`);
+  }
+
+  //Función para cargar los rollos madres de bulto
+  loadMotherRolls(tag : any, process : string){
+    this.modalRolls = false;
+    this.formDatosProduccion.patchValue({ 'etiquetaAsociada' :  tag });
+    this.exitMessage(`Se asoció el rollo madre N° ${tag} del proceso de ${process} exitosamente!`);
+  }
+
+  //Filtrar la tabla de los rollos cargados en el modal.
+  applyFilter = ($event, campo : any, actionField : any) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, actionField);
+
+  //Función para inactivar el campo OT alterna
+  changeOldProcess(){
+    let motherProcess : any = this.formDatosProduccion.value.procesoAnterior;
+    if(motherProcess == 'MATPRIMA') {
+      this.formDatosProduccion.patchValue({ etiquetaAsociada: null, otAnterior : null });
+    }
+  }
 }
