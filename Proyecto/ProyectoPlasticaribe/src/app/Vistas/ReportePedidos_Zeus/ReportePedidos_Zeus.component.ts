@@ -20,6 +20,7 @@ import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { DepartamentosMunicipiosColombiaService } from 'src/app/Servicios/DepartamentosMunicipiosColombia/DepartamentosMunicipiosColombia.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -78,7 +79,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                           private shepherdService: ShepherdService,
                             private msj : MensajesAplicacionService,
                               private deparMuniciosColService : DepartamentosMunicipiosColombiaService,
-                                private svBagpro : BagproService, ) {
+                                private svBagpro : BagproService, 
+                                  private svExcel : CreacionExcelService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -1538,4 +1540,81 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     });
     this.clientes = clientes;
   }
+
+  //Exportar formato para planeación de OT's
+  exportExcel(){
+    if(this.ArrayPedidos.length > 0) {
+      this.cargando = true;
+      setTimeout(() => {
+        let title : string = `Formato de pedidos de Zeus`;
+        let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+        let font : any = { size: 10, bold: true, alignment: 'center', name : 'Calibri' };
+        let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        let workbook = this.svExcel.formatoExcel(title, true);
+        this.addSheet(workbook, fill, font, border, this.infoProduction2(), 1);
+        this.svExcel.creacionHoja(workbook, `Pedidos ${moment().format('DD-MM-YYYY')}`, false);
+        this.svExcel.creacionExcel(`Pedidos Zeus ${moment().format('DD-MM-YYYY')}`, workbook);
+        this.cargando = false;  
+      }, 2000);
+    } else this.msj.mensajeAdvertencia(`No hay registros para exportar!`);
+  }
+
+  //.Agregar hoja al formato excel.
+  addSheet(workbook, fill , font, border, data : any, pageNumber : number) {
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addHeaderPage2(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addInfoExcel2(page, data);
+  }
+
+  //.Información de la producción.
+  infoProduction2(){
+    let info : any = [];
+    //this.ordenesConsultadas.sort((a,b) => a.id_Vendedor - b.id_Vendedor);
+    this.ArrayPedidos.forEach(p => {
+      info.push([p.consecutivo, p.id_Producto, p.estado, p.cliente, p.producto, p.OT, p.fecha_Creacion, parseFloat(p.cant_Pedida).toFixed(2), p.fecha_Entrega, parseFloat(p.cant_Facturada).toFixed(2), p.fecha_Despacho, parseFloat(p.precioUnidad).toFixed(2), parseFloat(p.costo_Cant_Total).toFixed(2), p.vendedor]);
+    });
+    //this.addTotalSheet1(info);
+    return info;
+  }
+
+  //.Agregar información a la hoja del excel.
+  addInfoExcel2(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [9,11,13,14];
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N']; 
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+
+    data.forEach(d => {
+      worksheet.addRow(d) 
+      row.forEach(r => {
+        worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+      });
+      contador++
+    });
+    //row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Agregar encabezado a la hoja del excel.
+  addHeaderPage2(worksheet, font, border, fill) {
+    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5','M5','N5',]
+    worksheet.addRow(['Consecutivo', 'Item', 'Estado', 'Cliente', 'Referencia', 'OT', 'Fecha Pedido', 'Cantidad', 'Fecha Solicitada', 'Cantidad Despachada', 'Fecha Despacho', 'Precio', 'Total Factura', 'Vendedor']);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:N3'];
+    this.stylesPage2(worksheet, concatCells, []);
+  }
+
+  //.Estilos de la hoja del excel.
+  stylesPage2(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1,6,7,9,11].forEach(x => worksheet.getColumn(x).width = 12);
+    [4,5,50].forEach(x => worksheet.getColumn(x).width = 50);
+    [3,12,13,10].forEach(x => worksheet.getColumn(x).width = 20);
+    [2].forEach(x => worksheet.getColumn(x).width = 10);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  } 
 }
