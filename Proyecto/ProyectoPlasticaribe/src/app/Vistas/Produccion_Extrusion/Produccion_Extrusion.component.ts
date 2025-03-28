@@ -381,6 +381,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     if (this.formDatosProduccion.value.proceso) {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
+      if(consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null});
       //this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), () => {
         this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), error => {
           this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
@@ -396,7 +397,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.datosOrdenTrabajo = data;
     this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
     this.buscarRollosPesados();
-    this.msjTotalProduction(data)
+    this.msjTotalProduction(data);
     data.forEach(datos => {
       this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
         dataClient.forEach(cli => {
@@ -422,6 +423,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           });
           this.buscarDatosConoSeleccionado();
         });
+      }, error => {
+        this.errorMessage(`Ocurrió un error al consultar el nit de cliente N° ${datos.nitCliente}`, error);
+        this.cargando = false;
       });
     });
   }
@@ -590,9 +594,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         let mostrarDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
         let anchoProducto : number = this.formDatosProduccion.value.anchoProducto;
         let edicionAnchoProducto : boolean = this.formDatosProduccion.value.edicionAnchoProducto;
+        let motherProcess : string = this.formDatosProduccion.value.procesoAnterior;
+        let otAltern : number = this.formDatosProduccion.value.otAlterna;
         this.formDatosProduccion.reset();
         this.validarProceso();
-        this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita)
+        this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita, motherProcess, otAltern)
         this.nuevoAnchoProducto = this.formDatosProduccion.value.anchoProducto;
         //this.buscarRollosPesados();
         this.buscraOrdenTrabajo(false);
@@ -601,7 +607,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
   }
 
-  loadDataInFields(productionPL : any, dataProduct : boolean, broadProduct : number, editBroadProduct : boolean, daipita){
+  loadDataInFields(productionPL : any, dataProduct : boolean, broadProduct : number, editBroadProduct : boolean, daipita, motherProcess: string, otAltern : number){
     this.formDatosProduccion.patchValue({
       'ordenTrabajo': productionPL.ot,
       'maquina': productionPL.maquina,
@@ -611,7 +617,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       'mostratDatosProducto': dataProduct,
       'anchoProducto' : broadProduct,
       'edicionAnchoProducto' : editBroadProduct,
-      'rebobinado' : false
+      'rebobinado' : false,
+      'procesoAnterior' : motherProcess,
+      'etiquetaAsociada' : productionPL.etiqueta_Trazabilidad,
+      'otAlterna': otAltern,
     });
   }
 

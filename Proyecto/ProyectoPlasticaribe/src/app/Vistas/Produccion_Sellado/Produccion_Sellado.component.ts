@@ -252,10 +252,13 @@ export class Produccion_SelladoComponent implements OnInit {
   habilitarSaldo = () => this.esSoloLectura ? this.esSoloLectura = false : this.esSoloLectura = true;
 
   //Función que busca la orden de trabajo y carga la información
-  buscarOT(validacionDatos: boolean = false) {
+  buscarOT(validacionDatos: boolean = false, newOT? : boolean) {
+    console.log(validacionDatos);
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargarTurnoActual();
+    if(newOT) this.formSellado.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null});
+
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
       let nitCliente: any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
       this.svcSedes.GetSedeClientexNitBagPro(nitCliente).subscribe(sede => {
@@ -267,7 +270,7 @@ export class Produccion_SelladoComponent implements OnInit {
           this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
           if (!validacionDatos) {
             let cantUnd: number = data[0].selladoCorte_CantBolsasBulto <= 0 ? this.formSellado.value.cantUnd : data[0].selladoCorte_CantBolsasBulto;
-            this.formSellado.patchValue({ cantUnd: cantUnd });
+            this.formSellado.patchValue({ 'cantUnd': cantUnd, });
           }
           this.formSellado.get('saldo')?.enable();
           this.validarProceso();
@@ -276,7 +279,7 @@ export class Produccion_SelladoComponent implements OnInit {
           this.cargarProduccionSellado(this.formSellado.value.ot, validacionDatos);
         }
       }, () => {
-        this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
+        this.svcMsjs.mensajeError(`Ocurrió un error al consultar el NIT del cliente N° ${nitCliente}!`);
         this.limpiarCampos();
       });
     }, () => {
@@ -345,7 +348,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.produccion.sort((a, b) => Number(b.bulto) - Number(a.bulto));
       } else {
         let cantUnd: number = this.formSellado.value.cantUnd || 0;
-        this.formSellado.patchValue({ cantUnd: cantUnd });
+        this.formSellado.patchValue({ 'cantUnd': cantUnd, 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null});
       }
     }, () => this.svcMsjs.mensajeError(`La OT ${ot} no fue encontrada en el proceso de Sellado`));
   }
@@ -487,6 +490,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que guarda el registro del rollo en la BD
   guardarRegistroEntrada(entrada: any, dataTagAssociated? : any) {
     let motherProcess : any = this.formSellado.value.procesoAnterior; 
+    let otAltern : any = this.formSellado.value.otAlterna; 
     this.svcProdProcesos.Post(entrada).subscribe(data => {
       this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, false, data.operario1_Id, data.datos_Etiqueta, data, motherProcess, dataTagAssociated);
       setTimeout(() => {
@@ -494,7 +498,7 @@ export class Produccion_SelladoComponent implements OnInit {
         else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
         this.cargarCamposUltimaOT();
         this.limpiarCampos();
-        this.formSellado.patchValue({ ot: this.ordenConsultada, maquina: this.maquinaConsultada, idOperario: this.operariosConsultados });
+        this.formSellado.patchValue({ 'ot': this.ordenConsultada, 'maquina': this.maquinaConsultada, 'idOperario': this.operariosConsultados, 'procesoAnterior' : motherProcess, 'etiquetaAsociada' : data.etiqueta_Trazabilidad, 'otAlterna' : otAltern });
         this.buscarOT();
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
