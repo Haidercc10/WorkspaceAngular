@@ -352,7 +352,7 @@
       header="Bopps agrupados"
       leftIcon="pi pi-table"
       tooltip="Información del Inventario de los Bopps genéricos"
-      *ngIf="[1,3,4,89,63,12,98].includes(this.ValidarRol)">
+      *ngIf="[1,3,4,89,63,12,98,2].includes(this.ValidarRol)">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
           <p-toolbar>
@@ -415,7 +415,7 @@
                 <th id="stock" pSortableColumn="Medida" pReorderableColumn scope="col">Medida
                   <p-sortIcon field="Medida"></p-sortIcon>
                 </th>
-                <th id="editar" *ngIf="[1,3,4,89,63,12,98].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
+                <th id="editar" *ngIf="[1,3,4,89,63,12,98,2].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-materiaPrima let-rowIndex="rowIndex">
@@ -429,7 +429,7 @@
                 <td>{{materiaPrima.Rollos | number}}</td>
                 <td class="columnaCantidad"><b>{{materiaPrima.Stock | number : '1.2-2'}}</b></td>
                 <td>{{materiaPrima.Medida}}</td>
-                <td *ngIf="[1,3,4,89,63,98].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="llamarModalBopp(materiaPrima)"></p-button></td>
+                <td *ngIf="[1,3,4,89,63,98,2].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="llamarModalBopp(materiaPrima)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">

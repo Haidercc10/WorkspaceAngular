@@ -89,7 +89,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.consultarDepartamentos();
     this.seleccionarColumnas();
     this.consultarPedidosZeus();
-    this.consultarPedidos();    
+    //this.consultarPedidos();    
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -157,11 +157,17 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     setTimeout(() => {
       this.getClientes();
       this.getVendedores();
-      //this.cargando = false;
       this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
-      const thisRef = this;
-      this.ArrayPedidos.forEach((pedido) => thisRef.expandedRows[pedido.consecutivo] = true);
-    }, 3500);
+      // Utiliza un enfoque de mapeo para expandir las filas
+      this.expandedRows = this.ArrayPedidos.reduce((acc, pedido) => {
+        acc[pedido.consecutivo] = true;
+        return acc;
+      }, {});
+    }, 6000);
+  }
+
+  ordenarPedidos(){
+    
   }
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
@@ -239,6 +245,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       CantPedidaKg_OT : '',
       CantPedidaUnd_OT : '',
       Zeus : 1,
+      'fecha_Factura' : datos.fecha_Factura
     };
     
     /*this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
@@ -1546,15 +1553,20 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     if(this.ArrayPedidos.length > 0) {
       this.cargando = true;
       setTimeout(() => {
-        let title : string = `Formato de pedidos de Zeus`;
+        let title : string = `Formato de pedidos de Zeus `;
         let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
         let font : any = { size: 10, bold: true, alignment: 'center', name : 'Calibri' };
         let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         let workbook = this.svExcel.formatoExcel(title, true);
         this.addSheet(workbook, fill, font, border, this.infoProduction2(), 1);
-        this.svExcel.creacionHoja(workbook, `Pedidos ${moment().format('DD-MM-YYYY')}`, false);
+        //this.svExcel.creacionHoja(workbook, `Pedidos ${moment().format('DD-MM-YYYY')}`, false);
         this.svExcel.creacionExcel(`Pedidos Zeus ${moment().format('DD-MM-YYYY')}`, workbook);
+        setTimeout(() => {
+          this.msj.mensajeConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!');
+          this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
+        }, 3500);
         this.cargando = false;  
+        this.datosExcel = this.ArrayPedidos;
       }, 2000);
     } else this.msj.mensajeAdvertencia(`No hay registros para exportar!`);
   }
@@ -1572,7 +1584,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     let info : any = [];
     //this.ordenesConsultadas.sort((a,b) => a.id_Vendedor - b.id_Vendedor);
     this.ArrayPedidos.forEach(p => {
-      info.push([p.consecutivo, p.id_Producto, p.estado, p.cliente, p.producto, p.OT, p.fecha_Creacion, parseFloat(p.cant_Pedida).toFixed(2), p.fecha_Entrega, parseFloat(p.cant_Facturada).toFixed(2), p.fecha_Despacho, parseFloat(p.precioUnidad).toFixed(2), parseFloat(p.costo_Cant_Total).toFixed(2), p.vendedor]);
+      info.push([parseInt(p.consecutivo), parseInt(p.id_Producto), p.estado, p.cliente, p.producto, p.OT, p.fecha_Creacion, parseFloat(p.cant_Pedida).toFixed(2), p.fecha_Entrega, parseFloat(p.cant_Facturada).toFixed(2), parseFloat(p.cant_Facturada) > 0 ? p.fecha_Factura : '', parseFloat(p.precioUnidad).toFixed(2), parseFloat(p.costo_Cant_Total).toFixed(2), p.vendedor]);
     });
     //this.addTotalSheet1(info);
     return info;
@@ -1580,12 +1592,15 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   //.Agregar información a la hoja del excel.
   addInfoExcel2(worksheet : any, data : any) {
-    let formatNumber: Array<number> = [9,11,13,14];
+    let formatNumber: Array<number> = [8,10,11,12,13];
     let contador : any = 6;
     let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N']; 
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-
     data.forEach(d => {
+      d[7] = parseFloat(d[7].toString().replace(',', '.'));
+      d[9] = parseFloat(d[9].toString().replace(',', '.'));
+      d[11] = parseFloat(d[11].toString().replace(',', '.'));
+      d[12] = parseFloat(d[12].toString().replace(',', '.'));
       worksheet.addRow(d) 
       row.forEach(r => {
         worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
@@ -1611,10 +1626,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   //.Estilos de la hoja del excel.
   stylesPage2(worksheet, concatCells, formatNumber) {
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    [1,6,7,9,11].forEach(x => worksheet.getColumn(x).width = 12);
-    [4,5,50].forEach(x => worksheet.getColumn(x).width = 50);
-    [3,12,13,10].forEach(x => worksheet.getColumn(x).width = 20);
-    [2].forEach(x => worksheet.getColumn(x).width = 10);
+    [1,7,8,12,].forEach(x => worksheet.getColumn(x).width = 12);
+    [4,5,14].forEach(x => worksheet.getColumn(x).width = 50);
+    [14].forEach(x => worksheet.getColumn(x).width = 40);
+    [9,11,13,].forEach(x => worksheet.getColumn(x).width = 15);
+    [10].forEach(x => worksheet.getColumn(x).width = 20);
+    [3].forEach(x => worksheet.getColumn(x).width = 25);
+    [2,6].forEach(x => worksheet.getColumn(x).width = 10);
     concatCells.forEach(cell => worksheet.mergeCells(cell));
   } 
 }

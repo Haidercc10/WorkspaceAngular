@@ -134,7 +134,7 @@ a:hover {
 }
 
 /* EXPORTAR PDF */
-.buttonExcel, .buttonPDF {
+.buttonExcel, .buttonPDF, .buttonExcel2 {
   margin: auto;
   width: 50px;
   height: 50px;
@@ -159,7 +159,7 @@ a:hover {
 }
 
 .buttonExcel2 {
-  background-color: #00aa3e;
+  background-color: #007029;
 }
 
 .svgIconPDF, .svgIconExcel, .svgIconExcel2 {
@@ -207,7 +207,7 @@ a:hover {
   transition-duration: .3s;
 }
 
-.svgIconPDF path, .svgIconExcel, .svgIconExcel2 path {
+.svgIconPDF path, .svgIconExcel path, .svgIconExcel2 path {
   fill: white;
 }
 
