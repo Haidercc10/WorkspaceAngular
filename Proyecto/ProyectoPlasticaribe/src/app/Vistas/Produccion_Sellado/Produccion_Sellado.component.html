@@ -42,7 +42,7 @@
       <div class="col-sm-12 col-md-3 col-xl-1">
         <span class="p-float-label">
             <p-dropdown formControlName="maquina" inputId="maquina" [options]="maquinas" optionLabel="maq_Numero"
-                optionValue="maq_Numero" [autoDisplayFirst]="false" [required]="true" [filter]="true" filterBy="maq_Numero"></p-dropdown>
+                optionValue="maq_Numero" [autoDisplayFirst]="false" [required]="true" [filter]="true" filterBy="maq_Numero" (onChange)="validarProceso()"></p-dropdown>
             <label for="maquina">Maquina</label>
         </span>
       </div>

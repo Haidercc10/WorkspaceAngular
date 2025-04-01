@@ -253,7 +253,6 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que busca la orden de trabajo y carga la información
   buscarOT(validacionDatos: boolean = false, newOT? : boolean) {
-    console.log(validacionDatos);
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargarTurnoActual();
@@ -307,8 +306,10 @@ export class Produccion_SelladoComponent implements OnInit {
   validarProceso() {
     if (this.ordenesTrabajo.length > 0) {
       let esWicket: boolean = this.ordenesTrabajo[0].wicket == null ? false : true;
+      console.log(esWicket);
       if (this.formSellado.value.maquina == 9 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' });
       else this.formSellado.patchValue({ proceso: 'SELLA' });
+      console.log(this.formSellado.value.maquina);
     }
   }
 
