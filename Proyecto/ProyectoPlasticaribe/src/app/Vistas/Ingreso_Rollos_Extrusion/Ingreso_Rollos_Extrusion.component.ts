@@ -1,7 +1,7 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
-import { log } from 'console';
+import { info, log } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
@@ -189,7 +189,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
           this.dtBgRollosService.getRollo(rollo, area).subscribe(dataPl => {
             if(dataPl.length == 0) {
               this.bagProService.getRollProduction(rollo, `?process=${proceso.toUpperCase()}`).subscribe(data => {
-                if(data != null) this.agregarRollo(data);
+                if(data != null) this.ingresarRollos(data);
                 else {
                   this.msjs(`Advertencia`, `No se encontró el rollo N° '${rollo}' en el proceso de '${proceso.toUpperCase()}'`);
                   this.cargarUltimoRollo();
@@ -246,12 +246,9 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
           if(this.FormConsultarRollos.value.Peso) {
             let ot : any = this.FormConsultarRollos.value.OrdenTrabajo;
             let area : any = this.FormConsultarRollos.value.Proceso;
-            console.log(area);
             
             let proceso : string = this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
-             console.log(this.procesos);
-             
-             console.log(proceso);
+            
             let peso : number = this.FormConsultarRollos.value.Peso;
             this.rollosSeleccionados = [];
             this.rollosOT = [];
@@ -260,8 +257,6 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
             this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
 
             this.dtBgRollosService.getRollsForOT(ot).subscribe(dataPl => {
-              console.log(proceso.toUpperCase(), ot, dataPl);
-              
               this.bagProService.getAvailablesRollsOT(ot, proceso, dataPl).subscribe(data => {
                 if(data.length > 0) this.cargarRolloSemejante(data, peso, dataPl);
                 else {
@@ -288,7 +283,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
     for (let index = 0; index < data.length; index++) {
       if(!this.rollosIngresar.map(x => x.rollo).includes(data[index].item) && 
-          (data[index].extnetokg >= (peso - 5)  && data[index].extnetokg <= (peso + 5)) && 
+          (data[index].extnetokg >= (peso - 5) && data[index].extnetokg <= (peso + 5)) && 
             !dataInStore.map(x => x).includes(data[index].item)) {
         this.FormConsultarRollos.patchValue({ 'Rollo' : data[index].item, });
         this.cargarRolloTabla();
@@ -350,9 +345,9 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     }, 500); 
   }
 
-  // Funcion que va a crear los rollos en la base de datos
-  ingresarRollos(){
-    if (this.rollosIngresar.length > 0){
+  /// Funcion que va a crear los rollos en la base de datos
+  ingresarRollos(dataBagpro : any){
+    //if (this.rollosIngresar.length > 0){
       this.cargando = true;
       const info : modelBodegasRollos = {
         'BgRollo_FechaEntrada': moment().format('YYYY-MM-DD'),
@@ -362,54 +357,78 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         'BgRollo_Observacion': this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion.toUpperCase(),
         'Usua_Id': this.storage_Id,
       }
-      this.bgRollosService.Post(info).subscribe(data => this.ingresarDetallesRollos(data.bgRollo_Id), error => {
+      this.bgRollosService.Post(info).subscribe(data => this.ingresarDetallesRollos(data.bgRollo_Id, dataBagpro), error => {
         this.mensajeService.mensajeError(`Error`, `Se encontró un error al ingresar los rollos | ${error.status} ${error.statusText}`);
         this.cargando = false;
       });
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar agregar mínimo un rollo para crear el ingreso!`);
+    //} else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar agregar mínimo un rollo para crear el ingreso!`);
   }
 
-  //
-  ingresarDetallesRollos(id : number){
-    let numRollos : number = 0;
-    this.rollosIngresar.forEach(x => {
-      const info : modelDtBodegasRollos = {
-        'BgRollo_Id': id,
-        'BgRollo_OrdenTrabajo': x.ot,
-        'Prod_Id': parseInt(x.item),
-        'DtBgRollo_Rollo': x.rollo,
-        'DtBgRollo_Cantidad': x.peso,
-        'UndMed_Id': x.unidad,
-        'BgRollo_BodegaActual': x.bodega_Actual,
-        'DtBgRollo_Extrusion': true,
-        'DtBgRollo_ProdIntermedio': true,
-        'DtBgRollo_Impresion': x.bodega_Actual == 'IMP' ? true : false,
-        'DtBgRollo_Rotograbado': x.bodega_Actual == 'ROT' ? true : false,
-        'DtBgRollo_Sellado': x.bodega_Actual == 'SELLA' ? true : false,
-        'DtBgRollo_Corte': x.bodega_Actual == 'CORTE' ? true : false,
-        'DtBgRollo_Despacho': false,
-        'DtBgRollo_Calidad': x.bodega_Actual == 'CALIDAD' ? true : false,
-        'Estado_Id': 19,
-        'BgRollo_BodegaInicial': x.proceso_Id,
-        'DtBgRollo_Ubicacion': x.ubicacion, 
-        'BgRollo_BodegaIngreso': x.bodega_Actual,
-        'DtBgRollo_FechaFab': x.fecha,
-        'DtBgRollo_Maq': x.maquina,
-      }
-      this.dtBgRollosService.Post(info).subscribe(() => {
-        numRollos++;
-        if (numRollos == this.rollosIngresar.length) this.createPDF(id, `creado`);
-      }, error => {
-        this.msjs(`Error`, `Ha ocurrido un error al ingresar los rollos | ${error.status} ${error.statusText}`);
-        this.cargando = false;
-      });
+  ///
+  ingresarDetallesRollos(id : number, x : any){
+    let subUbicacion : any = [undefined, null].includes(this.FormConsultarRollos.value.SubUbicacion) ? 0 : this.FormConsultarRollos.value.SubUbicacion;
+    let ubicacion : any = this.ubicaciones.find(x => x.ubR_Id == this.FormConsultarRollos.value.Ubicacion && x.ubR_SubId == subUbicacion).ubR_Nomenclatura;
+    let proceso_Id : any = this.FormConsultarRollos.value.Proceso;
+    let bodega_Actual : any = this.FormConsultarRollos.value.Bodega_Actual;
+    
+    const info : modelDtBodegasRollos = {
+      'BgRollo_Id': id,
+      'BgRollo_OrdenTrabajo': x.ot,
+      'Prod_Id': parseInt(x.item),
+      'DtBgRollo_Rollo': x.rollo,
+      'DtBgRollo_Cantidad': x.peso,
+      'UndMed_Id': x.unidad,
+      'BgRollo_BodegaActual': bodega_Actual,
+      'DtBgRollo_Extrusion': true,
+      'DtBgRollo_ProdIntermedio': true,
+      'DtBgRollo_Impresion': bodega_Actual == 'IMP' ? true : false,
+      'DtBgRollo_Rotograbado': bodega_Actual == 'ROT' ? true : false,
+      'DtBgRollo_Sellado': bodega_Actual == 'SELLA' ? true : false,
+      'DtBgRollo_Corte': bodega_Actual == 'CORTE' ? true : false,
+      'DtBgRollo_Despacho': false,
+      'DtBgRollo_Calidad': bodega_Actual == 'CALIDAD' ? true : false,
+      'Estado_Id': 19,
+      'BgRollo_BodegaInicial': proceso_Id,
+      'DtBgRollo_Ubicacion': ubicacion, 
+      'BgRollo_BodegaIngreso': bodega_Actual,
+      'DtBgRollo_FechaFab': x.fecha,
+      'DtBgRollo_Maq': x.maquina,
+    }
+    this.dtBgRollosService.Post(info).subscribe(() => {
+      this.listarRolloTabla(info, x);
+      this.msjIngresoExitoso(info);
+    }, error => {
+      this.msjs(`Error`, `Ha ocurrido un error al ingresar el/los rollos | ${error.status} ${error.statusText}`);
+      this.cargando = false;
+    });
+  }
+
+  //Función para 
+  listarRolloTabla(infoPL : any, dataBg : any){
+    let proceso : any = this.procesos2.find(x => x.proceso_Id == infoPL.BgRollo_BodegaIngreso).proceso_Nombre;
+
+    this.rollosIngresar.unshift({
+      'rollo' : infoPL.DtBgRollo_Rollo,
+      'ot' : infoPL.BgRollo_OrdenTrabajo,
+      'cliente' : dataBg.cliente,
+      'item' : infoPL.Prod_Id,
+      'referencia' : dataBg.referencia,
+      'peso' : infoPL.DtBgRollo_Cantidad,
+      'unidad' : infoPL.UndMed_Id,
+      'proceso' : proceso.toUpperCase(),
+      'bodega' : infoPL.BgRollo_BodegaInicial,
+      'ubicacion' : infoPL.DtBgRollo_Ubicacion,
+      'fecha' : infoPL.DtBgRollo_FechaFab,
+      'maquina' : infoPL.DtBgRollo_Maq,
     });
   }
 
   // Funcion que se va a ejecutar cuando se hayan ingresado todos los rollos
-  msjIngresoExitoso(id : number){
-    this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se han ingresado los rollos a la bodega correctamente`);
-    this.createPDF(id, ``)
+  msjIngresoExitoso(data : any){
+    this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.BgRollo_OrdenTrabajo, 'Ultimo_Rollo' : data.DtBgRollo_Rollo, 'Rollo' : null, 'Peso' : data.DtBgRollo_Cantidad, });
+    this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se han ingresado el rollo N° ${data.DtBgRollo_Rollo} a la bodega correctamente`);
+    this.cargando = false;
+    //this.createPDF(id, ``);
   }
 
   createPDF(id : number, action : string) {

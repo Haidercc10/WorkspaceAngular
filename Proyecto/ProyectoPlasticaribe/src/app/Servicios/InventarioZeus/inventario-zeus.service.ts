@@ -119,6 +119,10 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos`);
   }
 
+  GetTodosPedidos() {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getTodosPedidos`);
+  }
+
   getArticulosxCliente(id: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getArticulosxCliente/${id}`);
   }

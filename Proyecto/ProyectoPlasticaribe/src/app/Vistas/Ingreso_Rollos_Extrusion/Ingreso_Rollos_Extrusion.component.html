@@ -126,7 +126,7 @@
   <div class="mb-4">
     <div class="row g-3">
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
-        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de rollos agregados</h4>
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de rollos ingresados</h4>
       </div>
       <!-- <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
         <p-chip label="Rollos Ingresados: {{rollosIngresados}}" id="rollosIngresados" icon="pi pi-check"></p-chip>
@@ -216,7 +216,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="14"><h6 class="bold">No hay rollos agregados.</h6></td>
+            <td colspan="14"><h6 class="bold">No hay rollos ingresados.</h6></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -230,12 +230,12 @@
   </div>
 
   <!-- Botones -->
-  <div *ngIf="!cargando">
+  <!--<div *ngIf="!cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollosIngresar.length == 0" type="button" label="Ingresar Rollos" icon="pi pi-check" (click)="ingresarRollos()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar todo" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
-  </div>
+  </div>-->
 </p-card>
 
 <p-dialog [(visible)]="loadModal" [style]="{width: '60vw'}" [resizable]="false" header="Busqueda de rollos por OT y Peso" [modal]="true">
