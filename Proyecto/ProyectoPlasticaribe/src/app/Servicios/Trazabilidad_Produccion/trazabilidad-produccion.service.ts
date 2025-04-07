@@ -15,6 +15,6 @@ export class TrazabilidadProduccionService {
   
     getId = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/${dato}`);
   
-    getTraceability = (date1 : any, date2 : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getTraceability/${date1}/${date2}`);
+    getTraceability = (date1 : any, date2 : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getTraceability/${date1}/${date2}${url}`);
   
 }
