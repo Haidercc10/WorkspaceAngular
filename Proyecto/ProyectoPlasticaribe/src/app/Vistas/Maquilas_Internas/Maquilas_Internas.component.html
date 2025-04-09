@@ -61,12 +61,20 @@
         </div>
 
         <!--* MAQUINA -->
-        <div class="col-sm-12 col-md-2 col-xl-1">
+        <div class="col-sm-12 col-md-3 col-xl-1">
+          <span class="p-float-label">
+              <p-dropdown formControlName="machine" inputId="machine" [options]="machines" optionLabel="maq_Numero"
+                  optionValue="maq_Numero" [autoDisplayFirst]="false" [required]="true" [filter]="true" filterBy="maq_Numero"></p-dropdown>
+              <label for="maquina">Maquina</label>
+          </span>
+        </div>
+
+        <!--<div class="col-sm-12 col-md-2 col-xl-1">
             <span class="p-float-label">
                 <p-inputNumber formControlName="machine" inputId="Maquina" [required]="true"></p-inputNumber>
                 <label for="Maquina">Maquina</label>
             </span>
-        </div>
+        </div>-->
 
         <!--* OPERARIO -->
         <div class="col-sm-12 col-md-3 col-xl-2">

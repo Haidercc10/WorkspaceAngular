@@ -67,7 +67,7 @@
 
       <!--Saldo-->
       <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
-        <p-checkbox formControlName="saldo" [binary]="true" inputId="binary" id="saldo" (onChange)="habilitarSaldo()"
+        <p-checkbox formControlName="saldo" [binary]="true" inputId="binary" id="saldo" (click)="habilitarSaldo()"
           pTooltip="Al hacer click sobre este check el campo 'Cantidad Und.' será habilitado para casos donde la cantidad del bulto/paquete solo sea un saldo."
           tooltipPosition="top"></p-checkbox>
         <label for="saldo">Saldo</label>
@@ -387,7 +387,7 @@
             <td id="peso" class=""><b>{{data.peso1}}</b></td>
             <td id="operador" class="">{{data.operario}}</td>
             <td id="maquina" class="">{{data.maquina}}</td>
-            <td id="turno" class="">{{data.turno}}</td>
+            <td id="turno" class="">{{data.turno}}</td>|
             <td id="status" class=""><b>{{data.proceso}}</b></td>
             <td id="fecha" class="">{{data.fecha.replace(' 12:00:00 a. m.', '')}} - {{data.hora}}</td>
           </tr>
@@ -396,4 +396,38 @@
       </div>
     </div>
   </ng-template>
-</p-dialog>    
+</p-dialog>   
+
+<p-dialog [(visible)]="modalPassword" [draggable]="false" [style]="{width: '25%'}" header="Solicitud de registro de saldo" [modal]="true" (onHide)="rebootCheckResidues()">
+  <br>
+  <form [formGroup]="form" (ngSubmit)="validatePassword()">
+    <div class="mb-3">
+      <div class="row g-4">
+  
+        <!-- Autoriza -->
+        <div class="col-xs-12">
+          <span class="p-float-label">
+            <input formControlName="user" id="user" type="number" pInputText required />
+            <label for="user">Autoriza</label>
+          </span>
+        </div>
+  
+        <!-- Contraseña -->
+        <div class="col-xs-12">
+          <span class="p-float-label">
+            <p-password formControlName="pass" [feedback]="false" id="pass" [toggleMask]="true" required></p-password>
+            <label for="pass">Contraseña</label>
+          </span>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-danger" type="submit" label="Autorizar" [disabled]="form.invalid" icon="pi pi-check"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="form.reset()"></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </form>
+</p-dialog>   

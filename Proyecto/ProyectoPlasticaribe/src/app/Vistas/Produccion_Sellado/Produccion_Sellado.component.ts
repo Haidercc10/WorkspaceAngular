@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import moment from 'moment';
+import { Password } from 'primeng/password';
 import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { modelTrazabilidad_Produccion } from 'src/app/Modelo/modelTrazabilidad_Produccion';
@@ -16,6 +17,7 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { TrazabilidadProduccionService } from 'src/app/Servicios/Trazabilidad_Produccion/trazabilidad-produccion.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -58,6 +60,8 @@ export class Produccion_SelladoComponent implements OnInit {
   rolls : any = [];
   orderProduction : number = null;
   @ViewChild('dt1') dt1: Table | undefined;
+  modalPassword = false;
+  form !: FormGroup; //Formulario de sellado
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -73,9 +77,11 @@ export class Produccion_SelladoComponent implements OnInit {
     private router : Router,
     private svTraceability : TrazabilidadProduccionService,
     private svProcess : ProcesosService,
+    private svAuthentication: AuthenticationService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
+    this.inicializateFormResidues();
   }
 
   ngOnInit() {
@@ -118,8 +124,22 @@ export class Produccion_SelladoComponent implements OnInit {
     this.formSellado.get('saldo')?.disable();
   }
 
+  inicializateFormResidues(){
+    this.form = this.frmBuilder.group({
+      user: [null, Validators.required],
+      pass: [null, Validators.required],
+    });
+  }
+
   //Función para obtener las maquinas
-  getMachines = () => this.svMachines.getAllMachines().subscribe(data => { this.maquinas = data.filter(x => ['SELLA', 'WIKE'].includes(x.proceso_Id)) }, err => {});
+  getMachines() {
+    this.svMachines.getAllMachines().subscribe(data => { 
+      this.maquinas = data.filter(x => ['SELLA', 'WIKE'].includes(x.proceso_Id)); 
+      this.maquinas.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero)); 
+    }, err => {
+      this.svcMsjs.mensajeError('Error', `No fue posible cargar las maquinas | ${err.status} ${err.statusText}`);
+    });
+  } 
 
   //Función para obtener los procesos.
   getProcess() {
@@ -240,22 +260,82 @@ export class Produccion_SelladoComponent implements OnInit {
     this.clase = ``;
     this.formSellado.get('saldo')?.disable();
     this.cargarTurnoActual();
+    this.getMachines();
     this.cantBultoEstandar = 0;
     this.medida = '';
     if(this.repacking) this.formSellado.patchValue({ 'idOperario': [0]  });
+    this.form.reset();
   }
 
   //Función que filtra la info de la tabla
   aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dtProduccion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //Función que habilita/Deshabilita el campo Cantidad de unidades/paquetes para agregar saldos
-  habilitarSaldo = () => this.esSoloLectura ? this.esSoloLectura = false : this.esSoloLectura = true;
+  habilitarSaldo() {
+    console.log(this.esSoloLectura);
+    if(this.esSoloLectura) {
+      this.loadModal();
+    } else this.esSoloLectura = true;
+  } 
+
+  //Cargar modal para solicitar clave para pesar saldo.
+  loadModal(){
+    this.formSellado.patchValue({ saldo : false });
+    this.form.reset();
+    this.esSoloLectura = false;
+    this.modalPassword = true;
+    this.cargando = true;
+  }
+
+  //Validar que la contraseña ingresada sea correcta.
+  validatePassword(){
+    let user : number = this.form.value.user;
+    let pass : number = this.form.value.pass;
+
+    this.svcUsuarios.getUsuariosxId(user).subscribe(data => {
+      if(data) {
+        if(data[0].usua_Contrasena == pass) { 
+          if([97,96,86,8,94,1,5,12].includes(data[0].rolUsu_Id)) this.msjAuthorized();
+          else this.msjNoAuthorized();
+        } else this.svcMsjs.mensajeError('Error', `Usuario y/o contraseña incorrectos`);
+      } else this.msjNoAuthorized();
+    }, error => {
+      this.svcMsjs.mensajeError('Error', `Usuario y/o contraseña incorrectos | ${error.status} ${error.statusText}`);
+      this.cargando = true;
+    });
+  }
+
+  msjAuthorized(){
+    this.modalPassword = false;
+    this.cargando = false;
+    setTimeout(() => {
+      this.formSellado.patchValue({ saldo : true });
+      this.esSoloLectura = false;
+    }, 500);
+  }
+
+  //Función para enviar un msj de que
+  msjNoAuthorized(){
+    this.warnMsj('Advertencia', 'Debe solicitar permisos para realizar esta acción.');
+    this.cargando = true;
+    this.modalPassword = true;
+  }
+
+  //Función para reiniciar el check de saldos
+  rebootCheckResidues(){
+    this.formSellado.patchValue({ saldo : false });
+    this.esSoloLectura = true;
+    this.modalPassword = false;
+    this.cargando = false;
+  }
 
   //Función que busca la orden de trabajo y carga la información
   buscarOT(validacionDatos: boolean = false, newOT? : boolean) {
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargarTurnoActual();
+    this.getMachines();
+
     if(newOT) this.formSellado.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null});
 
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
@@ -366,6 +446,9 @@ export class Produccion_SelladoComponent implements OnInit {
     let ot : number = this.formSellado.value.ot;
     let oldProcess : any = this.formSellado.value.procesoAnterior;
     let tag : any = this.formSellado.value.etiquetaAsociada;
+    let teoricWeight : number = this.formSellado.value.pesoTeorico;
+    let teoricW5PMost : number = (teoricWeight + ((teoricWeight * 10) / 100));
+    let teoricW5PLess : number = (teoricWeight - ((teoricWeight * 10) / 100));
     this.cargando = true;
     this.getPuertoSerial();
     //this.buscarOT(true);
@@ -381,10 +464,17 @@ export class Produccion_SelladoComponent implements OnInit {
                     if(oldProcess) {
                       if(tag) {
                         if(tag.toString().length >= 6) {
-                          if (this.formSellado.value.cantUnd > 0) {
+                          if (this.formSellado.value.cantUnd > 0) { 
                             if (this.formSellado.value.cantKg > 1 && this.formSellado.value.cantKg <= 65) {
-                              if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
-                              else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
+                              if(this.esSoloLectura) {  
+                                if(this.formSellado.value.cantKg >= teoricW5PLess && this.formSellado.value.cantKg <= teoricW5PMost) {
+                                  if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
+                                  else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
+                                } else this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW5PLess.toFixed(2)} y ${teoricW5PMost.toFixed(2)}!`);
+                              } else {
+                                if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
+                                else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
+                              }
                             } else this.warnMsj(`Advertencia`, `¡La cantidad de kilos debe ser mayor a '1' y menor o igual a 65!`);
                           } else this.warnMsj(`Advertencia`, `¡La cantidad en unidades/paquetes debe ser mayor a '0'!`);
                         } else this.warnMsj(`Advertencia`, `¡La cantidad de digitos del rollo madre debe ser mayor a 5!`);
@@ -424,6 +514,7 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que crea la entrada y alista el post.
   crearEntrada(orden: any, data?: any) {
+    this.getMachines();
     this.cargarTurnoActual();
     this.cargando = true;
     let entrada: modelProduccionProcesos = {

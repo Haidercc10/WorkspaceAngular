@@ -34,7 +34,7 @@ function createWindow() {
       }
       print.print(pdfPath, options).then(success => {
         log.info(pdfPath);
-        setTimeout(() => { deleteFolderRecursively(Os.tmpdir()); }, 3500);
+        setTimeout(() => { deleteFolderRecursively(Os.tmpdir()); }, 4000);
       }).catch(error => log.error(error));
     });
   });

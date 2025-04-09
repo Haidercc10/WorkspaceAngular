@@ -3,12 +3,14 @@ import { Component, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { zip } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { modelMaquilas_Internas } from 'src/app/Modelo/modelMaquilas_Internas';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Maquilas_InternasService } from 'src/app/Servicios/Maquilas_Internas/Maquilas_Internas.service';
+import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -52,6 +54,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   selectedService : any = null;
   reader: any;
   port : SerialPort;
+  machines : any = []
 
   constructor(
     private AppComponent : AppComponent,
@@ -65,7 +68,8 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     private svServicesProduction : Servicios_ProduccionService,
     private svInternalMaquila : Maquilas_InternasService,
     private svPDF : CreacionPdfService,
-    private svMaterials : MaterialProductoService
+    private svMaterials : MaterialProductoService,
+    private svMachines : MaquinasService,
   ) { 
     this.initForm();
   }
@@ -79,17 +83,18 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     this.getServices();
     this.getCurrentTurn();
     this.getMaterials();
-    setTimeout(() => this.buscarPuertos(), 1000);
+    this.getHollidays2025();
+    this.getMachines();
+    //setTimeout(() => this.buscarPuertos(), 1000);
   }
 
   async ngOnDestroy() {
     this.reader.releaseLock();
     this.reader.cancel();
     await this.port.close();
-    console.log('Maquilas')
   }
 
-  chargeSerialPorts() {
+  /*chargeSerialPorts() {
     navigator.serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
@@ -136,32 +141,83 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
         this.reader.releaseLock();
       }
     }
+  }*/
+
+     //Función que obtiene los puertos seriales
+  async getPuertoSerial() {
+    try {
+      const port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      this.cargarDatosPuertoSerial(port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No se encontró una báscula conectada!');
+      else this.msj.mensajeError(ex);
+    }
   }
 
-  getHollidays2024(){
+  //Función que lee los datos del puerto serial
+  async cargarDatosPuertoSerial(port: any) {
+    let reader;
+    let keepReading: boolean = true;
+    setTimeout(async () => {
+      reader.releaseLock();
+      reader.cancel();
+      await port.close();
+    }, 1000);
+    while (port.readable && keepReading) {
+      reader = port.readable.getReader();
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            reader.releaseLock();
+            break;
+          }
+          if (value) {
+            let valor = this.ab2str(value);
+            let tara : number = this.form.value.weightTare;
+            valor = valor.replace(/[^\d.-]/g, '');
+            this.form.patchValue({ 'weight': valor, 'netWeight' : valor - tara });
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        reader.releaseLock();
+      }
+    }
+  } 
+
+  getHollidays2025(){
     this.holidays = [
       "2024-01-01",
-      "2024-01-08",
+      "2024-01-06",
       "2024-03-24",
-      "2024-03-25",
-      "2024-03-28",
-      "2024-03-29",
-      "2024-03-31",
+      "2024-04-17",
+      "2024-04-18",
       "2024-05-01",
-      "2024-05-13",
-      "2024-06-03",
-      "2024-06-10",
-      "2024-07-01",
-      "2024-07-20",
+      "2024-06-02",
+      "2024-06-23",
+      "2024-06-30",
       "2024-08-07",
-      "2024-08-19",
-      "2024-10-14",
-      "2024-11-04",
-      "2024-11-11",
+      "2024-08-18",
+      "2024-10-13",
+      "2024-11-03",
+      "2024-11-17",
       "2024-12-08",
       "2024-12-25",
-   ]
+   ];
   }
+
+  //Función para obtener las maquinas
+  getMachines() {
+    this.svMachines.getAllMachines().subscribe(data => { 
+      this.machines = data.filter(x => x.proceso_Id == 'EMP');
+      this.machines.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero)); 
+    }, err => {
+      this.msj.mensajeError('Error', `No fue posible cargar las maquinas | ${err.status} ${err.statusText}`);
+    });
+  } 
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -202,8 +258,21 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
 
   getConos() {
     this.svConos.GetConos().subscribe(data => {
-      this.conos = data
-      this.conos.sort((a, b) => b.cono_Id.localeCompare(a.cono_Id));
+      this.conos = data;
+      this.conos.forEach(x => {
+        if(x.cono_Id == '3Plg7mm') x.Id = 1;
+        if(x.cono_Id == '3Plg10mm') x.Id = 2;
+        if(x.cono_Id == 'CALYPSO80') x.Id = 3;
+        if(x.cono_Id == 'CALYPCINTA') x.Id = 4;
+        if(x.cono_Id == 'CALYGRIS') x.Id = 5;
+        if(x.cono_Id == '3Plg11mm') x.Id = 6;
+        if(x.cono_Id == '3Plg12mm') x.Id = 7;
+        if(x.cono_Id == '3Plg15mm') x.Id = 8;
+        if(x.cono_Id == '3Plg19mm') x.Id = 9;
+        if(x.cono_Id == '6Plg15mm') x.Id = 10;
+        if(x.cono_Id == 'N/A') x.Id = 11;
+      });
+      this.conos.sort((a, b) => Number(a.Id) - Number(b.Id));
     });
   }
 
@@ -366,33 +435,33 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   addService(){
-    //this.getPuertoSerial();
     this.getCurrentTurn();
     this.load = true;
     let days : number = 0;
     //this.form.patchValue({ 'weight' : 15.9, 'netWeight' : 15.9 - this.form.get('weightTare').value });
-    let weight : number = this.form.get('weight').value;
-    let netWeight : number = this.form.get('netWeight').value;
+    //let weight : number = this.form.get('weight').value;
+    //let netWeight : number = this.form.get('netWeight').value;
     let today : any = moment().format('YYYY-MM-DD');
     let dateSelected : any = moment(this.form.get('date').value).format('YYYY-MM-DD');
 
     days = moment(dateSelected).diff(moment(today), 'days');
 
+    this.getPuertoSerial();
     setTimeout(() => {
       if(this.form.valid) {
-        if(![0, null, undefined, ''].includes(weight)) {
-          if(![0, null, undefined, ''].includes(netWeight)) {
+        //if(![0, null, undefined, ''].includes(weight)) {
+         // if(![0, null, undefined, ''].includes(netWeight)) {
             if(days <= 0) {
               if(this.turn) {
                 this.createInternalMaquila();
                 //this.loadServicesTable(weight, netWeight);
-              } else this.msj.mensajeAdvertencia(`No hay un turno seleccionafo!`);
+              } else this.msj.mensajeAdvertencia(`No hay un turno seleccionado!`);
             } else this.msj.mensajeAdvertencia(`La fecha de servicio no puede ser mayor a la fecha actual`);
-          } else this.msj.mensajeAdvertencia(`El peso neto es inválido!`);
-        } else this.msj.mensajeAdvertencia(`El peso bruto es inválido!`);
+          //} else this.msj.mensajeAdvertencia(`El peso neto es inválido!`);
+        //} else this.msj.mensajeAdvertencia(`El peso bruto es inválido!`);
       } else  this.msj.mensajeAdvertencia(`Diligencie todos los campos!`);
       this.load = false;
-    }, 500);
+    }, 800);
   }
 
   loadServicesTable(weight : number, netWeight : number){
@@ -486,58 +555,61 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     this.selectedService = null;
     
     if(ot == this.dataOrderProduction[0].ot) {
-      this.load = true;
-      let operator : any = this.form.get('operator').value;
-      let service : any = this.form.get('service').value;
-      let nameOperator : any = this.operators.find(x => x.usua_Id == operator).usua_Nombre;
-      let date : any = moment().format('YYYY-MM-DD');
-      let valueService : any = this.holidays.map(x => x).includes(date) ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDomFest : 
-                               this.turn == 'DIA' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDia : 
-                               this.turn == 'NOCHE' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorNoche : 0;
+      //setTimeout(() => {
+        this.load = true;
+        let operator : any = this.form.get('operator').value;
+        let service : any = this.form.get('service').value;
+        let nameOperator : any = this.operators.find(x => x.usua_Id == operator).usua_Nombre;
+        let date : any = moment().format('YYYY-MM-DD');
+        let valueService : any = this.holidays.map(x => x).includes(date) ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDomFest : 
+                                this.turn == 'DIA' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDia : 
+                                this.turn == 'NOCHE' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorNoche : 0;
 
-      this.svInternalMaquila.getLastCodeMaquila().subscribe(code => {
-        let info : modelMaquilas_Internas = {
-          'MaqInt_Codigo': code + 1,
-          'MaqInt_OT': ot,
-          'Prod_Id': this.dataOrderProduction[0].item,
-          'Cono_Id': this.form.value.cono,
-          'Ancho_Cono': this.form.value.broadCono,
-          'Tara_Cono': this.form.value.weightTare,
-          'Peso_Bruto': this.form.value.weight,
-          'Peso_Neto': this.form.value.netWeight,
-          'Cantidad': this.form.value.netWeight,
-          'Presentacion': 'Kg',
-          'MaqInt_Medida': '',
-          'Maquina': this.form.value.machine,
-          'Operario_Id': this.form.value.operator,
-          'MaqInt_Fecha': moment().format('YYYY-MM-DD'),
-          'MaqInt_Hora': moment().format('HH:mm:ss'),
-          'Proceso_Id': 'CORTE',
-          'Estado_Id': 41,
-          'SvcProd_Id': this.form.value.service,
-          'MaqInt_FechaRegistro': moment().format('YYYY-MM-DD'),
-          'MaqInt_HoraRegistro': moment().format('HH:mm:ss'),
-          'Creador_Id': this.storage_Id,
-          'MaqInt_Observacion': this.form.value.observation,
-          'Material_Id': this.dataOrderProduction[0].materialId,
-          'Turno_Id': this.turn,
-          'Impreso': this.dataOrderProduction[0].printed,
-          'MaqInt_ValorPago': valueService
-        }
-        this.svInternalMaquila.Post(info).subscribe(data => {
-          this.selectedService = data.svcProd_Id;
-          let info : any = { 'ot': data.maqInt_OT, 'service' : data.svcProd_Id, 'machine' : data.maquina, 'operator' : data.operario_Id, 'cono' : data.cono_Id }
-          this.msj.mensajeConfirmacion(`Confirmación`, `Se creó el servicio de maquila interna de ${nameOperator} exitosamente!`);
-          this.researchOT(info);
-          //this.createPDF(code + 1, info, 'creado');
+        this.svInternalMaquila.getLastCodeMaquila().subscribe(code => {
+          let info : modelMaquilas_Internas = {
+            'MaqInt_Codigo': code + 1,
+            'MaqInt_OT': ot,
+            'Prod_Id': this.dataOrderProduction[0].item,
+            'Cono_Id': this.form.value.cono,
+            'Ancho_Cono': this.form.value.broadCono,
+            'Tara_Cono': this.form.value.weightTare,
+            'Peso_Bruto': this.form.value.weight,
+            'Peso_Neto': this.form.value.netWeight,
+            'Cantidad': this.form.value.netWeight,
+            'Presentacion': 'Kg',
+            'MaqInt_Medida': '',
+            'Maquina': this.form.value.machine,
+            'Operario_Id': this.form.value.operator,
+            'MaqInt_Fecha': moment().format('YYYY-MM-DD'),
+            'MaqInt_Hora': moment().format('HH:mm:ss'),
+            'Proceso_Id': 'CORTE',
+            'Estado_Id': 41,
+            'SvcProd_Id': this.form.value.service,
+            'MaqInt_FechaRegistro': moment().format('YYYY-MM-DD'),
+            'MaqInt_HoraRegistro': moment().format('HH:mm:ss'),
+            'Creador_Id': this.storage_Id,
+            'MaqInt_Observacion': this.form.value.observation,
+            'Material_Id': this.dataOrderProduction[0].materialId,
+            'Turno_Id': this.turn,
+            'Impreso': this.dataOrderProduction[0].printed,
+            'MaqInt_ValorPago': valueService
+          }
+          this.svInternalMaquila.Post(info).subscribe(data => {
+            this.selectedService = data.svcProd_Id;
+            let info : any = { 'ot': data.maqInt_OT, 'service' : data.svcProd_Id, 'machine' : data.maquina, 'operator' : data.operario_Id, 'cono' : data.cono_Id }
+            this.msj.mensajeConfirmacion(`Confirmación`, `Se creó el servicio de maquila interna de ${nameOperator} exitosamente!`);
+            this.researchOT(info);
+            //this.createPDF(code + 1, info, 'creado');
+          }, error => {
+            this.msj.mensajeError(`Error`, `No fue posible crear el servicio de maquila | ${error.status} ${error.statusText}`);
+            this.load = false;
+          });
         }, error => {
-          this.msj.mensajeError(`Error`, `No fue posible crear el servicio de maquila | ${error.status} ${error.statusText}`);
-          this.load = false;
+            this.msj.mensajeError(`Error`, `Error al obtener el último consecutivo de maquilas. | ${error.status} ${error.statusText}`);
+            this.load = false;
         });
-      }, error => {
-          this.msj.mensajeError(`Error`, `Error al obtener el último consecutivo de maquilas. | ${error.status} ${error.statusText}`);
-          this.load = false;
-      });                         
+      //}, 500);
+                               
     } else this.msj.mensajeAdvertencia(`La OT del servicio no coincide con la Información de la Orden de Producción!`);
   }
 

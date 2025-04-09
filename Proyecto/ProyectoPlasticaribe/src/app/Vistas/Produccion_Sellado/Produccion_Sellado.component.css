@@ -3,6 +3,10 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
     width: 100%;
 }
 
+p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
+  width: 100%;
+}
+
 ::ng-deep .p-multiselect {
     width: 100%;
 }

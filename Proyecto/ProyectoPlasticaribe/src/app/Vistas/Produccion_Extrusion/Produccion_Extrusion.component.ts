@@ -124,14 +124,22 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.getProcess();
     this.validarProceso();
     this.obtenerOperarios();
-    setTimeout(() => {
-      this.buscarPuertos()
+    //setTimeout(() => {
+      //this.buscarPuertos()
       this.getMachines();
-    }, 1000); 
+    //}, 1000); 
   }
 
   //Función para obtener las maquinas
-  getMachines = () => this.svMachines.getAllMachines().subscribe(data => { this.maquinas = data.filter(x => x.proceso_Id == this.validateProcess()) }, err => {});
+  //Función para obtener las maquinas
+  getMachines() {
+    this.svMachines.getAllMachines().subscribe(data => { 
+      this.maquinas = data.filter(x => x.proceso_Id == this.validateProcess());
+      this.maquinas.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero)); 
+    }, err => {
+      this.msj.mensajeError('Error', 'No fue posible cargar las maquinas');
+    });
+  } 
 
   async ngOnDestroy() {
     this.reader.releaseLock();
@@ -145,9 +153,14 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.msj.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
   }
 
-  warinigMessage(message: string) {
+  warinigMessage(message: string, production?) {
     this.cargando = false;
     this.msj.mensajeAdvertencia(message);
+    production ? this.clearWeight() : null;
+  }
+
+  clearWeight(){
+    this.formDatosProduccion.patchValue({ 'pesoBruto' : null, 'pesoNeto' : null, })
   }
 
   exitMessage(message: string) {
@@ -190,7 +203,53 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     //console.log(this.proceso);
   }
 
-  chargeSerialPorts() {
+  //Función que obtiene los puertos seriales
+  async getPuertoSerial() {
+    try {
+      const port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      this.cargarDatosPuertoSerial(port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No se encontró una báscula conectada!');
+      else this.msj.mensajeError(ex);
+    }
+  }
+
+  //Función que lee los datos del puerto serial
+  async cargarDatosPuertoSerial(port: any) {
+    let reader;
+    let keepReading: boolean = true;
+    setTimeout(async () => {
+      reader.releaseLock();
+      reader.cancel();
+      await port.close();
+    }, 1000);
+    while (port.readable && keepReading) {
+      reader = port.readable.getReader();
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            reader.releaseLock();
+            break;
+          }
+          if (value) {
+            let valor = this.ab2str(value);
+            let tara : number = this.formDatosProduccion.value.pesoTara;
+            valor = valor.replace(/[^\d.-]/g, '');
+            this.formDatosProduccion.patchValue({ 'pesoBruto': valor, 'pesoNeto' : valor - tara });
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        reader.releaseLock();
+      }
+    }
+  }
+
+  //3
+  /*chargeSerialPorts() {
     navigator.serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
@@ -198,6 +257,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     });
   }
 
+  //1
   async buscarPuertos() {
     this.port = await navigator.serial.requestPort();
     try {
@@ -209,6 +269,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }
   }
 
+  //2
   async chargeDataFromSerialPort(port: SerialPort) {
     let keepReading: boolean = true;
     while (port.readable && keepReading) {
@@ -237,7 +298,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         this.reader.releaseLock();
       }
     }
-  }
+  }*/
 
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
@@ -248,6 +309,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
     this.formDatosProduccion.reset();
     this.formDatosProduccion.patchValue({ mostratDatosProducto: mostratDatosProducto });
+    this.getMachines();
     this.obtenerTurnos();
     this.datosOrdenTrabajo = [];
     this.rollosPesados = [];
@@ -324,8 +386,21 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   obtenerConos() {
     this.conosService.GetConos().subscribe(data => {
-      this.conos = data
-      this.conos.sort((a, b) => b.cono_Id.localeCompare(a.cono_Id));
+      this.conos = data;
+      this.conos.forEach(x => {
+        if(x.cono_Id == '3Plg7mm') x.Id = 1;
+        if(x.cono_Id == '3Plg10mm') x.Id = 2;
+        if(x.cono_Id == 'CALYPSO80') x.Id = 3;
+        if(x.cono_Id == 'CALYPCINTA') x.Id = 4;
+        if(x.cono_Id == 'CALYGRIS') x.Id = 5;
+        if(x.cono_Id == '3Plg11mm') x.Id = 6;
+        if(x.cono_Id == '3Plg12mm') x.Id = 7;
+        if(x.cono_Id == '3Plg15mm') x.Id = 8;
+        if(x.cono_Id == '3Plg19mm') x.Id = 9;
+        if(x.cono_Id == '6Plg15mm') x.Id = 10;
+        if(x.cono_Id == 'N/A') x.Id = 11;
+      });
+      this.conos.sort((a, b) => Number(a.Id) - Number(b.Id));
     });
   }
 
@@ -377,6 +452,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   buscraOrdenTrabajo(consulta? : boolean) {
     this.reference = ``;
     this.obtenerTurnos();
+    this.getMachines();
     this.validarProceso();
     if (this.formDatosProduccion.value.proceso) {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
@@ -470,12 +546,12 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   validarDatos() {
     //this.buscraOrdenTrabajo();
-    console.log(this.formDatosProduccion)
     let ot : any = this.formDatosProduccion.value.ordenTrabajo;
     let oldProcess : any = this.formDatosProduccion.value.procesoAnterior;
     let tag : any = this.formDatosProduccion.value.etiquetaAsociada;
     this.cargando = true;
-    
+    this.getPuertoSerial();
+
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {
@@ -493,11 +569,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
                               } else {
                                 this.searchOldTag(tag, oldProcess);
                               } 
-                            } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`);
-                          } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`);
-                        } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`);
-                      } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`);
-                    } else this.warinigMessage(`¡El peso neto debe ser menor a '65' en el proceso de EMPAQUE!`); 
+                            } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`, true);
+                          } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`, true);
+                        } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`, true);
+                      } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`, true);
+                    } else this.warinigMessage(`¡El peso neto debe ser menor a '65' en el proceso de EMPAQUE!`, true); 
                   } else {
                     if(this.formDatosProduccion.value.proceso == 'EXT') {
                       this.guardarProduccion(); 
@@ -511,17 +587,17 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
                               } else {
                                 this.searchOldTag(tag, oldProcess);
                               } 
-                            } else this.warinigMessage(`¡Debe digitar un ancho de item válido!`);
-                          } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`);
-                        } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`);
-                      } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`);
+                            } else this.warinigMessage(`¡Debe digitar un ancho de item válido!`, true);
+                          } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`, true);
+                        } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`, true);
+                      } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`, true);
                     }
                   } 
-              } else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!`);
-            } else this.warinigMessage(`¡La maquina no puede ser cero (0)!`);
-          } else this.warinigMessage(`¡La OT que desea registrar no coincide con la consultada previamente!`);
-        } else this.warinigMessage(`¡Todos los campos   deben estar diligenciados!`);
-      } else this.warinigMessage(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
+              } else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!, true`);
+            } else this.warinigMessage(`¡La maquina no puede ser cero (0)!`, true);
+          } else this.warinigMessage(`¡La OT que desea registrar no coincide con la consultada previamente!`, true);
+        } else this.warinigMessage(`¡Todos los campos   deben estar diligenciados!`, true);
+      } else this.warinigMessage(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`, true);
     }, 500);
   }
 
@@ -529,9 +605,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   searchOldTag(tag : number, process : any){
     this.bagproService.getRollProduction(tag, `?process=${this.changeNameProcess(process)}`).subscribe(data => {
       if(data) this.guardarProduccion(data);
-      else this.warinigMessage(`La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`);
+      else this.warinigMessage(`La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`, true);
     }, error => {
-      this.warinigMessage(`No se encontró información de la etiqueta asociada | ${error.status} ${error.statusText}`);
+      this.warinigMessage(`No se encontró información de la etiqueta asociada | ${error.status} ${error.statusText}`, true);
     });
   }
 
