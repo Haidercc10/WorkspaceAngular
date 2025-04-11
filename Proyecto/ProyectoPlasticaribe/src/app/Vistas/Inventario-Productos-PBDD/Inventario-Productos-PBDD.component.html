@@ -1055,10 +1055,73 @@
       </ng-template>
       <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
         <tr>
-          <td>{{rowIndex + 1}}</td>
+          <td>
+            <button type="button" pButton pRipple [pRowToggler]="data" (click)="loadInfoComparative(data)" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+            <span class="font-bold">
+              {{rowIndex + 1}}
+            </span>
+          </td>
           <td *ngFor="let col of selectedColumnsComparative" [ngClass]="{'colorExis': col.header == 'Existencia',
             'colorQuantityProduction': col.header == 'Área',
             'colorTotalQuantity': col.header == 'Exis. Total'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="rowexpansion" let-data>
+        <tr>
+          <td colspan="23">
+            <div class="p-3">
+              <p-table
+                [value]="data.AvaibleProdution"
+                dataKey="factura"
+                styleClass="p-datatable-gridlines p-datatable-sm"
+                [scrollable]="true"
+                scrollHeight="30rem">
+
+                <ng-template pTemplate="header">
+                   <tr>
+                    <th class="text-center"></th>
+                    <th class="text-center" colspan="2">Información Orden de Trabajo</th>
+                    <th class="text-center" colspan="3"><b class="textBlue">Despacho</b></th>
+                    <th class="text-center" colspan="3"><b class="textYellow">Área Producción</b></th>
+                    <th class="text-center" colspan="2">Datos</th>
+                  </tr>
+                  <tr>
+                    <th>#</th>
+                    <th>OT</th>
+                    <th>Cliente</th>
+                    <th>Stock</th>
+                    <th>Unidades Producto</th>
+                    <th>Peso Bruto</th>
+                    <th>Stock</th>
+                    <th>Unidades Producto</th>
+                    <th>Peso Bruto</th>
+                    <th>Presentación</th>
+                    <th>Proceso</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                  <tr>
+                    <td>{{rowIndex + 1}}</td>
+                    <td>{{details.orderProduction}}</td>
+                    <td>{{details.client}}</td>
+                    <td><b class="textBlue">{{(details.stock) | number : '1.2-2'}}</b> </td>
+                    <td><b class="textBlue">{{(details.countStock)}}</b> </td>
+                    <td><b class="textBlue">{{details.gross_Weight | number : '1.2-2'}}</b></td>
+                    <td><b class="textYellow">{{(details.inArea) | number : '1.2-2'}}</b> </td>
+                    <td><b class="textYellow">{{(details.countInArea)}}</b> </td>
+                    <td><b class="textYellow">{{details.gross_Weight_Prod | number : '1.2-2'}}</b></td>
+                    <td>{{details.presentation}}</td>
+                    <td>{{details.process}}</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="11">No se encontraron registros</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </td>
         </tr>
       </ng-template>
       <ng-template *ngIf="![86,4].includes(ValidarRol)" pTemplate="footer">

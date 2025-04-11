@@ -270,6 +270,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   fillAvaibleProduction(data: any): Array<AvaibleProdution> {
+    console.log(data);
     let AvaibleProdution: Array<AvaibleProdution> = [];
     data.forEach(stock => {
       AvaibleProdution.push({
@@ -284,10 +285,19 @@ export class InventarioProductosPBDDComponent implements OnInit {
         Turn: stock.turn.turno_Nombre,
         Information: stock.information,
         orderProduction: stock.orderProduction,
+        client : stock.client,
       });
     });
     return AvaibleProdution;
   }
+
+  groupInfoAvailableByOt(data){
+    let info : any = this.fillAvaibleProduction(data).reduce((a,b) => {
+      if(!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+      return a;
+    }, [])
+    return info;
+   }
 
   fillActualMonth(data: any): number {
     let month: number = moment().month();
@@ -371,7 +381,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   //Función para cargar los rollos que se cargarán en cuanto se seleccione una fila 
   loadInfoRollsAvailables(data : any){
-    this.loaded = true;
+    this.loaded = true; 
     this.svProductionProcess.getRollsAvailablesForItem(data.item).subscribe(dataRolls => {
       let index : number = this.stockInformation.findIndex(x => x.item == data.item);
       this.stockInformation[index].AvaibleProdution = this.fillAvaibleProduction(dataRolls);
@@ -414,6 +424,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }, error => {
       this.msg.mensajeAdvertencia(``, `No se pudo obtener información del item N° ${data.item}`);
     })
+  }
+
+  loadInfoComparative(data){
+    console.log(data);
+    this.loaded = true;
+    this.svProductionProcess.getRollsAvailables(data.item).subscribe(dataStock => {
+      let index : number = this.comparativeStock.findIndex(x => x.item == data.item);
+      this.comparativeStock[index].AvaibleProdution = dataStock;
+      this.loaded = false;
+    }, error => { this.msjs(`Error`, `No se pudo obtener información del item N° ${data.item}.`); });
+    
   }
 
   //DES-USO
@@ -1067,10 +1088,11 @@ interface AvaibleProdution {
   Process: string,
   Date: any,
   Hour: string,
-  Price: number,
+  Price: number,  
   Turn: string,
   Information: string,
   orderProduction: number,
+  client? : string;
 }
 
 interface Columns {

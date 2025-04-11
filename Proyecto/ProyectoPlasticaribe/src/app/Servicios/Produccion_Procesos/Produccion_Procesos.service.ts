@@ -32,6 +32,8 @@ export class Produccion_ProcesosService {
   //Inventario de rollos disponibles en despacho, en el area y rollos pre entregados.  
   getRollsAvailablesForItem = (item: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRollsAvailablesForItem/${item}`);
 
+  getRollsAvailables = (item: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRollsAvailables/${item}`);
+
   getRollsInAreaForItem = (item: number, process : string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRollsInAreaForItem/${item}/${process}`);
 
   getRollsPreDeliveredForItem = (item: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRollsPreDeliveredForItem/${item}`);
