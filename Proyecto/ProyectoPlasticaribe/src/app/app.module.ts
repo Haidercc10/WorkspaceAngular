@@ -242,6 +242,7 @@ import { Diferencias_InventarioComponent } from './Vistas/Diferencias_Inventario
 import { ReporteClientesComponent } from './Vistas/reporte-clientes/reporte-clientes.component';
 import { RollosPesadosComponent } from './Vistas/rollos-pesados/rollos-pesados.component';
 import { MovTrazabilidadProduccionComponent } from './Vistas/mov-trazabilidad-produccion/mov-trazabilidad-produccion.component';
+import { SolicitudRollosAreasComponent } from './Vistas/solicitud-rollos-areas/solicitud-rollos-areas.component';
 
 @NgModule({
   declarations: [
@@ -403,7 +404,8 @@ import { MovTrazabilidadProduccionComponent } from './Vistas/mov-trazabilidad-pr
     Diferencias_InventarioComponent,
     ReporteClientesComponent,
     RollosPesadosComponent,
-    MovTrazabilidadProduccionComponent
+    MovTrazabilidadProduccionComponent,
+    SolicitudRollosAreasComponent
   ],
 
   imports: [

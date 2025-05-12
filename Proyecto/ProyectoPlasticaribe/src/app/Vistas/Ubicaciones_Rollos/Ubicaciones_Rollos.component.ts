@@ -86,7 +86,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
     })
   }
 
-  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 121, 3124, 115, 113, 3145, 3142].includes(x.usua_Id)); });
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 3139, 123456789, 121, 115, 113, 3142, 3123, 101, 7676].includes(x.usua_Id)); });
 
   //Leer storage del navegador.
   readStorage() {

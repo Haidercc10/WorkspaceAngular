@@ -10,6 +10,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
@@ -36,6 +37,10 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   modalFails : boolean = false;
   rollsToDelete : Array<rollsToDelete> = []; 
   arrayDiscardRolls : Array<modelRollosDesechos> = [];
+  users : any = [];
+  storage_Id: number;
+  storage_Name: number;
+  validateRole: number;
 
   constructor(private AppComponent : AppComponent,
     private frmBld : FormBuilder,
@@ -45,17 +50,30 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     private svcMsg : MessageService,
     private failsService : FallasTecnicasService,
     private svDiscardRolls : SrvRollosEliminadosService, 
-    private svBagPro : BagproService) {
+    private svBagPro : BagproService, 
+    private svUsers : UsuarioService,
+  ) {
     this.initForm();
     this.selectedMode = this.AppComponent.temaSeleccionado; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   }
 
   ngOnInit() {
+    this.readStorage();
     this.getProcess();
     this.getFails();
     this.loadRankDates();
+    this.getUsers();
     //this.msjAuthorizeDeleteRolls();
   }
+
+  //Leer storage del navegador.
+  readStorage() {
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Name = this.AppComponent.storage_Nombre;
+    this.validateRole = this.AppComponent.storage_Rol;
+  }
+
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 3139, 123456789, 121, 115, 113, 3142, 3123, 101, 7676, 3130, 114, 116].includes(x.usua_Id)); });
 
   //Función para cargar fechas en el rango.
   loadRankDates(){
@@ -72,6 +90,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
       OT : [null],
       Falla : [null, Validators.required],
       Observacion : [null],
+      user : [null, Validators.required],
     });
   }
 
@@ -102,11 +121,12 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
         this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de busqueda!`);
         this.load = false;
       });
-    } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe elegir el motivo de la eliminación!`);
+    } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar los campos 'Autoriza' y 'Motivo'!`);
   }
 
   loadTable(data : any, ){
     let falla : any = this.form.value.Falla;
+    let autoriza : any = this.form.value.user;
     let observacion : any = this.form.value.Observacion
      data.forEach(x => {
       if(!this.rolls.map(z => z.numeroRollo_BagPro).includes(x.numeroRollo_BagPro)) {
@@ -142,7 +162,9 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
           'presentacion': x.presentacion,
           'proceso_Nombre': x.proceso_Nombre,
           'falla' : falla,
-          'observacion' : observacion
+          'observacion' : observacion,
+          'autoriza' : autoriza,
+          'elimina' : this.storage_Id,
         });
       }
     });
@@ -235,7 +257,9 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
         'Rollo_FechaEliminacion' : moment().format('YYYY-MM-DD'),
         'Rollo_HoraEliminacion' : moment().format('HH:mm:ss'),
         'Rollo_Observacion' : x.observacion,
-        'Falla_Id' : x.falla
+        'Falla_Id' : x.falla,
+        'UsuaElimina_Id' : x.elimina,
+        'UsuaAutoriza_Id' : x.autoriza,
       })
     });
   }

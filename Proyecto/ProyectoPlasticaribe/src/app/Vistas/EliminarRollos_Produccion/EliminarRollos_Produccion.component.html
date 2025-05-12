@@ -40,12 +40,20 @@
         <div class="row g-3">
 
           <!--Rango fechas-->  
-          <div class="col-sm-12 col-md-6 col-xl-3">
+          <div class="col-sm-12 col-md-6 col-xl-2">
             <span class="p-float-label">
               <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true"></p-calendar>
               <label for="fecha">Rango de Fechas</label>
             </span>
           </div>  
+
+          <!--* Usuario -->
+          <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre" optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+              <label for="user">Usuario Autoriza*</label>
+            </span>
+          </div>
 
           <!-- Bodega -->
           <div class="col-sm-12 col-md-6 col-xl-2">
@@ -56,7 +64,7 @@
           </div>
 
           <!-- Motivo -->
-          <div class="col-sm-12 col-md-6 col-xl-3">
+          <div class="col-sm-12 col-md-6 col-xl-2">
             <span class="p-float-label">
               <p-dropdown formControlName="Falla" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
               <label for="Falla">Motivo*</label>
@@ -127,45 +135,47 @@
           <ng-template pTemplate="header">
             <tr>
                 <th></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'ot', 'contains')"></th>
+                <th></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'numeroRollo_BagPro', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'ot', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'prod_Id', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'prod_Nombre', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'cantidad', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'presentacion', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'fecha', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'proceso_Nombre', 'contains')"></th>
-                <th></th>
             </tr>
             <tr>
+              <th class="text-center" style="width: 3rem">
+                <p-tableHeaderCheckbox (click)="selectAllRolls()" id="elegirRollos" pTooltip="Selecciona todos los rollos consultados"></p-tableHeaderCheckbox>
+              </th>
               <th class="text-center" scope="col">#</th>
-              <th class="text-center" scope="col">OT</th>
+              
               <th class="text-center" scope="col">N° Bulto</th>
+              <th class="text-center" scope="col">OT</th>
               <th class="text-center" scope="col">Item</th>
               <th class="text-center" scope="col">Referencia</th>
               <th class="text-center" scope="col">Cantidad</th>
               <th class="text-center" scope="col">Presentacion</th>
               <th class="text-center" scope="col">Fecha Ingreso</th>
               <th class="text-center" scope="col">Proceso</th>
-              <th class="text-center" style="width: 3rem">
-                <p-tableHeaderCheckbox (click)="selectAllRolls()" id="elegirRollos" pTooltip="Selecciona todos los rollos consultados"></p-tableHeaderCheckbox>
-              </th>
+              
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-roll let-rowIndex="rowIndex">
             <tr>
-                <td class="text-center">{{rowIndex + 1}}</td>
-                <td class="text-center">{{roll.ot}}</td>
-                <td class="text-center">{{roll.numeroRollo_BagPro}}</td>
-                <td class="text-center">{{roll.prod_Id}}</td>
-                <td>{{roll.prod_Nombre}}</td>
-                <td class="text-center">{{ ['Paquete', 'Und'].includes(roll.presentacion) ? roll.cantidad : roll.peso_Neto | number: '1.2-2'}}</td>
-                <td class="text-center">{{roll.presentacion}}</td>
-                <td class="text-center">{{roll.fecha | date : 'dd/MM/YYYY'}}</td>
-                <td class="text-center">{{roll.proceso_Nombre}}</td>
                 <td>
                   <p-tableCheckbox [value]="roll" (click)="loadRollInsert(roll)" pTooltip="Seleccionar Rollo N° {{roll.numeroRollo_BagPro}}"></p-tableCheckbox>
                 </td>
+                <td class="text-center">{{rowIndex + 1}}</td>
+                <td class="text-center">{{roll.numeroRollo_BagPro}}</td>
+                <td class="text-center">{{roll.ot}}</td>
+                <td class="text-center">{{roll.prod_Id}}</td>
+                <td>{{roll.prod_Nombre}}</td>
+                <td class="text-center">{{ ['Paquete', 'Und'].includes(roll.presentacion) ? ['Sellado'].includes(roll.proceso_Nombre) ? roll.cantidad : roll.peso_Neto : roll.peso_Neto | number: '1.2-2'}}</td>
+                <td class="text-center">{{roll.presentacion}}</td>
+                <td class="text-center">{{roll.fecha | date : 'dd/MM/YYYY'}}</td>
+                <td class="text-center">{{roll.proceso_Nombre}}</td>
             </tr>
           </ng-template>
         </p-table>
@@ -199,45 +209,47 @@
           <ng-template pTemplate="header">
             <tr>
                 <th></th>
-                <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'ot', 'contains')"></th>
+                <th></th>
+                
                 <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'numeroRollo_BagPro', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'ot', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'prod_Id', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'prod_Nombre', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'cantidad', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'presentacion', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'fecha', 'contains')"></th>
                 <th><input pInputText style="width: 100%;" (input)="applyFilter2($event, 'proceso_Nombre', 'contains')"></th>
-                <th></th>
             </tr>
             <tr>
+              <th style="width: 3rem">
+                <p-tableHeaderCheckbox (click)="quitAllRolls()" id="" pTooltip="Quitar todos los rollos a eliminar"></p-tableHeaderCheckbox>
+              </th>
               <th class="text-center" scope="col">#</th>
-              <th class="text-center" scope="col">OT</th>
               <th class="text-center" scope="col">N° Bulto</th>
+              <th class="text-center" scope="col">OT</th>
               <th class="text-center" scope="col">Item</th>
               <th class="text-center" scope="col">Referencia</th>
               <th class="text-center" scope="col">Cantidad</th>
               <th class="text-center" scope="col">Presentación</th>
               <th class="text-center" scope="col">Fecha Ingreso</th>
               <th class="text-center" scope="col">Proceso</th>
-              <th style="width: 3rem">
-                <p-tableHeaderCheckbox (click)="quitAllRolls()" id="" pTooltip="Quitar todos los rollos a eliminar"></p-tableHeaderCheckbox>
-              </th>
+              
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-rollsIns let-rowIndex="rowIndex">
             <tr>
+              <td>
+                <p-tableCheckbox [value]="rollsIns" (click)="quitRollInsert(rollsIns)" pTooltip="Quitar el rollo N° {{rollsIns.numeroRollo_BagPro}} de la tabla" ></p-tableCheckbox>
+              </td>
               <td class="text-center">{{rowIndex + 1}}</td>
-              <td class="text-center">{{rollsIns.ot}}</td>
               <td class="text-center">{{rollsIns.numeroRollo_BagPro}}</td>
+              <td class="text-center">{{rollsIns.ot}}</td>
               <td class="text-center">{{rollsIns.prod_Id}}</td>
               <td>{{rollsIns.prod_Nombre}}</td>
               <td class="text-center">{{['Paquete', 'Und'].includes(rollsIns.presentacion) ? rollsIns.cantidad : rollsIns.peso_Neto | number: '1.2-2'}}</td>
               <td class="text-center">{{rollsIns.presentacion}}</td>
               <td class="text-center">{{rollsIns.fecha | date : 'dd/MM/yyyy' }}</td>
               <td class="text-center">{{rollsIns.proceso_Nombre}}</td>
-              <td>
-                <p-tableCheckbox [value]="rollsIns" (click)="quitRollInsert(rollsIns)" pTooltip="Quitar el rollo N° {{rollsIns.numeroRollo_BagPro}} de la tabla" ></p-tableCheckbox>
-              </td>
             </tr>
           </ng-template>
         </p-table>

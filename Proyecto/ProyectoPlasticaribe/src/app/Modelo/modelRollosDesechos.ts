@@ -22,8 +22,10 @@ export interface modelRollosDesechos {
   Proceso_Id: string;
   Turno_Id : string;
   Estado_Id : number;
-  Rollo_FechaEliminacion : any;
+  Rollo_FechaEliminacion : any; 
   Rollo_HoraEliminacion : string;
   Rollo_Observacion : string;
   Falla_Id : string;
+  UsuaElimina_Id : number;
+  UsuaAutoriza_Id : number;
 }

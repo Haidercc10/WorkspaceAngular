@@ -341,24 +341,28 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   //Función para validar la información que se va a guardar.
   validateInformation(){
     if(this.form.valid) {
+      let rolls : any = [];
+      let creditNote : boolean = this.form.value.creditNote;
+
       if(this.productionSelected.length > 0) {
-        if(this.qtyRollsDv == this.productionSelected.length) this.updateRollsInProduction();
+        this.productionSelected.forEach(x => { 
+          rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : creditNote ? true : x.statusId == 19 ? false : true });
+        });
+        if(this.qtyRollsDv == this.productionSelected.length) this.updateRollsInOrderFact(rolls); //this.updateRollsInProduction();
         else this.msg.mensajeAdvertencia(`La cantidad de bultos/rollos seleccionados no coincide con la cantidad de bultos de la devolución!`);
       } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar al menos un bulto!`);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe llenar todos los campos!`);
   }
 
   //Función para actualizar el estado de los bultos en producción procesos.
-  updateRollsInProduction(){
-    let creditNote : boolean = this.form.value.creditNote;
-    this.load = true;
-    let rolls : any = [];
+  updateRollsInProduction(rolls){
     if(this.productionSelected.length > 0) {
-      this.productionSelected.forEach(x => { 
-        rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : creditNote ? true : x.statusId == 19 ? false : true });
+      rolls.forEach(x => {
+        if(x.newStatus == 33) x.newStatus = 19;
+        else x.newStatus = x.newStatus;
       });
       this.svProduction.putChangeStateProduction(rolls).subscribe(data => {
-        this.updateRollsInOrderFact(rolls);
+        this.updateStatusDev();
       }, error => {
         this.msg.mensajeError('No fue posible actualizar el estado de los bultos a DISPONIBLE!', error);
         this.load = false;
@@ -368,13 +372,14 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
 
   //Función para actualizar el estado de los bultos en orden de facturación.
   updateRollsInOrderFact(rolls){
+    this.load = true;
     let order : any = this.form.value.orderFact;
     rolls.forEach(x => {
       if(x.newStatus == 19) x.newStatus = 33;
       else x.newStatus = x.newStatus;
     });
     this.dtOrderFactService.putStatusRollInOrderFact(rolls, order).subscribe(data => {
-      this.updateStatusDev();
+      this.updateRollsInProduction(rolls);
     }, error => {
       this.msg.mensajeError('No fue posible actualizar el estado de los bultos en la orden de facturación!', error);
       this.load = false;
@@ -390,7 +395,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
     let status : number;
     status = this.qtyRollsDv == this.productionSelected.length ? reposition ? 38 : 18 : 29;
-    this.load = true;
+    //this.load = true;
 
     this.svDevolutions.PutStatusDevolution(dev, status, date, hour, this.storage_Id, observation).subscribe(data => {
       this.createPDF(dev, 'actualizada');

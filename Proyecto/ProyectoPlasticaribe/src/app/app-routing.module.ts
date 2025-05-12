@@ -75,6 +75,7 @@ export const routes: Routes = [
   { path: 'Inventario-Bodegas-Rollos', loadChildren: () => import('./Modules/inventario-bodegas-rollos/inventario-bodegas-rollos.module').then(m => m.InventarioBodegasRollosModule) },
   { path: 'mov-bodega-rollos', loadChildren: () => import('./Modules/mov-bodega-rollos/mov-bodega-rollos.module').then(m => m.MovBodegaRollosModule) },
   { path: 'asignacion-rollos-ot', loadChildren: () => import('./Modules/asignacion-rollos-ot/asignacion-rollos-ot.module').then(m => m.AsignacionRollosOtModule) },
+  { path: 'solicitud-rollos-areas', loadChildren: () => import('./Modules/solicitud-rollos-areas/solicitud-rollos-areas.module').then(m => m.SolicitudRollosAreasModule) },
   
   // {path: 'AsignacionRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
   // {path: 'ReporteRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.

@@ -310,7 +310,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   calcularPrecio() {
     let total : number = 0;
     this.ArrayMateriaPrima.filter((data) => !data.Exits).reduce((a, b) => {
-      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) total += (b.Cantidad_Faltante_Editar * this.promedioCantidadCono(b.Nombre)) * b.Precio;
+      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) total += (b.Cantidad_Faltante_Editar /** this.promedioCantidadCono(b.Nombre))*/ * b.Precio);
       else total += (b.Cantidad_Faltante_Editar * b.Precio);
       return total; 
     }, 0);
@@ -321,7 +321,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   calcularSubtotal(id : any){
     let total : number = 0;
     this.ArrayMateriaPrima.filter((data) => !data.Exits && data.Id == id).reduce((a, b) => {
-      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) a += (b.Cantidad_Faltante_Editar * this.promedioCantidadCono(b.Nombre)) * b.Precio;
+      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) a += (b.Cantidad_Faltante_Editar /** this.promedioCantidadCono(b.Nombre))*/ * b.Precio);
       else a += (b.Cantidad_Faltante_Editar * b.Precio);
       total = a;
       return a; 

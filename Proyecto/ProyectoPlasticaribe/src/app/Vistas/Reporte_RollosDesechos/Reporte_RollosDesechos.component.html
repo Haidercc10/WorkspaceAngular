@@ -125,13 +125,15 @@
               <th class="text-center" scope="col"  pResizableColumn >Rollo <p-columnFilter type="text" field="Rollo" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Cliente <p-columnFilter type="text" field="Cliente" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Item <p-columnFilter type="text" field="Item_Id" display="menu"></p-columnFilter></th>
-              <th class="text-center" scope="col"  pResizableColumn >Nombre Item <p-columnFilter type="text" field="Item" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Referencia <p-columnFilter type="text" field="Item" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Peso <p-columnFilter type="text" field="Peso" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Und. <p-columnFilter type="text" field="Unidad" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Falla <p-columnFilter type="text" field="Falla" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Proceso <p-columnFilter type="text" field="Proceso" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Observación <p-columnFilter type="text" field="Observacion" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Fecha Peso <p-columnFilter type="text" field="Fecha" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Autorizado por <p-columnFilter type="text" field="Usuario_Autoriza" display="menu"></p-columnFilter></th>
+              <th class="text-center" scope="col"  pResizableColumn >Eliminado por <p-columnFilter type="text" field="Usuario_Elimina" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Fecha Eliminación <p-columnFilter type="text" field="Fecha_Eliminacion" display="menu"></p-columnFilter></th>
               <th class="text-center" scope="col"  pResizableColumn >Hora Eliminación <p-columnFilter type="text" field="Hora_Eliminacion" display="menu"></p-columnFilter></th>
               <th *ngFor="let col of columns" pResizableColumn>
@@ -153,6 +155,8 @@
               <td class="text-center" scope="col"><b>{{ArrayDocumento.Proceso}}</b></td>
               <td class="text-center" scope="col">{{ArrayDocumento.Observacion}}</td>
               <td class="text-center" scope="col">{{ArrayDocumento.Fecha}}</td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Usuario_Autoriza}}</td>
+              <td class="text-center" scope="col">{{ArrayDocumento.Usuario_Elimina}}</td>
               <td class="text-center" scope="col">{{ArrayDocumento.Fecha_Eliminacion}}</td>
               <td class="text-center" scope="col">{{ArrayDocumento.Hora_Eliminacion}}</td>
               <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>

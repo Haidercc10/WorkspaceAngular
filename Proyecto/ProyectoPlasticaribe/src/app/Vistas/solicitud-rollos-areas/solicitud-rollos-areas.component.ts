@@ -1,0 +1,774 @@
+import { Component, ViewChild } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ShepherdService } from 'angular-shepherd';
+import moment from 'moment';
+import { Table } from 'primeng/table';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsSolicitudRollos as defaultSteps } from 'src/app/data';
+import { modelDtSolicitudRollos } from 'src/app/Modelo/modelDtSolicitudRollos';
+import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
+import { modelSolicitudRollos } from 'src/app/Modelo/modelSolicitudRollos';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
+import { Detalles_SolicitudRollosService } from 'src/app/Servicios/Detalles_SolicitudRollos/Detalles_SolicitudRollos.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { Formato_DocumentosService } from 'src/app/Servicios/Formato_Documentos/Formato_Documentos.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
+import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
+import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_BodegaRollos/Ubicaciones_BodegaRollos.service';
+
+@Component({
+  selector: 'app-solicitud-rollos-areas',
+  templateUrl: './solicitud-rollos-areas.component.html',
+  styleUrls: ['./solicitud-rollos-areas.component.css']
+})
+export class SolicitudRollosAreasComponent {
+  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+
+  FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
+  bodegasSolicitadas : any [] = []; //Variable que va a tener las bodegas a los cuales se les pedirán rollos.
+  bodegasSolicitantes : any [] = []; //Variable que va a tener las bodegas que pedirán rollos.
+  rollosConsultados : any [] = []; //Variable que almacenará la información de los rollos que hayan sido consultados
+  rollosIngresar : any [] = []; //Variable que almcanerá la información de los rollos que van a ser ingresados
+  consolidadoProductos : any [] = []; //Variable que almacenará la información consolidad de los rollos que van a ser ingresados
+  devolucionRollos : boolean = false; //Variable que va a validar si el tipo de solicitud es una devolución o no
+  informacionPdf : any [] = [];
+  @ViewChild('dt') dt : Table | undefined; 
+  @ViewChild('dt2') dt2 : Table | undefined; 
+  @ViewChild('dt3') dt3 : Table | undefined; 
+  fails1 : any = [];
+  fails2 : any = [];
+  bodegaCalidad : any = [];
+  ubications : any = [];
+  url : any = ``;
+  currentStore : string = ``;
+  title : string = ``;
+  modalFails : boolean = false; 
+
+  constructor(private AppComponent : AppComponent,
+                private shepherdService: ShepherdService,
+                  private mensajeService : MensajesAplicacionService,
+                    private frmBuilder : FormBuilder,
+                      private procesosService : ProcesosService,
+                        private solicitudRollosService : Solicitud_Rollos_AreasService,
+                          private dtBgRollosService : Detalle_BodegaRollosService,
+                            private dtSolicitudRollosService : Detalles_SolicitudRollosService,
+                              private formatoDocsService : Formato_DocumentosService,
+                                private svPDF : CreacionPdfService, 
+                                  private svProduction : Produccion_ProcesosService, 
+                                    private svBagpro : BagproService,
+                                      private svSedesClients : SedeClienteService, 
+                                        private svFails : FallasTecnicasService, 
+                                          private svUbications : Ubicaciones_BodegaRollosService, 
+                                            private router : Router,) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+
+    this.FormConsultarRollos = this.frmBuilder.group({
+      OrdenTrabajo: [null],
+      Rollo : [null],
+      Observacion : [''],
+      BodegaSolicitada : [null, Validators.required],
+      BodegaSolicitante : [null, Validators.required],
+      Devolucion : [false], 
+      Falla : [1, Validators.required],
+      Peso : [null]
+    });
+  }
+
+  ngOnInit() {
+    this.lecturaStorage();
+    this.getFails();
+    this.getBodegas();
+    this.getUbications();
+    this.url = this.router.url;
+    this.validateProcess();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  //Función para obtener las fallas técnicas.
+  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { 
+    this.fails1 = datos.filter((item) => [1].includes(item.tipoFalla_Id));
+    this.fails2 = datos.filter((item) => [14].includes(item.tipoFalla_Id));
+  });
+
+  getUbications = () => this.svUbications.getUbications().subscribe(datos => this.ubications = datos);
+
+  //*
+  validateProcess(){
+    if(this.url == '/dev-bodega-rollos') {
+      this.devolucionRollos = true;
+      this.FormConsultarRollos.patchValue({ Devolucion : true });
+    } 
+  }
+
+  //! EN DES USO Funcion que va a consultar las bodegas de los que se van a solicitar rollos
+  obternerBodegas(){
+    this.procesosService.srvObtenerLista().subscribe(data => {
+      switch (this.ValidarRol){
+        case 64: //EXTRUSION
+          this.bodegasSolicitadas = data.filter(item => ['EXT'].includes(item.proceso_Id));
+          this.bodegasSolicitantes = data.filter(item => ['BGPI'].includes(item.proceso_Id));
+          this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'BGPI' });
+          break;
+        case 62: //IMPRESION
+          this.bodegasSolicitadas = data.filter(item => ['BGPI', 'ROT'].includes(item.proceso_Id));
+          this.bodegasSolicitantes = data.filter(item => ['IMP'].includes(item.proceso_Id));
+          this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'IMP' });
+          break;
+        case 63: //ROTOGRABADO
+          this.bodegasSolicitadas = data.filter(item => ['BGPI'].includes(item.proceso_Id));
+          this.bodegasSolicitantes = data.filter(item => ['ROT'].includes(item.proceso_Id));
+          this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'ROT' });
+          break;
+        case 8: //SELLADO
+          this.bodegasSolicitadas = data.filter(item => ['BGPI', 'IMP'].includes(item.proceso_Id));
+          this.bodegasSolicitantes = data.filter(item => ['SELLA'].includes(item.proceso_Id));
+          this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'SELLA' });
+          break;
+        case 10: //DESPACHO
+          this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP'].includes(item.proceso_Id));
+          this.bodegasSolicitantes = data.filter(item => ['DESP'].includes(item.proceso_Id));
+          this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'DESP' });
+        break;
+      default:
+        this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT', 'DESP'].includes(item.proceso_Id));
+        this.bodegasSolicitantes = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT', 'DESP'].includes(item.proceso_Id));
+      }
+    });
+  }
+
+  //Función para obtener las bodegas solicitada y solicitante.
+  getBodegas(){
+    this.procesosService.srvObtenerLista().subscribe(data => {
+      switch (this.ValidarRol) {
+        case 95:
+            this.bodegasSolicitadas = data.filter(x => ['BGPI', 'CALIDAD'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+            this.bodegasSolicitantes.reverse();
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'BGPI' });
+            this.currentStore = ``;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Solicitud de Rollos ${this.currentStore}`
+            break
+        case 86:
+            this.bodegasSolicitadas = data.filter(x => ['SELLA'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['DESP'].includes(x.proceso_Id));
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'SELLA' }); 
+            this.currentStore = this.bodegasSolicitadas.find(x => x.proceso_Id == 'SELLA').proceso_Nombre;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Solicitud de Rollos ${this.currentStore}`  
+            break;
+        case 4:
+            this.bodegasSolicitadas = data.filter(x => ['IMP'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['DESP', 'SELLA'].includes(x.proceso_Id));
+            this.bodegasSolicitantes.reverse();
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'IMP' });
+            this.currentStore = this.bodegasSolicitadas.find(x => x.proceso_Id == 'IMP').proceso_Nombre;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Solicitud de Rollos ${this.currentStore}`     
+            break;
+        case 89:
+            this.bodegasSolicitadas = data.filter(x => ['ROT'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['IMP', 'SELLA'].includes(x.proceso_Id));
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'ROT' });  
+            this.currentStore = this.bodegasSolicitadas.find(x => x.proceso_Id == 'ROT').proceso_Nombre;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Solicitud de Rollos ${this.currentStore}`   
+            break;    
+        default: 
+            this.bodegasSolicitadas = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP', 'CALIDAD'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['BGPI', /*'EXT',*/ 'SELLA', 'IMP', 'ROT', 'DESP', 'CALIDAD'].includes(x.proceso_Id));
+            this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
+            this.currentStore = ``;
+            this.title = this.devolucionRollos ? `Devolución de Rollos` : `Solicitud de Rollos ${this.currentStore}`
+          break;
+      }
+    });
+  }
+
+  // funcion que va a limpiar los campos del formulario
+  limpiarForm() {
+    console.log(this.FormConsultarRollos.value.Falla);
+    this.FormConsultarRollos.reset();
+    this.url == '/dev-bodega-rollos' ? this.devolucionRollos = true : false;
+    this.FormConsultarRollos.patchValue({ Devolucion : this.devolucionRollos ? true : false, Observacion : ``, Falla : 1,  });
+  }
+
+  // Funcion que va a limpiar todos los campos
+  limpiarCampos(){
+    this.FormConsultarRollos.reset();
+    this.rollosConsultados = [];
+    this.rollosIngresar = [];
+    this.consolidadoProductos = [];
+    this.informacionPdf = [];
+    this.cargando = false;
+    this.url == '/dev-bodega-rollos' ? this.devolucionRollos = true : false;
+    this.FormConsultarRollos.patchValue({ Devolucion : this.devolucionRollos ? true : false, Observacion : ``, Falla : 1, });
+  }
+
+  // Funcion que va a consultar los rollos mediante los parametros pasados por el usuario
+  consultarRollos(){
+    if (this.FormConsultarRollos.valid) {
+      let ot : number = this.FormConsultarRollos.value.OrdenTrabajo;
+      let rollo : number = this.FormConsultarRollos.value.Rollo;
+      let bodega : string = this.FormConsultarRollos.value.BodegaSolicitada;
+      let ruta : string = rollo != null ? `?rollo=${rollo}` : '';
+      ruta.length > 0 ? ruta += `&bodegaIngreso=${'N/A'}` : ruta = `?bodegaIngreso=${'N/A'}`
+
+      this.cargando = true;
+      this.rollosConsultados = [];
+      this.rollosIngresar = [];
+      this.consolidadoProductos = [];
+
+      this.dtBgRollosService.GetRollosDisponibles(bodega, ot, this.devolucionRollos ? 23 : 19, ruta).subscribe(data => data.forEach(item => this.llenarRollosIngresar(item)), err => {
+        this.mensajeService.mensajeError(`Error`, `No se encontró información disponible de la OT N° ${ot} en la Bodega solicitada | ${err.status} ${err.statusText}!`);
+        this.cargando = false;
+      });
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos OT y/o Rollo`);
+  }
+
+  // Funcion que va a llenar los rollos que estan disponibles para ser ingresados
+  llenarRollosIngresar(data : any){
+    if(!this.rollosIngresar.map(x => x.Rollo).includes(data.rollo)) {
+      let info : any = {
+        Ot : data.ot,
+        Rollo : parseInt(data.rollo),
+        Id_Producto : data.item,
+        Producto : data.referencia,
+        Cantidad : parseFloat(data.cantidad),
+        Presentacion : data.presentacion,
+        Ubicacion : data.ubicacion,
+        Proceso : data.bodega,
+      }
+      this.rollosConsultados.push(info);
+      this.rollosConsultados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
+      this.cargando = false;
+    } else {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya se utilizaron rollos de la OT N° ${data.ot}`);
+      this.cargando = false;
+    } 
+   
+  }
+
+  // Funcion que colocará los rollos que se van a insertar
+  llenarRollosAIngresar(item : any){
+    this.cargando = true;
+    let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    
+    this.rollosConsultados.splice(this.rollosConsultados.findIndex((data) => data.Rollo == item.Rollo), 1);
+    let index = this.rollosIngresar.findIndex((data) => data.Rollo == item.Rollo);
+    this.rollosIngresar[index].Proceso = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre;
+    this.rollosIngresar[index].Ubicacion = this.ubications.find(x => x.proceso_Id == bodegaSolicitante).ubR_Nomenclatura;
+    this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
+    this.groupProducts();
+    setTimeout(() => { this.cargando = false; }, 50);
+  }
+
+  // Funcion que seleccionará y colocará todos los rollos que se van a insertar
+  seleccionarTodosRollos(){
+    this.cargando = true;
+    let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    
+    this.rollosConsultados.forEach(x => {
+      x.Proceso = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitante).proceso_Nombre,
+      x.Ubicacion = this.ubications.find(x => x.proceso_Id == bodegaSolicitante).ubR_Nomenclatura
+    });  
+    this.rollosIngresar = this.rollosIngresar.concat(this.rollosConsultados);
+    this.rollosConsultados = [];  
+    this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
+    this.groupProducts();
+    setTimeout(() => { this.cargando = false; }, 50);
+  }
+
+  //Funcion que va a quitar lo rollos que se van a insertar
+  quitarRollosAIngresar(item : any){
+    this.cargando = true;
+    let bodegaSolicitada : any = this.FormConsultarRollos.value.BodegaSolicitada;
+
+    this.rollosIngresar.splice(this.rollosIngresar.findIndex(data => data.Rollo == item.Rollo), 1);
+    let index = this.rollosConsultados.findIndex((data) => data.Rollo == item.Rollo);
+    this.rollosConsultados[index].Proceso = this.devolucionRollos ? this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre : this.bodegasSolicitadas.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre;
+    this.rollosConsultados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
+    this.groupProducts();
+    setTimeout(() => { this.cargando = false; }, 50);
+  }
+
+  // Funcion que va a quitar todos los rollos que se van a insertar
+  quitarTodosRollos(){
+    this.cargando = true;
+    let bodegaSolicitada : any = this.FormConsultarRollos.value.BodegaSolicitada;
+    this.rollosIngresar.forEach(x => x.Proceso = this.devolucionRollos ? this.bodegasSolicitantes.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre : this.bodegasSolicitadas.find(x => x.proceso_Id == bodegaSolicitada).proceso_Nombre); 
+    this.rollosConsultados = this.rollosConsultados.concat(this.rollosIngresar);
+    this.rollosIngresar = [];
+    this.rollosConsultados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
+    this.groupProducts();
+    setTimeout(() => { this.cargando = false; }, 50);
+  }
+
+  //*Función para agrupar por OT las cantidades de rollos que se seleccionen. 
+  groupProducts(){
+    this.consolidadoProductos = this.rollosIngresar.reduce((a, b) => {
+      if(!a.map(x => x.Ot).includes(b.Ot)) a = [...a, b];
+      return a;
+    }, []);
+    this.orderTables();
+  }
+
+  //*Función para ordenar la tabla de rollos a ingresar y consolidado.
+  orderTables(){
+    this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
+    this.consolidadoProductos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+  }
+
+  //*
+  qtyConsolidateForOrder = (ot : number) => this.rollosIngresar.filter(x => x.Ot == ot).reduce((a, b) => a += b.Cantidad, 0);
+  
+  //*
+  qtyRollsConsolidateForOrder = (ot : number) => this.rollosIngresar.filter(x => x.Ot == ot).length;
+
+  //*
+  qtyTotalRolls = () => this.rollosIngresar.length;
+
+  //*
+  qtyTotal = () =>  this.rollosIngresar.reduce((a, b) => a += b.Cantidad, 0);
+
+  //*Función que busca los rollos a los que se les va a dar salida.
+  searchForRolls(){
+    let roll : any = this.FormConsultarRollos.value.Rollo;
+    let process : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    let selectedProcess : any = this.FormConsultarRollos.value.BodegaSolicitada;
+    let newProcess : any = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == process).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == process).proceso_Nombre;
+
+    if(this.rollosIngresar.length == 0 || newProcess == this.rollosIngresar[0].Proceso) {
+      if(roll) {
+        this.cargando = true;
+        this.dtBgRollosService.getRollForOut(roll, selectedProcess).subscribe(data => {
+          if(data.length > 0) this.loadTableForRoll(data);
+          else {
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontro información del rollo N° ${roll}`);
+            this.FormConsultarRollos.patchValue({ Rollo : null});
+            this.cargando = false;
+          }
+        }, error => {
+          this.mensajeService.mensajeError(`Error`, `Se encontraron errores al consultar el rollo N° ${roll} | ${error.status} ${error.statusText}`);
+          this.FormConsultarRollos.patchValue({ Rollo : null});
+          this.cargando = false;
+        });
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe digitar el número del rollo`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible realizar una asignación a varias bodegas solicitantes!`);
+  }
+
+  //*Función que carga los rollos a la tabla.
+  loadTableForRoll(data : any){
+    this.cargando = false;
+    this.FormConsultarRollos.patchValue({ Rollo : null});
+    let process : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    let newProcess : any = this.devolucionRollos ? this.bodegaCalidad.find(x => x.proceso_Id == process).proceso_Nombre : this.bodegasSolicitantes.find(x => x.proceso_Id == process).proceso_Nombre;
+    let newUbication : any = this.ubications.find(x => x.proceso_Id == process).ubR_Nomenclatura;
+
+    if(!this.rollosIngresar.map(x => x.Rollo).includes(data[0].rollo) && !this.rollosConsultados.map(x => x.Rollo).includes(data[0].rollo)) {
+      data.forEach(x => {
+        this.rollosIngresar.unshift({
+          'Ot' : x.ot,
+          'Rollo' : parseInt(x.rollo),
+          'Id_Producto' : x.item,
+          'Producto' : x.referencia,
+          'Cantidad' : parseFloat(x.cantidad),
+          'Presentacion' : x.presentacion,
+          'Ubicacion' : newUbication,
+          'Proceso' : newProcess,
+        });
+      });
+      this.groupProducts();
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `El rollo N° '${data[0].rollo}' ha sido agregado a la tabla de 'ROLLOS SOLICITADOS'!`)
+    } else this.mensajeService.mensajeAdvertencia(`El rollo N° ${data[0].rollo} ya se encuentra agregado en la tabla!`);
+  }
+
+  //! DES-USADA Funcion que permitirá ver el total de lo escogido para cada producto 
+  GrupoProductos(){
+    let producto : any = [];
+    this.consolidadoProductos = [];
+    for (let i = 0; i < this.rollosIngresar.length; i++) {
+      if (!producto.includes(this.rollosIngresar[i].Id_Producto)) {
+        let cantidad : number = 0, cantRollo : number = 0;
+        for (let j = 0; j < this.rollosIngresar.length; j++) {
+          if (this.rollosIngresar[i].Id_Producto == this.rollosIngresar[j].Id_Producto) {
+            cantidad += this.rollosIngresar[j].Cantidad;
+            cantRollo += 1;
+          }
+        }
+        if (cantRollo > 0){
+          producto.push(this.rollosIngresar[i].Id_Producto);
+          let info : any = {
+            Ot: this.rollosIngresar[i].Ot,
+            Id : this.rollosIngresar[i].Id_Producto,
+            Nombre : this.rollosIngresar[i].Producto,
+            Cantidad : cantidad,
+            Rollos: this.rollosIngresar.filter(x => x.Id_Producto == this.rollosIngresar[i].Id_Producto).length,
+            Presentacion : this.rollosIngresar[i].Presentacion,
+          }
+          this.consolidadoProductos.push(info);
+        }
+      }
+    }
+    setTimeout(() => {
+      this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
+      this.consolidadoProductos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+      this.cargando = false;
+    }, 50);
+  }
+
+  // Funcion que va a crear los rollos en la base de datos
+  ingresarRollos(){
+    if (this.rollosIngresar.length > 0){
+      this.cargando = true;
+      const info : modelSolicitudRollos = {
+        'Usua_Id': this.storage_Id,
+        'SolRollo_FechaSolicitud': moment().format('YYYY-MM-DD'),
+        'SolRollo_HoraSolicitud': moment().format('H:mm:ss'),
+        'Usua_Respuesta': this.storage_Id,
+        'Estado_Id': this.devolucionRollos ? 24 : 48,
+        'TpSol_Id': this.devolucionRollos ? 2 : 1,
+        'SolRollo_Observacion': this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion.toUpperCase(),
+        'SolRollo_FechaRespuesta': moment().format('YYYY-MM-DD'),
+        'SolRollo_HoraRespuesta': moment().format('H:mm:ss'),
+      }
+      this.solicitudRollosService.Post(info).subscribe(data => this.ingresarDetallesRollos(data.solRollo_Id), err => {
+        this.mensajeService.mensajeError(`Ha ocurrido un error al registrar la solicitud de rollos`, `${err.status} ${err.statusText}`);
+        this.cargando = false;
+      });
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar mínimo un rollo para realizar la solicitud!`);
+  }
+
+  //
+  ingresarDetallesRollos(id : number){
+    let numRollos : number = 0;
+      this.cargando = true;
+      for (let i = 0; i < this.rollosIngresar.length; i++) {
+        const info : modelDtSolicitudRollos = {
+          'DtSolRollo_OrdenTrabajo': this.rollosIngresar[i].Ot,
+          'DtSolRollo_Maquina': 0,
+          'DtSolRollo_BodegaSolicitante': this.FormConsultarRollos.value.BodegaSolicitante,
+          'DtSolRollo_BodegaSolicitada': this.FormConsultarRollos.value.BodegaSolicitada,
+          'DtSolRollo_Rollo': this.rollosIngresar[i].Rollo,
+          'DtSolRollo_Cantidad': this.rollosIngresar[i].Cantidad,
+          'UndMed_Id': this.rollosIngresar[i].Presentacion,
+          'Prod_Id': this.rollosIngresar[i].Id_Producto,
+          'SolRollo_Id': id, 
+          'Falla_Id' : this.devolucionRollos ? this.FormConsultarRollos.value.Falla : 1,
+        }
+        this.dtSolicitudRollosService.Post(info).subscribe(() => {
+          numRollos += 1
+          if (numRollos == this.rollosIngresar.length) this.actualizarBodegaRollos(id); //this.createPDF(id, `creada`);
+        }, err => {
+          this.mensajeService.mensajeError(`Ha ocurrido un error al registrar los detalles de la solicitud`, `${err.status} ${err.statusText}`);
+          this.cargando = false;
+        });
+      }
+  }
+
+  //*
+  actualizarBodegaRollos(idSolicitud : number){
+    let rolls : any = []; 
+    let bodegaSolicitante : any = this.FormConsultarRollos.value.BodegaSolicitante;
+
+    this.rollosIngresar.forEach(x => rolls.push({ 'Rollo' : x.Rollo, 'OT' : x.Ot, 'Ubicacion' : x.Ubicacion, }));
+    this.dtBgRollosService.putRollsStore(this.devolucionRollos ? 19 : 23, bodegaSolicitante, rolls).subscribe(data => {
+      this.createProductionInPL(idSolicitud, `creada`);
+    }, error => {
+      this.mensajeService.mensajeError(`Ha ocurrido un error al actualizar los rollos en la bodega`, `${error.status} ${error.statusText}`);
+      this.cargando = false;
+    });
+  }
+
+  //* Función que creará el registro de producción de BagPro en Plasticaribe
+  createProductionInPL(solicitud : number, action : string){
+    let wareHouseSelected : any = this.FormConsultarRollos.value.BodegaSolicitante;
+
+    if(wareHouseSelected == 'DESP') {
+      let rollsExtrusion : any = [];
+      let count = 0;
+      this.rollosIngresar.forEach(d => {
+        this.svBagpro.getInformationRoll(d.Rollo, d.Ot).subscribe(data => {
+          this.svSedesClients.GetSedeClientexNitBagPro(data[0].nitClient).subscribe(dataSede => {
+            count++
+            rollsExtrusion.push(this.dataProduction(d, data, dataSede));
+            if(this.rollosIngresar.length == count) this.sendDataProductionPL(rollsExtrusion, solicitud);
+          }, error => {
+            this.mensajeService.mensajeError(`Error`, `No se encontró información del cliente ${data[0].nitClient} | ${error.status} ${error.statusText}`);
+            this.cargando = false;
+          });
+        }, error => {
+          this.mensajeService.mensajeError(`Error`, `Ha ocurrido un error al consultar la información del rollo N° ${d.Rollo} | ${error.status} ${error.statusText}`);
+          this.cargando = false;
+        });
+      });
+    } else this.createPDF(solicitud, action);
+  }
+
+  //*Función que crea el registro en la tabla de producción.
+  sendDataProductionPL(rolls, solicitud : number){
+    this.svProduction.PostMassive(rolls).subscribe(dataPL => {
+       this.createPDF(solicitud, `creada`);
+    }, error => {
+      this.cargando = false;
+      this.mensajeService.mensajeError(`Error`, `No fue posible registrar los rollos en producción | ${error.status} ${error.statusText}`);
+    });
+  }
+
+  //* Función que coloca todos los datos necesarios para crear el registro. 
+  dataProduction(d : any, data : any, dataSede : any){
+    let production : modelProduccionProcesos = {
+      'Numero_Rollo': 0,
+      'Prod_Id': d.Id_Producto,
+      'Cli_Id': ![undefined, null].includes(dataSede) ? dataSede.length > 0 ? dataSede[0].id_Cliente : 1 : 1,
+      'Operario1_Id': 1516,
+      'Operario2_Id': 0,
+      'Operario3_Id': 0,
+      'Operario4_Id': 0,
+      'Pesado_Entre': 1,
+      'Maquina': data[0].production.maquina,
+      'Cono_Id': data[0].production.extCono2,
+      'Ancho_Cono': data[0].production.extConoC,
+      'Tara_Cono': data[0].production.extTara,
+      'Peso_Bruto': data[0].production.extBruto,
+      'Peso_Neto': d.Cantidad,
+      'Cantidad': d.Cantidad,
+      'Peso_Teorico': 0,
+      'Desviacion': 0,
+      'Precio': 0,
+      'Presentacion': d.Presentacion,
+      'Proceso_Id': 'EXT',
+      'Turno_Id': data[0].production.turno,
+      'Envio_Zeus': false,
+      'Datos_Etiqueta': '',
+      'Fecha': `${moment().format('YYYY-MM-DD')}`,
+      'Hora': `${moment().format('HH:mm:ss')}`,
+      'Creador_Id': 123456789,
+      'NumeroRollo_BagPro': d.Rollo,
+      'Rollo_Asociado': null,
+      'Observacion': `REGISTRO DE ROLLO PRODUCIDO EN BAGPRO. EL DIA ${moment().format('YYYY-MM-DD')} ${moment().format('HH:mm:ss')} HA SIDO CREADO DESDE LA BODEGA DE ROLLOS DE PLASTICARIBE POR CONCEPTO DE SOLICITUD PARA DESPACHO.`,
+      'OT': d.Ot,
+      'Estado_Rollo' : 19, 
+      'PrecioVenta_Producto' : data[0].price,
+    }
+    console.log(production);
+    return production;
+  }
+
+  //*
+  aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  //*
+  createPDF(id : number, action : string) {
+    this.dtSolicitudRollosService.GetInformacionSolicitud(id).subscribe(data => {
+      let title: string = this.devolucionRollos ? `Devolución de rollos N° ${id}` : `Solicitud de rollos N° ${id}`;
+      let content: any[] = this.contentPDF(data);
+      this.svPDF.formatoPDF(title, content);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, this.devolucionRollos ? `Devolución de rollos a bodega ${action} exitosamente` : `Solicitud de rollos a bodega ${action} exitosamente!`);
+      setTimeout(() => this.limpiarCampos(), 3000);
+    }, error => this.mensajeService.mensajeError(`Error`, `Error al consultar la solicitud de rollos N° ${id} | ${error.status} ${error.statusText}`));
+  }
+
+  //*
+  contentPDF(data): any[] {
+    let content: any[] = [];
+    let consolidatedInformation: Array<any> = this.getSolicitudPDF(data);
+    let informationProducts: Array<any> = this.getDetalleSolicitudPDF(data);
+    content.push(this.infoMovementPDF(data[0]));
+    content.push(this.tablaIngresoPDF(consolidatedInformation));
+    content.push(this.tableTotals(consolidatedInformation))
+    content.push(this.tablaDetallesPDF(informationProducts));
+    return content;
+  }
+
+  //*
+  getSolicitudPDF(data: any): Array<any> {
+    let info: Array<any> = [];
+    let contador: number = 0;
+    data.forEach(d => {
+      if (!info.map(x => x.OT).includes(d.orden_Trabajo)) {
+        contador++;
+        let cantRegistros : number = data.filter(x => x.orden_Trabajo == d.orden_Trabajo).length;
+        let pesoTotal: number = 0;
+        data.filter(x => x.orden_Trabajo == d.orden_Trabajo).forEach(x => pesoTotal += x.cantidad);
+        info.push({
+          "#": contador,
+          "OT": d.orden_Trabajo,
+          "Item": d.item,
+          "Referencia": d.referencia,
+          "Rollos" : cantRegistros,
+          "Peso": this.formatonumeros((pesoTotal).toFixed(2)),
+          "Peso2": pesoTotal,
+          "Presentación" : d.presentacion,
+        });
+      }
+    });
+    return info;
+  }
+
+  //*
+  getDetalleSolicitudPDF(data: any): Array<any> {
+    let info: Array<any> = [];
+    let count: number = 0;
+
+    data.forEach(d => {
+      count++;
+      info.push({
+        "#": count,
+        "Rollo": d.rollo,
+        "OT": d.orden_Trabajo,
+        "Item": d.item,
+        "Referencia": d.referencia,
+        "Peso": d.cantidad.toFixed(2),
+        "Und" : d.presentacion,
+        "Solicita" : d.bodega_Solicitante == 'Producto Intermedio' ? 'P. Intermedio' : d.bodega_Solicitante,
+        "Entrega" : d.bodega_Solicitada == 'Producto Intermedio' ? 'P. Intermedio' : d.bodega_Solicitada,
+      });
+    });
+    info.sort((a, b) => a.OT - b.OT);
+    return info;
+  }
+
+  //Función que muestra una tabla con la información general del ingreso.
+  infoMovementPDF(data : any): {} {
+    return {
+      margin : [0, 0, 0, 20],
+      table: {
+        widths: ['34%', '33%', '33%'],
+        body: [
+          [
+            { text: `Información general del movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
+          ],
+          [
+            { text: `N° Solicitud: ${data.solicitud}` },
+            { text: `Falla: ${data.falla}` },
+            { text: `Estado: ${data.estado}` },
+          ],
+          [
+            { text: `Usuario registro: ${data.usuario}` },
+            { text: `Fecha registro: ${data.fecha_Solicitud.replace('T00:00:00', '')}` },
+            { text: `Hora registro: ${data.hora_Solicitud}` },
+          ],
+          [
+            { text: `Observación: ${data.observacion}`, colSpan: 3, fontSize: 9, }, {}, {}
+          ], 
+        ]
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null;
+        }
+      }
+    }
+  }
+
+  //Función que consolida la información por mat. primas
+  tablaIngresoPDF(data) {
+    let columns: Array<string> = ['#', 'OT', 'Item', 'Referencia', 'Rollos', 'Peso', 'Presentación'];
+    let widths: Array<string> = ['5%', '10%', '10%', '45%', '10%', '10%', '10%'];
+    return {
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBody1(data, columns, 'Consolidado de rollos de la solicitud'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex <= 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  //Tabla con materiales recuperados ingresados detallados
+  tablaDetallesPDF(data) {
+    let columns: Array<string> = ['#', 'Rollo', 'Solicita', 'Entrega', 'OT', 'Item', 'Referencia', 'Peso', 'Und'];
+    let widths: Array<string> = ['4%', '8%', '12%', '12%', '7%', '7%', '40%', '7%', '3%'];
+    return {
+      margin: [0, 20],
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBody2(data, columns, 'Información detallada de los rollos solicitados'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex <= 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  //Tabla con los valores totales de pesos y registros
+  tableTotals(data : any){
+    return {
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['5%', '10%', '10%', '45%', '10%', '10%', '10%'],
+        body: [
+          [
+            { text: ``, bold : true, border: [true, false, false, true], },
+            { text: ``, bold : true, border: [false, false, false, true], },
+            { text: ``, bold : true, border: [false, false, false, true], },
+            { text: `Totales`, alignment: 'right', bold : true, border: [false, false, true, true], },
+            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseInt(b.Rollos), 0)))}`, bold : true, border: [false, false, true, true], },
+            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseFloat(b.Peso2), 0)).toFixed(2))}`, bold : true, border: [false, false, true, true], },
+            { text: `Kg`, bold : true, border: [false, false, true, true], },
+          ],
+        ],
+      }
+    }
+  }
+
+  //*
+  buildTableBody1(data, columns, title) {
+    var body = [];
+    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  //*
+  buildTableBody2(data, columns, title) {
+    var body = [];
+    body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+}

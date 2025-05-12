@@ -203,7 +203,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
                   precioProducto: data[0].presentacion == 'Kilo' ? data[0].valorKg : data[0].valorUnidad,
                 },
                 proceso: {
-                  proceso_Id: prod[0].nomStatus == 'SELLADO' ? 'SELLA' : prod[0].nomStatus == 'Wiketiado' ? 'WIKE' : 'EMP',
+                  proceso_Id: prod[0].nomStatus == 'SELLADO' ? 'SELLA' : prod[0].nomStatus == 'Wiketiado' ? 'WIKE' : prod[0].nomStatus == 'EMPAQUE' ? 'EMP' : 'EXT',
                   proceso_Nombre: prod[0].nomStatus,
                 },
                 turno: {

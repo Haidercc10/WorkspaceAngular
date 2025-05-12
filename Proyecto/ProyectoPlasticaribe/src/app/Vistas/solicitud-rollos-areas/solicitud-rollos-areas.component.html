@@ -1,0 +1,368 @@
+
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+    <div style="margin: auto;">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  </div>
+  
+  <div class="contain">
+    <!-- Navegador fin de parte superior -->
+    <div class="container-fluid">
+      <div class="mb-4 Titulo">
+        <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">{{ title }}</h2>
+      </div>
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+    </div>
+  </div>
+  
+  <p-card>
+    <!--<div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+      <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+    </div>-->
+  
+    <!--Crear Falla-->
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+      <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+    </div>
+  
+    <div class="mb-3">
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Rollos</h4>
+    </div>
+  
+    <div class="mb-5">
+      <i class="pi pi-exclamation-triangle"></i> <b> Nota:</b> Los campos marcados con (*) son obligatorios para realizar la consulta.
+    </div>
+    <br>
+  
+    <form [formGroup]="FormConsultarRollos">
+      <div class="mb-3" id="formulario">
+        <div class="row g-4">
+  
+          <!-- Bodega Solicitada -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
+            <span class="p-float-label">
+              <p-dropdown formControlName="BodegaSolicitada" inputId="BodegaSolicitada" optionValue="proceso_Id" optionLabel="proceso_Nombre" [options]="devolucionRollos ? bodegasSolicitantes : bodegasSolicitadas" [required]="true"></p-dropdown>
+              <label for="BodegaSolicitada">Bodega Solicitada*</label>
+            </span>
+          </div>
+  
+          <!-- Bodega Solicitante -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
+            <span class="p-float-label">
+              <p-dropdown formControlName="BodegaSolicitante" inputId="BodegaSolicitante" optionValue="proceso_Id" optionLabel="proceso_Nombre" [options]="devolucionRollos ? bodegaCalidad : bodegasSolicitantes" [required]="true"></p-dropdown>
+              <label for="BodegaSolicitante">Bodega Solicitante*</label>
+            </span>
+          </div>
+  
+          <!-- Consultar Orden de Trabajo -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+            <span class="p-input-icon-left p-float-label">
+              <i class="pi pi-search"></i>
+              <input formControlName="OrdenTrabajo" id="ordenTrabajo" (keyup.enter)="consultarRollos()" type="number" pInputText required/>
+              <label for="ordenTrabajo">OT</label>
+            </span>
+          </div>
+  
+          <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+            <span class="p-input-icon-left p-float-label">
+              <i class="pi pi-search"></i> 
+              <input formControlName="Peso" id="Peso" type="number" pInputText required/>
+              <label for="Peso">Peso</label>
+            </span>
+          </div>-->
+  
+          <!-- Numero de Rollo -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+            <span class="p-input-icon-left p-float-label">
+              <i class="pi pi-search"></i>
+              <input formControlName="Rollo" id="Rollo" type="number" (keyup.enter)="searchForRolls()" pInputText/>
+              <label for="Rollo">N° Rollo</label>
+            </span>
+          </div>
+          
+          <ng-container *ngIf="devolucionRollos; then DV else SOL"></ng-container>
+           <ng-template #DV>
+            <!-- Devolución -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="devolucion">
+              <div class="field-checkbox">
+                <p-checkbox formControlName="Devolucion" [(ngModel)]="devolucionRollos" [binary]="true" [readonly]="true" inputId="Devolucion"></p-checkbox>
+                  <label for="Devolucion"><p-chip label="Devolución por Calidad" icon="pi pi-undo"></p-chip></label>
+              </div>
+            </div>
+    
+            <!-- Falla -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+              <span class="p-float-label">
+                <p-dropdown formControlName="Falla" inputId="Falla" optionValue="falla_Id" optionLabel="falla_Nombre" [readonly]="!devolucionRollos" [options]="devolucionRollos ? fails2 : fails1" [required]="true" [autoDisplayFirst]="true"></p-dropdown>
+                <label for="Falla">Falla Técnica</label>
+              </span>
+            </div>
+           </ng-template>
+           <ng-template #SOL></ng-template>
+          
+  
+          <!-- Observacion -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-6 col-xxl-12" id="observacion">
+            <span class="p-float-label">
+              <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
+              <label for="textarea">Observación</label>
+            </span>
+          </div>
+        </div>
+      </div>
+  
+      <!--Botones-->
+      <div class="row g-3">
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos()"></button>
+          <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
+        </div>
+      </div>
+    </form>
+  
+    <div class="mb-4">
+      <hr class="Linea">
+    </div>
+  
+    <!--* titulo tabla 1 -->
+    <div class="mb-4">
+      <div class="row g-3">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i>{{ devolucionRollos ? ' Tabla de rollos consultados' : ' Tabla de rollos disponibles' }}  </h4>
+        </div>
+      </div>
+    </div>
+  
+    <!--* tabla 1 -->
+    <div class="mb-3">
+      <div class="row g-3 font-size-14" id="tabla1">
+        <p-table
+            #dt
+            [value]="rollosConsultados"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            dataKey="Rollo"
+            [(selection)]="rollosIngresar"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            *ngIf="!cargando">
+          <ng-template pTemplate="header">
+            <tr>
+              <th colspan="2"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Ot', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Rollo', dt)"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Id_Producto', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Producto', dt)"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Cantidad', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Presentacion', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Ubicacion', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Proceso', dt)"></th>
+            </tr>
+            <tr>
+              <th>#</th>
+              <th style="width: 3rem">
+                <p-checkbox id="elegirRollos" (click)="seleccionarTodosRollos()"></p-checkbox>
+              </th>
+              <th scope="col">OT</th>
+              <th scope="col">Rollo</th>
+              <th scope="col">Item</th>
+              <th scope="col">Referencia</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentacion</th>
+              <th scope="col">Ubicación</th>
+              <th scope="col">Bodega</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rollo let-rowIndex="rowIndex">
+            <tr>
+              <td>{{rowIndex + 1}}</td>
+              <td>
+                <p-tableCheckbox [value]="rollo" id="elegirRollo" (click)="llenarRollosAIngresar(rollo)"></p-tableCheckbox>
+              </td>
+              <td>{{rollo.Ot}}</td>
+              <td><b>{{rollo.Rollo}}</b></td>
+              <td>{{rollo.Id_Producto}}</td>
+              <td>{{rollo.Producto}}</td>
+              <td><b>{{rollo.Cantidad | number}}</b></td>
+              <td>{{rollo.Presentacion}}</td>
+              <td><b>{{rollo.Ubicacion}}</b></td>
+              <td> <span class="badge" 
+                [ngClass]="{'bg-Extrusion': rollo.Proceso == 'Extrusion',
+                'bg-ProductoIntermedio': rollo.Proceso == 'Producto Intermedio',
+                'bg-Impresion': rollo.Proceso == 'Impresion',
+                'bg-Rotograbado': rollo.Proceso == 'Rotograbado',
+                'bg-Sellado': rollo.Proceso == 'Sellado',
+                'bg-Despacho': rollo.Proceso == 'Despacho', 
+                'bg-Calidad': rollo.Proceso == 'Calidad'}">{{rollo.Proceso | uppercase}}</span>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  
+    <!--* Linea -->
+    <div class="mb-4">
+      <hr class="Linea">
+    </div>
+  
+    <!--* titulo tabla 2 -->
+    <div class="mb-4" *ngIf="!cargando">
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> {{ devolucionRollos ? ' Tabla de rollos a devolver' : ' Tabla de rollos solicitados' }} </h4>
+    </div>
+  
+    <!--* tabla 2 -->
+    <div class="mb-3">
+      <div class="row g-3" id="tabla2">
+        <p-table
+          #dt2
+          [value]="rollosIngresar"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          [rowHover]="true"
+          dataKey="Rollo"
+          [(selection)]="rollosConsultados"
+          [scrollable]="true"
+          scrollHeight="50rem"
+          *ngIf="!cargando">
+          <ng-template pTemplate="header">
+            <tr>
+              <th colspan="2"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Ot', dt2)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Rollo', dt2)"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Id_Producto', dt2)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Producto', dt2)"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltro($event, 'Cantidad', dt2)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Presentacion', dt2)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Ubicacion', dt2)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'Proceso', dt2)"></th>
+            </tr>
+            <tr>
+              <th>#</th>
+              <th style="width: 3rem">
+                <p-checkbox id="elegirRollos2" (click)="quitarTodosRollos()"></p-checkbox>
+              </th>
+              <th scope="col">OT</th>
+              <th scope="col">Rollo</th>
+              <th scope="col">Item</th>
+              <th scope="col">Refencia</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentación</th>
+              <th scope="col">Ubicación</th>
+              <th scope="col">Bodega</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowIndex="rowIndex" let-rollo >
+            <tr *ngIf="!rollo.exits">
+              <td>{{rowIndex + 1}}</td>
+              <td>
+                <p-tableCheckbox [value]="rollo" id="elegirRollo2" (click)="quitarRollosAIngresar(rollo)"></p-tableCheckbox>
+              </td>
+              <td>{{rollo.Ot}}</td>
+              <td><b>{{rollo.Rollo}}</b></td>
+              <td>{{rollo.Id_Producto}}</td>
+              <td>{{rollo.Producto}}</td>
+              <td><b>{{rollo.Cantidad | number : '1.2-2'}}</b></td>
+              <td>{{rollo.Presentacion}}</td>
+              <td><b>{{rollo.Ubicacion}}</b></td>
+              <td>
+                <span class="badge" 
+                [ngClass]="{'bg-Extrusion': rollo.Proceso == 'Extrusion',
+                'bg-ProductoIntermedio': rollo.Proceso == 'Producto Intermedio',
+                'bg-Impresion': rollo.Proceso == 'Impresion',
+                'bg-Rotograbado': rollo.Proceso == 'Rotograbado',
+                'bg-Sellado': rollo.Proceso == 'Sellado',
+                'bg-Despacho': rollo.Proceso == 'Despacho', 
+                'bg-Calidad': rollo.Proceso == 'Calidad'}">{{rollo.Proceso | uppercase}}</span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  
+    <!--* Linea -->
+    <div class="mb-4" *ngIf="!cargando">
+      <hr class="Linea">
+    </div>
+  
+    <!-- * tabla 3 -->
+    <div class="mb-4" *ngIf="!cargando">
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> {{ devolucionRollos ? ' Consolidado de productos a devolver' : ' Consolidado de productos solicitados' }}</h4>
+    </div>
+  
+    <!--* titulo tabla 3 -->
+    <div class="mb-3" *ngIf="!cargando">
+      <div class="row g-3" id="tabla3">
+        <div class="table-responsive">
+          <p-table
+          #dt3
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [rowHover]="true"
+          [value]="consolidadoProductos"
+          [scrollable]="true"
+          scrollHeight="50rem">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th scope="col">OT</th>
+              <th scope="col">Item</th>
+              <th scope="col">Referencia</th>
+              <th scope="col">N° Rollos</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentación</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-grupoProductos let-rowIndex="rowIndex">
+            <tr>
+              <td>{{rowIndex + 1}}</td>
+              <td>{{grupoProductos.Ot}}</td>
+              <td>{{grupoProductos.Id_Producto}}</td>
+              <td>{{grupoProductos.Producto}}</td>
+              <td>{{qtyRollsConsolidateForOrder(grupoProductos.Ot) }}</td>
+              <td>{{qtyConsolidateForOrder(grupoProductos.Ot) | number : '1.2-2'}}</td>
+              <td>{{grupoProductos.Presentacion}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="4" class="text-right">Totales</td>
+              <td>{{qtyTotalRolls() | number}}</td>
+              <td>{{qtyTotal() | number : '1.2-2'}}</td>
+              <td>Kg</td>
+            </tr>
+          </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  
+    <!--* Botones -->
+    <div class="bajarPagina" *ngIf="!cargando">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Generar {{devolucionRollos ? 'Devolución' : 'Salida'}}" icon="pi pi-check" [disabled]="rollosIngresar.length == 0" (click)="ingresarRollos()"></button>
+        <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+      </div>
+    </div>
+  </p-card>
+  
+  <!--* Modal fallas tecnicas -->
+  <p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
+    <ng-template pTemplate="content">
+      <div class="mb-2">
+        <i class="pi pi-exclamation-triangle"></i> <b> Nota:</b> Luego de colocar el nombre y descripción de la falla, el tipo debe ser Devolución Calidad.
+      </div>
+      <app-Crear_Fallas></app-Crear_Fallas>
+    </ng-template>  
+  </p-dialog> 
+  

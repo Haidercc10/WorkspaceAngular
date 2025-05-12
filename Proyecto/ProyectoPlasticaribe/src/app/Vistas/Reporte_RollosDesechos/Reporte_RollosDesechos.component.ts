@@ -183,6 +183,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         'Hora_Eliminacion' : x.rollo_HoraEliminacion,
         'Observacion' : x.observacion == null ? '' : x.observacion,
         'Falla' : x.falla_Nombre,
+        'Usuario_Elimina' : x.elimina, 
+        'Usuario_Autoriza' : x.autoriza
       }
       this.ArrayDocumento.push(info);
       this.mostrarColumnas();
@@ -255,14 +257,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       cell.font = font;
     });
 
-    ws.mergeCells('A1:T3');
+    ws.mergeCells('A1:V3');
     this.loadSizeHeader(ws);
   }
 
   //Función para cargar el tamaño de las columnas del header.
   loadSizeHeader(ws : any){
-    let widths : number[] = [5,10,10,50,10,50,10,15,10,10,10,15,10,40,20,15,30,20,20,40];
-    let columns : number[] = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]; 
+    let widths : number[] = [5,10,10,50,10,50,10,15,10,10,10,15,10,40,20,15,30,20,20,40,30,30];
+    let columns : number[] = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]; 
     let count : number = 0;
     
     columns.forEach(x => {
@@ -288,7 +290,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     let count : number = 0;
     for (const item of this.ArrayDocumento) {
       count++;
-      const data  : any = [
+      const data : any = [
         count,
         item.Orden, 
         item.Rollo, 
@@ -307,7 +309,10 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         item.Falla, 
         item.Fecha_Eliminacion, 
         item.Hora_Eliminacion, 
-        item.Observacion];
+        item.Observacion,
+        item.Usuario_Autoriza,
+        item.Usuario_Elimina,
+      ];
 
       info.push(data);
     }
@@ -336,7 +341,9 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       "Falla", 
       "Fecha Eliminación", 
       "Hora Eliminación", 
-      "Observación"
+      "Observación",
+      "Autorizado por",
+      "Eliminado por"
     ];
     return header;
   }

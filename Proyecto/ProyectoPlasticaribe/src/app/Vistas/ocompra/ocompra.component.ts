@@ -221,15 +221,15 @@ export class OcompraComponent implements OnInit {
     let ref : string = this.FormMateriaPrima.value.Nombre;
     let id : number = this.FormMateriaPrima.value.Id;
     let cant : number = 0;
+
     if (this.FormMateriaPrima.valid) {
       if (!this.materiasPrimasSeleccionadas.map(x => x.Id).includes(this.FormMateriaPrima.value.Id)) {
         if (this.FormMateriaPrima.value.Cantidad > 0) {
-          if(categoria == 18 ) {
+          if(categoria == 18) {
             if(ref.includes('CONO')) {
-              cant = this.FormMateriaPrima.value.Cantidad * ((parseFloat(ref.replace('CONO ', '').replace(' CMS', '').trim().split('-')[0]) + parseFloat(ref.replace('CONO ', '').replace(' CMS', '').trim().split('-')[1])) / 2)
+              cant = this.FormMateriaPrima.value.Cantidad; //this.FormMateriaPrima.value.Cantidad * ((parseFloat(ref.replace('CONO ', '').replace(' CMS', '').trim().split('-')[0]) + parseFloat(ref.replace('CONO ', '').replace(' CMS', '').trim().split('-')[1])) / 2)
             } else cant = this.FormMateriaPrima.value.Cantidad;
           } else cant = this.FormMateriaPrima.value.Cantidad;
-          console.log(cant);
           
           let info: any = {
             Id: this.FormMateriaPrima.value.Id,
@@ -269,7 +269,7 @@ export class OcompraComponent implements OnInit {
       //this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.materiasPrimasSeleccionadas[i].Precio;
       if(this.materiasPrimasSeleccionadas[i].Categoria == 18) {
         if(this.materiasPrimasSeleccionadas[i].Nombre.includes('CONO')) {
-          this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.promedioCantidadCono(this.materiasPrimasSeleccionadas[i].Nombre) * this.materiasPrimasSeleccionadas[i].Precio
+          this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.materiasPrimasSeleccionadas[i].Precio
         } else this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.materiasPrimasSeleccionadas[i].Precio;
       } else this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.materiasPrimasSeleccionadas[i].Precio;
     }
