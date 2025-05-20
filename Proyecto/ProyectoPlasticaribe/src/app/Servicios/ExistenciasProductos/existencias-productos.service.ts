@@ -18,6 +18,10 @@ export class ExistenciasProductosService {
   srvObtenerListaPorIdProducto2 = (id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPBDDXCodigoArticuloZeus/${id}`);
 
   srvObtenerListaPorIdProductoPresentacion = (id : any, presentacion : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacion/${id}/${presentacion}`);
+  
+  putConsolidateProductsOF = (of : number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/putConsolidateProductsOF/${of}`, data);
+
+  getDataProduct = (item : any, unit : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/getDataProduct/${item}/${unit}`);
 
   IdProductoPresentacionInventario = (id : any, presentacion : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacionInventario/${id}/${presentacion}`);
 

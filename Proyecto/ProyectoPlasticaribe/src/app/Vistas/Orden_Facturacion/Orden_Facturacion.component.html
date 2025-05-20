@@ -33,11 +33,19 @@
       </div>-->
 
       <!-- Order -->
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-2">
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-1">
         <span class="p-float-label">
           <input formControlName="order" id="order" type="number" [readonly]="reposition || ![null, '', 0, undefined].includes(formDataOrder.value.preload)" pInputText (keyup.enter)="getInfoOrderFact()"/>
           <label for="order">N° Orden</label>
         </span>
+      </div>
+
+      <!--Fact. Direct-->
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-1 col-xxl-1">
+        <div class="field-checkbox">
+          <p-checkbox formControlName="directFact" [binary]="true" inputId="directFact" id="directFact" pTooltip="Al checar este elemento indicas que la orden de facturación será directa "></p-checkbox>
+          <label for="directFact">Facturación Directa</label>
+        </div>
       </div>
 
       <!-- Sale Order -->
@@ -53,7 +61,7 @@
       <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
-          <input formControlName="preload" id="preload" type="text" type="number" [readonly]="editOrderFact || reposition" (keyup.enter)="getPreloadForId()" pInputText/>
+          <input formControlName="preload" id="preload" type="text" type="number" [readonly]="editOrderFact || reposition || formDataOrder.value.directFact" (keyup.enter)="getPreloadForId()" pInputText/>
           <label for="preload">N° Precargue</label>
         </span>
       </div> 
@@ -104,6 +112,7 @@
           <label for="textarea">Observación</label>
         </span>
       </div>
+
     </div>
   </form>
 
@@ -134,24 +143,50 @@
     (onRowUnselect)="this.getProducts()">
     <ng-template pTemplate="header">
       <tr>
+        <th style="font-weight: 800;" class="text-center" colspan="3">Información del Pedido</th>
+        <th style="font-weight: 800;" class="text-center" colspan="2">Información del Producto</th>
+        <th style="font-weight: 800;" class="text-center" [colSpan]="this.formDataOrder.value.directFact ? 3 : 2">Cantidad</th>
+        <th style="font-weight: 800;" class="text-center" colspan="1"></th>
+      </tr>
+      <tr>
+        <!--<th style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
+          <p-checkbox (click)="test1()"></p-checkbox>
+        </th>-->
         <th class="text-center">Pedido</th>
         <th class="text-center">Nit</th>
         <th class="text-center">Cliente</th>
         <th class="text-center">Item</th>
         <th class="text-center">Referencia</th>
-        <th class="text-center">Cantidad</th>
+        <th class="text-center">Pendiente</th>
+        <th class="text-center">Stock</th>
+        <th class="text-center" *ngIf="formDataOrder.value.directFact">A Facturar</th>
         <th class="text-center">Presentación</th>
         <th *ngIf="editOrderFact"></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data>
       <tr [pSelectableRow]="data">
+        <!--<td pFrozenColumn [frozen]="true" alignFrozen="left">
+          <p-tableCheckbox [value]="data" (click)="this.getProducts(data)"></p-tableCheckbox>
+        </td>-->
         <td class="text-center">{{data.consecutivo}}</td>
         <td class="text-center">{{data.id_Cliente}}</td>
         <td>{{data.cliente}}</td>
         <td class="text-center">{{data.id_Producto}}</td>
         <td>{{data.producto}}</td>
         <td class="text-center"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
+        <td class="text-center"><b>{{data.stockPL | number : '1.2-2'}}</b></td>
+         <td [pEditableColumn]="data.cant_Facturar" class="cursor" pTooltip="Editar cantidad a Facturar" *ngIf="formDataOrder.value.directFact">
+          <p-cellEditor *ngIf="data.stockPL > 0 && data.presentacion != 'KLS'">
+            <ng-template pTemplate="input">
+              <input pInputText type="number" (focusout)="outFocus(data.cant_Facturar, data.cant_Pendiente > data.stockPL ? data.stockPL : data.cant_Pendiente)" (focus)="onFocus()" [min]="1" [max]=" data.cant_Pendiente" [(ngModel)]="data.cant_Facturar" pEditableColumnField="cant_Facturar" required/>
+            </ng-template>
+            <ng-template pTemplate="output" >
+              {{ data.cant_Facturar == null || data.cant_Facturar > data.cant_pendiente ? data.cant_pendiente : data.cant_Facturar | number : '1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+          <!--{{data.quantity | number : '1.2-2'}}-->
+        </td>
         <td class="text-center">{{data.presentacion}}</td>
         <th class="text-center" *ngIf="editOrderFact">
           <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="seeMsjDeleteItem(data)" pTooltip="Eliminar item {{data.id_Producto}} - {{data.producto}} de la orden." tooltipPosition="top"></p-button>
@@ -159,6 +194,18 @@
       </tr>
     </ng-template>
   </p-table>
+
+  <div class="mb-3"></div>
+  
+   <!-- Agregar productos para facturar directamente sin selección de bultos. -->
+  <p-toolbar styleClass="mb-4 gap-2" *ngIf="formDataOrder.value.directFact">
+    <ng-template pTemplate="left">
+      <button pButton pRipple label="Añadir" icon="pi pi-plus" class="p-button-danger mr-2" (click)="addProductsDirectly()" [disabled]="fieldFocus"></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+    </ng-template>
+  </p-toolbar>
 
   <div class="my-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Consolidado de Productos Elegidos</h4>
@@ -190,11 +237,15 @@
         <td class="text-center">{{rowIndex + 1}}</td>
         <td class="text-center">{{data.saleOrder}}</td>
         <td class="text-center">{{data.item}}</td>
-        <td class="text-center">{{data.reference}}</td>
-        <td class="text-center">{{totalWeightByProduct(data.item) | number : '1.2-2'}}</td>
-        <td class="text-center">{{totalNetWeightByProduct(data.item) | number : '1.2-2'}}</td>
-        <td class="text-center"><b>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</b></td>
-        <td class="text-center">{{totalCountProductionByProduct(data.item)}}</td>
+        <td class="text-center">{{data.reference}}</td><!--
+        <td class="text-center">{{totalWeightByProduct(data)  | number : '1.2-2'}}</td>
+        <td class="text-center">{{totalNetWeightByProduct(data) | number : '1.2-2'}}</td>
+        <td class="text-center"><b>{{totalQuantityByProduct(data) | number : '1.2-2'}}</b></td>
+        <td class="text-center">{{totalCountProductionByProduct(data) | number : '1.2-2'}}</td>-->
+        <td class="text-center">{{data.weight  | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.netWeight | number : '1.2-2'}}</td>
+        <td class="text-center"><b>{{data.quantity | number : '1.2-2'}}</b></td>
+        <td class="text-center">{{data.cuontProduction | number : '1.2-2'}}</td>
         <td class="text-center">{{data.presentation}}</td>
       </tr>
     </ng-template>
@@ -204,11 +255,18 @@
         <td class="text-center">{{totalTotalWeightProducts() | number : '1.2-2'}}</td>
         <td class="text-center">{{totalTotalNetWeightProducts() | number : '1.2-2'}}</td>
         <td class="text-center">{{totalTotalProducts() | number : '1.2-2'}}</td>
-        <td class="text-center">{{productionSelected.length}}</td>
+        <td class="text-center">{{totalProducts() | number : '1.2-2'}}</td>
         <td></td>
       </tr>
     </ng-template>
   </p-table>
+
+  <div class="mb-3"></div>
+
+  <!--<div class="d-grid gap-2 d-md-flex justify-content-md-center" *ngIf="formDataOrder.value.directFact">
+    <button *ngIf="!editOrderFact" pButton class="p-button-danger" type="button" label="Crear Orden" icon="pi pi-send" [disabled]="fieldFocus" (click)="validateInformation()"></button>
+    <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFields(false)"></button>
+  </div>-->
 
   <div class="my-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos Disponibles.</h4>
@@ -229,7 +287,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
-          <p-checkbox (click)="selectedAllProduction()"></p-checkbox>
+          <p-checkbox (click)="selectedAllProduction()" *ngIf="directFactKg()"></p-checkbox>
         </th>
         <th>#</th>
         <th class="text-center" pSortableColumn="numberProduction">
@@ -282,7 +340,7 @@
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
         <td pFrozenColumn [frozen]="true" alignFrozen="left">
-          <p-tableCheckbox [value]="data" (click)="selectedProduction(data)"></p-tableCheckbox>
+          <p-tableCheckbox [value]="data" (click)="selectedProduction(data)" *ngIf="directFactKg()"></p-tableCheckbox>
         </td>
         <td class="text-center">{{rowIndex + 1}}</td>
         <td class="text-center">{{data.numberProduction}}</td>
@@ -302,9 +360,9 @@
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="2">Seleccionar: </td>
-        <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="selectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
-        <td><p-inputNumber [(ngModel)]="qtyToSend" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" class="length"> </p-inputNumber></td>
-        <td class="text-center"><p-button icon="pi pi-search-plus" [rounded]="true" severity="warning" (onClick)="selectByQuantity()" pTooltip="Seleccionar por cantidad"></p-button></td>
+        <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="selectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada" *ngIf="directFactKg()"></p-button></td>
+        <td><p-inputNumber [(ngModel)]="qtyToSend" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" class="length" *ngIf="directFactKg()"> </p-inputNumber></td>
+        <td class="text-center"><p-button icon="pi pi-search-plus" [rounded]="true" severity="warning" (onClick)="selectByQuantity()" pTooltip="Seleccionar por cantidad" *ngIf="directFactKg()"></p-button></td>
         <td class="text-right" colspan="2">Total</td>
         <!--Nuevo-->
         <td class="text-center">{{totalProduccionSearched() | number : '1.2-2'}}</td>
@@ -359,7 +417,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th *ngIf="!editOrderFact && !preloadDispatch" style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
-          <p-checkbox (click)="deselectedAllProduction()"></p-checkbox>
+          <p-checkbox (click)="deselectedAllProduction()" *ngIf="directFactKg()"></p-checkbox>
         </th>
         <th *ngIf="editOrderFact" style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left"></th>
         <th>#</th>
@@ -415,7 +473,7 @@
         <ng-container *ngIf="!preloadDispatch then NoPreload; else Preload" ></ng-container>
           <ng-template #NoPreload>
             <td pFrozenColumn [frozen]="true" alignFrozen="left">
-              <p-tableCheckbox *ngIf="!editOrderFact && !data.inOrder" [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
+              <p-tableCheckbox *ngIf="!editOrderFact && !data.inOrder && directFactKg()" [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
               <p-tableCheckbox *ngIf="editOrderFact && !data.inOrder" [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
               <p-button *ngIf="editOrderFact && data.inOrder" icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="seeMsgDeleteRolls(data)"></p-button>
             </td>
@@ -437,7 +495,7 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
-      <tr *ngIf="!editOrderFact && !preloadDispatch">
+      <tr *ngIf="!editOrderFact && !preloadDispatch && directFactKg()">
         <td colspan="2">Seleccionar: </td>
         <td class="text-center"><p-button icon="pi pi-check-circle" [rounded]="true" severity="success" (onClick)="deselectByFilters()" pTooltip="Seleccionar todo o seleccionar por la información filtrada"></p-button></td>
         <td colspan="9"></td>

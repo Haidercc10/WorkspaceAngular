@@ -32,25 +32,33 @@
         </span>
       </div>
 
-      <div class="col-sm-12 col-md-2">
+      <div class="col-sm-12 col-md-1">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
           <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationOrderFact()"/>
-          <label for="orderFact">Orden Fact.</label>
+          <label for="orderFact">N° Orden</label>
         </span>
+      </div>
+
+      <!--* Orden Facturación Directa -->
+      <div class="col-sm-12 col-md-1">
+        <div class="field-checkbox">
+          <p-checkbox formControlName="ofDirect" [binary]="true" [readonly]="true" inputId="ofDirect" id="ofDirect" pTooltip="Si este elemento aparece seleccionado significa que la orden fue creada de manera directa sin bultos"></p-checkbox>
+          <label for="ofDirect">Facturación Directa</label>
+        </div>
       </div>
 
       <div class="col-sm-12 col-md-2">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
-          <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus autocomplete="off" [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getInformationProduction()"/>
+          <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus autocomplete="off" [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getProductionToDispatch()"/><!--(keyup.enter)="getInformationProduction()-->
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>
 
        <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
-          <input formControlName="fact" type="text" id="fact" pInputText [required]="true" readonly/>
+          <input formControlName="fact" type="text" id="fact" pInputText [required]="true" /> <!--readonly-->
           <label for="fact">Factura</label>
         </span>
       </div>
@@ -78,6 +86,75 @@
     </div>
   </form>
 
+  <!--* Titulo Items -->
+  <div class="mb-4">
+    <div class="row g-3">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de referencias consolidadas</h4>
+      </div>
+    </div>
+  </div>
+
+  <!--* Tabla Items Consolidados -->
+  <div class="mb-4">
+    <div class="row g-3 font-size-14" id="tabla1">
+      <p-table
+          #dt1
+          [value]="rollsConsolidate"
+          styleClass="p-datatable-sm p-datatable-gridlines"
+          responsiveLayout="scroll"
+          [rowHover]="true"
+          dataKey="0"
+          [scrollable]="true"
+          scrollHeight="50rem"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          *ngIf="!load">
+        <ng-template pTemplate="header">
+          <tr>
+            <th></th>
+            <th class="text-center" colspan="2">Información Producto</th>
+            <th class="text-center" colspan="3">Información Cantidades</th>
+            <th class="text-center" colspan="2">Información Peso</th>
+          </tr>
+          <tr>
+            <th class="text-center">#</th>
+            <th class="text-center" scope="col">Item </th>
+            <th class="text-center" scope="col">Referencia</th>
+            <th class="text-center" scope="col">Cant/Peso Neto</th>
+            <th class="text-center" scope="col">Presentación</th>
+            <th class="text-center" scope="col">Cant. Rollos</th>
+            <th class="text-center" scope="col">Peso Bruto</th>
+            <th class="text-center" scope="col">Unidad</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+          <tr>
+            <td>{{rowIndex + 1}}</td>
+            <td class="text-center"><b>{{data.producto.prod_Id}}</b></td>
+            <td class="text-center">{{data.producto.prod_Nombre}}</td>
+            <td class="text-center textBlue"><b>{{qtyTotalItem(data) | number : '1.2-2'}}</b></td>
+            <td class="text-center">{{data.pp.presentacion}}</td>
+            <td class="text-center">{{qtyRollsItem(data)}}</td>
+            <td class="text-center textOrange"><b>{{ weightTotalItem(data) | number : '1.2-2'}}</b></td>
+            <td class="text-center">{{'Kg'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+  
+  <div class="mb-4">
+    <div class="row g-3">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de referencias seleccionadas</h4>
+      </div>
+    </div>
+  </div>
+
+  <!--Tabla de rollo a rollo -->
   <p-table
     *ngIf="!load"
     [value]="sendProductionZeus"

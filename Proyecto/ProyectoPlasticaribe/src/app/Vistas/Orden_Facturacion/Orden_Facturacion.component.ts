@@ -25,6 +25,9 @@ import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/de
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
+import { modelFacturacion_Productos } from 'src/app/Modelo/Facturacion_Productos';
 
 @Component({
   selector: 'app-Orden_Facturacion',
@@ -68,6 +71,7 @@ export class Orden_FacturacionComponent implements OnInit {
   comparativePreload : any = [];
   @ViewChild('tablePreload') tablePreload: Table;
   @ViewChild('tableSaleOrder') tableSaleOrder: Table;
+  fieldFocus : boolean = false;
   
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -87,7 +91,9 @@ export class Orden_FacturacionComponent implements OnInit {
     private svHeaderDevolutions : DevolucionesProductosService,
     private movOrderFact : MovimientosOrdenFacturacionComponent,
     private svDtlPreload : Detalles_PrecargueDespachoService,
-    private svPreload : Precargue_DespachoService
+    private svPreload : Precargue_DespachoService, 
+    private svStock : ExistenciasProductosService,
+    private svFactProducts : FacturacionProductosService,
   ) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
@@ -100,7 +106,8 @@ export class Orden_FacturacionComponent implements OnInit {
       client: [null, Validators.required],
       observation: [null],
       typeDoc: [null], 
-      preload : [null]
+      preload : [null], 
+      directFact : [false, Validators.required]
     });
 
     this.formItems = this.frmBuilder.group({
@@ -153,7 +160,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.clientService.LikeGetCliente(nameClient).subscribe(data => this.clients = data);
   }
 
-  getProducts() {
+  getProducts(data? : any) {
     if (this.selectedProductSaleOrder != null) {
       if(!this.preloadDispatch) {
         let idProduct: number = this.selectedProductSaleOrder.id_Producto;
@@ -181,6 +188,7 @@ export class Orden_FacturacionComponent implements OnInit {
                 netWeight : dataProduction.pp.peso_Neto,
                 ubication : ![null, undefined, ''].includes(dataProduction.ubication) ? dataProduction.ubication : '',
                 inOrder : false,
+                cuontProduction : 1,
               });
             }
             if (countProductionAvaible.length == this.production.length) this.production = this.changeNameProduct(this.production);
@@ -234,14 +242,27 @@ export class Orden_FacturacionComponent implements OnInit {
 
   getSalesOrders(info? : any) {
     let saleOrder: number = this.formDataOrder.value.saleOrder;
-    
     //if ([null, undefined, ''].includes(preload)) {
       this.invZeusService.getPedidosXConsecutivo(saleOrder).subscribe(data => {
-        this.selectedProductSaleOrder = null;
         this.products = data.filter(x => x.cant_Pendiente > 0);
-        if (this.products.length > 0) {
-          this.getClientFromSaleOrder(info);
-        } else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
+        this.products.forEach(x => {
+          let item : any = x.id_Producto;
+          let presentation : any = x.presentacion == 'KLS' ? 'Kg' : x.presentacion == 'PAQ' ? 'Paquete' : 'Und';
+
+          this.svStock.getDataProduct(item, presentation).subscribe(stock => {
+            x.stockPL = stock[0].e.exProd_Cantidad;
+            x.unit_Packing = stock[0].unit_Packing;
+            x.netWeight = stock[0].teoric_Weight;
+            x.weight = stock[0].teoric_GrossWeight;
+
+            this.selectedProductSaleOrder = null;
+            if (this.products.length > 0) {
+              this.getClientFromSaleOrder(info);
+            } else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
+          }, error => {
+            this.msj.mensajeAdvertencia(`No se encontró el item ${item} con presentación ${presentation} | ${error.status} ${error.statusText}`);
+          });
+        });
       }, error => this.msj.mensajeError(`¡No se encontró información del pedido consultado!`, `Error: ${error.error.title} | Status: ${error.status}`));
     //} else this.msj.mensajeAdvertencia(`Advertencia`, `No es posible buscar pedidos en ORDENES DE FACTURACIÓN con PRECARGUE DE DESPACHO!`);
   }
@@ -255,7 +276,6 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   getClientFromSaleOrder(info : any) {
-    console.log(info);
     let idthird: string = this.products[0].id_Cliente;
     this.invZeusService.getClientByIdThird(idthird).subscribe(data => {
       data.forEach(cli => {
@@ -459,7 +479,27 @@ export class Orden_FacturacionComponent implements OnInit {
 
   getConsolidateProduction() {
     this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
-      if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
+      if (!a.map(x => x.item).includes(b.item)) {
+          let object : any = {
+            'saleOrder' : b.saleOrder,
+            'item' : b.item, 
+            'reference' : b.reference, 
+            'weight' : b.weight, 
+            'netWeight' : b.netWeight, 
+            'cuontProduction' : b.cuontProduction,
+            'quantity' : b.quantity,
+            'presentation' : b.presentation,
+            'packingUnit' : this.products.find(x => x.id_Producto == b.item).unit_Packing,
+          }  
+          a.push(object);
+          console.log(a);
+          
+      } else {
+        a[a.map(x => x.item).indexOf(b.item)].quantity += b.quantity;
+        a[a.map(x => x.item).indexOf(b.item)].weight += b.weight;
+        a[a.map(x => x.item).indexOf(b.item)].netWeight += b.netWeight;
+        a[a.map(x => x.item).indexOf(b.item)].cuontProduction += b.cuontProduction;
+      }
       return a;
     }, []);
   }
@@ -470,98 +510,168 @@ export class Orden_FacturacionComponent implements OnInit {
     return total;
   }
 
-  totalWeightByProduct(item: number): number {
+  totalWeightByProduct(data : any): number {
     let total: number = 0;
-    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.weight);
+    !this.formDataOrder.value.directFact ? this.productionSelected.filter(x => x.item == data.item).forEach(x => total += x.weight) : 
+    (this.formDataOrder.value.directFact && data.presentation == 'Kg') ? this.productionSelected.filter(x => x.item == data.item).forEach(x => total += x.weight)  :
+    this.consolidatedProduction.filter(x => x.item == data.item).forEach(x => total += x.weight);
     return total;
   }
 
-  totalNetWeightByProduct(item: number): number {
+  totalNetWeightByProduct(data : any): number {
     let total: number = 0;
-    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.netWeight);
+     !this.formDataOrder.value.directFact ? this.productionSelected.filter(x => x.item == data.item).forEach(x => total += x.netWeight) : 
+    (this.formDataOrder.value.directFact && data.presentation == 'Kg') ? this.productionSelected.filter(x => x.item == data.item).forEach(x => total += x.netWeight)  :
+    this.consolidatedProduction.filter(x => x.item == data.item).forEach(x => total += x.netWeight);
     return total;
   }
 
-  totalQuantityByProduct(item: number): number {
+  totalQuantityByProduct(data : any): number {
     let total: number = 0;
-    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.quantity);
+    !this.formDataOrder.value.directFact ? this.productionSelected.filter(x => x.item == data.item).forEach(x => total += x.quantity) : 
+    (this.formDataOrder.value.directFact && data.presentation == 'Kg') ? this.productionSelected.filter(x => x.item == data.item).forEach(x => total += x.quantity) :
+    this.consolidatedProduction.filter(x => x.item == data.item).forEach(x => total += x.quantity);
     return total;
   }
 
   totalTotalNetWeightProducts(): number {
     let total: number = 0;
-    this.productionSelected.forEach(x => total += x.netWeight);
+    this.consolidatedProduction.forEach(x => total += x.netWeight);
     return total;
   }
 
   totalTotalWeightProducts(): number {
     let total: number = 0;
-    this.productionSelected.forEach(x => total += x.weight);
+    this.consolidatedProduction.forEach(x => total += x.weight);
     return total;
   }
 
   totalTotalProducts(): number {
     let total: number = 0;
-    this.productionSelected.forEach(x => total += x.quantity);
+    this.consolidatedProduction.forEach(x => total += x.quantity);
     return total;
   }
 
-  totalCountProductionByProduct(item: number): number {
+  totalCountProductionByProduct(data: any): number {
     let total: number = 0;
-    total = this.productionSelected.filter(x => x.item == item).length;
+    
+    return total;
+  }
+
+  totalProducts(){
+    let total : number = 0;
+    this.consolidatedProduction.forEach(x => total += x.cuontProduction);
     return total;
   }
 
   validateInformation() {
+    let factDirect : boolean = this.formDataOrder.value.directFact;
+    
     if (this.formDataOrder.valid) {
-      if (this.productionSelected.length > 0) {
-        if(!this.reposition) this.saveOrderFact();
-        else this.validateReposition();
-      } else this.msj.mensajeAdvertencia(`¡No ha seleccionado ningún rollo!`);
+      if(factDirect) {
+        this.saveOrderFact(factDirect);
+      } else {
+        if (this.productionSelected.length > 0) {
+          if(!this.reposition) this.saveOrderFact();
+          else this.validateReposition();
+        } else this.msj.mensajeAdvertencia(`¡No ha seleccionado ningún rollo!`);
+      }
     } else this.msj.mensajeAdvertencia(`¡Debe ingresar todos los datos!`);
   }
 
-  saveOrderFact() {
+  saveOrderFact(factDirect? : boolean) {
     if(this.reposition) this.onReject('reposition');
     this.load = true;
     let orderFact: modelOrdenFacturacion = {
-      Factura: [undefined, null, ''].includes(this.formDataOrder.value.fact) ? `` : this.formDataOrder.value.fact,
-      Cli_Id: this.formDataOrder.value.idClient,
-      Usua_Id: this.storage_Id,
-      Fecha: moment().format('YYYY-MM-DD'),
-      Hora: moment().format('HH:mm:ss'),
-      Observacion: !this.formDataOrder.value.observation ? '' : (this.formDataOrder.value.observation).toUpperCase(),
-      Estado_Id: 19
+      'Factura': [undefined, null, ''].includes(this.formDataOrder.value.fact) ? `` : this.formDataOrder.value.fact,
+      'Cli_Id': this.formDataOrder.value.idClient,
+      'Usua_Id': this.storage_Id,
+      'Fecha': moment().format('YYYY-MM-DD'),
+      'Hora': moment().format('HH:mm:ss'),
+      'Observacion': !this.formDataOrder.value.observation ? '' : (this.formDataOrder.value.observation).toUpperCase(),
+      'Estado_Id': 19, 
+      'Of_Directa' : factDirect,
     }
-    this.orderFactService.Post(orderFact).subscribe(data => this.saveDetailsOrderFact(data), error => this.msj.mensajeError(`¡Ocurrió un error al crear la orden de facturación!`, `Error: ${error.error.title} | Status: ${error.status}`));
+    this.orderFactService.Post(orderFact).subscribe(data => { 
+      !factDirect ? this.saveDetailsOrderFact(data) : this.saveProductsDirects(data.id); 
+    }, error => this.msj.mensajeError(`¡Ocurrió un error al crear la orden de facturación!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
-  saveDetailsOrderFact(data: any) {
+  saveDetailsOrderFact(data: any, of? : number, ) {
     let count: number = 0;
-    let order = data.id;
+    let ofDirect : boolean = this.formDataOrder.value.directFact;
+    let order : any = data == null ? of : data.id;
+    let fact : any = data == null ? '' : data.factura;
+    
     this.productionSelected.forEach(production => {
       let dtOrderFact: modelDt_OrdenFacturacion = {
-        Id_OrdenFacturacion: order,
-        Numero_Rollo: production.numberProduction,
-        Prod_Id: production.item,
-        Cantidad: production.quantity,
-        Presentacion: production.presentation,
-        Consecutivo_Pedido: (production.saleOrder).toString(),
-        Estado_Id: 20
+        'Id_OrdenFacturacion': order,
+        'Numero_Rollo': production.numberProduction,
+        'Prod_Id': production.item,
+        'Cantidad': production.quantity,
+        'Presentacion': production.presentation,
+        'Consecutivo_Pedido': (production.saleOrder).toString(),
+        'Estado_Id': 20
       }
       this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
         count++;
-        if (count == this.productionSelected.length) this.putStatusReels(order, data.factura);
+        if (count == this.productionSelected.length) {
+          this.putStatusReels(order, fact, ofDirect);
+        } 
       }, error => this.msj.mensajeError(`¡Ocurrió un error al crear los detalles de la orden de facturación!`, `Error: ${error.error.title} | Status: ${error.status}`));
     });
   }
 
-  putStatusReels(order: number, fact: string) {
+  ///Función para guardar las facturas que no contiene bultos. Solo kilaje
+  saveProductsDirects(of : number){
+    let count: number = 0;
+    let lengthFact : number = this.consolidatedProduction.length;
+
+    this.consolidatedProduction.forEach(x => {
+      let dtOrderFact: modelFacturacion_Productos = {
+        'FactPro_Pedido': x.saleOrder.toString(),
+        'Of_Id': of,
+        'Prod_Id': x.item,
+        'FactPro_Cantidad': x.quantity,
+        'UndMed_Id': x.presentation,
+        'FactPro_Unidades': x.cuontProduction,
+        'Peso_Bruto': x.weight,
+        'Peso_Neto': x.netWeight,
+      }
+      this.svFactProducts.Post(dtOrderFact).subscribe(dataFact => {
+        count++
+        if(count == lengthFact) {
+          if (this.consolidatedProduction.filter(x => x.presentation == 'Kg').length > 0) {
+            this.saveDetailsOrderFact(null, of);
+            this.updateStockProducts(of);
+          } else this.updateStockProducts(of);
+        }  
+      }, error => {
+        this.msj.mensajeError('Error', `Error al momento de generar la orden de facturación directa N° ${of}`);
+        this.load = false;
+      });
+    });
+  }
+
+  ///Función para actualizar la tabla de existencias productos. 
+  updateStockProducts(of : number){
+    this.svStock.putConsolidateProductsOF(of).subscribe(dataStock => {
+      this.createPDFFactDirect(of, '');
+      this.msj.mensajeConfirmacion('Confirmación', `Orden de facturación directa N° ${of} generada correctamente!`);
+      this.clearFields(false);
+      this.load = false;
+    }, error => {
+      this.msj.mensajeError('Error', `Error al intentar actualizar las existencias de productos de la OF N° ${of} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });
+  }
+
+  putStatusReels(order: number, fact: string, ofDirect? : boolean) {
     this.productionProcessService.putStateForSend(order).subscribe(() => {
       this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden N° ${order} actualizada exitosamente!`) : this.msj.mensajeConfirmacion('Orden creada exitosamente!');
       if(this.reposition) this.updateDevolution();
       if(this.preloadDispatch) this.updateOrderPreload();
-      this.createPDF(order, fact);
+      !ofDirect ? this.createPDF(order, fact) : null;
       this.clearFields(false);
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollos seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
@@ -619,6 +729,7 @@ export class Orden_FacturacionComponent implements OnInit {
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.tableTotals(data))
     content.push(this.tableProducts(informationProducts));
+
     return content;
   }
 
@@ -1286,6 +1397,161 @@ export class Orden_FacturacionComponent implements OnInit {
     this.consolidatedProduction = [];
   }
   
+  test1(){
+    console.log(1)
+  }
+
+  onFocus = () => this.fieldFocus = true;
+
+  outFocus(qty : number, qty2 : number) {
+    if(qty <= qty2) return this.fieldFocus = false;
+    else return this.fieldFocus = true;
+  }
+
+  //Agregar productos a facturar directamente sin seleccionar bultos. 
+  addProductsDirectly(){
+    let length : number = this.products.filter(z => z.cant_Facturar > 0).length;
+    if(length > 0) {
+      this.products.filter(z => z.cant_Facturar > 0).forEach(x => {
+        this.consolidatedProduction.push({
+          'saleOrder' : x.consecutivo,
+          'item' : x.id_Producto, 
+          'reference' : x.producto, 
+          'weight' : x.weight * (x.cant_Facturar / x.unit_Packing), 
+          'netWeight' : x.netWeight * (x.cant_Facturar / x.unit_Packing), 
+          'cuontProduction' : (x.cant_Facturar / x.unit_Packing),
+          'quantity' : x.cant_Facturar,
+          'presentation' : x.presentacion == 'KLS' ? 'Kg' : x.presentacion == 'UND' ? 'Und' : 'Paquete',
+          'packingUnit' : x.unit_Packing,
+        });
+      });
+    } else this.msj.mensajeAdvertencia('Advertencia', 'Debe haber al menos un item con cantidades para facturar');
+  }
+
+  ///Crear PDF por orden de facturación directa
+  createPDFFactDirect(of : number, fact : string){
+    this.svFactProducts.getInfoOfDirect(of).subscribe(data => {
+      let title: string = `Orden de Facturación N° ${of}`;
+      title += `${fact.length > 0 ? ` \n Factura N° ${fact}` : ''}`;
+      let content: any[] = this.directContentPDF(data);
+      this.createPDFService.formatoPDF(title, content);
+    }, error => {
+      this.msj.mensajeError(`Error`, `Error al momento de generar el documento N° ${of} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });
+  }
+
+  /// Función para cargar las tablas de los PDF. 
+  directContentPDF(data): any[] {
+    let content: any[] = [];
+    data = this.changeNameProductInPDF(data);
+    let consolidatedInformation: Array<any> = this.directConsolidatedInformation(data);
+    let informationProducts: Array<any> = this.getDirectInformationProducts(data[0].detailsFact);
+    
+    content.push(this.informationClientPDF(data[0]));
+    content.push(this.observationPDF(data[0]));
+    content.push(this.tableConsolidated(consolidatedInformation));
+    content.push(this.directTableTotals(data));
+    content.push(this.tableProducts(informationProducts))
+    return content;
+  }
+
+  /// Función para cargar la información consolidada de las referencias.
+  directConsolidatedInformation(data : any){
+    let consolidatedInformation : any = [];
+    let count : number = 0;
+
+    data.forEach(x => {
+      count++
+      consolidatedInformation.push({
+        "#" : count,
+        "Pedido": x.dtOrder.factPro_Pedido,
+        "Item": x.producto.prod_Id,
+        "Referencia": x.producto.prod_Nombre,
+        "Rollos": this.formatNumbers((x.dtOrder.factPro_Unidades).toFixed(2)),
+        "Peso B.": this.formatNumbers((x.dtOrder.peso_Bruto).toFixed(2)),
+        "Peso_Bruto": this.formatNumbers((x.dtOrder.peso_Bruto).toFixed(2)),
+        "Peso N.": this.formatNumbers((x.dtOrder.peso_Neto).toFixed(2)),
+        "Peso_Neto": this.formatNumbers((x.dtOrder.peso_Neto).toFixed(2)),
+        "Cantidad": this.formatNumbers((x.dtOrder.factPro_Cantidad).toFixed(2)),
+        "Unidad": x.dtOrder.undMed_Id
+      });
+    });
+    return consolidatedInformation;
+  }
+
+  /// Función para cargar la información detallada de las referencias.
+  getDirectInformationProducts(data: any): Array<any> {
+    let informationProducts: Array<any> = [];
+      if(data) {
+      let count: number = 0;
+      console.log(data);
+      
+      data.sort((a, b) => Number(a.dtOrder.numero_Rollo) - Number(b.dtOrder.numero_Rollo));
+      data.sort((a, b) => Number(a.producto.prod_Id) - Number(b.producto.prod_Id));
+      data.forEach(prod => {
+        count++;
+        informationProducts.push({
+          "#" : count,
+          "Rollo": prod.dtOrder.numero_Rollo,
+          "OT" : prod.orderProduction,
+          "Item": prod.producto.prod_Id,
+          "Referencia": prod.producto.prod_Nombre,
+          "Peso" : this.formatNumbers((prod.weight).toFixed(2)),
+          "Peso B." : this.formatNumbers((prod.weight).toFixed(2)),
+          "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
+          "Unidad": prod.dtOrder.presentacion,
+          "Ubicación": prod.ubication == null ? '' : prod.ubication,
+        });
+      });
+    }
+    return informationProducts;
+  }
+
+  /// Tabla con los totales de la consolidada. 
+  directTableTotals(data) {
+    let qtyRolls = this.directConsolidatedInformation(data).reduce((a, b) => a + parseInt(b.Rollos), 0);
+    let totalWeight = this.directConsolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso_Bruto.replace().replace(',','')), 0); 
+    let totalNetWeight = this.directConsolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso_Neto.replace().replace(',','')), 0); 
+    let totalQty = this.directConsolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Cantidad.replace(',','') ), 0); 
+    let units : any = [];
+    
+    this.directConsolidatedInformation(data).forEach(x => {
+      if(!units.includes(x.Unidad)) {
+        units.push(x.Unidad);
+      } 
+    });
+
+    return {
+      margin: [0, 0, 0, 0],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['2%', '12%', '6%', '40%', '8%', '8%', '5%', '12%', '7%'],
+        body: [
+          [
+            { text: ``, alignment: 'center', border: [true, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: `Totales`, alignment: 'right', bold : true, border: [false, false, false, true], },
+            { text: `${this.formatNumbers((totalWeight).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${this.formatNumbers((totalNetWeight).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${this.formatNumbers((qtyRolls))}`, alignment: '', bold : true, border: [true, false, true, true] },
+            { text: `${this.formatNumbers((totalQty).toFixed(2))}`, alignment: '', bold : true, border: [true, false, true, true], },
+            { text: `${units.length == 1 ? units : ``}`, alignment: '', bold : true, border: [false, false, true, true], },
+          ],
+        ],
+      }
+    }
+  }
+
+  //Habilitar checkbox para seleccionar rollos cuando sea OFD
+  directFactKg(){
+    let ofKg : boolean = false;
+    if(this.formDataOrder.value.directFact && this.production.filter(x => x.presentation == 'Kg').length > 0) ofKg = true;
+    else if(!this.formDataOrder.value.directFact) ofKg = true;
+    return ofKg  
+  }
 }
 
 interface production {
@@ -1305,6 +1571,9 @@ interface production {
   idDetail? : number;
   netWeight : number;
   preload? : number;
+  packingUnit? : number;
+  teoricWeight? : number;
+  teoricGrossWeight? : number;
 }
 
 

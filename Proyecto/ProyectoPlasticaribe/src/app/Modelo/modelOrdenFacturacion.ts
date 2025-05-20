@@ -7,4 +7,5 @@ export interface modelOrdenFacturacion {
     Hora: string;
     Observacion: string;
     Estado_Id: number;
+    Of_Directa? : boolean;
 }

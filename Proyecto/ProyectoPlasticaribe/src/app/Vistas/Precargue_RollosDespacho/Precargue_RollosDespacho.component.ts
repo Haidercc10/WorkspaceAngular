@@ -62,7 +62,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
 
   //*
   formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
+  
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;

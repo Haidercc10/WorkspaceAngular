@@ -73,6 +73,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
   tabStockBulto : boolean = false;
   tabStockComparative : boolean = false;
   loaded : boolean = true;
+  @ViewChild('tableQuality') tableQuality : Table | undefined;
+  stockQuality: Array<StockInformation> = [];
+  @ViewChild('tableRepacking') tableRepacking : Table | undefined;
+  stockRepacking: Array<StockInformation> = [];
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
@@ -89,7 +93,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.lecturaStorage();
     if([86,4].includes(this.ValidarRol)) {
       this.loadRollsProductionAvailable();
-    }    
+    } 
+    this.loadRollsQuality();
+    this.loadRollsForRepack();   
     //this.getStockInformation();
     //this.loadRollsProductionAvailable();
    }
@@ -737,6 +743,34 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.calculateTotalSellado();
       this.loading = false;
     }, error => { 
+      this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
+      this.loading = false; 
+    });
+  }
+
+  ///.Función para cargar el estado de los rollos que están en una devolución y tienen estado devuelto (24)
+  loadRollsQuality(){
+    this.stockQuality = [];
+
+    this.svProductionProcess.getRollsWarehouseQualityForItem().subscribe(data => {
+      this.stockQuality = data;
+      console.log(data);
+      this.loading = false;
+    }, error => {
+      this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
+      this.loading = false; 
+    });
+  }
+
+  ///.Función para cargar los rollos que están en estado REEMPAQUE (45)
+  loadRollsForRepack(){
+    this.stockRepacking = [];
+    
+    this.svProductionProcess.getRollsForRepack().subscribe(data => {
+      this.stockRepacking = data;
+      console.log(data);
+      this.loading = false;
+    }, error => {
       this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
       this.loading = false; 
     });

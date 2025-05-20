@@ -25,6 +25,8 @@ export class Produccion_ProcesosService {
 
   GetInformationAboutProductionToSend = (production: number, orderFact: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionToSend/${production}/${orderFact}`);
 
+  getProductsOFDirect = (production: number, orderFact: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getProductsOFDirect/${production}/${orderFact}`);
+
   GetInformationAboutProductionToUpdateZeus = (production: number, process: string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionToUpdateZeus/${production}/${process}`);
 
   GetAvaibleProduction = (item: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getAvaibleProduction/${item}`);
@@ -69,6 +71,10 @@ export class Produccion_ProcesosService {
   putReversionEnvioZeus = (fail : number, observation : string, rollos: any[]) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putReversionEnvioZeus/${fail}/${observation}`, rollos);
 
   getInfoProductionAvailable = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionAvailable`);
+
+  getRollsWarehouseQualityForItem = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRollsWarehouseQualityForItem`);
+
+  getRollsForRepack = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRollsForRepack`);
 
   putStateDeletedRolls = (data : Array<rollsToDelete>) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateDeletedRolls`, data);
 
