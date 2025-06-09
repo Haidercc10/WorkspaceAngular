@@ -18,4 +18,7 @@ export class FacturacionProductosService {
   
     Post = (data: modelFacturacion_Productos) => this.http.post(`${this.rutaPlasticaribeAPI}/Facturacion_Productos`, data);
   
+    Put = (id : number, data: modelFacturacion_Productos) => this.http.put(`${this.rutaPlasticaribeAPI}/Facturacion_Productos/${id}`, data);
+
+    PutOfDirectDispatched = (of : number, data: any) => this.http.put(`${this.rutaPlasticaribeAPI}/Facturacion_Productos/PutOfDirectDispatched/${of}`, data);
 }

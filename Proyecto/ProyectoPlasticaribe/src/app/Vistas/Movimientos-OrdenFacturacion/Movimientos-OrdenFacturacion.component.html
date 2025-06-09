@@ -84,6 +84,10 @@
           <p-sortIcon field="or.id"></p-sortIcon> Id
           <p-columnFilter type="text" field="or.id" display="menu"></p-columnFilter>
         </th>
+         <th class="text-center" pSortableColumn="or.of_Directa">
+          <p-sortIcon field="or.of_Directa"></p-sortIcon> Orden Directa
+          <p-columnFilter type="text" field="or.of_Directa" display="menu"></p-columnFilter>
+        </th>
         <th class="text-center" pSortableColumn="or.factura">
           <p-sortIcon field="or.factura"></p-sortIcon> Código
           <p-columnFilter type="text" field="or.factura" display="menu"></p-columnFilter>
@@ -115,6 +119,7 @@
     <ng-template pTemplate="body" let-data>
       <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'Devolucion'}" pTooltip="{{msjDevolutions(data)}}" tooltipPosition="top">
         <td class="text-center">{{data.or.id}}</td>
+        <td class="text-center">{{data.or.of_Directa == true ? 'SÍ' : 'NO'}}</td>
         <td class="text-center">{{data.or.factura}}</td>
         <td class="text-center">{{data.or.cli_Id}}</td>
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
@@ -122,10 +127,10 @@
         <td class="text-center">{{data.type | uppercase}}</td>
         <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-warning': [3,29].includes(data.or.estado_Id), 'bg-secondary1': [38].includes(data.or.estado_Id), 'bg-blue1': [39].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
         <td class="text-center" *ngIf="[1].includes(validateRole)">
-          <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-danger" [disabled]="data.type == 'Devolucion'" (onClick)="confirmSendData(data.or.id)"></p-button>
+          <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-danger" [disabled]="data.type == 'Devolucion'" (onClick)="confirmSendData(data)"></p-button>
         </td>
         <td class="text-center">
-          <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id, data.or.factura, data.type)"></p-button>
+          <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id, data.or.factura, data.type, data.or.of_Directa)"></p-button>
         </td>
       </tr>
     </ng-template>

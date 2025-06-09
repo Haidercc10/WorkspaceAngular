@@ -58,6 +58,20 @@ export class Precargue_RollosDespachoComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.focusInput(false);
+  }
+
+  ngOnDestroy(): void {
+    this.focusInput(true);
+  }
+
+  // Función para mantener el puntero del mouse en un campo especifico. 
+  focusInput(destroy: boolean) {
+    let time = setInterval(() => {
+      let preInBarsCode = document.getElementById('roll');
+      if (!destroy && preInBarsCode) preInBarsCode.focus();
+      else if (destroy) clearInterval(time);
+    }, 5000);
   }
 
   //*

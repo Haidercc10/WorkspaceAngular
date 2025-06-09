@@ -337,12 +337,11 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     let total: number = 0;
     if (disabilityBeforePayroll <= 0) {
       if (disabilityDays <= 2) total = valueDay * disabilityDays;
-      else if (disabilityDays => 3 && disabilityDays <= 90) total = (2 * valueDay) + ((disabilityDays - 2) * ((valueDay * 66.667) / 100));
+      //else if (disabilityDays => 3 && disabilityDays <= 90) total = (2 * valueDay) + ((disabilityDays - 2) * ((valueDay * 66.667) / 100));
       else if (disabilityDays > 90) total = (2 * valueDay) + (88 * ((valueDay * 66.667) / 100)) + ((disabilityDays - 90) * ((valueDay * 50) / 100));
     } else if (disabilityBeforePayroll > 0 && disabilityBeforePayroll < 2) {
-      if (disabilityDays <= 2) total = valueDay * disabilityDays;
-      else if (disabilityDays => 3 && disabilityDays <= 90) total = (1 * valueDay) + ((disabilityDays - 1) * ((valueDay * 66.667) / 100));
-      else if (disabilityDays > 90) total = (1 * valueDay) + (88 * ((valueDay * 66.667) / 100)) + ((disabilityDays - 90) * ((valueDay * 50) / 100));
+      //else if (disabilityDays => 3 && disabilityDays <= 90) total = (1 * valueDay) + ((disabilityDays - 1) * ((valueDay * 66.667) / 100));
+      //else if (disabilityDays > 90) total = (1 * valueDay) + (88 * ((valueDay * 66.667) / 100)) + ((disabilityDays - 90) * ((valueDay * 50) / 100));
     } else if (disabilityBeforePayroll >= 2 && disabilityBeforePayroll < 91) total = ((valueDay * 66.667) / 100) * disabilityDays;
     else if (disabilityBeforePayroll >= 91) total = ((valueDay * 50) / 100) * disabilityDays;
     return total;

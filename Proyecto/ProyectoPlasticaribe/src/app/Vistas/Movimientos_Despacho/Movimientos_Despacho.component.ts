@@ -80,6 +80,11 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.lecturaStorage();
     this.getDrivers();
     this.getStatuses();
+    this.loadRankDates();
+  }
+
+  loadRankDates(){
+    this.formSearchDespacho.patchValue({ 'dateStart' : new Date(), 'dateEnd' : new Date() });
   }
 
   lecturaStorage() {
@@ -94,6 +99,7 @@ export class Movimientos_DespachoComponent implements OnInit {
 
   clearFields() {
     this.formSearchDespacho.reset();
+    this.loadRankDates();
     this.load = false;
     this.dataDespacho = [];
     this.dataDetails = [];
@@ -103,6 +109,7 @@ export class Movimientos_DespachoComponent implements OnInit {
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   searchMovements() {
+    this.dataDespacho = [];
     //let lastMonth: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     this.load = true
     let today : any = moment().format('YYYY-MM-DD');
@@ -112,15 +119,20 @@ export class Movimientos_DespachoComponent implements OnInit {
     dateEnd = dateEnd == 'Fecha inválida' ? today : dateEnd;
     let route: string = this.validateParamsInRoute();
     this.dtAsgDespacho.GetRollosEnviadosCamion(dateStart, dateEnd, route).subscribe(data => {
+      let datalength : number = data ? data.length : 0;
+      let count : number = 0;
       data.forEach(x => {
+        console.log(x);
         x.details.forEach(z => {
           this.svZeus.getDataFactura(z.factura).subscribe(zData => {
             z.valor = zData.total,
             z.forma_Pago = zData.typePay
           });
         });
+        count++
+        if(count == datalength) this.dataDespacho = data;
       });
-      this.dataDespacho = data;
+      //this.dataDespacho = data;
       this.load = false;
     }, error => {
       this.msj.mensajeError(`No existen planillas de despacho en la fecha consultada | ${error.status} ${error.statusText}`);
@@ -161,7 +173,6 @@ export class Movimientos_DespachoComponent implements OnInit {
       'Pla_PesoTotal': data.pesoTotal,
     }
     this.svSpreadsheets.Post(info).subscribe(dataPlanilla => {
-      //console.log(dataa, index);
       this.createDetailsSpreadSheet(dataPlanilla, data, index);
     }, error => {
       this.msj.mensajeError(`Error`, `Error al crear la planilla de despacho | ${error.status} ${error.statusText}`);
@@ -172,6 +183,8 @@ export class Movimientos_DespachoComponent implements OnInit {
   //Función para crear el detalle de las planillas
   createDetailsSpreadSheet(dataPlanilla : any, data : any,  index : number){
     let count : number = 0;
+    let details : any = [];
+
     this.dataDespacho[index].details.forEach(x => {
       let info : modelDetalles_PlanillaDespacho = {
         'DtPla_Codigo': 0,
@@ -184,10 +197,12 @@ export class Movimientos_DespachoComponent implements OnInit {
         'DtPla_PesoBruto': x.peso_Bruto
       }
       this.svDetailsSpreadSheets.Post(info).subscribe(dataDet => {
-        count++
+        count++;
+        
         if(count == this.dataDespacho[index].details.length) {
-          //this.load = false;
-          this.updateMovementsDispatch(dataPlanilla.pla_Id, this.dataDespacho[index].details[0].codigos)
+          details.push(this.dataDespacho[index].details.forEach(y => y.codigos.map(z => z)));
+          console.log(details, '3');
+          this.updateMovementsDispatch(dataPlanilla.pla_Id, details);
         }
       }, error => {
         this.msj.mensajeError(`Error`, `Error al crear los detalles de la planilla de despacho | ${error.status} ${error.statusText}`);
@@ -202,7 +217,10 @@ export class Movimientos_DespachoComponent implements OnInit {
       this.load = false;
       this.createPDF(codeSpreadSheet);
       this.msj.mensajeConfirmacion(`Confirmación`, `Se creó exitosamente la planilla de despacho N° ${codeSpreadSheet}`);
-      setTimeout(() => { this.searchMovements(); }, 500);
+      setTimeout(() => { 
+        this.searchMovements();
+        this.clearFields(); 
+      }, 3000);
     }, error => {
       this.msj.mensajeError(`Error`, `Error al actualizar los movimientos de despacho | ${error.status} ${error.statusText}`);
       this.load = false;
@@ -317,6 +335,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     });
   }
 
+  //
   updateSpreadSheetForFact(){
     this.load = true;
     this.modalUpdateSpreadsheet = false;
@@ -379,7 +398,6 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.indice = index;
     this.load = true;
     
-    console.log(this.dataSpreadSheet, this.dataDetails, index);
     let msg : string = `Está seguro(a) que desea retirar la factura N° ${details.factura} de la planilla N° ${data.planilla}`;
     setTimeout(() => { this.msg.add({ severity:'warn', key:'anulled', summary: `Elección`, detail : msg,  sticky: true}); }, 200);
   }

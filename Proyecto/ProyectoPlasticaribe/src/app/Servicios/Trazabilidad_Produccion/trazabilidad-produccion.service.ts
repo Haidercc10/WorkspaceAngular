@@ -15,6 +15,9 @@ export class TrazabilidadProduccionService {
   
     getId = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/${dato}`);
   
-    getTraceability = (date1 : any, date2 : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getTraceability/${date1}/${date2}${url}`);
-  
+    getTraceability = (date1 : any, date2 : any, process : string, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getTraceability/${date1}/${date2}/${process}${url}`);
+
+    getFormatTraceability = (date1 : any, date2 : any, process : string, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getFormatTraceability/${date1}/${date2}/${process}${url}`);
+
+    getTraceabilityForProduction = (production : any, process : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getTraceabilityForProduction/${production}/${process}`);
 }

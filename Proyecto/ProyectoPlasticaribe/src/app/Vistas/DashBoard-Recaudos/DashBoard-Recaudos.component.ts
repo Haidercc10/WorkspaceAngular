@@ -34,9 +34,9 @@ export class DashBoardRecaudosComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  carteraAgrupadaClientes : any [] = []; //Variable que almacenará la información de la cartera agrupada por los clientes
-  carteraAgrupadaVendedores : any [] = []; //Variable que almacenará la información de la cartera agrupada por vendedores
-  cartera : any [] = []; //Variable que almacenará la información de la cartera, información detalla de cada una de las facturas en cartera
+  carteraAgrupadaClientes : any = []; //Variable que almacenará la información de la cartera agrupada por los clientes
+  carteraAgrupadaVendedores : any = []; //Variable que almacenará la información de la cartera agrupada por vendedores
+  cartera : any = []; //Variable que almacenará la información de la cartera, información detalla de cada una de las facturas en cartera
   //totalCartera : number = 0; //Variable que almacenará el valor total de la cartera
   vendedores : any [] = []; //Variable que almacenará la información de los vendedores
   clientes : any [] = []; //Variable que almacenará la información de los clientes
@@ -102,7 +102,14 @@ export class DashBoardRecaudosComponent implements OnInit {
   }
 
   // Funcion que consultará los clientes
-  obtenerClientes = () => this.zeusService.GetClientes().subscribe(data => this.clientes = data);
+  obtenerClientes() {
+    this.zeusService.GetClientes().subscribe(data => {
+      data.forEach(x => {
+        x.displayLabel = `${x.idcliente} - ${x.razoncial}`;
+        this.clientes.push(x);
+      });
+    });
+  } 
 
   // Funcion que consultará los vendedores
   obtenerVendedor = () => this.vendedorService.GetVendedores().subscribe(data => this.vendedores = data.map(x => x.usua_Nombre));
@@ -111,27 +118,29 @@ export class DashBoardRecaudosComponent implements OnInit {
   consultarCartera(){
     this.cargando = true;
     let ruta : string = "";
-    let cliente : string = this.FormFiltros.value.Cliente;
+    let cliente : any = this.FormFiltros.value.Cliente == null ? [] : this.FormFiltros.value.Cliente;
     let vendedor : string = this.FormFiltros.value.Vendedor;
     let carteraOriginal: boolean = this.FormFiltros.value.CarteraOriginal;
-
+    
+    
     this.carteraAgrupadaClientes = [];
     this.carteraAgrupadaVendedores = [];
     this.cartera = [];
 
-    if(![null, undefined, ''].includes(cliente)) {
-      if(cliente.includes('&')) {
-        cliente = cliente.replace(/&/g, '%26');
-      }
-    }
+    //if(![null, undefined, ''].includes(cliente)) {
+    //  if(cliente.includes('&')) {
+    //    cliente = cliente.replace(/&/g, '%26');
+    //  }
+    //}
 
     if (vendedor != null) ruta += `vendedor=${vendedor}`;
-    if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
+    //if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
 
-    this.zeusService.GetCarteraAgrupadaClientes(ruta).subscribe(data => this.carteraAgrupadaClientes = data);
+    this.zeusService.GetCarteraAgrupadaClientes(cliente, ruta).subscribe(data => this.carteraAgrupadaClientes = data);
     this.zeusService.GetCarteraAgrupadaVendedores(ruta).subscribe(data => this.carteraAgrupadaVendedores = data);
-    this.zeusService.GetCarteraTotal(ruta).subscribe(data => {
+    this.zeusService.GetCarteraTotal(cliente, ruta).subscribe((data : any) => {
+
       this.cartera = data.filter(x => x.saldo_Cartera > 0);
       if (carteraOriginal) this.cartera = this.cartera.filter(x => x.cantidad_Dias < 1000);
       this.cargando = false;
@@ -347,7 +356,8 @@ export class DashBoardRecaudosComponent implements OnInit {
     let carteraOriginal: boolean = this.FormFiltros.value.CarteraOriginal;
     if (carteraOriginal) informacion = this.cartera.filter(x => x.cantidad_Dias < 1000);
     if (this.FormFiltros.value.Vendedor) informacion = informacion.filter(x => x.nombre_Vendedor == this.FormFiltros.value.Vendedor);
-    if (this.FormFiltros.value.Cliente) informacion = informacion.filter(x => x.nombre_CLiente == this.FormFiltros.value.Cliente);
+    if (this.FormFiltros.value.Cliente) informacion = informacion.filter(x => this.FormFiltros.value.Cliente.includes(x.id_Cliente));
+    console.log(informacion);
     return informacion;
   }
 

@@ -21,6 +21,8 @@ export class ExistenciasProductosService {
   
   putConsolidateProductsOF = (of : number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/putConsolidateProductsOF/${of}`, data);
 
+  putStockThenAnullation = (of : number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/putStockThenAnullation/${of}`, data);
+
   getDataProduct = (item : any, unit : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/getDataProduct/${item}/${unit}`);
 
   IdProductoPresentacionInventario = (id : any, presentacion : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacionInventario/${id}/${presentacion}`);

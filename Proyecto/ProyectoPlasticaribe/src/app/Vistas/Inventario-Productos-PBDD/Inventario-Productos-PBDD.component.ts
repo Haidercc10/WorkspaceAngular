@@ -974,6 +974,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
    //Función que cargará la hoja de cálculo y los estilos.
    loadSheetAndStyles2(data : any){  
+    console.log(data);
     let title : any = `Inventario comparativo de productos`;  
     title += ` ${moment().format('DD-MM-YYYY')}`
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
@@ -1004,7 +1005,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader2(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5']; 
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5', 'J5','K5','L5','M5']; 
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader2());
     
@@ -1012,16 +1013,15 @@ export class InventarioProductosPBDDComponent implements OnInit {
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:I3');
+    ws.mergeCells('A1:M3');
 
     this.loadSizeHeader2(ws);
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader2(ws : any){
-    [5,6,7].forEach(x => ws.getColumn(x).width = 25);
-    [3,4].forEach(x => ws.getColumn(x).width = 50);
-    [9].forEach(x => ws.getColumn(x).width = 50);
+    [5,6,7,9,10,11,12].forEach(x => ws.getColumn(x).width = 25);
+    [3,4,13].forEach(x => ws.getColumn(x).width = 50);
     [1].forEach(x => ws.getColumn(x).width = 5);
     [2,7,8].forEach(x => ws.getColumn(x).width = 15);
   }
@@ -1037,6 +1037,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
       'Exist. Area', 
       'Exist. Total',  
       'Unidad', 
+      'Precio U.',
+      'Valor en Despacho',
+      'Valor en Producción',
+      'Valor Total',
       'Vendedor'
     ];
     return headerRow;
@@ -1044,9 +1048,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel2(ws : any, data : any, border : any, alignment : any){
-    let formatNumber: Array<number> = [5,6,7];
+    let formatNumber: Array<number> = [5,6,7,9,10,11,12];
     let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I',]; 
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M']; 
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(x => {
@@ -1075,6 +1079,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
         x.stockInProcess,
         x.totalStock,
         x.presentation,
+        x.price, 
+        (x.price * x.stock),
+        (x.price * x.stockInProcess),
+        x.price * (x.stock + x.stockInProcess),
         x.seller,
       ]);
     });

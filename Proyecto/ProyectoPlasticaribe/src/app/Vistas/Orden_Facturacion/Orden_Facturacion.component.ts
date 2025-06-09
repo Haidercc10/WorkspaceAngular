@@ -107,7 +107,7 @@ export class Orden_FacturacionComponent implements OnInit {
       observation: [null],
       typeDoc: [null], 
       preload : [null], 
-      directFact : [false, Validators.required]
+      directFact : [true, ]
     });
 
     this.formItems = this.frmBuilder.group({
@@ -123,6 +123,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.getPresentation();
     this.getTypesDocument();
     this.getLastOrderFact();
+    //this.createPDFFactDirect(12122, '');
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -254,15 +255,15 @@ export class Orden_FacturacionComponent implements OnInit {
             x.unit_Packing = stock[0].unit_Packing;
             x.netWeight = stock[0].teoric_Weight;
             x.weight = stock[0].teoric_GrossWeight;
-
-            this.selectedProductSaleOrder = null;
-            if (this.products.length > 0) {
-              this.getClientFromSaleOrder(info);
-            } else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
           }, error => {
             this.msj.mensajeAdvertencia(`No se encontró el item ${item} con presentación ${presentation} | ${error.status} ${error.statusText}`);
+            this.load = false;
           });
         });
+         this.selectedProductSaleOrder = null;
+         if (this.products.length > 0) {
+           this.getClientFromSaleOrder(info);
+         } else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
       }, error => this.msj.mensajeError(`¡No se encontró información del pedido consultado!`, `Error: ${error.error.title} | Status: ${error.status}`));
     //} else this.msj.mensajeAdvertencia(`Advertencia`, `No es posible buscar pedidos en ORDENES DE FACTURACIÓN con PRECARGUE DE DESPACHO!`);
   }
@@ -489,11 +490,9 @@ export class Orden_FacturacionComponent implements OnInit {
             'cuontProduction' : b.cuontProduction,
             'quantity' : b.quantity,
             'presentation' : b.presentation,
-            'packingUnit' : this.products.find(x => x.id_Producto == b.item).unit_Packing,
+            'packingUnit' : this.products.find(x => x.id_Producto == b.item) ? this.products.find(x => x.id_Producto == b.item).unit_Packing : 0,
           }  
           a.push(object);
-          console.log(a);
-          
       } else {
         a[a.map(x => x.item).indexOf(b.item)].quantity += b.quantity;
         a[a.map(x => x.item).indexOf(b.item)].weight += b.weight;
@@ -668,11 +667,11 @@ export class Orden_FacturacionComponent implements OnInit {
 
   putStatusReels(order: number, fact: string, ofDirect? : boolean) {
     this.productionProcessService.putStateForSend(order).subscribe(() => {
-      this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden N° ${order} actualizada exitosamente!`) : this.msj.mensajeConfirmacion('Orden creada exitosamente!');
+      this.editOrderFact ? this.msj.mensajeConfirmacion(`Orden N° ${order} actualizada exitosamente!`) : ofDirect ? null : this.msj.mensajeConfirmacion('Orden creada exitosamente!');
       if(this.reposition) this.updateDevolution();
       if(this.preloadDispatch) this.updateOrderPreload();
       !ofDirect ? this.createPDF(order, fact) : null;
-      this.clearFields(false);
+      setTimeout(() => { this.clearFields(false); }, 2000); 
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollos seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
@@ -763,8 +762,6 @@ export class Orden_FacturacionComponent implements OnInit {
           totalWeight += x.weight,
           totalNetWeight += x.netWeight
         }); 
-        console.log(totalNetWeight);
-        
         consolidatedInformation.push({
           "#" : count,
           "Pedido": prod.dtOrder.consecutivo_Pedido,
@@ -1288,6 +1285,8 @@ export class Orden_FacturacionComponent implements OnInit {
             this.svDtlPreload.getPreloadId(preload).subscribe(data => {
               //this.clearTables();
               this.getSalesOrders(data);
+              console.log(data);
+              
               this.load = false;
             }, error => {
               this.msjsOF(`Error`, [400, 404].includes(error.status) ? `No se encontró la orden de precargue N° ${preload} | \n${error.status} ${error.statusText}` : `No fue posible consultar la orden de despacho N° ${preload} | \n${error.status} ${error.statusText}`);
@@ -1314,6 +1313,7 @@ export class Orden_FacturacionComponent implements OnInit {
         'ubication' : x.ubication,
         'netWeight' : x.netWeight,
         'preload' : x.movement,
+        'cuontProduction' : 1,
       })
     });
     this.getConsolidateProduction();
@@ -1411,19 +1411,25 @@ export class Orden_FacturacionComponent implements OnInit {
   //Agregar productos a facturar directamente sin seleccionar bultos. 
   addProductsDirectly(){
     let length : number = this.products.filter(z => z.cant_Facturar > 0).length;
+    let itemsSelected : any = this.consolidatedProduction.map(x => x.item);
+
     if(length > 0) {
       this.products.filter(z => z.cant_Facturar > 0).forEach(x => {
-        this.consolidatedProduction.push({
-          'saleOrder' : x.consecutivo,
-          'item' : x.id_Producto, 
-          'reference' : x.producto, 
-          'weight' : x.weight * (x.cant_Facturar / x.unit_Packing), 
-          'netWeight' : x.netWeight * (x.cant_Facturar / x.unit_Packing), 
-          'cuontProduction' : (x.cant_Facturar / x.unit_Packing),
-          'quantity' : x.cant_Facturar,
-          'presentation' : x.presentacion == 'KLS' ? 'Kg' : x.presentacion == 'UND' ? 'Und' : 'Paquete',
-          'packingUnit' : x.unit_Packing,
-        });
+        if(!itemsSelected.includes(x.id_Producto)) {
+            this.consolidatedProduction.push({
+            'saleOrder' : x.consecutivo,
+            'item' : x.id_Producto, 
+            'reference' : x.producto, 
+            'weight' : x.weight * (x.cant_Facturar / x.unit_Packing), 
+            'netWeight' : x.netWeight * (x.cant_Facturar / x.unit_Packing), 
+            'cuontProduction' : (x.cant_Facturar / x.unit_Packing),
+            'quantity' : x.cant_Facturar,
+            'presentation' : x.presentacion == 'KLS' ? 'Kg' : x.presentacion == 'UND' ? 'Und' : 'Paquete',
+            'packingUnit' : x.unit_Packing,
+          });
+        } else {
+          this.msj.mensajeAdvertencia('Advertencia', `El item ${x.id_Producto} ${x.producto} ya fue elegido para facturar.`);
+        } 
       });
     } else this.msj.mensajeAdvertencia('Advertencia', 'Debe haber al menos un item con cantidades para facturar');
   }
@@ -1444,7 +1450,7 @@ export class Orden_FacturacionComponent implements OnInit {
   /// Función para cargar las tablas de los PDF. 
   directContentPDF(data): any[] {
     let content: any[] = [];
-    data = this.changeNameProductInPDF(data);
+    //data = this.changeNameProductInPDF(data);
     let consolidatedInformation: Array<any> = this.directConsolidatedInformation(data);
     let informationProducts: Array<any> = this.getDirectInformationProducts(data[0].detailsFact);
     
@@ -1452,7 +1458,7 @@ export class Orden_FacturacionComponent implements OnInit {
     content.push(this.observationPDF(data[0]));
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.directTableTotals(data));
-    content.push(this.tableProducts(informationProducts))
+    informationProducts.length > 0 ? content.push(this.tableProducts(informationProducts)) : null;
     return content;
   }
 
@@ -1483,10 +1489,8 @@ export class Orden_FacturacionComponent implements OnInit {
   /// Función para cargar la información detallada de las referencias.
   getDirectInformationProducts(data: any): Array<any> {
     let informationProducts: Array<any> = [];
-      if(data) {
+    if(![null, undefined].includes(data)) {
       let count: number = 0;
-      console.log(data);
-      
       data.sort((a, b) => Number(a.dtOrder.numero_Rollo) - Number(b.dtOrder.numero_Rollo));
       data.sort((a, b) => Number(a.producto.prod_Id) - Number(b.producto.prod_Id));
       data.forEach(prod => {
@@ -1510,7 +1514,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   /// Tabla con los totales de la consolidada. 
   directTableTotals(data) {
-    let qtyRolls = this.directConsolidatedInformation(data).reduce((a, b) => a + parseInt(b.Rollos), 0);
+    let qtyRolls = this.directConsolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Rollos.replace().replace(',','')), 0);
     let totalWeight = this.directConsolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso_Bruto.replace().replace(',','')), 0); 
     let totalNetWeight = this.directConsolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Peso_Neto.replace().replace(',','')), 0); 
     let totalQty = this.directConsolidatedInformation(data).reduce((a, b) => a + parseFloat(b.Cantidad.replace(',','') ), 0); 
@@ -1548,7 +1552,7 @@ export class Orden_FacturacionComponent implements OnInit {
   //Habilitar checkbox para seleccionar rollos cuando sea OFD
   directFactKg(){
     let ofKg : boolean = false;
-    if(this.formDataOrder.value.directFact && this.production.filter(x => x.presentation == 'Kg').length > 0) ofKg = true;
+    if(this.formDataOrder.value.directFact && this.production.filter(x => x.presentation == 'Kg').length > 0 || this.productionSelected.filter(x => x.presentation == 'Kg').length > 0) ofKg = true;
     else if(!this.formDataOrder.value.directFact) ofKg = true;
     return ofKg  
   }

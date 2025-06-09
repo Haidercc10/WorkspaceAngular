@@ -43,7 +43,7 @@
       <!--Fact. Direct-->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-1 col-xxl-1">
         <div class="field-checkbox">
-          <p-checkbox formControlName="directFact" [binary]="true" inputId="directFact" id="directFact" pTooltip="Al checar este elemento indicas que la orden de facturación será directa "></p-checkbox>
+          <p-checkbox formControlName="directFact" [binary]="true" inputId="directFact" id="directFact" pTooltip="Al checar este elemento indicas que la OF se creará sin selección de bultos."></p-checkbox>
           <label for="directFact">Facturación Directa</label>
         </div>
       </div>
@@ -179,10 +179,10 @@
          <td [pEditableColumn]="data.cant_Facturar" class="cursor" pTooltip="Editar cantidad a Facturar" *ngIf="formDataOrder.value.directFact">
           <p-cellEditor *ngIf="data.stockPL > 0 && data.presentacion != 'KLS'">
             <ng-template pTemplate="input">
-              <input pInputText type="number" (focusout)="outFocus(data.cant_Facturar, data.cant_Pendiente > data.stockPL ? data.stockPL : data.cant_Pendiente)" (focus)="onFocus()" [min]="1" [max]=" data.cant_Pendiente" [(ngModel)]="data.cant_Facturar" pEditableColumnField="cant_Facturar" required/>
+              <input pInputText type="number" (focusout)="outFocus(data.cant_Facturar, data.stockPL)" (focus)="onFocus()" [min]="1" [max]=" data.stockPL" [(ngModel)]="data.cant_Facturar" pEditableColumnField="cant_Facturar" required/>
             </ng-template>
             <ng-template pTemplate="output" >
-              {{ data.cant_Facturar == null || data.cant_Facturar > data.cant_pendiente ? data.cant_pendiente : data.cant_Facturar | number : '1.2-2' }}
+              {{ data.cant_Facturar == null || data.cant_Facturar > data.stockPL ? data.stockPL : data.cant_Facturar | number : '1.2-2' }}
             </ng-template>
           </p-cellEditor>
           <!--{{data.quantity | number : '1.2-2'}}-->
@@ -200,7 +200,7 @@
    <!-- Agregar productos para facturar directamente sin selección de bultos. -->
   <p-toolbar styleClass="mb-4 gap-2" *ngIf="formDataOrder.value.directFact">
     <ng-template pTemplate="left">
-      <button pButton pRipple label="Añadir" icon="pi pi-plus" class="p-button-danger mr-2" (click)="addProductsDirectly()" [disabled]="fieldFocus"></button>
+      <button pButton pRipple label="Añadir" icon="pi pi-plus" class="p-button-danger mr-2" (click)="addProductsDirectly()" [disabled]="fieldFocus || products.length == 0"></button>
     </ng-template>
 
     <ng-template pTemplate="right">
@@ -534,7 +534,7 @@
 
   <!--Botones-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button *ngIf="!editOrderFact" pButton class="p-button-danger" type="button" label="Crear Orden" icon="pi pi-send" [disabled]="load" (click)="validateInformation()"></button>
+    <button *ngIf="!editOrderFact" pButton class="p-button-danger" type="button" label="Crear Orden" icon="pi pi-send" [disabled]="load || consolidatedProduction.length == 0" (click)="validateInformation()"></button>
     <button *ngIf="editOrderFact" pButton class="p-button-danger" type="button" label="Editar Orden" icon="pi pi-pencil" [disabled]="load" (click)="editOrder()"></button>
     <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFields(false)"></button>
   </div>

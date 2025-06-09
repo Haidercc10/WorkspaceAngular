@@ -23,6 +23,8 @@ import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/
 import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
 import { of } from 'rxjs';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
+import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
+import { modelFacturacion_Productos } from 'src/app/Modelo/Facturacion_Productos';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -52,6 +54,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   preload : boolean = false;
   preSendProductionZeus : any[] = [];
   rollsConsolidate : any = [];
+  modalProductsNotRead : boolean = false;
+  remainingProducts : any = [];
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -69,7 +73,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private svDevolutions : DevolucionesProductosService,
     private cmpOrderFactPallets : OrdenFacturacion_PalletsComponent,
     private svDtlPreload : Detalles_PrecargueDespachoService,
-    private svPreload : Precargue_DespachoService 
+    private svPreload : Precargue_DespachoService,
+    private svFactProducts : FacturacionProductosService, 
   ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
@@ -89,12 +94,26 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ngOnInit() {
     this.getDrivers();
     this.lecturaStorage();
+    this.focusInput(false);
     // setTimeout(() => document.getElementById('RolloBarCode').focus(), 500);
   }
 
   lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
+  }
+
+  ngOnDestroy(): void {
+    this.focusInput(true);
+  }
+
+  // Función para mantener el puntero del mouse en un campo especifico. 
+  focusInput(destroy: boolean) {
+    let time = setInterval(() => {
+      let preInBarsCode = document.getElementById('RolloBarCode');
+      if (!destroy && preInBarsCode) preInBarsCode.focus();
+      else if (destroy) clearInterval(time);
+    }, 3000);
   }
 
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -111,6 +130,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.load = false;
     document.getElementById('RolloBarCode').focus();
     this.count = 0;
+    this.remainingProduction = [];
+    this.rollsConsolidate = [];
     this.productionInPallet = [];
     this.productionOutPallet = [];
     this.reposition = false;
@@ -127,11 +148,11 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     
     this.svPreload.GetIdPrecargue_Despacho(preload).subscribe(data => {
       this.productionProcessSerivce.getOrderFactForPreload(data.oF_Id).subscribe(dataOF => {
-        this.formProduction.patchValue({ 'orderFact' : data.oF_Id });
+        this.formProduction.patchValue({ 'orderFact' : data.oF_Id, 'client' : data.cli_Id });
         this.preSendProductionZeus = dataOF;
         this.load = false;
         this.preload = true;
-        this.getInformationOrderFact();
+        this.getInformationOrderFact(data.oF_Id, false);
       }, error => {
         this.msj.mensajeError(`Error`, `Error en la consulta de la orden de facturación asociada al precargue N° ${preload}`);
         this.clearFields();
@@ -142,52 +163,67 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     });
   }
 
-  getInformationOrderFact(){
-    let orderFact = this.formProduction.value.orderFact;
+  getInformationForDispatch(){
+    this.production = [];
+    this.rollsConsolidate = [];
+    this.remainingProducts = [];
+    this.remainingProduction = []
+    let orderFact : number = this.formProduction.value.orderFact;
+
+    this.orderFactService.getId(orderFact).subscribe(data => {
+      if(data.estado_Id == 19) {
+        let ofDirect : boolean = ![null, false, undefined].includes(data.of_Directa) ? true : false;
+        this.formProduction.patchValue({ 'ofDirect':  ofDirect, 'client': data.cli_Id, });
+        this.getInformationOrderFact(orderFact, ofDirect);
+      } else if(data.estado_Id == 21) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} ya fue despachada!`);
+      else if(data.estado_Id == 3) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} fue anulada!`);
+      else this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} no se encuentra disponible para despachar!`);
+    }, error => {
+      this.msj.mensajeError('Error', `Error al consultar la OF N° ${orderFact} | ${error.status} ${error.statusText}`);
+    });
+  }
+
+  getInformationOrderFact(of : number, ofDirect : boolean){
+    //let orderFact = this.formProduction.value.orderFact;
     this.reposition = false;
     this.load = true;
-    this.dtOrderFactService.GetInformacionOrderFactToSend(orderFact).subscribe(data => {
+    this.dtOrderFactService.GetInformacionOrderFactToSend(of, ofDirect).subscribe(data => {
       this.production = [];
       let saleOrders: Array<number> = [];
       data.forEach(dataProduction => {
-        this.formProduction.patchValue({
-          'ofDirect': ![null, false, undefined].includes(dataProduction.order.of_Directa) ? true : false, 
-          //'fact': dataProduction.order.factura,
-          'client': dataProduction.clientes.cli_Id
-        });
         saleOrders.push(dataProduction.dtOrder.consecutivo_Pedido);
+
+        //if(dataProduction.dtOrder.numero_Rollo != 0) {
         this.production.push({
           'saleOrder': dataProduction.dtOrder.consecutivo_Pedido,
           'item': dataProduction.producto.prod_Id,
           'reference': dataProduction.producto.prod_Nombre,
           'numberProduction': dataProduction.dtOrder.numero_Rollo,
           'quantity': dataProduction.dtOrder.cantidad,
-          'presentation': dataProduction.dtOrder.presentacion
+          'presentation': dataProduction.dtOrder.presentacion,
+          'ofDirect' : ofDirect
         });
+        //}
         this.load = false
-
-        if(dataProduction.order.of_Directa) {
-          this.getDataProduction(dataProduction.dtOrder.numero_Rollo);
-        } 
-
-        /*if (saleOrders.length == data.length){
+        if (saleOrders.length == data.length){
           //setTimeout(() => this.load = false, 50);
           let saleOrder : string = `${data[0].dtOrder.consecutivo_Pedido}`;
           if(!saleOrder.startsWith('DV')) {
             this.zeusService.GetFactura(saleOrders[saleOrders.length - 1]).subscribe(factura => {
-              this.orderFactService.PutFactOrder(orderFact, factura.documento).subscribe(() => {
+              this.orderFactService.PutFactOrder(of, factura.documento).subscribe(() => {
                 this.formProduction.patchValue({ fact: factura.documento });
                 this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
                 this.load = false;
                 this.sendProductionZeus = this.preSendProductionZeus;
+                this.consolidateItems();
                 //Carga la info de la OF en la tabla. 
               }, error => {
-                this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error);
+                this.errorMessage(`¡No se pudo actualizar la factura de la orden #${of}!`, error);
                 this.formProduction.patchValue({ 'orderFact' : '', });
                 this.preload = false;
               }); 
             }, error => {
-              this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${orderFact}!`, error);
+              this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${of}!`, error);
               this.formProduction.patchValue({ 'orderFact' : '', });
               this.preload = false;
             });
@@ -197,10 +233,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
             this.msj.mensajeConfirmacion(`Orden de reposición consultada`, `¡Ingrese los rollos que van a ser enviados por reposición!`);
             this.load = false;
           } 
-        }*/
+        }
       });
-      console.log(this.production);
-    }, error => this.errorMessage(`¡No se encontró información de la orden de facturación #${orderFact}!`,error));
+    }, error => this.errorMessage(`¡No se encontró información de la orden de facturación N° ${of}!`,error));
   }
 
   getInformationProduction() {
@@ -241,39 +276,61 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     if(ofDirect) {
       let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
       if (productionSearched.includes(production)) {
-        this.msj.mensajeAdvertencia(`Advertencia`, `El rollo ya se encuentra en la tabla`, 3000);
+        this.msj.mensajeAdvertencia(`Advertencia`, `El rollo/bulto N° ${production} ya se encuentra en la tabla`, 3000);
         this.clearFieldProduction();
-      } else this.getProductionOfDirect(production);
-    } 
-    else this.getInformationProduction();
+      } else 
+      if(production) {
+        this.getProductionOfDirect(production);
+      } else this.msj.mensajeAdvertencia('Advertencia', `No hay rollo leído para consultar!`);
+    } else this.getInformationProduction();
   }
 
   // Función para cargar bultos disponibles de OF directas al despacho. 
   getProductionOfDirect(production: number) {
     let orderFact = this.formProduction.value.orderFact;
     this.productionProcessSerivce.getProductsOFDirect(production, orderFact).subscribe(data => {
-      this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
-        this.sendProductionZeus.push(data[0]);
-        let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-        this.sendProductionZeus[i].dataExtrusion = {
-          'numero_RolloBagPro': production,
-          'precioProducto': data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
-          'extrusion_Ancho1': res[0].ancho1_Extrusion,
-          'extrusion_Ancho2': res[0].ancho2_Extrusion,
-          'extrusion_Ancho3': res[0].ancho3_Extrusion,
-          'undMed_Id': res[0].und_Extrusion,
-          'extrusion_Calibre': res[0].calibre_Extrusion,
-          'material': res[0].material,
-        };
-        this.sendProductionZeus[i].position = this.sendProductionZeus.length;
-        this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-        this.consolidateItems();
-        this.clearFieldProduction();
-      });
+      let productionFound : number = data[0].pp.numeroRollo_BagPro;
+        if(productionFound == production) {
+          this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+          this.sendProductionZeus.push(data[0]);
+          let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+          this.sendProductionZeus[i].dataExtrusion = {
+            'numero_RolloBagPro': production,
+            'precioProducto': data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
+            'extrusion_Ancho1': res[0].ancho1_Extrusion,
+            'extrusion_Ancho2': res[0].ancho2_Extrusion,
+            'extrusion_Ancho3': res[0].ancho3_Extrusion,
+            'undMed_Id': res[0].und_Extrusion,
+            'extrusion_Calibre': res[0].calibre_Extrusion,  
+            'material': res[0].material,
+            'ofDirect' : true,
+          };
+          this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+          this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
+          this.validateItemsToDispatch(data);
+        });
+      }
     }, error => {
       this.errorMessage(`No se encontró información del rollo/bulto ${production} de la OF N° ${orderFact}!`, error);
       this.clearFieldProduction();
     });
+  }
+
+  //Validar items a despachar
+  validateItemsToDispatch(data : any){
+    let qtyToDispatchForItem : number = this.production.filter(x => x.item == data[0].producto.prod_Id).reduce((a, b) => a += b.quantity, 0);
+    let qtyDispatched : number = this.sendProductionZeus.filter(x => x.producto.prod_Id == data[0].producto.prod_Id).reduce((a, b) => a += b.pp.cantidad, 0);
+    
+    if(qtyDispatched <= qtyToDispatchForItem) {
+      this.consolidateItems();
+      this.clearFieldProduction();
+    } else {
+      let ref : any = `${data[0].producto.prod_Id} - ${data[0].producto.prod_Nombre}`;
+      this.msj.mensajeAdvertencia('Advertencia',  `La cantidad a despachar de "${ref}" no puede ser mayor a la cantidad facturada (${qtyToDispatchForItem.toLocaleString()})!`, 3000);
+      this.sendProductionZeus.shift();
+      this.consolidateItems();
+      this.clearFieldProduction();
+    } 
   }
 
   //Función para limpiar el campo rollo leído.
@@ -301,6 +358,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         this.sendProductionZeus[i].position = this.sendProductionZeus.length;
         this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
         this.consolidateItems();
+         console.log(this.sendProductionZeus);
       });
     }, error => this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`,error));
   }
@@ -308,20 +366,62 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //Validar los datos a guardar 
   validateDataToSave(){
     if(this.sendProductionZeus.length > 0) {
+      let ofDirect : boolean = this.formProduction.value.ofDirect
       this.remainingProduction = [];
-      let productionSearched = this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro);
-      this.production.forEach(prod => {
-        if (!productionSearched.includes(prod.numberProduction)) this.remainingProduction.push(prod);
-      });
-      if (this.formProduction.value.driver) {
-        if (!['', null, undefined].includes(this.formProduction.value.car)) {
-          if (this.formProduction.value.car.length == 6) {
-            if (this.remainingProduction.length == 0) this.saveAsgFact();
-            else this.modalProductionNotRead = true;
-          } else this.msj.mensajeAdvertencia(`¡La placa del carro debe tener 6 digitos!`);
-        } else this.msj.mensajeAdvertencia(`¡Debe llenar el campo 'Placa Carro'!`);
-      } else this.msj.mensajeAdvertencia(`¡Debe elegir un conductor!`);
+      this.remainingProducts = [];
+      let productionInKg : number = this.production.filter(x => x.presentation == 'Kg').length;
+      
+      if(ofDirect && productionInKg == 0) this.validateOfDirects();
+      else if(ofDirect && productionInKg > 0) this.validateOfDirects();
+      else {
+        let productionSearched = this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro);
+        this.production.forEach(prod => {
+          if (!productionSearched.includes(prod.numberProduction)) this.remainingProduction.push(prod);
+        });
+      }
+      this.validateDataDispatch();
     } else this.msj.mensajeAdvertencia(`No hay rollos/bultos seleccionados para despachar!`);
+  }
+
+  ///
+  validateOfDirects(){
+    let itemToDispatch : any = this.rollsConsolidate.map(x => x.item);
+    itemToDispatch.sort();
+    this.production.sort();
+    this.rollsConsolidate.sort();
+    console.log(itemToDispatch);
+    console.log(this.production);
+    console.log(this.rollsConsolidate);
+    this.production.forEach(x => {
+      if(!itemToDispatch.includes(x.item)) {
+        this.remainingProducts.push(x);
+        console.log('Entré aquí')
+      } else {
+        this.rollsConsolidate.forEach(z => {
+          if(z.item == x.item) {
+            console.log(x.item, z.item);
+            if(z.quantity.toFixed(2) < x.quantity.toFixed(2)) this.remainingProducts.push(x);
+            else {
+              console.log('Entré acá');
+            }
+          }
+        });
+      }
+    });
+  }
+
+  //Validación de data a despachar.
+  validateDataDispatch(){
+    if (this.formProduction.value.driver) {
+      if (!['', null, undefined].includes(this.formProduction.value.car)) {
+        if (this.formProduction.value.car.length == 6) {
+          if (this.remainingProduction.length == 0) {
+            if(this.remainingProducts.length == 0)  this.saveAsgFact(); 
+            else this.modalProductsNotRead = true;
+          } else this.modalProductionNotRead = true;
+        } else this.msj.mensajeAdvertencia(`¡La placa del carro debe tener 6 digitos!`);
+      } else this.msj.mensajeAdvertencia(`¡Debe llenar el campo 'Placa Carro'!`);
+    } else this.msj.mensajeAdvertencia(`¡Debe elegir un Conductor!`);
   }
 
   //Guardar datos de la orden de facturación en la asignación de productos a facturas.
@@ -371,14 +471,14 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   saveProductionInOf(of : number, fact : string, ofDirect : boolean){
     //let count : number = 0;
-    this.sendProductionZeus.forEach(x => {
+    this.sendProductionZeus.filter(x => x.inOfDirect == false).forEach(x => {
       let dtOrderFact: modelDt_OrdenFacturacion = {
         'Id_OrdenFacturacion': of,
-        'Numero_Rollo': x.numberProduction,
-        'Prod_Id': x.item,
-        'Cantidad': x.quantity,
-        'Presentacion': x.presentation,
-        'Consecutivo_Pedido': (x.saleOrder).toString(),
+        'Numero_Rollo': x.dataExtrusion.numero_RolloBagPro,
+        'Prod_Id': x.producto.prod_Id,
+        'Cantidad': x.pp.presentacion == 'Kg' ? x.pp.peso_Neto : x.pp.cantidad,
+        'Presentacion': x.pp.presentacion,
+        'Consecutivo_Pedido': (x.salesOrder).toString(),
         'Estado_Id': 20
       }
       this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
@@ -411,9 +511,24 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       if(this.reposition) this.updateDevolution();
       if(this.preload) this.updatePreload(preload, orderFact);
       //this.cmpOrderFactPallets.createPDF(orderFact, fact);
-      ofDirect ? this.orden_FacturacionComponent.createPDFFactDirect(orderFact, fact) : this.orden_FacturacionComponent.createPDF(orderFact, fact);
-      this.clearFields();
+      if(ofDirect) {
+        this.updateOFDirectConsolidate(orderFact, fact) 
+      } else {
+        this.orden_FacturacionComponent.createPDF(orderFact, fact);
+        this.clearFields();
+      } 
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
+  }
+
+  ///Función para actualizar el estado de la orden de facturación directa.
+  updateOFDirectConsolidate(of : number, fact : string){
+    this.svFactProducts.PutOfDirectDispatched(of, this.rollsConsolidate).subscribe(data => {
+      this.orden_FacturacionComponent.createPDFFactDirect(of, fact);
+      this.clearFields();
+    }, error => {
+      this.msj.mensajeError('Error', `Error al momento de actualizar los productos `);
+      this.load = false;
+    });
   }
 
   //Actualizar estado de devolución a CERRADA
@@ -464,6 +579,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   removeProduction(data: any) {
     let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
     this.sendProductionZeus.splice(i, 1);
+    this.consolidateItems();
   }
 
   totalQuantity(): number {
@@ -627,7 +743,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //Función para obtener la info de la OF.
   getInformationOrderFact2(){
     let orderFact = this.formProduction.value.orderFact;
-    this.dtOrderFactService.GetInformacionOrderFactToSend(orderFact).subscribe(data => {
+    this.dtOrderFactService.GetInformacionOrderFactToSend(orderFact, false).subscribe(data => {
       this.load = true;
       this.production = [];
       let saleOrders: Array<number> = [];
@@ -763,10 +879,25 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   ///Cargar items consolidados a despachar.
   consolidateItems(){
-    this.rollsConsolidate = this.sendProductionZeus.reduce((acc, value) => {
-      let find = acc.find(x => x.producto.prod_Id == value.producto.prod_Id);
-      if(!find) acc.push(value);
-      return acc;
+    this.rollsConsolidate = this.sendProductionZeus.reduce((a, b) => {
+      let find = a.find(x => x.item == b.producto.prod_Id);
+      if(!find) {
+        let info : any = {
+          'item' : b.producto.prod_Id,
+          'reference' : b.producto.prod_Nombre, 
+          'quantity' : b.pp.presentacion == 'Kg' ? b.pp.peso_Neto : b.pp.cantidad,
+          'presentation' : b.pp.presentacion,
+          'countProduction' : 1,
+          'grossWeight' : b.pp.peso_Bruto, 
+          'unit' : 'Kg',
+        }
+        a.push(info);
+      } else {
+        a[a.map(x => x.item).indexOf(b.producto.prod_Id)].quantity += b.pp.presentacion == 'Kg' ? b.pp.peso_Neto : b.pp.cantidad;
+        a[a.map(x => x.item).indexOf(b.producto.prod_Id)].grossWeight += b.pp.peso_Bruto;
+        a[a.map(x => x.item).indexOf(b.producto.prod_Id)].countProduction += 1;
+      }
+      return a;
     }, []);
   }
 
@@ -779,6 +910,42 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ///
   weightTotalItem = (data : any) => this.sendProductionZeus.filter(x => x.producto.prod_Id == data.producto.prod_Id).reduce((a, b) => a += b.pp.peso_Bruto, 0);
 
+  /// Cantidad total consolidada a despachar 
+  totalConsolidateQuantity(): number {
+    let total: number = 0;
+    total = this.rollsConsolidate.reduce((a,b) => a += b.quantity, 0);
+    return total;
+  }
+
+  /// Cantidad total consolidada en peso bruto
+  totalGrossWeight(): number {
+    let total: number = 0;
+    total = this.rollsConsolidate.reduce((a,b) => a += b.grossWeight, 0);
+    return total;
+  }
+
+  /// Cantidad total consolidada en peso bruto
+  totalProduction(): number {
+    let total: number = 0;
+    total = this.rollsConsolidate.reduce((a,b) => a += b.countProduction, 0);
+    return total;
+  }
+
+  ///Cantidad despachada de un item 
+  totalDispatchItem(data : any) {
+    let total: number = 0;
+    total = this.rollsConsolidate.filter(x => x.item == data.item).reduce((a,b) => a += b.quantity, 0);
+    return total;
+  }
+
+  /// Diferencia entre la cantidad facturada vs despachada
+  diffDispatchVsFact(data : any){
+    let total : number = 0;
+    let fact : number = this.production.filter(x => x.item == data.item).reduce((a,b) => a += b.quantity, 0);
+    let dispatch : number = this.rollsConsolidate.filter(x => x.item == data.item).reduce((a,b) => a += b.quantity, 0);
+    total = (fact - dispatch);
+    return total
+  }
 }
 
 interface production {
@@ -790,6 +957,7 @@ interface production {
   cuontProduction?: number;
   presentation: string;
   pallet? : any;
+  ofDirect? : boolean;
 }
 
 //Función que consolida la información si existen rollos en pallets.

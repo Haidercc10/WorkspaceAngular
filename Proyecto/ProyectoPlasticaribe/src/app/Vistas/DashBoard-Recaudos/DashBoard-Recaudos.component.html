@@ -21,8 +21,16 @@
           <!-- FILTROS -->
           <form [formGroup]="FormFiltros" (ngSubmit)="tiempoExcedido()">
             <div class="row g-4 my-3">
+
               <!-- CLIENTES -->
               <div class="col-sm-12 col-md-12 col-lg-3">
+                <span class="p-float-label">
+                  <p-multiSelect formControlName="Cliente" inputId="Cliente" [options]="clientes" optionLabel="displayLabel" optionValue="idcliente"></p-multiSelect>
+                  <label for="Cliente">Cliente</label>
+                </span>
+              </div>
+
+              <!--<div class="col-sm-12 col-md-12 col-lg-3">
                 <span class="p-float-label">
                   <input formControlName="Cliente" autocomplete="off" id="Nombre" list="clientes" type="text" pInputText required/>
                   <datalist id="clientes">
@@ -30,7 +38,7 @@
                   </datalist>
                   <label for="Nombre">Cliente</label>
                 </span>
-              </div>
+              </div>-->
         
               <!-- VENDEDORES -->
               <div class="col-sm-12 col-md-12 col-lg-3">

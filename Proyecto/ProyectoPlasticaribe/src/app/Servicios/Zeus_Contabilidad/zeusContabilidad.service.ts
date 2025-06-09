@@ -20,7 +20,7 @@ export class ZeusContabilidadService {
   /**************************************************************** FACTURAS BU *****************************************************************************/
   GetCarteraClientes = (id : string) => this.http.get<any>(this.rutaZeusContabilidad + `/FacturasBU/getCarteraClientes/${id}`);
 
-  GetCarteraAgrupadaClientes = (ruta : string = '') => this.http.get<any>(`${this.rutaZeusContabilidad}/FacturasBU/getCarteraAgrupadaClientes${ruta}`);
+  GetCarteraAgrupadaClientes = (data : any, ruta : string = '') => this.http.post(`${this.rutaZeusContabilidad}/FacturasBU/getCarteraAgrupadaClientes${ruta}`, data);
 
   GetCarteraAgrupadaVendedores = (ruta : string = '') => this.http.get<any>(`${this.rutaZeusContabilidad}/FacturasBU/getCarteraAgrupadaVendedores${ruta}`);
 
@@ -28,7 +28,7 @@ export class ZeusContabilidadService {
 
   GetCartera_Anio_Mes = (anio : string, mes : string) => this.http.get<any>(`${this.rutaZeusContabilidad}/FacturasBU/getCartera_Anio_Mes/${anio}/${mes}`);
 
-  GetCarteraTotal = (ruta : string = '') => this.http.get<any>(`${this.rutaZeusContabilidad}/FacturasBU/getCarteraTotal${ruta}`);
+  GetCarteraTotal = (data : any = [], ruta : string = '') => this.http.post(`${this.rutaZeusContabilidad}/FacturasBU/getCarteraTotal${ruta}`, data);
 
   GetCarteraVendedor = (id : any) => this.http.get<any>(`${this.rutaZeusContabilidad}/FacturasBU/getCarteraVendedor/${id}`);
 

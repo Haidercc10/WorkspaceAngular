@@ -424,6 +424,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
     let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let ordenTrabajo: string = this.formDatosProduccion.value.ordenTrabajo;
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
+      console.log(data);
+      
       this.rollosPesados = data;
       this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
       this.contarReImpresionesPorEtiquetas();
