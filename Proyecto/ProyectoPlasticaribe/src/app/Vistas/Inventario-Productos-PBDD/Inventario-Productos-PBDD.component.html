@@ -1133,7 +1133,6 @@
     </p-table>
   </p-tabPanel>
   
-<!--
   <p-tabPanel
   header="Inventario Calidad"
   leftIcon="pi pi-database"
@@ -1153,7 +1152,7 @@
     <ng-template pTemplate="caption">
         <div class="row g-4">
             <div class="d-flex justify-content-end">
-                <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="createExcelRollToRoll(stockQuality, '')"></button>
+                <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="createExcelRollToRoll(stockQuality, 'CALIDAD')"></button>
             </div>
         </div>
     </ng-template>
@@ -1188,7 +1187,7 @@
         </tr>
     </ng-template> 
     <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
-        <tr>
+        <tr class="cursor" (dblclick)="searchMovements(inv)" pTooltip="Haz doble clic para ver la trazabilidad del rollo/bulto" tooltipPosition="top">
         <td class="text-center">{{rowIndex + 1}}</td>
         <td class="text-center"><b>{{inv.number_BagPro}}</b></td>
         <td class="text-center">{{inv.orderProduction }}</td>
@@ -1206,17 +1205,16 @@
     <ng-template pTemplate="footer">
         <tr>
             <td colspan="6" class="text-right">Disponibles</td>
-            <td class="text-center textBlue">{{0 |  number : '1.2-2'}}</td>
+            <td class="text-center textBlue">{{totalQtyQuality |  number : '1.2-2'}}</td>
             <td *ngIf="[86,4,12].includes(ValidarRol)" class="text-right"></td>
-            <td *ngIf="![86,4,12].includes(ValidarRol)" colspan="2"  class="text-right">Total</td>
-            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center textBlue">$ {{0 | number : '1.2-2'}}</td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" colspan="3"  class="text-right">Total</td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center textBlue">$ {{totalQuality | number : '1.2-2'}}</td>
             <td></td>
         </tr>
     </ng-template>
     </p-table>
   </p-tabPanel>
 
-   
   <p-tabPanel
   header="Inventario Reempaque"
   leftIcon="pi pi-database"
@@ -1236,7 +1234,7 @@
     <ng-template pTemplate="caption">
         <div class="row g-4">
             <div class="d-flex justify-content-end">
-                <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="createExcelRollToRoll(stockRepacking, '')"></button>
+                <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="createExcelRollToRoll(stockRepacking, 'REEMPAQUE')"></button>
             </div>
         </div>
     </ng-template>
@@ -1244,9 +1242,10 @@
         <tr id="filtros">
             <th></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'number_BagPro', tableRepacking)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ot', tableRepacking)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'item', tableRepacking)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', tableRepacking)"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ot', tableRepacking)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', tableRepacking)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'quantity', tableRepacking)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'weight', tableRepacking)"></th>
             <th *ngIf="![86,4,12].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', tableRepacking)"></th>
@@ -1259,9 +1258,10 @@
             <th class="text-center" pSortableColumn="number_BagPro" scope="col">Rollo  <p-sortIcon field="number_BagPro"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="item" scope="col">OT  <p-sortIcon field="item"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="reference" scope="col">Item  <p-sortIcon field="reference"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="ot" scope="col">Cliente  <p-sortIcon field="ot"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="quantity" scope="col">Referencia  <p-sortIcon field="quantity"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="weight" scope="col">Existencias  <p-sortIcon field="weight"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="ot" scope="col">Cliente  <p-sortIcon field="ot"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="quantity" scope="col">Existencias  <p-sortIcon field="quantity"></p-sortIcon></th>
+            <th *ngIf="![86,4,12].includes(ValidarRol)" class="text-center" pSortableColumn="weight" scope="col">Peso  <p-sortIcon field="weight"></p-sortIcon></th>
             <th *ngIf="![86,4,12].includes(ValidarRol)" class="text-center" pSortableColumn="price" scope="col">Precio  <p-sortIcon field="price"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="presentation" scope="col">Unidad  <p-sortIcon field="presentation"></p-sortIcon></th>
             <th *ngIf="![86,4,12].includes(ValidarRol)" class="text-center" pSortableColumn="subtotal" scope="col">Subtotal  <p-sortIcon field="subtotal"></p-sortIcon></th>
@@ -1269,13 +1269,14 @@
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
-        <tr>
+        <tr class="cursor" (dblclick)="searchMovements(inv)" pTooltip="Haz doble clic para ver la trazabilidad del rollo/bulto" tooltipPosition="top">
         <td class="text-center">{{rowIndex + 1}}</td>
         <td class="text-center"><b>{{inv.number_BagPro}}</b></td>
+        <td class="text-center">{{inv.orderProduction }}</td>
         <td class="text-center">{{inv.item }}</td>
         <td class="text-center"><b>{{inv.reference }}</b></td>  
-        <td>{{inv.ot }}</td>
-        <td>{{inv.quantity}}</td>
+        <td>{{ inv.client }}</td>
+        <td class="text-center">{{inv.quantity | number : '1.2-2'}}</td>
         <td class="text-center colorExis"><b>{{inv.weight | number : '1.2-2'}}</b></td>
         <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}</td>
         <td class="text-center">{{inv.presentation}}</td>
@@ -1286,16 +1287,16 @@
     <ng-template pTemplate="footer">
         <tr>
             <td colspan="6" class="text-right">Disponibles</td>
-            <td class="text-center textBlue">{{0 |  number : '1.2-2'}}</td>
+            <td class="text-center textBlue">{{totalQtyRepack |  number : '1.2-2'}}</td>
             <td *ngIf="[86,4,12].includes(ValidarRol)" class="text-right"></td>
-            <td *ngIf="![86,4,12].includes(ValidarRol)" colspan="2"  class="text-right">Total</td>
-            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center textBlue">$ {{0 | number : '1.2-2'}}</td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" colspan="3"  class="text-right">Total</td>
+            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center textBlue">$ {{totalRepack | number : '1.2-2'}}</td>
             <td></td>
         </tr>
     </ng-template>
     </p-table>
   </p-tabPanel>
--->
+
   <p-tabPanel
   header="Inventario Entregado No disponible"
   leftIcon="pi pi-th-large"
@@ -1434,3 +1435,7 @@
       </div>
     </ng-template>
 </p-toast>
+
+<p-dialog header="Trazabilidad rollo/bulto N° {{selectedRoll}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="traceability" [style]="{width: '85%'}" [modal]="true" >
+  <app-Movimientos_Rollos></app-Movimientos_Rollos>
+</p-dialog>

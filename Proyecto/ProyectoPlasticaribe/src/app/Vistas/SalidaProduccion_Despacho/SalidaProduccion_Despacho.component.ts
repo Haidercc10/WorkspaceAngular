@@ -386,20 +386,16 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ///
   validateOfDirects(){
     let itemToDispatch : any = this.rollsConsolidate.map(x => x.item);
-    itemToDispatch.sort();
-    this.production.sort();
-    this.rollsConsolidate.sort();
-    console.log(itemToDispatch);
-    console.log(this.production);
-    console.log(this.rollsConsolidate);
+    //itemToDispatch.sort();
+    //this.production.sort();
+    //this.rollsConsolidate.sort();
+   
     this.production.forEach(x => {
       if(!itemToDispatch.includes(x.item)) {
         this.remainingProducts.push(x);
-        console.log('Entré aquí')
       } else {
         this.rollsConsolidate.forEach(z => {
           if(z.item == x.item) {
-            console.log(x.item, z.item);
             if(z.quantity.toFixed(2) < x.quantity.toFixed(2)) this.remainingProducts.push(x);
             else {
               console.log('Entré acá');

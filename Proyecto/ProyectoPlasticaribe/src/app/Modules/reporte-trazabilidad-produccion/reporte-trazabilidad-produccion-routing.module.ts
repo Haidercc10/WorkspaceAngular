@@ -7,7 +7,7 @@ const routes: Routes = [
   {
       path: '',
       canActivate: [VistasPermisosGuard], 
-      data: { nombre: 'Reposiciones Carta' }, 
+      data: { nombre: 'Trazabilidad Produccion' }, 
       component : MovTrazabilidadProduccionComponent,
   }
 ];

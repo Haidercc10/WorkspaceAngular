@@ -9,6 +9,7 @@ import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Product
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MessageService } from 'primeng/api';
+import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
 
 @Injectable({
   providedIn : 'root'
@@ -77,6 +78,13 @@ export class InventarioProductosPBDDComponent implements OnInit {
   stockQuality: Array<StockInformation> = [];
   @ViewChild('tableRepacking') tableRepacking : Table | undefined;
   stockRepacking: Array<StockInformation> = [];
+  totalRepack : number = 0;
+  totalQuality : number = 0;
+  totalQtyRepack : number = 0; 
+  totalQtyQuality : number = 0; 
+  traceability : boolean = false;
+  selectedRoll : any = null;
+  @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
@@ -691,6 +699,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
     datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
     this.calculateTotalEmpaque();
     this.calculateTotalSellado();
+    this.calculateTotalQuality();
+    this.calculateTotalRepack();
   } 
 
   //Función que se encarga de mantener expandida la información de la tabla.
@@ -754,7 +764,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
     this.svProductionProcess.getRollsWarehouseQualityForItem().subscribe(data => {
       this.stockQuality = data;
-      console.log(data);
+      this.calculateTotalQuality();
       this.loading = false;
     }, error => {
       this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
@@ -768,6 +778,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     
     this.svProductionProcess.getRollsForRepack().subscribe(data => {
       this.stockRepacking = data;
+      this.calculateTotalRepack();
       console.log(data);
       this.loading = false;
     }, error => {
@@ -800,6 +811,30 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }, 500);
   }
 
+  /** Función que calcula el total de existencias y de valor que hay en la bodega de calidad*/
+  calculateTotalQuality(){
+    setTimeout(() => {
+      this.totalQuality = 0;
+      this.totalQtyQuality = 0;
+      if(this.tableQuality) {
+        if(this.tableQuality.filteredValue != undefined) this.totalsForData(this.tableQuality.filteredValue);
+        else this.totalsForDevolution(this.stockQuality);
+      } else this.totalsForDevolution(this.stockQuality);
+    }, 500);
+  }
+
+  /** Función que calcula el total de existencias y de valor que hay en la bodega de reempaque*/
+  calculateTotalRepack(){
+    setTimeout(() => {
+      this.totalRepack = 0;
+      this.totalQtyRepack = 0;
+      if(this.tableRepacking) {
+        if(this.tableRepacking.filteredValue != undefined) this.totalsForRepack(this.tableRepacking.filteredValue);
+        else this.totalsForRepack(this.stockRepacking);
+      } else this.totalsForRepack(this.stockRepacking);
+    }, 500);
+  }
+
   //Función para calcular los totales según la información que se le pase como parametro.
   totalsForData(data : any){
     data.forEach(x => {
@@ -810,6 +845,22 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.totalEmpaque += x.subtotal;
         this.totalQtyEmpaque += x.realQty;
       }
+    });
+  }
+
+  //Función para calcular los totales según la información que se le pase como parametro.
+  totalsForDevolution(data : any){
+    data.forEach(x => {
+      this.totalQuality += x.subtotal;  
+      this.totalQtyQuality += x.quantity;
+    });
+  }
+
+  //Función para calcular los totales según la información que se le pase como parametro.
+  totalsForRepack(data : any){
+    data.forEach(x => {
+      this.totalRepack += x.subtotal;  
+      this.totalQtyRepack += x.quantity;
     });
   }
 
@@ -836,7 +887,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   //Función que cargará la hoja de cálculo y los estilos.
   loadSheetAndStyles(data : any, process : string){  
     let title : any = `Reporte `;  
-    process == 'EMPAQUE' ? title += `rollo a rollo Empaque` : title += `bulto a bulto Sellado`;
+    process == 'EMPAQUE' ? title += `rollo a rollo Empaque` : process == 'SELLADO' ? title += `bulto a bulto Sellado` : process == 'CALIDAD' ? title += `bodega de calidad` : title += `bodega de reempaque`;
     title += ` ${moment().format('DD-MM-YYYY')}`
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
@@ -844,17 +895,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
     let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
     let workbook = this.createExcelService.formatoExcel(title, true);
 
-    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data, process);
     this.createExcelService.creacionExcel(title, workbook);
   }
 
   //Función para agregar una nueva hoja de calculo.
-  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any, process : string){
     let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
     let worksheet : any = wb.worksheets[0];
     this.loadStyleTitle(worksheet, title, fontTitle, alignment);
     this.loadHeader(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data, process), border,  alignment);
   }
 
   //Cargar estilos del titulo de la hoja.
@@ -927,7 +978,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Agregar fila de totales al formato excel.
-  addTotal(info : any, process : string){
+  addTotal(info : any, process : string, warehouse : any){
     info.push([
       '',
       '',
@@ -935,34 +986,34 @@ export class InventarioProductosPBDDComponent implements OnInit {
       '',
       '',
       'DISPONIBLES',
-      process == 'EMP' ? this.totalQtyEmpaque : this.totalQtySellado,
+      warehouse == 'CALIDAD' ? this.totalQtyQuality : warehouse == 'REEMPAQUE' ? this.totalQtyRepack : process == 'EMP' ? this.totalQtyEmpaque : this.totalQtySellado,
       '',
       'TOTAL',
-      process == 'EMP' ? this.totalEmpaque : this.totalSellado,
+      warehouse == 'CALIDAD' ? this.totalQuality : warehouse == 'REEMPAQUE' ? this.totalRepack : process == 'EMP' ? this.totalEmpaque : this.totalSellado,
       ''
     ]);
   }
 
   //.Función que contendrá la info al documento excel. 
-  dataExcel(data : any){
+  dataExcel(data : any, process : string){
     let info : any = [];
     let count : number = 0;
     data.forEach(x => {
       info.push([
         count += 1,
-        x.roll_BagPro,
-        x.ot,
+        ['CALIDAD', 'REEMPAQUE'].includes(process) ? x.number_BagPro : x.roll_BagPro,
+        ['CALIDAD', 'REEMPAQUE'].includes(process) ? x.orderProduction : x.ot,
         x.item,
         x.client,
         x.reference,
-        x.realQty,
+        ['CALIDAD', 'REEMPAQUE'].includes(process) ? x.quantity : x.realQty,
         x.price,
         x.presentation,
         x.subtotal,
-        x.date,
+        x.date.replace('T00:00:00', ''),
       ]);
     });
-    this.addTotal(info, data[0].process_Id);
+    this.addTotal(info, data[0].process_Id, process);
     return info;
   }
 
@@ -1088,6 +1139,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
     });
     return info;
   }
+
+  //*Función para cargar el modal de movimientos.
+  searchMovements(data : any){
+    this.load = true;
+    setTimeout(() => {
+      this.traceability = true;
+      this.selectedRoll = data.number_BagPro;
+      this.cmpMovRolls.searchMovements(data, `Producto Terminado`);
+      this.load = false;
+    }, 500);
+  } 
 }
 
 interface StockInformation {
