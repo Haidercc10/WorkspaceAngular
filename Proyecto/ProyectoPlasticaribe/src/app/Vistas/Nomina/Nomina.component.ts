@@ -151,6 +151,7 @@ export class NominaComponent implements OnInit {
     this.cmpNomina_Corte.searchPayRoll();
 
     this.servicioBagPro.GetNominaSelladoAcumuladaItem(fechaInicial, fechaFinal).subscribe(data => {
+      console.log(data);
       for (let index = 0; index < data.length; index++) {
         let info: any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
 
@@ -223,7 +224,10 @@ export class NominaComponent implements OnInit {
         }
       }
       setTimeout(() => this.llenarDatosAdicionalesNominaDespacho(data), 1500);
-    }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron registros en las fechas consultadas`));
+    }, () => {
+      this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron registros en las fechas consultadas`);
+      this.load = true;
+    }); 
   }
 
   llenarDatosAdicionalesNominaDespacho(data: any) {
