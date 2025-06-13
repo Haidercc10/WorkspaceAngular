@@ -36,4 +36,6 @@ export class UsuarioService {
   srvGuardarUsuario = (data : modelUsuario): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data);
 
   GetOperariosProduccion = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getOperariosProduccion`);
+
+  GetPackersProduction = (area : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/GetPackersProduction/${area}`);
 }

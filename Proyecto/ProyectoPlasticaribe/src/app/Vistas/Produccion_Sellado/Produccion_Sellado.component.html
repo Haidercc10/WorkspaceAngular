@@ -165,6 +165,15 @@
         </span>
       </div>
 
+      <!-- Empacador -->
+      <div class="col-sm-12 col-md-6 col-xl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="packer" inputId="packer" [options]="packers" optionLabel="userName" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"
+            optionValue="user_Id"></p-dropdown>
+          <label for="packer">Empacador</label>
+        </span>
+      </div>
+
       <p-divider></p-divider>
 
       <!--Tabla OT-->
@@ -281,7 +290,7 @@
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
         <td class="text-center">{{rowIndex + 1}}</td>
-        <td class="text-center">{{data.bulto}}</td>
+        <td class="text-center"><b>{{data.bulto}}</b></td>
         <ng-container
           *ngIf="data.operario1 != '0' && data.operario2 != '0' && data.operario3 != '0' && data.operario4 != '0'">
           <td>{{data.operario1}} - {{data.operario2}} - {{data.operario3}} - {{data.operario4}}</td>
@@ -302,12 +311,12 @@
           *ngIf="data.operario1 == '0' && data.operario2 == '0' && data.operario3 == '0' && data.operario4 == '0'">
           <td><b>REEMPAQUE</b></td>
         </ng-container>
-        <td class="text-center">{{data.cantidadUnd}}</td>
+        <td class="text-center textGreen"><b>{{data.cantidadUnd | number : '1.2-2'}}</b></td>
         <td class="text-center">{{data.presentacion1}}</td>
-        <td class="text-center">{{data.peso | number : '1.2-2'}}</td>
+        <td class="text-center"><b>{{data.peso | number : '1.2-2'}}</b></td>
         <td class="text-center">{{data.presentacion2}}</td>
         <td class="text-center">{{data.fecha}} - {{data.hora}}</td>
-        <td class="text-center">{{data.proceso}}</td>
+        <td class="text-center"><b>{{data.proceso}}</b></td>
         <!-- <td class="text-center" *ngIf="[1, 86].includes(ValidarRol)">
           <button class="buttonPDF"
             (click)="crearEtiqueta(data.bulto, data.peso, data.cantidadUnd, data.presentacion1, true, data.operario1)">
@@ -341,6 +350,59 @@
 
 <p-dialog [(visible)]="modalRolls" [draggable]="false" [style]="{width: '80%'}" header="Rollos de la OT {{orderProduction}}" [modal]="true" >
   <ng-template pTemplate="content">
+    <!--Titulo info detallada -->
+    <div class="mb-4">
+      <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-table"></i> Tabla de producción consolidada</h4>
+    </div>
+
+    <!--Tabla detallada -->
+    <div class="mb-3">
+      <div class="row g-3">
+        <p-table
+        #dt1
+        [value]="rollsConsolidate"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        dataKey="id">
+        <ng-template pTemplate="header">
+          <tr class="font-size-13" >
+            <th class="text-center" scope="col" pResizableColumn>#</th>
+            <th class="text-center" scope="col" pResizableColumn>OT</th>
+            <th class="text-center" scope="col" pResizableColumn>Item</th>
+            <th class="text-center" scope="col" pResizableColumn>Cliente</th>
+            <th class="text-center" scope="col" pResizableColumn>Referencia</th>
+            <th class="text-center" scope="col" pResizableColumn>N° Rollos</th>
+            <th class="text-center" scope="col" pResizableColumn>Peso Neto</th>
+            <th class="text-center" scope="col" pResizableColumn>Und</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+          <tr class="font-size-13">
+            <td class="text-center" id="ot" >{{rowIndex + 1}}</td>
+            <td class="text-center" id="item"><b>{{data.ot}}</b></td>
+            <td class="text-center" id="item">{{data.item}}</td>
+            <td class="text-center" id="cliente"><b>{{data.cliente}}</b></td>
+            <td class="text-center" id="referencia" >{{data.referencia }}</td>
+            <td class="text-center textBlue" id="total"><b>{{totalRolls() | number : '1.2-2'}}</b></td>
+            <td class="text-center textGreen" id="pesoN"><b>{{getTotalWeight() | number : '1.2-2'}}</b></td>
+            <td class="text-center" id="und">{{'Kg'}}</td>
+          </tr>
+        </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+    
+    <!--Titulo info detallada -->
+    <div class="mb-4">
+      <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de producción detallada</h4>
+    </div>
+
+    <!--Tabla detallada -->
     <div class="mb-3">
       <div class="row g-3">
         <p-table
@@ -383,18 +445,19 @@
             <td id="id" class=""><b>{{rowIndex + 1}}</b></td>
             <td id="id" class=""><b>{{data.rollo}}</b></td>
             <td id="cliente" class="">{{data.cliente}}</td>
-            <td id="producto" class=""><b>{{data.referencia }}</b></td>
+            <td id="producto" class="">{{data.referencia }}</td>
             <td id="peso" class=""><b>{{data.peso1}}</b></td>
             <td id="operador" class="">{{data.operario}}</td>
-            <td id="maquina" class="">{{data.maquina}}</td>
-            <td id="turno" class="">{{data.turno}}</td>|
+            <td id="maquina" class=""><b>{{data.maquina}}</b></td>
+            <td id="turno" class="">{{data.turno}}</td>
             <td id="status" class=""><b>{{data.proceso}}</b></td>
-            <td id="fecha" class="">{{data.fecha.replace(' 12:00:00 a. m.', '')}} - {{data.hora}}</td>
+            <td id="fecha" class="">{{data.fecha.replace(' 0:00:00', '')}} - {{data.hora}}</td>
           </tr>
         </ng-template>
         </p-table>
       </div>
     </div>
+
   </ng-template>
 </p-dialog>   
 

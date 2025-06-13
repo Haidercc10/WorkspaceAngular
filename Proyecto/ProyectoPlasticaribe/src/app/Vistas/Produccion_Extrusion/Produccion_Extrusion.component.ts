@@ -55,8 +55,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   rolls : any = [];
   orderProduction : number = null;
   modalRolls : boolean = false;
+  packers : any = [];
   @ViewChild('dt1') dt1: Table | undefined;
-
+  rollsConsolidate : any = [];
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
 
   constructor(private frmBuilder: FormBuilder,
@@ -111,6 +112,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       etiquetaAsociada : [null, ],
       procesoAnterior : [null, ],
       otAlterna : [null,],
+      packer : [null, ],
     });
   }
 
@@ -127,10 +129,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     //setTimeout(() => {
       //this.buscarPuertos()
       this.getMachines();
+      this.getPackers();
     //}, 1000); 
   }
 
-  //Función para obtener las maquinas
   //Función para obtener las maquinas
   getMachines() {
     this.svMachines.getAllMachines().subscribe(data => { 
@@ -315,6 +317,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.rollosPesados = [];
     this.validarProceso();
     consulta ? this.nuevoAnchoProducto = null : null;
+    this.rolls = [];
   }
 
   getProcess() {
@@ -329,6 +332,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       this.process.sort((a, b) => Number(a.order) - Number(b.order));
     });
   }
+
+  //Función que carga los empacadores de la producción de corte
+  getPackers = () => this.operariosService.GetPackersProduction('EMPAQUE').subscribe(data => { this.packers = data; }, error => console.log(error));
 
   sortArrayProcess(process: string) {
     let num: number = 0;
@@ -457,7 +463,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     if (this.formDatosProduccion.value.proceso) {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
-      if(consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null});
+      if(consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null, 'packer' : null, });
       //this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), () => {
         this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), error => {
           this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
@@ -559,21 +565,23 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             if (this.formDatosProduccion.value.maquina > 0) {
               if (this.formDatosProduccion.value.pesoNeto > 1) {
                   if (this.formDatosProduccion.value.proceso == 'EMP') {
-                    if (this.formDatosProduccion.value.pesoNeto <= 65) {
-                      if(tag) {
-                        if(tag.toString().length >= 6) {
-                          if(oldProcess) {
-                            if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
-                              if(oldProcess == 'MATPRIMA') {
-                                this.guardarProduccion();
-                              } else {
-                                this.searchOldTag(tag, oldProcess);
-                              } 
-                            } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`, true);
-                          } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`, true);
-                        } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`, true);
-                      } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`, true);
-                    } else this.warinigMessage(`¡El peso neto debe ser menor a '65' en el proceso de EMPAQUE!`, true); 
+                    if (this.formDatosProduccion.value.packer) {
+                      if (this.formDatosProduccion.value.pesoNeto <= 65) {
+                        if(tag) {
+                          if(tag.toString().length >= 6) {
+                            if(oldProcess) {
+                              if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
+                                if(oldProcess == 'MATPRIMA') {
+                                  this.guardarProduccion();
+                                } else {
+                                  this.searchOldTag(tag, oldProcess);
+                                } 
+                              } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`, true);
+                            } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`, true);
+                          } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`, true);
+                        } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`, true);
+                      } else this.warinigMessage(`¡El peso neto debe ser menor a '65' en el proceso de EMPAQUE!`, true); 
+                    } else this.warinigMessage(`Advertencia`, `Debe seleccionar el 'Empacador' del rollo/bulto`); 
                   } else {
                     if(this.formDatosProduccion.value.proceso == 'EXT') {
                       this.guardarProduccion(); 
@@ -648,6 +656,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Creador_Id: this.storage_Id,
       Rebobinado : this.formDatosProduccion.value.rebobinado,
       Etiqueta_Trazabilidad : this.formDatosProduccion.value.etiquetaAsociada,
+      Empacador_Id : [undefined, null].includes(this.formDatosProduccion.value.packer) ? 0 : this.formDatosProduccion.value.packer,
     }
     return datos;
   }
@@ -672,9 +681,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         let edicionAnchoProducto : boolean = this.formDatosProduccion.value.edicionAnchoProducto;
         let motherProcess : string = this.formDatosProduccion.value.procesoAnterior;
         let otAltern : number = this.formDatosProduccion.value.otAlterna;
+        let packer : any = this.formDatosProduccion.value.packer;
         this.formDatosProduccion.reset();
         this.validarProceso();
-        this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita, motherProcess, otAltern)
+        this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita, motherProcess, otAltern, packer)
         this.nuevoAnchoProducto = this.formDatosProduccion.value.anchoProducto;
         //this.buscarRollosPesados();
         this.buscraOrdenTrabajo(false);
@@ -683,7 +693,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
   }
 
-  loadDataInFields(productionPL : any, dataProduct : boolean, broadProduct : number, editBroadProduct : boolean, daipita, motherProcess: string, otAltern : number){
+  loadDataInFields(productionPL : any, dataProduct : boolean, broadProduct : number, editBroadProduct : boolean, daipita, motherProcess: string, otAltern : number, packer? : any){
     this.formDatosProduccion.patchValue({
       'ordenTrabajo': productionPL.ot,
       'maquina': productionPL.maquina,
@@ -697,6 +707,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       'procesoAnterior' : motherProcess,
       'etiquetaAsociada' : productionPL.etiqueta_Trazabilidad,
       'otAlterna': otAltern,
+      'packer' : packer,
     });
   }
 
@@ -798,6 +809,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       'Operario_2': productionPL.operario2_Id == null ? 0 : productionPL.operario2_Id,
       'Operario_3': productionPL.operario3_Id == null ? 0 : productionPL.operario3_Id,
       'Operario_4': productionPL.operario4_Id == null ? 0 : productionPL.operario4_Id,
+      'Empacador_Id' : [undefined, null].includes(productionPL.empacador_Id) ? 0 : productionPL.empacador_Id, 
+      'Turno_Id' : productionPL.turno_Id, 
       'Trz_EtiquetaAnterior': infoTagAssociated ? infoTagAssociated.rollo : this.formDatosProduccion.value.etiquetaAsociada,
       'Trz_OtAnterior': infoTagAssociated ? infoTagAssociated.ot : null,
       'Prod_Anterior': infoTagAssociated ? infoTagAssociated.item : 1,
@@ -869,6 +882,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   //Validar información de rollos por OT
   validateOrderProduction(typeOT : string){
+    this.rollsConsolidate = [];
     this.rolls = [];
     let ot : number = typeOT == 'altern' ? ![null, '', undefined].includes(this.formDatosProduccion.value.otAlterna) ? this.formDatosProduccion.value.otAlterna : this.formDatosProduccion.value.ordenTrabajo : this.formDatosProduccion.value.ordenTrabajo;
     let motherProcess : string = this.formDatosProduccion.value.procesoAnterior;
@@ -877,11 +891,18 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     if (ot && motherProcess) {
       this.cargando = true;
       this.bagproService.GetObtenerDatosxProcesos(ot, this.changeNameProcess(motherProcess)).subscribe(data => {
+        console.log(data);
         if(data) {
-          this.modalRolls = true;
-          this.rolls = data;
-          this.cargando = false;
-          this.orderProduction = ot;
+          if(data.length > 0) {
+             this.modalRolls = true;
+             this.rolls = data;
+             this.cargando = false;
+             this.orderProduction = ot;
+             this.getConsolidateProduction();
+          } else {
+            this.warinigMessage(`No se encontraron rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)}`);
+            this.cargando = false;
+          } 
         } else {
           this.warinigMessage(`No se encontraron rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)}`);
           this.orderProduction = ot;
@@ -890,12 +911,26 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     } else this.warinigMessage(`Debe diligenciar los campos 'Proceso Madre' y 'OT'`);
   }
 
+  //
+  getConsolidateProduction() {
+    this.rollsConsolidate = this.rolls.reduce((a, b) => {
+      if (!a.map(x => x.ot).includes(b.ot)) a = [...a, b];
+      return a;
+    }, []);
+  }
+
   //Función para cargar los rollos madres de bulto
   loadMotherRolls(tag : any, process : string){
     this.modalRolls = false;
     this.formDatosProduccion.patchValue({ 'etiquetaAsociada' :  tag });
     this.exitMessage(`Se asoció el rollo madre N° ${tag} del proceso de ${process} exitosamente!`);
   }
+
+  //Obtener el peso total. 
+  getTotalWeight = () => this.rolls.reduce((a, b) => a += b.peso1, 0);
+
+  //Obtener la cantidad de rollos
+  totalRolls = () => this.rolls.length;
 
   //Filtrar la tabla de los rollos cargados en el modal.
   applyFilter = ($event, campo : any, actionField : any) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, actionField);

@@ -34,7 +34,7 @@ function createWindow() {
       }
       print.print(pdfPath, options).then(success => {
         log.info(pdfPath);
-        setTimeout(() => { deleteFolderRecursively(Os.tmpdir()); }, 4000);
+        setTimeout(() => { deleteFolderRecursively(Os.tmpdir()); }, 1500);
       }).catch(error => log.error(error));
     });
   });
@@ -70,7 +70,7 @@ function createWindow() {
     if (details.deviceType === 'serial' && details.origin === 'file://') return true;
   });
 
-   appWin.webContents.openDevTools();
+  //appWin.webContents.openDevTools();
 
   appWin.on("closed", () => appWin = null);
 

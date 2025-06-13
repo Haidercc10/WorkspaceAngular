@@ -62,6 +62,9 @@ export class Produccion_SelladoComponent implements OnInit {
   @ViewChild('dt1') dt1: Table | undefined;
   modalPassword = false;
   form !: FormGroup; //Formulario de sellado
+  packers : any = []; // Variable que guardará los nombres de los empacadores. 
+  packerSelected : any;
+  rollsConsolidate : any = [];
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -93,6 +96,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getOperarios();
     this.getMachines();
     this.getProcess();
+    this.getPackers();
     // this.getPuertoSerial();
   }
 
@@ -120,6 +124,7 @@ export class Produccion_SelladoComponent implements OnInit {
       etiquetaAsociada : [null, ],
       procesoAnterior : [null, ],
       otAlterna : [null, ],
+      packer : [null, ]
     });
     this.formSellado.get('saldo')?.disable();
   }
@@ -241,6 +246,9 @@ export class Produccion_SelladoComponent implements OnInit {
     });
   }
 
+  //Función que carga los empacadores de la producción de sellado
+  getPackers = () => this.svcUsuarios.GetPackersProduction('SELLADO').subscribe(data => { this.packers = data; }, error => console.log(error));
+
   //Función que carga el turno actual.
   cargarTurnoActual() {
     this.svcBagPro.GetHorarioProceso('SELLADO').subscribe(turno => {
@@ -265,6 +273,8 @@ export class Produccion_SelladoComponent implements OnInit {
     this.medida = '';
     if(this.repacking) this.formSellado.patchValue({ 'idOperario': [0]  });
     this.form.reset();
+    this.rolls = [];
+    this.rollsConsolidate = [];
   }
 
   //Función que filtra la info de la tabla
@@ -336,7 +346,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.cargarTurnoActual();
     this.getMachines();
 
-    if(newOT) this.formSellado.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null});
+    if(newOT) this.formSellado.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null, 'packer' : null });
 
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
       let nitCliente: any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
@@ -380,6 +390,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.ordenConsultada = this.formSellado.value.ot;
     this.maquinaConsultada = this.formSellado.value.maquina;
     this.operariosConsultados = this.formSellado.value.idOperario;
+    this.packerSelected = this.formSellado.value.packer;
   }
 
   //Función que validará el proceso de sellado según la maquina y el item de la orden de trabajo.
@@ -461,25 +472,27 @@ export class Produccion_SelladoComponent implements OnInit {
               if (this.formSellado.value.maquina > 0) {
                 if (this.formSellado.value.idOperario != null) {
                   if ((this.formSellado.value.idOperario).length < 5) {
-                    if(oldProcess) {
-                      if(tag) {
-                        if(tag.toString().length >= 6) {
-                          if (this.formSellado.value.cantUnd > 0) { 
-                            if (this.formSellado.value.cantKg > 1 && this.formSellado.value.cantKg <= 65) {
-                              if(this.esSoloLectura) {  
-                                if(this.formSellado.value.cantKg >= teoricW5PLess && this.formSellado.value.cantKg <= teoricW5PMost) {
+                    if (this.formSellado.value.packer) {
+                      if(oldProcess) {
+                        if(tag) {
+                          if(tag.toString().length >= 6) {
+                            if (this.formSellado.value.cantUnd > 0) { 
+                              if (this.formSellado.value.cantKg > 1 && this.formSellado.value.cantKg <= 65) {
+                                if(this.esSoloLectura) {  
+                                  if(this.formSellado.value.cantKg >= teoricW5PLess && this.formSellado.value.cantKg <= teoricW5PMost) {
+                                    if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
+                                    else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
+                                  } else this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW5PLess.toFixed(2)} y ${teoricW5PMost.toFixed(2)}!`);
+                                } else {
                                   if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
                                   else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
-                                } else this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW5PLess.toFixed(2)} y ${teoricW5PMost.toFixed(2)}!`);
-                              } else {
-                                if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
-                                else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
-                              }
-                            } else this.warnMsj(`Advertencia`, `¡La cantidad de kilos debe ser mayor a '1' y menor o igual a 65!`);
-                          } else this.warnMsj(`Advertencia`, `¡La cantidad en unidades/paquetes debe ser mayor a '0'!`);
-                        } else this.warnMsj(`Advertencia`, `¡La cantidad de digitos del rollo madre debe ser mayor a 5!`);
-                      } else this.warnMsj(`Advertencia`, `Debe agregar un número de rollo madre válido!`);
-                    } else this.warnMsj(`Advertencia`, `Debe elegir el proceso madre de esta producción!`);
+                                }
+                              } else this.warnMsj(`Advertencia`, `¡La cantidad de kilos debe ser mayor a '1' y menor o igual a 65!`);
+                            } else this.warnMsj(`Advertencia`, `¡La cantidad en unidades/paquetes debe ser mayor a '0'!`);
+                          } else this.warnMsj(`Advertencia`, `¡La cantidad de digitos del rollo madre debe ser mayor a 5!`);
+                        } else this.warnMsj(`Advertencia`, `Debe agregar un número de rollo madre válido!`);
+                      } else this.warnMsj(`Advertencia`, `Debe elegir el proceso madre de esta producción!`);
+                    } else this.warnMsj(`Advertencia`, `Debe seleccionar el 'Empacador' del rollo/bulto`); 
                   } else this.warnMsj(`Advertencia`, `¡Un rollo no puede ser pesado por más de 4 operarios, verifique!`);
                 } else this.warnMsj(`Advertencia`, `¡Debe seleccionar al menos un operario!`);
               } else this.warnMsj(`Advertencia`, `¡Debe seleccionar una máquina válida!`);
@@ -546,6 +559,7 @@ export class Produccion_SelladoComponent implements OnInit {
       'Hora': moment().format('HH:mm:ss'),
       'Creador_Id': this.AppComponent.storage_Id,
       'Etiqueta_Trazabilidad' : this.formSellado.value.etiquetaAsociada,
+      'Empacador_Id' : [undefined, null].includes(this.formSellado.value.packer) ? 0 : this.formSellado.value.packer,
     }
     this.guardarRegistroEntrada(entrada, data);
   }
@@ -590,7 +604,7 @@ export class Produccion_SelladoComponent implements OnInit {
         else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
         this.cargarCamposUltimaOT();
         this.limpiarCampos();
-        this.formSellado.patchValue({ 'ot': this.ordenConsultada, 'maquina': this.maquinaConsultada, 'idOperario': this.operariosConsultados, 'procesoAnterior' : motherProcess, 'etiquetaAsociada' : data.etiqueta_Trazabilidad, 'otAlterna' : otAltern });
+        this.formSellado.patchValue({ 'ot': this.ordenConsultada, 'maquina': this.maquinaConsultada, 'idOperario': this.operariosConsultados, 'procesoAnterior' : motherProcess, 'etiquetaAsociada' : data.etiqueta_Trazabilidad, 'otAlterna' : otAltern, 'packer' : this.packerSelected });
         this.buscarOT();
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
@@ -703,6 +717,8 @@ export class Produccion_SelladoComponent implements OnInit {
       'Operario_2': productionPL.operario2_Id == null ? 0 : productionPL.operario2_Id,
       'Operario_3': productionPL.operario3_Id == null ? 0 : productionPL.operario3_Id,
       'Operario_4': productionPL.operario4_Id == null ? 0 : productionPL.operario4_Id,
+      'Empacador_Id' : [undefined, null].includes(productionPL.empacador_Id) ? 0 : productionPL.empacador_Id, 
+      'Turno_Id' : productionPL.turno_Id, 
       'Trz_EtiquetaAnterior': infoTagAssociated ? infoTagAssociated.rollo : this.formSellado.value.etiquetaAsociada,
       'Trz_OtAnterior': infoTagAssociated ? infoTagAssociated.ot : null,
       'Prod_Anterior': infoTagAssociated ? infoTagAssociated.item : 1,
@@ -722,6 +738,7 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Validar información de rollos por OT
   validateOrderProduction(typeOT : string){
+    this.rollsConsolidate = [];
     this.rolls = [];
     let ot : number = typeOT == 'altern' ? ![null, '', undefined].includes(this.formSellado.value.otAlterna) ? this.formSellado.value.otAlterna : this.formSellado.value.ot : this.formSellado.value.ot;
     let motherProcess : string = this.formSellado.value.procesoAnterior;
@@ -736,6 +753,7 @@ export class Produccion_SelladoComponent implements OnInit {
           this.rolls = data;
           this.cargando = false;
           this.orderProduction = ot;
+          this.consolidateProduction();
         } else {
           this.warnMsj(`Advertencia`, `No se encontraron rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)}`);
           this.orderProduction = ot;
@@ -747,6 +765,17 @@ export class Produccion_SelladoComponent implements OnInit {
       this.warnMsj(`Advertencia`, `Debe diligenciar los campos 'Proceso Madre' y 'OT'`);
     }
   }
+
+  consolidateProduction() {
+    this.rollsConsolidate = this.rolls.reduce((a, b) => {
+      if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
+      return a;
+    }, []);
+  }
+
+  getTotalWeight = () => this.rolls.reduce((a, b) => a += b.peso1, 0);
+
+  totalRolls = () => this.rolls.length;
 
   //Función para cargar los rollos madres de bulto
   loadMotherRolls(tag : any, process : string){

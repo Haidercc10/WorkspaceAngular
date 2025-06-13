@@ -16,6 +16,8 @@ export interface modelTrazabilidad_Produccion {
     Operario_2 : number; 
     Operario_3 : number; 
     Operario_4 : number; 
+    Empacador_Id? : number;
+    Turno_Id? : string;
     Trz_EtiquetaAnterior : number; 
     Trz_OtAnterior : number; 
     Prod_Anterior : number; 

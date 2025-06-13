@@ -29,4 +29,5 @@ export interface modelProduccionProcesos {
     Creador_Id : number;
     Rebobinado? : boolean;
     Etiqueta_Trazabilidad? : number;
+    Empacador_Id? : number;
 }
