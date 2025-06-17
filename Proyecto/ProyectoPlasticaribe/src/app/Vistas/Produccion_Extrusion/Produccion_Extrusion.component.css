@@ -70,3 +70,21 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
 .buttonPrint:hover {
     background-color: #22C55E;
 }
+
+.bg-rojo {
+  color: black;
+  background-color: #FF7878;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-verde {
+  color: black;
+  background-color: #8AFC9B;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-amarillo {
+  color: black;
+  background-color: #F3FC20;
+  font-size: calc(var(--font-size) * 15px);
+}

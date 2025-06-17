@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { subscribe } from 'diagnostics_channel';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
@@ -9,6 +10,7 @@ import { modelTrazabilidad_Produccion } from 'src/app/Modelo/modelTrazabilidad_P
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
 import { TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
@@ -59,6 +61,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   @ViewChild('dt1') dt1: Table | undefined;
   rollsConsolidate : any = [];
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
+  processProduction : boolean = false;
+  clase: any = ``;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -77,6 +81,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     private rePrintService: ReImpresionEtiquetasService,
     private svMachines : MaquinasService,
     private svTraceability : TrazabilidadProduccionService,
+    private svStatusProcess : EstadosProcesos_OTService,
     //private svRouter : Router,
   ) {
 
@@ -130,6 +135,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       //this.buscarPuertos()
       this.getMachines();
       this.getPackers();
+      //this.updateStatesProcessOT([]);
     //}, 1000); 
   }
 
@@ -318,6 +324,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.validarProceso();
     consulta ? this.nuevoAnchoProducto = null : null;
     this.rolls = [];
+    this.clase = ``;
   }
 
   getProcess() {
@@ -464,13 +471,14 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
       if(consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null, 'packer' : null, });
-      //this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), () => {
-        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data, consulta), error => {
+        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo, `?process=${this.formDatosProduccion.value.proceso}`).subscribe(data => {
+          this.putDataOrderProduction(data, consulta);
+          if(!consulta) this.updateStatesProcessOT(data[0].numero_Orden, this.formDatosProduccion.value.proceso, data[0].cantidad_Proceso, data[0].cantidad_Proceso);
+        }, error => {
           this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
           this.reference = ``;
           this.limpiarCampos(consulta);
         });
-      //});
     } else this.warinigMessage(`¡Debe haber seleccionado un proceso previamente!`);
   }
 
@@ -504,6 +512,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             'rebobinado' : false,
           });
           this.buscarDatosConoSeleccionado();
+          console.log(datos);
+          this.claseCantidadRealizada(datos)
         });
       }, error => {
         this.errorMessage(`Ocurrió un error al consultar el nit de cliente N° ${datos.nitCliente}`, error);
@@ -519,6 +529,16 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
     if(packed > sales) this.warinigMessage(`La orden está sobrepasada. Se solicitaron ${sales.toLocaleString()} y se han producido ${packed.toLocaleString()} ${unit}.`);
     else if(packed == sales) this.warinigMessage(`La cantidad solicitada es igual a la cantidad producida, verifique antes de continuar!`);
+  }
+
+  //Funcion que agrega una clase con un color especifico al campo cantidad realizada de la tabla.
+  claseCantidadRealizada(data) {
+    if (data.cantidad_Proceso == 0) this.clase = `badge bg-rojo`;
+    else if (data.cantidad_Proceso > 0 && data.cantidad_Proceso < data.cantidad_Pedida) this.clase = `badge bg-amarillo`;
+    else if (data.cantidad_Proceso >= data.cantidad_Pedida) this.clase = `badge bg-verde`;
+    else this.clase = ``;
+    console.log(this.clase);
+    
   }
 
   validarPrecio(datosOrden: any): number {
@@ -551,7 +571,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   validarDatos() {
-    //this.buscraOrdenTrabajo();
     let ot : any = this.formDatosProduccion.value.ordenTrabajo;
     let oldProcess : any = this.formDatosProduccion.value.procesoAnterior;
     let tag : any = this.formDatosProduccion.value.etiquetaAsociada;
@@ -754,12 +773,35 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           'showDataTagForClient': this.formDatosProduccion.value.mostratDatosProducto,
           'operator': rebobinado ? `${data.operador + ' RB'}` : `${data.operador}`
         }
-        this.createTraceability(dataProductionProcess, res, motherProcess, infoTagAssociated);
         this.createPDFService.createTagProduction(dataTagProduction);
+        this.createTraceability(dataProductionProcess, res, motherProcess, infoTagAssociated);
       }, error => {
         console.log(error);
       });
     });
+  }
+
+  updateStatesProcessOT(ot : any, process : string, qty : number, weight : number,){
+    this.svStatusProcess.putStatusProcessOT(ot, process, qty, weight).subscribe(dataUpdate => {
+      console.log(dataUpdate);
+    }, error => {
+      console.log(error);
+    });
+    /*['EXT', 'IMP', 'ROT', 'LAM', 'EMP'].forEach(x => {
+      this.bagproService.getDataForOrder(ot, x).subscribe(data => {
+        if(data) {
+          if(data.length > 0) {
+            count++ 
+            if(count == 1) {
+              this.processProduction = true;
+              return;
+            } 
+          }
+        }
+      }, error => {
+        console.log(error);
+      });
+    });*/
   }
 
   createTagProduction(code: number, quantity: number, quantity2: number, copy: boolean = false) {

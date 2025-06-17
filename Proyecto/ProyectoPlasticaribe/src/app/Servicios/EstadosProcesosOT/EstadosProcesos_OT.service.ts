@@ -32,4 +32,5 @@ export class EstadosProcesos_OTService {
 
   PutEstadoOrdenTrabajo = (ot : any, estado : any) => this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/putEstadoOrden/${ot}?estadoOt=${estado}`, estado);
 
+  putStatusProcessOT = (ot : any, process : any, quantity : number, weight : number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/putStatusProcessOT/${ot}/${process}/${quantity}/${weight}`, data);
 }

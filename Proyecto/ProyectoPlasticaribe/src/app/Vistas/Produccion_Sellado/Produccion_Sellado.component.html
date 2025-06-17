@@ -27,7 +27,7 @@
 
   <!--Formulario-->
   <form [formGroup]="formSellado">
-    <div class="row g-4 my-4 mb-5">
+    <div class="row g-4 mb-3">
 
       <!-- OT -->
       <div class="col-sm-12 col-md-6 col-xl-{{repacking ? 2 : 1}}">
@@ -87,7 +87,7 @@
       <div class="col-sm-12 col-md-6 col-xl-1">
         <span class="p-float-label">
           <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2"
-            [readonly]="true"></p-inputNumber>
+            [readonly]="true" ></p-inputNumber>
           <label for="cantKg">Cant. Kg</label>
         </span>
       </div>
@@ -174,66 +174,77 @@
         </span>
       </div>
 
-      <p-divider></p-divider>
+      <div class="mb-3">
+        <hr class="colorLinea">
+      </div>
+
+      <!--Orden de Producción -->
+      <!--<div class="mb-3">-->
+        
 
       <!--Tabla OT-->
-      <p-table #dtOT *ngIf="!cargando" styleClass="p-datatable-gridlines" [value]="ordenesTrabajo">
-        <ng-template pTemplate="header">
-          <tr>
-            <th style="font-weight: 800;" class="text-center" colspan="5">Información General</th>
-            <th style="font-weight: 800;" class="text-center" colspan="2">Cantidad</th>
-            <th style="font-weight: 800;" class="text-center" colspan="2"></th>
-            <th style="font-weight: 800;" class="text-center" colspan="3">Extrusión</th>
-            <th style="font-weight: 800;" class="text-center" colspan="3">Producto Terminado</th>
-          </tr>
-          <tr>
-            <th style="font-weight: 600;" class="text-center">OT</th>
-            <th style="font-weight: 600;" class="text-center">Cliente</th>
-            <th style="font-weight: 600;" class="text-center">Item</th>
-            <th style="font-weight: 600;" class="text-center">Referencia</th>
-            <th style="font-weight: 600;" class="text-center">Material</th>
-            <th style="font-weight: 600;" class="text-center">Programada</th>
-            <th style="font-weight: 600;" class="text-center">Realizada</th>
-            <th style="font-weight: 600;" class="text-center">Medida</th>
-            <th style="font-weight: 600;" class="text-center">Etiqueta</th>
-            <th style="font-weight: 600;" class="text-center">Ancho 1</th>
-            <th style="font-weight: 600;" class="text-center">Ancho 2</th>
-            <th style="font-weight: 600;" class="text-center">Ancho 3</th>
-            <th style="font-weight: 600;" class="text-center">Ancho</th>
-            <th style="font-weight: 600;" class="text-center">Largo</th>
-            <th style="font-weight: 600;" class="text-center">Fuelle</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-          <tr>
-            <td class="text-center">{{data.numero_Orden}}</td>
-            <td class="text-center">{{data.cliente}}</td>
-            <td class="text-center">{{data.id_Producto}}</td>
-            <td class="text-center">{{data.producto}}</td>
-            <td class="text-center">{{data.material}} - {{data.pigmento_Extrusion}}</td>
-            <td class="text-center">{{data.cantidad_Pedida | number : '1.2-2' }}</td>
-            <td class="text-center"><span class="{{clase}}">{{data.cantidad_Sellado | number : '1.2-2'}}</span></td>
-            <td class="text-center">{{data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' :
-              data.presentacion == 'Paquete' ? 'Paquete' : null}}</td>
-            <td class="text-center">{{data.selladoCorte_Etiqueta_Ancho}} X {{data.selladoCorte_Etiqueta_Largo}}</td>
-            <td class="text-center">{{data.ancho1_Extrusion | number : '1.2-2'}}</td>
-            <td class="text-center">{{data.ancho2_Extrusion | number : '1.2-2'}}</td>
-            <td class="text-center">{{data.ancho3_Extrusion | number : '1.2-2'}}</td>
-            <td class="text-center">{{data.selladoCorte_Ancho | number : '1.2-2'}}</td>
-            <td class="text-center">{{data.selladoCorte_Largo | number : '1.2-2'}}</td>
-            <td class="text-center">{{data.selladoCorte_Fuelle | number : '1.2-2'}}</td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <div class="mb-3">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información de la Orden de Producción </h4>
+        <br>
+        <p-table #dtOT *ngIf="!cargando" styleClass="p-datatable-gridlines" [value]="ordenesTrabajo">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="font-weight: 800;" class="text-center" colspan="5">Información General</th>
+              <th style="font-weight: 800;" class="text-center" colspan="2">Cantidad</th>
+              <th style="font-weight: 800;" class="text-center" colspan="2"></th>
+              <th style="font-weight: 800;" class="text-center" colspan="3">Extrusión</th>
+              <th style="font-weight: 800;" class="text-center" colspan="3">Producto Terminado</th>
+            </tr>
+            <tr>
+              <th style="font-weight: 600;" class="text-center">OT</th>
+              <th style="font-weight: 600;" class="text-center">Cliente</th>
+              <th style="font-weight: 600;" class="text-center">Item</th>
+              <th style="font-weight: 600;" class="text-center">Referencia</th>
+              <th style="font-weight: 600;" class="text-center">Material</th>
+              <th style="font-weight: 600;" class="text-center">Programada</th>
+              <th style="font-weight: 600;" class="text-center">Realizada</th>
+              <th style="font-weight: 600;" class="text-center">Medida</th>
+              <th style="font-weight: 600;" class="text-center">Etiqueta</th>
+              <th style="font-weight: 600;" class="text-center">Ancho 1</th>
+              <th style="font-weight: 600;" class="text-center">Ancho 2</th>
+              <th style="font-weight: 600;" class="text-center">Ancho 3</th>
+              <th style="font-weight: 600;" class="text-center">Ancho</th>
+              <th style="font-weight: 600;" class="text-center">Largo</th>
+              <th style="font-weight: 600;" class="text-center">Fuelle</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <tr>
+              <td class="text-center">{{data.numero_Orden}}</td>
+              <td class="text-center">{{data.cliente}}</td>
+              <td class="text-center">{{data.id_Producto}}</td>
+              <td class="text-center">{{data.producto}}</td>
+              <td class="text-center">{{data.material}} - {{data.pigmento_Extrusion}}</td>
+              <td class="text-center">{{data.cantidad_Pedida | number : '1.2-2' }}</td>
+              <td class="text-center"><span class="{{clase}}">{{data.cantidad_Sellado | number : '1.2-2'}}</span></td>
+              <td class="text-center">{{data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' :
+                data.presentacion == 'Paquete' ? 'Paquete' : null}}</td>
+              <td class="text-center">{{data.selladoCorte_Etiqueta_Ancho}} X {{data.selladoCorte_Etiqueta_Largo}}</td>
+              <td class="text-center">{{data.ancho1_Extrusion | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.ancho2_Extrusion | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.ancho3_Extrusion | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.selladoCorte_Ancho | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.selladoCorte_Largo | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.selladoCorte_Fuelle | number : '1.2-2'}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
 
-      <!-- Botones -->
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send"
-          [disabled]="ordenesTrabajo.length == 0" (click)="validarEntrada()"></button>
-        <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser"
-          (click)="limpiarCampos()"></button>
-          <!--<button pButton class="p-button-success" id="bascula" type="button" label="Conectar Bascula"
-          icon="pi pi-power-off" (click)="getPuertoSerial()"></button>-->
+        <!-- Botones -->
+        <br>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send"
+            [disabled]="ordenesTrabajo.length == 0" (click)="validarEntrada()"></button>
+          <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+            (click)="limpiarCampos()"></button>
+            <!--<button pButton class="p-button-success" id="bascula" type="button" label="Conectar Bascula"
+            icon="pi pi-power-off" (click)="getPuertoSerial()"></button>-->
+        </div>
       </div>
     </div>
   </form>

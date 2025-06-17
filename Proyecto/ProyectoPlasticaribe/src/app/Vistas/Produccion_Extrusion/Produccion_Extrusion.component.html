@@ -119,7 +119,7 @@
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
                     <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal"
-                        [readonly]="true" [minFractionDigits]="4"  [required]="true"></p-inputNumber> 
+                        [readonly]="true" [minFractionDigits]="4"  [required]="true"></p-inputNumber>
                     <label for="pesoBruto">Bruto Kg</label>
                 </span>
             </div>
@@ -128,7 +128,7 @@
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
                     <p-inputNumber formControlName="pesoNeto" [min]="2" inputId="pesoNeto" mode="decimal"
-                      [readonly]="true" [minFractionDigits]="4" [required]="true"></p-inputNumber>
+                    [readonly]="true"  [minFractionDigits]="4" [required]="true"></p-inputNumber>
                     <label for="pesoNeto">Neto Kg</label>
                 </span>
             </div>
@@ -198,6 +198,9 @@
         </div>
 
         <div class="row my-3">
+
+            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información de la Orden de Producción </h4>
+            <br>
             <p-table [value]="datosOrdenTrabajo" columnResizeMode="expand" styleClass="p-datatable-sm"
                 responsiveLayout="scroll" [rowHover]="true">
                 <ng-template pTemplate="header">
@@ -226,8 +229,8 @@
                         <td>{{data.id_Producto}}</td>
                         <td>{{data.producto}}</td>
                         <td>{{data.turno}}</td>
-                        <td class="textBlue"><b>{{data.peso_Neto | number : '1.2-2'}}</b></td>
-                        <td><b>{{ sumarPesoNeto() | number : '1.2-2'}}</b></td>
+                        <td><b>{{data.peso_Neto | number : '1.2-2'}}</b></td>
+                        <td><span class="{{clase}}">{{sumarPesoNeto() | number : '1.2-2'}}</span></td>
                         <td>{{proceso != 'Empaque' ? (data.ancho1_Extrusion | number : '1.2-2') :
                             (data.selladoCorte_Ancho | number : '1.2-2')}}</td>
                         <td>{{proceso != 'Empaque' ? (data.ancho2_Extrusion | number : '1.2-2') :
@@ -241,7 +244,6 @@
                 </ng-template>
             </p-table>
 
-            <p-divider></p-divider>
         </div>
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -254,6 +256,7 @@
     </form>
 
     <div class="mb-4">
+        <p-divider></p-divider>
         <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
             Rollos Producidos</h4>
     </div>
