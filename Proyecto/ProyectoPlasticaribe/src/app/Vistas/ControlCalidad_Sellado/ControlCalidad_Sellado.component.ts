@@ -11,6 +11,7 @@ import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import * as fs from 'file-saver';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +47,8 @@ export class ControlCalidad_SelladoComponent implements OnInit {
                   private srvBagpro : BagproService, 
                     private msjs : MensajesAplicacionService, 
                       private msg : MessageService, 
-                        private AppComponent : AppComponent) {
+                        private AppComponent : AppComponent, 
+                          private svExcel : CreacionExcelService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;                       
                          }
 
@@ -54,7 +56,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
     this.lecturaStorage();
     this.mostrarRegistrosHoy();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    this.exportarExcel();
+    //this.exportarExcel();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

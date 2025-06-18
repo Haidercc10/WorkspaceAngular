@@ -140,6 +140,9 @@ export class MovTrazabilidadProduccionComponent {
 
   ///. Cargar datos de bagpro para productos madre.
   loadDataFromBagpro(data : any, count : number){
+    console.log(1);
+    console.log(data);
+    
     data.forEach(x => {
       count++
       this.svBagpro.getRollProduction(x.motherRoll, `?process=${x.motherProcess.toUpperCase()}`).subscribe(dataBag => {
@@ -151,11 +154,14 @@ export class MovTrazabilidadProduccionComponent {
         x.motherTurn = dataBag.turno;
         this.groupTraceability.push(x);
       }, error => { console.log(error); });
+      console.log(count, data.length);
+      
       if(count == data.length) {
         this.groupTraceability.sort((a, b) => Number(a.motherRoll) - Number(b.motherRoll));
         this.load = false;
       }
     });
+    //this.load = false;
   }
   
   ///. Aplicar el filtro en las tablas 
