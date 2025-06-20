@@ -226,6 +226,7 @@ export class MovTrazabilidadProduccionComponent {
     let date1 : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let date2 : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
     let process : string = this.formFilters.value.process;
+    let roll : number = this.formFilters.value.roll;
     let count : number = 0;
 
     if(this.groupTraceability.length > 0) {
@@ -248,6 +249,7 @@ export class MovTrazabilidadProduccionComponent {
                   this.dataSearchedExcel();
                   this.load = false;
                 }
+                this.load = false;
               }, error => { 
                 console.log(error);
                 this.load = false;

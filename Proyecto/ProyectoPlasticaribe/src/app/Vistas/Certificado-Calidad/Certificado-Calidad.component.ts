@@ -328,6 +328,7 @@ export class CertificadoCalidadComponent implements OnInit {
       Fecha_Registro: moment().format('YYYY-MM-DD'),
       Hora_Registro: moment().format('H:mm:ss'),
       Usua_Id: this.storage_Id
+      
     }
     this.certCalidadService.Post(datosCertificado).subscribe(res => {
       this.crearPdfCertificado(res.consecutivo);
@@ -375,10 +376,25 @@ export class CertificadoCalidadComponent implements OnInit {
             { border: [false, false, true, false], text: `${datos.referencia}` },
           ],
           [
-            { border: [true, false, false, true], text: `Fecha Orden`, bold: true },
+            { border: [true, false, false, true], text: `Fecha Orden`, bold: true, },
             { border: [false, false, true, true], text: `${datos.fecha_Orden == null ? '' : datos.fecha_Orden.replace('T00:00:00', '')}` },
-            { border: [true, false, false, true], text: `Fecha Fin Produccion`, bold: true },
-            { border: [false, false, true, true], text: `${datos.fecha_Fin_Produccion == null ? '' : datos.fecha_Fin_Produccion.replace('T00:00:00', '')}` },
+            {
+              table: {
+                widths: [65, '*', 60, '*'],
+									body: [
+										[
+                      { border: [false, false, false, false], text: `Fin Producción`, bold: true,  }, 
+                      { border: [false, false, false, false], text: `${datos.fecha_Fin_Produccion == null ? '' : datos.fecha_Fin_Produccion.replace('T00:00:00', '')}` },
+                      { border: [false, false, false, false], text: `Fecha Vence`, bold: true, }, 
+                      { border: [false, false, false, false], text: `${datos.fecha_Vencimiento == null ? '' : datos.fecha_Vencimiento.replace('T00:00:00', '')}` },
+                    ],
+									], 
+								},
+                border: [false, false, false, true]
+            },
+            {  
+              border: [false, false, true, true], text: ``
+            }
           ],
         ]
       },
