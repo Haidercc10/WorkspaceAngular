@@ -254,6 +254,7 @@ export class MovTrazabilidadProduccionComponent {
                 console.log(error);
                 this.load = false;
               });
+               if(count == this.informationExcel.length) this.load = false;
             });
           } else this.warningMsj('Advertencia', 'No se encontraron datos para exportar!');
         } else this.warningMsj('Advertencia', 'No se encontró información en la consulta!');
