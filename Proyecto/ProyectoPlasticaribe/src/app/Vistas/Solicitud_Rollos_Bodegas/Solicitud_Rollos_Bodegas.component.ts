@@ -524,9 +524,9 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   //* Función que creará el registro de producción de BagPro en Plasticaribe
   createProductionInPL(solicitud : number, action : string){
-    let wareHouseSelected : any = this.FormConsultarRollos.value.BodegaSolicitante;
+    //let wareHouseSelected : any = this.FormConsultarRollos.value.BodegaSolicitante;
 
-    if(wareHouseSelected == 'DESP') {
+    /*if(wareHouseSelected == 'DESP') {
       let rollsExtrusion : any = [];
       let count = 0;
       this.rollosIngresar.forEach(d => {
@@ -544,7 +544,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
           this.cargando = false;
         });
       });
-    } else this.createPDF(solicitud, action);
+    } else*/ this.createPDF(solicitud, action);
   }
 
   //*Función que crea el registro en la tabla de producción.
