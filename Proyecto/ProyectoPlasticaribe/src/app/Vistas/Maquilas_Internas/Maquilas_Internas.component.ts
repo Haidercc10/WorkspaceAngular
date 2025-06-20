@@ -299,7 +299,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     this.realServices = [];
     this.load = true;
    
-    this.svBagPro.GetOrdenDeTrabajo(ot).subscribe(data => {
+    this.svBagPro.GetOrdenDeTrabajo(ot, '').subscribe(data => {
       let nitCliente : any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
       this.svSedes.GetSedeClientexNitBagPro(nitCliente).subscribe(sede => {
         let printed : boolean = data[0].id_Tinta1 == 1 ? false : true;
