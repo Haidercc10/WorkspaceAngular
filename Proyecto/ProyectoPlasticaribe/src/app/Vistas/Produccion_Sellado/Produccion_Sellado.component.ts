@@ -7,6 +7,7 @@ import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { modelTrazabilidad_Produccion } from 'src/app/Modelo/modelTrazabilidad_Produccion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CodeBarService } from 'src/app/Servicios/CodeBar/code-bar.service';
 import { TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
@@ -83,6 +84,7 @@ export class Produccion_SelladoComponent implements OnInit {
     private svProcess : ProcesosService,
     private svAuthentication: AuthenticationService,
     private svStatusProcess : EstadosProcesos_OTService,
+    private svCodeBar : CodeBarService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
@@ -99,7 +101,12 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getMachines();
     this.getProcess();
     this.getPackers();
+    this.generateCodeBar()
     // this.getPuertoSerial();
+  }
+
+  generateCodeBar(){
+    this.svCodeBar.createTagProduction([]);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
