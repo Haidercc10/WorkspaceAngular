@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
+import JsBarcode from 'jsbarcode';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 
@@ -14,7 +15,7 @@ export class CodeBarService {
     const pdfDefinition: any = {
       pageOrientation: 'portrait',
       info: { title: `` },
-      pageSize: { width: 377.95280352, height: 377.95280352 },
+      pageSize: { width: 377.95280352, height: 188.97640176 },
       pageMargins: [10, 10, 10, 10],
       content: this.contentPDF(user),
     }
@@ -42,18 +43,21 @@ export class CodeBarService {
   private contentPrincipalTablePDF(user): any[] {
     let content = [];
     content.push(this.dataBussiness());
-    /*content.push(
+    content.push(
       this.adictionalInformationTag(),
-      this.infoClient(dataTag),
-      this.dataOrderAndItem(dataTag),
-      this.nameReference(dataTag),
-      this.nameMaterial(dataTag),
-      this.createBarcode(dataTag),
-      this.quantity(dataTag),
-      this.presentationsTag(dataTag),
-      this.processAndDate(dataTag),
-      this.opertaros(dataTag),
-    );*/
+      this.infoClient([]),
+      //this.dataOrderAndItem(dataTag),
+      this.nameReference([]),
+      this.cargo([]),
+      this.nameMaterial([]),
+      this.createBarcode([]),
+      this.estado([]), 
+      this.iden([]),
+      //this.quantity(dataTag),
+      //this.presentationsTag(dataTag),
+      //this.processAndDate(dataTag),
+      //this.opertaros(dataTag),
+    );
 
     return content;
   }
@@ -73,29 +77,24 @@ export class CodeBarService {
       },
       {}
     ];
-  }
-/*
+  } 
+
   private adictionalInformationTag(): any[] {
     return [
-      { text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 8, alignment: 'center', colSpan: 2, margin: [-10, 0] },
+      { text: `PERSONAL AUTORIZADO`, bold: true, fontSize: 8, alignment: 'center', colSpan: 2, margin: [-10, 0] },
       {}
     ];
   }
 
-  private infoClient(dataTag: modelTagProduction): any[] {
+  private infoClient(user : any): any[] {
     return [
-      {
-        colSpan: 2,
-        margin: [0, 0],
-        columns: [
-          { width: 'auto', text: 'CLI.:', bold: true, fontSize: 10, alignment: 'left' },
-          { width: '*', text: (dataTag.client).toUpperCase(), fontSize: 10, alignment: 'left' },
-        ]
-      },
+      { text: 'PERMISO: PESAJE DE PRODUCCIÓN FUERA DEL RANGO ESTABLECIDO', bold: true, fontSize: 8, alignment: 'left', colSpan: 2, },
       {}
     ];
   }
 
+  
+/*
   private dataOrderAndItem(dataTag: modelTagProduction): any[] {
     return [
       {
@@ -127,22 +126,29 @@ export class CodeBarService {
       {}
     ]
   }
-
-  private nameReference(dataTag: modelTagProduction): any[] {
+*/
+  private nameReference(user : any): any[] {
     return [
       {
         colSpan: 2,
         margin: [0, 0],
         columns: [
-          { width: 'auto', text: 'REF.:', bold: true, fontSize: 10, alignment: 'left' },
-          { width: '*', text: (dataTag.reference).toUpperCase(), fontSize: 10, alignment: 'left' },
+          { width: 'auto', text: 'USU.: ', bold: true, fontSize: 10, alignment: 'left' },
+          { width: '*', text: " HAIDER CANTILLO".toUpperCase(), fontSize: 10, alignment: 'left' },
         ]
       },
       {}
     ];
   }
 
-  private nameMaterial(dataTag: modelTagProduction): any[] {
+  private cargo(user : any): any[] {
+    return [
+      { text: 'CARGO: ANALISTA DE SISTEMAS', bold: true, fontSize: 8, alignment: 'left', colSpan: 2, },
+      {}
+    ];
+  }
+
+  private nameMaterial(user : any): any[] {
     return [
       {
         margin: [-5, -3],
@@ -155,15 +161,15 @@ export class CodeBarService {
               {
                 border: [false, false, true, false],
                 columns: [
-                  { width: 'auto', text: 'MAT:', bold: true, fontSize: 9, alignment: 'left' },
-                  { width: 'auto', text: (dataTag.material).toUpperCase(), fontSize: 9, alignment: 'left' },
+                  { width: 'auto', text: 'ÁREA: ', bold: true, fontSize: 9, alignment: 'left' },
+                  { width: 'auto', text: " CALIDAD".toUpperCase(), fontSize: 9, alignment: 'left' },
                 ]
               },
               {
                 border: [false, false, false, false],
                 columns: [
-                  { width: 'auto', text: 'BULTO:', bold: true, fontSize: 10, alignment: 'left' },
-                  { width: 'auto', text: `${dataTag.reel}${!dataTag.copy ? '' : '.'}`, fontSize: 10, alignment: 'left' },
+                  { width: 'auto', text: 'ROL: ', bold: true, fontSize: 10, alignment: 'left' },
+                  { width: 'auto', text: `${' CALIDAD'}`, fontSize: 10, alignment: 'left' },
                 ]
               }
             ]
@@ -174,32 +180,43 @@ export class CodeBarService {
     ]
   }
 
-  private createBarcode(dataTag: modelTagProduction) {
-    let size: number = this.sizeBarcode(dataTag);
+  private createBarcode(user : any) {
+    let size: number = this.sizeBarcode(user);
     const imageBarcode = document.createElement('img');
-    if (dataTag.productionProcess != 'WIKETIADO') {
-      imageBarcode.id = 'barcode';
-      document.body.appendChild(imageBarcode);
-      JsBarcode("#barcode", (dataTag.reel).toString(), { format: "CODE128A", displayValue: false, width: 50, height: 150 });
-      let imagePDF = { image: imageBarcode.src, width: 155, height: size, colSpan: 2, alignment: 'center', margin: [0, -1] };
-      imageBarcode.remove();
-      return [imagePDF, {}];
-    } else {
-      let imagePDF = { image: referenceWike, width: 170, height: size, colSpan: 2, alignment: 'center', margin: [0, -1] };
-      return [imagePDF, {}];
-    }
+    imageBarcode.id = 'barcode';
+    document.body.appendChild(imageBarcode);
+    JsBarcode("#barcode", (1048322496).toString(), { format: "CODE128A", displayValue: false, width: 50, height: 150 });
+    let imagePDF = { image: imageBarcode.src, width: 155, height: size, colSpan: 2, alignment: 'center', margin: [0, -1] };
+    imageBarcode.remove();
+    return [imagePDF, {}];
   }
 
-  private sizeBarcode(dataTag: modelTagProduction): number {
+  private sizeBarcode(user): number {
     //console.clear();
-    let sizeClient: number = dataTag.client.length;
-    let sizeReference: number = dataTag.reference.length;
-    let size: number = 90;
+    let sizeClient: number = 20;
+    let sizeReference: number = 20;
+    let size: number = 100;
     size += sizeClient < 50 ? sizeClient < 24 ? 30 : 10 : 0;
     size += sizeReference < 50 ? sizeReference < 24 ? 30 : 10 : 0;
     return size;
   }
 
+  private estado(user : any): any[] {
+    return [
+      { text: 'ESTADO: ACTIVO', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
+      {}
+    ];
+  }
+
+  private iden(user : any): any[] {
+    return [
+      { text: 'ID: CC-1048322496', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
+      {}
+    ];
+  }
+
+  
+/*
   private quantity(dataTag: modelTagProduction) {
     let data = [];
     data.push(this.tableWithQuantity(dataTag.quantity));
