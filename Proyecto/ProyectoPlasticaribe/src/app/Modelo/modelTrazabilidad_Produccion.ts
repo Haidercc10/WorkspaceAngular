@@ -22,4 +22,5 @@ export interface modelTrazabilidad_Produccion {
     Trz_OtAnterior : number; 
     Prod_Anterior : number; 
     Proceso_Anterior : string;
+    Autoriza_Id? : number;
 }

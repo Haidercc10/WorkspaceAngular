@@ -11,7 +11,7 @@ export class CodeBarService {
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,) { }
 
   createTagProduction(user: any) {
-    let code: number = 1048322496;
+    let code: number = 3136;
     const pdfDefinition: any = {
       pageOrientation: 'portrait',
       info: { title: `` },
@@ -49,11 +49,13 @@ export class CodeBarService {
       //this.dataOrderAndItem(dataTag),
       this.nameReference([]),
       this.cargo([]),
-      this.nameMaterial([]),
+      this.area([]),
+      this.rol([]),
+      //this.nameMaterial([]),
       this.createBarcode([]),
       this.estado([]), 
       this.iden([]),
-      //this.quantity(dataTag),
+      this.quality([]),
       //this.presentationsTag(dataTag),
       //this.processAndDate(dataTag),
       //this.opertaros(dataTag),
@@ -81,7 +83,7 @@ export class CodeBarService {
 
   private adictionalInformationTag(): any[] {
     return [
-      { text: `PERSONAL AUTORIZADO`, bold: true, fontSize: 8, alignment: 'center', colSpan: 2, margin: [-10, 0] },
+      { text: `PERSONAL AUTORIZADO`, bold: true, fontSize: 10, alignment: 'center', colSpan: 2, margin: [-10, 0] },
       {}
     ];
   }
@@ -143,12 +145,26 @@ export class CodeBarService {
 
   private cargo(user : any): any[] {
     return [
-      { text: 'CARGO: ANALISTA DE SISTEMAS', bold: true, fontSize: 8, alignment: 'left', colSpan: 2, },
+      { text: 'CARGO: ANALISTA DE SISTEMAS', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
       {}
     ];
   }
 
-  private nameMaterial(user : any): any[] {
+  private area(user : any): any[] {
+    return [
+      { text: 'ÁREA: SISTEMAS', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
+      {}
+    ];
+  }
+
+  private rol(user : any): any[] {
+    return [
+      { text: 'ROL: SISTEMAS', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
+      {}
+    ];
+  }
+
+  /*private nameMaterial(user : any): any[] {
     return [
       {
         margin: [-5, -3],
@@ -178,14 +194,14 @@ export class CodeBarService {
       },
       {}
     ]
-  }
+  }*/
 
   private createBarcode(user : any) {
     let size: number = this.sizeBarcode(user);
     const imageBarcode = document.createElement('img');
     imageBarcode.id = 'barcode';
     document.body.appendChild(imageBarcode);
-    JsBarcode("#barcode", (1048322496).toString(), { format: "CODE128A", displayValue: false, width: 50, height: 150 });
+    JsBarcode("#barcode", ("322496").toString(), { format: "CODE128A", displayValue: false, width: 50, height: 150 });
     let imagePDF = { image: imageBarcode.src, width: 155, height: size, colSpan: 2, alignment: 'center', margin: [0, -1] };
     imageBarcode.remove();
     return [imagePDF, {}];
@@ -196,25 +212,31 @@ export class CodeBarService {
     let sizeClient: number = 20;
     let sizeReference: number = 20;
     let size: number = 100;
-    size += sizeClient < 50 ? sizeClient < 24 ? 30 : 10 : 0;
-    size += sizeReference < 50 ? sizeReference < 24 ? 30 : 10 : 0;
+    //size += sizeClient < 50 ? sizeClient < 24 ? 30 : 10 : 0;
+    //size += sizeReference < 50 ? sizeReference < 24 ? 30 : 10 : 0;
     return size;
   }
 
   private estado(user : any): any[] {
     return [
-      { text: 'ESTADO: ACTIVO', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
+      { text: 'ESTADO: ACTIVO', bold: true, fontSize: 10, alignment: 'center', colSpan: 2, },
       {}
     ];
   }
 
   private iden(user : any): any[] {
     return [
-      { text: 'ID: CC-1048322496', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
+      { text: 'ID: CC-1048322496', bold: true, fontSize: 10, alignment: 'center', colSpan: 2, },
       {}
     ];
   }
 
+  private quality(user : any): any[] {
+    return [
+      { text: 'LA CALIDAD ES HACER LAS COSAS BIEN DESDE EL PRINCIPIO.', bold: true, fontSize: 10, alignment: 'left', colSpan: 2, },
+      {}
+    ];
+  }
   
 /*
   private quantity(dataTag: modelTagProduction) {

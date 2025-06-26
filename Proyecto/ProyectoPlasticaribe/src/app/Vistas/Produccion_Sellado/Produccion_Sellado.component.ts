@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import moment from 'moment';
 import { Password } from 'primeng/password';
 import { Table } from 'primeng/table';
+import { Tag } from 'primeng/tag';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { modelTrazabilidad_Produccion } from 'src/app/Modelo/modelTrazabilidad_Produccion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -67,6 +68,10 @@ export class Produccion_SelladoComponent implements OnInit {
   packers : any = []; // Variable que guardará los nombres de los empacadores. 
   packerSelected : any;
   rollsConsolidate : any = [];
+  modalAuthorizeWeight : boolean = false;
+  formWeight !: FormGroup; //Formulario de autorización de pesos
+  usersAuthorized : any = [];
+  authUserSelected: any;
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -89,6 +94,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
     this.inicializateFormResidues();
+    this.initFormAuthorizeWeight();
   }
 
   ngOnInit() {
@@ -101,7 +107,8 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getMachines();
     this.getProcess();
     this.getPackers();
-    this.generateCodeBar()
+    //this.generateCodeBar()
+    this.getUsersAuthorized();
     // this.getPuertoSerial();
   }
 
@@ -133,7 +140,10 @@ export class Produccion_SelladoComponent implements OnInit {
       etiquetaAsociada : [null, ],
       procesoAnterior : [null, ],
       otAlterna : [null, ],
-      packer : [null, ]
+      packer : [null, ], 
+      minWeight : [null, ],
+      maxWeight : [null, ],
+      userAuthorize : [null, ], 
     });
     this.formSellado.get('saldo')?.disable();
   }
@@ -144,6 +154,14 @@ export class Produccion_SelladoComponent implements OnInit {
       pass: [null, Validators.required],
     });
   }
+
+  initFormAuthorizeWeight() {
+    this.formWeight = this.frmBuilder.group({
+      id: [null, Validators.required],
+    });
+  }
+
+  getUsersAuthorized = () => this.svcUsuarios.getListAuthorizeUsers().subscribe(data => this.usersAuthorized = data, error => this.svcMsjs.mensajeError(error));
 
   //Función para obtener las maquinas
   getMachines() {
@@ -284,6 +302,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.form.reset();
     this.rolls = [];
     this.rollsConsolidate = [];
+    this.modalAuthorizeWeight = false;
   }
 
   //Función que filtra la info de la tabla
@@ -353,9 +372,8 @@ export class Produccion_SelladoComponent implements OnInit {
     this.produccion = [];
     this.cargarTurnoActual();
     this.getMachines();
-
-    if(newOT) this.formSellado.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null, 'packer' : null });
-
+    if(newOT) this.formSellado.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null, 'packer' : null, 'minWeight' : null, 'maxWeight' : null, 'userAuthorize' : null });
+    
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot, `?process=${this.formSellado.value.proceso}`).subscribe(data => {
       let nitCliente: any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
       this.svcSedes.GetSedeClientexNitBagPro(nitCliente).subscribe(sede => {
@@ -400,6 +418,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.maquinaConsultada = this.formSellado.value.maquina;
     this.operariosConsultados = this.formSellado.value.idOperario;
     this.packerSelected = this.formSellado.value.packer;
+    this.authUserSelected = this.formSellado.value.userAuthorize;
   }
 
   //Función que validará el proceso de sellado según la maquina y el item de la orden de trabajo.
@@ -415,6 +434,8 @@ export class Produccion_SelladoComponent implements OnInit {
   calcularPesoTeorico() {
     if (this.ordenesTrabajo.length > 0) {
       let pesoTeorico: number = 0;
+      let minWeight : number = 0;
+      let maxWeight : number = 0;
       let pesoMillar: number = this.ordenesTrabajo[0].selladoCorte_PesoMillar;
       let cantidad: number = this.formSellado.value.cantUnd;
       let cantBolsasPaq: number = this.ordenesTrabajo[0].selladoCorte_CantBolsasPaquete;
@@ -422,7 +443,9 @@ export class Produccion_SelladoComponent implements OnInit {
       else if (this.ordenesTrabajo[0].presentacion == 'Unidad') pesoTeorico = ((cantidad * pesoMillar) / 1000);
       else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad == 1) pesoTeorico = (cantidad * pesoMillar);
       else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
-      this.formSellado.patchValue({ 'pesoTeorico': pesoTeorico });
+      minWeight = pesoTeorico - (pesoTeorico * 10 / 100);
+      maxWeight = pesoTeorico + (pesoTeorico * 10 / 100);
+      this.formSellado.patchValue({ 'pesoTeorico': pesoTeorico, 'minWeight' : minWeight, 'maxWeight' : maxWeight, });
     }
   }
 
@@ -486,13 +509,15 @@ export class Produccion_SelladoComponent implements OnInit {
                               if (this.formSellado.value.cantKg > 1 && this.formSellado.value.cantKg <= 65) {
                                 if(this.esSoloLectura) {  
                                   if(this.formSellado.value.cantKg >= teoricW5PLess && this.formSellado.value.cantKg <= teoricW5PMost) {
-                                    if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
-                                    else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
-                                  } else this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW5PLess.toFixed(2)} y ${teoricW5PMost.toFixed(2)}!`);
-                                } else {
-                                  if(oldProcess == 'MATPRIMA') this.crearEntrada(this.ordenesTrabajo[0]); 
-                                  else this.searchOldTag(this.ordenesTrabajo[0], tag, oldProcess); 
-                                }
+                                     this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
+                                  } else {
+                                    if(this.formSellado.value.userAuthorize) this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
+                                    else {
+                                      this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW5PLess.toFixed(2)} y ${teoricW5PMost.toFixed(2)}!`);
+                                      this.modalAuthorizeWeight = true;
+                                    }
+                                  } 
+                                } else this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
                               } else this.warnMsj(`Advertencia`, `¡La cantidad de kilos debe ser mayor a '1' y menor o igual a 65!`);
                             } else this.warnMsj(`Advertencia`, `¡La cantidad en unidades/paquetes debe ser mayor a '0'!`);
                           } else this.warnMsj(`Advertencia`, `¡La cantidad de digitos del rollo madre debe ser mayor a 5!`);
@@ -509,6 +534,12 @@ export class Produccion_SelladoComponent implements OnInit {
     }, 500);
   }
 
+  //Crear registro de producción 
+  createRecordProduction(orderProduction : any,  tag : number, oldProcess : string,){
+    if(oldProcess == 'MATPRIMA') this.crearEntrada(orderProduction); 
+    else this.searchOldTag(orderProduction, tag, oldProcess);
+  }
+
   //Mensaje de Advertencia.
   warnMsj(msj1 : any, msj2 : any){
     this.svcMsjs.mensajeAdvertencia(msj1, msj2);
@@ -520,6 +551,10 @@ export class Produccion_SelladoComponent implements OnInit {
   msjsOldRoll = () => 'Presiona "Enter" para cargar el modal de rollos madre.';
 
   msjsAltOT = () => 'Coloca el número de OT alternativa y presiona enter, para seleccionar un rollo madre de esta producción';
+
+  msjsMinWeight = () => 'Rango de peso (10%) minímo permitido para realizar el pesaje de producción';
+
+  msjsMaxWeight = () => 'Rango de peso (10%) maxímo permitido para realizar el pesaje de producción';
 
   //Buscar rollo madre 
   searchOldTag(dataOrderProduction : any, tag : number, process : any){
@@ -566,6 +601,7 @@ export class Produccion_SelladoComponent implements OnInit {
       'Creador_Id': this.AppComponent.storage_Id,
       'Etiqueta_Trazabilidad' : this.formSellado.value.etiquetaAsociada,
       'Empacador_Id' : [undefined, null].includes(this.formSellado.value.packer) ? 0 : this.formSellado.value.packer,
+      'Autoriza_Id' : this.formSellado.value.userAuthorize,
     }
     this.guardarRegistroEntrada(entrada, data);
   }
@@ -604,13 +640,13 @@ export class Produccion_SelladoComponent implements OnInit {
     let motherProcess : any = this.formSellado.value.procesoAnterior; 
     let otAltern : any = this.formSellado.value.otAlterna; 
     this.svcProdProcesos.Post(entrada).subscribe(data => {
-      this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, false, data.operario1_Id, data.datos_Etiqueta, data, motherProcess, dataTagAssociated);
+      this.crearEtiqueta(data.numero_Rollo, data.peso_Neto, data.cantidad, data.presentacion, false, data.operario1_Id, data.datos_Etiqueta, data, motherProcess, dataTagAssociated);
       setTimeout(() => {
         if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
         else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
         this.cargarCamposUltimaOT();
         this.limpiarCampos();
-        this.formSellado.patchValue({ 'ot': this.ordenConsultada, 'maquina': this.maquinaConsultada, 'idOperario': this.operariosConsultados, 'procesoAnterior' : motherProcess, 'etiquetaAsociada' : data.etiqueta_Trazabilidad, 'otAlterna' : otAltern, 'packer' : this.packerSelected });
+        this.formSellado.patchValue({ 'ot': this.ordenConsultada, 'maquina': this.maquinaConsultada, 'idOperario': this.operariosConsultados, 'procesoAnterior' : motherProcess, 'etiquetaAsociada' : data.etiqueta_Trazabilidad, 'otAlterna' : otAltern, 'packer' : this.packerSelected, 'userAuthorize' : this.authUserSelected });
         this.buscarOT();
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
@@ -636,7 +672,7 @@ export class Produccion_SelladoComponent implements OnInit {
         'orderProduction': this.formSellado.value.ot,
         'material': data[0].material,
         'quantity': cantKg,
-        'quantity2': medida == 'Kg' ? cantUnd : Math.trunc(cantUnd),
+        'quantity2': medida == 'Kg' ? cantKg : Math.trunc(cantUnd),
         'reel': data[0].bulto,
         'presentationItem1': 'Kg',
         'presentationItem2': medida != 'Kg' ? `${medida}(s)` : 'Kg',
@@ -729,6 +765,7 @@ export class Produccion_SelladoComponent implements OnInit {
       'Trz_OtAnterior': infoTagAssociated ? infoTagAssociated.ot : null,
       'Prod_Anterior': infoTagAssociated ? infoTagAssociated.item : 1,
       'Proceso_Anterior': motherProcess,
+      'Autoriza_Id' : productionPL.autoriza_Id,
     } 
     return info;
   }
@@ -813,4 +850,24 @@ export class Produccion_SelladoComponent implements OnInit {
       console.log(error);
     });
   }  
+
+  //
+  authorizeWeight(){
+    let id : number = this.formWeight.value.id;
+    this.svcUsuarios.GetUsersAthorizedForTeoricWeight(id).subscribe(data => {
+      if(data) {
+        if(data.length > 0) {
+          let user : number = data[0].user_Id;
+          let index : number = this.usersAuthorized.findIndex(x => x.user_Id == user);
+          this.svcMsjs.mensajeConfirmacion(`Confirmación`, `Autorizado exitosamente por ${data[0].userName}!`);
+          this.modalAuthorizeWeight = false;
+          this.formSellado.patchValue({ 'userAuthorize' : this.usersAuthorized[index].user_Id });
+          this.formWeight.reset()
+        } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Usuario sin autorización para realizar esta acción!`);
+      } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Usuario no autorizado para realizar esta acción!`);
+    }, error => {
+      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El usuario no tiene permisos para realizar esta acción!`);
+    });
+  }
+
 }

@@ -20,7 +20,7 @@
 
 <p-card>
   <!--Subtitulo-->
-  <div class="mb-3">
+  <div class="mb-5">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i>
       Cargar Datos Producción</h4>
   </div>
@@ -87,7 +87,7 @@
       <div class="col-sm-12 col-md-6 col-xl-1">
         <span class="p-float-label">
           <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2"
-            [readonly]="true" ></p-inputNumber>
+            ></p-inputNumber><!--[readonly]="true"-->
           <label for="cantKg">Cant. Kg</label>
         </span>
       </div>
@@ -98,6 +98,24 @@
           <p-inputNumber formControlName="pesoTeorico" id="teorico" type="number" [readonly]="true"
             [maxFractionDigits]="2"></p-inputNumber>
           <label for="teorico">Peso teórico</label>
+        </span>
+      </div>
+
+      <!--* Peso 10% menos -->
+      <div class="col-sm-12 col-md-6 col-xl-1 justify-content-end">
+        <span class="p-float-label">
+            <p-inputNumber formControlName="minWeight" inputId="minWeight" [readonly]="true" [useGrouping]="false" pTooltip="{{msjsMinWeight()}}" 
+            tooltipPosition="top" [maxFractionDigits]="2"></p-inputNumber>
+            <label for="minWeight">Peso min.</label>
+        </span>
+      </div>
+
+      <!--* Peso 10% más -->
+      <div class="col-sm-12 col-md-6 col-xl-1 justify-content-end">
+        <span class="p-float-label">
+            <p-inputNumber formControlName="maxWeight" inputId="maxWeight" [readonly]="true" [useGrouping]="false" pTooltip="{{msjsMaxWeight()}}" 
+            tooltipPosition="top" [maxFractionDigits]="2"></p-inputNumber>
+            <label for="maxWeight">Peso máx.</label>
         </span>
       </div>
 
@@ -135,7 +153,16 @@
         <label for="saldo">Mostrar Datos Etiqueta</label>
       </div>
 
-      <!-- PROCESO -->
+      <!-- Empacador -->
+      <div class="col-sm-12 col-md-6 col-xl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="packer" inputId="packer" [options]="packers" optionLabel="userName" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"
+            optionValue="user_Id"></p-dropdown>
+          <label for="packer">Empacador</label>
+        </span>
+      </div>
+
+      <!-- PROCESO MADRE--> 
       <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
             <p-dropdown formControlName="procesoAnterior" inputId="procesoAnterior" [options]="process"
@@ -157,7 +184,7 @@
       </div>
 
       <!--* OT Alterna -->
-      <div class="col-sm-12 col-md-6 col-xl-2 justify-content-end">
+      <div class="col-sm-12 col-md-6 col-xl-1 justify-content-end">
         <span class="p-float-label">
             <p-inputNumber formControlName="otAlterna" inputId="otAlterna" [useGrouping]="false" pTooltip="{{msjsAltOT()}}" 
             tooltipPosition="top" (keyup.enter)="validateOrderProduction('altern')"></p-inputNumber>
@@ -165,12 +192,12 @@
         </span>
       </div>
 
-      <!-- Empacador -->
+      <!-- Autoriza -->
       <div class="col-sm-12 col-md-6 col-xl-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="packer" inputId="packer" [options]="packers" optionLabel="userName" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"
+          <p-dropdown formControlName="userAuthorize" inputId="userAuthorize" [options]="usersAuthorized" [readonly]="true" optionLabel="userName" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"
             optionValue="user_Id"></p-dropdown>
-          <label for="packer">Empacador</label>
+          <label for="userAuthorize">Autoriza</label>
         </span>
       </div>
 
@@ -180,7 +207,6 @@
 
       <!--Orden de Producción -->
       <!--<div class="mb-3">-->
-        
 
       <!--Tabla OT-->
       <div class="mb-3">
@@ -505,3 +531,28 @@
     </div>
   </form>
 </p-dialog>   
+
+<p-dialog [(visible)]="modalAuthorizeWeight" [draggable]="false" [style]="{width: '25%'}" header="Solicitud de registro de producción" [modal]="true">
+  <form [formGroup]="formWeight" (ngSubmit)="authorizeWeight()">
+    <div class="mb-5">
+      <b><i class="pi pi-exclamation-triangle"></i> Nota: </b> El peso <b>está por fuera del rango permitido</b>, solicita la intervención de un <b>usuario autorizado</b> para continuar.   
+    </div>
+     <div class="mb-3">
+        <div class="row g-4">
+          <div class="col-xs-12">
+            <span class="p-float-label">
+              <p-password formControlName="id" [feedback]="false" id="id" required></p-password>
+              <label for="id">Autoriza</label>
+            </span>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button pButton class="p-button-danger" type="submit" label="Autorizar" [disabled]="formWeight.invalid" icon="pi pi-check"></button>
+              <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser" (click)="formWeight.reset()"></button>
+            </div>
+          </div>
+      </div>
+    </div>
+  </form>
+</p-dialog> 

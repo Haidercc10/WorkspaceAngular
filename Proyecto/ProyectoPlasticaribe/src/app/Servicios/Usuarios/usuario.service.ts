@@ -38,4 +38,8 @@ export class UsuarioService {
   GetOperariosProduccion = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getOperariosProduccion`);
 
   GetPackersProduction = (area : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/GetPackersProduction/${area}`);
+
+  GetUsersAthorizedForTeoricWeight = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/GetUsersAthorizedForTeoricWeight/${id}`);
+
+  getListAuthorizeUsers = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getListAuthorizeUsers`);
 }
