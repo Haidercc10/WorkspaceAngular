@@ -154,7 +154,7 @@
   </p-card>
 
   <!-- Modal de trazabilidad de productos -->
-  <p-dialog [(visible)]="modal1" [style]="{width: '85vw'}" [resizable]="false" header="Productos resultantes del rollo N° {{motherRoll}}" [modal]="true">
+  <p-dialog [(visible)]="modal1" [style]="{width: '95vw'}" [resizable]="false" header="Productos resultantes del rollo N° {{motherRoll}}" [modal]="true">
     <p-table 
       #dt2
       [value]="traceability" 
@@ -175,7 +175,9 @@
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childOperator', dt2)"></th>
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childDate', dt2)"></th>
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childHour', dt2)"></th>
-            <!--<th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childTurn', dt2)"></th>-->
+            <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childTurn', dt2)"></th>
+            <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childPacker', dt2)"></th>
+            <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childAuthorize', dt2)"></th>
           </tr>
           <tr>
               <th class="text-center">N°</th>
@@ -189,7 +191,9 @@
               <th class="text-center">Operario</th>
               <th class="text-center">Fecha</th>
               <th class="text-center">Hora</th>
-              <!--<th class="text-center">Turno</th>-->
+              <th class="text-center">Turno</th>
+              <th class="text-center">Empacador</th>
+              <th class="text-center">Autorizado por</th>
           </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -205,21 +209,23 @@
               <td class="text-center">{{ data.childOperator }}</td>
               <td class="text-center"><b>{{ data.childDate | date : 'yyyy-MM-dd' }}</b></td>
               <td class="text-center">{{ data.childHour }}</td>
-              <!--<td class="text-center"><b>{{ data.childTurn }}</b></td>-->
+              <td class="text-center">{{ data.childTurn }}</td>
+              <td class="text-center">{{ data.childPacker }}</td>
+              <td class="text-center">{{ data.childAuthorize }}</td>
           </tr>
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
           <td colspan="6" class="text-right">Total cantidad: </td>
           <td class="text-center">{{totalQuantity1() | number : '1.2-2'}}</td>
-          <td colspan="4" class="text-right"></td>
+          <td colspan="7" class="text-right"></td>
         </tr>
       </ng-template>
     </p-table>  
   </p-dialog>
 
   <!-- Modal de productos resultantes -->
-  <p-dialog [(visible)]="modal2" [style]="{width: '85vw'}" [resizable]="false" header="Productos resultantes del rollo N° {{motherRollChild}}" [modal]="true">
+  <p-dialog [(visible)]="modal2" [style]="{width: '95vw'}" [resizable]="false" header="Productos resultantes del rollo N° {{motherRollChild}}" [modal]="true">
     <p-table 
     #dt3
     [value]="childTraceability" 
@@ -240,7 +246,9 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childOperator', dt3)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childDate', dt3)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childHour', dt3)"></th>
-            <!--<th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childTurn', dt3)"></th>-->
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childTurn', dt3)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childPacker', dt3)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childAuthorize', dt3)"></th>
           </tr>
           <tr>
               <th class="text-center">N°</th>
@@ -254,7 +262,9 @@
               <th class="text-center">Operario</th>
               <th class="text-center">Fecha</th>
               <th class="text-center">Hora</th>
-              <!--<th class="text-center">Turno</th>-->
+              <th class="text-center">Turno</th>
+              <th class="text-center">Empacador</th>
+              <th class="text-center">Autorizado por</th>
           </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -270,14 +280,16 @@
             <td class="text-center">{{ data.childOperator }}</td>
             <td class="text-center"><b>{{ data.childDate | date : 'yyyy-MM-dd' }}</b></td>
             <td class="text-center">{{ data.childHour }}</td>
-            <!--<td class="text-center"><b>{{ data.childTurn }}</b></td>-->
+            <td class="text-center">{{ data.childTurn }}</td>
+            <td class="text-center">{{ data.childPacker }}</td>
+            <td class="text-center">{{ data.childAuthorize }}</td>
           </tr>
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
           <td colspan="6" class="text-right">Total cantidad: </td>
           <td class="text-center">{{totalQuantity2() | number : '1.2-2'}}</td>
-          <td colspan="4" class="text-right"></td>
+          <td colspan="7" class="text-right"></td>
         </tr>
       </ng-template>
     </p-table>  

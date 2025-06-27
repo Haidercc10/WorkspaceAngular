@@ -130,7 +130,10 @@ export class MovTrazabilidadProduccionComponent {
       this.svTraceability.getTraceability(date1, date2, process, this.validateRoute()).subscribe(data => {
         if(data) {
           if(data.length > 0) {
-            data = data.filter(x => ['EXT', 'MATPRIMA'].includes(x.motherProcess_Id));
+            let dataExtMatPrima : any[] = data.filter(x => ['EXT', 'MATPRIMA'].includes(x.motherProcess_Id));
+            let dataImp : any[] = data.filter(x => ['IMP'].includes(x.motherProcess_Id));
+            data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp;
+            console.log(data);
             this.loadDataFromBagpro(data, count);
           } else this.warningMsj(`Advertencia`, `No se encontraron resultados de búsqueda!`);
         } else this.warningMsj(`Advertencia`, `No se encontraron resultados con los filtros consultados`);
@@ -140,14 +143,11 @@ export class MovTrazabilidadProduccionComponent {
 
   ///. Cargar datos de bagpro para productos madre.
   loadDataFromBagpro(data : any, count : number){
-    console.log(1);
-    console.log(data);
-    
     data.forEach(x => {
       count++
       this.svBagpro.getRollProduction(x.motherRoll, `?process=${x.motherProcess.toUpperCase()}`).subscribe(dataBag => {
         count++
-        x.motherWeight = dataBag.peso; 
+        x.motherWeight = dataBag.peso == null ? 0 : dataBag.peso; 
         x.motherDate = dataBag.fecha;
         x.motherOperator = dataBag.operario;
         x.motherHour = dataBag.hora;
