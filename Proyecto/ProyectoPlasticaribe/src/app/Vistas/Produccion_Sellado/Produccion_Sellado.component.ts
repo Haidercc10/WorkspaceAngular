@@ -418,7 +418,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.maquinaConsultada = this.formSellado.value.maquina;
     this.operariosConsultados = this.formSellado.value.idOperario;
     this.packerSelected = this.formSellado.value.packer;
-    this.authUserSelected = this.formSellado.value.userAuthorize;
+    //this.authUserSelected = this.formSellado.value.userAuthorize;
   }
 
   //Función que validará el proceso de sellado según la maquina y el item de la orden de trabajo.
@@ -491,7 +491,7 @@ export class Produccion_SelladoComponent implements OnInit {
     let teoricW5PLess : number = (teoricWeight - ((teoricWeight * 10) / 100));
     this.cargando = true;
     this.getPuertoSerial();
-    //this.buscarOT(true);
+    
     if(this.repacking) this.formSellado.patchValue({ idOperario : [0] });
     setTimeout(() => {
       if (this.formSellado.valid) {
@@ -798,19 +798,14 @@ export class Produccion_SelladoComponent implements OnInit {
             this.cargando = false;
             this.orderProduction = ot;
             this.consolidateProduction();
-          } else {
-            this.warnMsj(`Advertencia`, `No se encontró producción de la OT ${ot} en ${this.changeNameProcess(motherProcess)}`);
-          }
+          } else this.warnMsj(`Advertencia`, `No se encontró producción de la OT ${ot} en ${this.changeNameProcess(motherProcess)}`);
         } else {
           this.warnMsj(`Advertencia`, `No se encontraron rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)}`);
           this.orderProduction = ot;
         }
-      }, error => {
-        this.warnMsj(`Error`, `Error al consultar rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)} | ${error.status} ${error.statusText}`);
-      });
-    } else {
-      this.warnMsj(`Advertencia`, `Debe diligenciar los campos 'Proceso Madre' y 'OT'`);
-    }
+      }, error => { this.warnMsj(`Error`, `Error al consultar rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)} | ${error.status} ${error.statusText}`); });
+    } else  this.warnMsj(`Advertencia`, `Debe diligenciar los campos 'Proceso Madre' y 'OT'`);
+    
   }
 
   consolidateProduction() {
@@ -862,12 +857,18 @@ export class Produccion_SelladoComponent implements OnInit {
           this.svcMsjs.mensajeConfirmacion(`Confirmación`, `Autorizado exitosamente por ${data[0].userName}!`);
           this.modalAuthorizeWeight = false;
           this.formSellado.patchValue({ 'userAuthorize' : this.usersAuthorized[index].user_Id });
-          this.formWeight.reset()
-        } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Usuario sin autorización para realizar esta acción!`);
-      } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Usuario no autorizado para realizar esta acción!`);
+          this.formWeight.reset();
+        } else this.msjAuthorize(`Advertencia`, `Usuario sin autorización para realizar esta acción!`);
+      } else this.msjAuthorize(`Advertencia`, `Usuario no autorizado para realizar esta acción!`);
     }, error => {
-      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El usuario no tiene permisos para realizar esta acción!`);
+      this.msjAuthorize(`Advertencia`, `El usuario no tiene permisos para realizar esta acción!`);
     });
+  }
+
+  //Mensaje de advertencia por no autorización de pesos teoricos.
+  msjAuthorize(msj1 : string, msj2 : string){
+    this.svcMsjs.mensajeAdvertencia(msj1, msj2);
+      this.formWeight.reset();
   }
 
 }

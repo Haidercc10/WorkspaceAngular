@@ -47,15 +47,6 @@
         </span>
       </div>
 
-      <!-- Maquina -->
-      <!--<div class="col-sm-12 col-md-6 col-xl-1">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="maquina" id="maq" type="number" [useGrouping]="false"
-            (onInput)="validarProceso()"></p-inputNumber>
-          <label for="maq">Maquina</label>
-        </span>
-      </div>-->
-
       <!-- Operario -->
       <div class="col-sm-12 col-md-6 col-xl-4" *ngIf="!repacking">
         <span class="p-float-label">
@@ -87,7 +78,7 @@
       <div class="col-sm-12 col-md-6 col-xl-1">
         <span class="p-float-label">
           <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2"
-            ></p-inputNumber><!--[readonly]="true"-->
+            [readonly]="true"></p-inputNumber>
           <label for="cantKg">Cant. Kg</label>
         </span>
       </div>
@@ -118,14 +109,6 @@
             <label for="maxWeight">Peso máx.</label>
         </span>
       </div>
-
-      <!--Peso Neto-->
-      <!--<div class="col-sm-12 col-md-6 col-xl-1">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="pesoNeto" id="real" type="number" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="real">Peso neto</label>
-          </span>
-        </div>-->
 
       <!-- Proceso -->
       <div class="col-sm-12 col-md-6 col-xl-{{repacking ? 2 : 1}} mb-3">
