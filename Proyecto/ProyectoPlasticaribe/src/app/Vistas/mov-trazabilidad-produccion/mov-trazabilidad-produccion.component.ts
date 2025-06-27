@@ -124,17 +124,20 @@ export class MovTrazabilidadProduccionComponent {
     let date1 : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let date2 : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
     let process : string = this.formFilters.value.process;
+    let bulto : number = this.formFilters.value.production;
     this.load = true;
     
     if(this.formFilters.valid) {
       this.svTraceability.getTraceability(date1, date2, process, this.validateRoute()).subscribe(data => {
+        console.log(data);
         if(data) {
           if(data.length > 0) {
             let dataExtMatPrima : any[] = data.filter(x => ['EXT', 'MATPRIMA'].includes(x.motherProcess_Id));
             let dataImp : any[] = data.filter(x => ['IMP'].includes(x.motherProcess_Id));
-            data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp;
-            console.log(data);
-            this.loadDataFromBagpro(data, count);
+            let dataRoto : any[] = data.filter(x => ['ROT', 'LAM'].includes(x.motherProcess_Id));
+            data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp.length > 0 ? dataImp : dataRoto;
+            if(data.length > 0) this.loadDataFromBagpro(data, count);
+            else this.warningMsj(`Advertencia`, `No se encontraron registros de producción.`);
           } else this.warningMsj(`Advertencia`, `No se encontraron resultados de búsqueda!`);
         } else this.warningMsj(`Advertencia`, `No se encontraron resultados con los filtros consultados`);
       }, error => { this.warningMsj(`Advertencia`, `Ocurrió un error al consultar la trazabilidad | ${error.status} ${error.statusText}`); });

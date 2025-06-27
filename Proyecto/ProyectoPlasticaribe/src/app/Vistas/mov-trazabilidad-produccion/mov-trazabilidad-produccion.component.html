@@ -197,7 +197,7 @@
           </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-          <tr (dblclick)="searchRollsChildren(data, 2)" class="cursor">
+          <tr (dblclick)="searchRollsChildren(data, 2)" class="cursor" [ngClass]="{ 'azul' : data.childRoll == formFilters.value.production }">
               <td class="text-center">{{ rowIndex + 1 }}</td>
               <td class="text-center">{{ data.childRoll }}</td>
               <td class="text-center">{{ data.childOT }}</td>
@@ -268,7 +268,7 @@
           </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-          <tr>
+          <tr [ngClass]="{ 'azul' : data.childRoll == formFilters.value.production }">
             <td class="text-center">{{ rowIndex + 1 }}</td>
             <td class="text-center">{{ data.childRoll }}</td>
             <td class="text-center">{{ data.childOT }}</td>

@@ -70,3 +70,7 @@
   ::ng-deep .p-toolbar {
       padding: 0.2rem   
   }
+
+.azul {
+  background-color: #83D3FF;
+}
