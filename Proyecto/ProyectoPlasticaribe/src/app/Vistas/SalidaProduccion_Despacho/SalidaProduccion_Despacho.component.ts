@@ -113,7 +113,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       let preInBarsCode = document.getElementById('RolloBarCode');
       if (!destroy && preInBarsCode) preInBarsCode.focus();
       else if (destroy) clearInterval(time);
-    }, 3000);
+    }, 6000);
   }
 
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');

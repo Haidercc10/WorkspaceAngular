@@ -81,6 +81,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.getDrivers();
     this.getStatuses();
     this.loadRankDates();
+    this.searchMovements();
   }
 
   loadRankDates(){
@@ -113,8 +114,8 @@ export class Movimientos_DespachoComponent implements OnInit {
     //let lastMonth: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     this.load = true
     let today : any = moment().format('YYYY-MM-DD');
-    let dateStart: any = moment(this.formSearchDespacho.value.dateStart).format('YYYY-MM-DD');
-    let dateEnd: any = moment(this.formSearchDespacho.value.dateEnd).format('YYYY-MM-DD');
+    let dateStart: any = '2024-12-20' //moment(this.formSearchDespacho.value.dateStart).format('YYYY-MM-DD');
+    let dateEnd: any = '2024-12-20' //moment(this.formSearchDespacho.value.dateEnd).format('YYYY-MM-DD');
     dateStart = dateStart == 'Fecha inválida' ? today : dateStart;
     dateEnd = dateEnd == 'Fecha inválida' ? today : dateEnd;
     let route: string = this.validateParamsInRoute();
@@ -184,7 +185,7 @@ export class Movimientos_DespachoComponent implements OnInit {
   createDetailsSpreadSheet(dataPlanilla : any, data : any,  index : number){
     let count : number = 0;
     let details : any = [];
-
+    
     this.dataDespacho[index].details.forEach(x => {
       let info : modelDetalles_PlanillaDespacho = {
         'DtPla_Codigo': 0,
@@ -198,10 +199,8 @@ export class Movimientos_DespachoComponent implements OnInit {
       }
       this.svDetailsSpreadSheets.Post(info).subscribe(dataDet => {
         count++;
-        
+        x.codigos.forEach(y => { details.push(y); });
         if(count == this.dataDespacho[index].details.length) {
-          details.push(this.dataDespacho[index].details.forEach(y => y.codigos.map(z => z)));
-          console.log(details, '3');
           this.updateMovementsDispatch(dataPlanilla.pla_Id, details);
         }
       }, error => {

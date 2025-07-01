@@ -98,9 +98,11 @@ export class Reingreso_ProduccionComponent implements OnInit {
 
     if (![null, undefined, ''].includes(dev)) {
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
-        if(![18].includes(data[0].dev.estado_Id)) {
+        
+        //let dataLength : number = data.filter(x => [45].includes(x.estado_Produccion)).length;
+        //if(![18].includes(data[0].dev.estado_Id)) {
           this.load = true;
-          //if(data.filter(x => [45].includes(x.estado_Produccion)).length > 0) {
+          //if(dataLength < 0) {
             data.filter(x => [45].includes(x.estado_Produccion)).forEach(x => {
               this.rolls.push({  
                 'item': x.prod.prod_Id,
@@ -115,7 +117,7 @@ export class Reingreso_ProduccionComponent implements OnInit {
               this.load = false;
             });
           //} this.msjs(`Advertencia`, `No hay rollos/bultos para asociar en la devolución N° ${dev}`, true);
-        } else this.msjs(`Advertencia`, `La devolución N° ${dev} se encuentra cerrada!`, true); 
+        //} else this.msjs(`Advertencia`, `La devolución N° ${dev} se encuentra cerrada!`, true); 
       }, error => {
         this.msjs(`Error`, error.status == 404 ? `No se encontró información de la devolución N° ${dev} | \n\n ${error.status} ${error.statusText}` : `Ocurrió un error al consultar la devolución N° ${dev} | \n\n ${error.status} ${error.statusText}`, true);
       }); 

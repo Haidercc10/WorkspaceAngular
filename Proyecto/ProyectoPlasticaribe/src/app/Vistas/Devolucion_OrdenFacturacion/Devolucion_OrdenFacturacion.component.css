@@ -15,3 +15,20 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
 ::ng-deep .field-checkbox {
   margin-top: 0.7rem;
 }
+
+::ng-deep p-inputnumber[_ngcontent-ng-c565009749], p-inputnumber[_ngcontent-ng-c565009749] span, p-inputnumber[_ngcontent-ng-c565009749] input {
+    display: flex;
+    width: 120px;
+}
+
+::ng-deep p-toolbar .p-toolbar {
+    justify-content: left !important;
+}
+
+::ng-deep .p-toolbar {
+    padding: 0.5rem   
+}
+
+::ng-deep .mb-4 {
+    margin-bottom: 0.5rem !important;
+}

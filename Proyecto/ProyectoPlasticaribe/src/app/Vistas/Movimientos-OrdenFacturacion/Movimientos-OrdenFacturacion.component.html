@@ -81,19 +81,19 @@
     <ng-template pTemplate="header">
       <tr>
         <th class="text-center" pSortableColumn="or.id">
-          <p-sortIcon field="or.id"></p-sortIcon> Id
+          <p-sortIcon field="or.id"></p-sortIcon> N° Doc.
           <p-columnFilter type="text" field="or.id" display="menu"></p-columnFilter>
         </th>
          <th class="text-center" pSortableColumn="or.of_Directa">
-          <p-sortIcon field="or.of_Directa"></p-sortIcon> Orden Directa
+          <p-sortIcon field="or.of_Directa"></p-sortIcon> OF Directa
           <p-columnFilter type="text" field="or.of_Directa" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="or.factura">
-          <p-sortIcon field="or.factura"></p-sortIcon> Código
+          <p-sortIcon field="or.factura"></p-sortIcon> Factura
           <p-columnFilter type="text" field="or.factura" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="or.cli_Id">
-          <p-sortIcon field="or.cli_Id"></p-sortIcon> Id Cliente
+          <p-sortIcon field="or.cli_Id"></p-sortIcon> NIT/CC
           <p-columnFilter type="text" field="or.cli_Id" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="clientes.cli_Nombre">
@@ -105,14 +105,14 @@
           <p-columnFilter type="text" field="fechaHora" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="type">
-          <p-sortIcon field="type"></p-sortIcon> Tipo de Documento
+          <p-sortIcon field="type"></p-sortIcon> Tipo Doc.
           <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="estado">
           <p-sortIcon field="estado"></p-sortIcon> Estado
           <p-columnFilter type="text" field="estado" display="menu"></p-columnFilter>
         </th>
-        <th class="text-center" *ngIf="[1].includes(validateRole)">Anular Orden</th>
+        <th class="text-center" *ngIf="[1].includes(validateRole)">Anular</th>
         <th id="ver3">Ver</th>
       </tr>
     </ng-template>

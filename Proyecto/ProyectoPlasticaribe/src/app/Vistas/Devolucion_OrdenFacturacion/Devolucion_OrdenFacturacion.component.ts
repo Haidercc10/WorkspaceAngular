@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
+import { log } from 'node:console';
 import { Table } from 'primeng/table';
 import { modelDevolucionProductos } from 'src/app/Modelo/modelDevolucionProductos';
 import { modelDtProductoDevuelto } from 'src/app/Modelo/modelDtProductoDevuelto';
@@ -38,7 +39,9 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   modalFails : boolean = false;
   reposition: boolean = false;
   fieldFocus: boolean = false;
-  
+  rollsScanned : any[] = [];  
+  form: FormGroup;
+
   @ViewChild('tableOrder') tableOrder : Table | undefined;
   @ViewChild('tableDevolution') tableDevolution : Table | undefined;
   @ViewChild('tableConsolidate') tableConsolidate : Table | undefined;
@@ -61,18 +64,31 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       idClient: [null, Validators.required],
       client: [null, Validators.required],
       reason: [null, Validators.required],
-      reposition : [false, Validators.required],
-      creditNote : [false, Validators.required ],
+      //reposition : [false, Validators.required],
+      //creditNote : [false, Validators.required ],
       roll : [''],
       observation: ['']
     });
+
+     this.form = this.frmBuilder.group({
+      roll : [null, Validators.required],
+     }); 
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.getFails();
-    console.log(this.fieldFocus);
+    this.focusInput(false);
   }
+
+// Función para mantener el puntero del mouse en un campo especifico. 
+  focusInput(destroy: boolean) {
+    let time = setInterval(() => {
+      let preInBarsCode = document.getElementById('roll');
+      if (!destroy && preInBarsCode) preInBarsCode.focus();
+      else if (destroy) clearInterval(time);
+    }, 10000);
+  } 
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
@@ -262,8 +278,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   saveDev() {
     this.load = true;
     let order : number = this.formDataOrder.value.order;
-    let reposition : boolean = this.formDataOrder.value.reposition;
-    let creditNote : boolean = this.formDataOrder.value.creditNote;
+    //let reposition : boolean = this.formDataOrder.value.reposition;
+    //let creditNote : boolean = this.formDataOrder.value.creditNote;
 
     let info: modelDevolucionProductos = {
       'FacturaVta_Id': this.formDataOrder.value.fact,
@@ -275,9 +291,9 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       'Usua_Id': this.storage_Id,
       'Id_OrdenFact': order,
       'Estado_Id': 11,
-      'DevProdFact_Reposicion': reposition,
+      'DevProdFact_Reposicion': false,
       'UsuaModifica_Id' : 0,
-      'DevProdFact_NotaCredito' : creditNote,
+      'DevProdFact_NotaCredito' : false,
     };
     this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
   }
@@ -537,7 +553,41 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       fontSize: 9,
     }
   }
+
+  scanRolls(){
+    let roll : any = this.form.value.roll;
+    if(this.production.length > 0) {
+      this.rollsScanned = this.productionSelected.map(x => x.numberProduction);
+        this.selectScanRolls(parseInt(roll));
+        this.form.reset();
+    } else this.msg.mensajeAdvertencia('Advertencia', 'No hay rollos/bultos para escanear!');
+  }
+
+  selectScanRolls(roll : any){
+    if(roll) {
+      this.load = true;
+      let index = this.production.findIndex(x => x.numberProduction == roll);
+      if(index != -1) {
+        this.productionSelected.push(this.production[index]);
+        this.getConsolidateProduction();
+        this.production.splice(index, 1);
+      } else {
+        console.log(this.rollsScanned, roll);
+        
+        if(this.rollsScanned.includes(roll)) {
+          this.msg.mensajeAdvertencia('Advertencia', `El rollo/bulto N°${roll} ya ha sido seleccionado!`);
+          this.form.reset();
+        } else {
+          this.msg.mensajeAdvertencia('Advertencia', `El rollo/bulto N° ${roll} no pertenece a la orden N° ${this.formDataOrder.value.order}!`);
+          this.form.reset();
+        }
+      }
+      setTimeout(() => this.load = false, 50);
+    } else this.msg.mensajeAdvertencia('Advertencia', `Debe digitar un número de rollo/bulto válido!`);
+  }
 }
+
+
 
 interface production {
   item: number;
