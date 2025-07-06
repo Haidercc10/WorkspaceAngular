@@ -81,7 +81,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.getDrivers();
     this.getStatuses();
     this.loadRankDates();
-    this.searchMovements();
+    //this.searchMovements();
   }
 
   loadRankDates(){
@@ -114,8 +114,8 @@ export class Movimientos_DespachoComponent implements OnInit {
     //let lastMonth: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     this.load = true
     let today : any = moment().format('YYYY-MM-DD');
-    let dateStart: any = '2024-12-20' //moment(this.formSearchDespacho.value.dateStart).format('YYYY-MM-DD');
-    let dateEnd: any = '2024-12-20' //moment(this.formSearchDespacho.value.dateEnd).format('YYYY-MM-DD');
+    let dateStart: any = moment(this.formSearchDespacho.value.dateStart).format('YYYY-MM-DD');
+    let dateEnd: any = moment(this.formSearchDespacho.value.dateEnd).format('YYYY-MM-DD');
     dateStart = dateStart == 'Fecha inválida' ? today : dateStart;
     dateEnd = dateEnd == 'Fecha inválida' ? today : dateEnd;
     let route: string = this.validateParamsInRoute();
@@ -123,7 +123,6 @@ export class Movimientos_DespachoComponent implements OnInit {
       let datalength : number = data ? data.length : 0;
       let count : number = 0;
       data.forEach(x => {
-        console.log(x);
         x.details.forEach(z => {
           this.svZeus.getDataFactura(z.factura).subscribe(zData => {
             z.valor = zData.total,
@@ -133,7 +132,6 @@ export class Movimientos_DespachoComponent implements OnInit {
         count++
         if(count == datalength) this.dataDespacho = data;
       });
-      //this.dataDespacho = data;
       this.load = false;
     }, error => {
       this.msj.mensajeError(`No existen planillas de despacho en la fecha consultada | ${error.status} ${error.statusText}`);

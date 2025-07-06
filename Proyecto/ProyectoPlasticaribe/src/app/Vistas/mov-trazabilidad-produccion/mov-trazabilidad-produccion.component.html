@@ -56,6 +56,14 @@
               <label for="orderProduction">OT*</label>
             </span>
           </div>
+
+          <!-- PRODUCTION -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-1">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="production" [useGrouping]="false" inputId="production"></p-inputNumber>
+              <label for="production">Rollo/Bulto</label>
+            </span>
+          </div>
       
           <!-- ITEM -->
           <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-4">
@@ -65,14 +73,6 @@
                 <option value={{item.prod_Id}} *ngFor="let item of products">{{item.prod_Nombre}}</option>
               </datalist>
               <label for="prod">Producto</label>
-            </span>
-          </div>
-      
-          <!-- PRODUCTION -->
-          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-1">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="production" [useGrouping]="false" inputId="production"></p-inputNumber>
-              <label for="production">Rollo / Bulto</label>
             </span>
           </div>
       </div>
@@ -96,7 +96,8 @@
       columnResizeMode="expand"
       [rowHover]="true"
       [scrollable]="true"
-      scrollHeight="50rem">
+      scrollHeight="50rem"
+      *ngIf="!load">
       <!--Header-->
       <ng-template pTemplate="header">
           <tr>
@@ -111,6 +112,8 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherDate', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherHour', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherTurn', dt)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherPacker', dt)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherAuthorize', dt)"></th>
           </tr>
           <tr>
             <th class="text-center">#</th>
@@ -124,22 +127,26 @@
             <th class="text-center">Fecha </th>
             <th class="text-center">Hora </th>
             <th class="text-center">Turno </th>
+            <th class="text-center">Empacador </th>
+            <th class="text-center">Autoriza </th>
           </tr>
       </ng-template>
       <!--Body-->
       <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-          <tr (dblclick)="searchRollsChildren(data, 1)" class="cursor">
+          <tr (dblclick)="searchRollsChildren(data, 1)" class="cursor" [ngClass]="{ 'azul' : data.motherRoll == formFilters.value.production }">
             <td class="text-center">{{ rowIndex + 1 }}</td>
             <td class="text-center">{{ data.motherRoll }}</td>
-            <td class="text-center">{{ data.motherOT }}</td>
+            <td class="text-center"><b>{{ data.motherOT }}</b></td>
             <td class="text-center">{{ data.motherItem }}</td>
             <td class="">{{ data.motherReference }}</td>
             <td class="text-center">{{ data.motherProcess }}</td>
-            <td class="text-center">{{ data.motherWeight }}</td>
+            <td class="text-center"><b>{{ data.motherWeight | number : '1.2-2' }}</b></td>
             <td class="text-center">{{ data.motherOperator }}</td>
-            <td class="text-center">{{ data.motherDate }}</td>
+            <td class="text-center"><b>{{ data.motherDate }}</b></td>
             <td class="text-center">{{ data.motherHour }}</td>
             <td class="text-center">{{ data.motherTurn }}</td>
+            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.motherPacker : 'N/A'}}</td>
+            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.motherAuthorize : 'N/A' }}</td>
           </tr>
       </ng-template>
       <!--Footer-->
@@ -147,7 +154,7 @@
         <tr>
           <td colspan="6" class="text-right">Total cantidad: </td>
           <td class="text-center">{{totalWeight() | number : '1.2-2'}}</td>
-          <td colspan="4" class="text-right"></td>
+          <td colspan="6" class="text-right"></td>
         </tr>
       </ng-template>
     </p-table>
@@ -210,8 +217,8 @@
               <td class="text-center"><b>{{ data.childDate | date : 'yyyy-MM-dd' }}</b></td>
               <td class="text-center">{{ data.childHour }}</td>
               <td class="text-center">{{ data.childTurn }}</td>
-              <td class="text-center">{{ data.childPacker }}</td>
-              <td class="text-center">{{ data.childAuthorize }}</td>
+              <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childPacker : 'N/A' }}</td>
+              <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childAuthorize : 'N/A'  }}</td>
           </tr>
       </ng-template>
       <ng-template pTemplate="footer">
@@ -281,8 +288,8 @@
             <td class="text-center"><b>{{ data.childDate | date : 'yyyy-MM-dd' }}</b></td>
             <td class="text-center">{{ data.childHour }}</td>
             <td class="text-center">{{ data.childTurn }}</td>
-            <td class="text-center">{{ data.childPacker }}</td>
-            <td class="text-center">{{ data.childAuthorize }}</td>
+            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childPacker : 'N/A' }}</td>
+            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childAuthorize : 'N/A' }}</td>
           </tr>
       </ng-template>
       <ng-template pTemplate="footer">

@@ -32,7 +32,7 @@ export class ReportesConsolidadosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.facturacion = true;
-    if ([4,85,86,87,88,89,12,95,75,80,12,74,94,2,76,77,81,5,98].includes(this.ValidarRol)) this.produccionDetallada = true;
+    if ([4,85,86,87,88,89,12,95,75,80,12,74,94,2,76,77,81,5,98,10].includes(this.ValidarRol)) this.produccionDetallada = true;
     if ([94].includes(this.ValidarRol)) this.consolidadoProduccionAreas = true;
 
   }
@@ -56,7 +56,7 @@ export class ReportesConsolidadosComponent implements OnInit {
     tab == `Pedidos` ?  this.pedidos = true : this.pedidos = false;
     tab == `Inventario` ?  this.inventarioProductos = true : this.inventarioProductos = false;
     tab == `Estadisticas Ventas` ?  this.estadisticasVentas = true : this.estadisticasVentas = false;
-    tab == `Rollos/Bultos` ?  this.rollos_bultos = true : this.rollos_bultos = false;
+    //tab == `Rollos/Bultos` ?  this.rollos_bultos = true : this.rollos_bultos = false;
   }
 
 

@@ -20,4 +20,7 @@ export class TrazabilidadProduccionService {
     getFormatTraceability = (date1 : any, date2 : any, process : string, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getFormatTraceability/${date1}/${date2}/${process}${url}`);
 
     getTraceabilityForProduction = (production : any, process : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getTraceabilityForProduction/${production}/${process}`);
-}
+
+    getAllTraceabilityForRoll = (date1 : any, date2 : any, production : any, ot : any, process : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Trazabilidad_Produccion/getAllTraceabilityForRoll/${date1}/${date2}/${production}/${ot}/${process}`);
+
+  }

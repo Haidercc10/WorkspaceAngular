@@ -71,7 +71,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       let preInBarsCode = document.getElementById('roll');
       if (!destroy && preInBarsCode) preInBarsCode.focus();
       else if (destroy) clearInterval(time);
-    }, 6000);
+    }, 10000);
   }
 
   //*

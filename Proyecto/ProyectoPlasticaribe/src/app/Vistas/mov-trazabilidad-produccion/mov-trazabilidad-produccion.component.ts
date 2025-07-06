@@ -59,6 +59,7 @@ export class MovTrazabilidadProduccionComponent {
     this.readStorage();
     this.getProcess();
     this.loadRankDates();
+    //this.getTraceForRoll('2025-06-01', '2025-07-02', 136234, 'SELLA', 912634);
   }
 
   //Función para cargar fechas en el rango.
@@ -125,22 +126,25 @@ export class MovTrazabilidadProduccionComponent {
     let date2 : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
     let process : string = this.formFilters.value.process;
     let bulto : number = this.formFilters.value.production;
-    this.load = true;
+    let ot : number = this.formFilters.value.orderProduction;
     
     if(this.formFilters.valid) {
-      this.svTraceability.getTraceability(date1, date2, process, this.validateRoute()).subscribe(data => {
-        console.log(data);
-        if(data) {
-          if(data.length > 0) {
-            let dataExtMatPrima : any[] = data.filter(x => ['EXT', 'MATPRIMA'].includes(x.motherProcess_Id));
-            let dataImp : any[] = data.filter(x => ['IMP'].includes(x.motherProcess_Id));
-            let dataRoto : any[] = data.filter(x => ['ROT', 'LAM'].includes(x.motherProcess_Id));
-            data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp.length > 0 ? dataImp : dataRoto;
-            if(data.length > 0) this.loadDataFromBagpro(data, count);
-            else this.warningMsj(`Advertencia`, `No se encontraron registros de producción.`);
-          } else this.warningMsj(`Advertencia`, `No se encontraron resultados de búsqueda!`);
-        } else this.warningMsj(`Advertencia`, `No se encontraron resultados con los filtros consultados`);
-      }, error => { this.warningMsj(`Advertencia`, `Ocurrió un error al consultar la trazabilidad | ${error.status} ${error.statusText}`); });
+      this.load = true;
+      if(bulto) this.getTraceForRoll(date1, date2, ot, process, bulto);
+      else {
+         this.svTraceability.getTraceability(date1, date2, process, this.validateRoute()).subscribe(data => {
+          if(data) {
+            if(data.length > 0) {
+              let dataExtMatPrima : any[] = data.filter(x => ['EXT', 'MATPRIMA'].includes(x.motherProcess_Id));
+              let dataImp : any[] = data.filter(x => ['IMP'].includes(x.motherProcess_Id));
+              let dataRoto : any[] = data.filter(x => ['ROT', 'LAM'].includes(x.motherProcess_Id));
+              data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp.length > 0 ? dataImp : dataRoto;
+              if(data.length > 0) this.loadDataFromBagpro(data, count);
+              else this.warningMsj(`Advertencia`, `No se encontraron registros de producción.`);
+            } else this.warningMsj(`Advertencia`, `No se encontraron resultados de búsqueda!`);
+          } else this.warningMsj(`Advertencia`, `No se encontraron resultados con los filtros consultados`);
+        }, error => { this.warningMsj(`Advertencia`, `Ocurrió un error al consultar la trazabilidad | ${error.status} ${error.statusText}`); });
+      }  
     } else this.warningMsj(`Advertencia`, `Debe completar los campos obligatorios`);
   }
 
@@ -149,8 +153,8 @@ export class MovTrazabilidadProduccionComponent {
     data.forEach(x => {
       count++
       this.svBagpro.getRollProduction(x.motherRoll, `?process=${x.motherProcess.toUpperCase()}`).subscribe(dataBag => {
-        count++
-        x.motherWeight = dataBag.peso == null ? 0 : dataBag.peso; 
+        x.motherWeight = dataBag.cantidad == null ? 0 : dataBag.cantidad; 
+        x.motherPresentation = dataBag.presentacion == null ? 0 : dataBag.presentacion;
         x.motherDate = dataBag.fecha;
         x.motherOperator = dataBag.operario;
         x.motherHour = dataBag.hora;
@@ -158,15 +162,45 @@ export class MovTrazabilidadProduccionComponent {
         this.groupTraceability.push(x);
       }, error => { console.log(error); });
       console.log(count, data.length);
-      
       if(count == data.length) {
-        this.groupTraceability.sort((a, b) => Number(a.motherRoll) - Number(b.motherRoll));
-        this.load = false;
+        setTimeout(() => {
+          this.groupTraceability.sort((a, b) => Number(a.motherRoll) - Number(b.motherRoll));
+          this.load = false;
+        }, 1000);
       }
     });
-    //this.load = false;
   }
   
+  //Función que mostrará la trazabilidad del rollo/bulto por OT. 
+  getTraceForRoll(date1 : any, date2 : any, ot : number, process : any, roll : number) {
+    let count : number = 0;
+    let array : any = [];
+    let area : string = this.process.find(x => x.proceso_Id == process)?.proceso_Nombre;
+
+    this.svTraceability.getAllTraceabilityForRoll(date1, date2, roll, ot, process).subscribe(data => {
+      if(data) {
+        if(data.length > 0) {
+          data.forEach(x => {
+            count++;
+            x.etiqueta1.motherRoll != null ? x.etiqueta1 = x.etiqueta1 : x.etiqueta1 = null;
+            x.etiqueta2.motherRoll != null ? x.etiqueta2 = x.etiqueta2 : x.etiqueta2 = null;
+            x.etiqueta3.motherRoll != null ? x.etiqueta3 = x.etiqueta3 : x.etiqueta3 = null;
+            if(x.etiqueta1) array.push(x.etiqueta1);
+            if(x.etiqueta2) array.push(x.etiqueta2);
+            if(x.etiqueta3) array.push(x.etiqueta3);
+            if(count == data.length) this.loadDataFromBagpro(array, 0);
+          });
+        } else {
+          this.load = false;
+          this.msg.mensajeAdvertencia('Advertencia', `No se encontraron resultados de búsqueda para el rollo/bulto N° ${roll} en ${area.toUpperCase()}`);
+        } 
+      }
+    }, error => {
+      this.msg.mensajeError('Error', `Error consultando la información de trazabilidad del rollo/bulto N° ${roll} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    });  
+  }
+
   ///. Aplicar el filtro en las tablas 
   aplicarFiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 

@@ -84,6 +84,7 @@ export class Dashboard_GeneralComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lecturaStorage();
     this.inicializarGraficas();
     this.llenarArrayAnos();
     this.llenarGraficas();
