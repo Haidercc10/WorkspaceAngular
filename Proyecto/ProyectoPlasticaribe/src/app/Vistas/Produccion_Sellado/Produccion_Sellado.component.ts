@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { log } from 'console';
 import moment from 'moment';
 import { Password } from 'primeng/password';
 import { Table } from 'primeng/table';
@@ -63,6 +64,7 @@ export class Produccion_SelladoComponent implements OnInit {
   rolls : any = [];
   orderProduction : number = null;
   @ViewChild('dt1') dt1: Table | undefined;
+  @ViewChild('dt0') dt0: Table | undefined;
   modalPassword = false;
   form !: FormGroup; //Formulario de sellado
   packers : any = []; // Variable que guardará los nombres de los empacadores. 
@@ -332,7 +334,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.svcUsuarios.getUsuariosxId(user).subscribe(data => {
       if(data) {
         if(data[0].usua_Contrasena == pass) { 
-          if([97,96,86,8,94,1,5,12].includes(data[0].rolUsu_Id)) this.msjAuthorized();
+          if([97,96,86,8,94,1,5,12,10].includes(data[0].rolUsu_Id)) this.msjAuthorized();
           else this.msjNoAuthorized();
         } else this.svcMsjs.mensajeError('Error', `Usuario y/o contraseña incorrectos`);
       } else this.msjNoAuthorized();
@@ -558,11 +560,20 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Buscar rollo madre 
   searchOldTag(dataOrderProduction : any, tag : number, process : any){
+    let ot : number = this.formSellado.value.ot;
+    let otAltern : number = this.formSellado.value.otAlterna;
+    let orders : any = [];
+
+    if(ot) orders.push(ot);
+    if(otAltern) orders.push(otAltern);
+    
     this.svcBagPro.getRollProduction(tag, `?process=${this.changeNameProcess(process)}`).subscribe(data => {
-      if(data) this.crearEntrada(dataOrderProduction, data);
-      else this.svcMsjs.mensajeAdvertencia(`La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`);
+      if(data)
+        if(orders.includes(data.ot)) this.crearEntrada(dataOrderProduction, data);
+        else this.warnMsj('Advertencia', `La etiqueta asociada no hace parte de la(s) OT's digitada(s)`);
+      else this.warnMsj('Advertencia', `La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`);
     }, error => {
-      this.svcMsjs.mensajeAdvertencia(`No se encontró información de la etiqueta asociada | ${error.status} ${error.statusText}`);
+      this.warnMsj('Advertencia', `No se encontró información de la etiqueta asociada | ${error.status} ${error.statusText}`);
     });
   }
 

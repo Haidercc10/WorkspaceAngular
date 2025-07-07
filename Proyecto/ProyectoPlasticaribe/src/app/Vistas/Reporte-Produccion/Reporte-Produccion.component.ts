@@ -5,8 +5,10 @@ import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -29,6 +31,10 @@ export class ReporteProduccionComponent implements OnInit {
   productos : any [] = [];
   produccion : any [] = [];
   rollosSeleccionados : any [] = [];
+  maquinas : any = [];
+  operarios : any = [];
+  operariosTotales : any = [];
+  maquinasTotales : any = [];
 
   constructor(private AppComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -36,27 +42,55 @@ export class ReporteProduccionComponent implements OnInit {
     private msj : MensajesAplicacionService,
     private productosService : ProductoService,
     private svcPDF : CreacionPdfService,
-    private svcExcel : CreacionExcelService
+    private svcExcel : CreacionExcelService,
+    private svMachines: MaquinasService,
+    private svOperators: UsuarioService
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
       rangoFechas: [null, Validators.required],
       OrdenTrabajo: [null],
-      proceso: [null],
+      proceso: [null, Validators.required],
       idCliente : [null],
       cliente : [null],
       idProducto : [null],
       producto : [null],
       Turno: [null],
       EnvioZeus: [false],
+      Maquina : [null],
+      operario: [null]
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.validarProcesoPorUsuarioRegistrado();
+    this.getMachines();
+    this.obtenerOperarios();
   }
+
+  //Función para obtener las maquinas
+  getMachines() {
+    this.svMachines.getAllMachines().subscribe(data => { 
+      this.maquinasTotales = data;
+      this.maquinasTotales.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero)); 
+    }, err => {
+      this.msj.mensajeError('Error', 'No fue posible cargar las maquinas');
+    });
+  } 
+
+  // Funcion que se encargará de validar el proceso seleccionado y filtrar los operarios
+  validarProceso(){
+    this.operarios = [];
+    this.maquinas = [];
+    let area : any = this.formFiltros.value.proceso; 
+    area == 'CAMISILLA' ? area = 'SELLADO' : area = area; 
+    this.operarios = this.operariosTotales.filter(x => x.area_Nombre == area);
+    this.maquinas = this.maquinasTotales.filter(x => area.startsWith(x.proceso_Id.toUpperCase()));
+  }
+
+  obtenerOperarios = () => this.svOperators.GetOperariosProduccion().subscribe(data => { this.operariosTotales = data; }, error => this.msj.mensajeError(error));
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
@@ -66,11 +100,11 @@ export class ReporteProduccionComponent implements OnInit {
 
   validarProcesoPorUsuarioRegistrado() {
     if (![1, 10, 83, 12].includes(this.ValidarRol)) {
-      if ([85,7,95].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION'];
+      if ([85,7,95,74].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION'];
       if ([86,8,81].includes(this.ValidarRol)) this.areasEmpresa = ['SELLADO', 'Wiketiado', 'CAMISILLA'];
       if ([87,9,4].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'IMPRESION'];
       if ([88,62,4].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION', 'EMPAQUE'];
-      if ([63,89].includes(this.ValidarRol)) this.areasEmpresa = ['ROTOGRABADO', 'LAMINADO'];
+      if ([63,89,76,77].includes(this.ValidarRol)) this.areasEmpresa = ['ROTOGRABADO', 'LAMINADO'];
       if ([75].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION'];
       if ([80].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE'];
     } else this.areasEmpresa = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
@@ -144,6 +178,8 @@ export class ReporteProduccionComponent implements OnInit {
     let cliente = this.formFiltros.value.idCliente;
     let producto = this.formFiltros.value.idProducto;
     let turno = this.formFiltros.value.Turno;
+    let maquina = this.formFiltros.value.Maquina;
+    let operario = this.formFiltros.value.operario;
     let envioZeus = this.formFiltros.value.EnvioZeus ? '1' : '0';
 
     if (orden != null) ruta += `orden=${orden}`;
@@ -152,6 +188,8 @@ export class ReporteProduccionComponent implements OnInit {
     if (producto != null) ruta.length > 0 ? ruta += `&producto=${producto}` : ruta += `producto=${producto}`;
     if (turno != null) ruta.length > 0 ? ruta += `&turno=${turno}` : ruta += `turno=${turno}`;
     if (envioZeus != null) ruta.length > 0 ? ruta += `&envioZeus=${envioZeus}` : ruta += `envioZeus=${envioZeus}`;
+    if (maquina != null) ruta.length > 0 ? ruta += `&maquina=${maquina}` : ruta += `maquina=${maquina}`;
+    if (operario != null) ruta.length > 0 ? ruta += `&operario=${operario}` : ruta += `operario=${operario}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
     return ruta;
   }

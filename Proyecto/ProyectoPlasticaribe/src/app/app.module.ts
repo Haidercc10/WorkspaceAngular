@@ -69,6 +69,7 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { TreeTableModule } from 'primeng/treetable';
+import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { MaterialExampleModule } from '../material.module';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
@@ -237,6 +238,7 @@ import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/M
     TieredMenuModule,
     ListboxModule,
     ColorPickerModule,
+    TriStateCheckboxModule
   ],
 
   providers: [

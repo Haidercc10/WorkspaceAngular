@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { log } from 'console';
 import { subscribe } from 'diagnostics_channel';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -59,6 +60,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   modalRolls : boolean = false;
   packers : any = [];
   @ViewChild('dt1') dt1: Table | undefined;
+  @ViewChild('dt0') dt0: Table | undefined;
   rollsConsolidate : any = [];
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
   processProduction : boolean = false;
@@ -590,11 +592,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
                           if(tag.toString().length >= 6) {
                             if(oldProcess) {
                               if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
-                                if(oldProcess == 'MATPRIMA') {
-                                  this.guardarProduccion();
-                                } else {
-                                  this.searchOldTag(tag, oldProcess);
-                                } 
+                                if(oldProcess == 'MATPRIMA') this.guardarProduccion();
+                                else this.searchOldTag(tag, oldProcess);
                               } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`, true);
                             } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`, true);
                           } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`, true);
@@ -609,11 +608,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
                         if(tag.toString().length >= 6) {
                           if(oldProcess) {
                             if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
-                              if(oldProcess == 'MATPRIMA') {
-                                this.guardarProduccion();
-                              } else {
-                                this.searchOldTag(tag, oldProcess);
-                              } 
+                              if(oldProcess == 'MATPRIMA') this.guardarProduccion();
+                              else this.searchOldTag(tag, oldProcess);
                             } else this.warinigMessage(`¡Debe digitar un ancho de item válido!`, true);
                           } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`, true);
                         } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`, true);
@@ -623,16 +619,25 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
               } else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!, true`);
             } else this.warinigMessage(`¡La maquina no puede ser cero (0)!`, true);
           } else this.warinigMessage(`¡La OT que desea registrar no coincide con la consultada previamente!`, true);
-        } else this.warinigMessage(`¡Todos los campos   deben estar diligenciados!`, true);
+        } else this.warinigMessage(`¡Todos los campos deben estar diligenciados!`, true);
       } else this.warinigMessage(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`, true);
     }, 500);
   }
 
   //
   searchOldTag(tag : number, process : any){
+    let ot : number = this.formDatosProduccion.value.ordenTrabajo;
+    let otAltern : number = this.formDatosProduccion.value.otAlterna;
+    let orders : any = [];
+
+    if(ot) orders.push(ot);
+    if(otAltern) orders.push(otAltern);
+
     this.bagproService.getRollProduction(tag, `?process=${this.changeNameProcess(process)}`).subscribe(data => {
-      if(data) this.guardarProduccion(data);
-      else this.warinigMessage(`La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`, true);
+      if(data) {
+        if(orders.includes(data.ot)) this.guardarProduccion(data);
+        else this.warinigMessage(`La etiqueta asociada no hace parte de la(s) OT's digitada(s)`);
+      } else this.warinigMessage(`La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`, true);
     }, error => {
       this.warinigMessage(`No se encontró información de la etiqueta asociada | ${error.status} ${error.statusText}`, true);
     });
@@ -691,7 +696,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.cargando = true;
     let rebobinado : boolean = this.formDatosProduccion.value.rebobinado;
     let daipita : any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? null : this.formDatosProduccion.value.daipita;
-    //console.log(`guardarProduccion: ${daipita}`);
+
     this.produccionProcesosService.Post(this.datosProduccion(daipita)).subscribe(res => {
       this.searchDataTagCreated(res.numero_Rollo, daipita, rebobinado, res, infoEtiquetaAsociada);
       setTimeout(() => {
@@ -749,8 +754,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   searchDataTagCreated(reel: number, daipita : any, rebobinado : boolean, dataProductionProcess : any, infoTagAssociated? : any) {
     let motherProcess : string = this.formDatosProduccion.value.procesoAnterior
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
-      //console.log(`searchDataTagCreated: ${daipita}`);
-      //let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? this.formDatosProduccion.value.daipita : this.formDatosProduccion.value.daipita;
+      
       res.forEach(data => {
         let dataTagProduction: modelTagProduction = {
           'client': data.clienteNombre.trim(),
@@ -787,21 +791,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }, error => {
       console.log(error);
     });
-    /*['EXT', 'IMP', 'ROT', 'LAM', 'EMP'].forEach(x => {
-      this.bagproService.getDataForOrder(ot, x).subscribe(data => {
-        if(data) {
-          if(data.length > 0) {
-            count++ 
-            if(count == 1) {
-              this.processProduction = true;
-              return;
-            } 
-          }
-        }
-      }, error => {
-        console.log(error);
-      });
-    });*/
   }
 
   createTagProduction(code: number, quantity: number, quantity2: number, copy: boolean = false) {
