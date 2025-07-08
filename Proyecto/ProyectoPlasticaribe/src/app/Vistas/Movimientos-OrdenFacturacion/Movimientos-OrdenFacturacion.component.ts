@@ -152,25 +152,16 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   PutStatusOrderAnulled() {
     this.onReject();
     this.load = true;
-    console.log(this.ofDirect);
     
     this.orderFactService.PutStatusOrderAnulled(this.anulledOrder).subscribe(() => {
       if(this.ofDirect) {
-        console.log(1);
-        
         if(this.detailsOF == 0) {
-          console.log(2);
-          
           this.updateStockProducts(true);
         } else if (this.detailsOF > 0) {
-          console.log(3);
-          
           this.updateStockProducts(true);
           this.PutStatusDetailsOrder(false);
         } 
       } else if(!this.ofDirect) {
-        console.log(4);
-        
         this.PutStatusDetailsOrder(false);
       } 
     }, error => this.errorMessage(`¡Ocurrió un error al intentar anular la orden N° ${this.anulledOrder}!`, error));

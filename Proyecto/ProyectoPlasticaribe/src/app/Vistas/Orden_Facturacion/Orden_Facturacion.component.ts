@@ -1,6 +1,6 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { co } from '@fullcalendar/core/internal-common';
+import { co, s } from '@fullcalendar/core/internal-common';
 import { log } from 'console';
 import moment from 'moment';
 import { MessageService, TreeNode } from 'primeng/api';
@@ -107,7 +107,9 @@ export class Orden_FacturacionComponent implements OnInit {
       observation: [null],
       typeDoc: [null], 
       preload : [null], 
-      directFact : [true, ]
+      directFact : [true, ],
+      salesId : [null, ],
+      sales : [null, ],
     });
 
     this.formItems = this.frmBuilder.group({
@@ -283,6 +285,8 @@ export class Orden_FacturacionComponent implements OnInit {
         this.formDataOrder.patchValue({
           idClient: cli.idtercero,
           client: cli.razoncial,
+          salesId: this.products[0].id_vendedor,
+          sales: this.products[0].vendedor,
         });
       });
       info != null ? this.comparationSaleOrder_Preload(info) : null; //this.clearSomeFields();
@@ -814,17 +818,22 @@ export class Orden_FacturacionComponent implements OnInit {
           [
             { text: `Nombre: ${data.clientes.cli_Nombre}` },
             { text: `ID: ${data.clientes.cli_Id}` },
-            { text: `Tipo de ID: ${data.clientes.tipoIdentificacion_Id}` },
+            { text: `Dirección: ${''}` },
           ],
           [
-            { text: `Telefono: ${data.clientes.cli_Telefono}` },
-            { text: `E-mail: ${data.clientes.cli_Email}`, colSpan: 2 },
+            { text: `E-mail: ${data.clientes.cli_Email}` },
+            { text: `Tel.: ${data.clientes.cli_Telefono}` },
+            { text: `OF Directa: ${''}` },
+          ],
+          [
+            { text: `Asesor: ${''}`, colSpan: 3 },
+            {},
             {}
           ],
           data.datosEnvio != null ? [
             { text: `Conductor: ${data.datosEnvio.conductor}` },
             { text: `Placa: ${data.datosEnvio.placa}` },
-            { text: `Despachado Por: ${data.datosEnvio.creadoPor}` },
+            { text: `Despacha: ${data.datosEnvio.creadoPor}` },
           ] : [
             { border: [false, false, false, false], colSpan: 3, text: '' }, {}, {}
           ],
