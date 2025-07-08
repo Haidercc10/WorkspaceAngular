@@ -132,8 +132,8 @@
     [scrollable]="true"
     scrollHeight="50rem"
     [paginator]="true"
-    [rows]="10"
-    [rowsPerPageOptions]="[10, 20, 50, 100]"
+    [rows]="30"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
       <ng-template pTemplate="header">
@@ -216,7 +216,7 @@
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
-          <td colspan="6" class="text-left">Totales</td>
+          <td colspan="7" class="text-left">Totales</td>
           <td>{{totalCantidadConsultada() | number : '1.2-2'}}</td>
           <td>{{totalPesoConsultado() | number : '1.2-2'}}</td>
           <td colspan="8"></td>

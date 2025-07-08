@@ -149,6 +149,14 @@
                 <label for="rebobinado"><b>Rebobinado</b></label>
             </div>
 
+            <!-- Empacador -->
+            <div class="col-sm-12 col-md-6 col-xl-2" *ngIf="proceso == 'Empaque'">
+                <span class="p-float-label">
+                <p-dropdown formControlName="packer" inputId="packer" [options]="packers" optionLabel="userName" optionValue="user_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"></p-dropdown>
+                <label for="packer">Empacador</label>
+                </span>
+            </div>
+
             <!-- PROCESO -->
             <div class="col-sm-12 col-md-2" *ngIf="![74].includes(ValidarRol)">
                 <span class="p-float-label">
@@ -175,14 +183,6 @@
                     <p-inputNumber formControlName="otAlterna" inputId="otAlterna" [readonly]="formDatosProduccion.value.procesoAnterior == 'MATPRIMA'" pTooltip="{{msjsAltOT()}}" 
                     tooltipPosition="top" [useGrouping]="false" (keyup.enter)="validateOrderProduction('altern')"></p-inputNumber>
                     <label for="otAlterna">OT Alterna</label>
-                </span>
-            </div>
-
-            <!-- Empacador -->
-            <div class="col-sm-12 col-md-6 col-xl-2" *ngIf="proceso == 'Empaque'">
-                <span class="p-float-label">
-                <p-dropdown formControlName="packer" inputId="packer" [options]="packers" optionLabel="userName" optionValue="user_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"></p-dropdown>
-                <label for="packer">Empacador</label>
                 </span>
             </div>
 

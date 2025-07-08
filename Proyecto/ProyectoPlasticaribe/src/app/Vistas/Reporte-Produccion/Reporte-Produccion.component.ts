@@ -194,17 +194,24 @@ export class ReporteProduccionComponent implements OnInit {
     return ruta;
   }
 
-  // Funcion que se encargará de sumar la cantidad o peso bruto de la información de producción
-  totalCantidadConsultada(){
-    let total : number = 0;
-    this.produccion.forEach(x => total += x.cantidad);
+   totalCantidadConsultada() {
+    let total: number = 0;
+    if(this.dt) {
+      if(this.dt.filteredValue) {
+        this.dt.filteredValue.forEach(z => total += z.cantidad);
+      } else this.produccion.forEach(x => total += x.cantidad);
+    } else this.produccion.forEach(x => total += x.cantidad);
     return total;
   }
 
   // Funcion que se encargará de sumar el peso neto de la información de producción
-  totalPesoConsultado(){
-    let total : number = 0;
-    this.produccion.forEach(x => total += x.peso);
+  totalPesoConsultado() {
+    let total: number = 0;
+    if(this.dt) {
+      if(this.dt.filteredValue) {
+        this.dt.filteredValue.forEach(z => total += z.peso);
+      } else this.produccion.forEach(x => total += x.peso);
+    } else this.produccion.forEach(x => total += x.peso);
     return total;
   }
 
