@@ -15,6 +15,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +45,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   modalDevolution : boolean = false;
   @ViewChild(Gestion_DevolucionesOFComponent) managementDevolutions : Gestion_DevolucionesOFComponent;
   @ViewChild(Orden_FacturacionComponent) Orden_FacturacionComponent : Orden_FacturacionComponent;
-
+  clients: any[] = [];
+  sales: any[] = [];
+  typesMovements: any[] = ['OF', 'DV'];
   
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
@@ -56,6 +60,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private productionProcessService : Produccion_ProcesosService,
     private cmpOrdFact : OrdenFacturacion_PalletsComponent, 
     private svExistProduct : ExistenciasProductosService,
+    private svZeusInv : InventarioZeusService,
+    private svUsuarios : UsuarioService
   ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -63,11 +69,17 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       orderFact : [null, Validators.required],
       startDate: [null, Validators.required],
       endDate: [null, Validators.required],
+      clientId: [null,],
+      client: [null,],
+      salesId: [null,],
+      sales: [null,],
+      typeMov: [null, Validators.required],
     });
   }
 
   ngOnInit() {
     this.readStorage();
+    this.consultarVendedores();
   }
 
   readStorage(){
@@ -114,7 +126,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   ///Generar
   createPDF(id : number, fact: string, type : string, ofDirect : boolean){
     this.load = true;
-    if (type == 'Orden') {
+    if (type == 'OF') {
       //this.dtOrderFactService.GetInformacionOrderFact(id).subscribe(data => {
         //let pallet : boolean = data.some(x => x.dtOrder.pallet_Id != null);
         //console.log(pallet, ofDirect);
@@ -122,7 +134,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       //}, error => {
         //this.msg.mensajeError(`Error`, `Error al consultar la OF N° ${id} | ${error.status} ${error.statusText}`);
       //});
-    } else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, 'exportada');
+    } else if (type == 'DV') this.devolucion_OrdenFacturacionComponent.createPDF(id, 'exportada');
     setTimeout(() => this.load = false, 3000);
   }
 
@@ -131,7 +143,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.anulledOrder = data.or.id;
     this.ofDirect = data.or.of_Directa;
     this.detailsOF = data.of;
-    console.log(this.ofDirect, this.detailsOF, this.anulledOrder);
+    
     this.messageService.add({
       severity: 'warn',
       key: 'confirmation',
@@ -191,13 +203,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   ///
   loadModalOrderFact(data : any){
-    if(data.type == 'Devolucion' && data.or.reposicion && data.or.estado_Id == 38) {
+    if(data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
       if([6,1].includes(this.validateRole)) {
         this.Orden_FacturacionComponent.clearFields(false);
         this.modalReposition = true;  
         this.Orden_FacturacionComponent.loadInfoForDevolution(data.or.id); 
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
-    } else if(data.type == 'Devolucion' && [11,29].includes(data.or.estado_Id)) {
+    } else if(data.type == 'DV' && [11,29].includes(data.or.estado_Id)) {
       if([5,1].includes(this.validateRole)) {
         this.managementDevolutions.clearFields();
         this.managementDevolutions.devolution = true;
@@ -209,6 +221,40 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   }
 
   msjDevolutions(data){
-    return `${data.type == 'Devolucion' && ![18,39].includes(data.or.estado_Id) ? 'Haz doble clic para continuar gestionando la devolución' : [18,39].includes(data.or.estado_Id) ? `La devolucion N° ${data.or.id} será repuesta en la orden N° ${data.of}` : ''}`
+    return `${data.type == 'DV' && ![18,39].includes(data.or.estado_Id) ? 'Haz doble clic para continuar gestionando la devolución' : [18,39].includes(data.or.estado_Id) ? `La devolucion N° ${data.or.id} será repuesta en la orden N° ${data.of}` : ''}`
   }
+
+  searchClients() {
+    let idClient = this.formFilters.value.idClient;
+    this.svZeusInv.getClientByIdThird(idClient).subscribe(data => {
+      data.forEach(cli => { this.formFilters.patchValue({ 'clientId': cli.idcliente, 'client': cli.razoncial, }); });
+    }, error => this.errorMessage(`¡No se encontró información del cliente consultado!`, error));
+  }
+
+  searchClientsByName() {
+    let name = this.formFilters.value.client;
+    this.svZeusInv.getClientByName(name).subscribe(data => this.clients = data);
+  }
+
+  selectClient() {
+    let client = this.clients.find(x => x.idcliente == this.formFilters.value.client);
+    this.formFilters.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, });
+  }
+
+  consultarVendedores = () =>  this.svUsuarios.GetVendedores().subscribe(data => { this.sales = data; });
+
+  // Funcion que va a colocar a llenar los campos correspondientes del vendedor
+  llenarVendedor(){
+    let nombre = this.formFilters.value.sales;
+    let vendedor = this.sales.find(x => x.usua_Nombre == nombre);
+    let Id_Vendedor : string = `${vendedor.usua_Id}`;
+    if (Id_Vendedor.length == 1) Id_Vendedor = `00${Id_Vendedor}`;
+    else if (Id_Vendedor.length == 2) Id_Vendedor = `0${Id_Vendedor}`;
+    this.formFilters.patchValue({
+      sales: vendedor.usua_Nombre,
+      salesId : Id_Vendedor,
+    });
+  }
+
+  exportExcel(){}
 }

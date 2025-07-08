@@ -24,27 +24,58 @@
   <form [formGroup]="formFilters" (ngSubmit)="searchData()">
     <div class="row g-3 my-4 justify-content-md-center">
 
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-1 col-xl-1 col-xxl-1">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
           <input formControlName="orderFact" id="orden" type="text" pInputText required/>
-          <label for="orden">Documento</label>
+          <label for="orden">Doc.</label>
         </span>
       </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-calendar formControlName="startDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
           <label for="FechaInicial">Fecha Inicial</label>
         </span>
       </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-calendar formControlName="endDate" inputId="FechaFinal" [showIcon]="true"></p-calendar>
           <label for="FechaFinal">Fecha Final</label>
         </span>
       </div>
+
+      <!-- CLIENT -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <span class="p-float-label">
+          <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText (keyup)="searchClientsByName()" (change)="selectClient()" />
+          <datalist id="clientes">
+            <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
+          </datalist>
+          <label for="Cliente">Cliente</label>
+        </span>
+      </div>
+
+      <!-- SALES -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3" id="Vendedor">
+        <span class="p-float-label">
+          <input formControlName="sales" id="Vendedor" list="vendedores" (change)="llenarVendedor()" type="text" pInputText autocomplete="off"/>
+          <datalist id="vendedores">
+            <option value={{item.usua_Nombre}} *ngFor="let item of sales">{{item.usua_Nombre}}</option>
+          </datalist>
+          <label for="Vendedor">Vendedor</label>
+        </span>
+      </div>
+
+      <!--* TYPE MOV. -->
+      <div class="col-sm-12 col-md-6 col-xl-1">
+         <span class="p-float-label">
+           <p-dropdown formControlName="typeMov" inputId="typeMov" [autoDisplayFirst]="false" [options]="typesMovements"></p-dropdown>
+           <label for="typeMov">Tipo Mov.</label>
+         </span>
+      </div>
+
 
     </div>
 
@@ -52,6 +83,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search" [disabled]="load"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFields()"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportExcel()"></button>
       </div>
     </div>
   </form>
@@ -81,9 +113,9 @@
       *ngIf="!load">
       <ng-template pTemplate="header">
         <tr>
-          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-book"></i> Datos Orden/Devolución</th>
-          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Cliente</th>
-          <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-calendar"></i> Fechas</th>
+          <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-book"></i> Datos Orden/Devolución</th>
+          <th style="font-weight: 800;" class="text-center" ><i class="pi pi-users"></i> Información Cliente</th>
+          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-calendar"></i> Fechas</th>
           <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-book"></i> Documento</th>
           <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-file-pdf"></i> Visualización</th>
         </tr>  
@@ -100,25 +132,20 @@
             <p-sortIcon field="or.factura"></p-sortIcon> Factura
             <p-columnFilter type="text" field="or.factura" display="menu"></p-columnFilter>
           </th>
-          <th class="text-center" pSortableColumn="or.cli_Id">
-            <p-sortIcon field="or.cli_Id"></p-sortIcon> NIT
-            <p-columnFilter type="text" field="or.cli_Id" display="menu"></p-columnFilter>
-          </th>
           <th class="text-center" pSortableColumn="clientes.cli_Nombre">
             <p-sortIcon field="clientes.cli_Nombre"></p-sortIcon> Cliente
             <p-columnFilter type="text" field="clientes.cli_Nombre" display="menu"></p-columnFilter>
           </th>
           <th class="text-center" pSortableColumn="fechaHora">
-            <p-sortIcon field="fechaHora"></p-sortIcon> Orden
+            <p-sortIcon field="fechaHora"></p-sortIcon> OF
             <p-columnFilter type="text" field="fechaHora" display="menu"></p-columnFilter>
           </th>
-          <th class="text-center" pSortableColumn="fechaHora">
-            <p-sortIcon field="fechaHora"></p-sortIcon> Despacho
-            <p-columnFilter type="text" field="fechaHora" display="menu"></p-columnFilter>
+          <th class="text-center" pSortableColumn="fechaDespacho">
+            <p-sortIcon field="fechaDespacho"></p-sortIcon> Cierre
+            <p-columnFilter type="text" field="fechaDespacho" display="menu"></p-columnFilter>
           </th>
-
           <th class="text-center" pSortableColumn="type">
-            <p-sortIcon field="type"></p-sortIcon> Tipo Doc.
+            <p-sortIcon field="type"></p-sortIcon> Tipo
             <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
           </th>
           <th class="text-center" pSortableColumn="estado">
@@ -134,9 +161,9 @@
           <td class="text-center">{{data.or.id}}</td>
           <td class="text-center">{{data.or.of_Directa == true ? 'SÍ' : 'NO'}}</td>
           <td class="text-center">{{data.or.factura}}</td>
-          <td class="text-center">{{data.or.cli_Id}}</td>
           <td class="text-center">{{data.clientes.cli_Nombre}}</td>
           <td class="text-center">{{data.fechaHora}}</td>
+          <td class="text-center">{{data.fechaDespacho }}</td>
           <td class="text-center">{{data.type | uppercase}}</td>
           <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-warning': [3,29].includes(data.or.estado_Id), 'bg-secondary1': [38].includes(data.or.estado_Id), 'bg-blue1': [39].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
           <td class="text-center" *ngIf="[1].includes(validateRole)">

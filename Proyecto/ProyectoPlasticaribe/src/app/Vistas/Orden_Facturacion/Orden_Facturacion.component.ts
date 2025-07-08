@@ -808,6 +808,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   informationClientPDF(data): {} {
+    console.log(data);
+    
     return {
       table: {
         widths: ['50%', '20%', '30%'],
@@ -818,12 +820,12 @@ export class Orden_FacturacionComponent implements OnInit {
           [
             { text: `Nombre: ${data.clientes.cli_Nombre}` },
             { text: `ID: ${data.clientes.cli_Id}` },
-            { text: `Dirección: ${''}` },
+            { text: `Dirección: ${data.direction}` },
           ],
           [
             { text: `E-mail: ${data.clientes.cli_Email}` },
             { text: `Tel.: ${data.clientes.cli_Telefono}` },
-            { text: `OF Directa: ${''}` },
+            { text: `OF Directa: ${data.order.of_Directa}` },
           ],
           [
             { text: `Asesor: ${''}`, colSpan: 3 },
