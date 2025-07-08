@@ -626,13 +626,13 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   //
   searchOldTag(tag : number, process : any){
-    let ot : number = this.formDatosProduccion.value.ordenTrabajo;
-    let otAltern : number = this.formDatosProduccion.value.otAlterna;
+    let ot : number = parseInt(this.formDatosProduccion.value.ordenTrabajo);
+    let otAltern : number = parseInt(this.formDatosProduccion.value.otAlterna);
     let orders : any = [];
 
     if(ot) orders.push(ot);
     if(otAltern) orders.push(otAltern);
-
+    
     this.bagproService.getRollProduction(tag, `?process=${this.changeNameProcess(process)}`).subscribe(data => {
       if(data) {
         if(orders.includes(data.ot)) this.guardarProduccion(data);
