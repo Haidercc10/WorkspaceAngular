@@ -83,7 +83,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search" [disabled]="load"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFields()"></button>
-        <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportExcel()"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" [disabled]="serchedData.length == 0" (click)="exportExcel()"></button>
       </div>
     </div>
   </form>
@@ -114,13 +114,13 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-book"></i> Datos Orden/Devolución</th>
-          <th style="font-weight: 800;" class="text-center" ><i class="pi pi-users"></i> Información Cliente</th>
-          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-calendar"></i> Fechas</th>
-          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-book"></i> Documento</th>
+          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Usuarios</th>
+          <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-calendar"></i> Fechas</th>
+          <th style="font-weight: 800;" class="text-center"></th>
           <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-file-pdf"></i> Visualización</th>
         </tr>  
         <tr>
-          <th class="text-center" pSortableColumn="or.id">
+          <th class="text-center" pSortableColumn="or.id" alignFrozen="left" pFrozenColumn [frozen]="true">
             <p-sortIcon field="or.id"></p-sortIcon> Id
             <p-columnFilter type="text" field="or.id" display="menu"></p-columnFilter>
           </th>
@@ -136,41 +136,46 @@
             <p-sortIcon field="clientes.cli_Nombre"></p-sortIcon> Cliente
             <p-columnFilter type="text" field="clientes.cli_Nombre" display="menu"></p-columnFilter>
           </th>
+           <th class="text-center" pSortableColumn="asesor">
+            <p-sortIcon field="asesor"></p-sortIcon> Asesor
+            <p-columnFilter type="text" field="asesor" display="menu"></p-columnFilter>
+          </th>
           <th class="text-center" pSortableColumn="fechaHora">
-            <p-sortIcon field="fechaHora"></p-sortIcon> OF
+            <p-sortIcon field="fechaHora"></p-sortIcon> Creación
             <p-columnFilter type="text" field="fechaHora" display="menu"></p-columnFilter>
           </th>
           <th class="text-center" pSortableColumn="fechaDespacho">
             <p-sortIcon field="fechaDespacho"></p-sortIcon> Cierre
             <p-columnFilter type="text" field="fechaDespacho" display="menu"></p-columnFilter>
           </th>
-          <th class="text-center" pSortableColumn="type">
-            <p-sortIcon field="type"></p-sortIcon> Tipo
-            <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+          <th class="text-center" pSortableColumn="dias">
+            <p-sortIcon field="dias"></p-sortIcon> Días
+            <p-columnFilter type="text" field="dias" display="menu"></p-columnFilter>
           </th>
           <th class="text-center" pSortableColumn="estado">
             <p-sortIcon field="estado"></p-sortIcon> Estado
             <p-columnFilter type="text" field="estado" display="menu"></p-columnFilter>
           </th>
           <th class="text-center" *ngIf="[1].includes(validateRole)">Anular</th>
-          <th id="ver3">Ver</th>
+          <th id="ver3" alignFrozen="right" pFrozenColumn [frozen]="true">Ver</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data>
-        <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'Devolucion'}" pTooltip="{{msjDevolutions(data)}}" tooltipPosition="top">
-          <td class="text-center">{{data.or.id}}</td>
+        <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'DV'}" pTooltip="{{msjDevolutions(data)}}" tooltipPosition="top">
+          <td class="text-center" alignFrozen="left" pFrozenColumn [frozen]="true">{{data.type}}-{{data.or.id}}</td>
           <td class="text-center">{{data.or.of_Directa == true ? 'SÍ' : 'NO'}}</td>
           <td class="text-center">{{data.or.factura}}</td>
-          <td class="text-center">{{data.clientes.cli_Nombre}}</td>
+          <td class="">{{data.clientes.cli_Nombre}}</td>
+          <td class="">{{data.asesor}}</td>
           <td class="text-center">{{data.fechaHora}}</td>
           <td class="text-center">{{data.fechaDespacho }}</td>
-          <td class="text-center">{{data.type | uppercase}}</td>
-          <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-warning': [3,29].includes(data.or.estado_Id), 'bg-secondary1': [38].includes(data.or.estado_Id), 'bg-blue1': [39].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
+          <td class="text-center">{{ data.dias }}</td>
+          <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-warning': [3,29].includes(data.or.estado_Id), 'bg-secondary1': [38].includes(data.or.estado_Id), 'bg-blue1': [39].includes(data.or.estado_Id), 'bg-black1': [53].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
           <td class="text-center" *ngIf="[1].includes(validateRole)">
-            <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-danger" [disabled]="data.type == 'Devolucion'" (onClick)="confirmSendData(data)"></p-button>
+            <p-button id="botonPdf" icon="pi pi-ban" styleClass="p-button-rounded p-button-warning" [disabled]="data.type == 'DV'" (onClick)="confirmSendData(data)"></p-button>
           </td>
-          <td class="text-center">
-            <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id, data.or.factura, data.type, data.or.of_Directa)"></p-button>
+          <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+            <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger" (onClick)="createPDF(data.or.id, data.or.factura, data.type, data.or.of_Directa)"></p-button>
           </td>
         </tr>
       </ng-template>
@@ -189,7 +194,7 @@
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
           <button type="button" pButton (click)="PutStatusOrderAnulled()" icon="pi pi-check" label="Sí"
-            class="p-button-warning" pTooltip="Los rollos también serán eliminados de BagPro."></button>
+            class="p-button-warning" pTooltip="Los rollos volverán al inventario"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No"

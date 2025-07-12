@@ -1,8 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { dv } from '@fullcalendar/core/internal-common';
 import moment from 'moment';
-import { log } from 'node:console';
+import { error, log } from 'node:console';
 import { Table } from 'primeng/table';
 import { modelDevolucionProductos } from 'src/app/Modelo/modelDevolucionProductos';
 import { modelDtProductoDevuelto } from 'src/app/Modelo/modelDtProductoDevuelto';
@@ -41,6 +42,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   fieldFocus: boolean = false;
   rollsScanned : any[] = [];  
   form: FormGroup;
+  products : any[] = [];
+  isDevolution : boolean = false;
 
   @ViewChild('tableOrder') tableOrder : Table | undefined;
   @ViewChild('tableDevolution') tableDevolution : Table | undefined;
@@ -59,6 +62,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.modoSeleccionado = appComponent.temaSeleccionado;
 
     this.formDataOrder = this.frmBuilder.group({
+      dv : [null,],
       order : [null, Validators.required],
       fact: [null, Validators.required],
       idClient: [null, Validators.required],
@@ -66,8 +70,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       reason: [null, Validators.required],
       //reposition : [false, Validators.required],
       //creditNote : [false, Validators.required ],
-      roll : [''],
-      observation: ['']
+      roll : [null],
+      observation: ['', Validators.required],
+      salesId : [null],
+      sales : [null],
+      contact : [null, Validators.required],
+      observationIn: [null, ],
     });
 
      this.form = this.frmBuilder.group({
@@ -78,7 +86,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getFails();
-    this.focusInput(false);
+    if(this.ValidarRol == 10) this.focusInput(false);
   }
 
 // Función para mantener el puntero del mouse en un campo especifico. 
@@ -120,12 +128,13 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.production = [];
     this.productionSelected = [];
     this.consolidatedProduction = [];
+    this.isDevolution = false;
   }
 
   clearTables(){
     this.production = [];
-    this.productionSelected = [];
-    this.consolidatedProduction = [];
+    //this.productionSelected = [];
+    //this.consolidatedProduction = [];
   }
 
   validateUrl(){
@@ -133,6 +142,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     let fact: any = this.formDataOrder.value.fact;
     let roll : any = this.formDataOrder.value.roll;
     let url : string = ``;
+
+    if(fact != null) fact.startsWith('0000') ? fact = fact.replace('0000', '') : fact = fact;
 
     if(order != null) url += `of=${order}`;
     if(fact != null) url.length > 0 ? url += `&fact=${fact}` : url += `fact=${fact}`;
@@ -143,35 +154,135 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   searchData() {
+    this.isDevolution = false;
     this.clearTables();
     let reason: any = this.formDataOrder.value.reason;
-
+    let fact : any = this.formDataOrder.value.fact;
+    
     if (reason != null) {
       if (![null, undefined, ''].includes(this.validateUrl())) {
         this.load = true;
         this.dtOrderFactService.GetInformationOrderFactByFilters(this.validateUrl()).subscribe(dataOf => {
-          this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(dataOf.id).subscribe(data => {
-            data.forEach(x => {
-              this.production.push({  
+          if(this.productionSelected.length > 0) {
+            console.log(dataOf.factura, fact);
+            if(fact != dataOf.factura) {
+              this.msg.mensajeAdvertencia(`No es posible generar una misma devolución a facturas diferentes!`);
+              this.load = false;
+              return;
+            }
+          }
+          setTimeout(() => {
+            this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(dataOf.id).subscribe(data => {
+              data.forEach(x => {
+                this.production.push({  
+                  'item': x.producto.prod_Id,
+                  'reference': x.producto.prod_Nombre,
+                  'numberProduction': x.dtOrder.numero_Rollo,
+                  'quantity': x.dtOrder.cantidad,
+                  'presentation': x.dtOrder.presentacion, 
+                  'fail' : reason,
+                  'quantity2' : x.dtOrder.cantidad,
+                  'of' : x.order.id, 
+                  'factura': x.order.factura,
+                  'ot': x.orderProduction,
+                  'weight' : x.weight ? x.weight : 0,
+                  'preIn' : false,
+                });
+                this.changeInformationFact(x);
+                this.load = false;
+              });
+            }, error => { this.errorMessage(`Ocurrió un error al consultar la orden de facturación N° ${dataOf.id}!`, error); });
+          }, 1000);
+        }, (error: HttpErrorResponse) => { 
+          this.errorMessage(`Error al consultar la orden de facturación por filtros!`, error);
+        }); 
+      } else this.msg.mensajeAdvertencia('Orden de facturación no valida!');
+    } else this.msg.mensajeAdvertencia(`Debe elegir el motivo de la devolución!`);
+  }
+
+  searchDevolution(){
+    let dv: any = this.formDataOrder.value.dv;
+
+    if(dv) {
+      this.dtDevService.GetInformationDevById(dv).subscribe(data => {
+        if([11,53,29].includes(data[0].dev.estado_Id)) {
+          this.load = true;
+          this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(data[0].dev.id_OrdenFact).subscribe(dataOF => {
+            this.isDevolution = true;
+            this.loadInfoDevolution(data[0]);
+            this.loadInfoDetailsDevolution(data);
+            dataOF.forEach(x => {
+              if(!this.production.map(z => z.numberProduction).includes(x.dtOrder.numero_Rollo)) {
+                this.production.push({  
                 'item': x.producto.prod_Id,
                 'reference': x.producto.prod_Nombre,
                 'numberProduction': x.dtOrder.numero_Rollo,
                 'quantity': x.dtOrder.cantidad,
                 'presentation': x.dtOrder.presentacion, 
-                'fail' : reason,
-                'quantity2' : x.dtOrder.cantidad
-              });
-              this.changeInformationFact(x);
-              this.load = false;
-            });
-          }, error => { this.errorMessage(`Ocurrió un error al consultar la orden de facturación N° ${dataOf.id}!`, error); });
-        }, (error: HttpErrorResponse) => { this.errorMessage(`Error al consultar la orden de facturación por filtros!`, error);}); 
-      } else this.msg.mensajeAdvertencia('Orden de facturación no valida!');
-    } else this.msg.mensajeAdvertencia(`Debe elegir el motivo de la devolución!`);
+                'fail' : data[0].dev.falla_Id,
+                'quantity2' : x.dtOrder.cantidad,
+                'of' : x.order.id, 
+                'factura': x.order.factura,
+                'ot': x.orderProduction,
+                'weight' : x.weight ? x.weight : 0,
+                'preIn' : false,
+                });
+              }
+            })
+          });
+        }  
+        },error => { 
+          this.errorMessage(`¡Ocurrió un error al buscar la devolución N° ${dv}!`, error)
+        });
+    } else this.msg.mensajeAdvertencia('Advertencia', `Debe digitar una devolución válida!`);
   }
 
   changeInformationFact(data: any) {
-    this.formDataOrder.patchValue({ 'idClient': data.clientes.cli_Id, 'client': data.clientes.cli_Nombre, 'fact': data.order.factura, 'order' : data.order.id, });
+    this.formDataOrder.patchValue({ 
+      'idClient': data.clientes.cli_Id, 
+      'client': data.clientes.cli_Nombre, 
+      'fact': data.order.factura,   
+      'order' : data.order.id,
+      'salesId' : '', //data.asesor.asesor_Id,
+      'sales' : '', //data.asesor.usua_Nombre, 
+    });
+  }
+
+  loadInfoDevolution(data: any) {
+    this.formDataOrder.patchValue({
+      'reason' : data.dtDev.falla_Id, 
+      'idClient': data.cliente.cli_Id, 
+      'client': data.cliente.cli_Nombre, 
+      'fact': data.dev.facturaVta_Id, 
+      'order' : data.dev.orderFact_Id,
+      'salesId' : '', //data.asesor.asesor_Id,
+      'sales' : '', //data.asesor.usua_Nombre, 
+      'contact' : data.dev.devProdFact_Responsable,
+      'observation' : data.dev.devProdFact_Observacion,
+    });
+    this.load = false;
+  }
+
+  loadInfoDetailsDevolution(data: any) {
+    data.forEach(x => {
+      this.production.push({  
+        'item': x.prod.prod_Id,
+        'reference': x.prod.prod_Nombre,
+        'numberProduction': x.dtDev.numero_Rollo,
+        'quantity': x.dtDev.cantidad,
+        'presentation': x.dtDev.presentacion, 
+        'fail' : data[0].dev.falla_Id,
+        'quantity2' : x.dtDev.cantidad,
+        'of' : x.dev.id_OrdenFact ? x.dev.id_OrdenFact : null, 
+        'factura': x.dev.facturaVta_Id ? x.dev.facturaVta_Id : null,
+        'ot': x.ot ? x.ot : null,
+        'weight' : x.weight ? x.weight : 0,
+        'preIn' : true,
+      });
+    });
+    console.log(this.production);
+    
+    //this.getConsolidateProduction();
   }
 
   selectedProduction(production: production) {
@@ -257,6 +368,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     return total;
   }
 
+  totalWeightByProduct(item: number): number {
+    let total: number = 0;
+    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.weight ? x.weight : 0);
+    return total;
+  }
+
   totalCountProductionByProduct(item: number): number {
     let total: number = 0;
     total = this.productionSelected.filter(x => x.item == item).length;
@@ -275,6 +392,19 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     } else this.msg.mensajeAdvertencia(`Debe ingresar todos los datos!`);
   }
 
+  //Actualización de la devolución por parte de encargado de ingreso.
+  validateInfoDevolution(){
+    let dev: any = this.formDataOrder.value.dv;
+    if(this.isDevolution) {
+      if (this.formDataOrder.valid) {
+        if (this.productionSelected.length > 0) {
+          this.load = true;
+          this.saveDetailsFact(dev);
+        } else this.msg.mensajeAdvertencia(`No ha seleccionado ningún rollo para devolver!`);
+      } else this.msg.mensajeAdvertencia(`Debe ingresar todos los datos!`);
+    } else this.msg.mensajeAdvertencia(`Debe pasar al modo ingreso de devolución!`);
+  }
+
   saveDev() {
     this.load = true;
     let order : number = this.formDataOrder.value.order;
@@ -290,10 +420,13 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       'TipoDevProdFact_Id': 1,
       'Usua_Id': this.storage_Id,
       'Id_OrdenFact': order,
-      'Estado_Id': 11,
+      'Estado_Id': 53,
       'DevProdFact_Reposicion': false,
       'UsuaModifica_Id' : 0,
       'DevProdFact_NotaCredito' : false,
+      'Asesor_Id' : this.formDataOrder.value.salesId ? this.formDataOrder.value.salesId : null,
+      'UsuaFinaliza_Id' : 0,
+      'DevProdFact_Responsable' : this.formDataOrder.value.contact ? this.formDataOrder.value.contact.toUpperCase() : '',
     };
     this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
   }
@@ -301,32 +434,56 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   saveDetailsFact(data: any) {
     let count: number = 0;
 
-    this.productionSelected.forEach(prod => {
+    this.productionSelected.filter(z => z.preIn == false).forEach(prod => {
       let info: modelDtProductoDevuelto = {
-        'DevProdFact_Id': data.devProdFact_Id,
+        'DevProdFact_Id': data.devProdFact_Id ? data.devProdFact_Id : data,
         'Prod_Id': prod.item,
         'DtDevProdFact_Cantidad': prod.quantity,
         'UndMed_Id': prod.presentation,
         'Rollo_Id': prod.numberProduction,
         'Falla_Id': prod.fail,
+        'DtDevprodFact_Factura': prod.factura ? prod.factura : null,
+        'DtDevprodFact_OT': prod.ot ? prod.ot : null,
+        'DtDevprodFact_PesoBruto': prod.weight ? prod.weight : null,
+        'DtDevprodFact_PesoNeto': prod.presentation == 'Kg' ? prod.quantity : prod.weight,
+        'Of_Id': prod.of ? prod.of : null,
       }
       this.dtDevService.srvGuardar(info).subscribe(() => {
         count++;
-        if (count == this.productionSelected.length) this.changeStatus(data);
+        if (count == this.productionSelected.filter(z => z.preIn == false).length) this.isDevolution ? this.changeStatus(data, 53, 24) : this.changeStatus(data, 23, 53);
       }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
     });
   }
 
-  changeStatus(data: any){
+  //Cambiar estado de rollos en la OF.
+  changeStatus(data: any, currentStatus? : number, newStatus? : number) {
     let order: number = this.formDataOrder.value.order;
     let reels: any = [];
 
-    this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : 23, 'newStatus' : 24, 'envioZeus' : true}) });
+    this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true}) });
     this.dtOrderFactService.PutStatusProduction(reels.map(x => x.roll), order).subscribe(() => {
-      this.updateStatusProduction(reels, data);
+      this.updateStatusDev(reels, order);
+      //this.updateStatusProduction(reels, data);
     }, (error) => this.errorMessage(`Ocurrió un error al cambiar el estado de los rollos en la orden N° ${order}!`, error));
   }
 
+  //Actualizar encabezado de la devolución
+  updateStatusDev(reels : any, production : any){
+    let dev: any = this.form.value.dev;
+    let date : any = moment().format('YYYY-MM-DD');
+    let hour : string = moment().format('HH:mm:ss');
+    let observation : any = this.form.value.observationIn == null ? '' : `?observation=${this.form.value.observationIn}`;
+    let status : number = 11;
+ 
+    this.devService.PutStatusDevolution(dev, status, date, hour, this.storage_Id, observation).subscribe(data => {
+      this.updateStatusProduction(reels, production);
+    }, error => {
+      this.msg.mensajeError(`No fue posible actualizar el estado de la devolución N° ${dev}!`, error);
+      this.load = false;
+    });
+  }
+
+  //Cambiar estado de rollos en tabla de producción.
   updateStatusProduction(rolls : any, data : any){
     this.svProduction.putChangeStateProduction(rolls).subscribe(dataChange => {
       this.createPDF(data.devProdFact_Id, 'creada');
@@ -335,6 +492,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     })
   }
 
+  
+  //Generación de formato PDF
   createPDF(devolution: any, action? : string) {
     this.dtDevService.GetInformationDevById(devolution).subscribe(data => {
       let title: string = `Devolución N° ${devolution}`;
@@ -352,7 +511,9 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     content.push(this.informationMovement(data[0]));
     content.push(this.informationClientPDF(data[0]));
     content.push(this.observationPDF(data[0]));
+    content.push(this.observationInPDF(data[0]));
     content.push(this.observationManagementPDF(data[0]));
+    content.push(this.observationEndPDF(data[0]));
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.tableProducts(informationProducts));
     return content;
@@ -366,13 +527,19 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         count++;
         let cuontProduction: number = data.filter(x => x.prod.prod_Id == prod.prod.prod_Id).length;
         let totalQuantity: number = 0;
-        data.filter(x => x.prod.prod_Id == prod.prod.prod_Id).forEach(x => totalQuantity += x.dtDev.cantidad);
+        let totalWeight: number = 0;
+
+        data.filter(x => x.prod.prod_Id == prod.prod.prod_Id).forEach(x => {
+          totalQuantity += x.dtDev.cantidad
+          totalWeight += x.weight ? x.weight : 0;
+        });
         consolidatedInformation.push({
           "#": count,
           "Item": prod.prod.prod_Id,
           "Referencia": prod.prod.prod_Nombre,
           "Cant. Rollos": this.formatNumbers((cuontProduction).toFixed(2)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
+          "Peso": this.formatNumbers((totalWeight).toFixed(2)),
           "Presentación": prod.dtDev.presentacion
         });
       }
@@ -388,10 +555,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       informationProducts.push({
         "#": count,
         "Rollo": prod.dtDev.numero_Rollo,
+        "OT": prod.ot,
         "Item": prod.prod.prod_Id,
         "Referencia": prod.prod.prod_Nombre,
         "Cantidad": this.formatNumbers((prod.dtDev.cantidad).toFixed(2)),
-        "Presentación": prod.dtDev.presentacion,
+        "Und": prod.dtDev.presentacion,
+        "Peso": this.formatNumbers((prod.weight ? prod.weight : 0).toFixed(2)),
         "Estado" : prod.estadoOF,
       });
     });
@@ -409,20 +578,25 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           [
             { text: `Orden Fact: ${data.dev.id_OrdenFact}` },
             { text: `Factura: ${data.dev.facturaVta_Id}` },
-            { text: `Requiere Reposición: ${data.dev.devProdFact_Reposicion == true ? 'SI' : 'NO' }`  },
+            { text: `Reposición: ${data.dev.devProdFact_Reposicion == true ? 'SI' : 'NO'} | Nota Crédito: ${data.dev.devProdFact_NotaCredito == true ? 'SI' : 'NO' }`},
           ],
           [
-            { text: `Usuario ingreso: ${data.usua.usua_Nombre}` },
-            { text: `Usuario revisión: ${data.usua.usua_Modifica == 0 ? '' : data.usua.usua_Modifica}` },
-            { text: `Estado: ${data.estadoDv.estado_Nombre}` },
+            { text: `Pre-ingresa: ${data.usua.usua_Nombre}` },
+            { text: `Ingresa: ${data.usua.usua_Modifica == 0 ? '' : data.usua.usua_Modifica}` },
+            { text: `Gestiona: ${[0, null].includes(data.usua.usuaFinaliza_Id) ? '' : data.usua.usuaFinaliza}` },
           ],
           [
-            { text: `Fecha ingreso: ${(data.dev.devProdFact_Fecha).replace('T00:00:00','')} ${data.dev.devProdFact_Hora}`, }, 
-            { text: `Fecha revisión: ${data.dev.devProdFact_FechaModificado != null ? (data.dev.devProdFact_FechaModificado).replace('T00:00:00','') : ''} ${data.dev.devProdFact_HoraModificado != null ? data.dev.devProdFact_HoraModificado : ''}`, }, 
-            { text: `Fecha cierre: ${data.dev.devProdFact_FechaFinalizado != null ? (data.dev.devProdFact_FechaFinalizado).replace('T00:00:00', '') : ''} ${data.dev.devProdFact_HoraFinalizado != null ? data.dev.devProdFact_HoraFinalizado : ''}`, } 
+            { text: `Fecha pre-ingreso: ${(data.dev.devProdFact_Fecha).replace('T00:00:00','')} ${data.dev.devProdFact_Hora}`, }, 
+            { text: `Fecha ingreso: ${data.dev.devProdFact_FechaModificado != null ? (data.dev.devProdFact_FechaModificado).replace('T00:00:00','') : ''} ${data.dev.devProdFact_HoraModificado != null ? data.dev.devProdFact_HoraModificado : ''}`, }, 
+            { text: `Fecha gestión: ${''}`, } 
           ],  
           [
-            { text: `Nota Crédito: ${data.dev.devProdFact_NotaCredito == true ? 'SI' : 'NO' }`, }, 
+            { text: `Finalizado por: ${''}`, }, 
+            { text: `Fecha Final.: ${''}`, }, 
+            { text: `N° Reposición: ${''}`, }, 
+          ], 
+          [          
+            { text: `Estado: ${data.estadoDv.estado_Nombre}` },
             { text: `Motivo devolución: ${data.dtDev.falla}`, colSpan: 2 }, 
           ] 
         ]
@@ -446,14 +620,14 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
             { text: `Información detallada del Cliente`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
           ],
           [
-            { text: `Nombre: ${data.cliente.cli_Nombre}` },
-            { text: `ID: ${data.cliente.cli_Id}` },
-            { text: `Tipo de ID: ${data.cliente.tipoIdentificacion_Id}` },
+            { text: `Cliente: ${data.cliente.cli_Id} - ${data.cliente.cli_Nombre}` },
+            { text: `Ciudad: ${data.city}` },
+            { text: `Dirección: ${data.direction}` },
           ],
           [
+            { text: `E-mail: ${data.cliente.cli_Email}`, },
             { text: `Telefono: ${data.cliente.cli_Telefono}` },
-            { text: `E-mail: ${data.cliente.cli_Email}`, colSpan: 2 },
-            {}
+            { text: `Responsable: ${data.dev.devProdFact_Responsable}`},
           ], 
         ]
       },
@@ -467,8 +641,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   tableConsolidated(data) {
-    let columns: Array<string> = ['#', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['10%', '10%', '40%', '15%', '15%', '10%'];
+    let columns: Array<string> = ['#', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Peso', 'Presentación'];
+    let widths: Array<string> = ['10%', '10%', '40%', '15%', '8%', '7%', '10%'];
     return {
       table: {
         headerRows: 2,
@@ -485,8 +659,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Estado'];
-    let widths: Array<string> = ['4%', '8%', '8%', '40%', '10%', '10%', '20%'];
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Cantidad', 'Peso', 'Und', 'Estado'];
+    let widths: Array<string> = ['4%', '8%', '6%', '6%', '35%', '7%', '7%', '8%','19%'];
     return {
       margin: [0, 10],
       table: {
@@ -505,7 +679,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   buildTableBody1(data, columns, title) {
     var body = [];
-    body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
+    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -517,7 +691,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   buildTableBody2(data, columns, title) {
     var body = [];
-    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -540,14 +714,40 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     }
   }
 
+  observationInPDF(data) {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, false, true, false], text: `Observación de ingreso: `, style: 'subtitulo', bold: true }],
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionModificado}` }]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
   observationManagementPDF(data) {
     return {
-      margin: [0, 0, 0, 20],
       table: {
         widths: ['*'],
         body: [
           [{ border: [true, false, true, false], text: `Observación de revisión: `, style: 'subtitulo', bold: true }],
           [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionGestion == null ? '' : data.dev.devProdFact_ObservacionGestion.toString().trim()}` }]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  observationEndPDF(data) {
+    return {
+      margin: [0, 0, 0, 20],
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, false, true, false], text: `Observación de cierre: `, style: 'subtitulo', bold: true }],
+          [{ border: [true, false, true, true], text: `${''}` }]
         ]
       },
       fontSize: 9,
@@ -587,8 +787,6 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 }
 
-
-
 interface production {
   item: number;
   reference: string;
@@ -598,4 +796,9 @@ interface production {
   presentation: string;
   fail? : number;
   quantity2? : number;
+  of?: number;
+  factura?: string;
+  ot?: number;
+  weight?: number;
+  preIn? : boolean;
 }

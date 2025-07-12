@@ -8,4 +8,5 @@ export interface modelOrdenFacturacion {
     Observacion: string;
     Estado_Id: number;
     Of_Directa? : boolean;
+    Asesor_Id?: number;
 }

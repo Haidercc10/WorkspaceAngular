@@ -1,6 +1,5 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import moment from 'moment';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
@@ -17,6 +16,8 @@ import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gesti
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +48,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   @ViewChild(Orden_FacturacionComponent) Orden_FacturacionComponent : Orden_FacturacionComponent;
   clients: any[] = [];
   sales: any[] = [];
-  typesMovements: any[] = ['OF', 'DV'];
+  typesMovements: any = ['OF', 'DV'];
   
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
@@ -61,7 +62,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private cmpOrdFact : OrdenFacturacion_PalletsComponent, 
     private svExistProduct : ExistenciasProductosService,
     private svZeusInv : InventarioZeusService,
-    private svUsuarios : UsuarioService
+    private svUsuarios : UsuarioService, 
+    private svExcel : CreacionExcelService
   ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -80,6 +82,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   ngOnInit() {
     this.readStorage();
     this.consultarVendedores();
+    this.loadRankDates();
+  }
+
+  //Función para cargar fechas en el rango.
+  loadRankDates(){
+    let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
+    this.formFilters.patchValue({ 'startDate' : initialDate, 'endDate' : new Date(), 'typeMov' : 'OF' });
   }
 
   readStorage(){
@@ -96,31 +105,61 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.anulledOrder = null;
     this.ofDirect = false;
     this.detailsOF = 0;
+    this.loadRankDates();
   }
 
   searchData(){
-    let orderNum : any = this.formFilters.value.orderFact;
-    let dateLastMonth : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let startDate : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD') == 'Fecha inválida' ? dateLastMonth : moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
-    let endDate : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
-    let route : string = orderNum != null ? `?order=${orderNum}` : '';
-    this.load = true;
+    let startDate : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD'); 
+    let endDate : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD'); 
+    let typeMov : any = this.formFilters.value.typeMov;
+
     this.serchedData = [];
     this.dt.clear();
+    
+    if (typeMov == 'OF') this.searchDataOrders(startDate, endDate, this.validateUrl());
+    else if (typeMov == 'DV') this.searchDataDevolutions(startDate, endDate, this.validateUrl());
+    else this.msg.mensajeAdvertencia(`¡Debe seleccionar un tipo de movimiento!`);
+  }
+
+  searchDataOrders(startDate: any, endDate: any, route: string){
+    this.load = true;
     this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => {
       if(![5,83].includes(this.validateRole)) data.forEach(dataOrder => this.serchedData.push(dataOrder));
+      this.serchedData.forEach(x => {
+        let date1 = moment(x.fechaHora).format('YYYY-MM-DD');
+        let date2 = x.fechaDespacho == null ? moment().format('YYYY-MM-DD') : moment(x.fechaDespacho).format('YYYY-MM-DD');
+        let initialDate = moment([moment(date1).year(), moment(date1).month() + 1, moment(date1).date()]); 
+        let dateTerm = moment([moment(date2).year(), moment(date2).month() + 1, moment(date2).date()]); 
+        x.dias = dateTerm.diff(initialDate, 'days'); 
+      });
+      setTimeout(() => {
+        this.serchedData.sort((a, b) => Number(b.dias) - Number(a.dias));
+        this.serchedData.sort((a, b) => b.estado.localeCompare(a.estado));
+      }, 500);
       this.load = false;
-    }, error => {
-      this.load = false;
-      this.msg.mensajeError(`¡No se encontró información de ordenes realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
-    });
-    this.searchDataDevolutions(startDate, endDate, route);
+      }, error => {
+        this.load = false;
+        this.msg.mensajeError(`¡No se encontraron ordenes con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
+      });
   }
 
   searchDataDevolutions(startDate: any, endDate: any, route: string){
+    this.load = true;
     this.dtDevolutionsService.GetDevolutions(startDate, endDate, route).subscribe(data => {
       data.forEach(dataDevolution => this.serchedData.push(dataDevolution));
-    }, () => this.load = false);
+      this.serchedData.forEach(x => {
+        let date1 = moment(x.fechaHora).format('YYYY-MM-DD');
+        let date2 = x.fechaDespacho == " " ? moment().format('YYYY-MM-DD') : moment(x.fechaDespacho).format('YYYY-MM-DD');
+        let initialDate = moment([moment(date1).year(), moment(date1).month() + 1, moment(date1).date()]); 
+        let dateTerm = moment([moment(date2).year(), moment(date2).month() + 1, moment(date2).date()]); 
+        x.dias = dateTerm.diff(initialDate, 'days'); 
+      });
+      setTimeout(() => { this.serchedData.sort((a, b) => b.estado.localeCompare(a.estado)); }, 500);
+      this.load = false;
+    }, error => {
+      this.load = false;
+      this.msg.mensajeError(`¡No se encontraron devoluciones con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
+    });
   }
 
   ///Generar
@@ -225,7 +264,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   }
 
   searchClients() {
-    let idClient = this.formFilters.value.idClient;
+    let idClient = this.formFilters.value.clientId;
     this.svZeusInv.getClientByIdThird(idClient).subscribe(data => {
       data.forEach(cli => { this.formFilters.patchValue({ 'clientId': cli.idcliente, 'client': cli.razoncial, }); });
     }, error => this.errorMessage(`¡No se encontró información del cliente consultado!`, error));
@@ -238,7 +277,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   selectClient() {
     let client = this.clients.find(x => x.idcliente == this.formFilters.value.client);
-    this.formFilters.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, });
+    this.formFilters.patchValue({ 'clientId': client.idcliente, 'client': client.razoncial, });
   }
 
   consultarVendedores = () =>  this.svUsuarios.GetVendedores().subscribe(data => { this.sales = data; });
@@ -256,5 +295,135 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     });
   }
 
-  exportExcel(){}
+   validateUrl(){
+    let order: any = this.formFilters.value.orderFact;
+    let clientId: any = this.formFilters.value.clientId;
+    let salesId : any = this.formFilters.value.salesId;
+    let url : string = ``;
+
+    if(order != null) url += `order=${order}`;
+    if(clientId != null) url.length > 0 ? url += `&clientId=${clientId}` : url += `clientId=${clientId}`;
+    if(salesId != null) url.length > 0 ? url += `&salesId=${salesId}` : url += `salesId=${salesId}`;
+
+    if(url.length > 0) url = `?${url}`;
+    return url;
+  }
+
+   //Función que exportará un formato excel con los datos de los clientes
+  exportExcel(){
+    if(this.serchedData.length > 0) {
+      setTimeout(() => { this.loadSheetAndStyles(this.serchedData); }, 500);
+    } else this.msg.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data : any){  
+    let typeMov : string = this.formFilters.value.typeMov;
+    let title : any = `Movimientos de `;  
+    title += typeMov == 'OF' ? `Facturación` : `Devoluciones`
+    title += ` ${moment().format('DD-MM-YYYY')}`;
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5']; 
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:J3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [5].forEach(x => ws.getColumn(x).width = 50);
+    [6].forEach(x => ws.getColumn(x).width = 40);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [3].forEach(x => ws.getColumn(x).width = 10);
+    [2,4,9,10].forEach(x => ws.getColumn(x).width = 15);
+    [7,8].forEach(x => ws.getColumn(x).width = 20);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      'N°',
+      'Documento',
+      'OF Directa',
+      'Factura', 
+      'Cliente',
+      'Asesor', 
+      'Fecha Creación',
+      'Fecha Cierre',
+      'Dias Pendiente',
+      'Estado', 
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J']; 
+    
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.or.id,
+        x.or.of_Directa ? 'Sí' : 'No',
+        x.or.factura,
+        x.clientes.cli_Nombre,
+        x.asesor,
+        x.fechaHora,
+        x.fechaDespacho,
+        x.dias,
+        x.estado,
+      ]);
+    });
+    return info;
+  }
 }

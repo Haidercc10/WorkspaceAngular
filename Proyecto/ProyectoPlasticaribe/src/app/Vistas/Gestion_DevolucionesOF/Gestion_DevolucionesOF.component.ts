@@ -159,7 +159,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
         if([11,29].includes(data[0].dev.estado_Id)) {
           this.load = true;
-          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id, observation).subscribe(() =>{
+          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id, observation).subscribe(() => {
             this.qtyRollsDv = data.length;
             data.forEach(x => {
               this.production.push({  

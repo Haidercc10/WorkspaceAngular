@@ -12,4 +12,7 @@ export interface modelDevolucionProductos {
   DevProdFact_Reposicion : boolean;
   UsuaModifica_Id : number;
   DevProdFact_NotaCredito? : boolean;
+  Asesor_Id?: number;
+  UsuaFinaliza_Id?: number;
+  DevProdFact_Responsable?: string;
 }

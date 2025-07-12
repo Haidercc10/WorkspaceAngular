@@ -285,10 +285,14 @@ export class Orden_FacturacionComponent implements OnInit {
         this.formDataOrder.patchValue({
           idClient: cli.idtercero,
           client: cli.razoncial,
-          salesId: this.products[0].id_vendedor,
+          salesId: parseInt(this.products[0].id_Vendedor),
           sales: this.products[0].vendedor,
         });
       });
+      console.log(parseInt(this.products[0].id_Vendedor));
+      
+      console.log(this.formDataOrder.value.salesId);
+      
       info != null ? this.comparationSaleOrder_Preload(info) : null; //this.clearSomeFields();
     }, error => this.msj.mensajeError(`¡No se encontró información del cliente asociado al pedido!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
@@ -594,6 +598,7 @@ export class Orden_FacturacionComponent implements OnInit {
       'Observacion': !this.formDataOrder.value.observation ? '' : (this.formDataOrder.value.observation).toUpperCase(),
       'Estado_Id': 19, 
       'Of_Directa' : factDirect,
+      'Asesor_Id' : this.formDataOrder.value.salesId ? this.formDataOrder.value.salesId : null,
     }
     this.orderFactService.Post(orderFact).subscribe(data => { 
       !factDirect ? this.saveDetailsOrderFact(data) : this.saveProductsDirects(data.id); 
@@ -614,7 +619,11 @@ export class Orden_FacturacionComponent implements OnInit {
         'Cantidad': production.quantity,
         'Presentacion': production.presentation,
         'Consecutivo_Pedido': (production.saleOrder).toString(),
-        'Estado_Id': 20
+        'Estado_Id': 20,
+        'OT': production.orderProduction,
+        'Peso_Bruto': production.weight,
+        'Peso_Neto': production.netWeight,
+        'Ubicacion': production.ubication ? production.ubication : '',
       }
       this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
         count++;
@@ -732,7 +741,6 @@ export class Orden_FacturacionComponent implements OnInit {
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.tableTotals(data))
     content.push(this.tableProducts(informationProducts));
-
     return content;
   }
 
@@ -820,17 +828,17 @@ export class Orden_FacturacionComponent implements OnInit {
           [
             { text: `Nombre: ${data.clientes.cli_Nombre}` },
             { text: `ID: ${data.clientes.cli_Id}` },
-            { text: `Dirección: ${data.direction}` },
+            { text: `Tel.: ${data.clientes.cli_Telefono}` },
           ],
           [
             { text: `E-mail: ${data.clientes.cli_Email}` },
-            { text: `Tel.: ${data.clientes.cli_Telefono}` },
-            { text: `OF Directa: ${data.order.of_Directa}` },
+            { text: `Ciudad: ${data.city}` },
+            { text: `Dirección: ${data.direction}` },
           ],
           [
-            { text: `Asesor: ${''}`, colSpan: 3 },
-            {},
-            {}
+            { text: `Asesor: ${data.asesor.usua_Nombre}`, },
+            { text: `Tel.: ${data.clientes.cli_Telefono}` },
+            { text: `OF Directa: ${data.order.of_Directa}` },
           ],
           data.datosEnvio != null ? [
             { text: `Conductor: ${data.datosEnvio.conductor}` },
@@ -1566,6 +1574,10 @@ export class Orden_FacturacionComponent implements OnInit {
     if(this.formDataOrder.value.directFact && this.production.filter(x => x.presentation == 'Kg').length > 0 || this.productionSelected.filter(x => x.presentation == 'Kg').length > 0) ofKg = true;
     else if(!this.formDataOrder.value.directFact) ofKg = true;
     return ofKg  
+  }
+
+  loadTableProductsOF(){
+    
   }
 }
 

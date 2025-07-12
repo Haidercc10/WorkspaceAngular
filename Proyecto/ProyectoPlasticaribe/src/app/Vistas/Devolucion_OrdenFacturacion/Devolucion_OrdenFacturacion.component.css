@@ -32,3 +32,7 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
 ::ng-deep .mb-4 {
     margin-bottom: 0.5rem !important;
 }
+
+.azul {
+  background-color: #83D3FF;
+}
