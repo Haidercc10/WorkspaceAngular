@@ -116,6 +116,7 @@ export class DesperdicioComponent implements OnInit {
     else if (this.ValidarRol == 81) this.area = { id :"SELLA", nombre : "Sellado", };
     else if (this.ValidarRol == 82) this.area = { id :"WIKE", nombre : "Wiketiado", };  
     else if (this.ValidarRol == 84) this.area = { id :"RECUP", nombre : "Recuperado", };  
+    else if (this.ValidarRol == 101) this.area = { id :"PERF", nombre : "Perforado", };  
     else this.area = { id : "N/A", nombre : "NO APLICA" };
     
     this.FormDesperdicio.patchValue({ IdArea : this.area.id, Area : this.area.nombre.toUpperCase(), });
@@ -174,7 +175,7 @@ export class DesperdicioComponent implements OnInit {
   } 
 
   //Funcion que va a conultar y obtener todas las areas de la empresa
-  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter(x => [3,4,8,12,7,2,1,9,5,6,10].includes(x.proceso_Codigo)));
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter(x => [3,4,8,12,7,2,1,9,5,6,10,18].includes(x.proceso_Codigo)));
 
   //Función que va a obtener todas las areas
   obtenerAreas = () => this.svcAreas.srvObtenerLista().subscribe(datos => this.areas = datos);
@@ -271,7 +272,7 @@ export class DesperdicioComponent implements OnInit {
     else area = ``;
     
     this.bagProService.GetOtProcesoDesperdicio(ot, ruta).subscribe(data => { 
-      if([74, 75, 76, 77, 78, 79, 80, 81, 82].includes(this.ValidarRol)) {
+      if([74, 75, 76, 77, 78, 79, 80, 81, 82, 101].includes(this.ValidarRol)) {
         this.desperdicios = data.filter(x => x.proceso.includes(`DESP_${area}`));
         this.copiaDesperdicios = this.desperdicios;
       } else {
@@ -295,11 +296,19 @@ export class DesperdicioComponent implements OnInit {
     this.getPuertoSerial();
     this.cargando = true;
     setTimeout(() => {
-      if(!this.FormDesperdicio.valid) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe completar todos los campos!`);
-      else if(this.FormDesperdicio.value.CantidadKg <= 0) this.mensajeService.mensajeAdvertencia(`El peso debe ser mayor a 0!`);
-      else if(this.FormDesperdicio.value.Maquina <= 0) this.mensajeService.mensajeAdvertencia(`La maquina no puede ser 0!`);
-      else if(this.FormDesperdicio.value.IdArea == "N/A") this.mensajeService.mensajeAdvertencia(`Debe elegir una área!`);
-      else {
+      if(!this.FormDesperdicio.valid) {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe completar todos los campos!`);
+        this.cargando = false;
+      } else if(this.FormDesperdicio.value.CantidadKg <= 0) {
+        this.mensajeService.mensajeAdvertencia(`El peso debe ser mayor a 0!`);
+        this.cargando = false;
+      } else if(this.FormDesperdicio.value.Maquina <= 0) {
+        this.mensajeService.mensajeAdvertencia(`La maquina no puede ser 0!`);
+        this.cargando = false;
+      } else if(this.FormDesperdicio.value.IdArea == "N/A") {
+        this.mensajeService.mensajeAdvertencia(`Debe elegir una área!`);
+        this.cargando = false;
+      } else {
         this.cargarTurnoActual();
         this.cargando = true;
         let info : any = {

@@ -155,7 +155,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.reader.releaseLock();
     this.reader.cancel();
     await this.port.close();
-    console.log('Producción')
   }
 
   errorMessage(message: string, error: HttpErrorResponse) {
@@ -201,6 +200,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       79: 'Corte',
       9: 'Empaque',
       80: 'Empaque',
+      101: 'Perforado', 
     };
     if (this.ValidarRol != 1) {
       this.proceso = process[this.ValidarRol];
@@ -210,7 +210,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       this.validateProcess();
     }
     this.obtenerTurnos();
-    //console.log(this.proceso);
   }
 
   //Función que obtiene los puertos seriales
@@ -331,7 +330,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   getProcess() {
     this.processService.srvObtenerLista().subscribe(res => {
-      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP', 'MATPRIMA'].includes(x.proceso_Id)).forEach(process => {
+      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP', 'MATPRIMA', 'PERFORADO',].includes(x.proceso_Id)).forEach(process => {
         this.process.push({
           order: this.sortArrayProcess(process.proceso_Nombre),
           proceso_Id: process.proceso_Id,
@@ -393,6 +392,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           79: 21,
           9: 11,
           80: 11,
+          101 : 36,
         }
         this.operarios = data.filter(x => x.area_Id == validateAreas[this.ValidarRol]);
       }
@@ -432,8 +432,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   validarAnchoCono() {
     let ancho: number = 0;
     let ancho1 = this.formDatosProduccion.get('ancho1').value;
-    //console.log(ancho1);
     let proceso = this.proceso;
+
     if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.formDatosProduccion.value.anchoProducto;
     else if (['Doblado'].includes(proceso)) {
       if (ancho1 == 0) ancho1 = this.formDatosProduccion.value.anchoProducto;
@@ -514,7 +514,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             'rebobinado' : false,
           });
           this.buscarDatosConoSeleccionado();
-          console.log(datos);
           this.claseCantidadRealizada(datos)
         });
       }, error => {
@@ -578,7 +577,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     let tag : any = this.formDatosProduccion.value.etiquetaAsociada;
     this.cargando = true;
     this.getPuertoSerial();
-
+    
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {
@@ -646,8 +645,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   //
   datosProduccion(daipita : any): modelProduccionProcesos {
     let presentation = this.formDatosProduccion.value.presentacion;
-    //let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? 1 : this.formDatosProduccion.value.daipita;
-    //console.log(`datosProduccion: ${daipita}`);    
+    
     if (presentation == 'Kilo') presentation = 'Kg';
     else if (presentation == 'Unidad') presentation = 'Und';
     let datos: modelProduccionProcesos = {
@@ -735,7 +733,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     });
   }
 
-  validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
+  validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'PERF' {
     const processMapping = {
       'EXTRUSION': 'EXT',
       'IMPRESION': 'IMP',
@@ -745,7 +743,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       'CORTE': 'CORTE',
       'EMPAQUE': 'EMP',
       'SELLADO': 'SELLA',
-      'WIKETIADO': 'WIKE'
+      'WIKETIADO': 'WIKE',
+      'PERFORADO' : 'PERF',
     };
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
     return processMapping[proceso] || proceso;
@@ -922,7 +921,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     if (ot && motherProcess) {
       this.cargando = true;
       this.bagproService.GetObtenerDatosxProcesos(ot, this.changeNameProcess(motherProcess)).subscribe(data => {
-        console.log(data);
         if(data) {
           if(data.length > 0) {
              this.modalRolls = true;

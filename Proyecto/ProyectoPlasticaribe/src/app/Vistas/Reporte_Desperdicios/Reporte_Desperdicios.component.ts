@@ -162,10 +162,10 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     const registro : any = {
       OT : datos.ot,
       Item : datos.item,
-      NombreItem : datos.nombreItem,
+      NombreItem : datos.referencia,
       NombreMaterial : datos.material,
       Impreso : datos.impreso,
-      PesoTotal : datos.pesoTotal,
+      PesoTotal : datos.cantidad,
       Presentacion : 'Kg'
     }
     this.arrayConsulta.push(registro);
@@ -190,22 +190,22 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   /** Función para llenar la tabla de modal. */
   llenarModal(datos : any){
     this.dialog = true;
-    this.otSeleccionada = datos.desp_OT;
-
+    this.otSeleccionada = datos.ot;
+    
     const dataCompleta : any = {
-      OT : datos.desp_OT,
-      Item : datos.prod_Id,
-      NombreItem : datos.prod_Nombre,
-      Peso : datos.desp_PesoKg,
-      Cantidad : this.formatonumeros(datos.desp_PesoKg),
+      OT : datos.ot,
+      Item : datos.item,
+      NombreItem : datos.referencia,
+      Peso : datos.cantidad,
+      Cantidad : this.formatonumeros(datos.cantidad),
       Und : 'Kg',
-      Proceso : datos.proceso_Nombre,
-      Material : datos.material_Nombre,
-      "No_Conformidad" : datos.falla_Nombre,
-      Impreso : datos.desp_Impresion,
-      Maquina : datos.actv_Serial,
-      Operario : datos.usua_Nombre,
-      Fecha : datos.desp_Fecha.replace('T00:00:00', ''),
+      Proceso : datos.proceso,
+      Material : datos.material,
+      "No_Conformidad" : datos.falla,
+      Impreso : datos.impreso,
+      Maquina : datos.maquina,
+      Operario : datos.operario,
+      Fecha : datos.fecha_Registro.replace('T00:00:00', ''),
     }
     this.arrayModal.push(dataCompleta);
   }

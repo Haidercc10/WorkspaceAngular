@@ -51,3 +51,9 @@
     background-color: MediumSlateBlue;
     font-size: calc(var(--font-size) * 15px);
 }
+
+.bg-Perforado {
+    color: white;
+    background-color: rgb(48, 156, 54);
+    font-size: calc(var(--font-size) * 15px);
+}

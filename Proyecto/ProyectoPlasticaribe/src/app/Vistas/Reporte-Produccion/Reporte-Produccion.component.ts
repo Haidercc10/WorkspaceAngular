@@ -107,7 +107,8 @@ export class ReporteProduccionComponent implements OnInit {
       if ([63,89,76,77].includes(this.ValidarRol)) this.areasEmpresa = ['ROTOGRABADO', 'LAMINADO'];
       if ([75].includes(this.ValidarRol)) this.areasEmpresa = ['IMPRESION'];
       if ([80].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE'];
-    } else this.areasEmpresa = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA'];
+      if ([101].includes(this.ValidarRol)) this.areasEmpresa = ['PERFORADO'];
+    } else this.areasEmpresa = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado', 'CAMISILLA', 'PERFORADO'];
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
