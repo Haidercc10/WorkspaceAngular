@@ -696,7 +696,7 @@ export class Orden_FacturacionComponent implements OnInit {
     dev = dev.split('-')[0].replace('DV', '');
     console.log(dev);
     
-    this.svHeaderDevolutions.PutStatusDevolution(dev, 39, date, hour, this.storage_Id, '').subscribe(data => {
+    this.svHeaderDevolutions.PutStatusDevolution(dev, 39, date, hour, this.storage_Id, true, false, '').subscribe(data => {
     }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar la devolución`); });
   }
 
@@ -1077,7 +1077,7 @@ export class Orden_FacturacionComponent implements OnInit {
     let index : any = this.productionSelected.findIndex(x => x.numberProduction == data.numberProduction);
     
     this.dtOrderFactService.deleteDetailOF(data.idDetail).subscribe(() => {
-      let infoRoll : any = [{'roll': data.numberProduction, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true }]; 
+      let infoRoll : any = [{'of' : this.formDataOrder.value.order, 'roll': data.numberProduction, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true }]; 
       this.productionProcessService.putChangeStateProduction(infoRoll).subscribe(() => {
         this.msjsOF(`Confirmación`, `Rollo N° ${data.numberProduction} eliminado exitosamente de la orden N° ${this.formDataOrder.value.order}!`);
         this.productionSelected.splice(index, 1);

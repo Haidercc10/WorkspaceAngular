@@ -63,7 +63,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
     this.formDataOrder = this.frmBuilder.group({
       dv : [null,],
-      order : [null, Validators.required],
+      order : [null, ],
       fact: [null, Validators.required],
       idClient: [null, Validators.required],
       client: [null, Validators.required],
@@ -202,10 +202,10 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   searchDevolution(){
     let dv: any = this.formDataOrder.value.dv;
-
+    
     if(dv) {
       this.dtDevService.GetInformationDevById(dv).subscribe(data => {
-        if([11,53,29].includes(data[0].dev.estado_Id)) {
+        if([53].includes(data[0].dev.estado_Id)) {
           this.load = true;
           this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(data[0].dev.id_OrdenFact).subscribe(dataOF => {
             this.isDevolution = true;
@@ -229,8 +229,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
                 });
               }
             })
-          });
-        }  
+          }, error => this.errorMessage(`Error al consultar la devolución N° ${dv}`, error));
+        } else this.msg.mensajeAdvertencia('Advertencia', `La devolución debe estar en estado PRE-DEVUELTO!`);
         },error => { 
           this.errorMessage(`¡Ocurrió un error al buscar la devolución N° ${dv}!`, error)
         });
@@ -431,24 +431,23 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
   }
 
-  saveDetailsFact(data: any) {
+  saveDetailsFact(dato: any) {
     let count: number = 0;
-
     this.productionSelected.filter(z => z.preIn == false).forEach(prod => {
       let info: modelDtProductoDevuelto = {
-        'DevProdFact_Id': data.devProdFact_Id ? data.devProdFact_Id : data,
+        'DevProdFact_Id': dato.devProdFact_Id ? dato.devProdFact_Id : dato,
         'Prod_Id': prod.item,
         'DtDevProdFact_Cantidad': prod.quantity,
         'UndMed_Id': prod.presentation,
         'Rollo_Id': prod.numberProduction,
-        'Falla_Id': prod.fail,
+        'Falla_Id': this.formDataOrder.value.reason,
         'DtDevprodFact_Factura': prod.factura ? prod.factura : null,
         'DtDevprodFact_OT': prod.ot ? prod.ot : null,
         'DtDevprodFact_PesoBruto': prod.weight ? prod.weight : null,
         'DtDevprodFact_PesoNeto': prod.presentation == 'Kg' ? prod.quantity : prod.weight,
         'Of_Id': prod.of ? prod.of : null,
       }
-      this.dtDevService.srvGuardar(info).subscribe(() => {
+      this.dtDevService.srvGuardar(info).subscribe(data => {
         count++;
         if (count == this.productionSelected.filter(z => z.preIn == false).length) this.isDevolution ? this.changeStatus(data, 53, 24) : this.changeStatus(data, 23, 53);
       }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
@@ -456,27 +455,30 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   //Cambiar estado de rollos en la OF.
-  changeStatus(data: any, currentStatus? : number, newStatus? : number) {
-    let order: number = this.formDataOrder.value.order;
+  changeStatus(data: any, currentStatus : number, newStatus : number) {
     let reels: any = [];
+    let reelsOF: any = [];
 
-    this.productionSelected.forEach(x => { reels.push({ 'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true}) });
-    this.dtOrderFactService.PutStatusProduction(reels.map(x => x.roll), order).subscribe(() => {
-      this.updateStatusDev(reels, order);
-      //this.updateStatusProduction(reels, data);
-    }, (error) => this.errorMessage(`Ocurrió un error al cambiar el estado de los rollos en la orden N° ${order}!`, error));
+    this.productionSelected.forEach(x => { 
+      reelsOF.push({'of' : x.of, 'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : x.preIn == false ? 20 : 53, 'newStatus' : newStatus, 'envioZeus' : true}) 
+      reels.push({'of' : x.of, 'roll' : x.numberProduction, 'item' : x.item, 'currentStatus' : x.preIn == false ? 23 : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true}) 
+    });
+    this.dtOrderFactService.putStatusInOF(reelsOF).subscribe(() => {
+      this.updateStatusDev(reels, data);
+    }, (error) => this.errorMessage(`Error al cambiar el estado de los rollos en la(s) orden(es) de facturación!`, error));
   }
 
   //Actualizar encabezado de la devolución
-  updateStatusDev(reels : any, production : any){
-    let dev: any = this.form.value.dev;
+  updateStatusDev(reels : any, data : any){
+    console.log(data, reels);
+    let dev: any = this.formDataOrder.value.dv;
     let date : any = moment().format('YYYY-MM-DD');
     let hour : string = moment().format('HH:mm:ss');
-    let observation : any = this.form.value.observationIn == null ? '' : `?observation=${this.form.value.observationIn}`;
-    let status : number = 11;
+    let observation : any = this.formDataOrder.value.observationIn == null ? '' : `?observation=${this.formDataOrder.value.observationIn}`;
+    let status : number = this.isDevolution ? 11 : 53;
  
-    this.devService.PutStatusDevolution(dev, status, date, hour, this.storage_Id, observation).subscribe(data => {
-      this.updateStatusProduction(reels, production);
+    this.devService.PutStatusDevolution(data.devProdFact_Id, status, date, hour, this.storage_Id, false, false, observation).subscribe(() => {
+      this.updateStatusProduction(reels, data);
     }, error => {
       this.msg.mensajeError(`No fue posible actualizar el estado de la devolución N° ${dev}!`, error);
       this.load = false;
@@ -489,7 +491,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       this.createPDF(data.devProdFact_Id, 'creada');
     }, error => {
       this.errorMessage(`No fue posible actualizar el estado de los rollos devueltos!`, error);
-    })
+    });
   }
 
   
@@ -504,6 +506,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     }, error => this.errorMessage(`¡Ocurrió un error al buscar información de la devolución #${devolution}!`, error));
   }
 
+  //
   contentPDF(data): any[] {
     let content: any[] = [];
     let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
@@ -583,16 +586,16 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           [
             { text: `Pre-ingresa: ${data.usua.usua_Nombre}` },
             { text: `Ingresa: ${data.usua.usua_Modifica == 0 ? '' : data.usua.usua_Modifica}` },
-            { text: `Gestiona: ${[0, null].includes(data.usua.usuaFinaliza_Id) ? '' : data.usua.usuaFinaliza}` },
+            { text: `Gestiona: ${[0, null, undefined].includes(data.usua.usuaGestiona) ? '' : data.usua.usuaGestiona}` },
           ],
           [
             { text: `Fecha pre-ingreso: ${(data.dev.devProdFact_Fecha).replace('T00:00:00','')} ${data.dev.devProdFact_Hora}`, }, 
             { text: `Fecha ingreso: ${data.dev.devProdFact_FechaModificado != null ? (data.dev.devProdFact_FechaModificado).replace('T00:00:00','') : ''} ${data.dev.devProdFact_HoraModificado != null ? data.dev.devProdFact_HoraModificado : ''}`, }, 
-            { text: `Fecha gestión: ${''}`, } 
+            { text: `Fecha gestión: ${data.dev.devProdFact_FechaGestion != null ? (data.dev.devProdFact_FechaGestion).replace('T00:00:00','') : ''} ${data.dev.devProdFact_HoraGestion != null ? data.dev.devProdFact_HoraGestion : ''}`, } 
           ],  
           [
-            { text: `Finalizado por: ${''}`, }, 
-            { text: `Fecha Final.: ${''}`, }, 
+            { text: `Finalizado por: ${data.usua.usuaFinaliza != 0 ? data.usua.usuaFinaliza : '' }`, }, 
+            { text: `Fecha Final.: ${data.dev.devProdFact_FechaFinalizado != null ? (data.dev.devProdFact_FechaFinalizado).replace('T00:00:00','') : ''}`, }, 
             { text: `N° Reposición: ${''}`, }, 
           ], 
           [          
@@ -628,6 +631,9 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
             { text: `E-mail: ${data.cliente.cli_Email}`, },
             { text: `Telefono: ${data.cliente.cli_Telefono}` },
             { text: `Responsable: ${data.dev.devProdFact_Responsable}`},
+          ], 
+          [
+            { text: `Asesor: ${data.asesor.usua_Nombre}`, colSpan : 3},
           ], 
         ]
       },
@@ -720,7 +726,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         widths: ['*'],
         body: [
           [{ border: [true, false, true, false], text: `Observación de ingreso: `, style: 'subtitulo', bold: true }],
-          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionModificado}` }]
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionModificado == null ? '' : data.dev.devProdFact_ObservacionModificado}` }]
         ]
       },
       fontSize: 9,
@@ -733,7 +739,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         widths: ['*'],
         body: [
           [{ border: [true, false, true, false], text: `Observación de revisión: `, style: 'subtitulo', bold: true }],
-          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionGestion == null ? '' : data.dev.devProdFact_ObservacionGestion.toString().trim()}` }]
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionGestion == null ? '' : data.dev.devProdFact_ObservacionGestion}` }]
         ]
       },
       fontSize: 9,
@@ -747,7 +753,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         widths: ['*'],
         body: [
           [{ border: [true, false, true, false], text: `Observación de cierre: `, style: 'subtitulo', bold: true }],
-          [{ border: [true, false, true, true], text: `${''}` }]
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_ObservacionFinal == null ? '' : data.dev.devProdFact_ObservacionFinal }` }]
         ]
       },
       fontSize: 9,

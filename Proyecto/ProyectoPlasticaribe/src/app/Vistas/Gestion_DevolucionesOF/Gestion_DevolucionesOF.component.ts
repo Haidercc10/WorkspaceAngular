@@ -84,7 +84,12 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       reason: [null, Validators.required],
       reposition : [false, Validators.required],
       creditNote : [false, Validators.required],
-      observation: [''], 
+      responsive : [null, Validators.required],
+      observationStart : [null, Validators.required],
+      observationIn : [null, Validators.required],
+      observation : [null, Validators.required],
+      salesId : [null, ],
+      sales : [null, ],
     });
   }
 
@@ -100,7 +105,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
-  getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [19,44,45].includes(x.estado_Id)) } );
+  getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [19,44,45,23].includes(x.estado_Id)) } );
 
   //Función para obtener las fallas técnicas.
   getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [13,14,15].includes(item.tipoFalla_Id)) });
@@ -114,7 +119,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     if (color == 'yellow') this.infoColor = `<b>${'AMARILLO:'}</b> Indica que si la devolución es con <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione para <b>${'REEMPAQUE'}</b>, al momento de <b>${'REINGRESARLOS A DESPACHO'}</b> debe hacerse <b>${'SIN AJUSTE A ZEUS'}</b>
     <br><br> Si la devolución no tiene <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione para <b>${'REEMPAQUE'}</b> quedarán con dicho estado, este cambiará cuando sea(n) <b>${'REEMPACADO(S) y PESADOS NUEVAMENTE EN EL SISTEMA'}</b>. Luego de esto <b>${'DEBE REINGRESARLOS A DESPACHO'}</b> por medio del sistema <b>${'PLASTICARIBE, CON AJUSTE A ZEUS'}</b>.`;
 
-    if (color == 'red') this.infoColor = `<b>${'ROJO:'}</b> Indica que el bulto/rollo definitivamente está en muy mal estado y debe ser enviado a <b>${'PELETIZADO'}</b>`;
+    if (color == 'red') this.infoColor = `<b>${'ROJO:'}</b> Indica que el bulto/rollo definitivamente está en muy mal estado y debe ser enviado a <b>${'PELETIZADO'}</b> ó se puede colocar en estado <b>${'NO DISPONIBLE'}</b> sí la razón es diferente.`;
 
     setTimeout(() => {
       this.op!.toggle($event);
@@ -152,6 +157,8 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let dev: any = this.form.value.dev;
     let date : any = moment().format('YYYY-MM-DD');
     let hour : string = moment().format('HH:mm:ss');
+    let reposition : boolean = [null, undefined, false].includes(this.form.value.reposition) ? false : true;
+    let creditNote : boolean = [null, undefined, false].includes(this.form.value.creditNote) ? false : true;
     let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
     this.qtyRollsDv = 0;
 
@@ -159,7 +166,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
         if([11,29].includes(data[0].dev.estado_Id)) {
           this.load = true;
-          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id, observation).subscribe(() => {
+          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id, reposition, creditNote, observation).subscribe(() => {
             this.qtyRollsDv = data.length;
             data.forEach(x => {
               this.production.push({  
@@ -167,6 +174,10 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
                 'reference': x.prod.prod_Nombre,
                 'numberProduction': x.dtDev.numero_Rollo,
                 'quantity': x.dtDev.cantidad,
+                'weight': x.dtDev.weight == null ? x.weight : x.dtDev.weight,
+                'of': x.dtDev.of == null ? x.dev.id_OrdenFact : x.dtDev.of,
+                'ot': x.dtDev.ot == null ? x.ot : x.dtDev.ot,
+                'fact' : x.dtDev.fact == null ? x.dev.devProdFact_Factura : x.dtDev.fact,
                 'presentation': x.dtDev.presentacion, 
                 'statusId': 23,
                 'statusName': 'NO DISPONIBLE',
@@ -198,6 +209,11 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       'reason' : data.dtDev.falla_Id, 
       'reposition' : data.dev.devProdFact_Reposicion,
       'creditNote' : data.dev.devProdFact_NotaCredito,
+      'observationStart' : data.dev.devProdFact_Observacion, 
+      'observationIn' : data.dev.devProdFact_ObservacionModificado, 
+      'responsive': data.dev.devProdFact_Responsable, 
+      'salesId' : data.dev.asesor_Id,
+      'sales' : data.asesor.usua_Nombre,
     });
   }
 
@@ -324,6 +340,13 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     return total;
   }
 
+  //Función para calcular la cantidad consolidada por bulto.
+  totalWeightByProduct(item: number): number {
+    let total: number = 0;
+    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.weight);
+    return total;
+  }
+
   //Función para contar los bultos consolidados por item.
   totalCountProductionByProduct(item: number): number {
     let total: number = 0;
@@ -346,12 +369,28 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
 
       if(this.productionSelected.length > 0) {
         this.productionSelected.forEach(x => { 
-          rolls.push({'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : creditNote ? true : x.statusId == 19 ? false : true });
+          rolls.push({'of': x.of, 'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : creditNote ? true : x.statusId == 19 ? false : true });
         });
         if(this.qtyRollsDv == this.productionSelected.length) this.updateRollsInOrderFact(rolls); //this.updateRollsInProduction();
         else this.msg.mensajeAdvertencia(`La cantidad de bultos/rollos seleccionados no coincide con la cantidad de bultos de la devolución!`);
       } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar al menos un bulto!`);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe llenar todos los campos!`);
+  }
+
+  //Función para actualizar el estado de los bultos en orden de facturación.
+  updateRollsInOrderFact(rolls){
+    this.load = true;
+    //let order : any = this.form.value.orderFact;
+    rolls.forEach(x => {
+      if(x.newStatus == 19) x.newStatus = 33;
+      else x.newStatus = x.newStatus;
+    });
+    this.dtOrderFactService.putStatusInOF(rolls).subscribe(data => {
+      this.updateRollsInProduction(rolls);
+    }, error => {
+      this.msg.mensajeError('No fue posible actualizar el estado de los bultos en la orden de facturación!', error);
+      this.load = false;
+    });
   }
 
   //Función para actualizar el estado de los bultos en producción procesos.
@@ -370,34 +409,19 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     }
   }
 
-  //Función para actualizar el estado de los bultos en orden de facturación.
-  updateRollsInOrderFact(rolls){
-    this.load = true;
-    let order : any = this.form.value.orderFact;
-    rolls.forEach(x => {
-      if(x.newStatus == 19) x.newStatus = 33;
-      else x.newStatus = x.newStatus;
-    });
-    this.dtOrderFactService.putStatusRollInOrderFact(rolls, order).subscribe(data => {
-      this.updateRollsInProduction(rolls);
-    }, error => {
-      this.msg.mensajeError('No fue posible actualizar el estado de los bultos en la orden de facturación!', error);
-      this.load = false;
-    });
-  }
-
   //Función para actualizar el estado de la devolución.
   updateStatusDev(){
     let dev: any = this.form.value.dev;
     let date : any = moment().format('YYYY-MM-DD');
     let hour : string = moment().format('HH:mm:ss');
     let reposition : boolean = this.form.value.reposition;
+    let creditNote : boolean = this.form.value.creditNote;
     let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
     let status : number;
-    status = this.qtyRollsDv == this.productionSelected.length ? reposition ? 38 : 18 : 29;
+    status = this.qtyRollsDv == this.productionSelected.length ? reposition ? 38 : 54 : 29;
     //this.load = true;
 
-    this.svDevolutions.PutStatusDevolution(dev, status, date, hour, this.storage_Id, observation).subscribe(data => {
+    this.svDevolutions.PutStatusDevolution(dev, status, date, hour, this.storage_Id, reposition, creditNote, observation).subscribe(data => {
       this.createPDF(dev, 'actualizada');
       //this.msg.mensajeConfirmacion('Confirmación', 'Los bultos seleccionados se actualizaron correctamente!');
     }, error => {
@@ -423,5 +447,9 @@ interface production {
   fail? : number;
   statusId? : number;
   statusName? : string;
+  weight? : number;
+  of? : number;
+  ot? : number;
+  fact? : string;
 }
 

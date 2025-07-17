@@ -10,6 +10,7 @@ import { modelReposiciones } from 'src/app/Modelo/modelReposiciones';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { Detalles_ReposicionesService } from 'src/app/Servicios/Detalles_Reposiciones/Detalles_Reposiciones.service';
+import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
@@ -45,6 +46,7 @@ export class ReposicionesComponent implements OnInit {
   rollsSelected : any = {};
   action : string = `Generar`;
   lastRepo : number = null;
+  repositionForDv : boolean = false;
 
   constructor(private AppComponent : AppComponent, 
     private fmBuild : FormBuilder,
@@ -56,6 +58,7 @@ export class ReposicionesComponent implements OnInit {
     private svDtlRepo : Detalles_ReposicionesService,
     private svPDF : CreacionPdfService,  
     private msg : MessageService, 
+    private svDetDevolutions : DetallesDevolucionesProductosService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
@@ -97,7 +100,7 @@ export class ReposicionesComponent implements OnInit {
       client : [null, Validators.required],
       clientStock : [false, ],
       observation : [null, Validators.required], 
-    })
+    });
   }
 
   //* Función para buscar clientes por nombre
@@ -151,11 +154,10 @@ export class ReposicionesComponent implements OnInit {
     this.edition = false;
     this.action = `Generar`;
     let repo : number = !movement ? this.form.value.repo : movement;
-    console.log(repo);
+    
     if(repo) {
       this.load = true;
       this.svDtlRepo.getRepositionId(repo).subscribe(data => {
-        console.log(data);
         if((!movement && data[0].statusId == 5) || data[0].statusId == 3) {
           this.msjs(`Advertencia`, `La reposición N° ${repo} no se encuentra disponible!`);
           this.load = false;
@@ -199,11 +201,15 @@ export class ReposicionesComponent implements OnInit {
   //* Función para cargar los datos del encabezado de la reposición
   loadClient(data : any){
     this.form.patchValue({
-      'client' : data.client,
+      'client' : data.client, 
       'idClient' : data.idClient,
       'observation' : data.observation1,
     });
   }
+
+  loadClientReposition(data : any){
+    this.form.patchValue({ 'client' : data.clientes.cli_Nombre, 'idClient' : data.or.cli_Id, });
+  } 
 
   //* Función para buscar rollo a rollo lo que se le va a reponer al cliente. 
   searchRolls(){
@@ -323,7 +329,7 @@ export class ReposicionesComponent implements OnInit {
   //*
   updateStatusRolls(id : number, bults : any){
     let rolls : Array<any> = [];
-    bults.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 23, 'envioZeus' : true }));    
+    bults.forEach(x => rolls.push({'of' : 0, 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 23, 'envioZeus' : true }));    
     this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => { 
       this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados | ${error.status} ${error.statusText}`); 
     });
@@ -499,6 +505,14 @@ export class ReposicionesComponent implements OnInit {
     });
   }
 
+  getItemsFromDevolution(data : any){
+    this.svDetDevolutions.GetInformationDevById(data.or.id).subscribe(data => {
+      console.log(data);
+    }, error => {
+      console.log(error);
+    });
+  }
+
   onReject(key : any){
     this.load = false;
     this.msg.clear(key);
@@ -507,6 +521,7 @@ export class ReposicionesComponent implements OnInit {
   clearFields(){
     this.form.reset();
     this.load = false;
+    this.repositionForDv = false;
     this.getLastReposition();
   }
 

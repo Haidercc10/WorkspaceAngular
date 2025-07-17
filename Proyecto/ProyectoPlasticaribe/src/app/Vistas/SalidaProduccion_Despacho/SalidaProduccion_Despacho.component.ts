@@ -536,7 +536,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     dev = dev.split('-')[0].replace('DV', '');
     console.log(dev);
     
-    this.svDevolutions.PutStatusDevolution(dev, 18, date, hour, this.storage_Id).subscribe(data => {
+    this.svDevolutions.PutStatusDevolution(dev, 18, date, hour, this.storage_Id, true, false,).subscribe(data => {
     }, error => { this.msj.mensajeError(`Error`, `No fue posible actualizar el estado de la devolución`); });
   }
 

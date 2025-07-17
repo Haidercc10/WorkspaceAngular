@@ -32,6 +32,8 @@ export class Dt_OrdenFacturacionService {
 
     PutStatusProduction = (data: Array<number>, order: number) => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/putStatusProduction/${order}`, data);
 
+    putStatusInOF = (data: Array<any>) => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/putStatusInOF`, data);
+
     putStatusRollInOrderFact = (data: Array<any>, order: number) => this.http.put(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/putStatusRollInOrderFact/${order}`, data);
 
     getProductionSentMonthConsolidate = (year: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getProductionSentMonthConsolidate/${year}`);

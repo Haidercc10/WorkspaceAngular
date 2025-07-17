@@ -261,7 +261,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   //*
   updateStatusRolls(id : number){
     let rolls : Array<any> = [];
-    this.rollsToDispatch.forEach(x => rolls.push({ 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 50, 'envioZeus' : true }));
+    this.rollsToDispatch.forEach(x => rolls.push({'of' : 0, 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 50, 'envioZeus' : true }));
     this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => { 
       this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados`); 
     });

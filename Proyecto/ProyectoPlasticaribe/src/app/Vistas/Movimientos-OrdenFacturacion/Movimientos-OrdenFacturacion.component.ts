@@ -18,6 +18,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import moment from 'moment';
+import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +46,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   modalReposition : boolean = false;
   modalDevolution : boolean = false;
   @ViewChild(Gestion_DevolucionesOFComponent) managementDevolutions : Gestion_DevolucionesOFComponent;
+  @ViewChild(ReposicionesComponent) Repositions : ReposicionesComponent;
   @ViewChild(Orden_FacturacionComponent) Orden_FacturacionComponent : Orden_FacturacionComponent;
   clients: any[] = [];
   sales: any[] = [];
@@ -244,9 +246,11 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   loadModalOrderFact(data : any){
     if(data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
       if([6,1].includes(this.validateRole)) {
-        this.Orden_FacturacionComponent.clearFields(false);
-        this.modalReposition = true;  
-        this.Orden_FacturacionComponent.loadInfoForDevolution(data.or.id); 
+        this.Repositions.clearAll();
+        this.modalReposition = true; 
+        this.Repositions.loadClientReposition(data);
+        this.Repositions.repositionForDv = true;
+        this.Repositions.getItemsFromDevolution(data);
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
     } else if(data.type == 'DV' && [11,29].includes(data.or.estado_Id)) {
       if([5,1].includes(this.validateRole)) {
