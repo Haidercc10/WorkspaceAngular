@@ -86,7 +86,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       creditNote : [false, Validators.required],
       responsive : [null, Validators.required],
       observationStart : [null, Validators.required],
-      observationIn : [null, Validators.required],
+      observationIn : [null ],
       observation : [null, Validators.required],
       salesId : [null, ],
       sales : [null, ],

@@ -19,6 +19,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import moment from 'moment';
 import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
+import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,7 @@ import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   formFilters !: FormGroup;
+  formEndDevolutions !: FormGroup;
   load: boolean = false;
   modoSeleccionado: boolean;
   validateRole: number;
@@ -51,6 +53,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   clients: any[] = [];
   sales: any[] = [];
   typesMovements: any = ['OF', 'DV'];
+  modalEndOrders : boolean = false;
   
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
@@ -65,7 +68,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private svExistProduct : ExistenciasProductosService,
     private svZeusInv : InventarioZeusService,
     private svUsuarios : UsuarioService, 
-    private svExcel : CreacionExcelService
+    private svExcel : CreacionExcelService,
+    private svDevolutions : DevolucionesProductosService,
+    //private ofs : Orden_FacturacionComponent
   ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -79,12 +84,21 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       sales: [null,],
       typeMov: [null, Validators.required],
     });
+
+    this.loadFormEndDevolution();
   }
 
   ngOnInit() {
     this.readStorage();
     this.consultarVendedores();
     this.loadRankDates();
+  }
+
+  loadFormEndDevolution(){
+    this.formEndDevolutions = this.frmBuilder.group({
+      dv : [null, Validators.required],
+      observationFinal: [null, Validators.required],
+    });
   }
 
   //Función para cargar fechas en el rango.
@@ -250,8 +264,10 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
         this.modalReposition = true; 
         this.Repositions.loadClientReposition(data);
         this.Repositions.repositionForDv = true;
-        this.Repositions.getItemsFromDevolution(data);
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
+    } else if(data.type == 'DV' && data.or.reposicion && [39, 54].includes(data.or.estado_Id)) {
+      this.modalEndOrders = true;
+      this.formEndDevolutions.patchValue({ dv : data.or.id });
     } else if(data.type == 'DV' && [11,29].includes(data.or.estado_Id)) {
       if([5,1].includes(this.validateRole)) {
         this.managementDevolutions.clearFields();
@@ -261,6 +277,32 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
         this.managementDevolutions.searchData();
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para gestionar devoluciones.`);
     } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
+  }
+
+  //Limpiar campos del formulario de cierre de devoluciones
+  clearFieldsDV(){
+    this.formEndDevolutions.patchValue({
+      'observationFinal' : null,
+    });
+  }
+
+  //Función para cerrar la devolución.
+  endDevolution(){
+    let dv : number = this.formEndDevolutions.value.dv;
+    let observation : string = this.formEndDevolutions.value.observationFinal;
+    let date : any = moment().format('YYYY-MM-DD');
+    let hour : string = moment().format('HH:mm:ss');
+    this.load = true;
+
+    this.svDevolutions.PutStatusDevolution(dv, 18, date, hour, this.storage_Id, true, false, `?observation=${observation}`).subscribe(data => {
+      this.devolucion_OrdenFacturacionComponent.createPDF(dv, 'cerrada');
+      this.modalDevolution = false;
+      this.formEndDevolutions.reset();
+      this.load = false;
+    }, error => {
+      this.msg.mensajeError('Error', `No fue posible actualizar el estado de la devolución N° ${dv}!`);
+      this.load = false;
+    });  
   }
 
   msjDevolutions(data){

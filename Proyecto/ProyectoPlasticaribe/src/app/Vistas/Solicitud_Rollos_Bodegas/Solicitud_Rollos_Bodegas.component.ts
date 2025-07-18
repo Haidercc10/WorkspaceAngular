@@ -184,7 +184,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       switch (this.ValidarRol) {
         case 95:
             this.bodegasSolicitadas = data.filter(x => ['BGPI', 'CALIDAD'].includes(x.proceso_Id));
-            this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP'].includes(x.proceso_Id));
+            this.bodegasSolicitantes = data.filter(x => ['SELLA', 'IMP', 'ROT', 'DESP', 'PERF'].includes(x.proceso_Id));
             this.bodegasSolicitantes.reverse();
             this.bodegaCalidad = data.filter(x => ['CALIDAD'].includes(x.proceso_Id));
             this.FormConsultarRollos.patchValue({ BodegaSolicitada : 'BGPI' });

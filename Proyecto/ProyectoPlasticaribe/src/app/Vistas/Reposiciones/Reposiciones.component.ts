@@ -1,6 +1,7 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
+import { createPdf } from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
 import { modelDetalles_PrecargueDespacho } from 'src/app/Modelo/modelDetalles_PrecargueDespacho';
@@ -11,6 +12,7 @@ import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.s
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { Detalles_ReposicionesService } from 'src/app/Servicios/Detalles_Reposiciones/Detalles_Reposiciones.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
+import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
@@ -59,6 +61,7 @@ export class ReposicionesComponent implements OnInit {
     private svPDF : CreacionPdfService,  
     private msg : MessageService, 
     private svDetDevolutions : DetallesDevolucionesProductosService,
+    private svDevolutions : DevolucionesProductosService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
@@ -93,6 +96,7 @@ export class ReposicionesComponent implements OnInit {
     this.form = this.fmBuild.group({
       repo : [null],
       roll : [null],
+      dev : [null ],
       //process : [null],
       //item : [null, Validators.required], 
       //reference : [null, Validators.required],
@@ -208,7 +212,7 @@ export class ReposicionesComponent implements OnInit {
   }
 
   loadClientReposition(data : any){
-    this.form.patchValue({ 'client' : data.clientes.cli_Nombre, 'idClient' : data.or.cli_Id, });
+    this.form.patchValue({ 'client' : data.clientes.cli_Nombre, 'idClient' : data.or.cli_Id, 'dev' : data.or.id });
   } 
 
   //* Función para buscar rollo a rollo lo que se le va a reponer al cliente. 
@@ -286,7 +290,7 @@ export class ReposicionesComponent implements OnInit {
   applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   //*
-  saveReposition(){
+  saveReposition(dev? : number){
     if(this.rollsToDispatch.length > 0) {
       this.load = true;
       let info : modelReposiciones = {
@@ -301,7 +305,7 @@ export class ReposicionesComponent implements OnInit {
         Usua_Salida: this.storage_Id,
         Rep_ObservacionSalida: '',
       };
-      this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id); }, error => { 
+      this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id, dev); }, error => { 
         this.msjs(`Error`, `Error guardando el encabezado de la reposición | ${error.status} ${error.statusText}`); 
         this.load = false;
       });
@@ -309,7 +313,7 @@ export class ReposicionesComponent implements OnInit {
   }
 
   //*
-  saveDetailsReposition(id : number){
+  saveDetailsReposition(id : number, devId? : number){
     let count : number = 0;
     this.rollsToDispatch.forEach(x => {
       let info : modelDetalles_Reposiciones = {
@@ -321,22 +325,39 @@ export class ReposicionesComponent implements OnInit {
       }
       this.svDtlRepo.Post(info).subscribe(data => {
         count += 1;
-        if(count == this.rollsToDispatch.length) this.updateStatusRolls(id, this.rollsToDispatch);
+        if(count == this.rollsToDispatch.length) this.updateStatusRolls(id, this.rollsToDispatch, devId);
       });
     });
   }
 
+  updateStatusDev(dev : number, repo : number){
+    let status : number = 39;
+    let date : any = moment().format('YYYY-MM-DD');
+    let hour : string = moment().format('HH:mm:ss');
+
+    this.svDevolutions.PutStatusDevolution(dev, status, date, hour, this.storage_Id, true, false, '').subscribe(data => {
+      this.createPDF(repo, 'actualizada');
+    }, error => {
+      this.msjs('Error', `No fue posible actualizar el estado de la devolución N° ${dev}!`);
+      this.load = false;
+    });
+  }
+
   //*
-  updateStatusRolls(id : number, bults : any){
+  updateStatusRolls(repo : number, bults : any, dev? : any){
     let rolls : Array<any> = [];
     bults.forEach(x => rolls.push({'of' : 0, 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 23, 'envioZeus' : true }));    
-    this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => { 
+    this.svProduction.putChangeStateProduction(rolls).subscribe(data => { 
+      dev ? this.updateStatusDev(dev, repo) : this.createPDF(repo, `creada`);
+     }, error => { 
       this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados | ${error.status} ${error.statusText}`); 
     });
   }
 
   sendAdjustmentZeus() {
     let counter : number = 0;
+    let dev : number = this.form.value.dev;
+
     if (this.rollsConsolidate.length > 0) {
       this.load = true;
       this.rollsConsolidate.forEach(data => {
@@ -356,7 +377,7 @@ export class ReposicionesComponent implements OnInit {
             this.svProduction.sendProductionToZeus(detail, item, unity, 0, (-(qty)).toString(), price).subscribe(dataAdjusment => {
               if(dataAdjusment.body.includes('<code>SUCESS</code>')) {
                 counter++;
-                if(counter == this.rollsConsolidate.length) this.saveReposition();
+                if(counter == this.rollsConsolidate.length) this.saveReposition(dev);
               }
             }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus | ${error.status} ${error.statusText }`); })
           }  

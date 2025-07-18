@@ -213,3 +213,34 @@
 <p-dialog header="Gestión de devoluciones de facturación" [(visible)]="modalDevolution" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
   <app-Gestion_DevolucionesOF></app-Gestion_DevolucionesOF>
 </p-dialog>
+
+<!--Modal para finalizar ordenes -->
+<p-dialog header="Finalizar devolución" [(visible)]="modalEndOrders" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
+  <form [formGroup]="formEndDevolutions" (ngSubmit)="endDevolution()">
+
+    <div class="row g-3 my-4 justify-content-md-center">
+      <!--* Devolución -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <input pInputText formControlName="dv" inputId="dv" autocomplete="off" type="number" readonly/>
+          <label for="dv">N° DV</label>
+        </span>
+      </div>
+
+      <!--* Observación -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-10 col-xl-10 col-xxl-10">
+        <span class="p-float-label">
+          <textarea formControlName="observationFinal" [rows]="1" inputId="observationFinal" required pInputTextarea></textarea>
+          <label for="observationFinal">Observación</label>
+        </span>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
+          <button pButton class="p-button-danger" type="submit" label="Cerrar Devolución" icon="pi pi-check" [disabled]="!formEndDevolutions.valid"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFieldsDV()"></button>
+        </div>
+      </div>
+    </div>
+  </form>
+</p-dialog>
