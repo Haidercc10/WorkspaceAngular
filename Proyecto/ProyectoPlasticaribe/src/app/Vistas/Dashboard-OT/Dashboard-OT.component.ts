@@ -241,17 +241,20 @@ export class DashboardOTComponent implements OnInit {
       case 'CAMISILLA':
         orden = 5;
         break;  
-      case 'ROTOGRABADO':
+      case 'PERFORADO':
         orden = 6;
-        break;
-      case 'LAMINADO':
+        break;  
+      case 'ROTOGRABADO':
         orden = 7;
         break;
-      case 'WIKETIADO':
+      case 'LAMINADO':
         orden = 8;
         break;
-      case 'DOBLADO':
+      case 'WIKETIADO':
         orden = 9;
+        break;
+      case 'DOBLADO':
+        orden = 10;
         break;  
       default:
         break;

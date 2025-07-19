@@ -31,6 +31,7 @@ export class Dashboard_AreasComponent implements OnInit {
   graficaSelladoProducido : any; //Variable que va a almacenar lo producido por el area de sellado
   graficaWiketiadoProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
   graficaCamisillasProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
+  graficaPerforadoProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
   aniosGraficados : number [] = []; //Variable que va a almacenar los años que se han graficado
 
   totalAnios_Extrusion : any [] = []; 
@@ -43,6 +44,7 @@ export class Dashboard_AreasComponent implements OnInit {
   totalAnios_Sellado : any [] = [];
   totalAnios_Wiketiado : any [] = [];
   totalAnios_Camisillas : any [] = [];
+  totalAnios_Perforado : any [] = [];
 
   constructor(private shepherdService: ShepherdService,
                 private paginaPrincial : PaginaPrincipalComponent,
@@ -129,6 +131,7 @@ export class Dashboard_AreasComponent implements OnInit {
     this.graficaSelladoProducido = this.formatoGraficas();
     this.graficaWiketiadoProducido = this.formatoGraficas();
     this.graficaCamisillasProducido = this.formatoGraficas();
+    this.graficaPerforadoProducido = this.formatoGraficas();
   }
 
   // Funcion que colocará el formato que debe tener la tabla y la cantidad de puntos que tendrá
@@ -151,6 +154,8 @@ export class Dashboard_AreasComponent implements OnInit {
   consultarInformacion(){
     this.cargando = true;
     this.bagProService.GetProduccionAreas(this.anioSeleccionado).subscribe(datos => {
+      console.log(datos);
+      
       this.aniosGraficados.push(this.anioSeleccionado);
       let proceso : string [] = [], count : number = 0;
       datos.forEach(prod => !proceso.includes(prod.area) ? proceso.push(prod.area) : null);
@@ -184,6 +189,8 @@ export class Dashboard_AreasComponent implements OnInit {
 
   // Funcion que se encargará de llenar las graficas
   llenarGraficas(data : any [], area : string){
+    console.log(area);
+    
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info = {
       label: `${area != null ? area.replace('_', '. ') : area} - ${this.anioSeleccionado}`,
@@ -207,6 +214,7 @@ export class Dashboard_AreasComponent implements OnInit {
     else if (['SELLADO', 'DESP_SELLADO'].includes(area)) this.graficaSelladoProducido.datasets.push(info);
     else if (['CAMISILLA'].includes(area)) this.graficaCamisillasProducido.datasets.push(info);
     else if (['Wiketiado'].includes(area)) this.graficaWiketiadoProducido.datasets.push(info);
+    else if (['PERFORADO', 'DESP_PERFORADO'].includes(area)) this.graficaPerforadoProducido.datasets.push(info);
   }
 
   // Funcion que va a colocar los totales de producción de cada area en cada año
@@ -221,6 +229,7 @@ export class Dashboard_AreasComponent implements OnInit {
     this.totalAnios_Sellado = [];
     this.totalAnios_Wiketiado = [];
     this.totalAnios_Camisillas = [];
+    this.totalAnios_Perforado = [];
     this.aniosGraficados.forEach(anio => {
       this.totalAnios_Extrusion.push(this.formatoTotales(this.graficaExtrusionProducido, anio));
       this.totalAnios_Impresion.push(this.formatoTotales(this.graficaImpresionProducido, anio));
@@ -232,6 +241,7 @@ export class Dashboard_AreasComponent implements OnInit {
       this.totalAnios_Sellado.push(this.formatoTotales(this.graficaSelladoProducido, anio));
       this.totalAnios_Wiketiado.push(this.formatoTotales(this.graficaWiketiadoProducido, anio));
       this.totalAnios_Camisillas.push(this.formatoTotales(this.graficaCamisillasProducido, anio));
+      this.totalAnios_Perforado.push(this.formatoTotales(this.graficaPerforadoProducido, anio));
     });
   }
 
