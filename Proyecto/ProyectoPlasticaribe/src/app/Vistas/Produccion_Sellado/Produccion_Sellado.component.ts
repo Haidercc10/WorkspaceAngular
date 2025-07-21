@@ -178,7 +178,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función para obtener los procesos.
   getProcess() {
     this.svProcess.srvObtenerLista().subscribe(res => {
-      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP', 'MATPRIMA'].includes(x.proceso_Id)).forEach(process => {
+      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP', 'MATPRIMA', 'PERF'].includes(x.proceso_Id)).forEach(process => {
         this.process.push({
           order: this.sortArrayProcess(process.proceso_Nombre),
           proceso_Id: process.proceso_Id,
