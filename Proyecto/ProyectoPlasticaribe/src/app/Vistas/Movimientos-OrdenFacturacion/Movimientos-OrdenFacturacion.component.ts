@@ -21,15 +21,13 @@ import moment from 'moment';
 import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 
-@Injectable({
-  providedIn: 'root'
-})
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
   templateUrl: './Movimientos-OrdenFacturacion.component.html',
   styleUrls: ['./Movimientos-OrdenFacturacion.component.css']
 })
+
 export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   formFilters !: FormGroup;
@@ -47,9 +45,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   detailsOF : number = 0;
   modalReposition : boolean = false;
   modalDevolution : boolean = false;
-  @ViewChild(Gestion_DevolucionesOFComponent) managementDevolutions : Gestion_DevolucionesOFComponent;
-  @ViewChild(ReposicionesComponent) Repositions : ReposicionesComponent;
-  @ViewChild(Orden_FacturacionComponent) Orden_FacturacionComponent : Orden_FacturacionComponent;
+  //@ViewChild(Gestion_DevolucionesOFComponent) managementDevolutions : Gestion_DevolucionesOFComponent;
+  //@ViewChild(ReposicionesComponent) Repositions : ReposicionesComponent;
+ 
   clients: any[] = [];
   sales: any[] = [];
   typesMovements: any = ['OF', 'DV'];
@@ -59,18 +57,19 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private frmBuilder : FormBuilder,
     private dtOrderFactService : Dt_OrdenFacturacionService,
     private msg : MensajesAplicacionService,
-    private devolucion_OrdenFacturacionComponent : Devolucion_OrdenFacturacionComponent,
+    
     private dtDevolutionsService : DetallesDevolucionesProductosService,
     private orderFactService: OrdenFacturacionService,
     private messageService: MessageService,
     private productionProcessService : Produccion_ProcesosService,
-    private cmpOrdFact : OrdenFacturacion_PalletsComponent, 
+    //private cmpOrdFact : OrdenFacturacion_PalletsComponent, 
     private svExistProduct : ExistenciasProductosService,
     private svZeusInv : InventarioZeusService,
     private svUsuarios : UsuarioService, 
     private svExcel : CreacionExcelService,
     private svDevolutions : DevolucionesProductosService,
-    //private ofs : Orden_FacturacionComponent
+    private cmpOrden_Facturacion : Orden_FacturacionComponent, 
+    private cmpDevolutions : Devolucion_OrdenFacturacionComponent,
   ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -185,11 +184,11 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       //this.dtOrderFactService.GetInformacionOrderFact(id).subscribe(data => {
         //let pallet : boolean = data.some(x => x.dtOrder.pallet_Id != null);
         //console.log(pallet, ofDirect);
-        /*!pallet ?*/ ofDirect ? this.Orden_FacturacionComponent.createPDFFactDirect(id, fact) : this.Orden_FacturacionComponent.createPDF(id, fact) /*: this.cmpOrdFact.createPDF(id, fact)*/;
+        /*!pallet ?*/ ofDirect ? this.cmpOrden_Facturacion.createPDFFactDirect(id, fact) : this.cmpOrden_Facturacion.createPDF(id, fact) /*: this.cmpOrdFact.createPDF(id, fact)*/;
       //}, error => {
         //this.msg.mensajeError(`Error`, `Error al consultar la OF N° ${id} | ${error.status} ${error.statusText}`);
       //});
-    } else if (type == 'DV') this.devolucion_OrdenFacturacionComponent.createPDF(id, 'exportada');
+    } else if (type == 'DV') this.cmpDevolutions.createPDF(id, 'exportada');
     setTimeout(() => this.load = false, 3000);
   }
 
@@ -260,21 +259,21 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   loadModalOrderFact(data : any){
     if(data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
       if([6,1].includes(this.validateRole)) {
-        this.Repositions.clearAll();
+        //this.Repositions.clearAll();
         this.modalReposition = true; 
-        this.Repositions.loadClientReposition(data);
-        this.Repositions.repositionForDv = true;
+        //this.Repositions.loadClientReposition(data);
+       // this.Repositions.repositionForDv = true;
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
     } else if(data.type == 'DV' && data.or.reposicion && [39, 54].includes(data.or.estado_Id)) {
       this.modalEndOrders = true;
       this.formEndDevolutions.patchValue({ dv : data.or.id });
     } else if(data.type == 'DV' && [11,29].includes(data.or.estado_Id)) {
       if([5,1].includes(this.validateRole)) {
-        this.managementDevolutions.clearFields();
-        this.managementDevolutions.devolution = true;
+        //this.managementDevolutions.clearFields();
+        //this.managementDevolutions.devolution = true;
         this.modalDevolution = true;
-        this.managementDevolutions.form.patchValue({ dev : data.or.id, }); 
-        this.managementDevolutions.searchData();
+        //this.managementDevolutions.form.patchValue({ dev : data.or.id, }); 
+        //this.managementDevolutions.searchData();
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para gestionar devoluciones.`);
     } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
   }
@@ -295,7 +294,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.load = true;
 
     this.svDevolutions.PutStatusDevolution(dv, 18, date, hour, this.storage_Id, true, false, `?observation=${observation}`).subscribe(data => {
-      this.devolucion_OrdenFacturacionComponent.createPDF(dv, 'cerrada');
+      this.cmpDevolutions.createPDF(dv, 'cerrada');
       this.modalDevolution = false;
       this.formEndDevolutions.reset();
       this.load = false;

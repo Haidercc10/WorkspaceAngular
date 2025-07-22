@@ -29,14 +29,14 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
 import { modelFacturacion_Productos } from 'src/app/Modelo/Facturacion_Productos';
 
+@Injectable({
+  providedIn: 'root'
+})
+
 @Component({
   selector: 'app-Orden_Facturacion',
   templateUrl: './Orden_Facturacion.component.html',
   styleUrls: ['./Orden_Facturacion.component.css'],
-})
-
-@Injectable({
-  providedIn: 'root'
 })
 
 export class Orden_FacturacionComponent implements OnInit {
@@ -89,7 +89,7 @@ export class Orden_FacturacionComponent implements OnInit {
     private svMsg : MessageService,
     private svDevolutions : DetallesDevolucionesProductosService,
     private svHeaderDevolutions : DevolucionesProductosService,
-    private movOrderFact : MovimientosOrdenFacturacionComponent,
+    //private movOrderFact : MovimientosOrdenFacturacionComponent,
     private svDtlPreload : Detalles_PrecargueDespachoService,
     private svPreload : Precargue_DespachoService, 
     private svStock : ExistenciasProductosService,
@@ -148,12 +148,12 @@ export class Orden_FacturacionComponent implements OnInit {
     this.rollSelected = {};
     this.editOrderFact = false;
     this.selectedProductSaleOrder = null;
-    if(this.reposition) {
+    /*if(this.reposition) {
       this.movOrderFact.searchData();
       this.movOrderFact.modalReposition = false;
-    }
+    }*/
     this.reposition = false;
-    this.movOrderFact.modalReposition = false;
+    //this.movOrderFact.modalReposition = false;
     !edit ? this.getLastOrderFact() : null;
     this.preloadDispatch = false;
   }

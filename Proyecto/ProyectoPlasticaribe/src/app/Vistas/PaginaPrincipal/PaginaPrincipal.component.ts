@@ -36,7 +36,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     if ([61,12,85,97,10].includes(this.ValidarRol)) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
     if ([1,12,94,85,98].includes(this.ValidarRol)) this.inventarioAreas = true;
-    if ([6,12,96,97,10].includes(this.ValidarRol)) this.facturacion = true;
+    if ([6,12,96,10].includes(this.ValidarRol)) this.facturacion = true;
   }
 
   ngOnDestroy(): void {
@@ -78,8 +78,8 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 9 ? this.compras = true : this.compras = false;
     index == 10 ? this.inventarioAreas = true : this.inventarioAreas = false;
     //index == 1 && this.ValidarRol == 12 ? this.facturacion = true : null;
-    index == 0 && [12,96,97,10].includes(this.ValidarRol) ? this.facturacion = true : null;
-    index == 1 && [12,96,97,2,10].includes(this.ValidarRol) ? this.pedidos = true : null;
+    index == 0 && [12,96,10].includes(this.ValidarRol) ? this.facturacion = true : null;
+    index == 1 && [12,96,2,10].includes(this.ValidarRol) ? this.pedidos = true : null;
     //index == 2 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
     //index == 3 && this.ValidarRol == 12 ? this.pedidos = true : null;
     index == 0 && [94,2].includes(this.ValidarRol) ? this.ordenTrabajo = true : null;

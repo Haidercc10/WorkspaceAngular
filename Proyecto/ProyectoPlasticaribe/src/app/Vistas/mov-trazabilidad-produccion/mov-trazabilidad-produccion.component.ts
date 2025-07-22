@@ -99,7 +99,7 @@ export class MovTrazabilidadProduccionComponent {
   }
 
   ///Obtener procesos especificos.
-  getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [9,1,2,7,3,4,15].includes(x.proceso_Codigo)), error => this.msg.mensajeError(error));
+  getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [9,1,2,7,3,4,15,18].includes(x.proceso_Codigo)), error => this.msg.mensajeError(error));
 
   // Buscar producto en el campo 
   searchProduct() {

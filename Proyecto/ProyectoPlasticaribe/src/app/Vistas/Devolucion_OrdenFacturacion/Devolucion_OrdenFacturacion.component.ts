@@ -497,7 +497,11 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   
   //Generación de formato PDF
   createPDF(devolution: any, action? : string) {
+    console.log(devolution);
+    
     this.dtDevService.GetInformationDevById(devolution).subscribe(data => {
+      console.log(data);
+      
       let title: string = `Devolución N° ${devolution}`;
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
@@ -508,6 +512,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   //
   contentPDF(data): any[] {
+    console.log(data);
     let content: any[] = [];
     let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
     let informationProducts: Array<any> = this.getInformationProducts(data);
@@ -564,9 +569,11 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         "Cantidad": this.formatNumbers((prod.dtDev.cantidad).toFixed(2)),
         "Und": prod.dtDev.presentacion,
         "Peso": this.formatNumbers((prod.weight ? prod.weight : 0).toFixed(2)),
-        "Estado" : prod.estadoOF,
+        "Estado" : '',
       });
     });
+    console.log('info' , informationProducts);
+    
     return informationProducts;
   }
 
