@@ -212,6 +212,7 @@ export class ReposicionesComponent implements OnInit {
   }
 
   loadClientReposition(data : any){
+    console.log(data);
     this.form.patchValue({ 'client' : data.clientes.cli_Nombre, 'idClient' : data.or.cli_Id, 'dev' : data.or.id });
   } 
 

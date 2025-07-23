@@ -61,7 +61,6 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     private svFails : FallasTecnicasService,
     private svProduction : Produccion_ProcesosService,
     private cmpDevolutions : Devolucion_OrdenFacturacionComponent, 
-    private movOF : MovimientosOrdenFacturacionComponent,
     private svStatus : EstadosService,
   ) {
       this.modoSeleccionado = appComponent.temaSeleccionado;
@@ -136,10 +135,10 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.consolidatedProduction = [];
     this.status = null;
     this.qtyRollsDv = 0;
-    if(this.devolution == true) {
+    /*if(this.devolution == true) {
       this.movOF.modalDevolution = false;
       this.movOF.searchData();
-    }
+    }*/
     this.devolution = false; 
   }
 

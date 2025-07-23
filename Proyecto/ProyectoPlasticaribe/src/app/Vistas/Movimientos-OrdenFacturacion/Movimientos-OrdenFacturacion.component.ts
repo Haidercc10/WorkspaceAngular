@@ -21,12 +21,15 @@ import moment from 'moment';
 import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 
-
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
   templateUrl: './Movimientos-OrdenFacturacion.component.html',
   styleUrls: ['./Movimientos-OrdenFacturacion.component.css']
 })
+
+@Injectable({
+  providedIn: 'root'
+}) 
 
 export class MovimientosOrdenFacturacionComponent implements OnInit {
 
@@ -70,6 +73,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private svDevolutions : DevolucionesProductosService,
     private cmpOrden_Facturacion : Orden_FacturacionComponent, 
     private cmpDevolutions : Devolucion_OrdenFacturacionComponent,
+    private managementDevolutions : Gestion_DevolucionesOFComponent,
+    private Repositions : ReposicionesComponent,
   ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -259,21 +264,22 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   loadModalOrderFact(data : any){
     if(data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
       if([6,1].includes(this.validateRole)) {
-        //this.Repositions.clearAll();
+        console.log(data);
+        this.Repositions.clearAll();
         this.modalReposition = true; 
-        //this.Repositions.loadClientReposition(data);
-       // this.Repositions.repositionForDv = true;
+        this.Repositions.loadClientReposition(data);
+        this.Repositions.repositionForDv = true;
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
     } else if(data.type == 'DV' && data.or.reposicion && [39, 54].includes(data.or.estado_Id)) {
       this.modalEndOrders = true;
       this.formEndDevolutions.patchValue({ dv : data.or.id });
     } else if(data.type == 'DV' && [11,29].includes(data.or.estado_Id)) {
       if([5,1].includes(this.validateRole)) {
-        //this.managementDevolutions.clearFields();
-        //this.managementDevolutions.devolution = true;
+        this.managementDevolutions.clearFields();
+        this.managementDevolutions.devolution = true;
         this.modalDevolution = true;
-        //this.managementDevolutions.form.patchValue({ dev : data.or.id, }); 
-        //this.managementDevolutions.searchData();
+        this.managementDevolutions.form.patchValue({ dev : data.or.id, }); 
+        this.managementDevolutions.searchData();
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para gestionar devoluciones.`);
     } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
   }

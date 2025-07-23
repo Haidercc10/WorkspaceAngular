@@ -221,7 +221,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
                 'presentation': x.dtOrder.presentacion, 
                 'fail' : data[0].dev.falla_Id,
                 'quantity2' : x.dtOrder.cantidad,
-                'of' : x.order.id, 
+                'of' : x.dtOrder.id_OrdenFacturacion, 
                 'factura': x.order.factura,
                 'ot': x.orderProduction,
                 'weight' : x.weight ? x.weight : 0,
@@ -273,7 +273,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         'presentation': x.dtDev.presentacion, 
         'fail' : data[0].dev.falla_Id,
         'quantity2' : x.dtDev.cantidad,
-        'of' : x.dev.id_OrdenFact ? x.dev.id_OrdenFact : null, 
+        'of' : x.dtDev.of ? x.dtDev.of : x.dev.id_OrdenFact, 
         'factura': x.dev.facturaVta_Id ? x.dev.facturaVta_Id : null,
         'ot': x.ot ? x.ot : null,
         'weight' : x.weight ? x.weight : 0,
@@ -433,25 +433,34 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   saveDetailsFact(dato: any) {
     let count: number = 0;
-    this.productionSelected.filter(z => z.preIn == false).forEach(prod => {
-      let info: modelDtProductoDevuelto = {
-        'DevProdFact_Id': dato.devProdFact_Id ? dato.devProdFact_Id : dato,
-        'Prod_Id': prod.item,
-        'DtDevProdFact_Cantidad': prod.quantity,
-        'UndMed_Id': prod.presentation,
-        'Rollo_Id': prod.numberProduction,
-        'Falla_Id': this.formDataOrder.value.reason,
-        'DtDevprodFact_Factura': prod.factura ? prod.factura : null,
-        'DtDevprodFact_OT': prod.ot ? prod.ot : null,
-        'DtDevprodFact_PesoBruto': prod.weight ? prod.weight : null,
-        'DtDevprodFact_PesoNeto': prod.presentation == 'Kg' ? prod.quantity : prod.weight,
-        'Of_Id': prod.of ? prod.of : null,
-      }
-      this.dtDevService.srvGuardar(info).subscribe(data => {
-        count++;
-        if (count == this.productionSelected.filter(z => z.preIn == false).length) this.isDevolution ? this.changeStatus(data, 53, 24) : this.changeStatus(data, 23, 53);
-      }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
-    });
+    let qtyRecords : number = this.productionSelected.filter(z => z.preIn == false).length;
+
+    if(qtyRecords > 0) {
+        this.productionSelected.filter(z => z.preIn == false).forEach(prod => {
+        let info: modelDtProductoDevuelto = {
+          'DevProdFact_Id': dato.devProdFact_Id ? dato.devProdFact_Id : dato,
+          'Prod_Id': prod.item,
+          'DtDevProdFact_Cantidad': prod.quantity,
+          'UndMed_Id': prod.presentation,
+          'Rollo_Id': prod.numberProduction,
+          'Falla_Id': this.formDataOrder.value.reason,
+          'DtDevprodFact_Factura': prod.factura ? prod.factura : null,
+          'DtDevprodFact_OT': prod.ot ? prod.ot : null,
+          'DtDevprodFact_PesoBruto': prod.weight ? prod.weight : null,
+          'DtDevprodFact_PesoNeto': prod.presentation == 'Kg' ? prod.quantity : prod.weight,
+          'Of_Id': prod.of ? prod.of : null,
+        }
+        this.dtDevService.srvGuardar(info).subscribe(data => {
+          count++;
+          
+          if (count == this.productionSelected.filter(z => z.preIn == false).length) this.isDevolution ? this.changeStatus(data, 53, 24) : this.changeStatus(data, 23, 53);
+        
+        }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
+      });
+    } else {
+      if(this.isDevolution) this.changeStatus(dato, 53, 24)
+      else this.changeStatus(dato, 23, 53);
+    }
   }
 
   //Cambiar estado de rollos en la OF.
@@ -470,14 +479,14 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   //Actualizar encabezado de la devolución
   updateStatusDev(reels : any, data : any){
-    console.log(data, reels);
     let dev: any = this.formDataOrder.value.dv;
     let date : any = moment().format('YYYY-MM-DD');
     let hour : string = moment().format('HH:mm:ss');
     let observation : any = this.formDataOrder.value.observationIn == null ? '' : `?observation=${this.formDataOrder.value.observationIn}`;
     let status : number = this.isDevolution ? 11 : 53;
+    
  
-    this.devService.PutStatusDevolution(data.devProdFact_Id, status, date, hour, this.storage_Id, false, false, observation).subscribe(() => {
+    this.devService.PutStatusDevolution(data, status, date, hour, this.storage_Id, false, false, observation).subscribe(() => {
       this.updateStatusProduction(reels, data);
     }, error => {
       this.msg.mensajeError(`No fue posible actualizar el estado de la devolución N° ${dev}!`, error);
@@ -488,13 +497,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   //Cambiar estado de rollos en tabla de producción.
   updateStatusProduction(rolls : any, data : any){
     this.svProduction.putChangeStateProduction(rolls).subscribe(dataChange => {
-      this.createPDF(data.devProdFact_Id, 'creada');
+      this.createPDF(data, 'creada');
     }, error => {
       this.errorMessage(`No fue posible actualizar el estado de los rollos devueltos!`, error);
     });
   }
 
-  
   //Generación de formato PDF
   createPDF(devolution: any, action? : string) {
     console.log(devolution);
@@ -569,7 +577,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         "Cantidad": this.formatNumbers((prod.dtDev.cantidad).toFixed(2)),
         "Und": prod.dtDev.presentacion,
         "Peso": this.formatNumbers((prod.weight ? prod.weight : 0).toFixed(2)),
-        "Estado" : '',
+        "Estado" : data[data.length - 1].estadoOF,
       });
     });
     console.log('info' , informationProducts);
