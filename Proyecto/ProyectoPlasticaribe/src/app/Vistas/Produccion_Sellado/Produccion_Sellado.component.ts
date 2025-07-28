@@ -334,7 +334,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.svcUsuarios.getUsuariosxId(user).subscribe(data => {
       if(data) {
         if(data[0].usua_Contrasena == pass) { 
-          if([97,96,86,8,94,1,5,12,10].includes(data[0].rolUsu_Id)) this.msjAuthorized();
+          if([97,96,86,8,1,5,12,10].includes(data[0].rolUsu_Id)) this.msjAuthorized();
           else this.msjNoAuthorized();
         } else this.svcMsjs.mensajeError('Error', `Usuario y/o contraseña incorrectos`);
       } else this.msjNoAuthorized();
@@ -720,6 +720,8 @@ export class Produccion_SelladoComponent implements OnInit {
         return 'ROTOGRABADO';
       case 'MATPRIMA' :
         return 'MATPRIMA';
+      case 'PERF' :
+      return 'PERFORADO';
       default :
         return ''; 
     }
@@ -745,7 +747,9 @@ export class Produccion_SelladoComponent implements OnInit {
       case 'ROTOGRABADO' :
         return 'ROT';
       case 'MATPRIMA' :
-          return 'MATPRIMA';  
+          return 'MATPRIMA';
+      case 'PERFORADO' :
+          return 'PERF';      
       default :
         return ''; 
     }
