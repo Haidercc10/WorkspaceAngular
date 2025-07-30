@@ -270,7 +270,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
         this.Repositions.loadClientReposition(data);
         this.Repositions.repositionForDv = true;
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
-    } else if(data.type == 'DV' && data.or.reposicion && [39, 54].includes(data.or.estado_Id)) {
+    } else if(data.type == 'DV' && [39, 54].includes(data.or.estado_Id)) {
       this.modalEndOrders = true;
       this.formEndDevolutions.patchValue({ dv : data.or.id });
     } else if(data.type == 'DV' && [11,29].includes(data.or.estado_Id)) {

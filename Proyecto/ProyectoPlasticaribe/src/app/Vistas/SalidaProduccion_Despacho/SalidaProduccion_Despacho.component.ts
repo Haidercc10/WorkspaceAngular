@@ -261,7 +261,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //Función para evitar que escriban el numero del bulto en el campo rollo leído
   quitBarCode() {
     setTimeout(() => { 
-      if(![1,10].includes(this.ValidarRol)) {
+      if(![1,10,97].includes(this.ValidarRol)) {
         this.formProduction.patchValue({ production : '' }); 
         if([null, undefined, ''].includes(this.formProduction.value.fact)) this.formProduction.patchValue({ production : '' });
       } 
@@ -386,9 +386,6 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ///
   validateOfDirects(){
     let itemToDispatch : any = this.rollsConsolidate.map(x => x.item);
-    //itemToDispatch.sort();
-    //this.production.sort();
-    //this.rollsConsolidate.sort();
    
     this.production.forEach(x => {
       if(!itemToDispatch.includes(x.item)) {

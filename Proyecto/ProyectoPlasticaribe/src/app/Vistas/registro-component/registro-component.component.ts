@@ -184,7 +184,7 @@ export class RegistroComponentComponent implements OnInit {
     this.dialogUsuarios = true;
     this.accion = 'Editar'
     this.servicioUsuarios.getUsuariosxId(item.Id).subscribe(dataUsuarios => {
-      this.FormUsuarios.setValue({
+      this.FormUsuarios.patchValue({
         usuId:  dataUsuarios[0].usua_Id,
         usuNombre: dataUsuarios[0].usua_Nombre,
         usuTipo: dataUsuarios[0].tpUsu_Id,

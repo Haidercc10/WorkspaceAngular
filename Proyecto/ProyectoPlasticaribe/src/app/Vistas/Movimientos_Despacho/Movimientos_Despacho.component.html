@@ -125,7 +125,7 @@
         <td>{{data.fecha | date : 'yyyy-MM-dd'}}</td>
         <td>{{data.planilla}}</td>
         <td class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">
-          <button *ngIf="data.planilla == null && [10,1].includes(ValidarRol)" pButton type="button" id="planilla" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Generar Planilla" icon="pi pi-plus" (click)="createSpreadSheet(data, rowIndex)"></button>
+          <button *ngIf="data.planilla == null && [10,1,97].includes(ValidarRol)" pButton type="button" id="planilla" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Generar Planilla" icon="pi pi-plus" (click)="createSpreadSheet(data, rowIndex)"></button>
           <button *ngIf="data.planilla != null" pButton type="button" id="pdf" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver Planilla" icon="pi pi-file-pdf" (click)="createPDF(data.planilla)"></button>
         </td>
       </tr>
@@ -144,7 +144,7 @@
                   <th scope="col">Valor <p-sortIcon field="valor"></p-sortIcon></th>
                   <th scope="col">Forma Pago<p-sortIcon field="forma_Pago"></p-sortIcon></th>
                   <th scope="col">Peso Bruto <p-sortIcon field="peso_Bruto"></p-sortIcon></th>
-                  <th class="text-center" *ngIf="data.planilla != null && [10,1].includes(ValidarRol)" scope="col">Actualizar N° Planilla</th>
+                  <th class="text-center" *ngIf="data.planilla != null && [10,1,97].includes(ValidarRol)" scope="col">Actualizar N° Planilla</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-product let-rowIndex="rowIndex">
@@ -156,7 +156,7 @@
                   <td>${{product.valor | number : '1.2-2'}}</td>
                   <td><b>{{product.forma_Pago }}</b></td>
                   <td>{{product.peso_Bruto | number : '1.2-2'}}</td>
-                  <td *ngIf="data.planilla != null && [10,1].includes(ValidarRol)" class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">
+                  <td *ngIf="data.planilla != null && [10,1,97].includes(ValidarRol)" class="text-center" pFrozenColumn alignFrozen="right" [frozen]="true">
                     <button pButton type="button" (click)="viewModal(data, product, rowIndex)" id="planilla" style="width: 30px; height: 30px;" class="p-button-warning p-button-rounded" pTooltip="Actualizar Planilla a Factura N° {{product.factura}}" pTooltipPosition="top" icon="pi pi-refresh"></button>
                   </td>  <!--(click)="viewMsjQuitFactura(data, product, rowIndex)"-->
                 </tr>

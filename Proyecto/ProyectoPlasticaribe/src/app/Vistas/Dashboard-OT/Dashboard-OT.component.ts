@@ -116,7 +116,7 @@ export class DashboardOTComponent implements OnInit {
     this.totalOrdenesMes = 0;
     this.costoTotalOrdenesMes = 0;
 
-    if ([1,60,12,94,85,2,98].includes(this.ValidarRol)) {
+    if ([1,60,12,94,85,2,98,5].includes(this.ValidarRol)) {
       this.estadosOrdenes = [
         { Nombre : 'ABIERTA', Cantidad : 0, Class : 'bg-naranja', },
         { Nombre : 'ASIGNADA', Cantidad : 0, Class : 'bg-azul', },

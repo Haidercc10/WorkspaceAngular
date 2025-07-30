@@ -29,7 +29,7 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 export class Gestion_DevolucionesOFComponent implements OnInit {
 
   load: boolean = false;
-  storage_Id: number | undefined;
+  storage_Id: any | undefined;
   storage_Name: string | undefined;
   ValidarRol: number | undefined;
   form !: FormGroup;
@@ -102,6 +102,8 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
+    console.log(this.storage_Id);
+    
   }
 
   getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [19,44,45,23].includes(x.estado_Id)) } );
@@ -159,13 +161,14 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     let reposition : boolean = [null, undefined, false].includes(this.form.value.reposition) ? false : true;
     let creditNote : boolean = [null, undefined, false].includes(this.form.value.creditNote) ? false : true;
     let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
+    let user : any = this.appComponent.storage_Id;
     this.qtyRollsDv = 0;
-
+  
     if (![null, undefined, ''].includes(dev)) {
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
         if([11,29].includes(data[0].dev.estado_Id)) {
           this.load = true;
-          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, this.storage_Id, reposition, creditNote, observation).subscribe(() => {
+          this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, user, reposition, creditNote, observation).subscribe(() => {
             this.qtyRollsDv = data.length;
             data.forEach(x => {
               this.production.push({  

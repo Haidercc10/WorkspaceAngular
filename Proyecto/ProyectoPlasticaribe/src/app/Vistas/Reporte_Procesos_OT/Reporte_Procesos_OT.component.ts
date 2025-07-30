@@ -147,11 +147,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Reporte de OT por Procesos - ${this.today}`;
-        const header = ["ID Vendedor", "OT", "Mat. Prima", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Cant. Producir Und.", "Medida", "Cant. Ingresada", "Cant. Enviada", "Fallas", "Observación", "Estado", "Fecha Creación", "Fecha Inicio", "Fecha Fin"]
+        const header = ["ID Vendedor", "OT", "Mat. Prima", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Perforado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Cant. Producir Und.", "Medida", "Cant. Ingresada", "Cant. Enviada", "Fallas", "Observación", "Estado", "Fecha Creación", "Fecha Inicio", "Fecha Fin"]
         let datos : any =[];
 
         for (const item of this.ArrayDocumento) {
-          const datos1  : any = [item.usu, item.ot, item.mp, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.cantUnd, item.und, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicio, item.fechaFinal];
+          const datos1  : any = [item.usu, item.ot, item.mp, item.ext, item.imp, item.rot, item.lam, item.perf, item.cor, item.emp, item.sel, item.wik, item.cant, item.cantUnd, item.und, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicio, item.fechaFinal];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -226,7 +226,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let qtyImp = row.getCell(5);
           let qtyRot = row.getCell(6);
           let qtyLam = row.getCell(7);
-          let qtyDbl = row.getCell(8);
+          let qtyPerf = row.getCell(8);
           let qtyCor = row.getCell(9);
           let qtyEmp = row.getCell(10);
           let qtySel = row.getCell(11);
@@ -238,9 +238,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorExt;
           if (+qtyExt.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorExt = 'C7FD7A'; //Terminada
           else if (+qtyExt.value < d[12] && +qtyExt.value > 0) colorExt = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorExt = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorExt = 'ADD8E6'; //Asignada
-          else if (+qtyExt.value == 0 && (qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorExt = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorExt = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorExt = 'ADD8E6'; //Asignada
+          else if (+qtyExt.value == 0 && (qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorExt = 'DDDDDD'; //No Iniciada
           qtyExt.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -252,9 +252,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorImp;
           if (+qtyImp.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorImp = 'C7FD7A'; //Terminada
           else if (+qtyImp.value < d[12] && +qtyImp.value > 0) colorImp = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorImp = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorImp = 'ADD8E6'; //Asignada
-          else if (+qtyImp.value == 0 && (qtyExt.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorImp = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorImp = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorImp = 'ADD8E6'; //Asignada
+          else if (+qtyImp.value == 0 && (qtyExt.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorImp = 'DDDDDD'; //No Iniciada
           qtyImp.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -266,9 +266,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorRot;
           if (+qtyRot.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorRot = 'C7FD7A'; //Terminada
           else if (+qtyRot.value < d[12] && +qtyRot.value > 0) colorRot = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorRot = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorRot = 'ADD8E6'; //Asignada
-          else if (+qtyRot.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorRot = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorRot = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorRot = 'ADD8E6'; //Asignada
+          else if (+qtyRot.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorRot = 'DDDDDD'; //No Iniciada
           qtyRot.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -280,9 +280,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorLam;
           if (+qtyLam.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorLam = 'C7FD7A'; //Terminada
           else if (+qtyLam.value < d[12] && +qtyLam.value > 0) colorLam = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorLam = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorLam = 'ADD8E6'; //Asignada
-          else if (+qtyLam.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorLam = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorLam = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorLam = 'ADD8E6'; //Asignada
+          else if (+qtyLam.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorLam = 'DDDDDD'; //No Iniciada
           qtyLam.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -291,16 +291,16 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
           // Doblado
           row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorDbl;
-          if (+qtyDbl.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorDbl = 'C7FD7A'; //Terminada
-          else if (+qtyDbl.value < d[12] && +qtyDbl.value > 0) colorDbl = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorDbl = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorDbl = 'ADD8E6'; //Asignada
-          else if (+qtyDbl.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorDbl = 'DDDDDD'; //No Iniciada
-          qtyDbl.fill = {
+          let colorPerf;
+          if (+qtyPerf.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorPerf = 'C7FD7A'; //Terminada
+          else if (+qtyPerf.value < d[12] && +qtyPerf.value > 0) colorPerf = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorPerf = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorPerf = 'ADD8E6'; //Asignada
+          else if (+qtyPerf.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorPerf = 'DDDDDD'; //No Iniciada
+          qtyPerf.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: colorDbl }
+            fgColor: { argb: colorPerf }
           }
 
           // Corte
@@ -308,9 +308,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorCor;
           if (+qtyCor.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorCor = 'C7FD7A'; //Terminada
           else if (+qtyCor.value < d[12] && +qtyCor.value > 0) colorCor = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorCor = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorCor = 'ADD8E6'; //Asignada
-          else if (+qtyCor.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorCor = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorCor = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorCor = 'ADD8E6'; //Asignada
+          else if (+qtyCor.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorCor = 'DDDDDD'; //No Iniciada
           qtyCor.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -322,9 +322,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorEmp;
           if (+qtyEmp.value >=  (+CantPedida + (+CantPedida)) && d[19] != 'Asignada' && d[19] != 'Abierta') colorEmp = 'C7FD7A'; //Terminada
           else if (+qtyEmp.value <  (+CantPedida + (+CantPedida)) && +qtyEmp.value > 0) colorEmp = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorEmp = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorEmp = 'ADD8E6'; //Asignada
-          else if (+qtyEmp.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorEmp = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorEmp = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorEmp = 'ADD8E6'; //Asignada
+          else if (+qtyEmp.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorEmp = 'DDDDDD'; //No Iniciada
           qtyEmp.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -336,9 +336,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorSel;
           if (+qtySel.value >= (+CantPedida + (+CantPedida)) && d[19] != 'Asignada' && d[19] != 'Abierta') colorSel = 'C7FD7A'; //Terminada
           else if (+qtySel.value <  (+CantPedida + (+CantPedida)) && +qtySel.value > 0) colorSel = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorSel = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorSel = 'ADD8E6'; //Asignada
-          else if (+qtySel.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorSel = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorSel = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorSel = 'ADD8E6'; //Asignada
+          else if (+qtySel.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorSel = 'DDDDDD'; //No Iniciada
           qtySel.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -350,9 +350,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let colorWik;
           if (+qtyWik.value >=  (+CantPedida + (+CantPedida)) && d[19] != 'Asignada' && d[19] != 'Abierta') colorWik = 'C7FD7A'; //Terminada
           else if (+qtyWik.value < (+CantPedida + (+CantPedida)) && +qtyWik.value > 0) colorWik = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorWik = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorWik = 'ADD8E6'; //Asignada
-          else if (+qtyWik.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorWik = 'DDDDDD'; //No Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorWik = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorWik = 'ADD8E6'; //Asignada
+          else if (+qtyWik.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorWik = 'DDDDDD'; //No Iniciada
           qtyWik.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -477,7 +477,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTCerrada = 0;
     let ruta : string = this.validarParametrosConsulta();
 
-    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => data.forEach(infoOt => this.llenarArray(infoOt)), error => {
+    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => {
+      data.forEach(infoOt => this.llenarArray(infoOt));
+      console.log(data);
+      
+    }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
       this.load = true;
     });
@@ -638,7 +642,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
           EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
           EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg,
-          EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
+          EstProcOT_PerforadoKg : datos_ot[i].estProcOT_PerforadoKg,
           EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
           EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
           EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,

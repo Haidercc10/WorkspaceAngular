@@ -452,9 +452,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         }
         this.dtDevService.srvGuardar(info).subscribe(data => {
           count++;
-          
           if (count == this.productionSelected.filter(z => z.preIn == false).length) this.isDevolution ? this.changeStatus(data, 53, 24) : this.changeStatus(data, 23, 53);
-        
         }, error => this.errorMessage(`Ocurrió un error al guardar los detalles de la devolución!`, error));
       });
     } else {
@@ -484,10 +482,10 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     let hour : string = moment().format('HH:mm:ss');
     let observation : any = this.formDataOrder.value.observationIn == null ? '' : `?observation=${this.formDataOrder.value.observationIn}`;
     let status : number = this.isDevolution ? 11 : 53;
-    
+    let realDv : number = data.devProdFact_Id ? data.devProdFact_Id : dev;
  
-    this.devService.PutStatusDevolution(data, status, date, hour, this.storage_Id, false, false, observation).subscribe(() => {
-      this.updateStatusProduction(reels, data);
+    this.devService.PutStatusDevolution(realDv, status, date, hour, this.storage_Id, false, false, observation).subscribe(() => {
+      this.updateStatusProduction(reels, realDv);
     }, error => {
       this.msg.mensajeError(`No fue posible actualizar el estado de la devolución N° ${dev}!`, error);
       this.load = false;

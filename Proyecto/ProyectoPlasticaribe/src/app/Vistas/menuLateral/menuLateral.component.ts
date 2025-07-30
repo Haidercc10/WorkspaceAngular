@@ -249,6 +249,7 @@ export class MenuLateralComponent implements OnInit {
           fPen_Id : dataUsuarios[i].fPen_Id,
           Usua_Fecha : dataUsuarios[i].usua_Fecha,
           Usua_Hora : dataUsuarios[i].usua_Hora,
+          Usua_Cedula : dataUsuarios[i].usua_Cedula,
         }
         this.usuarioService.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(() => {
           this.modalUsuario = false;

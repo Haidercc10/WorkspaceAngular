@@ -102,15 +102,17 @@
       styleClass="p-datatable-sm"
       responsiveLayout="scroll"
       [paginator]="true"
-      [rows]="20"
+      [rows]="30"
       [rowHover]="true"
       [showCurrentPageReport]="true"
-      [rowsPerPageOptions]="[5, 10, 15, 20]"
+      [rowsPerPageOptions]="[5, 10, 15, 20, 30, 50, 100]"
       currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="header">
+         
         <tr title="Filtros para realizar busquedas de cada campo" id="filtros">
+          <th></th>
           <th style="width: 10%;">
             <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')" class="w-full">
           </th>
@@ -135,6 +137,7 @@
           <th style="width: 10%;"></th>
         </tr>
         <tr>
+          <th scope="col" class="text-center">#</th>
           <th scope="col" class="text-center">OT</th>
           <th scope="col" class="text-center">Item</th>
           <th scope="col" class="text-center">Referencia</th>
@@ -145,8 +148,9 @@
           <th scope="col" class="text-center" title="Ver detalle de Desperdicio">Ver Detalle</th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-arrayConsulta>
+      <ng-template pTemplate="body" let-arrayConsulta let-rowIndex="rowIndex">
         <tr>
+          <td class="text-center">{{rowIndex + 1}}</td>
           <td class="text-center">{{arrayConsulta.OT}}</td>
           <td class="text-center">{{arrayConsulta.Item}}</td>
           <td>{{arrayConsulta.Referencia}}</td>
@@ -184,6 +188,7 @@
           scrollHeight="50rem">
           <ng-template pTemplate="header">
             <tr title="Filtros para realizar busquedas de cada campo">
+              <th></th>
               <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro2($event, 'OT', 'contains')" class="w-full"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Bulto', 'contains')" class="w-full"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Item', 'contains')" class="w-full"> </th>
@@ -200,6 +205,7 @@
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Maquina', 'contains')" class="w-full"></th>
             </tr>
             <tr>
+              <th scope="col" class="text-center">#</th>
               <th scope="col" class="text-center">OT</th>
               <th scope="col" class="text-center">Bulto</th>
               <th scope="col" class="text-center">Item</th>
@@ -216,8 +222,9 @@
               <th scope="col" class="text-center">Maquina</th>
             </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-arrayModal>
+          <ng-template pTemplate="body" let-arrayModal let-rowIndex="rowIndex">
             <tr class="font-size-14 centrarTh">
+              <td class="text-center">{{rowIndex + 1}}</td>
               <td class="text-center">{{arrayModal.OT}}</td>
               <td class="text-center">{{arrayModal.Observacion}}</td>
               <td class="text-center">{{arrayModal.Item}}</td>
@@ -236,7 +243,7 @@
           </ng-template>
           <ng-template pTemplate="footer">
             <tr>
-              <td colspan="6" style="text-align: end">Cantidad total desperdicio</td>
+              <td colspan="7" style="text-align: end">Cantidad total desperdicio</td>
               <td class="text-center">{{totalDesperdicio | number}} </td>
               <td class="text-center">{{"Kg"}}</td>
               <td colspan="6"></td>

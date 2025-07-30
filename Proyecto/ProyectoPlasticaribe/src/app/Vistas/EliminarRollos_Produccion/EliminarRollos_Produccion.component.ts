@@ -95,7 +95,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   }
 
   //Función para obtener los procesos.
-  getProcess = () => this.svcProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [8,4,3,7,2,1,9,5,6].includes(x.proceso_Codigo)));
+  getProcess = () => this.svcProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [8,4,3,7,2,1,9,5,6,18].includes(x.proceso_Codigo)));
 
   //Función para obtener las fallas técnicas.
   getFails = () =>  this.failsService.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 12) });
