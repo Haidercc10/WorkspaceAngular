@@ -706,10 +706,12 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         let packer : any = this.formDatosProduccion.value.packer;
         this.formDatosProduccion.reset();
         this.validarProceso();
-        this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita, motherProcess, otAltern, packer)
-        this.nuevoAnchoProducto = this.formDatosProduccion.value.anchoProducto;
         //this.buscarRollosPesados();
-        this.buscraOrdenTrabajo(false);
+        if(this.validateProcess() != 'EXT') {
+          this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita, motherProcess, otAltern, packer)
+          this.nuevoAnchoProducto = this.formDatosProduccion.value.anchoProducto;
+          this.buscraOrdenTrabajo(false);
+        } else this.limpiarCampos(false);
         this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
       }, 1000);
     }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
