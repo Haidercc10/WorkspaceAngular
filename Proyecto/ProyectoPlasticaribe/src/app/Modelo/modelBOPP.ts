@@ -19,4 +19,5 @@ export interface modelBOPP{
   BOPP_CodigoDoc : any,
   BOPP_TipoDoc : any,
   Prov_Id? : number;
+  SubCatMP_Id? : number;
 }

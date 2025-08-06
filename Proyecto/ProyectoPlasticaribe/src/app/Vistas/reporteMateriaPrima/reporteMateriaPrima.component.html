@@ -444,6 +444,87 @@
       </div>
     </p-tabPanel>
 
+    <!--Subcategorias-->
+    <p-tabPanel
+      header="Subcategorias"
+      leftIcon="pi pi-list"
+      tooltip="Información del Inventario por Subcategorias"
+      *ngIf="[1,3,4,89,63,12,98,2].includes(this.ValidarRol)">
+      <div class="mb-3" *ngIf="load">
+        <div class="row g-3 font-size-14" id="table">
+          <p-toolbar>
+            <ng-template pTemplate="left">
+            </ng-template>
+            <ng-template pTemplate="right">
+              <button pButton pRipple pTooltip="Exportar a excel inventario por subcategorias" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportExcel()"></button>
+            </ng-template>
+          </p-toolbar>
+          <p-table
+            #dt_Subcategories
+            [value]="subcategories"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="subcategories.length"
+            [rowsPerPageOptions]="[10,25,50,100,subcategories.length]"
+            [rowHover]="true"
+            dataKey="Id"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr class="font-size-16" id="filtros">
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'id', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Nombre', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Micras', 'contains')"></th>
+                <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Ancho', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'NombreCateg', 'contains')"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center" scope="col" pSortableColumn="id">Id
+                  <p-sortIcon field="id"></p-sortIcon>
+                </th>
+                <th class="text-center" pSortableColumn="reference" pReorderableColumn scope="col">Subcategoria
+                  <p-sortIcon field="reference"></p-sortIcon>
+                </th>
+                <th class="text-center" id="stock" pSortableColumn="stock" pReorderableColumn scope="col">Stock
+                  <p-sortIcon field="stock"></p-sortIcon>
+                </th>
+                <th class="text-center" id="unit" pSortableColumn="unit" pReorderableColumn scope="col">Presentación
+                  <p-sortIcon field="unit"></p-sortIcon>
+                </th>
+                <th class="text-center" id="subtotal" pSortableColumn="subtotal" pReorderableColumn scope="col">Subtotal
+                  <p-sortIcon field="subtotal"></p-sortIcon>
+                </th>
+                <th class="text-center">Ver</th>
+            </ng-template>
+            <ng-template pTemplate="body" let-mp let-rowIndex="rowIndex">
+              <tr>
+                <td class="text-center"><b>{{rowIndex + 1}}</b></td>
+                <td class="text-center"><b>{{mp.id}}</b></td>
+                <td>{{mp.reference}}</td>
+                <td class="text-center"><b>{{mp.stock | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{mp.unit }}</td>
+                <td class="text-center"><b>${{mp.subtotal | number : '1.2-2'}}</b></td>
+                <td class="text-center" *ngIf="[1,3,4,89,63,98,2].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="loadModalSubcategories(mp)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="5" class="text-right">Totales</td>
+                <td class="text-center">{{totalSubcategories | number : '1.2-2'}}</td>
+                <td></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+
   </p-tabView>
 </p-card>
 
@@ -505,6 +586,14 @@
             <span class="p-float-label">
               <p-dropdown formControlName="Categoria" inputId="Categoria" [options]="categorias" optionValue="catMP_Id" optionLabel="catMP_Nombre" [autoDisplayFirst]="false"></p-dropdown>
               <label for="Categoria">Categoria</label>
+            </span>
+          </div>
+
+          <!-- SubCategoria -->
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <p-dropdown formControlName="subcategory" inputId="subcategory" [options]="subcategoriesInModal" optionValue="subCatMP_Id" optionLabel="subCatMP_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+              <label for="subcategory">Subcategoria</label>
             </span>
           </div>
 
@@ -693,3 +782,85 @@
   </ng-template>
 
 </p-dialog>
+
+<!--Modal para ver las subcategorias-->
+<p-dialog [(visible)]="modalSubcat" [style]="{width: '85vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Materias primas asociadas a {{subcategory}}" [modal]="true" >
+  <ng-template pTemplate="content">
+
+    <div class="row g-3 font-size-14" id="table">
+      <p-table
+        #dt_Biorientados2
+        [value]="materials"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="materials.length"
+        [rowsPerPageOptions]="[10,25,50,100,materials.length]"
+        [rowHover]="true"
+        dataKey="Id"
+        [scrollable]="true"
+        scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr class="font-size-16">
+            <th></th>
+            <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Id', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Nombre', 'contains')"></th>
+            <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Cant', 'contains')"></th>
+            <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'UndCant', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'PrecioUnd', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'SubTotal', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Categoria', 'contains')"></th>
+          </tr>
+          <tr>
+            <th class="text-center">#</th>
+            <th class="text-center" scope="col" pSortableColumn="Id">ID
+              <p-sortIcon field="Id"></p-sortIcon>
+            </th>
+            <th class="text-center" pSortableColumn="Nombre" pReorderableColumn scope="col">Material
+              <p-sortIcon field="Nombre"></p-sortIcon>
+            </th>
+            <th class="text-center" id="Cant" pSortableColumn="Cant" pReorderableColumn scope="col">Stock
+              <p-sortIcon field="Cant"></p-sortIcon>
+            </th>
+            <th class="text-center" id="UndCant" pSortableColumn="UndCant" pReorderableColumn scope="col">Medida
+              <p-sortIcon field="UndCant"></p-sortIcon>
+            </th>
+            <th class="text-center" pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio
+              <p-sortIcon field="PrecioUnd"></p-sortIcon>
+            </th>
+            <th class="text-center" pSortableColumn="SubTotal" pReorderableColumn scope="col">Subtotal
+              <p-sortIcon field="SubTotal"></p-sortIcon>
+            </th>
+            <th class="text-center" pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
+              <p-sortIcon field="Categoria"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-mp let-rowIndex="rowIndex">
+          <tr>
+            <td class="text-center">{{rowIndex + 1}}</td>
+            <td class="text-center"><b>{{mp.Id}}</b></td>
+            <td>{{mp.Nombre}}</td>
+            <td class="text-center"><b>{{mp.Cant | number}}</b></td>
+            <td class="text-center">{{mp.UndCant}}</td>
+            <td class="text-center">{{mp.PrecioUnd | number}}</td>
+            <td class="text-center"><b>${{mp.SubTotal | number}}</b></td>
+            <td class="text-center">{{mp.Categoria}}</td>
+          </tr>
+        </ng-template>
+        <!--<ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
+            <td></td>
+            <td>{{totalSubcategories | number : '1.2-2'}}</td>
+            <td></td>
+          </tr>
+        </ng-template>-->
+      </p-table>
+    </div>
+  </ng-template>
+
+</p-dialog>
+

@@ -130,8 +130,10 @@ export class MovTrazabilidadProduccionComponent {
     
     if(this.formFilters.valid) {
       this.load = true;
-      if(bulto) this.getTraceForRoll(date1, date2, ot, process, bulto);
-      else {
+      if(bulto) {
+         this.getTraceForRoll(date1, date2, ot, process, bulto);
+         console.log(count);
+      } else {
          this.svTraceability.getTraceability(date1, date2, process, this.validateRoute()).subscribe(data => {
           if(data) {
             if(data.length > 0) {
@@ -139,6 +141,7 @@ export class MovTrazabilidadProduccionComponent {
               let dataImp : any[] = data.filter(x => ['IMP'].includes(x.motherProcess_Id));
               let dataRoto : any[] = data.filter(x => ['ROT', 'LAM'].includes(x.motherProcess_Id));
               data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp.length > 0 ? dataImp : dataRoto;
+              console.log(data);
               if(data.length > 0) this.loadDataFromBagpro(data, count);
               else this.warningMsj(`Advertencia`, `No se encontraron registros de producción.`);
             } else this.warningMsj(`Advertencia`, `No se encontraron resultados de búsqueda!`);
@@ -150,6 +153,7 @@ export class MovTrazabilidadProduccionComponent {
 
   ///. Cargar datos de bagpro para productos madre.
   loadDataFromBagpro(data : any, count : number){
+    console.log(count, data.length);
     data.forEach(x => {
       count++
       this.svBagpro.getRollProduction(x.motherRoll, `?process=${x.motherProcess.toUpperCase()}`).subscribe(dataBag => {
@@ -182,9 +186,10 @@ export class MovTrazabilidadProduccionComponent {
         if(data.length > 0) {
           data.forEach(x => {
             count++;
-            x.etiqueta1.motherRoll != null ? x.etiqueta1 = x.etiqueta1 : x.etiqueta1 = null;
-            x.etiqueta2.motherRoll != null ? x.etiqueta2 = x.etiqueta2 : x.etiqueta2 = null;
-            x.etiqueta3.motherRoll != null ? x.etiqueta3 = x.etiqueta3 : x.etiqueta3 = null;
+            x.etiqueta1 ? x.etiqueta1.motherRoll != null ? x.etiqueta1 = x.etiqueta1 : x.etiqueta1 = null : x.etiqueta3 = null;
+            x.etiqueta2 ? x.etiqueta2.motherRoll != null ? x.etiqueta2 = x.etiqueta2 : x.etiqueta2 = null : x.etiqueta3 = null;
+            x.etiqueta3 ? x.etiqueta3.motherRoll != null ? x.etiqueta3 = x.etiqueta3 : x.etiqueta3 = null : x.etiqueta3 = null;
+              
             if(x.etiqueta1) array.push(x.etiqueta1);
             if(x.etiqueta2) array.push(x.etiqueta2);
             if(x.etiqueta3) array.push(x.etiqueta3);

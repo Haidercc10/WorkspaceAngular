@@ -12,4 +12,5 @@ export interface modelTintas{
   Tinta_FechaIngreso : any;
   Tinta_Hora : string;
   Tinta_PrecioEstandar? : number;
+  SubCatMP_Id? : number;
 }

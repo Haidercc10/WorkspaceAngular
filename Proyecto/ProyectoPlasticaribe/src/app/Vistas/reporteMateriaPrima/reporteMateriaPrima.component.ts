@@ -22,6 +22,8 @@ import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
+import { SubcategoriasMatPrimaService } from 'src/app/Servicios/Subcategorias_MatPrima/subcategorias-mat-prima.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -38,6 +40,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   @ViewChild('dt_Biorientados') dt_Biorientados: Table | undefined;
   @ViewChild('dt_BoppGenerico') dt_BoppGenerico: Table | undefined;
   @ViewChild('dt_Biorientados2') dt_Biorientados2: Table | undefined;
+  @ViewChild('dt_Subcategories') dt_Subcategories: Table | undefined;
   columnas: any[] = []; //Variable que almacenará las columnas de la tabla que no se verá inicialmente pero que se podrá elegir
   _columnasSeleccionada: any[] = []; //variable que almacenará las columnas de la tabla que han sido seleccionadas
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -104,7 +107,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   idBoppGenerico: number = 1;
   materialSeleccionado: any = {};
   hora: any = moment().format('H:mm:ss');
-
+  subcategories : any = [];
+  isSubcategory : boolean = false;
+  modalSubcat : boolean = false;
+  totalSubcategories : number = 0;
+  materials : any = [];
+  subcategory : string;
+  subcategoriesInModal : any = [];
+  
   constructor(private materiaPrimaService: MateriaPrimaService,
     private tintasService: TintasService,
     private categoriMpService: CategoriaMateriaPrimaService,
@@ -116,8 +126,13 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     private msj: MensajesAplicacionService,
     private servicioBoppGen: BoppGenericoService,
     private srvMovEntradasMP: Movimientos_Entradas_MPService,
-    private srvSalidasMP: Entradas_Salidas_MPService,) {
+    private srvSalidasMP: Entradas_Salidas_MPService,
+    private svSubcategories : SubcategoriasMatPrimaService, 
+    private svExcel : CreacionExcelService,
+  ) {
+
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+
     this.FormEdicionMateriaPrima = this.frmBuilder.group({
       Id: [null, Validators.required],
       Nombre: [null, Validators.required],
@@ -130,7 +145,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       PrecioEstandar: [null, Validators.required],
       Micras: [null, Validators.required],
       BoppGenerico: [null],
-      IdBoppGenerico: [null]
+      IdBoppGenerico: [null], 
+      subcategory : [null],
     });
   }
 
@@ -140,6 +156,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.consultarInventario();
     this.consultarCategorias();
     this.obtenerUnidadesMedidas();
+    this.getSubcategories();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -164,6 +181,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   obtenerCategorias() {
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => this.categorias = datos_categorias);
     this.categorias.sort((a, b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
+  }
+
+   // Funcion para obtener las diferentes categorias de materia prima existentes
+  getSubcategories() {
+    this.svSubcategories.GetAll().subscribe(data => this.subcategoriesInModal = data);
   }
 
   // Funcion que va a obtener las diferentes materias primas
@@ -198,6 +220,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         SubTotal: this.ValidarRol == 1 ? data.subTotal : 0,
         Categoria: data.categoria,
         Categoria_Id: data.categoria_Id,
+        Subcategoria: data.subcategoria, 
+        Subcategoria_Id: data.subcategoria_Id,
       }
       if ([1,3,12,85,98,2].includes(this.ValidarRol)) this.ArrayMateriaPrima.push(info);
       this.ArrayMateriaPrima.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
@@ -242,6 +266,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.polietilenos = [];
     this.tintas = [];
     this.biorientados = [];
+    
     this.valorTotal = 0;
     this.cantInicial = 0;
     this.cantEntrante = 0;
@@ -270,6 +295,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero' },
         { header: 'SubTotal', field: 'SubTotal', tipo: 'numero' },
         { header: 'Categoria', field: 'Categoria', tipo: 'texto' },
+        { header: 'Subcategoria', field: 'Subcategoria', tipo: 'texto' },
         { header: 'Inicial', field: 'Inicial', tipo: 'numero' },
         { header: 'Entrada', field: 'Entrada', tipo: 'numero' },
         { header: 'Salida', field: 'Salida', tipo: 'numero' },
@@ -285,9 +311,48 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero' },
         { header: 'SubTotal', field: 'SubTotal', tipo: 'numero' },
         { header: 'Categoria', field: 'Categoria', tipo: 'texto' },
+        { header: 'Subcategoria', field: 'Subcategoria', tipo: 'texto' },
       ]
       this.load = true;
     }, 2500);
+  }
+
+  //Función para cargar los materiales por subcategorias.
+  loadSubcategories(){
+    this.totalSubcategories = 0;
+    this.subcategories = [];
+    this.load = false;
+    this.subcategories = this.polietilenos.filter(x => ![null, 21].includes(x.Subcategoria_Id)).reduce((a,b) =>{
+      let find = a.find(x => x.id == b.Subcategoria_Id);
+      if(!find) {
+        let object : any = {
+          'id' : b.Subcategoria_Id,
+          'reference' : b.Subcategoria, 
+          'stock' : b.Cant, 
+          'unit' : 'Kg', 
+          'subtotal' : b.SubTotal ? b.SubTotal : 0, 
+        }  
+        a.push(object);
+      } else {
+         a[a.map(x => x.id).indexOf(b.Subcategoria_Id)].stock += b.Cant;
+         a[a.map(x => x.id).indexOf(b.Subcategoria_Id)].subtotal += b.SubTotal ? b.SubTotal : 0;
+      }
+      this.load = true;
+      return a;
+    }, []);
+    setTimeout(() => { 
+      this.subcategories.sort((a,b) => Number(a.id) - Number(b.id)); 
+      this.totalSubcategories = this.subcategories.reduce((a,b) => a += b.subtotal, 0);
+    }, 500); 
+  }
+
+  //Modal para cargar las materias primas asociadas a la subcategoria seleccionada.
+  loadModalSubcategories(mp : any){
+    this.materials = [];
+    this.modalSubcat = true;
+    this.subcategory = mp.reference;
+    this.materials = this.ArrayMateriaPrima.filter(x => x.Subcategoria_Id == mp.id);
+    this.materials.sort((a,b) => Number(a.Id) - Number(b.Id));
   }
 
   // Funcion que va a mostrar las materias primas con existencias mayor a cero
@@ -336,6 +401,23 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       }
     }, 500);
+  }
+
+  applyFilter($event, campo: any, valorCampo: string){
+    this.dt_Subcategories!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => {
+      if (this.dt_Subcategories.filteredValue != null) {
+        this.totalSubcategories = 0;
+        for (let index = 0; index < this.dt_Subcategories.filteredValue.length; index++) {
+          this.totalSubcategories += this.dt_Subcategories.filteredValue[index].Stock;
+        }
+      } else {
+        this.totalSubcategories = 0;
+        for (let index = 0; index < this.dt_Subcategories._value.length; index++) {
+          this.totalSubcategories += this.dt_Subcategories._value[index].Stock;
+        }
+      }
+    }, 500)
   }
 
   cantidadExistencias(data: any) {
@@ -492,22 +574,19 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       this.dt_Biorientados.filteredValue != null ? datos = this.dt_Biorientados.filteredValue : datos = this.biorientados; //Biorientado filtrada y no filtrado
       title = `Inventario Biorientados - ${this.today}`;
     }
+    //datos.filter(x => ![21, null].includes(x.Subcategoria)).sort((a,b) => a.Subcategoria.localeCompare(b.Subcategoria));
     //if (this.boppsAgrupados) this.exportarExcel2();
     //else {
       setTimeout(() => {
-        const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
+        const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria", "Subcategoria"]
         for (const item of datos) {
-          const datos1: any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
+          const datos1: any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria, item.Subcategoria];
           infoDocumento.push(datos1);
         }
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
         let worksheet = workbook.addWorksheet(title);
         worksheet.addImage(imageId1, 'A1:B3');
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
-        worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell) => {
           cell.fill = {
@@ -517,8 +596,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:L3');
+        worksheet.mergeCells('A1:M3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.getCell('A1').value = title;
         infoDocumento.forEach(d => {
           let row = worksheet.addRow(d);
           row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
@@ -549,6 +630,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         worksheet.getColumn(10).width = 12;
         worksheet.getColumn(11).width = 20;
         worksheet.getColumn(12).width = 20;
+        worksheet.getColumn(13).width = 25;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -588,7 +670,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion que va a llamar el modal donde se editará la información de la materia prima
   llamarModalEdicionMateriaPrima(data: any) {
     this.materialSeleccionado = data;
-    console.log(this.materialSeleccionado)
     this.cargarBoppsGenericos();
     this.modalEditarMateriasPrimas = true;
     this.FormEdicionMateriaPrima.patchValue({
@@ -602,6 +683,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       Precio: data.PrecioUnd,
       Micras: 0,
       PrecioEstandar: data.PrecioEstandar,
+      subcategory : data.Subcategoria_Id,
     });
     if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
       this.esBopp = true;
@@ -631,6 +713,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         MatPri_Precio: this.FormEdicionMateriaPrima.value.Precio,
         TpBod_Id: 4,
         MatPri_PrecioEstandar: this.FormEdicionMateriaPrima.value.PrecioEstandar,
+        SubCatMP_Id : this.FormEdicionMateriaPrima.value.subcategory,
       }
       this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {
         this.crearAjustesMP(info.MatPri_Id, 2001, 1);
@@ -661,6 +744,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           Tinta_FechaIngreso: data.tinta_FechaIngreso,
           Tinta_Hora: data.tinta_Hora,
           Tinta_PrecioEstandar: this.FormEdicionMateriaPrima.value.PrecioEstandar,
+          SubCatMP_Id : this.FormEdicionMateriaPrima.value.subcategory,
         }
         this.tintasService.srvActualizar(info.Tinta_Id, info).subscribe(() => {
           this.crearAjustesMP(84, info.Tinta_Id, 1);
@@ -700,6 +784,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             BOPP_CodigoDoc: data[i].bopP_CodigoDoc,
             BOPP_TipoDoc: data[i].bopP_TipoDoc,
             Prov_Id : data[i].prov_Id,
+            SubCatMP_Id : this.FormEdicionMateriaPrima.value.subcategory,
           }
           this.servicioBoppGen.PutPrecioEstandar(this.idBoppGenerico, this.FormEdicionMateriaPrima.value.PrecioEstandar).subscribe();
           this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
@@ -825,8 +910,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     if (tab == 'Bopps agrupados') { 
       this.boppsAgrupados = true; 
       this.boppsAgrupados_Genericos(); 
-    } else this.boppsAgrupados = false;
-  }
+    } else if (tab == 'Subcategorias') {
+      this.isSubcategory = true;
+      this.loadSubcategories();
+    } 
+  } 
 
   // Funcion que va a filtrar la información en la tabla de inventario
   aplicarFiltrosBiorientados2($event, campo: any, valorCampo: string) {
@@ -1052,5 +1140,129 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       UndMed_Id: 'N/E',
     }
     this.srvSalidasMP.Post(salida).subscribe(data => { }, error => console.log(error));
+  }
+
+  //Función que exportará un formato excel con los datos de los clientes
+  exportExcel(){
+    if(this.subcategories.length > 0) {
+      this.load = false;
+      setTimeout(() => { this.loadSheetAndStyles(this.subcategories); }, 1000);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data : any){  
+    let title : any = `Inventario por subcategoria `;  
+    title += ` ${moment().format('DD-MM-YYYY')}`;
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.svExcel.formatoExcel(title, true);
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+    this.load = true;
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any){
+    ws.getCell('A1').alignment = { vertical: 'middle', horizontal: 'right', wrapText: true};
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5']; 
+    ws.addRow(this.loadFieldsHeader());
+
+    //ws.addRow([]);
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:F3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [3].forEach(x => ws.getColumn(x).width = 50);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [3,4,5,6].forEach(x => ws.getColumn(x).width = 20);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      'N°',
+      'Id',
+      'Subcategoria',
+      'Stock', 
+      'Presentación',
+      'Subtotal', 
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let formatNumber: Array<number> = [4,6];
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F']; 
+
+    formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    }); 
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.id,
+        x.reference,
+        x.stock,
+        x.unit,
+        x.subtotal,
+      ]);
+    });
+    this.addTotal(info);
+    return info;
+  }
+
+  totalSubcategoriesExcel = (data) => data.reduce((a, b) => a += b[5], 0);
+
+   //Agregar fila de totales al formato excel.
+  addTotal(info : any){
+    info.push([
+      '',
+      '',
+      '',
+      '',
+      'TOTAL',
+      this.totalSubcategoriesExcel(info),
+    ]);
   }
 }

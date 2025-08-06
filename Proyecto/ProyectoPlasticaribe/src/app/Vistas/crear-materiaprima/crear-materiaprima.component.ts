@@ -9,6 +9,7 @@ import { MatPrima_Material_PigmentoService } from 'src/app/Servicios/MatPrima_Ma
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { SubcategoriasMatPrimaService } from 'src/app/Servicios/Subcategorias_MatPrima/subcategorias-mat-prima.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,7 @@ export class CrearMateriaprimaComponent implements OnInit {
   materials = [];
   pigments = [];
   recovery : boolean = false;
+  subcategories : any = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -40,6 +42,7 @@ export class CrearMateriaprimaComponent implements OnInit {
                           private svMaterials : MaterialProductoService, 
                             private svPigments : PigmentoProductoService,
                               private svMMP : MatPrima_Material_PigmentoService,
+                                private svSubCatMP : SubcategoriasMatPrimaService,
                         ) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
@@ -53,7 +56,8 @@ export class CrearMateriaprimaComponent implements OnInit {
       mpUnidadMedida : ['', Validators.required],
       MpObservacion : ['', Validators.required],
       mpPigment : [null], 
-      mpMaterial : [null]
+      mpMaterial : [null], 
+      mpSubcategory: [null, ],
     });
   }
 
@@ -66,6 +70,11 @@ export class CrearMateriaprimaComponent implements OnInit {
 
    //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
   obtenerNombreCategoriasMp = () => this.categoriMpService.srvObtenerLista().subscribe(datos => this.nombreCategoriasMP = datos);
+
+  getSubcategoriesForId() {
+    let id : number = this.materiPrima.value.mpCategoria;
+    this.svSubCatMP.getSubcategoriesForCategory(id).subscribe(data => this.subcategories = data);
+  } 
 
   /** Limpiar campos al momento de crear la mat. prima. */
   limpiarCampos = () => this.materiPrima.reset();
@@ -91,6 +100,7 @@ export class CrearMateriaprimaComponent implements OnInit {
       TpBod_Id : 4,
       MatPri_Fecha : moment().format('YYYY-MM-DD'),
       MatPri_Hora : moment().format('H:mm:ss'),
+      SubCatMP_Id : this.materiPrima.value.mpSubcategory,
     }
 
     this.materiaPrimaService.srvGuardar(datosMP).subscribe(data => {
@@ -111,8 +121,14 @@ export class CrearMateriaprimaComponent implements OnInit {
 
   /** Cargar nombre en la descripción. */
   cargarDescripcion(){
-    let mtpNombre : any = this.materiPrima.value.MpNombre;
-    this.materiPrima.patchValue({ mpDescripcion: mtpNombre })
+   
+    
+    let mtpNombre : any = this.materiPrima.value.mpNombre;
+    console.log(mtpNombre);
+    setTimeout(() => {
+      this.materiPrima.patchValue({ mpDescripcion: mtpNombre })
+    }, 100);
+    
   }
 
   //Cargar materiales

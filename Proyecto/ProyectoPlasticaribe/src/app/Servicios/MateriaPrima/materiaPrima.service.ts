@@ -24,6 +24,8 @@ export class MateriaPrimaService {
   getInfo_MpTintaBopp_Id = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfo_MpTintasBopp_Id/${id}`);
 
   srvObtenerListaPorId = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
+  
+  getMaterialsForSubcategories = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMaterialsForSubcategories/${id}`);
 
   GetMateriasPrimasUtilizadasHoy = (fecha : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMateriasPrimasUtilizadasHoy/${fecha}`);
 
