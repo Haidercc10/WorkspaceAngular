@@ -562,6 +562,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   getInformationProducts(data: any): Array<any> {
+    console.log(data);
     let informationProducts: Array<any> = [];
     let count: number = 0;
     data.forEach(prod => {
@@ -646,7 +647,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
             { text: `Responsable: ${data.dev.devProdFact_Responsable}`},
           ], 
           [
-            { text: `Asesor: ${data.asesor.usua_Nombre}`, colSpan : 3},
+            { text: `Asesor: ${data.asesor.usua_Nombre == null ? '' : data.asesor.usua_Nombre}`, colSpan : 3},
           ], 
         ]
       },
