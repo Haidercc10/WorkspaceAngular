@@ -72,11 +72,26 @@
         </div>
 
         <!--* Rollo -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+          <span class=" p-float-label">
             <input pInputText formControlName="roll" inputId="roll" autocomplete="off" type="number" (keyup.enter)="searchRolls()"/>
             <label for="roll">Rollo/Bulto*</label>
+          </span>
+        </div>
+
+        <!-- Motivo -->
+        <div class="col-sm-12 col-md-6 col-xl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="fail" inputId="fail" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+            <label for="fail">Motivo*</label>
+          </span>
+        </div>
+
+        <!--* Usuario -->
+        <div class="col-sm-12 col-md-6 col-xl-3">
+          <span class="p-float-label">
+            <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre" optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+            <label for="user">Usuario Autoriza*</label>
           </span>
         </div>
 
@@ -113,7 +128,7 @@
         </div>-->
 
         <!--* Observación -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <textarea formControlName="observation" [rows]="1" inputId="observation" pInputTextarea></textarea>
             <label for="observation">Observación</label>

@@ -10,4 +10,6 @@ export interface modelReposiciones {
     Rep_HoraSalida : string;
     Usua_Salida : number;
     Rep_ObservacionSalida : string;
+    Falla_Id? : number, 
+    Usua_Autoriza? : number,
 }

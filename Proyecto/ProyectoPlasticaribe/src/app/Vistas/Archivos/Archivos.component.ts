@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ShepherdService } from 'angular-shepherd';
 import { File } from 'buffer';
 import moment from 'moment';
@@ -43,6 +44,7 @@ export class ArchivosComponent implements OnInit {
   rutaSeleccionada: any; /** Ruta del Archivo/Carpeta seleccionado para ser eliminado */
   accionMoverCopiar: number;
   value: number = 0;
+  url = ``;
 
   constructor(private frmBuilder: FormBuilder,
     private AppComponent: AppComponent,
@@ -50,7 +52,9 @@ export class ArchivosComponent implements OnInit {
     private categoriaArchivosService: Categorias_ArchivosService,
     private mensajeService: MensajesAplicacionService,
     private messageService: MessageService,
-    private shepherdService: ShepherdService) {
+    private shepherdService: ShepherdService, 
+    private router : Router, 
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     !localStorage.getItem('user') ? this.modoInvitado = false : this.modoInvitado = true;
@@ -63,6 +67,13 @@ export class ArchivosComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.url = this.router.url;
+    if(this.url == '/sistema-gestion-calidad') {
+      this.AppComponent.rutaCarpetaArchivos = 'D:\\Calidad\\Sistema de Gestion de Calidad';
+    }  
+    if(this.url == '/aseguramiento-calidad') {
+      this.AppComponent.rutaCarpetaArchivos = 'D:\\Calidad\\Aseguramiento de la Calidad';
+    }
     this.lecturaStorage();
     this.mostrarCarpetas();
     this.obtenerCategorias();

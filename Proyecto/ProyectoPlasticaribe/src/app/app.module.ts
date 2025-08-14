@@ -243,6 +243,8 @@ import { ReporteClientesComponent } from './Vistas/reporte-clientes/reporte-clie
 import { RollosPesadosComponent } from './Vistas/rollos-pesados/rollos-pesados.component';
 import { MovTrazabilidadProduccionComponent } from './Vistas/mov-trazabilidad-produccion/mov-trazabilidad-produccion.component';
 import { SolicitudRollosAreasComponent } from './Vistas/solicitud-rollos-areas/solicitud-rollos-areas.component';
+import { AseguramientoCalidadComponent } from './Vistas/aseguramiento-calidad/aseguramiento-calidad.component';
+import { SistemaGestionCalidadComponent } from './Vistas/sistema-gestion-calidad/sistema-gestion-calidad.component';
 
 @NgModule({
   declarations: [
@@ -405,7 +407,9 @@ import { SolicitudRollosAreasComponent } from './Vistas/solicitud-rollos-areas/s
     ReporteClientesComponent,
     RollosPesadosComponent,
     MovTrazabilidadProduccionComponent,
-    SolicitudRollosAreasComponent
+    SolicitudRollosAreasComponent,
+    AseguramientoCalidadComponent, 
+    SistemaGestionCalidadComponent,
   ],
 
   imports: [

@@ -12,6 +12,8 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { MessageService } from 'primeng/api';
 import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones.service';
 import { OverlayPanel } from 'primeng/overlaypanel';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 
 @Component({
   selector: 'app-Mov_Reposiciones',
@@ -37,6 +39,7 @@ export class Mov_ReposicionesComponent implements OnInit {
   selectedRepo : any = {};
   @ViewChild('op') op: OverlayPanel | undefined;
   observation : any = null;
+  fails : any = [];
 
   constructor(
     private appComponent: AppComponent,
@@ -49,6 +52,8 @@ export class Mov_ReposicionesComponent implements OnInit {
     private cmpRepostions : ReposicionesComponent,
     private svProduction : Produccion_ProcesosService,
     private msg : MessageService,
+    private svExcel : CreacionExcelService,
+    private svFails : FallasTecnicasService,
   ) {
       this.initForm();
       this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -65,6 +70,8 @@ export class Mov_ReposicionesComponent implements OnInit {
     let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
     this.form.patchValue({ 'startDate' : initialDate, 'endDate' : new Date() });
   }
+  
+  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 25) });
 
   //*
   getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11,5,3].includes(x.estado_Id))  }, error => { this.msjs(`Error`, `Error al consultar los estados.`) });
@@ -78,6 +85,7 @@ export class Mov_ReposicionesComponent implements OnInit {
       idClient: [null],
       client: [null],
       status: [null],
+      fail : [null],
     });
   }
 
@@ -126,11 +134,13 @@ export class Mov_ReposicionesComponent implements OnInit {
     let id: any = this.form.value.id;
     let status: any = this.form.value.status;
     let client : any = this.form.value.idClient;
+    let fail : any = this.form.value.fail;
     let url : string = ``;
 
     if(id != null) url += `id=${id}`;
     if(status != null) url.length > 0 ? url += `&status=${status}` : url += `status=${status}`;
     if(client != null) url.length > 0 ? url += `&roll=${client}` : url += `roll=${client}`;
+    if(fail != null) url.length > 0 ? url += `&fail=${fail}` : url += `fail=${fail}`;
 
     if(url.length > 0) url = `?${url}`;
     return url;
@@ -251,6 +261,118 @@ export class Mov_ReposicionesComponent implements OnInit {
         $event.stopPropagation();
       }, 500);
     }
-  }   
+  }
+  
+  //Función que exportará un formato excel con los datos de los clientes
+  exportExcel(){
+    if(this.searchedData.length > 0) {
+      this.load = true;
+      setTimeout(() => { this.loadSheetAndStyles(this.searchedData); }, 1000);
+    } else this.msjs(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data : any){  
+    let title : any = `Cartas de reposición de `;  
+    title += ` ${moment(this.form.value.startDate).format('DD-MM-YYYY')} a ${moment(this.form.value.endDate).format('DD-MM-YYYY')}`;
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.svExcel.formatoExcel(title, true);
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+    this.load = false;
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title : any, fontTitle : any){
+    ws.getCell('A1').alignment = { vertical: 'middle', horizontal: 'right', wrapText: true};
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5']; 
+    ws.addRow(this.loadFieldsHeader());
+
+    //ws.addRow([]);
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:H3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [3,8,7].forEach(x => ws.getColumn(x).width = 50);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [4,5,6].forEach(x => ws.getColumn(x).width = 20);
+    [2].forEach(x => ws.getColumn(x).width = 15);
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      'N°',
+      'N° Carta',
+      'Cliente',
+      'Fecha', 
+      'Estado',
+      'Motivo',
+      'Autoriza',
+      'Observación' 
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H']; 
+
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    }); 
+    //row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.movement,
+        x.client,
+        `${x.date1.replace('T00:00:00', '')} - ${x.hour1}`,
+        x.status,
+        x.fail,
+        x.authorize,
+        x.observation1,
+      ]);
+    });
+    return info;
+  }
 }
 

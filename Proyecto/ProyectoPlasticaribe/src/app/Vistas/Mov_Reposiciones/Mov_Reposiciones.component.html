@@ -25,7 +25,7 @@
       <div class="row g-3 my-4 justify-content-md-center">
   
         <!--* Documento -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="id" id="orden" type="text" pInputText required/>
@@ -50,7 +50,7 @@
         </div>
   
         <!--* Cliente -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="client" id="client" list="list" type="text" pInputText required (keyup)="searchClientsByName()" (change)="selectClient()"/>
@@ -58,6 +58,14 @@
               <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
             </datalist>
             <label for="client">Cliente*</label>
+          </span>
+        </div>
+
+        <!-- Motivo -->
+        <div class="col-sm-12 col-md-6 col-xl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="fail" inputId="fail" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+            <label for="fail">Motivo</label>
           </span>
         </div>
   
@@ -76,6 +84,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
           <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search" [disabled]="load"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFields()"></button>
+          <button pButton pRipple class="p-button-success" icon="pi pi-file-excel" type="button" label="Exportar excel" (click)="exportExcel()" id="botones1"></button>
         </div>
       </div>
     </form>
@@ -125,7 +134,8 @@
             <p-columnFilter type="text" field="date1" display="menu"></p-columnFilter>
           </th>
           <th class="text-center"> Observación</th>
-          <th class="text-center"> Tipo Doc.</th>
+          <th class="text-center"> Motivo</th>
+          <th class="text-center"> Autorizado por</th>
           <th class="text-center" pSortableColumn="status">
             <p-sortIcon field="status"></p-sortIcon> Estado
             <p-columnFilter type="text" field="status" display="menu"></p-columnFilter>
@@ -145,8 +155,8 @@
           <td class="text-center">
             <button id="editar" pRipple pButton (click)="viewObservation($event, data)" [disabled]="data.observation1 == null" icon="pi pi-fw pi-eye" label="Observación" class="p-button-success p-button-outlined" pTooltip="Haz clic para ver la observación de la reposición"></button>
           </td>
-          <td class="text-center"><b>{{'REPOSICIÓN'}}</b></td>
-          
+          <td class="text-center"><b>{{data.fail}}</b></td>
+          <td class="text-center"><b>{{data.authorize}}</b></td>
           <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
                                                                   'bg-success1': [5].includes(data.statusId),
                                                                   'bg-warning1': [3].includes(data.statusId), 

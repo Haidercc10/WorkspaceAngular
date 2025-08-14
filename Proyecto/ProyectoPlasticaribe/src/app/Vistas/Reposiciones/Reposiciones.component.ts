@@ -13,12 +13,14 @@ import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_Pr
 import { Detalles_ReposicionesService } from 'src/app/Servicios/Detalles_Reposiciones/Detalles_Reposiciones.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +51,8 @@ export class ReposicionesComponent implements OnInit {
   action : string = `Generar`;
   lastRepo : number = null;
   repositionForDv : boolean = false;
+  fails : any = [];
+  users : any = [];
 
   constructor(private AppComponent : AppComponent, 
     private fmBuild : FormBuilder,
@@ -62,6 +66,8 @@ export class ReposicionesComponent implements OnInit {
     private msg : MessageService, 
     private svDetDevolutions : DetallesDevolucionesProductosService,
     private svDevolutions : DevolucionesProductosService,
+    private svFails : FallasTecnicasService,
+    private svUsers : UsuarioService, 
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
@@ -70,6 +76,8 @@ export class ReposicionesComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getLastReposition();
+    this.getFails();
+    this.getUsers();
     //this.createPDF(1, `creada`);
   }
 
@@ -82,6 +90,10 @@ export class ReposicionesComponent implements OnInit {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
+
+  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 25) });
+
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 101, 3123, 1, 5, 30, 60, 111, 270, 304, 331, 435, 483, 531, 603, 713, 853].includes(x.usua_Id)); });
 
   getLastReposition() {
     this.svRepo.getLastReposition().subscribe(repo => { 
@@ -104,6 +116,8 @@ export class ReposicionesComponent implements OnInit {
       client : [null, Validators.required],
       clientStock : [false, ],
       observation : [null, Validators.required], 
+      fail : [null, ],
+      user : [null, ],
     });
   }
 
@@ -212,7 +226,6 @@ export class ReposicionesComponent implements OnInit {
   }
 
   loadClientReposition(data : any){
-    console.log(data);
     this.form.patchValue({ 'client' : data.clientes.cli_Nombre, 'idClient' : data.or.cli_Id, 'dev' : data.or.id });
   } 
 
@@ -305,6 +318,8 @@ export class ReposicionesComponent implements OnInit {
         Rep_HoraSalida: moment().format('HH:mm:ss'),
         Usua_Salida: this.storage_Id,
         Rep_ObservacionSalida: '',
+        Falla_Id : this.form.value.fail,
+        Usua_Autoriza : this.form.value.user, 
       };
       this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id, dev); }, error => { 
         this.msjs(`Error`, `Error guardando el encabezado de la reposición | ${error.status} ${error.statusText}`); 
@@ -668,7 +683,7 @@ export class ReposicionesComponent implements OnInit {
             { text: ``, alignment: '', fontSize: 11, bold: true, border: [false, false, false, false], },
           ], 
           [
-            { text: `Por medio de la presente reposición N° 00${data.movement} se hace entrega de la(s) siguiente(s) referencias:`, alignment: '', fontSize: 12, border: [false, false, false, false], },
+            { text: `Por medio del presente documento N° 00${data.movement} por motivo de ${data.fail}, solicitado por ${data.authorize} se hace entrega de la(s) siguiente(s) referencias:`, alignment: '', fontSize: 12, border: [false, false, false, false], },
           ],
         ]
       },
@@ -677,7 +692,7 @@ export class ReposicionesComponent implements OnInit {
 
   infoDate(data : any){
     return {
-      margin : [0, 0, 0, 45],
+      margin : [0, 0, 0, 15],
       table: {
         widths: ['*'],
         body: [

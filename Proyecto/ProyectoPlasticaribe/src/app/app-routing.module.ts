@@ -168,6 +168,9 @@ export const routes: Routes = [
   { path: 'mov-ingreso-peletizado', loadChildren: () => import('./Modules/mov-ingreso-peletizado/mov-ingreso-peletizado.module').then(m => m.MovIngresoPeletizadoModule) },
   { path: 'inventario-peletizado', loadChildren: () => import('./Modules/inventario-peletizado/inventario-peletizado.module').then(m => m.InventarioPeletizadoModule) },
   { path: 'salidas-peletizado', loadChildren: () => import('./Modules/salidas-peletizado/salidas-peletizado.module').then(m => m.SalidasPeletizadoModule) },
+  /*************************************************************** CALIDAD *************************************************************************************************/
+  { path: 'sistema-gestion-calidad', loadChildren: () => import('./Modules/sistema-gestion-calidad/sistema-gestion-calidad.module').then(m => m.SistemaGestionCalidadModule) },
+  { path: 'aseguramiento-calidad', loadChildren: () => import('./Modules/aseguramiento-calidad/aseguramiento-calidad.module').then(m => m.AseguramientoCalidadModule) },  
 ]
 
 @NgModule({
