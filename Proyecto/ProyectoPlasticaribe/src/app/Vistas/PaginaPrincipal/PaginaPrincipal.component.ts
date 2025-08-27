@@ -26,6 +26,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   costos : boolean = false;
   compras : boolean = false;
   inventarioAreas : boolean = false;
+  calidad : boolean = false;
 
   constructor(private AppComponent : AppComponent,) { }
 
@@ -36,7 +37,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     if ([61,12,85,97,10].includes(this.ValidarRol)) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
     if ([1,12,94,85,98,5].includes(this.ValidarRol)) this.inventarioAreas = true;
-    if ([6,12,96,10].includes(this.ValidarRol)) this.facturacion = true;
+    if ([1,5].includes(this.ValidarRol)) this.calidad = true;
   }
 
   ngOnDestroy(): void {
@@ -51,6 +52,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     this.costos = false;
     this.compras = false;
     this.inventarioAreas = false;
+    this.calidad = false;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -92,5 +94,6 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 2 && [97,10].includes(this.ValidarRol) ? this.gerencia = true : null;
     index == 2 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
     index == 4 && [98].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
+    index == 11 ? this.calidad = true : null;
   }
 }

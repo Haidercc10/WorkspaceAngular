@@ -174,6 +174,8 @@ export class Dashboard_AreasComponent implements OnInit {
           this.totalMesArea(datos, 11, area),
           this.totalMesArea(datos, 12, area),
         ];
+        console.log(produccion);
+        
         this.llenarGraficas(produccion, area);
         count++;
         if (count == proceso.length) {

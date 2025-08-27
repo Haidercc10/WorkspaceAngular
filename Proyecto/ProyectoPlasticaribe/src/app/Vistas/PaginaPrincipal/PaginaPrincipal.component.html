@@ -104,6 +104,15 @@
         <app-Dashboard_Areas *ngIf="inventarioAreas"></app-Dashboard_Areas>
       </p-tabPanel>
 
+      <!-- Producción por Áreas -->
+      <p-tabPanel
+        header="Calidad"
+        leftIcon="pi pi-credit-card"
+        tooltip="Información general sobre calidad"
+        *ngIf="[1,5].includes(ValidarRol)">
+        <app-dashboard-calidad *ngIf="calidad"></app-dashboard-calidad>
+      </p-tabPanel>
+
     </p-tabView>
   </div>
 </div>
