@@ -1,0 +1,34 @@
+<br>
+<form [formGroup]="form" (ngSubmit)="createReqs()">
+
+    <div class="mb-3">
+        <div class="row g-4">
+
+            <!-- Nombre Tercero -->
+            <div class="col-xs-12">
+                <span class="p-float-label">
+                    <input formControlName="req" id="req" type="text" (keyup)="loadDescription()" pInputText
+                        required />
+                    <label for="req">Nombre</label>
+                </span>
+            </div>
+
+            <!-- Nombre Tercero -->
+            <div class="col-xs-12">
+                <span class="p-float-label">
+                    <input formControlName="description" id="description" type="text" pInputText required />
+                    <label for="description">Descripción</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-danger" type="submit" label="Crear Req." icon="pi pi-check"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+                (click)="clearLabels()"></button>
+        </div>
+    </div>
+</form>

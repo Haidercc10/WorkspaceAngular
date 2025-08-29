@@ -1,0 +1,194 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+    <div style="margin: auto;">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</div>
+
+<div class="contain">
+    <!-- Navegador fin de parte superior -->
+    <div class="container-fluid">
+        <div class="mb-4 Titulo">
+            <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de Devoluciones Calidad</h2>
+        </div>
+        <div class="mb-4">
+            <hr class="colorLinea">
+        </div>
+    </div>
+</div>
+
+<p-card>
+    <div class="my-4">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+                class="pi pi-filter"></i> Filtros de búsqueda</h4>
+    </div>
+
+    <form [formGroup]="formFilters" (ngSubmit)="searchData()">
+        <div class="row g-3 my-4 justify-content-md-center">
+
+            <!--* TYPE MOV. -->
+            <div class="col-sm-12 col-md-6 col-xl-1">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="typeMov" inputId="typeMov" [autoDisplayFirst]="false"
+                        [options]="typesMovements"></p-dropdown>
+                    <label for="typeMov">Rechazo</label>
+                </span>
+            </div>
+
+            <!--* OT -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-1 col-xl-1 col-xxl-1">
+                <span class="p-input-icon-left p-float-label">
+                    <i class="pi pi-search"></i>
+                    <input formControlName="ot" id="ot" type="text" pInputText required />
+                    <label for="ot">OT</label>
+                </span>
+            </div>
+
+            <!--* Fecha 1 -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+                <span class="p-float-label">
+                    <p-calendar formControlName="startDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+                    <label for="FechaInicial">Fecha Inicial</label>
+                </span>
+            </div>
+
+            <!--* Fecha 2 -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+                <span class="p-float-label">
+                    <p-calendar formControlName="endDate" inputId="FechaFinal" [showIcon]="true"></p-calendar>
+                    <label for="FechaFinal">Fecha Final</label>
+                </span>
+            </div>
+
+            <!--* CLIENT -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                <span class="p-float-label">
+                    <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off"
+                        pInputText (keyup)="searchClientsByName()" (change)="selectClient()" />
+                    <datalist id="clientes">
+                        <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
+                    </datalist>
+                    <label for="Cliente">Cliente</label>
+                </span>
+            </div>
+
+            <!--* ITEM -->
+            <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-3 col-xxl-3">
+                <span class="p-float-label">
+                    <input formControlName="item" id="prod" list="producto" type="text" pInputText (change)="selectedProduct()" (keydown)="searchProduct()"/>
+                    <datalist id="producto">
+                        <option value={{item.prod_Id}} *ngFor="let item of products">{{item.prod_Nombre}}</option>
+                    </datalist>
+                    <label for="prod">Referencia</label>
+                </span>
+            </div>
+        </div>    
+        <div class="mb-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
+                <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"
+                    [disabled]="load"></button>
+                <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+                    [disabled]="load"></button>
+                <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel"
+                    [disabled]="serchedData.length == 0" (click)="exportExcel()"></button>
+            </div>
+        </div>
+    </form>
+
+    <div class="mb-4">
+        <hr class="Linea">
+    </div>
+
+    <div class="mb-5">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i>
+            Registros consultados</h4>
+    </div>
+
+    <div class="mb-4">
+        <p-table 
+        #dt 
+        [resizableColumns]="true" 
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm" 
+        responsiveLayout="scroll" 
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" 
+        [rowHover]="true"
+        [value]="serchedData" dataKey="Oc" [scrollable]="true" scrollHeight="50rem" *ngIf="!load">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="font-weight: 800;" class="text-center" colspan="5"><i class="pi pi-book"></i> Devolución</th>
+                    <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i>
+                        Calidad</th>
+                    <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-calendar"></i> Valores
+                    </th>
+                    <th style="font-weight: 800;" class="text-center"></th>
+                    <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-file-pdf"></i></th>
+                </tr>
+                <tr>
+                    <th class="text-center" pSortableColumn="devs.dvc_OT" alignFrozen="left" pFrozenColumn [frozen]="true">
+                        <p-sortIcon field="devs.dvc_OT"></p-sortIcon> OT
+                        <p-columnFilter type="text" field="devs.dvc_OT" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="client.cli_Nombre">
+                        <p-sortIcon field="client.cli_Nombre"></p-sortIcon> Cliente
+                        <p-columnFilter type="text" field="client.cli_Nombre" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="devs.prod_Id">
+                        <p-sortIcon field="devs.prod_Id"></p-sortIcon> Item
+                        <p-columnFilter type="text" field="devs.prod_Id" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="item.prod_Nombre">
+                        <p-sortIcon field="item.prod_Nombre"></p-sortIcon> Referencia
+                        <p-columnFilter type="text" field="item.prod_Nombre" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="fails.falla_Nombre">
+                        <p-sortIcon field="fails.falla_Nombre"></p-sortIcon> No conform.
+                        <p-columnFilter type="text" field="fails.falla_Nombre" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="process.proceso_Nombre">
+                        <p-sortIcon field="process.proceso_Nombre"></p-sortIcon> Proceso
+                        <p-columnFilter type="text" field="process.proceso_Nombre" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="req.req_Nombre">
+                        <p-sortIcon field="req.req_Nombre"></p-sortIcon> Requerimiento
+                        <p-columnFilter type="text" field="req.req_Nombre" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="devs.dvc_TipoRechazo">
+                        <p-sortIcon field="devs.dvc_TipoRechazo"></p-sortIcon> Rechazo
+                        <p-columnFilter type="text" field="devs.dvc_TipoRechazo" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="devs.dvc_PesoNeto">
+                        <p-sortIcon field="devs.dvc_PesoNeto"></p-sortIcon> Peso
+                        <p-columnFilter type="text" field="devs.dvc_PesoNeto" display="menu"></p-columnFilter>
+                    </th>
+                    <th id="ver3" alignFrozen="right" pFrozenColumn [frozen]="true">Ver</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data>
+                <tr [ngClass]="{'cursor': data.type == 'DV'}"
+                    pTooltip="{{''}}" tooltipPosition="top">
+                    <td class="text-center" alignFrozen="left" pFrozenColumn [frozen]="true">
+                        {{data.type}}-{{data.or.id}}</td>
+                    <td class="text-center">{{data.client.cli_Nombre == true ? 'SÍ' : 'NO'}}</td>
+                    <td class="text-center">{{data.devs.prod_Id}}</td>
+                    <td class="">{{data.item.prod_Nombre}}</td>
+                    <td class="">{{data.fails.falla_Nombre}}</td>
+                    <td class="text-center">{{data.process.proceso_Nombre}}</td>
+                    <td class="text-center">{{data.req.req_Nombre }}</td>
+                    <td class="text-center">{{ data.devs.dvc_TipoRechazo }}</td>
+                    <td class="text-center"><span class="badge"
+                            [ngClass]="{'bg-danger1': [19,11].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-success1': [21,18].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-warning': [3,29].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-secondary1': [38].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-blue1': [39].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-black1': [53].includes(data.or.devs.dvc_PesoNeto_Id)}">{{data.devs.dvc_PesoNeto}}</span>
+                    </td>
+                    <td class="text-center" *ngIf="[1].includes(validateRole)">
+                        <p-button id="botonPdf" icon="pi pi-ban" styleClass="p-button-rounded p-button-warning"
+                            [disabled]="data.type == 'DV'"></p-button>
+                    </td>
+                    <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+                        <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger"
+                            ></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</p-card>

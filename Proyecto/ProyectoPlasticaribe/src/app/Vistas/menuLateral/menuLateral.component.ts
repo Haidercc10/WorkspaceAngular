@@ -194,9 +194,22 @@ export class MenuLateralComponent implements OnInit {
   cargarOpcionesMenu(){
     let count : number = 0;
     this.categorias.forEach(element => {
+      if(element.label == 'Calidad') {
+        element.items.push(
+          {
+            label: 'Sistema de Gestión', icon: '', items: [
+              { label: 'Aseguramiento de la Calidad', icon: 'pi pi-flag-fill', command: () => { this.router.navigate(['/aseguramiento-calidad']); }},
+              { label: 'Sistema de Gestión Integrado', icon: 'pi pi-check-circle', command: () => { this.router.navigate(['/sistema-gestion-calidad']); }}
+            ]
+          }
+        );    
+      }
+      
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
           if (element.items) {
+            console.log(element.items);
+            
             element.items.push(
             {
               label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu,
@@ -206,7 +219,7 @@ export class MenuLateralComponent implements OnInit {
                   if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
                 } else if (element.label == `Productos`) {
                   if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]);
-                } 
+                }
                 this.display = false;
               }
             });

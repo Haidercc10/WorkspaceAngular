@@ -172,7 +172,7 @@ export const routes: Routes = [
   { path: 'sistema-gestion-calidad', loadChildren: () => import('./Modules/sistema-gestion-calidad/sistema-gestion-calidad.module').then(m => m.SistemaGestionCalidadModule) },
   { path: 'aseguramiento-calidad', loadChildren: () => import('./Modules/aseguramiento-calidad/aseguramiento-calidad.module').then(m => m.AseguramientoCalidadModule) },  
   { path: 'devoluciones-calidad', loadChildren: () => import('./Modules/devoluciones-calidad/devoluciones-calidad.module').then(m => m.DevolucionesCalidadModule) },  
-
+  { path: 'mov-devoluciones-calidad', loadChildren: () => import('./Modules/mov-devoluciones-calidad/mov-devoluciones-calidad.module').then(m => m.MovDevolucionesCalidadModule) },  
 ]
 
 @NgModule({

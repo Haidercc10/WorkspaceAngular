@@ -19,7 +19,9 @@
 <p-card>
  <!--Crear Falla-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+    <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear No Conformidad" id="botones1" (click)="modalFails = true"></button>
+    <button pButton pRipple class="p-button-danger" icon="pi pi-check-square" label="Crear Requerimiento" id="botones1" (click)="modalReqs = true"></button>
+  
   </div>
 
   <div class="mb-5">
@@ -363,5 +365,11 @@
 <p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
   <ng-template pTemplate="content">
     <app-Crear_Fallas></app-Crear_Fallas>
+  </ng-template>  
+</p-dialog> 
+
+<p-dialog [modal]="true" header="Creación de Requerimientos"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalReqs" [style]="{width: '400px', height: 'auto'}">
+  <ng-template pTemplate="content">
+    <app-requerimientos-calidad></app-requerimientos-calidad>
   </ng-template>  
 </p-dialog> 

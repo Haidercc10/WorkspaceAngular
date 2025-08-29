@@ -30,4 +30,7 @@ export class DevolucionesCalidadService {
     getTotalMoneyForClient = (year : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForClient/${year}${url}`);
 
     getDevolutionsForRejectedType = (year : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getDevolutionsForRejectedType/${year}`);
+
+    getMovementsDvQuality = (date1 : any, date2 : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getMovementsDvQuality/${date1}/${date2}${url}`);
+
 }

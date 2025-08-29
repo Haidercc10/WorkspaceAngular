@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import { info } from 'console';
@@ -22,6 +22,10 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { RequerimientosCalidadService } from 'src/app/Servicios/Requerimientos_Calidad/requerimientos-calidad.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-devoluciones-calidad',
@@ -92,6 +96,7 @@ export class DevolucionesCalidadComponent {
     devolutions : any = [];
     orderProduction : any = [];
     modalFails = false;
+    modalReqs = false;
   
     constructor(private frmBuilderMateriaPrima : FormBuilder,
                   private bagProServices : BagproService,

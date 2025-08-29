@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { VistasPermisosGuard } from 'src/app/Guards/vistas-permisos.guard';
-import { SistemaGestionCalidadComponent } from 'src/app/Vistas/sistema-gestion-calidad/sistema-gestion-calidad.component';
+import { MovDevolucionesCalidadComponent } from 'src/app/Vistas/mov-devoluciones-calidad/mov-devoluciones-calidad.component';
 
 const routes: Routes = [
   {
-    path: '', 
-    component: SistemaGestionCalidadComponent,
+    path: '',
     canActivate: [VistasPermisosGuard], 
-    data: {nombre: 'Sistema de Gestión Integrado'}, 
+    data: {nombre: 'Movimientos Devoluciones Calidad'}, 
+    component: MovDevolucionesCalidadComponent,
   }
 ];
 
@@ -16,4 +16,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class SistemaGestionCalidadRoutingModule { }
+export class MovDevolucionesCalidadRoutingModule { }
