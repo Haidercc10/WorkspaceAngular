@@ -91,6 +91,7 @@ export class DevolucionesCalidadComponent {
     requirements : any = [];
     devolutions : any = [];
     orderProduction : any = [];
+    modalFails = false;
   
     constructor(private frmBuilderMateriaPrima : FormBuilder,
                   private bagProServices : BagproService,
@@ -112,24 +113,10 @@ export class DevolucionesCalidadComponent {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
       this.infoOT = this.frmBuilderMateriaPrima.group({
         ot :[null,Validators.required],
-        //cliente :[null,Validators.required],
-        //IdProducto :[null,Validators.required],
-        //NombreProducto :[null, Validators.required],
-        //cantProductoSinMargenUnd :[null, Validators.required],
-        //cantProductoSinMargenKg :[null, Validators.required],
-        //margenAdicional :[null, Validators.required],
-        //cantProductoConMargen :[null, Validators.required],
-        //PresentacionProducto :[null, Validators.required],
-        //ValorUnidadProductoUnd :[null, Validators.required],
-        //ValorUnidadProductoKg :[null, Validators.required],
-        //ValorEstimadoOt :[null, Validators.required],
-        //fechaInicioOT :[null, Validators.required],
-        //fechaFinOT :[null, Validators.required],
         fail : [null, Validators.required],
         process : [null, Validators.required],
         type : [null, Validators.required],
         requirement : [null, Validators.required],
-        //weight : [null, Validators.required],
         weightNet : [null, Validators.required],
         subtotal : [0, Validators.required],
         observation : [null, Validators.required],
@@ -139,7 +126,6 @@ export class DevolucionesCalidadComponent {
   
     ngOnInit() {
       this.lecturaStorage();
-      //this.inhabilitarCampos();
       this.getFails();
       this.getProcess();
       this.getRequirements();
@@ -400,19 +386,6 @@ export class DevolucionesCalidadComponent {
       this.load = true;
     }
   
-    inhabilitarCampos = () => setTimeout(() => {
-      this.infoOT.disable(); 
-      this.infoOT.get('ot').enable();
-      this.infoOT.get('fail').enable();
-      this.infoOT.get('process').enable();
-      this.infoOT.get('type').enable();
-      this.infoOT.get('requirement').enable();
-      this.infoOT.get('weight').enable();
-      this.infoOT.get('weightNet').enable();
-      this.infoOT.get('subtotal').enable();
-      this.infoOT.get('observation').enable();
-    }, 1000);
-
     calcSubtotal() {
       let priceKg : number =  this.orderProduction[0].priceKg;
       let qtyKg : number =  (this.infoOT.value.weightNet) ? (this.infoOT.value.weightNet) : 0;
@@ -484,8 +457,9 @@ export class DevolucionesCalidadComponent {
             'weightNet' : this.infoOT.value.weightNet,  
             'price' : this.orderProduction[0].priceKg, 
             'subtotal' : this.infoOT.value.subtotal, 
-            'date' : this.infoOT.value.date,
-            'dateProduction' : this.orderProduction[0].initDate
+            'date' : moment(this.infoOT.value.date).format('YYYY-MM-DD'),
+            'dateProduction' : this.orderProduction[0].initDate,
+            'observation' : this.infoOT.value.observation,
           });
           setTimeout(() => {
             this.msj.mensajeConfirmacion(`OT N° ${this.orderProduction[0].ot} agregada exitosamente!`);
@@ -519,7 +493,7 @@ export class DevolucionesCalidadComponent {
         let info : modelDevoluciones_Calidad = {
           'Dvc_Fecha': moment(x.date).format('YYYY-MM-DD'),
           'Dvc_Ano': parseInt(moment().format('YYYY')),
-          'Dvc_Mes': moment().format('MMMM').toUpperCase(),
+          'Dvc_Mes': moment(x.date).format('MMMM').toUpperCase(),
           'Dvc_OT': x.ot,
           'Cli_Id': x.clientId,
           'Prod_Id': x.item,
@@ -534,6 +508,7 @@ export class DevolucionesCalidadComponent {
           'Dvc_FechaProduccion': moment(x.initDate).format('YYYY-MM-DD'),
           'Dvc_FechaRegistro': moment().format('YYYY-MM-DD'),
           'Dvc_Hora': moment().format('HH:mm:ss'),
+          'Dvc_Observacion': x.observation
         }
         this.svDevolutions.Post(info).subscribe(data => {
           count++
@@ -546,5 +521,14 @@ export class DevolucionesCalidadComponent {
           this.load = true;
         });
       });
+    }
+
+    //*
+    quitRoll(data : any){
+      this.load = false; 
+      let index : any = this.devolutions.findIndex(x => x.ot == data.ot);
+      this.msj.mensajeAdvertencia(`Advertencia`, `Se ha quitado la OT N° ${data.ot} de la tabla.`);
+      this.devolutions.splice(index, 1);
+      setTimeout(() => { this.load = true; }, 1000);
     }
 }

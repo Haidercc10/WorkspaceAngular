@@ -21,9 +21,10 @@ export class DashboardCalidadComponent {
   cargando : boolean = false; //Variable que va a validar si se esta cargando algo o no
 
   modoSeleccionado : boolean;
+  monthNames: any = ['', 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', ''];
+  monthSelected : any = null;
 
-
-  years : any [] = [2025]; //Variable que almacenará los años desde el 2019 hasta el año actual
+  years : any [] = [2025]; //Variable que almacenará los años desde el 2025 hasta el año actual
   selectedYear : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
 
   totalRejectedInt : number = 0;
@@ -31,6 +32,7 @@ export class DashboardCalidadComponent {
   devolutionsForArea : any = [];
   devolutionsForClient : any = [];
   devolutionsForMonth : any = [];
+  devolutionsForClientTable : any = [];
   
   /* GRAFICA */
   ComparativoData: any;
@@ -66,19 +68,22 @@ export class DashboardCalidadComponent {
 
   qualityVsFact : any = [];
 
+  devolutionsForRejected : any = [];
+  
+
   constructor(private AppComponent : AppComponent,
                 private mainPage : PaginaPrincipalComponent,
                   private svDevolutions : DevolucionesCalidadService,
                     private svFact : InventarioZeusService,) {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    }
+  }
 
   ngOnInit() {
-    
     this.lecturaStorage();
+    this.llenarArrayAnos();
+    this.selectMonthAuto();
     this.getInfoDevolutionsQuality();
     this.inicializarGraficas();
-    this.loadInformationDevolutions();
     this.tiempoExcedido();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -87,6 +92,10 @@ export class DashboardCalidadComponent {
       this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
     }, 1000);
   } 
+
+  selectMonthAuto(){
+    this.monthSelected = moment().format('MMMM').toUpperCase() 
+  }
   
    //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -98,7 +107,7 @@ export class DashboardCalidadComponent {
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.mainPage.calidad) {
-       setTimeout(() => this.llenarGraficaComparativo(), 3000);
+      setTimeout(() => this.llenarGraficaComparativo(), 3000);
       let time = setInterval(() => {
         if (this.mainPage.calidad)  setTimeout(() => this.llenarGraficaComparativo(), 3000);
         else clearInterval(time);
@@ -107,8 +116,16 @@ export class DashboardCalidadComponent {
   }
 
   getInfoDevolutionsQuality(){
+    this.devolutionsForArea = [];
+    this.devolutionsForClient = [];
+    this.devolutionsForClientTable = [];
+    this.devolutionsForMonth = [];
+    this.totalRejectedExt = 0;
+    this.totalRejectedInt = 0;
+
     //Devoluciones por tipo de rechazo
-    this.svDevolutions.getTotalMoneyForRejectedType(2025).subscribe(data1 => {
+    let month : string = [null, ''].includes(this.monthSelected) ? '' : `?month=${this.monthSelected}`;
+    this.svDevolutions.getTotalMoneyForRejectedType(this.selectedYear, month).subscribe(data1 => {
       this.totalRejectedExt = data1.filter(x => x.rejectedType == 'EXTERNO').reduce((a, b) => a += b.total, 0);
       this.totalRejectedInt = data1.filter(x => x.rejectedType == 'INTERNO').reduce((a, b) => a += b.total, 0);
     }, error => {
@@ -116,28 +133,57 @@ export class DashboardCalidadComponent {
     });
 
     //Devoluciones por area.
-    this.svDevolutions.getTotalMoneyForArea(2025).subscribe(data2 => {
+    this.svDevolutions.getTotalMoneyForArea(this.selectedYear, month).subscribe(data2 => {
       this.devolutionsForArea = data2;
       this.devolutionsForArea.sort((a,b) => Number(b.total) - Number(a.total));
     }, error =>{
       console.log(error);
     });
 
-    //Devoluciones por area.
-    this.svDevolutions.getTotalMoneyForClient(2025).subscribe(data3 => {
-      //console.log(data3);
+    //Devoluciones por cliente.
+    this.svDevolutions.getTotalMoneyForClient(this.selectedYear, month).subscribe(data3 => {
       this.devolutionsForClient = data3;
+      this.devolutionsForClientTable = data3;
       this.devolutionsForClient.sort((a,b) => Number(b.weight) - Number(a.weight));
+      this.devolutionsForClientTable.sort((a,b) => Number(b.total) - Number(a.total));
     }, error =>{
       console.log(error);
     });
+
+    //Devoluciones por cliente.
+    this.loadInformationDevolutions();
+
+    this.loadTypesRejected();
 
     setTimeout(() => {
       this.llenarGraficaAreas();
       this.llenarGraficaAreasPorKg();
       this.llenarGraficaClientes();
       this.llenarGraficaClientesPorKg();
-    }, 2000);  
+      this.llenarGraficaComparativo();
+    }, 1000);  
+  }
+
+  loadTypesRejected(){
+    this.svDevolutions.getDevolutionsForRejectedType(this.selectedYear).subscribe(data => {
+      this.devolutionsForRejected = data;
+    }, error => {
+      console.log(error);
+    });
+  }
+
+  totalRejected = () => this.devolutionsForRejected.reduce((a,b) => a += b.total, 0);
+
+  totalRejectedKg = () => this.devolutionsForRejected.reduce((a,b) => a += b.weight, 0);
+  
+  totalRejectedQty = () => this.devolutionsForRejected.reduce((a,b) => a += b.qty, 0);
+
+  // Funcion que va a llenar el array de años
+  llenarArrayAnos(){
+    const num_Mayor : number = Math.max(...this.years);
+    const currentYear = moment().year();
+    const newYears = Array.from({length: currentYear - num_Mayor}, (_, i) => num_Mayor + i + 1);
+    this.years.push(...newYears);
   }
 
   //Total devoluciones en kilos
@@ -147,10 +193,18 @@ export class DashboardCalidadComponent {
   totalDevolutionsInMoney = () => this.devolutionsForArea.reduce((a,b) => a += b.total, 0);
 
   //Total devoluciones en kilos
-  totalDevolutionsClientsInKg = () => this.devolutionsForClient.reduce((a,b) => a += b.weight, 0);
+  totalDevolutionsClientsInKg = () => this.devolutionsForClientTable.reduce((a,b) => a += b.weight, 0);
 
   //Total devoluciones en dinero
-  totalDevolutionsClientsInMoney = () => this.devolutionsForClient.reduce((a,b) => a += b.total, 0);
+  totalDevolutionsClientsInMoney = () => this.devolutionsForClientTable.reduce((a,b) => a += b.total, 0);
+
+  totalDevolutionsForMonth() {
+    let total : number = 0;
+    for (let index = 0; index < 12; index++) {
+      this.devolutionsForMonth[index] ? this.devolutionsForMonth[index].reduce((a,b) => total += b.total, 0) : null;
+    }
+    return total;    
+  } 
 
   //Total facturado (Facturación vs mala calidad)
   totalFact = () => this.qualityVsFact.reduce((a,b) => a += b.Valor, 0);
@@ -186,7 +240,9 @@ export class DashboardCalidadComponent {
     let areas : any = [];
     let total : any = [];
     let qty : any = [];
-    for (let i = 0; i < 10; i++) {
+    let arrayLength : number = this.devolutionsForArea.length > 9 ? 10 : this.devolutionsForArea.length;
+
+    for (let i = 0; i < arrayLength; i++) {
       areas.push(this.devolutionsForArea[i].area);
       total.push(this.devolutionsForArea[i].total);
       qty.push(this.devolutionsForArea[i].qty);
@@ -244,7 +300,10 @@ export class DashboardCalidadComponent {
     let areas : any = [];
     let weight : any = [];
     let qty : any = [];
-    for (let i = 0; i < 10; i++) {
+    let arrayLength : number = this.devolutionsForArea.length > 9 ? 10 : this.devolutionsForArea.length;
+
+    for (let i = 0; i < arrayLength; i++) {
+      console.log(i);
       areas.push(this.devolutionsForArea[i].area);
       weight.push(this.devolutionsForArea[i].weight);
       qty.push(this.devolutionsForArea[i].qty);
@@ -302,10 +361,12 @@ export class DashboardCalidadComponent {
     let clients : any = [];
     let total : any = [];
     let qty : any = [];
-    for (let i = 0; i < 10; i++) {
-      clients.push(this.devolutionsForClient[i].client);
-      total.push(this.devolutionsForClient[i].total);
-      qty.push(this.devolutionsForClient[i].qty);
+    let arrayLength : number = this.devolutionsForClientTable.length > 9 ? 10 : this.devolutionsForClientTable.length;
+
+    for (let i = 0; i < arrayLength; i++) {
+      clients.push(this.devolutionsForClientTable[i].client);
+      total.push(this.devolutionsForClientTable[i].total);
+      qty.push(this.devolutionsForClientTable[i].qty);
     }
     this.graphicForClientMoney = {
       labels: clients,
@@ -361,7 +422,9 @@ export class DashboardCalidadComponent {
     let clients : any = [];
     let weight : any = [];
     let qty : any = [];
-    for (let i = 0; i < 10; i++) {
+    let arrayLength : number = this.devolutionsForClient.length > 9 ? 10 : this.devolutionsForClient.length;
+
+    for (let i = 0; i < arrayLength; i++) {
       clients.push(this.devolutionsForClient[i].client);
       weight.push(this.devolutionsForClient[i].weight);
       qty.push(this.devolutionsForClient[i].qty);
@@ -417,7 +480,7 @@ export class DashboardCalidadComponent {
 
   //
   loadInformationDevolutions(){
-    this.svDevolutions.getTotalMoneyForMonth(2025).subscribe(data => {
+    this.svDevolutions.getTotalMoneyForMonth(this.selectedYear).subscribe(data => {
       this.devolutionsForMonth = data;
       setTimeout(() => {
         this.badQualityVsFact();
@@ -443,7 +506,7 @@ export class DashboardCalidadComponent {
     });
   }
 
-  totalMesArea = (datos : any [], mes : number) => datos.filter(x => x.year == 2025 && x.month == mes).reduce((a, b) => a += b.total, 0);
+  totalMesArea = (datos : any [], mes : number) => datos.filter(x => x.year == this.selectedYear && x.month == mes).reduce((a, b) => a += b.total, 0);
 
   //Función para inicializar las graficas
   inicializarGraficas(){
@@ -496,11 +559,9 @@ export class DashboardCalidadComponent {
 
   // Funcion que se encargará de llenar las graficas de areas
   llenarGraficas(data : any []){
-    console.log(data);
-    
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info = {
-      label: `${2025}`,
+      label: `${this.selectedYear}`,
       data: data,
       yAxisID: 'y',
       borderColor: color.substring(0, 4),
@@ -544,13 +605,11 @@ export class DashboardCalidadComponent {
   //
   badQualityVsFact(){
     let count : number = 0;
-    this.svFact.GetFacturacion_Mes_Mes('2025').subscribe(data => {
+    this.svFact.GetFacturacion_Mes_Mes(this.selectedYear.toString()).subscribe(data => {
       const quaVsFact = this.parseDatos(data).map(dato => {
         const fact = this.devolutionsForMonth[count].find(d => d.month == parseInt(dato.Mes))?.total || 0;
         const nameMonth = this.devolutionsForMonth[count].find(d => d.month == parseInt(dato.Mes))?.nameMonth || '';
         const percentage = (fact / dato.Valor);
-        console.log(fact, dato.Valor, percentage);
-        
         count++
         return { ...dato, Fact: fact, NombreMes : nameMonth, Porcentaje : percentage };
       });

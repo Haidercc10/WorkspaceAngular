@@ -21,11 +21,13 @@ export class DevolucionesCalidadService {
 
     Put = (data: Array<any>, id: number) => this.http.put(`${this.rutaPlasticaribeAPI}/Devoluciones_Calidad/${id}`, data);
 
-    getTotalMoneyForRejectedType = (year : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForRejectedType/${year}`);
+    getTotalMoneyForRejectedType = (year : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForRejectedType/${year}${url}`);
 
     getTotalMoneyForMonth = (year : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForMonth/${year}`);
 
-    getTotalMoneyForArea = (year : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForArea/${year}`);
+    getTotalMoneyForArea = (year : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForArea/${year}${url}`);
 
-    getTotalMoneyForClient = (year : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForClient/${year}`);
+    getTotalMoneyForClient = (year : any, url? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getTotalMoneyForClient/${year}${url}`);
+
+    getDevolutionsForRejectedType = (year : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Devoluciones_Calidad/getDevolutionsForRejectedType/${year}`);
 }

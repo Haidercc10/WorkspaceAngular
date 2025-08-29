@@ -1,0 +1,40 @@
+.costosAnios{
+  justify-content: center;
+  text-align: center;
+  background-color: #d1d1d122;
+  border: 1.9px dashed #8b8b8b;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.costosAniosOscuro{
+  justify-content: center;
+  text-align: center;
+  background-color: #aaa2;
+  border: 1.9px dashed #d7d7d7;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+::ng-deep .p-toolbar {
+  padding-top: 1%;
+  padding-bottom: 0%;
+}
+
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+  color: var(--rojo);
+  text-align: center;
+  width: 100%;
+}
+
+.bg-danger {
+    color: white;
+    background-color: palevioletred;
+    font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-success {
+    color: rgb(11, 82, 0);
+    background-color: palegreen;
+    font-size: calc(var(--font-size) * 15px);
+}
