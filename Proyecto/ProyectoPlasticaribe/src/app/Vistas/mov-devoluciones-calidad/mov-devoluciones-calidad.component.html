@@ -86,7 +86,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
                 <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"
                     [disabled]="load"></button>
-                <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+                <button pButton class="p-button-secondary" (click)="clearFields()" type="button" label="Limpiar Campos" icon="pi pi-eraser"
                     [disabled]="load"></button>
                 <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel"
                     [disabled]="serchedData.length == 0" (click)="exportExcel()"></button>
@@ -113,18 +113,19 @@
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" 
         [rowHover]="true"
-        [value]="serchedData" dataKey="Oc" [scrollable]="true" scrollHeight="50rem" *ngIf="!load">
+        [value]="serchedData" 
+        dataKey="Oc" 
+        [scrollable]="true" scrollHeight="50rem" *ngIf="!load">
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="font-weight: 800;" class="text-center" colspan="5"><i class="pi pi-book"></i> Devolución</th>
-                    <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i>
-                        Calidad</th>
-                    <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-calendar"></i> Valores
-                    </th>
+                    <th></th>
+                    <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-book"></i> Información OT</th>
+                    <th style="font-weight: 800;" class="text-center" colspan="5"><i class="pi pi-users"></i> Información Devolución</th>
+                    <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-calendar"></i> Valores </th>
                     <th style="font-weight: 800;" class="text-center"></th>
-                    <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-file-pdf"></i></th>
                 </tr>
                 <tr>
+                    <th></th>
                     <th class="text-center" pSortableColumn="devs.dvc_OT" alignFrozen="left" pFrozenColumn [frozen]="true">
                         <p-sortIcon field="devs.dvc_OT"></p-sortIcon> OT
                         <p-columnFilter type="text" field="devs.dvc_OT" display="menu"></p-columnFilter>
@@ -133,13 +134,13 @@
                         <p-sortIcon field="client.cli_Nombre"></p-sortIcon> Cliente
                         <p-columnFilter type="text" field="client.cli_Nombre" display="menu"></p-columnFilter>
                     </th>
-                    <th class="text-center" pSortableColumn="devs.prod_Id">
-                        <p-sortIcon field="devs.prod_Id"></p-sortIcon> Item
-                        <p-columnFilter type="text" field="devs.prod_Id" display="menu"></p-columnFilter>
-                    </th>
                     <th class="text-center" pSortableColumn="item.prod_Nombre">
                         <p-sortIcon field="item.prod_Nombre"></p-sortIcon> Referencia
                         <p-columnFilter type="text" field="item.prod_Nombre" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="devs.dvc_Fecha">
+                        <p-sortIcon field="devs.dvc_Fecha"></p-sortIcon> Fecha
+                        <p-columnFilter type="text" field="devs.dvc_Fecha" display="menu"></p-columnFilter>
                     </th>
                     <th class="text-center" pSortableColumn="fails.falla_Nombre">
                         <p-sortIcon field="fails.falla_Nombre"></p-sortIcon> No conform.
@@ -161,31 +162,34 @@
                         <p-sortIcon field="devs.dvc_PesoNeto"></p-sortIcon> Peso
                         <p-columnFilter type="text" field="devs.dvc_PesoNeto" display="menu"></p-columnFilter>
                     </th>
+                    <th class="text-center" pSortableColumn="devs.dvc_Subtotal">
+                        <p-sortIcon field="devs.dvc_Subtotal"></p-sortIcon> Subtotal
+                        <p-columnFilter type="text" field="devs.dvc_Subtotal" display="menu"></p-columnFilter>
+                    </th>
                     <th id="ver3" alignFrozen="right" pFrozenColumn [frozen]="true">Ver</th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-data>
-                <tr [ngClass]="{'cursor': data.type == 'DV'}"
-                    pTooltip="{{''}}" tooltipPosition="top">
-                    <td class="text-center" alignFrozen="left" pFrozenColumn [frozen]="true">
-                        {{data.type}}-{{data.or.id}}</td>
-                    <td class="text-center">{{data.client.cli_Nombre == true ? 'SÍ' : 'NO'}}</td>
-                    <td class="text-center">{{data.devs.prod_Id}}</td>
-                    <td class="">{{data.item.prod_Nombre}}</td>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+                <tr>
+                    <td class="">{{rowIndex + 1}}</td>
+                    <td class="text-center" alignFrozen="left" pFrozenColumn [frozen]="true">{{data.devs.dvc_OT}}</td>
+                    <td class=""><b>{{data.client.cli_Nombre}}</b></td>
+                    <td class=""><b>{{data.item.prod_Nombre}}</b></td>
+                    <td class="text-center">{{data.devs.dvc_Fecha | date : 'yyyy-MM-dd'}}</td>
                     <td class="">{{data.fails.falla_Nombre}}</td>
-                    <td class="text-center">{{data.process.proceso_Nombre}}</td>
-                    <td class="text-center">{{data.req.req_Nombre }}</td>
-                    <td class="text-center">{{ data.devs.dvc_TipoRechazo }}</td>
-                    <td class="text-center"><span class="badge"
-                            [ngClass]="{'bg-danger1': [19,11].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-success1': [21,18].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-warning': [3,29].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-secondary1': [38].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-blue1': [39].includes(data.or.devs.dvc_PesoNeto_Id), 'bg-black1': [53].includes(data.or.devs.dvc_PesoNeto_Id)}">{{data.devs.dvc_PesoNeto}}</span>
+                    <td class="text-center"><b>{{data.process.proceso_Nombre}}</b></td>
+                    <td class="">{{data.req.req_Nombre }}</td>
+                    <td class="text-center">
+                        <span class="badge" [ngClass]="{
+                                                        'bg-success1': data.devs.dvc_TipoRechazo == 'EXTERNO', 
+                                                        'bg-danger1': data.devs.dvc_TipoRechazo == 'INTERNO', 
+                                                        }">{{data.devs.dvc_TipoRechazo}}
+                        </span>
                     </td>
-                    <td class="text-center" *ngIf="[1].includes(validateRole)">
-                        <p-button id="botonPdf" icon="pi pi-ban" styleClass="p-button-rounded p-button-warning"
-                            [disabled]="data.type == 'DV'"></p-button>
-                    </td>
+                    <td class="text-center">{{data.devs.dvc_PesoNeto | number : '1.2-2'}}</td>
+                    <td class="text-center"><b>{{data.devs.dvc_Subtotal | number : '1.2-2'}}</b></td>
                     <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-                        <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger"
-                            ></p-button>
+                        <p-button id="botonPdf" icon="pi pi-eye" styleClass="p-button-rounded p-button-danger"></p-button>
                     </td>
                 </tr>
             </ng-template>

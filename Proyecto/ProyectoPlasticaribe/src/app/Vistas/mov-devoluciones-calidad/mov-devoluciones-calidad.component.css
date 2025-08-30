@@ -1,0 +1,11 @@
+.bg-danger1 {
+    color: white;
+    background-color: palevioletred;
+    font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-success1 {
+    color: rgb(11, 82, 0);
+    background-color: palegreen;
+    font-size: calc(var(--font-size) * 15px);
+}

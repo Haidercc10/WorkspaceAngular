@@ -208,8 +208,6 @@ export class MenuLateralComponent implements OnInit {
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
           if (element.items) {
-            console.log(element.items);
-            
             element.items.push(
             {
               label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu,

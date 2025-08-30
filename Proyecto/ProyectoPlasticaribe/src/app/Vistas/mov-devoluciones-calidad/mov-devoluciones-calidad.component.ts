@@ -9,6 +9,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { HttpErrorResponse } from '@angular/common/http';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Component({
   selector: 'app-mov-devoluciones-calidad',
@@ -36,6 +37,7 @@ export class MovDevolucionesCalidadComponent {
     private svZeusInv : InventarioZeusService, 
     private msg : MensajesAplicacionService,
     private svProducts : ProductoService,
+    private svExcel : CreacionExcelService,
   ){
       this.modoSeleccionado = this.appComponent.temaSeleccionado;
       this.initForm();
@@ -64,16 +66,18 @@ export class MovDevolucionesCalidadComponent {
       endDate: [null, Validators.required],
       typeMov: [null, ],
       ot: [null, ],
+      itemId: [null ],
       item: [null ],
       client: [null ],
+      clientId: [null ],
     });
   }
 
   validateUrl(){
     let ot: any = this.formFilters.value.ot;
     let typeRejected: any = this.formFilters.value.typeMov;
-    let client : any = this.formFilters.value.client;
-    let item : any = this.formFilters.value.item;
+    let client : any = this.formFilters.value.clientId;
+    let item : any = this.formFilters.value.itemId;
     let url : string = ``;
 
     if(ot != null) url += `ot=${ot}`;
@@ -103,34 +107,168 @@ export class MovDevolucionesCalidadComponent {
   }
 
   searchProduct() {
-    let nombre: string = this.formFilters.value.reference;
+    let nombre: string = this.formFilters.value.item;
     this.svProducts.obtenerItemsLike(nombre).subscribe(resp => this.products = resp);
   }
 
   selectedProduct() {
-    let producto: any = this.formFilters.value.reference;
+    let producto: any = this.formFilters.value.item;
     this.formFilters.patchValue({
-      item: producto,
-      reference: this.products.find(x => x.prod_Id == producto).prod_Nombre
+      'itemId': producto,
+      'item': this.products.find(x => x.prod_Id == producto).prod_Nombre
     });
   }
 
   searchData(){
+    this.load = true;
     let date1 : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let date2 : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
 
     this.svDevQuality.getMovementsDvQuality(date1, date2, this.validateUrl()).subscribe(data => {
       this.serchedData = data;
-      console.log(data);
+      this.load = false;
     }, error => {
-      console.log(error);
+      this.load = false;
+      console.log(error);this.errorMessage('Error al consultar los registros de devouciones', error)
     });
   }
-
-  exportExcel(){}
 
   errorMessage(message: string, error: HttpErrorResponse) {
     this.load = false;
     this.msg.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
   }
+
+  clearFields(){
+    this.formFilters.reset();
+    this.loadRankDates();
+  }
+
+  //Función que exportará un formato excel con los datos de los clientes
+    exportExcel(){
+      if(this.serchedData.length > 0) {
+        setTimeout(() => { this.loadSheetAndStyles(this.serchedData); }, 500);
+      } else this.msg.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+    }
+  
+    //Función que cargará la hoja y los estilos. 
+    loadSheetAndStyles(data : any){  
+      let title : any = `Devoluciones de`
+      title += ` ${moment(this.formFilters.value.startDate).format('DD-MM-YYYY')} a ${moment(this.formFilters.value.endDate).format('DD-MM-YYYY')}`;
+      let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+      let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+      let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+      let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+      let workbook = this.svExcel.formatoExcel(title, true);
+  
+      this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+      this.svExcel.creacionExcel(title, workbook);
+    }
+  
+    //Función para agregar una nueva hoja de calculo.
+    addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+      let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+      let worksheet : any = wb.worksheets[0];
+      this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+      this.loadHeader(worksheet, fill, border, font, alignment);
+      this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+    }
+  
+    //Cargar estilos del titulo de la hoja.
+    loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+      ws.getCell('A1').alignment = alignment;
+      ws.getCell('A1').font = fontTitle;
+      ws.getCell('A1').value = title;
+    }
+  
+    //Función para cargar los titulos de el header y los estilos.
+    loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+      let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','J5','K5','L5','M5','N5','O5','P5','Q5']; 
+      //ws.addRow([]);
+      ws.addRow(this.loadFieldsHeader());
+      
+      rowHeader.forEach(x => ws.getCell(x).fill = fill);
+      rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+      rowHeader.forEach(x => ws.getCell(x).border = border);
+      rowHeader.forEach(x => ws.getCell(x).font = font);
+      ws.mergeCells('A1:Q3');
+  
+      this.loadSizeHeader(ws);
+    }
+  
+    //Función para cargar el tamaño y el alto de las columnas del header.
+    loadSizeHeader(ws : any){
+      [5].forEach(x => ws.getColumn(x).width = 50);
+      [6].forEach(x => ws.getColumn(x).width = 40);
+      [1].forEach(x => ws.getColumn(x).width = 5);
+      [3].forEach(x => ws.getColumn(x).width = 10);
+      [2,4,9,10].forEach(x => ws.getColumn(x).width = 15);
+      [7,8].forEach(x => ws.getColumn(x).width = 20);
+    }
+  
+   //Función para cargar los nombres de las columnas del header
+    loadFieldsHeader(){
+      let headerRow = [
+        'N°',
+        'Fecha',
+        'Año',
+        'Mes', 
+        'Cliente',
+        'Item', 
+        'Referencia', 
+        'OT',
+        'Fecha Producción',
+        'No conformidad',
+        'Rechazo', 
+        'Observaciones', 
+        'Dpto. Encargado',
+        'Requerimiento',
+        'Peso',
+        'Precio Kg', 
+        'Precio Kg Mala Calidad',
+      ];
+      return headerRow;
+    }
+  
+    //Cargar información con los estilos al formato excel. 
+    loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+      let contador : any = 6;
+      let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q']; 
+      
+      data.forEach(x => {
+        ws.addRow(x);
+        row.forEach(r => {
+          ws.getCell(`${r}${contador}`).border = border;
+          ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+          ws.getCell(`${r}${contador}`).alignment = alignment;
+        });
+        contador++
+      }); 
+    }
+  
+    //.Función que contendrá la info al documento excel. 
+    dataExcel(data : any){
+      let info : any = [];
+      let count : number = 0;
+      data.forEach(x => {
+        info.push([
+          count += 1,
+          x.devs.dvc_Fecha,
+          x.devs.dvc_Ano,
+          x.devs.dvc_Mes,
+          x.client.cli_Nombre,
+          x.devs.prod_Id,
+          x.item.prod_Nombre,
+          x.devs.dvc_OT,
+          x.devs.dvc_FechaProduccion,
+          x.fails.falla_Nombre,
+          x.devs.dev_Observacion,
+          x.process.proceso_Nombre,
+          x.req.req_Nombre, 
+          x.devs.dvc_PesoNeto, 
+          x.devs.dvc_Precio, 
+          x.devs.dvc_Subtotal,
+        ]);
+      });
+      return info;
+    }
 }
