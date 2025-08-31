@@ -152,7 +152,7 @@ export class MovDevolucionesCalidadComponent {
   
     //Función que cargará la hoja y los estilos. 
     loadSheetAndStyles(data : any){  
-      let title : any = `Devoluciones de`
+      let title : any = `Movimientos de Devoluciones de`
       title += ` ${moment(this.formFilters.value.startDate).format('DD-MM-YYYY')} a ${moment(this.formFilters.value.endDate).format('DD-MM-YYYY')}`;
       let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
       let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
@@ -197,12 +197,13 @@ export class MovDevolucionesCalidadComponent {
   
     //Función para cargar el tamaño y el alto de las columnas del header.
     loadSizeHeader(ws : any){
-      [5].forEach(x => ws.getColumn(x).width = 50);
-      [6].forEach(x => ws.getColumn(x).width = 40);
+      [7,17].forEach(x => ws.getColumn(x).width = 50);
+      [5,10,12,13,16].forEach(x => ws.getColumn(x).width = 40);
       [1].forEach(x => ws.getColumn(x).width = 5);
       [3].forEach(x => ws.getColumn(x).width = 10);
-      [2,4,9,10].forEach(x => ws.getColumn(x).width = 15);
-      [7,8].forEach(x => ws.getColumn(x).width = 20);
+      [2,3,4,6,8,9,11,14,15].forEach(x => ws.getColumn(x).width = 12);
+      
+      [12].forEach(x => ws.getColumn(x).width = 20);
     }
   
    //Función para cargar los nombres de las columnas del header
@@ -219,12 +220,12 @@ export class MovDevolucionesCalidadComponent {
         'Fecha Producción',
         'No conformidad',
         'Rechazo', 
-        'Observaciones', 
-        'Dpto. Encargado',
+        'Responsable',
         'Requerimiento',
         'Peso',
         'Precio Kg', 
         'Precio Kg Mala Calidad',
+        'Observaciones', 
       ];
       return headerRow;
     }
@@ -233,7 +234,12 @@ export class MovDevolucionesCalidadComponent {
     loadInfoExcel(ws : any, data : any, border : any, alignment : any){
       let contador : any = 6;
       let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q']; 
-      
+      let formatNumber: Array<number> = [15, 16];
+      let formatNumber2: Array<number> = [14];
+
+      formatNumber.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
+      formatNumber2.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-"$"#,##0.00'); 
+
       data.forEach(x => {
         ws.addRow(x);
         row.forEach(r => {
@@ -252,21 +258,22 @@ export class MovDevolucionesCalidadComponent {
       data.forEach(x => {
         info.push([
           count += 1,
-          x.devs.dvc_Fecha,
+          x.devs.dvc_Fecha.replace('T00:00:00', ''),
           x.devs.dvc_Ano,
           x.devs.dvc_Mes,
           x.client.cli_Nombre,
           x.devs.prod_Id,
           x.item.prod_Nombre,
           x.devs.dvc_OT,
-          x.devs.dvc_FechaProduccion,
+          x.devs.dvc_FechaProduccion.replace('T00:00:00', ''),
           x.fails.falla_Nombre,
-          x.devs.dev_Observacion,
+          x.devs.dvc_TipoRechazo,
           x.process.proceso_Nombre,
           x.req.req_Nombre, 
           x.devs.dvc_PesoNeto, 
           x.devs.dvc_Precio, 
           x.devs.dvc_Subtotal,
+          x.devs.dvc_Observacion,
         ]);
       });
       return info;

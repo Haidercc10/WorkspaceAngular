@@ -120,6 +120,8 @@ export class DashboardCalidadComponent {
     this.devolutionsForClient = [];
     this.devolutionsForClientTable = [];
     this.devolutionsForMonth = [];
+    this.devolutionsForRejected = [];
+    this.qualityVsFact = [];
     this.totalRejectedExt = 0;
     this.totalRejectedInt = 0;
 
@@ -153,6 +155,7 @@ export class DashboardCalidadComponent {
     //Devoluciones por cliente.
     this.loadInformationDevolutions();
 
+    //Devoluciones por tipo de rechazo.
     this.loadTypesRejected();
 
     setTimeout(() => {
@@ -161,12 +164,13 @@ export class DashboardCalidadComponent {
       this.llenarGraficaClientes();
       this.llenarGraficaClientesPorKg();
       this.llenarGraficaComparativo();
-    }, 1000);  
+    }, 1500);  
   }
 
   loadTypesRejected(){
     this.svDevolutions.getDevolutionsForRejectedType(this.selectedYear).subscribe(data => {
       this.devolutionsForRejected = data;
+      this.devolutionsForRejected.sort((a,b) => Number(a.monthNro) - Number(b.monthNro))
     }, error => {
       console.log(error);
     });
