@@ -57,8 +57,8 @@ export class RequerimientosCalidadComponent {
       this.svReqs.Post(info).subscribe(data => {
         this.svMsjs.mensajeConfirmacion('Requerimiento creado correctamente!');
         this.load = false;
-        this.cmpDevQuality.modalFails = false;
-        this.cmpDevQuality.getFails(); 
+        this.cmpDevQuality.modalReqs = false;
+        this.cmpDevQuality.getRequirements(); 
         setTimeout(() => { this.form.reset(); }, 2000);
       }, error => {
         this.svMsjs.mensajeError(`Error`, `Ha ocurrido un error, por favor verifique!`);

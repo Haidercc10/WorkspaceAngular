@@ -23,15 +23,27 @@
 
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-9 col-xxl-9">
                             <div class="row m-auto justify-content-center">
-                                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-3 m-auto" id="">
-                                    <p-dropdown class="m-auto" [options]="years" [(ngModel)]="selectedYear"></p-dropdown>
+                                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 m-auto" id="">
+                                    <span class="p-float-label">
+                                        <p-dropdown class="m-auto" [options]="years" inputId="year" [(ngModel)]="selectedYear" (onChange)="getInfoDevolutionsQuality()"></p-dropdown>
+                                        <label for="year">Año</label>
+                                    </span>
                                 </div>
-                                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-3 m-auto" id="">
-                                    <p-dropdown class="m-auto" [options]="monthNames" [(ngModel)]="monthSelected"></p-dropdown>
+                                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 m-auto" id="">
+                                    <span class="p-float-label">
+                                        <p-dropdown class="m-auto" [options]="monthNames" inputId="month" [(ngModel)]="monthSelected" (onChange)="getInfoDevolutionsQuality()"></p-dropdown>
+                                        <label for="month">Mes</label>
+                                    </span>
                                 </div>
-                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4 m-auto" id="">
+                                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 m-auto" id="">
+                                    <span class="p-float-label">
+                                        <p-dropdown class="m-auto" [options]="typeRejected" inputId="rejected" [(ngModel)]="typeRejectedSelected" (onChange)="getInfoDevolutionsQuality()"></p-dropdown>
+                                        <label for="rejected">Rechazo</label>
+                                    </span>
+                                </div>
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 m-auto" id="">
                                     <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="getInfoDevolutionsQuality()"></button>
-                                    <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="getInfoDevolutionsQuality()"></button>
+                                    <button pButton pTooltip="Limpiar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="clearAll()"></button>
                                 </div>
                             </div>
                         </div>
@@ -43,6 +55,7 @@
 
                 </div>
             </div>
+
             <!--Dashboard de areas-->
             <p-tabPanel
                 header="Areas"
@@ -53,10 +66,10 @@
                     <!-- Grafica tipo de rechazo.  -->
                     <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 slide-in-blurred-top" id="">
                         <p-card>
-                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-bolt"></i> Valores en tipos de rechazos por calidad</h2>
+                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-bolt"></i> {{msj('Valores en')}}</h2>
                             <p-chart type="bar" width="100%" height="400px" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
                             <ng-template pTemplate="footer">
-                                <button pButton pTooltip="Mostrar Tabla" pRipple type="button" icon="pi pi-table" class="p-button-rounded p-button-danger"></button>
+                                <!--<button pButton pTooltip="Mostrar Tabla" pRipple type="button" icon="pi pi-table" class="p-button-rounded p-button-danger"></button>-->
                             </ng-template>
                         </p-card>
                     </div>
@@ -64,7 +77,7 @@
                     <!-- Devoluciones por area. -->
                     <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4 slide-in-blurred-top" id="">
                     <p-card>
-                        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> Devoluciones en áreas por calidad</h2>
+                        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> {{msj('Áreas con')}}</h2>
                         <ng-container *ngIf="devolutionsForArea.length > 0; then Tabla1 else Texto1;" ></ng-container>
                         <ng-template #Tabla1>
                             <p-table
@@ -87,7 +100,7 @@
                                         <td style="min-width: 50%; max-width: 50%">{{stock.area}}</td>
                                         <td style="min-width: 40%; max-width: 40%"><b>${{stock.total | number : '1.2-2'}}</b></td>
                                         <td style="min-width: 40%; max-width: 40%">{{stock.weight | number : '1.2-2'}}</td>
-                                        <td><p-button icon="pi pi-search" styleClass="p-button-rounded p-button-danger" [style]="{width: '30px', height: '30px'}"></p-button></td>
+                                        <td><p-button icon="pi pi-search" (click)="loadModalForFilter(stock)" styleClass="p-button-rounded p-button-danger" [style]="{width: '30px', height: '30px'}"></p-button></td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
@@ -114,7 +127,7 @@
                     <!--Devoluciones por mes-->
                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-5 col-xxl-5 py-4 px-2" id="">
                     <p-card>
-                        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Devoluciones en el mes por calidad</h2>
+                        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> {{msj('')}}</h2>
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="400px" [data]="graphicForMonth" [options]="graphicOptions"></p-chart>
                         <div class="row p-2">
                             <div class="col-xs-12 col-sm-12 col-md-4">
@@ -134,7 +147,7 @@
                     <!--Devoluciones en pesos/cantidad -->
                     <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-right" id="">
                         <p-card>
-                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> Top 10 areas con más costos en devoluciones por calidad</h2>
+                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i>  {{msj('Áreas con más costos en')}} </h2>
 
                             <p-chart type="bar" width="100%" height="400px" [data]="graficaPedidosClientes" [options]="opcionesGraficas"></p-chart>
                             <ng-template pTemplate="footer">
@@ -146,7 +159,7 @@
                     <!--Devoluciones en kilos/cantidad -->
                     <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-right" id="">
                         <p-card>
-                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> Top 10 areas con más kilaje en devoluciones por calidad</h2>
+                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> {{msj('Áreas con más kilos en')}}</h2>
 
                             <p-chart type="bar" width="100%" height="400px" [data]="graphicForKg" [options]="graphicOptionsKg"></p-chart>
                             <ng-template pTemplate="footer">
@@ -167,7 +180,7 @@
                     <!-- Devoluciones por clientes. -->
                     <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4 slide-in-blurred-top" id="">
                     <p-card>
-                        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> Devoluciones de clientes por calidad</h2>
+                        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> {{msj('Clientes con')}}</h2>
                         <ng-container *ngIf="devolutionsForClientTable.length > 0; then Tabla2 else Texto2;" ></ng-container>
                         <ng-template #Tabla2>
                             <p-table
@@ -190,7 +203,7 @@
                                         <td style="min-width: 50%; max-width: 50%">{{stock.client}}</td>
                                         <td style="min-width: 40%; max-width: 40%"><b>${{stock.total | number : '1.2-2'}}</b></td>
                                         <td style="min-width: 40%; max-width: 40%">{{stock.weight | number : '1.2-2'}}</td>
-                                        <td><p-button icon="pi pi-search" styleClass="p-button-rounded p-button-danger" [style]="{width: '30px', height: '30px'}"></p-button></td>
+                                        <td><p-button icon="pi pi-search" (click)="loadModalForFilter(stock)" styleClass="p-button-rounded p-button-danger" [style]="{width: '30px', height: '30px'}"></p-button></td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
@@ -217,7 +230,7 @@
                     <!--Devoluciones en pesos/cantidad -->
                     <div class="p-3 col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-right" id="">
                         <p-card>
-                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> Top 10 clientes con más costos en devoluciones por calidad</h2>
+                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> {{msj('Clientes con más costos en')}}</h2>
 
                             <p-chart type="bar" width="100%" height="400px" [data]="graphicForClientMoney" [options]="graphicOptionsClientMoney"></p-chart>
                             <ng-template pTemplate="footer">
@@ -229,7 +242,7 @@
                     <!--Devoluciones en kilos/cantidad -->
                     <div class="p-3 col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-right" id="">
                         <p-card>
-                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> Top 10 clientes con más kilaje en devoluciones por calidad</h2>
+                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> {{msj('Clientes con más kilaje en ')}} </h2>
 
                             <p-chart type="bar" width="100%" height="400px" [data]="graphicForClientKg" [options]="graphicOptionsClientKg"></p-chart>
                             <ng-template pTemplate="footer">
@@ -250,7 +263,7 @@
                 <div class="row g-2 p-2">
                     <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-5 col-xxl-5 slide-in-blurred-top" id="">
                         <p-card>
-                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i>Indicador devoluciones Calidad vs Facturación</h2>
+                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> {{msj('Indicador de')}} vs Facturación</h2>
                             <ng-container *ngIf="qualityVsFact.length > 0; then Tabla3 else Texto3;" ></ng-container>
                             <ng-template #Tabla3>
                                 <p-table
@@ -273,7 +286,7 @@
                                             <td style="min-width: 50%; max-width: 50%">{{stock.NombreMes}}</td>
                                             <td style="min-width: 40%; max-width: 40%"><b>${{stock.Valor | number : '1.2-2'}}</b></td>
                                             <td style="min-width: 40%; max-width: 40%">${{stock.Fact | number : '1.2-2'}}</td>
-                                            <td style="min-width: 40%; max-width: 40%">{{stock.Porcentaje | number : '1.2-6'}}%</td>
+                                            <td style="min-width: 40%; max-width: 40%">{{stock.Porcentaje | number : '1.2-2'}}%</td>
                                         </tr>
                                     </ng-template>
                                     <ng-template pTemplate="footer">
@@ -299,7 +312,7 @@
                     <!-- Resumen de rechazos -->
                     <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-7 col-xxl-7 slide-in-blurred-top" id="">    
                         <p-card>
-                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> Rechazos en los meses por calidad</h2>
+                            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> {{msj('')}}</h2>
                             <ng-container *ngIf="devolutionsForRejected.length > 0; then Tabla4 else Texto4;" ></ng-container>
                             <ng-template #Tabla4>
                                 <p-table
@@ -359,3 +372,9 @@
         
     </div>
 </div>
+
+<p-dialog [modal]="true" header=""  [draggable]="false" [(visible)]="modalClients" [style]="{width: '95%'}" >
+  <ng-template pTemplate="content">
+    <app-mov-devoluciones-calidad></app-mov-devoluciones-calidad>
+  </ng-template>  
+</p-dialog>

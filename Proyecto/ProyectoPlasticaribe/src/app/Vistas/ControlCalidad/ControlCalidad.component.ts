@@ -6,6 +6,7 @@ import { modelControlCalidad_CorteDoblado, modelControlCalidad_Impresion } from 
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ControlCalidad_CorteDobladoService } from 'src/app/Servicios/ControlCalidad_CorteDoblado/ControlCalidad_CorteDoblado.service';
 import { ControlCalidad_ImpresionService } from 'src/app/Servicios/ControlCalidad_Impresion/ControlCalidad_Impresion.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, ControlCalidad as defaultSteps } from 'src/app/data';
@@ -42,13 +43,15 @@ export class ControlCalidadComponent implements OnInit {
                   private shepherdService: ShepherdService,
                     private controlDbl : ControlCalidad_CorteDobladoService,
                       private controlImp : ControlCalidad_ImpresionService,
-                        private bagproService : BagproService,) {
+                        private bagproService : BagproService,
+                          private svExcel : CreacionExcelService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.consultarDatos()
+    //this.consultarDatos();
+    this.exportExcel();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -484,4 +487,178 @@ export class ControlCalidadComponent implements OnInit {
   }
 
   cambioTab = (index : any)  => index == 0 || index == 3 ? this.esExtrusionSellado = true : this.esExtrusionSellado = false;
+
+  exportExcel(){
+  //if(this.comparativeStock.length > 0) {
+    setTimeout(() => { this.loadSheetAndStyles2(this.datosControlCal_Impresion); }, 500);
+  //} else this.msg.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
+  }
+  
+  //Función que cargará la hoja de cálculo y los estilos.
+  loadSheetAndStyles2(data : any){  
+    console.log(data);
+    let title : any = `Control de calidad de extrusión`;  
+    //title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 10, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet2(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet2(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 10, bold: true };
+    let worksheet : any = wb.worksheets[0];
+    let unirCeldas : string [] = ['A33:R36'];
+
+    this.loadStyleTitle2(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadHeader2(worksheet, fill, border, font, alignment);
+    unirCeldas.forEach(cell => worksheet.mergeCells(cell));
+    this.loadInfoExcel2(worksheet, [/*this.dataExcel2(data)*/], border,  alignment);
+    worksheet.getCell('A33').value = `OBSERVACIONES: `;
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle2(ws: any, title : any, fontTitle : any, alignment : any){
+    ws.getCell('D1').alignment = alignment;
+    ws.getCell('D1').font = fontTitle;
+    ws.getCell('D1').value = title;
+    ws.getCell('Q1').alignment = alignment;
+    ws.getCell('Q1').font = fontTitle;
+    ws.getCell('Q1').value = `Código:FR-AC-GC-03`; 
+    ws.getCell('Q2').alignment = alignment;
+    ws.getCell('Q2').font = fontTitle;
+    ws.getCell('Q2').value = `Versión: 03`; 
+    ws.getCell('Q3').alignment = alignment;
+    ws.getCell('Q3').font = fontTitle;
+    ws.getCell('Q3').value = `Fecha: 30/07/2022`;
+    
+  }
+
+  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5', 'J5','K5','L5','M5', 'N5', 'O5', 'P5', 'Q5', 'R5']; 
+    let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5'];
+   
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+
+    unirCeldas.forEach(cell => ws.mergeCells(cell));
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader2(ws : any, fill : any, border : any, font : any, alignment : any){
+    let rowHeader : any = ['A7','B7','C7','D7','E7','F7','G7','H7','I7', 'J7','K7','L7','M7', 'N7', 'O7', 'P7', 'Q7', 'R7'];
+    let alinearWrap : string [] = ['H7', 'I7', 'J7', 'K7', 'L7', 'M7', 'Q7', 'R7'];
+    let textoRotado : string [] = ['B7', 'F7', 'U7', 'V7', 'W7', 'X7']; 
+    
+    ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader2());
+    
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    //ws.mergeCells('A1:M3');
+
+    alinearWrap.forEach(cell => ws.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  });
+    textoRotado.forEach(cell => ws.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', textRotation: 90 });
+    this.loadSizeHeader2(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws : any){
+    [11,12,13].forEach(x => ws.getColumn(x).width = 6);
+    [9,10].forEach(x => ws.getColumn(x).width = 7);
+    [14,15,16].forEach(x => ws.getColumn(x).width = 4);
+    [17,18].forEach(x => ws.getColumn(x).width = 8);
+    [3,6,7,8].forEach(x => ws.getColumn(x).width = 10);
+    [1].forEach(x => ws.getColumn(x).width = 9);
+    [2].forEach(x => ws.getColumn(x).width = 4);
+    [4].forEach(x => ws.getColumn(x).width = 25);
+    [4].forEach(x => ws.getColumn(x).width = 30);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader2(ws : any){
+    [11,12,13].forEach(x => ws.getColumn(x).width = 6);
+    [9,10].forEach(x => ws.getColumn(x).width = 7);
+    [14,15,16].forEach(x => ws.getColumn(x).width = 4);
+    [17,18].forEach(x => ws.getColumn(x).width = 8);
+    [3,6,7,8].forEach(x => ws.getColumn(x).width = 10);
+    [1].forEach(x => ws.getColumn(x).width = 9);
+    [2].forEach(x => ws.getColumn(x).width = 4);
+    [4].forEach(x => ws.getColumn(x).width = 25);
+    [4].forEach(x => ws.getColumn(x).width = 30);
+  }
+
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader(){
+    let headerRow = [
+      "FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""
+    ];
+    return headerRow;
+  }
+
+ //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader2(){
+    let headerRow = [
+      "MAQUINA", "RONDA", "OT", "CLIENTE", "PRODUCTO", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "CAL. MIN", "CAL. MAX", "CAL. PROM", "APARIENCIA", "TRATADO", "RASGADO", "BOB. TUBULAR", "BOB. LAMINA"
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel2(ws : any, data : any, border : any, alignment : any){
+    let formatNumber: Array<number> = [5,6,7,9,10,11,12];
+    let contador : any = 6;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M']; 
+
+    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+    //row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel2(data : any){
+    let info : any = [];
+    let count : number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.item,
+        x.client,
+        x.reference,
+        x.stock,
+        x.stockInProcess,
+        x.totalStock,
+        x.presentation,
+        x.price, 
+        (x.price * x.stock),
+        (x.price * x.stockInProcess),
+        x.price * (x.stock + x.stockInProcess),
+        x.seller,
+      ]);
+    });
+    return info;
+  }
+  
 }

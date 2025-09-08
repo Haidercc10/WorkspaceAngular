@@ -19,7 +19,7 @@
 </div>
 
 <p-card class="font-size-14">
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" *ngIf="[95,1,98].includes(ValidarRol)">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" *ngIf="[95,1,98,3].includes(ValidarRol)">
     <button pButton pRipple label="Cambiar Ubicación" icon="pi pi-arrow-right-arrow-left"class="p-button-outlined p-button-success" id="reubicar" (click)="changeUbications = true"></button>
     <p-button icon="pi pi-eye" label="Ver Plano Bodega" styleClass="p-button-rounded p-button-warning" (click)="warehouse = true" tooltipPosition="top"></p-button>
   </div>
@@ -166,7 +166,7 @@
 
     <!--* PRODUCTO INTERMEDIO -->
     <p-tabPanel
-      *ngIf="[95,1,12,98,95,89,86,94,4,85,2].includes(ValidarRol)"
+      *ngIf="[95,1,12,98,95,89,86,94,4,85,2,3].includes(ValidarRol)"
       header="Producto Intermedio"
       leftIcon="pi pi-box"
       tooltip="Información del Inventario de la Bodega de Producto Intermedio">
@@ -342,7 +342,7 @@
 
     <!--* ROTOGRABADO -->
     <p-tabPanel
-      *ngIf="[89,1,12,98,2].includes(ValidarRol)"
+      *ngIf="[89,1,12,98,2,3].includes(ValidarRol)"
       header="Rotograbado"
       leftIcon="pi pi-print"
       tooltip="Información del Inventario de la Bodega de Rotograbado">
@@ -430,7 +430,7 @@
 
     <!--* CALIDAD -->
     <p-tabPanel
-      *ngIf="[95,1,12,98,2].includes(ValidarRol)"
+      *ngIf="[95,1,12,98,2,3].includes(ValidarRol)"
       header="Calidad"
       leftIcon="pi pi-check-square"
       tooltip="Información del Inventario de la Bodega de Productos por Calidad">
@@ -518,7 +518,7 @@
 
     <!--* IMPRESIÓN -->
     <p-tabPanel
-      *ngIf="[4,1,12,98,2].includes(ValidarRol)"
+      *ngIf="[4,1,12,98,2,3].includes(ValidarRol)"
       header="Impresión"
       leftIcon="pi pi-print"
       tooltip="Información del Inventario de la Bodega de Productos por Calidad">
@@ -606,7 +606,7 @@
 
     <!--* SELLADO -->
     <p-tabPanel
-      *ngIf="[86,1,12,98,94,2].includes(ValidarRol)"
+      *ngIf="[86,1,12,98,94,2,3].includes(ValidarRol)"
       header="Sellado"
       leftIcon="pi pi-tags"
       tooltip="Información del Inventario de la Bodega de Rollos de Sellado">

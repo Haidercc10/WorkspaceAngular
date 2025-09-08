@@ -63,6 +63,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     this.readStorage();
     this.loadRankDates();
     this.getStatuses();
+    this.getFails();
   }
 
   //*Función para cargar las fechas desde que inicia el modulo.

@@ -66,7 +66,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.lecturaStorage(); 
     this.cargarPigmentos();
     this.mostrarRegistrosHoy();
-    this.exportExcel();
+    //this.exportExcel();
     //this.generarFormatoExcel();
   }
 

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Injectable, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { AppComponent } from 'src/app/app.component';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { DevolucionesCalidadService } from 'src/app/Servicios/Devoluciones_Calidad/devoluciones-calidad.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { MovDevolucionesCalidadComponent } from '../mov-devoluciones-calidad/mov-devoluciones-calidad.component';
 
 @Component({
   selector: 'app-dashboard-calidad',
@@ -12,6 +13,8 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
   styleUrls: ['./dashboard-calidad.component.css']
 })
 export class DashboardCalidadComponent {
+
+  @ViewChild(MovDevolucionesCalidadComponent) cmpMovDevQuality : MovDevolucionesCalidadComponent;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -23,13 +26,19 @@ export class DashboardCalidadComponent {
   modoSeleccionado : boolean;
   monthNames: any = ['', 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', ''];
   monthSelected : any = null;
+  typeRejected : any = ['', 'INTERNO', 'EXTERNO', ''];
+  typeRejectedSelected : any = null;
 
   years : any [] = [2025]; //Variable que almacenará los años desde el 2025 hasta el año actual
   selectedYear : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
 
+  modalClients : boolean = false;
+  modalAreas : boolean = false;
+
   totalRejectedInt : number = 0;
   totalRejectedExt : number = 0;
   devolutionsForArea : any = [];
+  devolutionsForAreaKg : any = [];
   devolutionsForClient : any = [];
   devolutionsForMonth : any = [];
   devolutionsForClientTable : any = [];
@@ -69,12 +78,14 @@ export class DashboardCalidadComponent {
   qualityVsFact : any = [];
 
   devolutionsForRejected : any = [];
-  
+  devolutionsForMonthExtern : any = [];
 
   constructor(private AppComponent : AppComponent,
                 private mainPage : PaginaPrincipalComponent,
                   private svDevolutions : DevolucionesCalidadService,
-                    private svFact : InventarioZeusService,) {
+                    private svFact : InventarioZeusService,
+                      //private cmpMovDevQuality : MovDevolucionesCalidadComponent,
+                      ) {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -115,7 +126,24 @@ export class DashboardCalidadComponent {
     }
   }
 
+  //Función que validará la URL con la que se desea ingresar. 
+
+  validateUrl(){
+    let month: any = this.monthSelected;
+    let rejected: any = this.typeRejectedSelected;
+   
+    let url : string = ``;
+
+    if(month != null) url += `month=${month}`;
+    if(rejected != null) url.length > 0 ? url += `&rejected=${rejected}` : url += `rejected=${rejected}`;
+
+    if(url.length > 0) url = `?${url}`;
+    return url;
+  }
+
   getInfoDevolutionsQuality(){
+    this.devolutionsForAreaKg = []
+    this.devolutionsForMonthExtern = [];
     this.devolutionsForArea = [];
     this.devolutionsForClient = [];
     this.devolutionsForClientTable = [];
@@ -126,8 +154,7 @@ export class DashboardCalidadComponent {
     this.totalRejectedInt = 0;
 
     //Devoluciones por tipo de rechazo
-    let month : string = [null, ''].includes(this.monthSelected) ? '' : `?month=${this.monthSelected}`;
-    this.svDevolutions.getTotalMoneyForRejectedType(this.selectedYear, month).subscribe(data1 => {
+    this.svDevolutions.getTotalMoneyForRejectedType(this.selectedYear, this.validateUrl()).subscribe(data1 => {
       this.totalRejectedExt = data1.filter(x => x.rejectedType == 'EXTERNO').reduce((a, b) => a += b.total, 0);
       this.totalRejectedInt = data1.filter(x => x.rejectedType == 'INTERNO').reduce((a, b) => a += b.total, 0);
     }, error => {
@@ -135,19 +162,34 @@ export class DashboardCalidadComponent {
     });
 
     //Devoluciones por area.
-    this.svDevolutions.getTotalMoneyForArea(this.selectedYear, month).subscribe(data2 => {
+    this.svDevolutions.getTotalMoneyForArea(this.selectedYear, this.validateUrl()).subscribe(data2 => {
       this.devolutionsForArea = data2;
       this.devolutionsForArea.sort((a,b) => Number(b.total) - Number(a.total));
+      this
+    }, error =>{
+      console.log(error);
+    });
+
+    //Devoluciones por area ordenado por Kg.
+    this.svDevolutions.getTotalMoneyForArea(this.selectedYear, this.validateUrl()).subscribe(data1 => {
+      this.devolutionsForAreaKg = data1
+      this.devolutionsForAreaKg.sort((a,b) => Number(b.weight) - Number(a.weight));
     }, error =>{
       console.log(error);
     });
 
     //Devoluciones por cliente.
-    this.svDevolutions.getTotalMoneyForClient(this.selectedYear, month).subscribe(data3 => {
-      this.devolutionsForClient = data3;
+    this.svDevolutions.getTotalMoneyForClient(this.selectedYear, this.validateUrl()).subscribe(data3 => {
       this.devolutionsForClientTable = data3;
-      this.devolutionsForClient.sort((a,b) => Number(b.weight) - Number(a.weight));
       this.devolutionsForClientTable.sort((a,b) => Number(b.total) - Number(a.total));
+    }, error =>{
+      console.log(error);
+    });
+
+    //Devoluciones por cliente ordenado por Kg.
+    this.svDevolutions.getTotalMoneyForClient(this.selectedYear, this.validateUrl()).subscribe(data3 => {
+      this.devolutionsForClient = data3;
+      this.devolutionsForClient.sort((a,b) => Number(b.weight) - Number(a.weight));
     }, error =>{
       console.log(error);
     });
@@ -158,17 +200,20 @@ export class DashboardCalidadComponent {
     //Devoluciones por tipo de rechazo.
     this.loadTypesRejected();
 
+    //Devoluciones externas
+    this.loadInformationDevolutionsExtern();
+
     setTimeout(() => {
       this.llenarGraficaAreas();
       this.llenarGraficaAreasPorKg();
       this.llenarGraficaClientes();
       this.llenarGraficaClientesPorKg();
       this.llenarGraficaComparativo();
-    }, 1500);  
+    }, 1500); 
   }
 
   loadTypesRejected(){
-    this.svDevolutions.getDevolutionsForRejectedType(this.selectedYear).subscribe(data => {
+    this.svDevolutions.getDevolutionsForRejectedType(this.selectedYear, this.validateUrl()).subscribe(data => {
       this.devolutionsForRejected = data;
       this.devolutionsForRejected.sort((a,b) => Number(a.monthNro) - Number(b.monthNro))
     }, error => {
@@ -304,13 +349,13 @@ export class DashboardCalidadComponent {
     let areas : any = [];
     let weight : any = [];
     let qty : any = [];
-    let arrayLength : number = this.devolutionsForArea.length > 9 ? 10 : this.devolutionsForArea.length;
+    let arrayLength : number = this.devolutionsForAreaKg.length > 9 ? 10 : this.devolutionsForAreaKg.length;
 
     for (let i = 0; i < arrayLength; i++) {
       console.log(i);
-      areas.push(this.devolutionsForArea[i].area);
-      weight.push(this.devolutionsForArea[i].weight);
-      qty.push(this.devolutionsForArea[i].qty);
+      areas.push(this.devolutionsForAreaKg[i].area);
+      weight.push(this.devolutionsForAreaKg[i].weight);
+      qty.push(this.devolutionsForAreaKg[i].qty);
     }
     this.graphicForKg = {
       labels: areas,
@@ -482,14 +527,23 @@ export class DashboardCalidadComponent {
     };
   }
 
-  //
-  loadInformationDevolutions(){
-    this.svDevolutions.getTotalMoneyForMonth(this.selectedYear).subscribe(data => {
-      this.devolutionsForMonth = data;
+  loadInformationDevolutionsExtern(){
+    let url : string = `?rejected=${this.typeRejectedSelected}`;
+    this.svDevolutions.getTotalMoneyForMonth(this.selectedYear, url).subscribe(data => {
+      this.devolutionsForMonthExtern = data;
       setTimeout(() => {
         this.badQualityVsFact();
       }, 2000);
-      
+    }, error => {
+      console.log(error);
+    }); 
+  } 
+
+  //
+  loadInformationDevolutions(){
+    let url : string = [null, ''].includes(this.typeRejectedSelected) ? '' : `?rejected=${this.typeRejectedSelected}`;
+    this.svDevolutions.getTotalMoneyForMonth(this.selectedYear, url).subscribe(data => {
+      this.devolutionsForMonth = data;
       let info : any = [
           this.totalMesArea(data[0], 1),
           this.totalMesArea(data[1], 2),
@@ -503,11 +557,13 @@ export class DashboardCalidadComponent {
           this.totalMesArea(data[9], 10),
           this.totalMesArea(data[10], 11),
           this.totalMesArea(data[11], 12),
-        ];
+      ];
       this.llenarGraficas(info);
+      
     }, error => {
       console.log(error);
     });
+    //if(consulta) this.inicializarGraficas();
   }
 
   totalMesArea = (datos : any [], mes : number) => datos.filter(x => x.year == this.selectedYear && x.month == mes).reduce((a, b) => a += b.total, 0);
@@ -611,9 +667,9 @@ export class DashboardCalidadComponent {
     let count : number = 0;
     this.svFact.GetFacturacion_Mes_Mes(this.selectedYear.toString()).subscribe(data => {
       const quaVsFact = this.parseDatos(data).map(dato => {
-        const fact = this.devolutionsForMonth[count].find(d => d.month == parseInt(dato.Mes))?.total || 0;
-        const nameMonth = this.devolutionsForMonth[count].find(d => d.month == parseInt(dato.Mes))?.nameMonth || '';
-        const percentage = (fact / dato.Valor);
+        const fact = this.devolutionsForMonthExtern[count].find(d => d.month == parseInt(dato.Mes))?.total || 0;
+        const nameMonth = this.devolutionsForMonthExtern[count].find(d => d.month == parseInt(dato.Mes))?.nameMonth || '';
+        const percentage = (fact / dato.Valor * 100);
         count++
         return { ...dato, Fact: fact, NombreMes : nameMonth, Porcentaje : percentage };
       });
@@ -633,5 +689,39 @@ export class DashboardCalidadComponent {
     });
   }
 
+  loadModalForFilter(data : any){
+    this.modalClients = true;
+    
+    this.cmpMovDevQuality.formFilters.patchValue({
+      ot: '134289'
+    });
 
+    console.log(moment().startOf('month').format('YYYY-MM-DD'));
+    
+   // this.cmpMovDevQuality.formFilters.value.clientId = data.devs.cli_Id;
+
+    //console.log(this.cmpMovDevQuality.formFilters.value.clientId);
+    
+    setTimeout(() => { this.cmpMovDevQuality.searchData(); }, 500);
+  }
+
+  msj(msjHtml : string){
+    let message : string = ``;
+    let intern : string = ` Rechazos Internos`;
+    let concat : string = ` +`;
+    let extern : string = ` Devoluciones`;
+    let quality : string = ` por Calidad`
+
+    if(['EXTERNO'].includes(this.typeRejectedSelected)) message = msjHtml + extern + quality;
+    else if(['INTERNO'].includes(this.typeRejectedSelected)) message = msjHtml + intern + quality;
+    else message = msjHtml + intern + concat + extern + quality;
+    return message;
+  } 
+
+  //Limpiar todo el dashboard, solo carga año y mes actual. 
+  clearAll(){
+    this.selectMonthAuto();
+    this.typeRejectedSelected = '';
+    this.getInfoDevolutionsQuality();
+  }
 }

@@ -9,6 +9,7 @@ import { EliminarRollos_ProduccionComponent } from '../EliminarRollos_Produccion
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { IngresoProduccion_DespachoComponent } from '../IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
 import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
+import { DevolucionesCalidadComponent } from '../devoluciones-calidad/devoluciones-calidad.component';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,7 @@ export class Crear_FallasComponent implements OnInit {
     private cmDeleteRolls : EliminarRollos_ProduccionComponent, 
     private cmpDevolutionItems : Devolucion_OrdenFacturacionComponent, 
     private cmpUbicationsRolls : Ubicaciones_RollosComponent,
+    private cmpDvsQuality : DevolucionesCalidadComponent,
   ) {
       this.selectedMode = this.AppComponent.temaSeleccionado;
       this.loadForm();
@@ -81,6 +83,8 @@ export class Crear_FallasComponent implements OnInit {
         this.cmpDevolutionItems.getFails(); 
         this.cmpUbicationsRolls.modalFails = false;
         this.cmpUbicationsRolls.getFails(); 
+        this.cmpDvsQuality.modalFails = false;
+        this.cmpDvsQuality.getFails(); 
         setTimeout(() => { this.form.reset(); }, 2000);
       }, error => {
         this.svMsjs.mensajeError(`Error`, `Ha ocurrido un error, por favor verifique!`);
