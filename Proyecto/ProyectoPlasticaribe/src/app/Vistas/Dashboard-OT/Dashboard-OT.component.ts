@@ -157,7 +157,6 @@ export class DashboardOTComponent implements OnInit {
   }
 
   consultarPesoProducidoOrdenes(){
-    //let camisilla : any = {};
     this.produccionAreasService.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
       this.procesosOrdenesMes = [];
       produccionAreas.forEach(areas => {
@@ -178,12 +177,8 @@ export class DashboardOTComponent implements OnInit {
           }
           this.procesosOrdenesMes.push(datos);
           this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
-          console.log(this.procesosOrdenesMes);
         }
       });
-      //camisilla = this.procesosOrdenesMes[0];
-      //this.procesosOrdenesMes.splice(0, 1)
-      //this.procesosOrdenesMes.splice(4, 0, camisilla);
     });
   }
 

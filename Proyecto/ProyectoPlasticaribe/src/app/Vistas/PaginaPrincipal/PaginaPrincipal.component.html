@@ -113,6 +113,15 @@
         <app-dashboard-calidad *ngIf="calidad"></app-dashboard-calidad>
       </p-tabPanel>
 
+      <!-- Producción por Áreas -->
+      <p-tabPanel
+        header="Producción"
+        leftIcon="pi pi-list"
+        tooltip="Información general sobre Producción"
+        *ngIf="[1].includes(ValidarRol)">
+        <app-dashboard-produccion *ngIf="production"></app-dashboard-produccion>
+      </p-tabPanel>
+
     </p-tabView>
   </div>
 </div>

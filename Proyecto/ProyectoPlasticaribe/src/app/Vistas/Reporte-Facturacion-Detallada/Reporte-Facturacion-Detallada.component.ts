@@ -10,6 +10,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -41,6 +42,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   items = [];
   dataDevolucion = [];
   devolutions : any = [];
+  transactions : any = [];
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -52,7 +54,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
                             private msg : MessageService, 
                               private svcClientesProductos : ClientesProductosService, 
                                 private svcProductos : ProductoService,
-                                  private svExcel : CreacionExcelService) {
+                                  private svExcel : CreacionExcelService,
+                                    private svZeusContabilidad : ZeusContabilidadService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
@@ -67,6 +70,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   ngOnInit() {
     this.obtenerVendedores();
+    this.loadRankDates();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -79,6 +83,13 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     this.clientes = [];
     this.productos = [];
     this.facturacionConsolidada = [];
+    this.loadRankDates();
+    this.transactions = [];
+  }
+
+  //Función para cargar fechas en el rango.
+  loadRankDates(){
+    this.formFiltros.patchValue({ 'rangoFechas' : [new Date(), new Date()] });
   }
 
   // Funcion que se encargará de obtener los vendedores
@@ -130,15 +141,16 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   // Funcion que se encargará de buscar las facturas
   buscarFacturacion(){
     if (this.formFiltros.value.rangoFechas) {
+      this.transactions = [];
       this.dataFacturacion = [];
       let item : any = this.formFiltros.value.idProducto;
       this.cargando = true;
       let fechaInicial : any = moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
       let fechaFinal : any = moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
-
-      this.zeusService.getNuevaFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => { this.llenarDatosFacturas(res) });
-      //this.zeusService.getNuevaDevolucionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosDevoluciones(res))
       
+      //this.zeusService.getNuevaDevolucionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosDevoluciones(res))
+      this.getTransactionReport(fechaInicial, fechaFinal);
+
       this.cargarFacturacionDetallada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
       if(item != null && item != undefined && item != '') this.cargarDevolucionesDetalladas2(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)); 
       else {
@@ -149,9 +161,36 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
       this.colocarNombresVendedores();
       setTimeout(() =>  { 
+        this.dataFacturacion.sort((a,b) => Number(parseInt(a.factura)) - Number(parseInt(b.factura)));
         this.cargando = false;
       }, 2000);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
+  }
+
+  getTransactionReport(date1 : any, date2 : any){
+    this.zeusService.getInformeTransacciones(date1, date2, this.validarParametrosConsulta(false)).subscribe(transactions => {
+        this.transactions = transactions;
+        transactions.filter(x => ['FV', 'NV', 'DV'].includes(x.idfuente) && ["FA"].includes(x.tipofac.trim()) && x.indcpitra == '2').forEach(x => {
+          this.zeusService.getFactWithoutIva(x.numefac).subscribe(fact => {
+            this.transactions = transactions;
+            this.dataFacturacion.push({
+              'fecha' : x.fechatra,
+              'factura' : x.numefac, 
+              'cliente' : x.descritra == 'ARRENDAMIENTO' ? 'HERRAJES ANDINA SAS' : x.descritra,
+              'suma' : ['NV', 'DV'].includes(x.idfuente) ? ((x.valortra)) : Math.abs(x.valortra), 
+              'recibo' : ['DV'].includes(x.idfuente) ? 'DEVOLUCIÓN' : ['NV'].includes(x.idfuente) ? 'NOTA DE VENTA' : ['FV'].includes(x.idfuente) && x.descritra == 'ARRENDAMIENTO' ? 'ARRIENDO' : '____________________________________',
+              'notIva' : fact ? fact.length > 0 ? fact[0].iva == 0 ? true : false : false : false,
+              'descuentos' : fact ? fact.length > 0 ? fact[0].descuentos : 0 : 0,
+              'cuenta' : x.codicta,
+              'table' : true,
+              'documento' : x.idfuente, 
+              'idCliente' : x.nittra,  
+              'idVendedor' : x.idvende,
+              'vendedor' : this.vendedores.filter(xy => xy.usua_Id == x.idvende)[0].usua_Nombre,
+            });
+          });
+        });
+      }, error => { console.log(error); });
   }
 
   // Funcion que retornará los parametros adicionales que tendrán las consultas de facturación y de devolución
@@ -181,8 +220,11 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       if(!filtroFacturas.includes(fac.factura)) {
         filtroFacturas.push(fac.factura);
         this.dataFacturacion.push(fac);
+      } else {
+        let index : number = this.dataFacturacion.findIndex(x => x.factura == fac.factura);
+        this.dataFacturacion[index].totalIvaVentas += fac.totalIvaVentas;
+        this.dataFacturacion[index].precioTotal += fac.precioTotal;
       }
-      console.log(this.dataFacturacion)
       this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
     });
   }
@@ -190,7 +232,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   // Funcion que se encargará de llenar la guardar la información de las devoluciones
   llenarDatosDevoluciones(devoluciones : any []){
     let filtroFacturas : any = [];
-    console.log(devoluciones)
     devoluciones.forEach(dev => {
       if(!filtroFacturas.includes(dev.factura)) {
         filtroFacturas.push(dev.factura);
@@ -202,19 +243,19 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   // Funcion que devolverá la información que se mostrará en la tabla de facturas
   tableFacturas(){
-    return this.dataFacturacion.filter(x => x.recibo != 'DEVOLUCIÓN');
+    return this.dataFacturacion.filter(x => !['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(x.recibo));
   }
 
   // Funcion que devolverá la información que se mostrará en la tabla de devoluciones
   tableDevoluciones(){
-    return this.dataFacturacion.filter(x => x.recibo == 'DEVOLUCIÓN');
+    return this.dataFacturacion.filter(x => ['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(x.recibo) && x.table == true);
   }
 
   // Funcion que devolverá el total de facturas
   totalFacturas(){
     let total : number = 0;
     this.dataFacturacion.forEach(fac => {
-      if (fac.recibo != 'DEVOLUCIÓN') total += fac.subTotal;
+      if (!['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(fac.recibo)) total += fac.suma;
     });
     return total;
   }
@@ -223,17 +264,18 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   totalDevoluciones(){
     let total : number = 0;
     this.dataFacturacion.forEach(fac => {
-      if (fac.recibo == 'DEVOLUCIÓN') total += fac.suma;
+      if (['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(fac.recibo) && fac.table == true) total += fac.suma;
     });
     return total;
   }
   
   // Funcion que se encargará de generar el PDF de la información de las facturas y de las devoluciones realizadas en el rango de fechas seleccionado.
   formatoPDF(){
-    if (this.dataFacturacion.length > 0) {
+    if (this.dataFacturacion.filter(x => x.table == true).length > 0) {
       this.onReject();
       this.cargando = true;
-      this.dataPDF = this.dataFacturacion;
+      this.dataPDF = this.dataFacturacion.filter(x => x.table == true);
+      this.dataPDF.sort((a,b) => Number(parseInt(a.factura)) - Number(parseInt(b.factura)));
       let headerAdicional : any [] = this.headerAdicional();
       let contentPDf : any [] = this.pdfFacturaConsolidad(this.dataPDF);
       let titulo = 'Informe de Ventas';
@@ -251,7 +293,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         fontSize: 10,
         bold: true,
         table: {
-          widths: ['10%', '15%', '45%', '15%', '15%'],
+          widths: ['10%', '12%', '35%', '15%', '28%'],
           body: [
             [
               { text: `Fecha`, alignment: 'center',  fillColor: '#ccc', border: [true, true, false, true] },
@@ -277,7 +319,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         border: [true, false, true, false],
         table: {
           dontBreakRows: true,
-          widths : ['10%', '15%', '45%', '15%', '15%'],
+          widths : ['10%', '12%', '35%', '15%', '28%'],
           body: this.facturas(datos)
         }
       },
@@ -328,15 +370,101 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     let data : any = [];
     data.push(
       [
-        { border: [false, false, false, false], text: `Total Ventas Grabadas`, fontSize: 11 },
-        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalVentasGrabadas().toFixed(2)))}` },
+        { border: [false, false, false, false], text: `Ventas Gravadas (Clientes con Iva):`, fontSize: 11 },
+        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.ventasGravadas().toFixed(2)))}` },
       ],
       [
-        { border: [false, false, false, false], text: `Total IVA`, fontSize: 11 },
-        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalIva().toFixed(2)))}` },
+        { border: [false, false, false, false], text: `Ventas Exentas (Clientes sin Iva):`, fontSize: 11 },
+        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.ventasExentas().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Total IVA:`, fontSize: 11 },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.ivaVentas().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Ventas Excluidas (Retenciones):`, fontSize: 11 },
+        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ -${this.formatonumeros((this.ventasExcluidas().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Total Descuento:`, fontSize: 11 },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ -${this.formatonumeros((this.descuentos().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Total Devoluciones:`, fontSize: 11 },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.totalDVS().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Total Notas de Venta:`, fontSize: 11 },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.totalNVS().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Total Facturación:`, fontSize: 11 },
+        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.totalFacturas().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Total Ventas del día:`, fontSize: 11 },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.totalVenta().toFixed(2)))}` },
       ],
     );
     return data;
+  }
+
+  //
+  ventasGravadas() : number {
+    let total : number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac == 'FA ' && x.indcpitra == '1').reduce((a,b) => a += (Math.abs(b.valortra)), 0) - this.ventasExentas() + this.descuentos();
+    return total;
+  }
+
+  //
+  ventasExentas() : number {
+    let total : number = 0;
+    total = this.dataFacturacion.filter(x => x.notIva == true).reduce((a,b) => a += (Math.abs(b.suma)), 0);
+    console.log('ventas exentas:', total);
+    
+    return total;
+  }
+
+  //
+  descuentos() : number {
+    let total : number = 0;
+    total = this.dataFacturacion.reduce((a,b) => a += b.descuentos, 0);
+    return total;
+  }
+
+  //
+  ventasExcluidas() : number {
+    let total : number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == "" && x.indcpitra == '1' && !['24080505', '143005', '612050', '41205005', '13050501', '422010'].includes(x.codicta.trim())).reduce((a,b) => a += (b.valortra), 0);
+    return total;
+  }
+
+  //
+  ivaVentas() : number {
+    let total : number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == "" && x.indcpitra == '1' && x.codicta.trim() == '24080505').reduce((a,b) => a += (Math.abs(b.valortra)), 0);
+    return total;
+  }
+
+  //
+  totalVenta() : number {
+    let total : number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == 'FA' && x.indcpitra == '2').reduce((a,b) => a += (+(b.valortra)), 0) + (this.totalDVS() + this.totalNVS()) ;
+    return total;
+  }
+
+  //
+  totalDVS() : number {
+    let total : number = 0;
+    total = this.dataFacturacion.filter(x => x.fuente == 'DV').reduce((a,b) => a += (+(b.suma)), 0);
+    return total;
+  }
+
+  //
+  totalNVS() : number {
+    let total : number = 0;
+    total = this.dataFacturacion.filter(x => x.fuente == 'NV').reduce((a,b) => a += (+(b.suma)), 0);
+    return total;
   }
 
   subTotalVentasGrabadas() : number {
@@ -371,7 +499,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
           cliente : dv.descritra,
           fecha : dv.fechatra,
           factura : dv.numefac,
-          factura2 : 'DV',
+          factura2 : dv.idfuente,
           item : '',
           referencia : '',
           presentacion : '',
@@ -395,7 +523,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
           cliente : dv.cliente,
           fecha : dv.fecha,
           factura : dv.factura,
-          factura2 : 'DV',
+          factura2 : dv.idfuente,
           item : dv.item,
           referencia : dv.referencia,
           presentacion : dv.presentacion,
@@ -486,7 +614,10 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     }
     if(vendedores.length > 1){
      data.push(
-      [{ margin: [10, 20, 10, 5], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()).toFixed(2))}`, }],
+      [{ margin: [10, 3, 10, 2], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Facturación: $ ${this.formatonumeros((this.totalFacturacion()).toFixed(2))}`, }],
+      [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Devoluciones: $ -${this.formatonumeros((this.totalDV()).toFixed(2))}`, }],
+      [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Notas de Venta: $ -${this.formatonumeros((this.totalNV()).toFixed(2))}`, }],
+      [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()).toFixed(2))}`, }],
      );
     }
     return data;
@@ -592,13 +723,13 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
          body: [
            [
              { text: `${items.fecha}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
-             { text: `${items.factura2}`, alignment: items.factura2 == `DV` ? `center` : `left`, border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
-             { text: `${items.item}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
-             { text: `${items.referencia}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
-             { text: `${items.presentacion}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
-             { text: `${this.formatonumeros(items.cantidad)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
-             { text: `${this.formatonumeros(items.precio)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
-             { text: `${this.formatonumeros(items.valorTotal)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`},
+             { text: `${items.factura2}`, alignment: ['DV', 'NV'].includes(items.factura2) ? `center` : `left`, border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black`}, 
+             { text: `${items.item}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
+             { text: `${items.referencia}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
+             { text: `${items.presentacion}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
+             { text: `${this.formatonumeros(items.cantidad)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
+             { text: `${this.formatonumeros(items.precio)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
+             { text: `${this.formatonumeros(items.valorTotal)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black`},
            ],
          ],
        }  
@@ -632,16 +763,31 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   //Total de facturación en el rango de fechas especificado
   totalFacturacion(){
     let total : number = 0;
-    total = this.infoPdf.filter(x => x.factura2 != 'DV').reduce((a,b) => a + b.valorTotal, 0);
+    total = this.infoPdf.filter(x => !['NV', 'DV'].includes(x.factura2)).reduce((a,b) => a + b.valorTotal, 0);
     return total;
   }
 
   //Total de devoluciones en el rango de fechas especificado
   totalDevolucion(){
     let total : number = 0;
-    total = this.infoPdf.filter(x => x.factura2 == 'DV').reduce((a,b) => a + b.valorTotal, 0);
+    total = this.infoPdf.filter(x => ['DV', 'NV'].includes(x.factura2)).reduce((a,b) => a + b.valorTotal, 0);
     return Math.abs(total);
   }
+
+  //Total de devoluciones en el rango de fechas especificado
+  totalNV(){
+    let total : number = 0;
+    total = this.infoPdf.filter(x => ['NV'].includes(x.factura2)).reduce((a,b) => a + b.valorTotal, 0);
+    return Math.abs(total);
+  }
+
+  //Total de devoluciones en el rango de fechas especificado
+  totalDV(){
+    let total : number = 0;
+    total = this.infoPdf.filter(x => ['DV'].includes(x.factura2)).reduce((a,b) => a + (b.valorTotal), 0);
+    return Math.abs(total);
+  }
+
 
   //Total de facturación por vendedor
   subTotalVendedor(vendedor : any){
@@ -698,13 +844,14 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       'cliente' : x.descritra,
       'fecha' : x.fechatra,
       'factura' : x.numefac,
-      'factura2' : 'DV',
+      'factura2' : x.idfuente,
       'item' : '',
       'referencia' : '',
       'presentacion' : '',
       'cantidad' : 1,
       'precio' : (-(x.valortra)),
       'valorTotal' : (-(x.valortra)),
+      'descuentos' : 0,
     }
     this.infoPdf.push(vendedoresDv); 
     this.colocarNombresVendedores();
@@ -728,17 +875,20 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       'vendedor' : '',
       'fecha' : x.fechatra,
       'factura' : x.numefac,
-      'recibo' : 'DEVOLUCIÓN',
-     }
-     this.putNameClients(x.cliprv, info); 
-     setTimeout(() => { this.dataFacturacion.push(info); }, 500); 
+      'recibo' : x.idfuente == 'DV' ? 'DEVOLUCIÓN' : 'NOTA DE VENTA',
+      'descuentos' : 0,
+      'fuente' : x.idfuente,
+      'table' : false,
+    }
+    this.putNameClients(x.cliprv, info); 
+    setTimeout(() => { this.dataFacturacion.push(info); }, 500); 
   }
 
   //Función que exportará un formato excel con los datos de los clientes
     exportExcel(){
-      console.log(this.dataFacturacion);
       if(this.dataFacturacion.length > 0) {
-        setTimeout(() => { this.loadSheetAndStyles(this.dataFacturacion); }, 500);
+        this.cargando = true; 
+        this.loadSheetAndStyles(this.dataFacturacion.filter(x => x.table == true)); 
       } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
     }
   
@@ -754,6 +904,9 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   
       this.addNewSheet(workbook, title, fill, border, font, alignment, data);
       this.svExcel.creacionExcel(title, workbook);
+      setTimeout(() => { 
+        this.cargando = false;
+      }, 2000);
     }
   
     //Función para agregar una nueva hoja de calculo.
@@ -842,8 +995,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
           x.factura,
           x.idCliente,
           x.cliente,
-          x.recibo == 'DEVOLUCIÓN' ? x.suma : x.subTotal,
-          x.recibo == 'DEVOLUCIÓN' ? x.recibo : 'FACTURACIÓN',
+          x.suma,
+          x.documento,
           x.idVendedor,
           x.vendedor,
         ]);
@@ -867,6 +1020,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     ]);
   }
 
-  qtyTotal = () => this.dataFacturacion.reduce((a,b) => a += b.subTotal, 0);
+  qtyTotal = () => this.dataFacturacion.filter(x => x.table == true).reduce((a,b) => a += b.suma, 0);
   
 }

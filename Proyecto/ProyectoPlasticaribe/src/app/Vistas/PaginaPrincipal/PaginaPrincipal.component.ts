@@ -27,6 +27,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   compras : boolean = false;
   inventarioAreas : boolean = false;
   calidad : boolean = false;
+  production : boolean = false;
 
   constructor(private AppComponent : AppComponent,) { }
 
@@ -53,6 +54,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     this.compras = false;
     this.inventarioAreas = false;
     this.calidad = false;
+    this.production = false;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -95,5 +97,6 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 2 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
     index == 4 && [98].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
     index == 11 ? this.calidad = true : null;
+    index == 12 ? this.production = true : null;
   }
 }

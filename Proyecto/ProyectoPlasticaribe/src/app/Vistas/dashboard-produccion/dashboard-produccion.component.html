@@ -1,0 +1,197 @@
+<div class="fondo">
+    <div class="row g-2 fila-1" *ngIf="[1].includes(ValidarRol) && !cargando">
+        <!--   -->
+        <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4 slide-in-blurred-top" id="">
+            <p-card>
+                <h2 style="font-weight: 700; text-align: center;"
+                    [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i
+                        class="pi pi-bolt"></i> Acumulado de producción vs meta por procesos</h2>
+                
+                <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataExtrusion" [options]="ComparativoOptionsExtrusion"></p-chart>
+                <p-chip class="text-center" label="Extrusión: {{totalPercMonth('EXTRUSION')}}% | Producido: {{totalKgMonth('EXTRUSION') | number}} Kg | Meta: {{totalGoalMonth('EXTRUSION') | number}} Kg"></p-chip>
+                <p-divider></p-divider>
+
+                <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataImpresion" [options]="ComparativoOptionsImpresion"></p-chart>
+                <p-chip label="Impresión: {{totalPercMonth('IMPRESION')}}% | Producido: {{totalKgMonth('IMPRESION') | number}} Kg | Meta: {{totalGoalMonth('IMPRESION') | number}} Kg"></p-chip>
+                <p-divider></p-divider>
+
+                <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataEmpaque" [options]="ComparativoOptionsEmpaque"></p-chart>
+                <p-chip class="mb-3" label="Corte: {{totalPercMonth('CORTE')}}% | Producido: {{totalKgMonth('CORTE') | number}} Kg | Meta: {{totalGoalMonth('CORTE') | number}} Kg"></p-chip>
+                <p-divider></p-divider>
+
+                <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataSellado" [options]="ComparativoOptionsSellado"></p-chart>
+                <p-chip class="mb-3" label="Sellado: {{totalPercMonth('SELLADO')}}% | Producido: {{totalKgMonth('SELLADO') | number}} Kg | Meta: {{totalGoalMonth('SELLADO') | number}} Kg"></p-chip>
+                
+            </p-card>
+        </div>
+
+        <!--Produccion diaria por maquina-->
+        <div class="p-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 slide-in-top" id="">
+            <p-card header="">
+                <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i
+                        class="pi pi-sliders-h"></i> Producción diaria por maquina</h2>
+                <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
+                    responsiveLayout="scroll" [scrollable]="true" scrollHeight="650px" [value]="productionMachines">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="machine" class="text-center"><p-sortIcon field="machine"></p-sortIcon>
+                                Maq.</th>
+                            <th pSortableColumn="weight" class=""><p-sortIcon field="weight"></p-sortIcon> Kg</th>
+                            <th pSortableColumn="goal" class=""><p-sortIcon field="goal"></p-sortIcon> Meta</th>
+                            <th pSortableColumn="percentage" class=""><p-sortIcon field="percentage"></p-sortIcon> Porc.
+                            </th>
+                            <th class="text-center">Ver</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td class="text-center"><b>{{data.machine}}</b></td>
+                            <td class="">{{data.weight | number : '1.2-2'}}</td>
+                            <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
+                                            [required]="true" (onKeyDown)="updateGoalForMachine(data, $event)"></p-inputNumber>
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{data.goal | number : '1.2-2'}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td class=""><b>{{data.percentage | number : '1.2-2'}}%</b></td>
+                            <td class="text-center"><p-button icon="pi pi-search"
+                                    styleClass="p-button-rounded p-button-success"
+                                    [style]="{width: '30px', height: '30px'}" 
+                                    (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <td class="text-center"><b>Totales</b></td>
+                        <td class=""><b>{{totalKgProcess() | number : '1.2-2'}}</b></td>
+                        <td class=""><b>{{totalMetaProcess() | number : '1.2-2'}}</b></td>
+                        <td colspan="2" class=""></td>
+                    </ng-template>
+                </p-table>
+            </p-card>
+        </div>
+
+        <!--   -->
+        <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4 slide-in-blurred-top" id="">
+        <p-card>
+            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-database"></i> </h2>
+
+            <!--Fila 1-->
+            <div class="mb-4">
+                <p-divider layout="vertical">
+                    <div class="row g-3" style="text-align: center;">
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-bolt"></i> Extrusión</b></h6>
+                            <p-knob [readonly]="true" [size]="100" [(ngModel)]="totalPercentageExt" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-extrusion" label=": {{totalKgProcess() | number}} Kg"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-extrusion" label=": {{totalMetaProcess() | number}} Kg"> <i class="pi pi-flag"></i> </p-chip>
+                        </div>
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-palette"></i> Impresión</b></h6>
+                            <p-knob [readonly]="true" [size]="100" [(ngModel)]="totalPercentageImp" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-impresion" label=": {{500000 | number}}"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-impresion" label=": {{500000 | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                        </div>
+                    </div>
+                </p-divider>
+            </div>
+            <p-divider></p-divider>
+            <!--Fila 2-->
+            <p-divider layout="vertical">
+            <div class="mb-4">
+                <div class="row g-3" style="text-align: center;">
+                    <div class="col-md">
+                        <h6><b><i class="pi pi-database"></i> Corte</b></h6>
+                        <p-knob [readonly]="true" [size]="100" [(ngModel)]="totalPercentageEmp" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
+                        <p-chip class="mr-2 prd-corte" label=": {{500000 | number}}"> <i class="pi pi-bolt"></i> </p-chip>
+                        <p-chip class="meta-corte" label=": {{500000 | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                    </div>
+            
+                    <div class="col-md">
+                        <h6 style="text-align: center;"><b><i class="pi pi-box"></i> Sellado</b></h6>
+                        <p-knob [readonly]="true" [size]="100" [(ngModel)]="totalPercentageSella" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
+                        <p-chip class="mr-2 prd-sellado" label=": {{500000 | number}}"> <i class="pi pi-bolt"></i> </p-chip>
+                        <p-chip class="meta-sellado" label=": {{500000 | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                    </div>
+                </div>
+            </div>
+            </p-divider>
+        </p-card>
+        </div>
+    </div>
+
+    <div class="row g-2 fila-2" *ngIf="[1].includes(ValidarRol) && !cargando">
+        <!-- Tabla de Procesos -->
+        <div class="p-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 slide-in-top" id="cantProcesos">
+            <p-card header="">
+                <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i>
+                    Cantidad Producida Por Procesos</h2>
+                <br>
+                <p-table #dt1 [resizableColumns]="true" columnResizeMode="expand"
+                    styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll" [scrollable]="true"
+                    scrollHeight="400px" [rowHover]="true" [value]="procesosOrdenesMes">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>#</th>
+                            <th>Proceso</th>
+                            <th>Kg</th>
+                            <th>Meta</th>
+                            <th>Porc.</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                        <tr [pEditableRow]="item">
+                            <td style="padding : 11px">{{rowIndex + 1}}</td>
+                            <td><b>{{item.Area}}</b></td>
+                            <td>{{item.Produccion | number : '1.2-2'}}</td>
+                            <td [pEditableColumn]="item.Meta_Produccion" pEditableColumnField="price" class="cursor">
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <p-inputNumber [(ngModel)]="item.Meta_Produccion" mode="decimal"
+                                            [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{item.Meta_Produccion | number : '1.2-2'}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td class="fw-bold">{{item.Porcentaje | number : '1.2-2'}}%</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <p-progressBar [value]="item.PorcentajeMeta.toFixed(2)"
+                                    [color]="colorProgresoMetaProduccion(item)"
+                                    [style]="{height: '15px'}"></p-progressBar>
+                            </td>
+                        </tr>
+                        <!-- <tr>
+                                <td colspan="5">
+                                    <div class="contenedorProgreso">
+                                    <div class="progresoPositivo" [ngStyle]="{background: item.Porcentaje > 0 ? '#eee' : colorProgresoMetaProduccion(item), width: '50%'}">
+                                        <div class="subProgreso" [ngStyle]="{width: item.Porcentaje + 100 + '%'}"></div>
+                                    </div>
+                                    <div class="progresoNegativo" [ngStyle]="{background: item.Porcentaje < 0 ? '#eee' : colorProgresoMetaProduccion(item), width: '50%'}">
+                                        <div class="subProgreso" [ngStyle]="{width: item.Porcentaje < 0 ? '100%' : 100 - item.Porcentaje + '%', 'margin-left' : item.Porcentaje < 0 ? '0' : (item.Porcentaje) + '%'}"></div>
+                                    </div>
+                                    </div>
+                                </td>
+                            </tr> -->
+                    </ng-template>
+                </p-table>
+                <ng-template pTemplate="footer">
+                    <!--<button pButton pTooltip="Graficar Procesos OT" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaProcesos()"></button>-->
+                </ng-template>
+            </p-card>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="Reporte de producción" [(visible)]="productionReport" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+    <app-Reporte-Produccion></app-Reporte-Produccion>
+</p-dialog>    
+

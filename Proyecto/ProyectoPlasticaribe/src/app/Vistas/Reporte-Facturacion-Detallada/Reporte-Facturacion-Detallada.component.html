@@ -67,7 +67,6 @@
         <button pButton class="p-button-danger" type="button" label="PDF Consolidado" icon="pi pi-file-pdf" (click)="formatoPDF()" pTooltip="Exportará la información consolidada de las facturas y devoluciones teniendo en cuenta los filtros consultados"></button>
         <button pButton class="p-button-danger" type="button" label="PDF Detallado" icon="pi pi-file-pdf" (click)="getFormatoPdfDetallado()" pTooltip="Exportará la información detallada de las facturas y devoluciones dependiendo los filtros consultados" ></button>
         <button pButton class="p-button-outlined p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportExcel()" pTooltip="Exportará la información detallada de las facturas y devoluciones dependiendo los filtros consultados" ></button>
- 
       </div>
     </div>
   </form>
@@ -94,6 +93,7 @@
         <ng-template pTemplate="header">
           <tr class="font-size-16" id="filtros">
             <th></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroFacturacion($event, 'documento', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroFacturacion($event, 'fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroFacturacion($event, 'factura', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroFacturacion($event, 'cliente', 'contains')"></th>
@@ -101,6 +101,7 @@
           </tr>
           <tr>
             <th>#</th>
+            <th>Tipo Doc.</th>
             <th>Fecha</th>
             <th>Factura</th>
             <th>Cliente</th>
@@ -108,9 +109,10 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data  let-rowIndex="rowIndex">
-          <tr *ngIf="data.recibo != 'DEVOLUCIÓN'" (click)="filtrarFactura(data)" class="cursor" pTooltip="Haz clic para ver los detalles de la Factura N° {{data.factura}}">
+          <tr *ngIf="!['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(data.recibo)" (click)="filtrarFactura(data)" class="cursor" pTooltip="Haz clic para ver los detalles de la Factura N° {{data.factura}}">
             <td>{{rowIndex + 1}}</td>
-            <td>{{data.fecha }}</td>
+            <td>{{data.documento == 'FV' ? 'FACTURA' : '' }}</td>
+            <td>{{data.fecha | date: 'yyyy-MM-dd'}}</td>
             <td>{{data.factura}}</td>
             <td>{{data.cliente}}</td>
             <td>{{data.suma | number : '1.2-2'}}</td>
@@ -118,8 +120,10 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="4" class="text-right">Total Facturación</td>
-            <td>{{totalFacturas() | number : '1.2-2'}}</td>
+            
+            <td colspan="3" class="text-center">Total Facturación: {{totalFacturas() | number : '1.2-2'}}</td>
+            <td colspan="3" class="text-center">Total Facturación - Devoluciones y Notas de venta: {{totalFacturas() + totalDevoluciones() | number : '1.2-2'}}</td>
+            
           </tr>
         </ng-template>
       </p-table>
@@ -127,7 +131,7 @@
 
     <!-- DEVOLUCIONES -->
     <div class="col-sm-12 col-md-6 px-5">
-      <h3 class="tituloRojo text-center my-4">Devoluciones</h3>
+      <h3 class="tituloRojo text-center my-4">Devoluciones/Notas de Venta</h3>
       <p-table 
         #dtDevolucion
         [value]="tableDevoluciones()"
@@ -144,6 +148,7 @@
         <ng-template pTemplate="header">
           <tr class="font-size-16" id="filtros">
             <th></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroFacturacion($event, 'documento', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroDevolucion($event, 'fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroDevolucion($event, 'factura', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroDevolucion($event, 'cliente', 'contains')"></th>
@@ -151,6 +156,7 @@
           </tr>
           <tr>
             <th>#</th>
+            <th>Tipo Doc.</th>
             <th>Fecha</th>
             <th>Factura</th>
             <th>Cliente</th>
@@ -158,9 +164,10 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data  let-rowIndex="rowIndex">
-          <tr *ngIf="data.recibo == 'DEVOLUCIÓN'">
+          <tr *ngIf="['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(data.recibo)">
             <td>{{rowIndex + 1}}</td>
-            <td>{{data.fecha }}</td>
+            <td>{{data.documento == 'NV' ? 'NOTA DE VENTA' : 'DEVOLUCIÓN'}}</td>
+            <td>{{data.fecha | date: 'yyyy-MM-dd'}}</td>
             <td>{{data.factura}}</td>
             <td>{{data.cliente}}</td>
             <td>{{data.suma | number : '1.2-2'}}</td>
@@ -168,7 +175,7 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="4" class="text-right">Total Devolución</td>
+            <td colspan="5" class="text-right">Total Devoluciones/Notas de Venta</td>
             <td>{{totalDevoluciones() | number : '1.2-2'}}</td>
           </tr>
         </ng-template>

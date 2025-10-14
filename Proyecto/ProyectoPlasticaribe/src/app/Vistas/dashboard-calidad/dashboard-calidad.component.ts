@@ -1,4 +1,4 @@
-import { Component, Injectable, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { AppComponent } from 'src/app/app.component';
@@ -12,7 +12,7 @@ import { MovDevolucionesCalidadComponent } from '../mov-devoluciones-calidad/mov
   templateUrl: './dashboard-calidad.component.html',
   styleUrls: ['./dashboard-calidad.component.css']
 })
-export class DashboardCalidadComponent {
+export class DashboardCalidadComponent implements OnInit {
 
   @ViewChild(MovDevolucionesCalidadComponent) cmpMovDevQuality : MovDevolucionesCalidadComponent;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -24,7 +24,7 @@ export class DashboardCalidadComponent {
   cargando : boolean = false; //Variable que va a validar si se esta cargando algo o no
 
   modoSeleccionado : boolean;
-  monthNames: any = ['', 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', ''];
+  monthNames: any = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', ''];
   monthSelected : any = null;
   typeRejected : any = ['', 'INTERNO', 'EXTERNO', ''];
   typeRejectedSelected : any = null;
@@ -94,7 +94,7 @@ export class DashboardCalidadComponent {
     this.llenarArrayAnos();
     this.selectMonthAuto();
     this.getInfoDevolutionsQuality();
-    this.inicializarGraficas();
+    this.inicializarGraficas(); //TODO: (1) 
     this.tiempoExcedido();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -127,11 +127,9 @@ export class DashboardCalidadComponent {
   }
 
   //Función que validará la URL con la que se desea ingresar. 
-
   validateUrl(){
     let month: any = this.monthSelected;
     let rejected: any = this.typeRejectedSelected;
-   
     let url : string = ``;
 
     if(month != null) url += `month=${month}`;
@@ -141,17 +139,22 @@ export class DashboardCalidadComponent {
     return url;
   }
 
+  //* Función que cargará todos los datos de las devoluciones y rechazos internos del dashboard. 
   getInfoDevolutionsQuality(){
+    this.devolutionsForMonth = [];
     this.devolutionsForAreaKg = []
     this.devolutionsForMonthExtern = [];
     this.devolutionsForArea = [];
     this.devolutionsForClient = [];
     this.devolutionsForClientTable = [];
-    this.devolutionsForMonth = [];
     this.devolutionsForRejected = [];
     this.qualityVsFact = [];
     this.totalRejectedExt = 0;
     this.totalRejectedInt = 0;
+
+    
+    //Devoluciones por mes.
+    this.loadInformationDevolutions();
 
     //Devoluciones por tipo de rechazo
     this.svDevolutions.getTotalMoneyForRejectedType(this.selectedYear, this.validateUrl()).subscribe(data1 => {
@@ -194,8 +197,6 @@ export class DashboardCalidadComponent {
       console.log(error);
     });
 
-    //Devoluciones por cliente.
-    this.loadInformationDevolutions();
 
     //Devoluciones por tipo de rechazo.
     this.loadTypesRejected();
@@ -212,6 +213,7 @@ export class DashboardCalidadComponent {
     }, 1500); 
   }
 
+  //Función que cargará los datos por tipo de rechazo. 
   loadTypesRejected(){
     this.svDevolutions.getDevolutionsForRejectedType(this.selectedYear, this.validateUrl()).subscribe(data => {
       this.devolutionsForRejected = data;
@@ -247,6 +249,7 @@ export class DashboardCalidadComponent {
   //Total devoluciones en dinero
   totalDevolutionsClientsInMoney = () => this.devolutionsForClientTable.reduce((a,b) => a += b.total, 0);
 
+  //
   totalDevolutionsForMonth() {
     let total : number = 0;
     for (let index = 0; index < 12; index++) {
@@ -405,7 +408,7 @@ export class DashboardCalidadComponent {
     };
   }
 
-  // Funcion que va a llenar la grafcia de los clientes con mas pedidos
+  // Funcion que va a llenar la grafica de los clientes con mas pedidos
   llenarGraficaClientes(){
     let clients : any = [];
     let total : any = [];
@@ -527,24 +530,25 @@ export class DashboardCalidadComponent {
     };
   }
 
+  //Función que cargará los datos de las rechazos y devoluciones mes a mes.
   loadInformationDevolutionsExtern(){
-    let url : string = `?rejected=${this.typeRejectedSelected}`;
-    this.svDevolutions.getTotalMoneyForMonth(this.selectedYear, url).subscribe(data => {
+    this.svDevolutions.getTotalMoneyForMonth(this.selectedYear, this.validateUrl()).subscribe(data => {
       this.devolutionsForMonthExtern = data;
-      setTimeout(() => {
+      //setTimeout(() => {
         this.badQualityVsFact();
-      }, 2000);
+      //}, 3000);
     }, error => {
       console.log(error);
     }); 
   } 
 
-  //
+  //TODO: Devoluciones y rechazos internos mes a mes.
   loadInformationDevolutions(){
+    //this.cargando = true;
     let url : string = [null, ''].includes(this.typeRejectedSelected) ? '' : `?rejected=${this.typeRejectedSelected}`;
     this.svDevolutions.getTotalMoneyForMonth(this.selectedYear, url).subscribe(data => {
       this.devolutionsForMonth = data;
-      let info : any = [
+      let info : any[] = [
           this.totalMesArea(data[0], 1),
           this.totalMesArea(data[1], 2),
           this.totalMesArea(data[2], 3),
@@ -559,16 +563,17 @@ export class DashboardCalidadComponent {
           this.totalMesArea(data[11], 12),
       ];
       this.llenarGraficas(info);
-      
+      //this.cargando = false;
     }, error => {
       console.log(error);
     });
     //if(consulta) this.inicializarGraficas();
   }
 
+  //Función que calculará el total por area en costos.
   totalMesArea = (datos : any [], mes : number) => datos.filter(x => x.year == this.selectedYear && x.month == mes).reduce((a, b) => a += b.total, 0);
 
-  //Función para inicializar las graficas
+  //TODO: Función para inicializar las graficas (2)
   inicializarGraficas(){
     this.graphicForMonth = [];
     //this.colocarTotalesProduccion();
@@ -576,7 +581,7 @@ export class DashboardCalidadComponent {
     this.graphicForMonth = this.formatoGraficas();
   }
 
-  //Llenar opciones de graficas
+  //TODO: Llenar opciones de graficas (3)
   llenarOpcionesGrafica(){
     this.graphicOptions = {
       stacked: false,
@@ -609,7 +614,7 @@ export class DashboardCalidadComponent {
     };
   }
 
-  //Formato de las graficas que contiene los meses
+  //TODO: Formato de las graficas que contiene los meses (4)
   formatoGraficas(){
     return {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -646,12 +651,12 @@ export class DashboardCalidadComponent {
   //
   formatoTotales(data : any [], anio : number){
     return {
-      Anio : anio,
-      Kg : this.calcularKgProducidos(data, anio)
+      'Anio' : anio,
+      'Kg' : this.calcularKgProducidos(data, anio)
     }
   }
 
-  //
+  //! Función en desuso.
   calcularKgProducidos(produccion : any, anio : number) : number {
     let total : number = 0;
     produccion.datasets.forEach(prod => {
@@ -662,7 +667,7 @@ export class DashboardCalidadComponent {
     return total;
   }
   
-  //
+  //Función que realizará el calculo de devoluciones/rechazos vs facturación
   badQualityVsFact(){
     let count : number = 0;
     this.svFact.GetFacturacion_Mes_Mes(this.selectedYear.toString()).subscribe(data => {
@@ -678,7 +683,7 @@ export class DashboardCalidadComponent {
     
   }
 
-  //
+  //Función que cambiará el tipo de dato de la facturación a array.
   parseDatos(raw: string[]): { Mes: string; Valor: number, Fact : number, NombreMes : string, Porcentaje : number }[] {
     return raw.map(entry => {
       const match = entry.match(/'Mes': '(\d+)', 'Valor': '([\d,]+)'/);
@@ -689,22 +694,26 @@ export class DashboardCalidadComponent {
     });
   }
 
-  loadModalForFilter(data : any){
+  //Función que cargará el modal de movimientos de devoluciones. 
+  loadModalForFilter(data : any, typeData : string, month? : string){
     this.modalClients = true;
-    
-    this.cmpMovDevQuality.formFilters.patchValue({
-      ot: '134289'
-    });
+    setTimeout(() => {
+      let mm = month ? month : this.monthSelected;
+      let monthIndex = this.monthNames.indexOf(mm);
 
-    console.log(moment().startOf('month').format('YYYY-MM-DD'));
-    
-   // this.cmpMovDevQuality.formFilters.value.clientId = data.devs.cli_Id;
-
-    //console.log(this.cmpMovDevQuality.formFilters.value.clientId);
-    
-    setTimeout(() => { this.cmpMovDevQuality.searchData(); }, 500);
+      this.cmpMovDevQuality.formFilters.patchValue({
+        startDate : new Date(moment({ 'year' : this.selectedYear, 'month': monthIndex, 'day' : 1 }).add(1, 'd').format('YYYY-MM-DD')),
+        endDate : new Date(moment({ 'year' : this.selectedYear, 'month': monthIndex, 'day' : 30 }).add(1, 'd').format('YYYY-MM-DD')),
+        process : typeData == 'area' ? data.areaId : null, 
+        clientId : typeData == 'client' ? data.clientId : null,
+        client : typeData == 'client' ? data.client : null,
+        typeMov : typeData == 'rejected' ? data.rejectedType : null,
+      });
+      this.cmpMovDevQuality.searchData(); 
+    }, 500);
   }
 
+  //Función que cambiará los titulos dependiendo lo que se seleccione en el dashboard.
   msj(msjHtml : string){
     let message : string = ``;
     let intern : string = ` Rechazos Internos`;

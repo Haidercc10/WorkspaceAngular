@@ -154,8 +154,6 @@ export class Dashboard_AreasComponent implements OnInit {
   consultarInformacion(){
     this.cargando = true;
     this.bagProService.GetProduccionAreas(this.anioSeleccionado).subscribe(datos => {
-      console.log(datos);
-      
       this.aniosGraficados.push(this.anioSeleccionado);
       let proceso : string [] = [], count : number = 0;
       datos.forEach(prod => !proceso.includes(prod.area) ? proceso.push(prod.area) : null);
@@ -174,8 +172,6 @@ export class Dashboard_AreasComponent implements OnInit {
           this.totalMesArea(datos, 11, area),
           this.totalMesArea(datos, 12, area),
         ];
-        console.log(produccion);
-        
         this.llenarGraficas(produccion, area);
         count++;
         if (count == proceso.length) {

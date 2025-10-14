@@ -34,6 +34,8 @@ export class ZeusContabilidadService {
 
   GetCartera_Mes_Anio = (periodo : any) => this.http.get<any>(`${this.rutaZeusContabilidad}/FacturasBU/getCartera_Mes_Anio/${periodo}`);
 
+  getHerrajesAndina = (date1 : any, date2 : any, url : string = '') => this.http.get<any>(`${this.rutaZeusContabilidad}/FacturasBU/getHerrajesAndina/${date1}/${date2}${url}`);
+
   /*********************************************************************** SaldoProvLibroPrincipal **********************************************************/
   GetCostosProveedores = (cuenta : string) => this.http.get<any>(`${this.rutaZeusContabilidad}/SaldoProv_LibroPrincipal/getCostosProveedores/${cuenta}`);
 

@@ -1,0 +1,47 @@
+::ng-deep .row {
+    text-align: center;
+}
+
+::ng-deep .p-chip {
+    margin-top: 2%;
+}
+
+::ng-deep .meta-extrusion .p-chip {
+    background-color: #ff9900ff;
+    color: white;
+}
+
+::ng-deep .prd-extrusion .p-chip {
+    background-color: #f0d800ff;
+    color: rgb(29, 22, 0);
+}
+
+::ng-deep .prd-impresion .p-chip {
+    background-color: #60f000ff;
+    color: rgb(0, 56, 12);
+}
+
+::ng-deep .meta-impresion .p-chip {
+    background-color: #009632ff;
+    color: white;
+}
+
+::ng-deep .prd-corte .p-chip {
+    background-color: #2e8fffff;
+    color: white;
+}
+
+::ng-deep .meta-corte .p-chip {
+    background-color: #003cffff;
+    color: white
+}
+
+::ng-deep .prd-sellado .p-chip {
+    background-color: #ff5353ff;
+    color: white;
+}
+
+::ng-deep .meta-sellado .p-chip {
+    background-color: #ff1111ff;
+    color: white
+}

@@ -1,4 +1,4 @@
-import { Component, Injectable, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -9,6 +9,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +34,9 @@ export class MovDevolucionesCalidadComponent implements OnInit {
   items : any = [];
   typesMovements: any = ['INTERNO', 'EXTERNO'];
   products : any = [];
+  @ViewChild('op') op: OverlayPanel | undefined;
+  observation : any = null;
+  processes : any = [];
 
   constructor(
     private appComponent : AppComponent,
@@ -41,14 +46,26 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     private msg : MensajesAplicacionService,
     private svProducts : ProductoService,
     private svExcel : CreacionExcelService,
+    private svProcess : ProcesosService,
   ){
       this.modoSeleccionado = this.appComponent.temaSeleccionado;
-      this.initForm();
+      this.formFilters = this.frmBuilder.group({
+        startDate: [null, Validators.required],
+        endDate: [null, Validators.required],
+        typeMov: [null, ],
+        ot: [null, ],
+        itemId: [null ],
+        item: [null ],
+        process: [null ],
+        client: [null ],
+        clientId: [null ],
+    });
   }  
 
   ngOnInit() {
     this.readStorage();
     this.loadRankDates();
+    this.getProcess();
   }
 
   //Función para cargar fechas en el rango.
@@ -71,6 +88,7 @@ export class MovDevolucionesCalidadComponent implements OnInit {
       ot: [null, ],
       itemId: [null ],
       item: [null ],
+      process: [null ],
       client: [null ],
       clientId: [null ],
     });
@@ -80,17 +98,21 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     let ot: any = this.formFilters.value.ot;
     let typeRejected: any = this.formFilters.value.typeMov;
     let client : any = this.formFilters.value.clientId;
-    let item : any = this.formFilters.value.itemId;
+    let process : any = this.formFilters.value.process;
     let url : string = ``;
 
     if(ot != null) url += `ot=${ot}`;
     if(client != null) url.length > 0 ? url += `&client=${client}` : url += `client=${client}`;
-    if(item != null) url.length > 0 ? url += `&item=${item}` : url += `item=${item}`;
+    if(process != null) url.length > 0 ? url += `&process=${process}` : url += `process=${process}`;
     if(typeRejected != null) url.length > 0 ? url += `&typeRejected=${typeRejected}` : url += `typeRejected=${typeRejected}`;
 
     if(url.length > 0) url = `?${url}`;
     return url;
   }
+
+  //Función para obtener los procesos.
+  getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => { this.processes = data }, error => { this.msg.mensajeError(`Error`, `Error en los procesos. | ${error}`); });
+
 
   searchClients() {
     let idClient = this.formFilters.value.clientId;
@@ -132,7 +154,7 @@ export class MovDevolucionesCalidadComponent implements OnInit {
       this.load = false;
     }, error => {
       this.load = false;
-      console.log(error);this.errorMessage('Error al consultar los registros de devouciones', error)
+      console.log(error);this.errorMessage('Error al consultar los registros de devoluciones', error)
     });
   }
 
@@ -281,4 +303,21 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     });
     return info;
   }
+
+   //*Función para mostrar la observación de la orden de reposición. 
+  viewObservation($event, data : any){
+    this.observation = data.devs.dvc_Observacion;
+    if (this.observation != null) {
+      setTimeout(() => {
+        this.op!.toggle($event); 
+        $event.stopPropagation();
+      }, 500);
+    }
+  }
+
+  //Función que totalizará los costos de los movimientos cargados en la tabla.
+  totalMoney = () => this.serchedData.reduce((a, b) => a += b.devs.dvc_Subtotal, 0);
+
+  //Función que totalizará los kilos de los movimientos cargados en la tabla.
+  totalKg = () => this.serchedData.reduce((a, b) => a += b.devs.dvc_PesoNeto, 0);
 }
