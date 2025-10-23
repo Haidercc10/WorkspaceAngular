@@ -576,7 +576,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         "Cantidad": this.formatNumbers((prod.dtDev.cantidad).toFixed(2)),
         "Und": prod.dtDev.presentacion,
         "Peso": this.formatNumbers((prod.weight ? prod.weight : 0).toFixed(2)),
-        "Estado" : data[data.length - 1].estadoOF,
+        "Estado" : ![null, undefined].includes(data[data.length - 1].estadoOF) ? data[data.length - 1].estadoOF : '',
       });
     });
     console.log('info' , informationProducts);

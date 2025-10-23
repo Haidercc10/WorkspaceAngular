@@ -8,7 +8,7 @@ export interface modelControlCalidad_Extrusion {
     CcExt_Cliente : string;
     Prod_Id : string;
     Referencia : string;
-    CcExt_Rollo : number;
+    CcExt_Rollo : string;
     Pigmento_Id : number;
     CcExt_AnchoTubular : number;
     CcExt_PesoMetro : number;
@@ -24,7 +24,30 @@ export interface modelControlCalidad_Extrusion {
     CcExt_Fecha : string;
     CcExt_Hora : string;
     CcExt_Observacion : string;
-    CcExt_CalibreTB : number;  
+    CcExt_CalibreTB : number; 
+    //Nuevos campos
+    CcExt_AlDardo : string;
+    CcExt_Geles : string;
+    CcExt_Quemado : string;
+    CcExt_Brillo : string; 
+    CcExt_Calibre1 : number;
+    CcExt_Calibre2 : number; 
+    CcExt_Calibre3 : number;
+    CcExt_Calibre4 : number;
+    CcExt_Calibre5 : number;
+    CcExt_Calibre6 : number; 
+    CcExt_Calibre7 : number;
+    CcExt_Calibre8 : number;
+    CcExt_Calibre9 : number;
+    CcExt_Calibre10 : number; 
+    CcExt_Calibre11 : number;
+    CcExt_Calibre12 : number;
+    CcExt_Calibre13 : number;
+    CcExt_Calibre14 : number; 
+    CcExt_Calibre15 : number;
+    CcExt_Calibre16 : number;
+    CCExt_Moda : number;
+    CCExt_Desviacion : number;
 }
 
 export interface modelControlCalidad_Impresion {

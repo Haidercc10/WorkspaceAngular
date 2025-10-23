@@ -199,7 +199,7 @@ export class MenuLateralComponent implements OnInit {
           {
             label: 'Sistema de Gestión', icon: '', items: [
               { label: 'Aseguramiento de la Calidad', icon: 'pi pi-flag-fill', command: () => { this.router.navigate(['/aseguramiento-calidad']); }},
-              { label: 'Sistema de Gestión Integrado', icon: 'pi pi-check-circle', command: () => { this.router.navigate(['/sistema-gestion-calidad']); }}
+              { label: 'Sistemas de Gestión', icon: 'pi pi-check-circle', command: () => { this.router.navigate(['/sistema-gestion-calidad']); }}
             ]
           }
         );    

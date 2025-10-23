@@ -8,7 +8,7 @@ const routes: Routes = [
     path: '', 
     component: SistemaGestionCalidadComponent,
     canActivate: [VistasPermisosGuard], 
-    data: {nombre: 'Sistema de Gestión Integrado'}, 
+    data: {nombre: 'Sistemas de Gestión'}, 
   }
 ];
 

@@ -50,8 +50,8 @@ export class ControlCalidadComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    //this.consultarDatos();
-    this.exportExcel();
+    this.consultarDatos();
+    //this.exportExcel();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -98,8 +98,8 @@ export class ControlCalidadComponent implements OnInit {
 
   // Funcion que va a consultar los registros de controles de calidad 
   consultarDatos(){
-    this.ConsultarDatosControlCal_Impresion();
-    this.ConsultarDatosControlCal_DobladoCorte();
+    //this.ConsultarDatosControlCal_Impresion();
+    //this.ConsultarDatosControlCal_DobladoCorte();
   }
 
   // Fucion que va a consultar los datos de los controles de calidad del area de impresión
@@ -490,7 +490,8 @@ export class ControlCalidadComponent implements OnInit {
 
   exportExcel(){
   //if(this.comparativeStock.length > 0) {
-    setTimeout(() => { this.loadSheetAndStyles2(this.datosControlCal_Impresion); }, 500);
+    //setTimeout(() => {  }, 500);
+    this.loadSheetAndStyles2(this.dataExcel2());
   //} else this.msg.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
   }
   
@@ -519,7 +520,7 @@ export class ControlCalidadComponent implements OnInit {
     this.loadHeader(worksheet, fill, border, font, alignment);
     this.loadHeader2(worksheet, fill, border, font, alignment);
     unirCeldas.forEach(cell => worksheet.mergeCells(cell));
-    this.loadInfoExcel2(worksheet, [/*this.dataExcel2(data)*/], border,  alignment);
+    this.loadInfoExcel2(worksheet, [this.dataExcel2()], border, alignment);
     worksheet.getCell('A33').value = `OBSERVACIONES: `;
   }
 
@@ -560,7 +561,7 @@ export class ControlCalidadComponent implements OnInit {
   loadHeader2(ws : any, fill : any, border : any, font : any, alignment : any){
     let rowHeader : any = ['A7','B7','C7','D7','E7','F7','G7','H7','I7', 'J7','K7','L7','M7', 'N7', 'O7', 'P7', 'Q7', 'R7'];
     let alinearWrap : string [] = ['H7', 'I7', 'J7', 'K7', 'L7', 'M7', 'Q7', 'R7'];
-    let textoRotado : string [] = ['B7', 'F7', 'U7', 'V7', 'W7', 'X7']; 
+    let textoRotado : string [] = ['B7', 'F7', 'N7', 'O7', 'P7']; 
     
     ws.addRow([]);
     ws.addRow(this.loadFieldsHeader2());
@@ -621,16 +622,19 @@ export class ControlCalidadComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel2(ws : any, data : any, border : any, alignment : any){
     let formatNumber: Array<number> = [5,6,7,9,10,11,12];
-    let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M']; 
+    let contador : any = 8;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R']; 
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    data.forEach(x => {
-      ws.addRow(x);
+    data[0].forEach(x => {
+      //ws.addRow(x);
       row.forEach(r => {
         ws.getCell(`${r}${contador}`).border = border;
         ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
         ws.getCell(`${r}${contador}`).alignment = alignment;
+        ws.getCell(`${r}${contador}`).value = x[contador];
+        console.log(x[contador]);
+        
       });
       contador++
     });
@@ -638,27 +642,32 @@ export class ControlCalidadComponent implements OnInit {
   }
 
   //.Función que contendrá la info al documento excel. 
-  dataExcel2(data : any){
+  dataExcel2(){
     let info : any = [];
-    let count : number = 0;
-    data.forEach(x => {
-      info.push([
-        count += 1,
-        x.item,
-        x.client,
-        x.reference,
-        x.stock,
-        x.stockInProcess,
-        x.totalStock,
-        x.presentation,
-        x.price, 
-        (x.price * x.stock),
-        (x.price * x.stockInProcess),
-        x.price * (x.stock + x.stockInProcess),
-        x.seller,
+    
+    for (let index = 0; index <= 24; index++) {
+     info.push([
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
       ]);
-    });
-    return info;
+      //console.log(info);
+    }
+    return info
   }
-  
 }

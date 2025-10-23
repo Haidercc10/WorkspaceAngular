@@ -10,6 +10,12 @@
     font-size: calc(var(--font-size) * 15px);
 }
 
+.bg-violet {
+    color: white;
+    background-color: rgb(104, 39, 255);
+    font-size: calc(var(--font-size) * 15px);
+}
+
 .bg-success {
     color: rgb(11, 82, 0);
     background-color: palegreen;

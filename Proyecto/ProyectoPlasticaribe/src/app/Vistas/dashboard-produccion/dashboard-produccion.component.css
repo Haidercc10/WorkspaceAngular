@@ -6,6 +6,8 @@
     margin-top: 2%;
 }
 
+/* Clases para meta y producción */
+
 ::ng-deep .meta-extrusion .p-chip {
     background-color: #ff9900ff;
     color: white;
@@ -44,4 +46,50 @@
 ::ng-deep .meta-sellado .p-chip {
     background-color: #ff1111ff;
     color: white
+}
+
+::ng-deep .prd-perforado .p-chip {
+    background-color: #8255ffff;
+    color: white;
+}
+
+::ng-deep .meta-perforado .p-chip {
+    background-color: #2000b1ff;
+    color: white
+}
+
+::ng-deep .prd-camisilla .p-chip {
+    background-color: #00d9ffff;
+    color: white;
+}
+
+::ng-deep .meta-camisilla .p-chip {
+    background-color: #008c91ff;
+    color: white
+}
+
+/* Clases titulos tablas */
+::ng-deep .title-extrusion {
+    color: #ff9900ff;
+}
+
+::ng-deep .title-impresion {
+    color: #60f000ff;
+}
+
+::ng-deep .title-corte  {
+    color: #2e8fffff;
+}
+
+::ng-deep .title-sellado {
+    color: #ff5353ff;
+}
+
+::ng-deep .title-perforado {
+    color: #8255ffff;
+}
+
+
+::ng-deep .title-camisilla {
+    color: #00d9ffff;
 }

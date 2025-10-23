@@ -67,8 +67,6 @@ export class BagproService {
 
   GetInformacionOrden_ProcesoExt = (orden : string, proceso : string) => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getInformacionOrden_Proceso/${orden}/${proceso}`);
   
-  getOtControlCalidadExtrusion = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/getOtControlCalidadExtrusion/${OT}/${proceso}`);
-
   GetProduccionAreas = (anio : number) => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProduccionAreas/${anio}`);
 
   GetProduccionDetalladaAreas = (inicio, fin, ruta) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProduccionDetalladaAreas/${inicio}/${fin}${ruta}`);
@@ -148,6 +146,8 @@ export class BagproService {
   getOtsForCustomerOrders1 = (date1: any, date2 : any, item : number, presentation : string, idClient : number, consecutivo : string): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ClientesOt/getOtsForCustomerOrders1/${date1}/${date2}/${item}/${presentation}/${idClient}/${consecutivo}`);
 
   getOtsForCustomerOrders2 = (pedidos : any[]) => this.http.post<any>(`${this.rutaBagPro}/ClientesOt/getOtsForCustomerOrders2`, pedidos);
+
+  getOtControlCalidadExtrusion = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/getOtControlCalidadExtrusion/${OT}/${proceso}`);
   
   /**************************************************************** CLIENTESOTITEM *******************************************************/
 

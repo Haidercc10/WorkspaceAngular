@@ -346,7 +346,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     });
   }
 
-   validateUrl(){
+  validateUrl(){
     let order: any = this.formFilters.value.orderFact;
     let clientId: any = this.formFilters.value.clientId;
     let salesId : any = this.formFilters.value.salesId;

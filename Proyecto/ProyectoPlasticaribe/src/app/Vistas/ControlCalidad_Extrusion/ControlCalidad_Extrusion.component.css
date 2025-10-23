@@ -25,3 +25,8 @@ p-calendar ::ng-deep .p-datepicker-header button:hover {
 .espacioMedio {
   justify-content: space-between;
 }
+
+::ng-deep .p-inputgroup-addon {
+  background: var(--rojo);
+  color : white;
+}

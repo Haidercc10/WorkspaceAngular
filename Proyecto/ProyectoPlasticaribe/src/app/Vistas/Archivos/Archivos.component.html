@@ -57,7 +57,16 @@
         [rowHover]="true"
         dataKey="id"
         [scrollable]="true"
-        scrollHeight="50rem">
+        scrollHeight="50rem"
+        [globalFilterFields]="['nombre']">
+        <ng-template pTemplate="caption">
+        <div class="flex align-items-center justify-content-between">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" id="buscar" placeholder="Buscar..." (input)="aplicarfiltroGlobal($event, 'contains')" pTooltip="Busqueda por items, nombres de carpetas/archivos." tooltipPosition="top"/>
+          </span>
+        </div>
+      </ng-template>
         <ng-template pTemplate="header">
           <tr class="font-size-13">
             <th scope="col" style="width: 65%">

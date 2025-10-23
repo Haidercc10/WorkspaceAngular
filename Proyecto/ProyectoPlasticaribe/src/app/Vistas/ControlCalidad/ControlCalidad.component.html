@@ -10,7 +10,7 @@
   <div class="container-fluid">
     <!-- Titulo principal -->
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Control de Calidad</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Control de Variables Calidad</h2>
     </div>
 
     <!-- Linea principal -->
@@ -21,10 +21,6 @@
 </div>
 
 <p-card>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-
   <p-tabView [scrollable]="true" (onChange)="cambioTab($event.index)">
 
     <div *ngIf="!esExtrusionSellado" class="row m-3 g-2">

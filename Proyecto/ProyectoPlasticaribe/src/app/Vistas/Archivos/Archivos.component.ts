@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ShepherdService } from 'angular-shepherd';
 import { File } from 'buffer';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
 import { ArchivosService } from 'src/app/Servicios/Archivos/Archivos.service';
 import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos/Categorias_Archivos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -45,6 +46,8 @@ export class ArchivosComponent implements OnInit {
   accionMoverCopiar: number;
   value: number = 0;
   url = ``;
+  @ViewChild('dt') dt: Table | undefined;
+  
 
   constructor(private frmBuilder: FormBuilder,
     private AppComponent: AppComponent,
@@ -69,7 +72,7 @@ export class ArchivosComponent implements OnInit {
   ngOnInit() {
     this.url = this.router.url;
     if(this.url == '/sistema-gestion-calidad') {
-      this.AppComponent.rutaCarpetaArchivos = 'D:\\Calidad\\Sistema de Gestion de Calidad';
+      this.AppComponent.rutaCarpetaArchivos = 'D:\\Calidad\\Sistemas de Gestión';
     }  
     if(this.url == '/aseguramiento-calidad') {
       this.AppComponent.rutaCarpetaArchivos = 'D:\\Calidad\\Aseguramiento de la Calidad';
@@ -387,4 +390,8 @@ export class ArchivosComponent implements OnInit {
       });
     });
   }
+
+  // Funcion que permitirá filtrar la información de la tabla
+  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+
 }

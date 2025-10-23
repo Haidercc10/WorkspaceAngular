@@ -28,6 +28,12 @@ export class DashboardProduccionComponent implements OnInit {
   primerDiaMes: any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   cargando: boolean = false; //Variable que va a validar si se esta cargando algo o no
   procesosOrdenesMes: any[] = []; //Variable que va a almcencar la cantidad de que se ha hecho en cada proceso de produccion
+  productionExt: any[] = [];
+  productionImp: any[] = [];
+  productionCorte: any[] = [];
+  productionSella: any[] = [];
+  productionCami: any[] = [];
+  productionPerf: any[] = [];
   productionMachines: any[] = [];
   productionReport : boolean = false;
 
@@ -42,15 +48,21 @@ export class DashboardProduccionComponent implements OnInit {
   ComparativoOptionsEmpaque : any;
   ComparativoDataSellado : any;
   ComparativoOptionsSellado : any;
+  ComparativoDataCamisilla : any;
+  ComparativoOptionsCamisilla : any;
+  ComparativoDataPerforado : any;
+  ComparativoOptionsPerforado : any;
   ComparativoPlugins = [ DataLabelsPlugin ];
 
   totalProduction : any = []
   totalGoal : any = []
 
-  totalPercentageExt : number = 50;
-  totalPercentageImp : number = 50;
-  totalPercentageEmp : number = 50;
-  totalPercentageSella : number = 50;
+  totalPercentageExt : number = 0;
+  totalPercentageImp : number = 0;
+  totalPercentageEmp : number = 0;
+  totalPercentageSella : number = 0;
+  totalPercentagePerf : number = 0;
+  totalPercentageCami : number = 0;
 
   totalPercentageMonth : number = 0;
 
@@ -106,23 +118,25 @@ export class DashboardProduccionComponent implements OnInit {
   tiempoExcedido() {
     if (this.mainPage.production) {
       setTimeout(() => this.loadDataProduction(), 1000);
-      setTimeout(() => this.llenarGraficaComparativo(), 3000);
       setTimeout(() => {
         this.llenarGraficaComparativoExtrusion();
         this.llenarGraficaComparativoImpresion();
         this.llenarGraficaComparativoEmpaque();
         this.llenarGraficaComparativoSellado();
+        this.llenarGraficaComparativoCamisilla();
+        this.llenarGraficaComparativoPerforado();
       }, 3000);
       
       let time = setInterval(() => {
         if (this.mainPage.production) {
           setTimeout(() => this.loadDataProduction(), 1000);
-          setTimeout(() => this.llenarGraficaComparativo(), 3000);
           setTimeout(() => {
             this.llenarGraficaComparativoExtrusion();
             this.llenarGraficaComparativoImpresion();
             this.llenarGraficaComparativoEmpaque();
             this.llenarGraficaComparativoSellado();
+            this.llenarGraficaComparativoCamisilla();
+            this.llenarGraficaComparativoPerforado();
           }, 3000);
           
         } else clearInterval(time);
@@ -150,10 +164,27 @@ export class DashboardProduccionComponent implements OnInit {
 
   //Obtener datos de producción por maquina
   getDataForMachine2(date1 : any, date2 : any){
-    this.productionMachines = [];
+    this.clearFields();
+
     this.svDailyProd.getProductionDay(date1, date2).subscribe(data => {
-      this.productionMachines = data.filter(x => x.process == 'EXT');
+      this.productionMachines = data;
+      this.totalPercentageCami = this.totalPercentageForProcess('CAMISILLA');
+      this.totalPercentageExt = this.totalPercentageForProcess('EXT');
+      this.totalPercentageImp = this.totalPercentageForProcess('IMP');
+      this.totalPercentageEmp = this.totalPercentageForProcess('EMP');
+      this.totalPercentageSella = this.totalPercentageForProcess('SELLA');
+      this.totalPercentagePerf = this.totalPercentageForProcess('PERF');
     });
+  }
+
+  clearFields(){
+    this.productionMachines= [];
+    this.totalPercentageCami = 0;
+    this.totalPercentageExt = 0;
+    this.totalPercentageImp = 0;
+    this.totalPercentageEmp = 0;
+    this.totalPercentageSella = 0;
+    this.totalPercentagePerf = 0;
   }
 
   //Función para actualizar la meta del día por maquina.
@@ -167,14 +198,18 @@ export class DashboardProduccionComponent implements OnInit {
     })
   }
 
+  productionMachineProcess = (process: string) => this.productionMachines.filter(x => x.process == process);
+
+  totalPercentageForProcess = (process : string) => Number.isNaN((this.totalKgProcess(process) * 100 / this.totalMetaProcess(process))) ? 0 : Math.round(this.totalKgProcess(process) * 100 / this.totalMetaProcess(process));
+
   //Total meta producción por proceso
-  totalMetaProcess = (process: string = 'EXT') => this.productionMachines.filter(x => x.process == process).reduce((a, b) => a += b.goal, 0);
+  totalMetaProcess = (process: string) => this.productionMachines.filter(x => x.process == process).reduce((a, b) => a += b.goal, 0);
 
   //Total kg por proceso
-  totalKgProcess = (process: string = 'EXT') => this.productionMachines.filter(x => x.process == process).reduce((a, b) => a += b.weight, 0);
+  totalKgProcess = (process: string) => this.productionMachines.filter(x => x.process == process).reduce((a, b) => a += b.weight, 0);
   
   //Total kg por proceso
-  totalPerc = (process: string = 'EXT') => this.productionMachines.filter(x => x.process == process).reduce((a, b) => this.totalPercentageExt += b.percentage, 0);
+  totalPerc = (process: string) => this.productionMachines.filter(x => x.process == process).reduce((a, b) => this.totalPercentageExt += b.percentage, 0);
 
   //Total meta proceso
   totalGoalMonth = (process: string) => this.procesosOrdenesMes.filter(x => x.Area == process).reduce((a, b) => a += b.Meta_Produccion, 0);
@@ -191,7 +226,7 @@ export class DashboardProduccionComponent implements OnInit {
   } 
 
 
-  //Función para obtener la información por procesos.
+  //* Función para obtener la información por procesos.
   consultarPesoProducidoOrdenes() {
     this.svProdAreas.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
       this.procesosOrdenesMes = [];
@@ -332,33 +367,9 @@ export class DashboardProduccionComponent implements OnInit {
     this.cmproduction.consultarProduccion();
   }
 
-  //TODO: GRAFICA 2
-  /** Función para llamar la grafica de */
-  llenarGraficaComparativo() {
-    this.ComparativoData = {
-      labels: [''],
-      datasets: [
-        { label: 'Producción Día', backgroundColor: '#919191ff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgProcess()] },
-        { label: 'Objetivo', backgroundColor: '#008cffff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalMetaProcess() ] }
-      ]
-    };
-
-    this.ComparativoOptions = {
-      indexAxis: 'y',
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
-        tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
-      },
-      scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
-      }
-    };
-  }
-
   //TODO: GRAFICA 1 BARRAS ACOSTADAS
 
-  /** Función para llamar la grafica de */
+  /** Función para llamar la grafica de extrusión*/
   llenarGraficaComparativoExtrusion() {
     this.ComparativoDataExtrusion = {
       labels: [''],
@@ -381,7 +392,7 @@ export class DashboardProduccionComponent implements OnInit {
     };
   }
 
-  /** Función para llamar la grafica de */
+  /** Función para llamar la grafica de impresión*/
   llenarGraficaComparativoImpresion() {
     this.ComparativoDataImpresion = {
       labels: [''],
@@ -404,7 +415,7 @@ export class DashboardProduccionComponent implements OnInit {
     };
   }
 
-  /** Función para llamar la grafica de */
+  /** Función para llamar la grafica de empaque */
   llenarGraficaComparativoEmpaque() {
     this.ComparativoDataEmpaque = {
       labels: [''],
@@ -427,7 +438,7 @@ export class DashboardProduccionComponent implements OnInit {
     };
   }
 
-  /** Función para llamar la grafica de */
+  /** Función para llamar la grafica de sellado*/
   llenarGraficaComparativoSellado() {
     this.ComparativoDataSellado = {
       labels: [''],
@@ -450,4 +461,49 @@ export class DashboardProduccionComponent implements OnInit {
     };
   }
 
+  /** Función para llamar la grafica de camisilla*/
+  llenarGraficaComparativoCamisilla() {
+    this.ComparativoDataCamisilla = {
+      labels: [''],
+      datasets: [
+        { label: 'Producción', backgroundColor: '#00d9ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('SELLADO')] },
+        { label: 'Meta', backgroundColor: '#008c91ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('SELLADO')] }
+      ]
+    };
+
+    this.ComparativoOptionsCamisilla = {
+      indexAxis: 'y',
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
+      },
+      scales: {
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+      }
+    };
+  }
+
+  /** Función para llamar la grafica de perforado*/
+  llenarGraficaComparativoPerforado() {
+    this.ComparativoDataPerforado = {
+      labels: [''],
+      datasets: [
+        { label: 'Producción', backgroundColor: '#8255ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('SELLADO')] },
+        { label: 'Meta', backgroundColor: '#2000b1ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('SELLADO')] }
+      ]
+    };
+
+    this.ComparativoOptionsPerforado = {
+      indexAxis: 'y',
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
+      },
+      scales: {
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+      }
+    };
+  }
 }
