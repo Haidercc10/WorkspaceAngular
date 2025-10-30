@@ -16,6 +16,7 @@ import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Table } from 'primeng/table';
+import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
 
 @Component({
   selector: 'app.desperdicio.component',
@@ -49,6 +50,8 @@ export class DesperdicioComponent implements OnInit {
   turnos : any = [];
   @ViewChild('dt2') dt2: Table | undefined; //Tabla de desperdicios
   copiaDesperdicios : any = [];
+  allOperators : any = [];
+  allMachines : any = [];
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -63,7 +66,8 @@ export class DesperdicioComponent implements OnInit {
                                   private mensajeService : MensajesAplicacionService,
                                     private svcAreas : AreaService, 
                                       private svcTurnos : TurnosService, 
-                                        private svcCrearPDF : CreacionPdfService) {
+                                        private svcCrearPDF : CreacionPdfService, 
+                                          private svMachines : MaquinasService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarFormulario();
@@ -100,9 +104,21 @@ export class DesperdicioComponent implements OnInit {
     setTimeout(() => { 
       this.filtrarArea(); 
       this.obtenerOperarios();
+      this.getMachines();
     }, 1000);
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
+
+  //Función para obtener las maquinas
+  getMachines() {
+    this.svMachines.getAllMachines().subscribe(data => { 
+      this.allMachines = data;
+      this.maquinas = data.filter(x => this.area.id == 'CORTE' ? x.proceso_Id == 'EMP' : x.proceso_Id == this.area.id);
+      this.maquinas.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero)); 
+    }, err => {
+      this.mensajeService.mensajeError('Error', 'No fue posible cargar las maquinas');
+    });
+  } 
 
   //Función que cargará el area del usuario logueado
   filtrarArea(){
@@ -124,6 +140,18 @@ export class DesperdicioComponent implements OnInit {
     if(this.area.nombre.toUpperCase() == "NO APLICA") this.areaOperarios = [];
     else this.areaOperarios = this.areas.filter(x => x.area_Nombre == this.area.nombre.toUpperCase());
     this.cargarTurnoActual();
+  }
+
+  //* Función para filtrar operarios */
+  filtrarOperarios(changeArea: boolean){
+    changeArea ? this.operarios = this.allOperators.filter((item) => item.rolUsu_Id == 59 && item.estado_Id == 1 && (this.areaOperarios.length > 0 ? item.area_Id == this.areaOperarios[0].area_Id : true)) : null;
+  }
+
+  //* Función para filtrar machinas */
+  filtrarMaquinas(changeMachine: boolean){
+    let area : any = this.FormDesperdicio.value.IdArea;
+    area == 'CORTE' ? area = 'EMP' : null;
+    changeMachine ? this.maquinas = this.allMachines.filter((item) => item.proceso_Id == area) : null;
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -153,6 +181,8 @@ export class DesperdicioComponent implements OnInit {
     this.ordenesTrabajo = [];
     this.copiaDesperdicios = [];
     this.filtrarArea();
+    this.obtenerOperarios();
+    this.getMachines();
   }
 
   // Funcion que va a limpiar todo
@@ -163,6 +193,8 @@ export class DesperdicioComponent implements OnInit {
     this.ordenesTrabajo = [];
     this.copiaDesperdicios = [];
     this.filtrarArea();
+    this.obtenerOperarios();
+    this.getMachines();
   }
 
   getTurnos = () => this.svcTurnos.srvObtenerLista().subscribe(data => this.turnos = data);
@@ -170,6 +202,7 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar los operarios
   obtenerOperarios() {
     this.operariosService.getUsuarios().subscribe(datos => {
+      this.allOperators = datos.filter((item) => item.rolUsu_Id == 59);
       this.operarios = datos.filter((item) => item.rolUsu_Id == 59 && (this.areaOperarios.length > 0 ? item.area_Id == this.areaOperarios[0].area_Id : true)); 
     });
   } 
@@ -196,6 +229,9 @@ export class DesperdicioComponent implements OnInit {
       IdArea : nuevo[0].proceso_Id,
       Area : nuevo[0].proceso_Nombre,
     });
+    this.areaOperarios = this.areas.filter(x => x.area_Nombre.toUpperCase() == nuevo[0].proceso_Nombre.toUpperCase());
+    this.filtrarOperarios(true);
+    this.filtrarMaquinas(true);
   }
 
   // Funcion que va a consultar el id del material y en su lugar colocará el nombre de este
@@ -294,6 +330,9 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a generar un desperdicio nuevo y lo va a agregar a la BD
   generarDesperdicio(){
     this.getPuertoSerial();
+    let area : any = this.FormDesperdicio.value.IdArea;
+    let turno : any = this.FormDesperdicio.value.Turno;
+
     this.cargando = true;
     setTimeout(() => {
       if(!this.FormDesperdicio.valid) {
@@ -326,23 +365,11 @@ export class DesperdicioComponent implements OnInit {
           'Desp_FechaRegistro' : this.today,
           'Desp_HoraRegistro' : moment().format('H:mm:ss'),
           'Proceso_Id' : this.FormDesperdicio.value.IdArea,
-          'Turno_Id' : this.FormDesperdicio.value.Turno,
+          'Turno_Id' : (area != 'EXT' && turno == 'RD') ? 'DIA' : (area != 'EXT' && turno == 'RN') ? 'NOCHE' : (area == 'EXT' && turno == 'DIA') ? 'RD' : (area == 'EXT' && turno == 'NOCHE') ? 'RN' : turno,
         }
         this.deperdicioService.Insert(info).subscribe(() => {
           this.limpiarTodo();
           this.mensajeService.mensajeConfirmacion(`Desperdicio guardado exitosamente!`);
-          this.FormDesperdicio.patchValue({
-            OTDesperdicio: info.Desp_OT,
-            IdTipoMaterial: info.Material_Id,
-            Maquina: info.Maquina,
-            IdOperario: info.Usua_Operario,
-            Impreso: info.Desp_Impresion,
-            IdTipoNoConformidad: info.Falla_Id,
-            Observacion: info.Desp_Observacion,
-            IdArea: info.Proceso_Id,
-            Turno: info.Turno_Id,
-          });
-          this.consultarOrdenTrabajo();
         }), () => {
           this.mensajeService.mensajeError(`Error`, `No se pudo ingresar el desperdicio, verifique!`);
           this.cargando = false;

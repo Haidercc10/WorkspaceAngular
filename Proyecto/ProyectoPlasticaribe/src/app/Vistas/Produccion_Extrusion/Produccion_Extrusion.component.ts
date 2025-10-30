@@ -465,6 +465,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   buscraOrdenTrabajo(consulta? : boolean) {
+    
     this.reference = ``;
     this.obtenerTurnos();
     this.getMachines();
@@ -473,7 +474,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
       if(consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null, 'packer' : null, });
-        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo, `?process=${this.formDatosProduccion.value.proceso}`).subscribe(data => {
+        let proceso: string = this.formDatosProduccion.value.proceso == 'DBLD'  ? 'DOBLADO' : this.formDatosProduccion.value.proceso;
+        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo, `?process=${proceso}`).subscribe(data => {
           this.putDataOrderProduction(data, consulta);
           if(!consulta) this.updateStatesProcessOT(data[0].numero_Orden, this.formDatosProduccion.value.proceso, data[0].cantidad_Proceso, data[0].cantidad_Proceso);
         }, error => {

@@ -30,6 +30,14 @@
     <div class="mb-3" id="formulario">
       <div class="row g-4">
 
+        <!-- AREA -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl" id="area">
+          <span class="p-float-label">
+            <p-dropdown formControlName="IdArea" (onChange)="buscarProceso()" id="Areas" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="Areas">Area</label>
+          </span>
+        </div>
+
         <!-- OT -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="ordenTrabajo">
           <span class="p-float-label">
@@ -59,10 +67,11 @@
         </div>
 
         <!-- MAQUINA -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="maquina">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="Maquina" id="Maquina" list="Maquinas" [useGrouping]="false"></p-inputNumber>
-            <label for="Maquina">Maquina</label>
+              <p-dropdown formControlName="Maquina" inputId="Maquina" [options]="maquinas" optionLabel="maq_Numero"
+                  optionValue="maq_Numero" [autoDisplayFirst]="false" [required]="true" [filter]="true" filterBy="maq_Numero"></p-dropdown>
+              <label for="maquina">Maquina</label>
           </span>
         </div>
 
@@ -87,14 +96,6 @@
           <span class="p-float-label">
             <p-inputNumber formControlName="CantidadKg" id="Cantidad" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
-          </span>
-        </div>
-
-        <!-- AREA -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl" id="area">
-          <span class="p-float-label">
-            <p-dropdown formControlName="IdArea" (onChange)="buscarProceso()" id="Areas" [options]="procesos" optionLabel="proceso_Nombre" [readonly]="this.ValidarRol != 1" optionValue="proceso_Id" [autoDisplayFirst]="false"></p-dropdown>
-            <label for="Areas">Area</label>
           </span>
         </div>
 
