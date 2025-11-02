@@ -25,18 +25,18 @@
   <form [formGroup]="formClientFilters">
     <div class="row my-5 g-4 justify-content-center">
       <!-- START DATE -->
-      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-1 col-xxl-1">
         <span class="p-float-label">
           <p-calendar formControlName="start" inputId="start" [showIcon]="true"></p-calendar>
-          <label for="start">Fecha Inicial</label>
+          <label for="start">F. Inicial</label>
         </span>
       </div>
 
       <!-- END DATE -->
-      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-1 col-xxl-1">
         <span class="p-float-label">
           <p-calendar formControlName="end" inputId="end" [showIcon]="true"></p-calendar>
-          <label for="end">Fecha Final</label>
+          <label for="end">F. Final</label>
         </span>
       </div>
 
@@ -56,6 +56,14 @@
             <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
           </datalist>
           <label for="Cliente">Cliente</label>
+        </span>
+      </div>
+
+      <!-- VENDEDOR -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="sales" inputId="sales" [autoDisplayFirst]="false" [options]="asesores" optionValue="usua_Nombre" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+          <label for="sales">Asesores</label>
         </span>
       </div>
 
@@ -104,8 +112,8 @@
       <tr>
         <th rowspan="2" colspan="2" class="text-center">#</th>
         <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'bill', billsClient)"></th>
-        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'id_Client', billsClient)"></th>
         <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'client', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'sales', billsClient)"></th>
         <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'date', billsClient)"></th>
         <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotal', billsClient)"></th>
         <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotalDiscount', billsClient)"></th>
@@ -114,8 +122,8 @@
       </tr>
       <tr>
         <th class="text-center" pSortableColumn="bill"><p-sortIcon field="bill"></p-sortIcon> Factura</th>
-        <th class="text-center" pSortableColumn="id_Client"><p-sortIcon field="id_Client"></p-sortIcon> Id Cliente</th>
         <th class="text-center" pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon> Cliente</th>
+        <th class="text-center" pSortableColumn="sales"><p-sortIcon field="sales"></p-sortIcon> Asesor</th>
         <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
         <th class="text-center" pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
         <th class="text-center" pSortableColumn="subTotalDiscount"><p-sortIcon field="subTotalDiscount"></p-sortIcon> SubTotal Dcto</th>
@@ -130,8 +138,8 @@
         </td>
         <td class="text-center">{{rowIndex + 1 | number}}</td>
         <td class="text-center">{{data.bill}}</td>
-        <td class="text-center">{{data.id_Client}}</td>
         <td class="text-center">{{data.client}}</td>
+        <td class="text-center">{{data.sales}}</td>
         <td class="text-center">{{data.date}}</td>
         <td class="text-right">{{data.subTotal | number : '1.2-2'}}</td>
         <td class="text-right">{{data.subTotalDiscount | number : '1.2-2'}}</td>

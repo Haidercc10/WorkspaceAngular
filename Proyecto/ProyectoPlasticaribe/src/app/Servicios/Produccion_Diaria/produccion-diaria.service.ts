@@ -22,6 +22,6 @@ export class ProduccionDiariaService {
   
       Put = (id : number, data : any) => this.http.put(`${this.rutaPlasticaribeAPI}/Produccion_Diaria/${id}`, data);
   
-      putGoalForMachine = (id : number, meta : number) => this.http.put(`${this.rutaPlasticaribeAPI}/Produccion_Diaria/putGoalForMachine/${id}/${meta}`, meta);
+      putGoalForMachine = (maq : number, process : any, date : any, goal : number) => this.http.put(`${this.rutaPlasticaribeAPI}/Produccion_Diaria/putGoalForMachine/${maq}/${process}/${date}/${goal}`, maq);
   
 }

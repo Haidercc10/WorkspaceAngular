@@ -55,6 +55,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   sales: any[] = [];
   typesMovements: any = ['OF', 'DV'];
   modalEndOrders : boolean = false;
+  registroSeleccionado: any = null;
   
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
@@ -262,9 +263,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   ///
   loadModalOrderFact(data : any){
+    this.registroSeleccionado = data;
     if(data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
       if([6,1].includes(this.validateRole)) {
-        console.log(data);
         this.Repositions.clearAll();
         this.modalReposition = true; 
         this.Repositions.loadClientReposition(data);

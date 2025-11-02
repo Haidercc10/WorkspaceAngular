@@ -610,7 +610,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           [
             { text: `Finalizado por: ${data.usua.usuaFinaliza != 0 ? data.usua.usuaFinaliza : '' }`, }, 
             { text: `Fecha Final.: ${data.dev.devProdFact_FechaFinalizado != null ? (data.dev.devProdFact_FechaFinalizado).replace('T00:00:00','') : ''}`, }, 
-            { text: `N° Reposición: ${''}`, }, 
+            { text: `N° Reposición: ${data.dev.reposicion_Id}`, }, 
           ], 
           [          
             { text: `Estado: ${data.estadoDv.estado_Nombre}` },

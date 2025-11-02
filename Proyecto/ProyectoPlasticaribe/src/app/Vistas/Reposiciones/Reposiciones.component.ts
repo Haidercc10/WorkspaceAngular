@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { createPdf } from 'pdfmake/build/pdfmake';
@@ -32,7 +32,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
   styleUrls: ['./Reposiciones.component.css']
 })
 
-export class ReposicionesComponent implements OnInit {
+export class ReposicionesComponent implements OnInit, OnChanges {
 
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -53,6 +53,7 @@ export class ReposicionesComponent implements OnInit {
   repositionForDv : boolean = false;
   fails : any = [];
   users : any = [];
+  @Input() dato: any
 
   constructor(private AppComponent : AppComponent, 
     private fmBuild : FormBuilder,
@@ -71,6 +72,13 @@ export class ReposicionesComponent implements OnInit {
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
+  }
+
+  ngOnChanges() {
+    if (this.dato) {
+      console.log(this.dato);
+      this.form.patchValue({ 'client' : this.dato.clientes.cli_Nombre, 'idClient' : this.dato.or.cli_Id, 'dev' : this.dato.or.id, fail : 182 });
+    }
   }
 
   ngOnInit() {
@@ -364,8 +372,8 @@ export class ReposicionesComponent implements OnInit {
     let rolls : Array<any> = [];
     bults.forEach(x => rolls.push({'of' : 0, 'roll' : x.roll, 'item' : x.item, 'currentStatus' : 19, 'newStatus' : 23, 'envioZeus' : true }));    
     this.svProduction.putChangeStateProduction(rolls).subscribe(data => { 
-      dev ? this.updateStatusDev(dev, repo) : this.createPDF(repo, `creada`);
-     }, error => { 
+      dev ? this.updateDevolution(dev, repo) : this.createPDF(repo, `creada`);
+    }, error => { 
       this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados | ${error.status} ${error.statusText}`); 
     });
   }
@@ -462,7 +470,7 @@ export class ReposicionesComponent implements OnInit {
     let roll : any = [];
     roll.push({'roll' : data.roll, 'item' : data.item, 'currentStatus' : 23, 'newStatus' : 19, 'envioZeus' : true });
     this.svProduction.putChangeStateProduction(roll).subscribe(data => { 
-     }, error => { 
+    }, error => { 
       this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados | ${error.status} ${error.statusText}`); 
     });
   }
@@ -550,6 +558,12 @@ export class ReposicionesComponent implements OnInit {
     });
   }
 
+  updateDevolution(dev : number, repo : number){
+    this.svDevolutions.PutStatusDVForReposition(dev, repo).subscribe(data => {
+      this.createPDF(repo, 'creada');
+    }, error => console.log(error));
+  }
+
   onReject(key : any){
     this.load = false;
     this.msg.clear(key);
@@ -571,6 +585,7 @@ export class ReposicionesComponent implements OnInit {
     this.action = `Generar`;
     this.edition = false;
     this.getLastReposition();
+    this.repositionForDv = false;
   }
 
   //* Función para acortar msjs 

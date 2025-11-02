@@ -56,6 +56,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   rollsConsolidate : any = [];
   modalProductsNotRead : boolean = false;
   remainingProducts : any = [];
+  verificationProducts : boolean = false;
+  validations : number = 0;
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -113,7 +115,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       let preInBarsCode = document.getElementById('RolloBarCode');
       if (!destroy && preInBarsCode) preInBarsCode.focus();
       else if (destroy) clearInterval(time);
-    }, 10000);
+    }, 30000);
   }
 
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -136,6 +138,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.productionOutPallet = [];
     this.reposition = false;
     this.preload = false;
+    this.validations = 0;
   }
 
   getDrivers() {
@@ -167,7 +170,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.production = [];
     this.rollsConsolidate = [];
     this.remainingProducts = [];
-    this.remainingProduction = []
+    this.remainingProduction = [];
+    this.sendProductionZeus = [];
     let orderFact : number = this.formProduction.value.orderFact;
 
     this.orderFactService.getId(orderFact).subscribe(data => {
@@ -238,22 +242,30 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     }, error => this.errorMessage(`¡No se encontró información de la orden de facturación N° ${of}!`,error));
   }
 
-  getInformationProduction() {
+  getInformationProduction(production) {
     let orderFact = this.formProduction.value.orderFact;
     let fact = this.formProduction.value.fact;
 
     if ([null, undefined, ''].includes(orderFact)) this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe buscar la orden de facturación/reposición para ingresar los rollos/bultos a despachar!`, 12000000);
     //else if ([null, undefined, ''].includes(fact.toString().trim())) this.msj.mensajeAdvertencia(`Advertencia`, `No existen facturas/remisiones asociadas al pedido de la orden de facturación N° ${orderFact}`)
     else {
-      let production = parseInt(this.formProduction.value.production);
+      //let production = parseInt(this.formProduction.value.production);
       let productionOrderSearched = this.production.map(x => x.numberProduction);
+      console.log(production);
+      
       if (!productionOrderSearched.includes(production)) this.msj.mensajeError(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`, ``, 12000000);
       else {
         this.formProduction.patchValue({ production: null });
         document.getElementById('RolloBarCode').focus();
+        this.load = true;
         let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
-        if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`, ``, 12000000);
-        else this.getDataProduction(production);
+        if (productionSearched.includes(production)) {
+          this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`, ``, 12000000);
+          this.load = false;
+        } else {
+          this.getDataProduction(production);
+          //this.load = false;
+        } 
       }
     }
   }
@@ -272,7 +284,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   getProductionToDispatch(){
     let ofDirect : boolean = this.formProduction.value.ofDirect;
     let production : number = parseInt(this.formProduction.value.production);
-
+    this.clearFieldProduction();
     if(ofDirect) {
       let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
       if (productionSearched.includes(production)) {
@@ -282,16 +294,17 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       if(production) {
         this.getProductionOfDirect(production);
       } else this.msj.mensajeAdvertencia('Advertencia', `No hay rollo leído para consultar!`);
-    } else this.getInformationProduction();
+    } else this.getInformationProduction(production);
   }
 
   // Función para cargar bultos disponibles de OF directas al despacho. 
   getProductionOfDirect(production: number) {
     let orderFact = this.formProduction.value.orderFact;
+    this.load = true;
     this.productionProcessSerivce.getProductsOFDirect(production, orderFact).subscribe(data => {
-      let productionFound : number = data[0].pp.numeroRollo_BagPro;
-        if(productionFound == production) {
-          this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+    let productionFound : number = data[0].pp.numeroRollo_BagPro;
+      if(productionFound == production) {
+        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
           this.sendProductionZeus.push(data[0]);
           let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
           this.sendProductionZeus[i].dataExtrusion = {
@@ -308,6 +321,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           this.sendProductionZeus[i].position = this.sendProductionZeus.length;
           this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
           this.validateItemsToDispatch(data);
+        }, error => {
+          this.clearFieldProduction();
+          console.log(error);
         });
       }
     }, error => {
@@ -337,6 +353,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   clearFieldProduction(){
     this.formProduction.patchValue({ production : null });
     document.getElementById('RolloBarCode').focus();
+    this.load = false;
   }
 
   getDataProduction(production: number) {
@@ -358,9 +375,14 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         this.sendProductionZeus[i].position = this.sendProductionZeus.length;
         this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
         this.consolidateItems();
-         console.log(this.sendProductionZeus);
+        this.load = false;
+      }, error => {
+        this.load = false
       });
-    }, error => this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`,error));
+    }, error => {
+      this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`,error);
+      this.load = false;
+    }); 
   }
 
   //Validar los datos a guardar 
@@ -386,7 +408,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ///
   validateOfDirects(){
     let itemToDispatch : any = this.rollsConsolidate.map(x => x.item);
-   
+  
     this.production.forEach(x => {
       if(!itemToDispatch.includes(x.item)) {
         this.remainingProducts.push(x);
@@ -409,7 +431,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       if (!['', null, undefined].includes(this.formProduction.value.car)) {
         if (this.formProduction.value.car.length == 6) {
           if (this.remainingProduction.length == 0) {
-            if(this.remainingProducts.length == 0)  this.saveAsgFact(); 
+            if(this.remainingProducts.length == 0) this.saveAsgFact();
             else this.modalProductsNotRead = true;
           } else this.modalProductionNotRead = true;
         } else this.msj.mensajeAdvertencia(`¡La placa del carro debe tener 6 digitos!`);
@@ -543,6 +565,22 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.svPreload.putPreloadForOrderFact(of, info).subscribe(data => {}, e => {
       this.msj.mensajeError(`Error`, `No fue posible actualizar el estado del precargue N° ${preload} | ${e.status} ${e.statusText}`);
     });
+  }
+
+  verifyDispatch(){
+    this.validations += 1;
+    let ofDirect : boolean = this.formProduction.value.ofDirect;
+    this.remainingProduction = [];
+
+    if(ofDirect) {
+      this.verificationProducts = true;
+    } else {
+      let productionSearched = this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro);
+      this.production.forEach(prod => {
+        if (!productionSearched.includes(prod.numberProduction)) this.remainingProduction.push(prod);
+      });
+      this.modalProductionNotRead = true;
+    }
   }
 
   printTag(data: any) {

@@ -202,6 +202,7 @@
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'rot', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'perf', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'lam', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cor', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')"></th>
@@ -224,6 +225,7 @@
               <th scope="col" pResizableColumn pSortableColumn="imp">Impresión <p-sortIcon field="imp"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="rot">Rotograbado <p-sortIcon field="rot"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="perf">Perforado <p-sortIcon field="perf"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="dbl">Doblado <p-sortIcon field="dbl"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="lam">Laminado <p-sortIcon field="lam"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="cor">Corte <p-sortIcon field="cor"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="emp">Empaque <p-sortIcon field="emp"></p-sortIcon></th>
@@ -252,90 +254,100 @@
               <td [ngClass]="{
                 'verde' : data.ext >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.ext < data.cant && data.ext > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.ext == 0 && data.ext < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.ext == 0 && data.ext < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.ext == 0 && data.ext < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.ext == 0 && data.ext < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
 
               <!-- Impresion -->
               <td [ngClass]="{
                 'verde' : data.imp >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.imp < data.cant && data.imp > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.imp == 0 && data.imp < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.imp == 0 && data.imp < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.imp == 0 && data.imp < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.imp == 0 && data.imp < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
 
               <!-- Rotograbado -->
               <td [ngClass]="{
                 'verde' : data.rot >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.rot < data.cant && data.rot > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.rot == 0 && data.rot < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.rot == 0 && data.rot < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.rot == 0 && data.rot < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.rot == 0 && data.rot < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
 
-              <!-- Doblado -->
+              <!-- Perforado -->
               <td [ngClass]="{
                 'verde' : data.perf >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.perf < data.cant && data.perf > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.perf == 0 && data.perf < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.perf == 0 && data.perf < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.perf == 0 && data.perf < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.perf == 0 && data.perf < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'PERFORADO')">{{data.perf == 0 ? 'NO' : data.perf | number}}</td>
+
+              <!--* Doblado -->
+              <td [ngClass]="{
+                'verde' : data.dbl >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
+                'amarillo' : data.perf < data.cant && data.perf > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.perf == 0 && data.perf < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.dbl == 0 && data.dbl < data.cant,
+              }" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
 
               <!-- laminado -->
               <td [ngClass]="{
                 'verde' : data.lam >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.lam < data.cant && data.lam > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.lam == 0 && data.lam < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.lam == 0 && data.lam < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.lam == 0 && data.lam < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.lam == 0 && data.lam < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
 
               <!-- Corte -->
               <td [ngClass]="{
                 'verde' : data.cor >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.cor < data.cant && data.cor > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.cor == 0 && data.cor < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.cor == 0 && data.cor < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.cor == 0 && data.cor < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.cor == 0 && data.cor < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.lam | number}}</td>
 
               <!-- Empaque -->
               <td [ngClass]="{
                 'verde' : data.emp >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.emp < data.cant && data.emp > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.emp == 0 && data.emp < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.emp == 0 && data.emp < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.emp == 0 && data.emp < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.emp == 0 && data.emp < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'EMPAQUE')">{{data.emp == 0 ? 'NO' : data.emp | number}}</td>
 
               <!-- Sellado -->
               <td [ngClass]="{
                 'verde' : data.sel >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.sel < data.cant && data.sel > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.sel == 0 && data.sel < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.sel == 0 && data.sel < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.sel == 0 && data.sel < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.sel == 0 && data.sel < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
 
               <!-- Wiketiado -->
               <td [ngClass]="{
                 'verde' : data.wik >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.wik < data.cant && data.wik > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.wik == 0 && data.wik < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.wik == 0 && data.wik < data.cant,
+                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
+                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.wik == 0 && data.wik < data.cant) && data.est == 'ANULADO',
+                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.wik == 0 && data.wik < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
 
               <td id="desp" scope="col" (click)="data.desp != 0 || data.despUnd != 0 ? consultarRollosDespacho_OT(data.ot) : 0"><b><b>{{data.desp | number}} Kg - {{data.despUnd | number}} Und</b></b></td>

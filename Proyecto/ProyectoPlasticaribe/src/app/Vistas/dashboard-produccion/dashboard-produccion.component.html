@@ -121,27 +121,28 @@
                     <div class="p-4 col-xl-3 col-lg-3 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="">
                         <h6 class="title-extrusion"><b><i class="pi pi-bolt title-extrusion"></i> Extrusión</b></h6>
                         <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="550px" [value]="productionMachineProcess('EXT')">
+                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="600px" [value]="productionMachineProcess('EXT')">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th pSortableColumn="machine" class="text-center">
+                                    <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine" class="">
                                         Maq.</th>
                                     <th pSortableColumn="weight" class=""> Kg</th>
                                     <th pSortableColumn="goal" class=""> Meta</th>
-                                    <th pSortableColumn="percentage" class=""> Porc.
-                                    </th>
-                                    <th class="text-center">Ver</th>
+                                    <th pSortableColumn="percentage" class=""> Porcentaje</th>
+                                    <th pSortableColumn="weightDay" class=""> Día</th>
+                                    <th pSortableColumn="weightNight" class=""> Noche</th>
+                                    <th class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-data>
                                 <tr>
-                                    <td class="text-center"><b>{{data.machine}}</b></td>
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 2;" class=""><b>{{data.machine}}</b></td>
                                     <td class="">{{data.weight | number}}</td>
                                     <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                         <p-cellEditor>
                                             <ng-template pTemplate="input">
                                                 <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                    [required]="true" (onKeyDown)="updateGoalForMachine(data, $event)"></p-inputNumber>
+                                                    [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'EXT')"></p-inputNumber>
                                             </ng-template>
                                             <ng-template pTemplate="output">
                                                 {{data.goal | number}}
@@ -149,7 +150,9 @@
                                         </p-cellEditor>
                                     </td>
                                     <td class=""><b>{{data.percentage | number}}%</b></td>
-                                    <td class="text-center"><p-button icon="pi pi-search"
+                                    <td class="">{{data.weightDay | number}}</td>
+                                    <td class="">{{data.weightNight | number}}</td>
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;" class=""><p-button icon="pi pi-search"
                                             styleClass="p-button-rounded p-button-warning"
                                             [style]="{width: '30px', height: '30px'}" 
                                             (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
@@ -157,10 +160,13 @@
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="footer">
-                                <td class=""><b>Totales</b></td>
-                                <td class="text-right"><b>{{totalKgProcess('EXT') | number}}</b></td>
-                                <td class="text-right"><b>{{totalMetaProcess('EXT') | number}}</b></td>
-                                <td colspan="2" class=""></td>
+                                <td><b>Total</b></td>
+                                <td><b>{{totalKgProcess('EXT') | number :'1.0-0'}}</b></td>
+                                <td><b>{{totalMetaProcess('EXT') | number :'1.0-0'}}</b></td>
+                                <td class=""></td>
+                                <td><b>{{totalKgDay('EXT') | number :'1.0-0'}}</b></td>
+                                <td><b>{{totalKgNight('EXT') | number :'1.0-0'}}</b></td>
+                                <td class=""></td>
                             </ng-template>
                         </p-table>
                     </div>
@@ -171,27 +177,29 @@
                         <div class="p-4 col-md-6" id="">
                             <h6 class="title-impresion"><b><i class="pi pi-palette title-impresion"></i> Impresión</b></h6>
                             <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="200px" [value]="productionMachineProcess('IMP')">
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('IMP')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pSortableColumn="machine" class="text-center">
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine" class="">
                                             Maq.</th>
                                         <th pSortableColumn="weight" class=""> Kg</th>
                                         <th pSortableColumn="goal" class=""> Meta</th>
-                                        <th pSortableColumn="percentage" class=""> Porc.
+                                        <th pSortableColumn="percentage" class=""> Porcentaje
                                         </th>
-                                        <th class="text-center">Ver</th>
+                                        <th pSortableColumn="weightDay" class=""> Día</th>
+                                        <th pSortableColumn="weightNight" class=""> Noche</th>
+                                        <th class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td class="text-center"><b>{{data.machine}}</b></td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" class=""><b>{{data.machine}}</b></td>
                                         <td class="">{{data.weight | number}}</td>
                                         <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
                                                     <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event)"></p-inputNumber>
+                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'IMP')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
@@ -199,7 +207,9 @@
                                             </p-cellEditor>
                                         </td>
                                         <td class=""><b>{{data.percentage | number}}%</b></td>
-                                        <td class="text-center"><p-button icon="pi pi-search"
+                                        <td class="">{{data.weightDay | number}}</td>
+                                        <td class="">{{data.weightNight | number}}</td>
+                                        <td class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded p-button-success"
                                                 [style]="{width: '30px', height: '30px'}" 
                                                 (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
@@ -207,10 +217,13 @@
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td class=""><b>Totales</b></td>
-                                    <td class="text-right"><b>{{totalKgProcess('IMP') | number}}</b></td>
-                                    <td class="text-right"><b>{{totalMetaProcess('IMP') | number}}</b></td>
-                                    <td colspan="2" class=""></td>
+                                    <td class=""><b>Total</b></td>
+                                    <td class=""><b>{{totalKgProcess('IMP') | number :'1.0-0'}}</b></td>
+                                    <td class=""><b>{{totalMetaProcess('IMP') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                    <td><b>{{totalKgDay('IMP') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalKgNight('IMP') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
                                 </ng-template>
                             </p-table>
                         </div>
@@ -219,35 +232,38 @@
                         <div class="p-4 col-md-6" id="">
                             <h6 class="title-corte"><b><i class="pi pi-database title-corte"></i> Corte</b></h6>
                             <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="200px" [value]="productionMachineProcess('EMP')">
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('EMP')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pSortableColumn="machine" class="text-center">
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine">
                                             Maq.</th>
-                                        <th pSortableColumn="weight" class=""> Kg</th>
-                                        <th pSortableColumn="goal" class=""> Meta</th>
-                                        <th pSortableColumn="percentage" class=""> Porc.
-                                        </th>
-                                        <th class="text-center">Ver</th>
+                                        <th pSortableColumn="weight"> Kg</th>
+                                        <th pSortableColumn="goal"> Meta</th>
+                                        <th pSortableColumn="percentage"> Porcentaje</th>
+                                        <th pSortableColumn="weightDay" class=""> Día</th>
+                                        <th pSortableColumn="weightNight" class=""> Noche</th>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td class="text-center"><b>{{data.machine}}</b></td>
-                                        <td class="">{{data.weight | number}}</td>
-                                        <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"><b>{{data.machine}}</b></td>
+                                        <td>{{data.weight | number}}</td>
+                                        <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
                                                     <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event)"></p-inputNumber>
+                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'EMP')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
                                                 </ng-template>
                                             </p-cellEditor>
                                         </td>
-                                        <td class=""><b>{{data.percentage | number}}%</b></td>
-                                        <td class="text-center"><p-button icon="pi pi-search"
+                                        <td><b>{{data.percentage | number}}%</b></td>
+                                        <td class="">{{data.weightDay | number}}</td>
+                                        <td class="">{{data.weightNight | number}}</td>
+                                        <td class="text-center" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded"
                                                 [style]="{width: '30px', height: '30px'}" 
                                                 (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
@@ -255,10 +271,13 @@
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td class=""><b>Totales</b></td>
-                                    <td class="text-right"><b>{{totalKgProcess('EMP') | number}}</b></td>
-                                    <td class="text-right"><b>{{totalMetaProcess('EMP') | number}}</b></td>
-                                    <td colspan="2" class=""></td>
+                                    <td><b>Total</b></td>
+                                    <td><b>{{totalKgProcess('EMP') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalMetaProcess('EMP') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                    <td><b>{{totalKgDay('EMP') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalKgNight('EMP') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
                                 </ng-template>
                             </p-table>
                         </div>
@@ -269,35 +288,40 @@
                         <div class="p-4 col-md-6" id="">
                             <h6 class="title-perforado"><b><i class="pi pi-ellipsis-v title-perforado"></i> Perforado</b></h6>
                             <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="200px" [value]="productionMachineProcess('PERF')">
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('PERF')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pSortableColumn="machine" class="text-center">
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;" pSortableColumn="machine">
                                             Maq.</th>
                                         <th pSortableColumn="weight" class=""> Kg</th>
                                         <th pSortableColumn="goal" class=""> Meta</th>
-                                        <th pSortableColumn="percentage" class=""> Porc.
+                                        <th pSortableColumn="percentage" class=""> Porcentaje
                                         </th>
-                                        <th class="text-center">Ver</th>
+                                        <th pSortableColumn="weightDay" class=""> Día</th>
+                                        <th pSortableColumn="weightNight" class=""> Noche</th>
+                                        <th class="text-center" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td class="text-center"><b>{{data.machine}}</b></td>
-                                        <td class="">{{data.weight | number}}</td>
-                                        <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;"><b>{{data.machine}}</b></td>
+                                        <td>{{data.weight | number}}</td>
+                                        <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
                                                     <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event)"></p-inputNumber>
+                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'PERF')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
                                                 </ng-template>
                                             </p-cellEditor>
+
                                         </td>
-                                        <td class=""><b>{{data.percentage }}%</b></td>
-                                        <td class="text-center"><p-button icon="pi pi-search"
+                                        <td><b>{{data.percentage | number}}%</b></td>
+                                        <td class="">{{data.weightDay | number }}</td>
+                                        <td class="">{{data.weightNight | number }}</td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded p-button-help"
                                                 [style]="{width: '30px', height: '30px'}" 
                                                 (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
@@ -305,10 +329,13 @@
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td class=""><b>Totales</b></td>
-                                    <td class="text-right"><b>{{totalKgProcess('PERF') | number}}</b></td>
-                                    <td class="text-right"><b>{{totalMetaProcess('PERF') | number}}</b></td>
-                                    <td colspan="2" class=""></td>
+                                    <td><b>Total</b></td>
+                                    <td><b>{{totalKgProcess('PERF') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalMetaProcess('PERF') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                    <td><b>{{totalKgDay('PERF') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalKgNight('PERF') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
                                 </ng-template>
                             </p-table>
                         </div>
@@ -317,35 +344,39 @@
                         <div class="p-2 col-md-6" id="">
                             <h6 class="title-camisilla"><b><i class="pi pi-bookmark title-camisilla"></i> Camisilla</b></h6>
                             <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="200px" [value]="productionMachineProcess('CAMISILLA')">
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('CAMISILLA')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pSortableColumn="machine" class="text-center">
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;" pSortableColumn="machine" >
                                             Maq.</th>
-                                        <th pSortableColumn="weight" class=""> Kg</th>
-                                        <th pSortableColumn="goal" class=""> Meta</th>
-                                        <th pSortableColumn="percentage" class=""> Porc.
+                                        <th pSortableColumn="weight"> Kg</th>
+                                        <th pSortableColumn="goal"> Meta</th>
+                                        <th pSortableColumn="percentage"> Porcentaje
                                         </th>
-                                        <th class="text-center">Ver</th>
+                                        <th pSortableColumn="weightDay" class=""> Día</th>
+                                        <th pSortableColumn="weightNight" class=""> Noche</th>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td class="text-center"><b>{{data.machine}}</b></td>
-                                        <td class="">{{data.weight | number}}</td>
-                                        <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;"><b>{{data.machine}}</b></td>
+                                        <td>{{data.weight | number}}</td>
+                                        <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
                                                     <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event)"></p-inputNumber>
+                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'CAMISILLA')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
                                                 </ng-template>
                                             </p-cellEditor>
                                         </td>
-                                        <td class=""><b>{{data.percentage | number}}%</b></td>
-                                        <td class="text-center"><p-button icon="pi pi-search"
+                                        <td><b>{{data.percentage | number}}%</b></td>
+                                        <td class="">{{data.weightDay | number}}</td>
+                                        <td class="">{{data.weightNight | number}}</td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded p-button-info"
                                                 [style]="{width: '30px', height: '30px'}" 
                                                 (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
@@ -353,10 +384,13 @@
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td class=""><b>Totales</b></td>
-                                    <td class="text-right"><b>{{totalKgProcess('CAMISILLA') | number}}</b></td>
-                                    <td class="text-right"><b>{{totalMetaProcess('CAMISILLA') | number}}</b></td>
-                                    <td colspan="2" class=""></td>
+                                    <td><b>Total</b></td>
+                                    <td><b>{{totalKgProcess('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalMetaProcess('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                    <td><b>{{totalKgDay('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalKgNight('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
                                 </ng-template>
                             </p-table>
                         </div>
@@ -366,35 +400,39 @@
                     <div class="p-4 col-xl-3 col-lg-3 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="">
                         <h6 class="title-sellado"><b><i class="pi pi-box title-sellado"></i> Sellado</b></h6>
                         <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="550px" [value]="productionMachineProcess('SELLA')">
+                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="600px" [value]="productionMachineProcess('SELLA')">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th pSortableColumn="machine" class="text-center">
+                                    <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine">
                                         Maq.</th>
                                     <th pSortableColumn="weight" class=""> Kg</th>
                                     <th pSortableColumn="goal" class=""> Meta</th>
-                                    <th pSortableColumn="percentage" class=""> Porc.
+                                    <th pSortableColumn="percentage" class=""> Porcentaje
                                     </th>
-                                    <th class="text-center">Ver</th>
+                                    <th pSortableColumn="weightDay" class=""> Día</th>
+                                    <th pSortableColumn="weightNight" class=""> Noche</th>
+                                    <th>Ver</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-data>
                                 <tr>
-                                    <td class="text-center"><b>{{data.machine}}</b></td>
-                                    <td class="">{{data.weight | number}}</td>
-                                    <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"><b>{{data.machine}}</b></td>
+                                    <td>{{data.weight | number}}</td>
+                                    <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                         <p-cellEditor>
                                             <ng-template pTemplate="input">
                                                 <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                    [required]="true" (onKeyDown)="updateGoalForMachine(data, $event)"></p-inputNumber>
+                                                    [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'SELLA')"></p-inputNumber>
                                             </ng-template>
                                             <ng-template pTemplate="output">
                                                 {{data.goal | number}}
                                             </ng-template>
                                         </p-cellEditor>
                                     </td>
-                                    <td class=""><b>{{data.percentage | number}}%</b></td>
-                                    <td class="text-center"><p-button icon="pi pi-search"
+                                    <td><b>{{data.percentage | number}}%</b></td>
+                                    <td class="">{{data.weightDay | number}}</td>
+                                    <td class="">{{data.weightNight | number}}</td>
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 2;"><p-button icon="pi pi-search"
                                             styleClass="p-button-rounded p-button-danger"
                                             [style]="{width: '30px', height: '30px'}" 
                                             (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
@@ -402,10 +440,13 @@
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="footer">
-                                <td class=""><b>Totales</b></td>
-                                <td class="text-right"><b>{{totalKgProcess('SELLA') | number}}</b></td>
-                                <td class="text-right"><b>{{totalMetaProcess('SELLA') | number}}</b></td>
-                                <td colspan="2" class=""></td>
+                                <td><b>Total</b></td>
+                                <td><b>{{totalKgProcess('SELLA') | number :'1.0-0'}}</b></td>
+                                <td><b>{{totalMetaProcess('SELLA') | number :'1.0-0'}}</b></td>
+                                <td class=""></td>
+                                <td><b>{{totalKgDay('SELLA') | number :'1.0-0'}}</b></td>
+                                <td><b>{{totalKgNight('SELLA') | number :'1.0-0'}}</b></td>
+                                <td class=""></td>
                             </ng-template>
                         </p-table>
                     </div>

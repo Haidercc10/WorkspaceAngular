@@ -77,7 +77,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     setTimeout(() => {
       this.mostrarRegistrosHoy();
     }, 500); 
-    this.getCurrentTurn(); 
+    this.getCurrentTurn();
     //this.exportExcel();
     //this.generarFormatoExcel();
   }

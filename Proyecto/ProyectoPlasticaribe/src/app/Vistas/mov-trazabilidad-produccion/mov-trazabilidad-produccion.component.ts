@@ -99,7 +99,7 @@ export class MovTrazabilidadProduccionComponent {
   }
 
   ///Obtener procesos especificos.
-  getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [9,1,2,7,3,4,15,18].includes(x.proceso_Codigo)), error => this.msg.mensajeError(error));
+  getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [9,1,2,7,3,4,15,18,5,].includes(x.proceso_Codigo)), error => this.msg.mensajeError(error));
 
   // Buscar producto en el campo 
   searchProduct() {
@@ -140,7 +140,8 @@ export class MovTrazabilidadProduccionComponent {
               let dataExtMatPrima : any[] = data.filter(x => ['EXT', 'MATPRIMA'].includes(x.motherProcess_Id));
               let dataImp : any[] = data.filter(x => ['IMP'].includes(x.motherProcess_Id));
               let dataRoto : any[] = data.filter(x => ['ROT', 'LAM'].includes(x.motherProcess_Id));
-              data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp.length > 0 ? dataImp : dataRoto;
+              let dataPerfDob : any[] = data.filter(x => ['PERF', 'DBLD'].includes(x.motherProcess_Id));
+              data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp.length > 0 ? dataImp : dataPerfDob.length > 0 ? dataImp : dataRoto;
               console.log(data);
               if(data.length > 0) this.loadDataFromBagpro(data, count);
               else this.warningMsj(`Advertencia`, `No se encontraron registros de producción.`);
@@ -163,6 +164,7 @@ export class MovTrazabilidadProduccionComponent {
         x.motherOperator = dataBag.operario;
         x.motherHour = dataBag.hora;
         x.motherTurn = dataBag.turno;
+        x.motherMachine = dataBag.maquina;
         this.groupTraceability.push(x);
       }, error => { console.log(error); });
       console.log(count, data.length);

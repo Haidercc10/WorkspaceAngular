@@ -28,6 +28,12 @@
     font-size: calc(var(--font-size) * 15px);
 }
 
+.bg-brown1 {
+    color: rgb(255, 255, 255);
+    background-color: rgb(71, 40, 0);
+    font-size: calc(var(--font-size) * 15px);
+}
+
 ::ng-deep .p-button-icon-only {
   justify-content: center;
   height: 2rem;

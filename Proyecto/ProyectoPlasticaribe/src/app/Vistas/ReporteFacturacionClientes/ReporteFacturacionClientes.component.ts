@@ -6,6 +6,7 @@ import { Table } from 'primeng/table';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -27,17 +28,21 @@ export class ReporteFacturacionClientesComponent implements OnInit {
   billsPerClient: Array<BillsClient> = [];
   @ViewChild('billsClient') billsClient: Table | undefined;
   @ViewChild('detailsTable') detailsTable: Table | undefined;
+  asesores : any = [];
 
   constructor(private appComponent: AppComponent,
     private zeusInvService: InventarioZeusService,
     private frmBuilder: FormBuilder,
     private msg: MensajesAplicacionService,
-    private svExcel: CreacionExcelService) {
+    private svExcel: CreacionExcelService,
+    private svUsuarios : UsuarioService,
+  ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
     this.initForm();
+    this.obtenerVendedores();
   }
 
   initForm() {
@@ -48,6 +53,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
       reference: [null],
       start: [null],
       end: [null],
+      sales : [null]
     });
   }
 
@@ -66,6 +72,8 @@ export class ReporteFacturacionClientesComponent implements OnInit {
   }
 
   aplyFilter = ($event, campo: string, table: Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  obtenerVendedores = () => this.svUsuarios.GetVendedores().subscribe(data => this.asesores = data);
 
   searchClients() {
     let idClient = this.formClientFilters.value.idClient;
@@ -123,8 +131,10 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     let end = moment(this.formClientFilters.value.end).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.formClientFilters.value.end).format('YYYY-MM-DD');
     let idClient = this.formClientFilters.value.idClient;
     let item = this.formClientFilters.value.item;
+    let sales : any = this.formClientFilters.value.item;
     if (idClient != null) route += `client=${idClient}`;
     if (item != null) route.length > 0 ? route += `&item=${item}` : route += `item=${item}`;
+    if (sales != null) route.length > 0 ? route += `&sales=${sales}` : route += `sales=${sales}`;
     if (route.length > 0) route = `?${route}`;
     route = `/${start}/${end}${route}`;
     return route;
@@ -155,6 +165,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
         bill: billData.bill,
         id_Client: billData.id_Client,
         client: billData.client,
+        sales : billData.sales,
         subTotal: this.subTotalPerBill(billData.bill, allData),
         subTotalDiscount: this.subTotalPerBillDiscount(billData.bill, allData),
         subTotalIVA: this.subTotalPerBillIVA(billData.bill, allData),
@@ -285,7 +296,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5']; 
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5']; 
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
     
@@ -293,16 +304,16 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:I3');
+    ws.mergeCells('A1:J3');
 
     this.loadSizeHeader(ws);
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws : any){
-    [4,9].forEach(x => ws.getColumn(x).width = 40);
+    [4,9,5].forEach(x => ws.getColumn(x).width = 40);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [2,3,5,9,8,6,7].forEach(x => ws.getColumn(x).width = 15);
+    [2,3,9,8,6,7,10].forEach(x => ws.getColumn(x).width = 15);
   }
 
  //Función para cargar los nombres de las columnas del header
@@ -312,6 +323,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
       'Factura',
       'NIT/CC',
       'Razón Social',
+      'Asesor',
       'Fecha',
       'Valor', 
       'Descuento',
@@ -324,9 +336,9 @@ export class ReporteFacturacionClientesComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws : any, data : any, border : any, alignment : any){
     let contador : any = 6;
-    let formatNumber: Array<number> = [6,7,8,9];
+    let formatNumber: Array<number> = [7,8,9,10];
     formatNumber.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
-    let row : any = ['A','B','C','D','E','F','G','H','I']; 
+    let row : any = ['A','B','C','D','E','F','G','H','I','J']; 
     
     data.forEach(x => {
       ws.addRow(x);
@@ -350,6 +362,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
         x.bill,
         x.id_Client,
         x.client,
+        x.sales,
         x.date,
         x.subTotal, 
         x.subTotalDiscount,
@@ -368,6 +381,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
       '',
       '',
       '',
+      '',
       'TOTAL',
       this.qtySubTotal(),
       this.qtyDiscount(),
@@ -376,13 +390,13 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     ]);
   }
 
-  qtyTotal = () => this.billsPerClient.filter(x => x.finalSubTotal > 0).reduce((a,b) => a += b.finalSubTotal, 0);
+  qtyTotal = () => this.billsPerClient.reduce((a,b) => a += b.finalSubTotal, 0);
 
   qtyIva = () => this.billsPerClient.filter(x => x.subTotalIVA > 0).reduce((a,b) => a += b.subTotalIVA, 0);
 
   qtyDiscount = () => this.billsPerClient.filter(x => x.subTotalDiscount > 0).reduce((a,b) => a += b.subTotalDiscount, 0);
   
-  qtySubTotal = () => this.billsPerClient.filter(x => x.subTotal > 0).reduce((a,b) => a += b.subTotal, 0);
+  qtySubTotal = () => this.billsPerClient.reduce((a,b) => a += b.subTotal, 0);
 
 }
 
@@ -393,6 +407,7 @@ interface BillsClient {
   bill: string;
   id_Client: number;
   client: string;
+  sales : string;
   subTotal: number;
   subTotalDiscount: number;
   subTotalIVA: number;

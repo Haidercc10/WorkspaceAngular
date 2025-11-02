@@ -160,7 +160,7 @@ export class DashboardOTComponent implements OnInit {
     this.produccionAreasService.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
       this.procesosOrdenesMes = [];
       produccionAreas.forEach(areas => {
-        if(!['Doblado'].includes(areas.proceso_Nombre)) {
+        //if(!['Doblado'].includes(areas.proceso_Nombre)) {
           let metaMesActual : number = this.metaMesActual(areas);
           let produccionMesActual : number = this.produccionMesActual(areas);
           let datos : any = {
@@ -177,7 +177,7 @@ export class DashboardOTComponent implements OnInit {
           }
           this.procesosOrdenesMes.push(datos);
           this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
-        }
+        //}
       });
     });
   }

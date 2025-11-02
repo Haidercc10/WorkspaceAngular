@@ -479,7 +479,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => {
       data.forEach(infoOt => this.llenarArray(infoOt));
-      console.log(data);
+      
       
     }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
@@ -515,6 +515,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     data.fecha = data.fecha != null ? data.fecha.replace('T00:00:00', '') : data.fecha;
     data.fechaInicio = data.fechaInicio != null ? data.fechaInicio.replace('T00:00:00', '') : data.fechaInicio;
     data.fechaFinal = data.fechaFinal != null ? data.fechaFinal.replace('T00:00:00', '') : data.fechaFinal;
+    console.log(data, data.perf);
+    
+    data.perf == null ? data.perf = 0 : data.perf = data.perf;
 
     this.columnas = [
       { header: 'Presentación', field: 'und'},

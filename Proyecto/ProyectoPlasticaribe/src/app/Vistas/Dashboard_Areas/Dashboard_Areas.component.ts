@@ -24,7 +24,7 @@ export class Dashboard_AreasComponent implements OnInit {
   graficaExtrusionProducido : any; //Variable que va a almacenar lo producido por el area de extrusion
   graficaImpresionProducido : any; //Variable que va a almacenar lo producido por el area de impresion
   graficaRotograbadoProducido : any; //Variable que va a almacenar lo producido por el area de rotograbado
-  //graficaDobladoProducido : any; //Variable que va a almacenar lo producido por el area de doblado
+  graficaDobladoProducido : any; //Variable que va a almacenar lo producido por el area de doblado
   graficaLaminadoProducido : any; //Variable que va a almacenar lo producido por el area de laminado
   graficaCorteProducido : any; //Variable que va a almacenar lo producido por el area de corte
   graficaEmpaqueProducido : any; //Variable que va a almacenar lo producido por el area de empaque
@@ -37,7 +37,7 @@ export class Dashboard_AreasComponent implements OnInit {
   totalAnios_Extrusion : any [] = []; 
   totalAnios_Impresion : any [] = [];
   totalAnios_Rotograbado : any [] = [];
-  //totalAnios_Doblado : any [] = [];
+  totalAnios_Doblado : any [] = [];
   totalAnios_Laminado : any [] = [];
   totalAnios_Corte : any [] = [];
   totalAnios_Empaque : any [] = [];
@@ -124,7 +124,7 @@ export class Dashboard_AreasComponent implements OnInit {
     this.graficaExtrusionProducido = this.formatoGraficas();
     this.graficaImpresionProducido = this.formatoGraficas();
     this.graficaRotograbadoProducido = this.formatoGraficas();
-    //this.graficaDobladoProducido = this.formatoGraficas();
+    this.graficaDobladoProducido = this.formatoGraficas();
     this.graficaLaminadoProducido = this.formatoGraficas();
     this.graficaCorteProducido = this.formatoGraficas();
     this.graficaEmpaqueProducido = this.formatoGraficas();
@@ -187,8 +187,6 @@ export class Dashboard_AreasComponent implements OnInit {
 
   // Funcion que se encargará de llenar las graficas
   llenarGraficas(data : any [], area : string){
-    console.log(area);
-    
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info = {
       label: `${area != null ? area.replace('_', '. ') : area} - ${this.anioSeleccionado}`,
@@ -205,7 +203,7 @@ export class Dashboard_AreasComponent implements OnInit {
     if (['EXTRUSION', 'DESP_EXTRUSION'].includes(area)) this.graficaExtrusionProducido.datasets.push(info);
     else if (['IMPRESION', 'DESP_IMPRESION'].includes(area)) this.graficaImpresionProducido.datasets.push(info);
     else if (['ROTOGRABADO', 'DESP_ROTOGRABADO'].includes(area)) this.graficaRotograbadoProducido.datasets.push(info);
-    //else if (['DOBLADO', 'DESP_DOBLADO'].includes(area)) this.graficaDobladoProducido.datasets.push(info);
+    else if (['DOBLADO', 'DESP_DOBLADO'].includes(area)) this.graficaDobladoProducido.datasets.push(info);
     else if (['LAMINADO', 'DESP_LAMINADO'].includes(area)) this.graficaLaminadoProducido.datasets.push(info);
     else if (['CORTE', 'DESP_CORTADORES'].includes(area)) this.graficaCorteProducido.datasets.push(info);
     else if (['EMPAQUE', 'DESP_EMPAQUE'].includes(area)) this.graficaEmpaqueProducido.datasets.push(info);
@@ -220,7 +218,7 @@ export class Dashboard_AreasComponent implements OnInit {
     this.totalAnios_Extrusion = [];
     this.totalAnios_Impresion = [];
     this.totalAnios_Rotograbado = [];
-    //this.totalAnios_Doblado = [];
+    this.totalAnios_Doblado = [];
     this.totalAnios_Laminado = [];
     this.totalAnios_Corte = [];
     this.totalAnios_Empaque = [];
@@ -232,7 +230,7 @@ export class Dashboard_AreasComponent implements OnInit {
       this.totalAnios_Extrusion.push(this.formatoTotales(this.graficaExtrusionProducido, anio));
       this.totalAnios_Impresion.push(this.formatoTotales(this.graficaImpresionProducido, anio));
       this.totalAnios_Rotograbado.push(this.formatoTotales(this.graficaRotograbadoProducido, anio));
-      //this.totalAnios_Doblado.push(this.formatoTotales(this.graficaDobladoProducido, anio));
+      this.totalAnios_Doblado.push(this.formatoTotales(this.graficaDobladoProducido, anio));
       this.totalAnios_Laminado.push(this.formatoTotales(this.graficaLaminadoProducido, anio));
       this.totalAnios_Corte.push(this.formatoTotales(this.graficaCorteProducido, anio));
       this.totalAnios_Empaque.push(this.formatoTotales(this.graficaEmpaqueProducido, anio));

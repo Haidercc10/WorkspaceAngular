@@ -188,13 +188,13 @@ export class DashboardProduccionComponent implements OnInit {
   }
 
   //Función para actualizar la meta del día por maquina.
-  updateGoalForMachine(data : any, $event : any){
-    let goal = this.productionMachines.find(x => x.id == data.id).goal; 
+  updateGoalForMachine(data : any, $event : any, process : string){
+    let goal = this.productionMachineProcess(process).find(x => x.machine == data.machine).goal; 
 
-    this.svDailyProd.putGoalForMachine(data.id, goal).subscribe(dataa => {
+    this.svDailyProd.putGoalForMachine(data.machine, process, '2025-10-31', goal).subscribe(dataa => {
       if ($event.key == 'Enter') this.svMsj.mensajeConfirmacion(`¡Meta establecida con éxito!`);
     }, error => {
-
+      this.svMsj.mensajeError('Error', ``)
     })
   }
 
@@ -203,7 +203,7 @@ export class DashboardProduccionComponent implements OnInit {
   totalPercentageForProcess = (process : string) => Number.isNaN((this.totalKgProcess(process) * 100 / this.totalMetaProcess(process))) ? 0 : Math.round(this.totalKgProcess(process) * 100 / this.totalMetaProcess(process));
 
   //Total meta producción por proceso
-  totalMetaProcess = (process: string) => this.productionMachines.filter(x => x.process == process).reduce((a, b) => a += b.goal, 0);
+  totalMetaProcess = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.goal, 0);
 
   //Total kg por proceso
   totalKgProcess = (process: string) => this.productionMachines.filter(x => x.process == process).reduce((a, b) => a += b.weight, 0);
@@ -216,6 +216,12 @@ export class DashboardProduccionComponent implements OnInit {
 
   //Total kg proceso
   totalKgMonth = (process: string) => this.procesosOrdenesMes.filter(x => x.Area == process).reduce((a, b) => a += b.Produccion, 0);
+
+  totalKgDay = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.weightDay, 0);
+
+  totalKgNight = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.weightNight, 0);
+
+  //totalTotalNight = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.weightNight, 0); 
 
   //Total kg proceso
   totalPercMonth(process: string) {
@@ -466,8 +472,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataCamisilla = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#00d9ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('SELLADO')] },
-        { label: 'Meta', backgroundColor: '#008c91ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('SELLADO')] }
+        { label: 'Producción', backgroundColor: '#00d9ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('CAMISILLA')] },
+        { label: 'Meta', backgroundColor: '#008c91ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('CAMISILLA')] }
       ]
     };
 
@@ -489,8 +495,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataPerforado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#8255ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('SELLADO')] },
-        { label: 'Meta', backgroundColor: '#2000b1ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('SELLADO')] }
+        { label: 'Producción', backgroundColor: '#8255ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('PERFORADO')] },
+        { label: 'Meta', backgroundColor: '#2000b1ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('PERFORADO')] }
       ]
     };
 

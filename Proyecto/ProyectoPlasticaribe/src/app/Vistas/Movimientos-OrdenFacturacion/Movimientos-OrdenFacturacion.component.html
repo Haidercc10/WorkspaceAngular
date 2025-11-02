@@ -168,7 +168,7 @@
           <td class="text-center">{{data.fechaHora}}</td>
           <td class="text-center">{{data.fechaDespacho }}</td>
           <td class="text-center">{{ data.dias }}</td>
-          <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-violet': [29].includes(data.or.estado_Id), 'bg-warning': [3].includes(data.or.estado_Id), 'bg-secondary1': [38].includes(data.or.estado_Id), 'bg-blue1': [39].includes(data.or.estado_Id), 'bg-black1': [53].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
+          <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-violet': [29].includes(data.or.estado_Id), 'bg-warning': [3].includes(data.or.estado_Id), 'bg-secondary1': [38].includes(data.or.estado_Id), 'bg-blue1': [39].includes(data.or.estado_Id), 'bg-black1': [53].includes(data.or.estado_Id), 'bg-brown1': [54].includes(data.or.estado_Id)}">{{data.estado}}</span></td>
           <td class="text-center" *ngIf="[1].includes(validateRole)">
             <p-button id="botonPdf" icon="pi pi-ban" styleClass="p-button-rounded p-button-warning" [disabled]="data.type == 'DV'" (onClick)="confirmSendData(data)"></p-button>
           </td>
@@ -206,7 +206,7 @@
 <!--Modal para reposiciones -->
 <p-dialog header="Reposición por devolución" [(visible)]="modalReposition" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
   <!--<app-Orden_Facturacion></app-Orden_Facturacion>-->
-  <app-Reposiciones></app-Reposiciones>
+  <app-Reposiciones [dato]="registroSeleccionado"></app-Reposiciones>
 </p-dialog>
 
 <!--Modal para gestión de devoluciones -->

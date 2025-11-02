@@ -112,6 +112,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherDate', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherHour', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherTurn', dt)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherMachine', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherPacker', dt)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'motherAuthorize', dt)"></th>
           </tr>
@@ -127,6 +128,7 @@
             <th class="text-center">Fecha </th>
             <th class="text-center">Hora </th>
             <th class="text-center">Turno </th>
+            <th class="text-center">Maquina </th>
             <th class="text-center">Empacador </th>
             <th class="text-center">Autoriza </th>
           </tr>
@@ -145,6 +147,7 @@
             <td class="text-center"><b>{{ data.motherDate }}</b></td>
             <td class="text-center">{{ data.motherHour }}</td>
             <td class="text-center">{{ data.motherTurn }}</td>
+            <td class="text-center">{{ data.motherMachine }}</td>
             <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.motherPacker : 'N/A'}}</td>
             <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.motherAuthorize : 'N/A' }}</td>
           </tr>
@@ -154,7 +157,7 @@
         <tr>
           <td colspan="6" class="text-right">Total cantidad: </td>
           <td class="text-center">{{totalWeight() | number : '1.2-2'}}</td>
-          <td colspan="6" class="text-right"></td>
+          <td colspan="7" class="text-right"></td>
         </tr>
       </ng-template>
     </p-table>
@@ -183,6 +186,7 @@
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childDate', dt2)"></th>
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childHour', dt2)"></th>
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childTurn', dt2)"></th>
+            <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childMachine', dt2)"></th>
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childPacker', dt2)"></th>
             <th><input pInputText style="width: 100%" type="text" (input)="aplicarFiltro($event, 'childAuthorize', dt2)"></th>
           </tr>
@@ -199,6 +203,7 @@
               <th class="text-center">Fecha</th>
               <th class="text-center">Hora</th>
               <th class="text-center">Turno</th>
+              <th class="text-center">Maquina</th>
               <th class="text-center">Empacador</th>
               <th class="text-center">Autorizado por</th>
           </tr>
@@ -217,15 +222,16 @@
               <td class="text-center"><b>{{ data.childDate | date : 'yyyy-MM-dd' }}</b></td>
               <td class="text-center">{{ data.childHour }}</td>
               <td class="text-center">{{ data.childTurn }}</td>
-              <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childPacker : 'N/A' }}</td>
-              <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childAuthorize : 'N/A'  }}</td>
+              <td class="text-center">{{ data.childMachine }}</td>
+              <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.childProcess) ? data.childPacker : 'N/A' }}</td>
+              <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.childProcess) ? data.childAuthorize : 'N/A'  }}</td>
           </tr>
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
           <td colspan="6" class="text-right">Total cantidad: </td>
           <td class="text-center">{{totalQuantity1() | number : '1.2-2'}}</td>
-          <td colspan="7" class="text-right"></td>
+          <td colspan="8" class="text-right"></td>
         </tr>
       </ng-template>
     </p-table>  
@@ -254,6 +260,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childDate', dt3)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childHour', dt3)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childTurn', dt3)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childMachine', dt3)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childPacker', dt3)"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'childAuthorize', dt3)"></th>
           </tr>
@@ -270,6 +277,7 @@
               <th class="text-center">Fecha</th>
               <th class="text-center">Hora</th>
               <th class="text-center">Turno</th>
+              <th class="text-center">Maquina</th>
               <th class="text-center">Empacador</th>
               <th class="text-center">Autorizado por</th>
           </tr>
@@ -288,15 +296,16 @@
             <td class="text-center"><b>{{ data.childDate | date : 'yyyy-MM-dd' }}</b></td>
             <td class="text-center">{{ data.childHour }}</td>
             <td class="text-center">{{ data.childTurn }}</td>
-            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childPacker : 'N/A' }}</td>
-            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.motherProcess) ? data.childAuthorize : 'N/A' }}</td>
+            <td class="text-center">{{ data.childMachine }}</td>
+            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.childProcess) ? data.childPacker : 'N/A' }}</td>
+            <td class="text-center">{{ ['Sellado', 'Empaque'].includes(data.childProcess) ? data.childAuthorize : 'N/A' }}</td>
           </tr>
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
           <td colspan="6" class="text-right">Total cantidad: </td>
           <td class="text-center">{{totalQuantity2() | number : '1.2-2'}}</td>
-          <td colspan="7" class="text-right"></td>
+          <td colspan="8" class="text-right"></td>
         </tr>
       </ng-template>
     </p-table>  
