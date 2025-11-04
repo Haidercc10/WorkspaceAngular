@@ -33,15 +33,11 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lecturaStorage();
-    if ([1,60,12,94,85,2,98,5].includes(this.ValidarRol)) this.ordenTrabajo = true;
-    if ([3,12,85].includes(this.ValidarRol)) this.materiaPrima = true;
-    if ([61,12,85,97,10].includes(this.ValidarRol)) this.pedidos = true;
-    if (this.ValidarRol == 69) this.recaudos = true;
-    if ([1,12,94,85,98,5].includes(this.ValidarRol)) this.inventarioAreas = true;
-    if ([1,5].includes(this.ValidarRol)) this.calidad = true;
+    this.production = true;
   }
 
   ngOnDestroy(): void {
+    this.production = false;
     this.ordenTrabajo = false;
     this.facturacion = false;
     this.materiaPrima = false;
@@ -54,7 +50,6 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     this.compras = false;
     this.inventarioAreas = false;
     this.calidad = false;
-    this.production = false;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -70,33 +65,47 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   //
   cambioTab(e : any) {  
     var index = e.index;
-    index == 0 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
-    index == 1 && [1,12,60,98].includes(this.ValidarRol) ? this.facturacion = true : this.facturacion = false;
-    index == 2 ? this.materiaPrima = true : this.materiaPrima = false;
-    index == 3 ? this.pedidos = true : this.pedidos = false;
-    index == 4 ? this.facturacionVendedores = true : this.facturacionVendedores = false;
-    index == 5 ? this.recaudos = true : this.recaudos = false;
-    index == 6 ? this.cuentasPagar = true : this.cuentasPagar = false;
-    index == 7 ? this.gerencia = true : this.gerencia = false;
-    index == 8 ? this.costos = true : this.costos = false;
-    index == 9 ? this.compras = true : this.compras = false;
-    index == 10 ? this.inventarioAreas = true : this.inventarioAreas = false;
-    //index == 1 && this.ValidarRol == 12 ? this.facturacion = true : null;
-    index == 0 && [12,96,10].includes(this.ValidarRol) ? this.facturacion = true : null;
-    index == 1 && [12,96,2,10].includes(this.ValidarRol) ? this.pedidos = true : null;
-    //index == 2 && this.ValidarRol == 12 ? this.materiaPrima = true : null;
-    //index == 3 && this.ValidarRol == 12 ? this.pedidos = true : null;
-    index == 0 && [94,2].includes(this.ValidarRol) ? this.ordenTrabajo = true : null;
-    index == 1 && [5].includes(this.ValidarRol) ? this.gerencia = true : null;
-    index == 2 && [5].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
-    index == 1 && [94].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
-    index == 1 && [85].includes(this.ValidarRol) ? this.materiaPrima = true : null;
-    index == 2 && [85,].includes(this.ValidarRol) ? this.pedidos = true : null;
-    index == 3 && [85].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
-    index == 2 && [97,10].includes(this.ValidarRol) ? this.gerencia = true : null;
-    index == 2 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
-    index == 4 && [98].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
-    index == 11 ? this.calidad = true : null;
-    index == 12 ? this.production = true : null;
+    //Usuario administrador.
+    index == 1 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
+    index == 2 ? this.facturacion = true : this.facturacion = false;
+    index == 3 ? this.materiaPrima = true : this.materiaPrima = false;
+    index == 4 ? this.pedidos = true : this.pedidos = false;
+    index == 5 ? this.facturacionVendedores = true : this.facturacionVendedores = false;
+    index == 6 ? this.recaudos = true : this.recaudos = false;
+    index == 7 ? this.cuentasPagar = true : this.cuentasPagar = false;
+    index == 8 ? this.gerencia = true : this.gerencia = false;
+    index == 9 ? this.costos = true : this.costos = false;
+    index == 10 ? this.compras = true : this.compras = false;
+    index == 11 ? this.inventarioAreas = true : this.inventarioAreas = false;
+    index == 12 ? this.calidad = true : this.calidad = false;
+
+    //Facturación, Despacho, 
+    index == 1 && [6,10,12,96,69].includes(this.ValidarRol) ? this.facturacion = true : null;
+    index == 2 && [6,10,12,96].includes(this.ValidarRol) ? this.pedidos = true : null;
+    index == 3 && [97,10].includes(this.ValidarRol) ? this.gerencia = true : null;
+
+    //Calidad
+    index == 4 && [5].includes(this.ValidarRol) ? this.calidad = true : null;
+    index == 2 && [5].includes(this.ValidarRol) ? this.gerencia = true : null;
+    index == 3 && [5].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
+
+    //Cartera
+    index == 2 && [69].includes(this.ValidarRol) ? this.recaudos = true : null;
+    
+    //Planeación
+    index == 3 && [98].includes(this.ValidarRol) ? this.materiaPrima = true : null;
+    index == 4 && [98].includes(this.ValidarRol) ? this.pedidos = true : null;
+    index == 5 && [98].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
+    
+    //Jefes Extrusion/Sellado/Impresión/Rotograbado 
+    index == 2 && [85,94,4,89,88,87].includes(this.ValidarRol) ? this.materiaPrima = true : null;
+    index == 3 && [85,94,4,89,88,87].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
+    
+    //Ventas
+    index == 2 && [2,98].includes(this.ValidarRol) ? this.facturacion = true : null;
+    index == 3 && [2].includes(this.ValidarRol) ? this.pedidos = true : null;
+    index == 4 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
+    index == 5 && [2].includes(this.ValidarRol) ? this.recaudos = true : null;
+    index == 6 && [2].includes(this.ValidarRol) ? this.gerencia = true : null;
   }
 }

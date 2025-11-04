@@ -366,10 +366,10 @@ export class DashboardProduccionComponent implements OnInit {
     return color;
   }
 
-  getDetailsProductionForMachine(process? : string, machine? : number){
+  getDetailsProductionForMachine(process? : string, machine? : number, turn? : string){
     let date: any = moment().format('YYYY-MM-DD');
     this.productionReport = true;
-    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date), new Date(date)], 'proceso': process.toUpperCase(), 'Maquina' : machine, });
+    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date), new Date(date)], 'proceso': process.toUpperCase(), 'Maquina' : machine, 'Turno' : turn,});
     this.cmproduction.consultarProduccion();
   }
 
