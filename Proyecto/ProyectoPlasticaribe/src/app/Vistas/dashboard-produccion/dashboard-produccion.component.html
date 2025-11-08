@@ -54,15 +54,15 @@
                     <div class="row g-3" style="text-align: center;">
                         <div class="col-md">
                             <h6><b><i class="pi pi-bolt"></i> Extrusión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageExt" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-extrusion" label=": {{totalKgProcess('EXT') | number}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-extrusion" label=": {{totalMetaProcess('EXT') | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageExt" [min]="0" [max]="maxExtrusion" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-extrusion" label=": {{totalKgProcess('EXT') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-extrusion" label=": {{totalMetaProcess('EXT') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
                         </div>
                         <div class="col-md">
                             <h6><b><i class="pi pi-palette"></i> Impresión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageImp" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-impresion" label=": {{totalKgProcess('IMP') | number}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-impresion" label=": {{totalMetaProcess('IMP') | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageImp" [min]="0" [max]="maxImpresion" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-impresion" label=": {{totalKgProcess('IMP') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-impresion" label=": {{totalMetaProcess('IMP') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
                         </div>
                     </div>
                 </div>
@@ -72,16 +72,16 @@
                     <div class="row g-3" style="text-align: center;">
                         <div class="col-md">
                             <h6><b><i class="pi pi-ellipsis-v"></i> Perforado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentagePerf" [min]="0" [max]="300" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-perforado" label=": {{totalKgProcess('PERF') | number}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-perforado" label=": {{totalMetaProcess('PERF') | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentagePerf" [min]="0" [max]="maxPerforado" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-perforado" label=": {{totalKgProcess('PERF') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-perforado" label=": {{totalMetaProcess('PERF') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
                         </div>
                 
                         <div class="col-md">
                             <h6><b><i class="pi pi-database"></i> Corte</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageEmp" [min]="0" [max]="200" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-corte" label=": {{totalKgProcess('EMP') | number}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-corte" label=": {{totalMetaProcess('EMP') | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageEmp" [min]="0" [max]="maxCorte" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-corte" label=": {{totalKgProcess('EMP') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-corte" label=": {{totalMetaProcess('EMP') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
                         </div>
                     </div>
                 </div>
@@ -91,16 +91,16 @@
                     <div class="row g-3" style="text-align: center;">
                         <div class="col-md">
                             <h6 style="text-align: center;"><b><i class="pi pi-box"></i> Sellado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageSella" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-sellado" label=": {{totalKgProcess('SELLA') | number}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-sellado" label=": {{totalMetaProcess('SELLA') | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageSella" [min]="0" [max]="maxSellado" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-sellado" label=": {{totalKgProcess('SELLA') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-sellado" label=": {{totalMetaProcess('SELLA') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
                         </div>
                 
                         <div class="col-md">
                             <h6 style="text-align: center;"><b><i class="pi pi-bookmark"></i> Camisilla</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageCami" [min]="0" [max]="100" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-camisilla" label=": {{totalKgProcess('CAMISILLA') | number}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-camisilla" label=": {{totalMetaProcess('CAMISILLA') | number}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageCami" [min]="0" [max]="maxCamisilla" valueTemplate="{value}%"></p-knob>
+                            <p-chip class="mr-2 prd-camisilla" label=": {{totalKgProcess('CAMISILLA') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-camisilla" label=": {{totalMetaProcess('CAMISILLA') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
                         </div>
                     </div>
                 </div>
@@ -150,12 +150,12 @@
                                         </p-cellEditor>
                                     </td>
                                     <td class=""><b>{{data.percentage | number}}%</b></td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')">{{data.weightDay | number}}</td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')">{{data.weightNight | number}}</td>
+                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
+                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
                                     <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;" class=""><p-button icon="pi pi-search"
                                             styleClass="p-button-rounded p-button-warning"
                                             [style]="{width: '30px', height: '30px'}" 
-                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
+                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
                                     </td>
                                 </tr>
                             </ng-template>
@@ -207,12 +207,12 @@
                                             </p-cellEditor>
                                         </td>
                                         <td class=""><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')">{{data.weightDay | number}}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')">{{data.weightNight | number}}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
                                         <td class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded p-button-success"
                                                 [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
@@ -261,12 +261,12 @@
                                             </p-cellEditor>
                                         </td>
                                         <td><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')">{{data.weightDay | number}}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')">{{data.weightNight | number}}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
                                         <td class="text-center" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded"
                                                 [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
@@ -319,12 +319,12 @@
 
                                         </td>
                                         <td><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')">{{data.weightDay | number }}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')">{{data.weightNight | number }}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number }}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number }}</td>
                                         <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded p-button-help"
                                                 [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
@@ -374,12 +374,12 @@
                                             </p-cellEditor>
                                         </td>
                                         <td><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')">{{data.weightDay | number}}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')">{{data.weightNight | number}}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
+                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
                                         <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded p-button-info"
                                                 [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
@@ -430,12 +430,12 @@
                                         </p-cellEditor>
                                     </td>
                                     <td><b>{{data.percentage | number}}%</b></td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')">{{data.weightDay | number}}</td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')">{{data.weightNight | number}}</td>
+                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
+                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
                                     <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 2;"><p-button icon="pi pi-search"
                                             styleClass="p-button-rounded p-button-danger"
                                             [style]="{width: '30px', height: '30px'}" 
-                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)"></p-button>
+                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
                                     </td>
                                 </tr>
                             </ng-template>

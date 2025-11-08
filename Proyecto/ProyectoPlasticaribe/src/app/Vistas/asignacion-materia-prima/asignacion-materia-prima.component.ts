@@ -401,6 +401,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         MatPri_Fecha : datos_materiaPrima.matPri_Fecha,
         MatPri_Hora : datos_materiaPrima.matPri_Hora,
         MatPri_PrecioEstandar : datos_materiaPrima.matPri_PrecioEstandar,
+        SubCatMP_Id : datos_materiaPrima.subCatMP_Id
       }
       this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(null, () => {
         this.load = true;

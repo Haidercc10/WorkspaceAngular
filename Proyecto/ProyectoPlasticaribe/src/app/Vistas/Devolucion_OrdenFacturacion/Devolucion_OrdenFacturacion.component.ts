@@ -95,7 +95,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       let preInBarsCode = document.getElementById('roll');
       if (!destroy && preInBarsCode) preInBarsCode.focus();
       else if (destroy) clearInterval(time);
-    }, 10000);
+    }, 30000);
   } 
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');

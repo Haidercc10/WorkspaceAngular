@@ -32,12 +32,14 @@
         </span>
       </div>
 
-      <div class="col-sm-12 col-md-1">
-        <span class="p-input-icon-left p-float-label">
-          <i class="pi pi-search"></i>
-          <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationForDispatch()"/>
-          <label for="orderFact">N° Orden</label>
-        </span>
+      <div class="col-sm-12 col-md-2">
+        <div class="p-inputgroup">
+          <span class="p-float-label">
+            <input formControlName="orderFact" type="number" id="orderFact" required pInputText (keyup.enter)="getInformationForDispatch()"/>
+            <label for="orderFact">N° Orden Fact.</label>
+            <span class="p-inputgroup-addon cursor" pTooltip="Ver Orden en PDF" positionTooltip="top" (click)="viewOF()"> <i class="pi pi-file-pdf"></i></span>
+          </span>
+        </div>
       </div>
 
       <!--* Orden Facturación Directa -->
@@ -51,7 +53,7 @@
       <div class="col-sm-12 col-md-2">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
-          <input formControlName="production" id="RolloBarCode" [disabled]="load" type="number" class="read-only" pInputText pAutoFocus autocomplete="off" [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getProductionToDispatch()"/> <!--(keyup.enter)="getInformationProduction()-->
+          <input formControlName="production" id="RolloBarCode" type="number" class="read-only" pInputText pAutoFocus autocomplete="off" [autofocus]="true" (keyup)="quitBarCode()" (keyup.enter)="getProductionToDispatch()"/> <!--(keyup.enter)="getInformationProduction()-->
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>
@@ -70,7 +72,7 @@
         </span>
       </div>
 
-      <div class="col-sm-12 col-md-2">
+      <div class="col-sm-12 col-md-1">
         <span class="p-float-label">
           <input formControlName="car" type="text" id="car" pInputText required/>
           <label for="car">Placa Carro</label>

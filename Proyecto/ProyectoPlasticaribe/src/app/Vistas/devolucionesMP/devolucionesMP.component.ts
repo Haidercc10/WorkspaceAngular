@@ -236,6 +236,10 @@ export class DevolucionesMPComponent implements OnInit {
             CatMP_Id : datos_materiaPrima.catMP_Id,
             MatPri_Precio : datos_materiaPrima.matPri_Precio,
             TpBod_Id : datos_materiaPrima.tpBod_Id,
+            MatPri_Fecha : datos_materiaPrima.matPri_Fecha,
+            MatPri_Hora : datos_materiaPrima.matPri_Hora,
+            MatPri_PrecioEstandar : datos_materiaPrima.matPri_PrecioEstandar,
+            SubCatMP_Id : datos_materiaPrima.subCatMP_Id
           }
           this.materiaPrimaService.srvActualizar(this.materiasPrimasRetiradas[index].Id_MateriaPrima, datosMP).subscribe(() => {
             this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de devolución creado con éxito`);

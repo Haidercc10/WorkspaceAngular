@@ -71,7 +71,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       let preInBarsCode = document.getElementById('roll');
       if (!destroy && preInBarsCode) preInBarsCode.focus();
       else if (destroy) clearInterval(time);
-    }, 10000);
+    }, 30000);
   }
 
   //*
@@ -148,39 +148,66 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     let clientStock : boolean = this.form.value.clientStock;
     let count : number = 0;
     //let clients : any = this.clients.find(x => x.idcliente == client);
-
+    
+    
     if(this.form.valid) {
-      clientStock ? clientReal = [1061, 1035] : clientReal = [client];
-      if(this.rollsToDispatch.length > 0 && !clientStock) {
-        if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
-          this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
-          return;
-        }
-      }
-      this.load = true;
-      clientReal.forEach(cr => {
-        this.svProduction.getInformationDispatch(roll, cr).subscribe(data => {
-          if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
-            this.rollsToDispatch.unshift(data[0]);
-            this.consolidateItems();
-            this.msjs(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
-            this.form.patchValue({ roll : null });
-          } else {
-            this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
-            this.form.patchValue({ roll : null });
-          } 
-          return;
-        }, error => {
-          count += 1;
-          if(count == clientReal.length) {
-            [400, 404].includes(error.status) ? this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.msjs(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
-            this.form.patchValue({ roll : null });
+      this.disabledFieldRoll();
+      if(roll) {
+        clientStock ? clientReal = [1061, 1035] : clientReal = [client];
+        if(this.rollsToDispatch.length > 0 && !clientStock) {
+            if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
+              this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
+              this.enabledFieldRoll();
+              return;
+            }
+            this.enabledFieldRoll();
           }
-        });
-      });
+          //this.load = true;
+        
+          clientReal.forEach(cr => {
+            this.svProduction.getInformationDispatch(roll, cr).subscribe(data => {
+              if(!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
+                this.rollsToDispatch.unshift(data[0]);
+                this.consolidateItems();
+                this.msjs(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
+                this.enabledFieldRoll();
+              } else {
+                this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
+                this.enabledFieldRoll();
+              } 
+              return;
+            }, error => {
+              count += 1;
+              if(count == clientReal.length) {
+                [400, 404].includes(error.status) ? this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.msjs(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
+                this.enabledFieldRoll();
+              }
+            });
+          });
+        } else {
+          this.enabledFieldRoll();
+        }
+     
       
-    } else this.msjs(`Advertencia`, `Debe llenar todos los campos`);
+    } else {
+      this.msjs(`Advertencia`, `Debe llenar todos los campos`);
+      this.enabledFieldRoll();
+    }
   }
+
+  disabledFieldRoll(){
+    this.load = true;
+    this.form.get('roll')?.disable();
+  }
+
+  enabledFieldRoll(){
+    this.load = false;
+    this.form.get('roll')?.enable();
+    this.form.patchValue({ roll : null});
+    document.getElementById('roll').focus();
+  }
+
+
 
   //*
   consolidateItems(){

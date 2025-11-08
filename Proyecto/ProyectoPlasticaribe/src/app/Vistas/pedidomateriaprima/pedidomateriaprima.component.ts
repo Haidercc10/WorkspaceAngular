@@ -578,6 +578,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             MatPri_Precio : datos_materiaPrima.matPri_Precio,
             TpBod_Id : datos_materiaPrima.tpBod_Id,
             MatPri_PrecioEstandar : datos_materiaPrima.matPri_PrecioEstandar,
+            SubCatMP_Id : datos_materiaPrima.subCatMP_Id
           }
 
           this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(() => {

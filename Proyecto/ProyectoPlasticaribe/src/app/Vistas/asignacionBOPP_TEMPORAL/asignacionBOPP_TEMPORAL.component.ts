@@ -349,7 +349,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     setTimeout(() => {
       this.moverBopp();
       this.cargar_MovEntradasMP();
-    }, 5000);
+    }, 6500);
   }
 
   //funcion que va a mover el inventario de los rollos

@@ -245,7 +245,7 @@
         </ng-template>
         <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
           <tr>
-            <td class="text-center">{{(rollsToDispatch.length - 1) - rowIndex + 1}}</td>
+            <td class="text-center">{{(rollsToDispatch.length - rowIndex)}}</td>
             <td class="text-center"><b>{{data.roll}}</b></td>
             <td class="text-center">{{data.ot}}</td>
             <td>{{data.client}}</td>

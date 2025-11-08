@@ -811,6 +811,8 @@ export class OcompraComponent implements OnInit {
       TpBod_Id: data.tpBod_Id,
       MatPri_Fecha: data.matPri_Fecha,
       MatPri_Hora: data.matPri_Hora,
+      MatPri_PrecioEstandar : data.matPri_PrecioEstandar,
+      SubCatMP_Id : data.subCatMP_Id
     }
     this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, 'No fue posible actualizar el precio de las materias primas'));
   }

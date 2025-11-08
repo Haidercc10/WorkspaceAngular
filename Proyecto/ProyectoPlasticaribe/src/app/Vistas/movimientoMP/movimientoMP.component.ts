@@ -477,10 +477,10 @@ export class MovimientoMPComponent implements OnInit {
           [
             {border: [true, false, true, true], text: `Peso Total`, bold : true, colSpan : 2 },
             {},
-            {border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`, bold : true, },
+            {border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data).toFixed(2))}`, bold : true, },
             {},
             {border: [true, false, true, true], text: `Valor Total`, bold : true, },
-            {border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`, bold : true, },
+            {border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data).toFixed(2))}`, bold : true, },
           ],
         ]
       },

@@ -25,6 +25,7 @@ import { of } from 'rxjs';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
 import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
 import { modelFacturacion_Productos } from 'src/app/Modelo/Facturacion_Productos';
+import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -77,6 +78,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private svDtlPreload : Detalles_PrecargueDespachoService,
     private svPreload : Precargue_DespachoService,
     private svFactProducts : FacturacionProductosService, 
+    private cmpMovOF : MovimientosOrdenFacturacionComponent
   ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
@@ -126,10 +128,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   }
 
   clearFields() {
+    this.load = false;
     this.sendProductionZeus = [];
     this.productionSearched = null;
     this.formProduction.reset();
-    this.load = false;
     document.getElementById('RolloBarCode').focus();
     this.count = 0;
     this.remainingProduction = [];
@@ -139,10 +141,23 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.reposition = false;
     this.preload = false;
     this.validations = 0;
+    this.preSendProductionZeus = [];
   }
 
   getDrivers() {
     this.usuariosService.GetConsdutores().subscribe(data => this.drivers = data);
+  }
+
+  //Función para ver la OF desde el despacho
+  viewOF(){
+    let of : number = this.formProduction.value.orderFact;
+    if(of) {
+      this.load = true;
+      let fact : string = this.formProduction.value.fact;
+      let ofDirect : boolean = ![null, false, undefined].includes(this.formProduction.value.ofDirect) ? true : false;
+      this.cmpMovOF.createPDF(of, fact, 'OF', ofDirect);
+      setTimeout(() => { this.load = false; }, 1000);
+    } else this.msj.mensajeAdvertencia('Debe colocar un número de orden válido!');
   }
 
   getInformationPreload(){
@@ -173,6 +188,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.remainingProduction = [];
     this.sendProductionZeus = [];
     let orderFact : number = this.formProduction.value.orderFact;
+    this.load = true;
 
     this.orderFactService.getId(orderFact).subscribe(data => {
       if(data.estado_Id == 19) {
@@ -190,7 +206,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   getInformationOrderFact(of : number, ofDirect : boolean){
     //let orderFact = this.formProduction.value.orderFact;
     this.reposition = false;
-    this.load = true;
+    //this.load = true;
     this.dtOrderFactService.GetInformacionOrderFactToSend(of, ofDirect).subscribe(data => {
       this.production = [];
       let saleOrders: Array<number> = [];
@@ -208,7 +224,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           'ofDirect' : ofDirect
         });
         //}
-        this.load = false
+        this.load = false;
         if (saleOrders.length == data.length){
           //setTimeout(() => this.load = false, 50);
           let saleOrder : string = `${data[0].dtOrder.consecutivo_Pedido}`;
@@ -242,32 +258,47 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     }, error => this.errorMessage(`¡No se encontró información de la orden de facturación N° ${of}!`,error));
   }
 
-  getInformationProduction(production) {
+  getInformationProduction(production : number) {
     let orderFact = this.formProduction.value.orderFact;
-    let fact = this.formProduction.value.fact;
 
-    if ([null, undefined, ''].includes(orderFact)) this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe buscar la orden de facturación/reposición para ingresar los rollos/bultos a despachar!`, 12000000);
-    //else if ([null, undefined, ''].includes(fact.toString().trim())) this.msj.mensajeAdvertencia(`Advertencia`, `No existen facturas/remisiones asociadas al pedido de la orden de facturación N° ${orderFact}`)
-    else {
-      //let production = parseInt(this.formProduction.value.production);
-      let productionOrderSearched = this.production.map(x => x.numberProduction);
-      console.log(production);
-      
-      if (!productionOrderSearched.includes(production)) this.msj.mensajeError(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`, ``, 12000000);
+    //if(production) {
+      if ([null, undefined, ''].includes(orderFact)) this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe buscar la orden de facturación/reposición para ingresar los rollos/bultos a despachar!`, 12000000);
+      //else if ([null, undefined, ''].includes(fact.toString().trim())) this.msj.mensajeAdvertencia(`Advertencia`, `No existen facturas/remisiones asociadas al pedido de la orden de facturación N° ${orderFact}`)
       else {
-        this.formProduction.patchValue({ production: null });
-        document.getElementById('RolloBarCode').focus();
-        this.load = true;
-        let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
-        if (productionSearched.includes(production)) {
-          this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`, ``, 12000000);
-          this.load = false;
+        //let production = parseInt(this.formProduction.value.production);
+        let productionOrderSearched = this.production.map(x => x.numberProduction);
+        console.log(production);
+        this.disabledFieldRoll();
+        if (!productionOrderSearched.includes(production)) {
+          this.enabledFieldRoll();
+          this.msj.mensajeError(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`, ``, 12000000);
         } else {
-          this.getDataProduction(production);
-          //this.load = false;
-        } 
+          this.formProduction.patchValue({ production: null });
+          document.getElementById('RolloBarCode').focus();
+          let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
+          if (productionSearched.includes(production)) {
+            this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`, ``, 12000000);
+            this.enabledFieldRoll();
+          } else {
+            this.getDataProduction(production);
+          } 
+        }
       }
-    }
+    //} else {
+    //  this.msj.mensajeAdvertencia(`Advertencia`, `Debe digitar un número de rollo/bulto válido`, 12000000);
+    //}
+    
+  }
+
+  disabledFieldRoll(){
+    this.load = true;
+    this.formProduction.get('production')?.disable();
+  }
+
+  enabledFieldRoll(){
+    this.load = false;
+    this.formProduction.get('production')?.enable();
+    document.getElementById('RolloBarCode').focus();
   }
 
   //Función para evitar que escriban el numero del bulto en el campo rollo leído
@@ -285,22 +316,24 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     let ofDirect : boolean = this.formProduction.value.ofDirect;
     let production : number = parseInt(this.formProduction.value.production);
     this.clearFieldProduction();
-    if(ofDirect) {
-      let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
-      if (productionSearched.includes(production)) {
-        this.msj.mensajeAdvertencia(`Advertencia`, `El rollo/bulto N° ${production} ya se encuentra en la tabla`, 3000);
-        this.clearFieldProduction();
-      } else 
-      if(production) {
-        this.getProductionOfDirect(production);
-      } else this.msj.mensajeAdvertencia('Advertencia', `No hay rollo leído para consultar!`);
-    } else this.getInformationProduction(production);
+    if(production) {
+      if(ofDirect) {
+        let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
+        if (productionSearched.includes(production)) {
+          this.msj.mensajeAdvertencia(`Advertencia`, `El rollo/bulto N° ${production} ya se encuentra en la tabla`, 3000);
+          this.clearFieldProduction();
+        } else 
+        if(production) {
+          this.getProductionOfDirect(production);
+        } else this.msj.mensajeAdvertencia('Advertencia', `No hay rollo leído para consultar!`);
+      } else this.getInformationProduction(production);
+    } //else this.msj.mensajeAdvertencia('Advertencia', `Debe digitar un consecutivo de rollo/bulto válido`);
   }
 
   // Función para cargar bultos disponibles de OF directas al despacho. 
   getProductionOfDirect(production: number) {
     let orderFact = this.formProduction.value.orderFact;
-    this.load = true;
+    this.disabledFieldRoll();
     this.productionProcessSerivce.getProductsOFDirect(production, orderFact).subscribe(data => {
     let productionFound : number = data[0].pp.numeroRollo_BagPro;
       if(productionFound == production) {
@@ -325,7 +358,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           this.clearFieldProduction();
           console.log(error);
         });
-      }
+      } else this.clearFieldProduction();
     }, error => {
       this.errorMessage(`No se encontró información del rollo/bulto ${production} de la OF N° ${orderFact}!`, error);
       this.clearFieldProduction();
@@ -352,37 +385,43 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //Función para limpiar el campo rollo leído.
   clearFieldProduction(){
     this.formProduction.patchValue({ production : null });
+    this.formProduction.get('production')?.enable();
     document.getElementById('RolloBarCode').focus();
     this.load = false;
   }
 
   getDataProduction(production: number) {
-    let orderFact = this.formProduction.value.orderFact;
-    this.productionProcessSerivce.GetInformationAboutProductionToSend(production, orderFact).subscribe(data => {
-      this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
-        this.sendProductionZeus.push(data[0]);
-        let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-        this.sendProductionZeus[i].dataExtrusion = {
-          numero_RolloBagPro: production,
-          precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
-          extrusion_Ancho1: res[0].ancho1_Extrusion,
-          extrusion_Ancho2: res[0].ancho2_Extrusion,
-          extrusion_Ancho3: res[0].ancho3_Extrusion,
-          undMed_Id: res[0].und_Extrusion,
-          extrusion_Calibre: res[0].calibre_Extrusion,
-          material: res[0].material,
-        };
-        this.sendProductionZeus[i].position = this.sendProductionZeus.length;
-        this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-        this.consolidateItems();
-        this.load = false;
+    if(production) {
+      let orderFact = this.formProduction.value.orderFact;
+      this.productionProcessSerivce.GetInformationAboutProductionToSend(production, orderFact).subscribe(data => {
+        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+          this.sendProductionZeus.push(data[0]);
+          let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+          this.sendProductionZeus[i].dataExtrusion = {
+            numero_RolloBagPro: production,
+            precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
+            extrusion_Ancho1: res[0].ancho1_Extrusion,
+            extrusion_Ancho2: res[0].ancho2_Extrusion,
+            extrusion_Ancho3: res[0].ancho3_Extrusion,
+            undMed_Id: res[0].und_Extrusion,
+            extrusion_Calibre: res[0].calibre_Extrusion,
+            material: res[0].material,
+          };
+          this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+          this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
+          this.consolidateItems();
+          this.enabledFieldRoll();
+        }, error => {
+          this.enabledFieldRoll();
+        });
       }, error => {
-        this.load = false
-      });
-    }, error => {
-      this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`,error);
-      this.load = false;
-    }); 
+        this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`,error);
+        this.enabledFieldRoll();
+      }); 
+    } else {
+      this.msj.mensajeAdvertencia(`Advertencia`, `Digite un rollo/bulto válido para continuar`);
+      this.enabledFieldRoll();
+    }
   }
 
   //Validar los datos a guardar 
@@ -391,17 +430,38 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       let ofDirect : boolean = this.formProduction.value.ofDirect
       this.remainingProduction = [];
       this.remainingProducts = [];
-      let productionInKg : number = this.production.filter(x => x.presentation == 'Kg').length;
       
-      if(ofDirect && productionInKg == 0) this.validateOfDirects();
-      else if(ofDirect && productionInKg > 0) this.validateOfDirects();
+      if(ofDirect) this.validateOfDirects();
       else {
         let productionSearched = this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro);
         this.production.forEach(prod => {
           if (!productionSearched.includes(prod.numberProduction)) this.remainingProduction.push(prod);
         });
       }
-      this.validateDataDispatch();
+      // Validar cantidades facturadas vs despachadas
+      let errores: string[] = [];
+
+      this.production.forEach(prod => {
+        // Buscar todos los rollos despachados del mismo producto (por ejemplo por código o id)
+        let despachado = this.sendProductionZeus
+          .filter(x => x.pp.prod_Id == prod.item) // Ajusta la propiedad que identifica el producto
+          .reduce((sum, item) => sum + (item.pp.cantidad || item.pp.peso_Neto), 0);
+        
+          console.log(despachado, prod.quantity);
+        
+        if (despachado < prod.quantity) {
+          errores.push(`El item ${prod.item} tiene ${despachado} de ${prod.quantity}`);
+        }
+      });
+
+    if (errores.length > 0) {
+      if(ofDirect) this.modalProductsNotRead = true;
+      else this.modalProductionNotRead = true;
+      return; // Detiene el flujo
+    }
+
+    // Si todo está bien, continuar
+    this.validateDataDispatch();
     } else this.msj.mensajeAdvertencia(`No hay rollos/bultos seleccionados para despachar!`);
   }
 
@@ -521,16 +581,18 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     let preload = this.formProduction.value.preload;
 
     this.productionProcessSerivce.putStateNotAvaible(orderFact).subscribe(() => {
-      this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
+      this.msj.mensajeConfirmacion(`¡Orden despachada correctamente!`);
       let fact = this.formProduction.value.fact;
       if(this.reposition) this.updateDevolution();
       if(this.preload) this.updatePreload(preload, orderFact);
       //this.cmpOrderFactPallets.createPDF(orderFact, fact);
       if(ofDirect) {
-        this.updateOFDirectConsolidate(orderFact, fact) 
+        this.updateOFDirectConsolidate(orderFact, fact); 
       } else {
-        this.orden_FacturacionComponent.createPDF(orderFact, fact);
         this.clearFields();
+        setTimeout(() => {
+          this.orden_FacturacionComponent.createPDF(orderFact, fact);
+        }, 200);
       } 
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
@@ -538,8 +600,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ///Función para actualizar el estado de la orden de facturación directa.
   updateOFDirectConsolidate(of : number, fact : string){
     this.svFactProducts.PutOfDirectDispatched(of, this.rollsConsolidate).subscribe(data => {
-      this.orden_FacturacionComponent.createPDFFactDirect(of, fact);
       this.clearFields();
+      setTimeout(() => {
+        this.orden_FacturacionComponent.createPDFFactDirect(of, fact);
+      }, 200); 
     }, error => {
       this.msj.mensajeError('Error', `Error al momento de actualizar los productos `);
       this.load = false;

@@ -425,6 +425,8 @@ export class Orden_MaquilaComponent implements OnInit {
           TpBod_Id: datos.tpBod_Id,
           MatPri_Fecha : datos.matPri_Fecha,
           MatPri_Hora : datos.matPri_Hora,
+          MatPri_PrecioEstandar : datos.matPri_PrecioEstandar,
+          SubCatMP_Id : datos.subCatMP_Id
         }
         this.materiaPrimaService.srvActualizar(id, info).subscribe(null, () => this.msj.mensajeError(`¡No se pudo actualizar el inventario de la materia prima ${datos.matPri_Nombre}!`));
       });

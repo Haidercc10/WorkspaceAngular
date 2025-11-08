@@ -68,6 +68,15 @@ export class DashboardProduccionComponent implements OnInit {
 
   modoSeleccionado: boolean;
 
+  //Valores maximos por area;
+  maxExtrusion : number = 100;
+  maxImpresion : number = 100;
+  maxPerforado : number = 100;
+  maxCorte : number = 100;
+  maxCamisilla : number = 100;
+  maxSellado : number = 100;
+  
+
   constructor(
     private AppComponent: AppComponent,
     private mainPage: PaginaPrincipalComponent,
@@ -174,6 +183,13 @@ export class DashboardProduccionComponent implements OnInit {
       this.totalPercentageEmp = this.totalPercentageForProcess('EMP');
       this.totalPercentageSella = this.totalPercentageForProcess('SELLA');
       this.totalPercentagePerf = this.totalPercentageForProcess('PERF');
+      //Cambiar porcentaje maximo si sobre pasa 100
+      this.maxExtrusion = this.totalPercentageExt > 100 ? this.totalPercentageExt : this.maxExtrusion; 
+      this.maxImpresion = this.totalPercentageImp > 100 ? this.totalPercentageImp : this.maxImpresion;
+      this.maxPerforado = this.totalPercentagePerf > 100 ? this.totalPercentagePerf : this.maxPerforado;
+      this.maxCorte = this.totalPercentageEmp > 100 ? this.totalPercentageEmp : this.maxCorte;
+      this.maxCamisilla = this.totalPercentageCami > 100 ? this.totalPercentageCami : this.maxCamisilla;
+      this.maxSellado = this.totalPercentageSella > 100 ? this.totalPercentageSella : this.maxSellado;
     });
   }
 

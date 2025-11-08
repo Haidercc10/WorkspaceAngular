@@ -1,5 +1,8 @@
 import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
+import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
+import { modelUsabilidad_Modulos } from 'src/app/Modelo/modelUsabilidad_Modulos';
+import { UsabilidadModulosService } from 'src/app/Servicios/Usabilidad_Modulos/usabilidad-modulos.service';
 
 @Injectable({  providedIn: 'root' })
 
@@ -29,7 +32,9 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   calidad : boolean = false;
   production : boolean = false;
 
-  constructor(private AppComponent : AppComponent,) { }
+  constructor(private AppComponent : AppComponent,
+    private svUseModules : UsabilidadModulosService,
+  ) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -65,6 +70,8 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   //
   cambioTab(e : any) {  
     var index = e.index;
+    let tab : any = e.originalEvent.srcElement.innerText;
+
     //Usuario administrador.
     index == 1 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
     index == 2 ? this.facturacion = true : this.facturacion = false;
@@ -100,6 +107,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     //Jefes Extrusion/Sellado/Impresión/Rotograbado 
     index == 2 && [85,94,4,89,88,87].includes(this.ValidarRol) ? this.materiaPrima = true : null;
     index == 3 && [85,94,4,89,88,87].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
+    index == 4 && [85,94,4,89,88,87].includes(this.ValidarRol) ? this.calidad = true : null;
     
     //Ventas
     index == 2 && [2,98].includes(this.ValidarRol) ? this.facturacion = true : null;
@@ -107,5 +115,22 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 4 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
     index == 5 && [2].includes(this.ValidarRol) ? this.recaudos = true : null;
     index == 6 && [2].includes(this.ValidarRol) ? this.gerencia = true : null;
+
+    this.saveLogModule(tab);
+  }
+
+  saveLogModule(module : string){
+    let model : modelUsabilidad_Modulos = {
+      Usm_Modulo: 'Dashboard ' + module,
+      Usua_Id: this.storage_Id,
+      Usm_Fecha: moment().format('YYYY-MM-DD'),
+      Usm_Hora: moment().format('HH:mm:ss'),
+      Usm_Accion : 'Click'
+    } 
+    this.svUseModules.Post(model).subscribe(data => {
+      console.log(data)
+    }, error => {
+      console.log(error);
+    })
   }
 }
