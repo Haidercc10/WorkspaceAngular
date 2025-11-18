@@ -106,7 +106,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.loadRollsForRepack();   
     //this.getStockInformation();
     //this.loadRollsProductionAvailable();
-   }
+  }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -311,7 +311,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       return a;
     }, [])
     return info;
-   }
+  }
 
   fillActualMonth(data: any): number {
     let month: number = moment().month();
@@ -1182,6 +1182,7 @@ interface StockInformation {
   november: number,
   december: number,*/
   process? : string,
+  daysOnInv? : number,
 }
 
 interface AvaibleProdution {
@@ -1196,7 +1197,8 @@ interface AvaibleProdution {
   Turn: string,
   Information: string,
   orderProduction: number,
-  client? : string;
+  client? : string,
+  daysOnInv? : number,
 }
 
 interface Columns {

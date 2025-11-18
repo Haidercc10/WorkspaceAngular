@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -12,6 +12,16 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { defaultStepOptions, stepsReporteDesperdicio as defaultSteps } from 'src/app/data';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
+import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produccion.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Reporte_Desperdicios',
@@ -20,7 +30,7 @@ import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.s
 })
 
 export class Reporte_DesperdiciosComponent implements OnInit {
-
+  @ViewChild(ReporteProduccionComponent) cmproduction: ReporteProduccionComponent;
   @ViewChild('dt') dt: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros */
@@ -28,35 +38,48 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   arrayMateriales = []; /** array que contendrá los materiales de materia prima*/
   arrayProductos = []; /** array que cargará los productos con la consulta de tipo LIKE*/
   idProducto: any = 0; /** ID de producto que se cargará en el campo ITEM, pero se mostrará el nombre. */
-  arrayConsulta : any =[]; /** Array que cargará la consulta inicial */
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  arrayModal : any = []; /** Array que se cargará en la tabla del modal con la info de la OT Seleccionada */
-  dialog : boolean = false; /** Variable que mostrará o no, el modal */
-  totalDesperdicio : number = 0; /** Variable que contendrá la cantidad total de desperdicio por OT. */
-  otSeleccionada : number = 0; /** Variable que contendrá la OT Seleccionada en la tabla */
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  arrayDesperdicios : any = []; //Array que guardará la información total de los desperdicios consultados.
-  date : any | undefined = [new Date(), new Date()] //Variable que guardará la fecha seleccionada en el campo de rango de fechas
+  arrayConsulta: any = []; /** Array que cargará la consulta inicial */
+  today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  arrayModal: any = []; /** Array que se cargará en la tabla del modal con la info de la OT Seleccionada */
+  dialog: boolean = false; /** Variable que mostrará o no, el modal */
+  totalDesperdicio: number = 0; /** Variable que contendrá la cantidad total de desperdicio por OT. */
+  otSeleccionada: number = 0; /** Variable que contendrá la OT Seleccionada en la tabla */
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  arrayDesperdicios: any = []; //Array que guardará la información total de los desperdicios consultados.
+  date: any | undefined = [new Date(), new Date()] //Variable que guardará la fecha seleccionada en el campo de rango de fechas
+  turnos: string[] = [];
+  process: any = [];
+  fails: any = [];
+  pesoTotal: number = 0;
+  production: any = [];
+  productionReport: boolean = false;
 
-  constructor(private formBuilder : FormBuilder,
-                private servicioMateriales : MaterialProductoService,
-                  private servicioProductos : ProductoService,
-                    private servicioDesperdicios : DesperdicioService,
-                      private AppComponent : AppComponent,
-                          private shepherdService: ShepherdService,
-                            private msj : MensajesAplicacionService, 
-                              private svcPDF : CreacionPdfService) {
+  constructor(private formBuilder: FormBuilder,
+    private servicioMateriales: MaterialProductoService,
+    private servicioProductos: ProductoService,
+    private servicioDesperdicios: DesperdicioService,
+    private AppComponent: AppComponent,
+    private shepherdService: ShepherdService,
+    private msj: MensajesAplicacionService,
+    private svcPDF: CreacionPdfService,
+    private svTurnos: TurnosService,
+    private svProcess: ProcesosService,
+    private svFails: FallasTecnicasService,
+    private svExcel: CreacionExcelService,
+    private svBagpro: BagproService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+
     this.formFiltros = this.formBuilder.group({
-      OT : [null],
-      Producto : [null],
-      productoId : [null],
-      RangoFechas : [null, null],
-      Material : [null],
+      OT: [null],
+      fail: [null],
+      RangoFechas: [null, null],
+      Material: [null],
+      turn: [null],
+      process: [null],
     });
   }
 
@@ -64,29 +87,32 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   ngOnInit() {
     this.cargarMateriales();
     this.lecturaStorage();
+    this.getTurnos();
+    this.obtenerFallas();
+    this.obtenerProcesos();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función para validar el area del rol del usuario logueado.
-  validateArea(){
-    let area : any = ``;
-    if ([74,85,7].includes(this.ValidarRol)) area = "EXT";
+  validateArea() {
+    let area: any = ``;
+    if ([74, 85, 7].includes(this.ValidarRol)) area = "EXT";
     else if ([88, 62, 4, 75].includes(this.ValidarRol)) area = "IMP";
-    else if ([89, 76, 63].includes(this.ValidarRol))  area = "ROT";
+    else if ([89, 76, 63].includes(this.ValidarRol)) area = "ROT";
     else if (this.ValidarRol == 77) area = "LAM";
     else if (this.ValidarRol == 78) area = "DBLD";
-    else if ([79,4].includes(this.ValidarRol)) area = "CORTE"
-    else if (([87,9,80,4].includes(this.ValidarRol))) area = "EMP";
-    else if ([81,86,8,82].includes(this.ValidarRol)) area = "SELLA";
-    else if (this.ValidarRol == 82) area = "WIKE";  
-    else if (this.ValidarRol == 84) area = "RECUP";  
+    else if ([79, 4].includes(this.ValidarRol)) area = "CORTE"
+    else if (([87, 9, 80, 4].includes(this.ValidarRol))) area = "EMP";
+    else if ([81, 86, 8, 82].includes(this.ValidarRol)) area = "SELLA";
+    else if (this.ValidarRol == 82) area = "WIKE";
+    else if (this.ValidarRol == 84) area = "RECUP";
     else area = "N/A";
 
     return area;
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
-  tutorial(){
+  tutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
@@ -95,217 +121,353 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  obtenerFallas() {
+    this.svFails.srvObtenerLista().subscribe(datos => {
+      this.fails = datos.filter((item) => [9, 11].includes(item.tipoFalla_Id));
+      this.fails.sort((a, b) => Number(b.falla_Id) - Number(a.falla_Id));
+    });
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
-    return number.toString().replace(exp,rep);
+    return number.toString().replace(exp, rep);
   }
 
   /** Función que cargará los materiales en el combobox.*/
   cargarMateriales = () => this.servicioMateriales.srvObtenerLista().subscribe(data => this.arrayMateriales = data.filter(x => x.material_Id != 1));
 
-  /** Función que cargará los productos con una consulta de tipo LIKE */
-  likeCargarProductos(){
+  //! Función que cargará los productos con una consulta de tipo LIKE */
+  likeCargarProductos() {
     this.arrayProductos = [];
-    let producto : any = this.formFiltros.value.Producto;
+    let producto: any = this.formFiltros.value.Producto;
 
-    if(producto != null) this.servicioProductos.obtenerItemsLike(producto).subscribe(dataProducto => { this.arrayProductos = dataProducto; });
+    if (producto != null) this.servicioProductos.obtenerItemsLike(producto).subscribe(dataProducto => { this.arrayProductos = dataProducto; });
   }
 
-  /** Función que cargará el ID del producto en el campo, pero mostrará el nombre */
+  //! Función que cargará el ID del producto en el campo, pero mostrará el nombre */
   seleccionarProducto() {
-    let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
+    let expresion: any = /^[0-9]*(\.?)[ 0-9]+$/;
     this.idProducto = this.formFiltros.value.Producto;
 
-    if(this.idProducto.match(expresion) != null) {
+    if (this.idProducto.match(expresion) != null) {
       let nuevo: any[] = this.arrayProductos.filter((item) => item.prod_Id == this.idProducto);
       this.formFiltros.patchValue({
-        productoId : nuevo[0].prod_Id,
+        productoId: nuevo[0].prod_Id,
         Producto: nuevo[0].prod_Nombre,
       });
     } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
   }
 
+  //
+  getTurnos = () => this.svTurnos.srvObtenerLista().subscribe(data => this.turnos = data.filter((x: { turno_Id: string; }) => ['DIA', 'NOCHE'].includes(x.turno_Id)));
+
   /** Función que consultará según los campos de busqueda diferentes de vacio. (FECHAS)*/
   Consultar() {
-    let fecha : any = this.formFiltros.value.RangoFechas;
-    let fecha1 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
-    let fecha2 : any = ['Fecha inválida', null, undefined, ''].includes(fecha == null ? fecha : fecha[1]) ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
+    let fecha: any = this.formFiltros.value.RangoFechas;
+    let fecha1: any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
+    let fecha2: any = ['Fecha inválida', null, undefined, ''].includes(fecha == null ? fecha : fecha[1]) ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
     this.arrayConsulta = [];
     this.arrayDesperdicios = [];
     this.load = false;
-    let ordenesTrabajo : any = [];
+    let ordenesTrabajo: any = [];
 
-    setTimeout(() => {
-      this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, this.rutaAPI()).subscribe(data => {
-        if(![12,1,5].includes(this.ValidarRol)) data = data.filter((x) => x.id_Proceso == this.validateArea());
+    this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, this.rutaAPI()).subscribe(data => {
+      this.svBagpro.getProductionDay(fecha1, fecha2, this.ordersProduction(data), this.validateUrlProduction()).subscribe(prod => {
+        this.production = prod;
+        if (![12, 1, 5].includes(this.ValidarRol)) data = data.filter((x) => x.id_Proceso == this.validateArea());
         this.arrayDesperdicios = data;
-        console.log(this.arrayDesperdicios);
-        
+
         if (data.length == 0) {
           this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
           this.load = true;
         } else {
-          for (let i = 0; i < data.length; i++) {
-            if(ordenesTrabajo.indexOf(data[i].ot) == -1) {
-              ordenesTrabajo.push(data[i].ot);
-              this.llenarTabla(data[i]);
-            } 
-          }
+          data.forEach(x => {
+            if (ordenesTrabajo.filter(z => z.Proceso == x.id_Proceso && z.Orden_Produccion == x.ot).length == 0) {
+              ordenesTrabajo.push({ 'Proceso': x.id_Proceso, 'Orden_Produccion': x.ot });
+              this.llenarTabla(x);
+            }
+          });
           setTimeout(() => { this.load = true; }, 1000);
         }
       });
-    }, 500);
+    });
+  }
+
+  validateUrlProduction(){
+    let turno : string = this.formFiltros.value.turn;
+    let procesoId : string = this.formFiltros.value.process;
+    let proceso : string = (procesoId) ? this.process.filter(x => x.proceso_Id == procesoId)[0].proceso_Nombre.toUpperCase() : null;
+    let url: string = '';
+
+    if (proceso != null) url += `proceso=${proceso}`;
+    if (turno != null) url.length > 0 ? url += `&turno=${turno}` : url += `turno=${turno}`;
+    if (url.length > 0) url = `?${url}`;
+    return url;
+  }
+
+  //Función que cargará las maquinas por OT
+  machinesForOT(data: any, row : any) {
+    let machines: any = [];
+    machines = data.filter(x => x.ot == row.ot && x.proceso == row.proceso).reduce((a, b) => {
+      if (!a.map(x => x).includes(b.maquina)) a = [...a, b.maquina];
+      return a;
+    }, []);
+    return machines;
+  }
+
+  //Función que cargar las ordenes de trabajo que se buscarán en el reporte de producción
+  ordersProduction(data: any) {
+    let orders: any = [];
+    orders = data.reduce((a, b) => {
+      if (!a.map(x => x).includes(b.ot)) a = [...a, b.ot.toString()];
+      return a;
+    }, []);
+    return orders
   }
 
   //Función que valida la ruta que se utilizará en la consulta en el API.
   rutaAPI() {
-    let OT : any = this.formFiltros.value.OT;
-    let material : any = this.formFiltros.value.Material;
-    let item : any = this.formFiltros.value.productoId;
-    let ruta : string = '';
+    let OT: any = this.formFiltros.value.OT;
+    let material: any = this.formFiltros.value.Material;
+    let type: any = this.formFiltros.value.productoId;
+    let turn: any = this.formFiltros.value.turn;
+    let process: any = this.formFiltros.value.process;
+    process = process == 'CAMISILLA' ? 'SELLA' : process;
+    let url: string = '';
 
-    if (OT != null && material != null && item != null) ruta = `?OT=${OT}&material=${material}&item=${item}`;
-    else if (OT != null && material != null) ruta = `?OT=${OT}&material=${material}`;
-    else if (OT != null && item != null) ruta = `?OT=${OT}&item=${item}`;
-    else if (material != null && item != null) ruta = `?material=${material}&item=${item}`;
-    else if (OT != null) ruta = `?OT=${OT}`;
-    else if (item != null) ruta = `?item=${item}`;
-    else if (material != null) ruta = `?material=${material}`;
-    else ruta = ``;
+    if (OT != null) url += `OT=${OT}`;
+    if (material != null) url.length > 0 ? url += `&material=${material}` : url += `material=${material}`;
+    if (type != null) url.length > 0 ? url += `&type=${type}` : url += `type=${type}`;
+    if (turn != null) url.length > 0 ? url += `&turn=${turn}` : url += `turn=${turn}`;
+    if (process != null) url.length > 0 ? url += `&process=${process}` : url += `process=${process}`;
+    if (url.length > 0) url = `?${url}`;
 
-    return ruta;
+    return url;
   }
 
   /** Llenar la tabla inicial de resultados de busqueda */
-  llenarTabla(datos : any) {
-    const registro : any = {
-      'OT' : datos.ot,
-      'Item' : datos.item,
-      'Referencia' : datos.referencia,
-      'Material' : datos.material,
-      'Impreso' : datos.impreso,
-      'Cantidad' : this.calculateTotalOT(datos.ot),
-      'Presentacion' : 'Kg',
-      'No_Conformidades' : this.calculateNoConformityOT(datos.ot), 
-      'Proceso' : datos.id_Proceso,
-      'Fecha' : datos.fecha_Registro.replace('T00:00:00', ''),
-      'Hora' : datos.hora_Registro,
-      'Maquina' : datos.maquina,
-      'Operario' : datos.operario,
-      'No_Conformidad' : datos.falla,
-      'Observacion' : datos.observacion,
+  llenarTabla(datos: any) {
+    const registro: any = {
+      'OT': datos.ot,
+      'Item': datos.item,
+      'Referencia': datos.referencia,
+      'Material': datos.material,
+      'Impreso': datos.impreso,
+      'Cantidad': this.calculateTotalOT(datos.ot, datos.id_Proceso),
+      'Presentacion': 'Kg',
+      'No_Conformidades': this.calculateNoConformityOT(datos.ot, datos.id_Proceso),
+      'Production': this.productionForOTProcess(datos.ot, datos.proceso),
+      'Porcentaje' : this.productionForOTProcess(datos.ot, datos.proceso) == 0 ? 0 : (this.calculateTotalOT(datos.ot, datos.id_Proceso) * 100) / this.productionForOTProcess(datos.ot, datos.proceso),
+      'Proceso': datos.id_Proceso,
+      'Nombre_Proceso': datos.proceso,
+      'Fecha': datos.fecha_Registro.replace('T00:00:00', ''),
+      'Hora': datos.hora_Registro,
+      'Maquina': datos.maquina,
+      'Operario': datos.operario,
+      'No_Conformidad': datos.falla,
+      'Observacion': datos.observacion,
+      'Cantidad_Normal' : this.calculateTotalNormalOT(datos.ot, datos.id_Proceso),
+      'Porcentaje_Normal' : this.productionForOTProcess(datos.ot, datos.proceso) == 0 ? 0 : (this.calculateTotalNormalOT(datos.ot, datos.id_Proceso) * 100) / this.productionForOTProcess(datos.ot, datos.proceso),
+      'Maquinas' : this.machinesForOT(this.arrayDesperdicios, datos),
     }
     this.arrayConsulta.push(registro);
   }
 
-  /** Función para que al momento de seleccionar una OT de la tabla se cargue el modal. */
-  consultarOTenTabla(item : any){
+
+  getDetailsProductionForOT(process?: string, ot?: string, maquina? : any) {
+    let date1 = moment(this.formFiltros.value.RangoFechas[0]).add(1, 'd').format('YYYY-MM-DD');
+    let date2 = moment(this.formFiltros.value.RangoFechas[1]).add(1, 'd').format('YYYY-MM-DD');
+    let turn : string = this.formFiltros.value.turn;
+
+    [35,37,38,39].includes(maquina[0]) && process == 'SELLADO' ? process = 'CAMISILLA' : process = process;
+    process == 'CORTE' ? process = 'EMPAQUE' : process = process;
+
+    this.productionReport = true;
+    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date1), new Date(date2)], 'proceso': process.toUpperCase(), 'OrdenTrabajo': ot, 'Turno' : turn});
+    this.cmproduction.consultarProduccion();
+  }
+
+  productionForOTProcess(ot: any, process: any) {
+    let production : number = 0;
+    process == 'CORTE' ? process = 'EMPAQUE' : process = process;
+    
+    production = this.production.filter(x => x.ot == ot && x.proceso == process).reduce((a, b) => a += b.peso, 0);
+    return production;
+  } 
+
+  //Funcion que va a conultar y obtener todas las areas de la empresa
+  obtenerProcesos = () => this.svProcess.srvObtenerLista().subscribe(datos => this.process = datos.filter(x => [3, 4, 8, 12, 7, 2, 1, 9, 5, 6, 10, 17].includes(x.proceso_Codigo)));
+
+  //! Función para que al momento de seleccionar una OT de la tabla se cargue el modal. */
+  consultarOTenTabla(item: any) {
     this.arrayModal = [];
     this.otSeleccionada = item.OT;
-    this.load = false;
+    //this.load = false;
     this.servicioDesperdicios.getDesperdicioxOT(item.OT).subscribe(dataDesperdicios => {
-      if(![12,1,5].includes(this.ValidarRol)) dataDesperdicios = dataDesperdicios.filter((x) => x.id_Proceso == this.validateArea());
+      if (![12, 1, 5].includes(this.ValidarRol)) dataDesperdicios = dataDesperdicios.filter((x) => x.id_Proceso == this.validateArea());
       for (let index = 0; index < dataDesperdicios.length; index++) {
-        this.llenarModal(dataDesperdicios[index]);
+        this.llenarModal(dataDesperdicios[index], false);
       }
-      this.pesoTotalDesperdicio();
     });
-    setTimeout(() => { this.load = true }, 500);
+    //setTimeout(() => { this.load = true }, 500);
   }
 
   /** Función para llenar la tabla de modal. */
-  llenarModal(datos : any){
-    datos.observacion = datos.observacion.replace('Rollo #', '');
-    datos.observacion = datos.observacion.includes('ProcExtrusion') ? datos.observacion.replace(' en ProcExtrusion Bagpro', '') : datos.observacion.replace(' en ProcDesperdicio Bagpro', '');
-    this.dialog = true;
-    this.otSeleccionada = datos.ot;
+  llenarModal(data: any, normal : boolean) {
+    this.arrayModal = [];
 
-    const dataCompleta : any = {
-      'OT' : datos.ot,
-      'Bulto' : datos.bulto,
-      'Item' : datos.item,
-      'Referencia' : datos.referencia,
-      'Peso' : datos.cantidad,
-      'Cantidad' : this.formatonumeros(datos.cantidad),
-      'Und' : datos.presentacion,
-      'Proceso' : datos.id_Proceso,
-      'Material' : datos.material,
-      "No_Conformidad" : datos.falla,
-      'No_Conformidades' : this.calculateNoConformityOT(datos.ot),
-      'Impreso' : datos.impreso,
-      'Maquina' : datos.maquina,
-      'Operario' : datos.operario,
-      'Fecha' : datos.fecha_Registro.replace('T00:00:00', ''),
-      'Hora' : datos.hora_Registro,
-      'Observacion' : datos.observacion,
-    }
-    this.arrayModal.push(dataCompleta);
+    let info: any = (normal) ? 
+    this.arrayDesperdicios.filter(x => x.ot == data.OT && x.id_Proceso == data.Proceso && [10,62].includes(x.id_Falla)) :
+    this.arrayDesperdicios.filter(x => x.ot == data.OT && x.id_Proceso == data.Proceso && ![10,62].includes(x.id_Falla)) ;
+    this.dialog = true;
+    this.otSeleccionada = data.OT;
+
+    info.forEach(datos => {
+      const dataCompleta: any = {
+        'OT': datos.ot,
+        'Bulto': datos.bulto,
+        'Item': datos.item,
+        'Referencia': datos.referencia,
+        'Peso': datos.cantidad,
+        'Cantidad': this.formatonumeros(datos.cantidad),
+        'Und': datos.presentacion,
+        'Proceso': datos.id_Proceso,
+        'Material': datos.material,
+        "No_Conformidad": datos.falla,
+        'No_Conformidades': this.calculateNoConformityOT(datos.ot, datos.id_Proceso),
+        'Impreso': datos.impreso,
+        'Maquina': datos.maquina,
+        'Operario': datos.operario,
+        'Fecha': datos.fecha_Registro.replace('T00:00:00', ''),
+        'Hora': datos.hora_Registro,
+        'Observacion': datos.observacion,
+      }
+      this.arrayModal.push(dataCompleta);
+    });
   }
 
   /** Función para limpiar filtros de busqueda */
-  limpiarCampos(){
+  limpiarCampos() {
     this.formFiltros.reset();
     this.arrayConsulta = [];
     this.arrayModal = [];
     this.arrayDesperdicios = [];
-    this.formFiltros.patchValue({ RangoFechas : [new Date(), new Date()] }); 
+    this.formFiltros.patchValue({ RangoFechas: [new Date(), new Date()] });
   }
 
   /** Función que calcula la cantidad total del desperdicio */
-  pesoTotalDesperdicio(){
-    setTimeout(() => {
-      this.totalDesperdicio = 0;
-      if(this.dt2.filteredValue != null) {
-        for (let indx = 0; indx < this.dt2.filteredValue.length; indx++) {
-          this.totalDesperdicio += this.dt2.filteredValue[indx].Peso;
-        }
-      } else {
-      for (let index = 0; index < this.arrayModal.length; index++) {
-            this.totalDesperdicio += this.arrayModal[index].Peso;
-          }
-    }
-    }, 500);
+  pesoTotalDesperdicio() {
+    let total: number = 0;
+    if (this.dt) {
+      if (this.dt.filteredValue) total = this.dt.filteredValue.reduce((a, b) => a += b.Peso, 0);
+      else total = this.arrayModal.reduce((a, b) => a += b.Peso, 0);
+    } else total = this.arrayModal.reduce((a, b) => a += b.Peso, 0);
+    return total;
+  }
+
+  //* Función para mostrar la cantidad total producida en la tabla principal.
+  pesoProducido() {
+    let total: number = 0;
+
+    if (this.dt) {
+      if (this.dt.filteredValue) total = this.dt.filteredValue.reduce((a, b) => a += b.Production, 0);
+      else total = this.arrayConsulta.reduce((a, b) => a += b.Production, 0);
+    } else total = this.arrayConsulta.reduce((a, b) => a += b.Production, 0);
+    return total;
+  }
+
+  //* Función para mostrar la cantidad total de desperdicio en la tabla principal.
+  pesoDesperdicio() {
+    let total: number = 0;
+    if (this.dt) {
+      if (this.dt.filteredValue) total = this.dt.filteredValue.reduce((a, b) => a += b.Cantidad, 0);
+      else total = this.arrayConsulta.reduce((a, b) => a += b.Cantidad, 0);
+    } else total = this.arrayConsulta.reduce((a, b) => a += b.Cantidad, 0);
+    return total;
+  }
+
+  //* Función que calculará el .
+  totalPorcNormal() {
+    let total: number = 0;
+    if (this.dt) {
+      if (this.dt.filteredValue) total = (this.totalCantidadNormal() * 100) / this.pesoProducido();
+      else total = (this.totalCantidadNormal() * 100) / this.pesoProducido();
+    } else total = (this.totalCantidadNormal() * 100) / this.pesoProducido();
+    return total;
+  }
+
+  //* Función que calculará el .
+  totalPorc() {
+    let total: number = 0;
+    if (this.dt) {
+      if (this.dt.filteredValue) total = (this.pesoDesperdicio() * 100) / this.pesoProducido();
+      else total = (this.pesoDesperdicio() * 100) / this.pesoProducido();
+    } else total = (this.pesoDesperdicio() * 100) / this.pesoProducido();
+    return total;
+  }
+
+  //* Función que calculará el .
+  totalCantidadNormal() {
+    let total: number = 0;
+    //setTimeout(() => {
+    if (this.dt) {
+      if (this.dt.filteredValue) total = this.dt.filteredValue.reduce((a, b) => a += b.Cantidad_Normal, 0);
+      else total = this.arrayConsulta.reduce((a, b) => a += b.Cantidad_Normal, 0);
+    } else total = this.arrayConsulta.reduce((a, b) => a += b.Cantidad_Normal, 0);
+    return total;
+  }
+
+  //* Función que calculará el total de no conformidades.
+  totalFails() {
+    let total: number = 0;
+    //setTimeout(() => {
+    if (this.dt) {
+      if (this.dt.filteredValue) total = this.dt.filteredValue.reduce((a, b) => a += b.No_Conformidades, 0);
+      else total = this.arrayConsulta.reduce((a, b) => a += b.No_Conformidades, 0);
+    } else total = this.arrayConsulta.reduce((a, b) => a += b.No_Conformidades, 0);
+    return total;
   }
 
   // Funcion que permitirá filtrar la información de la tabla
-  aplicarfiltro($event, campo : any, valorCampo : string){
+  aplicarfiltro($event, campo: any, valorCampo: string) {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
   }
 
   // Funcion que permitirá filtrar la información de la tabla
-  aplicarfiltro2($event, campo : any, valorCampo : string){
+  aplicarfiltro2($event, campo: any, valorCampo: string) {
     this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     this.pesoTotalDesperdicio();
   }
 
+  //* INICIO PDF
   // Función para crear tanto el PDF del modal como el consolidado por OT.
-  newPdf(){
-    if(this.arrayConsulta.length > 0){
+  newPdf() {
+    if (this.arrayConsulta.length > 0) {
       this.load = false;
-      let fecha : any = this.formFiltros.value.RangoFechas;
-      let date1 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
-      let date2 : any = ['Fecha inválida', null, undefined, ''].includes(fecha == null ? fecha : fecha[1]) ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
-      let title : string = this.dialog ? `Reporte Desperdicios \nOT N° ${this.otSeleccionada}` : `Reporte Desperdicios \n ${date1} a ${date2}`;
+      let fecha: any = this.formFiltros.value.RangoFechas;
+      let date1: any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
+      let date2: any = ['Fecha inválida', null, undefined, ''].includes(fecha == null ? fecha : fecha[1]) ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
+      let title: string = this.dialog ? `Reporte Desperdicios \nOT N° ${this.otSeleccionada}` : `Reporte Desperdicios \n ${date1} a ${date2}`;
       this.arrayModal = this.arrayModal.filter(item => item.OT == this.otSeleccionada);
       let content: any[] = this.dialog ? this.contentPDF(this.arrayModal) : this.contentPDF(this.arrayConsulta);
       this.svcPDF.formatoPDF(title, content);
-      setTimeout(() => { this.load = true; }, 2000); 
+      setTimeout(() => { this.load = true; }, 2000);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay información para generar el reporte.`);
   }
 
   //Adición de contenido al pdf. 
-  contentPDF(data : any) : any {
-    let content : any[] = [];
-    let groupedInformation : any = this.groupedInfo(data);
-    let detailedInformation : any = this.dialog ? this.detailedInfo(data) : this.detailedInfo(this.arrayDesperdicios);
+  contentPDF(data: any): any {
+    let content: any[] = [];
+    let groupedInformation: any = this.groupedInfo(data);
+    let detailedInformation: any = this.dialog ? this.detailedInfo(data) : this.detailedInfo(this.arrayDesperdicios);
 
     content.push(this.headerTableConsolidated(groupedInformation));
     content.push(this.totalInfoTableOne())
@@ -313,41 +475,41 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     content.push(this.totalInfo());
     return content;
   }
-  
+
   //Encabezado de tabla consolidada del PDF
-  headerTableConsolidated(data : any) {
-    let columns : any[] = ['N°', 'OT', 'Item', 'Referencia', 'No_Conformidades', 'Cantidad', 'Presentacion'];
+  headerTableConsolidated(data: any) {
+    let columns: any[] = ['N°', 'OT', 'Item', 'Referencia', 'No_Conformidades', 'Cantidad', 'Presentacion'];
     let widths: Array<string> = ['5%', '10%', '10%', '40%', '15%', '10%', '10%'];
     return {
       margin: [0, 0, 0, 0],
-      borders : 'noBorders',
-      table : {
-        headerRows : 2,
-        widths : widths, 
-        body : this.builderTableBody(data, columns, 'Información consolidada de desperdicios'),
+      borders: 'noBorders',
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.builderTableBody(data, columns, 'Información consolidada de desperdicios'),
       },
-      fontSize : 8,
-      layout : {
-        fillColor : function(rowIndex) {
-          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null; 
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null;
         },
       }
     }
   }
 
   //Información consolidada de la(s) orden(es) de trabajo agrupada(s) por OT.
-  groupedInfo(data : any){
-    let info : any = [];
+  groupedInfo(data: any) {
+    let info: any = [];
     data.forEach(x => {
-      if(!info.map(y => y.OT).includes(x.OT)) {
-        let object : any = {
-          'N°' : info.length + 1,
-          'OT' : x.OT,
-          'Item' : x.Item, 
-          'Referencia' : x.Referencia,
-          'No_Conformidades' : x.No_Conformidades,
-          'Cantidad' : this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(x.OT)).toFixed()) : this.formatonumeros(parseFloat(x.Cantidad).toFixed(2)),
-          'Presentacion' : 'Kg' 
+      if (!info.map(y => y.OT).includes(x.OT)) {
+        let object: any = {
+          'N°': info.length + 1,
+          'OT': x.OT,
+          'Item': x.Item,
+          'Referencia': x.Referencia,
+          'No_Conformidades': x.No_Conformidades,
+          'Cantidad': this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(x.OT, '')).toFixed()) : this.formatonumeros(parseFloat(x.Cantidad).toFixed(2)),
+          'Presentacion': 'Kg'
         }
         info.push(object);
       }
@@ -356,75 +518,75 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
   //Encabezado de tabla consolidada del PDF
-  headerTableDetails(data : any) {
-    let columns : any[] = ['N°', 'OT', 'Bulto', 'Proceso', 'Maq', 'Material', 'Operario', 'No_Conformidad', 'Cant', 'Und', 'Imp', 'Fecha'];
-    let widths: Array<string> = ['3%','7%','7%','7%','4%','12%','15%','20%','5%','5%','4%','9%'];
+  headerTableDetails(data: any) {
+    let columns: any[] = ['N°', 'OT', 'Bulto', 'Proceso', 'Maq', 'Material', 'Operario', 'No_Conformidad', 'Cant', 'Und', 'Imp', 'Fecha'];
+    let widths: Array<string> = ['3%', '7%', '7%', '7%', '4%', '12%', '15%', '20%', '5%', '5%', '4%', '9%'];
     return {
       margin: [0, 0, 0, 0],
-      table : {
-        widths : widths, 
-        body : this.builderTableBody2(data, columns, 'Información consolidada de desperdicios'),
+      table: {
+        widths: widths,
+        body: this.builderTableBody2(data, columns, 'Información consolidada de desperdicios'),
       },
-      fontSize : 8,
-      layout : {
-        fillColor : function(rowIndex) {
-          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null; 
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null;
         },
       }
     }
   }
 
   //Información detallada de los desperdicios por bulto en el PDF
-  detailedInfo(data : any){
-    let info : any = [];
+  detailedInfo(data: any) {
+    let info: any = [];
     data.forEach(x => {
-      const completeData : any = {
-        'N°' : info.length + 1,
-        'OT' : this.dialog ? x.OT : x.ot,
-        'Bulto' : this.dialog ? x.Observacion : x.observacion,
-        'Referencia' : this.dialog ? x.Referencia : x.referencia,
-        'Cantidad' : this.dialog ? x.Cantidad : x.cantidad,
-        'Cant' : this.dialog ? this.formatonumeros(x.Cantidad) : this.formatonumeros(x.cantidad),
-        'Und' : this.dialog ? x.Und : x.presentacion,
-        'Proceso' : this.dialog ? x.Proceso : x.id_Proceso,
-        'Material' : this.dialog ? x.Material : x.material,
-        "No_Conformidad" : this.dialog ? x.No_Conformidad : x.falla,
-        'Imp' : this.dialog ? x.Impreso : x.impreso,
-        'Maq' : this.dialog ? x.Maquina : x.maquina,
-        'Operario' : this.dialog ? x.Operario : x.operario,
-        'Fecha' : this.dialog ? x.Fecha.replace('T00:00:00', '') : x.fecha_Registro.replace('T00:00:00', ''),
+      const completeData: any = {
+        'N°': info.length + 1,
+        'OT': this.dialog ? x.OT : x.ot,
+        'Bulto': this.dialog ? x.Observacion : x.observacion,
+        'Referencia': this.dialog ? x.Referencia : x.referencia,
+        'Cantidad': this.dialog ? x.Cantidad : x.cantidad,
+        'Cant': this.dialog ? this.formatonumeros(x.Cantidad) : this.formatonumeros(x.cantidad),
+        'Und': this.dialog ? x.Und : x.presentacion,
+        'Proceso': this.dialog ? x.Proceso : x.id_Proceso,
+        'Material': this.dialog ? x.Material : x.material,
+        "No_Conformidad": this.dialog ? x.No_Conformidad : x.falla,
+        'Imp': this.dialog ? x.Impreso : x.impreso,
+        'Maq': this.dialog ? x.Maquina : x.maquina,
+        'Operario': this.dialog ? x.Operario : x.operario,
+        'Fecha': this.dialog ? x.Fecha.replace('T00:00:00', '') : x.fecha_Registro.replace('T00:00:00', ''),
       }
       info.push(completeData);
     });
     return info;
   }
 
-   //Cantidad total pesada en desperdicios en el PDF.
-  totalInfo(){
+  //Cantidad total pesada en desperdicios en el PDF.
+  totalInfo() {
     return {
-      text: `\nCantidad total: ${this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(this.otSeleccionada)).toFixed(2)) : this.formatonumeros(parseFloat(this.calculateTotal()).toFixed(2))} KLS`,
+      text: `\nCantidad total: ${this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(this.otSeleccionada, '')).toFixed(2)) : this.formatonumeros(parseFloat(this.calculateTotal()).toFixed(2))} KLS`,
       alignment: 'right',
-      style: 'header', 
-      fontSize : 10, 
-      bold : true,
+      style: 'header',
+      fontSize: 10,
+      bold: true,
     };
   }
 
   //Tabla con la cantidad total pesada en desperdicios en el PDF en la tabla 1.
-  totalInfoTableOne(){
+  totalInfoTableOne() {
     return {
       margin: [0, 0, 0, 20],
       table: {
-        widths : ['5%', '10%', '10%', '40%', '15%', '10%', '10%'],
+        widths: ['5%', '10%', '10%', '40%', '15%', '10%', '10%'],
         body: [
           [
-           { text : ``, border : [false, false, false, false], }, 
-           { text : ``, border : [false, false, false, false], }, 
-           { text : ``, border : [false, false, false, false], }, 
-           { text : ``, border : [false, false, false, false], }, 
-           { text : `Cantidad Total`, border : [true, false, true, true], fontSize : 8, bold : true, alignment: 'right', }, 
-           { text :`${this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(this.otSeleccionada)).toFixed(2)) : this.formatonumeros(parseFloat(this.calculateTotal()).toFixed(2))}`, border : [true, false, true, true], fontSize : 8, bold : true,}, 
-           { text : 'Kg', border : [true, false, true, true], fontSize : 8, bold : true,}
+            { text: ``, border: [false, false, false, false], },
+            { text: ``, border: [false, false, false, false], },
+            { text: ``, border: [false, false, false, false], },
+            { text: ``, border: [false, false, false, false], },
+            { text: `Cantidad Total`, border: [true, false, true, true], fontSize: 8, bold: true, alignment: 'right', },
+            { text: `${this.dialog ? this.formatonumeros(parseFloat(this.calculateTotalOT(this.otSeleccionada, '')).toFixed(2)) : this.formatonumeros(parseFloat(this.calculateTotal()).toFixed(2))}`, border: [true, false, true, true], fontSize: 8, bold: true, },
+            { text: 'Kg', border: [true, false, true, true], fontSize: 8, bold: true, }
           ],
         ]
       },
@@ -444,7 +606,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     return body;
   }
 
-   //Constructor tabla 1 (Detalles)
+  //Constructor tabla 1 (Detalles)
   builderTableBody2(data, columns, tittle) {
     var body = [];
     body.push([{ colSpan: 12, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]);
@@ -457,14 +619,262 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     return body;
   }
 
+  //*CALCULOS TOTALES
+
   //Función para calcular la cantidad total.
   calculateTotal() {
     return this.arrayDesperdicios.reduce((acc, item) => acc += item.cantidad, 0);
-  } 
+  }
   //Función para calcular la cantidad total por orden de trabajo en el PDF.
-  calculateTotalOT = (ot : number) => this.arrayDesperdicios.filter(x => x.ot == ot).reduce((acc, item) => acc += item.cantidad, 0);
+  calculateTotalOT = (ot: number, process: string) => this.arrayDesperdicios.filter(x => x.ot == ot && x.id_Proceso == process && ![10,62].includes(x.id_Falla)).reduce((acc, item) => acc += item.cantidad, 0);
+
+  calculateTotalNormalOT = (ot: number, process: string) => this.arrayDesperdicios.filter(x => x.ot == ot && x.id_Proceso == process && [10,62].includes(x.id_Falla)).reduce((acc, item) => acc += item.cantidad, 0);
 
   //Función para calcular la cantidad total de no conformidades en el PDF.
-  calculateNoConformityOT = (ot : number) => this.arrayDesperdicios.filter(x => x.ot == ot).length;
+  calculateNoConformityOT = (ot: number, process: string) => this.arrayDesperdicios.filter(x => x.ot == ot && x.id_Proceso == process).length;
+
+
+  //* INICIO EXCEL  
+  //Función que exportará un formato excel con los datos de los clientes
+  exportExcel() {
+    if (this.arrayConsulta.length > 0) {
+      setTimeout(() => { this.loadSheetAndStyles(this.arrayConsulta); }, 500);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data: any) {
+    let date1 : any = moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
+    let date2 : any = moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
+
+    let title: any = `Reporte Desperdicios ${date1} `;
+    date2 != date1 ? title += `- ${date2}` : title = title;
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 10, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    let workbook = this.svExcel.formatoExcel(title, true);
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionHoja(workbook, `Reporte Desperdicios Detallado`, false);
+    this.addDetailedSheet(workbook, fill, font, border, this.addDetailedDataExcel(this.arrayDesperdicios), 2);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet: any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5'];
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:M3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws: any) {
+    [5].forEach(x => ws.getColumn(x).width = 15);
+    [6, 2].forEach(x => ws.getColumn(x).width = 20);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [3].forEach(x => ws.getColumn(x).width = 10);
+    [4,].forEach(x => ws.getColumn(x).width = 40);
+    [7, 8, 9, 10, 11, 12, 13].forEach(x => ws.getColumn(x).width = 20);
+  }
+
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader() {
+    let headerRow = [
+      'N°',
+      'OT',
+      'Item',
+      'Referencia',
+      'Area',
+      'Material',
+      'No conformidades',
+      'Producido (Kg)',
+      'Desperdicio (Kg)',
+      'Porcentaje',
+      'Proceso',
+      'Porc. Proceso',
+      'Tipo',
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
+    let contador: any = 6;
+    let formatNumber: Array<number> = [8,9,10,11,12];
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
+
+    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data: any) {
+    let info: any = [];
+    let count: number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.OT,
+        x.Item,
+        x.Referencia,
+        x.Nombre_Proceso,
+        x.Material,
+        x.No_Conformidades,
+        x.Production,
+        x.Cantidad,
+        `${x.Porcentaje.toFixed(2)}%`,
+        x.Cantidad_Normal,
+        `${x.Porcentaje_Normal.toFixed(2)}%`,
+        x.No_Conformidad,
+      ]);
+    });
+    this.addTotal(info);
+    return info;
+  }
+
+  //Agregar fila de totales al formato excel.
+  addTotal(info: any) {
+    info.push([
+      '',
+      '',
+      '',
+      '',
+      '',
+      'TOTALES',
+      this.totalFails(),
+      this.pesoProducido(),
+      this.pesoDesperdicio(),
+      `${this.totalPorc().toFixed(2)}%`, 
+      this.totalCantidadNormal(),
+      `${this.totalPorcNormal().toFixed(2)}%`,
+      ''
+    ]);
+  }
+
+  //? Hoja 2 INFORMACIÓN DETALLADA.
+  addDetailedSheet(workbook, fill, font, border, data: any, pageNumber: number) {
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addDetailedHeader(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addDetailedInfoExcel(page, data);
+  }
+
+  //.Agregar encabezado de la hoja 2: Reporte de producción consolidado.
+  addDetailedHeader(worksheet, font, border, fill) {
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let rowHeader: any = ['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'H4', 'I4', 'J4', 'K4', 'L4', 'M4',];
+    worksheet.addRow(['N°', 'OT', 'Item', 'Referencia', 'Area', 'Material', 'Peso (Kg)', 'Tipo', 'Operario', 'Maquina', 'Impreso', 'Fecha', 'Hora',]);
+
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells: any = ['A1:M3'];
+    this.stylesDetailedPage(worksheet, concatCells, []);
+  }
+
+  //.Agregar información a la hoja 2: Reporte de producción consolidado.
+  addDetailedExcel(worksheet: any, data: any) {
+    let formatNumber: Array<number> = [6];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  //.Agregar información a la hoja 2: Reporte de producción consolidado.
+  addDetailedInfoExcel(worksheet: any, data: any) {
+    let formatNumber: Array<number> = [6];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  //.Agregar información a la hoja 2: Reporte de producción consolidado.
+  addDetailedDataExcel(data) {
+    let info: any = [];
+    let count: number = 0;
+
+    info = data.reduce((acc, x) => {
+      acc =
+        [...acc, [
+          count += 1,
+          x.ot,
+          x.item,
+          x.referencia,
+          x.proceso,
+          x.material,
+          x.cantidad,
+          x.falla,
+          x.operario,
+          x.maquina,
+          x.proceso == 'EXTRUSION' ? 'NO' : x.impreso,
+          x.fecha_Registro.replace('T00:00:00', ''),
+          x.hora_Registro,
+        ]]
+      return acc;
+    }, [])
+    this.addDetailedTotal(info);
+    return info;
+  }
+
+  //.Estilos de la hoja 2: Reporte de producción consolidado..
+  stylesDetailedPage(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1].forEach(x => worksheet.getColumn(x).width = 5);
+    [2, 3, 5, 6, 7, 10, 11, 12, 13].forEach(x => worksheet.getColumn(x).width = 12);
+    [8, 9].forEach(x => worksheet.getColumn(x).width = 25);
+    [4].forEach(x => worksheet.getColumn(x).width = 50);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //.Estilos de la hoja 2: Reporte de producción consolidado
+  addDetailedTotal(info: any) {
+    info.push([
+      '',
+      '',
+      '',
+      '',
+      '',
+      'TOTALES',
+      this.pesoDesperdicio(),
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ]);
+  }
 }
 

@@ -8,6 +8,7 @@ import { ProduccionAreasService } from 'src/app/Servicios/ProduciconAreas/Produc
 import { ProduccionDiariaService } from 'src/app/Servicios/Produccion_Diaria/produccion-diaria.service';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produccion.component';
+import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produc
   styleUrls: ['./dashboard-produccion.component.css']
 })
 export class DashboardProduccionComponent implements OnInit {
-  @ViewChild(ReporteProduccionComponent) cmproduction : ReporteProduccionComponent;
+  @ViewChild(ReporteProduccionComponent) cmproduction: ReporteProduccionComponent;
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -35,47 +36,57 @@ export class DashboardProduccionComponent implements OnInit {
   productionCami: any[] = [];
   productionPerf: any[] = [];
   productionMachines: any[] = [];
-  productionReport : boolean = false;
+  productionReport: boolean = false;
+  wasteReport: boolean = false;
+  arrayModal: any = [];
 
   //* Variables grafica comparativa
-  ComparativoData : any;
-  ComparativoOptions : any;
-  ComparativoDataExtrusion : any;
-  ComparativoOptionsExtrusion : any;
-  ComparativoDataImpresion : any;
-  ComparativoOptionsImpresion : any;
-  ComparativoDataEmpaque : any;
-  ComparativoOptionsEmpaque : any;
-  ComparativoDataSellado : any;
-  ComparativoOptionsSellado : any;
-  ComparativoDataCamisilla : any;
-  ComparativoOptionsCamisilla : any;
-  ComparativoDataPerforado : any;
-  ComparativoOptionsPerforado : any;
-  ComparativoPlugins = [ DataLabelsPlugin ];
+  ComparativoData: any;
+  ComparativoOptions: any;
+  ComparativoDataExtrusion: any;
+  ComparativoOptionsExtrusion: any;
+  ComparativoDataImpresion: any;
+  ComparativoOptionsImpresion: any;
+  ComparativoDataEmpaque: any;
+  ComparativoOptionsEmpaque: any;
+  ComparativoDataSellado: any;
+  ComparativoOptionsSellado: any;
+  ComparativoDataCamisilla: any;
+  ComparativoOptionsCamisilla: any;
+  ComparativoDataPerforado: any;
+  ComparativoOptionsPerforado: any;
+  ComparativoPlugins = [DataLabelsPlugin];
 
-  totalProduction : any = []
-  totalGoal : any = []
+  totalProduction: any = [];
+  totalGoal: any = [];
 
-  totalPercentageExt : number = 0;
-  totalPercentageImp : number = 0;
-  totalPercentageEmp : number = 0;
-  totalPercentageSella : number = 0;
-  totalPercentagePerf : number = 0;
-  totalPercentageCami : number = 0;
+  totalPercentageExt: number = 0;
+  totalPercentageImp: number = 0;
+  totalPercentageEmp: number = 0;
+  totalPercentageSella: number = 0;
+  totalPercentagePerf: number = 0;
+  totalPercentageCami: number = 0;
 
-  totalPercentageMonth : number = 0;
+  wastePercentageExt: number = 0;
+  wastePercentageImp: number = 0;
+  wastePercentageEmp: number = 0;
+  wastePercentageSella: number = 0;
+  wastePercentagePerf: number = 0;
+  wastePercentageCami: number = 0;
+
+  totalPercentageMonth: number = 0;
 
   modoSeleccionado: boolean;
 
   //Valores maximos por area;
-  maxExtrusion : number = 100;
-  maxImpresion : number = 100;
-  maxPerforado : number = 100;
-  maxCorte : number = 100;
-  maxCamisilla : number = 100;
-  maxSellado : number = 100;
+  maxExtrusion: number = 100;
+  maxImpresion: number = 100;
+  maxPerforado: number = 100;
+  maxCorte: number = 100;
+  maxCamisilla: number = 100;
+  maxSellado: number = 100;
   
+
 
   constructor(
     private AppComponent: AppComponent,
@@ -83,8 +94,8 @@ export class DashboardProduccionComponent implements OnInit {
     private svBagpro: BagproService,
     private svMsj: MensajesAplicacionService,
     private svProdAreas: ProduccionAreasService,
-    private svDailyProd : ProduccionDiariaService,
-    //private cmpProduction : ReporteProduccionComponent,
+    private svDailyProd: ProduccionDiariaService,
+    private svDesperdicios: DesperdicioService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
@@ -92,7 +103,7 @@ export class DashboardProduccionComponent implements OnInit {
   ngOnInit() {
     this.tiempoExcedido();
     this.lecturaStorage();
-    setInterval(() =>  {
+    setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
       this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
@@ -135,7 +146,7 @@ export class DashboardProduccionComponent implements OnInit {
         this.llenarGraficaComparativoCamisilla();
         this.llenarGraficaComparativoPerforado();
       }, 3000);
-      
+
       let time = setInterval(() => {
         if (this.mainPage.production) {
           setTimeout(() => this.loadDataProduction(), 1000);
@@ -147,7 +158,7 @@ export class DashboardProduccionComponent implements OnInit {
             this.llenarGraficaComparativoCamisilla();
             this.llenarGraficaComparativoPerforado();
           }, 3000);
-          
+
         } else clearInterval(time);
       }, 60000);
     }
@@ -159,20 +170,11 @@ export class DashboardProduccionComponent implements OnInit {
     let date2: any = moment().subtract(1, 'd').format('YYYY-MM-DD');
 
     this.consultarPesoProducidoOrdenes();
-    //this.getDataForMachine(date1, date2);
     this.getDataForMachine2(date1, date2);
   }
 
-  //Función para obtener la información por maquinas.
-  getDataForMachine(date1, date2) {
-    this.productionMachines = [];
-    this.svBagpro.getProductionDay(date1, date2).subscribe(data => {
-      this.productionMachines = data.filter(x => x.proceso == 'EXTRUSION');
-    });
-  }
-
   //Obtener datos de producción por maquina
-  getDataForMachine2(date1 : any, date2 : any){
+  getDataForMachine2(date1: any, date2: any) {
     this.clearFields();
 
     this.svDailyProd.getProductionDay(date1, date2).subscribe(data => {
@@ -183,8 +185,15 @@ export class DashboardProduccionComponent implements OnInit {
       this.totalPercentageEmp = this.totalPercentageForProcess('EMP');
       this.totalPercentageSella = this.totalPercentageForProcess('SELLA');
       this.totalPercentagePerf = this.totalPercentageForProcess('PERF');
+
+      this.wastePercentageCami = this.totalPorcWaste('CAMISILLA');
+      this.wastePercentageExt = this.totalPorcWaste('EXT');
+      this.wastePercentageImp = this.totalPorcWaste('IMP');
+      this.wastePercentageEmp = this.totalPorcWaste('EMP');
+      this.wastePercentageSella = this.totalPorcWaste('SELLA');
+      this.wastePercentagePerf = this.totalPorcWaste('PERF');
       //Cambiar porcentaje maximo si sobre pasa 100
-      this.maxExtrusion = this.totalPercentageExt > 100 ? this.totalPercentageExt : this.maxExtrusion; 
+      this.maxExtrusion = this.totalPercentageExt > 100 ? this.totalPercentageExt : this.maxExtrusion;
       this.maxImpresion = this.totalPercentageImp > 100 ? this.totalPercentageImp : this.maxImpresion;
       this.maxPerforado = this.totalPercentagePerf > 100 ? this.totalPercentagePerf : this.maxPerforado;
       this.maxCorte = this.totalPercentageEmp > 100 ? this.totalPercentageEmp : this.maxCorte;
@@ -193,8 +202,8 @@ export class DashboardProduccionComponent implements OnInit {
     });
   }
 
-  clearFields(){
-    this.productionMachines= [];
+  clearFields() {
+    this.productionMachines = [];
     this.totalPercentageCami = 0;
     this.totalPercentageExt = 0;
     this.totalPercentageImp = 0;
@@ -204,8 +213,8 @@ export class DashboardProduccionComponent implements OnInit {
   }
 
   //Función para actualizar la meta del día por maquina.
-  updateGoalForMachine(data : any, $event : any, process : string){
-    let goal = this.productionMachineProcess(process).find(x => x.machine == data.machine).goal; 
+  updateGoalForMachine(data: any, $event: any, process: string) {
+    let goal = this.productionMachineProcess(process).find(x => x.machine == data.machine).goal;
 
     this.svDailyProd.putGoalForMachine(data.machine, process, '2025-10-31', goal).subscribe(dataa => {
       if ($event.key == 'Enter') this.svMsj.mensajeConfirmacion(`¡Meta establecida con éxito!`);
@@ -216,14 +225,14 @@ export class DashboardProduccionComponent implements OnInit {
 
   productionMachineProcess = (process: string) => this.productionMachines.filter(x => x.process == process);
 
-  totalPercentageForProcess = (process : string) => Number.isNaN((this.totalKgProcess(process) * 100 / this.totalMetaProcess(process))) ? 0 : Math.round(this.totalKgProcess(process) * 100 / this.totalMetaProcess(process));
+  totalPercentageForProcess = (process: string) => Number.isNaN((this.totalKgProcess(process) * 100 / this.totalMetaProcess(process))) ? 0 : Math.round(this.totalKgProcess(process) * 100 / this.totalMetaProcess(process));
 
   //Total meta producción por proceso
   totalMetaProcess = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.goal, 0);
 
   //Total kg por proceso
   totalKgProcess = (process: string) => this.productionMachines.filter(x => x.process == process).reduce((a, b) => a += b.weight, 0);
-  
+
   //Total kg por proceso
   totalPerc = (process: string) => this.productionMachines.filter(x => x.process == process).reduce((a, b) => this.totalPercentageExt += b.percentage, 0);
 
@@ -233,11 +242,91 @@ export class DashboardProduccionComponent implements OnInit {
   //Total kg proceso
   totalKgMonth = (process: string) => this.procesosOrdenesMes.filter(x => x.Area == process).reduce((a, b) => a += b.Produccion, 0);
 
+  //
+  totalPercProcess = (process: string) => this.procesosOrdenesMes.filter(x => x.Area == process).reduce((a, b) => a += b.Porcentaje, 0);
+
   totalKgDay = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.weightDay, 0);
 
   totalKgNight = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.weightNight, 0);
 
-  //totalTotalNight = (process: string) => this.productionMachines.filter(x => x.process == process && x.weight > 0).reduce((a, b) => a += b.weightNight, 0); 
+  //Total desperdicios
+  totalWaste = (process: string) => this.productionMachines.filter(x => x.process == process && x.waste > 0).reduce((a, b) => a += b.waste, 0);
+
+  //Total desperdicios Mes
+  totalWasteMonth = (process: string) => this.procesosOrdenesMes.filter(x => x.Area == process).reduce((a, b) => a += b.Desperdicio, 0);
+
+  //Total desperdicios Mes
+  totalWasteModal = () => this.arrayModal.reduce((a, b) => a += b.Peso, 0);
+
+  porcTotalWasteMonth(process: string) {
+    let total: number = 0;
+
+    (this.totalKgMonth(process) == 0 || this.totalWasteMonth(process) == 0) ? total = 0 : total = ((this.totalWasteMonth(process) * 100) / this.totalKgMonth(process))
+    return total;
+  }
+
+  //
+  porcWaste(prod: number, waste: number) {
+    let total: number = 0;
+
+    (prod == 0 || waste == 0) ? total = 0 : total = ((waste * 100) / prod)
+    return total;
+  }
+
+  //
+  totalPorcWaste(process: string) {
+    let total: number = 0;
+    total = this.totalWaste(process) == 0 ? 0 : Math.round((this.totalWaste(process) * 100) / this.totalKgProcess(process));
+    return total;
+  }
+
+  //*MODAL
+  //
+  loadDetailsWaste(process : string, machine : number, waste : number) {
+    console.log(process, machine, waste);
+    
+    this.arrayModal = [];
+    if(waste > 0) {
+      let date = moment().subtract(1, 'd').format('YYYY-MM-DD');
+      let ruta : string = `?process=${process}&machine=${machine}`;
+      this.svDesperdicios.getDesperdicio(date, date, ruta).subscribe(data => {
+        if(data) {
+          if(data.length > 0) {
+            this.wasteReport = true;
+            data.forEach(x => {
+              this.llenarModal(x);
+            });
+          }
+        }   
+      });
+    } else this.svMsj.mensajeAdvertencia('No existen registros de desperdicios');
+  }
+
+  //
+  /** Función para llenar la tabla de modal. */
+  llenarModal(datos: any, ) {
+    
+    //this.otSeleccionada = data.OT;
+    const dataCompleta: any = {
+      'OT': datos.ot,
+      'Bulto': datos.bulto,
+      'Item': datos.item,
+      'Referencia': datos.referencia,
+      'Peso': datos.cantidad,
+      'Cantidad': datos.cantidad,
+      'Und': datos.presentacion,
+      'Proceso': datos.id_Proceso,
+      'Material': datos.material,
+      "No_Conformidad": datos.falla,
+      'Impreso': datos.impreso,
+      'Maquina': datos.maquina,
+      'Operario': datos.operario,
+      'Fecha': datos.fecha_Registro.replace('T00:00:00', ''),
+      'Hora': datos.hora_Registro,
+      'Observacion': datos.observacion,
+    }
+    this.arrayModal.push(dataCompleta);
+  }
 
   //Total kg proceso
   totalPercMonth(process: string) {
@@ -245,15 +334,15 @@ export class DashboardProduccionComponent implements OnInit {
     this.totalPercentageMonth = this.procesosOrdenesMes.filter(x => x.Area == process).reduce((a, b) => a += b.PorcentajeMeta, 0);
     this.totalPercentageMonth = (Math.round(this.totalPercentageMonth));
     return this.totalPercentageMonth;
-  } 
-
+  }
 
   //* Función para obtener la información por procesos.
   consultarPesoProducidoOrdenes() {
     this.svProdAreas.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
       this.procesosOrdenesMes = [];
       produccionAreas.forEach(areas => {
-        if (!['Doblado'].includes(areas.proceso_Nombre)) {
+        let area : string = areas.proceso_Id
+        this.svDesperdicios.GetDesperdiciosMes(area).subscribe(desp => {
           let metaMesActual: number = this.metaMesActual(areas);
           let produccionMesActual: number = this.produccionMesActual(areas);
           let datos: any = {
@@ -267,12 +356,13 @@ export class DashboardProduccionComponent implements OnInit {
             'rangoSlider': this.rangoSliderPorcentajeProcesos(this.porcentajeProgresoMetaProduccion(areas)),
             'PorcentajeMeta': (produccionMesActual / metaMesActual) * 100,
             'PorcentajeMensual': this.porcentajeProgresoMetaProduccion(areas),
+            'Desperdicio': desp,
+            'Porcentaje_Desperdicio': (desp * 100) / produccionMesActual
           }
           this.procesosOrdenesMes.push(datos);
           this.procesosOrdenesMes.sort((a, b) => a.Orden - b.Orden);
-        }
+        });
       });
-      //this.totalPercMonth();
     });
   }
 
@@ -382,15 +472,14 @@ export class DashboardProduccionComponent implements OnInit {
     return color;
   }
 
-  getDetailsProductionForMachine(process? : string, machine? : number, turn? : string){
+  getDetailsProductionForMachine(process?: string, machine?: number, turn?: string) {
     let date: any = moment().format('YYYY-MM-DD');
     this.productionReport = true;
-    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date), new Date(date)], 'proceso': process.toUpperCase(), 'Maquina' : machine, 'Turno' : turn,});
+    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date), new Date(date)], 'proceso': process.toUpperCase(), 'Maquina': machine, 'Turno': turn, });
     this.cmproduction.consultarProduccion();
   }
 
   //TODO: GRAFICA 1 BARRAS ACOSTADAS
-
   /** Función para llamar la grafica de extrusión*/
   llenarGraficaComparativoExtrusion() {
     this.ComparativoDataExtrusion = {

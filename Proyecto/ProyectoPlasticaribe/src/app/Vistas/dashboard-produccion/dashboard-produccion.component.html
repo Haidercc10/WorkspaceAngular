@@ -1,7 +1,7 @@
 <div class="fondo">
     <div class="row g-2 fila-1" *ngIf="!cargando">
         <!-- Acumulado de producción vs meta -->
-        <div class="p-2 col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8 slide-in-blurred-top" id="">
+        <div class="p-2 col-xs-12 col-sm-12 col-md-8 col-lg-7 col-xl-7 col-xxl-7 slide-in-blurred-top" id="">
             <p-card>
                 <h2 style="font-weight: 700; text-align: center;"
                     [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i
@@ -11,58 +11,91 @@
                     <div class="row g-3" style="text-align: center;">
                         <div class="col-md">
                             <!--Extrusión-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataExtrusion" [options]="ComparativoOptionsExtrusion"></p-chart>
-                            <p-chip class="text-center" label="Extrusión: {{totalPercMonth('EXTRUSION')}}% | Prod.: {{totalKgMonth('EXTRUSION') | number}} | Meta: {{totalGoalMonth('EXTRUSION') | number}}"></p-chip>
+                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataExtrusion"
+                                [options]="ComparativoOptionsExtrusion"></p-chart>
+                            <p-chip class="text-center"
+                                label="EXT: {{totalPercMonth('EXTRUSION')}}% |⚡️: {{totalKgMonth('EXTRUSION') | number : '1.0-0'}} 🚩: {{totalGoalMonth('EXTRUSION') | number : '1.0-0'}} 🎯: {{totalPercProcess('EXTRUSION') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('EXTRUSION') | number : '1.0-0'}} • {{porcTotalWasteMonth('EXTRUSION') | number : '1.0-0'}}%"></p-chip>
                             <p-divider></p-divider>
                             <!--Impresión-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataImpresion" [options]="ComparativoOptionsImpresion"></p-chart>
-                            <p-chip label="Impresión: {{totalPercMonth('IMPRESION')}}% | Prod.: {{totalKgMonth('IMPRESION') | number}} | Meta: {{totalGoalMonth('IMPRESION') | number}}"></p-chip>
+                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataImpresion"
+                                [options]="ComparativoOptionsImpresion"></p-chart>
+                            <p-chip
+                                label="IMP: {{totalPercMonth('IMPRESION')}}% |⚡️: {{totalKgMonth('IMPRESION') | number : '1.0-0'}} 🚩: {{totalGoalMonth('IMPRESION') | number : '1.0-0'}} 🎯: {{totalPercProcess('IMPRESION') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('IMPRESION') | number : '1.0-0'}} • {{porcTotalWasteMonth('IMPRESION') | number : '1.0-0'}}%"></p-chip>
                             <p-divider></p-divider>
                             <!--Perforado-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataPerforado" [options]="ComparativoOptionsPerforado"></p-chart>
-                            <p-chip class="mb-3" label="Perforado: {{totalPercMonth('PERFORADO')}}% | Prod.: {{totalKgMonth('PERFORADO') | number}} | Meta: {{totalGoalMonth('PERFORADO') | number}}"></p-chip>
+                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataPerforado"
+                                [options]="ComparativoOptionsPerforado"></p-chart>
+                            <p-chip class="mb-3"
+                                label="PERF: {{totalPercMonth('PERFORADO')}}% |⚡️: {{totalKgMonth('PERFORADO') | number : '1.0-0'}} 🚩: {{totalGoalMonth('PERFORADO') | number : '1.0-0'}} 🎯: {{totalPercProcess('PERFORADO') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('PERFORADO') | number : '1.0-0'}} • {{porcTotalWasteMonth('PERFORADO') | number : '1.0-0'}}%"></p-chip>
                         </div>
 
                         <div class="col-md">
                             <!--Corte-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataEmpaque" [options]="ComparativoOptionsEmpaque"></p-chart>
-                            <p-chip class="mb-3" label="Corte: {{totalPercMonth('CORTE')}}% | Prod.: {{totalKgMonth('CORTE') | number}} | Meta: {{totalGoalMonth('CORTE') | number}}"></p-chip>
+                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataEmpaque"
+                                [options]="ComparativoOptionsEmpaque"></p-chart>
+                            <p-chip class="mb-3"
+                                label="CORTE: {{totalPercMonth('CORTE')}}% |⚡️: {{totalKgMonth('CORTE') | number : '1.0-0'}} 🚩: {{totalGoalMonth('CORTE') | number : '1.0-0'}} 🎯: {{totalPercProcess('CORTE') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('CORTE') | number : '1.0-0'}} • {{porcTotalWasteMonth('CORTE') | number : '1.0-0'}}% "></p-chip>
                             <p-divider></p-divider>
 
                             <!--Sellado-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataSellado" [options]="ComparativoOptionsSellado"></p-chart>
-                            <p-chip class="mb-3" label="Sellado: {{totalPercMonth('SELLADO')}}% | Prod.: {{totalKgMonth('SELLADO') | number}} | Meta: {{totalGoalMonth('SELLADO') | number}}"></p-chip>
+                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataSellado"
+                                [options]="ComparativoOptionsSellado"></p-chart>
+                            <p-chip class="mb-3"
+                                label="SELLA.: {{totalPercMonth('SELLADO')}}% |⚡️: {{totalKgMonth('SELLADO') | number : '1.0-0'}} 🚩: {{totalGoalMonth('SELLADO') | number : '1.0-0'}} 🎯: {{totalPercProcess('SELLADO') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('SELLADO') | number : '1.0-0'}} • {{porcTotalWasteMonth('SELLADO') | number : '1.0-0'}}%"></p-chip>
                             <p-divider></p-divider>
-                            
+
                             <!--Camisilla-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataCamisilla" [options]="ComparativoOptionsCamisilla"></p-chart>
-                            <p-chip label="Camisilla: {{totalPercMonth('CAMISILLA')}}% | Prod.: {{totalKgMonth('CAMISILLA') | number}} | Meta: {{totalGoalMonth('CAMISILLA') | number}}"></p-chip>
+                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataCamisilla"
+                                [options]="ComparativoOptionsCamisilla"></p-chart>
+                            <p-chip
+                                label="CAMIS.: {{totalPercMonth('CAMISILLA')}}% |⚡️: {{totalKgMonth('CAMISILLA') | number : '1.0-0'}} 🚩: {{totalGoalMonth('CAMISILLA') | number : '1.0-0'}} 🎯: {{totalPercProcess('CAMISILLA') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('CAMISILLA') | number : '1.0-0'}} • {{porcTotalWasteMonth('CAMISILLA') | number : '1.0-0'}}%"></p-chip>
                         </div>
                     </div>
                 </div>
             </p-card>
         </div>
 
-        
         <!-- Meta diaria por maquinas -->
-        <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4 slide-in-blurred-top" id="">
+        <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-5 slide-in-blurred-top" id="">
             <p-card>
-                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-check-circle"></i> Cumplimiento de programación diaria </h2>
+                <h2 style="font-weight: 700; text-align: center;"
+                    [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i
+                        class="pi pi-check-circle"></i> Cumplimiento de programación diaria </h2>
                 <p-divider></p-divider>
                 <!--Fila 1-->
                 <div class="mb-4">
                     <div class="row g-3" style="text-align: center;">
                         <div class="col-md">
                             <h6><b><i class="pi pi-bolt"></i> Extrusión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageExt" [min]="0" [max]="maxExtrusion" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-extrusion" label=": {{totalKgProcess('EXT') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-extrusion" label=": {{totalMetaProcess('EXT') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageExt" [min]="0"
+                                [max]="maxExtrusion" valueTemplate="{value}%" valueColor="#f0d800ff"></p-knob>
+                            <p-chip class="mr-2 prd-extrusion" label=": {{totalKgProcess('EXT') | number : '1.0-0'}}">
+                                <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-extrusion" label=": {{totalMetaProcess('EXT') | number : '1.0-0'}}"> <i
+                                    class="pi pi-flag"></i> </p-chip>
+                        </div>
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-slack"></i> Desp. Extrusión</b></h6>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageExt" [min]="0" [max]="wastePercentageExt < 10 ? 10 : wastePercentageExt"
+                                valueTemplate="{value}%" [strokeWidth]="7" valueColor="Red"></p-knob>
+                            <p-chip label=": {{totalWaste('EXT') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
+                            </p-chip>
                         </div>
                         <div class="col-md">
                             <h6><b><i class="pi pi-palette"></i> Impresión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageImp" [min]="0" [max]="maxImpresion" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-impresion" label=": {{totalKgProcess('IMP') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-impresion" label=": {{totalMetaProcess('IMP') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageImp" [min]="0"
+                                [max]="maxImpresion" valueTemplate="{value}%" valueColor="#60f000ff"></p-knob>
+                            <p-chip class="mr-2 prd-impresion" label=": {{totalKgProcess('IMP') | number : '1.0-0'}}">
+                                <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-impresion" label=": {{totalMetaProcess('IMP') | number : '1.0-0'}}"> <i
+                                    class="pi pi-flag"></i> </p-chip>
+                        </div>
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-slack"></i> Desp. Impresión</b></h6>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageImp" [min]="0" [max]="totalPercentageImp < 10 ? 10 : totalPercentageImp"
+                                valueTemplate="{value}%" [strokeWidth]="7" valueColor="Red"></p-knob>
+                            <p-chip label=": {{totalWaste('IMP') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
+                            </p-chip>
                         </div>
                     </div>
                 </div>
@@ -72,16 +105,35 @@
                     <div class="row g-3" style="text-align: center;">
                         <div class="col-md">
                             <h6><b><i class="pi pi-ellipsis-v"></i> Perforado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentagePerf" [min]="0" [max]="maxPerforado" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-perforado" label=": {{totalKgProcess('PERF') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-perforado" label=": {{totalMetaProcess('PERF') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentagePerf" [min]="0"
+                                [max]="maxPerforado" valueTemplate="{value}%" valueColor="#8255ffff"></p-knob>
+                            <p-chip class="mr-2 prd-perforado" label=": {{totalKgProcess('PERF') | number : '1.0-0'}}">
+                                <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-perforado" label=": {{totalMetaProcess('PERF') | number : '1.0-0'}}"> <i
+                                    class="pi pi-flag"></i> </p-chip>
                         </div>
-                
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-slack"></i> Desp. Perforado</b></h6>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentagePerf" [min]="0"
+                                [max]="wastePercentagePerf < 15 ? 15 : wastePercentagePerf" valueTemplate="{value}%" [strokeWidth]="7" valueColor="Red"></p-knob>
+                            <p-chip label=": {{totalWaste('PERF') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
+                            </p-chip>
+                        </div>
                         <div class="col-md">
                             <h6><b><i class="pi pi-database"></i> Corte</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageEmp" [min]="0" [max]="maxCorte" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-corte" label=": {{totalKgProcess('EMP') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-corte" label=": {{totalMetaProcess('EMP') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageEmp" [min]="0"
+                                [max]="maxCorte" valueTemplate="{value}%" valueColor="#2e8fffff"></p-knob>
+                            <p-chip class="mr-2 prd-corte" label=": {{totalKgProcess('EMP') | number : '1.0-0'}}"> <i
+                                    class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-corte" label=": {{totalMetaProcess('EMP') | number : '1.0-0'}}"> <i
+                                    class="pi pi-flag"></i> </p-chip>
+                        </div>
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-slack"></i> Desp. Corte</b></h6>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageEmp" [min]="0" [max]="wastePercentageExt < 10 ? 10 : wastePercentageExt"
+                                valueTemplate="{value}%" [strokeWidth]="7" valueColor="Red"></p-knob>
+                            <p-chip label=": {{totalWaste('EMP') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
+                            </p-chip>
                         </div>
                     </div>
                 </div>
@@ -91,16 +143,37 @@
                     <div class="row g-3" style="text-align: center;">
                         <div class="col-md">
                             <h6 style="text-align: center;"><b><i class="pi pi-box"></i> Sellado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageSella" [min]="0" [max]="maxSellado" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-sellado" label=": {{totalKgProcess('SELLA') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-sellado" label=": {{totalMetaProcess('SELLA') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageSella" [min]="0"
+                                [max]="maxSellado" valueTemplate="{value}%" valueColor="#ff5353ff"></p-knob>
+                            <p-chip class="mr-2 prd-sellado" label=": {{totalKgProcess('SELLA') | number : '1.0-0'}}">
+                                <i class="pi pi-bolt"></i> </p-chip>
+                            <p-chip class="meta-sellado" label=": {{totalMetaProcess('SELLA') | number : '1.0-0'}}"> <i
+                                    class="pi pi-flag"></i> </p-chip>
                         </div>
-                
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-slack"></i> Desp. Sellado</b></h6>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageSella" [min]="0"
+                                [max]="wastePercentageSella < 10 ? 10 : wastePercentageSella" valueTemplate="{value}%" [strokeWidth]="7" valueColor="Red"></p-knob>
+                            <p-chip label=": {{totalWaste('SELLA') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
+                            </p-chip>
+                        </div>
                         <div class="col-md">
                             <h6 style="text-align: center;"><b><i class="pi pi-bookmark"></i> Camisilla</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageCami" [min]="0" [max]="maxCamisilla" valueTemplate="{value}%"></p-knob>
-                            <p-chip class="mr-2 prd-camisilla" label=": {{totalKgProcess('CAMISILLA') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-camisilla" label=": {{totalMetaProcess('CAMISILLA') | number : '1.0-0'}}"> <i class="pi pi-flag"></i> </p-chip>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageCami" [min]="0"
+                                [max]="maxCamisilla" valueTemplate="{value}%" valueColor="#00d9ffff"></p-knob>
+                            <p-chip class="mr-2 prd-camisilla"
+                                label=": {{totalKgProcess('CAMISILLA') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i>
+                            </p-chip>
+                            <p-chip class="meta-camisilla"
+                                label=": {{totalMetaProcess('CAMISILLA') | number : '1.0-0'}}"> <i
+                                    class="pi pi-flag"></i> </p-chip>
+                        </div>
+                        <div class="col-md">
+                            <h6><b><i class="pi pi-slack"></i> Desp Camisilla</b></h6>
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageCami" [min]="0"
+                                [max]="wastePercentageCami < 15 ? 15 : wastePercentageCami" valueTemplate="{value}%" [strokeWidth]="7" valueColor="Red"></p-knob>
+                            <p-chip label=": {{totalWaste('CAMISILLA') | number : '1.0-0'}}"> <i
+                                    class="pi pi-trash"></i> </p-chip>
                         </div>
                     </div>
                 </div>
@@ -108,9 +181,8 @@
         </div>
     </div>
 
+    <!--Produccion diaria por maquina -->
     <div class="row g-2 fila-2" *ngIf="!cargando">
-
-        <!--Produccion diaria por maquina -->
         <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="">
             <p-card class="" header="">
                 <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i
@@ -120,29 +192,44 @@
                     <!--Extrusión-->
                     <div class="p-4 col-xl-3 col-lg-3 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="">
                         <h6 class="title-extrusion"><b><i class="pi pi-bolt title-extrusion"></i> Extrusión</b></h6>
-                        <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="600px" [value]="productionMachineProcess('EXT')">
+                        <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-gridlines p-datatable-sm"
+                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="700px"
+                            [value]="productionMachineProcess('EXT')">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine" class="">
+                                    <th></th>
+                                    <th style="font-weight: 800;" class="text-center" colspan="3"> Producción</th>
+                                    <th style="font-weight: 800;" class="text-center textRed" colspan="2"> Desperdicio</th>
+                                    <th style="font-weight: 800;" class="text-center" colspan="2">Producción</th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"
+                                        pSortableColumn="machine" class="">
                                         Maq.</th>
                                     <th pSortableColumn="weight" class=""> Kg</th>
                                     <th pSortableColumn="goal" class=""> Meta</th>
-                                    <th pSortableColumn="percentage" class=""> Porcentaje</th>
+                                    <th pSortableColumn="percentage" class=""> % </th>
+                                    <th pSortableColumn="waste"> Kg</th>
+                                    <th pSortableColumn=""> %</th>
                                     <th pSortableColumn="weightDay" class=""> Día</th>
                                     <th pSortableColumn="weightNight" class=""> Noche</th>
-                                    <th class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
+                                    <th class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">
+                                        Ver</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-data>
                                 <tr>
-                                    <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 2;" class=""><b>{{data.machine}}</b></td>
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 2;" class="">
+                                        <b>{{data.machine}}</b></td>
                                     <td class="">{{data.weight | number}}</td>
-                                    <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
+                                    <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price"
+                                        class="cursor">
                                         <p-cellEditor>
                                             <ng-template pTemplate="input">
-                                                <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                    [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'EXT')"></p-inputNumber>
+                                                <p-inputNumber [(ngModel)]="data.goal" mode="decimal"
+                                                    [minFractionDigits]="2" [required]="true"
+                                                    (onKeyDown)="updateGoalForMachine(data, $event, 'EXT')"></p-inputNumber>
                                             </ng-template>
                                             <ng-template pTemplate="output">
                                                 {{data.goal | number}}
@@ -150,23 +237,39 @@
                                         </p-cellEditor>
                                     </td>
                                     <td class=""><b>{{data.percentage | number}}%</b></td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
-                                    <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;" class=""><p-button icon="pi pi-search"
-                                            styleClass="p-button-rounded p-button-warning"
-                                            [style]="{width: '30px', height: '30px'}" 
-                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
+                                    <td class="cursor textRed" (dblclick)="loadDetailsWaste(data.process, data.machine, data.waste)"
+                                        pTooltip="Doble clic para ver desperdicios" tooltipPosition="top">{{data.waste |
+                                        number}}</td>
+                                    <td class="textRed">{{porcWaste(data.weight, data.waste) | number :'1.0-0'}}%</td>
+                                    <td class="cursor"
+                                        (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')"
+                                        pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">
+                                        {{data.weightDay | number}}</td>
+                                    <td class="cursor"
+                                        (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')"
+                                        pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">
+                                        {{data.weightNight | number}}</td>
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;" class="">
+                                        <p-button icon="pi pi-search" styleClass="p-button-rounded p-button-warning"
+                                            [style]="{width: '30px', height: '30px'}"
+                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)"
+                                            pTooltip="Ver registros de producción maquina N° {{data.machine}}"
+                                            tooltipPosition="top"></p-button>
                                     </td>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="footer">
-                                <td><b>Total</b></td>
-                                <td><b>{{totalKgProcess('EXT') | number :'1.0-0'}}</b></td>
-                                <td><b>{{totalMetaProcess('EXT') | number :'1.0-0'}}</b></td>
-                                <td class=""></td>
-                                <td><b>{{totalKgDay('EXT') | number :'1.0-0'}}</b></td>
-                                <td><b>{{totalKgNight('EXT') | number :'1.0-0'}}</b></td>
-                                <td class=""></td>
+                                <tr>
+                                    <td><b>Total</b></td>
+                                    <td><b>{{totalKgProcess('EXT') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalMetaProcess('EXT') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                    <td class="textRed">{{totalWaste('EXT') | number}}</td>
+                                    <td class="textRed">{{totalPorcWaste('EXT') | number :'1.0-0'}}%</td>
+                                    <td><b>{{totalKgDay('EXT') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalKgNight('EXT') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                </tr>
                             </ng-template>
                         </p-table>
                     </div>
@@ -175,31 +278,47 @@
                     <div class="row g-3 col-md-6">
                         <!--Impresión-->
                         <div class="p-4 col-md-6" id="">
-                            <h6 class="title-impresion"><b><i class="pi pi-palette title-impresion"></i> Impresión</b></h6>
-                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('IMP')">
+                            <h6 class="title-impresion"><b><i class="pi pi-palette title-impresion"></i> Impresión</b>
+                            </h6>
+                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-gridlines p-datatable-sm"
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="280px"
+                                [value]="productionMachineProcess('IMP')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine" class="">
+                                        <th></th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="3"> Producción</th>
+                                        <th style="font-weight: 800;" class="text-center textRed" colspan="2"> Desperdicio</th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="2">Producción</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"
+                                            pSortableColumn="machine" class="">
                                             Maq.</th>
                                         <th pSortableColumn="weight" class=""> Kg</th>
                                         <th pSortableColumn="goal" class=""> Meta</th>
-                                        <th pSortableColumn="percentage" class=""> Porcentaje
+                                        <th pSortableColumn="percentage" class=""> %
                                         </th>
+                                        <th pSortableColumn="waste"> Kg</th>
+                                        <th pSortableColumn=""> %</th>
                                         <th pSortableColumn="weightDay" class=""> Día</th>
                                         <th pSortableColumn="weightNight" class=""> Noche</th>
-                                        <th class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
+                                        <th class="" pFrozenColumn [frozen]="true" alignFrozen="right"
+                                            style="z-index: 1;">Ver</th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" class=""><b>{{data.machine}}</b></td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"
+                                            class=""><b>{{data.machine}}</b></td>
                                         <td class="">{{data.weight | number}}</td>
-                                        <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
+                                        <td class="" [pEditableColumn]="data.goal" pEditableColumnField="price"
+                                            class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
-                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'IMP')"></p-inputNumber>
+                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal"
+                                                        [minFractionDigits]="2" [required]="true"
+                                                        (onKeyDown)="updateGoalForMachine(data, $event, 'IMP')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
@@ -207,53 +326,83 @@
                                             </p-cellEditor>
                                         </td>
                                         <td class=""><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
-                                        <td class="" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
+                                        <td class="cursor textRed" (dblclick)="loadDetailsWaste(data.process, data.machine, data.waste)"
+                                        pTooltip="Doble clic para ver desperdicios" tooltipPosition="top">{{data.waste | number}}</td>
+                                        <td class="textRed">{{porcWaste(data.weight, data.waste) | number :'1.0-0'}}%</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')"
+                                            pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">
+                                            {{data.weightDay | number}}</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')"
+                                            pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">
+                                            {{data.weightNight | number}}</td>
+                                        <td class="" pFrozenColumn [frozen]="true" alignFrozen="right"
+                                            style="z-index: 1;"><p-button icon="pi pi-search"
                                                 styleClass="p-button-rounded p-button-success"
-                                                [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
+                                                [style]="{width: '30px', height: '30px'}"
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"
+                                                pTooltip="Ver registros de producción maquina N° {{data.machine}}"
+                                                tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td class=""><b>Total</b></td>
-                                    <td class=""><b>{{totalKgProcess('IMP') | number :'1.0-0'}}</b></td>
-                                    <td class=""><b>{{totalMetaProcess('IMP') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
-                                    <td><b>{{totalKgDay('IMP') | number :'1.0-0'}}</b></td>
-                                    <td><b>{{totalKgNight('IMP') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
+                                    <tr>
+                                        <td class=""><b>Total</b></td>
+                                        <td class=""><b>{{totalKgProcess('IMP') | number :'1.0-0'}}</b></td>
+                                        <td class=""><b>{{totalMetaProcess('IMP') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                        <td class="cursor textRed">{{totalWaste('IMP') | number}}</td>
+                                        <td class="textRed">{{totalPorcWaste('IMP') | number :'1.0-0'}}%</td>
+                                        <td><b>{{totalKgDay('IMP') | number :'1.0-0'}}</b></td>
+                                        <td><b>{{totalKgNight('IMP') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                    </tr>
                                 </ng-template>
                             </p-table>
                         </div>
-                        
+
                         <!--Corte-->
                         <div class="p-4 col-md-6" id="">
                             <h6 class="title-corte"><b><i class="pi pi-database title-corte"></i> Corte</b></h6>
-                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('EMP')">
+                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-gridlines p-datatable-sm"
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="280px"
+                                [value]="productionMachineProcess('EMP')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine">
+                                        <th></th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="3"> Producción</th>
+                                        <th style="font-weight: 800;" class="text-center textRed" colspan="2"> Desperdicio</th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="2">Producción</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"
+                                            pSortableColumn="machine">
                                             Maq.</th>
                                         <th pSortableColumn="weight"> Kg</th>
                                         <th pSortableColumn="goal"> Meta</th>
-                                        <th pSortableColumn="percentage"> Porcentaje</th>
+                                        <th pSortableColumn="percentage"> % </th>
+                                        <th pSortableColumn="waste"> Kg</th>
+                                        <th pSortableColumn=""> %</th>
                                         <th pSortableColumn="weightDay" class=""> Día</th>
                                         <th pSortableColumn="weightNight" class=""> Noche</th>
-                                        <th pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver
+                                        </th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"><b>{{data.machine}}</b></td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;">
+                                            <b>{{data.machine}}</b></td>
                                         <td>{{data.weight | number}}</td>
                                         <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
-                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'EMP')"></p-inputNumber>
+                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal"
+                                                        [minFractionDigits]="2" [required]="true"
+                                                        (onKeyDown)="updateGoalForMachine(data, $event, 'EMP')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
@@ -261,23 +410,38 @@
                                             </p-cellEditor>
                                         </td>
                                         <td><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
-                                        <td class="text-center" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
-                                                styleClass="p-button-rounded"
-                                                [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
+                                        <td class="cursor textRed" (dblclick)="loadDetailsWaste('CORTE', data.machine, data.waste)"
+                                        pTooltip="Doble clic para ver desperdicios" tooltipPosition="top">{{data.waste | number}}</td>
+                                        <td class="textRed">{{porcWaste(data.weight, data.waste) | number :'1.0-0'}}%</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')"
+                                            pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">
+                                            {{data.weightDay | number}}</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')"
+                                            pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">
+                                            {{data.weightNight | number}}</td>
+                                        <td class="text-center" pFrozenColumn [frozen]="true" alignFrozen="right"
+                                            style="z-index: 1;"><p-button icon="pi pi-search"
+                                                styleClass="p-button-rounded" [style]="{width: '30px', height: '30px'}"
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"
+                                                pTooltip="Ver registros de producción maquina N° {{data.machine}}"
+                                                tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td><b>Total</b></td>
-                                    <td><b>{{totalKgProcess('EMP') | number :'1.0-0'}}</b></td>
-                                    <td><b>{{totalMetaProcess('EMP') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
-                                    <td><b>{{totalKgDay('EMP') | number :'1.0-0'}}</b></td>
-                                    <td><b>{{totalKgNight('EMP') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
+                                    <tr>
+                                        <td><b>Total</b></td>
+                                        <td><b>{{totalKgProcess('EMP') | number :'1.0-0'}}</b></td>
+                                        <td><b>{{totalMetaProcess('EMP') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                        <td class="textRed">{{totalWaste('EMP') | number}}</td>
+                                        <td class="textRed">{{totalPorcWaste('EMP') | number :'1.0-0'}}%</td>
+                                        <td><b>{{totalKgDay('EMP') | number :'1.0-0'}}</b></td>
+                                        <td><b>{{totalKgNight('EMP') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                    </tr>
                                 </ng-template>
                             </p-table>
                         </div>
@@ -286,87 +450,131 @@
 
                         <!--Perforado-->
                         <div class="p-4 col-md-6" id="">
-                            <h6 class="title-perforado"><b><i class="pi pi-ellipsis-v title-perforado"></i> Perforado</b></h6>
-                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('PERF')">
+                            <h6 class="title-perforado"><b><i class="pi pi-ellipsis-v title-perforado"></i>
+                                    Perforado</b></h6>
+                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-gridlines p-datatable-sm"
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="280px"
+                                [value]="productionMachineProcess('PERF')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;" pSortableColumn="machine">
+                                        <th></th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="3"> Producción</th>
+                                        <th style="font-weight: 800;" class="text-center textRed" colspan="2"> Desperdicio</th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="2">Producción</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;"
+                                            pSortableColumn="machine">
                                             Maq.</th>
                                         <th pSortableColumn="weight" class=""> Kg</th>
                                         <th pSortableColumn="goal" class=""> Meta</th>
-                                        <th pSortableColumn="percentage" class=""> Porcentaje
+                                        <th pSortableColumn="percentage" class=""> %
                                         </th>
+                                        <th pSortableColumn="waste"> Kg</th>
+                                        <th pSortableColumn=""> %</th>
                                         <th pSortableColumn="weightDay" class=""> Día</th>
                                         <th pSortableColumn="weightNight" class=""> Noche</th>
-                                        <th class="text-center" pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
+                                        <th class="text-center" pFrozenColumn [frozen]="true" alignFrozen="right"
+                                            style="z-index: 1;">Ver</th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;"><b>{{data.machine}}</b></td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;">
+                                            <b>{{data.machine}}</b></td>
                                         <td>{{data.weight | number}}</td>
                                         <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
-                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'PERF')"></p-inputNumber>
+                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal"
+                                                        [minFractionDigits]="2" [required]="true"
+                                                        (onKeyDown)="updateGoalForMachine(data, $event, 'PERF')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
                                                 </ng-template>
                                             </p-cellEditor>
-
                                         </td>
                                         <td><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number }}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number }}</td>
-                                        <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
-                                                styleClass="p-button-rounded p-button-help"
-                                                [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
+                                        <td class="textRed" (dblclick)="loadDetailsWaste(data.process, data.machine, data.waste)"
+                                        pTooltip="Doble clic para ver desperdicios" tooltipPosition="top">{{data.waste | number}}</td>
+                                        <td class="textRed">{{porcWaste(data.weight, data.waste) | number :'1.0-0'}}%</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')"
+                                            pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">
+                                            {{data.weightDay | number }}</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')"
+                                            pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">
+                                            {{data.weightNight | number }}</td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">
+                                            <p-button icon="pi pi-search" styleClass="p-button-rounded p-button-help"
+                                                [style]="{width: '30px', height: '30px'}"
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"
+                                                pTooltip="Ver registros de producción maquina N° {{data.machine}}"
+                                                tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td><b>Total</b></td>
-                                    <td><b>{{totalKgProcess('PERF') | number :'1.0-0'}}</b></td>
-                                    <td><b>{{totalMetaProcess('PERF') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
-                                    <td><b>{{totalKgDay('PERF') | number :'1.0-0'}}</b></td>
-                                    <td><b>{{totalKgNight('PERF') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
+                                    <tr>
+                                        <td><b>Total</b></td>
+                                        <td><b>{{totalKgProcess('PERF') | number :'1.0-0'}}</b></td>
+                                        <td><b>{{totalMetaProcess('PERF') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                        <td class="textRed">{{totalWaste('PERF') | number}}</td>
+                                        <td class="textRed">{{totalPorcWaste('PERF') | number :'1.0-0'}}%</td>
+                                        <td><b>{{totalKgDay('PERF') | number :'1.0-0'}}</b></td>
+                                        <td><b>{{totalKgNight('PERF') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                    </tr>
                                 </ng-template>
                             </p-table>
                         </div>
-                    
+
                         <!--Camisilla-->
                         <div class="p-2 col-md-6" id="">
-                            <h6 class="title-camisilla"><b><i class="pi pi-bookmark title-camisilla"></i> Camisilla</b></h6>
-                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="230px" [value]="productionMachineProcess('CAMISILLA')">
+                            <h6 class="title-camisilla"><b><i class="pi pi-bookmark title-camisilla"></i> Camisilla</b>
+                            </h6>
+                            <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-gridlines p-datatable-sm"
+                                responsiveLayout="scroll" [scrollable]="true" scrollHeight="280px"
+                                [value]="productionMachineProcess('CAMISILLA')">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;" pSortableColumn="machine" >
+                                        <th></th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="3"> Producción</th>
+                                        <th style="font-weight: 800;" class="text-center textRed" colspan="2"> Desperdicio</th>
+                                        <th style="font-weight: 800;" class="text-center" colspan="2">Producción</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;"
+                                            pSortableColumn="machine">
                                             Maq.</th>
                                         <th pSortableColumn="weight"> Kg</th>
                                         <th pSortableColumn="goal"> Meta</th>
-                                        <th pSortableColumn="percentage"> Porcentaje
+                                        <th pSortableColumn="percentage"> %
                                         </th>
+                                        <th pSortableColumn="waste"> Kg</th>
+                                        <th pSortableColumn=""> %</th>
                                         <th pSortableColumn="weightDay" class=""> Día</th>
                                         <th pSortableColumn="weightNight" class=""> Noche</th>
-                                        <th pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver</th>
+                                        <th pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">Ver
+                                        </th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-data>
                                     <tr>
-                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;"><b>{{data.machine}}</b></td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;">
+                                            <b>{{data.machine}}</b></td>
                                         <td>{{data.weight | number}}</td>
                                         <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                             <p-cellEditor>
                                                 <ng-template pTemplate="input">
-                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                        [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'CAMISILLA')"></p-inputNumber>
+                                                    <p-inputNumber [(ngModel)]="data.goal" mode="decimal"
+                                                        [minFractionDigits]="2" [required]="true"
+                                                        (onKeyDown)="updateGoalForMachine(data, $event, 'CAMISILLA')"></p-inputNumber>
                                                 </ng-template>
                                                 <ng-template pTemplate="output">
                                                     {{data.goal | number}}
@@ -374,41 +582,67 @@
                                             </p-cellEditor>
                                         </td>
                                         <td><b>{{data.percentage | number}}%</b></td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
-                                        <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
-                                        <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;"><p-button icon="pi pi-search"
-                                                styleClass="p-button-rounded p-button-info"
-                                                [style]="{width: '30px', height: '30px'}" 
-                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
+                                        <td class="cursor textRed" (dblclick)="loadDetailsWaste('SELLA', data.machine, data.waste)"
+                                        pTooltip="Doble clic para ver desperdicios" tooltipPosition="top">{{data.waste | number}}</td>
+                                        <td class="textRed">{{porcWaste(data.weight, data.waste) | number :'1.0-0'}}%</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')"
+                                            pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">
+                                            {{data.weightDay | number}}</td>
+                                        <td class="cursor"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')"
+                                            pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">
+                                            {{data.weightNight | number}}</td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 1;">
+                                            <p-button icon="pi pi-search" styleClass="p-button-rounded p-button-info"
+                                                [style]="{width: '30px', height: '30px'}"
+                                                (click)="getDetailsProductionForMachine(data.processName, data.machine)"
+                                                pTooltip="Ver registros de producción maquina N° {{data.machine}}"
+                                                tooltipPosition="top"></p-button>
                                         </td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="footer">
-                                    <td><b>Total</b></td>
-                                    <td><b>{{totalKgProcess('CAMISILLA') | number :'1.0-0'}}</b></td>
-                                    <td><b>{{totalMetaProcess('CAMISILLA') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
-                                    <td><b>{{totalKgDay('CAMISILLA') | number :'1.0-0'}}</b></td>
-                                    <td><b>{{totalKgNight('CAMISILLA') | number :'1.0-0'}}</b></td>
-                                    <td class=""></td>
+                                    <tr>
+                                        <td><b>Total</b></td>
+                                        <td><b>{{totalKgProcess('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                        <td><b>{{totalMetaProcess('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                        <td class="textRed">{{totalWaste('CAMISILLA') | number}}</td>
+                                        <td class="textRed">{{totalPorcWaste('CAMISILLA') | number :'1.0-0'}}%</td>
+                                        <td><b>{{totalKgDay('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                        <td><b>{{totalKgNight('CAMISILLA') | number :'1.0-0'}}</b></td>
+                                        <td class=""></td>
+                                    </tr>
                                 </ng-template>
                             </p-table>
                         </div>
                     </div>
-                    
+
                     <!--Sellado-->
                     <div class="p-4 col-xl-3 col-lg-3 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="">
                         <h6 class="title-sellado"><b><i class="pi pi-box title-sellado"></i> Sellado</b></h6>
-                        <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-sm"
-                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="600px" [value]="productionMachineProcess('SELLA')">
+                        <p-table #dt2 responsiveLayout="stack" [rowHover]="true" styleClass="p-datatable-gridlines p-datatable-sm"
+                            responsiveLayout="scroll" [scrollable]="true" scrollHeight="700px"
+                            [value]="productionMachineProcess('SELLA')">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;" pSortableColumn="machine">
+                                    <th></th>
+                                    <th style="font-weight: 800;" class="text-center" colspan="3"> Producción</th>
+                                    <th style="font-weight: 800;" class="text-center textRed" colspan="2"> Desperdicio</th>
+                                    <th style="font-weight: 800;" class="text-center" colspan="2">Producción</th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <th pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"
+                                        pSortableColumn="machine">
                                         Maq.</th>
                                     <th pSortableColumn="weight" class=""> Kg</th>
                                     <th pSortableColumn="goal" class=""> Meta</th>
-                                    <th pSortableColumn="percentage" class=""> Porcentaje
+                                    <th pSortableColumn="percentage" class=""> %
                                     </th>
+                                    <th pSortableColumn="waste"> Kg</th>
+                                    <th pSortableColumn=""> %</th>
                                     <th pSortableColumn="weightDay" class=""> Día</th>
                                     <th pSortableColumn="weightNight" class=""> Noche</th>
                                     <th>Ver</th>
@@ -416,13 +650,15 @@
                             </ng-template>
                             <ng-template pTemplate="body" let-data>
                                 <tr>
-                                    <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;"><b>{{data.machine}}</b></td>
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 1;">
+                                        <b>{{data.machine}}</b></td>
                                     <td>{{data.weight | number}}</td>
                                     <td [pEditableColumn]="data.goal" pEditableColumnField="price" class="cursor">
                                         <p-cellEditor>
                                             <ng-template pTemplate="input">
-                                                <p-inputNumber [(ngModel)]="data.goal" mode="decimal" [minFractionDigits]="2"
-                                                    [required]="true" (onKeyDown)="updateGoalForMachine(data, $event, 'SELLA')"></p-inputNumber>
+                                                <p-inputNumber [(ngModel)]="data.goal" mode="decimal"
+                                                    [minFractionDigits]="2" [required]="true"
+                                                    (onKeyDown)="updateGoalForMachine(data, $event, 'SELLA')"></p-inputNumber>
                                             </ng-template>
                                             <ng-template pTemplate="output">
                                                 {{data.goal | number}}
@@ -430,34 +666,111 @@
                                         </p-cellEditor>
                                     </td>
                                     <td><b>{{data.percentage | number}}%</b></td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')" pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">{{data.weightDay | number}}</td>
-                                    <td class="cursor" (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')" pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">{{data.weightNight | number}}</td>
-                                    <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 2;"><p-button icon="pi pi-search"
-                                            styleClass="p-button-rounded p-button-danger"
-                                            [style]="{width: '30px', height: '30px'}" 
-                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)" pTooltip="Ver registros de producción maquina N° {{data.machine}}" tooltipPosition="top"></p-button>
+                                    <td class="cursor textRed" (dblclick)="loadDetailsWaste(data.process, data.machine, data.waste)"
+                                        pTooltip="Doble clic para ver desperdicios" tooltipPosition="top">{{data.waste | number}}</td>
+                                    <td class="textRed">{{porcWaste(data.weight, data.waste) | number :'1.0-0'}}%</td>
+                                    <td class="cursor"
+                                        (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')"
+                                        pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">
+                                        {{data.weightDay | number}}</td>
+                                    <td class="cursor"
+                                        (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')"
+                                        pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">
+                                        {{data.weightNight | number}}</td>
+                                    <td pFrozenColumn [frozen]="true" alignFrozen="right" style="z-index: 2;"><p-button
+                                            icon="pi pi-search" styleClass="p-button-rounded p-button-danger"
+                                            [style]="{width: '30px', height: '30px'}"
+                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)"
+                                            pTooltip="Ver registros de producción maquina N° {{data.machine}}"
+                                            tooltipPosition="top"></p-button>
                                     </td>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="footer">
-                                <td><b>Total</b></td>
-                                <td><b>{{totalKgProcess('SELLA') | number :'1.0-0'}}</b></td>
-                                <td><b>{{totalMetaProcess('SELLA') | number :'1.0-0'}}</b></td>
-                                <td class=""></td>
-                                <td><b>{{totalKgDay('SELLA') | number :'1.0-0'}}</b></td>
-                                <td><b>{{totalKgNight('SELLA') | number :'1.0-0'}}</b></td>
-                                <td class=""></td>
+                                <tr>
+                                    <td><b>Total</b></td>
+                                    <td><b>{{totalKgProcess('SELLA') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalMetaProcess('SELLA') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                    <td class="textRed">{{totalWaste('SELLA') | number :'1.0-0'}}</td>
+                                    <td class="textRed">{{totalPorcWaste('SELLA') | number :'1.0-0'}}%</td>
+                                    <td><b>{{totalKgDay('SELLA') | number :'1.0-0'}}</b></td>
+                                    <td><b>{{totalKgNight('SELLA') | number :'1.0-0'}}</b></td>
+                                    <td class=""></td>
+                                </tr>
                             </ng-template>
                         </p-table>
                     </div>
-                </div>        
-                
+                </div>
+
             </p-card>
         </div>
     </div>
 </div>
 
-<p-dialog header="Reporte de producción" [(visible)]="productionReport" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+<!--Modal de producción -->
+<p-dialog header="Reporte de producción" [(visible)]="productionReport" [modal]="true" [style]="{ width: '80vw' }"
+    [draggable]="false" [resizable]="false">
     <app-Reporte-Produccion></app-Reporte-Produccion>
-</p-dialog>   
+</p-dialog>
 
+<!--Modal de Desperdicios -->
+<p-dialog header="Reporte de Desperdicios" [(visible)]="wasteReport" [modal]="true" [style]="{ width: '95vw' }"
+    [draggable]="false" [resizable]="false">
+    <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+    <div class="table-responsive">
+        <p-table #dt2 [resizableColumns]="true" columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [paginator]="true" [rows]="10"
+            [rowHover]="true" [value]="arrayModal" [showCurrentPageReport]="true"
+            [rowsPerPageOptions]="[5, 10, 15, 20, 100, 200]"
+            currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros" [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th scope="col" class="text-center">#</th>
+                    <th scope="col" class="text-center">OT</th>
+                    <th scope="col" class="text-center">Consec.</th>
+                    <th scope="col" class="text-center">Item</th>
+                    <th scope="col" class="text-center">Referencia</th>
+                    <th scope="col" class="text-center">Material</th>
+                    <th scope="col" class="text-center">Impreso</th>
+                    <th scope="col" class="text-center">Cantidad</th>
+                    <th scope="col" class="text-center">Und</th>
+                    <th scope="col" class="text-center">No Conformidad</th>
+                    <th scope="col" class="text-center">Fecha</th>
+                    <th scope="col" class="text-center">Hora</th>
+                    <th scope="col" class="text-center">Operario</th>
+                    <th scope="col" class="text-center">Proceso</th>
+                    <th scope="col" class="text-center">Maquina</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-arrayModal let-rowIndex="rowIndex">
+                <tr class="font-size-14 centrarTh">
+                    <td class="text-center">{{rowIndex + 1}}</td>
+                    <td class="text-center">{{arrayModal.OT}}</td>
+                    <td class="text-center">{{arrayModal.Observacion}}</td>
+                    <td class="text-center">{{arrayModal.Item}}</td>
+                    <td>{{arrayModal.Referencia}}</td>
+                    <td class="text-center">{{arrayModal.Material}}</td>
+                    <td class="text-center">{{arrayModal.Impreso}}</td>
+                    <td class="text-center">{{arrayModal.Peso | number}}</td>
+                    <td class="text-center">{{arrayModal.Und}}</td>
+                    <td class="text-center">{{arrayModal.No_Conformidad}}</td>
+                    <td class="text-center">{{arrayModal.Fecha}}</td>
+                    <td class="text-center">{{arrayModal.Hora}}</td>
+                    <td class="text-center">{{arrayModal.Operario}}</td>
+                    <td class="text-center">{{arrayModal.Proceso}}</td>
+                    <td class="text-center">{{arrayModal.Maquina}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="7" style="text-align: end">Cantidad total desperdicio</td>
+                    <td class="text-center">{{totalWasteModal() | number : '1.2-2'}} </td>
+                    <td class="text-center">{{"Kg"}}</td>
+                    <td colspan="6"></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</p-dialog>

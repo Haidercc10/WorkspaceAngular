@@ -23,6 +23,8 @@ export class DesperdicioService {
 
   GetDesperdicioOt = (ot : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/GetDesperdicioOt/${ot}`);
 
+  GetDesperdiciosMes = (process : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/GetDesperdiciosMes/${process}`);
+
   getMovimientosDesperdicios = (fecha1 : any, fecha2 : any, ruta : string = ``) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/getMovDesperdicios/${fecha1}/${fecha2}/${ruta}`);
   
   Put = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Desperdicios/${id}`, data);

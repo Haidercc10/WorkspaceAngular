@@ -103,7 +103,7 @@ export class BagproService {
 
   getPayRollCourt = (date1 : any, date2 : any): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getPayRollCourt/${date1}/${date2}`);
 
-  getProductionDay = (date1 : any, date2 : any): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProductionDay/${date1}/${date2}`);
+  getProductionDay = (date1 : any, date2 : any, ot : any, url : string): Observable<any> => this.http.post(`${this.rutaBagPro}/ProcExtrusion/getProductionDay/${date1}/${date2}${url}`, ot);
 
   /********************************************************** CLIENTESOT ****************************************************************/
 
