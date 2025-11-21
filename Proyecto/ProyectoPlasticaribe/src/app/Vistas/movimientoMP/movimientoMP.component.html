@@ -117,6 +117,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Usuario', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Proveedor', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Subcategoria', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Id_MateriaPrima', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Materia_Prima', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Cantidad', 'contains')"></th>
@@ -130,6 +131,7 @@
             <th scope="col">Fecha Registro</th>
             <th scope="col">Registrado Por:</th>
             <th scope="col">Proveedor</th>
+            <th scope="col">Subcategoria</th>
             <th scope="col">Id</th>
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
@@ -145,6 +147,7 @@
             <td>{{data.Fecha | date : 'yyyy-MM-dd'}}</td>
             <td>{{data.Usuario}}</td>
             <td>{{data.Proveedor}}</td>
+            <td>{{data.Subcategoria}}</td>
             <td>{{data.Id_MateriaPrima}}</td>
             <td>{{data.Materia_Prima}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
@@ -155,13 +158,13 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="7" class="text-right">Total Kg de Polietilenos Asignados</td>
+            <td colspan="8" class="text-right">Total Kg de Polietilenos Asignados</td>
             <td colspan="3">{{calcularTotalMaterialPrima(movimientosPolietilenos) | number : '1.0-2'}}</td>
           </tr>
           <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="6"></td>
+            <td colspan="7"></td>
           </tr>
         </ng-template>
       </p-table>
@@ -189,6 +192,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Usuario', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Proveedor', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Subcategoria', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Id_Tinta', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Tinta', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Cantidad', 'contains')"></th>
@@ -202,6 +206,7 @@
             <th scope="col">Fecha Registro</th>
             <th scope="col">Registrado Por:</th>
             <th scope="col">Proveedor</th>
+            <th scope="col">Subcategoria</th>
             <th scope="col">Id</th>
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
@@ -217,6 +222,7 @@
             <td>{{data.Fecha | date : 'yyyy-MM-dd'}}</td>
             <td>{{data.Usuario}}</td>
             <td>{{data.Proveedor}}</td>
+            <td>{{data.Subcategoria}}</td>
             <td>{{data.Id_Tinta}}</td>
             <td>{{data.Tinta}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
@@ -227,13 +233,13 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="7" class="text-right">Total Kg de Tintas Asignadas</td>
+            <td colspan="8" class="text-right">Total Kg de Tintas Asignadas</td>
             <td colspan="3">{{calcularTotalMaterialPrima(movimientosTintas) | number : '1.0-2'}}</td>
           </tr>
           <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="6"></td>
+            <td colspan="7"></td>
           </tr>
         </ng-template>
       </p-table>
@@ -261,6 +267,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Usuario', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Proveedor', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Subcategoria', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Id', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Bopp', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Cantidad', 'contains')"></th>
@@ -274,6 +281,7 @@
             <th scope="col">Fecha Registro</th>
             <th scope="col">Registrado Por:</th>
             <th scope="col">Proveedor</th>
+            <th scope="col">Subcategoria</th>
             <th scope="col">Id</th>
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
@@ -289,6 +297,7 @@
             <td>{{data.Fecha | date : 'yyyy-MM-dd'}}</td>
             <td>{{data.Usuario}}</td>
             <td>{{data.Proveedor}}</td>
+            <td>{{data.Subcategoria}}</td>
             <td>{{data.Id_Bopp}}</td>
             <td>{{data.Bopp}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
@@ -299,13 +308,13 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="7" class="text-right">Total Kg de Biorientados Asignados</td>
+            <td colspan="8" class="text-right">Total Kg de Biorientados Asignados</td>
             <td colspan="3">{{calcularTotalMaterialPrima(movimientosBiorientados) | number : '1.0-2'}}</td>
           </tr>
           <tr>
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
-            <td colspan="6"></td>
+            <td colspan="7"></td>
           </tr>
         </ng-template>
       </p-table>

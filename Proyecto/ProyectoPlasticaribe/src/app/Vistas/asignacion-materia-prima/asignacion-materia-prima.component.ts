@@ -188,6 +188,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   cargarInformacionOT(ot : string, datos_procesos){
     this.detallesAsignacionService.GetPolietilenoAsignada(parseInt(ot)).subscribe(datos_asignacion => {
       this.cantRestante = this.kgOT - datos_asignacion;
+      console.log(this.cantRestante);
+      
       let info : any = {
         ot : ot,
         cliente : datos_procesos.clienteNom,
@@ -290,6 +292,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   asignacionMateriaPrima(){
     let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
     if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
+      console.log(this.calcularMateriaPrimaAsignada());
+      
       if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
       else {
         if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)){

@@ -107,7 +107,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     else if (this.ValidarRol == 82) area = "WIKE";
     else if (this.ValidarRol == 84) area = "RECUP";
     else area = "N/A";
-
+    console.log(area);
     return area;
   }
 
@@ -144,28 +144,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   /** Función que cargará los materiales en el combobox.*/
   cargarMateriales = () => this.servicioMateriales.srvObtenerLista().subscribe(data => this.arrayMateriales = data.filter(x => x.material_Id != 1));
 
-  //! Función que cargará los productos con una consulta de tipo LIKE */
-  likeCargarProductos() {
-    this.arrayProductos = [];
-    let producto: any = this.formFiltros.value.Producto;
-
-    if (producto != null) this.servicioProductos.obtenerItemsLike(producto).subscribe(dataProducto => { this.arrayProductos = dataProducto; });
-  }
-
-  //! Función que cargará el ID del producto en el campo, pero mostrará el nombre */
-  seleccionarProducto() {
-    let expresion: any = /^[0-9]*(\.?)[ 0-9]+$/;
-    this.idProducto = this.formFiltros.value.Producto;
-
-    if (this.idProducto.match(expresion) != null) {
-      let nuevo: any[] = this.arrayProductos.filter((item) => item.prod_Id == this.idProducto);
-      this.formFiltros.patchValue({
-        productoId: nuevo[0].prod_Id,
-        Producto: nuevo[0].prod_Nombre,
-      });
-    } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
-  }
-
   //
   getTurnos = () => this.svTurnos.srvObtenerLista().subscribe(data => this.turnos = data.filter((x: { turno_Id: string; }) => ['DIA', 'NOCHE'].includes(x.turno_Id)));
 
@@ -182,7 +160,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, this.rutaAPI()).subscribe(data => {
       this.svBagpro.getProductionDay(fecha1, fecha2, this.ordersProduction(data), this.validateUrlProduction()).subscribe(prod => {
         this.production = prod;
-        if (![12, 1, 5].includes(this.ValidarRol)) data = data.filter((x) => x.id_Proceso == this.validateArea());
+        //if (![12, 1, 5].includes(this.ValidarRol)) data = data.filter((x) => x.id_Proceso == this.validateArea());
         this.arrayDesperdicios = data;
 
         if (data.length == 0) {

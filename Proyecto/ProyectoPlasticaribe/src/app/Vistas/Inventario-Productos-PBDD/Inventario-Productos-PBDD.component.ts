@@ -117,9 +117,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   fillColumns() {
      this.columns = [
-      { header: 'Item', field: 'item', type: '' },
+      { header: 'Item', field: 'item', type: '', },
       { header: 'Cliente', field: 'client', type: '' },
       { header: 'Referencia', field: 'reference', type: '' },
+      { header: 'Dias en Inventario', field: 'daysOnInv', type: '', },
       { header: 'Existencia', field: 'stock', type: 'number' },
       { header: 'Área', field: 'stockInProcess', type: 'number' },
       { header: 'Exis. Total', field: 'totalStock', type: 'number' },
@@ -131,6 +132,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Cant. Estandar', field: 'qtyStandard', type: 'number' },
       { header: 'Peso Bruto', field: 'weight', type: 'number' },
       { header: 'Unidades Producto', field: 'unityProducts', type: '' },
+      
       /*{ header: 'Mes Actual', field: 'actualMonth', type: 'number' },
       { header: 'Enero', field: 'junuary', type: 'number' },
       { header: 'Febrero', field: 'february', type: 'number' },
@@ -159,8 +161,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.selectedColumnsComparative = [...this.columns];
         //this.selectedColumnsComparative.splice(10, 13);
         //this.selectedColumns.splice(10, 13);
-        this.selectedColumns.splice(4, 1);
-        this.selectedColumns.splice(4, 1);
+        this.selectedColumns.splice(5, 1);
+        this.selectedColumns.splice(5, 1);
       //}
   }
 
@@ -257,6 +259,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           presentation: stock.stock.presentation,
           // subTotal: stock.stock.stockPrice,
           subTotal: (stock.stock.stock * stock.stock.price),
+          daysOnInv : moment().diff(moment(stock.date), 'days'),
           seller: stock.seller,
           cityClient : stock.cityClient, 
           weight : stock.weight, 
@@ -345,6 +348,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           price: stock.stock.price,
           presentation: stock.stock.presentation,
           subTotal: (stock.stock.stock * stock.stock.price),
+          daysOnInv : moment().diff(moment(stock.date), 'days'),
           seller: stock.seller,
           cityClient : stock.cityClient, 
           weight : stock.weight, 

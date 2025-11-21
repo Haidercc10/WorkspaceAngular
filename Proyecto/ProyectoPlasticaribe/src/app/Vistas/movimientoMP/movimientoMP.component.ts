@@ -191,7 +191,8 @@ export class MovimientoMPComponent implements OnInit {
         Presentacion : datos[i].presentacion,
         Precio : datos[i].precio,
         SubTotal : (datos[i].cantidad * datos[i].precio),
-        Proveedor : datos[i].proveedor
+        Proveedor : datos[i].proveedor, 
+        Subcategoria : datos[i].subcategoria
       };
       this.agrupacionMateriasPrimas(datos[i], info);
       count++;
@@ -652,7 +653,7 @@ export class MovimientoMPComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5']; 
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5']; 
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
     
@@ -660,7 +661,7 @@ export class MovimientoMPComponent implements OnInit {
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:J3');
+    ws.mergeCells('A1:K3');
 
     this.loadSizeHeader(ws);
   }
@@ -668,10 +669,10 @@ export class MovimientoMPComponent implements OnInit {
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws : any){
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [2,7,9,10].forEach(x => ws.getColumn(x).width = 10);
+    [2,8,10,11].forEach(x => ws.getColumn(x).width = 10);
     [4,].forEach(x => ws.getColumn(x).width = 15);
-    [8].forEach(x => ws.getColumn(x).width = 50);
-    [3,5,6].forEach(x => ws.getColumn(x).width = 40);
+    [9].forEach(x => ws.getColumn(x).width = 50);
+    [3,5,6,7].forEach(x => ws.getColumn(x).width = 40);
   }
 
  //Función para cargar los nombres de las columnas del header
@@ -683,6 +684,7 @@ export class MovimientoMPComponent implements OnInit {
       'Fecha Registro', 
       'Usuario',
       'Proveedor', 
+      'Subcategoria', 
       'Id',
       'Material',
       'Cantidad', 
@@ -694,10 +696,10 @@ export class MovimientoMPComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws : any, data : any, border : any, alignment : any){
     let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J']; 
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K']; 
     
-    let formatNumber: Array<number> = [9];
-    let formatNumber$: Array<number> = [10];
+    let formatNumber: Array<number> = [10];
+    let formatNumber$: Array<number> = [11];
     formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     formatNumber$.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
     
@@ -724,6 +726,7 @@ export class MovimientoMPComponent implements OnInit {
         x.Fecha.replace('T00:00:00', ''),
         x.Usuario,
         x.Proveedor,
+        x.Subcategoria,
         this.activeTab == `Materias Primas` ? x.Id_MateriaPrima :
         this.activeTab == `Tintas` ? x.Id_Tinta :
         this.activeTab == `Biorientados` ? x.Id_Bopp : null,
