@@ -5,25 +5,49 @@
 </div>
 
 <div class="mb-4">
-    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar variables en maquinas</h3>
+    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i>
+        Buscar variables en maquinas</h3>
 </div>
 
-<div class="row mb-3 g-2">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2 mr-2">
-        <span class="p-float-label" id="rango-fechas">
-            <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range"
-                [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
-            <label for="FechaInicial">Rango de Fechas</label>
-        </span>
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
-        <div class="d-grid gap-2 d-md-flex">
-            <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí."
-                label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar"
-                (click)="mostrarRegistrosHoy()"></button>
+<form [formGroup]="FormFiltros">
+    <!--* Campos-->
+    <div class="mb-3" id="formulario">
+        <div class="row g-3 mb-3 g-2">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2 mr-2">
+                <span class="p-float-label" id="rango-fechas">
+                    <p-calendar formControlName="rank" id="rango" inputId="FechaInicial" selectionMode="range"
+                        [showIcon]="true"
+                        pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
+                    <label for="FechaInicial">Rango de Fechas</label>
+                </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1" id="turno">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="turn" id="turn" [options]="turns" optionLabel="turno_Id"
+                        optionValue="turno_Id"
+                        [autoDisplayFirst]="![1].includes(ValidarRol) ? true : false"></p-dropdown>
+                    <label for="turn">Turno</label>
+                </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="user" id="user" optionValue="user_Id" 
+                        [options]="users" optionLabel="usua_Nombre" [autoDisplayFirst]="![1].includes(ValidarRol) ? true : false"></p-dropdown>
+                    <label for="user">Usuario</label>
+                </span>
+            </div>
+            <!--* Botones-->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
+                <div class="d-grid gap-2 d-md-flex">
+                    <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí."
+                        label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar"
+                        (click)="mostrarRegistrosHoy()"></button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+</form>
 
 <p-table #dtExtrusion *ngIf="!load" dataKey="Id" [value]="registros" [resizableColumns]="true" columnResizeMode="expand"
     styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [scrollable]="true" scrollHeight="50rem"
@@ -34,6 +58,7 @@
                 <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success"
                     (click)="agregarFila()"></button>
             </div>
+
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <button pButton pRipple label="Exportar excel" icon="pi pi-file-excel" class="p-button-success"
@@ -68,6 +93,7 @@
             <th><input pInputText (input)="aplicarfiltro($event, 'Cal4', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Hora', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Usuario', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Observacion', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Moda', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'CalProm', 'contains')"></th>
@@ -76,13 +102,13 @@
         </tr>
         <tr>
             <th colspan="9"></th>
-            <th></th> 
+            <th></th>
             <th colspan="3" class="text-center">Calibres ± 5%</th>
             <th colspan="4" class="text-center">Evaluación física</th>
-            <th></th> 
+            <th></th>
             <th colspan="4" class="text-center">Calibres (Muestra)</th>
-            <th colspan="2">Registro</th> 
-            <th></th> 
+            <th colspan="3">Registro</th>
+            <th></th>
             <th colspan="3" class="text-center">Datos Estadisticos</th>
             <th></th>
         </tr>
@@ -112,29 +138,30 @@
             <th style="min-width : 100px">Cal. 4</th>
             <th style="min-width : 120px">Fecha</th>
             <th style="min-width : 120px">Hora</th>
+            <th style="min-width : 120px">Usuario</th>
             <th style="min-width : 200px">Observacion</th>
-            <th style="min-width : 100px" >Moda</th>
+            <th style="min-width : 100px">Moda</th>
             <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Promedio</th>
             <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Desviación</th>
             <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
-        <tr [pEditableRow]="registro" [ngClass]="{'noEnviados' : !registro.Guardado}" (dblclick)="loadDataMachine(registro.Fecha, registro.Maquina)" class="cursor">
+        <tr [pEditableRow]="registro" [ngClass]="{'noEnviados' : !registro.Guardado}"
+            (dblclick)="loadDataMachine(registro.Fecha, registro.Maquina)" class="cursor">
             <!--OT-->
             <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <div class="p-inputgroup">
                             <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus
-                            [autofocus]="true" 
-                            (onKeyDown)="presionarTab($event, registro, ri)"
-                            (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
+                                [autofocus]="true" (onKeyDown)="presionarTab($event, registro, ri)"
+                                (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                             <span class="p-inputgroup-addon cursor" (click)="consultarOT(registro, ri)">
                                 <i class="pi pi-search"></i>
                             </span>
                         </div>
-                
+
                     </ng-template>
                     <ng-template pTemplate="output">
                         <i *ngIf="!registro.Guardado" class="pi pi-exclamation-circle cursor font-size-16"
@@ -160,8 +187,10 @@
                 <td>
                     <p-cellEditor>
                         <ng-template pTemplate="input">
-                            <p-dropdown [options]="maquinas" appendTo="body" [(ngModel)]="registro.Maquina" [editable]="true" [autoDisplayFirst]="true"
-                                [style]="{'width':'100%'}" (onChange)="validateRoundInput(registro, ri)" (keyup)="validateRoundInput(registro, ri)"></p-dropdown>
+                            <p-dropdown [options]="maquinas" appendTo="body" [(ngModel)]="registro.Maquina"
+                                [editable]="true" [autoDisplayFirst]="true" [style]="{'width':'100%'}"
+                                (onChange)="validateRoundInput(registro, ri)"
+                                (keyup)="validateRoundInput(registro, ri)"></p-dropdown>
                         </ng-template>
                         <ng-template pTemplate="output">
                             <b>{{registro.Maquina}}</b>
@@ -363,8 +392,9 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2"
-                            [(ngModel)]="registro.Cal1" (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)" (keyup)="calculateModa(ri)"></p-inputNumber>
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.Cal1"
+                            (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)"
+                            (keyup)="calculateModa(ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Cal1 | number: '1.2-2'}}
@@ -374,8 +404,9 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2"
-                            [(ngModel)]="registro.Cal2" (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)" (keyup)="calculateModa(ri)"></p-inputNumber>
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.Cal2"
+                            (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)"
+                            (keyup)="calculateModa(ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Cal2 | number: '1.2-2'}}
@@ -385,8 +416,9 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2"
-                            [(ngModel)]="registro.Cal3" (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)" (keyup)="calculateModa(ri)"></p-inputNumber>
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.Cal3"
+                            (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)"
+                            (keyup)="calculateModa(ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Cal3 | number: '1.2-2'}}
@@ -396,8 +428,9 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2"
-                            [(ngModel)]="registro.Cal4" (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)" (keyup)="calculateModa(ri)"></p-inputNumber>
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.Cal4"
+                            (keyup)="calculateAverage(ri)" (keyup)="calculateDesv(ri)"
+                            (keyup)="calculateModa(ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Cal4 | number: '1.2-2'}}
@@ -421,7 +454,17 @@
                         <input pInputText type="text" [(ngModel)]="registro.Hora" [readOnly]="true">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        <b>{{registro.Hora}}</b>
+                        {{registro.Hora}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Usuario" [readOnly]="true">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        <b>{{registro.Usuario}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -465,7 +508,7 @@
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2"
-                            [(ngModel)]="registro.Desviacion" ></p-inputNumber>
+                            [(ngModel)]="registro.Desviacion"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Desviacion | number: '1.2-2'}}
@@ -476,13 +519,14 @@
             <td pFrozenColumn [frozen]="true" alignFrozen="right">
                 <div class="flex align-items-center justify-content-center gap-2">
                     <button *ngIf="!editing" id="edit_{{ri}}" pButton pRipple type="button" pInitEditableRow
-                        icon="pi pi-pencil" (click)="onRowEditInit(registro, ri)"
-                        class="p-button-rounded p-button-text" style="width: 30px; height: 30px;"></button>
+                        icon="pi pi-pencil" (click)="onRowEditInit(registro, ri)" class="p-button-rounded p-button-text"
+                        style="width: 30px; height: 30px;"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
-                        (click)="mostrarEleccion(registro)"
-                        class="p-button-rounded p-button-text p-button-success mr-2" style="width: 30px; height: 30px;"></button>
+                        (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"
+                        style="width: 30px; height: 30px;"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
-                        (click)="onRowEditCancel(ri)" class="p-button-rounded p-button-text p-button-danger" style="width: 30px; height: 30px;"></button>
+                        (click)="onRowEditCancel(ri)" class="p-button-rounded p-button-text p-button-danger"
+                        style="width: 30px; height: 30px;"></button>
                     <button *ngIf="editing && !registro.Guardado" pButton pRipple type="button"
                         pTooltip="Quitar registro" icon="pi pi-trash" (click)="quitarRegistro(ri)"
                         class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;"></button>
@@ -514,7 +558,7 @@
     </ng-template>
 </p-toast>
 
-<p-dialog header="Reporte de producción" [(visible)]="productionReport" [modal]="true" [style]="{ width: '90vw' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Reporte de producción" [(visible)]="productionReport" [modal]="true" [style]="{ width: '90vw' }"
+    [draggable]="false" [resizable]="false">
     <app-Reporte-Produccion></app-Reporte-Produccion>
 </p-dialog>
-

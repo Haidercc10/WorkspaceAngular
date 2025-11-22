@@ -1,5 +1,5 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
@@ -14,6 +14,8 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import * as fs from 'file-saver';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produccion.component';
+import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Injectable({ 
   providedIn: 'root'
@@ -54,7 +56,9 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   rondas : any = [1, 2, 3, 4, 5]; //Variable que va a contener las rondas de los controles de extrusion
   maquinas : any = []; //Variable que guardará las maquinas desde las que se pesó una OT.
   sidesRoll : any = ["A", "B"];
-  turn : any = [];
+  turn : any;
+  turns : any = [];
+  users : any = [];
   productionReport : boolean = false;
   productionMachines : any = [];
   @ViewChild(ReporteProduccionComponent) cmpProduction : ReporteProduccionComponent;
@@ -65,22 +69,54 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
                     private srvPigmentos : PigmentoProductoService, 
                       private srvCcExtrusion : ControlCalidad_ExtrusionService, 
                         private msg : MessageService, 
-                          private svExcel : CreacionExcelService,) { 
+                          private svExcel : CreacionExcelService,
+                            private frm : FormBuilder,
+                              private svTurns : TurnosService, 
+                                private svUsers : UsuarioService) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    this.rangoFechas = [new Date(moment().add(1, 'd').format('YYYY-MM-DD')), new Date(moment().add(1, 'd').format('YYYY-MM-DD'))]
+    //this.rangoFechas = [new Date(moment().add(1, 'd').format('YYYY-MM-DD')), new Date(moment().add(1, 'd').format('YYYY-MM-DD'))]
+
+    this.loadForm();
   }
 
   ngOnInit() {
-    
+    this.loadRankDates();
     this.lecturaStorage(); 
     this.cargarPigmentos();
     setTimeout(() => {
+      this.getTurns();
+      this.getUsers();
       this.mostrarRegistrosHoy();
-    }, 500); 
+    }, 1000); 
     this.getCurrentTurn();
+    
     //this.exportExcel();
     //this.generarFormatoExcel();
   }
+
+  //*Cargar formulario desde que inicia la vista
+  loadForm(){
+    this.FormFiltros = this.frm.group({
+      rank : [new Date(moment().add(1, 'd').format('YYYY-MM-DD')), new Date(moment().add(1, 'd').format('YYYY-MM-DD'))],
+      turn : null,
+      user : null
+    });
+  }
+
+  //* Función para cargar fechas en el rango.
+  loadRankDates(){
+    this.FormFiltros.patchValue({ 'rank' : [new Date(), new Date()] });
+  }
+
+  //* Función para cargar turnos
+  getTurns() {
+    this.svTurns.srvObtenerLista().subscribe(data => {
+      this.turns = data.filter(x => ['DIA', 'NOCHE', ''].includes(x.turno_Id));
+      ![1].includes(this.ValidarRol) ? this.FormFiltros.patchValue({ turn : this.turn == 'RD' ? 'DIA' : 'NOCHE' }) : null;
+    });
+  }
+
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [5].includes(x.rolUsu_Id) && x.estado_Id == 1); });
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -89,6 +125,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  //Obtener turno de bagpro.
   getCurrentTurn() {
     this.srvBagpro.GetHorarioProceso('EXTRUSION').subscribe(turn => { this.turn = turn.toString(); }, error => { this.msjs.mensajeError(`Error`, `Errores encontrados al consultar los turnos.`) });
   }
@@ -100,8 +137,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   mostrarRegistrosHoy() {
     this.registros = [];
     this.load = true;
-    let fechaInicio : any = this.rangoFechas[0] == null || this.rangoFechas[0].length == 0 ? this.today : moment(this.rangoFechas[0]).format('YYYY-MM-DD');
-    let fechaFin : any = this.rangoFechas[1] == null || this.rangoFechas[1].length == 0 ? fechaInicio : moment(this.rangoFechas[1]).format('YYYY-MM-DD');
+    let fechaInicio : any = moment(this.FormFiltros.value.rank[0]).format('YYYY-MM-DD');
+    let fechaFin : any = moment(this.FormFiltros.value.rank[1]).format('YYYY-MM-DD');
     
     this.srvCcExtrusion.Get_TodoHoy(fechaInicio, fechaFin).subscribe(data => {
       if(data.length > 0) data.forEach(res => this.cargarRegistrosCCExtrusion(res));
@@ -110,64 +147,66 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que cargará los registros de las OT a los que se les ha guardado una ronda hoy.
   cargarRegistrosCCExtrusion(datos : any) {
-    let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == datos.pigmento_Id);
+    let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == datos.cce.pigmento_Id);
     let info : any = {
-      'Id' : datos.ccExt_Id,
-      'Ronda' : datos.ccExt_Ronda,
-      'OT' : datos.ccExt_OT,
-      'Maquina' : datos.ccExt_Maquina,
-      'Cliente' : datos.ccExt_Cliente,
-      'Item' : datos.prod_Id,
-      'Referencia' : datos.referencia,
-      'Rollo' : datos.ccExt_Rollo,
+      'Id' : datos.cce.ccExt_Id,
+      'Ronda' : datos.cce.ccExt_Ronda,
+      'OT' : datos.cce.ccExt_OT,
+      'Maquina' : datos.cce.ccExt_Maquina,
+      'Cliente' : datos.cce.ccExt_Cliente,
+      'Item' : datos.cce.prod_Id,
+      'Referencia' : datos.cce.referencia,
+      'Rollo' : datos.cce.ccExt_Rollo,
       'Pigmento' : pigmento[0].pigmt_Nombre,
-      'AnchoTubular' : datos.ccExt_AnchoTubular,
-      'PesoMetro' : datos.ccExt_PesoMetro,
-      'Ancho' : datos.ccExt_Ancho,
-      'CalMin' : datos.ccExt_CalibreMin,
-      'CalMax' : datos.ccExt_CalibreMax,
-      'CalProm' : datos.ccExt_CalibreProm,
-      'Apariencia' : datos.ccExt_Apariencia,
-      'Tratado' : datos.ccExt_Tratado,
-      'Rasgado' : datos.ccExt_Rasgado,
-      'TipoBobina' : datos.ccExt_TipoBobina,
-      'Fecha' : datos.ccExt_Fecha.replace('T00:00:00', ''),
-      'Hora' : datos.ccExt_Hora,
-      'Observacion' : datos.ccExt_Observacion,
-      'CalibreTB' : datos.ccExt_CalibreTB,
+      'AnchoTubular' : datos.cce.ccExt_AnchoTubular,
+      'PesoMetro' : datos.cce.ccExt_PesoMetro,
+      'Ancho' : datos.cce.ccExt_Ancho,
+      'CalMin' : datos.cce.ccExt_CalibreMin,
+      'CalMax' : datos.cce.ccExt_CalibreMax,
+      'CalProm' : datos.cce.ccExt_CalibreProm,
+      'Apariencia' : datos.cce.ccExt_Apariencia,
+      'Tratado' : datos.cce.ccExt_Tratado,
+      'Rasgado' : datos.cce.ccExt_Rasgado,
+      'TipoBobina' : datos.cce.ccExt_TipoBobina,
+      'Fecha' : datos.cce.ccExt_Fecha.replace('T00:00:00', ''),
+      'Hora' : datos.cce.ccExt_Hora,
+      'Observacion' : datos.cce.ccExt_Observacion,
+      'CalibreTB' : datos.cce.ccExt_CalibreTB,
       'Guardado' : true,
       //Nuevos campos
-      'AlDardo' : datos.ccExt_AlDardo,
-      'Geles' : datos.ccExt_Geles,
-      'Quemado' : datos.ccExt_Quemado,
-      'Brillo' : datos.ccExt_Brillo,
-      'Cal1' : datos.ccExt_Calibre1,
-      'Cal2' : datos.ccExt_Calibre2,
-      'Cal3' : datos.ccExt_Calibre3,
-      'Cal4' : datos.ccExt_Calibre4,
-      'Cal5' : datos.ccExt_Calibre5,
-      'Cal6' : datos.ccExt_Calibre6,
-      'Cal7' : datos.ccExt_Calibre7,
-      'Cal8' : datos.ccExt_Calibre8,
-      'Cal9' : datos.ccExt_Calibre9,
-      'Cal10' : datos.ccExt_Calibre10,
-      'Cal11' : datos.ccExt_Calibre11,
-      'Cal12' : datos.ccExt_Calibre12,
-      'Cal13' : datos.ccExt_Calibre13,
-      'Cal14' : datos.ccExt_Calibre14,
-      'Cal15' : datos.ccExt_Calibre15,
-      'Cal16' : datos.ccExt_Calibre16,
-      'Desviacion' : datos.ccExt_Desviacion,
-      'Moda' : datos.ccExt_Moda,
+      'AlDardo' : datos.cce.ccExt_AlDardo,
+      'Geles' : datos.cce.ccExt_Geles,
+      'Quemado' : datos.cce.ccExt_Quemado,
+      'Brillo' : datos.cce.ccExt_Brillo,
+      'Cal1' : datos.cce.ccExt_Calibre1,
+      'Cal2' : datos.cce.ccExt_Calibre2,
+      'Cal3' : datos.cce.ccExt_Calibre3,
+      'Cal4' : datos.cce.ccExt_Calibre4,
+      'Cal5' : datos.cce.ccExt_Calibre5,
+      'Cal6' : datos.cce.ccExt_Calibre6,
+      'Cal7' : datos.cce.ccExt_Calibre7,
+      'Cal8' : datos.cce.ccExt_Calibre8,
+      'Cal9' : datos.cce.ccExt_Calibre9,
+      'Cal10' : datos.cce.ccExt_Calibre10,
+      'Cal11' : datos.cce.ccExt_Calibre11,
+      'Cal12' : datos.cce.ccExt_Calibre12,
+      'Cal13' : datos.cce.ccExt_Calibre13,
+      'Cal14' : datos.cce.ccExt_Calibre14,
+      'Cal15' : datos.cce.ccExt_Calibre15,
+      'Cal16' : datos.cce.ccExt_Calibre16,
+      'Desviacion' : datos.cce.ccExt_Desviacion,
+      'Moda' : datos.cce.ccExt_Moda,
+      'Usuario' : datos.u.usua_Nombre,
     }
     this.registros.push(info);
-    this.registros.sort((a, b) => a.Ronda - b.Ronda);
-    this.registros.sort((a, b) => a.OT - b.OT);
+    //this.registros.sort((a, b) => a.Ronda - b.Ronda);
     this.registros.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
+    this.registros.sort((a, b) => a.hora - b.hora);
   }
 
   //Función que va a consultar la información de la OT a la que desea agregar una ronda.
   consultarOT(datos : any, indexTabla : number){
+    this.getCurrentTurn();
     this.maquinas =[];
     this.load = true;
     this.ronda = 0;
@@ -305,6 +344,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       'Cal4' : data.calibre,
       'Moda' : data.calibre,
       'Desviacion': 0, 
+      'Usuario' : this.storage_Nombre,
       'Guardado' : false,
     }
     this.registros[indexTabla] = info;
@@ -514,7 +554,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   // Funcion que va a darle el estilo a cada celda del encabezado de la tabla
   headersExcel(worksheet : any) {
-    const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
+    const header1 = ["FECHA", `${''}`, "", "TURNO", `${''}`, "NOMBRE INSPECTOR", `${''}`]
     const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "CAL. MIN", "CAL. MAX", "CAL. PROM", "APARIENCIA", "TRATADO", "RASGADO", "TIPO BOBINA", "CALIBRE"]
     let titleRow = worksheet.addRow([]);    
     
