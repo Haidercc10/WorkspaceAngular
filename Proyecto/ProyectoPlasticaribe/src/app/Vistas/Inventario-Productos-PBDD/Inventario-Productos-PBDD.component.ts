@@ -12,7 +12,7 @@ import { MessageService } from 'primeng/api';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
 
 @Injectable({
-  providedIn : 'root'
+  providedIn: 'root'
 })
 
 @Component({
@@ -53,70 +53,70 @@ export class InventarioProductosPBDDComponent implements OnInit {
   stockDelivered_NoAvaible: Array<StockInformation> = [];
   @ViewChild('tableRollsEmpaque') tableRollsEmpaque: Table | undefined;
   @ViewChild('tableRollsSellado') tableRollsSellado: Table | undefined;
-  rollsAvailablesSellado : Array<any> = [];
-  rollsAvailablesEmpaque : Array<any> = [];
-  totalEmpaque : number = 0;
-  totalSellado : number = 0;
-  totalQtyEmpaque : number = 0; 
-  totalQtySellado : number = 0; 
-  loading : boolean = false;
-  indexTab : number = 0;
-  stateOptions: any[] = [{ value: 'off', icon : 'pi pi-table', title : 'Contraer filas'}, { value: 'on', icon : 'pi pi-list', title: 'Desplegar filas'}];
-  value : string = 'off';
-  itemSelected : any = {};
-  @ViewChild('tableDetails1') tableDetails1 : Table | undefined;
-  @ViewChild('tableExpInvEmpaque') tableExpInvEmpaque : Table | undefined;
-  @ViewChild('tableExpInvSellado') tableExpInvSellado : Table | undefined;
-  tabStockEmpaque : boolean = false;
-  tabStockSellado : boolean = false;
-  tabStockExtrusion : boolean = false;
-  tabStockKg : boolean = false;
-  tabStockBulto : boolean = false;
-  tabStockComparative : boolean = false;
-  loaded : boolean = true;
-  @ViewChild('tableQuality') tableQuality : Table | undefined;
+  rollsAvailablesSellado: Array<any> = [];
+  rollsAvailablesEmpaque: Array<any> = [];
+  totalEmpaque: number = 0;
+  totalSellado: number = 0;
+  totalQtyEmpaque: number = 0;
+  totalQtySellado: number = 0;
+  loading: boolean = false;
+  indexTab: number = 0;
+  stateOptions: any[] = [{ value: 'off', icon: 'pi pi-table', title: 'Contraer filas' }, { value: 'on', icon: 'pi pi-list', title: 'Desplegar filas' }];
+  value: string = 'off';
+  itemSelected: any = {};
+  @ViewChild('tableDetails1') tableDetails1: Table | undefined;
+  @ViewChild('tableExpInvEmpaque') tableExpInvEmpaque: Table | undefined;
+  @ViewChild('tableExpInvSellado') tableExpInvSellado: Table | undefined;
+  tabStockEmpaque: boolean = false;
+  tabStockSellado: boolean = false;
+  tabStockExtrusion: boolean = false;
+  tabStockKg: boolean = false;
+  tabStockBulto: boolean = false;
+  tabStockComparative: boolean = false;
+  loaded: boolean = true;
+  @ViewChild('tableQuality') tableQuality: Table | undefined;
   stockQuality: Array<StockInformation> = [];
-  @ViewChild('tableRepacking') tableRepacking : Table | undefined;
+  @ViewChild('tableRepacking') tableRepacking: Table | undefined;
   stockRepacking: Array<StockInformation> = [];
-  totalRepack : number = 0;
-  totalQuality : number = 0;
-  totalQtyRepack : number = 0; 
-  totalQtyQuality : number = 0; 
-  traceability : boolean = false;
-  selectedRoll : any = null;
-  @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
+  totalRepack: number = 0;
+  totalQuality: number = 0;
+  totalQtyRepack: number = 0;
+  totalQtyQuality: number = 0;
+  traceability: boolean = false;
+  selectedRoll: any = null;
+  @ViewChild(Movimientos_RollosComponent) cmpMovRolls: Movimientos_RollosComponent;
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
     private stockService: ExistenciasProductosService,
     private createExcelService: CreacionExcelService,
-    private svProductionProcess : Produccion_ProcesosService, 
-    private svInvZeus : InventarioZeusService,
-    private svMsg : MessageService,
+    private svProductionProcess: Produccion_ProcesosService,
+    private svInvZeus: InventarioZeusService,
+    private svMsg: MessageService,
   ) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    if([86,4].includes(this.ValidarRol)) {
+    if ([86, 4].includes(this.ValidarRol)) {
       this.loadRollsProductionAvailable();
-    } 
+    }
     this.loadRollsQuality();
-    this.loadRollsForRepack();   
+    this.loadRollsForRepack();
     //this.getStockInformation();
     //this.loadRollsProductionAvailable();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.storage_Nombre = this.appComponent.storage_Nombre;
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
   fillColumns() {
-     this.columns = [
+    this.columns = [
       { header: 'Item', field: 'item', type: '', },
       { header: 'Cliente', field: 'client', type: '' },
       { header: 'Referencia', field: 'reference', type: '' },
@@ -132,7 +132,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Cant. Estandar', field: 'qtyStandard', type: 'number' },
       { header: 'Peso Bruto', field: 'weight', type: 'number' },
       { header: 'Unidades Producto', field: 'unityProducts', type: '' },
-      
+
       /*{ header: 'Mes Actual', field: 'actualMonth', type: 'number' },
       { header: 'Enero', field: 'junuary', type: 'number' },
       { header: 'Febrero', field: 'february', type: 'number' },
@@ -147,46 +147,46 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Noviembre', field: 'november', type: 'number' },
       { header: 'Diciembre', field: 'december', type: 'number' },*/
     ];
-      /*if([86,4].includes(this.ValidarRol)) {
-        let cols : any = [];
-        cols.push(this.columns[4], this.columns[5]);
-        [4,5,6,8].forEach(x => this.columns.splice(x, 1));
-        this.columns.splice(8, 12);
-        this.columns.splice(4, 1);
-        this.selectedColumns = [...this.columns];
-        this.selectedColumnsComparative = [...this.columns];
-        this.selectedColumnsComparative.splice(4, 0, cols[0], cols[1]);
-      } else {*/
-        this.selectedColumns = [...this.columns];
-        this.selectedColumnsComparative = [...this.columns];
-        //this.selectedColumnsComparative.splice(10, 13);
-        //this.selectedColumns.splice(10, 13);
-        this.selectedColumns.splice(5, 1);
-        this.selectedColumns.splice(5, 1);
-      //}
+    /*if([86,4].includes(this.ValidarRol)) {
+      let cols : any = [];
+      cols.push(this.columns[4], this.columns[5]);
+      [4,5,6,8].forEach(x => this.columns.splice(x, 1));
+      this.columns.splice(8, 12);
+      this.columns.splice(4, 1);
+      this.selectedColumns = [...this.columns];
+      this.selectedColumnsComparative = [...this.columns];
+      this.selectedColumnsComparative.splice(4, 0, cols[0], cols[1]);
+    } else {*/
+    this.selectedColumns = [...this.columns];
+    this.selectedColumnsComparative = [...this.columns];
+    //this.selectedColumnsComparative.splice(10, 13);
+    //this.selectedColumns.splice(10, 13);
+    this.selectedColumns.splice(5, 1);
+    this.selectedColumns.splice(5, 1);
+    //}
   }
 
   getStockInformation() {
     //if(!this.despacho) {
-      this.load = true;
-      //this.despacho = true;
-      this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
-        //this.getStockProcess();
-        //this.getStockDeliveredNotAvaible();
-        this.fillColumns();
-        this.stockInformation = this.fillStockInformation(data);
-        this.fillComparativeStock(data, true);
-        //this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
-        //this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
-        //this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
-        //this.loadRollsProductionAvailable();
-        this.load = false; 
-      });
+    this.load = true;
+    //this.despacho = true;
+    this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
+      //this.getStockProcess();
+      //this.getStockDeliveredNotAvaible();
+      this.fillColumns();
+      this.stockInformation = this.fillStockInformation(data);
+      this.fillComparativeStock(data, true);
+      //this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
+      //this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
+      //this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
+      //this.loadRollsProductionAvailable();
+      this.load = false;
+    });
     //}
   }
 
-  getStockProcessSellado(){
-    if(!this.tabStockSellado) {
+  getStockProcessSellado() {
+    if (!this.tabStockSellado) {
       this.loading = true
       this.stockService.GetStockProducts_Process('SELLA').subscribe(data => {
         this.tabStockSellado = true;
@@ -194,11 +194,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.fillComparativeStock(data, false);
         this.loading = false;
       });
-    }  
+    }
   }
 
-  getStockProcessExtrusion(){
-    if(!this.tabStockExtrusion) {
+  getStockProcessExtrusion() {
+    if (!this.tabStockExtrusion) {
       this.loading = true
       this.stockService.GetStockProducts_Process('EXT').subscribe(data => {
         this.tabStockExtrusion = true;
@@ -206,11 +206,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.fillComparativeStock(data, false);
         this.loading = false;
       });
-    }  
+    }
   }
 
-  getStockProcessEmpaque(){
-    if(!this.tabStockEmpaque) {
+  getStockProcessEmpaque() {
+    if (!this.tabStockEmpaque) {
       this.loading = true
       this.stockService.GetStockProducts_Process('EMP').subscribe(data => {
         this.tabStockEmpaque = true;
@@ -222,7 +222,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   getStockInformationKg() {
-    if(!this.tabStockKg) {
+    if (!this.tabStockKg) {
       this.loading = true
       this.tabStockKg = true;
       this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
@@ -231,12 +231,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   getStockInformationBulto() {
-    if(!this.tabStockBulto) {
+    if (!this.tabStockBulto) {
       this.loading = true;
       this.tabStockBulto = true;
       this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
       this.loading = false;
-    }  
+    }
   }
 
   getStockDeliveredNotAvaible() {
@@ -246,7 +246,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     });
   }
 
-  fillStockInformation(data: any, process? : string): Array<StockInformation> {
+  fillStockInformation(data: any, process?: string): Array<StockInformation> {
     let stockInformation: Array<StockInformation> = [];
     data.forEach(stock => {
       if (!stockInformation.map(x => x.item).includes(stock.product.item)) {
@@ -259,12 +259,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
           presentation: stock.stock.presentation,
           // subTotal: stock.stock.stockPrice,
           subTotal: (stock.stock.stock * stock.stock.price),
-          daysOnInv : moment().diff(moment(stock.date), 'days'),
+          daysOnInv: moment().diff(moment(stock.date), 'days'),
           seller: stock.seller,
-          cityClient : stock.cityClient, 
-          weight : stock.weight, 
-          qtyStandard : stock.qtyStandard,
-          unityProducts : stock.count,
+          cityClient: stock.cityClient,
+          weight: stock.weight,
+          qtyStandard: stock.qtyStandard,
+          unityProducts: stock.count,
           AvaibleProdution: [], // this.fillAvaibleProduction(stock.avaible_Production),
           /*actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
           junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
@@ -279,7 +279,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           october: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].octubre,
           november: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].noviembre,
           december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,*/
-          process : process,
+          process: process,
         });
       }
     });
@@ -302,15 +302,15 @@ export class InventarioProductosPBDDComponent implements OnInit {
         Turn: stock.turn.turno_Nombre,
         Information: stock.information,
         orderProduction: stock.orderProduction,
-        client : stock.client,
+        client: stock.client,
       });
     });
     return AvaibleProdution;
   }
 
-  groupInfoAvailableByOt(data){
-    let info : any = this.fillAvaibleProduction(data).reduce((a,b) => {
-      if(!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+  groupInfoAvailableByOt(data) {
+    let info: any = this.fillAvaibleProduction(data).reduce((a, b) => {
+      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
       return a;
     }, [])
     return info;
@@ -348,12 +348,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
           price: stock.stock.price,
           presentation: stock.stock.presentation,
           subTotal: (stock.stock.stock * stock.stock.price),
-          daysOnInv : moment().diff(moment(stock.date), 'days'),
+          daysOnInv: moment().diff(moment(stock.date), 'days'),
           seller: stock.seller,
-          cityClient : stock.cityClient, 
-          weight : stock.weight, 
-          qtyStandard : stock.qtyStandard,
-          unityProducts : stock.count,
+          cityClient: stock.cityClient,
+          weight: stock.weight,
+          qtyStandard: stock.qtyStandard,
+          unityProducts: stock.count,
           AvaibleProdution: [], //this.fillAvaibleProduction(stock.avaible_Production),
           /*actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
           junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
@@ -398,37 +398,37 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función para cargar los rollos que se cargarán en cuanto se seleccione una fila 
-  loadInfoRollsAvailables(data : any){
-    this.loaded = true; 
+  loadInfoRollsAvailables(data: any) {
+    this.loaded = true;
     this.svProductionProcess.getRollsAvailablesForItem(data.item).subscribe(dataRolls => {
-      let index : number = this.stockInformation.findIndex(x => x.item == data.item);
+      let index: number = this.stockInformation.findIndex(x => x.item == data.item);
       this.stockInformation[index].AvaibleProdution = this.fillAvaibleProduction(dataRolls);
       this.loaded = false;
     }, error => { this.msjs(`Error`, `No se pudo obtener información del item N° ${data.item} en despacho.`); });
   }
 
   //Función para cargar los rollos que se cargarán en cuanto se seleccione el icono  
-  loadInfoRollsInAreaSellado(data : any){
+  loadInfoRollsInAreaSellado(data: any) {
     this.loading = true;
-    let index : number = this.stockSellado.findIndex(x => x.item == data.item);
+    let index: number = this.stockSellado.findIndex(x => x.item == data.item);
     this.svProductionProcess.getRollsInAreaForItem(data.item, data.process).subscribe(data => {
       this.stockSellado[index].AvaibleProdution = this.fillAvaibleProduction(data);
       this.loading = false;
-    }, error => { this.msg.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en Sellado.`);});
+    }, error => { this.msg.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en Sellado.`); });
   }
 
-  loadInfoRollsInAreaEmpaque(data : any){
+  loadInfoRollsInAreaEmpaque(data: any) {
     this.loading = true;
-    let index : number = this.stockEmpaque.findIndex(x => x.item == data.item);
+    let index: number = this.stockEmpaque.findIndex(x => x.item == data.item);
     this.svProductionProcess.getRollsInAreaForItem(data.item, data.process).subscribe(data => {
       this.stockEmpaque[index].AvaibleProdution = this.fillAvaibleProduction(data);
       this.loading = false;
     }, error => { this.msg.mensajeAdvertencia(`Error`, `No se pudo obtener información del item N° ${data.item} en Empaque.`); });
   }
 
-  loadInfoRollsInAreaExtrusion(data : any){
+  loadInfoRollsInAreaExtrusion(data: any) {
     this.loading = true;
-    let index : number = this.stockExtrusion.findIndex(x => x.item == data.item);
+    let index: number = this.stockExtrusion.findIndex(x => x.item == data.item);
     this.svProductionProcess.getRollsInAreaForItem(data.item, data.process).subscribe(data => {
       this.stockExtrusion[index].AvaibleProdution = this.fillAvaibleProduction(data);
       this.loading = false;
@@ -436,7 +436,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función para cargar los rollos que se cargarán en cuanto se seleccione una fila 
-  loadInfoRollsPreDelivered(data : any){
+  loadInfoRollsPreDelivered(data: any) {
     this.svProductionProcess.getRollsPreDeliveredForItem(data.item).subscribe(data => {
       this.fillAvaibleProduction(data);
     }, error => {
@@ -444,66 +444,66 @@ export class InventarioProductosPBDDComponent implements OnInit {
     })
   }
 
-  loadInfoComparative(data){
+  loadInfoComparative(data) {
     console.log(data);
     this.loaded = true;
     this.svProductionProcess.getRollsAvailables(data.item).subscribe(dataStock => {
-      let index : number = this.comparativeStock.findIndex(x => x.item == data.item);
+      let index: number = this.comparativeStock.findIndex(x => x.item == data.item);
       this.comparativeStock[index].AvaibleProdution = dataStock;
       this.loaded = false;
     }, error => { this.msjs(`Error`, `No se pudo obtener información del item N° ${data.item}.`); });
-    
+
   }
 
   //DES-USO
   //Función que mostrará un msj de confirmación para eliminación de items en la OF.
-  seeMsjEditItem(data : any, roll? : any){
+  seeMsjEditItem(data: any, roll?: any) {
     this.load = true;
     this.itemSelected = {};
     this.itemSelected = data;
     roll ? this.itemSelected.numberProduction = roll : null;
-    let msg : string = ``;
-    
+    let msg: string = ``;
+
     roll ? msg = `¿Está seguro que desea colocar el bulto N° ${roll} como 'NO DISPONIBLE'?` : msg = `¿Esta seguro que desea colocar todos los bultos del item '${data.item} - ${data.reference}' como 'NO DISPONIBLE'?`
-    setTimeout(() => { this.svMsg.add({ severity:'warn', key:'item', summary: `Elección`, detail : msg,  sticky: true}); }, 200);
+    setTimeout(() => { this.svMsg.add({ severity: 'warn', key: 'item', summary: `Elección`, detail: msg, sticky: true }); }, 200);
   }
 
   //Función que creará un ajuste negativo en Zeus del item que se desea colocar como 'no disponible' en Plasticaribe. 
-  sendAdjustmentZeus(data : any) {
+  sendAdjustmentZeus(data: any) {
     if (data != null) {
-      this.onReject ('item');
+      this.onReject('item');
       this.load = true;
-      let unit : string = data.presentation == 'Kg' ? 'KLS' : data.presentation == 'Und' ? 'UND' : 'PAQ';
-      let qty : number = data.AvaibleProdution.reduce((a, b) => unit == 'KLS' ? a += b.Weight : a += b.Quantity, 0);
-      let item : string = data.item; 
-      let price : string = data.price;
-      let detail : string = `Ajuste desde App Plasticaribe del Item ${item} con cantidad de ${(-(qty))} ${unit}`;
-      
+      let unit: string = data.presentation == 'Kg' ? 'KLS' : data.presentation == 'Und' ? 'UND' : 'PAQ';
+      let qty: number = data.AvaibleProdution.reduce((a, b) => unit == 'KLS' ? a += b.Weight : a += b.Quantity, 0);
+      let item: string = data.item;
+      let price: string = data.price;
+      let detail: string = `Ajuste desde App Plasticaribe del Item ${item} con cantidad de ${(-(qty))} ${unit}`;
+
       this.svInvZeus.getExistenciasProductos(data.item, unit).subscribe(dataExis => {
-        if(dataExis.length == 0 || (dataExis[0].existencias < qty)) {
-          let qtyZeus : number = dataExis.length == 0 ? 0 : dataExis[0].existencias;
-          let message : string = `La cantidad del item a ajustar en Plasticaribe "${qty.toLocaleString()} ${unit}" es mayor al stock de Zeus "${qtyZeus.toLocaleString()} ${unit}"`
+        if (dataExis.length == 0 || (dataExis[0].existencias < qty)) {
+          let qtyZeus: number = dataExis.length == 0 ? 0 : dataExis[0].existencias;
+          let message: string = `La cantidad del item a ajustar en Plasticaribe "${qty.toLocaleString()} ${unit}" es mayor al stock de Zeus "${qtyZeus.toLocaleString()} ${unit}"`
           this.msjs(`Advertencia`, message);
         } else {
           this.svProductionProcess.sendProductionToZeus(detail, item, unit, 0, (-(qty)).toString(), price).subscribe(dataAdjusment => {
             this.setItemNotAvailable(data, false);
           }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus!`); })
-        }  
+        }
       }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste a Zeus!`); });
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un item!`);
   }
 
   //Función que actualizará el estado de los rollos de un item a no disponible
-  setItemNotAvailable(data : any, soloPlasticaribe : boolean){
+  setItemNotAvailable(data: any, soloPlasticaribe: boolean) {
     soloPlasticaribe ? this.load = true : null;
-    this.onReject ('item');
+    this.onReject('item');
 
-    if(this.itemSelected.numberProduction) this.setRollNotAvailable(data);
+    if (this.itemSelected.numberProduction) this.setRollNotAvailable(data);
     else {
-      let index : number = this.stockInformation.findIndex(x => x.item == data.item);
-      let rollsAvailables : any = [];
-      data.AvaibleProdution.forEach(x => rollsAvailables.push({'roll': x.NumberProduction, 'item' : data.item,}) );
-      
+      let index: number = this.stockInformation.findIndex(x => x.item == data.item);
+      let rollsAvailables: any = [];
+      data.AvaibleProdution.forEach(x => rollsAvailables.push({ 'roll': x.NumberProduction, 'item': data.item, }));
+
       this.svProductionProcess.putChangeStateProduction(rollsAvailables).subscribe(data => {
         this.stockInformation.splice(index, 1);
         this.msjs(`Confirmación`, `Se ha actualizado el stock de la referencia ${data.item - data.reference}`);
@@ -511,37 +511,37 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }
   }
 
-   //Función que actualizará el estado de los rollos a no disponible
-  setRollNotAvailable(data : any){
-    let indexItem : number = this.stockInformation.findIndex(x => x.item == data.item);
-    let indexRoll : number = this.stockInformation[indexItem].AvaibleProdution.findIndex(x => x.NumberProduction == this.itemSelected.numberProduction)
-    let roll : any = this.itemSelected.numberProduction;
-    
-    this.svProductionProcess.putChangeStateProduction([{'roll': roll, 'item' : data.item, }]).subscribe(dataChange => {
+  //Función que actualizará el estado de los rollos a no disponible
+  setRollNotAvailable(data: any) {
+    let indexItem: number = this.stockInformation.findIndex(x => x.item == data.item);
+    let indexRoll: number = this.stockInformation[indexItem].AvaibleProdution.findIndex(x => x.NumberProduction == this.itemSelected.numberProduction)
+    let roll: any = this.itemSelected.numberProduction;
+
+    this.svProductionProcess.putChangeStateProduction([{ 'roll': roll, 'item': data.item, }]).subscribe(dataChange => {
       this.stockInformation[indexItem].AvaibleProdution.splice(indexRoll, 1);
       this.msjs(`Confirmación`, `El bulto N°${roll} ya NO ESTÁ DISPONIBLE en inventario!`);
     });
   }
 
   //Función que quitará el msj de elección
-  onReject(key : any) {
+  onReject(key: any) {
     this.load = false;
     this.svMsg.clear(key);
   }
 
   //Acortar msjs de confirmación, error y adavertencia
-  msjs(msj1 : string, msj2 : string) {
+  msjs(msj1: string, msj2: string) {
     this.load = false;
     this.loading = false;
     switch (msj1) {
-      case 'Confirmación' :
+      case 'Confirmación':
         return this.msg.mensajeConfirmacion(msj1, msj2);
-      case 'Advertencia' : 
+      case 'Advertencia':
         return this.msg.mensajeAdvertencia(msj1, msj2);
-      case 'Error' : 
+      case 'Error':
         return this.msg.mensajeError(msj1, msj2);
-      default :
-        return this.msg.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`); 
+      default:
+        return this.msg.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`);
     }
   }
 
@@ -552,7 +552,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
         let font: any = { name: 'Calibri', family: 4, size: 11, bold: true };
         let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         let workbook = this.createExcelService.formatoExcel(title, true);
-      
+
         this.addPageExcel(workbook, font, border, dataDocument);
         //this.createExcelService.creacionHoja(workbook, `Inventario Despacho Rollo a Rollo`, true);
         //this.addSheetExcel2(workbook, font, border, dataDocument);
@@ -564,13 +564,13 @@ export class InventarioProductosPBDDComponent implements OnInit {
   addPageExcel(workbook, font, border, dataDocument: Array<StockInformation>) {
     let pageOne = workbook.worksheets[0];
     this.addHeaderPageOne(pageOne, font, border);
-    pageOne.mergeCells('A1:L3');
+    pageOne.mergeCells('A1:M3');
     pageOne.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
     this.addDataExcel(pageOne, dataDocument);
   }
 
   addHeaderPageOne(worksheet, font, border) {
-    const header = ["Item", "Cliente", "Ciudad", "Referencia", "Existencias", "Cant. Estandar", "Presentación", "Unidades Producto", "Peso Bruto Total", "Precio", "Subtotal", "Vendedor", /*"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"*/];
+    const header = ["Item", "Cliente", "Ciudad", "Referencia", "Días en Inventario", "Existencias", "Cant. Estandar", "Presentación", "Unidades Producto", "Peso Bruto Total", "Precio", "Subtotal", "Vendedor", /*"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"*/];
     let headerRow = worksheet.addRow(header);
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
@@ -583,7 +583,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     let dataStock = this.fillDataExcel(dataDocument);
     dataStock.forEach(d => {
       let row = worksheet.addRow(d);
-      let formatNumber: number[] = [5, 6, 9, 10, 11];
+      let formatNumber: number[] = [6, 7, 10, 11, 12];
       formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     });
     this.changeSizeColumnsExcel(worksheet);
@@ -595,13 +595,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
       dataStock.push([
         stock.item,
         stock.client,
-        stock.cityClient, 
+        stock.cityClient,
         stock.reference,
+        stock.daysOnInv,
         stock.stock,
         stock.qtyStandard,
         stock.presentation,
         stock.unityProducts,
-        stock.weight, 
+        stock.weight,
         stock.price,
         stock.subTotal,
         stock.seller,
@@ -623,9 +624,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   changeSizeColumnsExcel(worksheet) {
-    let size55: number[] = [2, 4, 12];
-    let size20: number[] = [3, 8];
-    let size15: number[] = [1, 6, 5, 7, 9, 10, 11];
+    let size55: number[] = [2, 4, 13];
+    let size20: number[] = [3, 5, 8];
+    let size15: number[] = [1, 6, 7, 9, 10, 11, 12];
     size55.forEach(e => worksheet.getColumn(e).width = 55);
     size20.forEach(e => worksheet.getColumn(e).width = 20);
     size15.forEach(e => worksheet.getColumn(e).width = 15);
@@ -664,9 +665,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   changeSizeColumnsSheet2Excel(worksheet) {
-    let size10: number[] = [1,2,3,8];
-    let size45: number[] = [4,5,10];
-    let size15: number[] = [6,7,9];
+    let size10: number[] = [1, 2, 3, 8];
+    let size45: number[] = [4, 5, 10];
+    let size15: number[] = [6, 7, 9];
     let size20: number[] = [11];
     size45.forEach(e => worksheet.getColumn(e).width = 45);
     size15.forEach(e => worksheet.getColumn(e).width = 15);
@@ -699,19 +700,19 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función que se encarga de filtrar la información de la tabla
-  applyFilter($event, campo : any, datos : Table) {
+  applyFilter($event, campo: any, datos: Table) {
     datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
     this.calculateTotalEmpaque();
     this.calculateTotalSellado();
     this.calculateTotalQuality();
     this.calculateTotalRepack();
-  } 
+  }
 
   //Función que se encarga de mantener expandida la información de la tabla.
-  changeTab(e : any) {
+  changeTab(e: any) {
     this.indexTab = e.index;
-    if([86,4].includes(this.ValidarRol)) {
-      if(this.indexTab == 1) {
+    if ([86, 4].includes(this.ValidarRol)) {
+      if (this.indexTab == 1) {
         //this.getStockProcess();
         this.getStockProcessEmpaque();
         this.getStockProcessSellado();
@@ -727,16 +728,16 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.indexTab == 6 ? this.getStockInformationKg() : null;
       this.indexTab == 7 ? this.getStockInformationBulto() : null;
 
-      if(this.indexTab == 3) {
+      if (this.indexTab == 3) {
         this.getStockProcessEmpaque();
         this.deployRows();
       } else null;
-      if(this.indexTab == 4) {
+      if (this.indexTab == 4) {
         this.getStockProcessSellado();
         this.deployRows();
       } else null;
 
-      if(this.indexTab == 8) {
+      if (this.indexTab == 8) {
         this.getStockProcessEmpaque();
         this.getStockProcessSellado();
         this.deployRows();
@@ -745,25 +746,25 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Cargar producción disponible en el area de sellado y empaque.
-  loadRollsProductionAvailable(){
+  loadRollsProductionAvailable() {
     this.rollsAvailablesEmpaque = [];
     this.rollsAvailablesSellado = [];
     this.loading = true;
 
-    this.svProductionProcess.getInfoProductionAvailable().subscribe(data => { 
+    this.svProductionProcess.getInfoProductionAvailable().subscribe(data => {
       this.rollsAvailablesEmpaque = data.filter(x => x.process_Id == 'EMP');
-      this.rollsAvailablesSellado = data.filter(x => x.process_Id == 'SELLA'); 
-      this.calculateTotalEmpaque(); 
+      this.rollsAvailablesSellado = data.filter(x => x.process_Id == 'SELLA');
+      this.calculateTotalEmpaque();
       this.calculateTotalSellado();
       this.loading = false;
-    }, error => { 
+    }, error => {
       this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
-      this.loading = false; 
+      this.loading = false;
     });
   }
 
   ///.Función para cargar el estado de los rollos que están en una devolución y tienen estado devuelto (24)
-  loadRollsQuality(){
+  loadRollsQuality() {
     this.stockQuality = [];
 
     this.svProductionProcess.getRollsWarehouseQualityForItem().subscribe(data => {
@@ -772,14 +773,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.loading = false;
     }, error => {
       this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
-      this.loading = false; 
+      this.loading = false;
     });
   }
 
   ///.Función para cargar los rollos que están en estado REEMPAQUE (45)
-  loadRollsForRepack(){
+  loadRollsForRepack() {
     this.stockRepacking = [];
-    
+
     this.svProductionProcess.getRollsForRepack().subscribe(data => {
       this.stockRepacking = data;
       this.calculateTotalRepack();
@@ -787,65 +788,65 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.loading = false;
     }, error => {
       this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);
-      this.loading = false; 
+      this.loading = false;
     });
   }
 
   /** Función que calcula el total de existencias y de valor que hay en la producción de empaque*/
-  calculateTotalEmpaque(){
+  calculateTotalEmpaque() {
     setTimeout(() => {
       this.totalEmpaque = 0;
       this.totalQtyEmpaque = 0;
-      if(this.tableRollsEmpaque) {
-        if(this.tableRollsEmpaque.filteredValue != undefined) this.totalsForData(this.tableRollsEmpaque.filteredValue);
+      if (this.tableRollsEmpaque) {
+        if (this.tableRollsEmpaque.filteredValue != undefined) this.totalsForData(this.tableRollsEmpaque.filteredValue);
         else this.totalsForData(this.rollsAvailablesEmpaque);
       } else this.totalsForData(this.rollsAvailablesEmpaque);
     }, 500);
   }
 
   /** Función que calcula el total de existencias y de valor que hay en la producción de sellado*/
-  calculateTotalSellado(){
+  calculateTotalSellado() {
     setTimeout(() => {
       this.totalSellado = 0;
       this.totalQtySellado = 0;
-      if(this.tableRollsSellado) {
-        if(this.tableRollsSellado.filteredValue != undefined) this.totalsForData(this.tableRollsSellado.filteredValue);
+      if (this.tableRollsSellado) {
+        if (this.tableRollsSellado.filteredValue != undefined) this.totalsForData(this.tableRollsSellado.filteredValue);
         else this.totalsForData(this.rollsAvailablesSellado);
       } else this.totalsForData(this.rollsAvailablesSellado);
     }, 500);
   }
 
   /** Función que calcula el total de existencias y de valor que hay en la bodega de calidad*/
-  calculateTotalQuality(){
+  calculateTotalQuality() {
     setTimeout(() => {
       this.totalQuality = 0;
       this.totalQtyQuality = 0;
-      if(this.tableQuality) {
-        if(this.tableQuality.filteredValue != undefined) this.totalsForData(this.tableQuality.filteredValue);
+      if (this.tableQuality) {
+        if (this.tableQuality.filteredValue != undefined) this.totalsForData(this.tableQuality.filteredValue);
         else this.totalsForDevolution(this.stockQuality);
       } else this.totalsForDevolution(this.stockQuality);
     }, 500);
   }
 
   /** Función que calcula el total de existencias y de valor que hay en la bodega de reempaque*/
-  calculateTotalRepack(){
+  calculateTotalRepack() {
     setTimeout(() => {
       this.totalRepack = 0;
       this.totalQtyRepack = 0;
-      if(this.tableRepacking) {
-        if(this.tableRepacking.filteredValue != undefined) this.totalsForRepack(this.tableRepacking.filteredValue);
+      if (this.tableRepacking) {
+        if (this.tableRepacking.filteredValue != undefined) this.totalsForRepack(this.tableRepacking.filteredValue);
         else this.totalsForRepack(this.stockRepacking);
       } else this.totalsForRepack(this.stockRepacking);
     }, 500);
   }
 
   //Función para calcular los totales según la información que se le pase como parametro.
-  totalsForData(data : any){
+  totalsForData(data: any) {
     data.forEach(x => {
-      if(x.process_Id == 'SELLA') {
-        this.totalSellado += x.subtotal;  
+      if (x.process_Id == 'SELLA') {
+        this.totalSellado += x.subtotal;
         this.totalQtySellado += x.realQty;
-      } else if(x.process_Id == 'EMP') {
+      } else if (x.process_Id == 'EMP') {
         this.totalEmpaque += x.subtotal;
         this.totalQtyEmpaque += x.realQty;
       }
@@ -853,27 +854,27 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función para calcular los totales según la información que se le pase como parametro.
-  totalsForDevolution(data : any){
+  totalsForDevolution(data: any) {
     data.forEach(x => {
-      this.totalQuality += x.subtotal;  
+      this.totalQuality += x.subtotal;
       this.totalQtyQuality += x.quantity;
     });
   }
 
   //Función para calcular los totales según la información que se le pase como parametro.
-  totalsForRepack(data : any){
+  totalsForRepack(data: any) {
     data.forEach(x => {
-      this.totalRepack += x.subtotal;  
+      this.totalRepack += x.subtotal;
       this.totalQtyRepack += x.quantity;
     });
   }
 
   /** Desplegar y contraer filas de la tabla. */
-  deployRows(){
+  deployRows() {
     const thisRef = this;
-    
-    if([86].includes(this.ValidarRol)) this.indexTab == 1 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
-    else if([4].includes(this.ValidarRol)) this.indexTab == 1 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
+
+    if ([86].includes(this.ValidarRol)) this.indexTab == 1 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
+    else if ([4].includes(this.ValidarRol)) this.indexTab == 1 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
     else {
       this.indexTab == 3 && this.value == 'on' ? this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockEmpaque.forEach((x) => thisRef.expandedRows[x.item] = false);
       this.indexTab == 4 && this.value == 'on' ? this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = true) : this.stockSellado.forEach((x) => thisRef.expandedRows[x.item] = false);
@@ -882,21 +883,21 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   //EXCEL ROLLO A ROLLO.
   /** Función que se encarga de crear el archivo de Excel de la producción de empaque. */
-  createExcelRollToRoll(data : any, process : string){
-    if(data.length > 0) {
+  createExcelRollToRoll(data: any, process: string) {
+    if (data.length > 0) {
       setTimeout(() => { this.loadSheetAndStyles(data, process); }, 500);
     } else this.msg.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
   }
 
   //Función que cargará la hoja de cálculo y los estilos.
-  loadSheetAndStyles(data : any, process : string){  
-    let title : any = `Reporte `;  
+  loadSheetAndStyles(data: any, process: string) {
+    let title: any = `Reporte `;
     process == 'EMPAQUE' ? title += `rollo a rollo Empaque` : process == 'SELLADO' ? title += `bulto a bulto Sellado` : process == 'CALIDAD' ? title += `bodega de calidad` : title += `bodega de reempaque`;
     title += ` ${moment().format('DD-MM-YYYY')}`
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
-    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     let workbook = this.createExcelService.formatoExcel(title, true);
 
     this.addNewSheet(workbook, title, fill, border, font, alignment, data, process);
@@ -904,27 +905,27 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función para agregar una nueva hoja de calculo.
-  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any, process : string){
+  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any, process: string) {
     let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-    let worksheet : any = wb.worksheets[0];
+    let worksheet: any = wb.worksheets[0];
     this.loadStyleTitle(worksheet, title, fontTitle, alignment);
     this.loadHeader(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel(worksheet, this.dataExcel(data, process), border,  alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data, process), border, alignment);
   }
 
   //Cargar estilos del titulo de la hoja.
-  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
     ws.getCell('A1').alignment = alignment;
     ws.getCell('A1').font = fontTitle;
     ws.getCell('A1').value = title;
   }
 
   //Función para cargar los titulos de el header y los estilos.
-  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5']; 
+  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5'];
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
-    
+
     rowHeader.forEach(x => ws.getCell(x).fill = fill);
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
@@ -935,27 +936,27 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
-  loadSizeHeader(ws : any){
-    [5,6].forEach(x => ws.getColumn(x).width = 50);
+  loadSizeHeader(ws: any) {
+    [5, 6].forEach(x => ws.getColumn(x).width = 50);
     [11].forEach(x => ws.getColumn(x).width = 30);
-    [2,3,4].forEach(x => ws.getColumn(x).width = 10);
+    [2, 3, 4].forEach(x => ws.getColumn(x).width = 10);
     [9].forEach(x => ws.getColumn(x).width = 8);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [7,8,10,].forEach(x => ws.getColumn(x).width = 15);
+    [7, 8, 10,].forEach(x => ws.getColumn(x).width = 15);
   }
 
- //Función para cargar los nombres de las columnas del header
-  loadFieldsHeader(){
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader() {
     let headerRow = [
       'N°',
       'Rollo',
       'OT',
-      'Item', 
+      'Item',
       'Cliente',
-      'Referencia', 
+      'Referencia',
       'Existencias',
       'Precio',
-      'Unidad', 
+      'Unidad',
       'Subtotal',
       'Fecha'
     ];
@@ -963,10 +964,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Cargar información con los estilos al formato excel. 
-  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
-    let formatNumber: Array<number> = [7,8,10];
-    let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K']; 
+  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
+    let formatNumber: Array<number> = [7, 8, 10];
+    let contador: any = 6;
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(x => {
@@ -978,11 +979,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
       });
       contador++
     });
-    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold: true, });
   }
 
   //Agregar fila de totales al formato excel.
-  addTotal(info : any, process : string, warehouse : any){
+  addTotal(info: any, process: string, warehouse: any) {
     info.push([
       '',
       '',
@@ -999,9 +1000,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //.Función que contendrá la info al documento excel. 
-  dataExcel(data : any, process : string){
-    let info : any = [];
-    let count : number = 0;
+  dataExcel(data: any, process: string) {
+    let info: any = [];
+    let count: number = 0;
     data.forEach(x => {
       info.push([
         count += 1,
@@ -1021,21 +1022,21 @@ export class InventarioProductosPBDDComponent implements OnInit {
     return info;
   }
 
-  comparativeExcel(){
-    if(this.comparativeStock.length > 0) {
+  comparativeExcel() {
+    if (this.comparativeStock.length > 0) {
       setTimeout(() => { this.loadSheetAndStyles2(this.comparativeStock); }, 500);
     } else this.msg.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
   }
 
-   //Función que cargará la hoja de cálculo y los estilos.
-   loadSheetAndStyles2(data : any){  
+  //Función que cargará la hoja de cálculo y los estilos.
+  loadSheetAndStyles2(data: any) {
     console.log(data);
-    let title : any = `Inventario comparativo de productos`;  
+    let title: any = `Inventario comparativo de productos`;
     title += ` ${moment().format('DD-MM-YYYY')}`
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
-    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     let workbook = this.createExcelService.formatoExcel(title, true);
 
     this.addNewSheet2(workbook, title, fill, border, font, alignment, data);
@@ -1043,55 +1044,56 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Función para agregar una nueva hoja de calculo.
-  addNewSheet2(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+  addNewSheet2(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
     let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-    let worksheet : any = wb.worksheets[0];
+    let worksheet: any = wb.worksheets[0];
     this.loadStyleTitle2(worksheet, title, fontTitle, alignment);
     this.loadHeader2(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel2(worksheet, this.dataExcel2(data), border,  alignment);
+    this.loadInfoExcel2(worksheet, this.dataExcel2(data), border, alignment);
   }
 
   //Cargar estilos del titulo de la hoja.
-  loadStyleTitle2(ws: any, title : any, fontTitle : any, alignment : any){
+  loadStyleTitle2(ws: any, title: any, fontTitle: any, alignment: any) {
     ws.getCell('A1').alignment = alignment;
     ws.getCell('A1').font = fontTitle;
     ws.getCell('A1').value = title;
   }
 
   //Función para cargar los titulos de el header y los estilos.
-  loadHeader2(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5', 'J5','K5','L5','M5']; 
+  loadHeader2(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5'];
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader2());
-    
+
     rowHeader.forEach(x => ws.getCell(x).fill = fill);
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:M3');
+    ws.mergeCells('A1:N3');
 
     this.loadSizeHeader2(ws);
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
-  loadSizeHeader2(ws : any){
-    [5,6,7,9,10,11,12].forEach(x => ws.getColumn(x).width = 25);
-    [3,4,13].forEach(x => ws.getColumn(x).width = 50);
+  loadSizeHeader2(ws: any) {
+    [5, 6, 7, 9, 10, 11, 12].forEach(x => ws.getColumn(x).width = 25);
+    [3, 4, 14].forEach(x => ws.getColumn(x).width = 50);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [2,7,8].forEach(x => ws.getColumn(x).width = 15);
+    [2, 7, 8, 13].forEach(x => ws.getColumn(x).width = 15);
   }
 
- //Función para cargar los nombres de las columnas del header
-  loadFieldsHeader2(){
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader2() {
     let headerRow = [
       'N°',
       'Item',
       'Cliente',
-      'Referencia', 
+      'Referencia',
+      'Días en Inventario',
       'Exist. Despacho',
-      'Exist. Area', 
-      'Exist. Total',  
-      'Unidad', 
+      'Exist. Area',
+      'Exist. Total',
+      'Unidad',
       'Precio U.',
       'Valor en Despacho',
       'Valor en Producción',
@@ -1102,10 +1104,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //Cargar información con los estilos al formato excel. 
-  loadInfoExcel2(ws : any, data : any, border : any, alignment : any){
-    let formatNumber: Array<number> = [5,6,7,9,10,11,12];
-    let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M']; 
+  loadInfoExcel2(ws: any, data: any, border: any, alignment: any) {
+    let formatNumber: Array<number> = [6, 7, 8, 10, 11, 12, 13];
+    let contador: any = 6;
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(x => {
@@ -1121,20 +1123,21 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //.Función que contendrá la info al documento excel. 
-  dataExcel2(data : any){
-    let info : any = [];
-    let count : number = 0;
+  dataExcel2(data: any) {
+    let info: any = [];
+    let count: number = 0;
     data.forEach(x => {
       info.push([
         count += 1,
         x.item,
         x.client,
         x.reference,
+        x.daysOnInv,
         x.stock,
         x.stockInProcess,
         x.totalStock,
         x.presentation,
-        x.price, 
+        x.price,
         (x.price * x.stock),
         (x.price * x.stockInProcess),
         x.price * (x.stock + x.stockInProcess),
@@ -1145,7 +1148,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   //*Función para cargar el modal de movimientos.
-  searchMovements(data : any){
+  searchMovements(data: any) {
     this.load = true;
     setTimeout(() => {
       this.traceability = true;
@@ -1153,7 +1156,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.cmpMovRolls.searchMovements(data, `Producto Terminado`);
       this.load = false;
     }, 500);
-  } 
+  }
 }
 
 interface StockInformation {
@@ -1167,10 +1170,10 @@ interface StockInformation {
   presentation: string,
   subTotal: number,
   seller: string,
-  cityClient : string,
-  weight : number,
-  qtyStandard : number,
-  unityProducts : number,
+  cityClient: string,
+  weight: number,
+  qtyStandard: number,
+  unityProducts: number,
   AvaibleProdution: Array<AvaibleProdution>,
   /*actualMonth: number,
   junuary: number,
@@ -1185,8 +1188,8 @@ interface StockInformation {
   october: number,
   november: number,
   december: number,*/
-  process? : string,
-  daysOnInv? : number,
+  process?: string,
+  daysOnInv?: number,
 }
 
 interface AvaibleProdution {
@@ -1197,12 +1200,12 @@ interface AvaibleProdution {
   Process: string,
   Date: any,
   Hour: string,
-  Price: number,  
+  Price: number,
   Turn: string,
   Information: string,
   orderProduction: number,
-  client? : string,
-  daysOnInv? : number,
+  client?: string,
+  daysOnInv?: number,
 }
 
 interface Columns {
