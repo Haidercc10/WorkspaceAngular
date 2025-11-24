@@ -25,23 +25,27 @@
                 <span class="p-float-label">
                     <p-dropdown formControlName="turn" id="turn" [options]="turns" optionLabel="turno_Id"
                         optionValue="turno_Id"
-                        [autoDisplayFirst]="![1].includes(ValidarRol) ? true : false"></p-dropdown>
+                        [autoDisplayFirst]="false"></p-dropdown>
                     <label for="turn">Turno</label>
                 </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
                 <span class="p-float-label">
-                    <p-dropdown formControlName="user" id="user" optionValue="user_Id" 
-                        [options]="users" optionLabel="usua_Nombre" [autoDisplayFirst]="![1].includes(ValidarRol) ? true : false"></p-dropdown>
+                    <p-dropdown formControlName="user" id="user" [options]="users" optionLabel="usua_Nombre"
+                        optionValue="usua_Id"
+                        [autoDisplayFirst]="false"></p-dropdown>
                     <label for="user">Usuario</label>
                 </span>
             </div>
             <!--* Botones-->
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3">
                 <div class="d-grid gap-2 d-md-flex">
                     <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí."
                         label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar"
                         (click)="mostrarRegistrosHoy()"></button>
+
+                    <button id="clear" pButton pRipple label="Limpiar" icon="pi pi-eraser"
+                        class="p-button-secondary botonesOpciones" (click)="clearFields()"></button>
                 </div>
             </div>
         </div>
@@ -93,6 +97,7 @@
             <th><input pInputText (input)="aplicarfiltro($event, 'Cal4', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Hora', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Turno', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Usuario', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Observacion', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Moda', 'contains')"></th>
@@ -107,7 +112,7 @@
             <th colspan="4" class="text-center">Evaluación física</th>
             <th></th>
             <th colspan="4" class="text-center">Calibres (Muestra)</th>
-            <th colspan="3">Registro</th>
+            <th colspan="4">Registro</th>
             <th></th>
             <th colspan="3" class="text-center">Datos Estadisticos</th>
             <th></th>
@@ -138,6 +143,7 @@
             <th style="min-width : 100px">Cal. 4</th>
             <th style="min-width : 120px">Fecha</th>
             <th style="min-width : 120px">Hora</th>
+            <th style="min-width : 120px">Turno</th>
             <th style="min-width : 120px">Usuario</th>
             <th style="min-width : 200px">Observacion</th>
             <th style="min-width : 100px">Moda</th>
@@ -455,6 +461,16 @@
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Hora}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Turno" [readOnly]="true">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Turno}}
                     </ng-template>
                 </p-cellEditor>
             </td>

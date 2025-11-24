@@ -83,6 +83,7 @@ export class ControlCalidadComponent implements OnInit {
         Id : this.datosControlCal_Impresion.length == 0 ? 1 : Math.max(...this.datosControlCal_Impresion.map(o => o.Id)) + 2, 
         Id_PkBd : 0 
       });
+      setTimeout(() => { this.dt_Impresion.initRowEdit(this.dt_Impresion.value[0]); }, 200);
     } else this.msj.mensajeAdvertencia(`¡Solo puede agregar un dato a la vez!`);
   }
 
@@ -98,7 +99,7 @@ export class ControlCalidadComponent implements OnInit {
 
   // Funcion que va a consultar los registros de controles de calidad 
   consultarDatos(){
-    //this.ConsultarDatosControlCal_Impresion();
+    this.ConsultarDatosControlCal_Impresion();
     //this.ConsultarDatosControlCal_DobladoCorte();
   }
 
