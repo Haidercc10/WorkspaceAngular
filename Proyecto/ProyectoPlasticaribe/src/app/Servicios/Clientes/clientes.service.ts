@@ -35,4 +35,6 @@ export class ClientesService {
   LikeGetCliente = (dato : string): Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/LikeGetClientes/${dato}`);
 
   GetSedesClientes_NombreCliente = (nombre : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Clientes/getSedesClientes_NombreCliente/${nombre}`);
+
+  getClientsWithRestrictionWeight = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Clientes/getClientsWithRestrictionWeight`);
 }

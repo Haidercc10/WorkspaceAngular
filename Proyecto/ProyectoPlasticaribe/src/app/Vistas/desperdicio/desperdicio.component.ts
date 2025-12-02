@@ -331,7 +331,9 @@ export class DesperdicioComponent implements OnInit {
   generarDesperdicio(){
     this.getPuertoSerial();
     let area : any = this.FormDesperdicio.value.IdArea;
+    let ot : any = this.FormDesperdicio.value.OTDesperdicio;
     let turno : any = this.FormDesperdicio.value.Turno;
+    let otConsultada : any = this.ordenesTrabajo[0].OTDesperdicio;
 
     this.cargando = true;
     setTimeout(() => {
@@ -347,6 +349,9 @@ export class DesperdicioComponent implements OnInit {
       } else if(this.FormDesperdicio.value.IdArea == "N/A") {
         this.mensajeService.mensajeAdvertencia(`Debe elegir una área!`);
         this.cargando = false;
+      } else if(otConsultada != ot) {
+        this.mensajeService.mensajeAdvertencia('Advertencia', `La OT consultada '${otConsultada}' no es igual a la Orden de Trabajo a registrar '${ot}', por favor corregir!`);
+        this.cargando = false;  
       } else {
         this.cargarTurnoActual();
         this.cargando = true;

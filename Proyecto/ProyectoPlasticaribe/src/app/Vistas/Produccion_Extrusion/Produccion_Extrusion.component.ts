@@ -9,6 +9,7 @@ import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { modelTrazabilidad_Produccion } from 'src/app/Modelo/modelTrazabilidad_Produccion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
 import { TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
@@ -39,6 +40,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   ValidarRol: number;
   modoSeleccionado: boolean = false;
   formDatosProduccion !: FormGroup;
+  formWeight !: FormGroup;
   turnos: Array<any> = [];
   unidadesMedida: Array<any> = [];
   operarios: Array<any> = [];
@@ -65,6 +67,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
   processProduction : boolean = false;
   clase: any = ``;
+  client : number = null;
+  clientsRestrictionWeight : any = [];
+  modalAuthorizeWeight : boolean = false;
+  usersAuthorized : any = [];
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -84,6 +90,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     private svMachines : MaquinasService,
     private svTraceability : TrazabilidadProduccionService,
     private svStatusProcess : EstadosProcesos_OTService,
+    private svClients : ClientesService,
+    private svUsers : UsuarioService,
     //private svRouter : Router,
   ) {
 
@@ -120,7 +128,12 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       procesoAnterior : [null, ],
       otAlterna : [null,],
       packer : [null, ],
+      pesoMin : [null, ],
+      pesoMax : [null, ],
+      observacion : [null, ],
+      userAuthorize : [null, ], 
     });
+    this.initFormAuthorizeWeight();
   }
 
   ngOnInit() {
@@ -137,6 +150,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       //this.buscarPuertos()
       this.getMachines();
       this.getPackers();
+      this.getUsersAuthorized();
+      this.getClientsWithRestrictionWeight();
       //this.updateStatesProcessOT([]);
     //}, 1000); 
   }
@@ -210,6 +225,19 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       this.validateProcess();
     }
     this.obtenerTurnos();
+  }
+
+  //Función que obtiene los clientes con restricción de peso
+  getClientsWithRestrictionWeight() {
+    this.clientsRestrictionWeight = [];
+    this.svClients.getClientsWithRestrictionWeight().subscribe(data => {
+      if(data) {
+        if(data.length > 0) {
+          data.forEach(x => this.clientsRestrictionWeight.push(x.cli_Id));
+        } else this.clientsRestrictionWeight = [];
+      } else this.clientsRestrictionWeight = [];
+      console.log(this.clientsRestrictionWeight);
+    }, error => console.log(error));
   }
 
   //Función que obtiene los puertos seriales
@@ -326,6 +354,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     consulta ? this.nuevoAnchoProducto = null : null;
     this.rolls = [];
     this.clase = ``;
+    this.getClientsWithRestrictionWeight();
   }
 
   getProcess() {
@@ -465,7 +494,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   buscraOrdenTrabajo(consulta? : boolean) {
-    
+    this.client = null;
     this.reference = ``;
     this.obtenerTurnos();
     this.getMachines();
@@ -497,6 +526,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         dataClient.forEach(cli => {
           this.reference = datos.producto;
           this.datosOrdenTrabajo[0].id_Cliente = cli.id_Cliente;
+          this.client = cli.id_Cliente;
+          console.log(this.client);
           this.formDatosProduccion.patchValue({
             'idCliente': cli.id_Cliente,
             'cliente': datos.cliente,
@@ -514,6 +545,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             'daipita' : this.reference.includes('DAIPITA') && this.validateProcess() == 'EMP' ? 3000 : null,
             'edicionAnchoProducto' : false,
             'rebobinado' : false,
+            'pesoMin' : datos.selladoCorte_PesoRollo > 0 ? datos.selladoCorte_PesoRollo - 0.5 : null,
+            'pesoMax' : datos.selladoCorte_PesoRollo > 0 ? datos.selladoCorte_PesoRollo + 0.5 : null,
+            'observacion' : datos.observacion,
           });
           this.buscarDatosConoSeleccionado();
           this.claseCantidadRealizada(datos)
@@ -577,6 +611,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     let ot : any = this.formDatosProduccion.value.ordenTrabajo;
     let oldProcess : any = this.formDatosProduccion.value.procesoAnterior;
     let tag : any = this.formDatosProduccion.value.etiquetaAsociada;
+    let pesoMin : any = this.formDatosProduccion.value.pesoMin;
+    let pesoMax : any = this.formDatosProduccion.value.pesoMax;
     this.cargando = true;
     this.getPuertoSerial();
     
@@ -593,8 +629,23 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
                           if(tag.toString().length >= 6) {
                             if(oldProcess) {
                               if(![null, undefined, 0, ''].includes(this.formDatosProduccion.value.anchoProducto)) {
-                                if(oldProcess == 'MATPRIMA') this.guardarProduccion();
-                                else this.searchOldTag(tag, oldProcess);
+                                if(this.clientsRestrictionWeight.includes(this.client)) {
+                                  if(pesoMin && pesoMax) {
+                                    if(this.formDatosProduccion.value.pesoNeto >= pesoMin && this.formDatosProduccion.value.pesoNeto <= pesoMax) {
+                                      this.createRecordProduction(oldProcess, tag);
+                                    } else {
+                                      if(this.formDatosProduccion.value.userAuthorize) {
+                                        this.guardarProduccion();
+                                      } else {
+                                        this.warinigMessage(`¡El peso neto debe estar entre ${pesoMin} y ${pesoMax}!`, true);
+                                        this.modalAuthorizeWeight = true;
+                                      }
+                                    } 
+                                  } else {
+                                    this.warinigMessage(`¡Debe definir el peso mínimo y máximo para la OT N° ${ot} del cliente ${this.formDatosProduccion.value.cliente}!`, true);
+                                  };
+                                } else this.createRecordProduction(oldProcess, tag);
+                                
                               } else this.warinigMessage(`¡Debe digitar un ancho de producto válido!`, true);
                             } else this.warinigMessage(`Debe agregar el proceso del que proviene la etiqueta asociada!`, true);
                           } else this.warinigMessage(`¡La cantidad de digitos de la etiqueta asociada debe ser mayor a 5!`, true);
@@ -617,12 +668,18 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
                       } else this.warinigMessage(`Debe llenar el campo 'Etiqueta asociada'!`, true);
                     }
                   } 
-              } else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!, true`);
+              } else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!`, true);
             } else this.warinigMessage(`¡La maquina no puede ser cero (0)!`, true);
           } else this.warinigMessage(`¡La OT que desea registrar no coincide con la consultada previamente!`, true);
         } else this.warinigMessage(`¡Todos los campos deben estar diligenciados!`, true);
       } else this.warinigMessage(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`, true);
     }, 500);
+  }
+
+  //Función que crea el registro de producción
+  createRecordProduction(oldProcess : any, tag : number) {
+    if(oldProcess == 'MATPRIMA') this.guardarProduccion();
+     else this.searchOldTag(tag, oldProcess);
   }
 
   //
@@ -681,6 +738,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Rebobinado : this.formDatosProduccion.value.rebobinado,
       Etiqueta_Trazabilidad : this.formDatosProduccion.value.etiquetaAsociada,
       Empacador_Id : [undefined, null].includes(this.formDatosProduccion.value.packer) ? 0 : this.formDatosProduccion.value.packer,
+      Autoriza_Id : this.formDatosProduccion.value.userAuthorize ? this.formDatosProduccion.value.userAuthorize : 0,
     }
     return datos;
   }
@@ -706,6 +764,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         let motherProcess : string = this.formDatosProduccion.value.procesoAnterior;
         let otAltern : number = this.formDatosProduccion.value.otAlterna;
         let packer : any = this.formDatosProduccion.value.packer;
+        let ot : any = this.formDatosProduccion.value.ordenTrabajo;
+        let process : any = this.formDatosProduccion.value.proceso;
         this.formDatosProduccion.reset();
         this.validarProceso();
         //this.buscarRollosPesados();
@@ -713,11 +773,24 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           this.loadDataInFields(res, mostrarDatosProducto, anchoProducto, edicionAnchoProducto, daipita, motherProcess, otAltern, packer)
           this.nuevoAnchoProducto = this.formDatosProduccion.value.anchoProducto;
           this.buscraOrdenTrabajo(false);
-        } else this.limpiarCampos(false);
+        } else {
+          this.updateEPOTExtrusion(ot, process);
+        } 
         this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
       }, 1000);
     }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
   }
+
+  //Función para actualizar los estados de la OT en el proceso de extrusión
+  updateEPOTExtrusion(ordenTrabajo : any, proceso : any){ 
+   this.bagproService.GetOrdenDeTrabajo(ordenTrabajo, `?process=${proceso}`).subscribe(data => {
+      this.updateStatesProcessOT(data[0].numero_Orden, this.formDatosProduccion.value.proceso, data[0].cantidad_Proceso, data[0].cantidad_Proceso);
+      this.limpiarCampos(false);
+    }, error => {
+      console.log(error);
+      this.limpiarCampos(false);
+    });
+  }  
 
   loadDataInFields(productionPL : any, dataProduct : boolean, broadProduct : number, editBroadProduct : boolean, daipita, motherProcess: string, otAltern : number, packer? : any){
     this.formDatosProduccion.patchValue({
@@ -974,5 +1047,40 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     if(motherProcess == 'MATPRIMA') {
       this.formDatosProduccion.patchValue({ etiquetaAsociada: null, otAnterior : null });
     }
+  }
+
+  //Formulario para autorizar peso
+  initFormAuthorizeWeight() {
+    this.formWeight = this.frmBuilder.group({
+      id: [null, Validators.required],
+    });
+  }
+
+  //Obtener usuarios autorizados
+  getUsersAuthorized = () => this.svUsers.getListAuthorizeUsers().subscribe(data => this.usersAuthorized = data, error => this.msj.mensajeError(error));
+
+    //
+  authorizeWeight(){
+    let id : number = this.formWeight.value.id;
+    this.svUsers.GetUsersAthorizedForTeoricWeight(id).subscribe(data => {
+      if(data) {
+        if(data.length > 0) {
+          let user : number = data[0].user_Id;
+          let index : number = this.usersAuthorized.findIndex(x => x.user_Id == user);
+          this.msj.mensajeConfirmacion(`Confirmación`, `Autorizado exitosamente por ${data[0].userName}!`);
+          this.modalAuthorizeWeight = false;
+          this.formDatosProduccion.patchValue({ 'userAuthorize' : this.usersAuthorized[index].user_Id });
+          this.formWeight.reset();
+        } else this.msjAuthorize(`Advertencia`, `Usuario sin autorización para realizar esta acción!`);
+      } else this.msjAuthorize(`Advertencia`, `Usuario no autorizado para realizar esta acción!`);
+    }, error => {
+      this.msjAuthorize(`Advertencia`, `El usuario no tiene permisos para realizar esta acción!`);
+    });
+  }
+
+  //Mensaje de advertencia por no autorización de pesos teoricos.
+  msjAuthorize(msj1 : string, msj2 : string){
+    this.msj.mensajeAdvertencia(msj1, msj2);
+    this.formWeight.reset();
   }
 }

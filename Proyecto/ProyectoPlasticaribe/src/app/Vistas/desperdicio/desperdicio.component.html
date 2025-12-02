@@ -94,7 +94,7 @@
         <!-- CANTIDAD DE DESPERDICIO -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="cantidad">
           <span class="p-float-label">
-            <p-inputNumber formControlName="CantidadKg" id="Cantidad" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+            <p-inputNumber formControlName="CantidadKg" id="Cantidad" mode="decimal" [minFractionDigits]="2" [readonly]="false"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
           </span>
         </div>
@@ -127,11 +127,12 @@
       [rowHover]="true">
        <ng-template pTemplate="header">
            <tr>
-             <th style="font-weight: 800;" class="text-center" colspan="3">Información General</th>
+             <th style="font-weight: 800;" class="text-center" colspan="4">Información General</th>
              <th style="font-weight: 800;" class="text-center" colspan="3">Desperdicio</th>
              <th style="font-weight: 800;" class="text-center" colspan="6">Extrusión</th>
            </tr>
            <tr>
+               <th style="font-weight: 600;" class="text-center">OT</th>
                <th style="font-weight: 600;" class="text-center">Cliente</th>
                <th style="font-weight: 600;" class="text-center">Item</th>
                <th style="font-weight: 600;" class="text-center">Referencia</th>
@@ -148,6 +149,7 @@
        </ng-template>
        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
            <tr>
+              <td class="text-center">{{ data.OTDesperdicio }}</td>
                <td class="text-center">{{ data.Cliente }}</td>
                <td class="text-center">{{ data.IdProducto }}</td>
                <td class="text-center">{{ data.Producto }}</td>

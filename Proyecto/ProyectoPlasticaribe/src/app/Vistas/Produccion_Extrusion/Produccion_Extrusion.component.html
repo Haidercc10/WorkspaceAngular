@@ -8,7 +8,8 @@
     <!-- Navegador fin de parte superior -->
     <div class="container-fluid">
         <div class="mb-4 Titulo">
-            <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de {{proceso}}</h2> <!--*ngIf="!rebobinado"-->
+            <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de
+                {{proceso}}</h2> <!--*ngIf="!rebobinado"-->
             <!--<h2 *ngIf="rebobinado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Rebobinado de Corte</h2>-->
         </div>
         <div class="mb-4">
@@ -47,8 +48,9 @@
             <!-- MAQUINA -->
             <div class="col-sm-12 col-md-3 col-xl-1">
                 <span class="p-float-label">
-                    <p-dropdown formControlName="maquina" inputId="maquina" [options]="maquinas" optionLabel="maq_Numero"
-                        optionValue="maq_Numero" [autoDisplayFirst]="false" [required]="true" [filter]="true" filterBy="maq_Numero"></p-dropdown>
+                    <p-dropdown formControlName="maquina" inputId="maquina" [options]="maquinas"
+                        optionLabel="maq_Numero" optionValue="maq_Numero" [autoDisplayFirst]="false" [required]="true"
+                        [filter]="true" filterBy="maq_Numero"></p-dropdown>
                     <label for="maquina">Maquina</label>
                 </span>
             </div>
@@ -62,19 +64,21 @@
                     <label for="operario">Operario</label>
                 </span>
             </div>
-            
-             <!--EDITAR ANCHO PRODUCTO -->
-             <div class="col-sm-12 col-md-6 col-xl field-checkbox">
-                <p-checkbox formControlName="edicionAnchoProducto" [binary]="true" inputId="binary" id="edicionAnchoProducto"
-                  pTooltip="Al activar este campo podrá editar el ancho del item/producto."
-                  tooltipPosition="top"></p-checkbox>
+
+            <!--EDITAR ANCHO PRODUCTO -->
+            <div class="col-sm-12 col-md-6 col-xl field-checkbox">
+                <p-checkbox formControlName="edicionAnchoProducto" [binary]="true" inputId="binary"
+                    id="edicionAnchoProducto" pTooltip="Al activar este campo podrá editar el ancho del item/producto."
+                    tooltipPosition="top"></p-checkbox>
                 <label for="edicionAnchoProducto">Editar Ancho</label>
-              </div>
-            
-             <!-- ANCHO PRODUCTO -->
-             <div class="col-sm-12 col-md-2 col-xl-1">
+            </div>
+
+            <!-- ANCHO PRODUCTO -->
+            <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="anchoProducto" (keyup)="EditarAncho()" inputId="anchoProducto" mode="decimal" [readonly]="formDatosProduccion.value.edicionAnchoProducto == false" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="anchoProducto" (keyup)="EditarAncho()" inputId="anchoProducto"
+                        mode="decimal" [readonly]="formDatosProduccion.value.edicionAnchoProducto == false"
+                        [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="anchoProducto">Ancho Item</label>
                 </span>
             </div>
@@ -111,7 +115,7 @@
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
                     <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal"
-                    [readonly]="false" [minFractionDigits]="4" [required]="true"></p-inputNumber>
+                        [readonly]="false" [minFractionDigits]="4" [required]="true"></p-inputNumber>
                     <label for="pesoBruto">Bruto Kg</label>
                 </span>
             </div>
@@ -120,7 +124,7 @@
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
                     <p-inputNumber formControlName="pesoNeto" [min]="2" inputId="pesoNeto" mode="decimal"
-                    [readonly]="false" [minFractionDigits]="4" [required]="true"></p-inputNumber>
+                        [readonly]="false" [minFractionDigits]="4" [required]="true"></p-inputNumber>
                     <label for="pesoNeto">Neto Kg</label>
                 </span>
             </div>
@@ -143,7 +147,8 @@
 
             <!--* REBOBINADO -->
             <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
-                <p-checkbox formControlName="rebobinado" [binary]="true" inputId="binary" id="rebobinado" [readonly]="proceso != 'Empaque'"
+                <p-checkbox formControlName="rebobinado" [binary]="true" inputId="binary" id="rebobinado"
+                    [readonly]="proceso != 'Empaque'"
                     pTooltip="Al activar este campo el valor de la producción del item incrementa, ya que se toma como revisión de bobina."
                     tooltipPosition="top"></p-checkbox>
                 <label for="rebobinado"><b>Rebobinado</b></label>
@@ -152,8 +157,10 @@
             <!-- Empacador -->
             <div class="col-sm-12 col-md-6 col-xl-2" *ngIf="proceso == 'Empaque'">
                 <span class="p-float-label">
-                <p-dropdown formControlName="packer" inputId="packer" [options]="packers" optionLabel="userName" optionValue="user_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"></p-dropdown>
-                <label for="packer">Empacador</label>
+                    <p-dropdown formControlName="packer" inputId="packer" [options]="packers" optionLabel="userName"
+                        optionValue="user_Id" [autoDisplayFirst]="false" [filter]="true"
+                        filterBy="userName"></p-dropdown>
+                    <label for="packer">Empacador</label>
                 </span>
             </div>
 
@@ -161,9 +168,8 @@
             <div class="col-sm-12 col-md-2" *ngIf="![74].includes(ValidarRol)">
                 <span class="p-float-label">
                     <p-dropdown formControlName="procesoAnterior" inputId="procesoAnterior" [options]="process"
-                        optionLabel="proceso_Nombre" optionValue="proceso_Id" (onChange)="changeOldProcess()" pTooltip="{{msjsOldProcess()}}" 
-                        tooltipPosition="top"
-                        [autoDisplayFirst]="false"></p-dropdown>
+                        optionLabel="proceso_Nombre" optionValue="proceso_Id" (onChange)="changeOldProcess()"
+                        pTooltip="{{msjsOldProcess()}}" tooltipPosition="top" [autoDisplayFirst]="false"></p-dropdown>
                     <label for="procesoAnterior">Proceso madre</label>
                 </span>
             </div>
@@ -171,18 +177,59 @@
             <!--* Rollo/Bulto Asociado -->
             <div class="col-sm-12 col-md-2 col-xl-2" *ngIf="![74].includes(ValidarRol)">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="etiquetaAsociada" inputId="etiquetaAsociada" (keyup.enter)="validateOrderProduction('actual')" [useGrouping]="false" pTooltip="{{msjsOldRoll()}}" 
-                    tooltipPosition="top"></p-inputNumber>
+                    <p-inputNumber formControlName="etiquetaAsociada" inputId="etiquetaAsociada"
+                        (keyup.enter)="validateOrderProduction('actual')" [useGrouping]="false"
+                        pTooltip="{{msjsOldRoll()}}" tooltipPosition="top"></p-inputNumber>
                     <label for="etiquetaAsociada">Rollo madre</label>
                 </span>
             </div>
 
             <!--* OT Alterna -->
-            <div class="col-sm-12 col-md-6 col-xl-2 justify-content-end" *ngIf="(![74].includes(ValidarRol) && formDatosProduccion.value.procesoAnterior != 'MATPRIMA') || ![74].includes(ValidarRol)">
+            <div class="col-sm-12 col-md-6 col-xl-2 justify-content-end"
+                *ngIf="(![74].includes(ValidarRol) && formDatosProduccion.value.procesoAnterior != 'MATPRIMA') || ![74].includes(ValidarRol)">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="otAlterna" inputId="otAlterna" [readonly]="formDatosProduccion.value.procesoAnterior == 'MATPRIMA'" pTooltip="{{msjsAltOT()}}" 
-                    tooltipPosition="top" [useGrouping]="false" (keyup.enter)="validateOrderProduction('altern')"></p-inputNumber>
+                    <p-inputNumber formControlName="otAlterna" inputId="otAlterna"
+                        [readonly]="formDatosProduccion.value.procesoAnterior == 'MATPRIMA'" pTooltip="{{msjsAltOT()}}"
+                        tooltipPosition="top" [useGrouping]="false"
+                        (keyup.enter)="validateOrderProduction('altern')"></p-inputNumber>
                     <label for="otAlterna">OT Alterna</label>
+                </span>
+            </div>
+
+            <!-- Peso Min -->
+            <div class="col-sm-12 col-md-2 col-xl-1" *ngIf="proceso == 'Empaque'">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="pesoMin" [minFractionDigits]="2" inputId="pesoMin" mode="decimal"
+                        [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
+                    <label for="pesoMin">Peso Min.</label>
+                </span>
+            </div>
+
+            <!-- Peso Max. -->
+            <div class="col-sm-12 col-md-2 col-xl-1" *ngIf="proceso == 'Empaque'">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="pesoMax" [minFractionDigits]="2" inputId="pesoMax" mode="decimal"
+                        [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
+                    <label for="pesoMax">Peso Max.</label>
+                </span>
+            </div>
+
+            <!--Observacion-->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-8 col-xxl-8" id="observacion"
+                *ngIf="proceso == 'Empaque'">
+                <span class="p-float-label">
+                    <textarea formControlName="observacion" [rows]="1" pInputTextarea></textarea>
+                    <label for="textarea">Observación</label>
+                </span>
+            </div>
+
+            <!-- Autoriza -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="userAuthorize" inputId="userAuthorize" [options]="usersAuthorized"
+                        [readonly]="true" optionLabel="userName" [autoDisplayFirst]="false" [filter]="true"
+                        filterBy="userName" optionValue="user_Id"></p-dropdown>
+                    <label for="userAuthorize">Autoriza</label>
                 </span>
             </div>
 
@@ -191,7 +238,8 @@
 
         <div class="row my-3">
 
-            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información de la Orden de Producción </h4>
+            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+                    class="pi pi-wrench"></i> Información de la Orden de Producción </h4>
             <br>
             <p-table [value]="datosOrdenTrabajo" columnResizeMode="expand" styleClass="p-datatable-sm"
                 responsiveLayout="scroll" [rowHover]="true">
@@ -253,28 +301,23 @@
             Rollos Producidos</h4>
     </div>
 
-    <p-table #dtProduccion
-        [value]="rollosPesados"
-        columnResizeMode="expand"
-        styleClass="p-datatable-sm"
-        responsiveLayout="scroll"
-        [rowHover]="true"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
-        [scrollable]="true"
+    <p-table #dtProduccion [value]="rollosPesados" columnResizeMode="expand" styleClass="p-datatable-sm"
+        responsiveLayout="scroll" [rowHover]="true" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header">
             <tr>
-              <th></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'item', 'contains')"></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'extBruto', 'contains')"></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'extnetokg', 'contains')"></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'material', 'contains')"></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'maquina', 'contains')"></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'hora', 'contains')"></th>
-              <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'turno', 'contains')"></th>
-              <!-- <th *ngIf="[1, 86].includes(ValidarRol)"></th> -->
+                <th></th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'item', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'extBruto', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'extnetokg', 'contains')">
+                </th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'material', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'maquina', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'hora', 'contains')"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'turno', 'contains')"></th>
+                <!-- <th *ngIf="[1, 86].includes(ValidarRol)"></th> -->
             </tr>
             <tr>
                 <th class="text-center">#</th>
@@ -322,114 +365,145 @@
     </p-table>
 </p-card>
 
-<p-dialog [(visible)]="modalRolls" [draggable]="false" [style]="{width: '80%'}" header="Rollos de la OT {{orderProduction}}" [modal]="true" >
+<p-dialog [(visible)]="modalRolls" [draggable]="false" [style]="{width: '80%'}"
+    header="Rollos de la OT {{orderProduction}}" [modal]="true">
     <ng-template pTemplate="content">
         <!--Titulo info consolidada -->
         <div class="mb-4">
-            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-table"></i> Tabla de producción consolidada</h4>
+            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+                    class="pi pi-table"></i> Tabla de producción consolidada</h4>
         </div>
 
         <!--Tabla consolidada -->
         <div class="mb-3">
             <div class="row g-3">
-                <p-table
-                #dt0
-                [value]="rollsConsolidate"
-                [resizableColumns]="true"
-                columnResizeMode="expand"
-                styleClass="p-datatable-gridlines p-datatable-sm"
-                responsiveLayout="scroll"
-                [rowHover]="true"
-                dataKey="id">
-                <ng-template pTemplate="header">
-                <tr class="font-size-13" >
-                    <th class="text-center" scope="col" pResizableColumn>#</th>
-                    <th class="text-center" scope="col" pResizableColumn>OT</th>
-                    <th class="text-center" scope="col" pResizableColumn>Item</th>
-                    <th class="text-center" scope="col" pResizableColumn>Cliente</th>
-                    <th class="text-center" scope="col" pResizableColumn>Referencia</th>
-                    <th class="text-center" scope="col" pResizableColumn>N° Rollos</th>
-                    <th class="text-center" scope="col" pResizableColumn>Peso Neto</th>
-                    <th class="text-center" scope="col" pResizableColumn>Und</th>
-                </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-                <tr class="font-size-13">
-                    <td class="text-center" id="ot" >{{rowIndex + 1}}</td>
-                    <td class="text-center" id="item"><b>{{data.ot}}</b></td>
-                    <td class="text-center" id="item">{{data.item}}</td>
-                    <td class="text-center" id="cliente"><b>{{data.cliente}}</b></td>
-                    <td class="text-center" id="referencia" >{{data.referencia }}</td>
-                    <td class="text-center textBlue" id="total"><b>{{totalRolls() | number : '1.2-2'}}</b></td>
-                    <td class="text-center textGreen" id="pesoN"><b>{{getTotalWeight() | number : '1.2-2'}}</b></td>
-                    <td class="text-center" id="und">{{'Kg'}}</td>
-                </tr>
-                </ng-template>
+                <p-table #dt0 [value]="rollsConsolidate" [resizableColumns]="true" columnResizeMode="expand"
+                    styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true"
+                    dataKey="id">
+                    <ng-template pTemplate="header">
+                        <tr class="font-size-13">
+                            <th class="text-center" scope="col" pResizableColumn>#</th>
+                            <th class="text-center" scope="col" pResizableColumn>OT</th>
+                            <th class="text-center" scope="col" pResizableColumn>Item</th>
+                            <th class="text-center" scope="col" pResizableColumn>Cliente</th>
+                            <th class="text-center" scope="col" pResizableColumn>Referencia</th>
+                            <th class="text-center" scope="col" pResizableColumn>N° Rollos</th>
+                            <th class="text-center" scope="col" pResizableColumn>Peso Neto</th>
+                            <th class="text-center" scope="col" pResizableColumn>Und</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+                        <tr class="font-size-13">
+                            <td class="text-center" id="ot">{{rowIndex + 1}}</td>
+                            <td class="text-center" id="item"><b>{{data.ot}}</b></td>
+                            <td class="text-center" id="item">{{data.item}}</td>
+                            <td class="text-center" id="cliente"><b>{{data.cliente}}</b></td>
+                            <td class="text-center" id="referencia">{{data.referencia }}</td>
+                            <td class="text-center textBlue" id="total"><b>{{totalRolls() | number : '1.2-2'}}</b></td>
+                            <td class="text-center textGreen" id="pesoN"><b>{{getTotalWeight() | number : '1.2-2'}}</b>
+                            </td>
+                            <td class="text-center" id="und">{{'Kg'}}</td>
+                        </tr>
+                    </ng-template>
                 </p-table>
             </div>
         </div>
 
         <p-divider></p-divider>
-        
+
         <!--Titulo info detallada -->
         <div class="mb-4">
-        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de producción detallada</h4>
+            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+                    class="pi pi-list"></i> Tabla de producción detallada</h4>
         </div>
 
         <!--Tabla detallada -->
         <div class="mb-3">
             <div class="row g-3">
-                <p-table
-                #dt1
-                [value]="rolls"
-                [resizableColumns]="true"
-                columnResizeMode="expand"
-                styleClass="p-datatable-gridlines p-datatable-sm"
-                responsiveLayout="scroll"
-                [rowHover]="true"
-                dataKey="id">
-                <ng-template pTemplate="header">
-                <tr>
-                    <th></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'rollo', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'cliente', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'referencia', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'peso1', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'operario', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'maquina', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'turno', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'proceso', 'contains')"></th>
-                    <th><input pInputText style="width: 100%;" (input)="applyFilter($event, 'fecha', 'contains')"></th>
-                </tr>
-                <tr class="font-size-13" >
-                    <th scope="col" pResizableColumn>#</th>
-                    <th scope="col" pResizableColumn>Rollo</th>
-                    <th scope="col" pResizableColumn>Cliente</th>
-                    <th scope="col" pResizableColumn>Referencia</th>
-                    <th scope="col" pResizableColumn>Peso</th>
-                    <th scope="col" pResizableColumn>Operador</th>
-                    <th scope="col" pResizableColumn>Maq.</th>
-                    <th scope="col" pResizableColumn>Turno</th>
-                    <th scope="col" pResizableColumn>Proceso</th>
-                    <th scope="col" pResizableColumn>Fecha</th>
-                </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-                <tr class="font-size-13 cursor" (click)="loadMotherRolls(data.rollo, data.proceso)">
-                    <td id="id" class="">{{rowIndex + 1}}</td>
-                    <td id="id" class=""><b>{{data.rollo}}</b></td>
-                    <td id="cliente" class="">{{data.cliente}}</td>
-                    <td id="producto" class="">{{data.referencia }}</td>
-                    <td id="peso" class=""><b>{{data.peso1}}</b></td>
-                    <td id="operador" class="">{{data.operario}}</td>
-                    <td id="maquina" class=""><b>{{data.maquina}}</b></td>
-                    <td id="turno" class="">{{data.turno}}</td>
-                    <td id="status" class=""><b>{{data.proceso}}</b></td>
-                    <td id="fecha" class="">{{data.fecha.replace(' 0:00:00', '')}} - {{data.hora}}</td>
-                </tr>
-                </ng-template>
+                <p-table #dt1 [value]="rolls" [resizableColumns]="true" columnResizeMode="expand"
+                    styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true"
+                    dataKey="id">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'rollo', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'cliente', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'referencia', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'peso1', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'operario', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'maquina', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'turno', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'proceso', 'contains')"></th>
+                            <th><input pInputText style="width: 100%;"
+                                    (input)="applyFilter($event, 'fecha', 'contains')"></th>
+                        </tr>
+                        <tr class="font-size-13">
+                            <th scope="col" pResizableColumn>#</th>
+                            <th scope="col" pResizableColumn>Rollo</th>
+                            <th scope="col" pResizableColumn>Cliente</th>
+                            <th scope="col" pResizableColumn>Referencia</th>
+                            <th scope="col" pResizableColumn>Peso</th>
+                            <th scope="col" pResizableColumn>Operador</th>
+                            <th scope="col" pResizableColumn>Maq.</th>
+                            <th scope="col" pResizableColumn>Turno</th>
+                            <th scope="col" pResizableColumn>Proceso</th>
+                            <th scope="col" pResizableColumn>Fecha</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+                        <tr class="font-size-13 cursor" (click)="loadMotherRolls(data.rollo, data.proceso)">
+                            <td id="id" class="">{{rowIndex + 1}}</td>
+                            <td id="id" class=""><b>{{data.rollo}}</b></td>
+                            <td id="cliente" class="">{{data.cliente}}</td>
+                            <td id="producto" class="">{{data.referencia }}</td>
+                            <td id="peso" class=""><b>{{data.peso1}}</b></td>
+                            <td id="operador" class="">{{data.operario}}</td>
+                            <td id="maquina" class=""><b>{{data.maquina}}</b></td>
+                            <td id="turno" class="">{{data.turno}}</td>
+                            <td id="status" class=""><b>{{data.proceso}}</b></td>
+                            <td id="fecha" class="">{{data.fecha.replace(' 0:00:00', '')}} - {{data.hora}}</td>
+                        </tr>
+                    </ng-template>
                 </p-table>
             </div>
         </div>
     </ng-template>
-</p-dialog>    
+</p-dialog>
+
+<!-- Modal autorización peso fuera de rango -->
+<p-dialog [(visible)]="modalAuthorizeWeight" [draggable]="false" [style]="{width: '25%'}"
+    header="Solicitud de registro de producción" [modal]="true">
+    <form [formGroup]="formWeight" (ngSubmit)="authorizeWeight()">
+        <div class="mb-5">
+            <b><i class="pi pi-exclamation-triangle"></i> Nota: </b> El peso <b>está por fuera del rango permitido</b>,
+            solicita la intervención de un <b>usuario autorizado</b> para continuar.
+        </div>
+        <div class="mb-3">
+            <div class="row g-4">
+                <div class="col-sm-12 col-md-12 col-xl-12">
+                    <span class="p-float-label">
+                        <p-password formControlName="id" [feedback]="false" id="id" required></p-password>
+                        <label for="id">Autoriza</label>
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button pButton class="p-button-danger" type="submit" label="Autorizar"
+                            [disabled]="formWeight.invalid" icon="pi pi-check"></button>
+                        <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser"
+                            (click)="formWeight.reset()"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>    
+</p-dialog>
