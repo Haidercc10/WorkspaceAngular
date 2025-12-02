@@ -292,7 +292,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   asignacionMateriaPrima(){
     let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
     if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
-      console.log(this.calcularMateriaPrimaAsignada());
       
       if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
       else {

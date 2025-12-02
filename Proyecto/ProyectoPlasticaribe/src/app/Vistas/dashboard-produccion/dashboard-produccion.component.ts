@@ -283,8 +283,6 @@ export class DashboardProduccionComponent implements OnInit {
   //*MODAL
   //
   loadDetailsWaste(process : string, machine : number, waste : number) {
-    console.log(process, machine, waste);
-    
     this.arrayModal = [];
     if(waste > 0) {
       let date = moment().subtract(1, 'd').format('YYYY-MM-DD');

@@ -265,7 +265,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   loadModalOrderFact(data : any){
     this.registroSeleccionado = data;
     if(data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
-      if([6,1].includes(this.validateRole)) {
+      if([1,10].includes(this.validateRole)) {
         this.Repositions.clearAll();
         this.modalReposition = true; 
         this.Repositions.loadClientReposition(data);

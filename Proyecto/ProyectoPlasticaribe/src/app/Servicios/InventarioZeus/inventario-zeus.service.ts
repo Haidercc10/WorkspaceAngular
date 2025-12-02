@@ -223,4 +223,10 @@ export class InventarioZeusService {
   getClientByIdThird = (id: string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Clientes/getClientByIdThird/${id}`);
 
   getClientsForLastFact = (date1: any, date2: any, url? : string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/MovimientoItems/getClientsForLastFact/${date1}/${date2}${url}`);
+
+  
+  //*********************************************************************** TRANSAC ******************************************************************************/
+
+  getActiveSales = (): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Maevende/getActiveSales`);
+
 }

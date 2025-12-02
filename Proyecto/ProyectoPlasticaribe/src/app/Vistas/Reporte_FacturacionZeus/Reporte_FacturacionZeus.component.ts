@@ -4,7 +4,9 @@ import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
+import { log } from 'node:console';
 import { Table } from 'primeng/table';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -25,39 +27,42 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   @ViewChild('dt') dt: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
-  cargando : boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  Clientes : any = []; /** Array que contendrá la información de los clientes */
-  Items : any = []; /** Array que contendrá la información de los items */
-  Vendedores : any = []; /** Array que contendrá la información de los vendedores */
-  anos : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
-  anioActual : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
-  datosFacturacion : any [] = []; //Variable que tendrá la información del consolidado consultado
-  datosFacturacionConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
-  tabSeleccionado : number = 1; //Variable que tendrá la información del tab seleccionado
-  eneroUno : any = moment().startOf('year').format('YYYY-MM-DD'); //Variable que contendrá el primero de enero del año actual
-  today : any = moment().format('YYYY-MM-DD'); //Variable que contendrá la fecha actual
+  cargando: boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  Clientes: any = []; /** Array que contendrá la información de los clientes */
+  Items: any = []; /** Array que contendrá la información de los items */
+  Vendedores: any = []; /** Array que contendrá la información de los vendedores */
+  anos: any[] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
+  anioActual: number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
+  datosFacturacion: any[] = []; //Variable que tendrá la información del consolidado consultado
+  datosFacturacionConsolidado: any[] = []; //Variable que tendrá la información del consolidado consultado
+  tabSeleccionado: number = 1; //Variable que tendrá la información del tab seleccionado
+  eneroUno: any = moment().startOf('year').format('YYYY-MM-DD'); //Variable que contendrá el primero de enero del año actual
+  today: any = moment().format('YYYY-MM-DD'); //Variable que contendrá la fecha actual
+  dataSales: any = []; //Variable que guardará la info consolidada por asesores. 
+  dataClients: any = []; //Variable que guardará la info consolidada por asesores. 
 
-  constructor(private frmBuilder : FormBuilder,
-                private AppComponent : AppComponent,
-                  private invetarioZeusService : InventarioZeusService,
-                    private usuariosService : UsuarioService,
-                      private shepherdService: ShepherdService,
-                        private msj : MensajesAplicacionService,
-                          private contabilidadZeus :  ZeusContabilidadService,
-                            private svcExcel : CreacionExcelService) {
+  constructor(private frmBuilder: FormBuilder,
+    private AppComponent: AppComponent,
+    private invetarioZeusService: InventarioZeusService,
+    private usuariosService: UsuarioService,
+    private shepherdService: ShepherdService,
+    private msj: MensajesAplicacionService,
+    private contabilidadZeus: ZeusContabilidadService,
+    private svcExcel: CreacionExcelService,
+    private svBagpro: BagproService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       Vendedor: [null],
-      Id_Vendedor : [null],
+      Id_Vendedor: [null],
       Cliente: [null],
-      Id_Cliente : [null],
+      Id_Cliente: [null],
       Referencia: [null],
-      Item : [null],
+      Item: [null],
       rangoFechas: [null],
     });
   }
@@ -70,7 +75,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
-  tutorial(){
+  tutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
@@ -79,7 +84,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
@@ -89,7 +94,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // funcion que va a limpiar todo
-  limpiarTodo(){
+  limpiarTodo() {
     this.formFiltros.reset();
     this.consultarVendedores();
     this.datosFacturacion = [];
@@ -98,18 +103,18 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   }
 
   /** Función para cargar los años en el combobox de años. */
-  cargarAnios(){
+  cargarAnios() {
     for (let i = 0; i < this.anos.length; i++) {
-      let num_Mayor : number = Math.max(...this.anos);
+      let num_Mayor: number = Math.max(...this.anos);
       if (num_Mayor == moment().year()) break;
       this.anos.push(num_Mayor + 1);
     }
   }
 
   // Funcion que va a consultar los vendedores
-  consultarVendedores(){
+  consultarVendedores() {
     this.usuariosService.GetVendedores().subscribe(data => {
-      if ([1,6,96,12,2].includes(this.ValidarRol)) this.Vendedores = data;
+      if ([1, 6, 96, 12, 2, 69].includes(this.ValidarRol)) this.Vendedores = data;
       /*if (this.ValidarRol == 2) {
         this.Vendedores = data.filter(x => x.usua_Id == this.storage_Id);
         let Id_Vendedor : string = `${this.Vendedores[0].usua_Id}`;
@@ -124,31 +129,31 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   }
 
   // Funcion que va a colocar a llenar los campos correspondientes del vendedor
-  llenarVendedor(){
+  llenarVendedor() {
     let nombre = this.formFiltros.value.Vendedor;
     let vendedor = this.Vendedores.find(x => x.usua_Nombre == nombre);
-    let Id_Vendedor : string = `${vendedor.usua_Id}`;
+    let Id_Vendedor: string = `${vendedor.usua_Id}`;
     if (Id_Vendedor.length == 1) Id_Vendedor = `00${Id_Vendedor}`;
     else if (Id_Vendedor.length == 2) Id_Vendedor = `0${Id_Vendedor}`;
     this.formFiltros.patchValue({
       Vendedor: vendedor.usua_Nombre,
-      Id_Vendedor : Id_Vendedor,
+      Id_Vendedor: Id_Vendedor,
     });
   }
 
   // Funcion que va a consultar los clientes
-  consultarClientes(){
+  consultarClientes() {
     this.contabilidadZeus.GetClientes().subscribe(data => this.Clientes = data);
     if (this.ValidarRol == 2) this.Clientes = this.Clientes.filter(x => x.idvende == this.formFiltros.value.Id_Vendedor);
   }
 
   // Funcion que va a colocar a llenar los campos correspondientes del cliente
-  llenarCliente(){
+  llenarCliente() {
     let nombre = this.formFiltros.value.Cliente;
     let cliente = this.Clientes.find(x => x.idcliente == nombre);
     this.formFiltros.patchValue({
       Cliente: cliente.razoncial,
-      Id_Cliente : cliente.idcliente,
+      Id_Cliente: cliente.idcliente,
     });
   }
 
@@ -156,31 +161,31 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   consultarProductos = () => this.invetarioZeusService.LikeGetItems(this.formFiltros.value.Referencia).subscribe(dataItems => this.Items = dataItems);
 
   // Funcion que va a colocar a llenar los campos correspondientes del producto
-  llenarProducto(){
+  llenarProducto() {
     let item = this.formFiltros.value.Referencia;
     let producto = this.Items.find(x => x.codigo == item);
     this.formFiltros.patchValue({
-      Item : producto.codigo,
+      Item: producto.codigo,
       Referencia: producto.nombre,
     });
   }
 
   // Funcion que va consultar en la base de datos la infomracion de la facturación
-  consultarFacturacion(){
+  consultarFacturacion() {
     this.cargando = true;
     this.datosFacturacion = [];
     this.datosFacturacionConsolidado = [];
-    
-    let fechaInicial : any = this.formFiltros.value.rangoFechas == undefined ? this.eneroUno : moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
-    let fechaFinal : any = this.formFiltros.value.rangoFechas == undefined ? this.today : moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
+
+    let fechaInicial: any = this.formFiltros.value.rangoFechas == undefined ? this.eneroUno : moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
+    let fechaFinal: any = this.formFiltros.value.rangoFechas == undefined ? this.today : moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
     let vendedor = this.formFiltros.value.Id_Vendedor;
     let nombreVendedor = this.formFiltros.value.Vendedor;
     let producto = this.formFiltros.value.Item;
     let nombreItem = this.formFiltros.value.Referencia;
     let cliente = this.formFiltros.value.Id_Cliente;
-    let nombreCliente = this.formFiltros.value.Cliente;    
-    let ruta : string = '';
-    
+    let nombreCliente = this.formFiltros.value.Cliente;
+    let ruta: string = '';
+
     if (vendedor != null) ruta += `vendedor=${vendedor}`;
     if (nombreVendedor != null) ruta.length > 0 ? ruta += `&nombreVendedor=${nombreVendedor}` : ruta += `nombreVendedor=${nombreVendedor}`;
     if (producto != null) ruta.length > 0 ? ruta += `&producto=${producto}` : ruta += `producto=${producto}`;
@@ -188,21 +193,53 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
     if (nombreCliente != null) ruta.length > 0 ? ruta += `&nombreCliente=${nombreCliente}` : ruta += `nombreCliente=${nombreCliente}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
-    
+
     if (fechaInicial == null) fechaInicial = this.eneroUno;
     if (fechaFinal == null) fechaFinal = this.today;
 
+
     this.invetarioZeusService.GetConsolidadClientesArticulo(fechaInicial, fechaFinal, ruta).subscribe(data => {
+
       if (data.length == 0) this.msj.mensajeAdvertencia('¡No se encontraron resultados de bésqueda con la combinación de filtros seleccionada!');
       else {
         data.forEach(x => this.llenarConsolidado(x));
         data.forEach(x => this.llenarDatosConsolidado(x));
+        this.getSales();
       }
     }, null, () => this.cargando = false);
   }
 
+  //Función que cargará los vendedores activos en zeus 
+  getSales() {
+    let years: any = [];
+    this.datosFacturacion.forEach(x => {
+      if (!years.includes(x.Ano)) years.push(x.Ano);
+    });
+    years.sort();
+    years.forEach(y => {
+      this.invetarioZeusService.getActiveSales().subscribe(data => {
+        data.forEach(z => {
+          z.Year = y;
+        });
+        this.dataSales = data;
+        console.log(this.dataSales);
+      }, error => console.log(error));
+    });
+  }
+
+  //*CALCULOS DE KILAJE Y FACTURACIÓN
+  //función que mostrará la facturación el asesor. 
+  getFactAsesor = (year: string, month: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Mes == month && x.Id_Vendedor == code).reduce((a, b) => a + b.SubTotal, 0);
+
+  //función que mostrará el kilaje vendido por el asesor. 
+  getKgAsesor = (year: string, month: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Mes == month && x.Id_Vendedor == code && x.Presentacion == 'KLS').reduce((a, b) => a + b.Cantidad, 0);
+
+  getTotalFactAsesor =  (year: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Id_Vendedor == code).reduce((a, b) => a + b.SubTotal, 0);
+
+  getTotalKgAsesor = (year: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Id_Vendedor == code).reduce((a, b) => a + b.Cantidad, 0);
+
   // Funcion que va a llenar el array que contendrá la informacion del consolidado
-  llenarConsolidado(data : any){
+  llenarConsolidado(data: any) {
     if (data.mes == 1) data.mes = 'Enero';
     if (data.mes == 2) data.mes = 'Febrero';
     if (data.mes == 3) data.mes = 'Marzo';
@@ -216,62 +253,62 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (data.mes == 11) data.mes = 'Noviembre';
     if (data.mes == 12) data.mes = 'Diciembre';
 
-    let info : any = {
-      Id : this.datosFacturacion.length == 0 ? 1 : Math.max(...this.datosFacturacion.map(x => x.Id)) + 1,
-      Mes : data.mes,
-      Ano : `${data.ano}`,
-      Id_Cliente : data.id_Cliente,
-      Cliente : data.cliente,
-      Id_Producto : data.id_Producto,
-      Producto : data.producto,
-      Cantidad : data.cantidad,
-      Devolucion : data.devolucion,
-      Presentacion : data.presentacion,
-      Precio : data.precio,
-      SubTotal : data.subTotal,
-      SubTotalDev : data.cantidad == 0 ? data.subTotal : 0,
-      Id_Vendedor : data.id_Vendedor,
-      Vendedor : data.vendedor,
+    let info: any = {
+      Id: this.datosFacturacion.length == 0 ? 1 : Math.max(...this.datosFacturacion.map(x => x.Id)) + 1,
+      Mes: data.mes,
+      Ano: `${data.ano}`,
+      Id_Cliente: data.id_Cliente,
+      Cliente: data.cliente,
+      Id_Producto: data.id_Producto,
+      Producto: data.producto,
+      Cantidad: data.cantidad,
+      Devolucion: data.devolucion,
+      Presentacion: data.presentacion,
+      Precio: data.precio,
+      SubTotal: data.subTotal,
+      SubTotalDev: data.cantidad == 0 ? data.subTotal : 0,
+      Id_Vendedor: data.id_Vendedor,
+      Vendedor: data.vendedor,
     }
     this.datosFacturacion.push(info);
   }
 
   // Funcion que va a llenar el array que contendrá la informacion del consolidado
-  llenarDatosConsolidado(data : any){
+  llenarDatosConsolidado(data: any) {
     if (data.devolucion == 0) {
-      let info : any = {
-        Id : this.datosFacturacionConsolidado.length == 0 ? 1 : Math.max(...this.datosFacturacionConsolidado.map(x => x.Id)) + 1,
-        Ano : `${data.ano}`,
-        Id_Cliente : data.id_Cliente,
-        Cliente : data.cliente,
-        Id_Producto : data.id_Producto,
-        Producto : `${data.id_Producto} - ${data.producto} - ${data.presentacion}`,
-        Cantidad : data.cantidad,
-        Devolucion : data.devolucion,
-        Presentacion : data.presentacion,
-        Precio : data.precio,
-        SubTotal : data.subTotal,
-        SubTotalDev : data.cantidad == 0 ? data.subTotal : 0,
-        Enero : data.mes == 'Enero' ? data.cantidad : 0,
-        Febrero : data.mes == 'Febrero' ? data.cantidad : 0,
-        Marzo : data.mes == 'Marzo' ? data.cantidad : 0,
-        Abril : data.mes == 'Abril' ? data.cantidad : 0,
-        Mayo : data.mes == 'Mayo' ? data.cantidad : 0,
-        Junio : data.mes == 'Junio' ? data.cantidad : 0,
-        Julio : data.mes == 'Julio' ? data.cantidad : 0,
-        Agosto : data.mes == 'Agosto' ? data.cantidad : 0,
-        Septiembre : data.mes == 'Septiembre' ? data.cantidad : 0,
-        Octubre : data.mes == 'Octubre' ? data.cantidad : 0,
-        Noviembre : data.mes == 'Noviembre' ? data.cantidad : 0,
-        Diciembre : data.mes == 'Diciembre' ? data.cantidad : 0,
-        Id_Vendedor : data.id_Vendedor,
-        Vendedor : data.vendedor,
+      let info: any = {
+        Id: this.datosFacturacionConsolidado.length == 0 ? 1 : Math.max(...this.datosFacturacionConsolidado.map(x => x.Id)) + 1,
+        Ano: `${data.ano}`,
+        Id_Cliente: data.id_Cliente,
+        Cliente: data.cliente,
+        Id_Producto: data.id_Producto,
+        Producto: `${data.id_Producto} - ${data.producto} - ${data.presentacion}`,
+        Cantidad: data.cantidad,
+        Devolucion: data.devolucion,
+        Presentacion: data.presentacion,
+        Precio: data.precio,
+        SubTotal: data.subTotal,
+        SubTotalDev: data.cantidad == 0 ? data.subTotal : 0,
+        Enero: data.mes == 'Enero' ? data.cantidad : 0,
+        Febrero: data.mes == 'Febrero' ? data.cantidad : 0,
+        Marzo: data.mes == 'Marzo' ? data.cantidad : 0,
+        Abril: data.mes == 'Abril' ? data.cantidad : 0,
+        Mayo: data.mes == 'Mayo' ? data.cantidad : 0,
+        Junio: data.mes == 'Junio' ? data.cantidad : 0,
+        Julio: data.mes == 'Julio' ? data.cantidad : 0,
+        Agosto: data.mes == 'Agosto' ? data.cantidad : 0,
+        Septiembre: data.mes == 'Septiembre' ? data.cantidad : 0,
+        Octubre: data.mes == 'Octubre' ? data.cantidad : 0,
+        Noviembre: data.mes == 'Noviembre' ? data.cantidad : 0,
+        Diciembre: data.mes == 'Diciembre' ? data.cantidad : 0,
+        Id_Vendedor: data.id_Vendedor,
+        Vendedor: data.vendedor,
       }
       let nuevo = this.datosFacturacionConsolidado.findIndex((item) => item.Ano == info.Ano
-                  && item.Id_Cliente == info.Id_Cliente
-                  && item.Id_Producto == info.Id_Producto
-                  && item.Presentacion == info.Presentacion
-                  && item.Precio == info.Precio);
+        && item.Id_Cliente == info.Id_Cliente
+        && item.Id_Producto == info.Id_Producto
+        && item.Presentacion == info.Presentacion
+        && item.Precio == info.Precio);
       if (nuevo == -1) this.datosFacturacionConsolidado.push(info);
       else {
         data.mes == 'Enero' ? this.datosFacturacionConsolidado[nuevo].Enero = info.Enero : this.datosFacturacionConsolidado[nuevo].Enero;
@@ -296,25 +333,25 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   calcularTotal = () => this.datosFacturacion.reduce((acc, item) => acc + item.SubTotal, 0);
 
   // Funcion que va a calcular y devolver el valor total de lo facturado en un año
-  calcularTotalAno = (ano : number) => this.datosFacturacion.filter(x => x.Ano == ano).reduce((acc, item) => acc + item.SubTotal, 0);
+  calcularTotalAno = (ano: number) => this.datosFacturacion.filter(x => x.Ano == ano).reduce((acc, item) => acc + item.SubTotal, 0);
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro2 = ($event, campo : any, valorCampo : string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro2 = ($event, campo: any, valorCampo: string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a exportar a excel la informacion que este cargada en la tabla
-  exportarExcelConsolidadoItems(){
+  exportarExcelConsolidadoItems() {
     if (this.datosFacturacionConsolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       setTimeout(() => {
         const title = `Consolidado Facturación x Items - ${moment().format('DD-MM-YYYY')}`;
         const header = ["Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Presentación", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
-        let datos : any =[];
+        let datos: any = [];
         for (const item of this.datosFacturacionConsolidado) {
-          const datos1  : any = [item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Presentacion, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
+          const datos1: any = [item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Presentacion, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -333,13 +370,13 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          row.alignment = { horizontal : 'center' }
+          row.alignment = { horizontal: 'center' }
 
-          let frtNum : number [] = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-          let width12 : number [] = [1, 6, 21];
-          let width15 : number [] = [2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-          let width30 : number [] = [19, 20];
-          let width50 : number [] = [5, 22];
+          let frtNum: number[] = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+          let width12: number[] = [1, 6, 21];
+          let width15: number[] = [2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+          let width30: number[] = [19, 20];
+          let width50: number[] = [5, 22];
 
           frtNum.forEach(n => row.getCell(n).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
           width12.forEach(n => worksheet.getColumn(n).width = 12);
@@ -363,14 +400,14 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   }
 
   //Función que cambiará el numero del tab seleccionado
-  cambioTab(e : any) {
+  cambioTab(e: any) {
     var index = e.index;
-    index == 0 ? this.tabSeleccionado = 1 : index == 1 ? this.tabSeleccionado = 2 : this.tabSeleccionado = 1; 
+    index == 0 ? this.tabSeleccionado = 1 : index == 1 ? this.tabSeleccionado = 2 : this.tabSeleccionado = 1;
   }
 
   //Función para exportar el formato excel dependiendo la tab seleccionada en el momento.
-  exportarExcel = (nroTab : number) => nroTab == 1 ? this.exportarExcelConsolidadoMeses() : this.exportarExcelConsolidadoItems();
-  
+  exportarExcel = (nroTab: number) => nroTab == 1 ? this.exportarExcelConsolidadoMeses() : this.exportarExcelConsolidadoItems();
+
   //Función para exportar el formato excel consolidado por meses.
   exportarExcelConsolidadoMeses() {
     if (this.datosFacturacion.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No hay registros para exportar!');
@@ -379,14 +416,14 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       setTimeout(() => {
         const title = `Consolidado Facturación x Meses - ${moment().format('DD-MM-YYYY')}`;
         const header = ["Mes", "Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Cantidad", "Presentación", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
-         let datos : any =[];
+        let datos: any = [];
         for (const item of this.datosFacturacion) {
-          const datos1  : any = [item.Mes, item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Cantidad, item.Presentacion, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
+          const datos1: any = [item.Mes, item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Cantidad, item.Presentacion, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
           datos.push(datos1);
         }
         let workbook = new Workbook();
         console.log(workbook)
-        const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+        const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
         let worksheet = workbook.addWorksheet(`Consolidado Facturación x Meses - ${moment().format('DD-MM-YYYY')}`);
         worksheet.addImage(imageId1, 'A1:C3');
         let titleRow = worksheet.addRow([title]);
@@ -406,7 +443,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           [1, 2, 8, 11].forEach(n => worksheet.getColumn(n).width = 12);
           [3, 5, 7, 9, 10].forEach(n => worksheet.getColumn(n).width = 15);
           [4, 6, 12].forEach(n => worksheet.getColumn(n).width = 60);
-          [1, 2].forEach(n => worksheet.getColumn(n).alignment = { horizontal : 'center' });
+          [1, 2].forEach(n => worksheet.getColumn(n).alignment = { horizontal: 'center' });
         });
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -420,17 +457,17 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     }
   }
 
-  exportarExcelPorMeses(){
+  exportarExcelPorMeses() {
     //if (this.datosFacturacion.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No hay registros para exportar!');
     //else {
-      const title = `Consolidado Facturación Mes`;
-      let bordes : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      let fuente : any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-      let workbook = this.svcExcel.formatoExcel(title);
-      console.log(workbook)
-      let worksheet = workbook.worksheets[0];
-      console.log(worksheet)
-      this.svcExcel.creacionExcel(`Consolidado`, workbook)
+    const title = `Consolidado Facturación Mes`;
+    let bordes: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    let fuente: any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+    let workbook = this.svcExcel.formatoExcel(title);
+    console.log(workbook)
+    let worksheet = workbook.worksheets[0];
+    console.log(worksheet)
+    this.svcExcel.creacionExcel(`Consolidado`, workbook)
     //}
   }
 

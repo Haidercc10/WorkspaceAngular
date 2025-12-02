@@ -37,19 +37,19 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   production: Array<production> = [];
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];
-  fails : Array<any> = [];
+  fails: Array<any> = [];
   devolution: boolean = false;
-  statuses : Array<any> = []; //[{id : 19, name : 'DISPONIBLE'}, {id : 23, name : 'NO DISPONIBLE'}, ];
-  status : any = null;
-  qtyRollsDv : number = 0;
+  statuses: Array<any> = []; //[{id : 19, name : 'DISPONIBLE'}, {id : 23, name : 'NO DISPONIBLE'}, ];
+  status: any = null;
+  qtyRollsDv: number = 0;
   @ViewChild('op') op: OverlayPanel | undefined;
-  infoColor : string = ``;
-  
+  infoColor: string = ``;
+
   //@ViewChild(MovimientosOrdenFacturacionComponent) movOF : MovimientosOrdenFacturacionComponent;
-  
-  @ViewChild('tableOrder') tableOrder : Table | undefined;
-  @ViewChild('tableDevolution') tableDevolution : Table | undefined;
-  @ViewChild('tableConsolidate') tableConsolidate : Table | undefined;
+
+  @ViewChild('tableOrder') tableOrder: Table | undefined;
+  @ViewChild('tableDevolution') tableDevolution: Table | undefined;
+  @ViewChild('tableConsolidate') tableConsolidate: Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -58,13 +58,13 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     private createPDFService: CreacionPdfService,
     private svDevolutions: DevolucionesProductosService,
     private svDetailsDevolutions: DetallesDevolucionesProductosService,
-    private svFails : FallasTecnicasService,
-    private svProduction : Produccion_ProcesosService,
-    private cmpDevolutions : Devolucion_OrdenFacturacionComponent, 
-    private svStatus : EstadosService,
+    private svFails: FallasTecnicasService,
+    private svProduction: Produccion_ProcesosService,
+    private cmpDevolutions: Devolucion_OrdenFacturacionComponent,
+    private svStatus: EstadosService,
   ) {
-      this.modoSeleccionado = appComponent.temaSeleccionado;
-      this.validateForm();
+    this.modoSeleccionado = appComponent.temaSeleccionado;
+    this.validateForm();
   }
 
   ngOnInit() {
@@ -73,22 +73,22 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.getStatuses();
   }
 
-  validateForm(){
+  validateForm() {
     this.form = this.frmBuilder.group({
-      dev : [null, Validators.required],
-      orderFact : [null, Validators.required],
+      dev: [null, Validators.required],
+      orderFact: [null, Validators.required],
       fact: [null, Validators.required],
       idClient: [null, Validators.required],
       client: [null, Validators.required],
       reason: [null, Validators.required],
-      reposition : [false, Validators.required],
-      creditNote : [false, Validators.required],
-      responsive : [null, Validators.required],
-      observationStart : [null, Validators.required],
-      observationIn : [null ],
-      observation : [null, Validators.required],
-      salesId : [null, ],
-      sales : [null, ],
+      reposition: [false, Validators.required],
+      creditNote: [false, Validators.required],
+      responsive: [null, Validators.required],
+      observationStart: [null, Validators.required],
+      observationIn: [null],
+      observation: [null, Validators.required],
+      salesId: [null,],
+      sales: [null,],
     });
   }
 
@@ -103,17 +103,17 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
     console.log(this.storage_Id);
-    
+
   }
 
-  getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [19,44,45,23].includes(x.estado_Id)) } );
+  getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [19, 44, 45, 23].includes(x.estado_Id)) });
 
   //Función para obtener las fallas técnicas.
-  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [13,14,15].includes(item.tipoFalla_Id)) });
-  
-  applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+  getFails = () => this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [13, 14, 15].includes(item.tipoFalla_Id)) });
 
-  descriptionColors($event : any, color : string){
+  applyFilter = ($event, campo: any, table: any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  descriptionColors($event: any, color: string) {
     if (color == 'green') this.infoColor = `<b>${'VERDE:'}</b> Indica que si la devolución es con <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione como <b>${'DISPONIBLES'},</b> volverán al <b>${'INVENTARIO DE DESPACHO'}.</b>
     <br><br> Si la devolución no tiene <b>${'NOTA CREDITO'}</b> los bultos/rollos que seleccione como <b>${'DISPONIBLES'},</b> volverán al <b>${'INVENTARIO DEL AREA'}</b> en la que fueron producidos. Luego de esto <b>${'DEBE REINGRESARLOS A DESPACHO'}</b> por medio del sistema <b>${'PLASTICARIBE'}</b>.`;
 
@@ -141,11 +141,11 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       this.movOF.modalDevolution = false;
       this.movOF.searchData();
     }*/
-    this.devolution = false; 
+    this.devolution = false;
   }
 
   //Función para limpiar tablas.
-  clearTables(){
+  clearTables() {
     this.status = null;
     this.production = [];
     this.productionSelected = [];
@@ -156,22 +156,22 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   searchData() {
     this.clearTables();
     let dev: any = this.form.value.dev;
-    let date : any = moment().format('YYYY-MM-DD');
-    let hour : string = moment().format('HH:mm:ss');
-    let reposition : boolean = [null, undefined, false].includes(this.form.value.reposition) ? false : true;
-    let creditNote : boolean = [null, undefined, false].includes(this.form.value.creditNote) ? false : true;
-    let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
-    let user : any = this.appComponent.storage_Id;
+    let date: any = moment().format('YYYY-MM-DD');
+    let hour: string = moment().format('HH:mm:ss');
+    let reposition: boolean = [null, undefined, false].includes(this.form.value.reposition) ? false : true;
+    let creditNote: boolean = [null, undefined, false].includes(this.form.value.creditNote) ? false : true;
+    let observation: any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
+    let user: any = this.appComponent.storage_Id;
     this.qtyRollsDv = 0;
-  
+
     if (![null, undefined, ''].includes(dev)) {
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
-        if([11,29].includes(data[0].dev.estado_Id)) {
+        if ([11, 29].includes(data[0].dev.estado_Id)) {
           this.load = true;
           this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, user, reposition, creditNote, observation).subscribe(() => {
             this.qtyRollsDv = data.length;
             data.forEach(x => {
-              this.production.push({  
+              this.production.push({
                 'item': x.prod.prod_Id,
                 'reference': x.prod.prod_Nombre,
                 'numberProduction': x.dtDev.numero_Rollo,
@@ -179,8 +179,8 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
                 'weight': x.dtDev.weight == null ? x.weight : x.dtDev.weight,
                 'of': x.dtDev.of == null ? x.dev.id_OrdenFact : x.dtDev.of,
                 'ot': x.dtDev.ot == null ? x.ot : x.dtDev.ot,
-                'fact' : x.dtDev.fact == null ? x.dev.devProdFact_Factura : x.dtDev.fact,
-                'presentation': x.dtDev.presentacion, 
+                'fact': x.dtDev.fact == null ? x.dev.devProdFact_Factura : x.dtDev.fact,
+                'presentation': x.dtDev.presentacion,
                 'statusId': 23,
                 'statusName': 'NO DISPONIBLE',
               });
@@ -197,31 +197,31 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
         }
       }, (error: HttpErrorResponse) => {
         this.errorMessage(`No fue posible consultar la devolución N° ${dev}!`, error);
-      }); 
+      });
     } else this.msg.mensajeAdvertencia('Número de devolución no valido!');
   }
 
   //Función para cargar la información de la factura.
   changeInformationDev(data: any) {
-    this.form.patchValue({ 
+    this.form.patchValue({
       'orderFact': data.dev.id_OrdenFact,
-      'idClient': data.cliente.cli_Id, 
-      'client': data.cliente.cli_Nombre, 
-      'fact': data.dev.facturaVta_Id, 
-      'reason' : data.dtDev.falla_Id, 
-      'reposition' : data.dev.devProdFact_Reposicion,
-      'creditNote' : data.dev.devProdFact_NotaCredito,
-      'observationStart' : data.dev.devProdFact_Observacion, 
-      'observationIn' : data.dev.devProdFact_ObservacionModificado, 
-      'responsive': data.dev.devProdFact_Responsable, 
-      'salesId' : data.dev.asesor_Id,
-      'sales' : data.asesor.usua_Nombre,
+      'idClient': data.cliente.cli_Id,
+      'client': data.cliente.cli_Nombre,
+      'fact': data.dev.facturaVta_Id,
+      'reason': data.dtDev.falla_Id,
+      'reposition': data.dev.devProdFact_Reposicion,
+      'creditNote': data.dev.devProdFact_NotaCredito,
+      'observationStart': data.dev.devProdFact_Observacion,
+      'observationIn': data.dev.devProdFact_ObservacionModificado,
+      'responsive': data.dev.devProdFact_Responsable,
+      'salesId': data.dev.asesor_Id,
+      'sales': data.asesor.usua_Nombre,
     });
   }
 
   //Función para seleccionar bultos
   selectedProduction(production: production) {
-    if(this.status) {
+    if (this.status) {
       this.load = true;
       let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
       this.production.splice(index, 1);
@@ -240,17 +240,17 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 50);
   }
-   
+
   //Función para validar el estado que tendrá los bultos
-  validateSelection(data : any, statusId : any, statusName : any, production : any){
+  validateSelection(data: any, statusId: any, statusName: any, production: any) {
     let index2 = data.findIndex(x => x.numberProduction == production.numberProduction);
     data[index2].statusId = statusId;
-    data[index2].statusName = statusName;  
+    data[index2].statusName = statusName;
   }
 
   //Función para seleccionar todos los bultos
   selectedAllProduction() {
-    if(this.status) {
+    if (this.status) {
       let tableDv = this.tableDevolution;
       this.load = true;
       this.productionSelected = this.productionSelected.concat(this.production);
@@ -272,32 +272,32 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   }
 
   //Validar que al seleccionar/deseleccionar todos los bultos tomen el estado correspondiente 
-  validateSelectionAllProduction(data : any, statusId : number, statusName : string, tableDevolution : any){
+  validateSelectionAllProduction(data: any, statusId: number, statusName: string, tableDevolution: any) {
     console.log(tableDevolution);
     data.filter(x => !tableDevolution._value.map(y => y.numberProduction).includes(x.numberProduction)).forEach(x => {
-      x.statusId = statusId, 
-      x.statusName = statusName
+      x.statusId = statusId,
+        x.statusName = statusName
     });
   }
 
   //Función para seleccionar según lo que esté filtrado en la tabla.
-  selectionForFilters(){
+  selectionForFilters() {
     let data = this.tableOrder.filteredValue ? this.tableOrder.filteredValue : this.tableOrder.value;
 
-    if(data.length > 0) {
+    if (data.length > 0) {
       this.load = true;
-      this.productionSelected = this.productionSelected.concat(data); 
-      if(!this.tableOrder.filteredValue) {
+      this.productionSelected = this.productionSelected.concat(data);
+      if (!this.tableOrder.filteredValue) {
         this.production = [];
         this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre, this.tableDevolution);
       } else {
         data.forEach(x => {
-          x.statusId = this.status, 
-          x.statusName = this.statuses.find(x => x.estado_Id == this.status).estado_Nombre
-          let index : number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
+          x.statusId = this.status,
+            x.statusName = this.statuses.find(x => x.estado_Id == this.status).estado_Nombre
+          let index: number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
           this.production.splice(index, 1);
         });
-        this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction));
+        this.productionSelected.sort((a, b) => Number(b.numberProduction) - Number(a.numberProduction));
       }
       this.getConsolidateProduction();
       setTimeout(() => { this.load = false; }, 5);
@@ -305,26 +305,26 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   }
 
   //Función para seleccionar según lo que esté filtrado en la tabla.
-  deselectionForFilters(){
+  deselectionForFilters() {
     let data = this.tableDevolution.filteredValue ? this.tableDevolution.filteredValue : this.tableDevolution.value;
 
-    if(data.length > 0) {
+    if (data.length > 0) {
       this.load = true;
-      this.production = this.production.concat(data); 
-      if(!this.tableDevolution.filteredValue) {
+      this.production = this.production.concat(data);
+      if (!this.tableDevolution.filteredValue) {
         this.productionSelected = [];
       } else {
         data.forEach(x => {
-          x.statusId = 23, 
-          x.statusName = 'NO DISPONIBLE'
-          let index : number = this.productionSelected.findIndex(p => p.numberProduction == x.numberProduction);
+          x.statusId = 23,
+            x.statusName = 'NO DISPONIBLE'
+          let index: number = this.productionSelected.findIndex(p => p.numberProduction == x.numberProduction);
           this.productionSelected.splice(index, 1);
         });
-        this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
+        this.production.sort((a, b) => Number(a.numberProduction) - Number(b.numberProduction));
       }
       this.getConsolidateProduction();
       setTimeout(() => { this.load = false; }, 5);
-    } else this.msg.mensajeAdvertencia(`No hay datos para deseleccionar!`, ``);  
+    } else this.msg.mensajeAdvertencia(`No hay datos para deseleccionar!`, ``);
   }
 
   //Función para consolidar la información de lo que se ha seleccionado.
@@ -357,34 +357,34 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   }
 
   //Función para contar los bultos consolidados por item.
-  totalCountProductionByProductStatus(item: number, status : number): number {
+  totalCountProductionByProductStatus(item: number, status: number): number {
     let total: number = 0;
     total = this.productionSelected.filter(x => x.item == item && x.statusId == status).length;
     return total;
   }
 
   //Función para validar la información que se va a guardar.
-  validateInformation(){
-    if(this.form.valid) {
-      let rolls : any = [];
-      let creditNote : boolean = this.form.value.creditNote;
+  validateInformation() {
+    if (this.form.valid) {
+      let rolls: any = [];
+      let creditNote: boolean = this.form.value.creditNote;
 
-      if(this.productionSelected.length > 0) {
-        this.productionSelected.forEach(x => { 
-          rolls.push({'of': x.of, 'roll': x.numberProduction, 'item': x.item, 'currentStatus' : 24, 'newStatus' : x.statusId, 'envioZeus' : creditNote ? true : x.statusId == 19 ? false : true });
+      if (this.productionSelected.length > 0) {
+        this.productionSelected.forEach(x => {
+          rolls.push({ 'of': x.of, 'roll': x.numberProduction, 'item': x.item, 'currentStatus': 24, 'newStatus': x.statusId, 'envioZeus': creditNote ? true : x.statusId == 19 ? false : true });
         });
-        if(this.qtyRollsDv == this.productionSelected.length) this.updateRollsInOrderFact(rolls); //this.updateRollsInProduction();
+        if (this.qtyRollsDv == this.productionSelected.length) this.updateRollsInOrderFact(rolls); //this.updateRollsInProduction();
         else this.msg.mensajeAdvertencia(`La cantidad de bultos/rollos seleccionados no coincide con la cantidad de bultos de la devolución!`);
       } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe seleccionar al menos un bulto!`);
     } else this.msg.mensajeAdvertencia(`Advertencia`, `Debe llenar todos los campos!`);
   }
 
   //Función para actualizar el estado de los bultos en orden de facturación.
-  updateRollsInOrderFact(rolls){
+  updateRollsInOrderFact(rolls) {
     this.load = true;
     //let order : any = this.form.value.orderFact;
     rolls.forEach(x => {
-      if(x.newStatus == 19) x.newStatus = 33;
+      if (x.newStatus == 19) x.newStatus = 33;
       else x.newStatus = x.newStatus;
     });
     this.dtOrderFactService.putStatusInOF(rolls).subscribe(data => {
@@ -396,10 +396,10 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   }
 
   //Función para actualizar el estado de los bultos en producción procesos.
-  updateRollsInProduction(rolls){
-    if(this.productionSelected.length > 0) {
+  updateRollsInProduction(rolls) {
+    if (this.productionSelected.length > 0) {
       rolls.forEach(x => {
-        if(x.newStatus == 33) x.newStatus = 19;
+        if (x.newStatus == 33) x.newStatus = 19;
         else x.newStatus = x.newStatus;
       });
       this.svProduction.putChangeStateProduction(rolls).subscribe(data => {
@@ -412,14 +412,14 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   }
 
   //Función para actualizar el estado de la devolución.
-  updateStatusDev(){
+  updateStatusDev() {
     let dev: any = this.form.value.dev;
-    let date : any = moment().format('YYYY-MM-DD');
-    let hour : string = moment().format('HH:mm:ss');
-    let reposition : boolean = this.form.value.reposition;
-    let creditNote : boolean = this.form.value.creditNote;
-    let observation : any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
-    let status : number;
+    let date: any = moment().format('YYYY-MM-DD');
+    let hour: string = moment().format('HH:mm:ss');
+    let reposition: boolean = this.form.value.reposition;
+    let creditNote: boolean = this.form.value.creditNote;
+    let observation: any = this.form.value.observation == null ? '' : `?observation=${this.form.value.observation}`;
+    let status: number;
     status = this.qtyRollsDv == this.productionSelected.length ? reposition ? 38 : 54 : 29;
     //this.load = true;
 
@@ -432,9 +432,9 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     });
   }
 
-  createPDF(dev : any, action : any){
+  createPDF(dev: any, action: any) {
     this.cmpDevolutions.createPDF(dev, action);
-    this.clearFields(); 
+    this.clearFields();
   }
 
 }
@@ -446,12 +446,12 @@ interface production {
   quantity: number;
   cuontProduction?: number;
   presentation: string;
-  fail? : number;
-  statusId? : number;
-  statusName? : string;
-  weight? : number;
-  of? : number;
-  ot? : number;
-  fact? : string;
+  fail?: number;
+  statusId?: number;
+  statusName?: string;
+  weight?: number;
+  of?: number;
+  ot?: number;
+  fact?: string;
 }
 

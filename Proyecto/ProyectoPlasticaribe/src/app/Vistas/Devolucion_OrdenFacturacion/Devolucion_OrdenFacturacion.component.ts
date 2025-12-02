@@ -86,17 +86,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getFails();
-    if(this.ValidarRol == 10) this.focusInput(false);
   }
-
-// Función para mantener el puntero del mouse en un campo especifico. 
-  focusInput(destroy: boolean) {
-    let time = setInterval(() => {
-      let preInBarsCode = document.getElementById('roll');
-      if (!destroy && preInBarsCode) preInBarsCode.focus();
-      else if (destroy) clearInterval(time);
-    }, 30000);
-  } 
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
@@ -381,9 +371,6 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   validateInformation() {
-    console.log(this.formDataOrder.value);
-    console.log(this.formDataOrder);
-    
     if (this.formDataOrder.valid) {
       if (this.productionSelected.length > 0) {
         if (this.formDataOrder.value.order != null) this.saveDev();
@@ -408,8 +395,6 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   saveDev() {
     this.load = true;
     let order : number = this.formDataOrder.value.order;
-    //let reposition : boolean = this.formDataOrder.value.reposition;
-    //let creditNote : boolean = this.formDataOrder.value.creditNote;
 
     let info: modelDevolucionProductos = {
       'FacturaVta_Id': this.formDataOrder.value.fact,
@@ -462,7 +447,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   //Cambiar estado de rollos en la OF.
-  changeStatus(data: any, currentStatus : number, newStatus : number) {
+  changeStatus(data : any, currentStatus : number, newStatus : number) {
     let reels: any = [];
     let reelsOF: any = [];
 
