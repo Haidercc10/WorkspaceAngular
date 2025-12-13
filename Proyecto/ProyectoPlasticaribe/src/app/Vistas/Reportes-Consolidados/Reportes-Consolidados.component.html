@@ -74,6 +74,14 @@
         <app-Reporte_EstadisticasVentas></app-Reporte_EstadisticasVentas>
       </p-tabPanel>
 
+      <p-tabPanel
+        *ngIf="[1,6,96,12,97,2,98,10,69].includes(ValidarRol)"
+        header="Información de Ventas"
+        leftIcon="pi pi-sliders-h">
+        <app-informacion-ventas></app-informacion-ventas>
+      </p-tabPanel>
+
+
       <!--<p-tabPanel
         *ngIf="[1,4,6,85,86,87,10,88,89,12,95,75,80,74,12,94,97,2,76,77,81,5].includes(ValidarRol)"
         header="Rollos/Bultos"

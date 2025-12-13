@@ -813,6 +813,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       });
       contador++
     });
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 10, bold : true, }); 
   }
 
   //.Función que contendrá la info al documento excel. 

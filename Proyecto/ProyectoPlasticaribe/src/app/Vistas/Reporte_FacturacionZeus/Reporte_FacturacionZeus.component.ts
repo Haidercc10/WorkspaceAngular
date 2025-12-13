@@ -26,6 +26,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
+  @ViewChild('dt3') dt3: Table | undefined;
+  @ViewChild('dt4') dt4: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
   cargando: boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -43,8 +45,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   tabSeleccionado: number = 1; //Variable que tendrá la información del tab seleccionado
   eneroUno: any = moment().startOf('year').format('YYYY-MM-DD'); //Variable que contendrá el primero de enero del año actual
   today: any = moment().format('YYYY-MM-DD'); //Variable que contendrá la fecha actual
-  dataSales: any = []; //Variable que guardará la info consolidada por asesores. 
-  dataClients: any = []; //Variable que guardará la info consolidada por asesores. 
+  
 
   constructor(private frmBuilder: FormBuilder,
     private AppComponent: AppComponent,
@@ -197,46 +198,14 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (fechaInicial == null) fechaInicial = this.eneroUno;
     if (fechaFinal == null) fechaFinal = this.today;
 
-
     this.invetarioZeusService.GetConsolidadClientesArticulo(fechaInicial, fechaFinal, ruta).subscribe(data => {
-
       if (data.length == 0) this.msj.mensajeAdvertencia('¡No se encontraron resultados de bésqueda con la combinación de filtros seleccionada!');
       else {
         data.forEach(x => this.llenarConsolidado(x));
         data.forEach(x => this.llenarDatosConsolidado(x));
-        this.getSales();
       }
-    }, null, () => this.cargando = false);
+    }, null, () => this.cargando = false );
   }
-
-  //Función que cargará los vendedores activos en zeus 
-  getSales() {
-    let years: any = [];
-    this.datosFacturacion.forEach(x => {
-      if (!years.includes(x.Ano)) years.push(x.Ano);
-    });
-    years.sort();
-    years.forEach(y => {
-      this.invetarioZeusService.getActiveSales().subscribe(data => {
-        data.forEach(z => {
-          z.Year = y;
-        });
-        this.dataSales = data;
-        console.log(this.dataSales);
-      }, error => console.log(error));
-    });
-  }
-
-  //*CALCULOS DE KILAJE Y FACTURACIÓN
-  //función que mostrará la facturación el asesor. 
-  getFactAsesor = (year: string, month: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Mes == month && x.Id_Vendedor == code).reduce((a, b) => a + b.SubTotal, 0);
-
-  //función que mostrará el kilaje vendido por el asesor. 
-  getKgAsesor = (year: string, month: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Mes == month && x.Id_Vendedor == code && x.Presentacion == 'KLS').reduce((a, b) => a + b.Cantidad, 0);
-
-  getTotalFactAsesor =  (year: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Id_Vendedor == code).reduce((a, b) => a + b.SubTotal, 0);
-
-  getTotalKgAsesor = (year: string, code: string) => this.datosFacturacion.filter(x => x.Ano == year && x.Id_Vendedor == code).reduce((a, b) => a + b.Cantidad, 0);
 
   // Funcion que va a llenar el array que contendrá la informacion del consolidado
   llenarConsolidado(data: any) {
@@ -402,7 +371,11 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   //Función que cambiará el numero del tab seleccionado
   cambioTab(e: any) {
     var index = e.index;
-    index == 0 ? this.tabSeleccionado = 1 : index == 1 ? this.tabSeleccionado = 2 : this.tabSeleccionado = 1;
+    index == 0 ? this.tabSeleccionado = 1 : 
+    index == 1 ? this.tabSeleccionado = 2 : 
+    index == 2 ? this.tabSeleccionado = 3 :
+    index == 3 ? this.tabSeleccionado = 4 :
+    this.tabSeleccionado = 1;
   }
 
   //Función para exportar el formato excel dependiendo la tab seleccionada en el momento.

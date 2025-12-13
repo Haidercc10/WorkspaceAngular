@@ -169,7 +169,7 @@ export class InventarioZeusService {
 
   GetProductosFaturadosMes = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getProductosFaturadosMes`);
 
-  GetVendedoresFacturasMes = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getVendedoresFacturasMes`);
+  GetVendedoresFacturasMes = (year : number, url? : string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getVendedoresFacturasMes/${year}${url}`);
 
   GetComprasMes = (anio: any, mes: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes/${anio}/${mes}`);
 
@@ -205,6 +205,12 @@ export class InventarioZeusService {
 
   getInformeTransacciones = (fecha1: any, fecha2: any, url : string = '') => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getInformeTransacciones/${fecha1}/${fecha2}${url}`);
   
+  getProductsForClient = (client : any) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getProductsForClient/${client}`);
+
+  getBillingAnnual = (year : any) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getBillingAnnual/${year}`);
+
+  getBillingClientsAnnual = (year : any) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getBillingClientsAnnual/${year}`);
+
   //*********************************************************************** TRANSAC ******************************************************************************/
   GetRecibosCaja = (fecha1: any, fecha2: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 

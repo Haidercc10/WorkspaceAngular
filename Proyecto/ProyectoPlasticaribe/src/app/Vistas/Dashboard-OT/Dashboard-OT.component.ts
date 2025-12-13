@@ -153,7 +153,7 @@ export class DashboardOTComponent implements OnInit {
     this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos => this.costoTotalOrdenesMes = datos.reduce((a, b) => a + b.costo, 0));
     this.zeusService.GetClienteFacturadosMes().subscribe(data => this.clientesFacturados = data);
     this.zeusService.GetProductosFaturadosMes().subscribe(data => this.productosFacturas = data);
-    this.zeusService.GetVendedoresFacturasMes().subscribe(data1 => this.vendedoresFacturas = data1);
+    this.zeusService.GetVendedoresFacturasMes(2025, `?month=${12}`).subscribe(data1 => this.vendedoresFacturas = data1);
   }
 
   consultarPesoProducidoOrdenes(){

@@ -97,6 +97,8 @@ export class PedidoExternoComponent implements OnInit {
       PedObservacion: '',
       PedDescuento: 0,
       PedIva: true,
+      PedDireccionEntrega: [null, Validators.required],
+      PedOc: '',
     });
 
     //Datos para la tabla de productos.
@@ -259,7 +261,7 @@ export class PedidoExternoComponent implements OnInit {
               if (this.validarFechasCartera(datos[i])) break;
             }
           }, () => {
-            this.msj.mensajeError(`Error`, `¡Error al consultar la cartera del cliente selecionado!`);
+            this.msj.mensajeError(`Error`, `¡Error al consultar la cartera del cliente seleccionado!`);
             this.limpiarTodosCampos();
           }, () => this.cargando = false);
         });
@@ -287,8 +289,11 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion para cargar los productos de un solo cliente
   productoCliente() {
     this.producto = [];
+    
     this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(datos_clientesProductos => {
       datos_clientesProductos.forEach(prod => this.productosServices.srvObtenerListaPorId(prod.prod_Id).subscribe(datos => this.producto.push(datos)));
+      console.log(this.producto);
+      
     });
   }
 
@@ -303,7 +308,7 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   productoSinExistencia(idProducto: number) {
-    this.unidadMedidaService.srvObtenerLista().subscribe(data => this.presentacion = data.filter(x => ['Und', 'Kg', 'Rollo', 'Paquete'].includes(x.undMed_Id)).map(und => und.undMed_Id));
+    this.unidadMedidaService.srvObtenerLista().subscribe(data => this.presentacion = data.filter(x => ['Und', 'Kg', 'Paquete'].includes(x.undMed_Id)).map(und => und.undMed_Id));
     this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
       this.FormPedidoExternoProductos.patchValue({
         ProdId: datos_producto[0].prod_Id,
@@ -345,20 +350,25 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion que envia la informacion de los productos a la tabla.
   cargarFormProductoEnTablas() {
     let precioProducto: number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;
-    if (precioProducto > 0 && precioProducto >= this.ultimoPrecio) {
-      this.ArrayProducto.push({
-        Id: this.FormPedidoExternoProductos.get('ProdId')?.value,
-        Nombre: this.FormPedidoExternoProductos.value.ProdNombre,
-        Cant: this.FormPedidoExternoProductos.get('ProdCantidad').value,
-        UndCant: this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-        PrecioUnd: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
-        Stock: this.FormPedidoExternoProductos.get('ProdStock').value,
-        SubTotal: (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
-        FechaEntrega: moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
-      });
-      this.LimpiarCamposProductos();
-      this.productoCliente();
-    } else this.msj.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
+    let item: number = this.FormPedidoExternoProductos.value.ProdId;
+    let ref: number = this.FormPedidoExternoProductos.value.ProdNombre;
+    if (this.ArrayProducto.filter(x => x.Id == item).length > 0) this.msj.mensajeAdvertencia(`Advertencia`, `El item ${item} ${ref} ya se encuentra en la tabla`)
+    else {
+      if (precioProducto > 0 && precioProducto >= this.ultimoPrecio) {
+        this.ArrayProducto.push({
+          Id: this.FormPedidoExternoProductos.get('ProdId')?.value,
+          Nombre: this.FormPedidoExternoProductos.value.ProdNombre,
+          Cant: this.FormPedidoExternoProductos.get('ProdCantidad').value,
+          UndCant: this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
+          PrecioUnd: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
+          Stock: this.FormPedidoExternoProductos.get('ProdStock').value,
+          SubTotal: (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
+          FechaEntrega: moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
+        });
+        this.LimpiarCamposProductos();
+        this.productoCliente();
+      } else this.msj.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
+    }
   }
 
   // Funcion que va a retornar el valor total del pedido
@@ -439,8 +449,8 @@ export class PedidoExternoComponent implements OnInit {
           PedExt_Iva: this.iva,
           PedExt_PrecioTotalFinal: this.valorFinalPedido(),
           PedExt_HoraCreacion: moment().format('H:mm:ss'),
-          PedExt_Oc : '', 
-          PedExt_DireccionEntrega : '',
+          PedExt_Oc: '',
+          PedExt_DireccionEntrega: '',
         }
         this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data => this.crearDetallesPedido(data.pedExt_Id), () => {
           this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido, por favor intente de nuevo!');

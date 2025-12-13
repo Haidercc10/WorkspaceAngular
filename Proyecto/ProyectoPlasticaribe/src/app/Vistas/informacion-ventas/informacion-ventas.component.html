@@ -1,0 +1,617 @@
+<!--* CARGA-->
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+        <div style="margin: auto;">
+                <p-progressSpinner></p-progressSpinner>
+        </div>
+</div>
+
+<div class="p-5 mb-4">
+        <!--* Titulo filtros-->
+        <div class="mb-5">
+                <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-20">
+                        <i class="pi pi-filter"></i> Filtros de búsqueda
+                </h3>
+        </div>
+
+        <!--* Formulario -->
+        <form [formGroup]="form" id="form" (ngSubmit)="cambioTab($event)">
+                <div class="mb-3">
+                        <div class="row g-4">
+                                <!--* AÑO-->
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-1 col-xxl-1" id="">
+                                        <span class="p-float-label">
+                                                <p-dropdown formControlName="year" class="m-auto" [options]="years"
+                                                        inputId="year" [autoDisplayFirst]="false"></p-dropdown>
+                                                <label for="year">Año</label>
+                                        </span>
+                                </div>
+
+                                <!--* MES -->
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-1 col-xxl-1" id="">
+                                        <span class="p-float-label">
+                                                <p-dropdown formControlName="month" class="m-auto"
+                                                        [options]="monthNames" inputId="month"
+                                                        [autoDisplayFirst]="false"></p-dropdown>
+                                                <label for="month">Mes</label>
+                                        </span>
+                                </div>
+
+                                <!-- Id Vendedores -->
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2" id="Id_Vendedor">
+                                        <span class="p-float-label">
+                                                <input formControlName="asesorId" id="Id_Vendedor" type="text"
+                                                        pInputText autocomplete="off" />
+                                                <label for="Id_Vendedor">Id Vendedor</label>
+                                        </span>
+                                </div>
+
+                                <!-- Vendedores -->
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="Vendedor">
+                                        <span class="p-float-label">
+                                                <input formControlName="asesor" id="Vendedor" list="vendedores"
+                                                        (change)="loadAsesor()" type="text" pInputText
+                                                        autocomplete="off" />
+                                                <datalist id="vendedores">
+                                                        <option value={{item.usua_Nombre}} *ngFor="let item of sales">
+                                                                {{item.usua_Nombre}}
+                                                        </option>
+                                                </datalist>
+                                                <label for="Vendedor">Vendedor</label>
+                                        </span>
+                                </div>
+
+                                <!-- Id Cliente -->
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2" id="Id_Cliente">
+                                        <span class="p-float-label">
+                                                <input formControlName="clientId" id="Id_Cliente" [readonly]="true"
+                                                        type="text" pInputText autocomplete="off" />
+                                                <label for="Id_Cliente">Id Cliente</label>
+                                        </span>
+                                </div>
+
+                                <!-- Clientes -->
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="Cliente">
+                                        <span class="p-float-label">
+                                                <input formControlName="client" id="Cliente" list="clientes"
+                                                        (change)="loadClients()" autocomplete="off" type="text"
+                                                        pInputText />
+                                                <datalist id="clientes">
+                                                        <option value={{item.cli_Id}} *ngFor="let item of clients">
+                                                                {{item.cli_Nombre}}</option>
+                                                </datalist>
+                                                <label for="Cliente">Cliente</label>
+                                        </span>
+                                </div>
+                        </div>
+                </div>
+
+                <!--* Botones-->
+                <div class="mb-3">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones">
+                                <button pButton class="p-button-danger" type="submit" label="Consultar"
+                                        icon="pi pi-search"></button>
+                                <button pButton class="p-button-secondary" type="button" label="Limpiar Campos"
+                                        icon="pi pi-eraser" (click)="clearAll()"></button>
+                                <button pButton class="p-button-success" type="button" label="Exportar Excel"
+                                        icon="pi pi-file-excel" (click)="exportExcel()"></button>
+                        </div>
+                </div>
+        </form>
+
+        <!--* Linea-->
+        <p-divider></p-divider>
+
+        <!--* Titulo Tabla-->
+        <div class="mb-4">
+                <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i
+                                class="pi pi-list"></i>
+                        Registros consultados</h2>
+        </div>
+
+        <!--* TABLAS-->
+        <p-tabView (onChange)="cambioTab($event)">
+                <p-tabPanel header="Consolidado por Asesores" leftIcon="pi pi-box">
+                        <div *ngIf="!load">
+                                <p-table #dt1 [value]="dataAsesors" rowGroupMode="subheader" groupRowsBy="year"
+                                        [resizableColumns]="true" columnResizeMode="expand" responsiveLayout="scroll"
+                                        sortField="year" sortMode="single" [scrollable]="true" scrollHeight="1000px"
+                                        [rowHover]="true" styleClass="p-datatable-gridlines p-datatable-sm">
+                                        <ng-template pTemplate="header">
+                                                <tr class="font-size-16" id="filtros">
+                                                        <th></th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                </tr>
+                                                <tr>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                        </th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Información Asesor</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Enero</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Febrero</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Marzo</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Abril</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Mayo</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Junio</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Julio</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Agosto</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Septiembre</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Octubre</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Noviembre</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Diciembre</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                SubTotal</th>
+                                                </tr>
+                                                <tr>
+                                                        <th>#</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Año</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Codigo </th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Asesor</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg
+                                                        </th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact
+                                                        </th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.</th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg
+                                                        </th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.
+                                                        </th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg
+                                                        </th>
+                                                        <th pResizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Fact.
+                                                        </th>
+                                                        <th pRsizableColumn pSortableColumn=""><p-sortIcon
+                                                                        field=""></p-sortIcon> Kg</th>
+                                                </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="groupheader" let-data>
+                                                <tr pRowGroupHeader style="background-color: #83D3FF;">
+                                                        <td colspan="30">
+                                                                <span class="font-bold"
+                                                                        style="color: black;"><b>{{data.year}}</b></span>
+                                                        </td>
+                                                </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+                                                <tr class="font-size-15">
+                                                        <td>{{rowIndex + 1}}</td>
+                                                        <td class="text-center">{{data.year}}</td>
+                                                        <td class="text-center">{{data.asesorId}}</td>
+                                                        <td>{{data.asesor}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "01",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "01",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "02",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "02",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "03",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "03",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "04",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "04",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "05",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "05",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "06",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "06",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "07",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "07",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "08",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "08",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(2025, "09",
+                                                                        data.asesorId) | number : '1.2-2'}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "09",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(2025, "10",
+                                                                        data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "10",
+                                                                data.asesorId) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactAsesor(data.year, "11",
+                                                                        data.asesorId) | number : '1.2-2'}}</b></td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "11",
+                                                                data.asesorId) | number : '1.2-2'}}
+                                                        </td>
+                                                        <td class="text-center"><b>${{getFactAsesor(data.year, "12",
+                                                                        data.asesorId) | number : '1.2-2'}}</b>
+                                                        </td>
+                                                        <td class="text-center">{{getKgAsesor(data.year, "12",
+                                                                data.asesorId) | number : '1.2-2'}}
+                                                        </td>
+                                                        <td class="text-center textGreen"><b>$
+                                                                        {{getTotalFactAsesor(data.year, data.asesorId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center textBlue">{{getTotalKgAsesor(data.year,
+                                                                data.asesorId) | number : '1.2-2'}}
+                                                        </td>
+                                                </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="groupfooter" let-data>
+                                                <tr class="font-bold" style="background-color: palegreen; color: black">
+                                                        <td colspan="4" class="text-left font-bold pr-6"><b>{{'Total
+                                                                        Año: ' + data.year}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "01") | number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "01") |
+                                                                number : '1.2-2'}}</td>
+
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "02"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "02"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "03"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "03"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "04"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "04"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "05"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "05"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "06"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "06"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "07"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "07"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "08"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "08"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "09"
+                                                                        ) | number : '1.2-2'}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "09"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "10"
+                                                                        ) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "10"
+                                                                ) | number : '1.2-2'}}</td>
+                                                        <td class="text-center"><b>$ {{getFactMonthAsesor(data.year,
+                                                                        "11"
+                                                                        ) | number : '1.2-2'}}</b></td>
+                                                        <td class="text-center"><b> {{getKgMonthAsesor(data.year, "11"
+                                                                        ) | number : '1.2-2'}}</b>
+                                                        </td>
+                                                        <td class="text-center"><b>${{getFactMonthAsesor(data.year, "12"
+                                                                        ) | number : '1.2-2'}}</b>
+                                                        </td>
+                                                        <td class="text-center">{{getKgMonthAsesor(data.year, "12"
+                                                                ) | number : '1.2-2'}}
+                                                        </td>
+                                                        <td class="text-left"><b>{{totalFactYear(data.year) | currency :
+                                                                        'COP
+                                                                        $'}}</b></td>
+                                                        <td class="text-left"><b>{{totalKgYear(data.year) | currency :
+                                                                        'COP
+                                                                        $'}}</b></td>
+                                                </tr>
+                                        </ng-template>
+                                </p-table>
+                        </div>
+                </p-tabPanel>
+
+                <p-tabPanel header="Consolidado por Clientes" leftIcon="pi pi-box">
+                        <div *ngIf="!load">
+                                <p-table [value]="dataClients" rowGroupMode="rowspan" groupRowsBy="sales.asesor"
+                                        sortField="sales.asesor" sortMode="single" [tableStyle]="{'min-width': '75rem'}"
+                                        styleClass="p-datatable-gridlines p-datatable-sm" [resizableColumns]="true"
+                                        responsiveLayout="scroll" [scrollable]="true" columnResizeMode="expand"
+                                        scrollHeight="1000px">
+                                        <ng-template pTemplate="header">
+                                                <tr class="font-size-16" id="filtros">
+                                                        <th></th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                        </th>
+                                                </tr>
+                                                <tr>
+                                                        <th></th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                                Información Asesor</th>
+                                                        <th style="font-weight: 800;" class="text-center" colspan="12">
+                                                                Facturación Meses</th>
+                                                        <th style="font-weight: 800;" class="text-center">
+                                                        </th>
+                                                </tr>
+                                                <tr>
+                                                        <th style="width:3rem">#</th>
+                                                        <th class="text-center">Asesor</th>
+                                                        <th class="text-center">Cliente</th>
+                                                        <th class="text-center">Enero </th>
+                                                        <th class="text-center">Febrero </th>
+                                                        <th class="text-center">Marzo </th>
+                                                        <th class="text-center">Abril </th>
+                                                        <th class="text-center">Mayo </th>
+                                                        <th class="text-center">Junio </th>
+                                                        <th class="text-center">Julio </th>
+                                                        <th class="text-center">Agosto </th>
+                                                        <th class="text-center">Septiembre </th>
+                                                        <th class="text-center">Octubre </th>
+                                                        <th class="text-center">Noviembre </th>
+                                                        <th class="text-center">Diciembre </th>
+                                                        <th class="text-center">Subtotal </th>
+                                                </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex"
+                                                let-rowgroup="rowgroup" let-rowspan="rowspan">
+                                                <tr>
+                                                        <td>{{rowIndex + 1}}</td>
+                                                        <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                                                                <span
+                                                                        class="font-bold ml-2">{{data.sales.asesor}}</span>
+                                                        </td>
+                                                        <td>{{data.cliente}}</td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "01",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "02",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "03",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "04",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "05",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "06",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "07",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "08",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "09",
+                                                                        data.asesorId, data.clienteId) | number}}</b>
+                                                        </td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "10",
+                                                                        data.asesorId, data.clienteId) |
+                                                                        number}}</b></td>
+                                                        <td class="text-center"><b>$ {{getFactClient(data.year, "11",
+                                                                        data.asesorId, data.clienteId) | number}}</b>
+                                                        </td>
+                                                        <td class="text-center">{{getFactClient(data.year, "12",
+                                                                data.asesorId, data.clienteId) | number}}
+                                                        </td>
+                                                        <td class="text-center">{{getSubtotalFactClient(data.year,
+                                                                        data.asesorId, data.clienteId) | number}}
+                                                        </td>
+                                                        
+                                                </tr>
+                                        </ng-template>
+                                </p-table>
+                        </div>
+                </p-tabPanel>
+        </p-tabView>
+</div>

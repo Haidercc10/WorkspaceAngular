@@ -250,6 +250,7 @@ import { DashboardCalidadComponent } from './Vistas/dashboard-calidad/dashboard-
 import { RequerimientosCalidadComponent } from './Vistas/requerimientos-calidad/requerimientos-calidad.component';
 import { MovDevolucionesCalidadComponent } from './Vistas/mov-devoluciones-calidad/mov-devoluciones-calidad.component';
 import { DashboardProduccionComponent } from './Vistas/dashboard-produccion/dashboard-produccion.component';
+import { InformacionVentasComponent } from './Vistas/informacion-ventas/informacion-ventas.component';
 
 @NgModule({
   declarations: [
@@ -414,7 +415,13 @@ import { DashboardProduccionComponent } from './Vistas/dashboard-produccion/dash
     MovTrazabilidadProduccionComponent,
     SolicitudRollosAreasComponent,
     AseguramientoCalidadComponent, 
-    SistemaGestionCalidadComponent, DevolucionesCalidadComponent, DashboardCalidadComponent, RequerimientosCalidadComponent, MovDevolucionesCalidadComponent, DashboardProduccionComponent,
+    SistemaGestionCalidadComponent, 
+    DevolucionesCalidadComponent, 
+    DashboardCalidadComponent, 
+    RequerimientosCalidadComponent, 
+    MovDevolucionesCalidadComponent, 
+    DashboardProduccionComponent, 
+    InformacionVentasComponent,
   ],
 
   imports: [
