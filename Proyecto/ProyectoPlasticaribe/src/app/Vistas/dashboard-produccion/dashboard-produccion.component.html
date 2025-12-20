@@ -130,7 +130,7 @@
                         </div>
                         <div class="col-md">
                             <h6><b><i class="pi pi-slack"></i> Desp. Corte</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageEmp" [min]="0" [max]="wastePercentageExt < 10 ? 10 : wastePercentageExt"
+                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageEmp" [min]="0" [max]="wastePercentageEmp < 10 ? 10 : wastePercentageEmp"
                                 valueTemplate="{value}%" [strokeWidth]="7" valueColor="Red"></p-knob>
                             <p-chip label=": {{totalWaste('EMP') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
                             </p-chip>

@@ -183,13 +183,10 @@
 </p-card>
 
 <div class="p-5" *ngIf="reporteConsolidado">
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-
   <!-- Informacion sobre los colores -->
   <p-toolbar class="p-2" id="informacionColores">
     <ng-template pTemplate="right">
+      <p-button label="Ver consolidado" id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-warning" (click)="groupSales()" pTooltip="Ver información consolidada de pedidos y asesores" tooltipPosition="top"></p-button>
       <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-success" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
       <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-info" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
       <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-danger" (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
@@ -405,7 +402,7 @@
 
 <p-dialog [(visible)]="modal" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Información consolidada de asesores" [modal]="true" >
   <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button label="Exportar excel" icon="pi pi-file-excel" styleClass="p-button-rounded p-button-success" [style]="{width: '30px', height: '30px'}" (click)="exportExcel2()"  tooltipPosition="top"></p-button>
+    <p-button label="Exportar excel" icon="pi pi-file-excel" styleClass="p-button-rounded p-button-success" (click)="exportExcel2()" tooltipPosition="top"></p-button>
   </div>
   <div class="mb-3">
     <div class="row g-3 font-size-14" id="tabla1">
@@ -426,7 +423,7 @@
             <th></th>
             <th class="text-center" colspan="2">Vendedor</th>
             <th class="text-center">Mes Anterior</th>
-            <th class="text-center" colspan="">Información pedidos activos</th>
+            <th class="text-center" colspan="3">Información pedidos activos</th>
           </tr>
           <tr>
             <th class="text-center">#</th>
@@ -434,7 +431,7 @@
             <th class="text-center" scope="col">Asesor</th>
             <th class="text-center" scope="col">Facturación</th>
             <th class="text-center" scope="col">Pendiente</th>
-            <th class="text-center" scope="col">Facturación</th>
+            <th class="text-center" scope="col">Facturación actual</th>
             <th class="text-center" scope="col">Proyectado</th>
           </tr>
         </ng-template>
@@ -446,15 +443,15 @@
             <td class="text-center"><b>{{data.factMesAnterior | number : '1.2-2'}}</b></td>
             <td class="text-center textRed" >$<b>{{data.pendiente | number : '1.2-2' }}</b></td>
             <td class="text-center"><b>{{data.factMesActual | number : '1.2-2'}}</b></td>
-            <td class="text-center"><b>{{data.proyectado | number : '1.2-2'}}</b></td>
+            <td class="text-center textBlue"><b>{{data.proyectado | number : '1.2-2'}}</b></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td class="text-center" colspan="3"><b>Totales</b></td>
-            <td class="text-center textBlue">${{getTotalMonth1() | number : '1.2-2'}}</td>
+            <td class="text-center">${{getTotalMonth1() | number : '1.2-2'}}</td>
             <td class="text-center textRed">${{totalPending() | number : '1.2-2' }}</td>
-            <td class="text-center textBlue">${{getTotalMonth2() | number : '1.2-2'}}</td>
+            <td class="text-center">${{getTotalMonth2() | number : '1.2-2'}}</td>
             <td class="text-center textBlue">${{getTotalProyectado() | number : '1.2-2'}}</td>
           </tr>
         </ng-template>

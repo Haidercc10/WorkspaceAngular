@@ -14,11 +14,11 @@
         </div>
 
         <!--* Formulario -->
-        <form [formGroup]="form" id="form" (ngSubmit)="cambioTab($event)">
+        <form [formGroup]="form" id="form" (ngSubmit)="validateQuery()">
                 <div class="mb-3">
                         <div class="row g-4">
                                 <!--* AÑO-->
-                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-1 col-xxl-1" id="">
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2" id="">
                                         <span class="p-float-label">
                                                 <p-dropdown formControlName="year" class="m-auto" [options]="years"
                                                         inputId="year" [autoDisplayFirst]="false"></p-dropdown>
@@ -26,37 +26,14 @@
                                         </span>
                                 </div>
 
-                                <!--* MES -->
-                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-1 col-xxl-1" id="">
+                                <!-- Id Vendedores-->
+                                <div class="col-sm-12 col-md-6 col-xl-4">
                                         <span class="p-float-label">
-                                                <p-dropdown formControlName="month" class="m-auto"
-                                                        [options]="monthNames" inputId="month"
-                                                        [autoDisplayFirst]="false"></p-dropdown>
-                                                <label for="month">Mes</label>
-                                        </span>
-                                </div>
-
-                                <!-- Id Vendedores -->
-                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2" id="Id_Vendedor">
-                                        <span class="p-float-label">
-                                                <input formControlName="asesorId" id="Id_Vendedor" type="text"
-                                                        pInputText autocomplete="off" />
-                                                <label for="Id_Vendedor">Id Vendedor</label>
-                                        </span>
-                                </div>
-
-                                <!-- Vendedores -->
-                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="Vendedor">
-                                        <span class="p-float-label">
-                                                <input formControlName="asesor" id="Vendedor" list="vendedores"
-                                                        (change)="loadAsesor()" type="text" pInputText
-                                                        autocomplete="off" />
-                                                <datalist id="vendedores">
-                                                        <option value={{item.usua_Nombre}} *ngFor="let item of sales">
-                                                                {{item.usua_Nombre}}
-                                                        </option>
-                                                </datalist>
-                                                <label for="Vendedor">Vendedor</label>
+                                                <p-dropdown formControlName="asesor" inputId="asesor"
+                                                        [autoDisplayFirst]="false" [options]="asesors"
+                                                        optionValue="code" optionLabel="asesor" [filter]="true"
+                                                        filterBy="asesor"></p-dropdown>
+                                                <label for="asesor">Vendedores</label>
                                         </span>
                                 </div>
 
@@ -70,11 +47,11 @@
                                 </div>
 
                                 <!-- Clientes -->
-                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="Cliente">
+                                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4" id="Cliente">
                                         <span class="p-float-label">
                                                 <input formControlName="client" id="Cliente" list="clientes"
                                                         (change)="loadClients()" autocomplete="off" type="text"
-                                                        pInputText />
+                                                        pInputText (change)="loadClients()" (keydown)="getClients()" />
                                                 <datalist id="clientes">
                                                         <option value={{item.cli_Id}} *ngFor="let item of clients">
                                                                 {{item.cli_Nombre}}</option>
@@ -120,91 +97,91 @@
                                                 <tr class="font-size-16" id="filtros">
                                                         <th></th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, 'year', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, 'asesorId', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, 'asesor', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro1($event, '', 'contains')">
                                                         </th>
                                                 </tr>
                                                 <tr>
@@ -477,7 +454,7 @@
 
                 <p-tabPanel header="Consolidado por Clientes" leftIcon="pi pi-box">
                         <div *ngIf="!load">
-                                <p-table [value]="dataClients" rowGroupMode="rowspan" groupRowsBy="sales.asesor"
+                                <p-table #dt2 [value]="dataClients" rowGroupMode="rowspan" groupRowsBy="sales.asesor"
                                         sortField="sales.asesor" sortMode="single" [tableStyle]="{'min-width': '75rem'}"
                                         styleClass="p-datatable-gridlines p-datatable-sm" [resizableColumns]="true"
                                         responsiveLayout="scroll" [scrollable]="true" columnResizeMode="expand"
@@ -486,10 +463,13 @@
                                                 <tr class="font-size-16" id="filtros">
                                                         <th></th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro2($event, 'asesor', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
-                                                                        (input)="aplicarfiltro2($event, '', 'contains')">
+                                                                        (input)="aplicarfiltro2($event, 'clienteId', 'contains')">
+                                                        </th>
+                                                        <th><input pInputText type="text" style="width: 100%;"
+                                                                        (input)="aplicarfiltro2($event, 'cliente', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
                                                                         (input)="aplicarfiltro2($event, '', 'contains')">
@@ -533,7 +513,7 @@
                                                 </tr>
                                                 <tr>
                                                         <th></th>
-                                                        <th style="font-weight: 800;" class="text-center" colspan="2">
+                                                        <th style="font-weight: 800;" class="text-center" colspan="3">
                                                                 Información Asesor</th>
                                                         <th style="font-weight: 800;" class="text-center" colspan="12">
                                                                 Facturación Meses</th>
@@ -542,21 +522,22 @@
                                                 </tr>
                                                 <tr>
                                                         <th style="width:3rem">#</th>
-                                                        <th class="text-center">Asesor</th>
-                                                        <th class="text-center">Cliente</th>
-                                                        <th class="text-center">Enero </th>
-                                                        <th class="text-center">Febrero </th>
-                                                        <th class="text-center">Marzo </th>
-                                                        <th class="text-center">Abril </th>
-                                                        <th class="text-center">Mayo </th>
-                                                        <th class="text-center">Junio </th>
-                                                        <th class="text-center">Julio </th>
-                                                        <th class="text-center">Agosto </th>
-                                                        <th class="text-center">Septiembre </th>
-                                                        <th class="text-center">Octubre </th>
-                                                        <th class="text-center">Noviembre </th>
-                                                        <th class="text-center">Diciembre </th>
-                                                        <th class="text-center">Subtotal </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="asesor"></p-sortIcon> Asesor</th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="clienteId"></p-sortIcon> Cod. Cliente</th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Enero </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Febrero </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Marzo </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Abril </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Mayo </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Junio </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Julio </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Agosto </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Septiembre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Octubre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Noviembre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Diciembre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Subtotal </th>
                                                 </tr>
                                         </ng-template>
                                         <ng-template pTemplate="body" let-data let-rowIndex="rowIndex"
@@ -567,6 +548,7 @@
                                                                 <span
                                                                         class="font-bold ml-2">{{data.sales.asesor}}</span>
                                                         </td>
+                                                        <td>{{data.clienteId}}</td>
                                                         <td>{{data.cliente}}</td>
                                                         <td class="text-center"><b>$ {{getFactClient(data.year, "01",
                                                                         data.asesorId, data.clienteId) |
@@ -601,13 +583,13 @@
                                                         <td class="text-center"><b>$ {{getFactClient(data.year, "11",
                                                                         data.asesorId, data.clienteId) | number}}</b>
                                                         </td>
-                                                        <td class="text-center">{{getFactClient(data.year, "12",
+                                                        <td class="text-center">${{getFactClient(data.year, "12",
                                                                 data.asesorId, data.clienteId) | number}}
                                                         </td>
-                                                        <td class="text-center">{{getSubtotalFactClient(data.year,
-                                                                        data.asesorId, data.clienteId) | number}}
+                                                        <td class="text-center">${{getSubtotalFactClient(data.year,
+                                                                data.asesorId, data.clienteId) | number}}
                                                         </td>
-                                                        
+
                                                 </tr>
                                         </ng-template>
                                 </p-table>

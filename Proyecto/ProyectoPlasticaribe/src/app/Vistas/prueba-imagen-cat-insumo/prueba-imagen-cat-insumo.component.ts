@@ -35,8 +35,8 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 })
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
-
-  load: boolean = false;
+ 
+load: boolean = false;
   storage_Id: number | undefined;
   storage_Name: string | undefined;
   ValidarRol: number | undefined;
@@ -80,10 +80,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   ngOnInit() {
     
-    this.dates();
-    this.items();
+    //this.dates();
+    //this.items();
   }
-
+ /*
   dates(){
     let dates : any = [
       /*'12/01/2023',
@@ -333,7 +333,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       '23/11/2023',
       '24/11/2023',
       '24/11/2023',
-      '24/11/2023',*/
+      '24/11/2023',
       '28/04/2023',
       '28/04/2023',
       '29/04/2023',
@@ -532,7 +532,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       this.op!.toggle($event);
       $event.stopPropagation();
     }, 500);
-  }
+  }*/
 }
 
 interface production {
@@ -546,4 +546,6 @@ interface production {
   statusId? : number;
   statusName? : string;
 }
+
+
 

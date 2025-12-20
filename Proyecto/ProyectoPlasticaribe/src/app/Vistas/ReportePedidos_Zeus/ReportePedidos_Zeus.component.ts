@@ -22,6 +22,7 @@ import { DepartamentosMunicipiosColombiaService } from 'src/app/Servicios/Depart
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { group } from 'console';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -74,7 +75,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   modal: boolean = false;
   actualMonth = parseInt(moment().format('MM'));
   previousMonth = parseInt(moment().subtract(1, 'month').format('MM'));
-  asesors : any = [];
+  asesors: any = [];
 
   constructor(private AppComponent: AppComponent,
     private messageService: MessageService,
@@ -86,7 +87,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     private msj: MensajesAplicacionService,
     private deparMuniciosColService: DepartamentosMunicipiosColombiaService,
     private svBagpro: BagproService,
-    private svExcel: CreacionExcelService) {
+    private svExcel: CreacionExcelService,
+    private svUsers: UsuarioService,
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -95,6 +98,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.consultarDepartamentos();
     this.seleccionarColumnas();
     this.consultarPedidosZeus();
+    this.getBillingSales();
     //this.consultarPedidos();    
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
@@ -163,7 +167,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     setTimeout(() => {
       this.getClientes();
       this.getVendedores();
-      this.getBillingSales()
       this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
       // Utiliza un enfoque de mapeo para expandir las filas
       this.expandedRows = this.ArrayPedidos.reduce((acc, pedido) => {
@@ -173,26 +176,29 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     }, 6000);
   }
 
+  //Función que obtendrá la información de 
   getBillingSales() {
-    this.asesors = this.vendedores;
     let previousMonth = moment().subtract(1, 'month').format('MM');
     let actualMonth = moment().format('MM');
     let months: any = [previousMonth, actualMonth];
 
-    this.vendedores.forEach(x => {
-      months.forEach(month => {
-        this.inventarioZeusService.GetCostoFacturado_Vendedor(x.id, month, 2025).subscribe(fact => {
-          if(month == previousMonth) x.factMesAnterior = fact
-          if(month == actualMonth) x.factMesActual = fact
+    this.svUsers.GetVendedores().subscribe(data => {
+      data.forEach(x => {
+        let code: string = x.usua_Id.toString()
+        let asesorId: string = code.length == 1 ? `00${x.usua_Id}` : code.length == 2 ? `0${x.usua_Id}` : `${x.usua_Id}`;
+        x.asesor = x.usua_Nombre;
+        x.id = asesorId
+        months.forEach(month => {
+          this.inventarioZeusService.GetCostoFacturado_Vendedor(x.id, month, 2025).subscribe(fact => {
+            if (month == previousMonth) x.factMesAnterior = fact
+            if (month == actualMonth) x.factMesActual = fact
+          });
         });
       });
-    });  
-    console.log(this.vendedores);
+      this.asesors = data;
+    });
   }
 
-  ordenarPedidos() {
-
-  }
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
   consultarPedidos() {
@@ -373,13 +379,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           'mes': month,
           'anio': 2025,
           'factMesAnterior': this.totalPreviousMonth(item.idVendedor),
-          'factMesActual' : this.totalActualMonth(item.idVendedor), 
-          'proyectado' : pendiente + this.totalActualMonth(item.idVendedor),
+          'factMesActual': this.totalActualMonth(item.idVendedor),
+          'proyectado': pendiente + this.totalActualMonth(item.idVendedor),
         });
       } else {
-        this.groupedSales[index].pendiente += pendiente, 
-        this.groupedSales[index].proyectado = this.groupedSales[index].pendiente + this.totalActualMonth(item.idVendedor)
-        
+        this.groupedSales[index].pendiente += pendiente,
+          this.groupedSales[index].proyectado = this.groupedSales[index].pendiente + this.totalActualMonth(item.idVendedor)
+
         //this.groupedSales[index].factMesAnterior = datos;
       }
     });
@@ -392,16 +398,16 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   totalPending = () => this.groupedSales.reduce((a, b) => a + b.pendiente, 0);
 
   //*Función que mostrará la facturación del mes anterior de cada vendedor
-  totalPreviousMonth = (code : string) => this.vendedores.filter(x => x.id == code).reduce((a, b) => a + b.factMesAnterior, 0);
+  totalPreviousMonth = (code: string) => this.asesors.filter(x => x.id == code).reduce((a, b) => a + b.factMesAnterior, 0);
 
   //*Función que mostrará la facturación del mes actual de cada vendedor
-  totalActualMonth = (code : string) => this.vendedores.filter(x => x.id == code).reduce((a, b) => a + b.factMesActual, 0);
+  totalActualMonth = (code: string) => this.asesors.filter(x => x.id == code).reduce((a, b) => a + b.factMesActual, 0);
 
   //*Función que mostrará la facturación del mes anterior de cada vendedor
-  getTotalMonth1 = () => this.vendedores.reduce((a, b) => a + b.factMesAnterior, 0);
+  getTotalMonth1 = () => this.asesors.reduce((a, b) => a + b.factMesAnterior, 0);
 
   //*Función que mostrará la facturación del mes actual de cada vendedor
-  getTotalMonth2 = () => this.vendedores.reduce((a, b) => a + b.factMesActual, 0);
+  getTotalMonth2 = () => this.asesors.reduce((a, b) => a + b.factMesActual, 0);
 
   //*Función que mostrará la facturación del mes actual de cada vendedor
   getTotalProyectado = () => this.groupedSales.reduce((a, b) => a + b.proyectado, 0);
@@ -1711,7 +1717,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   //Función que cargará la hoja y los estilos. 
   loadSheetAndStyles(data: any) {
-    let title: any = `Información de ventas por asesores`;
+    let title: any = `Información consolidada por asesores`;
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 10, bold: true };
@@ -1757,8 +1763,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     [5].forEach(x => ws.getColumn(x).width = 15);
     [6, 2].forEach(x => ws.getColumn(x).width = 20);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [3].forEach(x => ws.getColumn(x).width = 10);
-    [4,].forEach(x => ws.getColumn(x).width = 40);
+    [4].forEach(x => ws.getColumn(x).width = 10);
+    [3].forEach(x => ws.getColumn(x).width = 40);
     [7].forEach(x => ws.getColumn(x).width = 20);
   }
 
@@ -1779,7 +1785,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
     let contador: any = 6;
-    let formatNumber: Array<number> = [4,5,6,7];
+    let formatNumber: Array<number> = [4, 5, 6, 7];
     let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G',];
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
@@ -1804,8 +1810,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         x.codigo,
         x.vendedor,
         x.factMesAnterior,
-        x.pendiente, 
-        x.factMesActual, 
+        x.pendiente,
+        x.factMesActual,
         x.proyectado
       ]);
     });
@@ -1822,7 +1828,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       this.getTotalMonth1(),
       this.totalPending(),
       this.getTotalMonth2(),
-      0  
+      0
     ]);
   }
 }

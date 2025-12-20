@@ -10,7 +10,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
-import { firmaJefeCalidad } from './FirmaJefeCalidad';
+import { firmaJefeCalidad2 } from './FirmaJefeCalidad2';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 
 @Injectable({
@@ -573,7 +573,7 @@ export class CertificadoCalidadComponent implements OnInit {
         widths : ['*'],
         style : '',
         body : [
-          [ { image : firmaJefeCalidad, width : 110, height : 60}],
+          [ { image : firmaJefeCalidad2, width : 110, height : 40}],
           [ {text : `Jefe de Calidad`, fontSize : 11, bold: true } ],
           [ {text : `Plasticaribe SAS`, fontSize : 11, bold: true } ]
         ]

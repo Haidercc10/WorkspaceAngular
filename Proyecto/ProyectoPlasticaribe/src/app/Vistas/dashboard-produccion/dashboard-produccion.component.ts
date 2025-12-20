@@ -124,7 +124,7 @@ export class DashboardProduccionComponent implements OnInit {
       this.ComparativoOptionsSellado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsSellado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsSellado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    }, 1000);
+    }, 500);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

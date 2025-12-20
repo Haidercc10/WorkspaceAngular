@@ -57,6 +57,8 @@ export class InformacionVentasComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.loadYears();
+    this.loadActualYear();
+    this.getAsesors();
     //this.getClientsInformation();
     this.getSalesInformationAndKg();
     /*setTimeout(() => {
@@ -78,17 +80,14 @@ export class InformacionVentasComponent implements OnInit {
       client: [null,],
       clientId: [null,],
       asesor: [null,],
-      asesorId: [null,],
       year: [null,],
-      month: [null, Validators.required],
     });
   }
 
   //* FUNCIONES DE CONVERSION
   // Funcion que colocará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
-
+  
   //* LIMPIAR DATOS
   //Funcion que va a limpiar todo
   clearAll() {
@@ -108,10 +107,13 @@ export class InformacionVentasComponent implements OnInit {
     }
   }
 
-  //*ASESORES Y CLIENTES
-  //Funcion que cargará lo asesores
+  //Función que cargar el año actual en el campo.
+  loadActualYear = () => this.form.patchValue({ 'year': moment().year(), });
+
+  //*GET ASESORES Y CLIENTES
+  //Funcion que cargará los asesores
   getAsesors() {
-    this.load = true;
+    //this.load = true;
     let count: number = 0;
     this.svAsesors.GetVendedores().subscribe(data => {
       data.forEach(x => {
@@ -119,12 +121,12 @@ export class InformacionVentasComponent implements OnInit {
         if (x.usua_Id.toString().length == 1) this.asesors.push({ asesor: x.usua_Nombre, code: `00${x.usua_Id}` });
         else if (x.usua_Id.toString().length == 2) this.asesors.push({ asesor: x.usua_Nombre, code: `0${x.usua_Id}` });
         else this.asesors.push({ asesor: x.usua_Nombre, code: `${x.usua_Id}` });
-        if (count == data.length) this.load = false;
+        //if (count == data.length) this.load = false;
       });
     }, error => console.log(error));
   }
 
-  // Función pa 
+  // Función para cargar info de los asesores 
   loadAsesor() {
     let name = this.form.value.sales;
     let sale = this.sales.find(x => x.usua_Nombre == name);
@@ -145,10 +147,10 @@ export class InformacionVentasComponent implements OnInit {
   // Funcion que va a colocar a llenar los campos correspondientes del cliente
   loadClients() {
     let name = this.form.value.client;
-    let cliente = this.clients.find(x => x.idcliente == name);
+    let cliente = this.clients.find(x => x.cli_Id == name);
     this.form.patchValue({
-      'client': cliente.usua_Id,
-      'clientId': cliente.usua_Nombre,
+      'client': name,
+      'clientId': cliente.cli_Id,
     });
   }
 
@@ -193,9 +195,10 @@ export class InformacionVentasComponent implements OnInit {
     this.dataAsesors = [];
     this.dataSales = [];
     this.load = true;
+    let year : number = this.form.value.year; 
 
     // 1. Llamar a la API (forkJoin si fueran varios años)
-    forkJoin([this.svInvZeus.getBillingAnnual(2025)])
+    forkJoin([this.svInvZeus.getBillingAnnual(year, this.validateUrl())])
       .pipe(
         tap((responses: any[]) => {
           const data = responses[0];
@@ -250,10 +253,12 @@ export class InformacionVentasComponent implements OnInit {
     this.dataClients = [];
     this.dataSalesClients = [];
     this.load = true;
-    this.svInvZeus.getBillingClientsAnnual(2025).subscribe(data => {
+    let year : number = this.form.value.year;
+
+    this.svInvZeus.getBillingClientsAnnual(year, this.validateUrl()).subscribe(data => {
       this.dataSalesClients = data;
       data.forEach(x => {
-        if (this.dataClients.filter(y => y.clienteId == x.clienteId && y.year == x.year).length == 0) {
+        if (this.dataClients.filter(y => y.asesorId == x.asesorId && y.clienteId == x.clienteId && y.year == x.year).length == 0) {
           this.dataClients.push(x);
         }
       });
@@ -264,10 +269,27 @@ export class InformacionVentasComponent implements OnInit {
     });
   }
 
+  validateUrl(){
+    let client: any = this.form.value.clienteId;
+    let asesor : any = this.form.value.asesor;
+    let url : string = ``;
+
+    if(asesor != null) url += `asesor=${asesor}`;
+    if(client != null) url.length > 0 ? url += `&client=${client}` : url += `client=${client}`;
+
+    if(url.length > 0) url = `?${url}`;
+    return url;
+  }
+
   cambioTab($event) {
     this.tab = $event.index;
-    if ($event.index == 0) this.getSalesInformation();
-    else if ($event.index == 1) this.getClientsInformation();
+    if (this.tab == 0) this.getSalesInformationAndKg();
+    else if (this.tab == 1) this.getClientsInformation();
+  }
+
+  validateQuery(){
+    if (this.tab == 0) this.getSalesInformationAndKg();
+    else if (this.tab == 1) this.getClientsInformation();
   }
 
   //*CALCULOS ASESOR
@@ -335,12 +357,14 @@ export class InformacionVentasComponent implements OnInit {
   }
 
   //*
-  getSubtotalFactClient = (year: string, code : string, client: string) => this.dataSalesClients.filter(x => x.year == year && x.asesorId == code && x.clienteId == client).reduce((a, b) => a + b.value, 0);
+  getSubtotalFactClient = (year: string, code: string, client: string) => this.dataSalesClients.filter(x => x.year == year && x.asesorId == code && x.clienteId == client).reduce((a, b) => a + b.value, 0);
 
   //
-  getTotalFactMonth = (year: string, month : string) => this.dataSalesClients.filter(x => x.year == year && x.month == month).reduce((a, b) => a + b.value, 0);
+  getTotalFactMonth = (year: string, month: string) => this.dataSalesClients.filter(x => x.year == year && x.month == month).reduce((a, b) => a + b.value, 0);
 
   //*** FILTROS */ 
+  aplicarfiltro1 = ($event, campo: any, valorCampo: string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
   aplicarfiltro2 = ($event, campo: any, valorCampo: string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //* EXPORTAR DOCUMENTOS
@@ -348,11 +372,15 @@ export class InformacionVentasComponent implements OnInit {
     if (this.tab == 0) this.exportExcel1();
     else if (this.tab == 1) this.exportExcel2();
   }
-  
+
   //* EXCEL TAB 1
   exportExcel1() {
     if (this.dataAsesors.length > 0) {
-      setTimeout(() => { this.loadSheetAndStyles(this.dataAsesors); }, 500);
+      this.load = true;
+      setTimeout(() => { 
+        this.loadSheetAndStyles(this.dataAsesors); 
+        this.load = false;
+      }, 500);
     } else this.svMsj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
   }
 
@@ -405,7 +433,7 @@ export class InformacionVentasComponent implements OnInit {
     [5].forEach(x => ws.getColumn(x).width = 15);
     [6].forEach(x => ws.getColumn(x).width = 20);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [2,3].forEach(x => ws.getColumn(x).width = 10);
+    [2, 3].forEach(x => ws.getColumn(x).width = 10);
     [4,].forEach(x => ws.getColumn(x).width = 40);
     [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30].forEach(x => ws.getColumn(x).width = 15);
   }
@@ -463,7 +491,7 @@ export class InformacionVentasComponent implements OnInit {
       });
       contador++
     });
-    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 10, bold : true, }); 
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 10, bold: true, });
   }
 
   //.Función que contendrá la info al documento excel. 
@@ -546,30 +574,66 @@ export class InformacionVentasComponent implements OnInit {
 
   //* EXCEL TAB 2
   exportExcel2() {
-    if (this.dataAsesors.length > 0) {
-      setTimeout(() => { this.loadSheetAndStyles2(this.dataClients); }, 500);
+    if (this.dataClients.length > 0) {
+      this.load = true;
+      setTimeout(() => { 
+        this.loadSheetAndStyles2(this.dataClients); 
+        this.load = false;
+      }, 500);
     } else this.svMsj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que agrupa por asesor y agrega sus items.
+  groupByAsesor(data: any[]) {
+    const map = new Map<string, any[]>();
+
+    data.forEach(item => {
+      if (!map.has(item.asesor)) {
+        map.set(item.asesor, []);
+      }
+      map.get(item.asesor)?.push(item);
+    });
+    return map;
   }
 
   //Función que cargará la hoja y los estilos. 
   loadSheetAndStyles2(data: any) {
-    let title: any = `Información ventas mes-cliente`;
+    let title: any = `Información ventas`;
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 10, bold: true };
     let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     let workbook = this.svExcel.formatoExcel(title, true);
-    this.addNewSheet2(workbook, title, fill, border, font, alignment, data);
+
+    const dataByAsesor = this.groupByAsesor(data);
+
+    dataByAsesor.forEach((dataAsesor, asesor) => {
+      const sheetName = asesor.substring(0, 30); // Excel max 31 chars
+      const worksheet = workbook.addWorksheet(sheetName);
+
+      this.addNewSheet2(
+        workbook,
+        title + ` - ${asesor}`,
+        fill,
+        border,
+        font,
+        alignment,
+        dataAsesor,
+        worksheet
+      );
+    });
+
+    workbook.removeWorksheet(workbook.worksheets[0].id);
     this.svExcel.creacionExcel(title, workbook);
   }
 
   //Función para agregar una nueva hoja de calculo.
-  addNewSheet2(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
+  addNewSheet2(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any, ws: any) {
     let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-    let worksheet: any = wb.worksheets[0];
-    this.loadStyleTitle2(worksheet, title, fontTitle, alignment);
-    this.loadHeader2(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel2(worksheet, this.dataExcel2(data), border, alignment);
+    //let worksheet: any = wb.worksheets[0];
+    this.loadStyleTitle2(ws, title, fontTitle, alignment);
+    this.loadHeader2(ws, fill, border, font, alignment);
+    this.loadInfoExcel2(ws, this.dataExcel2(data), border, alignment);
   }
 
   //Cargar estilos del titulo de la hoja.
@@ -581,16 +645,16 @@ export class InformacionVentasComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader2(ws: any, fill: any, border: any, font: any, alignment: any) {
-    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5', 'P5', 'Q5', 'R5'];
-    //ws.addRow([]);
-    ws.addRow(this.loadFieldsHeader2());
-
-    rowHeader.forEach(x => ws.getCell(x).fill = fill);
-    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
-    rowHeader.forEach(x => ws.getCell(x).border = border);
-    rowHeader.forEach(x => ws.getCell(x).font = font);
+    const headers = this.loadFieldsHeader2();
+    headers.forEach((text, index) => {
+      const cell = ws.getCell(5, index + 1);
+      cell.value = text;
+      cell.fill = fill;
+      cell.alignment = alignment;
+      cell.border = border;
+      cell.font = font;
+    })
     ws.mergeCells('A1:R3');
-
     this.loadSizeHeader2(ws);
   }
 
@@ -623,7 +687,7 @@ export class InformacionVentasComponent implements OnInit {
       'Fact. Octubre',
       'Fact. Noviembre',
       'Fact. Diciembre',
-      'Subtotal Fact.',
+      'TOTAL CLIENTE.',
     ];
     return headerRow;
   }
@@ -644,7 +708,7 @@ export class InformacionVentasComponent implements OnInit {
       });
       contador++
     });
-    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 10, bold : true, }); 
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 10, bold: true, });
   }
 
   //.Función que contendrá la info al documento excel. 
@@ -677,29 +741,23 @@ export class InformacionVentasComponent implements OnInit {
     return info;
   }
 
-  //Agregar fila de totales al formato excel.
-  addTotal2(info: any) {
-    console.log(info);
-    
-    info.push([
-      '',
-      '',
-      '',
-      '',
-      'TOTALES',
-      this.getTotalFactMonth('2025', '01'),
-      this.getTotalFactMonth('2025', '02'),
-      this.getTotalFactMonth('2025', '03'),
-      this.getTotalFactMonth('2025', '04'),
-      this.getTotalFactMonth('2025', '05'),
-      this.getTotalFactMonth('2025', '06'),
-      this.getTotalFactMonth('2025', '07'),
-      this.getTotalFactMonth('2025', '08'),
-      this.getTotalFactMonth('2025', '09'),
-      this.getTotalFactMonth('2025', '10'),
-      this.getTotalFactMonth('2025', '11'),
-      this.getTotalFactMonth('2025', '12'),
-      0,
-    ]);
+  addTotal2(info: any[]) {
+    if (info.length === 0) return;
+
+    const totalRow: any[] = [];
+    const columnsToSum = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]; // Fact + Subtotal
+
+    // Inicializar
+    for (let i = 0; i < info[0].length; i++) {
+      totalRow[i] = '';
+    }
+
+    totalRow[4] = 'TOTAL ASESOR';
+
+    columnsToSum.forEach(i => {
+      totalRow[i] = info.reduce((sum, row) => sum + (+row[i] || 0), 0);
+    });
+
+    info.push(totalRow);
   }
 }

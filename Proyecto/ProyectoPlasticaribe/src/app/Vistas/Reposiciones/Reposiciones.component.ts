@@ -392,8 +392,11 @@ export class ReposicionesComponent implements OnInit, OnChanges {
         let detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${(-(qty))} ${unity}`;
 
         this.svZeus.getExistenciasProductos(data.item, unity).subscribe(dataExis => {
-          if(dataExis.length == 0 || (dataExis[0].existencias < qty || !dataExis)) {
+          if(dataExis.length == 0 || (dataExis[0].existencias < qty.toFixed(2) || !dataExis)) {
+            console.log(dataExis);
             let qtyZeus : number = dataExis.length == 0 ? 0 : dataExis[0].existencias;
+            console.log(qtyZeus);
+            console.log(qty)
             let message : string = `La cantidad del item ${data.item} en Plasticaribe "${qty.toLocaleString()} ${unity}" es mayor al stock de Zeus "${qtyZeus.toLocaleString()} ${unity}"`
             this.msjs(`Advertencia`, message);
             return;

@@ -12,13 +12,17 @@
     <p-divider></p-divider>
   </div>
 </div>
-
+<!-- Datos iniciales -->
 <p-card>
+  <!--Titulo-->
   <div class="mb-4">
     <h2 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-users"></i> Seleccionar Trabajadores</h2>
   </div>
 
+  <!-- busqueda inicial -->
   <div class="row g-4 my-3">
+    
+    <!--Campos-->
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
       <span class="p-float-label" id="rango-fechas">
         <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangeDates" selectionMode="range" [selectOtherMonths]="true" [showButtonBar]="true" [disabledDates]="disabledDates" [maxDate]="today" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
@@ -33,6 +37,7 @@
       </span>
     </div>
 
+    <!--Botones-->
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
       <button pButton class="p-button-danger mx-2" type="button" label="Consultar" icon="pi pi-search" (click)="getWorkers()"></button>
       <button pButton class="p-button-secondary mx-2" type="button" label="Limpiar Campos" icon="pi pi-eraser"></button>
@@ -48,6 +53,7 @@
 
   <p-divider></p-divider>
 
+  <!--Tabla de nomina-->
   <p-table
   #tableWorkers
   [value]="payroll"
@@ -198,6 +204,7 @@
   </div>
 </p-card>
 
+<!--Modal Devengos y deducciones -->
 <p-dialog [(visible)]="modalPayroll" [style]="{width: '90%', height: '80%'}" header="Editar Devengos y Deducciones" [modal]="true">
   <form [formGroup]="formPayrollWorker">
     <p-accordion [multiple]="true" [activeIndex]="[0,1,2,3]">
@@ -238,7 +245,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-2 col-xl-2 col-xxl-1">
               <span class="p-float-label">
-                <p-inputNumber formControlName="daysToPay" inputId="daysToPay" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="daysToPay" inputId="daysToPay" [required]="true" [readonly]="true" ></p-inputNumber>
                 <label for="daysToPay">Días a Pagar</label>
               </span>
             </div>
@@ -257,7 +264,7 @@
           </div>
         </ng-template>
       </p-accordionTab>
-
+      <!--Devengos-->
       <p-accordionTab>
         <ng-template pTemplate="header">
           <div class="flex align-items-center">
@@ -430,7 +437,7 @@
           </div>
         </ng-template>
       </p-accordionTab>
-
+      <!--Deducciones-->
       <p-accordionTab>
         <ng-template pTemplate="header">
           <div class="flex align-items-center">
@@ -442,20 +449,20 @@
           <div class="row g-4 my-2">
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="eps" inputId="eps" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="eps" inputId="eps" [required]="true" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
                 <label for="eps">EPS</label>
               </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="afp" inputId="afp" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="afp" inputId="afp" [required]="true" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
                 <label for="afp">AFP</label>
               </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-inputgroup">
                 <span class="p-float-label">
-                  <p-inputNumber formControlName="saving" inputId="saving" [required]="true" [readonly]="true"></p-inputNumber>
+                  <p-inputNumber formControlName="saving" inputId="saving" [required]="true" [readonly]="true" ></p-inputNumber>
                   <label for="saving">Ahorro</label>
                 </span>
                 <button pButton class="p-button-warning" id="pdf" type="button" icon="pi pi-eye" [disabled]="[0, '', null, undefined].includes(formPayrollWorker.value.saving)" (click)="showDetailsMoneySave()"></button>
@@ -481,7 +488,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="totalDiscounts" inputId="totalDiscounts" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="totalDiscounts" inputId="totalDiscounts" [required]="true" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
                 <label for="totalDiscounts">Total Dcto</label>
               </span>
             </div>
@@ -499,14 +506,14 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="deductions" inputId="deductions" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="deductions" inputId="deductions" [required]="true" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
                 <label for="deductions">Deducciones</label>
               </span>
             </div>
           </div>
         </ng-template>
       </p-accordionTab>
-
+      <!--Total-->
       <p-accordionTab>
         <ng-template pTemplate="header">
           <div class="flex align-items-center">
@@ -518,7 +525,7 @@
           <div class="row g-4 my-2">
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="subTotalToPay" inputId="subTotalToPay" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="subTotalToPay" inputId="subTotalToPay" [required]="true" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
                 <label for="subTotalToPay">Total a Pagar</label>
               </span>
             </div>
