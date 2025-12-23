@@ -14,6 +14,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepAsignacionBopp as defaultSteps } from 'src/app/data';
+import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
 
 @Component({
   selector: 'app-asignacionBOPP_TEMPORAL',
@@ -56,7 +57,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                               private shepherdService: ShepherdService,
                                 private msj : MensajesAplicacionService,
                                   private srvMovEntradasMP : Movimientos_Entradas_MPService,
-                                    private srvMovSalidasMP : Entradas_Salidas_MPService,) {
+                                    private srvMovSalidasMP : Entradas_Salidas_MPService,
+                                      private cmpMovMatPrima: MovimientoMPComponent,) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : ['', Validators.required],
@@ -349,6 +351,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     setTimeout(() => {
       this.moverBopp();
       this.cargar_MovEntradasMP();
+      let data = { 'Id': this.idAsignacion, 'Movimiento': 'ASIGBOPP' };
+      this.cmpMovMatPrima.validarTipoMovimiento(data)
     }, 6500);
   }
 
@@ -361,7 +365,9 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           this.boppService.PutInventarioBiorientado(datos_bopp[j].bopP_Id, cantidad).subscribe(() => {
             this.obtenerBOPP();
             this.msj.mensajeConfirmacion(`Asignación exitosa`,`Se ha creado exitosamente la asignación de rollos!`);
-            setTimeout(() => this.limpiarTodosLosCampos(), 2000);
+            setTimeout(() => {
+              this.limpiarTodosLosCampos()
+            }, 2000);
           }, () => this.msj.mensajeError(`Error`, `Se ha producido un error al momento de mover el inventario del rollo ${this.ArrayBoppPedida[i].Nombre}!`));
         }
       });

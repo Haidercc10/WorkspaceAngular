@@ -294,7 +294,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       let info : any = [];
       //this.ordenesConsultadas.sort((a,b) => a.id_Vendedor - b.id_Vendedor);
       this.ordenesConsultadas.forEach(d => {
-        info.push([d.ordenTrabajo, d.item, d.fechaCreacion.replace('T00:00:00', ''), d.fecha_Despacho.replace('T00:00:00', ''), d.cliente, d.formato_Extrusion + d.ancho_Extrusion + d.calibre_Extrusion + d.pigmento_Extrusion, d.kilos, d.referencia, d.ancho, d.peso_Metro, d.rodillo, d.material, d.maquinas.toString(), d.color_1, d.color_2, d.color_3, d.color_4, d.color_5, d.color_6, d.color_7, d.color_8, d.anchoReal, d.fuelle_Izquierdo, d.fuelle_Derecho, d.largo, d.fuelle_Fondo, d.tipo_Sellado, d.cant_Unidades ]);
+        info.push([d.ordenTrabajo, d.item, d.fechaCreacion.replace('T00:00:00', ''), d.fecha_Despacho.replace('T00:00:00', ''), d.cliente, d.formato_Extrusion + d.ancho_Extrusion + d.calibre_Extrusion + d.pigmento_Extrusion, d.kilos, d.referencia, d.ancho, d.peso_Metro, d.rodillo, d.material, d.maquinas.toString(), d.color_1, d.color_2, d.color_3, d.color_4, d.color_5, d.color_6, d.color_7, d.color_8, d.anchoReal, d.fuelle_Izquierdo, d.fuelle_Derecho, d.largo, d.fuelle_Fondo, d.tipo_Sellado, d.cant_Unidades, d.peso_Millar ]);
       });
       //this.addTotalSheet1(info);
       return info;
@@ -302,9 +302,9 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   
     //.Agregar información a la hoja del excel.
     addInfoExcel2(worksheet : any, data : any) {
-      let formatNumber: Array<number> = [7,9,10,22,23,24,25,26,28];
+      let formatNumber: Array<number> = [7,9,10,22,23,24,25,26,28,29];
       let contador : any = 6;
-      let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB']; 
+      let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC']; 
       formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
   
       data.forEach(d => {
@@ -319,15 +319,15 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   
     //.Agregar encabezado a la hoja del excel.
     addHeaderPage2(worksheet, font, border, fill) {
-      let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5','M5','N5','O5','P5','Q5','R5','S5','T5','U5','V5','W5','X5','Y5','Z5','AA5','AB5']
+      let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5','M5','N5','O5','P5','Q5','R5','S5','T5','U5','V5','W5','X5','Y5','Z5','AA5','AB5','AC5']
       worksheet.addRow(['Consecutivo', 'Item', 'Fecha', 'Fecha Despacho', 'Cliente', 'Referencia a Extruir', 'Kilos', 'Nombre Referencia', 'Ancho Final', 'PM', 'Rodillo', 'Material', 'Maquinas', 
-        'Color 1', 'Color 2', 'Color 3', 'Color 4', 'Color 5', 'Color 6', 'Color 7', 'Color 8', 'Ancho', 'F. Izquierdo', 'F. Derecho', 'Largo', 'F. Fondo', 'Tipo Sellado', 'Cant. Unidades' ]);
+        'Color 1', 'Color 2', 'Color 3', 'Color 4', 'Color 5', 'Color 6', 'Color 7', 'Color 8', 'Ancho', 'F. Izquierdo', 'F. Derecho', 'Largo', 'F. Fondo', 'Tipo Sellado', 'Cant. Unidades', 'Peso Millar' ]);
       
       rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
       rowHeader.forEach(x => worksheet.getCell(x).font = font);
       rowHeader.forEach(x => worksheet.getCell(x).border = border);
   
-      let concatCells : any = ['A1:AB3'];
+      let concatCells : any = ['A1:AC3'];
       this.stylesPage2(worksheet, concatCells, []);
     }
   
@@ -338,7 +338,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       [6].forEach(x => worksheet.getColumn(x).width = 60);
       [5,8].forEach(x => worksheet.getColumn(x).width = 50);
       [4,12,13,27,28].forEach(x => worksheet.getColumn(x).width = 15);
-      [2,7,9,10,11,14,15,16,17,18,19,20,21,22,23,24,25,26].forEach(x => worksheet.getColumn(x).width = 10);
+      [2,7,9,10,11,14,15,16,17,18,19,20,21,22,23,24,25,26,29].forEach(x => worksheet.getColumn(x).width = 10);
       concatCells.forEach(cell => worksheet.mergeCells(cell));
     }
   

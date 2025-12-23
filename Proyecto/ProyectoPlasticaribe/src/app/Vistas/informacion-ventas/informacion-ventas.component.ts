@@ -39,6 +39,8 @@ export class InformacionVentasComponent implements OnInit {
   dataKg: any = [];
   dataKgClients: any = [];
   tab: number = 0;
+  loadTab0: boolean = false;
+  loadTab1: boolean = false;
 
   constructor(
     private frmBuilder: FormBuilder,
@@ -87,7 +89,7 @@ export class InformacionVentasComponent implements OnInit {
   //* FUNCIONES DE CONVERSION
   // Funcion que colocará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-  
+
   //* LIMPIAR DATOS
   //Funcion que va a limpiar todo
   clearAll() {
@@ -154,48 +156,12 @@ export class InformacionVentasComponent implements OnInit {
     });
   }
 
-  //*CONSULTAR INFORMACION
-  getSalesInformation() {
-    this.dataAsesors = [];
-    this.load = true;
-    [2025].forEach(x => {
-      this.svInvZeus.getBillingAnnual(x).subscribe(data => {
-        this.dataSales = data;
-        data.forEach(y => {
-          if (this.dataAsesors.filter(z => z.asesorId == y.asesorId && z.year == y.year).length == 0) {
-            this.dataAsesors.push(y);
-          }
-        });
-        this.load = false;
-      }, error => {
-        this.load = false;
-        console.log(error);
-      });
-    })
-  }
-
-  convertDataKg() {
-    this.dataSales.forEach(x => {
-      this.svBagpro.CalcularKilosItem(x.items).subscribe(data => {
-        data.forEach(y => {
-          if (y != null) {
-            this.dataKg.push({
-              'year': x.year,
-              'month': x.month,
-              'asesorId': x.asesorId,
-              'kg': y.weight,
-            });
-          }
-        });
-      });
-    });
-  }
-
   getSalesInformationAndKg() {
     this.dataAsesors = [];
     this.dataSales = [];
+    this.loadTab0 = true;
     this.load = true;
-    let year : number = this.form.value.year; 
+    let year: number = this.form.value.year;
 
     // 1. Llamar a la API (forkJoin si fueran varios años)
     forkJoin([this.svInvZeus.getBillingAnnual(year, this.validateUrl())])
@@ -212,7 +178,7 @@ export class InformacionVentasComponent implements OnInit {
           });
         }),
 
-        // 2. Cuando termine lo anterior ▶ Ejecutar convertDataKg
+        // 2. Cuando termine lo anterior --> Ejecutar convertDataKg
         switchMap(() => this.convertDataKgRx())
       )
       .subscribe({
@@ -248,46 +214,74 @@ export class InformacionVentasComponent implements OnInit {
     return forkJoin(requests);
   }
 
-  //Función que colocará la información como lo solicita la tabla 
   getClientsInformation() {
+    this.loadTab1 = true;
     this.dataClients = [];
     this.dataSalesClients = [];
     this.load = true;
-    let year : number = this.form.value.year;
 
-    this.svInvZeus.getBillingClientsAnnual(year, this.validateUrl()).subscribe(data => {
-      this.dataSalesClients = data;
-      data.forEach(x => {
-        if (this.dataClients.filter(y => y.asesorId == x.asesorId && y.clienteId == x.clienteId && y.year == x.year).length == 0) {
-          this.dataClients.push(x);
-        }
+    const year: string = this.form.value.year;
+    const meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+
+    this.svInvZeus.getBillingClientsAnnual(year, this.validateUrl())
+      .subscribe(data => {
+
+        this.dataSalesClients = data;
+
+        data.forEach(x => {
+          const existe = this.dataClients.find(y =>
+            y.asesorId === x.asesorId &&
+            y.clienteId === x.clienteId &&
+            y.year === x.year
+          );
+
+          if (!existe) {
+            const cliente: any = { ...x };
+
+            meses.forEach(mes => {
+              cliente[`mes${mes}`] = this.getFactClient(
+                x.year,
+                mes,
+                x.asesorId,
+                x.clienteId
+              );
+            });
+
+            cliente.total = meses.reduce(
+              (sum, mes) => sum + cliente[`mes${mes}`],
+              0
+            );
+
+            this.dataClients.push(cliente);
+          }
+        });
+
+        this.load = false;
+      }, error => {
+        console.error(error);
+        this.load = false;
       });
-      this.load = false;
-    }, error => {
-      console.log(error);
-      this.load = false;
-    });
   }
 
-  validateUrl(){
+  validateUrl() {
     let client: any = this.form.value.clienteId;
-    let asesor : any = this.form.value.asesor;
-    let url : string = ``;
+    let asesor: any = this.form.value.asesor;
+    let url: string = ``;
 
-    if(asesor != null) url += `asesor=${asesor}`;
-    if(client != null) url.length > 0 ? url += `&client=${client}` : url += `client=${client}`;
+    if (asesor != null) url += `asesor=${asesor}`;
+    if (client != null) url.length > 0 ? url += `&client=${client}` : url += `client=${client}`;
 
-    if(url.length > 0) url = `?${url}`;
+    if (url.length > 0) url = `?${url}`;
     return url;
   }
 
   cambioTab($event) {
     this.tab = $event.index;
-    if (this.tab == 0) this.getSalesInformationAndKg();
-    else if (this.tab == 1) this.getClientsInformation();
+    (this.tab == 0 && !this.loadTab0) ? this.getSalesInformationAndKg() : null;
+    (this.tab == 1 && !this.loadTab1) ? this.getClientsInformation() : null;
   }
 
-  validateQuery(){
+  validateQuery() {
     if (this.tab == 0) this.getSalesInformationAndKg();
     else if (this.tab == 1) this.getClientsInformation();
   }
@@ -377,8 +371,8 @@ export class InformacionVentasComponent implements OnInit {
   exportExcel1() {
     if (this.dataAsesors.length > 0) {
       this.load = true;
-      setTimeout(() => { 
-        this.loadSheetAndStyles(this.dataAsesors); 
+      setTimeout(() => {
+        this.loadSheetAndStyles(this.dataAsesors);
         this.load = false;
       }, 500);
     } else this.svMsj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
@@ -498,6 +492,8 @@ export class InformacionVentasComponent implements OnInit {
   dataExcel(data: any) {
     let info: any = [];
     let count: number = 0;
+    const year = data?.[0]?.year;
+
     data.forEach(x => {
       info.push([
         count += 1,
@@ -532,43 +528,44 @@ export class InformacionVentasComponent implements OnInit {
         this.getTotalKgAsesor(x.year, x.asesorId)
       ]);
     });
-    this.addTotal(info);
+    this.addTotal(info, year);
     return info;
   }
 
   //Agregar fila de totales al formato excel.
-  addTotal(info: any) {
+  addTotal(info: any, year: any) {
+
     info.push([
       '',
       '',
       '',
       'TOTALES',
-      this.getFactMonthAsesor('2025', '01'),
-      this.getKgMonthAsesor('2025', '01'),
-      this.getFactMonthAsesor('2025', '02'),
-      this.getKgMonthAsesor('2025', '02'),
-      this.getFactMonthAsesor('2025', '03'),
-      this.getKgMonthAsesor('2025', '03'),
-      this.getFactMonthAsesor('2025', '04'),
-      this.getKgMonthAsesor('2025', '04'),
-      this.getFactMonthAsesor('2025', '05'),
-      this.getKgMonthAsesor('2025', '05'),
-      this.getFactMonthAsesor('2025', '06'),
-      this.getKgMonthAsesor('2025', '06'),
-      this.getFactMonthAsesor('2025', '07'),
-      this.getKgMonthAsesor('2025', '07'),
-      this.getFactMonthAsesor('2025', '08'),
-      this.getKgMonthAsesor('2025', '08'),
-      this.getFactMonthAsesor('2025', '09'),
-      this.getKgMonthAsesor('2025', '09'),
-      this.getFactMonthAsesor('2025', '10'),
-      this.getKgMonthAsesor('2025', '10'),
-      this.getFactMonthAsesor('2025', '11'),
-      this.getKgMonthAsesor('2025', '11'),
-      this.getFactMonthAsesor('2025', '12'),
-      this.getKgMonthAsesor('2025', '12'),
-      this.totalFactYear('2025'),
-      this.totalKgYear('2025')
+      this.getFactMonthAsesor(year, '01'),
+      this.getKgMonthAsesor(year, '01'),
+      this.getFactMonthAsesor(year, '02'),
+      this.getKgMonthAsesor(year, '02'),
+      this.getFactMonthAsesor(year, '03'),
+      this.getKgMonthAsesor(year, '03'),
+      this.getFactMonthAsesor(year, '04'),
+      this.getKgMonthAsesor(year, '04'),
+      this.getFactMonthAsesor(year, '05'),
+      this.getKgMonthAsesor(year, '05'),
+      this.getFactMonthAsesor(year, '06'),
+      this.getKgMonthAsesor(year, '06'),
+      this.getFactMonthAsesor(year, '07'),
+      this.getKgMonthAsesor(year, '07'),
+      this.getFactMonthAsesor(year, '08'),
+      this.getKgMonthAsesor(year, '08'),
+      this.getFactMonthAsesor(year, '09'),
+      this.getKgMonthAsesor(year, '09'),
+      this.getFactMonthAsesor(year, '10'),
+      this.getKgMonthAsesor(year, '10'),
+      this.getFactMonthAsesor(year, '11'),
+      this.getKgMonthAsesor(year, '11'),
+      this.getFactMonthAsesor(year, '12'),
+      this.getKgMonthAsesor(year, '12'),
+      this.totalFactYear(year),
+      this.totalKgYear(year)
     ]);
   }
 
@@ -576,8 +573,8 @@ export class InformacionVentasComponent implements OnInit {
   exportExcel2() {
     if (this.dataClients.length > 0) {
       this.load = true;
-      setTimeout(() => { 
-        this.loadSheetAndStyles2(this.dataClients); 
+      setTimeout(() => {
+        this.loadSheetAndStyles2(this.dataClients);
         this.load = false;
       }, 500);
     } else this.svMsj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
