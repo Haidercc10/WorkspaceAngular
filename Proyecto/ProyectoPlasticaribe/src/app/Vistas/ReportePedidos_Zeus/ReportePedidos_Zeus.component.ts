@@ -33,6 +33,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   @ViewChild('op') op: OverlayPanel | undefined;
   @ViewChild('dt') dt: Table | undefined;
+  @ViewChild('dtModal2') dtModal2: Table | undefined;
   @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT: Reporte_Procesos_OTComponent;
   @ViewChild(PedidoExternoComponent) modalPedidoExterno: PedidoExternoComponent;
   @Input() reporteConsolidado: boolean = false;
@@ -76,6 +77,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   actualMonth = parseInt(moment().format('MM'));
   previousMonth = parseInt(moment().subtract(1, 'month').format('MM'));
   asesors: any = [];
+  modalSalesAsesor: boolean = false;
+  salesAsesor: any = [];
+  selectedAsesor: string = '';
 
   constructor(private AppComponent: AppComponent,
     private messageService: MessageService,
@@ -199,6 +203,35 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     });
   }
 
+  //*MODAL 3
+  //*Función que mostrará los pedidos de cada vendedor por cliente. 
+  getSalesAsesor(asesor: any) {
+    this.salesAsesor = [];
+    this.selectedAsesor = asesor.vendedor
+    let sales: any = this.ArrayPedidos.filter(x => x.idVendedor == asesor.codigo);
+    if (sales?.length) {
+      this.salesAsesor = sales.map(x => ({
+        ...x,
+        sales: {
+          cliente: x.cliente
+        }
+      }));
+    }
+    this.salesAsesor.sort((a, b) => a.sales.cliente.localeCompare(b.sales.cliente));
+    if (this.salesAsesor.length > 0) this.modalSalesAsesor = true;
+    else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró información de ventas para el asesor ${this.selectedAsesor}`);
+  }
+
+  //
+  totalSalesPending(asesor : string) {
+    console.log(asesor);
+    let total : number = 0;
+    total = this.salesAsesor.filter(x => x.vendedor == asesor).reduce((acc, x) => acc += parseFloat(x.costo_Cant_Pendiente), 0);
+    return total;
+  }
+
+  //
+  totalSalesPendingForClient = (asesor : string, client : any) => this.salesAsesor.filter(x => x.idVendedor == asesor && x.cliente == client).reduce((acc, x) => acc + parseFloat(x.costo_Cant_Pendiente), 0);
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
   consultarPedidos() {
@@ -671,6 +704,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       else this.datosExcel = this.ArrayPedidos;
     }, 400);
   }
+
+  
+  applyFilter = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   // Función que mostrará la descripción de cada una de las card de los dashboard's
   mostrarDescripcion($event, color: string) {

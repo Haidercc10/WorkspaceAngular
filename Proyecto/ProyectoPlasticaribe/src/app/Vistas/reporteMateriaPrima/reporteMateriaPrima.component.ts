@@ -154,9 +154,12 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerCategorias();
     this.consultarInventario();
-    this.consultarCategorias();
+    this.getCatMP();
+    this.getCatTintas();
+    this.getCatBOPP();
     this.obtenerUnidadesMedidas();
     this.getSubcategories();
+
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -164,11 +167,28 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
-  consultarCategorias() {
-    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => { this.categoriasMP = datos; });
-    this.tintasService.GetCategoriasTintas().subscribe(datos => { this.categoriasTintas = datos; });
-    this.boppService.GetCategoriasBOPP().subscribe(datos => { this.categoriasBOPP = datos; });
+  getCatMP() {
+    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => { 
+      this.categoriasMP = datos; 
+      console.log(this.categoriasMP, 1);
+    });
+    
   }
+
+  getCatTintas(){
+    this.tintasService.GetCategoriasTintas().subscribe(datos => { 
+      this.categoriasTintas = datos; 
+      console.log(this.categoriasTintas, 2)
+    });
+  }
+
+  getCatBOPP(){
+    this.boppService.GetCategoriasBOPP().subscribe(datos => { this.categoriasBOPP = datos; 
+      console.log(this.categoriasBOPP, 3)
+    });
+  }
+  
+    
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
@@ -702,6 +722,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a editar una materia primas
   editarMateriaPrima() {
+    console.log(this.categoriasMP, this.categoriasTintas, this.categoriasBOPP)
+    console.log(this.FormEdicionMateriaPrima.value.Categoria);
+    
     if (this.categoriasMP.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
       const info: modelMateriaPrima = {
         MatPri_Id: this.FormEdicionMateriaPrima.value.Id,

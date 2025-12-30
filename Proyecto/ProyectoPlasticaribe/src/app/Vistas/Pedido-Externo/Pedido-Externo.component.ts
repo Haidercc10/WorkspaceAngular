@@ -19,6 +19,13 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsCrearPedidos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
+import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
+import { FormatosService } from 'src/app/Servicios/Formato/Formatos.service';
+import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
+import { Tipos_ImpresionService } from 'src/app/Servicios/TipoImpresion/Tipos_Impresion.service';
+import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +43,7 @@ export class PedidoExternoComponent implements OnInit {
 
   public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos cliente
   public FormPedidoExternoProductos!: FormGroup; //Formuladio de pedidos productos
+  public formProdTerminado !: FormGroup; //Formulario de producto terminado
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -67,6 +75,12 @@ export class PedidoExternoComponent implements OnInit {
   pedidoEditar: number = 0; //Variable que alamcenará el numero el pedido que se está editando
   fechaUltFacuracion: any; //Variable que mostrará la fecha de la ultima facturacion de un producto seleccionado
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  materials: any = [];
+  pigments: any = [];
+  printingTypes: any = [];
+  sealedTypes: any = [];
+  formats: any = [];
+
 
   constructor(private pedidoproductoService: OpedidoproductoService,
     private productosServices: ProductoService,
@@ -82,8 +96,15 @@ export class PedidoExternoComponent implements OnInit {
     private zeusCobtabilidadService: ZeusContabilidadService,
     private messageService: MessageService,
     private shepherdService: ShepherdService,
-    private msj: MensajesAplicacionService,) {
+    private msj: MensajesAplicacionService,
+    private svMaterials: MaterialProductoService,
+    private svPigments: PigmentoProductoService,
+    private svPrinting: Tipos_ImpresionService,
+    private svFormats: TipoProductoService,
+    private svSealed: TiposSelladoService
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       PedClienteId: [null, Validators.required],
@@ -95,8 +116,6 @@ export class PedidoExternoComponent implements OnInit {
       PedFechaEnt: moment(this.today).format('YYYY-MM-DD'),
       PedEstadoId: 11,
       PedObservacion: '',
-      PedDescuento: 0,
-      PedIva: true,
       PedDireccionEntrega: [null, Validators.required],
       PedOc: '',
     });
@@ -111,12 +130,39 @@ export class PedidoExternoComponent implements OnInit {
       ProdUltFacturacion: [null, Validators.required],
       ProdStock: [null, Validators.required],
       ProdFechaEnt: [null, Validators.required],
+      material: [null, Validators.required],
+      pigment: [null, Validators.required],
+      printing: [false],
+      printingDouble: [false],
+      embobinate: [null,],
+      treaty: [false,],
+      caliber: [null, Validators.required],
     });
+
+    this.formProdTerminado = this.frmBuilderPedExterno.group({
+      margin: [null, Validators.required],
+      weightMillar: [null, Validators.required],
+      weightRoll: [null, Validators.required],
+      weightUnit: [null, Validators.required],
+      qtyBagxBulto: [null, Validators.required],
+      qtyBagxPaq: [null, Validators.required],
+      tpSealed: [null, Validators.required],
+      tpPrinting: [null, Validators.required],
+      format: [null, Validators.required],
+      width: [null, Validators.required],
+      long: [null, Validators.required],
+      bellow: [null, Validators.required]
+    })
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.checkboxIva();
+    this.getMaterials();
+    this.getPigments();
+    this.getPrintingTypes();
+    this.getSealedTypes();
+    this.getFormats();
+    this.getPresentations();
     this.buscarClientes();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
@@ -139,7 +185,7 @@ export class PedidoExternoComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  // Funcion que va a dar un valor a la variable iva dependiendo de si fue seleccionada o no la casilla del iva
+  //! Funcion que va a dar un valor a la variable iva dependiendo de si fue seleccionada o no la casilla del iva
   checkboxIva() {
     if (this.checked) this.iva = 19;
     else this.iva = 0;
@@ -174,6 +220,21 @@ export class PedidoExternoComponent implements OnInit {
     this.FormPedidoExternoProductos.reset();
   }
 
+  //*LISTAS
+  getMaterials = () => this.svMaterials.srvObtenerLista().subscribe(x => this.materials = x);
+
+  getPigments = () => this.svPigments.srvObtenerLista().subscribe(x => this.pigments = x);
+
+  getSealedTypes = () => this.svSealed.srvObtenerLista().subscribe(x => this.sealedTypes = x);
+
+  getPrintingTypes = () => this.svPrinting.srvObtenerLista().subscribe(x => this.printingTypes = x);
+
+  getFormats = () => this.svFormats.srvObtenerLista().subscribe(x => this.formats = x);
+
+  getPresentations = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => { this.presentacion = data; console.log(data) });
+
+
+  //*CLIENTES
   // Funcion que va a buscar los posibles clientes a los que se les puede hacer el pedido de productos
   buscarClientes() {
     let nombre: string = this.FormPedidoExternoClientes.value.PedClienteNombre;
@@ -289,11 +350,8 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion para cargar los productos de un solo cliente
   productoCliente() {
     this.producto = [];
-    
-    this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(datos_clientesProductos => {
-      datos_clientesProductos.forEach(prod => this.productosServices.srvObtenerListaPorId(prod.prod_Id).subscribe(datos => this.producto.push(datos)));
-      console.log(this.producto);
-      
+    this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(data => {
+      this.producto = data;
     });
   }
 
@@ -301,22 +359,27 @@ export class PedidoExternoComponent implements OnInit {
   buscarProducto(idProducto: any) {
     this.presentacion = [];
     if ([null, undefined, ''].includes(idProducto)) this.productoCliente();
+
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
+      console.log(datos_existencis);
+
       if (datos_existencis.length > 0) this.productoConExistencia(datos_existencis, idProducto);
       else if (datos_existencis.length == 0) this.productoSinExistencia(idProducto);
     });
   }
 
   productoSinExistencia(idProducto: number) {
-    this.unidadMedidaService.srvObtenerLista().subscribe(data => this.presentacion = data.filter(x => ['Und', 'Kg', 'Paquete'].includes(x.undMed_Id)).map(und => und.undMed_Id));
-    this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
-      this.FormPedidoExternoProductos.patchValue({
-        ProdId: datos_producto[0].prod_Id,
-        ProdNombre: datos_producto[0].prod_Nombre,
-        ProdPrecioUnd: 0,
-        ProdUltFacturacion: 0,
-        ProdStock: 0,
-      });
+    let datos_producto = this.producto.filter(x => x.prod_Id == idProducto);
+    
+    this.FormPedidoExternoProductos.patchValue({
+      'ProdId': datos_producto[0].prod_Id,
+      'ProdNombre': datos_producto[0].prod_Nombre,
+      'ProdPrecioUnd': 0,
+      'ProdUltFacturacion': 0,
+      'ProdStock': 0,
+      'material': datos_producto[0].material_Id,
+      'pigment': datos_producto[0].pigmt_Id,
+      'caliber' : datos_producto[0].prod_Calibre
     });
   }
 
@@ -331,10 +394,13 @@ export class PedidoExternoComponent implements OnInit {
         });
         setTimeout(() => {
           this.FormPedidoExternoProductos.patchValue({
-            ProdId: prod.prod_Id,
-            ProdNombre: prod.prod_Nombre,
-            ProdUnidadMedidaCant: prod.undMed_Id,
-            ProdPrecioUnd: prod.exProd_PrecioVenta,
+            'ProdId': prod.prod_Id,
+            'ProdNombre': prod.prod_Nombre,
+            'ProdUnidadMedidaCant': prod.undMed_Id,
+            'ProdPrecioUnd': prod.exProd_PrecioVenta,
+            'material': prod.material_Id,
+            'pigmento': prod.pigmento_Id,
+           
           });
         }, 100);
       });
