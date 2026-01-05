@@ -213,3 +213,24 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
   border-radius: 10px;
   margin: 10px;
 }
+
+::ng-deep .p-chip {
+    margin-top: 0.5%;
+}
+
+#pb1 ::ng-deep .p-progressbar .p-progressbar-value {
+  background: lightseagreen;
+}
+
+#pb2 ::ng-deep .p-progressbar .p-progressbar-value {
+  background: dodgerblue;
+}
+
+ #pb3 ::ng-deep .p-progressbar .p-progressbar-value {
+  background: gold;
+}
+
+#grafica ::ng-deep .p-card {
+  padding: 0;
+}
+

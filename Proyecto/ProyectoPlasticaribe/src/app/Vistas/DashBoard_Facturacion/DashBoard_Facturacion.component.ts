@@ -7,6 +7,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { CumplimientoFacturacionService } from 'src/app/Servicios/Cumplimiento_Facturacion/cumplimiento-facturacion.service';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -35,11 +36,20 @@ export class DashBoard_FacturacionComponent implements OnInit {
   facturadoAnios : any[] = []; //variable que almacenará la información de lo facturado por los años
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
+  complianceBilling : any = {}; //Variable que mostrará los diferentes datos del cumplimiento de facturación. 
+  percentageBillingDay : number = 0; //Variable que almacenará el porcentaje de cumplimiento de facturación del día
+  percentageBillingMonth : number = 0; //
+  percentageBillingYear : number = 0; //
+
+
+
+
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private shepherdService: ShepherdService,
                     private mensajeAplicacion : MensajesAplicacionService,
-                      private paginaPrincial : PaginaPrincipalComponent,) {
+                      private paginaPrincial : PaginaPrincipalComponent,
+                        private svCompBilling : CumplimientoFacturacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -48,6 +58,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.llenarArrayAnos();
     this.tiempoExcedido();
     this.graficarDatos();
+    
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
       this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
@@ -72,10 +83,12 @@ export class DashBoard_FacturacionComponent implements OnInit {
     if (this.paginaPrincial.facturacion) {
       this.facturacionAnio();
       this.facturacion();
+      this.getComplianceBilling();
       let time = setInterval(() => {
         if (this.paginaPrincial.facturacion) {
           this.facturacionAnio(true);
           this.facturacion();
+          this.getComplianceBilling();
         } else clearInterval(time);
       }, 60000);
     }
@@ -209,4 +222,29 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.facturasData.datasets.push(info);
     this.cargando = false;
   }
+
+  //*NUEVO
+  getComplianceBilling(){
+    this.complianceBilling = {};
+    this.percentageBillingDay = 0;
+    this.percentageBillingMonth = 0;
+    this.percentageBillingYear = 0; 
+
+    this.svCompBilling.ComplianceToday().subscribe(data => {
+      
+      this.complianceBilling = {
+        'day' : data[0].cufa_FacturadoDia,
+        'month' : data[0].cufa_FacturadoMes,
+        'year' : data[0].cufa_FacturadoAnual,
+        'goalDay' : data[0].cufa_MetaDia,
+        'goalMonth' : data[0].cufa_MetaMes, 
+        'goalYear' : data[0].cufa_MetaAnual, 
+        'percDay' : data[0].cufa_PorcentajeDia.toFixed(),
+        'percMonth' : data[0].cufa_PorcentajeMes.toFixed(), 
+        'percYear' : data[0].cufa_PorcentajeAnual.toFixed(), 
+      }
+      console.log(this.complianceBilling);
+      
+    });
+  } 
 }
