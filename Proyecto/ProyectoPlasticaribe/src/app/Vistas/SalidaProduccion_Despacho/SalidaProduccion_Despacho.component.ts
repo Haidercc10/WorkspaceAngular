@@ -20,11 +20,8 @@ import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/O
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
-import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
-import { of } from 'rxjs';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
 import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
-import { modelFacturacion_Productos } from 'src/app/Modelo/Facturacion_Productos';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 
 @Component({
@@ -444,12 +441,12 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       this.production.forEach(prod => {
         // Buscar todos los rollos despachados del mismo producto (por ejemplo por código o id)
         let despachado = this.sendProductionZeus
-          .filter(x => x.pp.prod_Id == prod.item) // Ajusta la propiedad que identifica el producto
+          .filter(x => x.pp.prod_Id == prod.item) 
           .reduce((sum, item) => sum + (item.pp.cantidad || item.pp.peso_Neto), 0);
         
           console.log(despachado, prod.quantity);
         
-        if (despachado < prod.quantity) {
+        if (despachado.toFixed(2) < prod.quantity) {
           errores.push(`El item ${prod.item} tiene ${despachado} de ${prod.quantity}`);
         }
       });

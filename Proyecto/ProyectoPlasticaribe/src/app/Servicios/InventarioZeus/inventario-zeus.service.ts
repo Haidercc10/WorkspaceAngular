@@ -214,7 +214,7 @@ export class InventarioZeusService {
   //*********************************************************************** TRANSAC ******************************************************************************/
   GetRecibosCaja = (fecha1: any, fecha2: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 
-  ValorTotalFacturadoHoy = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/ValorTotalFacturadoHoy`);
+  ValorTotalFacturadoHoy = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/ValorTotalFacturadoHoy2`);
 
   /*********************************************************************** Cruce_DocumentosRelacionados ******************************************************************************/
   GetFactura_PorPedidos = (orderSales: Array<string>) => this.http.post(`${this.rutaInventarioZeusAPI}/Cruce_DocumentosRelacionados/getFactura_PorPedidos`, orderSales);

@@ -7,75 +7,86 @@
 
 <div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
   <div class="row g-3">
-    <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
       <!-- Cumplimiento Día -->
       <div class="roll-in-left">
-        <p-card [style]="{ height: '160px',  border: '3px solid lightseagreen' }">
+        <p-card [style]="{ border: '3px solid #4a99b4' }">
           <ng-template pTemplate="header">
-            <div class="flex align-items-center gap-2">
+            <div class="flex align-items-center gap-2 justify-content-center">
               <i class="pi pi-money-bill"
                 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-              <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Cumplimiento Día</b></h2>
+              <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Cumplimiento
+                  Día</b></h2>
             </div>
           </ng-template>
 
           <ng-template pTemplate="body">
-            <p-progressBar [value]="complianceBilling.percDay" [style]="{height: '18px'}" id="pb1"></p-progressBar>
-            <br>
-            <p-chip
-              label="💲Facturación: ${{complianceBilling.day | number : '1.0-0'}}" class="mr-2"></p-chip>•
-              <p-chip
-              label="🚩Meta: ${{complianceBilling.goalDay | number : '1.0-0'}}" class="mr-2 cursor"></p-chip>
+            <p-progressBar [value]="complianceBilling.percDay"
+              [style]="{height: '15px', '--bar-color': getColorProgressBar(complianceBilling.percDay)}"
+              id="pb1"></p-progressBar>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <p-chip label="💲Facturación: ${{complianceBilling.day | number : '1.0-0'}}" class="mr-3"></p-chip>
+
+            <p-chip label="🚩Meta: ${{complianceBilling.goalDay | number : '1.0-0'}}" class="mr-2 cursor"
+              (click)="getModalGoal(GoalType.Dia)" pTooltip="Haz clic para actualizar la meta del día!"></p-chip>
           </ng-template>
         </p-card>
       </div>
     </div>
 
     <!-- Cumplimiento Mes -->
-    <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
       <div class="roll-in-top">
-        <p-card [style]="{ height: '160px', border: '3px solid dodgerblue' }">
+        <p-card [style]="{ border: '3px solid #4a99b4' }">
           <ng-template pTemplate="header">
-            <div class="flex align-items-center gap-2">
+            <div class="flex align-items-center gap-2 justify-content-center">
               <i class="pi pi-wallet"
                 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-              <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Cumplimiento Mes</b>
+              <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Cumplimiento
+                  Mes</b>
               </h2>
             </div>
           </ng-template>
 
           <ng-template pTemplate="body">
-            <p-progressBar [value]="complianceBilling.percMonth" [style]="{height: '18px'}" id="pb2"></p-progressBar>
-            <br>
-            <p-chip
-              label="💲Facturación: ${{complianceBilling.month | number : '1.0-0'}}" class="mr-2"></p-chip>•
-              <p-chip
-              label="🚩Meta: ${{complianceBilling.goalMonth | number : '1.0-0'}}" class="mr-2 cursor"></p-chip>
+            <p-progressBar [value]="complianceBilling.percMonth"
+              [style]="{height: '15px', '--bar-color': getColorProgressBar(complianceBilling.percMonth)}"
+              id="pb2"></p-progressBar>
+          </ng-template>
+
+          <ng-template pTemplate="footer">
+            <p-chip label="💲Facturación: ${{complianceBilling.month | number : '1.0-0'}}" class="mr-3"></p-chip>
+            <p-chip label="🚩Meta: ${{complianceBilling.goalMonth | number : '1.0-0'}}" class="cursor"
+              (click)="getModalGoal(GoalType.Mes)" pTooltip="Haz clic para actualizar la meta del mes!"></p-chip>
           </ng-template>
         </p-card>
       </div>
     </div>
 
     <!-- Cumplimiento Año -->
-    <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
       <div class="roll-in-right">
-        <p-card [style]="{ height: '160px', border: '3px solid gold' }">
+        <p-card [style]="{ height: '150px', border: '3px solid #4a99b4' }">
           <ng-template pTemplate="header">
-            <div class="flex align-items-center gap-2 text-center">
+            <div class="flex align-items-center gap-2 justify-content-center">
               <i class="pi pi-dollar"
                 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-              <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Cumplimiento Año</b>
+              <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Cumplimiento
+                  Año</b>
               </h2>
             </div>
           </ng-template>
 
           <ng-template pTemplate="body">
-            <p-progressBar [value]="complianceBilling.percYear" [style]="{height: '18px'}" id="pb3"></p-progressBar>
-            <br>
-            <p-chip
-              label="💲Facturación: ${{complianceBilling.year | number : '1.0-0'}}" class="mr-2"></p-chip>•
-              <p-chip
-              label="🚩Meta: ${{complianceBilling.goalYear | number : '1.0-0'}}" class="mr-2 cursor"></p-chip>
+            <p-progressBar [value]="complianceBilling.percYear"
+              [style]="{height: '15px', '--bar-color': getColorProgressBar(complianceBilling.percYear) }"
+              id="pb3"></p-progressBar>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <p-chip label="💲Facturación: ${{complianceBilling.year | number : '1.0-0'}}" class="mr-2"></p-chip>
+            <p-chip label="🚩Meta: ${{complianceBilling.goalYear | number : '1.0-0'}}" class="cursor"
+              (click)="getModalGoal(GoalType.Anual)" pTooltip="Haz clic para actualizar la meta del año!"></p-chip>
           </ng-template>
         </p-card>
       </div>
@@ -87,12 +98,13 @@
 
         <!-- Total ventas del día -->
         <div class="p-3 roll-in-left">
-          <p-card [style]="{ height: '130px' }">
+          <p-card [style]="{ height: '130px', border: '3px solid #4a99b4' }">
             <ng-template pTemplate="header">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-dollar"
                   [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Ventas del día</b></h5>
+                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Ventas del
+                    día</b></h5>
               </div>
             </ng-template>
 
@@ -102,32 +114,33 @@
           </p-card>
         </div>
 
-
         <!-- Total iva ventas del mes -->
         <div class="p-3 roll-in-left">
-          <p-card [style]="{ height: '130px' }">
+          <p-card [style]="{ height: '130px', border: '3px solid #4a99b4' }">
             <ng-template pTemplate="header">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-truck"
                   [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Ventas del mes</b></h5>
+                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Ventas del
+                    mes</b></h5>
               </div>
             </ng-template>
 
             <ng-template pTemplate="body">
-              <h4><b>{{ totalFacuturadoMes | currency : '$' }}</b></h4>
+              <h4><b>{{ totalFacturadoMes | currency : '$' }}</b></h4>
             </ng-template>
           </p-card>
         </div>
 
         <!-- Total iva ventas del mes -->
         <div class="p-3 roll-in-left">
-          <p-card [style]="{ height: '130px' }">
+          <p-card [style]="{ height: '130px', border: '3px solid #4a99b4' }">
             <ng-template pTemplate="header">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-wallet"
                   [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Iva ventas mes</b></h5>
+                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Iva ventas
+                    mes</b></h5>
               </div>
             </ng-template>
 
@@ -139,35 +152,37 @@
 
         <!-- Total ventas del mes -->
         <div class="p-3 roll-in-left">
-          <p-card [style]="{ height: '130px' }">
+          <p-card [style]="{ height: '130px', border: '3px solid #4a99b4' }">
             <ng-template pTemplate="header">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-dollar"
                   [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Total ventas mes</b>
+                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Total ventas
+                    mes</b>
                 </h5>
               </div>
             </ng-template>
 
             <ng-template pTemplate="body">
-              <h4><b>{{ totalFacuturadoMes + totalIvaVentaMes | currency : '$' }}</b></h4>
+              <h4><b>{{ totalFacturadoMes + totalIvaVentaMes | currency : '$' }}</b></h4>
             </ng-template>
           </p-card>
         </div>
 
         <!--* Ventas año -->
         <div class="p-3 roll-in-left">
-          <p-card [style]="{ height: '130px' }">
+          <p-card [style]="{ height: '130px', border: '3px solid #4a99b4' }">
             <ng-template pTemplate="header">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-dollar"
                   [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"></i>
-                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Ventas del año</b></h5>
+                <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>Ventas del
+                    año</b></h5>
               </div>
             </ng-template>
 
             <ng-template pTemplate="body">
-              <h4><b>{{ totalFacturadoanio | currency:'$' }}</b></h4>
+              <h4><b>{{ totalFacturadoAnio | currency:'$' }}</b></h4>
             </ng-template>
           </p-card>
         </div>
@@ -177,17 +192,15 @@
       <div class="col-xxl-9 col-xl-9 col-lg-7 col-md-12 col-sm-12 col-xs-12 m-auto slide-in-elliptic-top-fwd"
         id="grafica">
         <div>
-          <p-card>
-            
-
+          <p-card [style]="{ border: '3px solid #4a99b4' }">
             <p-toolbar>
               <div class="p-toolbar-group-start">
                 <h2 style="font-weight: 700; text-align: center;"
-              [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i
-                class="pi pi-chart-line"></i> Facturación Mensual</h2>
+                  [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i
+                    class="pi pi-chart-line"></i> Facturación Mensual</h2>
               </div>
               <div class="p-toolbar-group-center">
-                
+
               </div>
               <div class="p-toolbar-group-end">
                 <h5 class="mr-3">Elige el año a graficar: </h5>
@@ -200,7 +213,6 @@
                   (click)="graficarDatos()"></button>
               </div>
             </p-toolbar>
-
             <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="facturasData"
               [options]="facturasOptions"></p-chart>
 
@@ -222,3 +234,18 @@
       </div>
     </div>
   </div>
+
+  <!--* Dialogo para actualizar metas-->
+  <p-dialog header="Actualizar Meta {{typeGoal}}" [(visible)]="modalGoal" [modal]="true" [style]="{ width: '20vw' }"
+    [draggable]="false" [resizable]="false">
+    <div class="flex align-items-center gap-2 justify-content-center">
+      <p-inputNumber [(ngModel)]="valueGoal" inputId="goal" mode="decimal" [min]="1" [maxFractionDigits]="2"
+        (keyup.enter)="updateGoalBilling()" class="mr-2" pTooltip="Enter para cambiar el valor de la meta {{typeGoal}}"
+        tooltipPosition="top"></p-inputNumber>
+      <button pButton pTooltip="Confirmar" tooltipPosition="top" pRipple type="button" icon="pi pi-check-square"
+        class="p-button-rounded p-button-danger mr-2" styleClass="btn-modal-rounded"
+        (click)="updateGoalBilling()"></button>
+      <button styleClass="btn-modal-rounded" pButton pTooltip="Limpiar" tooltipPosition="top" pRipple type="button"
+        icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="valueGoal = 0"></button>
+    </div>
+  </p-dialog>
