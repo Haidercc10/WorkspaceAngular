@@ -1,11 +1,12 @@
 <div class="d-flex justify-content-center overlay" *ngIf="load">
     <div style="margin: auto;">
-      <p-progressSpinner></p-progressSpinner>
+        <p-progressSpinner></p-progressSpinner>
     </div>
 </div>
 
 <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Inventario Despacho</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i>
+        Inventario Despacho</h4>
 </div>
 
 <form [formGroup]="formStorehouse" (ngSubmit)="GetStoreByUbicationAndProducts()">
@@ -14,7 +15,8 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
             <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-search"></i>
-                <input formControlName="item" id="IdProducto" type="text" pInputText required (keyup.enter)="searchProductByItem()"/>
+                <input formControlName="item" id="IdProducto" type="text" pInputText required
+                    (keyup.enter)="searchProductByItem()" />
                 <label for="IdProducto">Item</label>
             </span>
         </div>
@@ -22,7 +24,8 @@
         <!-- REFERENCIA -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-6">
             <span class="p-float-label">
-                <input formControlName="reference" id="reference" list="products" type="text" autocomplete="off" pInputText (keypress)="searchProductByReference()" (change)="selectedProduct()"/>
+                <input formControlName="reference" id="reference" list="products" type="text" autocomplete="off"
+                    pInputText (keypress)="searchProductByReference()" (change)="selectedProduct()" />
                 <datalist id="products">
                     <option value={{item.prod.prod_Id}} *ngFor="let item of products">{{item.prod.prod_Nombre}}</option>
                 </datalist>
@@ -33,16 +36,18 @@
         <!-- NUMERO ROLLO -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
             <span class="p-float-label">
-                <p-inputNumber formControlName="numberProuction" [useGrouping]="false" inputId="numberProuction"></p-inputNumber>
+                <p-inputNumber formControlName="numberProuction" [useGrouping]="false"
+                    inputId="numberProuction"></p-inputNumber>
                 <label for="numberProuction">Rollo / Bulto</label>
             </span>
         </div>
     </div>
-    
+
     <div class="mb-1">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
             <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
-            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearAll()"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+                (click)="clearAll()"></button>
         </div>
     </div>
 </form>
@@ -50,7 +55,8 @@
 <p-divider></p-divider>
 
 <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Bodegas</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
+        Bodegas</h4>
 </div>
 
 <p-tabView (onChange)="changeTab($event.index)">
@@ -61,35 +67,44 @@
             <div class="EST1">
                 <span class="title">ESTANTE 1</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0031_EST1_PL1_A" pTooltip="ESTANTE 1 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL1_A')">
+                    <div class="CA cursor" id="B0031_EST1_PL1_A" pTooltip="ESTANTE 1 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST1_PL1_B" pTooltip="ESTANTE 1 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL1_B')">
+                    <div class="CB cursor" id="B0031_EST1_PL1_B" pTooltip="ESTANTE 1 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST1_PL1_C" pTooltip="ESTANTE 1 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL1_C')">
+                    <div class="CC cursor" id="B0031_EST1_PL1_C" pTooltip="ESTANTE 1 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0031_EST1_PL2_A" pTooltip="ESTANTE 1 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL2_A')">
+                    <div class="CA cursor" id="B0031_EST1_PL2_A" pTooltip="ESTANTE 1 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST1_PL2_B" pTooltip="ESTANTE 1 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL2_B')">
+                    <div class="CB cursor" id="B0031_EST1_PL2_B" pTooltip="ESTANTE 1 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST1_PL2_C" pTooltip="ESTANTE 1 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL2_C')">
+                    <div class="CC cursor" id="B0031_EST1_PL2_C" pTooltip="ESTANTE 1 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0031_EST1_PL3_A" pTooltip="ESTANTE 1 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL3_A')">
+                    <div class="CA cursor" id="B0031_EST1_PL3_A" pTooltip="ESTANTE 1 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST1_PL3_B" pTooltip="ESTANTE 1 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL3_B')">
+                    <div class="CB cursor" id="B0031_EST1_PL3_B" pTooltip="ESTANTE 1 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL3_B')">
                         <span>PL3. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST1_PL3_C" pTooltip="ESTANTE 1 - PALO 3 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL3_C')">
+                    <div class="CC cursor" id="B0031_EST1_PL3_C" pTooltip="ESTANTE 1 - PALO 3 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST1_PL3_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
@@ -98,24 +113,30 @@
             <div class="EST2">
                 <span class="title">ESTANTE 2</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0031_EST2_PL1_A" pTooltip="ESTANTE 2 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL1_A')">
+                    <div class="CA cursor" id="B0031_EST2_PL1_A" pTooltip="ESTANTE 2 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST2_PL1_B" pTooltip="ESTANTE 2 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL1_B')">
+                    <div class="CB cursor" id="B0031_EST2_PL1_B" pTooltip="ESTANTE 2 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST2_PL1_C" pTooltip="ESTANTE 2 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL1_C')">
+                    <div class="CC cursor" id="B0031_EST2_PL1_C" pTooltip="ESTANTE 2 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0031_EST2_PL2_A" pTooltip="ESTANTE 2 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL2_A')">
+                    <div class="CA cursor" id="B0031_EST2_PL2_A" pTooltip="ESTANTE 2 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST2_PL2_B" pTooltip="ESTANTE 2 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL2_B')">
+                    <div class="CB cursor" id="B0031_EST2_PL2_B" pTooltip="ESTANTE 2 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST2_PL2_C" pTooltip="ESTANTE 2 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL2_C')">
+                    <div class="CC cursor" id="B0031_EST2_PL2_C" pTooltip="ESTANTE 2 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST2_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
@@ -124,39 +145,48 @@
             <div class="EST3">
                 <span class="title">ESTANTE 3</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0031_EST3_PL1_A" pTooltip="ESTANTE 3 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL1_A')">
+                    <div class="CA cursor" id="B0031_EST3_PL1_A" pTooltip="ESTANTE 3 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST3_PL1_B" pTooltip="ESTANTE 3 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL1_B')">
+                    <div class="CB cursor" id="B0031_EST3_PL1_B" pTooltip="ESTANTE 3 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST3_PL1_C" pTooltip="ESTANTE 3 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL1_C')">
+                    <div class="CC cursor" id="B0031_EST3_PL1_C" pTooltip="ESTANTE 3 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0031_EST3_PL2_A" pTooltip="ESTANTE 3 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL2_A')">
+                    <div class="CA cursor" id="B0031_EST3_PL2_A" pTooltip="ESTANTE 3 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST3_PL2_B" pTooltip="ESTANTE 3 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL2_B')">
+                    <div class="CB cursor" id="B0031_EST3_PL2_B" pTooltip="ESTANTE 3 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST3_PL2_C" pTooltip="ESTANTE 3 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL2_C')">
+                    <div class="CC cursor" id="B0031_EST3_PL2_C" pTooltip="ESTANTE 3 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST3_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
             </div>
-            
+
             <div class="EST4">
                 <span class="title">ESTANTE 4</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0031_EST4_PL1_A" pTooltip="ESTANTE 4 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST4_PL1_A')">
+                    <div class="CA cursor" id="B0031_EST4_PL1_A" pTooltip="ESTANTE 4 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST4_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0031_EST4_PL1_B" pTooltip="ESTANTE 4 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST4_PL1_B')">
+                    <div class="CB cursor" id="B0031_EST4_PL1_B" pTooltip="ESTANTE 4 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST4_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0031_EST4_PL1_C" pTooltip="ESTANTE 4 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST4_PL1_C')">
+                    <div class="CC cursor" id="B0031_EST4_PL1_C" pTooltip="ESTANTE 4 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST4_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
@@ -164,80 +194,96 @@
 
             <div class="EST5">
                 <span class="title">ESTANTE 5</span>
-                <div class="CA cursor" id="B0031_EST5_PL1_A" pTooltip="ESTANTE 5 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_A')">
+                <div class="CA cursor" id="B0031_EST5_PL1_A" pTooltip="ESTANTE 5 - PALO 1 - CUBO A"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_A')">
                     <span>PL1. A</span>
                 </div>
-                <div class="CB cursor" id="B0031_EST5_PL1_B" pTooltip="ESTANTE 5 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_B')">
+                <div class="CB cursor" id="B0031_EST5_PL1_B" pTooltip="ESTANTE 5 - PALO 1 - CUBO B"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_B')">
                     <span>PL1. B</span>
                 </div>
-                <div class="CC cursor" id="B0031_EST5_PL1_C" pTooltip="ESTANTE 5 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_C')">
+                <div class="CC cursor" id="B0031_EST5_PL1_C" pTooltip="ESTANTE 5 - PALO 1 - CUBO C"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_C')">
                     <span>PL1. C</span>
                 </div>
-                <div class="CD cursor" id="B0031_EST5_PL1_D" pTooltip="ESTANTE 5 - PALO 1 - CUBO D" tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_D')">
+                <div class="CD cursor" id="B0031_EST5_PL1_D" pTooltip="ESTANTE 5 - PALO 1 - CUBO D"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0031_EST5_PL1_D')">
                     <span>PL1. D</span>
                 </div>
             </div>
 
             <div class="PS6">
-                <div class="PS6_1 cursor" id="B0031_PD6_ESTB1" pTooltip="PLATAFORMA DINAMICA 6 - ESTIBA 1" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PD6_ESTB1')">
+                <div class="PS6_1 cursor" id="B0031_PD6_ESTB1" pTooltip="PLATAFORMA DINAMICA 6 - ESTIBA 1"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0031_PD6_ESTB1')">
                     <span class="title">PLATAFORMA DINAMICA 6</span>
                     <span>ESTB 1</span>
                 </div>
-                <div class="PS6_2 cursor" id="B0031_PD6_ESTB2" pTooltip="PLATAFORMA DINAMICA 6 - ESTIBA 2" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PD6_ESTB2')">
+                <div class="PS6_2 cursor" id="B0031_PD6_ESTB2" pTooltip="PLATAFORMA DINAMICA 6 - ESTIBA 2"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0031_PD6_ESTB2')">
                     <span class="title">PLATAFORMA DINAMICA 6</span>
                     <span>ESTB 2</span>
                 </div>
-                <div class="PS6_3 cursor" id="B0031_PD6_ESTB3" pTooltip="PLATAFORMA DINAMICA 6 - ESTIBA 3" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PD6_ESTB3')">
+                <div class="PS6_3 cursor" id="B0031_PD6_ESTB3" pTooltip="PLATAFORMA DINAMICA 6 - ESTIBA 3"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0031_PD6_ESTB3')">
                     <span class="title">PLATAFORMA DINAMICA 6</span>
                     <span>ESTB 3</span>
                 </div>
             </div>
 
-            <div class="PS5_1 cursor" id="B0031_PS5_ESTB1" pTooltip="PASILLO 5 - ESTIBA 1" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PS5_ESTB1')">
+            <div class="PS5_1 cursor" id="B0031_PS5_ESTB1" pTooltip="PASILLO 5 - ESTIBA 1" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0031_PS5_ESTB1')">
                 <span class="title">PASILLO 5</span>
                 <span>ESTB 1</span>
             </div>
 
-            <div class="PS5_2 cursor" id="B0031_PS5_ESTB2" pTooltip="PASILLO 5 - ESTIBA 2" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PS5_ESTB2')">
+            <div class="PS5_2 cursor" id="B0031_PS5_ESTB2" pTooltip="PASILLO 5 - ESTIBA 2" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0031_PS5_ESTB2')">
                 <span class="title">PASILLO 5</span>
                 <span>ESTB 2</span>
             </div>
 
-            <div class="PS5_3 cursor" id="B0031_PS5_ESTB3" pTooltip="PASILLO 5 - ESTIBA 3" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PS5_ESTB3')">
+            <div class="PS5_3 cursor" id="B0031_PS5_ESTB3" pTooltip="PASILLO 5 - ESTIBA 3" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0031_PS5_ESTB3')">
                 <span class="title">PASILLO 5</span>
                 <span>ESTB 3</span>
             </div>
 
-            <div class="PS7_1 cursor" id="B0031_PS7_ESTB1" pTooltip="PASILLO 7 - ESTIBA 1" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PS7_ESTB1')">
+            <div class="PS7_1 cursor" id="B0031_PS7_ESTB1" pTooltip="PASILLO 7 - ESTIBA 1" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0031_PS7_ESTB1')">
                 <span class="title">PASILLO 7</span>
                 <span>ESTB 1</span>
             </div>
 
-            <div class="PS7_2 cursor" id="B0031_PS7_ESTB2" pTooltip="PASILLO 7 - ESTIBA 2" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PS7_ESTB2')">
+            <div class="PS7_2 cursor" id="B0031_PS7_ESTB2" pTooltip="PASILLO 7 - ESTIBA 2" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0031_PS7_ESTB2')">
                 <span class="title">PASILLO 7</span>
                 <span>ESTB 2</span>
             </div>
 
-            <div class="PS7_3 cursor" id="B0031_PS7_ESTB3" pTooltip="PASILLO 7 - ESTIBA 3" tooltipPosition="top" (click)="GetStoreByUbication('B0031_PS7_ESTB3')">
+            <div class="PS7_3 cursor" id="B0031_PS7_ESTB3" pTooltip="PASILLO 7 - ESTIBA 3" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0031_PS7_ESTB3')">
                 <span class="title">PASILLO 7</span>
                 <span>ESTB 3</span>
             </div>
         </div>
     </p-tabPanel>
-    
+
     <p-tabPanel header="Bodega 0032" leftIcon="pi pi-box">
         <div class="B0032">
             <div id="B0032_protectedPanel"></div>
 
             <div class="EST8">
                 <span class="tittle">ESTANTE 8</span>
-                <div class="CA cursor" id="B0032_EST8_PL1_A" pTooltip="ESTANTE 8 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST8_PL1_A')">
+                <div class="CA cursor" id="B0032_EST8_PL1_A" pTooltip="ESTANTE 8 - PALO 1 - CUBO A"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST8_PL1_A')">
                     <span>PL1. A</span>
                 </div>
-                <div class="CB cursor" id="B0032_EST8_PL1_B" pTooltip="ESTANTE 8 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST8_PL1_B')">
+                <div class="CB cursor" id="B0032_EST8_PL1_B" pTooltip="ESTANTE 8 - PALO 1 - CUBO B"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST8_PL1_B')">
                     <span>PL1. B</span>
                 </div>
-                <div class="CC cursor" id="B0032_EST8_PL1_C" pTooltip="ESTANTE 8 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST8_PL1_C')">
+                <div class="CC cursor" id="B0032_EST8_PL1_C" pTooltip="ESTANTE 8 - PALO 1 - CUBO C"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST8_PL1_C')">
                     <span>PL1. C</span>
                 </div>
             </div>
@@ -245,34 +291,42 @@
             <div class="EST9">
                 <span class="title">ESTANTE 9</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST9_PL1_A" pTooltip="ESTANTE 9 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST9_PL1_A" pTooltip="ESTANTE 9 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST9_PL1_B" pTooltip="ESTANTE 9 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL1_B')">
+                    <div class="CB cursor" id="B0032_EST9_PL1_B" pTooltip="ESTANTE 9 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL1_B')">
                         <span>PL1. B</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0032_EST9_PL2_A" pTooltip="ESTANTE 9 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL2_A')">
+                    <div class="CA cursor" id="B0032_EST9_PL2_A" pTooltip="ESTANTE 9 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST9_PL2_B" pTooltip="ESTANTE 9 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL2_B')">
+                    <div class="CB cursor" id="B0032_EST9_PL2_B" pTooltip="ESTANTE 9 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL2_B')">
                         <span>PL2. B</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0032_EST9_PL3_A" pTooltip="ESTANTE 9 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL3_A')">
+                    <div class="CA cursor" id="B0032_EST9_PL3_A" pTooltip="ESTANTE 9 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST9_PL3_B" pTooltip="ESTANTE 9 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL3_B')">
+                    <div class="CB cursor" id="B0032_EST9_PL3_B" pTooltip="ESTANTE 9 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL3_B')">
                         <span>PL3. B</span>
                     </div>
                 </div>
                 <div class="PL4">
-                    <div class="CA cursor" id="B0032_EST9_PL4_A" pTooltip="ESTANTE 9 - PALO 4 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL4_A')">
+                    <div class="CA cursor" id="B0032_EST9_PL4_A" pTooltip="ESTANTE 9 - PALO 4 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL4_A')">
                         <span>PL4. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST9_PL4_B" pTooltip="ESTANTE 9 - PALO 4 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL4_B')">
+                    <div class="CB cursor" id="B0032_EST9_PL4_B" pTooltip="ESTANTE 9 - PALO 4 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST9_PL4_B')">
                         <span>PL4. B</span>
                     </div>
                 </div>
@@ -281,35 +335,44 @@
             <div class="EST10">
                 <span class="title">ESTANTE 10</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST10_PL1_A" pTooltip="ESTANTE 10 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST10_PL1_A" pTooltip="ESTANTE 10 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST10_PL1_B" pTooltip="ESTANTE 10 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL1_B')">
+                    <div class="CB cursor" id="B0032_EST10_PL1_B" pTooltip="ESTANTE 10 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST10_PL1_C" pTooltip="ESTANTE 10 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL1_C')">
+                    <div class="CC cursor" id="B0032_EST10_PL1_C" pTooltip="ESTANTE 10 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0032_EST10_PL2_A" pTooltip="ESTANTE 10 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL2_A')">
+                    <div class="CA cursor" id="B0032_EST10_PL2_A" pTooltip="ESTANTE 10 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST10_PL2_B" pTooltip="ESTANTE 10 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL2_B')">
+                    <div class="CB cursor" id="B0032_EST10_PL2_B" pTooltip="ESTANTE 10 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST10_PL2_C" pTooltip="ESTANTE 10 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL2_C')">
+                    <div class="CC cursor" id="B0032_EST10_PL2_C" pTooltip="ESTANTE 10 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0032_EST10_PL3_A" pTooltip="ESTANTE 10 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL3_A')">
+                    <div class="CA cursor" id="B0032_EST10_PL3_A" pTooltip="ESTANTE 10 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST10_PL3_B" pTooltip="ESTANTE 10 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL3_B')">
+                    <div class="CB cursor" id="B0032_EST10_PL3_B" pTooltip="ESTANTE 10 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL3_B')">
                         <span>PL3. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST10_PL3_C" pTooltip="ESTANTE 10 - PALO 3 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL3_C')">
+                    <div class="CC cursor" id="B0032_EST10_PL3_C" pTooltip="ESTANTE 10 - PALO 3 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL3_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
@@ -318,13 +381,16 @@
             <div class="EST10_PL4">
                 <span class="tittle">ESTANTE 10</span>
                 <div class="PL4">
-                    <div class="CA cursor" id="B0032_EST10_PL4_A" pTooltip="ESTANTE 10 - PALO 4 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL4_A')">
+                    <div class="CA cursor" id="B0032_EST10_PL4_A" pTooltip="ESTANTE 10 - PALO 4 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL4_A')">
                         <span>PL4. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST10_PL4_B" pTooltip="ESTANTE 10 - PALO 4 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL4_B')">
+                    <div class="CB cursor" id="B0032_EST10_PL4_B" pTooltip="ESTANTE 10 - PALO 4 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL4_B')">
                         <span>PL4. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST10_PL4_C" pTooltip="ESTANTE 10 - PALO 4 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL4_C')">
+                    <div class="CC cursor" id="B0032_EST10_PL4_C" pTooltip="ESTANTE 10 - PALO 4 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST10_PL4_C')">
                         <span>PL4. C</span>
                     </div>
                 </div>
@@ -333,35 +399,44 @@
             <div class="EST11">
                 <span class="title">ESTANTE 11</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST11_PL1_A" pTooltip="ESTANTE 11 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST11_PL1_A" pTooltip="ESTANTE 11 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST11_PL1_B" pTooltip="ESTANTE 11 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL1_B')">
+                    <div class="CB cursor" id="B0032_EST11_PL1_B" pTooltip="ESTANTE 11 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST11_PL1_C" pTooltip="ESTANTE 11 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL1_C')">
+                    <div class="CC cursor" id="B0032_EST11_PL1_C" pTooltip="ESTANTE 11 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0032_EST11_PL2_A" pTooltip="ESTANTE 11 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL2_A')">
+                    <div class="CA cursor" id="B0032_EST11_PL2_A" pTooltip="ESTANTE 11 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST11_PL2_B" pTooltip="ESTANTE 11 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL2_B')">
+                    <div class="CB cursor" id="B0032_EST11_PL2_B" pTooltip="ESTANTE 11 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST11_PL2_C" pTooltip="ESTANTE 11 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL2_C')">
+                    <div class="CC cursor" id="B0032_EST11_PL2_C" pTooltip="ESTANTE 11 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0032_EST11_PL3_A" pTooltip="ESTANTE 11 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL3_A')">
+                    <div class="CA cursor" id="B0032_EST11_PL3_A" pTooltip="ESTANTE 11 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST11_PL3_B" pTooltip="ESTANTE 11 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL3_B')">
+                    <div class="CB cursor" id="B0032_EST11_PL3_B" pTooltip="ESTANTE 11 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL3_B')">
                         <span>PL3. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST11_PL3_C" pTooltip="ESTANTE 11 - PALO 3 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL3_C')">
+                    <div class="CC cursor" id="B0032_EST11_PL3_C" pTooltip="ESTANTE 11 - PALO 3 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST11_PL3_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
@@ -370,35 +445,44 @@
             <div class="EST12">
                 <span class="title">ESTANTE 12</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST12_PL1_A" pTooltip="ESTANTE 12 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST12_PL1_A" pTooltip="ESTANTE 12 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST12_PL1_B" pTooltip="ESTANTE 12 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL1_B')">
+                    <div class="CB cursor" id="B0032_EST12_PL1_B" pTooltip="ESTANTE 12 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST12_PL1_C" pTooltip="ESTANTE 12 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL1_C')">
+                    <div class="CC cursor" id="B0032_EST12_PL1_C" pTooltip="ESTANTE 12 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0032_EST12_PL2_A" pTooltip="ESTANTE 12 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL2_A')">
+                    <div class="CA cursor" id="B0032_EST12_PL2_A" pTooltip="ESTANTE 12 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST12_PL2_B" pTooltip="ESTANTE 12 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL2_B')">
+                    <div class="CB cursor" id="B0032_EST12_PL2_B" pTooltip="ESTANTE 12 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST12_PL2_C" pTooltip="ESTANTE 12 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL2_C')">
+                    <div class="CC cursor" id="B0032_EST12_PL2_C" pTooltip="ESTANTE 12 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL2_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0032_EST12_PL3_A" pTooltip="ESTANTE 12 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL3_A')">
+                    <div class="CA cursor" id="B0032_EST12_PL3_A" pTooltip="ESTANTE 12 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST12_PL3_B" pTooltip="ESTANTE 12 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL3_B')">
+                    <div class="CB cursor" id="B0032_EST12_PL3_B" pTooltip="ESTANTE 12 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL3_B')">
                         <span>PL3. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST12_PL3_C" pTooltip="ESTANTE 12 - PALO 3 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL3_C')">
+                    <div class="CC cursor" id="B0032_EST12_PL3_C" pTooltip="ESTANTE 12 - PALO 3 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL3_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
@@ -407,13 +491,16 @@
             <div class="EST12_PL4">
                 <span class="tittle">ESTANTE 12</span>
                 <div class="PL4">
-                    <div class="CA cursor" id="B0032_EST12_PL4_A" pTooltip="ESTANTE 12 - PALO 4 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL4_A')">
+                    <div class="CA cursor" id="B0032_EST12_PL4_A" pTooltip="ESTANTE 12 - PALO 4 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL4_A')">
                         <span>PL4. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST12_PL4_B" pTooltip="ESTANTE 12 - PALO 4 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL4_B')">
+                    <div class="CB cursor" id="B0032_EST12_PL4_B" pTooltip="ESTANTE 12 - PALO 4 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL4_B')">
                         <span>PL4. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST12_PL4_C" pTooltip="ESTANTE 12 - PALO 4 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL4_C')">
+                    <div class="CC cursor" id="B0032_EST12_PL4_C" pTooltip="ESTANTE 12 - PALO 4 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST12_PL4_C')">
                         <span>PL4. C</span>
                     </div>
                 </div>
@@ -422,35 +509,44 @@
             <div class="EST13">
                 <span class="title">ESTANTE 13</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST13_PL1_A" pTooltip="ESTANTE 13 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST13_PL1_A" pTooltip="ESTANTE 13 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST13_PL1_B" pTooltip="ESTANTE 13 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL1_B')">
+                    <div class="CB cursor" id="B0032_EST13_PL1_B" pTooltip="ESTANTE 13 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST13_PL1_C" pTooltip="ESTANTE 13 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL1_C')">
+                    <div class="CC cursor" id="B0032_EST13_PL1_C" pTooltip="ESTANTE 13 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0032_EST13_PL2_A" pTooltip="ESTANTE 13 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL2_A')">
+                    <div class="CA cursor" id="B0032_EST13_PL2_A" pTooltip="ESTANTE 13 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST13_PL2_B" pTooltip="ESTANTE 13 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL2_B')">
+                    <div class="CB cursor" id="B0032_EST13_PL2_B" pTooltip="ESTANTE 13 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST13_PL2_C" pTooltip="ESTANTE 13 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL2_C')">
+                    <div class="CC cursor" id="B0032_EST13_PL2_C" pTooltip="ESTANTE 13 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0032_EST13_PL3_A" pTooltip="ESTANTE 13 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL3_A')">
+                    <div class="CA cursor" id="B0032_EST13_PL3_A" pTooltip="ESTANTE 13 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST13_PL3_B" pTooltip="ESTANTE 13 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL3_B')">
+                    <div class="CB cursor" id="B0032_EST13_PL3_B" pTooltip="ESTANTE 13 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL3_B')">
                         <span>PL3. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST13_PL3_C" pTooltip="ESTANTE 13 - PALO 3 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL3_C')">
+                    <div class="CC cursor" id="B0032_EST13_PL3_C" pTooltip="ESTANTE 13 - PALO 3 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST13_PL3_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
@@ -459,46 +555,58 @@
             <div class="EST14">
                 <span class="tittle">ESTANTE 14</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST14_PL1_A" pTooltip="ESTANTE 14 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST14_PL1_A" pTooltip="ESTANTE 14 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST14_PL1_B" pTooltip="ESTANTE 14 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_B')">
+                    <div class="CB cursor" id="B0032_EST14_PL1_B" pTooltip="ESTANTE 14 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST14_PL1_C" pTooltip="ESTANTE 14 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_C')">
+                    <div class="CC cursor" id="B0032_EST14_PL1_C" pTooltip="ESTANTE 14 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0032_EST14_PL1_A" pTooltip="ESTANTE 14 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST14_PL1_A" pTooltip="ESTANTE 14 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL1_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST14_PL2_B" pTooltip="ESTANTE 14 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL2_B')">
+                    <div class="CB cursor" id="B0032_EST14_PL2_B" pTooltip="ESTANTE 14 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST14_PL2_C" pTooltip="ESTANTE 14 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL2_C')">
+                    <div class="CC cursor" id="B0032_EST14_PL2_C" pTooltip="ESTANTE 14 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0032_EST14_PL3_A" pTooltip="ESTANTE 14 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL3_A')">
+                    <div class="CA cursor" id="B0032_EST14_PL3_A" pTooltip="ESTANTE 14 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST14_PL3_B" pTooltip="ESTANTE 14 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL3_B')">
+                    <div class="CB cursor" id="B0032_EST14_PL3_B" pTooltip="ESTANTE 14 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL3_B')">
                         <span>PL3. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST14_PL3_C" pTooltip="ESTANTE 14 - PALO 3 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL3_C')">
+                    <div class="CC cursor" id="B0032_EST14_PL3_C" pTooltip="ESTANTE 14 - PALO 3 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL3_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
                 <div class="PL4">
-                    <div class="CA cursor" id="B0032_EST14_PL4_A" pTooltip="ESTANTE 14 - PALO 4 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL4_A')">
+                    <div class="CA cursor" id="B0032_EST14_PL4_A" pTooltip="ESTANTE 14 - PALO 4 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL4_A')">
                         <span>PL4. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST14_PL4_B" pTooltip="ESTANTE 14 - PALO 4 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL4_B')">
+                    <div class="CB cursor" id="B0032_EST14_PL4_B" pTooltip="ESTANTE 14 - PALO 4 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL4_B')">
                         <span>PL4. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST14_PL4_C" pTooltip="ESTANTE 14 - PALO 4 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL4_C')">
+                    <div class="CC cursor" id="B0032_EST14_PL4_C" pTooltip="ESTANTE 14 - PALO 4 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST14_PL4_C')">
                         <span>PL4. C</span>
                     </div>
                 </div>
@@ -507,35 +615,44 @@
             <div class="EST15">
                 <span class="title">ESTANTE 15</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST15_PL1_A" pTooltip="ESTANTE 15 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST15_PL1_A" pTooltip="ESTANTE 15 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL1_A')">
                         <span>PL1. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST15_PL1_B" pTooltip="ESTANTE 15 - PALO 1 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL1_B')">
+                    <div class="CB cursor" id="B0032_EST15_PL1_B" pTooltip="ESTANTE 15 - PALO 1 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL1_B')">
                         <span>PL1. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST15_PL1_C" pTooltip="ESTANTE 15 - PALO 1 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL1_C')">
+                    <div class="CC cursor" id="B0032_EST15_PL1_C" pTooltip="ESTANTE 15 - PALO 1 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL1_C')">
                         <span>PL1. C</span>
                     </div>
                 </div>
                 <div class="PL2">
-                    <div class="CA cursor" id="B0032_EST15_PL2_A" pTooltip="ESTANTE 15 - PALO 2 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL2_A')">
+                    <div class="CA cursor" id="B0032_EST15_PL2_A" pTooltip="ESTANTE 15 - PALO 2 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL2_A')">
                         <span>PL2. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST15_PL2_B" pTooltip="ESTANTE 15 - PALO 2 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL2_B')">
+                    <div class="CB cursor" id="B0032_EST15_PL2_B" pTooltip="ESTANTE 15 - PALO 2 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL2_B')">
                         <span>PL2. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST15_PL2_C" pTooltip="ESTANTE 15 - PALO 2 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL2_C')">
+                    <div class="CC cursor" id="B0032_EST15_PL2_C" pTooltip="ESTANTE 15 - PALO 2 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL2_C')">
                         <span>PL2. C</span>
                     </div>
                 </div>
                 <div class="PL3">
-                    <div class="CA cursor" id="B0032_EST15_PL3_A" pTooltip="ESTANTE 15 - PALO 3 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL3_A')">
+                    <div class="CA cursor" id="B0032_EST15_PL3_A" pTooltip="ESTANTE 15 - PALO 3 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL3_A')">
                         <span>PL3. A</span>
                     </div>
-                    <div class="CB cursor" id="B0032_EST15_PL3_B" pTooltip="ESTANTE 15 - PALO 3 - CUBO B" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL3_B')">
+                    <div class="CB cursor" id="B0032_EST15_PL3_B" pTooltip="ESTANTE 15 - PALO 3 - CUBO B"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL3_B')">
                         <span>PL3. B</span>
                     </div>
-                    <div class="CC cursor" id="B0032_EST15_PL3_C" pTooltip="ESTANTE 15 - PALO 3 - CUBO C" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL3_C')">
+                    <div class="CC cursor" id="B0032_EST15_PL3_C" pTooltip="ESTANTE 15 - PALO 3 - CUBO C"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST15_PL3_C')">
                         <span>PL3. C</span>
                     </div>
                 </div>
@@ -544,18 +661,21 @@
             <div class="EST16">
                 <span class="title">ESTANTE 16</span>
                 <div class="PL1">
-                    <div class="CA cursor" id="B0032_EST16_PL1_A" pTooltip="ESTANTE 16 - PALO 1 - CUBO A" tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST16_PL1_A')">
+                    <div class="CA cursor" id="B0032_EST16_PL1_A" pTooltip="ESTANTE 16 - PALO 1 - CUBO A"
+                        tooltipPosition="top" (click)="GetStoreByUbication('B0032_EST16_PL1_A')">
                         <span>PL3. A</span>
                     </div>
                 </div>
             </div>
 
-            <div class="PS17_1 cursor" id="B0032_PS17_ESTB1" pTooltip="PASILLO 17 - ESTIBA 1" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS17_ESTB1')">
+            <div class="PS17_1 cursor" id="B0032_PS17_ESTB1" pTooltip="PASILLO 17 - ESTIBA 1" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0032_PS17_ESTB1')">
                 <span class="title">PASILLO 17</span>
                 <span>ESTB 1</span>
             </div>
 
-            <div class="PS17_2 cursor" id="B0032_PS17_ESTB2" pTooltip="PASILLO 17 - ESTIBA 2" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS17_ESTB2')">
+            <div class="PS17_2 cursor" id="B0032_PS17_ESTB2" pTooltip="PASILLO 17 - ESTIBA 2" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0032_PS17_ESTB2')">
                 <span class="title">PASILLO 17</span>
                 <span>ESTB 2</span>
             </div>
@@ -563,95 +683,116 @@
             <div class="PS17_3"></div>
 
             <div class="PS18">
-                <div class="PS18_1 cursor" id="B0032_PS18_ESTB3" pTooltip="PASILLO 18 - ESTIBA 3" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS18_ESTB3')">
+                <div class="PS18_1 cursor" id="B0032_PS18_ESTB3" pTooltip="PASILLO 18 - ESTIBA 3" tooltipPosition="top"
+                    (click)="GetStoreByUbication('B0032_PS18_ESTB3')">
                     <span class="title">PASILLO 18</span>
                     <span>ESTB 3</span>
                 </div>
+                <!--
                 <div class="PS18_2 cursor" id="B0032_PS18_ESTB4" pTooltip="PASILLO 18 - ESTIBA 4" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS18_ESTB4')">
                     <span class="title">PASILLO 18</span>
                     <span>ESTB 4</span>
                 </div>
+                -->
             </div>
 
             <div class="PS18__2">
-                <div class="PS18_3 cursor" id="B0032_PS18_ESTB5" pTooltip="PASILLO 18 - ESTIBA 5" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS18_ESTB5')">
+                <div class="PS18_3 cursor" id="B0032_PS18_ESTB5" pTooltip="PASILLO 18 - ESTIBA 5" tooltipPosition="top"
+                    (click)="GetStoreByUbication('B0032_PS18_ESTB5')">
                     <span class="title">PASILLO 18</span>
                     <span>ESTB 5</span>
                 </div>
-                <div class="PS18_4 cursor" id="B0032_PS18_ESTB6" pTooltip="PASILLO 18 - ESTIBA 6" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS18_ESTB6')">
+                <div class="PS18_4 cursor" id="B0032_PS18_ESTB6" pTooltip="PASILLO 18 - ESTIBA 6" tooltipPosition="top"
+                    (click)="GetStoreByUbication('B0032_PS18_ESTB6')">
                     <span class="title">PASILLO 18</span>
                     <span>ESTB 6</span>
                 </div>
             </div>
 
             <div class="PS19">
-                <div class="PS19_1 cursor" id="B0032_PS19_ESTB7" pTooltip="PASILLO 19 - ESTIBA 7" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS19_ESTB7')">
+                <div class="PS19_1 cursor" id="B0032_PS19_ESTB7" pTooltip="PASILLO 19 - ESTIBA 7" tooltipPosition="top"
+                    (click)="GetStoreByUbication('B0032_PS19_ESTB7')">
                     <span class="title">PASILLO 19</span>
                     <span>ESTB 7</span>
                 </div>
-                <div class="PS19_2 cursor" id="B0032_PS19_ESTB8" pTooltip="PASILLO 19 - ESTIBA 8" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS19_ESTB8')">
+                <div class="PS19_2 cursor" id="B0032_PS19_ESTB8" pTooltip="PASILLO 19 - ESTIBA 8" tooltipPosition="top"
+                    (click)="GetStoreByUbication('B0032_PS19_ESTB8')">
                     <span class="title">PASILLO 19</span>
                     <span>ESTB 8</span>
                 </div>
-                <div class="PS19_3 cursor" id="B0032_PS19_ESTB9" pTooltip="PASILLO 19 - ESTIBA 9" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS19_ESTB9')">
+                <div class="PS19_3 cursor" id="B0032_PS19_ESTB9" pTooltip="PASILLO 19 - ESTIBA 9" tooltipPosition="top"
+                    (click)="GetStoreByUbication('B0032_PS19_ESTB9')">
                     <span class="title">PASILLO 19</span>
                     <span>ESTB 9</span>
                 </div>
-                <div class="PS19_4 cursor" id="B0032_PS19_ESTB10" pTooltip="PASILLO 19 - ESTIBA 10" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS19_ESTB10')">
+                <div class="PS19_4 cursor" id="B0032_PS19_ESTB10" pTooltip="PASILLO 19 - ESTIBA 10"
+                    tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS19_ESTB10')">
                     <span class="title">PASILLO 19</span>
                     <span>ESTB 10</span>
                 </div>
             </div>
 
-            <div class="PS19__2 cursor" id="B0032_PS19_ESTB11" pTooltip="PASILLO 19 - ESTIBA 11" tooltipPosition="top" (click)="GetStoreByUbication('B0032_PS19_ESTB11')">
+            <div class="PS19__2 cursor" id="B0032_PS19_ESTB11" pTooltip="PASILLO 19 - ESTIBA 11" tooltipPosition="top"
+                (click)="GetStoreByUbication('B0032_PS19_ESTB11')">
                 <span class="title">PASILLO 19</span>
                 <span>ESTB 11</span>
             </div>
         </div>
     </p-tabPanel>
-    
+
     <p-tabPanel header="Bodega 0033" leftIcon="pi pi-database">
         <div class="B0033 text-center">
             <div id="B0033_protectedPanel"></div>
             <div class="_B0033_FUERA"></div>
-            
-            <!-- ESTANTE 20 -->
-            <div class="_B0033_EST20" pTooltip="Estante 20" tooltipPosition="top" id="EST20">
-                <div class="_B0033_EST20_TXT ESTANTE"><b>EST 20</b></div>
+
+            <!-- ESTANTE 31 -->
+              <div class="_B0033_EST31" pTooltip="Estante 31" tooltipPosition="top" id="EST31">
+                <div class="_B0033_EST31_TXT ESTANTE"><b>EST 31</b></div>
             </div>
             <div class="_B0033_EST31_PAL1">
-                <div class="_B0033_EST31_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST31_PL1_A')" id="B0033_EST31_PL1_A" pTooltip="ESTANTE 31 - PALO 1 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST31_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST31_PL1_A')"
+                    id="B0033_EST31_PL1_A" pTooltip="ESTANTE 31 - PALO 1 - CUBO A" tooltipPosition="top">
                     <div class="QBOS30_ABAJO"><b>A</b></div>
                     <div class="NRO_PALO"><b>PL 1</b></div>
                 </div>
-                <div class="_B0033_EST31_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST31_PL1_B')" id="B0033_EST31_PL1_B" pTooltip="ESTANTE 31 - PALO 1 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST31_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST31_PL1_B')"
+                    id="B0033_EST31_PL1_B" pTooltip="ESTANTE 31 - PALO 1 - CUBO B" tooltipPosition="top">
                     <div class="QBOS30_ABAJO"><b>B</b></div>
                 </div>
             </div>
 
+            <div class="_B0033_EST20" pTooltip="Estante 20" tooltipPosition="top" id="EST20">
+                <div class="_B0033_EST20_TXT ESTANTE"><b>EST 20</b></div>
+            </div>
             <div class="_B0033_EST20_PL1">
-                <div class="_B0033_EST20_PL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL1_A')" id="B0033_EST20_PL1_A" pTooltip="ESTANTE 20 - PALO 1 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST20_PL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL1_A')"
+                    id="B0033_EST20_PL1_A" pTooltip="ESTANTE 20 - PALO 1 - CUBO A" tooltipPosition="top">
                     <div class="QBOS28"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST20_PL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL1_B')" id="B0033_EST20_PL1_B" pTooltip="ESTANTE 20 - PALO 1 - CUBO B" tooltipPosition="top">
-                    <div class="QBOS28"><b>B</b></div>    
+                <div class="_B0033_EST20_PL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL1_B')"
+                    id="B0033_EST20_PL1_B" pTooltip="ESTANTE 20 - PALO 1 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS28"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 1</b></div>
                 </div>
             </div>
             <div class="_B0033_EST20_PL2">
-                <div class="_B0033_EST20_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL2_A')" id="B0033_EST20_PL2_A" pTooltip="ESTANTE 20 - PALO 2 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST20_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL2_A')"
+                    id="B0033_EST20_PL2_A" pTooltip="ESTANTE 20 - PALO 2 - CUBO A" tooltipPosition="top">
                     <div class="QBOS28"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST20_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL2_B')" id="B0033_EST20_PL2_B" pTooltip="ESTANTE 20 - PALO 2 - CUBO B" tooltipPosition="top">
-                    <div class="QBOS28"><b>B</b></div>    
+                <div class="_B0033_EST20_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL2_B')"
+                    id="B0033_EST20_PL2_B" pTooltip="ESTANTE 20 - PALO 2 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS28"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 2</b></div>
                 </div>
             </div>
             <div class="_B0033_EST20_PL3">
-                <div class="_B0033_EST20_PL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL3_A')" id="B0033_EST20_PL3_A" pTooltip="ESTANTE 20 - PALO 3 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST20_PL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL3_A')"
+                    id="B0033_EST20_PL3_A" pTooltip="ESTANTE 20 - PALO 3 - CUBO A" tooltipPosition="top">
                     <div class="QBOS28"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST20_PL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL3_B')" id="B0033_EST20_PL3_B" pTooltip="ESTANTE 20 - PALO 3 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST20_PL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST20_PL3_B')"
+                    id="B0033_EST20_PL3_B" pTooltip="ESTANTE 20 - PALO 3 - CUBO B" tooltipPosition="top">
                     <div class="QBOS28"><b>A</b></div>
                     <div class="NRO_PALO"><b>PL 3</b></div>
                 </div>
@@ -662,33 +803,48 @@
                 <div class="_B0033_EST21_TXT ESTANTE"><b>EST 21</b></div>
             </div>
             <div class="_B0033_EST21_PAL1">
-                <div class="_B0033_EST21_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL1_A')" id="B0033_EST21_PL1_A" pTooltip="ESTANTE 21 - PALO 1 - CUBO A" tooltipPosition="top">
-                    <div class="QBOS28"><b>A</b></div>
+                <div class="_B0033_EST21_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL1_A')"
+                    id="B0033_EST21_PL1_A" pTooltip="ESTANTE 21 - PALO 1 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST21_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL1_B')" id="B0033_EST21_PL1_B" pTooltip="ESTANTE 21 - PALO 1 - CUBO B" tooltipPosition="top">
-                    <div class="QBOS28"><b>B</b></div>    
+                <div class="_B0033_EST21_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL1_B')"
+                    id="B0033_EST21_PL1_B" pTooltip="ESTANTE 21 - PALO 1 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 1</b></div>
                 </div>
-                <div class="_B0033_EST21_PAL1_C PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL1_C')" id="B0033_EST21_PL3_C" pTooltip="ESTANTE 21 - PALO 1 - CUBO C" tooltipPosition="top">
-                    <div class="QBOS28"><b>C</b></div>
+                <div class="_B0033_EST21_PAL1_C PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL1_C')"
+                    id="B0033_EST21_PL1_C" pTooltip="ESTANTE 21 - PALO 1 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
             <div class="_B0033_EST21_PAL2">
-                <div class="_B0033_EST21_PAL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL2_A')" id="B0033_EST21_PL2_A" pTooltip="ESTANTE 21 - PALO 2 - CUBO A" tooltipPosition="top">
-                    <div class="QBOS28"><b>A</b></div>
+                <div class="_B0033_EST21_PAL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL2_A')"
+                    id="B0033_EST21_PL2_A" pTooltip="ESTANTE 21 - PALO 2 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST21_PAL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL2_B')" id="B0033_EST21_PL2_B" pTooltip="ESTANTE 21 - PALO 2 - CUBO B" tooltipPosition="top">
-                    <div class="QBOS28"><b>B</b></div>    
+                <div class="_B0033_EST21_PAL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL2_B')"
+                    id="B0033_EST21_PL2_B" pTooltip="ESTANTE 21 - PALO 2 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 2</b></div>
+                </div>
+                <div class="_B0033_EST21_PAL2_C PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL2_C')"
+                    id="B0033_EST21_PL2_C" pTooltip="ESTANTE 21 - PALO 2 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
             <div class="_B0033_EST21_PAL3">
-                <div class="_B0033_EST21_PAL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL3_A')" id="B0033_EST21_PL3_A" pTooltip="ESTANTE 21 - PALO 3 - CUBO A" tooltipPosition="top">
-                    <div class="QBOS28"><b>A</b></div>
+                <div class="_B0033_EST21_PAL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL3_A')"
+                    id="B0033_EST21_PL3_A" pTooltip="ESTANTE 21 - PALO 3 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST21_PAL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL3_B')" id="B0033_EST21_PL3_B" pTooltip="ESTANTE 21 - PALO 3 - CUBO B" tooltipPosition="top">
-                    <div class="QBOS28"><b>B</b></div>    
+                <div class="_B0033_EST21_PAL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL3_B')"
+                    id="B0033_EST21_PL3_B" pTooltip="ESTANTE 21 - PALO 3 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 3</b></div>
+                </div>
+                <div class="_B0033_EST21_PAL3_C PALOS cursor" (click)="GetStoreByUbication('B0033_EST21_PL3_C')"
+                    id="B0033_EST21_PL3_C" pTooltip="ESTANTE 21 - PALO 3 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
 
@@ -697,38 +853,47 @@
                 <div class="_B0033_EST22_TXT ESTANTE"><b>EST 22</b></div>
             </div>
             <div class="_B0033_EST22_PAL1">
-                <div class="_B0033_EST22_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL1_A')" id="B0033_EST22_PL1_A" pTooltip="ESTANTE 22 - PALO 1 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST22_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL1_A')"
+                    id="B0033_EST22_PL1_A" pTooltip="ESTANTE 22 - PALO 1 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST22_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL1_B')" id="B0033_EST22_PL1_B" pTooltip="ESTANTE 22 - PALO 1 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST22_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL1_B')"
+                    id="B0033_EST22_PL1_B" pTooltip="ESTANTE 22 - PALO 1 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 1</b></div>
                 </div>
-                <div class="_B0033_EST22_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL1_C')" id="B0033_EST22_PL1_C" pTooltip="ESTANTE 22 - PALO 1 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST22_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL1_C')"
+                    id="B0033_EST22_PL1_C" pTooltip="ESTANTE 22 - PALO 1 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
             <div class="_B0033_EST22_PL2">
-                <div class="_B0033_EST22_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL2_A')" id="B0033_EST22_PL2_A" pTooltip="ESTANTE 22 - PALO 2 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST22_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL2_A')"
+                    id="B0033_EST22_PL2_A" pTooltip="ESTANTE 22 - PALO 2 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST22_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL2_B')" id="B0033_EST22_PL2_B" pTooltip="ESTANTE 22 - PALO 2 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST22_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL2_B')"
+                    id="B0033_EST22_PL2_B" pTooltip="ESTANTE 22 - PALO 2 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 2</b></div>
                 </div>
-                <div class="_B0033_EST22_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL2_C')" id="B0033_EST22_PL2_C" pTooltip="ESTANTE 22 - PALO 2 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST22_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL2_C')"
+                    id="B0033_EST22_PL2_C" pTooltip="ESTANTE 22 - PALO 2 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
             <div class="_B0033_EST22_PL3">
-                <div class="_B0033_EST22_PL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL3_A')" id="B0033_EST22_PL3_A" pTooltip="ESTANTE 22 - PALO 3 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST22_PL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL3_A')"
+                    id="B0033_EST22_PL3_A" pTooltip="ESTANTE 22 - PALO 3 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST22_PL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL3_B')" id="B0033_EST22_PL3_B" pTooltip="ESTANTE 22 - PALO 3 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST22_PL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL3_B')"
+                    id="B0033_EST22_PL3_B" pTooltip="ESTANTE 22 - PALO 3 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 3</b></div>
                 </div>
-                <div class="_B0033_EST22_PL3_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL3_C')" id="B0033_EST22_PL3_C" pTooltip="ESTANTE 22 - PALO 3 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST22_PL3_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST22_PL3_C')"
+                    id="B0033_EST22_PL3_C" pTooltip="ESTANTE 22 - PALO 3 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
@@ -738,68 +903,126 @@
                 <div class="_B0033_EST23_TXT ESTANTE"><b>EST 23</b></div>
             </div>
             <div class="_B0033_EST23_PAL1">
-                <div class="_B0033_EST23_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL1_A')" id="B0033_EST23_PL1_A" pTooltip="ESTANTE 23 - PALO 1 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST23_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL1_A')"
+                    id="B0033_EST23_PL1_A" pTooltip="ESTANTE 23 - PALO 1 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST23_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL1_B')" id="B0033_EST23_PL1_B" pTooltip="ESTANTE 23 - PALO 1 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST23_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL1_B')"
+                    id="B0033_EST23_PL1_B" pTooltip="ESTANTE 23 - PALO 1 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 1</b></div>
                 </div>
-                <div class="_B0033_EST23_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL1_C')" id="B0033_EST23_PL1_C" pTooltip="ESTANTE 23 - PALO 1 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST23_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL1_C')"
+                    id="B0033_EST23_PL1_C" pTooltip="ESTANTE 23 - PALO 1 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
             <div class="_B0033_EST23_PL2">
-                <div class="_B0033_EST23_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL2_A')" id="B0033_EST23_PL2_A" pTooltip="ESTANTE 23 - PALO 2 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST23_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL2_A')"
+                    id="B0033_EST23_PL2_A" pTooltip="ESTANTE 23 - PALO 2 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST23_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL2_B')" id="B0033_EST23_PL2_B" pTooltip="ESTANTE 23 - PALO 2 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST23_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL2_B')"
+                    id="B0033_EST23_PL2_B" pTooltip="ESTANTE 23 - PALO 2 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 2</b></div>
                 </div>
-                <div class="_B0033_EST23_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL2_C')" id="B0033_EST23_PL2_C" pTooltip="ESTANTE 23 - PALO 2 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST23_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL2_C')"
+                    id="B0033_EST23_PL2_C" pTooltip="ESTANTE 23 - PALO 2 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
             <div class="_B0033_EST23_PL3">
-                <div class="_B0033_EST23_PL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL3_A')" id="B0033_EST23_PL3_A" pTooltip="ESTANTE 23 - PALO 3 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST23_PL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL3_A')"
+                    id="B0033_EST23_PL3_A" pTooltip="ESTANTE 23 - PALO 3 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST23_PL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL3_B')" id="B0033_EST23_PL3_B" pTooltip="ESTANTE 23 - PALO 3 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST23_PL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL3_B')"
+                    id="B0033_EST23_PL3_B" pTooltip="ESTANTE 23 - PALO 3 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 3</b></div>
                 </div>
-                <div class="_B0033_EST23_PL3_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL3_C')" id="B0033_EST23_PL3_C" pTooltip="ESTANTE 23 - PALO 3 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST23_PL3_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST23_PL3_C')"
+                    id="B0033_EST23_PL3_C" pTooltip="ESTANTE 23 - PALO 3 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
 
-            <!--ESTANTE 24 -->
-            <div class="_B0033_EST24" pTooltip="Estante 24" tooltipPosition="top" id="EST24">
-                <div class="_B0033_EST24_TXT ESTANTE"><b>EST 24</b></div>
+            <!--ESTANTE 27 -->
+            <div class="_B0033_EST27" pTooltip="Estante 27" tooltipPosition="top" id="EST27">
+                <div class="_B0033_EST27_TXT ESTANTE"><b>EST 27</b></div>
             </div>
-            <div class="_B0033_EST24_PAL1">
-                <div class="_B0033_EST24_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL1_A')" id="B0033_EST24_PL1_A" pTooltip="ESTANTE 24 - PALO 1 - CUBO A" tooltipPosition="top">
+            <div class="_B0033_EST27_PAL1">
+                <div class="_B0033_EST27_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL1_A')"
+                    id="B0033_EST27_PL1_A" pTooltip="ESTANTE 27 - PALO 1 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST24_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL1_B')" id="B0033_EST24_PL1_B" pTooltip="ESTANTE 24 - PALO 1 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST27_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL1_B')"
+                    id="B0033_EST27_PL1_B" pTooltip="ESTANTE 27 - PALO 1 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO_2"><b>PL 1</b></div>
                 </div>
-                <div class="_B0033_EST24_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL1_C')" id="B0033_EST24_PL1_C" pTooltip="ESTANTE 24 - PALO 1 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST27_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL1_C')"
+                    id="B0033_EST27_PL1_C" pTooltip="ESTANTE 27 - PALO 1 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
-            <div class="_B0033_EST24_PL2">
-                <div class="_B0033_EST24_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL2_A')" id="B0033_EST24_PL2_A" pTooltip="ESTANTE 24 - PALO 2 - CUBO A" tooltipPosition="top">
+            <div class="_B0033_EST27_PL2">
+                <div class="_B0033_EST27_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL2_A')"
+                    id="B0033_EST27_PL2_A" pTooltip="ESTANTE 27 - PALO 2 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST24_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL2_B')" id="B0033_EST24_PL2_B" pTooltip="ESTANTE 24 - PALO 2 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST27_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL2_B')"
+                    id="B0033_EST27_PL2_B" pTooltip="ESTANTE 27 - PALO 2 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO_2"><b>PL 2</b></div>
                 </div>
-                <div class="_B0033_EST24_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL2_B')" id="B0033_EST24_PL2_B" pTooltip="ESTANTE 24 - PALO 2 - CUBO C" tooltipPosition="top">
+                <div class="_B0033_EST27_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL2_B')"
+                    id="B0033_EST27_PL2_B" pTooltip="ESTANTE 27 - PALO 2 - CUBO C" tooltipPosition="top">
                     <div class="QBOS18"><b>C</b></div>
+                </div>
+            </div>
+            <div class="_B0033_EST27_PL3">
+                <div class="_B0033_EST27_PL3_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL3_A')"
+                    id="B0033_EST27_PL3_A" pTooltip="ESTANTE 27 - PALO 3 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
+                </div>
+                <div class="_B0033_EST27_PL3_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL3_B')"
+                    id="B0033_EST27_PL3_B" pTooltip="ESTANTE 27 - PALO 3 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
+                    <div class="NRO_PALO_2"><b>PL 3</b></div>
+                </div>
+                <div class="_B0033_EST27_PL3_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST27_PL3_C')"
+                    id="B0033_EST27_PL3_C" pTooltip="ESTANTE 27 - PALO 3 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
+                </div>
+            </div>
+
+            <!-- * NUEVO ESTANTE 24 -->
+            <div class="_B0033_EST24" pTooltip="Estante 24" tooltipPosition="top" id="EST25">
+                <div class="_B0033_EST24_TXT ESTANTE"><b>EST 24</b></div>
+            </div>
+            <div class="_B0033_EST24_PAL1">
+                <div class="_B0033_EST24_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL1_A')"
+                    id="B0033_EST24_PL1_A" pTooltip="ESTANTE 24 - PALO 1 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS28"><b>A</b></div>
+                </div>
+                <div class="_B0033_EST24_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL1_B')"
+                    id="B0033_EST24_PL1_B" pTooltip="ESTANTE 24 - PALO 1 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS28"><b>B</b></div>
+                    <div class="NRO_PALO"><b>PL 1</b></div>
+                </div>
+
+            </div>
+            <div class="_B0033_EST24_PL2">
+                <div class="_B0033_EST24_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL1_A')"
+                    id="B0033_EST24_PL2_A" pTooltip="ESTANTE 24 - PALO 2 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS28"><b>A</b></div>
+                </div>
+                <div class="_B0033_EST24_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST24_PL2_B')"
+                    id="B0033_EST24_PL2_B" pTooltip="ESTANTE 24 - PALO 2 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS28"><b>B</b></div>
+                    <div class="NRO_PALO"><b>PL 2</b></div>
                 </div>
             </div>
 
@@ -808,42 +1031,73 @@
                 <div class="_B0033_EST25_TXT ESTANTE"><b>EST 25</b></div>
             </div>
             <div class="_B0033_EST25_PAL1">
-                <div class="_B0033_EST25_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_A')" id="B0033_EST25_PL1_A" pTooltip="ESTANTE 25 - PALO 1 - CUBO A" tooltipPosition="top">
+                <div class="_B0033_EST25_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_A')"
+                    id="B0033_EST25_PL1_A" pTooltip="ESTANTE 25 - PALO 1 - CUBO A" tooltipPosition="top">
                     <div class="QBOS18"><b>A</b></div>
                 </div>
-                <div class="_B0033_EST25_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_B')" id="B0033_EST25_PL1_B" pTooltip="ESTANTE 25 - PALO 1 - CUBO B" tooltipPosition="top">
+                <div class="_B0033_EST25_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_B')"
+                    id="B0033_EST25_PAL1_B" pTooltip="ESTANTE 25 - PALO 1 - CUBO B" tooltipPosition="top">
                     <div class="QBOS18"><b>B</b></div>
                     <div class="NRO_PALO"><b>PL 1</b></div>
-                </div>
-                <div class="_B0033_EST25_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_C')" id="B0033_EST25_PL1_C" pTooltip="ESTANTE 25 - PALO 1 - CUBO C" tooltipPosition="top">
-                    <div class="QBOS18"><b>C</b></div>
-                </div>
-            </div>
-            <div class="_B0033_EST25_PL2">
-                <div class="_B0033_EST25_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_A')" id="B0033_EST25_PL2_A" pTooltip="ESTANTE 25 - PALO 2 - CUBO A" tooltipPosition="top">
-                    <div class="QBOS18"><b>A</b></div>
-                </div>
-                <div class="_B0033_EST25_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_B')" id="B0033_EST25_PL2_B" pTooltip="ESTANTE 25 - PALO 2 - CUBO B" tooltipPosition="top">
-                    <div class="QBOS18"><b>B</b></div>
-                    <div class="NRO_PALO"><b>PL 2</b></div>
-                </div>
-                <div class="_B0033_EST25_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST25_PL1_C')" id="B0033_EST25_PL2_C" pTooltip="ESTANTE 25 - PALO 2 - CUBO C" tooltipPosition="top">
-                    <div class="QBOS18"><b>C</b></div>
                 </div>
             </div>
 
             <!--ESTANTE 26 -->
-            <div class="_B0033_EST26" pTooltip="PASILLO 26" tooltipPosition="top" id="PS26">
+            <div class="_B0033_EST26" pTooltip="Estante 26" tooltipPosition="top" id="EST26">
                 <div class="_B0033_EST26_TXT ESTANTE"><b>EST 26</b></div>
             </div>
-            <div class="_B0033_EST26_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_A')" id="B0033_EST26_PL1_A" pTooltip="ESTANTE 26 - PALO 1 - CUBO A" tooltipPosition="top">
-                <div class="QBOS18"><b>A</b></div>
-                <div class="NRO_PALO"><b>PL 1</b></div>
+            <div class="_B0033_EST26_PAL1">
+                <div class="_B0033_EST26_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_A')"
+                    id="B0033_EST26_PL1_A" pTooltip="ESTANTE 26 - PALO 1 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
+                </div>
+                <div class="_B0033_EST26_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_B')"
+                    id="B0033_EST26_PL1_B" pTooltip="ESTANTE 26 - PALO 1 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
+                    <div class="NRO_PALO"><b>PL 1</b></div>
+                </div>
+                <div class="_B0033_EST26_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_C')"
+                    id="B0033_EST26_PL1_C" pTooltip="ESTANTE 26 - PALO 1 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
+                </div>
             </div>
-            <div class="_B0033_EST26_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL2_B')" id="B0033_EST26_PL2_B" pTooltip="ESTANTE 26 - PALO 2 - CUBO B" tooltipPosition="top">
-                <div class="QBOS18"><b>B</b></div>
-                <div class="NRO_PALO"><b>PL 2</b></div>
+            <div class="_B0033_EST26_PL2">
+                <div class="_B0033_EST26_PL2_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_A')"
+                    id="B0033_EST26_PL2_A" pTooltip="ESTANTE 26 - PALO 2 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
+                </div>
+                <div class="_B0033_EST26_PL2_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_B')"
+                    id="B0033_EST26_PL2_B" pTooltip="ESTANTE 26 - PALO 2 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
+                    <div class="NRO_PALO"><b>PL 2</b></div>
+                </div>
+                <div class="_B0033_EST26_PL2_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_C')"
+                    id="B0033_EST26_PL2_C" pTooltip="ESTANTE 26 - PALO 2 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
+                </div>
             </div>
+
+            <!--ESTANTE 30 -->
+            <div class="_B0033_EST30" pTooltip="ESTANTE 30" tooltipPosition="top" id="PS30">
+                <div class="_B0033_EST30_TXT ESTANTE"><b>EST 30</b></div>
+            </div>
+            <div class="_B0033_EST30_PAL1">
+                <div class="_B0033_EST30_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST30_PAL1_A')"
+                    id="B0033_EST30_PL1_A" pTooltip="ESTANTE 30 - PALO 1 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
+                    <div class="NRO_PALO"><b>PL 1</b></div>
+                </div>
+                <div class="_B0033_EST30_PL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST30_PL1_B')"
+                    id="B0033_EST30_PL1_B" pTooltip="ESTANTE 30 - PALO  - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
+                </div>
+                
+                <div class="_B0033_EST30_PL1_C PALOS cursor" (click)="GetStoreByUbication('B0033_EST30_PL1_C')"
+                    id="B0033_EST30_PL1_C" pTooltip="ESTANTE 30 - PALO 1 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
+                </div>
+            </div>
+
 
             <!--PASILLO 27-->
             <!--<div class="_B0033_PAS27" pTooltip="PASILLO 27" tooltipPosition="top" id="PS27">
@@ -859,51 +1113,99 @@
                 <div class="NRO_ESTIBA"><b>ESTB 3</b></div>
             </div>-->
 
-                <!--PASILLO 28-->
-                <div class="_B0033_PAS29" pTooltip="PASILLO 28" tooltipPosition="top" id="PS28">
-                <div class="_B0033_PAS28_TXT PASILLOS"><b>PASILLO 28</b></div>
+            <!--PASILLO 28-->
+            <div class="_B0033_PAS32" pTooltip="PASILLO 32" tooltipPosition="top" id="PS32">
+                <div class="_B0033_PAS32_TXT PASILLOS"><b>PASILLO 32</b></div>
             </div>
+            <!--
             <div class="_B0033_PAS28_ESTB4 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS28_ESTB4')" id="B0033_PS28_ESTB4" pTooltip="PASILLO 28 - ESTIBA 4" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 4</b></div>
             </div>
             <div class="_B0033_PAS28_ESTB5 cursor" (click)="GetStoreByUbication('B0033_PS28_ESTB5')" id="B0033_PS28_ESTB5" pTooltip="PASILLO 28 - ESTIBA 5" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 5</b></div>
             </div>
+            -->
 
-            <!--PASILLO 29-->
-            <div class="_B0033_PAS29" pTooltip="PASILLO 29" tooltipPosition="top" id="PS29">
-                <div class="_B0033_PAS29_TXT PASILLOS"><b>PASILLO 29</b></div>
+            <!--PASILLO 34-->
+            <div class="_B0033_PAS34" pTooltip="PASILLO 34" tooltipPosition="top" id="PS34">
+                <div class="_B0033_PAS34_TXT PASILLOS"><b>PASILLO 34</b></div>
             </div>
+            <!--
             <div class="_B0033_PAS29_ESTB6 ESTIBAS_G10 cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB6')" id="B0033_PS29_ESTB6" pTooltip="PASILLO 29 - ESTIBA 6" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 6</b></div>
-            </div>
-            <div class="_B0033_PAS29_ESTB7 ESTIBAS_G10 cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB7')" id="B0033_PS29_ESTB7" pTooltip="PASILLO 29 - ESTIBA 7" tooltipPosition="top">
+            </div>-->
+            <!--<div class="_B0033_PAS29_ESTB7 ESTIBAS_G10 cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB7')"
+                id="B0033_PS29_ESTB7" pTooltip="PASILLO 29 - ESTIBA 7" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 7</b></div>
-            </div>
-            <div class="_B0033_PAS29_ESTB8 ESTIBAS_G10 cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB8')" id="B0033_PS29_ESTB8" pTooltip="PASILLO 29 - ESTIBA 8" tooltipPosition="top">
+            </div>-->
+            <!-- <div class="_B0033_PAS29_ESTB8 ESTIBAS_G10 cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB8')" id="B0033_PS29_ESTB8" pTooltip="PASILLO 29 - ESTIBA 8" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 8</b></div>
             </div>
             <div class="_B0033_PAS29_ESTB9 ESTIBAS_G10 cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB9')" id="B0033_PS29_ESTB9" pTooltip="PASILLO 29 - ESTIBA 9" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 9</b></div>
-            </div>
+            </div> -->
+            <!--
             <div class="_B0033_PAS29_ESTB12 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB12')" id="B0033_PS29_ESTB12" pTooltip="PASILLO 29 - ESTIBA 12" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 12</b></div>
             </div>
             <div class="_B0033_PAS29_ESTB13 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB13')" id="B0033_PS29_ESTB13" pTooltip="PASILLO 29 - ESTIBA 13" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 13</b></div>
             </div>
+            -->
+
+            <!--* NUEVO ESTANTE 28-->
+            <div class="_B0033_EST28" pTooltip="Estante 28" tooltipPosition="top" id="EST28">
+                <div class="_B0033_EST28_TXT ESTANTE"><b>EST 28</b></div>
+            </div>
+            <div class="_B0033_EST28_PAL1">
+                <div class="_B0033_EST28_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST28_PL1_C')"
+                    id="B0033_EST28_PL1_C" pTooltip="ESTANTE 28 - PALO 1 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
+                </div>
+                <div class="_B0033_EST28_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST28_PL1_B')"
+                    id="B0033_EST28_PL1_B" pTooltip="ESTANTE 28 - PALO 1 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
+                    <div class="NRO_PALO_2"><b>PL 1</b></div>
+                </div>
+                <div class="_B0033_EST28_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST28_PL1_A')"
+                    id="B0033_EST28_PL1_A" pTooltip="ESTANTE 28 - PALO 1 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
+                </div>
+            </div>
+
+            <!--* NUEVO ESTANTE 29-->
+            <div class="_B0033_EST29" pTooltip="Estante 29" tooltipPosition="top" id="EST29">
+                <div class="_B0033_EST29_TXT ESTANTE"><b>EST 29</b></div>
+            </div>
+            <div class="_B0033_EST29_PAL1">
+                <div class="_B0033_EST29_PAL1_SE PALOS cursor" (click)="GetStoreByUbication('B0033_EST29_PL1_C')"
+                    id="B0033_EST29_PL1_C" pTooltip="ESTANTE 29 - PALO 1 - CUBO C" tooltipPosition="top">
+                    <div class="QBOS18"><b>C</b></div>
+                </div>
+                <div class="_B0033_EST29_PAL1_B PALOS cursor" (click)="GetStoreByUbication('B0033_EST29_PL1_B')"
+                    id="B0033_EST29_PL1_B" pTooltip="ESTANTE 29 - PALO 1 - CUBO B" tooltipPosition="top">
+                    <div class="QBOS18"><b>B</b></div>
+                    <div class="NRO_PALO_2"><b>PL 1</b></div>
+                </div>
+                <div class="_B0033_EST29_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST29_PL1_A')"
+                    id="B0033_EST29_PL1_A" pTooltip="ESTANTE 29 - PALO 1 - CUBO A" tooltipPosition="top">
+                    <div class="QBOS18"><b>A</b></div>
+                </div>
+            </div>
 
             <!--PASILLO 30-->
-            <div class="_B0033_PAS30" pTooltip="PASILLO 30" tooltipPosition="top" id="PS30">
-                <div class="_B0033_PAS30_TXT PASILLOS"><b>PASILLO 30</b></div>
-            </div>
+
+             <div class="_B0033_PAS33" pTooltip="PASILLO 33" tooltipPosition="top" id="PS33">
+                <div class="_B0033_PAS33_TXT PASILLOS"><b>PASILLO 33</b></div>
+            </div> 
+            <!--
             <div class="_B0033_PAS30_ESTB10 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS30_ESTB10')" id="B0033_PS30_ESTB10" pTooltip="PASILLO 30 - ESTIBA 10" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB10</b></div>
             </div>
             <div class="_B0033_PAS30_ESTB11 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS30_ESTB11')" id="B0033_PS30_ESTB11" pTooltip="PASILLO 30 - ESTIBA 11" tooltipPosition="top">
                 <div class="NRO_ESTIBA"><b>ESTB 11</b></div>
             </div>
-
+            -->
             <!--FORMAS-->
             <div class="_B0033_FORMA_DEGRADADO"></div>
             <div class="_B0033_FORMA1_PAS29"></div>
@@ -911,40 +1213,42 @@
             <div class="_B0033_FORMA_GRIS">
                 <div class="_B0033_FORMA_GRIS2"></div>
             </div>
-            </div>
+        </div>
     </p-tabPanel>
 </p-tabView>
 
-<p-dialog [(visible)]="showDataStore" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles del Inventario en {{ubicationModal}}" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="showDataStore" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}"
+    [resizable]="true" header="Detalles del Inventario en {{ubicationModal}}" [modal]="true" styleClass="p-fluid">
     <ng-template pTemplate="content">
-        <p-table
-        #consolidateTable
-        [value]="dataSearched"
-        [resizableColumns]="true"
-        columnResizeMode="expand"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [rowHover]="true"
-        dataKey="item"
-        [scrollable]="true"
-        scrollHeight="50rem">
+        <p-table #consolidateTable [value]="dataSearched" [resizableColumns]="true" columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true" dataKey="item"
+            [scrollable]="true" scrollHeight="50rem">
             <ng-template pTemplate="header">
                 <tr>
                     <th rowspan="2" colspan="2">#</th>
-                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'item', consolidateTable)"></th>
-                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'reference', consolidateTable)"></th>
-                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'ubication', consolidateTable)"></th>
-                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'numberProductionBagPro', consolidateTable)"></th>
-                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'totalQuantity', consolidateTable)"></th>
-                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'presentation', consolidateTable)"></th>
-                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotal', consolidateTable)"></th>
+                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'item', consolidateTable)">
+                    </th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'reference', consolidateTable)"></th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'ubication', consolidateTable)"></th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'numberProductionBagPro', consolidateTable)"></th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'totalQuantity', consolidateTable)"></th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'presentation', consolidateTable)"></th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'subTotal', consolidateTable)"></th>
                 </tr>
                 <tr>
                     <th pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
                     <th pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
                     <th pSortableColumn="ubication"><p-sortIcon field="ubication"></p-sortIcon> Ubicación</th>
-                    <th pSortableColumn="numberProductionBagPro"><p-sortIcon field="numberProductionBagPro"></p-sortIcon> Cant. Rollos/Bultos</th>
-                    <th pSortableColumn="totalQuantity"><p-sortIcon field="totalQuantity"></p-sortIcon> Cantidad Total</th>
+                    <th pSortableColumn="numberProductionBagPro"><p-sortIcon
+                            field="numberProductionBagPro"></p-sortIcon> Cant. Rollos/Bultos</th>
+                    <th pSortableColumn="totalQuantity"><p-sortIcon field="totalQuantity"></p-sortIcon> Cantidad Total
+                    </th>
                     <th pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
                     <th pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
                 </tr>
@@ -952,7 +1256,10 @@
             <ng-template pTemplate="body" let-rowIndex="rowIndex" let-data let-expanded="expanded">
                 <tr>
                     <td>
-                      <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                        <button type="button" pButton pRipple [pRowToggler]="data"
+                            class="p-button-text p-button-rounded p-button-plain"
+                            pTooltip="Haz clic para ver más detalles"
+                            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                     </td>
                     <td>{{rowIndex + 1 | number}}</td>
                     <td>{{data.item}}</td>
@@ -971,61 +1278,63 @@
             <ng-template pTemplate="rowexpansion" let-data>
                 <tr>
                     <td colspan="10">
-                        <p-table
-                        #detailsTable
-                        [value]="data.detailsProduction"
-                        dataKey="numberProductionBagPro"
-                        styleClass="p-datatable-gridlines p-datatable-sm"
-                        [scrollable]="true"
-                        scrollHeight="20rem">
+                        <p-table #detailsTable [value]="data.detailsProduction" dataKey="numberProductionBagPro"
+                            styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true" scrollHeight="20rem">
                             <ng-template pTemplate="header">
-                                <tr>
-                                    <th rowspan="2">#</th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'orderProduction', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'numberProductionBagPro', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'weight', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'quantity', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'presentation', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'date', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'hour', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'price', detailsTable)"></th>
-                                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotal', detailsTable)"></th>
-                                </tr>
-                                <tr>
-                                    <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT</th>
-                                    <th pSortableColumn="numberProductionBagPro"><p-sortIcon field="numberProductionBagPro"></p-sortIcon> Numero Rollo/Bulto</th>
-                                    <th pSortableColumn="weight"><p-sortIcon field="weight"></p-sortIcon> Peso (Kg)</th>
-                                    <th pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cantidad</th>
-                                    <th pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
-                                    <th pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
-                                    <th pSortableColumn="hour"><p-sortIcon field="hour"></p-sortIcon> Hora</th>
-                                    <th pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
-                                    <th pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
-                                </tr>
-                            </ng-template>
-                            <ng-template pTemplate="body" let-rowIndex="rowIndex" let-dataDetails>
-                                <tr>
-                                    <td>{{rowIndex + 1}}</td>
-                                    <td>{{dataDetails.orderProduction}}</td>
-                                    <td>{{dataDetails.numberProductionBagPro}}</td>
-                                    <td>{{dataDetails.weight | number : '1.2-2'}}</td>
-                                    <td>{{dataDetails.quantity | number : '1.2-2'}}</td>
-                                    <td>{{dataDetails.presentation}}</td>
-                                    <td>{{dataDetails.date}}</td>
-                                    <td>{{dataDetails.hour}}</td>
-                                    <td>{{dataDetails.price | number : '1.2-2'}}</td>
-                                    <td>{{dataDetails.subTotal | number : '1.2-2'}}</td>
-                                </tr>
-                            </ng-template>
-                            <ng-template pTemplate="emptymessage">
-                                <tr>
-                                    <td colspan="10">No se encontraron registros</td>
-                                </tr>
-                            </ng-template>
-                        </p-table>
-                    </td>
                 <tr>
+                    <th rowspan="2">#</th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'orderProduction', detailsTable)"></th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'numberProductionBagPro', detailsTable)"></th>
+                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'weight', detailsTable)">
+                    </th>
+                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'quantity', detailsTable)">
+                    </th>
+                    <th><input pInputText style="width: 100%;"
+                            (input)="aplyFilter($event, 'presentation', detailsTable)"></th>
+                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'date', detailsTable)"></th>
+                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'hour', detailsTable)"></th>
+                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'price', detailsTable)"></th>
+                    <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotal', detailsTable)">
+                    </th>
+                </tr>
+                <tr>
+                    <th pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT</th>
+                    <th pSortableColumn="numberProductionBagPro"><p-sortIcon
+                            field="numberProductionBagPro"></p-sortIcon> Numero Rollo/Bulto</th>
+                    <th pSortableColumn="weight"><p-sortIcon field="weight"></p-sortIcon> Peso (Kg)</th>
+                    <th pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cantidad</th>
+                    <th pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
+                    <th pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
+                    <th pSortableColumn="hour"><p-sortIcon field="hour"></p-sortIcon> Hora</th>
+                    <th pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
+                    <th pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowIndex="rowIndex" let-dataDetails>
+                <tr>
+                    <td>{{rowIndex + 1}}</td>
+                    <td>{{dataDetails.orderProduction}}</td>
+                    <td>{{dataDetails.numberProductionBagPro}}</td>
+                    <td>{{dataDetails.weight | number : '1.2-2'}}</td>
+                    <td>{{dataDetails.quantity | number : '1.2-2'}}</td>
+                    <td>{{dataDetails.presentation}}</td>
+                    <td>{{dataDetails.date}}</td>
+                    <td>{{dataDetails.hour}}</td>
+                    <td>{{dataDetails.price | number : '1.2-2'}}</td>
+                    <td>{{dataDetails.subTotal | number : '1.2-2'}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="10">No se encontraron registros</td>
+                </tr>
             </ng-template>
         </p-table>
+        </td>
+        <tr>
+    </ng-template>
+    </p-table>
     </ng-template>
 </p-dialog>
