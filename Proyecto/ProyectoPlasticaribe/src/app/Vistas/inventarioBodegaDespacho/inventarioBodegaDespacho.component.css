@@ -1899,13 +1899,18 @@ div[class*="PS"] span {
     margin: -1.5rem;
 }
 
-._B0034_PAS1_ESTB31 {
+._B0034_PAS1 {
     display: grid;
     grid-column: 12;
     grid-row: 1 / 2;
-    background-color: rgb(211, 228, 255);
     grid-template-columns: repeat(2, 30px);
     grid-template-rows: repeat(4, 30px);
     grid-auto-columns: auto;
     gap: 5px;
+}
+
+._B0034_PAS1_ESTB31 {
+    grid-column: 2 / 16;
+    grid-row: 1 / 4;
+    background-color: rgb(211, 228, 255);
 }

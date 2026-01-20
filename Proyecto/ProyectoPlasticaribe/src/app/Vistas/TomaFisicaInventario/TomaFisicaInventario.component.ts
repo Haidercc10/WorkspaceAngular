@@ -14,6 +14,8 @@ import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDe
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { Table } from 'primeng/table';
+import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
+import { s } from '@fullcalendar/core/internal-common';
 
 @Component({
   selector: 'app-TomaFisicaInventario',
@@ -51,7 +53,9 @@ export class TomaFisicaInventarioComponent implements OnInit {
     private dtEntracesService: DetallesEntradaRollosService,
     private storehouseService: BodegasDespachoService,
     private messageService: MessageService,
-    private clients: SedeClienteService,) {
+    private clients: SedeClienteService,
+    private svPhysicalCount: TomaFisicaInventarioService,
+  ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
 
@@ -132,42 +136,34 @@ export class TomaFisicaInventarioComponent implements OnInit {
     else if (ubicationSelected.nombreUbicacion == 'PASILLO') ubicationName = 'PS';
     if (subUbicationSelected.nombreSubUbicacion == 'PALO') subUbicationName = 'PL';
     else if (subUbicationSelected.nombreSubUbicacion == 'ESTIBA') subUbicationName = 'ESTB';
-    return `B${this.storehouseSelected}_${ubicationName}${ubicationSelected.idUbicacion}_${subUbicationName}${subUbicationSelected.idSubUbicacion}${cube}`;
+    return `B${this.storehouseSelected}_${ubicationName}${ubicationSelected.idUbicacion}_${subUbicationName}${subUbicationSelected.idSubUbicacion}${cube}`.trim();
   }
 
   validateUbicationSelected() {
-    if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected != null) this.getInformationProduction();
+    if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected != null) this.validatePhysicalInventory();
     else this.msj.mensajeAdvertencia(`¡Debe llenar los campo para validar la ubicación que tendrá el rollo/bulto!`);
   }
 
-  getInformationProduction() {
-    let production = parseInt(this.productionSearched);
-    this.productionSearched = null;
-    let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLA' : 'EXT';
-    let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
-    if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
-    else {
-      this.productionProcessSerivce.GetInformationAboutProduction(production, searchInTable).subscribe(data => {
+  getInformationProduction(production, process, productionSearched) {
+    //let production = parseInt(this.productionSearched);
+    //this.productionSearched = null;
+    //let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLA' : 'EXT';
+    //let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
+    //if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
+    //else {
+      this.productionProcessSerivce.GetInformationAboutProduction(production, process).subscribe(data => {
         if (data[0].proceso.proceso_Id != 'WIKE') {
-          this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+          //this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
             this.sendProductionZeus.push(data[0]);
             let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-            this.sendProductionZeus[i].dataExtrusion = {
-              numero_RolloBagPro: production,
-              precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
-              extrusion_Ancho1: res[0].ancho1_Extrusion,
-              extrusion_Ancho2: res[0].ancho2_Extrusion,
-              extrusion_Ancho3: res[0].ancho3_Extrusion,
-              undMed_Id: res[0].und_Extrusion,
-              extrusion_Calibre: res[0].calibre_Extrusion,
-              material: res[0].material,
-            }
+            this.sendProductionZeus[i].pp.numero_RolloBagPro = production;
             this.sendProductionZeus[i].position = this.sendProductionZeus.length + 1;
-            this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-          });
-        } else this.msj.mensajeAdvertencia(`¡No puede Ingresar Rollos/Bultos provenientes del procesos 'WIKETIADO'!`);
+            this.savePhysicalInventory(this.sendProductionZeus[i]);
+            this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
+          //});
+        } else this.msj.mensajeAdvertencia(`¡No puede ingresar rollos/bultos provenientes del procesos 'WIKETIADO'!`);
       }, () => this.lookingForDataInBagpro(production));
-    }
+    //}
   }
 
   lookingForDataInBagpro(production: number) {
@@ -209,7 +205,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
                   extrusion_Ancho3: data[0].ancho3_Extrusion,
                   undMed_Id: data[0].und_Extrusion,
                   extrusion_Calibre: data[0].calibre_Extrusion,
-                  material: ['SELLADO','Wiketiado'].includes(prod[0].nomStatus) ? prod[0].estado : prod[0].material,
+                  material: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].estado : prod[0].material,
                   precioProducto: data[0].presentacion == 'Kilo' ? data[0].valorKg : data[0].valorUnidad,
                 },
                 proceso: {
@@ -223,13 +219,83 @@ export class TomaFisicaInventarioComponent implements OnInit {
               });
               let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
               this.sendProductionZeus[i].position = this.sendProductionZeus.length;
-              // this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
-              this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
+              this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
+              this.savePhysicalInventory(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
+            }, error => {
+              console.log(error)
             });
+          }, error => {
+            console.log(error)
           });
-        } else this.msj.mensajeAdvertencia(`¡No puede Ingresar Rollos/Bultos provenientes del procesos 'WIKETIADO'!`);
-      } else this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
-    }, () => this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`));
+        } else {
+          this.msj.mensajeAdvertencia(`¡No puede Ingresar Rollos/Bultos provenientes del procesos 'WIKETIADO'!`);
+          this.load = false;
+        }
+      } else {
+        this.msj.mensajeAdvertencia(`No se encontró el rollo/bulto N° ${production} en el proceso de ${searchInTable}`);
+        this.load = false;
+      }
+    }, error => {
+      this.msj.mensajeAdvertencia(`No se encontró rollo/bulto con la etiqueta N° ${production} en ${searchInTable}`, error)
+      this.load = false;
+    });
+  }
+
+  savePhysicalInventory(production: any) {
+    let p : any = production;
+    if (p) {
+      let inventory: TomaFisicaInventario = {
+        'Tfi_NumeroRollo': p.pp.numero_Rollo,
+        'Tfi_Etiqueta': p.pp.numeroRollo_BagPro,
+        'Tfi_OT': p.pp.ot,
+        'Prod_Id': p.pp.prod_Id,
+        'Cli_Id': p.pp.cli_Id,
+        'Tfi_CantidadReal': p.pp.presentacion == 'Kg' ? p.pp.peso_Neto : p.pp.cantidad,
+        'Tfi_PesoBruto': p.pp.peso_Neto,
+        'Presentacion': p.pp.presentacion,
+        'Proceso_Id': p.pp.proceso_Id,
+        'Estado_Rollo': p.pp.estado_Rollo,
+        'Tfi_PrecioVenta': p.pp.precioVenta_Producto,
+        'Tfi_EnvioZeus': p.pp.envio_Zeus,
+        'Tfi_Fecha': moment().format('YYYY-MM-DD'),
+        'Tfi_Hora': moment().format('HH:mm:ss'),
+        'UsuaRegistro_Id': this.storage_Id,
+        'Tfi_Ubicacion': this.setUbication(),
+        'Tipo_Inventario': 'GENERAL',
+        'TpBod_Id': 3
+      }
+      this.svPhysicalCount.Post(inventory).subscribe((data) => {
+        this.msj.mensajeConfirmacion(`Rollo/bulto N° ${data.tfi_Etiqueta} registrado correctamente`, '');
+        this.load = false;
+      }, error => {
+        this.msj.mensajeError(`Error al registrar el rollo/bulto ${inventory.Tfi_Etiqueta} en la toma fisica`, `| ${error.status, error.statusText}`);
+        this.load = false;
+      });
+    } else {
+      this.msj.mensajeError(`No se encontraron registros de producción de la etiqueta N° ${p.pp.numeroRollo_BagPro}`,);
+      this.load = false;
+    }
+  }
+
+  validatePhysicalInventory() {
+    let roll = parseInt(this.productionSearched);
+    this.productionSearched = null;
+    let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLA' : 'EXT';
+    let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
+
+    this.svPhysicalCount.getPhysicalInventory(roll, searchInTable).subscribe(data => {
+      console.log(data, roll, searchInTable);
+      if (data != null) {
+        this.msj.mensajeAdvertencia(`El rollo/bulto N° ${data.tfi_Etiqueta} ya fue ingresado`);
+        this.load = false;
+      } else {
+        this.load = true;
+        this.getInformationProduction(roll, searchInTable, productionSearched)
+      }
+    }, error => {
+      this.msj.mensajeError(error);
+      this.load = false;
+    });
   }
 
   confirmSendData() {
@@ -303,7 +369,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
     this.productionProcessSerivce.putSendZeus(reel).subscribe(null, error => this.errorMessageWhenTryUpdateReel(errorMessage, error));
   }
 
-  createProduction(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE') : modelProduccionProcesos {
+  createProduction(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE'): modelProduccionProcesos {
     let data: any = this.sendProductionZeus.filter(x => x.pp.numero_Rollo == numberProduction && x.proceso.proceso_Id == process)[0];
     let sellado: boolean = ['SELLA', 'WIKE'].includes(process);
     let datos: modelProduccionProcesos = {
@@ -328,7 +394,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
       Precio: 0,
       Presentacion: data.pp.presentacion,
       Proceso_Id: process,
-      Turno_Id: sellado ? data.dataFromExtrusion.turnos : data.dataFromExtrusion.turno ,
+      Turno_Id: sellado ? data.dataFromExtrusion.turnos : data.dataFromExtrusion.turno,
       Envio_Zeus: true,
       Datos_Etiqueta: sellado ? data.dataFromExtrusion.fechaCambio : '',
       Fecha: sellado ? data.dataFromExtrusion.fechaEntrada : data.dataFromExtrusion.fecha,
@@ -339,7 +405,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
     return datos;
   }
 
-  saveInProductionProcess(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE'){
+  saveInProductionProcess(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE') {
     this.productionProcessSerivce.Post(this.createProduction(numberProduction, process)).subscribe(null, error => {
       let errorMessage: string = `¡No fue posible crear el registro del Rollo/Bulto #${numberProduction} proveniente de 'BagPro'!`;
       this.errorMessageWhenTryUpdateReel(errorMessage, error);
@@ -412,9 +478,9 @@ export class TomaFisicaInventarioComponent implements OnInit {
           user: (this.storage_Name).toString().toUpperCase(),
           process: (data.proceso.proceso_Nombre).toString().toUpperCase(),
           ubication: (this.setUbication()).toString().toUpperCase(),
-          productionPL : data.dataExtrusion.numero_Rollo,
-          stateRollPP : '',
-          price : 0,
+          productionPL: data.dataExtrusion.numero_Rollo,
+          stateRollPP: '',
+          price: 0,
         });
         this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
         this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
@@ -600,5 +666,28 @@ export class TomaFisicaInventarioComponent implements OnInit {
   }
 
   //Función para filtrar la tabla de rollos a eliminar.
-  applyFilter = ($event, campo : any, valorCampo : string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  applyFilter = ($event, campo: any, valorCampo: string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+}
+
+export interface TomaFisicaInventario {
+  Tfi_Id?: number,
+  Tfi_NumeroRollo: number,
+  Tfi_Etiqueta: number,
+  Tfi_OT: number,
+  Prod_Id: number,
+  Cli_Id: number,
+  Tfi_CantidadReal: number,
+  Tfi_PesoBruto: number,
+  Presentacion: string,
+  Proceso_Id: string,
+  Estado_Rollo: number,
+  Tfi_PrecioVenta: number,
+  Tfi_EnvioZeus: boolean,
+  Tfi_Fecha: any,
+  Tfi_Hora: any,
+  UsuaRegistro_Id: number,
+  Tfi_Ubicacion: string,
+  Tipo_Inventario : string,
+  TpBod_Id : number,
+  Tfi_Observacion?: string,
 }

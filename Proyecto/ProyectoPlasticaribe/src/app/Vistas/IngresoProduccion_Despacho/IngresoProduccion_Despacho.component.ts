@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -16,6 +16,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
+import { TomaFisicaInventario, TomaFisicaInventarioComponent } from '../TomaFisicaInventario/TomaFisicaInventario.component';
+import { InventarioVsTomaFisicaComponent } from '../inventario-vs-toma-fisica/inventario-vs-toma-fisica.component';
 
 @Component({
   selector: 'app-IngresoProduccion_Despacho',
@@ -42,6 +44,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   cubeSelected: any;
   dataSearched: Array<dataDesp> = [];
   searchIn: any = null;
+  @ViewChild(InventarioVsTomaFisicaComponent) cmpInvVsPhysical : InventarioVsTomaFisicaComponent;
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -310,6 +313,10 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     });
   }
 
+  loadInventory(){
+    this.cmpInvVsPhysical.getInventory();
+  }
+
   messageConfirmationUpdateStore() {
     this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
     this.load = false;
@@ -442,6 +449,10 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       if (count == this.sendProductionZeus.length) this.createPDF();
     });
   }
+
+  changeTab(index: any) {
+    if (index == 2) this.loadInventory();
+  }  
 
   createPDF() {
     this.load = true;

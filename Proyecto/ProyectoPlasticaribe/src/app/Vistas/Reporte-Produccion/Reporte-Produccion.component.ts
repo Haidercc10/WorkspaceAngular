@@ -54,7 +54,7 @@ export class ReporteProduccionComponent implements OnInit {
     this.formFiltros = this.frmBuilder.group({
       rangoFechas: [null, Validators.required],
       OrdenTrabajo: [null],
-      proceso: [null, Validators.required],
+      proceso: [null],
       idCliente: [null],
       cliente: [null],
       idProducto: [null],

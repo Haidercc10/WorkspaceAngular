@@ -17,7 +17,7 @@
 </div>
 
 <p-card>
-  <p-tabView>
+  <p-tabView (onChange)="changeTab($event.index)">
     <p-tabPanel header="Subir Producción" leftIcon="pi pi-upload">
       <div class="my-2">
         <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
@@ -134,12 +134,13 @@
       </p-table>
     </p-tabPanel>
 
-    <p-tabPanel header="Subir Entrega de Producción" leftIcon="pi pi-upload">
-      <app-IngresoDespacho_EntregaMercancia></app-IngresoDespacho_EntregaMercancia>
-    </p-tabPanel>
-
     <p-tabPanel header="Toma Fisíca de Inventario" leftIcon="pi pi-upload">
       <app-TomaFisicaInventario></app-TomaFisicaInventario>
+    </p-tabPanel>
+
+    <p-tabPanel header="Inventario Vs Toma Fisica" leftIcon="pi pi-check">
+      <!--<app-IngresoDespacho_EntregaMercancia></app-IngresoDespacho_EntregaMercancia>-->
+      <app-inventario-vs-toma-fisica></app-inventario-vs-toma-fisica>
     </p-tabPanel>
 
     <p-tabPanel *ngIf="ValidarRol == 1" header="Reingreso de producción" leftIcon="pi pi-upload">
