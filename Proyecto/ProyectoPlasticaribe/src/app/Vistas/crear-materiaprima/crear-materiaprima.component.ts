@@ -30,20 +30,20 @@ export class CrearMateriaprimaComponent implements OnInit {
   proveedores = []; /** Array para cargar los proveedores de materia prima. */
   materials = [];
   pigments = [];
-  recovery : boolean = false;
-  subcategories : any = [];
+  recovery: boolean = false;
+  subcategories: any = [];
 
-  constructor(private materiaPrimaService : MateriaPrimaService,
-                private categoriMpService : CategoriaMateriaPrimaService,
-                  private frmBuilderMateriaPrima : FormBuilder,
-                    private proveedorservices : ProveedorService,
-                      private proveedorMPService : MpProveedorService,
-                        private mensajeService : MensajesAplicacionService,
-                          private svMaterials : MaterialProductoService, 
-                            private svPigments : PigmentoProductoService,
-                              private svMMP : MatPrima_Material_PigmentoService,
-                                private svSubCatMP : SubcategoriasMatPrimaService,
-                        ) {
+  constructor(private materiaPrimaService: MateriaPrimaService,
+    private categoriMpService: CategoriaMateriaPrimaService,
+    private frmBuilderMateriaPrima: FormBuilder,
+    private proveedorservices: ProveedorService,
+    private proveedorMPService: MpProveedorService,
+    private mensajeService: MensajesAplicacionService,
+    private svMaterials: MaterialProductoService,
+    private svPigments: PigmentoProductoService,
+    private svMMP: MatPrima_Material_PigmentoService,
+    private svSubCatMP: SubcategoriasMatPrimaService,
+  ) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
       mpNombre: ['', Validators.required],
@@ -52,12 +52,12 @@ export class CrearMateriaprimaComponent implements OnInit {
       mpCategoria: ['', Validators.required],
       mpEstado: ['', Validators.required],
       mpValor: [null, Validators.required],
-      Stock : ['', Validators.required],
-      mpUnidadMedida : ['', Validators.required],
-      MpObservacion : ['', Validators.required],
-      mpPigment : [null], 
-      mpMaterial : [null], 
-      mpSubcategory: [null, ],
+      Stock: ['', Validators.required],
+      mpUnidadMedida: ['', Validators.required],
+      MpObservacion: ['', Validators.required],
+      mpPigment: [null],
+      mpMaterial: [null],
+      mpSubcategory: [null,],
     });
   }
 
@@ -68,13 +68,13 @@ export class CrearMateriaprimaComponent implements OnInit {
     this.getPigments();
   }
 
-   //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
+  //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
   obtenerNombreCategoriasMp = () => this.categoriMpService.srvObtenerLista().subscribe(datos => this.nombreCategoriasMP = datos);
 
   getSubcategoriesForId() {
-    let id : number = this.materiPrima.value.mpCategoria;
+    let id: number = this.materiPrima.value.mpCategoria;
     this.svSubCatMP.getSubcategoriesForCategory(id).subscribe(data => this.subcategories = data);
-  } 
+  }
 
   /** Limpiar campos al momento de crear la mat. prima. */
   limpiarCampos = () => this.materiPrima.reset();
@@ -83,52 +83,52 @@ export class CrearMateriaprimaComponent implements OnInit {
   obtenerProceedor = () => this.proveedorservices.srvObtenerLista().subscribe(datos => this.proveedores = datos);
 
   /** Crear el registro de la materia prima en la base de datos. */
-  registrarMateriPrima(){
-    let nombreMateriaPrima : string = this.materiPrima.value.mpNombre;
-    let descripcionMateriaPrima : string = this.materiPrima.value.mpDescripcion;
-    let stockMateriaPrima : number = 0;
-    let categoriaMateriaPrima : any = this.materiPrima.value.mpCategoria;
-    let precioMateriaPrima : number = this.materiPrima.value.mpValor;
+  registrarMateriPrima() {
+    let nombreMateriaPrima: string = this.materiPrima.value.mpNombre;
+    let descripcionMateriaPrima: string = this.materiPrima.value.mpDescripcion;
+    let stockMateriaPrima: number = 0;
+    let categoriaMateriaPrima: any = this.materiPrima.value.mpCategoria;
+    let precioMateriaPrima: number = this.materiPrima.value.mpValor;
 
-    const datosMP : any = {
-      MatPri_Nombre : nombreMateriaPrima.toUpperCase(),
-      MatPri_Descripcion : descripcionMateriaPrima.toUpperCase(),
-      MatPri_Stock : stockMateriaPrima,
-      UndMed_Id : 'Kg',
-      CatMP_Id : categoriaMateriaPrima,
-      MatPri_Precio : precioMateriaPrima,
-      TpBod_Id : 4,
-      MatPri_Fecha : moment().format('YYYY-MM-DD'),
-      MatPri_Hora : moment().format('H:mm:ss'),
-      SubCatMP_Id : this.materiPrima.value.mpSubcategory,
+    const datosMP: any = {
+      MatPri_Nombre: nombreMateriaPrima.toUpperCase(),
+      MatPri_Descripcion: descripcionMateriaPrima.toUpperCase(),
+      MatPri_Stock: stockMateriaPrima,
+      UndMed_Id: 'Kg',
+      CatMP_Id: categoriaMateriaPrima,
+      MatPri_Precio: precioMateriaPrima,
+      TpBod_Id: 4,
+      MatPri_Fecha: moment().format('YYYY-MM-DD'),
+      MatPri_Hora: moment().format('H:mm:ss'),
+      SubCatMP_Id: this.materiPrima.value.mpSubcategory,
     }
 
     this.materiaPrimaService.srvGuardar(datosMP).subscribe(data => {
       this.mensajeService.mensajeConfirmacion('Materia Prima creada con éxito');
-      if(this.recovery) this.createRecovery(data.matPri_Id)
+      if (this.recovery) this.createRecovery(data.matPri_Id)
       setTimeout(() => { this.materiPrima.reset(); }, 1000);
     }, () => this.mensajeService.mensajeError(`¡Mensaje Error!`, 'Falló al crear la materia prima, verifique!'));
   }
 
   //Funcion qu creará la relacion de materia prima y proveedores
-  creacionMpProveedor(idMateriaPrima : number, proveedor : number){
+  creacionMpProveedor(idMateriaPrima: number, proveedor: number) {
     const datosMpProveedor = {
-      Prov_Id : proveedor,
-      MatPri_Id : idMateriaPrima,
+      Prov_Id: proveedor,
+      MatPri_Id: idMateriaPrima,
     }
-    this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(() => {});
+    this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(() => { });
   }
 
   /** Cargar nombre en la descripción. */
-  cargarDescripcion(){
-   
-    
-    let mtpNombre : any = this.materiPrima.value.mpNombre;
+  cargarDescripcion() {
+
+
+    let mtpNombre: any = this.materiPrima.value.mpNombre;
     console.log(mtpNombre);
     setTimeout(() => {
       this.materiPrima.patchValue({ mpDescripcion: mtpNombre })
     }, 100);
-    
+
   }
 
   //Cargar materiales
@@ -138,14 +138,14 @@ export class CrearMateriaprimaComponent implements OnInit {
   getPigments = () => this.svPigments.srvObtenerLista().subscribe(data => this.pigments = data);
 
   //Crear materia prima recuperada
-  createRecovery(matprima : any){
-    let info : any = {
-      'MatPri_Id' : matprima,
-      'Material_Id' : this.materiPrima.value.mpMaterial,
-      'Pigmt_Id' : this.materiPrima.value.mpPigment,
+  createRecovery(matprima: any) {
+    let info: any = {
+      'MatPri_Id': matprima,
+      'Material_Id': this.materiPrima.value.mpMaterial,
+      'Pigmt_Id': this.materiPrima.value.mpPigment,
     }
     this.svMMP.Post(info).subscribe(data => { console.log('Registro creado con exito.'); }, error => {
-       this.mensajeService.mensajeError(`Error al crear la relación entre recuperado, material y pigmento | ${error.status} ${error.statusText}`);
+      this.mensajeService.mensajeError(`Error al crear la relación entre recuperado, material y pigmento | ${error.status} ${error.statusText}`);
     });
   }
 

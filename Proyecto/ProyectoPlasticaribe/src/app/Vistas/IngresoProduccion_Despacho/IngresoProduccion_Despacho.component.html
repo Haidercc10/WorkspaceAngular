@@ -143,8 +143,8 @@
       <app-inventario-vs-toma-fisica></app-inventario-vs-toma-fisica>
     </p-tabPanel>
 
-    <p-tabPanel *ngIf="ValidarRol == 1" header="Reingreso de producción" leftIcon="pi pi-upload">
-      <app-Reingreso_Produccion></app-Reingreso_Produccion>
+    <p-tabPanel header="Movimientos toma física" leftIcon="pi pi-search">
+      <app-movimientos-toma-fisica></app-movimientos-toma-fisica>
     </p-tabPanel>
 
     <p-tabPanel header="Consultar Producción" leftIcon="pi pi-search">
@@ -157,6 +157,10 @@
 
     <p-tabPanel header="Inventario Bodegas" leftIcon="pi pi-th-large">
       <app-inventarioBodegaDespacho></app-inventarioBodegaDespacho>
+    </p-tabPanel>
+
+    <p-tabPanel *ngIf="ValidarRol == 1" header="Reingreso de producción" leftIcon="pi pi-upload">
+      <app-Reingreso_Produccion></app-Reingreso_Produccion>
     </p-tabPanel>
 
   </p-tabView>

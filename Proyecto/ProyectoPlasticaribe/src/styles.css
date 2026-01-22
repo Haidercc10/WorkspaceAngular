@@ -510,6 +510,12 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
+.bg-danger3 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(179, 95, 95);
+  font-size: calc(var(--font-size) * 14px);
+}
+
 .bg-warning2 {
   color: rgb(255, 255, 255);
   background-color: rgb(255, 166, 0);

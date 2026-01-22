@@ -1,7 +1,9 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
+import { forkJoin } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { InventariosService } from 'src/app/Servicios/Inventarios/inventarios.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
 
 @Injectable({
@@ -27,11 +29,13 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   ValidarRol: number;
   loading: boolean;
   modal: boolean = false;
+  itemSelected: item = { item: 0, ref: '', unit : '' };
 
 
   constructor(private AppComponent: AppComponent,
     private svInvSnapshot: InventariosService,
     private svPhysicalCount: TomaFisicaInventarioService,
+    private msj: MensajesAplicacionService
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
@@ -51,7 +55,7 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   //Función que se encarga de filtrar la información de la tabla
   applyFilter = ($event, campo: any, datos: Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  //Función 
+  //Función que obtiene el inventario en snapshot
   getInventory() {
     this.loading = true;
     this.svInvSnapshot.getInventorySnapshot().subscribe(res => {
@@ -62,25 +66,52 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
     })
   }
 
-  loadDetailsInventory(item: number) {
+  //Función que carga los detalles del inventario seleccionado
+  loadDetailsInventory(item: any) {
     this.modal = true;
-    this.getSystemInventory(item);
-  }
-
-  getSystemInventory(item: any) {
     this.load = true;
-    this.svInvSnapshot.getInventorySnapshotForItem(item).subscribe(data1 => {
-      this.inventorySystem = data1;
-      this.load = false;
-      this.svPhysicalCount.getPhysicalCountForItem(item).subscribe(data2 => {
-        this.inventoryCount = data2;
-        this.load = false;
-      }, error => console.log(error));
-    }, error => console.log(error));
+    this.itemSelected = { item: item.item, ref: item.reference, unit : item.unit };
+
+    forkJoin({
+      system: this.svInvSnapshot.getInventorySnapshotForItem(item.item, item.unit),
+      physical: this.svPhysicalCount.getPhysicalCountForItem(item.item, item.unit)
+    })
+      .subscribe({
+        next: ({ system, physical }) => {
+          this.inventorySystem = system;
+          this.inventoryCount = physical;
+        },
+        error: err => {
+          console.error(err);
+        },
+        complete: () => {
+          this.load = false;
+        }
+      });
   }
 
+  //Función que calcula el total del inventario
   totalInventory = () => this.inventory.reduce((a, b) => a + b.subtotal, 0);
 
+  //Funcion que calculan el total del sistema
+  totalSystemInventoryForItem = (item : number, unit : string) => this.inventorySystem.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.quantity, 0);
 
+  //Función que calcula el total de la toma fisica
+  totalCountInventoryForItem = (item : number, unit : string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.quantity, 0);
 
+  //Funcion que calculan el total en pesos del inventario del sistema
+  valueSystemInventoryForItem = (item : number, unit : string) => this.inventorySystem.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
+
+  //Función que calcula el total en pesos de la toma fisica
+  valueCountInventoryForItem = (item : number, unit : string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
+
+  exportExcel(){
+    this.msj.mensajeAdvertencia('¡Funcionalidad en Desarrollo!');
+  }
+}
+
+export interface item {
+  item: number,
+  ref: string,
+  unit: string,
 }

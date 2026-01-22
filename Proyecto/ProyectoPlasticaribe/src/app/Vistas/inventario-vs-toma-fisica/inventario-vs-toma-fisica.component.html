@@ -1,6 +1,7 @@
 <div class="my-2 mb-3">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-sync"></i>
-        <b> Comparación de Inventario y toma fisica</b></h4>
+        <b> Comparación de Inventario y toma fisica</b>
+    </h4>
 </div>
 
 <p-table #table [resizableColumns]="true" columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm"
@@ -10,7 +11,7 @@
         <div class="row g-4">
             <div class="d-flex justify-content-end">
                 <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"
-                    class="p-button-success" id="exportar"></button>
+                    class="p-button-success" id="exportar" (clic)="exportExcel()"></button>
             </div>
         </div>
     </ng-template>
@@ -27,16 +28,32 @@
             </th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'diference', table)">
             </th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', table)">
+            </th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'quantity', table)">
             </th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', table)">
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'diference3', table)">
             </th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'count', table)">
             </th>
-            <th *ngIf="![86,4,12].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;"
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'diference2', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;"
                     (input)="applyFilter($event, 'price', table)"></th>
-            <th *ngIf="![86,4,12].includes(ValidarRol)"><input pInputText type="text" style="width: 100%;"
+            <th><input pInputText type="text" style="width: 100%;"
                     (input)="applyFilter($event, 'subtotal', table)"></th>
+        </tr>
+        <tr>
+            <th style="font-weight: 800;" class="text-center"></th>
+            <th style="font-weight: 800;" class="text-center textGreen" colspan="2"><i class="pi pi-box"></i> Producto</th>
+            <th style="font-weight: 800;" class="text-center textBlue" colspan="3"><i class="pi pi-sync"></i>
+                Inventario actual</th>
+                <th style="font-weight: 800;" class="text-center"></th>
+            <th style="font-weight: 800;" class="text-center textOrange" colspan="2"><i class="pi pi-database"></i>
+                Consolidado vs Detallado</th>
+            <th style="font-weight: 800;" class="text-center"></th>
+            <th style="font-weight: 800;" class="text-center textYellow"><i class="pi pi-eye"></i> Detallado vs Físico</th>
+            <th style="font-weight: 800;" class="text-center textRed" colspan="2"><i class="pi pi-dollar"></i> Valores</th>
         </tr>
         <tr style="font-size: 30px;">
             <th class="text-center">#</th>
@@ -49,12 +66,16 @@
                     field="physicalQty"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="diference" scope="col"> Diferencia <p-sortIcon
                     field="diference"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="quantity" scope="col"> Cant./Peso <p-sortIcon
-                    field="quantity"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="unit" scope="col">Presentación <p-sortIcon
+            <th class="text-center" pSortableColumn="unit" scope="col">Und <p-sortIcon
                     field="unit"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="quantity" scope="col"> Sumatoria <p-sortIcon
+                    field="quantity"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="diference3" scope="col"> Diferencia <p-sortIcon
+                    field="diference3"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="count" scope="col">Unidades <p-sortIcon field="count"></p-sortIcon>
             </th>
+            <th class="text-center" pSortableColumn="diference2" scope="col"> Diferencia <p-sortIcon
+                    field="diference3"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="price" scope="col">Precio <p-sortIcon field="price"></p-sortIcon>
             </th>
             <th class="text-center" pSortableColumn="subtotal" scope="col">Subtotal <p-sortIcon
@@ -62,37 +83,42 @@
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
-        <tr class="cursor" (dblclick)="loadDetailsInventory(inv.item)" pTooltip="Doble clic para ver más sobre {{inv.item}} - {{inv.reference }}">
+        <tr class="cursor" (dblclick)="loadDetailsInventory(inv)"
+            pTooltip="Doble clic para ver más sobre {{inv.item}} - {{inv.reference }}">
             <td class="text-center">{{rowIndex + 1}}</td>
             <td class="text-center"><b>{{inv.item}}</b></td>
             <td class="text-center">{{inv.reference }}</td>
-            <td class="text-center">{{inv.stock | number}}</td>
+            <td class="text-center"><b>{{inv.stock | number}}</b></td>
             <td class="text-center">{{ inv.physicalQty | number }}</td>
             <td class="text-center"
                 [ngClass]="{ 'textRed' : inv.diference != 0, 'textGreen' : inv.diference == 0, 'textYellow' : inv.physicalQty > inv.stock }">
                 <b>{{ inv.diference | number }}</b>
             </td>
-            <td class="text-center">{{ inv.quantity | number }}</td>
             <td>{{inv.unit}}</td>
+            <td class="text-center"><b>{{ inv.quantity | number }}</b></td>
+            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference3 != 0, 'textGreen' : inv.diference3 == 0, }">{{ inv.diference3 | number }}</td>
+            
             <td class="text-center"><b>{{inv.count | number : '1.2-2'}}</b></td>
-            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center">$ {{inv.price | number : '1.2-2'}}
+            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference2 != 0, 'textGreen' : inv.diference2 == 0, }"><b>{{inv.diference2 | number : '1.2-2'}}</b></td>
+            <td class="text-center">$ {{inv.price | number : '1.2-2'}}
             </td>
-            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center"><b>$ {{inv.subtotal | number :
+            <td class="text-center"><b>$ {{inv.subtotal | number :
                     '1.2-2'}}</b></td>
         </tr>
     </ng-template>
     <ng-template pTemplate="footer">
         <tr>
-            <td colspan="10" class="text-right">Total</td>
-            <td *ngIf="![86,4,12].includes(ValidarRol)" class="text-center textBlue">$ {{totalInventory() | number :
+            <td colspan="12" class="text-right">Total</td>
+            <td class="text-center textBlue">$ {{totalInventory() | number :
                 '1.2-2'}}</td>
         </tr>
     </ng-template>
 </p-table>
 
 <!--* Modal de inventario detallado -->
-<p-dialog header="Rollos/Bultos disponibles de {{0}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="modal"
-    [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Rollos/Bultos disponibles de {{itemSelected.item}} - {{itemSelected.ref}}"
+    [contentStyle]="{'overflow':'visible'}" [(visible)]="modal" [modal]="true" [style]="{ width: '95vw' }"
+    [draggable]="false" [resizable]="false">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
     </div>
     <div class="row g-4">
@@ -126,6 +152,8 @@
                         <th><input pInputText type="text" style="width: 100%;"
                                 (input)="applyFilter($event, 'price', tableSystem)"></th>
                         <th><input pInputText type="text" style="width: 100%;"
+                                (input)="applyFilter($event, 'subTotal', tableSystem)"></th>
+                        <th><input pInputText type="text" style="width: 100%;"
                                 (input)="applyFilter($event, 'location', tableSystem)"></th>
                         <th><input pInputText type="text" style="width: 100%;"
                                 (input)="applyFilter($event, 'process', tableSystem)"></th>
@@ -139,14 +167,18 @@
                         <th class="text-center" pSortableColumn="ot"><p-sortIcon field="ot"></p-sortIcon> OT</th>
                         <th class="text-center" pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon>
                             Cliente</th>
-                        <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cant./Peso
+                        <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon>
+                            Stock
                         </th>
                         <th class="text-center" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon>
                             Precio</th>
-                        <th class="text-center" pSortableColumn="location"><p-sortIcon field="location"></p-sortIcon> Ubicación
+                        <th class="text-center" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon>
+                            Subtotal</th>
+                        <th class="text-center" pSortableColumn="location"><p-sortIcon field="location"></p-sortIcon>
+                            Ubicación
                         </th>
-                        <th class="text-center" pSortableColumn="process"><p-sortIcon
-                                field="presentation"></p-sortIcon> Proceso</th>
+                        <th class="text-center" pSortableColumn="process"><p-sortIcon field="presentation"></p-sortIcon>
+                            Proceso</th>
                         <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha
                         </th>
                     </tr>
@@ -154,27 +186,32 @@
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                     <tr>
                         <td class="text-center">{{rowIndex + 1}}</td>
-                        <td class="text-center"><b>{{data.label}}</b></td>
-                        <td class="text-center">{{data.ot }}</td>
+                        <td class="text-center">{{data.label}}</td>
+                        <td class="text-center"><b>{{data.ot }}</b></td>
                         <td class="">{{data.client}}</td>
-                        <td class="text-center">{{ data.quantity | number}}</td>
+                        <td class="text-center textGreen"><b>{{ data.quantity | number}}</b></td>
                         <td class="text-center">{{ data.price | number }}</td>
-                        <td class="text-center"><b>{{ data.location }}</b></td>
-                        <td class="text-center">{{ data.process }}</td>
-                        <td class="text-center"><b>{{ data.date | date : 'dd/MM/yyyy'}}</b></td>
+                        <td class="text-center"><b>{{ data.subTotal | number }}</b></td>
+                        <td class="text-center">{{ data.location }}</td>
+                        <td class="text-center"><b>{{ data.process }}</b></td>
+                        <td class="text-center">{{ data.date | date : 'dd/MM/yyyy'}}</td>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <h6 class="bold">No existen rollos/bultos asociados.</h6>
                         </td>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="footer">
                     <tr>
-                        <td colspan="6" class="text-right">Cantidad Total</td>
-                        <td class="text-center">{{0 | number : '1.2-2'}}</td>
+                        <td colspan="4" class="text-right">Total</td>
+                        <td class="text-center">{{totalSystemInventoryForItem(itemSelected.item, itemSelected.unit) |
+                            number}}</td>
+                        <th></th>
+                        <td class="text-center">{{valueSystemInventoryForItem(itemSelected.item, itemSelected.unit) |
+                            number}}</td>
                         <td colspan="3" class="text-center"></td>
                     </tr>
                 </ng-template>
@@ -211,6 +248,8 @@
                         <th><input pInputText type="text" style="width: 100%;"
                                 (input)="applyFilter($event, 'price', tableCount)"></th>
                         <th><input pInputText type="text" style="width: 100%;"
+                                (input)="applyFilter($event, 'subTotal', tableCount)"></th>
+                        <th><input pInputText type="text" style="width: 100%;"
                                 (input)="applyFilter($event, 'location', tableCount)"></th>
                         <th><input pInputText type="text" style="width: 100%;"
                                 (input)="applyFilter($event, 'process', tableCount)"></th>
@@ -225,28 +264,33 @@
                         <th class="text-center" pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon>
                             Cliente</th>
                         <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon>
-                            Cant./Peso</th>
+                            Stock</th>
                         <th class="text-center" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon>
                             Precio</th>
+                        <th class="text-center" pSortableColumn="subTotal"><p-sortIcon field="subtotal"></p-sortIcon>
+                            Subtotal
+                        </th>
                         <th class="text-center" pSortableColumn="location"><p-sortIcon field="location"></p-sortIcon>
                             Ubicación</th>
                         <th class="text-center" pSortableColumn="process"><p-sortIcon field="presentation"></p-sortIcon>
                             Proceso</th>
                         <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha
                         </th>
+
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                     <tr>
                         <td class="text-center">{{rowIndex + 1}}</td>
-                        <td class="text-center"><b>{{data.label}}</b></td>
-                        <td class="text-center">{{data.ot }}</td>
+                        <td class="text-center">{{data.label}}</td>
+                        <td class="text-center"><b>{{data.ot }}</b></td>
                         <td class="">{{data.client}}</td>
-                        <td class="text-center">{{ data.quantity | number }}</td>
-                        <td class="text-center">{{ data.price | number}}</td>
-                        <td class="text-center"><b>{{ data.location }}</b></td>
-                        <td class="text-center">{{ data.process }}</td>
-                        <td class="text-center"><b>{{ data.date | date : 'dd/MM/yyyy' }}</b></td>
+                        <td class="text-center textGreen"><b>{{ data.quantity | number}}</b></td>
+                        <td class="text-center">{{ data.price | number }}</td>
+                        <td class="text-center"><b>{{ data.subTotal | number }}</b></td>
+                        <td class="text-center">{{ data.location }}</td>
+                        <td class="text-center"><b>{{ data.process }}</b></td>
+                        <td class="text-center">{{ data.date | date : 'dd/MM/yyyy'}}</td>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="emptymessage">
@@ -258,8 +302,12 @@
                 </ng-template>
                 <ng-template pTemplate="footer">
                     <tr>
-                        <td colspan="6" class="text-right">Cantidad Total</td>
-                        <td class="text-center">{{0 | number : '1.2-2'}}</td>
+                        <td colspan="4" class="text-right">Total</td>
+                        <td class="text-center">{{totalCountInventoryForItem(itemSelected.item, itemSelected.unit) |
+                            number}}</td>
+                        <th></th>
+                        <td class="text-center">{{valueCountInventoryForItem(itemSelected.item, itemSelected.unit) |
+                            number}}</td>
                         <td colspan="3" class="text-center"></td>
                     </tr>
                 </ng-template>

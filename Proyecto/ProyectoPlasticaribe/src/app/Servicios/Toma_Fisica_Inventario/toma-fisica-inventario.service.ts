@@ -16,5 +16,8 @@ export class TomaFisicaInventarioService {
 
     getPhysicalInventory = (roll : number, process : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Toma_Fisica_Inventario/getPhysicalInventory/${roll}/${process}`);
 
-    getPhysicalCountForItem = (item : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Toma_Fisica_Inventario/getPhysicalCountForItem/${item}`);
-}
+    getPhysicalCountForItem = (item : number, unit : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Toma_Fisica_Inventario/getPhysicalCountForItem/${item}/${unit}`);
+
+    getMovPhysicalCount = (date1 : any, date2 : any, url : string = ``) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Toma_Fisica_Inventario/getMovPhysicalCount/${date1}/${date2}${url}`);
+
+  }

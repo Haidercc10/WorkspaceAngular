@@ -13,5 +13,5 @@ export class InventariosService {
 
     getInventorySnapshot = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Inventarios/getInventorySnapshot');
 
-    getInventorySnapshotForItem = (item : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Inventarios/getInventorySnapshotForItem/${item}`);
+    getInventorySnapshotForItem = (item : number, unit : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Inventarios/getInventorySnapshotForItem/${item}/${unit}`);
 }

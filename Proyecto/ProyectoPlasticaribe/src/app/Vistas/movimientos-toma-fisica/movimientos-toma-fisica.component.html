@@ -1,0 +1,155 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+    <div style="margin: auto;">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="getMovements()">
+    <div class="row g-4 my-4">
+        <!--* START DATE -->
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl col-xxl">
+            <span class="p-float-label">
+                <p-calendar formControlName="date1" inputId="date1" [showIcon]="true"></p-calendar>
+                <label for="date1">Fecha Inicial</label>
+            </span>
+        </div>
+
+        <!--* END DATE -->
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl col-xxl">
+            <span class="p-float-label">
+                <p-calendar formControlName="date2" inputId="date2" [showIcon]="true"></p-calendar>
+                <label for="date2">Fecha Final</label>
+            </span>
+        </div>
+
+        <!-- * OT -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="ot" [useGrouping]="false" inputId="ot"
+                    [required]="true"></p-inputNumber>
+                <label for="ot">OT</label>
+            </span>
+        </div>
+
+        <!--* ITEM -->
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-3 col-xxl-3">
+            <span class="p-float-label">
+                <input formControlName="reference" id="prod" list="producto" type="text" pInputText
+                    (change)="selectedProduct()" (keydown)="searchProduct()" />
+                <datalist id="producto">
+                    <option value={{item.prod_Id}} *ngFor="let item of items">{{item.prod_Nombre}}</option>
+                </datalist>
+                <label for="prod">Referencia</label>
+            </span>
+        </div>
+
+        <!--* CLIENT -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+            <span class="p-input-icon-left p-float-label">
+                <i class="pi pi-search"></i>
+                <input formControlName="client" id="client" list="list" type="text" pInputText required
+                    (keyup)="searchClientsByName()" (change)="selectClient()" />
+                <datalist id="list">
+                    <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
+                </datalist>
+                <label for="client">Cliente*</label>
+            </span>
+        </div>
+
+        <!--* USER -->
+        <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+                <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre"
+                    optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                <label for="user">Usuario Autoriza*</label>
+            </span>
+        </div>
+    </div>
+    <!--* Botones -->
+    <div class="row my-4">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+                (click)="clearFields()"></button>
+            <button pButton class="p-button-success" type="button" label="Exportar" icon="pi pi-file-excel" (click)="exportExcel()"></button>
+        </div>
+    </div>
+</form>
+
+<!--* table-->
+<p-table #table [value]="movements" columnResizeMode="expand" [resizableColumns]="true" styleClass="p-datatable-sm"
+    responsiveLayout="scroll" [rowHover]="true" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" [scrollable]="true"
+    scrollHeight="50rem" dataKey="production">
+    <ng-template pTemplate="header">
+        <tr class="font-size-16">
+            <th></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot')">
+            </th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'label')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'quantity')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'location')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'state')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'user')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'zeus')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hour')"></th>
+        </tr>
+        <tr>
+            <th>#</th>
+            <th class="text-center" pSortableColumn="ot"><p-sortIcon field="ot"></p-sortIcon>
+                OT</th>
+            <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
+            <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia
+            </th>
+            <th class="text-center" pSortableColumn="label"><p-sortIcon field="label"></p-sortIcon> Etiqueta</th>
+            <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cant.</th>
+            <th class="text-center" pSortableColumn="unit"><p-sortIcon field="unit"></p-sortIcon> Und.
+            </th>
+            <th class="text-center" pSortableColumn="process"><p-sortIcon field="process"></p-sortIcon> Proceso</th>
+            <th class="text-center" pSortableColumn="location"><p-sortIcon field="location"></p-sortIcon> Ubicación
+            </th>
+            <th class="text-center" pSortableColumn="state"><p-sortIcon field="state"></p-sortIcon> Estado
+            </th>
+            <th class="text-center" pSortableColumn="zeus"><p-sortIcon field="zeus"></p-sortIcon> Zeus</th>
+            <th class="text-center" pSortableColumn="user"><p-sortIcon field="user"></p-sortIcon> Usuario</th>
+            <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
+            <th class="text-center" pSortableColumn="hour"><p-sortIcon field="hour"></p-sortIcon> Hora</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr class="cursor">
+            <td class="text-center">{{rowIndex + 1 | number}}</td>
+            <td class="text-center"><b>{{data.ot}}</b></td>
+            <td class="text-center">{{data.item}}</td>
+            <td><b>{{data.reference}}</b></td>
+            <td class="text-center">{{data.label}}</td>
+            <td class="text-center"><b>{{data.quantity | number: '1.2-2'}}</b></td>
+            <td class="text-center">{{data.unit}}</td>
+            <td class="text-center"><b>{{data.process}}</b></td>
+            <td class="text-center">{{data.location}}</td>
+            <td class="text-center">
+                <span class="badge" [ngClass]="{'bg-success1': data.state == 'DISPONIBLE', 
+                                        'bg-danger1': data.state == 'NO DISPONIBLE', 
+                                        'bg-danger2': data.state == 'PELETIZADO', 
+                                        'bg-danger3': data.state == 'ELIMINADO', 
+                                        'bg-azul': data.state == 'FACTURADO', 
+                                        'bg-warning1': data.state == 'REEMPAQUE', 
+                                        'bg-warning2': data.state == 'REEMPACADO', 
+                                        'bg-secondary1' : data.state == 'DEVUELTO', 
+                                        'bg-blue3' : data.state == 'DEVUELTO CONFORME',
+                                        'bg-blue2' : data.state == 'EN REPOSICION',
+                                        'bg-blue4' : data.state == 'PRECARGADO',
+                                       }">{{data.state}}</span>
+            </td>
+            <td class="text-center"> {{data.zeus}}</td>
+            <td class="text-center"> <b>{{data.user}}</b></td>
+            <td class="text-center"> {{data.date | date : 'dd-MM-yyyy'}}</td>
+            <td class="text-center">{{data.hour}}</td>
+        </tr>
+    </ng-template>
+</p-table>
