@@ -16,6 +16,7 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { Table } from 'primeng/table';
 import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
 import { s } from '@fullcalendar/core/internal-common';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Component({
   selector: 'app-TomaFisicaInventario',
@@ -55,6 +56,8 @@ export class TomaFisicaInventarioComponent implements OnInit {
     private messageService: MessageService,
     private clients: SedeClienteService,
     private svPhysicalCount: TomaFisicaInventarioService,
+    private svExcel: CreacionExcelService,
+
   ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
@@ -151,18 +154,18 @@ export class TomaFisicaInventarioComponent implements OnInit {
     //let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
     //if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     //else {
-      this.productionProcessSerivce.GetInformationAboutProduction(production, process).subscribe(data => {
-        if (data[0].proceso.proceso_Id != 'WIKE') {
-          //this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
-            this.sendProductionZeus.push(data[0]);
-            let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-            this.sendProductionZeus[i].pp.numero_RolloBagPro = production;
-            this.sendProductionZeus[i].position = this.sendProductionZeus.length + 1;
-            this.savePhysicalInventory(this.sendProductionZeus[i]);
-            this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
-          //});
-        } else this.msj.mensajeAdvertencia(`¡No puede ingresar rollos/bultos provenientes del procesos 'WIKETIADO'!`);
-      }, () => this.lookingForDataInBagpro(production));
+    this.productionProcessSerivce.GetInformationAboutProduction(production, process).subscribe(data => {
+      if (data[0].proceso.proceso_Id != 'WIKE') {
+        //this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+        this.sendProductionZeus.push(data[0]);
+        let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+        this.sendProductionZeus[i].pp.numero_RolloBagPro = production;
+        this.sendProductionZeus[i].position = this.sendProductionZeus.length + 1;
+        this.savePhysicalInventory(this.sendProductionZeus[i]);
+        this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
+        //});
+      } else this.msj.mensajeAdvertencia(`¡No puede ingresar rollos/bultos provenientes del procesos 'WIKETIADO'!`);
+    }, () => this.lookingForDataInBagpro(production));
     //}
   }
 
@@ -242,7 +245,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
   }
 
   savePhysicalInventory(production: any) {
-    let p : any = production;
+    let p: any = production;
     if (p) {
       let inventory: TomaFisicaInventario = {
         'Tfi_NumeroRollo': p.pp.numero_Rollo,
@@ -667,6 +670,124 @@ export class TomaFisicaInventarioComponent implements OnInit {
 
   //Función para filtrar la tabla de rollos a eliminar.
   applyFilter = ($event, campo: any, valorCampo: string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  //Función que exportará un formato excel con los datos de los clientes
+  exportExcel() {
+    if (this.sendProductionZeus.length > 0) {
+      setTimeout(() => { this.loadSheetAndStyles(this.sendProductionZeus); }, 500);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data: any) {
+    let title: any = `Toma fisica de Inventario`;
+    title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet: any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5',];
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:K3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws: any) {
+    [2, 3, 5, 7, 8, 11,].forEach(x => ws.getColumn(x).width = 12);
+    [4,6].forEach(x => ws.getColumn(x).width = 50);
+    [1].forEach(x => ws.getColumn(x).width = 8);
+    [9, 10].forEach(x => ws.getColumn(x).width = 20);
+  }
+
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader() {
+    let headerRow = [
+      'N°',
+      'Rollo/Bulto',
+      'OT',
+      'Cliente',
+      'Item',
+      'Referencia.',
+      'Cant./Peso',
+      'Peso bruto',
+      'Unidad',
+      'Proceso',
+      'Zeus',
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
+    let contador: any = 6;
+    let formatNumber: Array<number> = [7,8];
+    formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',];
+
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data: any) {
+    let info: any = [];
+    let count: number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.pp.numeroRollo_BagPro,
+        x.pp.ot,
+        x.clientes.cli_Nombre,
+        x.producto.prod_Id,
+        x.producto.prod_Nombre,
+        ['Und', 'Paquete'].includes(x.pp.presentacion) ? x.pp.cantidad : x.pp.peso_Neto,
+        x.pp.peso_Bruto,
+        x.pp.presentacion,
+        x.proceso.proceso_Nombre,
+        x.pp.envio_Zeus ? 'SI' : 'NO',
+      ]);
+    });
+    return info;
+  }
 }
 
 export interface TomaFisicaInventario {
@@ -687,7 +808,7 @@ export interface TomaFisicaInventario {
   Tfi_Hora: any,
   UsuaRegistro_Id: number,
   Tfi_Ubicacion: string,
-  Tipo_Inventario : string,
-  TpBod_Id : number,
+  Tipo_Inventario: string,
+  TpBod_Id: number,
   Tfi_Observacion?: string,
 }

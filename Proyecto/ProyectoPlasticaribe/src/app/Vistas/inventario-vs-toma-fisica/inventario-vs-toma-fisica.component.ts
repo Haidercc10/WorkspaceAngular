@@ -1,7 +1,9 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import moment from 'moment';
 import { Table } from 'primeng/table';
 import { forkJoin } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { InventariosService } from 'src/app/Servicios/Inventarios/inventarios.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
@@ -35,7 +37,8 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   constructor(private AppComponent: AppComponent,
     private svInvSnapshot: InventariosService,
     private svPhysicalCount: TomaFisicaInventarioService,
-    private msj: MensajesAplicacionService
+    private msj: MensajesAplicacionService,
+    private svExcel: CreacionExcelService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
@@ -105,8 +108,137 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   //Función que calcula el total en pesos de la toma fisica
   valueCountInventoryForItem = (item : number, unit : string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
 
-  exportExcel(){
-    this.msj.mensajeAdvertencia('¡Funcionalidad en Desarrollo!');
+  //Función que exportará un formato excel con los datos de los clientes
+  exportExcel() {
+    if (this.inventory.length > 0) {
+      setTimeout(() => { this.loadSheetAndStyles(this.inventory); }, 500);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
+
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data: any) {
+    let title: any = `Inventario vs Toma Fisica`;
+    title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet: any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5', 'P5', 'Q5', 'R5'];
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:R3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws: any) {
+    [11,2,].forEach(x => ws.getColumn(x).width = 10);
+    [4,5,6,7,8,9,10,11,12,13,14,15].forEach(x => ws.getColumn(x).width = 20);
+    [16,17,18].forEach(x => ws.getColumn(x).width = 25);
+    //[].forEach(x => ws.getColumn(x).width = 40);
+    [3].forEach(x => ws.getColumn(x).width = 50);
+  }
+
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader() {
+    let headerRow = [
+      'N°',
+      'Item',
+      'Referencia',
+      'Sistema',
+      'Fisico',
+      'Diferencia',
+      'Und',
+      'Precio Venta',
+      'Subtotal', 
+      'Cant. Detallada',
+      'Físico',
+      'Diferencia',
+      'Unds Detalladas',
+      'Unds Fisicas',
+      'Dif. Unidades',
+      'Sistema',
+      'Cant. Detallada',
+      'Diferencia',
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
+    let contador: any = 6;
+    let formatNumber: Array<number> = [4,5,6,8,9,10,11,12,13,14,15,16,17,18];
+    formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
+
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data: any) {
+    let info: any = [];
+    let count: number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.item,
+        x.reference,
+        x.stock,
+        x.physicalQty,
+        x.diference,
+        x.unit,
+        x.price,
+        x.subtotal,
+        x.quantity,
+        x.physicalQty,
+        x.diference2,
+        x.count,
+        x.physicalRollos,
+        x.diferenceUnits,
+        x.stock,
+        x.quantity,
+        x.diference3,
+      ]);
+    });
+    return info;
   }
 }
 

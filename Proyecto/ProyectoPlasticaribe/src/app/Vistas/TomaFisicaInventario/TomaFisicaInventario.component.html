@@ -57,8 +57,9 @@
 
 <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
   <!--<button pButton class="p-button-success m-2" type="button" label="Subir Producción" icon="pi pi-send" [disabled]="sendProductionZeus.length == 0" (click)="confirmSendData()"></button>-->
-  <button pButton class="p-button-danger m-2" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="sendProductionZeus.length == 0" (click)="fillDataProductionIncome()"></button>
-  <button pButton class="p-button-secondary m-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+  <button pButton class="p-button-danger mr-2" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="sendProductionZeus.length == 0" (click)="fillDataProductionIncome()"></button>
+  <button pButton class="p-button-secondary mr-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+  <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" [disabled]="sendProductionZeus.length == 0" (click)="exportExcel()"></button> 
 </div>
 
 <div class="mb-4">
@@ -75,6 +76,7 @@
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Id', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Nombre', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.cantidad', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.peso_Bruto', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.presentacion', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'proceso.proceso_Nombre', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'envio_Zeus', 'contains')"></th>

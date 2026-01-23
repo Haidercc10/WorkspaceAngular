@@ -101,7 +101,7 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   }
 
   //*USUARIOS
-  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 115, 3142, 7676, 5673].includes(x.usua_Id)); });
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 123456789, 115, 3142, 7676, 5673, 3163].includes(x.usua_Id)); });
 
   //*LIMPIEZA
   clearFields() {
@@ -231,6 +231,8 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
     let contador: any = 6;
+    let formatNumber: Array<number> = [6];
+    formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
 
     data.forEach(x => {

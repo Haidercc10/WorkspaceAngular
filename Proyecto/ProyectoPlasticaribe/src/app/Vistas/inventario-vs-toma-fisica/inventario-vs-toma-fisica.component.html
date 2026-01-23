@@ -11,7 +11,7 @@
         <div class="row g-4">
             <div class="d-flex justify-content-end">
                 <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"
-                    class="p-button-success" id="exportar" (clic)="exportExcel()"></button>
+                    class="p-button-success" id="exportar" (click)="exportExcel()"></button>
             </div>
         </div>
     </ng-template>
@@ -30,30 +30,43 @@
             </th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', table)">
             </th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'price', table)"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'subtotal', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'quantity', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'physicalQty', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'diference2', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'count', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;"
+                    (input)="applyFilter($event, 'physicalRollos', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;"
+                    (input)="applyFilter($event, 'diferenceUnits', table)">
+            </th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'stock', table)">
+            </th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'quantity', table)">
             </th>
             <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'diference3', table)">
             </th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'count', table)">
-            </th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'diference2', table)">
-            </th>
-            <th><input pInputText type="text" style="width: 100%;"
-                    (input)="applyFilter($event, 'price', table)"></th>
-            <th><input pInputText type="text" style="width: 100%;"
-                    (input)="applyFilter($event, 'subtotal', table)"></th>
+
         </tr>
         <tr>
             <th style="font-weight: 800;" class="text-center"></th>
-            <th style="font-weight: 800;" class="text-center textGreen" colspan="2"><i class="pi pi-box"></i> Producto</th>
-            <th style="font-weight: 800;" class="text-center textBlue" colspan="3"><i class="pi pi-sync"></i>
-                Inventario actual</th>
-                <th style="font-weight: 800;" class="text-center"></th>
-            <th style="font-weight: 800;" class="text-center textOrange" colspan="2"><i class="pi pi-database"></i>
-                Consolidado vs Detallado</th>
-            <th style="font-weight: 800;" class="text-center"></th>
-            <th style="font-weight: 800;" class="text-center textYellow"><i class="pi pi-eye"></i> Detallado vs Físico</th>
-            <th style="font-weight: 800;" class="text-center textRed" colspan="2"><i class="pi pi-dollar"></i> Valores</th>
+            <th style="font-weight: 800;" class="text-center textGreen" colspan="2"><i class="pi pi-box"></i>Información
+                Producto
+            </th>
+            <th style="font-weight: 800;" class="text-center textBlue" colspan="6"><i class="pi pi-sync"></i>
+                Inv. Sistema vs Fisico</th>
+            <th style="font-weight: 800;" colspan="6" class="text-center textYellow"><i class="pi pi-eye"></i>Inv.
+                Detallado vs Físico
+            </th>
+            <th style="font-weight: 800;" class="text-center textOrange" colspan="3"><i class="pi pi-database"></i>
+                Inv. Sistema vs Detallado</th>
         </tr>
         <tr style="font-size: 30px;">
             <th class="text-center">#</th>
@@ -64,22 +77,32 @@
             </th>
             <th class="text-center" pSortableColumn="physicalQty" scope="col"> Fisíco <p-sortIcon
                     field="physicalQty"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="diference" scope="col"> Diferencia <p-sortIcon
+            <th class="text-center" pSortableColumn="diference" scope="col"> Dif. <p-sortIcon
                     field="diference"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="unit" scope="col">Und <p-sortIcon
-                    field="unit"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="quantity" scope="col"> Sumatoria <p-sortIcon
-                    field="quantity"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="diference3" scope="col"> Diferencia <p-sortIcon
-                    field="diference3"></p-sortIcon></th>
-            <th class="text-center" pSortableColumn="count" scope="col">Unidades <p-sortIcon field="count"></p-sortIcon>
-            </th>
-            <th class="text-center" pSortableColumn="diference2" scope="col"> Diferencia <p-sortIcon
-                    field="diference3"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="unit" scope="col">Und <p-sortIcon field="unit"></p-sortIcon></th>
             <th class="text-center" pSortableColumn="price" scope="col">Precio <p-sortIcon field="price"></p-sortIcon>
             </th>
             <th class="text-center" pSortableColumn="subtotal" scope="col">Subtotal <p-sortIcon
                     field="subtotal"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="quantity" scope="col"> Cant. Detallada <p-sortIcon
+                    field="quantity"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="physicalQty" scope="col"> Fisíco <p-sortIcon
+                    field="physicalQty"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="diference2" scope="col"> Dif. <p-sortIcon
+                    field="diference3"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="count" scope="col"> Unds Detalladas<p-sortIcon
+                    field="count"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="physicalRollos" scope="col"> Unds Físicas<p-sortIcon
+                    field="PhysicalRollos"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="diferenceUnits" scope="col"> Dif. Unidades<p-sortIcon
+                    field="diferenceUnits"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="stock" scope="col">Sistema <p-sortIcon field="stock"></p-sortIcon>
+            </th>
+            <th class="text-center" pSortableColumn="quantity" scope="col"> Cant. Detallada <p-sortIcon
+                    field="quantity"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="diference3" scope="col"> Dif. <p-sortIcon
+                    field="diference3"></p-sortIcon></th>
+
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
@@ -87,30 +110,44 @@
             pTooltip="Doble clic para ver más sobre {{inv.item}} - {{inv.reference }}">
             <td class="text-center">{{rowIndex + 1}}</td>
             <td class="text-center"><b>{{inv.item}}</b></td>
-            <td class="text-center">{{inv.reference }}</td>
+            <td class="">{{inv.reference }}</td>
             <td class="text-center"><b>{{inv.stock | number}}</b></td>
             <td class="text-center">{{ inv.physicalQty | number }}</td>
             <td class="text-center"
-                [ngClass]="{ 'textRed' : inv.diference != 0, 'textGreen' : inv.diference == 0, 'textYellow' : inv.physicalQty > inv.stock }">
+                [ngClass]="{ 'textRed' : inv.diference != 0, 'textGreen' : inv.diference == 0, }">
                 <b>{{ inv.diference | number }}</b>
             </td>
             <td>{{inv.unit}}</td>
-            <td class="text-center"><b>{{ inv.quantity | number }}</b></td>
-            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference3 != 0, 'textGreen' : inv.diference3 == 0, }">{{ inv.diference3 | number }}</td>
-            
-            <td class="text-center"><b>{{inv.count | number : '1.2-2'}}</b></td>
-            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference2 != 0, 'textGreen' : inv.diference2 == 0, }"><b>{{inv.diference2 | number : '1.2-2'}}</b></td>
-            <td class="text-center">$ {{inv.price | number : '1.2-2'}}
+            <td class="text-center">$ {{inv.price | number}}
             </td>
-            <td class="text-center"><b>$ {{inv.subtotal | number :
-                    '1.2-2'}}</b></td>
+            <td class="text-center"><b>$ {{inv.subtotal | number
+                    }}</b></td>
+            <td class="text-center">{{ inv.quantity | number }}</td>
+            <td class="text-center">{{ inv.physicalQty | number }}</td>
+            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference2 != 0, 'textGreen' : inv.diference2 == 0, }">
+                <b>{{inv.diference2 | number}}</b>
+            </td>
+            <td class="text-center">
+                {{inv.count | number}}
+            </td>
+            <td class="text-center"> {{inv.physicalRollos | number}}</td>
+            <td class="text-center"
+                [ngClass]="{ 'textRed' : inv.diferenceUnits != 0, 'textGreen' : inv.diferenceUnits == 0, }">
+                <b>{{inv.diferenceUnits | number}}</b>
+            </td>        
+            <td class="text-center">{{inv.stock | number}}</td>
+            <td class="text-center">{{ inv.quantity | number }}</td>
+            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference3 != 0, 'textGreen' : inv.diference3 == 0, }">
+                <b>{{ inv.diference3 | number }}</b>
+            </td>
         </tr>
     </ng-template>
     <ng-template pTemplate="footer">
         <tr>
-            <td colspan="12" class="text-right">Total</td>
+            <td colspan="8" class="text-right">Total</td>
             <td class="text-center textBlue">$ {{totalInventory() | number :
                 '1.2-2'}}</td>
+            <td colspan="8"></td>
         </tr>
     </ng-template>
 </p-table>
