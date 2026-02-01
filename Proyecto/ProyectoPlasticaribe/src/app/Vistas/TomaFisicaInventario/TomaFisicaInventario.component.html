@@ -4,52 +4,136 @@
   </div>
 </div>
 
-<div class="mb-4">
-  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-wrench"></i> Cargar Inventario</h4>
+<div class="mb-5">
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-wrench"></i> <b> Cargar
+      Inventario</b></h4>
+</div>
+<!--Form 1 -->
+<form [formGroup]="form">
+  <div class="row g-4">
+
+    <!--* Código -->
+    <div class="col-sm-12 col-md-6 col-xl-2">
+      <span class=" p-float-label">
+        <input pInputText formControlName="id" inputId="id" autocomplete="off" type="number" [readonly]="true" />
+        <label for="id">*Código</label>
+      </span>
+    </div>
+
+    <!--* Descripción -->
+    <div class="col-sm-12 col-md-6 col-xl-3">
+      <span class="p-float-label">
+        <p-dropdown formControlName="description" inputId="description" [autoDisplayFirst]="false" [editable]="true"
+          [options]="inventories" optionLabel="toma_Descripcion" optionValue="toma_Id" [filter]="true" id="description"
+          filterBy="toma_Descripcion" (onChange)="selectToma()"></p-dropdown>
+        <label for="fail">*Nombre</label>
+      </span>
+    </div>
+
+    <!--* Tipo -->
+    <div class="col-sm-12 col-md-6 col-xl-2">
+      <span class="p-float-label">
+        <p-dropdown formControlName="type" inputId="user" [options]="inventoryTypes" [autoDisplayFirst]="false"
+          [required]="true" [filter]="true"></p-dropdown>
+        <label for="user">*Tipo Inv.</label>
+      </span>
+    </div>
+
+    <!--* Bodega -->
+    <div class="col-sm-12 col-md-6 col-xl-2">
+      <span class="p-float-label">
+        <p-dropdown formControlName="warehouse" inputId="user" [options]="wareHouses" [autoDisplayFirst]="false"
+          [required]="true" [filter]="true" optionLabel="tpBod_Nombre" optionValue="tpBod_Id"></p-dropdown>
+        <label for="user">*Bodega</label>
+      </span>
+    </div>
+
+    <!--* Inventario Snapshot-->
+    <div class="col-sm-12 col-md-6 col-xl-3">
+      <span class="p-float-label">
+        <p-dropdown formControlName="idInvSnapshot" inputId="user" [options]="snapshots" [autoDisplayFirst]="false"
+          [filter]="true" optionLabel="invSnap_Descripcion" optionValue="invSnap_Id"></p-dropdown>
+        <label for="user">*Inventario asociado</label>
+      </span>
+    </div>
+
+    <!--*Observacion-->
+    <!--<div class="col-sm-12 col-md-6 col-xl-12">
+      <span class="p-float-label">
+        <textarea formControlName="observation" [rows]="1" inputId="observation" pInputTextarea></textarea>
+        <label for="observation">Observación</label>
+      </span>
+    </div>-->
+
+    <!--* Botones-->
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger mr-2" type="button" (click)="confirmation()" label="Crear Toma"
+        id="button-create" [disabled]="!form.valid || form.value.id" icon="pi pi-check-square"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" id="button-clean"
+        icon="pi pi-eraser" (click)="clearFields()"></button>
+    </div>
+  </div>
+</form>
+
+<p-divider></p-divider>
+
+<!--Form 2-->
+<div class="mb-5">
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-database"></i> <b>
+      Escanear producción</b></h4>
 </div>
 
-<div class="row my-5 g-4 justify-content-center">
+<div class="row mb-3 g-4 justify-content-center">
   <div class="col-sm-12 col-md-2">
     <span class="p-float-label">
-      <input type="text" id="ReelBarsCode" pInputText autocomplete="off" pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="validateUbicationSelected()" />
+      <input type="text" id="ReelBarsCode" pInputText autocomplete="off" pAutoFocus [autofocus]="true"
+        [(ngModel)]="productionSearched" (keyup.enter)="validateUbicationSelected()" [readonly]="!createdToma" />
       <label for="ReelBarsCode">Rollo Leído</label>
     </span>
   </div>
 
   <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
     <span class="p-float-label">
-      <p-dropdown [(ngModel)]="storehouseSelected" id="bodegas" optionValue="id" [autoDisplayFirst]="false" [options]="storehouse" optionLabel="nombre" (onChange)="getUbicationByStorehouse()"></p-dropdown>
+      <p-dropdown [(ngModel)]="storehouseSelected" id="bodegas" optionValue="id" [autoDisplayFirst]="false"
+        [options]="storehouse" optionLabel="nombre" (onChange)="getUbicationByStorehouse()"
+        [readonly]="!createdToma"></p-dropdown>
       <label for="bodegas">Bodega</label>
     </span>
   </div>
 
   <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
     <span class="p-float-label">
-      <p-dropdown [(ngModel)]="ubicationSelected" id="ubication" optionValue="nombreCompleto" [autoDisplayFirst]="false" [options]="ubicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getSubUbicationByStorehouse()"></p-dropdown>
+      <p-dropdown [(ngModel)]="ubicationSelected" id="ubication" optionValue="nombreCompleto" [autoDisplayFirst]="false"
+        [options]="ubicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getSubUbicationByStorehouse()"
+        [readonly]="!createdToma"></p-dropdown>
       <label for="ubication">Ubicación</label>
     </span>
   </div>
 
   <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
     <span class="p-float-label">
-      <p-dropdown [(ngModel)]="subUbicationSelected" id="subUbication" optionValue="idSubUbicacion" [autoDisplayFirst]="false" [options]="subUbicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getCubesBySubUbication()"></p-dropdown>
+      <p-dropdown [(ngModel)]="subUbicationSelected" id="subUbication" optionValue="idSubUbicacion"
+        [autoDisplayFirst]="false" [options]="subUbicationsStorehouse" optionLabel="nombreCompleto"
+        (onChange)="getCubesBySubUbication()" [readonly]="!createdToma"></p-dropdown>
       <label for="subUbication">Sub Ubicación</label>
     </span>
   </div>
 
   <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
     <span class="p-float-label">
-      <p-dropdown [(ngModel)]="cubeSelected" id="cube" optionValue="idCubo" [autoDisplayFirst]="false" [options]="cubes" optionLabel="idCubo"></p-dropdown>
+      <p-dropdown [(ngModel)]="cubeSelected" id="cube" optionValue="idCubo" [autoDisplayFirst]="false" [options]="cubes"
+        optionLabel="idCubo" [readonly]="!createdToma"></p-dropdown>
       <label for="cube">Cubos</label>
     </span>
   </div>
 
   <div class="col-sm-12 col-md-6 col-xl-2" id="iva">
     <div class="field-checkbox my-2 mx-4">
-      <p-triStateCheckbox [(ngModel)]="searchIn" inputId="tricheckbox"></p-triStateCheckbox>
+      <p-triStateCheckbox [(ngModel)]="searchIn" inputId="tricheckbox" [readonly]="!createdToma"></p-triStateCheckbox>
       <label for="tricheckbox">
         <p-chip [label]="searchIn == null ? 'Todos' : searchIn ? 'Extrusión/Empaque' : 'Sellado'"
-                [icon]="searchIn == null ? 'pi pi-sync' : searchIn ? 'pi pi-bolt' : 'pi pi-box'"></p-chip>
+          [icon]="searchIn == null ? 'pi pi-sync' : searchIn ? 'pi pi-bolt' : 'pi pi-box'"></p-chip>
       </label>
     </div>
   </div>
@@ -57,29 +141,41 @@
 
 <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
   <!--<button pButton class="p-button-success m-2" type="button" label="Subir Producción" icon="pi pi-send" [disabled]="sendProductionZeus.length == 0" (click)="confirmSendData()"></button>-->
-  <button pButton class="p-button-danger mr-2" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="sendProductionZeus.length == 0" (click)="fillDataProductionIncome()"></button>
-  <button pButton class="p-button-secondary mr-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
-  <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" [disabled]="sendProductionZeus.length == 0" (click)="exportExcel()"></button> 
+  <button pButton class="p-button-danger mr-2" type="button" label="Exportar PDF" icon="pi pi-file-pdf"
+    [disabled]="sendProductionZeus.length == 0" (click)="fillDataProductionIncome()"></button>
+  <button pButton class="p-button-secondary mr-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+    (click)="clearFields()"></button>
+  <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel"
+    [disabled]="sendProductionZeus.length == 0" (click)="exportExcel()"></button>
 </div>
 
 <div class="mb-4">
-  <p-table #dtDetailed [value]="sendProductionZeus" columnResizeMode="expand" styleClass="p-datatable-sm p-datatable-gridlines"
-    responsiveLayout="scroll" [rowHover]="true" [showCurrentPageReport]="true"
-    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" [scrollable]="true"
-    scrollHeight="50rem" [resizableColumns]="true">
+  <p-table #dtDetailed [value]="sendProductionZeus" columnResizeMode="expand"
+    styleClass="p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll" [rowHover]="true"
+    [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
+    [scrollable]="true" scrollHeight="50rem" [resizableColumns]="true">
     <ng-template pTemplate="header">
       <tr id="filtros">
         <th></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.numeroRollo_BagPro', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;"
+            (input)="applyFilter($event, 'pp.numeroRollo_BagPro', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.ot', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'clientes.cli_Nombre', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Id', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Nombre', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.cantidad', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.peso_Bruto', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.presentacion', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'proceso.proceso_Nombre', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'envio_Zeus', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;"
+            (input)="applyFilter($event, 'clientes.cli_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;"
+            (input)="applyFilter($event, 'producto.prod_Id', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;"
+            (input)="applyFilter($event, 'producto.prod_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.cantidad', 'contains')">
+        </th>
+        <th><input pInputText type="text" style="width: 100%;"
+            (input)="applyFilter($event, 'pp.peso_Bruto', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;"
+            (input)="applyFilter($event, 'pp.presentacion', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;"
+            (input)="applyFilter($event, 'proceso.proceso_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'envio_Zeus', 'contains')">
+        </th>
         <th></th>
       </tr>
       <tr>
@@ -106,7 +202,14 @@
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
         <td class="text-center">{{data.producto.prod_Id}}</td>
         <td class="text-center">{{data.producto.prod_Nombre}}</td>
-        <td class="text-center">{{(['Und', 'Paquete'].includes(data.pp.presentacion) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
+        <td class="text-center">{{
+          ['Und', 'Paquete'].includes(data.pp.presentacion)
+          ? (
+          ['SELLA', 'EMP'].includes(data.proceso.proceso_Id)
+          ? data.pp.cantidad
+          : data.pp.peso_Neto
+          )
+          : data.pp.peso_Neto | number : '1.2-2'}}</td>
         <td class="text-center">{{data.pp.peso_Bruto}}</td>
         <td class="text-center">{{data.pp.presentacion}}</td>
         <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
@@ -122,7 +225,7 @@
   </p-table>
 </div>
 
-<p-toast position="center" key="SaveData" (onClose)="onReject()" [baseZIndex]="5000">
+<p-toast position="center" key="SaveData" (onClose)="onReject('delete')" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">
     <div class="flex flex-column" style="flex: 1">
       <div class="text-center">
@@ -136,7 +239,30 @@
             class="p-button-warning" pTooltip="Los rollos también serán eliminados de BagPro."></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No"
+          <button type="button" pButton (click)="onReject('delete')" icon="pi pi-times" label="No"
+            class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!--Confirmacion-->
+<p-toast position="center" key="confirm" (onClose)="onReject('close')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton icon="pi pi-check" label="Sí" (click)="saveHeaderPhysicalCount()"
+            class="p-button-warning" pTooltip="{{msgTooltip}}"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject('close')"
             class="p-button-secondary"></button>
         </div>
       </div>

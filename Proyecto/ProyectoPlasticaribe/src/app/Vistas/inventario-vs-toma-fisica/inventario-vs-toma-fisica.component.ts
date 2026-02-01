@@ -4,6 +4,7 @@ import { Table } from 'primeng/table';
 import { forkJoin } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { InventarioSnapshotService } from 'src/app/Servicios/Inventario_Snapshot/inventario-snapshot.service';
 import { InventariosService } from 'src/app/Servicios/Inventarios/inventarios.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
@@ -31,7 +32,9 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   ValidarRol: number;
   loading: boolean;
   modal: boolean = false;
-  itemSelected: item = { item: 0, ref: '', unit : '' };
+  itemSelected: item = { item: 0, ref: '', unit: '' };
+  inventories: any = [];
+  countInventory: any;
 
 
   constructor(private AppComponent: AppComponent,
@@ -39,13 +42,15 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
     private svPhysicalCount: TomaFisicaInventarioService,
     private msj: MensajesAplicacionService,
     private svExcel: CreacionExcelService,
+    private svSnapshot: InventarioSnapshotService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.getInventory();
+    //this.getInventory();
+    this.getInventoriesAdd();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -60,10 +65,22 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
 
   //Función que obtiene el inventario en snapshot
   getInventory() {
+    if (this.countInventory) {
     this.loading = true;
-    this.svInvSnapshot.getInventorySnapshot().subscribe(res => {
-      this.inventory = res;
-      this.loading = false;
+      this.svInvSnapshot.getInventorySnapshot(this.countInventory).subscribe(res => {
+        this.inventory = res;
+        this.loading = false;
+      }, error => {
+        console.log(error);
+        this.loading = false;
+      })
+    }
+
+  }
+
+  getInventoriesAdd() {
+    this.svSnapshot.getInventoriesSnapshot().subscribe(data => {
+      this.inventories = data;
     }, error => {
       console.log(error);
     })
@@ -73,7 +90,7 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   loadDetailsInventory(item: any) {
     this.modal = true;
     this.load = true;
-    this.itemSelected = { item: item.item, ref: item.reference, unit : item.unit };
+    this.itemSelected = { item: item.item, ref: item.reference, unit: item.unit };
 
     forkJoin({
       system: this.svInvSnapshot.getInventorySnapshotForItem(item.item, item.unit),
@@ -97,16 +114,16 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   totalInventory = () => this.inventory.reduce((a, b) => a + b.subtotal, 0);
 
   //Funcion que calculan el total del sistema
-  totalSystemInventoryForItem = (item : number, unit : string) => this.inventorySystem.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.quantity, 0);
+  totalSystemInventoryForItem = (item: number, unit: string) => this.inventorySystem.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.quantity, 0);
 
   //Función que calcula el total de la toma fisica
-  totalCountInventoryForItem = (item : number, unit : string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.quantity, 0);
+  totalCountInventoryForItem = (item: number, unit: string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.quantity, 0);
 
   //Funcion que calculan el total en pesos del inventario del sistema
-  valueSystemInventoryForItem = (item : number, unit : string) => this.inventorySystem.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
+  valueSystemInventoryForItem = (item: number, unit: string) => this.inventorySystem.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
 
   //Función que calcula el total en pesos de la toma fisica
-  valueCountInventoryForItem = (item : number, unit : string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
+  valueCountInventoryForItem = (item: number, unit: string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
 
   //Función que exportará un formato excel con los datos de los clientes
   exportExcel() {
@@ -162,9 +179,9 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
 
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws: any) {
-    [11,2,].forEach(x => ws.getColumn(x).width = 10);
-    [4,5,6,7,8,9,10,11,12,13,14,15].forEach(x => ws.getColumn(x).width = 20);
-    [16,17,18].forEach(x => ws.getColumn(x).width = 25);
+    [11, 2,].forEach(x => ws.getColumn(x).width = 10);
+    [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].forEach(x => ws.getColumn(x).width = 20);
+    [16, 17, 18].forEach(x => ws.getColumn(x).width = 25);
     //[].forEach(x => ws.getColumn(x).width = 40);
     [3].forEach(x => ws.getColumn(x).width = 50);
   }
@@ -180,7 +197,7 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
       'Diferencia',
       'Und',
       'Precio Venta',
-      'Subtotal', 
+      'Subtotal',
       'Cant. Detallada',
       'Físico',
       'Diferencia',
@@ -197,7 +214,7 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
     let contador: any = 6;
-    let formatNumber: Array<number> = [4,5,6,8,9,10,11,12,13,14,15,16,17,18];
+    let formatNumber: Array<number> = [4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
     formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
 

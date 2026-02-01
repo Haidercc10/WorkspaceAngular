@@ -4,17 +4,23 @@
     </h4>
 </div>
 
+<p-toolbar styleClass="mb-2">
+    <ng-template pTemplate="left">
+        <p-dropdown optionLabel="invSnap_Descripcion" [(ngModel)]="countInventory" optionValue="invSnap_Id"
+            [options]="inventories" placeholder="Elige un inventario" (onChange)="getInventory()"
+            pTooltip="Aquí podrás elegir el inventario y ver la trazabilidad del mismo" />
+    </ng-template>
+    <ng-template pTemplate="center">
+    </ng-template>
+    <ng-template pTemplate="right">
+        <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"
+            class="p-button-success" id="exportar" (click)="exportExcel()"></button>
+    </ng-template>
+</p-toolbar>
+
 <p-table #table [resizableColumns]="true" columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm"
     responsiveLayout="scroll" [rowHover]="true" [loading]="loading" [value]="inventory" [scrollable]="true"
     scrollHeight="50rem">
-    <ng-template pTemplate="caption">
-        <div class="row g-4">
-            <div class="d-flex justify-content-end">
-                <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"
-                    class="p-button-success" id="exportar" (click)="exportExcel()"></button>
-            </div>
-        </div>
-    </ng-template>
     <ng-template pTemplate="header" style="font-size: 30px;">
         <tr id="filtros">
             <th></th>
@@ -57,15 +63,15 @@
         </tr>
         <tr>
             <th style="font-weight: 800;" class="text-center"></th>
-            <th style="font-weight: 800;" class="text-center textGreen" colspan="2"><i class="pi pi-box"></i>Información
+            <th style="font-weight: 800;" class="text-center textGreen" colspan="2"><i class="pi pi-box"></i> Información
                 Producto
             </th>
             <th style="font-weight: 800;" class="text-center textBlue" colspan="6"><i class="pi pi-sync"></i>
                 Inv. Sistema vs Fisico</th>
-            <th style="font-weight: 800;" colspan="6" class="text-center textYellow"><i class="pi pi-eye"></i>Inv.
+            <th style="font-weight: 800;" colspan="6" class="text-center textYellow"><i class="pi pi-eye"></i> Inv.
                 Detallado vs Físico
             </th>
-            <th style="font-weight: 800;" class="text-center textOrange" colspan="3"><i class="pi pi-database"></i>
+            <th style="font-weight: 800;" class="text-center textOrange" colspan="3"><i class="pi pi-database"></i> 
                 Inv. Sistema vs Detallado</th>
         </tr>
         <tr style="font-size: 30px;">
@@ -113,8 +119,7 @@
             <td class="">{{inv.reference }}</td>
             <td class="text-center"><b>{{inv.stock | number}}</b></td>
             <td class="text-center">{{ inv.physicalQty | number }}</td>
-            <td class="text-center"
-                [ngClass]="{ 'textRed' : inv.diference != 0, 'textGreen' : inv.diference == 0, }">
+            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference != 0, 'textGreen' : inv.diference == 0, }">
                 <b>{{ inv.diference | number }}</b>
             </td>
             <td>{{inv.unit}}</td>
@@ -134,7 +139,7 @@
             <td class="text-center"
                 [ngClass]="{ 'textRed' : inv.diferenceUnits != 0, 'textGreen' : inv.diferenceUnits == 0, }">
                 <b>{{inv.diferenceUnits | number}}</b>
-            </td>        
+            </td>
             <td class="text-center">{{inv.stock | number}}</td>
             <td class="text-center">{{ inv.quantity | number }}</td>
             <td class="text-center" [ngClass]="{ 'textRed' : inv.diference3 != 0, 'textGreen' : inv.diference3 == 0, }">

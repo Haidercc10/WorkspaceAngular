@@ -130,13 +130,6 @@ export class PedidoExternoComponent implements OnInit {
       ProdUltFacturacion: [null, Validators.required],
       ProdStock: [null, Validators.required],
       ProdFechaEnt: [null, Validators.required],
-      material: [null, Validators.required],
-      pigment: [null, Validators.required],
-      printing: [false],
-      printingDouble: [false],
-      embobinate: [null,],
-      treaty: [false,],
-      caliber: [null, Validators.required],
     });
 
     this.formProdTerminado = this.frmBuilderPedExterno.group({
@@ -151,7 +144,14 @@ export class PedidoExternoComponent implements OnInit {
       format: [null, Validators.required],
       width: [null, Validators.required],
       long: [null, Validators.required],
-      bellow: [null, Validators.required]
+      bellow: [null, Validators.required], 
+      material: [null, Validators.required],
+      pigment: [null, Validators.required],
+      printing: [false],
+      printingDouble: [false],
+      embobinate: [null,],
+      treaty: [false,],
+      caliber: [null, Validators.required],
     })
   }
 

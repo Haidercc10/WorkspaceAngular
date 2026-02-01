@@ -6,19 +6,29 @@
 
 <form [formGroup]="form" (ngSubmit)="getMovements()">
     <div class="row g-4 my-4">
-        <!--* START DATE -->
+
+        <!--* START DATE 
         <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl col-xxl">
             <span class="p-float-label">
                 <p-calendar formControlName="date1" inputId="date1" [showIcon]="true"></p-calendar>
                 <label for="date1">Fecha Inicial</label>
             </span>
-        </div>
+        </div>-->
 
-        <!--* END DATE -->
+        <!--* END DATE 
         <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl col-xxl">
             <span class="p-float-label">
                 <p-calendar formControlName="date2" inputId="date2" [showIcon]="true"></p-calendar>
                 <label for="date2">Fecha Final</label>
+            </span>
+        </div>-->
+
+        <!--* INVENTARIO -->
+        <div class="col-sm-12 col-md-6 col-xl-3">
+            <span class="p-float-label">
+                <p-dropdown formControlName="inventory" inputId="inventory" [options]="inventories" optionLabel="invSnap_Descripcion"
+                    optionValue="invSnap_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                <label for="inventory">Inventario asociado*</label>
             </span>
         </div>
 
@@ -44,7 +54,7 @@
         </div>
 
         <!--* CLIENT -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
             <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-search"></i>
                 <input formControlName="client" id="client" list="list" type="text" pInputText required

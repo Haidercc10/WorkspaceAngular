@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -15,8 +15,13 @@ import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos'
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { Table } from 'primeng/table';
 import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
-import { s } from '@fullcalendar/core/internal-common';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TomaFisicaService } from 'src/app/Servicios/Toma_Fisica/toma-fisica.service';
+import { modelToma_Fisica } from 'src/app/Modelo/modelToma_Fisica';
+import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
+import { InventarioSnapshotService } from 'src/app/Servicios/Inventario_Snapshot/inventario-snapshot.service';
+
 
 @Component({
   selector: 'app-TomaFisicaInventario',
@@ -44,6 +49,19 @@ export class TomaFisicaInventarioComponent implements OnInit {
   dataSearched: Array<dataDesp> = [];
   searchIn: any = null;
   @ViewChild('dtDetailed') dtDetailed: Table | undefined;
+  form !: FormGroup;
+  createdToma: boolean = false;
+  inventoryTypes: any = ['GENERAL', 'CICLICO', 'AUDITORÍA'];
+  inventories: any = [];
+  wareHouses: any = [];
+  modal: boolean = false;
+  @ViewChild('ReelBarsCode') ReelBarsCode!: ElementRef<HTMLInputElement>;
+  private focusInterval: any;
+  message: string = '';
+  msgTooltip: string = '';
+  associatedInventory: any = [];
+  snapshots: any = [];
+  statuses: any = [];
 
   constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,
@@ -57,27 +75,47 @@ export class TomaFisicaInventarioComponent implements OnInit {
     private clients: SedeClienteService,
     private svPhysicalCount: TomaFisicaInventarioService,
     private svExcel: CreacionExcelService,
-
+    private formBuilder: FormBuilder,
+    private svCount: TomaFisicaService,
+    private svMsg: MessageService,
+    private svWareHouses: TipoBodegaService,
+    private svSnapshot: InventarioSnapshotService,
   ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
+    this.loadForm();
   }
 
   ngOnInit(): void {
     this.readStorage();
     this.getStorehouse();
-    this.focusInput(false);
+    this.startFocus();
+    this.getWareHouses();
+    this.getPhysicalCountActive();
+    this.getInventoriesAdd();
   }
 
   ngOnDestroy(): void {
-    this.focusInput(true);
+    this.stopFocus();
   }
 
-  focusInput(destroy: boolean) {
-    let time = setInterval(() => {
-      let preInBarsCode = document.getElementById('ReelBarsCode');
-      if (!destroy && preInBarsCode) preInBarsCode.focus();
-      else if (destroy) clearInterval(time);
+  startFocus() {
+    this.focusInterval = setInterval(() => {
+      const active = document.activeElement as HTMLElement;
+      const isTyping =
+        active &&
+        (active.tagName === 'INPUT' ||
+          active.tagName === 'TEXTAREA' ||
+          active.tagName === 'SELECT' ||
+          active.isContentEditable);
+
+      if (!isTyping) {
+        this.ReelBarsCode?.nativeElement.focus();
+      }
     }, 1000);
+  }
+
+  stopFocus() {
+    clearInterval(this.focusInterval);
   }
 
   readStorage() {
@@ -95,7 +133,107 @@ export class TomaFisicaInventarioComponent implements OnInit {
     this.subUbicationSelected = null;
     this.cubes = [];
     this.cubeSelected = null;
+    this.createdToma = false;
+    this.form.reset();
+    this.onReject('close');
   }
+
+  getWareHouses = () => this.svWareHouses.getAll().subscribe(data => {
+    this.wareHouses = data.filter(x => [3, 13].includes(x.tpBod_Id));
+  });
+
+  getInventoriesAdd() {
+    this.svSnapshot.getInventoriesSnapshot().subscribe(data => {
+      this.snapshots = data;
+    }, error => {
+      console.log(error);
+    })
+  }
+
+  //Función que 
+  loadForm() {
+    this.form = this.formBuilder.group({
+      id: [null,],
+      idInvSnapshot: [null,],
+      description: [null, Validators.required],
+      type: [null, Validators.required],
+      warehouse: [null, Validators.required],
+      observation: [null,],
+    });
+  }
+
+  getPhysicalCountActive() {
+    this.svCount.getTomasFisicas().subscribe(data => {
+      this.inventories = data;
+    }, error => {
+      this.msj.mensajeAdvertencia(`Error`, `Error al cargar las tomas fisicas activas ${error.message}`);
+    })
+  }
+
+  //Función 
+  headerPhysicalCount() {
+    //let wareHouse : string = this.wareHouses.filter(x => x.tpBod_Id == this.form.value.warehouse).map(x => x.tpBod_Nombre).toString();
+    let model: modelToma_Fisica = {
+      InvSnap_Id: this.form.value.idInvSnapshot,
+      Toma_Descripcion: this.form.value.description, //`TOMA ${this.form.value.type} ${wareHouse} ${moment().format('YYYY-MM-DD')} ${moment().format('HH:mm:ss')}` ,
+      Tipo_Inventario: this.form.value.type,
+      TpBod_Id: this.form.value.warehouse,
+      Toma_FechaCreacion: moment().format('YYYY-MM-DD'),
+      Toma_HoraCreacion: moment().format('HH:mm:ss'),
+      Usua_Id: this.storage_Id,
+      Estado_Id: 1,
+      Toma_Observacion: this.form.value.description,
+    }
+    return model
+  }
+
+  //Función PARA
+  saveHeaderPhysicalCount() {
+    this.onReject('confirm');
+    this.svCount.Post(this.headerPhysicalCount()).subscribe(data => {
+      this.msj.mensajeConfirmacion(`Toma ${data.toma_Descripcion} creada exitosamente`);
+      this.clearFields();
+      this.getPhysicalCountActive();
+    }, error => {
+      this.msj.mensajeError(`Error`, `Error al momento de crear la toma fisica | ${error.message} ${error.statusText}`)
+    });
+  }
+
+  //Función que 
+  selectToma() {
+    let code: number = this.form.value.description;
+    let toma: any = this.inventories.find(x => x.toma_Id == code);
+    console.log(toma);
+
+    if (toma) {
+      if (toma) {
+        this.form.patchValue({
+          'id': toma.toma_Id,
+          'description': toma.toma_Descripcion,
+          'type': toma.tipo_Inventario,
+          'warehouse': toma.tpBod_Id,
+          'observation': toma.toma_Observacion == null ? '' : toma.toma_Observacion,
+          'idInvSnapshot': toma.invSnap_Id
+        });
+        this.createdToma = true;
+      } else this.msj.mensajeAdvertencia(`Toma fisica N° ${code} no encontrada`);
+    }
+    //else {
+    //  this.msj.mensajeAdvertencia(`No se encontró una toma fisica con el código ${code}`);
+    //}
+  }
+
+  //Función 
+  confirmation() {
+    this.message = `¿Está seguro que desea crear una nueva toma física?`
+    this.msgTooltip = `Debe utilizar el código generado para toda la toma fisica.`
+
+    setTimeout(() => {
+      this.messageService.add({ severity: 'warn', key: 'confirm', summary: 'Elección', detail: this.message, sticky: true });
+    }, 200);
+  }
+
+  onReject = (action: string) => this.svMsg.clear(action);
 
   getStorehouse = () => this.storehouseService.GetBodegas().subscribe(data => this.storehouse = data);
 
@@ -172,6 +310,10 @@ export class TomaFisicaInventarioComponent implements OnInit {
   lookingForDataInBagpro(production: number) {
     let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLADO' : 'EXTRUSION';
     this.bagproService.GetProductionByNumber(production, searchInTable).subscribe(prod => {
+      console.log(
+        prod
+      );
+
       if (prod.length > 0) {
         if (prod[0].nomStatus != 'Wiketiado') {
           this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
@@ -182,13 +324,24 @@ export class TomaFisicaInventarioComponent implements OnInit {
                   numero_Rollo: prod[0].item,
                   numeroRollo_BagPro: prod[0].item,
                   presentacion: data[0].presentacion == 'Kilo' ? 'Kg' : data[0].presentacion == 'Unidad' ? 'Und' : 'Paquete',
-                  cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : data[0].presentacion == 'Kilo' ? 0 : 1,
+                  cantidad: ['Unidad', 'Paquete'].includes(data[0].presentacion)
+                    ? (
+                      ['SELLADO', 'EMPAQUE'].includes(prod[0].nomStatus)
+                        ? prod[0].qty
+                        : prod[0].peso ? prod[0].peso : prod[0].extnetokg
+                    )
+                    : prod[0].peso ? prod[0].peso : prod[0].extnetokg,
                   peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
                   peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
                   maquina: parseInt(prod[0].maquina),
                   fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00', '') : prod[0].fecha.replace('T00:00:00', ''),
                   hora: prod[0].hora,
-                  envio_Zeus: parseInt(prod[0].envioZeus),
+                  envio_Zeus: parseInt(prod[0].envioZeus) == 1 ? true : false,
+                  precioVenta_Producto: data[0].presentacion == 'Kilo' ? data[0].valorKg : prod[0].nomStatus.trim() == 'EXT' ? data[0].valorKg : data[0].valorUnidad,
+                  estado_Rollo: 19,
+                  proceso_Id: prod[0].nomStatus.trim() == 'SELLADO' ? 'SELLA' : prod[0].nomStatus.trim() == 'EMP' ? 'EMP' : 'EXT',
+                  prod_Id: data[0].id_Producto,
+                  cli_Id: cli.length > 0 ? cli[0].id_Cliente : 1,
                 },
                 producto: {
                   prod_Id: data[0].id_Producto,
@@ -223,7 +376,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
               let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
               this.sendProductionZeus[i].position = this.sendProductionZeus.length;
               this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
-              this.savePhysicalInventory(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
+              this.savePhysicalInventory(this.sendProductionZeus[i]);
             }, error => {
               console.log(error)
             });
@@ -247,14 +400,22 @@ export class TomaFisicaInventarioComponent implements OnInit {
   savePhysicalInventory(production: any) {
     let p: any = production;
     if (p) {
+      console.log(p.pp.presentacion, p.proceso.proceso_Id);
+
       let inventory: TomaFisicaInventario = {
         'Tfi_NumeroRollo': p.pp.numero_Rollo,
         'Tfi_Etiqueta': p.pp.numeroRollo_BagPro,
         'Tfi_OT': p.pp.ot,
         'Prod_Id': p.pp.prod_Id,
         'Cli_Id': p.pp.cli_Id,
-        'Tfi_CantidadReal': p.pp.presentacion == 'Kg' ? p.pp.peso_Neto : p.pp.cantidad,
-        'Tfi_PesoBruto': p.pp.peso_Neto,
+        'Tfi_CantidadReal': ['Und', 'Paquete'].includes(p.pp.presentacion)
+          ? (
+            ['SELLA', 'EMP'].includes(p.proceso.proceso_Id)
+              ? p.pp.cantidad
+              : p.pp.peso_Neto
+          )
+          : p.pp.peso_Neto,
+        'Tfi_PesoBruto': p.pp.peso_Bruto,
         'Presentacion': p.pp.presentacion,
         'Proceso_Id': p.pp.proceso_Id,
         'Estado_Rollo': p.pp.estado_Rollo,
@@ -264,14 +425,14 @@ export class TomaFisicaInventarioComponent implements OnInit {
         'Tfi_Hora': moment().format('HH:mm:ss'),
         'UsuaRegistro_Id': this.storage_Id,
         'Tfi_Ubicacion': this.setUbication(),
-        'Tipo_Inventario': 'GENERAL',
-        'TpBod_Id': 3
+        Toma_Id: this.form.value.id,
       }
       this.svPhysicalCount.Post(inventory).subscribe((data) => {
         this.msj.mensajeConfirmacion(`Rollo/bulto N° ${data.tfi_Etiqueta} registrado correctamente`, '');
         this.load = false;
       }, error => {
         this.msj.mensajeError(`Error al registrar el rollo/bulto ${inventory.Tfi_Etiqueta} en la toma fisica`, `| ${error.status, error.statusText}`);
+
         this.load = false;
       });
     } else {
@@ -314,10 +475,9 @@ export class TomaFisicaInventarioComponent implements OnInit {
     });
   }
 
-  onReject = () => this.messageService.clear('SaveData');
 
   sendDataToZeus() {
-    this.onReject();
+    this.onReject('delete');
     let count: number = 0;
     let sendProductionEnvioZeus: Array<any> = this.sendProductionZeus.filter(x => x.pp.envio_Zeus == 0);
     if (sendProductionEnvioZeus.length > 0) {
@@ -726,7 +886,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws: any) {
     [2, 3, 5, 7, 8, 11,].forEach(x => ws.getColumn(x).width = 12);
-    [4,6].forEach(x => ws.getColumn(x).width = 50);
+    [4, 6].forEach(x => ws.getColumn(x).width = 50);
     [1].forEach(x => ws.getColumn(x).width = 8);
     [9, 10].forEach(x => ws.getColumn(x).width = 20);
   }
@@ -752,7 +912,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
     let contador: any = 6;
-    let formatNumber: Array<number> = [7,8];
+    let formatNumber: Array<number> = [7, 8];
     formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',];
 
@@ -808,7 +968,6 @@ export interface TomaFisicaInventario {
   Tfi_Hora: any,
   UsuaRegistro_Id: number,
   Tfi_Ubicacion: string,
-  Tipo_Inventario: string,
-  TpBod_Id: number,
   Tfi_Observacion?: string,
+  Toma_Id: string;
 }

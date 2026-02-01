@@ -154,70 +154,7 @@
           </span>
         </div>
 
-        <!-- * Material -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
-          <span class="p-float-label">
-            <p-dropdown formControlName="material" inputId="material" optionValue="material_Id"
-              [autoDisplayFirst]="false" [options]="materials" optionLabel="material_Nombre"
-              [required]="true"></p-dropdown>
-            <label for="material">Material</label>
-          </span>
-        </div>
-
-        <!-- * Pigmento -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
-          <span class="p-float-label">
-            <p-dropdown formControlName="pigment" inputId="Pigmento" [options]="pigments"
-              optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true"
-              filterBy="pigmt_Nombre" [required]="true">
-              <i class="pi pi-circle-fill"></i>
-            </p-dropdown>
-            <label for="Pigmento">Pigmento</label>
-          </span>
-        </div>
-
-        <!-- * Calibre -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="caliber">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="caliber" mode="decimal" [min]="0" inputId="caliber"
-              [minFractionDigits]="2"></p-inputNumber>
-            <label for="caliber">Calibre</label>
-          </span>
-        </div>
-
-        <!--* Tratado -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
-          <div class="field-checkbox">
-            <p-checkbox formControlName="treaty" [binary]="true" inputId="treaty" id="treaty"></p-checkbox>
-            <label for="treaty">Tratado</label>
-          </div>
-        </div>
-
-        <!--* Impresion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
-          <div class="field-checkbox">
-            <p-checkbox formControlName="printing" [binary]="true" inputId="printing" id="printing"></p-checkbox>
-            <label for="printing">Impresión</label>
-          </div>
-        </div>
-
-        <!--* Impresion Doble Cara-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
-          <div class="field-checkbox">
-            <p-checkbox formControlName="printingDouble" [binary]="true" inputId="printingDouble"
-              id="printingDouble"></p-checkbox>
-            <label for="printingDouble">Impresión Doble Cara</label>
-          </div>
-        </div>
-
-        <!--* Embobinado -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1" id="precio">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="embobinate" [min]="0" inputId="embobinate"
-              [minFractionDigits]="2"></p-inputNumber>
-            <label for="embobinate"># Embobinado</label>
-          </span>
-        </div>
+        
 
         <!-- Cantidad Pedida -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="cantidad">
@@ -409,6 +346,72 @@
             <label for="tpSealed">Tipo Sellado</label>
           </span>
         </div>
+
+        <!-- * Material -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="material" inputId="material" optionValue="material_Id"
+              [autoDisplayFirst]="false" [options]="materials" optionLabel="material_Nombre"
+              [required]="true"></p-dropdown>
+            <label for="material">Material</label>
+          </span>
+        </div>
+
+        <!-- * Pigmento -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="pigment" inputId="Pigmento" [options]="pigments"
+              optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true"
+              filterBy="pigmt_Nombre" [required]="true">
+              <i class="pi pi-circle-fill"></i>
+            </p-dropdown>
+            <label for="Pigmento">Pigmento</label>
+          </span>
+        </div>
+
+        <!-- * Calibre -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="caliber">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="caliber" mode="decimal" [min]="0" inputId="caliber"
+              [minFractionDigits]="2"></p-inputNumber>
+            <label for="caliber">Calibre</label>
+          </span>
+        </div>
+
+        <!--* Tratado -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+          <div class="field-checkbox">
+            <p-checkbox formControlName="treaty" [binary]="true" inputId="treaty" id="treaty"></p-checkbox>
+            <label for="treaty">Tratado</label>
+          </div>
+        </div>
+
+        <!--* Impresion -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+          <div class="field-checkbox">
+            <p-checkbox formControlName="printing" [binary]="true" inputId="printing" id="printing"></p-checkbox>
+            <label for="printing">Impresión</label>
+          </div>
+        </div>
+
+        <!--* Impresion Doble Cara-->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+          <div class="field-checkbox">
+            <p-checkbox formControlName="printingDouble" [binary]="true" inputId="printingDouble"
+              id="printingDouble"></p-checkbox>
+            <label for="printingDouble">Impresión Doble Cara</label>
+          </div>
+        </div>
+
+        <!--* Embobinado -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1" id="precio">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="embobinate" [min]="0" inputId="embobinate"
+              [minFractionDigits]="2"></p-inputNumber>
+            <label for="embobinate"># Embobinado</label>
+          </span>
+        </div>
+
       </div>
     </div>
 

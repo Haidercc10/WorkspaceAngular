@@ -10,6 +10,7 @@ import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inven
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { InventarioSnapshotService } from 'src/app/Servicios/Inventario_Snapshot/inventario-snapshot.service';
 
 @Component({
   selector: 'app-movimientos-toma-fisica',
@@ -29,6 +30,7 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   @ViewChild('table') table: Table | undefined;
   clients: any = [];
   @ViewChild(Movimientos_RollosComponent) cmpMovRolls: Movimientos_RollosComponent;
+  inventories : any = [];
 
   constructor(private AppComponent: AppComponent,
     private svPhysicalCount: TomaFisicaInventarioService,
@@ -38,6 +40,7 @@ export class MovimientosTomaFisicaComponent implements OnInit {
     private svProducts: ProductoService,
     private svZeus: InventarioZeusService,
     private svExcel: CreacionExcelService,
+    private svSnapshot: InventarioSnapshotService,
   ) {
     this.initForm();
   }
@@ -46,6 +49,7 @@ export class MovimientosTomaFisicaComponent implements OnInit {
     this.readStorage();
     this.loadDate();
     this.getUsers();
+    this.getInventoriesAdd();
   }
 
   //Leer storage del navegador.
@@ -62,8 +66,7 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   //Función que inicializa el formulario
   initForm() {
     this.form = this.fmBuild.group({
-      date1: [null],
-      date2: [null],
+      inventory: [null],
       ot: [null],
       item: [null],
       reference: [null],
@@ -76,12 +79,13 @@ export class MovimientosTomaFisicaComponent implements OnInit {
 
   //Función que construye la url con los parámetros de búsqueda
   url = () => {
-    let url = `?`;
+    let url = ``;
     if (this.form.value.ot != null) url += `&ot=${this.form.value.ot}`;
     if (this.form.value.item != null) url += `&item=${this.form.value.item}`;
     if (this.form.value.client != null) url += `&client=${this.form.value.client}`;
     if (this.form.value.user != null) url += `&user=${this.form.value.user}`;
     if (this.form.value.location != null) url += `&location=${this.form.value.location}`;
+    url.length > 0 ? `?${url}` : url = ``;
     return url;
   }
 
@@ -89,9 +93,8 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   //Función que obtiene los movimientos de la toma fisica
   getMovements() {
     this.load = true;
-    let date1 = moment(this.form.value.date1).format('YYYY-MM-DD');
-    let date2 = moment(this.form.value.date2).format('YYYY-MM-DD');
-    this.svPhysicalCount.getMovPhysicalCount(date1, date2, this.url()).subscribe(res => {
+    let inv : number = this.form.value.inventory  
+    this.svPhysicalCount.getMovPhysicalCount(inv, this.url()).subscribe(res => {
       this.movements = res;
       this.load = false;
     }, err => {
@@ -106,6 +109,7 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   //*LIMPIEZA
   clearFields() {
     this.movements = [];
+    this.inventories = [];
     this.items = [];
     this.clients = [];
     this.form.reset();
@@ -113,6 +117,14 @@ export class MovimientosTomaFisicaComponent implements OnInit {
     this.loadDate();
   }
 
+  //Función
+  getInventoriesAdd() {
+    this.svSnapshot.getInventoriesSnapshot().subscribe(data => {
+      this.inventories = data;
+    }, error => {
+      console.log(error);
+    })
+  }
 
   //*PRODUCTOS
   //Función que busca los productos por medio del nombre

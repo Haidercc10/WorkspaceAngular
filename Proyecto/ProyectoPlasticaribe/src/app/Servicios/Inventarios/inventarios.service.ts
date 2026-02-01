@@ -11,7 +11,7 @@ export class InventariosService {
   
     constructor(private http : HttpClient,) { }
 
-    getInventorySnapshot = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Inventarios/getInventorySnapshot');
+    getInventorySnapshot = (inventory : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Inventarios/getInventorySnapshot/${inventory}`);
 
     getInventorySnapshotForItem = (item : number, unit : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Inventarios/getInventorySnapshotForItem/${item}/${unit}`);
 }

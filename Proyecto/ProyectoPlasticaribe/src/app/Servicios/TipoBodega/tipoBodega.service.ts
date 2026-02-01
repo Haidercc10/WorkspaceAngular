@@ -11,4 +11,7 @@ export class TipoBodegaService {
   constructor(private http : HttpClient,) { }
   
   srvObtenerListaPorId = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Bodega/${dato}`);
+
+  getAll = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Bodega`);
+
 }
