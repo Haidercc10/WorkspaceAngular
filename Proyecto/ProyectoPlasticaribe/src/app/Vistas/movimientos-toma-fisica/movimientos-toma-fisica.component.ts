@@ -29,8 +29,10 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   load: boolean = false;
   @ViewChild('table') table: Table | undefined;
   clients: any = [];
-  @ViewChild(Movimientos_RollosComponent) cmpMovRolls: Movimientos_RollosComponent;
-  inventories : any = [];
+  inventories: any = [];
+  traceability : boolean = false;
+  selectedRoll : number = 0;
+  @ViewChild(Movimientos_RollosComponent) cmpTraceability : Movimientos_RollosComponent;
 
   constructor(private AppComponent: AppComponent,
     private svPhysicalCount: TomaFisicaInventarioService,
@@ -80,12 +82,13 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   //Función que construye la url con los parámetros de búsqueda
   url = () => {
     let url = ``;
-    if (this.form.value.ot != null) url += `&ot=${this.form.value.ot}`;
-    if (this.form.value.item != null) url += `&item=${this.form.value.item}`;
-    if (this.form.value.client != null) url += `&client=${this.form.value.client}`;
-    if (this.form.value.user != null) url += `&user=${this.form.value.user}`;
-    if (this.form.value.location != null) url += `&location=${this.form.value.location}`;
-    url.length > 0 ? `?${url}` : url = ``;
+    if (this.form.value.ot != null) url.length > 0 ? url += `&ot=${this.form.value.ot}` : url += `ot=${this.form.value.ot}`;
+    if (this.form.value.item != null) url.length > 0 ? url += `&item=${this.form.value.item}` : url += `item=${this.form.value.item}`;
+    if (this.form.value.client != null) url.length > 0 ? url += `&client=${this.form.value.client}` : url += `client=${this.form.value.client}`;
+    if (this.form.value.user != null) url.length > 0 ? url += `&user=${this.form.value.user}` : url += `user=${this.form.value.user}`;
+    if (this.form.value.location != null) url.length > 0 ? url += `&location=${this.form.value.location}` : url += `location=${this.form.value.location}`;
+
+    if (url.length > 0) url = `?${url}`;
     return url;
   }
 
@@ -93,7 +96,7 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   //Función que obtiene los movimientos de la toma fisica
   getMovements() {
     this.load = true;
-    let inv : number = this.form.value.inventory  
+    let inv: number = this.form.value.inventory
     this.svPhysicalCount.getMovPhysicalCount(inv, this.url()).subscribe(res => {
       this.movements = res;
       this.load = false;
@@ -109,7 +112,6 @@ export class MovimientosTomaFisicaComponent implements OnInit {
   //*LIMPIEZA
   clearFields() {
     this.movements = [];
-    this.inventories = [];
     this.items = [];
     this.clients = [];
     this.form.reset();
@@ -157,6 +159,20 @@ export class MovimientosTomaFisicaComponent implements OnInit {
 
   //*FILTROS
   applyFilter = ($event, campo: any) => this.table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  //*Función para cargar el modal de movimientos.
+  searchMovements(data: any) {
+    //this.load = true;
+    setTimeout(() => {
+      this.traceability = true;
+      data.number_BagPro = data.label;
+      this.selectedRoll = data.label;
+      console.log(data);
+      this.cmpTraceability.searchMovements(data, `Producto Terminado`, data.labelPL);
+      //this.load = false;
+    }, 500);
+  }
+
 
   //Función que exportará un formato excel con los datos de los clientes
   exportExcel() {
@@ -212,10 +228,10 @@ export class MovimientosTomaFisicaComponent implements OnInit {
 
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws: any) {
-    [2,3,5,6,7,8,11,13,14].forEach(x => ws.getColumn(x).width = 12);
+    [2, 3, 5, 6, 7, 8, 11, 13, 14].forEach(x => ws.getColumn(x).width = 12);
     [4].forEach(x => ws.getColumn(x).width = 50);
     [1].forEach(x => ws.getColumn(x).width = 8);
-    [9,10].forEach(x => ws.getColumn(x).width = 20);
+    [9, 10].forEach(x => ws.getColumn(x).width = 20);
     [12].forEach(x => ws.getColumn(x).width = 30);
   }
 

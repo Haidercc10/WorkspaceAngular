@@ -8,6 +8,7 @@ import { InventarioSnapshotService } from 'src/app/Servicios/Inventario_Snapshot
 import { InventariosService } from 'src/app/Servicios/Inventarios/inventarios.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
+import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +36,9 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
   itemSelected: item = { item: 0, ref: '', unit: '' };
   inventories: any = [];
   countInventory: any;
-
+  traceability : boolean = false;
+  selectedRoll : number = 0;
+  @ViewChild(Movimientos_RollosComponent) cmpTraceability : Movimientos_RollosComponent;
 
   constructor(private AppComponent: AppComponent,
     private svInvSnapshot: InventariosService,
@@ -75,7 +78,6 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
         this.loading = false;
       })
     }
-
   }
 
   getInventoriesAdd() {
@@ -100,6 +102,8 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
         next: ({ system, physical }) => {
           this.inventorySystem = system;
           this.inventoryCount = physical;
+          this.inventorySystem.sort((a,b) => Number(a.label - b.label));
+          this.inventoryCount.sort((a,b) => Number(a.label - b.label));
         },
         error: err => {
           console.error(err);
@@ -124,6 +128,18 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
 
   //Función que calcula el total en pesos de la toma fisica
   valueCountInventoryForItem = (item: number, unit: string) => this.inventoryCount.filter(x => item == item && x.unit == unit).reduce((a, b) => a + b.subTotal, 0);
+
+  //*Función para cargar el modal de movimientos.
+  searchMovements(data : any){
+    //this.load = true;
+    setTimeout(() => {
+      this.traceability = true;
+      data.number_BagPro = data.label;
+      this.selectedRoll = data.label;
+      this.cmpTraceability.searchMovements(data, `Producto Terminado`, data.labelPL);
+      //this.load = false;
+    }, 500);
+  } 
 
   //Función que exportará un formato excel con los datos de los clientes
   exportExcel() {

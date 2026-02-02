@@ -6,11 +6,13 @@
 
 <p-toolbar styleClass="mb-2">
     <ng-template pTemplate="left">
+        <p-button id="iconos" icon="pi pi-refresh" class="mr-2" styleClass="p-button-rounded p-button-success"
+            (click)="getInventory()" pTooltip="Recargar inventario" tooltipPosition="top"></p-button>
+    </ng-template>
+    <ng-template pTemplate="center">
         <p-dropdown optionLabel="invSnap_Descripcion" [(ngModel)]="countInventory" optionValue="invSnap_Id"
             [options]="inventories" placeholder="Elige un inventario" (onChange)="getInventory()"
             pTooltip="Aquí podrás elegir el inventario y ver la trazabilidad del mismo" />
-    </ng-template>
-    <ng-template pTemplate="center">
     </ng-template>
     <ng-template pTemplate="right">
         <button pButton pRipple label="Exportar Excel" pTooltip="Exportar excel" icon="pi pi-file-excel"
@@ -63,7 +65,8 @@
         </tr>
         <tr>
             <th style="font-weight: 800;" class="text-center"></th>
-            <th style="font-weight: 800;" class="text-center textGreen" colspan="2"><i class="pi pi-box"></i> Información
+            <th style="font-weight: 800;" class="text-center textGreen" colspan="2"><i class="pi pi-box"></i>
+                Información
                 Producto
             </th>
             <th style="font-weight: 800;" class="text-center textBlue" colspan="6"><i class="pi pi-sync"></i>
@@ -71,7 +74,7 @@
             <th style="font-weight: 800;" colspan="6" class="text-center textYellow"><i class="pi pi-eye"></i> Inv.
                 Detallado vs Físico
             </th>
-            <th style="font-weight: 800;" class="text-center textOrange" colspan="3"><i class="pi pi-database"></i> 
+            <th style="font-weight: 800;" class="text-center textOrange" colspan="3"><i class="pi pi-database"></i>
                 Inv. Sistema vs Detallado</th>
         </tr>
         <tr style="font-size: 30px;">
@@ -119,7 +122,7 @@
             <td class="">{{inv.reference }}</td>
             <td class="text-center"><b>{{inv.stock | number}}</b></td>
             <td class="text-center">{{ inv.physicalQty | number }}</td>
-            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference != 0, 'textGreen' : inv.diference == 0, }">
+            <td class="text-center" [ngClass]="{ 'textRed' : inv.diference > 0, 'textGreen' : inv.diference == 0, 'textYellow' : inv.diference < 0, }">
                 <b>{{ inv.diference | number }}</b>
             </td>
             <td>{{inv.unit}}</td>
@@ -226,7 +229,7 @@
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-                    <tr>
+                    <tr class="cursor" (dblclick)="searchMovements(data)" pTooltip="Haz doble clic para ver la trazabilidad del rollo/bulto" tooltipPosition="top">
                         <td class="text-center">{{rowIndex + 1}}</td>
                         <td class="text-center">{{data.label}}</td>
                         <td class="text-center"><b>{{data.ot }}</b></td>
@@ -322,7 +325,7 @@
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-                    <tr>
+                    <tr class="cursor" (dblclick)="searchMovements(data)" pTooltip="Haz doble clic para ver la trazabilidad del rollo/bulto" tooltipPosition="top">
                         <td class="text-center">{{rowIndex + 1}}</td>
                         <td class="text-center">{{data.label}}</td>
                         <td class="text-center"><b>{{data.ot }}</b></td>
@@ -356,4 +359,9 @@
             </p-table>
         </div>
     </div>
+</p-dialog>
+
+<p-dialog header="Trazabilidad rollo/bulto N° {{selectedRoll}}" [(visible)]="traceability" [modal]="true"
+    [style]="{ width: '85vw' }" [resizable]="false">
+    <app-Movimientos_Rollos></app-Movimientos_Rollos>
 </p-dialog>

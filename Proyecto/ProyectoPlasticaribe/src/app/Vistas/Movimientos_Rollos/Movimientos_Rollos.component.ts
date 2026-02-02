@@ -52,7 +52,6 @@ export class Movimientos_RollosComponent implements OnInit {
 
   //Función para cargar el modal de movimientos.
   searchMovements(data : any, type : string, numberRollPL? : number){
-    console.log(data);
     this.movements = [];
     this.load = true;
     this.currentStatus = ``;
