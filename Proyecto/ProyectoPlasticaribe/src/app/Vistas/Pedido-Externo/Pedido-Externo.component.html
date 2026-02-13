@@ -153,9 +153,7 @@
             <label for="ProdNombre">Referencia</label>
           </span>
         </div>
-
         
-
         <!-- Cantidad Pedida -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="cantidad">
           <span class="p-float-label">
@@ -168,8 +166,8 @@
         <!-- Presentacion -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="presentacion">
           <span class="p-float-label">
-            <p-dropdown formControlName="ProdUnidadMedidaCant" inputId="Und" [autoDisplayFirst]="false" optionValue="undMed_Id"
-            optionLabel="undMed_Id" [options]="presentacion" [required]="true"></p-dropdown>
+            <p-dropdown formControlName="ProdUnidadMedidaCant" inputId="Und" [autoDisplayFirst]="false" optionValue=""
+            optionLabel="" [options]="presentacion" [required]="true"></p-dropdown>
             <label for="Und">Presentación</label>
           </span>
         </div>
@@ -213,7 +211,7 @@
         <!-- Ultima fecha Facturada -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-4" id="ultFecha">
           <span class="p-float-label">
-            <p-chip label="Ultima Fecha Facturada: {{fechaUltFacuracion}}" icon="pi pi-calendar"></p-chip>
+            <p-chip label="Última facturación: {{fechaUltFacuracion}}" icon="pi pi-calendar"></p-chip>
           </span>
         </div>
 

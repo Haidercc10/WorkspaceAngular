@@ -29,21 +29,11 @@
                   <label for="Cliente">Cliente</label>
                 </span>
               </div>
-
-              <!--<div class="col-sm-12 col-md-12 col-lg-3">
-                <span class="p-float-label">
-                  <input formControlName="Cliente" autocomplete="off" id="Nombre" list="clientes" type="text" pInputText required/>
-                  <datalist id="clientes">
-                    <option value={{item.razoncial}} *ngFor="let item of clientes">{{item.razoncial}} - {{item.idcliente}}</option>
-                  </datalist>
-                  <label for="Nombre">Cliente</label>
-                </span>
-              </div>-->
         
               <!-- VENDEDORES -->
-              <div class="col-sm-12 col-md-12 col-lg-3">
+              <div class="col-sm-12 col-md-12 col-lg-3" *ngIf="[1,69].includes(ValidarRol)">
                 <span class="p-float-label">
-                  <p-dropdown formControlName="Vendedor" id="Nombre" [autoDisplayFirst]="false" appendTo="body" [options]="vendedores" [showClear]="true"></p-dropdown>
+                  <p-dropdown formControlName="Vendedor" id="Nombre" [autoDisplayFirst]="false" appendTo="body" [options]="vendedores" [showClear]="true" ></p-dropdown>
                   <label for="Nombre">Vendedor</label>
                 </span>
               </div>

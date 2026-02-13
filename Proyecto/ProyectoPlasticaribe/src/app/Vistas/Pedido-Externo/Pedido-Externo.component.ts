@@ -144,7 +144,7 @@ export class PedidoExternoComponent implements OnInit {
       format: [null, Validators.required],
       width: [null, Validators.required],
       long: [null, Validators.required],
-      bellow: [null, Validators.required], 
+      bellow: [null, Validators.required],
       material: [null, Validators.required],
       pigment: [null, Validators.required],
       printing: [false],
@@ -248,18 +248,14 @@ export class PedidoExternoComponent implements OnInit {
   clienteSeleccionado() {
     let nombre: string = this.FormPedidoExternoClientes.value.PedClienteNombre;
     if (![null, '', undefined].includes(nombre)) {
-      this.clientesService.srvObtenerListaPorNombreCliente(nombre).subscribe(datos => {
-        datos.forEach(cli => {
-          this.FormPedidoExternoClientes.patchValue({
-            PedClienteNombre: cli.cli_Nombre,
-            PedClienteId: cli.cli_Id,
-          });
-          setTimeout(() => {
-            this.ciudadClienteComboBox();
-            this.productoCliente();
-          }, 100);
-        });
+      this.FormPedidoExternoClientes.patchValue({
+        'PedClienteNombre': nombre,
+        'PedClienteId': this.cliente.filter(x => x.cli_Nombre == nombre)[0].cli_Id,
       });
+      setTimeout(() => {
+        this.ciudadClienteComboBox();
+        this.productoCliente();
+      }, 100);
     }
   }
 
@@ -268,25 +264,26 @@ export class PedidoExternoComponent implements OnInit {
     this.LimpiarCamposProductos();
     this.sedeCliente = [];
     let cliente: any = this.FormPedidoExternoClientes.value.PedClienteId;
-    this.sedesClientesService.srvObtenerListaPorCliente(cliente).subscribe(datos_sedesClientes => {
-      this.ciudad = datos_sedesClientes.map(sede => sede.sedeCliente_Ciudad);
-      if (datos_sedesClientes.length <= 1) {
-        this.usuarioVende = datos_sedesClientes.map(x => x.usua_Nombre);
-        this.sedeCliente = datos_sedesClientes.map(x => x.sedeCliente_Direccion);
-        datos_sedesClientes.forEach(item => {
+    this.sedesClientesService.srvObtenerListaPorCliente(cliente).subscribe(data => {
+      this.ciudad = data.map(sede => sede.sedeCliente_Ciudad);
+      if (data.length <= 1) {
+        this.usuarioVende = data.map(x => x.usua_Nombre);
+        this.sedeCliente = data.map(x => x.sedeCliente_Direccion);
+        data.forEach(item => {
           this.FormPedidoExternoClientes.patchValue({
-            PedSedeCli_Id: item.sedeCliente_Direccion,
-            ciudad_sede: item.sedeCliente_Ciudad,
-            PedUsuarioNombre: item.usua_Nombre,
-            PedUsuarioId: item.usua_Id,
+            'PedSedeCli_Id': item.sedeCliente_Direccion,
+            'ciudad_sede': item.sedeCliente_Ciudad,
+            'PedUsuarioNombre': item.usua_Nombre,
+            'PedUsuarioId': item.usua_Id,
+            'PedDireccionEntrega': item.sedeCliente_Direccion,
           });
         });
         this.verificarCartera();
       } else {
-        this.usuarioVende.push(datos_sedesClientes[0].usua_Nombre);
+        this.usuarioVende.push(data[0].usua_Nombre);
         this.FormPedidoExternoClientes.patchValue({
-          PedUsuarioNombre: datos_sedesClientes[0].usua_Nombre,
-          PedUsuarioId: datos_sedesClientes[0].usua_Id,
+          'PedUsuarioNombre': data[0].usua_Nombre,
+          'PedUsuarioId': data[0].usua_Id,
         });
         this.sedeCliente = [];
       }
@@ -317,7 +314,7 @@ export class PedidoExternoComponent implements OnInit {
     if (direccionSede != null && ciudad != null && clienteNombre != null) {
       this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
         datos_sedeCliente.forEach(codBagpro => {
-          this.zeusCobtabilidadService.GetCarteraClientes(codBagpro.sedeCli_CodBagPro).subscribe(datos => {
+          this.zeusCobtabilidadService.GetCarteraClientes2(codBagpro.sedeCli_CodBagPro).subscribe(datos => {
             for (let i = 0; i < datos.length; i++) {
               if (this.validarFechasCartera(datos[i])) break;
             }
@@ -338,10 +335,13 @@ export class PedidoExternoComponent implements OnInit {
 
   validarFechasCartera(datos: any): boolean {
     let fechaRadicado: any = datos.fecha_Radicado == null ? datos.lapsO_DOC : datos.fecha_Radicado;
+
     let hoy = moment([moment().year(), moment().month(), moment().date()]);
     let fechaDocumento = moment([moment(fechaRadicado).year(), moment(fechaRadicado).month(), moment(fechaRadicado).date()]);
+
     if (hoy.diff(fechaDocumento, 'days') >= 70) {
-      this.msj.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
+      let dias: number = hoy.diff(fechaDocumento, 'days')
+      this.msj.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(dias)} días en cartera, no es posible crearle un pedido.`);
       this.limpiarTodosCampos();
       return true;
     } else return false;
@@ -358,53 +358,92 @@ export class PedidoExternoComponent implements OnInit {
   //Funcion encargada de buscar un producto por el id del producto
   buscarProducto(idProducto: any) {
     this.presentacion = [];
+
     if ([null, undefined, ''].includes(idProducto)) this.productoCliente();
-
-    this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
-      console.log(datos_existencis);
-
-      if (datos_existencis.length > 0) this.productoConExistencia(datos_existencis, idProducto);
-      else if (datos_existencis.length == 0) this.productoSinExistencia(idProducto);
+    this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(data => {
+      console.log(data);
+      if (data.length > 0) this.productoConExistencia(data, idProducto);
+      else if (data.length == 0) this.productoSinExistencia(idProducto);
     });
   }
 
   productoSinExistencia(idProducto: number) {
     let datos_producto = this.producto.filter(x => x.prod_Id == idProducto);
-    
+
     this.FormPedidoExternoProductos.patchValue({
       'ProdId': datos_producto[0].prod_Id,
       'ProdNombre': datos_producto[0].prod_Nombre,
       'ProdPrecioUnd': 0,
       'ProdUltFacturacion': 0,
       'ProdStock': 0,
-      'material': datos_producto[0].material_Id,
-      'pigment': datos_producto[0].pigmt_Id,
-      'caliber' : datos_producto[0].prod_Calibre
     });
+
+    this.formProdTerminado.patchValue({
+      margin : datos_producto[0].prod_Margen,
+      weightMillar : datos_producto[0].prod_Peso_Millar,
+      weightRoll : datos_producto[0].prod_Peso,
+      weightUnit : 0,
+      qtyBagxBulto : datos_producto[0].prod_CantBolsasBulto,
+      qtyBagxPaq : datos_producto[0].prod_CantBolsasPaquete,
+      tpSealed : datos_producto[0].tpSellado_Id,
+      tpPrinting : datos_producto[0].tpImpresion_Id,
+      format: datos_producto[0].tpProd_Id,
+      width: datos_producto[0].prod_Ancho,
+      long: datos_producto[0].prod_Largo,
+      bellow: datos_producto[0].prod_Fuelle,
+      material: datos_producto[0].material_Id,
+      pigment: datos_producto[0].pigmt_Id,
+      printing: '',
+      printingDouble: '',
+      embobinate: 0,
+      treaty: datos_producto[0].tratado_Id,
+      caliber: datos_producto[0].prod_Calibre,
+    })
   }
 
-  productoConExistencia(datos_existencis, idProducto: number) {
-    datos_existencis.forEach(exis => this.FormPedidoExternoProductos.patchValue({ ProdStock: parseFloat(exis.disponibles) }));
-    this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
-      this.presentacion = datos_prod.map(x => x.undMed_Id);
-      datos_prod.forEach(prod => {
-        this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), prod.undMed_Id).subscribe(datos_prodPedido => {
-          this.FormPedidoExternoProductos.patchValue({ ProdUltFacturacion: datos_prodPedido.precioUnidad | 0 });
-          this.fechaUltFacuracion = datos_prodPedido.fechaDocumento.replace('T00:00:00', '');
+  productoConExistencia(stock, idProducto: number) {
+    stock.forEach(exis => 
+      this.FormPedidoExternoProductos.patchValue({ 'ProdStock': parseFloat(exis.disponibles) }));
+      this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
+        this.presentacion = datos_prod.map(x => x.undMed_Id);
+        datos_prod.forEach(prod => {
+          //this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), prod.undMed_Id).subscribe(dataPed => {
+          //  this.FormPedidoExternoProductos.patchValue({ 'ProdUltFacturacion': dataPed.precioUnidad | 0 });
+          //  this.fechaUltFacuracion = dataPed.fechaDocumento.replace('T00:00:00', '');
+          //});
+          setTimeout(() => {
+            this.FormPedidoExternoProductos.patchValue({
+              'ProdId': prod.prod_Id,
+              'ProdNombre': prod.prod_Nombre,
+              'ProdUnidadMedidaCant': prod.undMed_Id,
+              'ProdPrecioUnd': prod.exProd_PrecioVenta,
+            });
+            console.log(prod);
+            
+            this.formProdTerminado.patchValue({
+              margin : prod.prod_Margen,
+              weightMillar : prod.prod_Peso_Millar,
+              weightRoll : prod.prod_Peso,
+              weightUnit : 0,
+              qtyBagxBulto : prod.prod_CantBolsasBulto,
+              qtyBagxPaq : prod.prod_CantBolsasPaquete,
+              tpSealed : prod.tpSellado_Id,
+              tpPrinting : prod.tpImpresion_Id,
+              format: prod.tpProd_Id,
+              width: prod.prod_Ancho,
+              long: prod.prod_Largo,
+              bellow: prod.prod_Fuelle,
+              material: prod.material_Id,
+              pigment: prod.pigmt_Id,
+              printing: '',
+              printingDouble: '',
+              embobinate: 0,
+              treaty: prod.tratado_Id,
+              caliber: prod.prod_Calibre,
+            })
+          }, 1000);
         });
-        setTimeout(() => {
-          this.FormPedidoExternoProductos.patchValue({
-            'ProdId': prod.prod_Id,
-            'ProdNombre': prod.prod_Nombre,
-            'ProdUnidadMedidaCant': prod.undMed_Id,
-            'ProdPrecioUnd': prod.exProd_PrecioVenta,
-            'material': prod.material_Id,
-            'pigmento': prod.pigmento_Id,
-           
-          });
-        }, 100);
       });
-    });
   }
 
   // VALIDACION PARA CAMPOS VACIOS

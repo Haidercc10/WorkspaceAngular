@@ -22,33 +22,33 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 export class Inventario_Bodegas_RollosComponent implements OnInit {
 
-  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  cargando: boolean = false; //Variable para validar que salga o no la imagen de carga
+  today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
-  inventarioTotal : any [] = []; //Variable que almacenará la información del inventario total de todas las bodegas
-  inventarioExtrusion : any [] = []; //Variable que almacenará la información del inventario de la bodega de extrusion
-  inventarioProductoIntermedio : any [] = []; //Variable que almacenará la información del inventario de la bodega de producto intermedio
-  inventarioImpresion : any [] = []; //Variable que almacenará la información del inventario de la bodega de impresio
-  inventarioRotograbado : any [] = []; //Variable que almacenará la información del inventario de la bodega de rotograbado
-  inventarioSellado : any [] = []; //Variable que almacenará la información del inventario de la bodega de sellado
-  inventarioDespacho : any [] = []; //Variable que almacenará la información del inventario de la bodega de despacho
-  inventarioDetallado : any [] = []; //Vaariable que almacenará la información del inventario detallado
-  inventario : boolean = false; //Variablq que validará si se ve el modal de los rollos o no
-  inventoryRolls : any = []; 
-  selectedRolls : any = [];
-  warehouse : boolean = false;
-  changeUbications : boolean = false; 
-  form : FormGroup;
-  ubications : Array<any> = [];
-  subUbications : Array<any> = [];
-  allUbications : Array<any> = [];
-  inventarioCalidad : any [] = [];
-  currentStore : string = ``;
+  inventarioTotal: any[] = []; //Variable que almacenará la información del inventario total de todas las bodegas
+  inventarioExtrusion: any[] = []; //Variable que almacenará la información del inventario de la bodega de extrusion
+  inventarioProductoIntermedio: any[] = []; //Variable que almacenará la información del inventario de la bodega de producto intermedio
+  inventarioImpresion: any[] = []; //Variable que almacenará la información del inventario de la bodega de impresio
+  inventarioRotograbado: any[] = []; //Variable que almacenará la información del inventario de la bodega de rotograbado
+  inventarioSellado: any[] = []; //Variable que almacenará la información del inventario de la bodega de sellado
+  inventarioDespacho: any[] = []; //Variable que almacenará la información del inventario de la bodega de despacho
+  inventarioDetallado: any[] = []; //Vaariable que almacenará la información del inventario detallado
+  inventario: boolean = false; //Variablq que validará si se ve el modal de los rollos o no
+  inventoryRolls: any = [];
+  selectedRolls: any = [];
+  warehouse: boolean = false;
+  changeUbications: boolean = false;
+  form: FormGroup;
+  ubications: Array<any> = [];
+  subUbications: Array<any> = [];
+  allUbications: Array<any> = [];
+  inventarioCalidad: any[] = [];
+  currentStore: string = ``;
 
   @ViewChild('dtProductoIntermedio') dtProductoIntermedio: Table | undefined;
   @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
@@ -59,15 +59,15 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   @ViewChild('dtImpresion') dtImpresion: Table | undefined;
   @ViewChild('dtSellado') dtSellado: Table | undefined;
 
-  constructor(private AppComponent : AppComponent,
-                private shepherdService: ShepherdService,
-                  private msj : MensajesAplicacionService,
-                    private bgRollosService : Detalle_BodegaRollosService,
-                      private svExcel : CreacionExcelService, 
-                        private svBagpro : BagproService, 
-                          private formBuilder : FormBuilder, 
-                            private svUbicationsStore : Ubicaciones_BodegaRollosService, 
-                              private svDetailsStore : Detalle_BodegaRollosService) {
+  constructor(private AppComponent: AppComponent,
+    private shepherdService: ShepherdService,
+    private msj: MensajesAplicacionService,
+    private bgRollosService: Detalle_BodegaRollosService,
+    private svExcel: CreacionExcelService,
+    private svBagpro: BagproService,
+    private formBuilder: FormBuilder,
+    private svUbicationsStore: Ubicaciones_BodegaRollosService,
+    private svDetailsStore: Detalle_BodegaRollosService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
   }
@@ -79,7 +79,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //*
-  validateRol(){
+  validateRol() {
     /*if([95].includes(this.ValidarRol)) {
       this.inventarioProductoIntermedio = [];
       this.inventarioCalidad = [];
@@ -99,9 +99,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       this.currentStore = `Impresión`;
       this.consultarInventario(`?wareHouse=${'IMP'}`);
     } else if([1,12,98].includes(this.ValidarRol)) {*/
-      this.clearInventories();
-      this.consultarInventario('');
-      this.currentStore = ``;
+    this.clearInventories();
+    this.consultarInventario('');
+    this.currentStore = ``;
     /*}*/
   }
 
@@ -113,9 +113,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.inventarioSellado = [];
     this.inventarioImpresion = [];
   }
-  
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
@@ -123,7 +123,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
-  tutorial(){
+  tutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
@@ -132,85 +132,85 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //*
-  initForm(){
+  initForm() {
     this.form = this.formBuilder.group({
-      roll : [null],
-      ubication : [null, Validators.required],
-      subUbication : [null],
-      observation : [null, Validators.required]
+      roll: [null],
+      ubication: [null, Validators.required],
+      subUbication: [null],
+      observation: [null, Validators.required]
     });
   }
 
   //*
-  clearFields(){
+  clearFields() {
     this.form.reset();
   }
 
   //*
   getAllUbicationsStore() {
-    this.svUbicationsStore.getUbications().subscribe(data => { 
+    this.svUbicationsStore.getUbications().subscribe(data => {
       this.allUbications = data;
       this.ubications = data.reduce((a, b) => {
-        if(!a.map(x => x.ubR_Id).includes(b.ubR_Id)) a = [...a, b];
-          return a;
-      }, []); 
+        if (!a.map(x => x.ubR_Id).includes(b.ubR_Id)) a = [...a, b];
+        return a;
+      }, []);
     }, error => {
       this.msj.mensajeError(`Error`, `No fue posible cargar las ubicaciones | ${error.status} ${error.statusText}`)
-    }); 
+    });
   }
 
   //*
   getSubUbications() {
-    let ubication : any = this.form.value.ubication;
+    let ubication: any = this.form.value.ubication;
     this.subUbications = this.allUbications.filter(x => x.ubR_Id == ubication);
   }
 
   //*
-  quitRoll(data : any){
-    this.cargando = true; 
-    let index : any = this.selectedRolls.findIndex(x => x.roll == data.roll);
+  quitRoll(data: any) {
+    this.cargando = true;
+    let index: any = this.selectedRolls.findIndex(x => x.roll == data.roll);
     this.msj.mensajeAdvertencia(`Advertencia`, `Se ha quitado el rollo N° ${data.roll} de la tabla.`);
     this.selectedRolls.splice(index, 1);
-    if(this.selectedRolls.length == 0) this.changeUbications = false;
+    if (this.selectedRolls.length == 0) this.changeUbications = false;
     setTimeout(() => { this.cargando = false; }, 1000);
   }
 
   //*
-  searchForRolls(){
-    let roll : any = this.form.value.roll;
+  searchForRolls() {
+    let roll: any = this.form.value.roll;
 
-    if(roll) {
+    if (roll) {
       this.cargando = true;
       this.svDetailsStore.getRollForOut(roll, 'BGPI').subscribe(data => {
-        if(data.length > 0) this.loadTableForRoll(data);
+        if (data.length > 0) this.loadTableForRoll(data);
         else {
           this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró información del rollo N° ${roll}`);
-          this.form.patchValue({ roll : null});
+          this.form.patchValue({ roll: null });
           this.cargando = false;
         }
       }, error => {
         this.msj.mensajeError(`Error`, `Se encontraron errores al consultar el rollo N° ${roll} | ${error.status} ${error.statusText}`);
-        this.form.patchValue({ roll : null});
+        this.form.patchValue({ roll: null });
         this.cargando = false;
       });
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe digitar el número del rollo`);
   }
 
   //*
-  loadTableForRoll(data : any){
+  loadTableForRoll(data: any) {
     this.cargando = false;
-    this.form.patchValue({ roll : null});
+    this.form.patchValue({ roll: null });
 
-    if(!this.selectedRolls.map(x => x.Rollo).includes(data[0].rollo)) {
+    if (!this.selectedRolls.map(x => x.Rollo).includes(data[0].rollo)) {
       data.forEach(x => {
         this.selectedRolls.unshift({
-          'roll' : x.rollo,
-          'ot' : parseInt(x.ot),
-          'item' : x.item,
-          'reference' : x.referencia,
-          'qty' : parseFloat(x.cantidad),
-          'presentation' : x.presentacion,
-          'ubication' : x.ubicacion,
+          'roll': x.rollo,
+          'ot': parseInt(x.ot),
+          'item': x.item,
+          'reference': x.referencia,
+          'qty': parseFloat(x.cantidad),
+          'presentation': x.presentacion,
+          'ubication': x.ubicacion,
         });
       });
       //this.groupProducts();
@@ -219,26 +219,26 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //*
-  reubicateRolls(){
-    if(this.selectedRolls.length > 0) {
+  reubicateRolls() {
+    if (this.selectedRolls.length > 0) {
       this.cargando = true;
-      let subUbication : any = [undefined, null].includes(this.form.value.subUbication) ? 0 : this.form.value.subUbication;
-      let newUbication : any = this.allUbications.find(x => x.ubR_Id == this.form.value.ubication && x.ubR_SubId == subUbication).ubR_Nomenclatura;
-      let observation : any = `El día ${moment().format(`YYYY-MM-DD`)}, el usuario ${this.storage_Nombre} realiza cambio de ubicación hacía ${newUbication} por el siguiente motivo: ${this.form.value.observation}`; 
-      
+      let subUbication: any = [undefined, null].includes(this.form.value.subUbication) ? 0 : this.form.value.subUbication;
+      let newUbication: any = this.allUbications.find(x => x.ubR_Id == this.form.value.ubication && x.ubR_SubId == subUbication).ubR_Nomenclatura;
+      let observation: any = `El día ${moment().format(`YYYY-MM-DD`)}, el usuario ${this.storage_Nombre} realiza cambio de ubicación hacía ${newUbication} por el siguiente motivo: ${this.form.value.observation}`;
+
       this.svDetailsStore.putUbicationRoll(newUbication, observation, this.selectedRolls.map(x => x.roll)).subscribe(data => {
         this.changeUbications = false;
-        setTimeout(() => { this.clearAfterReubication(); }, 1500); 
+        setTimeout(() => { this.clearAfterReubication(); }, 1500);
       }, error => {
         this.msj.mensajeError(`Error`, `Error actualizando la ubicación de los rollos | ${error.status} ${error.statusText}`);
         this.cargando = false;
       });
     } else this.msj.mensajeAdvertencia(`Debe cargar mínimo un rollo a reubicar!`)
-    
+
   }
 
   //*
-  clearAfterReubication(){
+  clearAfterReubication() {
     this.msj.mensajeConfirmacion(`Confirmación`, `Ubicación de rollos actualizada exitosamente!`);
     this.cargando = false;
     this.form.reset();
@@ -247,11 +247,14 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number: any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
+  formatonumeros = (number: any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que va a buscar la información de los inventarios de las bodegas
-  consultarInventario(process? : string){
-    let num : number = 0;
+  consultarInventario(process?: string) {
+    const sales = this.ValidarRol == 2
+      ? `${String(this.storage_Id).padStart(3, '0')}`
+      : '';
+    let num: number = 0;
     this.cargando = true;
 
     this.bgRollosService.GetInventarioRollos(process).subscribe(data => {
@@ -259,108 +262,121 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       else {
         for (let i = 0; i < data.length; i++) {
           this.svBagpro.getClientsForOT(data[i].bgRollo_OrdenTrabajo).subscribe(dataBagpro => {
-            let info : any = {
+            let info: any = {
               Orden: data[i].bgRollo_OrdenTrabajo,
-              Cliente : dataBagpro[0].clienteNom,
+              Cliente: dataBagpro[0].clienteNom,
               Item: data[i].prod_Id,
               Referencia: data[i].prod_Nombre,
               Cantidad: data[i].cantidad,
               Presentacion: data[i].undMed_Id,
-              Material : dataBagpro[0].extMaterialNom,
+              Material: dataBagpro[0].extMaterialNom,
               Ancho: dataBagpro[0].extAcho1,
-              Unidad : dataBagpro[0].extUnidadesNom,
-              Color : dataBagpro[0].extPigmentoNom,
-              Calibre : dataBagpro[0].extCalibre,
-              Precio : dataBagpro[0].datosValorKg,
+              Unidad: dataBagpro[0].extUnidadesNom,
+              Color: dataBagpro[0].extPigmentoNom,
+              Calibre: dataBagpro[0].extCalibre,
+              Precio: dataBagpro[0].datosValorKg,
               Rollos: data[i].rollos,
               Bodega: data[i].bgRollo_BodegaActual,
               BodegaActual: data[i].proceso_Nombre,
+              Vendedor: dataBagpro[0].usrModifica
               //Fecha_Rollo: dataBagpro[i].fabrication_Day
             }
-            //this.inventarioTotal.push(info);
-            //if (data[i].bgRollo_BodegaActual == 'EXT') this.inventarioExtrusion.push(info);
-            if (data[i].bgRollo_BodegaActual == 'BGPI') this.inventarioProductoIntermedio.push(info);
+            
+            if (data[i].bgRollo_BodegaActual == 'BGPI') {
+              this.inventarioProductoIntermedio.push(info);
+              this.inventarioProductoIntermedio = sales.length > 0 ? this.inventarioProductoIntermedio.filter(x => x.Vendedor == sales) : this.inventarioProductoIntermedio;
+            }
             if (data[i].bgRollo_BodegaActual == 'IMP') this.inventarioImpresion.push(info);
             if (data[i].bgRollo_BodegaActual == 'ROT') this.inventarioRotograbado.push(info);
             if (data[i].bgRollo_BodegaActual == 'CALIDAD') this.inventarioCalidad.push(info);
             if (data[i].bgRollo_BodegaActual == 'SELLA') this.inventarioSellado.push(info);
-            //if (data[i].bgRollo_BodegaActual == 'DESP') this.inventarioDespacho.push(info);
             num += 1;
             if (num == data.length) this.cargando = false;
           });
         }
       }
-      
+
     }, error => {
-       this.msj.mensajeError(`Error`, `No fue posible cargar el inventario de rollos`); 
-       this.cargando = false
+      this.msj.mensajeError(`Error`, `No fue posible cargar el inventario de rollos | ${error.status} ${error.statusText}`);
+      this.cargando = false
     });
   }
 
   // Funcion que va a consultar los detalles de las ordenes de trabajo
-  consultarDetallesInventario(cliente : any, orden : number, bodega : string){
-    let num : number = 0;
+  consultarDetallesInventario(cliente: any, orden: number, bodega: string) {
+    const sales = this.ValidarRol == 2
+      ? `${String(this.storage_Id).padStart(3, '0')}`
+      : '';
+    let num: number = 0;
     this.inventarioDetallado = [];
-    
+
     this.bgRollosService.GetInventarioRollos_OrdenTrabajo(orden, bodega).subscribe(data => {
       this.inventario = true;
       for (let i = 0; i < data.length; i++) {
-        let info : any = {
-          Rollo: data[i].dtBgRollo_Rollo,
-          Orden: data[i].bgRollo_OrdenTrabajo,
-          Cliente : cliente,
-          Item: data[i].prod_Id,
-          Referencia: data[i].prod_Nombre,
-          Cantidad: data[i].dtBgRollo_Cantidad,
-          Presentacion: data[i].undMed_Id,
-          Bodega_Actual : data[i].proceso_Nombre,
-          Ubicacion : data[i].dtBgRollo_Ubicacion,
-          Fecha: data[i].bgRollo_FechaEntrada.replace('T00:00:00', ''),
-          Extrusion: data[i].dtBgRollo_Extrusion ? 'SI' : 'NO',
-          ProductoIntermedio: data[i].dtBgRollo_ProdIntermedio ? 'SI' : 'NO',
-          Impresion: data[i].dtBgRollo_Impresion ? 'SI' : 'NO',
-          Rotograbado: data[i].dtBgRollo_Rotograbado ? 'SI' : 'NO',
-          Sellado: data[i].dtBgRollo_Sellado ? 'SI' : 'NO',
-          Despacho: data[i].dtBgRollo_Despacho ? 'SI' : 'NO',
-          Calidad: data[i].dtBgRollo_Calidad ? 'SI' : 'NO',
+        //this.svBagpro.getClientsForOT(data[i].bgRollo_OrdenTrabajo).subscribe(dataBagpro => {
+        num += 1;
+        let info: any = {
+          'Rollo': data[i].dtBgRollo_Rollo,
+          'Orden': data[i].bgRollo_OrdenTrabajo,
+          'Cliente': cliente,
+          'Item': data[i].prod_Id,
+          'Referencia': data[i].prod_Nombre,
+          'Cantidad': data[i].dtBgRollo_Cantidad,
+          'Presentacion': data[i].undMed_Id,
+          'Bodega_Actual': data[i].proceso_Nombre,
+          'Ubicacion': data[i].dtBgRollo_Ubicacion,
+          'Fecha': data[i].bgRollo_FechaEntrada.replace('T00:00:00', ''),
+          'Extrusion': data[i].dtBgRollo_Extrusion ? 'SI' : 'NO',
+          'ProductoIntermedio': data[i].dtBgRollo_ProdIntermedio ? 'SI' : 'NO',
+          'Impresion': data[i].dtBgRollo_Impresion ? 'SI' : 'NO',
+          'Rotograbado': data[i].dtBgRollo_Rotograbado ? 'SI' : 'NO',
+          'Sellado': data[i].dtBgRollo_Sellado ? 'SI' : 'NO',
+          'Despacho': data[i].dtBgRollo_Despacho ? 'SI' : 'NO',
+          'Calidad': data[i].dtBgRollo_Calidad ? 'SI' : 'NO',
+          //'Vendedor': dataBagpro[0].usrModifica,
         }
+
         this.inventarioDetallado.push(info);
-        if (num == data.length) this.cargando = false;
+        if (num == data.length) {
+          this.inventarioDetallado = sales.length > 0 ? this.inventarioDetallado.filter(x => x.Vendedor == sales) : this.inventarioDetallado;
+          this.cargando = false;
+        }
+        //});
       }
     }, () => this.cargando = false);
   }
 
   // Funcion que va a aplicar un filtro de busqueda a las tablas
-  aplicarfiltro = ($event : any, campo : any, valorCampo : string, tabla : any) => tabla!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro = ($event: any, campo: any, valorCampo: string, tabla: any) => tabla!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a calcular la cantidad total de kg que hay
-  calcularTotalKg(table, arrayProcess){
-    let total : number = 0;
+  calcularTotalKg(table, arrayProcess) {
+    let total: number = 0;
 
-    if(table) {
-      if(table.filteredValue) total = table.filteredValue.reduce((a, b) => a += b.Cantidad, 0);
-      else total = arrayProcess.reduce((a,b) => a += b.Cantidad, 0);
-    } else total = arrayProcess.reduce((a,b) => a += b.Cantidad, 0);
+    if (table) {
+      if (table.filteredValue) total = table.filteredValue.reduce((a, b) => a += b.Cantidad, 0);
+      else total = arrayProcess.reduce((a, b) => a += b.Cantidad, 0);
+    } else total = arrayProcess.reduce((a, b) => a += b.Cantidad, 0);
     return total;
   }
 
-  calcularTotalRollos(table, arrayProcess){
-    let total : number = 0;
-    
-    if(table) {
-      if(table.filteredValue) total = table.filteredValue.reduce((a, b) => a += b.Rollos, 0);
+  calcularTotalRollos(table, arrayProcess) {
+    let total: number = 0;
+
+    if (table) {
+      if (table.filteredValue) total = table.filteredValue.reduce((a, b) => a += b.Rollos, 0);
       else total = arrayProcess.reduce((a, b) => a += b.Rollos, 0);
     } else total = arrayProcess.reduce((a, b) => a += b.Rollos, 0);
     return total;
   }
 
   // Funcion que va a crear un archivo de excel
-  crearExcel(num : number){
-    if(this.inventarioProductoIntermedio.length > 0) {
+  crearExcel(num: number) {
+    if (this.inventarioProductoIntermedio.length > 0) {
       this.cargando = true;
-      let datos : any [] = [];
-      let infoDocumento : any [] = [];
-      let title : string = ``;
+      let datos: any[] = [];
+      let infoDocumento: any[] = [];
+      let title: string = ``;
 
       if (num == 1) {
         title = `Inventario Bodegas - ${this.today}`;
@@ -387,16 +403,16 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       setTimeout(() => {
         const header = ["Orden Trabajo", "Cliente", "Item", "Referencia", "Cantidad Kg", "Presentación", "Cantidad Rollos", "Bodega Actual"]
         for (const item of datos) {
-          const datos1  : any = [item.Orden, item.Cliente, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Rollos, item.BodegaActual];
+          const datos1: any = [item.Orden, item.Cliente, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Rollos, item.BodegaActual];
           infoDocumento.push(datos1);
         }
         let workbook = new Workbook();
-        const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+        const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
         let worksheet = workbook.addWorksheet(title);
         worksheet.addImage(imageId1, 'A1:B3');
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell) => {
-          cell.fill = {  type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' }}
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
           cell.font = { name: 'Calibri', family: 4, size: 12, bold: true }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
@@ -408,41 +424,41 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           let row = worksheet.addRow(d);
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
-        let widths : any = [20, 50, 20, 50, 31, 15, 20, 30];
-        let count : number = 0;
+        let widths: any = [20, 50, 20, 50, 31, 15, 20, 30];
+        let count: number = 0;
         widths.forEach(x => {
           count++
           worksheet.getColumn(count).width = x;
-        }); 
+        });
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             fs.saveAs(blob, title + `.xlsx`);
           });
           this.cargando = false;
-          this.msj.mensajeConfirmacion(`Confirmación`, `${title} exportado exitosamente!` );
+          this.msj.mensajeConfirmacion(`Confirmación`, `${title} exportado exitosamente!`);
         }, 1000);
       }, 1500);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `No se puede crear el archivo Excel porque no hay datos para exportar`);
   }
 
   // Funcion que va a crear un excel de los detalles
-  crearExcelDetallado(){
+  crearExcelDetallado() {
     if (this.inventarioDetallado.length > 0) {
       this.cargando = true;
       this.inventario = false;
-      let datos : any [] = this.inventarioDetallado;
-      let infoDocumento : any [] = [];
-      let title : string = `Inventario detallado OT N° ${this.inventarioDetallado[0].Orden}`;
+      let datos: any[] = this.inventarioDetallado;
+      let infoDocumento: any[] = [];
+      let title: string = `Inventario detallado OT N° ${this.inventarioDetallado[0].Orden}`;
 
       setTimeout(() => {
         const header = ["Rollo", "OT", "Cliente", "Item", "Referencia", "Cantidad", "Presentación", "Fecha Ingreso", "Ubicación", "Extrusión", "Producto Intermedio", "Impresión", "Rotograbado", "Sellado", "Despacho"]
         for (const item of datos) {
-          const datos1  : any = [item.Rollo, item.Orden, item.Cliente, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Fecha, item.Ubicacion, item.Extrusion, item.ProductoIntermedio, item.Impresion, item.Rotograbado, item.Sellado, item.Despacho];
+          const datos1: any = [item.Rollo, item.Orden, item.Cliente, item.Item, item.Referencia, item.Cantidad, item.Presentacion, item.Fecha, item.Ubicacion, item.Extrusion, item.ProductoIntermedio, item.Impresion, item.Rotograbado, item.Sellado, item.Despacho];
           infoDocumento.push(datos1);
         }
         let workbook = new Workbook();
-        const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+        const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
         let worksheet = workbook.addWorksheet(title);
         worksheet.addImage(imageId1, 'A1:B3');
         let headerRow = worksheet.addRow(header);
@@ -464,12 +480,12 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
 
-        let widths : any = [15,10,50,15,50,15,15,15,15,15,25,12,15,12,12]
-        let count : number = 0;
+        let widths: any = [15, 10, 50, 15, 50, 15, 15, 15, 15, 15, 25, 12, 15, 12, 12]
+        let count: number = 0;
         widths.forEach(x => {
           count++
           worksheet.getColumn(count).width = x;
-        }); 
+        });
 
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -485,128 +501,122 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //* 
-  searchInventoryRolls(){
+  searchInventoryRolls() {
+    let orders : any = this.inventarioProductoIntermedio.map(x => x.Orden);
     this.inventoryRolls = [];
     this.cargando = true;
+    const sales = this.ValidarRol == 2
+      ? `${String(this.storage_Id).padStart(3, '0')}`
+      : '';
+      
 
     this.searchProcessData().process.forEach(y => {
+      console.log(y, 1);
+
       this.bgRollosService.getInventoryAvailable(y).subscribe(data => {
+        sales.length > 0 ? data = data.filter(x => orders.includes(x.ot)) : data = data;
         this.cargando = false;
         this.inventoryRolls = this.inventoryRolls.concat(data);
-        
         this.inventoryRolls.forEach(x => {
-          x.client = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Cliente, 
-          x.material = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Material,
-          x.broad = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Ancho, 
-          x.unit = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Unidad
-          x.caliber = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Calibre,
-          x.color = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Color,
-          x.value = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Precio,
-          x.unit = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Unidad, 
-          x.date = this.searchProcessData().dataInv.find(z => z.Orden == x.ot).Fecha_Rollo, 
+          x.client = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Cliente
+          x.material = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Material,
+          x.broad = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Ancho,
+          x.unit = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Unidad
+          x.caliber = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Calibre,
+          x.color = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Color,
+          x.value = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Precio,
+          x.unit = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Unidad,
+          x.date = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Fecha_Rollo,
           x.daysInventory = x.dayFabrication == null ? 0 : moment().diff(moment(x.dayFabrication), 'days')
+          x.sales = this.searchProcessData().dataInv.filter(z => z.Orden == x.ot)[0].Vendedor
         });
+
       }, error => {
         this.msj.mensajeError(`Error`, `No fue posible consultar el inventario de rollos disponibles`);
         this.cargando = false;
       });
-    });  
-    
+    });
+
   }
 
   //*
-  searchProcessData(){
-    let process : any = [];
-    let array : any = [];
-
-    /*if([95].includes(this.ValidarRol)) {
-      process = [`?process=${'BGPI'}`, `?process=${'CALIDAD'}`];
-      array = this.inventarioProductoIntermedio.concat(this.inventarioCalidad);
-    } else if([89].includes(this.ValidarRol)) {
-      process = [`?process=${'ROT'}`];
-      array = this.inventarioRotograbado;
-    } else if([86].includes(this.ValidarRol)) {
-      process = [`?process=${'SELLA'}`];
-      array = this.inventarioSellado;
-    } else if([4].includes(this.ValidarRol)) {
-      process = [`?process=${'IMP'}`];
-      array = this.inventarioImpresion;
-    } else {*/
-      process = [''];
-      array = this.inventarioProductoIntermedio.concat(this.inventarioRotograbado).concat(this.inventarioCalidad).concat(this.inventarioImpresion).concat(this.inventarioSellado);
-   //} 
-    return { 'dataInv' : array, 'process' : process, }
+  searchProcessData() {
+    let process: any = [];
+    let array: any = [];
+    process = [''];
+    array = this.inventarioProductoIntermedio.concat(this.inventarioRotograbado).concat(this.inventarioCalidad).concat(this.inventarioImpresion).concat(this.inventarioSellado);
+    return { 'dataInv': array, 'process': process, }
   }
 
   //* Función que va muestra el inv. de rollos por OT/Detallado actualizado 
-  changeTab(event : any){
-    let tab : any = event.originalEvent.srcElement.innerText;
-    
-    if(tab == 'Producto Intermedio') {
+  changeTab(event: any) {
+    let tab: any = event.originalEvent.srcElement.innerText;
+
+    if (tab == 'Producto Intermedio') {
       this.inventarioProductoIntermedio = [];
       this.consultarInventario(`?wareHouse=${'BGPI'}`);
       this.currentStore = ``;
-    } else if(tab == 'Inventario Detallado') {
+    } else if (tab == 'Inventario Detallado') {
       this.inventoryRolls = [];
       this.searchInventoryRolls();
       this.currentStore = ` Detallado`;
-    } else if(tab == 'Rotograbado') {
+    } else if (tab == 'Rotograbado') {
       this.inventarioRotograbado = [];
       this.consultarInventario(`?wareHouse=${'ROT'}`);
       this.currentStore = ` Rotograbado`;
-    } else if(tab == 'Calidad') {
+    } else if (tab == 'Calidad') {
       this.inventarioCalidad = [];
       this.consultarInventario(`?wareHouse=${'CALIDAD'}`);
       this.currentStore = ` Calidad`;
-    } else if(tab == 'Impresión') {
+    } else if (tab == 'Impresión') {
       this.inventarioImpresion = [];
       this.consultarInventario(`?wareHouse=${'IMP'}`);
       this.currentStore = ` Impresión`;
-    } else if(tab == 'Sellado') {
+    } else if (tab == 'Sellado') {
       this.inventarioSellado = [];
       this.consultarInventario(`?wareHouse=${'SELLA'}`);
       this.currentStore = ` Sellado`;
-    } else if(tab == 'Extrusión') {
+    } else if (tab == 'Extrusión') {
       this.inventarioExtrusion = [];
       this.consultarInventario(`?wareHouse=${'EXT'}`);
       this.currentStore = ` Extrusión`;
-    }    
+    }
   }
 
   //*Función que muestra la cantidad total en inventario de lo que haya en la tabla al instante
-  qtyTotal(){
-    let total : number = 0;
+  qtyTotal() {
+    let total: number = 0;
     //setTimeout(() => {
-      if(this.dtDetailsProdIntermedio) {
-        if(this.dtDetailsProdIntermedio.filteredValue) total = this.dtDetailsProdIntermedio.filteredValue.reduce((a, b) => a += b.qty, 0);
-        else total = this.inventoryRolls.reduce((a, b) => a += b.qty, 0);
-      } else total = this.inventoryRolls.reduce((a, b) => a += b.qty, 0);
-      return total;
+    if (this.dtDetailsProdIntermedio) {
+      if (this.dtDetailsProdIntermedio.filteredValue) total = this.dtDetailsProdIntermedio.filteredValue.reduce((a, b) => a += b.qty, 0);
+      else total = this.inventoryRolls.reduce((a, b) => a += b.qty, 0);
+    } else total = this.inventoryRolls.reduce((a, b) => a += b.qty, 0);
+    return total;
     //}, 500);
   }
 
   //*Función que muestra la cantidad total de rollos que hay en inventario
-  qtyTotalRolls(){
-    let total : number = 0;
+  qtyTotalRolls() {
+    let total: number = 0;
     //setTimeout(() => {
-      if(this.dtDetailsProdIntermedio) {
-        if(this.dtDetailsProdIntermedio.filteredValue) total = this.dtDetailsProdIntermedio.filteredValue.length;
-        else total = this.inventoryRolls.length;
-      } else total = this.inventoryRolls.length;
-      return total;
+    if (this.dtDetailsProdIntermedio) {
+      if (this.dtDetailsProdIntermedio.filteredValue) total = this.dtDetailsProdIntermedio.filteredValue.length;
+      else total = this.inventoryRolls.length;
+    } else total = this.inventoryRolls.length;
+    return total;
     //}, 500);
   }
 
   //? CREACIÓN DE FORMATO EXCEL
   //* Función para crear excel de rollo a rollo detallado.
-  createExcel(){
-    let data : any = [];
-    if(this.dtDetailsProdIntermedio) { 
-      if(this.dtDetailsProdIntermedio.filteredValue) data = this.dtDetailsProdIntermedio.filteredValue;
-      else data = this.inventoryRolls; 
-    } else data = this.inventoryRolls; 
-     
-    if(data.length > 0) {
+  createExcel() {
+    let data: any = [];
+    if (this.dtDetailsProdIntermedio) {
+      if (this.dtDetailsProdIntermedio.filteredValue) data = this.dtDetailsProdIntermedio.filteredValue;
+      else data = this.inventoryRolls;
+    } else data = this.inventoryRolls;
+
+    if (data.length > 0) {
       this.cargando = true;
       setTimeout(() => { this.loadSheetAndStyles(data); }, 500);
       setTimeout(() => { this.cargando = false; }, 1000);
@@ -614,12 +624,12 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //Función que cargará la hoja de cálculo y los estilos.
-  loadSheetAndStyles(data : any){  
-    let title : any = `Inventario bodega de rollos ${moment().format('DD-MM-YYYY')}`
+  loadSheetAndStyles(data: any) {
+    let title: any = `Inventario bodega de rollos ${moment().format('DD-MM-YYYY')}`
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
-    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     let workbook = this.svExcel.formatoExcel(title, true);
 
     this.addNewSheet(workbook, title, fill, border, font, alignment, data);
@@ -627,27 +637,27 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //Función para agregar una nueva hoja de calculo.
-  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
     let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-    let worksheet : any = wb.worksheets[0];
+    let worksheet: any = wb.worksheets[0];
     this.loadStyleTitle(worksheet, title, fontTitle, alignment);
     this.loadHeader(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
   }
 
   //Cargar estilos del titulo de la hoja.
-  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
     ws.getCell('A1').alignment = alignment;
     ws.getCell('A1').font = fontTitle;
     ws.getCell('A1').value = title;
   }
 
   //Función para cargar los titulos de el header y los estilos.
-  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5','N5','O5','P5','Q5']; 
+  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5', 'P5', 'Q5'];
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
-    
+
     rowHeader.forEach(x => ws.getCell(x).fill = fill);
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
@@ -658,22 +668,22 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
-  loadSizeHeader(ws : any){
-    [6,4].forEach(x => ws.getColumn(x).width = 50);
-    [2,3,5,7,9,11,13,14].forEach(x => ws.getColumn(x).width = 10);
+  loadSizeHeader(ws: any) {
+    [6, 4].forEach(x => ws.getColumn(x).width = 50);
+    [2, 3, 5, 7, 9, 11, 13, 14].forEach(x => ws.getColumn(x).width = 10);
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [8,10,12,15,16,17].forEach(x => ws.getColumn(x).width = 15);
+    [8, 10, 12, 15, 16, 17].forEach(x => ws.getColumn(x).width = 15);
   }
 
- //Función para cargar los nombres de las columnas del header
-  loadFieldsHeader(){
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader() {
     let headerRow = [
       'N°',
       'Rollo',
       'OT',
       'Cliente',
-      'Item', 
-      'Referencia', 
+      'Item',
+      'Referencia',
       'Cantidad',
       'Precio Kg',
       'Unidad',
@@ -690,10 +700,10 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //Cargar información con los estilos al formato excel. 
-  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
-    let formatNumber: Array<number> = [7,8,11,13];
-    let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q']; 
+  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
+    let formatNumber: Array<number> = [7, 8, 11, 13];
+    let contador: any = 6;
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
 
     formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(x => {
@@ -705,11 +715,11 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
       });
       contador++
     });
-    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold: true, });
   }
 
   //Agregar fila de totales al formato excel.
-  addTotal(info : any){
+  addTotal(info: any) {
     info.push([
       '',
       '',
@@ -732,9 +742,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   }
 
   //.Función que contendrá la info al documento excel. 
-  dataExcel(data : any){
-    let info : any = [];
-    let count : number = 0;
+  dataExcel(data: any) {
+    let info: any = [];
+    let count: number = 0;
     data.forEach(x => {
       info.push([
         count += 1,

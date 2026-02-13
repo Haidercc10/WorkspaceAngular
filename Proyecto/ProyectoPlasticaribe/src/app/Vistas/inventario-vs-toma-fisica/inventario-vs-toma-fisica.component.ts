@@ -52,7 +52,6 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    //this.getInventory();
     this.getInventoriesAdd();
   }
 

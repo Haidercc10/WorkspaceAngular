@@ -114,7 +114,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 3 && [2].includes(this.ValidarRol) ? this.pedidos = true : null;
     index == 4 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
     index == 5 && [2].includes(this.ValidarRol) ? this.recaudos = true : null;
-    index == 6 && [2].includes(this.ValidarRol) ? this.gerencia = true : null;
+    //index == 6 && [2].includes(this.ValidarRol) ? this.gerencia = true : null;
 
     this.saveLogModule(tab);
   }

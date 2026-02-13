@@ -157,15 +157,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.pedidosOriginales = [];
     this.ArrayPedidos = [];
     this.datosExcel = [];
+    const sales = this.ValidarRol == 2
+      ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
+      : '';
 
-    this.inventarioZeusService.GetPedidos().subscribe(datos_pedidos => {
+    this.inventarioZeusService.GetPedidos(sales).subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
-        //if (this.ValidarRol == 2){
-        //  if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-        /*} else*/ if ([1, 96, 6, 10, 60, 61, 12, 85, 97, 2, 69, 98].includes(this.ValidarRol)) {
-          this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-          this.loadOtInCustomerOrder(datos_pedidos[i], datos_pedidos.length);
-        }
+        this.llenarArrayPedidosZeus(datos_pedidos[i], i);
+        this.loadOtInCustomerOrder(datos_pedidos[i], datos_pedidos.length);
       }
     });
     setTimeout(() => {
@@ -223,15 +222,15 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   }
 
   //
-  totalSalesPending(asesor : string) {
+  totalSalesPending(asesor: string) {
     console.log(asesor);
-    let total : number = 0;
+    let total: number = 0;
     total = this.salesAsesor.filter(x => x.vendedor == asesor).reduce((acc, x) => acc += parseFloat(x.costo_Cant_Pendiente), 0);
     return total;
   }
 
   //
-  totalSalesPendingForClient = (asesor : string, client : any) => this.salesAsesor.filter(x => x.idVendedor == asesor && x.cliente == client).reduce((acc, x) => acc + parseFloat(x.costo_Cant_Pendiente), 0);
+  totalSalesPendingForClient = (asesor: string, client: any) => this.salesAsesor.filter(x => x.idVendedor == asesor && x.cliente == client).reduce((acc, x) => acc + parseFloat(x.costo_Cant_Pendiente), 0);
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
   consultarPedidos() {
@@ -705,8 +704,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     }, 400);
   }
 
-  
-  applyFilter = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  applyFilter = ($event, campo: any, datos: Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   // Función que mostrará la descripción de cada una de las card de los dashboard's
   mostrarDescripcion($event, color: string) {

@@ -65,7 +65,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       startDate: [null],
       endDate: [null],
       item: [null],
-      reference: [null],
+      ref: [null],
       production: [null],
     });
   }
@@ -78,17 +78,18 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   }
 
   searchProduct() {
-    let nombre: string = this.formFilters.value.reference;
+    let nombre: string = this.formFilters.value.ref;
     this.productsService.obtenerItemsLike(nombre).subscribe(resp => this.products = resp);
+    console.log(this.products);
+    
   }
 
+   //Función que carga item y referencia dependiendo el que se seleccione en la lista.
   selectedProduct() {
-    let producto: any = this.formFilters.value.reference;
-    this.formFilters.patchValue({
-      item: producto,
-      reference: this.products.find(x => x.prod_Id == producto).prod_Nombre
-    });
+    let producto: any = this.formFilters.value.ref;
+    this.formFilters.patchValue({ 'item': producto, 'ref': this.products.find(x => x.prod_Id == producto).prod_Nombre });
   }
+
 
   searchaDataProductionIncome() {
     let lastMounth: any = moment().subtract(1, 'M').format('YYYY-MM-DD');

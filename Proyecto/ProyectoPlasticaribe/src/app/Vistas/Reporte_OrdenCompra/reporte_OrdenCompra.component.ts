@@ -10,6 +10,8 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovOrdenCompra as defaultSteps } from 'src/app/data';
 import { OcompraComponent } from '../ocompra/ocompra.component';
 import { Table } from 'primeng/table';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 
 @Component({
   selector: 'app-reporte_OrdenCompra',
@@ -19,47 +21,61 @@ import { Table } from 'primeng/table';
 export class Reporte_OrdenCompraComponent implements OnInit {
 
   public FormConsultarFiltros !: FormGroup;
-  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
-  estados : any [] = []; //Variable que almacenará los estados que pueden tener las ordenes de compra de materia prima
-  registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
-  datosPdf : any [] = []; //variable que va a almacenar la informacion de la orden de compra consultada
+  cargando: boolean = false; //Variable para validar que salga o no la imagen de carga
+  today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol
+  estados: any[] = []; //Variable que almacenará los estados que pueden tener las ordenes de compra de materia prima
+  registrosConsultados: any[] = []; //Variable que va a almacenar los diferentes registros consultados
+  datosPdf: any[] = []; //variable que va a almacenar la informacion de la orden de compra consultada
 
   // Editar Orden de Compra
-  @ViewChild(OcompraComponent)  EditarOrdenCompra : OcompraComponent;
-  mostrarModal : boolean = false; //Variable que va a mostrar o no, el modal para editar ordenes de compra
-  numeroOrdenCompra : number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  @ViewChild(OcompraComponent) EditarOrdenCompra: OcompraComponent;
+  mostrarModal: boolean = false; //Variable que va a mostrar o no, el modal para editar ordenes de compra
+  numeroOrdenCompra: number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
-  constructor(private frmBuilder : FormBuilder,
-                private AppComponent : AppComponent,
-                  private estadosService : EstadosService,
-                    private dtOrdenCompraService : DetallesOrdenesCompraService,
-                        private shepherdService: ShepherdService,
-                          private msj : MensajesAplicacionService,
-                            private creacionPDFService : CreacionPdfService,) {
+  //* Nuevos filtros.
+  proveedor: any = [];
+  materiasPrimas : any [] = [];
+  @ViewChild('dt1') dt1: Table | undefined;
+
+  constructor(private frmBuilder: FormBuilder,
+    private AppComponent: AppComponent,
+    private estadosService: EstadosService,
+    private dtOrdenCompraService: DetallesOrdenesCompraService,
+    private shepherdService: ShepherdService,
+    private msj: MensajesAplicacionService,
+    private creacionPDFService: CreacionPdfService,
+    private svProv: ProveedorService,
+    private svMatPrima: MateriaPrimaService,
+  ) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
-      Documento : [null, Validators.required],
+      Documento: [null,],
       fechaDoc: [null, Validators.required],
       fechaFinalDoc: [null, Validators.required],
-      estadoDoc: [null, Validators.required],
+      estadoDoc: [null,],
+      prvId: [null],
+      prvName: [null],
+      mp: [null],
+      mpId : [null,]
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerEstados();
+    this.obtenerMateriasPrimas();
+    this.obtenerProveeedor();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
@@ -69,7 +85,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que va a consultar y almacenar los estados que pueden tener las ordenes de compra
-  obtenerEstados(){
+  obtenerEstados() {
     this.estadosService.srvObtenerListaEstados().subscribe(datos => {
       datos.forEach(estados => {
         if ([11, 5, 3, 12].includes(estados.estado_Id)) this.estados.push(estados);
@@ -77,8 +93,34 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     });
   }
 
+  //Función para obtenet las materias primas
+  obtenerMateriasPrimas = () => this.svMatPrima.GetInventarioMateriasPrimas().subscribe(datos => this.materiasPrimas = datos);
+
+  //Función para obtener los proveedores
+  obtenerProveeedor = () => this.svProv.srvObtenerLista().subscribe(datos_proveedor => this.proveedor = datos_proveedor);
+
+  // Funcion que le va a cambiar el nombre al proveedor
+  cambiarNombreProveedor() {
+    let id: number = this.FormConsultarFiltros.value.prvName;
+    let nuevo: any[] = this.proveedor.filter((item) => item.prov_Id == id);
+    this.FormConsultarFiltros.patchValue({
+      'prvId': nuevo[0].prov_Id,
+      'prvName': nuevo[0].prov_Nombre,
+    });
+  }
+
+  // Funcion que le va a colocar el nombre a la materia prima seleccionada
+  cambiarNombreMateriaPrima() {
+    let id: number = this.FormConsultarFiltros.value.mp;
+    let nuevo: any = this.materiasPrimas.filter((item) => item.id_Materia_Prima == id);
+    this.FormConsultarFiltros.patchValue({
+      'mpId': id,
+      'mp': nuevo[0].nombre_Materia_Prima,
+    });
+  }
+
   // funcion que limpiará todo
-  limpiarCampos(){
+  limpiarCampos() {
     this.cargando = false;
     this.FormConsultarFiltros.reset();
     this.datosPdf = [];
@@ -86,24 +128,30 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   }
 
   // funcion que va a consultar los filtros utilizados para traer ka informacion
-  consultarFiltros(){
+  consultarFiltros() {
     this.cargando = true;
     this.registrosConsultados = [];
-    let cantDatos : number = 0;
-    let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let oc : number = this.FormConsultarFiltros.value.Documento;
-    let fechaincial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
-    let estado : any = this.FormConsultarFiltros.value.estadoDoc;    
-    let ruta : string = '';
+    let cantDatos: number = 0;
+    let fechaMesAnterior: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
+    let oc: number = this.FormConsultarFiltros.value.Documento;
+    let fechaincial: any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal: any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
+    let estado: any = this.FormConsultarFiltros.value.estadoDoc;
+    let prov: any = this.FormConsultarFiltros.value.prvId;
+    let mp: any = this.FormConsultarFiltros.value.mpId;
+    let ruta: string = '';
 
     if (oc != null) ruta += `orden=${oc}`;
     if (estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}`;
+    if (prov != null) ruta.length > 0 ? ruta += `&prov=${prov}` : ruta += `prov=${prov}`;
+    if (mp != null) ruta.length > 0 ? ruta += `&mp=${mp}` : ruta += `mp=${mp}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
 
     this.dtOrdenCompraService.GetOrdenesCompras(fechaincial, fechaFinal, ruta).subscribe(datos_orden => {
+      console.log(datos_orden);
       datos_orden.forEach(orden => {
-        if (!this.registrosConsultados.map(x => x.Oc).includes(orden.consecutivo)) this.llenarTabla(orden);
+        this.llenarTabla(orden);
+        //if (!this.registrosConsultados.map(x => x.Oc).includes(orden.consecutivo)) 
         cantDatos++;
         cantDatos == datos_orden.length ? this.cargando = false : null;
       });
@@ -114,37 +162,60 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   }
 
   // Funcion que servirá para llenar la tabla que se verá que está en la vista con la informacion que devuelve la consulta
-  llenarTabla(data : any){
-    let info : any = {
-      Oc : data.consecutivo,
-      Fecha : data.fecha.replace('T00:00:00', ''),
-      Estado : data.estado,
-      Usuario : data.usuario,
+  llenarTabla(data: any) {
+    let info: any = {
+      Oc: data.consecutivo,
+      Fecha: data.fecha.replace('T00:00:00', ''),
+      Estado: data.estado,
+      Usuario: data.usuario,
+      Proveedor: data.proveedor,
+      Material: data.material,
+      Cantidad: data.cantidad,
+      Precio: data.precio,
+      Subtotal: data.subTotal,
     }
     this.registrosConsultados.push(info);
-    this.registrosConsultados.sort((a,b) => Number(a.Oc) - Number(b.Oc));
+    this.registrosConsultados.sort((a, b) => Number(a.Oc) - Number(b.Oc));
+  }
+
+  totalOrders() {
+    let total: number = 0;
+    if (this.dt1) {
+      if (this.dt1.filteredValue) total = this.dt1.filteredValue.reduce((a, b) => a += b.Subtotal, 0);
+      else total = this.registrosConsultados.reduce((a, b) => a += b.Subtotal, 0);
+    } else total = this.registrosConsultados.reduce((a, b) => a += b.Subtotal, 0);
+    return total;
+  }
+
+  totalQty() {
+    let total: number = 0;
+    if (this.dt1) {
+      if (this.dt1.filteredValue) total = this.dt1.filteredValue.reduce((a, b) => a += b.Cantidad, 0);
+      else total = this.registrosConsultados.reduce((a, b) => a += b.Cantidad, 0);
+    } else total = this.registrosConsultados.reduce((a, b) => a += b.Cantidad, 0);
+    return total;
   }
 
   // Funcion que limpiará los filtros utilizados en la tabla
   clear = (table: Table) => table.clear();
 
   //Buscar informacion de la orden de compra creada
-  buscarinfoOrdenCompra(orden : number){
+  buscarinfoOrdenCompra(orden: number) {
     this.datosPdf = [];
     this.cargando = true;
     setTimeout(() => {
       this.dtOrdenCompraService.GetOrdenCompra(orden).subscribe(datos_orden => {
         for (let i = 0; i < datos_orden.length; i++) {
-          let info : any = {
-            Id : datos_orden[i].id,
+          let info: any = {
+            Id: datos_orden[i].id,
             Id_Mp: datos_orden[i].mP_Id,
             Id_Tinta: datos_orden[i].tinta_Id,
             Id_Bopp: datos_orden[i].bopp_Id,
-            Nombre : datos_orden[i].material,
-            Cantidad : this.formatonumeros(datos_orden[i].cantidad),
-            Medida : datos_orden[i].unidad_Medida,
-            Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
-            SubTotal : `$${this.formatonumeros(datos_orden[i].subTotal)}` //`$${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+            Nombre: datos_orden[i].material,
+            Cantidad: this.formatonumeros(datos_orden[i].cantidad),
+            Medida: datos_orden[i].unidad_Medida,
+            Precio: `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
+            SubTotal: `$${this.formatonumeros(datos_orden[i].subTotal)}` //`$${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
           }
           /*if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
@@ -157,18 +228,18 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             info.Nombre = datos_orden[i].bopp;
           }*/
           this.datosPdf.push(info);
-          this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+          this.datosPdf.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
         }
         this.crearPDF(orden);
       }, () => this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`));
     }, 100);
   }
 
-  crearPDF(oc : number){
+  crearPDF(oc: number) {
     this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
-        let titulo : string = `Orden de Compra N° ${datos_orden[i].consecutivo}`;
-        let content : any [] = this.contenidoPDF(datos_orden[i]);
+        let titulo: string = `Orden de Compra N° ${datos_orden[i].consecutivo}`;
+        let content: any[] = this.contenidoPDF(datos_orden[i]);
         this.creacionPDFService.formatoPDF(titulo, content);
         setTimeout(() => this.cargando = false, 3000);
         break;
@@ -176,8 +247,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     }, () => this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`));
   }
 
-  contenidoPDF(datos_orden){
-    let data : any [] = [];
+  contenidoPDF(datos_orden) {
+    let data: any[] = [];
     data.push(this.informacionProveedorPDF());
     data.push(this.datosProveedorPDF(datos_orden));
     data.push(this.informacionMateriaPrimaPDF());
@@ -187,7 +258,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     return data;
   }
 
-  informacionProveedorPDF(){
+  informacionProveedorPDF() {
     return {
       text: `\n Información detallada del Proveedor \n \n`,
       alignment: 'center',
@@ -196,23 +267,23 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     };
   }
 
-  datosProveedorPDF(datos_orden){
+  datosProveedorPDF(datos_orden) {
     return {
       table: {
         widths: ['50%', '20%', '30%'],
         body: [
           [
-            {text: `Nombre: ${datos_orden.proveedor}`},
-            {text: `ID: ${datos_orden.proveedor_Id}`},
-            {text: `Tipo de ID: ${datos_orden.tipo_Id}`},
+            { text: `Nombre: ${datos_orden.proveedor}` },
+            { text: `ID: ${datos_orden.proveedor_Id}` },
+            { text: `Tipo de ID: ${datos_orden.tipo_Id}` },
           ],
           [
-            {text: `Telefono: ${datos_orden.telefono_Proveedor}`},
-            {text: `Ciudad: ${datos_orden.ciudad_Proveedor}`},
-            {text: `Tipo de Proveedor: ${datos_orden.tipo_Proveedor}`}
+            { text: `Telefono: ${datos_orden.telefono_Proveedor}` },
+            { text: `Ciudad: ${datos_orden.ciudad_Proveedor}` },
+            { text: `Tipo de Proveedor: ${datos_orden.tipo_Proveedor}` }
           ],
           [
-            {text:`E-mail: ${datos_orden.correo_Proveedor}`},
+            { text: `E-mail: ${datos_orden.correo_Proveedor}` },
             {},
             {}
           ]
@@ -223,7 +294,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     }
   }
 
-  informacionMateriaPrimaPDF(){
+  informacionMateriaPrimaPDF() {
     return {
       text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
       alignment: 'center',
@@ -231,7 +302,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     }
   }
 
-  datosMateriasPrimasPDF(){
+  datosMateriasPrimasPDF() {
     return this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Precio', 'SubTotal'])
   }
 
@@ -253,12 +324,12 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
-  buildTableBody(data : any, columns : any) {
+  buildTableBody(data: any, columns: any) {
     var body = [];
     body.push(columns);
-    data.forEach(function(row) {
+    data.forEach(function (row) {
       var dataRow = [];
-      columns.forEach(function(column) {
+      columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });
       body.push(dataRow);
@@ -266,10 +337,10 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     return body;
   }
 
-  calcularConceptosAutomaticosPDF(data : any): any {
+  calcularConceptosAutomaticosPDF(data: any): any {
     let baseGlobal: number = data.base;
     let base: boolean = data.valor_Total >= baseGlobal;
-    let iva : number = ((data.valor_Total * data.iva) / 100);
+    let iva: number = ((data.valor_Total * data.iva) / 100);
     let baseIVA: boolean = iva >= baseGlobal;
     let reteFuente: number = base ? (data.valor_Total * data.reteFuente) / 100 : 0;
     let reteIVA: number = baseIVA ? (((data.valor_Total * data.iva) / 100) * data.reteIva) / 100 : 0;
@@ -292,10 +363,10 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           [
             '',
             { border: [true, false, true, true], text: `Peso Total` },
-            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`},
+            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}` },
             '',
             { border: [true, false, true, true], text: `Subtotal` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`, alignment: 'right'},
+            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`, alignment: 'right' },
           ],
           [
             '',
@@ -303,7 +374,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `IVA ${datos_orden.iva}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}`, alignment: 'right'},
+            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}`, alignment: 'right' },
           ],
           [
             '',
@@ -311,7 +382,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE Fuente ${datos_orden.reteFuente}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right'},
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right' },
           ],
           [
             '',
@@ -319,7 +390,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE IVA ${datos_orden.reteIva}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right'},
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right' },
           ],
           [
             '',
@@ -327,7 +398,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE ICA ${datos_orden.reteIca}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right'},
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right' },
           ],
           [
             '',
@@ -335,7 +406,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `Valor Total` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right'},
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right' },
           ],
         ]
       },
@@ -344,7 +415,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     }
   }
 
-  observacionPDF(datos_orden){
+  observacionPDF(datos_orden) {
     return {
       margin: [0, 20],
       table: {
@@ -359,24 +430,24 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   }
 
   // Funcion que abrirá y llenará el modal con la informacion de la orden de compra
-  llenarModal(numeroOrden : number){
+  llenarModal(numeroOrden: number) {
     if (this.ValidarRol == 1 || this.ValidarRol == 6) {
       this.mostrarModal = true;
       this.numeroOrdenCompra = numeroOrden;
       this.EditarOrdenCompra.edicionOrdenCompra = true;
       this.EditarOrdenCompra.FormOrdenCompra.reset();
       this.EditarOrdenCompra.FormMateriaPrima.reset();
-      this.EditarOrdenCompra.FormMateriaPrima.patchValue({ iva : 19 });
+      this.EditarOrdenCompra.FormMateriaPrima.patchValue({ iva: 19 });
       this.EditarOrdenCompra.materiasPrimasSeleccionadas = [];
       this.EditarOrdenCompra.consecutivoOrdenCompra = 0;
       this.EditarOrdenCompra.informacionPDF = [];
       this.dtOrdenCompraService.GetOrdenCompra(numeroOrden).subscribe(datos_orden => {
         for (let i = 0; i < datos_orden.length; i++) {
           this.EditarOrdenCompra.FormOrdenCompra.patchValue({
-            ConsecutivoOrden : numeroOrden,
-            Proveedor : datos_orden[i].proveedor,
-            Id_Proveedor : datos_orden[i].proveedor_Id,
-            Observacion : datos_orden[i].observacion,
+            ConsecutivoOrden: numeroOrden,
+            Proveedor: datos_orden[i].proveedor,
+            Id_Proveedor: datos_orden[i].proveedor_Id,
+            Observacion: datos_orden[i].observacion,
             ReteIVA: datos_orden[i].reteIva,
             ReteICA: datos_orden[i].reteIca,
             ReteFuente: datos_orden[i].reteFuente,
@@ -385,16 +456,16 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           break;
         }
         for (let i = 0; i < datos_orden.length; i++) {
-          let info : any = {
-            Id : datos_orden[i].id,
+          let info: any = {
+            Id: datos_orden[i].id,
             Id_Mp: datos_orden[i].mP_Id,
             Id_Tinta: datos_orden[i].tinta_Id,
             Id_Bopp: datos_orden[i].bopp_Id,
-            Nombre : datos_orden[i].material,
-            Cantidad : datos_orden[i].cantidad,
-            Und_Medida : datos_orden[i].unidad_Medida,
-            Precio : datos_orden[i].precio_Unitario,
-            SubTotal : datos_orden[i].subTotal //(datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+            Nombre: datos_orden[i].material,
+            Cantidad: datos_orden[i].cantidad,
+            Und_Medida: datos_orden[i].unidad_Medida,
+            Precio: datos_orden[i].precio_Unitario,
+            SubTotal: datos_orden[i].subTotal //(datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
           };
           /*if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
@@ -412,8 +483,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     }
   }
 
-   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
-   verTutorial() {
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;

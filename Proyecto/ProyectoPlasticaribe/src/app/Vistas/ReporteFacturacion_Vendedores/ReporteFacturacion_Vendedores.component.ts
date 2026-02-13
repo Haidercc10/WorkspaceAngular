@@ -50,12 +50,21 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     this.llenarArrayAnios();
     this.consultarVendedores();
     this.graficarDatos();
+    this.validateRol();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
       this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
     }, 1000);
+  }
+
+  //Función que validará que si el usuario logueado es vendedor se filtre.
+  validateRol(){
+    if (this.ValidarRol == 2) {
+      this.vendedorSeleccionado = this.storage_Id;
+      this.consultarFacturacionVendedor();
+    } 
   }
 
   tutorial(){
@@ -84,7 +93,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
   // Funcion que va a consultar la información de los vendedores
   consultarVendedores(){
-    if ([1,60,6,2].includes(this.ValidarRol)) this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
+    if ([1,60,6].includes(this.ValidarRol)) this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
     else if (this.ValidarRol == 2) this.vendedores = [ { usua_Id : this.storage_Id, usua_Nombre : this.storage_Nombre, } ];
   }
 

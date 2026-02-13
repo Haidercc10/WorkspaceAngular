@@ -18,7 +18,7 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(`${this.rutaPlasticaribeAPI}/Estados_ProcesosOT/getInfo_OrdenesTrabajo/${fechaIni}/${fechaFin}${ruta}`);
   }
 
-  GetProductosOrdenesUltimoMes = (fecha1 : any, fecha2 : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getProductosOrdenesUltimoMes/${fecha1}/${fecha2}`);
+  GetProductosOrdenesUltimoMes = (fecha1 : any, fecha2 : any, sales? : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getProductosOrdenesUltimoMes/${fecha1}/${fecha2}${sales}`);
 
   GetVendedoresOrdenesUltimoMes = (fecha1 : any, fecha2 : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getVendedoresOrdenesUltimoMes/${fecha1}/${fecha2}`);
 
@@ -26,7 +26,7 @@ export class EstadosProcesos_OTService {
 
   GetOrdenesTrabajo_Pedido = (pedido : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOrdenesTrabajo_Pedido/${pedido}`);
 
-  GetOrdenesMes_Estados = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOrdenesMes_Estados`);
+  GetOrdenesMes_Estados = (sales? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOrdenesMes_Estados${sales}`);
 
   getOtsForSalesOrder = (customerSales : any[]) => this.http.post<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOtsForSalesOrder`, customerSales);
 
