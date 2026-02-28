@@ -56,24 +56,25 @@ export class Produccion_SelladoComponent implements OnInit {
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol
   maquinaConsultada: number;
   operariosConsultados: any = [];
-  url : any = ``;
-  repacking : boolean = false;
-  maquinas : any = [];
-  process : any = []; //Variable que alojará los procesos de los cuales proviene un rollo anterior
-  modalRolls : boolean = false;
-  rolls : any = [];
-  orderProduction : number = null;
+  url: any = ``;
+  repacking: boolean = false;
+  maquinas: any = [];
+  process: any = []; //Variable que alojará los procesos de los cuales proviene un rollo anterior
+  modalRolls: boolean = false;
+  rolls: any = [];
+  orderProduction: number = null;
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt0') dt0: Table | undefined;
   modalPassword = false;
   form !: FormGroup; //Formulario de sellado
-  packers : any = []; // Variable que guardará los nombres de los empacadores. 
-  packerSelected : any;
-  rollsConsolidate : any = [];
-  modalAuthorizeWeight : boolean = false;
+  packers: any = []; // Variable que guardará los nombres de los empacadores. 
+  packerSelected: any;
+  rollsConsolidate: any = [];
+  modalAuthorizeWeight: boolean = false;
   formWeight !: FormGroup; //Formulario de autorización de pesos
-  usersAuthorized : any = [];
+  usersAuthorized: any = [];
   authUserSelected: any;
+  cintaSelected: boolean = false;
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -85,13 +86,13 @@ export class Produccion_SelladoComponent implements OnInit {
     private svcCrearPDF: TagProduction_2,
     private svcSedes: SedeClienteService,
     private rePrintService: ReImpresionEtiquetasService,
-    private svMachines : MaquinasService,
-    private router : Router,
-    private svTraceability : TrazabilidadProduccionService,
-    private svProcess : ProcesosService,
+    private svMachines: MaquinasService,
+    private router: Router,
+    private svTraceability: TrazabilidadProduccionService,
+    private svProcess: ProcesosService,
     private svAuthentication: AuthenticationService,
-    private svStatusProcess : EstadosProcesos_OTService,
-    private svCodeBar : CodeBarService,
+    private svStatusProcess: EstadosProcesos_OTService,
+    private svCodeBar: CodeBarService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
@@ -104,7 +105,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getTurnos();
     this.cargarTurnoActual();
     this.url = this.router.url;
-    if(this.url == '/reempaque-sellado') this.repacking = true;
+    if (this.url == '/reempaque-sellado') this.repacking = true;
     this.getOperarios();
     this.getMachines();
     this.getProcess();
@@ -114,7 +115,7 @@ export class Produccion_SelladoComponent implements OnInit {
     // this.getPuertoSerial();
   }
 
-  generateCodeBar(){
+  generateCodeBar() {
     this.svCodeBar.createTagProduction([]);
   }
 
@@ -131,7 +132,7 @@ export class Produccion_SelladoComponent implements OnInit {
       ot: [null],
       turno: [null],
       idOperario: [null],
-      cantUnd: [null],
+      cantUnd: [ null ],
       cantKg: [null],
       pesoTeorico: [null],
       pesoNeto: [null],
@@ -139,18 +140,19 @@ export class Produccion_SelladoComponent implements OnInit {
       saldo: [false],
       proceso: ['SELLA'],
       mostratDatosProducto: [false],
-      etiquetaAsociada : [null, ],
-      procesoAnterior : [null, ],
-      otAlterna : [null, ],
-      packer : [null, ], 
-      minWeight : [null, ],
-      maxWeight : [null, ],
-      userAuthorize : [null, ], 
+      etiquetaAsociada: [null,],
+      procesoAnterior: [null,],
+      otAlterna: [null,],
+      packer: [null,],
+      minWeight: [null,],
+      maxWeight: [null,],
+      userAuthorize: [null,],
+      cinta : [false]
     });
     this.formSellado.get('saldo')?.disable();
   }
 
-  inicializateFormResidues(){
+  inicializateFormResidues() {
     this.form = this.frmBuilder.group({
       user: [null, Validators.required],
       pass: [null, Validators.required],
@@ -167,13 +169,13 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función para obtener las maquinas
   getMachines() {
-    this.svMachines.getAllMachines().subscribe(data => { 
-      this.maquinas = data.filter(x => ['SELLA', 'WIKE'].includes(x.proceso_Id)); 
-      this.maquinas.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero)); 
+    this.svMachines.getAllMachines().subscribe(data => {
+      this.maquinas = data.filter(x => ['SELLA', 'WIKE'].includes(x.proceso_Id));
+      this.maquinas.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero));
     }, err => {
       this.svcMsjs.mensajeError('Error', `No fue posible cargar las maquinas | ${err.status} ${err.statusText}`);
     });
-  } 
+  }
 
   //Función para obtener los procesos.
   getProcess() {
@@ -199,7 +201,7 @@ export class Produccion_SelladoComponent implements OnInit {
       'DOBLADO': 4,
       'LAMINADO': 5,
       'CORTE': 6,
-      'EMPAQUE': 7, 
+      'EMPAQUE': 7,
       'MATPRIMA': 8,
     };
     num = processMapping[process.toUpperCase()];
@@ -267,11 +269,11 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que carga los operarios de sellado
   getOperarios() {
-    this.svcUsuarios.GetOperariosProduccion().subscribe(d => { 
-      if(this.repacking) {
-        this.operarios = d.filter(x => x.usua_Id == 0); 
+    this.svcUsuarios.GetOperariosProduccion().subscribe(d => {
+      if (this.repacking) {
+        this.operarios = d.filter(x => x.usua_Id == 0);
         this.formSellado.patchValue({ 'idOperario': [0] });
-      } else this.operarios = d.filter(x => x.area_Id == 10 && x.usua_Id != 0); 
+      } else this.operarios = d.filter(x => x.area_Id == 10 && x.usua_Id != 0);
     });
   }
 
@@ -300,7 +302,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getMachines();
     this.cantBultoEstandar = 0;
     this.medida = '';
-    if(this.repacking) this.formSellado.patchValue({ 'idOperario': [0]  });
+    if (this.repacking) this.formSellado.patchValue({ 'idOperario': [0] });
     this.form.reset();
     this.rolls = [];
     this.rollsConsolidate = [];
@@ -312,14 +314,16 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que habilita/Deshabilita el campo Cantidad de unidades/paquetes para agregar saldos
   habilitarSaldo() {
-    if(this.esSoloLectura) {
+    if (this.esSoloLectura) {
       this.loadModal();
-    } else this.esSoloLectura = true;
-  } 
+    } else {
+        this.esSoloLectura = true;      
+    }
+  }
 
   //Cargar modal para solicitar clave para pesar saldo.
-  loadModal(){
-    this.formSellado.patchValue({ saldo : false });
+  loadModal() {
+    this.formSellado.patchValue({ saldo: false });
     this.form.reset();
     this.esSoloLectura = false;
     this.modalPassword = true;
@@ -327,14 +331,14 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Validar que la contraseña ingresada sea correcta.
-  validatePassword(){
-    let user : number = this.form.value.user;
-    let pass : number = this.form.value.pass;
+  validatePassword() {
+    let user: number = this.form.value.user;
+    let pass: number = this.form.value.pass;
 
     this.svcUsuarios.getUsuariosxId(user).subscribe(data => {
-      if(data) {
-        if(data[0].usua_Contrasena == pass) { 
-          if([97,96,86,8,1,5,12,10].includes(data[0].rolUsu_Id)) this.msjAuthorized();
+      if (data) {
+        if (data[0].usua_Contrasena == pass) {
+          if ([97, 96, 86, 8, 1, 5, 12, 10].includes(data[0].rolUsu_Id)) this.msjAuthorized();
           else this.msjNoAuthorized();
         } else this.svcMsjs.mensajeError('Error', `Usuario y/o contraseña incorrectos`);
       } else this.msjNoAuthorized();
@@ -344,39 +348,40 @@ export class Produccion_SelladoComponent implements OnInit {
     });
   }
 
-  msjAuthorized(){
+  msjAuthorized() {
     this.modalPassword = false;
     this.cargando = false;
     setTimeout(() => {
-      this.formSellado.patchValue({ saldo : true });
+      this.formSellado.patchValue({ saldo: true });
       this.esSoloLectura = false;
-    }, 500);
+    }, 1000);
   }
 
   //Función para enviar un msj de que
-  msjNoAuthorized(){
+  msjNoAuthorized() {
     this.warnMsj('Advertencia', 'Debe solicitar permisos para realizar esta acción.');
     this.cargando = true;
     this.modalPassword = true;
   }
 
   //Función para reiniciar el check de saldos
-  rebootCheckResidues(){
-    this.formSellado.patchValue({ saldo : false });
+  rebootCheckResidues() {
+    this.formSellado.patchValue({ saldo: false });
     this.esSoloLectura = true;
     this.modalPassword = false;
     this.cargando = false;
   }
 
   //Función que busca la orden de trabajo y carga la información
-  buscarOT(validacionDatos: boolean = false, newOT? : boolean) {
+  buscarOT(validacionDatos: boolean = false, newOT?: boolean) {
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargarTurnoActual();
     this.getMachines();
-    if(newOT) this.formSellado.patchValue({ 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null, 'packer' : null, 'minWeight' : null, 'maxWeight' : null, 'userAuthorize' : null });
-    
+    if (newOT) this.formSellado.patchValue({ 'procesoAnterior': null, 'etiquetaAsociada': null, 'otAlterna': null, 'packer': null, 'minWeight': null, 'maxWeight': null, 'userAuthorize': null });
+
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot, `?process=${this.formSellado.value.proceso}`).subscribe(data => {
+      console.log('data OT:', data);
       let nitCliente: any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
       this.svcSedes.GetSedeClientexNitBagPro(nitCliente).subscribe(sede => {
         if (data.length > 0) {
@@ -389,9 +394,12 @@ export class Produccion_SelladoComponent implements OnInit {
             let cantUnd: number = data[0].selladoCorte_CantBolsasBulto <= 0 ? this.formSellado.value.cantUnd : data[0].selladoCorte_CantBolsasBulto;
             this.formSellado.patchValue({ 'cantUnd': cantUnd, });
           }
+          //Cinta
+          if(data[0].producto.includes('CINTA')) this.formSellado.patchValue({ cinta: true });
+          else this.formSellado.patchValue({ cinta: false });
           this.formSellado.get('saldo')?.enable();
           this.validarProceso();
-          if(!newOT) this.updateStatesProcessOT(data[0].numero_Orden, this.formSellado.value.proceso, data[0].cantidad_Sellado, data[0].peso_Sellado);
+          if (!newOT) this.updateStatesProcessOT(data[0].numero_Orden, this.formSellado.value.proceso, data[0].cantidad_Sellado, data[0].peso_Sellado);
           setTimeout(() => this.calcularPesoTeorico(), 500);
           this.claseCantidadRealizada(data[0]);
           this.cargarProduccionSellado(this.formSellado.value.ot, validacionDatos);
@@ -405,13 +413,13 @@ export class Produccion_SelladoComponent implements OnInit {
     });
   }
 
-  msjTotalProduction(data : any){
-    let pedida : number = data[0].cantidad_Pedida;
-    let sellada : number = data[0].cantidad_Sellado;
-    let unit : string = data[0].presentacion;
+  msjTotalProduction(data: any) {
+    let pedida: number = data[0].cantidad_Pedida;
+    let sellada: number = data[0].cantidad_Sellado;
+    let unit: string = data[0].presentacion;
 
-    if(sellada > pedida) this.svcMsjs.mensajeAdvertencia(`La orden está sobrepasada!`, `Se solicitaron ${pedida.toLocaleString()} y se han producido ${sellada.toLocaleString()} ${unit}.`);
-    else if(sellada == pedida) this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad solicita es igual a la cantidad producida!`);
+    if (sellada > pedida) this.svcMsjs.mensajeAdvertencia(`La orden está sobrepasada!`, `Se solicitaron ${pedida.toLocaleString()} y se han producido ${sellada.toLocaleString()} ${unit}.`);
+    else if (sellada == pedida) this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad solicita es igual a la cantidad producida!`);
   }
 
   //Función que cargará los campos
@@ -420,6 +428,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.maquinaConsultada = this.formSellado.value.maquina;
     this.operariosConsultados = this.formSellado.value.idOperario;
     this.packerSelected = this.formSellado.value.packer;
+    this.cintaSelected = this.formSellado.value.cinta;
     //this.authUserSelected = this.formSellado.value.userAuthorize;
   }
 
@@ -436,8 +445,8 @@ export class Produccion_SelladoComponent implements OnInit {
   calcularPesoTeorico() {
     if (this.ordenesTrabajo.length > 0) {
       let pesoTeorico: number = 0;
-      let minWeight : number = 0;
-      let maxWeight : number = 0;
+      let minWeight: number = 0;
+      let maxWeight: number = 0;
       let pesoMillar: number = this.ordenesTrabajo[0].selladoCorte_PesoMillar;
       let cantidad: number = this.formSellado.value.cantUnd;
       let cantBolsasPaq: number = this.ordenesTrabajo[0].selladoCorte_CantBolsasPaquete;
@@ -447,7 +456,7 @@ export class Produccion_SelladoComponent implements OnInit {
       else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
       minWeight = pesoTeorico - (pesoTeorico * 10 / 100);
       maxWeight = pesoTeorico + (pesoTeorico * 10 / 100);
-      this.formSellado.patchValue({ 'pesoTeorico': pesoTeorico, 'minWeight' : minWeight, 'maxWeight' : maxWeight, });
+      this.formSellado.patchValue({ 'pesoTeorico': pesoTeorico, 'minWeight': minWeight, 'maxWeight': maxWeight, });
     }
   }
 
@@ -472,7 +481,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.produccion.sort((a, b) => Number(b.bulto) - Number(a.bulto));
       } else {
         let cantUnd: number = this.formSellado.value.cantUnd || 0;
-        this.formSellado.patchValue({ 'cantUnd': cantUnd, 'procesoAnterior' : null, 'etiquetaAsociada' : null, 'otAlterna' : null});
+        this.formSellado.patchValue({ 'cantUnd': cantUnd, 'procesoAnterior': null, 'etiquetaAsociada': null, 'otAlterna': null });
       }
     }, () => this.svcMsjs.mensajeError(`La OT ${ot} no fue encontrada en el proceso de Sellado`));
   }
@@ -485,47 +494,47 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que valida la entrada del registro
   validarEntrada() {
-    let ot : number = this.formSellado.value.ot;
-    let oldProcess : any = this.formSellado.value.procesoAnterior;
-    let tag : any = this.formSellado.value.etiquetaAsociada;
-    let teoricWeight : number = this.formSellado.value.pesoTeorico;
-    let teoricW5PMost : number = (teoricWeight + ((teoricWeight * 10) / 100));
-    let teoricW5PLess : number = (teoricWeight - ((teoricWeight * 10) / 100));
+    let ot: number = this.formSellado.value.ot;
+    let oldProcess: any = this.formSellado.value.procesoAnterior;
+    let tag: any = this.formSellado.value.etiquetaAsociada;
+    let teoricWeight: number = this.formSellado.value.pesoTeorico;
+    let teoricW5PMost: number = (teoricWeight + ((teoricWeight * 10) / 100));
+    let teoricW5PLess: number = (teoricWeight - ((teoricWeight * 10) / 100));
     this.cargando = true;
     this.getPuertoSerial();
-    
-    if(this.repacking) this.formSellado.patchValue({ idOperario : [0] });
+
+    if (this.repacking) this.formSellado.patchValue({ idOperario: [0] });
     setTimeout(() => {
       if (this.formSellado.valid) {
         if (this.formSellado.value.ot != null && this.formSellado.value.ot != '') {
           if (this.ordenesTrabajo.length > 0) {
-            if(ot == this.ordenesTrabajo[0].numero_Orden) {
+            if (ot == this.ordenesTrabajo[0].numero_Orden) {
               if (this.formSellado.value.maquina > 0) {
                 if (this.formSellado.value.idOperario != null) {
                   if ((this.formSellado.value.idOperario).length < 5) {
                     if (this.formSellado.value.packer) {
-                      if(oldProcess) {
-                        if(tag) {
-                          if(tag.toString().length >= 6) {
-                            if (this.formSellado.value.cantUnd > 0) { 
+                      if (oldProcess) {
+                        if (tag) {
+                          if (tag.toString().length >= 6) {
+                            if (this.formSellado.value.cantUnd > 0) {
                               if (this.formSellado.value.cantKg > 1 && this.formSellado.value.cantKg <= 65) {
-                                if(this.esSoloLectura) {  
-                                  if(this.formSellado.value.cantKg >= teoricW5PLess && this.formSellado.value.cantKg <= teoricW5PMost) {
-                                     this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
+                                if (this.esSoloLectura) {
+                                  if (this.formSellado.value.cantKg >= teoricW5PLess && this.formSellado.value.cantKg <= teoricW5PMost) {
+                                    this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
                                   } else {
-                                    if(this.formSellado.value.userAuthorize) this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
+                                    if (this.formSellado.value.userAuthorize) this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
                                     else {
                                       this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW5PLess.toFixed(2)} y ${teoricW5PMost.toFixed(2)}!`);
                                       this.modalAuthorizeWeight = true;
                                     }
-                                  } 
+                                  }
                                 } else this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
                               } else this.warnMsj(`Advertencia`, `¡La cantidad de kilos debe ser mayor a '1' y menor o igual a 65!`);
                             } else this.warnMsj(`Advertencia`, `¡La cantidad en unidades/paquetes debe ser mayor a '0'!`);
                           } else this.warnMsj(`Advertencia`, `¡La cantidad de digitos del rollo madre debe ser mayor a 5!`);
                         } else this.warnMsj(`Advertencia`, `Debe agregar un número de rollo madre válido!`);
                       } else this.warnMsj(`Advertencia`, `Debe elegir el proceso madre de esta producción!`);
-                    } else this.warnMsj(`Advertencia`, `Debe seleccionar el 'Empacador' del rollo/bulto`); 
+                    } else this.warnMsj(`Advertencia`, `Debe seleccionar el 'Empacador' del rollo/bulto`);
                   } else this.warnMsj(`Advertencia`, `¡Un rollo no puede ser pesado por más de 4 operarios, verifique!`);
                 } else this.warnMsj(`Advertencia`, `¡Debe seleccionar al menos un operario!`);
               } else this.warnMsj(`Advertencia`, `¡Debe seleccionar una máquina válida!`);
@@ -537,13 +546,13 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Crear registro de producción 
-  createRecordProduction(orderProduction : any,  tag : number, oldProcess : string,){
-    if(oldProcess == 'MATPRIMA') this.crearEntrada(orderProduction); 
+  createRecordProduction(orderProduction: any, tag: number, oldProcess: string,) {
+    if (oldProcess == 'MATPRIMA') this.crearEntrada(orderProduction);
     else this.searchOldTag(orderProduction, tag, oldProcess);
   }
 
   //Mensaje de Advertencia.
-  warnMsj(msj1 : any, msj2 : any){
+  warnMsj(msj1: any, msj2: any) {
     this.svcMsjs.mensajeAdvertencia(msj1, msj2);
     this.cargando = false;
   }
@@ -559,17 +568,17 @@ export class Produccion_SelladoComponent implements OnInit {
   msjsMaxWeight = () => 'Rango de peso (10%) maxímo permitido para realizar el pesaje de producción';
 
   //Buscar rollo madre 
-  searchOldTag(dataOrderProduction : any, tag : number, process : any){
-    let ot : number = this.formSellado.value.ot;
-    let otAltern : number = this.formSellado.value.otAlterna;
-    let orders : any = [];
+  searchOldTag(dataOrderProduction: any, tag: number, process: any) {
+    let ot: number = this.formSellado.value.ot;
+    let otAltern: number = this.formSellado.value.otAlterna;
+    let orders: any = [];
 
-    if(ot) orders.push(ot);
-    if(otAltern) orders.push(otAltern);
-    
+    if (ot) orders.push(ot);
+    if (otAltern) orders.push(otAltern);
+
     this.svcBagPro.getRollProduction(tag, `?process=${this.changeNameProcess(process)}`).subscribe(data => {
-      if(data)
-        if(orders.includes(data.ot)) this.crearEntrada(dataOrderProduction, data);
+      if (data)
+        if (orders.includes(data.ot)) this.crearEntrada(dataOrderProduction, data);
         else this.warnMsj('Advertencia', `La etiqueta asociada no hace parte de la(s) OT's digitada(s)`);
       else this.warnMsj('Advertencia', `La etiqueta asociada no hace parte del proceso de ${this.changeNameProcess(process)}`);
     }, error => {
@@ -579,6 +588,8 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que crea la entrada y alista el post.
   crearEntrada(orden: any, data?: any) {
+    let cinta = this.formSellado.value.cinta;
+    console.log('cinta:', cinta);
     this.getMachines();
     this.cargarTurnoActual();
     this.cargando = true;
@@ -596,8 +607,8 @@ export class Produccion_SelladoComponent implements OnInit {
       'Cono_Id': 'N/A',
       'Ancho_Cono': 0,
       'Tara_Cono': 0,
-      'Peso_Bruto': parseFloat(this.formSellado.value.cantKg),
-      'Peso_Neto': parseFloat(this.formSellado.value.cantKg),
+      'Peso_Bruto': cinta ? Math.round(parseFloat(this.formSellado.value.cantKg)) : parseFloat(this.formSellado.value.cantKg),
+      'Peso_Neto': cinta ? Math.round(parseFloat(this.formSellado.value.cantKg)) : parseFloat(this.formSellado.value.cantKg),
       'Cantidad': parseFloat(this.formSellado.value.cantUnd),
       'Peso_Teorico': parseFloat(this.formSellado.value.pesoTeorico),
       'Desviacion': (((parseFloat(this.formSellado.value.cantKg) / parseFloat(this.formSellado.value.pesoTeorico)) * 100) - 100),
@@ -610,9 +621,9 @@ export class Produccion_SelladoComponent implements OnInit {
       'Fecha': moment().format('YYYY-MM-DD'),
       'Hora': moment().format('HH:mm:ss'),
       'Creador_Id': this.AppComponent.storage_Id,
-      'Etiqueta_Trazabilidad' : this.formSellado.value.etiquetaAsociada,
-      'Empacador_Id' : [undefined, null].includes(this.formSellado.value.packer) ? 0 : this.formSellado.value.packer,
-      'Autoriza_Id' : this.formSellado.value.userAuthorize,
+      'Etiqueta_Trazabilidad': this.formSellado.value.etiquetaAsociada,
+      'Empacador_Id': [undefined, null].includes(this.formSellado.value.packer) ? 0 : this.formSellado.value.packer,
+      'Autoriza_Id': this.formSellado.value.userAuthorize,
     }
     this.guardarRegistroEntrada(entrada, data);
   }
@@ -647,9 +658,9 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Función que guarda el registro del rollo en la BD
-  guardarRegistroEntrada(entrada: any, dataTagAssociated? : any) {
-    let motherProcess : any = this.formSellado.value.procesoAnterior; 
-    let otAltern : any = this.formSellado.value.otAlterna; 
+  guardarRegistroEntrada(entrada: any, dataTagAssociated?: any) {
+    let motherProcess: any = this.formSellado.value.procesoAnterior;
+    let otAltern: any = this.formSellado.value.otAlterna;
     this.svcProdProcesos.Post(entrada).subscribe(data => {
       this.crearEtiqueta(data.numero_Rollo, data.peso_Neto, data.cantidad, data.presentacion, false, data.operario1_Id, data.datos_Etiqueta, data, motherProcess, dataTagAssociated);
       setTimeout(() => {
@@ -657,14 +668,80 @@ export class Produccion_SelladoComponent implements OnInit {
         else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
         this.cargarCamposUltimaOT();
         this.limpiarCampos();
-        this.formSellado.patchValue({ 'ot': this.ordenConsultada, 'maquina': this.maquinaConsultada, 'idOperario': this.operariosConsultados, 'procesoAnterior' : motherProcess, 'etiquetaAsociada' : data.etiqueta_Trazabilidad, 'otAlterna' : otAltern, 'packer' : this.packerSelected, 'userAuthorize' : this.authUserSelected });
+        this.formSellado.patchValue({ 
+          'ot': this.ordenConsultada, 
+          'maquina': this.maquinaConsultada, 
+          'idOperario': this.operariosConsultados, 
+          'procesoAnterior': motherProcess, 
+          'etiquetaAsociada': data.etiqueta_Trazabilidad, 
+          'otAlterna': otAltern, 
+          'packer': this.packerSelected, 
+          'userAuthorize': this.authUserSelected, 
+          'cinta': this.cintaSelected, 
+        });
         this.buscarOT();
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
   }
 
+  //****** Función que guarda el registro del rollo en la BD (Versión 2 para repacking) ******//
+  guardarRegistroEntrada2(entrada: any, dataTagAssociated?: any) {
+    let motherProcess = this.formSellado.value.procesoAnterior;
+    let otAltern = this.formSellado.value.otAlterna;
+
+    this.svcProdProcesos.Post(entrada).subscribe(data => {
+      if (!data.numeroRollo_BagPro) {
+        this.svcMsjs.mensajeAdvertencia(
+          'Etiqueta no disponible aún',
+          'El rollo se creó pero la etiqueta aún no está lista'
+        );
+        return;
+      }
+
+      // USAR ROLLO BAGPRO
+      this.crearEtiqueta(
+        data.numeroRollo_BagPro,   //  CORRECTO
+        data.peso_Neto,
+        data.cantidad,
+        data.presentacion,
+        false,
+        data.operario1_Id,
+        data.datos_Etiqueta,
+        data,
+        motherProcess,
+        dataTagAssociated
+      );
+
+      // UI (esto sí puede ir después)
+      this.svcMsjs.mensajeConfirmacion(
+        'Confirmación',
+        'Registro de rollo creado con éxito'
+      );
+
+      this.cargarCamposUltimaOT();
+      this.limpiarCampos();
+      this.formSellado.patchValue({
+        'ot': this.ordenConsultada,
+        'maquina': this.maquinaConsultada,
+        'idOperario': this.operariosConsultados,
+        'procesoAnterior': motherProcess,
+        'etiquetaAsociada': data.etiqueta_Trazabilidad,
+        'otAlterna': otAltern,
+        'packer': this.packerSelected,
+        'userAuthorize': this.authUserSelected,
+        'cinta': this.cintaSelected,
+      });
+
+      this.buscarOT();
+    },
+      () => this.svcMsjs.mensajeError(
+        'Error',
+        'No fue posible crear el registro de entrada de producción'
+      ));
+  }
+
   //Función que crea el pdf de la etiqueta
-  crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any, reimpresion: boolean, operador: any, datosEtiqueta: string = '', productionPL : any, motherProcess : string, tagAssociated? : any) {
+  crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any, reimpresion: boolean, operador: any, datosEtiqueta: string = '', productionPL: any, motherProcess: string, tagAssociated?: any) {
     let dataRollo: any = reimpresion ? this.produccion.find(x => x.bulto == rollo).proceso : this.procesos.find(x => x.Id == this.formSellado.value.proceso).Nombre;
     let operario: any;
     if (!reimpresion) operario = this.operarios.filter(x => x.usua_Id == operador);
@@ -675,11 +752,11 @@ export class Produccion_SelladoComponent implements OnInit {
         'client': data[0].cliente,
         'item': data[0].id_Producto,
         'reference': data[0].producto,
-        'width': data[0].ancho1_Extrusion, 
-        'height': data[0].ancho2_Extrusion, 
-        'bellows': data[0].ancho3_Extrusion, 
-        'und': data[0].und_Extrusion, 
-        'cal': data[0].calibre_Extrusion, 
+        'width': data[0].ancho1_Extrusion,
+        'height': data[0].ancho2_Extrusion,
+        'bellows': data[0].ancho3_Extrusion,
+        'und': data[0].und_Extrusion,
+        'cal': data[0].calibre_Extrusion,
         'orderProduction': this.formSellado.value.ot,
         'material': data[0].material,
         'quantity': cantKg,
@@ -699,65 +776,65 @@ export class Produccion_SelladoComponent implements OnInit {
     }, () => { this.svcMsjs.mensajeError(`Error`, `No fue posible generar la etiqueta, por favor verifique!`) });
   }
 
-   //Cambiar nombre de proceso de bagpro a plasticaribe
-   changeNameProcess(process : string){
+  //Cambiar nombre de proceso de bagpro a plasticaribe
+  changeNameProcess(process: string) {
     switch (process) {
-      case 'EXT' :
+      case 'EXT':
         return 'EXTRUSION';
-      case 'IMP' :
+      case 'IMP':
         return 'IMPRESION';
-      case 'LAM' :
+      case 'LAM':
         return 'LAMINADO';
-      case 'CORTE' :
+      case 'CORTE':
         return 'CORTE';
-      case 'DBLD' :
+      case 'DBLD':
         return 'DOBLADO';
-      case 'EMP' :
+      case 'EMP':
         return 'EMPAQUE';
-      case 'SELLA' :
+      case 'SELLA':
         return 'SELLADO';
-      case 'ROT' :
+      case 'ROT':
         return 'ROTOGRABADO';
-      case 'MATPRIMA' :
+      case 'MATPRIMA':
         return 'MATPRIMA';
-      case 'PERF' :
-      return 'PERFORADO';
-      default :
-        return ''; 
+      case 'PERF':
+        return 'PERFORADO';
+      default:
+        return '';
     }
-   }
+  }
 
   //Cambiar nombre de proceso de plasticaribe a bagpro
-  changeProcessInverse(process : string){
+  changeProcessInverse(process: string) {
     switch (process) {
-      case 'EXTRUSION' :
+      case 'EXTRUSION':
         return 'EXT';
-      case 'IMPRESION' :
+      case 'IMPRESION':
         return 'IMP';
-      case 'LAMINADO' :
+      case 'LAMINADO':
         return 'LAM';
-      case 'CORTE' :
+      case 'CORTE':
         return 'CORTE';
-      case 'DOBLADO' :
+      case 'DOBLADO':
         return 'DBLD';
-      case 'EMPAQUE' :
+      case 'EMPAQUE':
         return 'EMP';
-      case 'SELLADO' :
+      case 'SELLADO':
         return 'SELLA';
-      case 'ROTOGRABADO' :
+      case 'ROTOGRABADO':
         return 'ROT';
-      case 'MATPRIMA' :
-          return 'MATPRIMA';
-      case 'PERFORADO' :
-          return 'PERF';      
-      default :
-        return ''; 
+      case 'MATPRIMA':
+        return 'MATPRIMA';
+      case 'PERFORADO':
+        return 'PERF';
+      default:
+        return '';
     }
   }
 
   //Modelo de trazabilidad
-  modelTraceability(productionPL : any, produccionBagPro : any, motherProcess : string, infoTagAssociated? : any){
-    let info : modelTrazabilidad_Produccion = {
+  modelTraceability(productionPL: any, produccionBagPro: any, motherProcess: string, infoTagAssociated?: any) {
+    let info: modelTrazabilidad_Produccion = {
       'Trz_Etiqueta': produccionBagPro[0].bulto,
       'Trz_Ot': productionPL.ot,
       'Prod_Id': productionPL.prod_Id,
@@ -774,19 +851,19 @@ export class Produccion_SelladoComponent implements OnInit {
       'Operario_2': productionPL.operario2_Id == null ? 0 : productionPL.operario2_Id,
       'Operario_3': productionPL.operario3_Id == null ? 0 : productionPL.operario3_Id,
       'Operario_4': productionPL.operario4_Id == null ? 0 : productionPL.operario4_Id,
-      'Empacador_Id' : [undefined, null].includes(productionPL.empacador_Id) ? 0 : productionPL.empacador_Id, 
-      'Turno_Id' : productionPL.turno_Id, 
+      'Empacador_Id': [undefined, null].includes(productionPL.empacador_Id) ? 0 : productionPL.empacador_Id,
+      'Turno_Id': productionPL.turno_Id,
       'Trz_EtiquetaAnterior': infoTagAssociated ? infoTagAssociated.rollo : this.formSellado.value.etiquetaAsociada,
       'Trz_OtAnterior': infoTagAssociated ? infoTagAssociated.ot : null,
       'Prod_Anterior': infoTagAssociated ? infoTagAssociated.item : 1,
       'Proceso_Anterior': motherProcess,
-      'Autoriza_Id' : productionPL.autoriza_Id,
-    } 
+      'Autoriza_Id': productionPL.autoriza_Id,
+    }
     return info;
   }
 
   //Crear registro de trazabilidad. 
-  createTraceability(productionProcess : any, infoTagBagPro : any, motherProcess : string, infoTagAssociated? : number){
+  createTraceability(productionProcess: any, infoTagBagPro: any, motherProcess: string, infoTagAssociated?: number) {
     this.svTraceability.PostTraceability(this.modelTraceability(productionProcess, infoTagBagPro, motherProcess, infoTagAssociated)).subscribe(trace => {
     }, error => {
       this.svcMsjs.mensajeError(`Error`, `Error al crear el registro de trazabilidad | ${error.status} ${error.statusText}`);
@@ -795,19 +872,19 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Validar información de rollos por OT
-  validateOrderProduction(typeOT : string){
+  validateOrderProduction(typeOT: string) {
     this.rollsConsolidate = [];
     this.rolls = [];
-    let ot : number = typeOT == 'altern' ? ![null, '', undefined].includes(this.formSellado.value.otAlterna) ? this.formSellado.value.otAlterna : this.formSellado.value.ot : this.formSellado.value.ot;
-    let motherProcess : string = this.formSellado.value.procesoAnterior;
-    
+    let ot: number = typeOT == 'altern' ? ![null, '', undefined].includes(this.formSellado.value.otAlterna) ? this.formSellado.value.otAlterna : this.formSellado.value.ot : this.formSellado.value.ot;
+    let motherProcess: string = this.formSellado.value.procesoAnterior;
+
     this.orderProduction = null;
 
-    if(ot && motherProcess) {
+    if (ot && motherProcess) {
       this.cargando = true;
       this.svcBagPro.GetObtenerDatosxProcesos(ot, this.changeNameProcess(motherProcess)).subscribe(data => {
-        if(data) {
-          if(data.length > 0) {
+        if (data) {
+          if (data.length > 0) {
             this.modalRolls = true;
             this.rolls = data;
             this.cargando = false;
@@ -819,8 +896,8 @@ export class Produccion_SelladoComponent implements OnInit {
           this.orderProduction = ot;
         }
       }, error => { this.warnMsj(`Error`, `Error al consultar rollos de la OT ${ot} en el proceso de ${this.changeNameProcess(motherProcess)} | ${error.status} ${error.statusText}`); });
-    } else  this.warnMsj(`Advertencia`, `Debe diligenciar los campos 'Proceso Madre' y 'OT'`);
-    
+    } else this.warnMsj(`Advertencia`, `Debe diligenciar los campos 'Proceso Madre' y 'OT'`);
+
   }
 
   consolidateProduction() {
@@ -835,43 +912,43 @@ export class Produccion_SelladoComponent implements OnInit {
   totalRolls = () => this.rolls.length;
 
   //Función para cargar los rollos madres de bulto
-  loadMotherRolls(tag : any, process : string){
+  loadMotherRolls(tag: any, process: string) {
     this.modalRolls = false;
-    this.formSellado.patchValue({ 'etiquetaAsociada' :  tag });
+    this.formSellado.patchValue({ 'etiquetaAsociada': tag });
     this.svcMsjs.mensajeConfirmacion(`Confirmación`, `Se asoció el rollo madre N° ${tag} del proceso de ${process} exitosamente!`);
   }
 
   //Filtrar la tabla de los rollos cargados en el modal.
-  applyFilter = ($event, campo : any, actionField : any) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, actionField);
+  applyFilter = ($event, campo: any, actionField: any) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, actionField);
 
   //Función para inactivar el campo OT alterna
-  changeOldProcess(){
-    let motherProcess : any = this.formSellado.value.procesoAnterior;
-    if(motherProcess == 'MATPRIMA') {
-      this.formSellado.patchValue({ etiquetaAsociada: null, otAnterior : null });
+  changeOldProcess() {
+    let motherProcess: any = this.formSellado.value.procesoAnterior;
+    if (motherProcess == 'MATPRIMA') {
+      this.formSellado.patchValue({ etiquetaAsociada: null, otAnterior: null });
     }
   }
 
   //Actualizar pesaje en estados procesos OT. 
-  updateStatesProcessOT(ot : any, process : string, qty : number, weight : number,){
+  updateStatesProcessOT(ot: any, process: string, qty: number, weight: number,) {
     this.svStatusProcess.putStatusProcessOT(ot, process, qty, weight).subscribe(dataUpdate => {
       console.log(dataUpdate);
     }, error => {
       console.log(error);
     });
-  }  
+  }
 
   //
-  authorizeWeight(){
-    let id : number = this.formWeight.value.id;
+  authorizeWeight() {
+    let id: number = this.formWeight.value.id;
     this.svcUsuarios.GetUsersAthorizedForTeoricWeight(id).subscribe(data => {
-      if(data) {
-        if(data.length > 0) {
-          let user : number = data[0].user_Id;
-          let index : number = this.usersAuthorized.findIndex(x => x.user_Id == user);
+      if (data) {
+        if (data.length > 0) {
+          let user: number = data[0].user_Id;
+          let index: number = this.usersAuthorized.findIndex(x => x.user_Id == user);
           this.svcMsjs.mensajeConfirmacion(`Confirmación`, `Autorizado exitosamente por ${data[0].userName}!`);
           this.modalAuthorizeWeight = false;
-          this.formSellado.patchValue({ 'userAuthorize' : this.usersAuthorized[index].user_Id });
+          this.formSellado.patchValue({ 'userAuthorize': this.usersAuthorized[index].user_Id });
           this.formWeight.reset();
         } else this.msjAuthorize(`Advertencia`, `Usuario sin autorización para realizar esta acción!`);
       } else this.msjAuthorize(`Advertencia`, `Usuario no autorizado para realizar esta acción!`);
@@ -881,9 +958,9 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Mensaje de advertencia por no autorización de pesos teoricos.
-  msjAuthorize(msj1 : string, msj2 : string){
+  msjAuthorize(msj1: string, msj2: string) {
     this.svcMsjs.mensajeAdvertencia(msj1, msj2);
-      this.formWeight.reset();
+    this.formWeight.reset();
   }
 
 }

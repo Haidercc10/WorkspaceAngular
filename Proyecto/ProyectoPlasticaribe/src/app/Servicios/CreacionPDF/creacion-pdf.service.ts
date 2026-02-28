@@ -495,8 +495,8 @@ export class TagProduction_2 {
     let sizeClient: number = dataTag.client.length;
     let sizeReference: number = dataTag.reference.length;
     let size: number = 90;
-    size += sizeClient < 50 ? sizeClient < 24 ? 30 : 10 : 0;
-    size += sizeReference < 50 ? sizeReference < 24 ? 30 : 10 : 0;
+    size += sizeClient < 50 ? sizeClient < 24 ? 15 : 10 : 0;
+    size += sizeReference < 50 ? sizeReference < 24 ? 15 : 10 : 0;
     return size;
   }
 

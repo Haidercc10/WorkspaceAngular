@@ -58,7 +58,7 @@
 
       <!--Saldo-->
       <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
-        <p-checkbox formControlName="saldo" [binary]="true" inputId="binary" id="saldo" (click)="habilitarSaldo()"
+        <p-checkbox formControlName="saldo" [binary]="true" inputId="saldo" id="saldo" (click)="habilitarSaldo()"
           pTooltip="Al hacer click sobre este check el campo 'Cantidad Und.' será habilitado para casos donde la cantidad del bulto/paquete solo sea un saldo."
           tooltipPosition="top"></p-checkbox>
         <label for="saldo">Saldo</label>
@@ -69,16 +69,16 @@
         <span class="p-float-label">
           <p-inputNumber formControlName="cantUnd" (onInput)="calcularPesoTeorico()" id="cantUnd" type="number"
             [maxFractionDigits]="2" [readonly]="esSoloLectura" [useGrouping]="false"
-            pTooltip="Cantidad de Unidades / Paquetes / Kilos" tooltipPosition="top"></p-inputNumber>
+            pTooltip="Cantidad de Unidades/Paquetes/Kilos" tooltipPosition="top"></p-inputNumber>
           <label for="cantUnd">Cantidad</label>
         </span>
       </div>
 
-      <!--Cantidad Kg-->
+      <!--Cantidad Kg -->
       <div class="col-sm-12 col-md-6 col-xl-1">
         <span class="p-float-label">
           <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2"
-            [readonly]="true"></p-inputNumber>
+          [readonly]="true"></p-inputNumber>
           <label for="cantKg">Cant. Kg</label>
         </span>
       </div>
@@ -182,6 +182,12 @@
             optionValue="user_Id"></p-dropdown>
           <label for="userAuthorize">Autoriza</label>
         </span>
+      </div>
+
+      <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox">
+        <p-checkbox formControlName="cinta" [binary]="true" inputId="cinta" id="cinta"
+          pTooltip="Al activar este campo se redondea el peso del bulto. Ej: de 15.20 a 15.00" tooltipPosition="top"></p-checkbox>
+        <label for="cinta">Referencia Cinta</label>
       </div>
 
       <div class="mb-3">
