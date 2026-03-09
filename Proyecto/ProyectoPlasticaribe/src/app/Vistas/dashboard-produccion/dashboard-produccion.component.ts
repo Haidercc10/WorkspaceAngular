@@ -86,7 +86,7 @@ export class DashboardProduccionComponent implements OnInit {
   maxCamisilla: number = 100;
   maxSellado: number = 100;
   
-
+  dateSelected : any;
 
   constructor(
     private AppComponent: AppComponent,
@@ -101,6 +101,7 @@ export class DashboardProduccionComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.dateSelected = new Date(moment().format('YYYY-MM-DD'));
     this.tiempoExcedido();
     this.lecturaStorage();
     setInterval(() => {
@@ -137,6 +138,7 @@ export class DashboardProduccionComponent implements OnInit {
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.mainPage.production) {
+      this.dateSelected = new Date(moment().format('YYYY-MM-DD'));
       setTimeout(() => this.loadDataProduction(), 1000);
       setTimeout(() => {
         this.llenarGraficaComparativoExtrusion();
@@ -149,6 +151,7 @@ export class DashboardProduccionComponent implements OnInit {
 
       let time = setInterval(() => {
         if (this.mainPage.production) {
+          this.dateSelected = new Date(moment().format('YYYY-MM-DD'));
           setTimeout(() => this.loadDataProduction(), 1000);
           setTimeout(() => {
             this.llenarGraficaComparativoExtrusion();
@@ -166,11 +169,11 @@ export class DashboardProduccionComponent implements OnInit {
 
   //TODO: Solo información del dashboard
   loadDataProduction() {
-    let date1: any = moment().subtract(1, 'd').format('YYYY-MM-DD');
-    let date2: any = moment().subtract(1, 'd').format('YYYY-MM-DD');
-
+    //let date1: any = moment().subtract(1, 'd').format('YYYY-MM-DD');
+    //let date2: any = moment().subtract(1, 'd').format('YYYY-MM-DD');
+    //this.dateSelected = moment(this.dateSelected).format('YYYY-MM-DD')
     this.consultarPesoProducidoOrdenes();
-    this.getDataForMachine2(date1, date2);
+    this.getDataForMachine2(moment(this.dateSelected).format('YYYY-MM-DD'), moment(this.dateSelected).format('YYYY-MM-DD'));
   }
 
   //Obtener datos de producción por maquina
@@ -178,6 +181,7 @@ export class DashboardProduccionComponent implements OnInit {
     this.clearFields();
 
     this.svDailyProd.getProductionDay(date1, date2).subscribe(data => {
+      console.log(data);
       this.productionMachines = data;
       this.totalPercentageCami = this.totalPercentageForProcess('CAMISILLA');
       this.totalPercentageExt = this.totalPercentageForProcess('EXT');
@@ -471,9 +475,9 @@ export class DashboardProduccionComponent implements OnInit {
   }
 
   getDetailsProductionForMachine(process?: string, machine?: number, turn?: string) {
-    let date: any = moment().format('YYYY-MM-DD');
+    //let date: any = moment().format('YYYY-MM-DD');
     this.productionReport = true;
-    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date), new Date(date)], 'proceso': process.toUpperCase(), 'Maquina': machine, 'Turno': turn, });
+    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(this.dateSelected), new Date(this.dateSelected)], 'proceso': process.toUpperCase(), 'Maquina': machine, 'Turno': turn, });
     this.cmproduction.consultarProduccion();
   }
 

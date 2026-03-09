@@ -110,10 +110,10 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 4 && [85,94,4,89,88,87].includes(this.ValidarRol) ? this.calidad = true : null;
     
     //Ventas
-    index == 2 && [2,98].includes(this.ValidarRol) ? this.facturacion = true : null;
-    index == 3 && [2].includes(this.ValidarRol) ? this.pedidos = true : null;
-    index == 4 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
-    index == 5 && [2].includes(this.ValidarRol) ? this.recaudos = true : null;
+    index == 2 && [2,98,103].includes(this.ValidarRol) ? this.facturacion = true : null;
+    index == 3 && [2,103].includes(this.ValidarRol) ? this.pedidos = true : null;
+    index == 4 && [2,103].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
+    index == 5 && [2,103].includes(this.ValidarRol) ? this.recaudos = true : null;
     //index == 6 && [2].includes(this.ValidarRol) ? this.gerencia = true : null;
 
     this.saveLogModule(tab);
@@ -128,7 +128,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
       Usm_Accion : 'Click'
     } 
     this.svUseModules.Post(model).subscribe(data => {
-      console.log(data)
+      //console.log(data)
     }, error => {
       console.log(error);
     })

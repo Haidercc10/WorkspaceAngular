@@ -195,7 +195,7 @@ export class InventarioZeusService {
 
   getEstadisticaVentasAnio = (anio: any, ruta?: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getEstadisticaVentasAnio/${anio}${ruta}`);
 
-  GetBillsByClient = (route: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getBillsByClient${route}`);
+  GetBillsByClient = (date1 : any, date2 : any, route? : string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getBillsByClient/${date1}/${date2}${route}`);
 
   KilosFacturadosMes = (year : any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/KilosFacturadosMes/${year}`);
 

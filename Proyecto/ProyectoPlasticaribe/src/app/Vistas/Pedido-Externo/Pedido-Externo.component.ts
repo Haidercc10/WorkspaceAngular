@@ -406,40 +406,39 @@ export class PedidoExternoComponent implements OnInit {
       this.FormPedidoExternoProductos.patchValue({ 'ProdStock': parseFloat(exis.disponibles) }));
       this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
         this.presentacion = datos_prod.map(x => x.undMed_Id);
-        datos_prod.forEach(prod => {
+        datos_prod.forEach(p => {
           //this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), prod.undMed_Id).subscribe(dataPed => {
           //  this.FormPedidoExternoProductos.patchValue({ 'ProdUltFacturacion': dataPed.precioUnidad | 0 });
           //  this.fechaUltFacuracion = dataPed.fechaDocumento.replace('T00:00:00', '');
           //});
           setTimeout(() => {
             this.FormPedidoExternoProductos.patchValue({
-              'ProdId': prod.prod_Id,
-              'ProdNombre': prod.prod_Nombre,
-              'ProdUnidadMedidaCant': prod.undMed_Id,
-              'ProdPrecioUnd': prod.exProd_PrecioVenta,
+              'ProdId': p.prod.prod_Id,
+              'ProdNombre': p.prod.prod_Nombre,
+              'ProdUnidadMedidaCant': p.prod.undMed_Id,
+              'ProdPrecioUnd': p.prod.exProd_PrecioVenta,
             });
-            console.log(prod);
             
             this.formProdTerminado.patchValue({
-              margin : prod.prod_Margen,
-              weightMillar : prod.prod_Peso_Millar,
-              weightRoll : prod.prod_Peso,
+              margin : p.prod.prod_Margen,
+              weightMillar : p.prod.prod_Peso_Millar,
+              weightRoll : p.prod.prod_Peso,
               weightUnit : 0,
-              qtyBagxBulto : prod.prod_CantBolsasBulto,
-              qtyBagxPaq : prod.prod_CantBolsasPaquete,
-              tpSealed : prod.tpSellado_Id,
-              tpPrinting : prod.tpImpresion_Id,
-              format: prod.tpProd_Id,
-              width: prod.prod_Ancho,
-              long: prod.prod_Largo,
-              bellow: prod.prod_Fuelle,
-              material: prod.material_Id,
-              pigment: prod.pigmt_Id,
+              qtyBagxBulto : p.prod.prod_CantBolsasBulto,
+              qtyBagxPaq : p.prod.prod_CantBolsasPaquete,
+              tpSealed : p.prod.tpSellado_Id,
+              tpPrinting : p.prod.tpImpresion_Id,
+              format: p.prod.tpProd_Id,
+              width: p.prod.prod_Ancho,
+              long: p.prod.prod_Largo,
+              bellow: p.prod.prod_Fuelle,
+              material: p.prod.material_Id,
+              pigment: p.prod.pigmt_Id,
               printing: '',
               printingDouble: '',
               embobinate: 0,
-              treaty: prod.tratado_Id,
-              caliber: prod.prod_Calibre,
+              treaty: p.prod.tratado_Id,
+              caliber: p.prod.prod_Calibre,
             })
           }, 1000);
         });

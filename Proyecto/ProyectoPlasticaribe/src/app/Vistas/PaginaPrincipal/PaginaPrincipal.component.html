@@ -4,7 +4,7 @@
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
   <div class="container-fluid" id="card">
-    <p-tabView (onChange)="cambioTab($event)" *ngIf="[1,2,3,4,6,10,59,60,61,69,12,94,96,85,97,2,98,10,5,63,64,65,74,75,76,77,78,79,80,81,85,86,87,88,89,97,98,102,101,95,83].includes(ValidarRol)">
+    <p-tabView (onChange)="cambioTab($event)" *ngIf="[1,2,3,4,6,10,59,60,61,69,12,94,96,85,97,2,98,10,5,63,64,65,74,75,76,77,78,79,80,81,85,86,87,88,89,97,98,102,101,95,83,103].includes(ValidarRol)">
       <!-- Producción por Áreas -->
       <p-tabPanel
         header="Producción"
@@ -18,7 +18,7 @@
         header="Ordenes de Trabajo"
         leftIcon="pi pi-sliders-h"
         tooltip="Información de las Ordenes de Trabajo"
-        *ngIf="[1,60,12,94,85,2,98,5].includes(ValidarRol)">
+        *ngIf="[1,60,12,94,85,2,98,5,103].includes(ValidarRol)">
         <app-Dashboard-OT *ngIf="ordenTrabajo"></app-Dashboard-OT>
       </p-tabPanel>
 
@@ -27,7 +27,7 @@
         header="Facturación"
         leftIcon="pi pi-dollar"
         tooltip="Información de la Facturación Mensual"
-        *ngIf="[1,60,6,12,96,98,10,2,69].includes(ValidarRol)">
+        *ngIf="[1,60,6,12,96,98,10,2,69,103].includes(ValidarRol)">
         <app-DashBoard_Facturacion *ngIf="facturacion"></app-DashBoard_Facturacion>
       </p-tabPanel>
 
@@ -45,7 +45,7 @@
         header="Pedidos"
         leftIcon="pi pi-shopping-bag"
         tooltip="Información de los Pedidos creados en Zeus"
-        *ngIf="[1,60,61,6,12,96,85,97,2,98,10].includes(ValidarRol)">
+        *ngIf="[1,60,61,6,12,96,85,97,2,98,10,103].includes(ValidarRol)">
         <app-DashBoard_Pedidos *ngIf="pedidos"></app-DashBoard_Pedidos>
       </p-tabPanel>
 
@@ -54,7 +54,7 @@
         header="Facturación Vendedores"
         leftIcon="pi pi-chart-line"
         tooltip="Información de la Facturación Mensual y las Ordenes de Trabajo"
-        *ngIf="[1,60,12,2].includes(ValidarRol)">
+        *ngIf="[1,60,12,2,103].includes(ValidarRol)">
         <app-ReporteFacturacion_Vendedores *ngIf="facturacionVendedores"></app-ReporteFacturacion_Vendedores>
       </p-tabPanel>
 
@@ -63,7 +63,7 @@
         header="Recaudos"
         leftIcon="pi pi-shopping-cart"
         tooltip="Información sobre los recaudos de la empresa"
-        *ngIf="[1,61,69,12,2].includes(ValidarRol)">
+        *ngIf="[1,61,69,12,2,103].includes(ValidarRol)">
         <app-DashBoard-Recaudos *ngIf="recaudos"></app-DashBoard-Recaudos>
       </p-tabPanel>
 

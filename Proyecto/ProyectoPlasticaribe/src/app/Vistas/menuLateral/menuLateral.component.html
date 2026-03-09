@@ -2,8 +2,9 @@
   <!-- Navegador Principal -->
   <nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
     <div class="container-fluid">
-      <p>
-        <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button (click)="mostrarMenuLateral()">
+      <img class="logo2 cursor" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="" (click)="mostrarMenuLateral()">
+      <!--<p>
+        <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button >
           <b>
             <span class="font-size-18" [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">
               <i class="pi pi-home font-size-20 px-2 py-3"></i>
@@ -11,7 +12,7 @@
             </span>
           </b>
         </button>
-      </p>
+      </p>-->
       <div class="p-2">
         <i class="pi pi-envelope font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadCorreosNuevos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="modalCorreos = true" *ngIf="[1,6,2].includes(ValidarRol)"></i>
         <i class="pi pi-calendar font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadEventos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="mostrarModalCalendario()"></i>
@@ -31,7 +32,7 @@
   <!-- Menú Principal -->
   <p-sidebar [(visible)]="display" [style]="{width : '30rem'}">
     <div class="imagen">
-      <img [src]="!modoSeleccionado ? 'assets/PLASTICARIBE_logo.png' : 'assets/Logo-Plasticaribe/logo.png'" alt="Plasticaribe S.A.S">
+      <img [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="Plasticaribe S.A.S">
     </div>
     <br>
     <p-panelMenu *ngIf="!cargando" [model]="categorias" [multiple]="true" [style]="{color : modoSeleccionado ?  'white' : 'black'}"></p-panelMenu>

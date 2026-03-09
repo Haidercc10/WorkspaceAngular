@@ -69,6 +69,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lecturaStorage();
     this.obtenerVendedores();
     this.loadRankDates();
   }
@@ -94,7 +95,17 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   // Funcion que se encargará de obtener los vendedores
   obtenerVendedores(){
-    this.vendedorService.GetVendedores().subscribe(resp => this.vendedores = resp);
+    let asesor : any = this.ValidarRol == 2 ? this.AppComponent.storage_Id : null;  
+    this.vendedorService.GetVendedores().subscribe(resp => {
+      this.vendedores = resp;
+      this.vendedores = asesor ? this.vendedores.filter(x => x.usua_Id == asesor) : this.vendedores
+    });
+  }
+
+  //Crea la función lecturaStorage()
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que se encargaá de buscar los clientes

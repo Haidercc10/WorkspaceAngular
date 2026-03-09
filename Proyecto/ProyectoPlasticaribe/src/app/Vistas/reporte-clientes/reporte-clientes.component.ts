@@ -7,6 +7,7 @@ import { AppComponent } from 'src/app/app.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-reporte-clientes',
@@ -23,18 +24,22 @@ export class ReporteClientesComponent {
   clients: Array<any> = [];
   dataClients : any = [];
   @ViewChild('tableClients') tableClients : Table | undefined;
+  sales : any = [];
 
   constructor(private appComponent: AppComponent,
     private zeusInvService: InventarioZeusService,
     private frmBuilder: FormBuilder,
     private msg: MensajesAplicacionService,
-    private svExcel : CreacionExcelService
+    private svExcel : CreacionExcelService,
+    private svUsers : UsuarioService,
+
   ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
     this.initForm();
   }
 
   ngOnInit(): void {
+    this.readStorage();
   }
 
   initForm() {
@@ -43,7 +48,16 @@ export class ReporteClientesComponent {
       client: [null],
       start: [null],
       end: [null],
+      sales : [null],
     });
+  }
+
+  //Crea la función de lecturaStorage()
+  readStorage(){
+    this.storage_Id = this.appComponent.storage_Id;
+    this.storage_Name = this.appComponent.storage_Nombre;
+    this.validateRole = this.appComponent.ValidarRol;
+    this.getSales();
   }
 
   clearFields() {
@@ -55,6 +69,15 @@ export class ReporteClientesComponent {
   errorMessage(message: string, error: HttpErrorResponse) {
     this.msg.mensajeError(message, `Error: ${error.error.title} | Status: ${error.status}`);
     this.load = false;
+  }
+
+  // Realiza la función getSales() que está en el modulo de movimientos de orden de facturación
+  getSales(){
+    let asesor: any = this.validateRole == 2 ? this.appComponent.storage_Id : null;
+    this.svUsers.GetVendedores().subscribe(data => {
+      this.sales = data;
+      this.sales = asesor ? this.sales.filter(x => x.usua_Id == asesor) : this.sales
+    })
   }
 
   aplyFilter = ($event, campo: string, table: Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
@@ -82,11 +105,14 @@ export class ReporteClientesComponent {
     let date1 : any = moment(this.form.value.start).format('YYYY-MM-DD');
     let date2 : any = moment(this.form.value.end).format('YYYY-MM-DD');
     let client : any = this.form.value.idClient;
+    let sales = this.validateRole == 2
+      ? `${String(this.storage_Id).padStart(3, '0')}`
+      : '';
+
     let url : string = ``;
 
-    if(client != null) {
-      if(client.toString().length > 0) url = `?client=${client}`;
-    }
+    if(client != null) url.length > 0 ? url += `&client=${client}` : url += `?client=${client}`;  
+    if(sales != null) url.length > 0 ? url += `&sales=${sales}` : url += `?sales=${sales}`;
     
     if(date1 == 'Fecha inválida') date1 = moment().add(1, 'd').format('YYYY-MM-DD');
     if(date2 == 'Fecha inválida') date2 = moment().add(1, 'd').format('YYYY-MM-DD');

@@ -104,7 +104,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   //
   facturacion2() {
-    if (![1, 60, 6, 12, 96, 98, 10, 2, 69].includes(this.ValidarRol)) {
+    if (![1, 60, 6, 12, 96, 98, 10, 2, 69, 103].includes(this.ValidarRol)) {
       return;
     }
 
@@ -175,7 +175,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Funcion que va a consultar la información de la facturación
   facturacion() {
-    if ([1, 60, 6, 12, 96, 98, 10, 2, 69].includes(this.ValidarRol)) {
+    if ([1, 60, 6, 12, 96, 98, 10, 2, 69, 103].includes(this.ValidarRol)) {
       this.zeusService.ValorTotalFacturadoHoy().subscribe(datos_facturacion => this.totalFacturadoDia = datos_facturacion);
       this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
         if (moment().month() == 7 && this.anoSeleccionado == 2023) this.totalFacturadoMes = (datos_facturacion + 6249600 + 12091700);
@@ -207,6 +207,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
       this.cargando = true;
       let costoMeses: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       this.zeusService.GetFacturacion_Mes_Mes(`${this.anoSeleccionado}`).subscribe(dato => {
+        console.log(dato);
         for (let i = 0; i < dato.length; i++) {
           let info: any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
           costoMeses = [
@@ -224,6 +225,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
             i == 11 ? parseFloat(info.Valor) : costoMeses[11],
           ];
           if (i == 11) this.llenarGraficaFacturacion(costoMeses);
+          console.log(costoMeses);
+          
           let info_Anio: any = {
             anio: this.anoSeleccionado,
             costo: costoMeses.reduce((a, b) => a + b, 0),

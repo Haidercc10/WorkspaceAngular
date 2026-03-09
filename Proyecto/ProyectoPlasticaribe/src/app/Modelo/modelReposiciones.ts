@@ -12,4 +12,5 @@ export interface modelReposiciones {
     Rep_ObservacionSalida : string;
     Falla_Id? : number, 
     Usua_Autoriza? : number,
+    Usua_Vendedor? : number,
 }

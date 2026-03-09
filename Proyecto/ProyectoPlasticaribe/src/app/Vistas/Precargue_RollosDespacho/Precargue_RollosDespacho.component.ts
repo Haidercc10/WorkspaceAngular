@@ -89,7 +89,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       doc : [null],
       roll : [null],
       clientStock : [false, ],
-      //process : [null],
+      asesor : [null],
       //item : [null, Validators.required], 
       //reference : [null, Validators.required],
       idClient : [null, Validators.required], 
@@ -107,7 +107,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   //*
   selectClient() {
     let client = this.clients.find(x => x.idcliente == this.form.value.client);
-    this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, });
+    this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, 'asesor' : client.idvende, });
   }
 
   //*
@@ -187,8 +187,6 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         } else {
           this.enabledFieldRoll();
         }
-     
-      
     } else {
       this.msjs(`Advertencia`, `Debe llenar todos los campos`);
       this.enabledFieldRoll();
@@ -260,7 +258,9 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         Pcd_HoraModifica: moment().format('HH:mm:ss'),
         Usua_Modifica: 0,
         Pcd_ObservacionModifica: '',
+        Usua_Vendedor : parseInt(this.form.value.asesor),
       };
+      
       this.svPreload.Post(info).subscribe(data => { this.saveDetailsPreload(data.pcd_Id); }, error => { 
         this.msjs(`Error`, `Error guardando el encabezado del precargue de despacho`); 
       });

@@ -24,7 +24,8 @@
       <!-- VENDEDOR -->
       <div class="col-sm-12 col-md-6 col-xl-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="vendedor" inputId="vendedores" [autoDisplayFirst]="false" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+          <p-dropdown formControlName="vendedor" inputId="vendedores" [autoDisplayFirst]="ValidarRol == 2"
+            [readonly]="ValidarRol == 2" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
           <label for="vendedores">Vendedores</label>
         </span>
       </div>

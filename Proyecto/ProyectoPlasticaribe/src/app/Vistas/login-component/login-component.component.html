@@ -1,9 +1,9 @@
 <div class="fondo">
   <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()" autocomplete="off">
 
-    <div class="titulo">
+    <!--<div class="titulo">
       <img class="logo slide-in-fwd-center" src="/assets/PLASTICARIBE_logo.png" alt="">
-    </div>
+    </div>-->
 
     <!--Contenedor Principal-->
     <div class="container-fluid slide-in-fwd-center">
@@ -11,7 +11,9 @@
 
         <!--Titulo-->
         <div class="mb-3">
-          <h4 class="tituloRojo"><i class="pi pi-sign-in"></i> Accede a tu cuenta</h4>
+          <h4 class="tituloRojo"><i class="pi pi-sign-in"></i> Accede a tu cuenta de</h4>
+          <img class="logo2" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="">
+          
         </div>
 
         <div class="col-md mb">

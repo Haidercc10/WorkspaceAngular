@@ -38,12 +38,27 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     private svUsuarios : UsuarioService,
   ) {
     this.selectedMode = this.appComponent.temaSeleccionado;
+    this.initForm();
   }
 
   ngOnInit(): void {
-    this.initForm();
-    this.obtenerVendedores();
+    this.readStorage();
+    this.loadRankDates();
   }
+
+  // 
+  readStorage(){
+    this.storage_Id = this.appComponent.storage_Id;
+    this.storage_Name = this.appComponent.storage_Nombre;
+    this.validateRole = this.appComponent.storage_Rol;
+    this.getSales();
+  }
+
+  //Crea la función loadRankDates()
+  loadRankDates(){
+    let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
+    this.formClientFilters.patchValue({ 'start': initialDate, 'end': new Date() });
+  } 
 
   initForm() {
     this.formClientFilters = this.frmBuilder.group({
@@ -64,6 +79,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     this.items = [];
     this.clients = [];
     this.billsClient.clear();
+    this.loadRankDates();
   }
 
   errorMessage(message: string, error: HttpErrorResponse) {
@@ -71,9 +87,17 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     this.load = false;
   }
 
+  //
   aplyFilter = ($event, campo: string, table: Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  obtenerVendedores = () => this.svUsuarios.GetVendedores().subscribe(data => this.asesores = data);
+  //
+  getSales() {
+    let asesor: any = this.validateRole == 2 ? this.appComponent.storage_Id : null;
+    this.svUsuarios.GetVendedores().subscribe(resp => {
+      this.asesores = resp,
+        this.asesores = asesor ? this.asesores.filter(x => x.usua_Id == asesor) : this.asesores
+    });
+  }
 
   searchClients() {
     let idClient = this.formClientFilters.value.idClient;
@@ -127,27 +151,30 @@ export class ReporteFacturacionClientesComponent implements OnInit {
 
   validateRoute(): string {
     let route: string = '';
-    let start = moment(this.formClientFilters.value.start).format('YYYY-MM-DD') == 'Fecha inválida' ? '2001-01-01' : moment(this.formClientFilters.value.start).format('YYYY-MM-DD');
-    let end = moment(this.formClientFilters.value.end).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.formClientFilters.value.end).format('YYYY-MM-DD');
     let idClient = this.formClientFilters.value.idClient;
     let item = this.formClientFilters.value.item;
-    let sales : any = this.formClientFilters.value.item;
+    let sales : any = this.formClientFilters.value.sales;
     if (idClient != null) route += `client=${idClient}`;
     if (item != null) route.length > 0 ? route += `&item=${item}` : route += `item=${item}`;
-    if (sales != null) route.length > 0 ? route += `&sales=${sales}` : route += `sales=${sales}`;
+    if (sales != null) route.length > 0 ? route += `&asesor=${sales}` : route += `asesor=${sales}`;
     if (route.length > 0) route = `?${route}`;
-    route = `/${start}/${end}${route}`;
+    //route = `/${start}/${end}${route}`;
     return route;
   }
 
   searchBillsFromClient() {
+    let start = moment(this.formClientFilters.value.start).format('YYYY-MM-DD');
+    let end = moment(this.formClientFilters.value.end).format('YYYY-MM-DD');
+    
     this.load = true;
     this.billsPerClient = [];
     this.billsClient.clear();
     let errorMessage: string = `¡No se encontraron facturas del cliente seleccionado!`;
     let count: number = 0;
     let route: string = this.validateRoute();
-    this.zeusInvService.GetBillsByClient(route).subscribe(data => {
+    console.log(route)
+    
+    this.zeusInvService.GetBillsByClient(start, end, route).subscribe(data => {
       data.forEach(bill => {
         this.consolidateDataClients(bill, data);
         count++;

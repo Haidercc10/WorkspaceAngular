@@ -316,7 +316,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
 
       if (prod.length > 0) {
         if (prod[0].nomStatus != 'Wiketiado') {
-          this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
+          this.bagproService.GetOrdenDeTrabajo(prod[0].ot, '').subscribe(data => {
             this.clients.GetSedeClientexNitBagPro(data[0].nitCliente).subscribe(cli => {
               this.sendProductionZeus.push({
                 pp: {

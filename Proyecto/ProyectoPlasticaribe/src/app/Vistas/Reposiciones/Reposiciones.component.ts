@@ -77,7 +77,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
   ngOnChanges() {
     if (this.dato) {
       console.log(this.dato);
-      this.form.patchValue({ 'client' : this.dato.clientes.cli_Nombre, 'idClient' : this.dato.or.cli_Id, 'dev' : this.dato.or.id, fail : 182 });
+      this.form.patchValue({ 'client' : this.dato.clientes.cli_Nombre, 'idClient' : this.dato.or.cli_Id, 'dev' : this.dato.or.id, fail : 182, 'sales' : this.dato.clientes.usua_Id, });
     }
   }
 
@@ -126,6 +126,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
       observation : [null, Validators.required], 
       fail : [null, ],
       user : [null, ],
+      sales : [null, ],
     });
   }
 
@@ -138,7 +139,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
   //* Función para seleccionar clientes
   selectClient() {
     let client = this.clients.find(x => x.idcliente == this.form.value.client);
-    this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, });
+    this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, 'sales' : parseInt(client.idvende) });
   }
 
   //* Función para buscar productos por nombre
@@ -328,6 +329,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
         Rep_ObservacionSalida: '',
         Falla_Id : this.form.value.fail,
         Usua_Autoriza : this.form.value.user, 
+        Usua_Vendedor : this.form.value.asesor == undefined ? null : this.form.value.sales,
       };
       this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id, dev); }, error => { 
         this.msjs(`Error`, `Error guardando el encabezado de la reposición | ${error.status} ${error.statusText}`); 

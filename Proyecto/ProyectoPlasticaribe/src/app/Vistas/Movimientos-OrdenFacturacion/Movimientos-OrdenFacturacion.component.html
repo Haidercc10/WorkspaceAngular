@@ -65,14 +65,13 @@
         </span>
       </div>
 
-      <!-- SALES -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3" id="Vendedor">
+      <!--* SALES -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
-          <input formControlName="sales" id="Vendedor" list="vendedores" (change)="llenarVendedor()" type="text" pInputText autocomplete="off"/>
-          <datalist id="vendedores">
-            <option value={{item.usua_Nombre}} *ngFor="let item of sales">{{item.usua_Nombre}}</option>
-          </datalist>
-          <label for="Vendedor">Vendedor</label>
+          <p-dropdown formControlName="sales" inputId="sales" [autoDisplayFirst]="validateRole == 2"
+            [readonly]="validateRole == 2" [options]="sales" optionValue="usua_Id" optionLabel="usua_Nombre"
+            [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+          <label for="sales">Vendedores</label>
         </span>
       </div>
     </div>

@@ -334,7 +334,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.productionProcessSerivce.getProductsOFDirect(production, orderFact).subscribe(data => {
     let productionFound : number = data[0].pp.numeroRollo_BagPro;
       if(productionFound == production) {
-        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
           this.sendProductionZeus.push(data[0]);
           let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
           this.sendProductionZeus[i].dataExtrusion = {
@@ -391,7 +391,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     if(production) {
       let orderFact = this.formProduction.value.orderFact;
       this.productionProcessSerivce.GetInformationAboutProductionToSend(production, orderFact).subscribe(data => {
-        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
           this.sendProductionZeus.push(data[0]);
           let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
           this.sendProductionZeus[i].dataExtrusion = {

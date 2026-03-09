@@ -14,6 +14,7 @@ import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-Mov_Reposiciones',
@@ -40,6 +41,7 @@ export class Mov_ReposicionesComponent implements OnInit {
   @ViewChild('op') op: OverlayPanel | undefined;
   observation : any = null;
   fails : any = [];
+  sales: any[] = [];
 
   constructor(
     private appComponent: AppComponent,
@@ -54,6 +56,7 @@ export class Mov_ReposicionesComponent implements OnInit {
     private msg : MessageService,
     private svExcel : CreacionExcelService,
     private svFails : FallasTecnicasService,
+    private svSales : UsuarioService,
   ) {
       this.initForm();
       this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -77,6 +80,14 @@ export class Mov_ReposicionesComponent implements OnInit {
   //*
   getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11,5,3].includes(x.estado_Id))  }, error => { this.msjs(`Error`, `Error al consultar los estados.`) });
 
+  getSales() {
+    let asesor: any = this.ValidarRol == 2 ? this.appComponent.storage_Id : null;
+    this.svSales.GetVendedores().subscribe(resp => {
+      this.sales = resp,
+        this.sales = asesor ? this.sales.filter(x => x.usua_Id == asesor) : this.sales
+    });
+  }
+
   //*
   initForm(){
     this.form = this.frmBuilder.group({
@@ -87,6 +98,7 @@ export class Mov_ReposicionesComponent implements OnInit {
       client: [null],
       status: [null],
       fail : [null],
+      sales : [null],
     });
   }
 
@@ -94,6 +106,7 @@ export class Mov_ReposicionesComponent implements OnInit {
   readStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
+    this.getSales();
   }
 
   //*
@@ -136,12 +149,14 @@ export class Mov_ReposicionesComponent implements OnInit {
     let status: any = this.form.value.status;
     let client : any = this.form.value.idClient;
     let fail : any = this.form.value.fail;
+    let sales : any = this.form.value.sales;
     let url : string = ``;
 
     if(id != null) url += `id=${id}`;
     if(status != null) url.length > 0 ? url += `&status=${status}` : url += `status=${status}`;
     if(client != null) url.length > 0 ? url += `&roll=${client}` : url += `roll=${client}`;
     if(fail != null) url.length > 0 ? url += `&fail=${fail}` : url += `fail=${fail}`;
+    if(sales != null) url.length > 0 ? url += `&sales=${sales}` : url += `sales=${sales}`;
 
     if(url.length > 0) url = `?${url}`;
     return url;

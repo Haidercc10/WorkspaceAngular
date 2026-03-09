@@ -145,7 +145,9 @@
             <!-- Nombre Vendedor -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="vendedor">
               <span class="p-float-label">
-                <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores" optionValue="usua_Nombre" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre" [showClear]="true" [autoDisplayFirst]="false" [required]="true" (onChange)="vendedorSeleccionado()"></p-dropdown>
+                <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" 
+                [filter]="true" filterBy="usua_Nombre" [showClear]="true" [autoDisplayFirst]="ValidarRol == 2"
+                [readonly]="ValidarRol == 2" [required]="true" (onChange)="vendedorSeleccionado()"></p-dropdown>
                 <label for="Nombre_Vendedor">Vendedor</label>
               </span>
             </div>
@@ -2176,7 +2178,7 @@
 
 <!-- Modal de crear clientes -->
 <p-dialog header="Crear Clientes" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" [draggable]="false" (onHide)="ngOnInit()">
-  <app-crear-clientes></app-crear-clientes>
+  <!--<app-crear-clientes></app-crear-clientes>-->
 </p-dialog>
 
 <p-toast position="center" key="editarOrden" (onClose)="cerrarMensaje()" [baseZIndex]="5000">

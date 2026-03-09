@@ -140,7 +140,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     else {
       this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(production, searchInTable).subscribe(data => {
         if (data[0].proceso.proceso_Id != 'WIKE') {
-          this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+          this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
             this.sendProductionZeus.push(data[0]);
             let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
             this.sendProductionZeus[i].dataExtrusion = {
@@ -158,8 +158,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
             this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
           }, error => { this.msj.mensajeError(`Error`, `No fue posible consultar la OT N° ${data[0].pp.ot} en BagPro | ${error.status} ${error.statusText}`) });
         } else this.msj.mensajeError(`Advertencia`, `No es posible ingresar rollos/bultos del proceso de 'WIKETIADO'!`);
-        }, () => this.lookingForDataInBagpro(production));
-      //}, () => this.warningNotFound(production));
+        //}, () => this.lookingForDataInBagpro(production));
+      }, () => this.warningNotFound(production));
     }
   }
 

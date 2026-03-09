@@ -117,7 +117,7 @@ export class DashboardOTComponent implements OnInit {
     this.totalOrdenesMes = 0;
     this.costoTotalOrdenesMes = 0;
 
-    if ([1, 60, 12, 94, 85, 2, 98, 5].includes(this.ValidarRol)) {
+    if ([1, 60, 12, 94, 85, 2, 98, 5, 103].includes(this.ValidarRol)) {
       this.estadosOrdenes = [
         { Nombre: 'ABIERTA', Cantidad: 0, Class: 'bg-naranja', },
         { Nombre: 'ASIGNADA', Cantidad: 0, Class: 'bg-azul', },
@@ -131,7 +131,6 @@ export class DashboardOTComponent implements OnInit {
   }
 
   consultarDatosOrdenesTrabajo() {
-
     const sales = this.ValidarRol == 2
       ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
       : '';
@@ -185,7 +184,7 @@ export class DashboardOTComponent implements OnInit {
           this.clientesFacturados = response.clientesFact;
           this.productosFacturas = response.productosFact;
           this.vendedoresFacturas = response.vendedoresFact;
-
+          
           // 8. OTROS MÉTODOS
           this.consultarPesoProducidoOrdenes();
 
@@ -335,6 +334,7 @@ export class DashboardOTComponent implements OnInit {
   llenarGraficaVendedores() {
     this.graficaMateriales = false;
     this.mostrarGraficaBarras = true;
+    this.nombreGrafica = '';
     this.nombreGrafica = `Grafica de Vendedores`;
     let vendedores: any = [];
     let costoVentas: any = [];
@@ -423,6 +423,7 @@ export class DashboardOTComponent implements OnInit {
   llenarGraficaClientes() {
     this.graficaMateriales = false;
     this.mostrarGraficaBarras = true;
+    this.nombreGrafica = '';
     this.nombreGrafica = `Grafica de Clientes`;
     let clientes: any = [];
     let costo: any = [];
@@ -445,6 +446,7 @@ export class DashboardOTComponent implements OnInit {
   // Funcion que va a llenar la grafica de pie con informacion de los estados de las ordenes de trabajo
   llenarGraficaEstadosOt() {
     this.mostrarGraficaPie = true;
+    this.nombreGrafica = ''
     this.nombreGrafica = `Grafica de Estados de Ordenes de Trabajo`;
     let labels: string[] = [];
     let cantidades: number[] = [];
@@ -475,6 +477,7 @@ export class DashboardOTComponent implements OnInit {
   llenarGraficaMateriales(TipoGrafica: number) {
     this.graficaMateriales = true;
     this.mostrarGraficaBarras = true;
+    this.nombreGrafica = '';
     this.nombreGrafica = `Grafica de Materiales`;
     let labels: string[] = [];
     let cantidad: number[] = [];
@@ -515,6 +518,7 @@ export class DashboardOTComponent implements OnInit {
   llenarGraficaProcesos() {
     this.graficaMateriales = false;
     this.mostrarGraficaBarras = true;
+    this.nombreGrafica = '';
     this.nombreGrafica = `Grafica de Procesos`;
     let labels: string[] = [];
     let cantidad: number[] = [];
@@ -536,9 +540,14 @@ export class DashboardOTComponent implements OnInit {
   }
 
   llenarGraficaFactClientes() {
+    console.log('entré');
+    
     this.mostrarGraficaBarras = true;
+    this.nombreGrafica = '';
     this.nombreGrafica = `Grafica de facturación por clientes`;
-    let clientes: any = [], costo: any = [], cantVeces: any = [];
+    let clientes: any = [];
+    let costo: any = []; 
+    let cantVeces: any = [];
     for (let i = 0; i < 10; i++) {
       clientes.push(this.clientesFacturados[i].cliente);
       costo.push(this.clientesFacturados[i].costo);
@@ -556,6 +565,7 @@ export class DashboardOTComponent implements OnInit {
 
   llenarGraficaFactVendedores() {
     this.mostrarGraficaBarras = true;
+    this.nombreGrafica = '';
     this.nombreGrafica = `Grafica de facturación por vendedores`;
     let vendedores: any = [];
     let costo: any = [];

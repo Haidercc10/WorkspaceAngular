@@ -673,8 +673,10 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a consultar los vendedores de la empresa
   consultarVendedores() {
+    let asesor: any = this.ValidarRol == 2 ? this.AppComponent.storage_Id : null;
     this.usuarioService.GetVendedores().subscribe(data => {
       this.vendedores = data;
+      this.vendedores = asesor ? this.vendedores.filter(x => x.usua_Id == asesor) : this.vendedores
       this.vendedores.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
     });
   }
@@ -830,8 +832,11 @@ export class Orden_TrabajoComponent implements OnInit {
   busquedaOTBagPro(ot: any) {
     this.cargando = true;
     ot = typeof (ot) == 'number' ? ot : ot.ordenTrabajo;
+    const sales = this.ValidarRol == 2
+      ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
+      : '';
     this.limpiarProducto();
-    this.bagProService.GetOrdenDeTrabajo(ot).subscribe(datos_Ot => {
+    this.bagProService.GetOrdenDeTrabajo(ot, sales).subscribe(datos_Ot => {
       this.svcSedes.GetSedeClientexNitBagPro(datos_Ot[0].nitCliente).subscribe(datos_Sedes => {
         this.producto = datos_Ot[0].id_Producto;
         this.presentacionProducto = datos_Ot[0].presentacion;
@@ -895,7 +900,7 @@ export class Orden_TrabajoComponent implements OnInit {
         }
       })
     }, () => {
-      this.msj.mensajeAdvertencia(`¡Advertencia!`, `No se encuentra una Orden de Trabajo anterior para el producto ${this.producto} y presentación ${presentacion}`);
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `No se encuentra una OT anterior para el producto ${this.producto} y presentación ${presentacion}`);
       this.cargando = false;
     });
     this.cargando = false;
@@ -2298,12 +2303,12 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a colocar la información de la empresa en el header
   informacionEmpresaHeader(datos_ot) {
     return [
-      { image: logoParaPdf, width: 220, height: 50, margin: [10, 5] },
+      { image: logoParaPdf, width: 220, height: 50, margin: [5, 5] },
       {
-        text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot.numero_Orden}`,
-        style: 'titulo',
-        alignment: 'center',
-        margin: [0, 20, 0, 0],
+        text: `OT ${datos_ot.numero_Orden}`,
+        style: 'orden_trabajo',
+        alignment: 'right',
+        margin: [0, 10, 0, 0],
       },
     ]
   }
@@ -2910,7 +2915,8 @@ export class Orden_TrabajoComponent implements OnInit {
     return {
       header: { fontSize: 7, bold: true },
       titulo: { fontSize: 11, bold: true },
-      ot: { fontSize: 13, bold: true },
+      ot: { fontSize: 11, bold: true },
+      orden_trabajo: { fontSize: 30, bold: true },
       subtitulo: { fontSize: 10, bold: true },
       titulosTablas: {
         border: [false, false, false, false],

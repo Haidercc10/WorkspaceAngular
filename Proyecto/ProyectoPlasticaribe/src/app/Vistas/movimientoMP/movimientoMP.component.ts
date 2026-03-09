@@ -16,7 +16,7 @@ import { tableLayouts } from 'pdfmake/build/pdfmake';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 
 @Component({
@@ -30,43 +30,54 @@ export class MovimientoMPComponent implements OnInit {
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
   @ViewChild('dt3') dt3: Table | undefined;
-  cargando : boolean = false;
+  @ViewChild('dt4') dt4: Table | undefined;
+  @ViewChild('dt5') dt5: Table | undefined;
+  @ViewChild('dt6') dt6: Table | undefined;
+  @ViewChild('dt7') dt7: Table | undefined;
+  cargando: boolean = false;
   formMovimientos !: FormGroup;
-  tiposMovimientos : any [] = [];
-  materiasPrimas : any [] = [];
-  today : any = moment().format('YYYY-MM-DD');
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  movimientosPolietilenos : any [] = []; //Variable que va a contener la informacion de los movimientos de los polietilenos
-  movimientosTintas : any [] = []; //Variable que va a contener la información de los movomientos de las tintas
-  movimientosBiorientados : any [] = []; //Variable que va a contener la informacion de los movimientos de los biorientados
-  datosPdf : any [] = []; //Variable en la que se almacenará la información que se verá en el pdf
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  cantRestante : number = 0;
-  cantAsignada : number = 0;
-  movements : any = [];
-  activeTab : any = `Materias Primas`;
+  tiposMovimientos: any[] = [];
+  materiasPrimas: any[] = [];
+  today: any = moment().format('YYYY-MM-DD');
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  movimientosPolietilenos: any[] = []; //Variable que va a contener la informacion de los movimientos de los polietilenos
+  movimientosTintas: any[] = []; //Variable que va a contener la información de los movomientos de las tintas
+  movimientosBiorientados: any[] = []; //Variable que va a contener la informacion de los movimientos de los biorientados
+  datosPdf: any[] = []; //Variable en la que se almacenará la información que se verá en el pdf
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  cantRestante: number = 0;
+  cantAsignada: number = 0;
+  movements: any = [];
+  activeTab: any = `Materias Primas`;
+  typeMovements: string[] = ['ENTRADA', 'SALIDA', 'DEVOLUCION',]
+  copiaTiposMovimientos: any = [];
+  groupedInfo: any = [];
+  modal: boolean = false;
+  detailInfo: any = [];
+  selectedMovement : string = '';
 
-  constructor(private frmBuilder : FormBuilder,
-                private AppComponent : AppComponent,
-                  private materiaPrimaService : MateriaPrimaService,
-                    private detallesAsignacionService : DetallesAsignacionService,
-                      private bagProServices : BagproService,
-                        private shepherdService: ShepherdService,
-                          private mensajeService : MensajesAplicacionService,
-                            private creacionPDFService : CreacionPdfService,
-                              private cmpEntryBOPP : EntradaBOPPComponent, 
-                                private svExcel : CreacionExcelService,) {
+  constructor(private frmBuilder: FormBuilder,
+    private AppComponent: AppComponent,
+    private materiaPrimaService: MateriaPrimaService,
+    private detallesAsignacionService: DetallesAsignacionService,
+    private bagProServices: BagproService,
+    private shepherdService: ShepherdService,
+    private mensajeService: MensajesAplicacionService,
+    private creacionPDFService: CreacionPdfService,
+    private cmpEntryBOPP: EntradaBOPPComponent,
+    private svExcel: CreacionExcelService,) {
 
     this.formMovimientos = this.frmBuilder.group({
-      Codigo : [null, Validators.required],
-      FechaInicial : [null, Validators.required],
-      FechaFinal : [null, Validators.required],
-      TipoMovimiento : [null, Validators.required],
-      MateriasPrimas_Id : [null, Validators.required],
-      MateriasPrimas : [null, Validators.required],
+      Codigo: [null, Validators.required],
+      FechaInicial: [null, Validators.required],
+      FechaFinal: [null, Validators.required],
+      TipoMovimiento: [null, Validators.required],
+      MateriasPrimas_Id: [null, Validators.required],
+      MateriasPrimas: [null, Validators.required],
+      movement: ['ENTRADA', Validators.required],
     });
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -75,57 +86,84 @@ export class MovimientoMPComponent implements OnInit {
   ngOnInit(): void {
     this.obtenerTipoDocumento();
     this.obtenerMateriasPrimas();
+    this.loadRankDates();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  //Función para cargar fechas en el rango.
+  loadRankDates() {
+    let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
+    this.formMovimientos.patchValue({ 'FechaInicial': initialDate, 'FechaFinal' : new Date() });
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion para obtener los diferentes tipos de documentos que podemos encontrar
-  obtenerTipoDocumento(){
+  obtenerTipoDocumento() {
+    let type : any = this.formMovimientos.value.movement;
     this.tiposMovimientos = [
-      { Id: 'ASIGBOPA', Nombre: 'Asignación BOPA' },
-      { Id: 'ASIGBOPP', Nombre: 'Asignación BOPP' },
-      { Id: 'ASIGMP', Nombre: 'Asignación MP' },
-      { Id: 'ASIGPOLY', Nombre: 'Asignación Poliester' },
-      { Id: 'ASIGTINTAS', Nombre: 'Asignación de Tintas' },
-      { Id: 'CRTINTAS', Nombre: 'Creación de Tintas' },
-      { Id: 'DEVMP', Nombre: 'Devolución MP' },
-      { Id: 'FCO', Nombre: 'Factura de Compra' },
-      { Id: 'REM', Nombre: 'Remisión' },
-      { Id: 'ENTBIO', Nombre: 'Entrada de Biorientado'},
+      { Id: 'ASIGBOPA', Nombre: 'Asignación BOPA', Tipo: 'SALIDA' },
+      { Id: 'ASIGBOPP', Nombre: 'Asignación BOPP', Tipo: 'SALIDA' },
+      { Id: 'ASIGMP', Nombre: 'Asignación MP', Tipo: 'SALIDA' },
+      { Id: 'ASIGPOLY', Nombre: 'Asignación Poliester', Tipo: 'SALIDA' },
+      { Id: 'ASIGTINTAS', Nombre: 'Asignación de Tintas', Tipo: 'SALIDA' },
+      { Id: 'CRTINTAS', Nombre: 'Creación de Tintas', Tipo: 'ENTRADA' },
+      { Id: 'DEVMP', Nombre: 'Devolución MP', Tipo: 'DEVOLUCION' },
+      { Id: 'FCO', Nombre: 'Factura de Compra', Tipo: 'ENTRADA' },
+      { Id: 'REM', Nombre: 'Remisión', Tipo: 'ENTRADA' },
+      { Id: 'ENTBIO', Nombre: 'Entrada de Biorientado', Tipo: 'ENTRADA' },
     ];
-    this.tiposMovimientos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+    //this.copiaTiposMovimientos = this.tiposMovimientos;
+    this.copiaTiposMovimientos = this.tiposMovimientos.filter(item => item.Tipo === type);
+    this.tiposMovimientos.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+    this.copiaTiposMovimientos.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
   }
 
   // Funcion que va a obtener la información de las materias primas
   obtenerMateriasPrimas = () => this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos => this.materiasPrimas = datos);
 
   // Funcion que va a limpiar el formulario
-  limpiarCampos = () => this.formMovimientos.reset();
+  limpiarCampos() {
+    this.formMovimientos.reset();
+    this.loadRankDates();
+    this.movimientosBiorientados = [];
+    this.movimientosPolietilenos = [];
+    this.movimientosTintas = [];
+    this.groupedInfo = [];
+    this.detailInfo = [];
+    this.selectedMovement = '';
+  } 
 
   // Funcion que le va a colocar el nombre a la materia prima seleccionada
-  cambiarNombreMateriaPrima(){
-    let id : number = this.formMovimientos.value.MateriasPrimas;
-    let nuevo : any = this.materiasPrimas.filter((item) => item.id_Materia_Prima == id);
+  cambiarNombreMateriaPrima() {
+    let id: number = this.formMovimientos.value.MateriasPrimas;
+    let nuevo: any = this.materiasPrimas.filter((item) => item.id_Materia_Prima == id);
     this.formMovimientos.patchValue({
-      MateriasPrimas_Id : id,
-      MateriasPrimas : nuevo[0].nombre_Materia_Prima,
+      MateriasPrimas_Id: id,
+      MateriasPrimas: nuevo[0].nombre_Materia_Prima,
     });
   }
 
+  changeDocuments() {
+    let mov: any = this.formMovimientos.value.movement;
+    this.copiaTiposMovimientos = this.tiposMovimientos.filter(item => item.Tipo === mov);
+  }
+
   // Funcion que va a consultar la información de los movimientos
-  consultarMovimientos(){
+  consultarMovimientos() {
     this.cargando = true;
     this.cantRestante = 0;
     this.cantAsignada = 0;
     this.movimientosPolietilenos = [];
     this.movimientosTintas = [];
     this.movimientosBiorientados = [];
-    let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let fechaInicial : any = moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD');
-    let fechaFinal : any =moment( this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD');
-    let ruta : string = this.validacionParametrosConsulta();
+    this.groupedInfo = [];
+    this.detailInfo = [];
+    let fechaMesAnterior: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
+    let fechaInicial: any = moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD');
+    let fechaFinal: any = moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD');
+    let ruta: string = this.validacionParametrosConsulta();
 
     this.materiaPrimaService.GetMoviemientos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
       if (datos.length == 0) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
@@ -135,26 +173,30 @@ export class MovimientoMPComponent implements OnInit {
     this.totalAsignadoRestanteAsignar();
   }
 
-  validacionParametrosConsulta(){
-    let ruta : string = ``;
-    let codigo : any = this.formMovimientos.value.Codigo;
-    let tipoMovimiento : any = this.formMovimientos.value.TipoMovimiento;
-    let materiaPrima : any = this.formMovimientos.value.MateriasPrimas_Id;
+  //Reescribe la función validacionParametrosConsulta() más simplificada
 
-    if (codigo != null && tipoMovimiento != null && materiaPrima != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}&materiaPrima=${materiaPrima}`;
-    else if (codigo != null && tipoMovimiento != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}`;
-    else if (codigo != null && materiaPrima != null) ruta = `?codigo=${codigo}&materiaPrima=${materiaPrima}`;
-    else if (tipoMovimiento != null && materiaPrima != null) ruta = `?tipoMov=${tipoMovimiento}&materiaPrima=${materiaPrima}`;
-    else if (codigo != null) ruta = `?codigo=${codigo}`;
-    else if (tipoMovimiento != null) ruta = `?tipoMov=${tipoMovimiento}`;
-    else if (materiaPrima != null) ruta = `?materiaPrima=${materiaPrima}`;
-    else ruta = ``;
 
-    return ruta;
+  validacionParametrosConsulta() {
+    let url: string = ``;
+    let codigo: any = this.formMovimientos.value.Codigo;
+    let tipoMovimiento: any = this.formMovimientos.value.TipoMovimiento;
+    let materiaPrima: any = this.formMovimientos.value.MateriasPrimas_Id;
+    let mov: any = this.formMovimientos.value.movement;
+    console.log(mov);
+
+    if (codigo != null) url.length > 0 ? url += `&codigo=${codigo}` : url += `codigo=${codigo}`;
+    if (tipoMovimiento != null) url.length > 0 ? url += `&tipoMov=${tipoMovimiento}` : url += `tipoMov=${tipoMovimiento}`;
+    if (materiaPrima != null) url.length > 0 ? url += `&materiaPrima=${materiaPrima}` : url += `materiaPrima=${materiaPrima}`;
+    if (mov != null) url.length > 0 ? url += `&tipoDoc=${mov}` : url += `tipoDoc=${mov}`;
+
+    url.length > 0 ? url = `?${url}` : url = ``;
+    console.log(url);
+
+    return url;
   }
 
-  totalAsignadoRestanteAsignar(){
-    let codigo : any = this.formMovimientos.value.Codigo;
+  totalAsignadoRestanteAsignar() {
+    let codigo: any = this.formMovimientos.value.Codigo;
     if (codigo != null) {
       this.bagProServices.srvObtenerListaClienteOT_Item(codigo).subscribe(datos_procesos => {
         for (let i = 0; i < datos_procesos.length; i++) {
@@ -168,31 +210,33 @@ export class MovimientoMPComponent implements OnInit {
     }
   }
 
-  llenarMateriasPrimasConsultadas(datos){
-    console.log(datos);
+  llenarMateriasPrimasConsultadas(datos) {
     this.cargando = true;
-    let count : number = 0;
+    let count: number = 0;
     for (let i = 0; i < datos.length; i++) {
-      let info : any = {
-        Id : datos[i].id,
-        Codigo : datos[i].codigo,
-        Movimiento : datos[i].movimiento,
-        Tipo_Movimiento : datos[i].tipo_Movimiento,
-        Fecha : datos[i].fecha,
-        Hora : datos[i].hora,
-        Usuario : datos[i].usuario,
-        Id_MateriaPrima : datos[i].materia_Prima_Id,
-        Materia_Prima : datos[i].materia_Prima,
-        Id_Tinta : datos[i].tinta_Id,
-        Tinta : datos[i].tinta,
-        Id_Bopp : datos[i].bopp_Id,
-        Bopp : datos[i].bopp,
-        Cantidad : datos[i].cantidad,
-        Presentacion : datos[i].presentacion,
-        Precio : datos[i].precio,
-        SubTotal : (datos[i].cantidad * datos[i].precio),
-        Proveedor : datos[i].proveedor, 
-        Subcategoria : datos[i].subcategoria
+      let info: any = {
+        Id: datos[i].id,
+        Codigo: datos[i].codigo,
+        Movimiento: datos[i].movimiento,
+        Tipo_Movimiento: datos[i].tipo_Movimiento,
+        Fecha: datos[i].fecha,
+        Hora: datos[i].hora,
+        Usuario: datos[i].usuario,
+        Id_MateriaPrima: datos[i].materia_Prima_Id,
+        Materia_Prima: datos[i].materia_Prima,
+        Id_Tinta: datos[i].tinta_Id,
+        Tinta: datos[i].tinta,
+        Id_Bopp: datos[i].bopp_Id,
+        Bopp: datos[i].bopp,
+        Cantidad: datos[i].cantidad,
+        Presentacion: datos[i].presentacion,
+        Precio: datos[i].precio,
+        SubTotal: (datos[i].cantidad * datos[i].precio),
+        Proveedor: datos[i].proveedor,
+        Subcategoria: datos[i].subcategoria,
+        mp_Id: this.validateMaterial(datos[i]).item,
+        mp: this.validateMaterial(datos[i]).reference,
+        TipoMov: datos[i].tpDoc
       };
       this.agrupacionMateriasPrimas(datos[i], info);
       count++;
@@ -200,29 +244,119 @@ export class MovimientoMPComponent implements OnInit {
     }
   }
 
-  agrupacionMateriasPrimas(datos, infoMateriaPrima){
+  agrupacionMateriasPrimas(datos, infoMateriaPrima) {
     // Polietilenos
-    if (datos.materia_Prima_Id != 84 && datos.tinta_Id == 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) this.movimientosPolietilenos.push(infoMateriaPrima);
-    this.movimientosPolietilenos.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
-    this.movimientosPolietilenos.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
+    if (datos.materia_Prima_Id != 84 && datos.tinta_Id == 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) {
+      this.movimientosPolietilenos.push(infoMateriaPrima);
+      this.groupedInformation(this.movimientosPolietilenos, 'mp')
+    }
+    this.movimientosPolietilenos.sort((a, b) => a.Codigo.localeCompare(b.Codigo));
+    this.movimientosPolietilenos.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
 
     // Tintas
-    if (datos.materia_Prima_Id == 84 && datos.tinta_Id != 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) this.movimientosTintas.push(infoMateriaPrima);
-    this.movimientosTintas.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
-    this.movimientosTintas.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
+    if (datos.materia_Prima_Id == 84 && datos.tinta_Id != 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) {
+      this.movimientosTintas.push(infoMateriaPrima);
+      this.groupedInformation(this.movimientosTintas, 'tinta')
+    }
+    this.movimientosTintas.sort((a, b) => a.Codigo.localeCompare(b.Codigo));
+    this.movimientosTintas.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
 
     // Biorientado
-    if (datos.materia_Prima_Id == 84 && datos.tinta_Id == 2001 && (datos.bopp_Id != 449 || datos.bopp_Id != 1)) this.movimientosBiorientados.push(infoMateriaPrima);
-    this.movimientosBiorientados.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
-    this.movimientosBiorientados.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
+    if (datos.materia_Prima_Id == 84 && datos.tinta_Id == 2001 && (datos.bopp_Id != 449 || datos.bopp_Id != 1)) {
+      this.movimientosBiorientados.push(infoMateriaPrima);
+      this.groupedInformation(this.movimientosBiorientados, 'bopp')
+    }
+    this.movimientosBiorientados.sort((a, b) => a.Codigo.localeCompare(b.Codigo));
+    this.movimientosBiorientados.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
   }
 
+  validateMaterial(datos) {
+    if (datos.materia_Prima_Id != 84 && datos.tinta_Id == 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) {
+      return {
+        'item': datos.materia_Prima_Id,
+        'reference': datos.materia_Prima
+      }
+    } else if (datos.materia_Prima_Id == 84 && datos.tinta_Id != 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) {
+      return {
+        'item': datos.tinta_Id,
+        'reference': datos.tinta
+      }
+    } else if (datos.materia_Prima_Id == 84 && datos.tinta_Id == 2001 && (datos.bopp_Id != 449 || datos.bopp_Id != 1)) {
+      return {
+        'item': datos.bopp_Id,
+        'reference': datos.bopp
+      }
+    } else {
+      return {
+        'item': 0,
+        'reference': 'No definido'
+      };
+    }
+  }
+
+  //Función que
+  groupedInformation(data: any[], type: string) {
+    data.forEach(d => {
+      let count: number = 0;
+      const existingItem = this.groupedInfo.find(x => x.item === d.mp_Id);
+      if (!existingItem) {
+        this.groupedInfo.push({
+          'item': d.mp_Id,
+          'reference': d.mp,
+          'typeMov': d.TipoMov,
+          'qty': d.Cantidad,
+          'type': type,
+          'price': d.Precio,
+          'subTotal': d.Cantidad * d.Precio,
+          'count': count++
+        });
+      } else {
+        existingItem.qty = this.validateQty(data, d);
+        existingItem.subTotal = existingItem.qty * existingItem.price;
+        existingItem.count = this.validateCount(data, d)
+      }
+    });
+  }
+
+  validateQty = (data: any, d: any) => data.filter(x => x.mp_Id == d.mp_Id && x.TipoMov == d.TipoMov).reduce((sum, current) => sum + current.Cantidad, 0);
+
+  validateCount = (data: any, d: any) => data.filter(x => x.mp_Id == d.mp_Id && x.TipoMov == d.TipoMov).length;
+
+  //Función que
+  groupedMatPrimas = () => this.groupedInfo.filter(x => x.type == 'mp');
+
+  totalMatPrimas = () => this.groupedInfo.filter(x => x.type == 'mp').reduce((sum, current) => sum + current.subTotal, 0);
+
+  //Función que 
+  groupedTintas = () => this.groupedInfo.filter(x => x.type == 'tinta');
+
+  totalTintas = () => this.groupedInfo.filter(x => x.type == 'tinta').reduce((sum, current) => sum + current.subTotal, 0);
+
+  //Función que 
+  groupedBopp = () => this.groupedInfo.filter(x => x.type == 'bopp');
+
+  totalBopp = () => this.groupedInfo.filter(x => x.type == 'bopp').reduce((sum, current) => sum + current.subTotal, 0);
+
+  //Función que 
+  loadDetailsMaterial(data: any) {
+    this.selectedMovement = `${data.item} - ${data.reference}`
+    this.detailInfo = [];
+    this.modal = true;
+    if (data.type == 'mp') this.detailInfo = this.movimientosPolietilenos.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov);
+    if (data.type == 'tinta') this.detailInfo = this.movimientosTintas.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov)
+    if (data.type == 'bopp') this.detailInfo = this.movimientosBiorientados.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov)
+  }
+  
+  totalDetailedInfo = () => this.detailInfo.reduce((sum, current) => sum + current.SubTotal, 0);
+
+  totalQtyDetailedInfo = () => this.detailInfo.reduce((sum, current) => sum + current.Cantidad, 0);
+
   // Funcion que va a validar el tipo de movimiento para crear el pdf
-  validarTipoMovimiento(data : any){
+  validarTipoMovimiento(data: any) {
     console.log(data);
     this.datosPdf = [];
     this.cargando = true;
-    let movAsignaciones : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS'];
+    let movAsignaciones: string[] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS'];
     if (movAsignaciones.includes(data.Movimiento)) this.asignacionesMateriaPrima(data);
     else if (data.Movimiento == 'CRTINTAS') this.creacionTintas(data);
     else if (data.Movimiento == 'DEVMP') this.devolucionesMateriaPrima(data);
@@ -230,28 +364,28 @@ export class MovimientoMPComponent implements OnInit {
     else if (data.Movimiento == 'ENTBIO') {
       this.cmpEntryBOPP.crearPDF(data.Fecha, data.Hora);
       this.cargando = false;
-    } 
+    }
   }
 
-  asignacionesMateriaPrima(data : any){
-    let informacionPdf : any;
+  asignacionesMateriaPrima(data: any) {
+    let informacionPdf: any;
     this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
-        let info : any = {
-          Id : '',
-          Nombre : '',
-          Cantidad : this.formatonumeros(datos[i].cantidad),
-          "Presentación" : datos[i].unidad_Medida,
-          Precio : this.formatonumeros(datos[i].precio),
-          SubTotal : this.formatonumeros(datos[i].subTotal),
+        let info: any = {
+          Id: '',
+          Nombre: '',
+          Cantidad: this.formatonumeros(datos[i].cantidad),
+          "Presentación": datos[i].unidad_Medida,
+          Precio: this.formatonumeros(datos[i].precio),
+          SubTotal: this.formatonumeros(datos[i].subTotal),
         }
         if (data.Movimiento == 'ASIGMP') {
           info.Id = datos[i].materia_Prima_Id;
           info.Nombre = datos[i].materia_Prima;
-        } else if (data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY'){
+        } else if (data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY') {
           info.Id = datos[i].bopp_Id;
           info.Nombre = datos[i].bopp;
-        } else if (data.Movimiento == 'ASIGTINTAS'){
+        } else if (data.Movimiento == 'ASIGTINTAS') {
           info.Id = datos[i].tinta_Id;
           info.Nombre = datos[i].tinta;
         }
@@ -261,22 +395,22 @@ export class MovimientoMPComponent implements OnInit {
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
-  creacionTintas(data: any){
-    let informacionPdf : any;
+  creacionTintas(data: any) {
+    let informacionPdf: any;
     this.materiaPrimaService.GetInfoMovimientoCreacionTinta(data.Id).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
-        let info : any = {
-          Id : '',
-          Nombre : '',
-          Cantidad : this.formatonumeros(datos[i].cantidad),
-          "Presentación" : datos[i].unidad_Medida,
-          Precio : this.formatonumeros(datos[i].precio),
-          SubTotal : this.formatonumeros(datos[i].subTotal),
+        let info: any = {
+          Id: '',
+          Nombre: '',
+          Cantidad: this.formatonumeros(datos[i].cantidad),
+          "Presentación": datos[i].unidad_Medida,
+          Precio: this.formatonumeros(datos[i].precio),
+          SubTotal: this.formatonumeros(datos[i].subTotal),
         }
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001) {
           info.Id = datos[i].materia_Prima_Id;
           info.Nombre = datos[i].materia_Prima;
-        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001){
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001) {
           info.Id = datos[i].tinta_Id;
           info.Nombre = datos[i].tinta;
         }
@@ -296,25 +430,25 @@ export class MovimientoMPComponent implements OnInit {
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
-  devolucionesMateriaPrima(data : any){
-    let informacionPdf : any;
+  devolucionesMateriaPrima(data: any) {
+    let informacionPdf: any;
     this.materiaPrimaService.GetInfoMovimientosDevoluciones(data.Id).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
-        let info : any = {
-          Id : '',
-          Nombre : '',
-          Cantidad : this.formatonumeros(datos[i].cantidad),
-          "Presentación" : datos[i].unidad_Medida,
-          Precio : this.formatonumeros(datos[i].precio),
-          SubTotal : this.formatonumeros(datos[i].subTotal),
+        let info: any = {
+          Id: '',
+          Nombre: '',
+          Cantidad: this.formatonumeros(datos[i].cantidad),
+          "Presentación": datos[i].unidad_Medida,
+          Precio: this.formatonumeros(datos[i].precio),
+          SubTotal: this.formatonumeros(datos[i].subTotal),
         }
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
           info.Nombre = datos[i].materia_Prima;
-        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].tinta_Id;
           info.Nombre = datos[i].tinta;
-        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].bopp_Id;
           info.Nombre = datos[i].bopp;
         }
@@ -334,70 +468,70 @@ export class MovimientoMPComponent implements OnInit {
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
-  entradasMateriasPrimas(data : any){
+  entradasMateriasPrimas(data: any) {
     this.datosPdf = [];
-    let informacionPdf : any = null;
+    let informacionPdf: any = null;
     this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
-        
-        let info : any = {
-          Id : '',
-          Nombre : '',
-          Cantidad : this.formatonumeros(datos[i].cantidad),
-          "Presentación" : datos[i].unidad_Medida,
-          Precio : `$${this.formatonumeros(datos[i].precio)}`,
-          SubTotal : `$${this.formatonumeros(datos[i].subTotal)}`,
+
+        let info: any = {
+          Id: '',
+          Nombre: '',
+          Cantidad: this.formatonumeros(datos[i].cantidad),
+          "Presentación": datos[i].unidad_Medida,
+          Precio: `$${this.formatonumeros(datos[i].precio)}`,
+          SubTotal: `$${this.formatonumeros(datos[i].subTotal)}`,
         }
         console.log(datos[i].subTotal);
-        
+
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
           info.Nombre = datos[i].materia_Prima;
           info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
           info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
-        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].tinta_Id;
           info.Nombre = datos[i].tinta;
           info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
           info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
-        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].bopp_Id;
           info.Nombre = datos[i].bopp;
-          info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);      
+          info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
           info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
         }
         //setTimeout(() => {
-          /*this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
-            for (let j = 0; j < datoMP.length; j++) {
-              info.Precio = this.formatonumeros(datoMP[j].precio);
-              datos[i].subTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad);
-              info.SubTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.formatonumeros(this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad)) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
-            }
-          });*/
-          this.datosPdf.push(info);
+        /*this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
+          for (let j = 0; j < datoMP.length; j++) {
+            info.Precio = this.formatonumeros(datoMP[j].precio);
+            datos[i].subTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad) : (datoMP[j].precio * datos[i].cantidad);
+            info.SubTotal = datoMP[j].categoria == 'EMBALAJE' ? info.Nombre.includes('CONO') ? this.formatonumeros(this.subTotalCono(info.Nombre, datoMP[j].precio, datos[i].cantidad)) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad) : this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
+          }
+        });*/
+        this.datosPdf.push(info);
         //}, 500);
       }
       informacionPdf = datos;
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
-  subTotalCono(cono : any, precio : number, cant : number){
-    let total : number = 0; 
+  subTotalCono(cono: any, precio: number, cant: number) {
+    let total: number = 0;
     total = precio * (cant * ((parseFloat(cono.replace('CONO ', '').replace(' CMS', '').trim().split('-')[0]) + parseFloat(cono.replace('CONO ', '').replace(' CMS', '').trim().split('-')[1])) / 2))
     return total;
   }
-  
-  crearPDF(data : any){
-    let movimientoOrdenesTrabajo : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
-    let tituloAdicional : string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';
-    let titulo : string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;
-    let content : any = this.contenidoPDF(data, movimientoOrdenesTrabajo);
+
+  crearPDF(data: any) {
+    let movimientoOrdenesTrabajo: string[] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
+    let tituloAdicional: string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';
+    let titulo: string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;
+    let content: any = this.contenidoPDF(data, movimientoOrdenesTrabajo);
     this.creacionPDFService.formatoPDF(titulo, content);
     setTimeout(() => this.cargando = false, 3000);
   }
 
-  contenidoPDF(data : any, movimientosOT : any[]){
-    let datos : any = [];
+  contenidoPDF(data: any, movimientosOT: any[]) {
+    let datos: any = [];
     datos.push(this.infoMovement(data[0]));
     datos.push(this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']));
     datos.push(movimientosOT.includes(data[0].movimiento) ? this.totalesPDF(data) : data[0].movimiento != 'CRTINTAS' ? this.totalesPDF2(data) : '');
@@ -405,41 +539,41 @@ export class MovimientoMPComponent implements OnInit {
     return datos;
   }
 
-  infoMovement(data : any){
+  infoMovement(data: any) {
     return {
       table: {
-        widths : ['40%', '30%', '30%'],
-				body: [
-					[ { text: `Información General del Movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {},],
+        widths: ['40%', '30%', '30%'],
+        body: [
+          [{ text: `Información General del Movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {},],
           ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ?
+            [
+              { text: `Proveedor:  ${data.proveedor}`, },
+              { text: `NIT/CC: ${data.proveedor_Id}`, },
+              { text: `Telefono: ${data.telefono_Proveedor}`, }
+            ] : [
+              { text: ``, border: [false, false, false, false] },
+              { text: ``, border: [false, false, false, false] },
+              { text: ``, border: [false, false, false, false] }],
           [
-            { text: `Proveedor:  ${data.proveedor}`, },
-            { text: `NIT/CC: ${data.proveedor_Id}`,  },
-            { text: `Telefono: ${data.telefono_Proveedor}`, }
-          ] : [
-                {text: ``, border: [false, false, false, false]}, 
-                {text: ``, border: [false, false, false, false]}, 
-                {text: ``, border: [false, false, false, false]} ],
-					[
-            { text: ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? `N° Orden Compra: ${data.orden_Compra}` : `OT N°: ${data.codigo}`},
+            { text: ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? `N° Orden Compra: ${data.orden_Compra}` : `OT N°: ${data.codigo}` },
             { text: `Usuario: ${data.usuario}` },
-            { text: `Fecha: ${data.fecha.replace('T00:00:00', '')} ${data.hora}`},
-          ], 
-				]
-			}, 
+            { text: `Fecha: ${data.fecha.replace('T00:00:00', '')} ${data.hora}` },
+          ],
+        ]
+      },
       fontSize: 8,
       layout: {
         fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#DDDDDD' : null;
         }
-      }  
-		}
+      }
+    }
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
-      margin : [0, 15, 0, 0],
+      margin: [0, 15, 0, 0],
       table: {
         headerRows: 2,
         widths: ['10%', '40%', '13%', '10%', '12%', '15%'],
@@ -455,13 +589,13 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
-  buildTableBody(data : any, columns : any, title : string) {
+  buildTableBody(data: any, columns: any, title: string) {
     var body = [];
     body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
-    data.forEach(function(row) {
+    data.forEach(function (row) {
       var dataRow = [];
-      columns.forEach(function(column) {
+      columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });
       body.push(dataRow);
@@ -469,28 +603,28 @@ export class MovimientoMPComponent implements OnInit {
     return body;
   }
 
-  totalesPDF(data : any){
+  totalesPDF(data: any) {
     return {
       table: {
         widths: ['10%', '40%', '13%', '10%', '12%', '15%'],
         style: 'header',
         body: [
           [
-            {border: [true, false, true, true], text: `Peso Total`, bold : true, colSpan : 2 },
+            { border: [true, false, true, true], text: `Peso Total`, bold: true, colSpan: 2 },
             {},
-            {border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data).toFixed(2))}`, bold : true, },
+            { border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data).toFixed(2))}`, bold: true, },
             {},
-            {border: [true, false, true, true], text: `Valor Total`, bold : true, },
-            {border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data).toFixed(2))}`, bold : true, },
+            { border: [true, false, true, true], text: `Valor Total`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data).toFixed(2))}`, bold: true, },
           ],
         ]
       },
-      layout: {defaultBorder: false},
+      layout: { defaultBorder: false },
       fontSize: 8,
     }
   }
 
-  observacionPDF(data : any){
+  observacionPDF(data: any) {
     return {
       margin: [0, 20],
       table: {
@@ -504,16 +638,16 @@ export class MovimientoMPComponent implements OnInit {
     };
   }
 
-  calcularConceptosAutomaticosPDF(data : any): any {
+  calcularConceptosAutomaticosPDF(data: any): any {
     let baseGlobal: number = data.base;
     let base: boolean = data.valor_Total >= baseGlobal;
-    let iva : number = ((data.valor_Total * data.iva) / 100);
+    let iva: number = ((data.valor_Total * data.iva) / 100);
     let baseIVA: boolean = iva >= baseGlobal;
     let reteFuente: number = base ? (data.valor_Total * data.reteFuente) / 100 : 0;
     let reteIVA: number = baseIVA ? (((data.valor_Total * data.iva) / 100) * data.reteIva) / 100 : 0;
     let reteICA: number = base ? (data.valor_Total * data.reteIca) / 100 : 0;
     console.log(reteFuente);
-    
+
     return {
       ReteFuente: reteFuente,
       ReteIVA: reteIVA,
@@ -522,7 +656,7 @@ export class MovimientoMPComponent implements OnInit {
     }
   }
 
-  totalesPDF2(datos_orden) { 
+  totalesPDF2(datos_orden) {
     let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden[0]);
     return {
       table: {
@@ -530,53 +664,53 @@ export class MovimientoMPComponent implements OnInit {
         style: 'header',
         body: [
           [
-            
-            { border: [true, false, true, true], text: `Peso Total`, colSpan : 2, alignment: 'right', bold : true, },
+
+            { border: [true, false, true, true], text: `Peso Total`, colSpan: 2, alignment: 'right', bold: true, },
             {},
-            { border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(datos_orden))}`, bold : true,},
+            { border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(datos_orden))}`, bold: true, },
             '',
-            { border: [true, false, true, true], text: `Subtotal`, bold : true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden[0].valor_Total).toFixed(2))}`, alignment: 'right', bold : true,},
+            { border: [true, false, true, true], text: `Subtotal`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden[0].valor_Total).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
             '',
             '',
             '',
-            { border: [true, false, true, true], text: `IVA ${datos_orden[0].iva}%`, bold : true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden[0].valor_Total * datos_orden[0].iva) / 100).toFixed(2))}`, alignment: 'right', bold : true,},
+            { border: [true, false, true, true], text: `IVA ${datos_orden[0].iva}%`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden[0].valor_Total * datos_orden[0].iva) / 100).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
             '',
             '',
             '',
-            { border: [true, false, true, true], text: `RTE Fuente ${datos_orden[0].reteFuente}%`, bold : true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right', bold : true,},
+            { border: [true, false, true, true], text: `RTE Fuente ${datos_orden[0].reteFuente}%`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
             '',
             '',
             '',
-            { border: [true, false, true, true], text: `RTE IVA ${datos_orden[0].reteIva}%`, bold : true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right', bold : true,},
+            { border: [true, false, true, true], text: `RTE IVA ${datos_orden[0].reteIva}%`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
             '',
             '',
             '',
-            { border: [true, false, true, true], text: `RTE ICA ${datos_orden[0].reteIca}%`, bold : true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right', bold : true,},
+            { border: [true, false, true, true], text: `RTE ICA ${datos_orden[0].reteIca}%`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
             '',
             '',
             '',
-            { border: [true, false, true, true], text: `Valor Total`, bold : true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right', bold : true,},
+            { border: [true, false, true, true], text: `Valor Total`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
         ]
       },
@@ -586,20 +720,28 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   // Funcion que va a devolver el valor total de la materia prima asignada
-  calcularTotalMaterialPrima = (data : any) : number => data.reduce((a, b) => a + b.Cantidad, 0);
+  calcularTotalMaterialPrima = (data: any): number => data.reduce((a, b) => a + b.Cantidad, 0);
 
   // Funcion que va a devolver la cantidad total pesada de materia prima asignada
-  calcularTotalCantidad = (data : any) : number => data.reduce((a, b) => a + b.cantidad, 0);
+  calcularTotalCantidad = (data: any): number => data.reduce((a, b) => a + b.cantidad, 0);
 
   // Funcion que va a devolver el costo total de la materia prima asignada
-  calcularTotalCosto = (data : any) : number => data.reduce((a, b) => a + b.subTotal, 0);
+  calcularTotalCosto = (data: any): number => data.reduce((a, b) => a + b.subTotal, 0);
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro1 = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro1 = ($event, campo: any, valorCampo: string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  aplicarfiltro2 = ($event, campo : any, valorCampo : string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro2 = ($event, campo: any, valorCampo: string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  aplicarfiltro3 = ($event, campo : any, valorCampo : string) => this.dt3!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro3 = ($event, campo: any, valorCampo: string) => this.dt3!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltro4 = ($event, campo: any, valorCampo: string) => this.dt4!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltro5 = ($event, campo: any, valorCampo: string) => this.dt5!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltro6 = ($event, campo: any, valorCampo: string) => this.dt6!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  
+  aplicarfiltro7 = ($event, campo: any, valorCampo: string) => this.dt7!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {
@@ -611,24 +753,24 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   //Función que exportará un formato excel con los datos de los clientes
-  exportExcel(data : any){
+  exportExcel(data: any) {
     this.activeTab == `Materias Primas` ? data = this.movimientosPolietilenos :
-    this.activeTab == `Tintas` ? data = this.movimientosTintas :
-    this.activeTab == `Biorientados` ? data = this.movimientosBiorientados : data = [];
+      this.activeTab == `Tintas` ? data = this.movimientosTintas :
+        this.activeTab == `Biorientados` ? data = this.movimientosBiorientados : data = [];
 
-    if(data.length > 0) {
+    if (data.length > 0) {
       setTimeout(() => { this.loadSheetAndStyles(data, this.activeTab); }, 500);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
   }
 
   //Función que cargará la hoja y los estilos. 
-  loadSheetAndStyles(data : any, typeData : string){  
-    let title : any = `Movimientos ${typeData}`;  
+  loadSheetAndStyles(data: any, typeData: string) {
+    let title: any = `Movimientos ${typeData}`;
     title += ` ${moment().format('DD-MM-YYYY')}`
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
-    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     let workbook = this.svExcel.formatoExcel(title, true);
 
     this.addNewSheet(workbook, title, fill, border, font, alignment, data);
@@ -636,27 +778,27 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   //Función para agregar una nueva hoja de calculo.
-  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
+  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
     let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-    let worksheet : any = wb.worksheets[0];
+    let worksheet: any = wb.worksheets[0];
     this.loadStyleTitle(worksheet, title, fontTitle, alignment);
     this.loadHeader(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
   }
 
   //Cargar estilos del titulo de la hoja.
-  loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
+  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
     ws.getCell('A1').alignment = alignment;
     ws.getCell('A1').font = fontTitle;
     ws.getCell('A1').value = title;
   }
 
   //Función para cargar los titulos de el header y los estilos.
-  loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5']; 
+  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5'];
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
-    
+
     rowHeader.forEach(x => ws.getCell(x).fill = fill);
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
@@ -667,42 +809,42 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
-  loadSizeHeader(ws : any){
+  loadSizeHeader(ws: any) {
     [1].forEach(x => ws.getColumn(x).width = 5);
-    [2,8,10,11].forEach(x => ws.getColumn(x).width = 10);
+    [2, 8, 10, 11].forEach(x => ws.getColumn(x).width = 10);
     [4,].forEach(x => ws.getColumn(x).width = 15);
     [9].forEach(x => ws.getColumn(x).width = 50);
-    [3,5,6,7].forEach(x => ws.getColumn(x).width = 40);
+    [3, 5, 6, 7].forEach(x => ws.getColumn(x).width = 40);
   }
 
- //Función para cargar los nombres de las columnas del header
-  loadFieldsHeader(){
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader() {
     let headerRow = [
       'N°',
       'OT/Doc',
       'Tipo Mov.',
-      'Fecha Registro', 
+      'Fecha Registro',
       'Usuario',
-      'Proveedor', 
-      'Subcategoria', 
+      'Proveedor',
+      'Subcategoria',
       'Id',
       'Material',
-      'Cantidad', 
+      'Cantidad',
       'Precio',
     ];
     return headerRow;
   }
 
   //Cargar información con los estilos al formato excel. 
-  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
-    let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K']; 
-    
+  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
+    let contador: any = 6;
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+
     let formatNumber: Array<number> = [10];
     let formatNumber$: Array<number> = [11];
     formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     formatNumber$.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
-    
+
     data.forEach(x => {
       ws.addRow(x);
       row.forEach(r => {
@@ -711,13 +853,13 @@ export class MovimientoMPComponent implements OnInit {
         ws.getCell(`${r}${contador}`).alignment = alignment;
       });
       contador++
-    }); 
+    });
   }
 
   //.Función que contendrá la info al documento excel. 
-  dataExcel(data : any){
-    let info : any = [];
-    let count : number = 0;
+  dataExcel(data: any) {
+    let info: any = [];
+    let count: number = 0;
     data.forEach(x => {
       info.push([
         count += 1,
@@ -728,11 +870,11 @@ export class MovimientoMPComponent implements OnInit {
         x.Proveedor,
         x.Subcategoria,
         this.activeTab == `Materias Primas` ? x.Id_MateriaPrima :
-        this.activeTab == `Tintas` ? x.Id_Tinta :
-        this.activeTab == `Biorientados` ? x.Id_Bopp : null,
+          this.activeTab == `Tintas` ? x.Id_Tinta :
+            this.activeTab == `Biorientados` ? x.Id_Bopp : null,
         this.activeTab == `Materias Primas` ? x.Materia_Prima :
-        this.activeTab == `Tintas` ? x.Tinta :
-        this.activeTab == `Biorientados` ? x.Bopp : null,
+          this.activeTab == `Tintas` ? x.Tinta :
+            this.activeTab == `Biorientados` ? x.Bopp : null,
         x.Cantidad,
         x.Precio
       ]);
@@ -740,12 +882,12 @@ export class MovimientoMPComponent implements OnInit {
     return info;
   }
 
-  changeTab(event : any){
-    let tab : any = event.originalEvent.srcElement.innerText;
-    
-    if(tab == 'Materias Primas') this.activeTab = `Materias Primas`;
-    else if(tab == 'Tintas') this.activeTab = `Tintas`;
-    else if(tab == 'Biorientados') this.activeTab = `Biorientados`;
-  } 
+  changeTab(event: any) {
+    let tab: any = event.originalEvent.srcElement.innerText;
+
+    if (tab == 'Materias Primas') this.activeTab = `Materias Primas`;
+    else if (tab == 'Tintas') this.activeTab = `Tintas`;
+    else if (tab == 'Biorientados') this.activeTab = `Biorientados`;
+  }
 
 }

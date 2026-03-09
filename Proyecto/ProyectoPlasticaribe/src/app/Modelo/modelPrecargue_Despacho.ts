@@ -11,4 +11,5 @@ export interface modelPrecargue_Despacho {
     Pcd_HoraModifica : string;
     Usua_Modifica : number;
     Pcd_ObservacionModifica : string;
+    Usua_Vendedor? : number;
 }

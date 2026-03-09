@@ -182,7 +182,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //Función para cambiar el nombre de las referencias dependiendo el numero de la OT. 
   changeNameReferences(reference : any, pallet : any) {
     reference.forEach(r => {
-      this.bagproService.GetOrdenDeTrabajo(r.ot).subscribe(dataOT => {
+      this.bagproService.GetOrdenDeTrabajo(r.ot, '').subscribe(dataOT => {
         if(dataOT.length > 0) {
           pallet.rolls.filter(x => x.ot == r.ot).forEach(x => { 
             x.reference = dataOT[0].producto 
@@ -628,7 +628,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
       return a;
     }, []);
     orderProduction.forEach(d => {
-      this.bagproService.GetOrdenDeTrabajo(d.orderProduction).subscribe(dataOrder => {
+      this.bagproService.GetOrdenDeTrabajo(d.orderProduction, '').subscribe(dataOrder => {
         data.filter(x => x.orderProduction == d.orderProduction).forEach(prod => {
           prod.producto.prod_Nombre = dataOrder[0].producto;
           console.log(prod.Referencia)
