@@ -151,9 +151,12 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.columnasSeleccionada = [];
     let count : number = 0;
     let items : any = [];
+    const sales = this.ValidarRol == 2
+      ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
+      : '';
 
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_Existencias => {
-      this.clienteOtItems.srvObtenerItemsBagproXClienteItem(datos_Existencias.map(x => parseInt(x.codigo))).subscribe(datos_Cliente => {
+      this.clienteOtItems.srvObtenerItemsBagproXClienteItem(datos_Existencias.map(x => parseInt(x.codigo)), sales).subscribe(datos_Cliente => {
         for (let j = 0; j < datos_Cliente.length; j++) {
           if(!items.includes(datos_Cliente[j].clienteItems)) {
             items.push(datos_Cliente[j].clienteItems)

@@ -29,7 +29,7 @@ export class ExistenciasProductosService {
 
   GetInfoProducto = (producto : string) : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/getInfoProducto/${producto}`);
 
-  GetStockProducts_AvaibleProduction = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_AvaibleProduction`);
+  GetStockProducts_AvaibleProduction = (sales? : string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_AvaibleProduction${sales}`);
 
   GetStockProducts_Process = (process: 'EMP' | 'SELLA' | 'WIKE' | 'EXT'): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_Process/${process}`);
 

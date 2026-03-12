@@ -9,7 +9,9 @@
       <p-tabPanel
         header="Producción"
         leftIcon="pi pi-list"
-        tooltip="Información general sobre Producción">
+        tooltip="Información general sobre Producción"
+        *ngIf="![2].includes(ValidarRol)"  
+        >
         <app-dashboard-produccion *ngIf="production"></app-dashboard-produccion>
       </p-tabPanel>
 
@@ -27,7 +29,7 @@
         header="Facturación"
         leftIcon="pi pi-dollar"
         tooltip="Información de la Facturación Mensual"
-        *ngIf="[1,60,6,12,96,98,10,2,69,103].includes(ValidarRol)">
+        *ngIf="[1,60,6,12,96,98,10,69,103].includes(ValidarRol)">
         <app-DashBoard_Facturacion *ngIf="facturacion"></app-DashBoard_Facturacion>
       </p-tabPanel>
 

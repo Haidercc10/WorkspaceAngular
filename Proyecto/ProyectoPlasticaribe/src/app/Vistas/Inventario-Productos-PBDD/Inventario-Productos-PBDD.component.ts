@@ -168,9 +168,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   getStockInformation() {
     //if(!this.despacho) {
+    let sales :string = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id)}` : '';
     this.load = true;
     //this.despacho = true;
-    this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
+    this.stockService.GetStockProducts_AvaibleProduction(sales).subscribe(data => {
       //this.getStockProcess();
       //this.getStockDeliveredNotAvaible();
       this.fillColumns();

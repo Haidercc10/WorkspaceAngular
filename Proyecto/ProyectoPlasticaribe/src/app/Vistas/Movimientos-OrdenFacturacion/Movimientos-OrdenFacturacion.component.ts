@@ -198,7 +198,6 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
         const today = moment();
         this.serchedData = data;
         this.serchedData = this.serchedData.map(x => {
-
           const fechaInicio = moment(x.fechaHora);
           const fechaFin = x.fechaDespacho == " "
             ? today
@@ -212,9 +211,6 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
           this.serchedData.sort((a, b) =>
             b.estado.localeCompare(a.estado)
           );
-
-          console.log(this.serchedData);
-
         })
       }, error: (error) => {
         this.msg.mensajeError(`¡No se encontraron devoluciones con los parametros consultados!`,

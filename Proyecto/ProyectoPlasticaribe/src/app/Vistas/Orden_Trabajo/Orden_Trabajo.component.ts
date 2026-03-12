@@ -2308,7 +2308,7 @@ export class Orden_TrabajoComponent implements OnInit {
         text: `OT ${datos_ot.numero_Orden}`,
         style: 'orden_trabajo',
         alignment: 'right',
-        margin: [0, 10, 0, 0],
+        margin: [0, 10, 10, 0],
       },
     ]
   }
