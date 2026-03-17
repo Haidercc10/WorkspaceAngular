@@ -80,6 +80,8 @@ export class PedidoExternoComponent implements OnInit {
   printingTypes: any = [];
   sealedTypes: any = [];
   formats: any = [];
+  treatys: any = [];
+  printingFD : string[] = ['FRENTE', 'DORSO'];
 
 
   constructor(private pedidoproductoService: OpedidoproductoService,
@@ -101,7 +103,8 @@ export class PedidoExternoComponent implements OnInit {
     private svPigments: PigmentoProductoService,
     private svPrinting: Tipos_ImpresionService,
     private svFormats: TipoProductoService,
-    private svSealed: TiposSelladoService
+    private svSealed: TiposSelladoService,
+    private svTratados: TratadoService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -133,7 +136,6 @@ export class PedidoExternoComponent implements OnInit {
     });
 
     this.formProdTerminado = this.frmBuilderPedExterno.group({
-      margin: [null, Validators.required],
       weightMillar: [null, Validators.required],
       weightRoll: [null, Validators.required],
       weightUnit: [null, Validators.required],
@@ -144,14 +146,18 @@ export class PedidoExternoComponent implements OnInit {
       format: [null, Validators.required],
       width: [null, Validators.required],
       long: [null, Validators.required],
-      bellow: [null, Validators.required],
+      bellowRight: [null, Validators.required],
+      bellowLeft: [null, Validators.required],
+      bellowBottom: [null, Validators.required],
       material: [null, Validators.required],
       pigment: [null, Validators.required],
-      printing: [false],
-      printingDouble: [false],
+      printing: [null],
       embobinate: [null,],
-      treaty: [false,],
+      treaty: [null],
       caliber: [null, Validators.required],
+      unitsCaliber: [null, Validators.required],
+      unitsALF: [null, Validators.required],
+      solapa : [null, Validators.required],
     })
   }
 
@@ -163,6 +169,7 @@ export class PedidoExternoComponent implements OnInit {
     this.getSealedTypes();
     this.getFormats();
     this.getPresentations();
+    this.getTreatys();
     this.buscarClientes();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
@@ -231,8 +238,9 @@ export class PedidoExternoComponent implements OnInit {
 
   getFormats = () => this.svFormats.srvObtenerLista().subscribe(x => this.formats = x);
 
-  getPresentations = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => { this.presentacion = data; console.log(data) });
+  getPresentations = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => { this.presentacion = data; });
 
+  getTreatys = () => this.svTratados.srvObtenerLista().subscribe(data => { this.treatys = data; });
 
   //*CLIENTES
   // Funcion que va a buscar los posibles clientes a los que se les puede hacer el pedido de productos
@@ -357,11 +365,9 @@ export class PedidoExternoComponent implements OnInit {
 
   //Funcion encargada de buscar un producto por el id del producto
   buscarProducto(idProducto: any) {
-    this.presentacion = [];
-
+    //this.presentacion = [];
     if ([null, undefined, ''].includes(idProducto)) this.productoCliente();
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(data => {
-      console.log(data);
       if (data.length > 0) this.productoConExistencia(data, idProducto);
       else if (data.length == 0) this.productoSinExistencia(idProducto);
     });
@@ -369,13 +375,14 @@ export class PedidoExternoComponent implements OnInit {
 
   productoSinExistencia(idProducto: number) {
     let datos_producto = this.producto.filter(x => x.prod_Id == idProducto);
-
+    
     this.FormPedidoExternoProductos.patchValue({
       'ProdId': datos_producto[0].prod_Id,
       'ProdNombre': datos_producto[0].prod_Nombre,
       'ProdPrecioUnd': 0,
       'ProdUltFacturacion': 0,
       'ProdStock': 0,
+      'ProdUnidadMedidaCant': datos_producto[0].undMed_Id,
     });
 
     this.formProdTerminado.patchValue({
@@ -398,6 +405,7 @@ export class PedidoExternoComponent implements OnInit {
       embobinate: 0,
       treaty: datos_producto[0].tratado_Id,
       caliber: datos_producto[0].prod_Calibre,
+      unitsALF: datos_producto[0].undMedACF,
     })
   }
 
@@ -405,18 +413,21 @@ export class PedidoExternoComponent implements OnInit {
     stock.forEach(exis => 
       this.FormPedidoExternoProductos.patchValue({ 'ProdStock': parseFloat(exis.disponibles) }));
       this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
-        this.presentacion = datos_prod.map(x => x.undMed_Id);
+        console.log(2, datos_prod);
+        
         datos_prod.forEach(p => {
-          //this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), prod.undMed_Id).subscribe(dataPed => {
-          //  this.FormPedidoExternoProductos.patchValue({ 'ProdUltFacturacion': dataPed.precioUnidad | 0 });
-          //  this.fechaUltFacuracion = dataPed.fechaDocumento.replace('T00:00:00', '');
-          //});
+          this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), p.exist.undMed_Id).subscribe(dataPed => {
+            this.FormPedidoExternoProductos.patchValue({ 'ProdUltFacturacion': dataPed.precioUnidad | 0 });
+            this.fechaUltFacuracion = dataPed.fechaDocumento.replace('T00:00:00', '');
+          });
           setTimeout(() => {
+            console.log(p.prod.undMed_Id);
+            
             this.FormPedidoExternoProductos.patchValue({
               'ProdId': p.prod.prod_Id,
               'ProdNombre': p.prod.prod_Nombre,
-              'ProdUnidadMedidaCant': p.prod.undMed_Id,
-              'ProdPrecioUnd': p.prod.exProd_PrecioVenta,
+              'ProdUnidadMedidaCant': p.exist.undMed_Id,
+              'ProdPrecioUnd': p.exist.exProd_PrecioVenta,
             });
             
             this.formProdTerminado.patchValue({
@@ -439,6 +450,7 @@ export class PedidoExternoComponent implements OnInit {
               embobinate: 0,
               treaty: p.prod.tratado_Id,
               caliber: p.prod.prod_Calibre,
+              unitsALF: p.prod.undMedACF,
             })
           }, 1000);
         });

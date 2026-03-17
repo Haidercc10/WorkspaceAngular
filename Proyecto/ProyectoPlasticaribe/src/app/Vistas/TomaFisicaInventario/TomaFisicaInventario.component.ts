@@ -443,10 +443,11 @@ export class TomaFisicaInventarioComponent implements OnInit {
 
   validatePhysicalInventory() {
     let roll = parseInt(this.productionSearched);
+    let toma = this.form.value.id;
     this.productionSearched = null;
     let searchInTable: string[] = this.searchIn == null ? ['TODO'] : !this.searchIn ? ['SELLA'] : ['EXT', 'EMP'];
     let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
-    this.svPhysicalCount.getPhysicalInventory(roll, searchInTable).subscribe(data => {
+    this.svPhysicalCount.getPhysicalInventory(toma, roll, searchInTable).subscribe(data => {
       if (data != null) {
         this.msj.mensajeAdvertencia(`El rollo/bulto N° ${data.tfi_Etiqueta} ya fue ingresado`);
         this.load = false;

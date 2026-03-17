@@ -153,7 +153,7 @@
             <label for="ProdNombre">Referencia</label>
           </span>
         </div>
-        
+
         <!-- Cantidad Pedida -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="cantidad">
           <span class="p-float-label">
@@ -166,8 +166,8 @@
         <!-- Presentacion -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="presentacion">
           <span class="p-float-label">
-            <p-dropdown formControlName="ProdUnidadMedidaCant" inputId="Und" [autoDisplayFirst]="false" optionValue=""
-            optionLabel="" [options]="presentacion" [required]="true"></p-dropdown>
+            <p-dropdown formControlName="ProdUnidadMedidaCant" inputId="Und" [autoDisplayFirst]="false"
+              optionValue="undMed_Id" optionLabel="undMed_Id" [options]="presentacion" [required]="true"></p-dropdown>
             <label for="Und">Presentación</label>
           </span>
         </div>
@@ -225,8 +225,8 @@
 
   <!-- Titulo PT -->
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
-        class="pi pi-database"></i> Producto Terminado</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-database"></i>
+      Producto Terminado</h4>
   </div>
 
   <!--*Formulario 3-->
@@ -238,9 +238,60 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-dropdown formControlName="format" inputId="format" [autoDisplayFirst]="false" optionValue="tpProd_Id"
-            optionLabel="tpProd_Nombre"
-              [options]="formats" [required]="true" ></p-dropdown>
+              optionLabel="tpProd_Nombre" [options]="formats" [required]="true"></p-dropdown>
             <label for="format">Formato</label>
+          </span>
+        </div>
+
+        <!-- * Material -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="material" inputId="material" optionValue="material_Id"
+              [autoDisplayFirst]="false" [options]="materials" optionLabel="material_Nombre"
+              [required]="true"></p-dropdown>
+            <label for="material">Material</label>
+          </span>
+        </div>
+
+        <!-- * Pigmento -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="pigment" inputId="Pigmento" [options]="pigments" optionLabel="pigmt_Nombre"
+              optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="pigmt_Nombre"
+              [required]="true">
+              <i class="pi pi-circle-fill"></i>
+            </p-dropdown>
+            <label for="Pigmento">Pigmento</label>
+          </span>
+        </div>
+
+        <!--* Tratado -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="treaty" inputId="Tratado" [options]="treatys" optionLabel="tratado_Nombre"
+              optionValue="tratado_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="tratado_Nombre"
+              [required]="true">
+              <i class="pi pi-circle-fill"></i>
+            </p-dropdown>
+            <label for="Tratado">Tratado</label>
+          </span>
+        </div>
+
+        <!-- * Calibre -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="caliber">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="caliber" mode="decimal" [min]="0" inputId="caliber"
+              [minFractionDigits]="2"></p-inputNumber>
+            <label for="caliber">Calibre</label>
+          </span>
+        </div>
+
+        <!--* Unidad Calibre -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="units">
+          <span class="p-float-label">
+            <p-dropdown formControlName="unitsALF" inputId="unit" [autoDisplayFirst]="false" optionValue="undMed_Id"
+              optionLabel="undMed_Id" [options]="presentacion" [required]="true"></p-dropdown>
+            <label for="units">Und. Calibre</label>
           </span>
         </div>
 
@@ -253,7 +304,7 @@
           </span>
         </div>
 
-        <!-- Ancho -->
+        <!-- Largo -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="long" mode="decimal" [min]="0" inputId="long"
@@ -262,21 +313,48 @@
           </span>
         </div>
 
-        <!-- Fuelle -->
+        <!-- Fuelle Izquierdo -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
-            <p-inputNumber formControlName="bellow" mode="decimal" [min]="0" inputId="bellow"
+            <p-inputNumber formControlName="bellowLeft" mode="decimal" [min]="0" inputId="bellowLeft"
               [minFractionDigits]="2"></p-inputNumber>
-            <label for="bellow">Fuelle</label>
+            <label for="bellowLeft">Fuelle Izq.</label>
           </span>
         </div>
 
-        <!-- Margen -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
+        <!-- Fuelle Derecho -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
-            <p-inputNumber formControlName="margin" mode="decimal" inputId="margin" [minFractionDigits]="2"
-              [readonly]="true"></p-inputNumber>
-            <label for="margin">Margen (%)</label>
+            <p-inputNumber formControlName="bellowRight" mode="decimal" [min]="0" inputId="bellowRight"
+              [minFractionDigits]="2"></p-inputNumber>
+            <label for="bellowRight">Fuelle Der.</label>
+          </span>
+        </div>
+
+        <!-- Fuelle Derecho -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="bellowBottom" mode="decimal" [min]="0" inputId="bellowBottom"
+              [minFractionDigits]="2"></p-inputNumber>
+            <label for="bellowBottom">Fuelle Fondo</label>
+          </span>
+        </div>
+
+        <!--* Unidad Ancho/Largo/Fuelle -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="units">
+          <span class="p-float-label">
+            <p-dropdown formControlName="unitsALF" inputId="unit" [autoDisplayFirst]="false" optionValue="undMed_Id"
+              optionLabel="undMed_Id" [options]="presentacion" [required]="true"></p-dropdown>
+            <label for="units">Und. Medida</label>
+          </span>
+        </div>
+
+        <!-- Solapa -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="solapa" mode="decimal" [min]="0" inputId="solapa"
+              [minFractionDigits]="2"></p-inputNumber>
+            <label for="solapa">Solapa</label>
           </span>
         </div>
 
@@ -310,8 +388,7 @@
         <!--  -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
-            <p-inputNumber formControlName="qtyBagxBulto" inputId="qtyBagxBulto"
-              [readonly]="true"></p-inputNumber>
+            <p-inputNumber formControlName="qtyBagxBulto" inputId="qtyBagxBulto" [readonly]="true"></p-inputNumber>
             <label for="qtyBagxBulto">Cant. Bolsas x Bulto</label>
           </span>
         </div>
@@ -319,8 +396,7 @@
         <!---->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
-            <p-inputNumber formControlName="qtyBagxPaq" inputId="qtyBagxPaq"
-              [readonly]="true"></p-inputNumber>
+            <p-inputNumber formControlName="qtyBagxPaq" inputId="qtyBagxPaq" [readonly]="true"></p-inputNumber>
             <label for="qtyBagxPaq">Cant. Bolsas x Paquete</label>
           </span>
         </div>
@@ -328,9 +404,9 @@
         <!-- Tipo impresión -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
-            <p-dropdown formControlName="tpPrinting" inputId="tpPrinting" [autoDisplayFirst]="false" [readonly]="!FormPedidoExternoProductos.value.printing" optionValue="tpImpresion_Id"
-            optionLabel="tpImpresion_Nombre"
-              [options]="printingTypes" [required]="true"></p-dropdown>
+            <p-dropdown formControlName="tpPrinting" inputId="tpPrinting" [autoDisplayFirst]="false"
+              optionValue="tpImpresion_Id" optionLabel="tpImpresion_Nombre" [options]="printingTypes"
+              [required]="true"></p-dropdown>
             <label for="tpPrinting">Tipo Impresión</label>
           </span>
         </div>
@@ -338,76 +414,48 @@
         <!-- Tipo Sellado -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
-            <p-dropdown formControlName="tpSealed" inputId="tpSealed" [autoDisplayFirst]="false" optionValue="tpSellado_Id"
-            optionLabel="tpSellados_Nombre"
-              [options]="sealedTypes" [required]="true" ></p-dropdown>
+            <p-dropdown formControlName="tpSealed" inputId="tpSealed" [autoDisplayFirst]="false"
+              optionValue="tpSellado_Id" optionLabel="tpSellados_Nombre" [options]="sealedTypes"
+              [required]="true"></p-dropdown>
             <label for="tpSealed">Tipo Sellado</label>
           </span>
         </div>
 
-        <!-- * Material -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+        <!--* impresión -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="units">
           <span class="p-float-label">
-            <p-dropdown formControlName="material" inputId="material" optionValue="material_Id"
-              [autoDisplayFirst]="false" [options]="materials" optionLabel="material_Nombre"
-              [required]="true"></p-dropdown>
-            <label for="material">Material</label>
-          </span>
-        </div>
-
-        <!-- * Pigmento -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
-          <span class="p-float-label">
-            <p-dropdown formControlName="pigment" inputId="Pigmento" [options]="pigments"
-              optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true"
-              filterBy="pigmt_Nombre" [required]="true">
-              <i class="pi pi-circle-fill"></i>
-            </p-dropdown>
-            <label for="Pigmento">Pigmento</label>
-          </span>
-        </div>
-
-        <!-- * Calibre -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="caliber">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="caliber" mode="decimal" [min]="0" inputId="caliber"
-              [minFractionDigits]="2"></p-inputNumber>
-            <label for="caliber">Calibre</label>
-          </span>
-        </div>
-
-        <!--* Tratado -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
-          <div class="field-checkbox">
-            <p-checkbox formControlName="treaty" [binary]="true" inputId="treaty" id="treaty"></p-checkbox>
-            <label for="treaty">Tratado</label>
-          </div>
-        </div>
-
-        <!--* Impresion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
-          <div class="field-checkbox">
-            <p-checkbox formControlName="printing" [binary]="true" inputId="printing" id="printing"></p-checkbox>
+            <p-dropdown formControlName="printing" inputId="printing" [autoDisplayFirst]="false" optionValue=""
+              optionLabel="" [options]="printingFD" [required]="true"></p-dropdown>
             <label for="printing">Impresión</label>
-          </div>
+          </span>
         </div>
+
+        
 
         <!--* Impresion Doble Cara-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+        <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
           <div class="field-checkbox">
             <p-checkbox formControlName="printingDouble" [binary]="true" inputId="printingDouble"
               id="printingDouble"></p-checkbox>
             <label for="printingDouble">Impresión Doble Cara</label>
           </div>
-        </div>
+        </div>-->
 
         <!--* Embobinado -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1" id="precio">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="embobinate">
           <span class="p-float-label">
-            <p-inputNumber formControlName="embobinate" [min]="0" inputId="embobinate"
-              [minFractionDigits]="2"></p-inputNumber>
+            <p-inputNumber formControlName="embobinate" [min]="0" inputId="embobinate" [minFractionDigits]="2"
+              [useGrouping]="false"></p-inputNumber>
             <label for="embobinate"># Embobinado</label>
           </span>
+        </div>
+
+        <!--* Laminado -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+          <div class="field-checkbox">
+            <p-checkbox formControlName="laminated" [binary]="true" inputId="laminated" id="laminated"></p-checkbox>
+            <label for="laminated">Laminado</label>
+          </div>
         </div>
 
       </div>
