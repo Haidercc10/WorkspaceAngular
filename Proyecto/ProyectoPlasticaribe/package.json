@@ -2,10 +2,10 @@
   "name": "plasticaribe",
   "version": "5.0.11",
   "main": "main.js",
-  "icon": "/assets/Plascaribe_Icono.ico",
+  "icon": "/assets/Plascaribe_Icon2.ico",
   "scripts": {
     "ng": "ng",
-    "icon": "/assets/Plascaribe_Icono.png",
+    "icon": "/assets/Plascaribe_Icono2.png",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

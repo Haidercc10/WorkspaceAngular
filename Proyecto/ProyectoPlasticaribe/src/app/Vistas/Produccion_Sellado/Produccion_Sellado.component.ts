@@ -624,6 +624,7 @@ export class Produccion_SelladoComponent implements OnInit {
       'Etiqueta_Trazabilidad': this.formSellado.value.etiquetaAsociada,
       'Empacador_Id': [undefined, null].includes(this.formSellado.value.packer) ? 0 : this.formSellado.value.packer,
       'Autoriza_Id': this.formSellado.value.userAuthorize,
+      'Estado_Rollo' : 19
     }
     this.guardarRegistroEntrada(entrada, data);
   }
@@ -661,8 +662,10 @@ export class Produccion_SelladoComponent implements OnInit {
   guardarRegistroEntrada(entrada: any, dataTagAssociated?: any) {
     let motherProcess: any = this.formSellado.value.procesoAnterior;
     let otAltern: any = this.formSellado.value.otAlterna;
-    this.svcProdProcesos.Post(entrada).subscribe(data => {
-      this.crearEtiqueta(data.numero_Rollo, data.peso_Neto, data.cantidad, data.presentacion, false, data.operario1_Id, data.datos_Etiqueta, data, motherProcess, dataTagAssociated);
+    this.svcProdProcesos.postProduccionProcesos(entrada).subscribe(data => {
+      console.log('PostProduccionProcesos', data);
+      this.getEtiquetaPlasticaribe(data, dataTagAssociated);
+      //this.crearEtiqueta(data.numero_Rollo, data.peso_Neto, data.cantidad, data.presentacion, false, data.operario1_Id, data.datos_Etiqueta, data, motherProcess, dataTagAssociated);
       setTimeout(() => {
         if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
         else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
@@ -682,6 +685,82 @@ export class Produccion_SelladoComponent implements OnInit {
         this.buscarOT();
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
+  }
+
+  //Nueva etiqueta
+  getEtiquetaPlasticaribe(data : any, tagAssociated) {
+    console.log('Entré a getEtiquetaPlasticaribe', data, tagAssociated )
+    let motherProcess: any = this.formSellado.value.procesoAnterior;
+
+    let etiqueta: modelTagProduction = {
+      'client': data.cli_Nombre,
+      'item': data.prod_Id,
+      'reference': data.prod_Nombre,
+      'width': 0,
+      'height': 0,
+      'bellows': 0,
+      'und': '',
+      'cal': 0,
+      'orderProduction': data.ot,
+      'material': data.material_Nombre,
+      'quantity': data.peso_Neto,
+      'quantity2': data.presentacion == 'Kg' ? data.peso_Neto : Math.trunc(data.cantidad),
+      'reel': data.numeroRollo_BagPro,
+      'presentationItem1': 'Kg',
+      'presentationItem2': data.presentacion != 'Kg' ? data.presentacion : 'Kg',
+      'productionProcess': data.proceso_Nombre.toUpperCase(),
+      'showNameBussiness': true,
+      'operator': data.usua_Nombre,
+      'copy': false,
+      'dataTagForClient': '',
+      'showDataTagForClient': this.formSellado.value.mostratDatosProducto ? this.formSellado.value.mostratDatosProducto : '',
+      'machine': data.maquina,
+      'date' : data.fecha.replace('T00:00:00', ''),
+      'hour' : data.hora
+    }
+     this.svcCrearPDF.createTagProduction(etiqueta);
+    this.createTraceability2(data, motherProcess, tagAssociated);
+  }
+
+  //* Nueva trazabilidad
+  createTraceability2(productionProcess: any, motherProcess: string, infoTagAssociated?: number) {
+    this.svTraceability.PostTraceability(this.modelTraceability2(productionProcess, motherProcess, infoTagAssociated)).subscribe(trace => {
+    }, error => {
+      this.svcMsjs.mensajeError(`Error`, `Error al crear el registro de trazabilidad | ${error.status} ${error.statusText}`);
+      this.cargando = false;
+    });
+  }
+
+  //Nuevo modelo. 
+  modelTraceability2(productionPL: any, motherProcess: string, infoTagAssociated?: any) {
+    console.log(`modelTraceability2:`, productionPL, motherProcess, infoTagAssociated);
+    
+    let info: modelTrazabilidad_Produccion = {
+      'Trz_Etiqueta': productionPL.numeroRollo_BagPro,
+      'Trz_Ot': productionPL.ot,
+      'Prod_Id': productionPL.prod_Id,
+      'Cli_Id': productionPL.cli_Id,
+      'Proceso_Id': productionPL.proceso_Id,
+      'Trz_Fecha': productionPL.fecha,
+      'Trz_Hora': productionPL.hora,
+      'Trz_PesoNeto': productionPL.peso_Neto,
+      'Trz_PesoBruto': productionPL.peso_Bruto,
+      'Trz_Cantidad': productionPL.cantidad,
+      'Presentacion': productionPL.presentacion,
+      'Trz_Maquina': productionPL.maquina,
+      'Operario_1': productionPL.operario1_Id,
+      'Operario_2': productionPL.operario2_Id == null ? 0 : productionPL.operario2_Id,
+      'Operario_3': productionPL.operario3_Id == null ? 0 : productionPL.operario3_Id,
+      'Operario_4': productionPL.operario4_Id == null ? 0 : productionPL.operario4_Id,
+      'Empacador_Id': [undefined, null].includes(productionPL.empacador_Id) ? 0 : productionPL.empacador_Id,
+      'Turno_Id': productionPL.turno_Id,
+      'Trz_EtiquetaAnterior': infoTagAssociated ? infoTagAssociated.rollo : this.formSellado.value.etiquetaAsociada,
+      'Trz_OtAnterior': infoTagAssociated ? infoTagAssociated.ot : null,
+      'Prod_Anterior': infoTagAssociated ? infoTagAssociated.item : 1,
+      'Proceso_Anterior': motherProcess,
+      'Autoriza_Id': productionPL.autoriza_Id,
+    }
+    return info;
   }
 
   //****** Función que guarda el registro del rollo en la BD (Versión 2 para repacking) ******//

@@ -31,4 +31,5 @@ export interface modelProduccionProcesos {
     Etiqueta_Trazabilidad? : number;
     Empacador_Id? : number;
     Autoriza_Id? : number;
+    Estado_Rollo? : number;
 }

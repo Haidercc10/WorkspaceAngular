@@ -7,6 +7,10 @@
   user-select: none;
 }
 
+.logo2 {
+  width: 10%;
+}
+
 p-panelmenu ::ng-deep div, p-panelmenu ::ng-deep .p-panelmenu-panel, p-panelmenu ::ng-deep .p-panelmenu-header, p-panelmenu ::ng-deep div a {
   background-color: #fff0 !important;
   border: none !important;

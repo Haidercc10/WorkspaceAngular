@@ -224,7 +224,7 @@
             </div>
 
             <!-- Autoriza -->
-            <div class="col-sm-12 col-md-6 col-xl-2">
+            <div class="col-sm-12 col-md-6 col-xl-2" *ngIf="proceso == 'Empaque'">
                 <span class="p-float-label">
                     <p-dropdown formControlName="userAuthorize" inputId="userAuthorize" [options]="usersAuthorized"
                         [readonly]="true" optionLabel="userName" [autoDisplayFirst]="false" [filter]="true"

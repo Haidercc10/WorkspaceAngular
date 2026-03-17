@@ -739,6 +739,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Etiqueta_Trazabilidad : this.formDatosProduccion.value.etiquetaAsociada,
       Empacador_Id : [undefined, null].includes(this.formDatosProduccion.value.packer) ? 0 : this.formDatosProduccion.value.packer,
       Autoriza_Id : this.formDatosProduccion.value.userAuthorize ? this.formDatosProduccion.value.userAuthorize : 0,
+      Estado_Rollo : 19
     }
     return datos;
   }
@@ -755,8 +756,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     let rebobinado : boolean = this.formDatosProduccion.value.rebobinado;
     let daipita : any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? null : this.formDatosProduccion.value.daipita;
 
-    this.produccionProcesosService.Post(this.datosProduccion(daipita)).subscribe(res => {
-      this.searchDataTagCreated(res.numero_Rollo, daipita, rebobinado, res, infoEtiquetaAsociada);
+    this.produccionProcesosService.postProduccionProcesos(this.datosProduccion(daipita)).subscribe(res => {
+      //this.searchDataTagCreated(res.numero_Rollo, daipita, rebobinado, res, infoEtiquetaAsociada);
+      this.getEtiquetaPlasticaribe(res, infoEtiquetaAsociada, daipita, rebobinado);
       setTimeout(() => {
         let mostrarDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
         let anchoProducto : number = this.formDatosProduccion.value.anchoProducto;
@@ -779,6 +781,82 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
       }, 1000);
     }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
+  }
+
+  //Nueva etiqueta
+  getEtiquetaPlasticaribe(data : any, tagAssociated : any, daipita : any, rebobinado : boolean) {
+    console.log('Entré a getEtiquetaPlasticaribe', data, tagAssociated )
+    let motherProcess: any = this.formDatosProduccion.value.procesoAnterior;
+
+    let etiqueta: modelTagProduction = {
+      'client': data.cli_Nombre,
+      'item': data.prod_Id,
+      'reference': data.prod_Nombre,
+      'width': 0,
+      'height': 0,
+      'bellows': 0,
+      'und': '',
+      'cal': 0,
+      'orderProduction': data.ot,
+      'material': data.material_Nombre,
+      'quantity': this.validateProcess() != 'EMP' ? data.peso_Bruto : [0, '', null, undefined].includes(daipita) ? data.peso_Bruto : data.peso_Neto,
+      'quantity2': this.validateProcess() != 'EMP' ? data.peso_Neto : [0, '', null, undefined].includes(daipita) ? data.peso_Neto : daipita, //data.presentacion == 'Kg' ? data.peso_Neto : Math.trunc(data.cantidad),
+      'reel': data.numeroRollo_BagPro,
+      'presentationItem1': [0, '', null, undefined].includes(daipita) ? 'Kg Bruto' : this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
+      'presentationItem2': [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
+      'productionProcess': data.proceso_Nombre.toUpperCase(),
+      'showNameBussiness': true,
+      'operator': rebobinado ? `${data.usua_Nombre + ' RB'}` : `${data.usua_Nombre}`,
+      'copy': false,
+      'dataTagForClient': '',
+      'showDataTagForClient': this.formDatosProduccion.value.mostratDatosProducto ? this.formDatosProduccion.value.mostratDatosProducto : '',
+      'machine': data.maquina,
+      'date' : data.fecha.replace('T00:00:00', ''),
+      'hour' : data.hora
+    }
+     this.createPDFService.createTagProduction(etiqueta);
+    this.createTraceability2(data, motherProcess, tagAssociated);
+  }
+
+  //* Nueva trazabilidad
+  createTraceability2(productionProcess: any, motherProcess: string, infoTagAssociated?: number) {
+    this.svTraceability.PostTraceability(this.modelTraceability2(productionProcess, motherProcess, infoTagAssociated)).subscribe(trace => {
+    }, error => {
+      this.msj.mensajeError(`Error`, `Error al crear el registro de trazabilidad | ${error.status} ${error.statusText}`);
+      this.cargando = false;
+    });
+  }
+
+  //Nuevo modelo. 
+  modelTraceability2(productionPL: any, motherProcess: string, infoTagAssociated?: any) {
+    console.log(`modelTraceability2:`, productionPL, motherProcess, infoTagAssociated);
+    
+    let info: modelTrazabilidad_Produccion = {
+      'Trz_Etiqueta': productionPL.numeroRollo_BagPro,
+      'Trz_Ot': productionPL.ot,
+      'Prod_Id': productionPL.prod_Id,
+      'Cli_Id': productionPL.cli_Id,
+      'Proceso_Id': productionPL.proceso_Id,
+      'Trz_Fecha': productionPL.fecha,
+      'Trz_Hora': productionPL.hora,
+      'Trz_PesoNeto': productionPL.peso_Neto,
+      'Trz_PesoBruto': productionPL.peso_Bruto,
+      'Trz_Cantidad': productionPL.cantidad,
+      'Presentacion': productionPL.presentacion,
+      'Trz_Maquina': productionPL.maquina,
+      'Operario_1': productionPL.operario1_Id,
+      'Operario_2': productionPL.operario2_Id == null ? 0 : productionPL.operario2_Id,
+      'Operario_3': productionPL.operario3_Id == null ? 0 : productionPL.operario3_Id,
+      'Operario_4': productionPL.operario4_Id == null ? 0 : productionPL.operario4_Id,
+      'Empacador_Id': [undefined, null].includes(productionPL.empacador_Id) ? 0 : productionPL.empacador_Id,
+      'Turno_Id': productionPL.turno_Id,
+      'Trz_EtiquetaAnterior': infoTagAssociated ? infoTagAssociated.rollo : this.formDatosProduccion.value.etiquetaAsociada,
+      'Trz_OtAnterior': infoTagAssociated ? infoTagAssociated.ot : null,
+      'Prod_Anterior': infoTagAssociated ? infoTagAssociated.item : 1,
+      'Proceso_Anterior': motherProcess,
+      'Autoriza_Id': productionPL.autoriza_Id,
+    }
+    return info;
   }
 
   //Función para actualizar los estados de la OT en el proceso de extrusión

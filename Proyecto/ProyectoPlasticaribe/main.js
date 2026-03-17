@@ -11,7 +11,7 @@ function createWindow() {
   appWin = new BrowserWindow({
     title: "Plasticaribe",
     resizable: true,
-    icon: '/assets/Plascaribe_Icono.png',
+    icon: '/assets/Plascaribe_Icono2.png',
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: true,

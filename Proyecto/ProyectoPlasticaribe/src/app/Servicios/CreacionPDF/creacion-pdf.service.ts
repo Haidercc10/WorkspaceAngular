@@ -462,7 +462,7 @@ export class TagProduction_2 {
               {
                 border: [false, false, false, false],
                 columns: [
-                  { width: 'auto', text: 'BULTO:', bold: true, fontSize: 10, alignment: 'left' },
+                  { width: 'auto', text: 'ID:', bold: true, fontSize: 10, alignment: 'left' },
                   { width: 'auto', text: `${dataTag.reel}${!dataTag.copy ? '' : '.'}`, fontSize: 10, alignment: 'left' },
                 ]
               }
@@ -523,8 +523,8 @@ export class TagProduction_2 {
 
   private processAndDate(dataTag: modelTagProduction): Array<any> {
     return [
-      { text: dataTag.productionProcess, alignment: 'center', fontSize: 8, bold: true },
-      { text: `${moment().format('YYYY-MM-DD HH:mm:ss')}`, alignment: 'center', fontSize: 8 },
+      { text: `${dataTag.productionProcess} | ${dataTag.machine}`, alignment: 'center', fontSize: 8, bold: true },
+      { text: `${dataTag.date} ${dataTag.hour}`, alignment: 'center', fontSize: 8 },
     ]
   }
 
@@ -587,4 +587,7 @@ export interface modelTagProduction {
   copy?: boolean;
   dataTagForClient?: string;
   showDataTagForClient?: boolean;
+  machine?: string;
+  date? : any;
+  hour? : any;
 }

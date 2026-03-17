@@ -27,6 +27,8 @@ export class Produccion_ProcesosService {
 
   Post = (body: modelProduccionProcesos): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos`, body);
 
+  postProduccionProcesos = (body: modelProduccionProcesos): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/postProduccionProcesos`, body);
+
   getOtSentToPeletizado = (ot : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getOtSentToPeletizado/${ot}`);
   
   GetInfoProduction = (date1 : any, date2 : any, url? : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProduction/${date1}/${date2}${url}`);
