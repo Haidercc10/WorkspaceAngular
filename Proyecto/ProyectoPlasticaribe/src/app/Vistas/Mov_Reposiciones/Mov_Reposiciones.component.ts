@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Table } from 'exceljs';
+import { Table } from 'primeng/table';
 import moment from 'moment';
+import { forkJoin } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
@@ -24,24 +25,25 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 export class Mov_ReposicionesComponent implements OnInit {
 
-  form !: FormGroup;
+  form!: FormGroup;
   load: boolean = false;
   modoSeleccionado: boolean;
-  ValidarRol : number;
-  storage_Id : number;
-  storage_Nombre : any;
+  ValidarRol: number;
+  storage_Id: number;
+  storage_Nombre: any;
   searchedData: any[] = [];
   @ViewChild('dt') dt: Table;
-  modal : boolean = false;
-  rollsFromRepo : any = [];
-  rollsConsolidates : any = [];
-  clients : any = [];
-  statuses : any = [];
-  selectedRepo : any = {};
+  modal: boolean = false;
+  rollsFromRepo: any = [];
+  rollsConsolidates: any = [];
+  clients: any = [];
+  statuses: any = [];
+  selectedRepo: any = {};
   @ViewChild('op') op: OverlayPanel | undefined;
-  observation : any = null;
-  fails : any = [];
+  observation: any = null;
+  fails: any = [];
   sales: any[] = [];
+  private allDetailsForRepo: any[] = [];
 
   constructor(
     private appComponent: AppComponent,
@@ -75,16 +77,18 @@ export class Mov_ReposicionesComponent implements OnInit {
     this.form.patchValue({ 'startDate' : initialDate, 'endDate' : new Date() });
   }
   
-  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 25) });
+  getFails = () => this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item: any) => item.tipoFalla_Id == 25); });
 
   //*
-  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11,5,3].includes(x.estado_Id))  }, error => { this.msjs(`Error`, `Error al consultar los estados.`) });
+  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(
+    data => { this.statuses = data.filter((x: any) => [11, 5, 3].includes(x.estado_Id)); },
+    () => { this.msjs(`Error`, `Error al consultar los estados.`); }
+  );
 
   getSales() {
-    let asesor: any = this.ValidarRol == 2 ? this.appComponent.storage_Id : null;
+    const asesorId: number | null = this.ValidarRol == 2 ? this.appComponent.storage_Id : null;
     this.svSales.GetVendedores().subscribe(resp => {
-      this.sales = resp,
-        this.sales = asesor ? this.sales.filter(x => x.usua_Id == asesor) : this.sales
+      this.sales = asesorId ? resp.filter((x: any) => x.usua_Id == asesorId) : resp;
     });
   }
 
@@ -132,10 +136,10 @@ export class Mov_ReposicionesComponent implements OnInit {
   //*Función para consultar los movimientos de reposiciones
   searchData(){
     this.load = true;
-    let date1 : any = moment(this.form.value.startDate).format('YYYY-MM-DD');
-    let date2 : any = moment(this.form.value.endDate).format('YYYY-MM-DD');
+    const date1 = moment(this.form.value.startDate).format('YYYY-MM-DD');
+    const date2 = moment(this.form.value.endDate).format('YYYY-MM-DD');
 
-    this.svDtlRepositions.getMovementsReposition(date1, date2, this.validateUrl()).subscribe(data => {
+    this.svDtlRepositions.getMovementsReposition(date1, date2, this.buildQueryParams()).subscribe(data => {
       this.searchedData = data;
       this.load = false;
     }, error => {
@@ -143,23 +147,18 @@ export class Mov_ReposicionesComponent implements OnInit {
     });
   }
 
-  //* Validar la URL que se enviará al API para consultar.
-  validateUrl(){
-    let id: any = this.form.value.id;
-    let status: any = this.form.value.status;
-    let client : any = this.form.value.idClient;
-    let fail : any = this.form.value.fail;
-    let sales : any = this.form.value.sales;
-    let url : string = ``;
+  //* Construye los parámetros de búsqueda para la URL.
+  buildQueryParams(): string {
+    const { id, status, idClient: client, fail, sales } = this.form.value;
+    const params: string[] = [];
 
-    if(id != null) url += `id=${id}`;
-    if(status != null) url.length > 0 ? url += `&status=${status}` : url += `status=${status}`;
-    if(client != null) url.length > 0 ? url += `&roll=${client}` : url += `roll=${client}`;
-    if(fail != null) url.length > 0 ? url += `&fail=${fail}` : url += `fail=${fail}`;
-    if(sales != null) url.length > 0 ? url += `&sales=${sales}` : url += `sales=${sales}`;
+    if (id != null)     params.push(`id=${id}`);
+    if (status != null) params.push(`status=${status}`);
+    if (client != null) params.push(`roll=${client}`);
+    if (fail != null)   params.push(`fail=${fail}`);
+    if (sales != null)  params.push(`sales=${sales}`);
 
-    if(url.length > 0) url = `?${url}`;
-    return url;
+    return params.length > 0 ? `?${params.join('&')}` : '';
   }
 
   //* Función para validar los mensajes a mostrar
@@ -174,21 +173,25 @@ export class Mov_ReposicionesComponent implements OnInit {
         return this.svMsjs.mensajeError(msj1, msj2);
       default :
         return this.svMsjs.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`); 
-    }``
+    }
   }
 
-  //*Función para mostrar el msj de confirmación de eliminación de rollos
+  //*Función para mostrar el msj de confirmación de anulación de reposición
   viewMsgAnullation(data : any) {
     this.load = true;
-    this.selectedRepo = {};
     this.selectedRepo = data;
-    this.cmpRepostions.searchRepositions(data.movement);
-    setTimeout(() => { 
-      this.rollsConsolidates = this.cmpRepostions.rollsConsolidate; 
-      console.log(this.rollsConsolidates);
-      this.msg.add({severity:'warn', key:'reposition', summary:'Elección', detail: `¿Está seguro que desea anular la reposición N° ${data.movement}?`, sticky: true});
-    }, 2500);
-  } 
+    this.svDtlRepositions.getRepositionId(data.movement).subscribe(
+      details => {
+        this.allDetailsForRepo = details;
+        this.rollsConsolidates = this.consolidateByItem(details);
+        this.load = false;
+        this.msg.add({severity:'warn', key:'reposition', summary:'Elección', detail: `¿Está seguro que desea anular la reposición N° ${data.movement}?`, sticky: true});
+      },
+      error => {
+        this.msjs(`Error`, `Error al consultar la reposición N° ${data.movement} | ${error.status} ${error.statusText}.`);
+      }
+    );
+  }
   
   //* Función para quitar msj de confirmación.
   onReject(key : any) {
@@ -199,15 +202,13 @@ export class Mov_ReposicionesComponent implements OnInit {
   //* Función para anular la reposición y cambiar estado DISPONIBLE los rollos.
   discardReposition(){
     this.onReject('reposition');
-    let data : any = {};
-    data = this.selectedRepo;
+    const data = this.selectedRepo;
     this.load = true;
     this.svProduction.putAvailableFromReposition(data.movement, this.storage_Id).subscribe(() => {
       this.msjs(`Confirmación`, `Reposición N° ${data.movement} anulada exitosamente!`);
       this.searchData();
     }, error => {
       this.msjs(`Error`, `Error al actualizar el estado de los rollos | ${error.status} ${error.statusText}.`);
-      this.load = false;
     });
   }
 
@@ -223,49 +224,68 @@ export class Mov_ReposicionesComponent implements OnInit {
 
   //*
   sendPositiveAdjustment(){
-    let count : number = 0
     this.onReject('reposition');
-    //data = this.rollsSelected;
-
-    this.rollsConsolidates.forEach(data => {
-      let unity : string = data.unit == 'Kg' ? 'KLS' : data.unit == 'Und' ? 'UND' : 'PAQ';
-      //let qty : number = data.qty;
-      let item : string = data.item; 
-      let price : string = data.price;
-      let detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${(this.cmpRepostions.qtyTotalItem(data))} ${unity}`;
-      
-      this.svProduction.sendProductionToZeus(detail, item, unity, 0, (this.cmpRepostions.qtyTotalItem(data)).toString(), price).subscribe(dataAdjusment => {
-        count++
-        if(this.rollsConsolidates.length == count) this.discardReposition();
-      }, error => { this.msjs(`Error`, `No fue posible enviar el ajuste positivo a Zeus | ${error.status} ${error.statusText}`); });
+    const adjustments$ = this.rollsConsolidates.map((data: any) => {
+      // La API devuelve el campo 'presentation'; no se usa 'unit' porque aquí
+      // se trabaja directamente con la respuesta del API sin pasar por loadTable.
+      const unity : string = data.presentation == 'Kg' ? 'KLS' : data.presentation == 'Und' ? 'UND' : 'PAQ';
+      const qty : string = this.qtyTotalItem(data).toString();
+      const item : string = data.item;
+      const price : string = data.price;
+      const detail : string = `Ajuste desde App Plasticaribe por concepto de REPOSICION al Item ${item} con cantidad de ${qty} ${unity}`;
+      return this.svProduction.sendProductionToZeus(detail, item, unity, 0, qty, price);
     });
+
+    this.load = true;
+    forkJoin(adjustments$).subscribe(
+      () => { this.discardReposition(); },
+      error => { this.msjs(`Error`, `No fue posible enviar el ajuste positivo a Zeus | ${error.status} ${error.statusText}`); }
+    );
+  }
+
+  //* Consolida los detalles de una reposición por item único.
+  private consolidateByItem(details: any[]): any[] {
+    return details.reduce((acc: any[], value: any) => {
+      if (!acc.find((x: any) => x.item == value.item)) acc.push(value);
+      return acc;
+    }, []);
+  }
+
+  //* Calcula la cantidad total de un item sumando todos sus rollos en el detalle.
+  private qtyTotalItem(data: any): number {
+    return this.allDetailsForRepo
+      .filter((x: any) => x.item == data.item)
+      .reduce((a: number, b: any) => a + b.quantity, 0);
   }
 
 
   finishRepo(data : any){
     this.onReject('finishReposition');
     this.load = true;
-    let info : any = [{ 'user' : this.storage_Id, 'status' : 5 }]
+    const info : any = [{ 'user' : this.storage_Id, 'status' : 5 }]
     this.svRepo.putReposition(data.movement, info).subscribe(() => {
       this.msjs(`Confirmación`, `Reposición N° ${data.movement} finalizada exitosamente!`);
-      this.load = false;
+      this.searchData();
     }, error => {
       this.msjs(`Error`, `Error al finalizar la reposición N° ${data.movement} | ${error.status} ${error.statusText}.`);
-      this.load = false;
     });
   }
 
-  //*Función para mostrar el msj de confirmación de eliminación de rollos
+  //*Función para mostrar el msj de confirmación de finalización de reposición
   viewMsgFinishRepo(data : any) {
     this.load = true;
-    this.selectedRepo = {};
     this.selectedRepo = data;
-    this.cmpRepostions.searchRepositions(data.movement);
-    setTimeout(() => { 
-      this.rollsConsolidates = this.cmpRepostions.rollsConsolidate;   
-      console.log(this.rollsConsolidates);
-    }, 1000);
-    this.msg.add({severity:'warn', key:'finishReposition', summary:'Elección', detail: `¿Está seguro que desea finalizar la reposición N° ${data.movement}?`, sticky: true});
+    this.svDtlRepositions.getRepositionId(data.movement).subscribe(
+      details => {
+        this.allDetailsForRepo = details;
+        this.rollsConsolidates = this.consolidateByItem(details);
+        this.load = false;
+        this.msg.add({severity:'warn', key:'finishReposition', summary:'Elección', detail: `¿Está seguro que desea finalizar la reposición N° ${data.movement}?`, sticky: true});
+      },
+      error => {
+        this.msjs(`Error`, `Error al consultar la reposición N° ${data.movement} | ${error.status} ${error.statusText}.`);
+      }
+    );
   }
 
   //*Función para mostrar la observación de la orden de reposición. 
@@ -322,11 +342,12 @@ export class Mov_ReposicionesComponent implements OnInit {
     let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5']; 
     ws.addRow(this.loadFieldsHeader());
 
-    //ws.addRow([]);
-    rowHeader.forEach(x => ws.getCell(x).fill = fill);
-    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
-    rowHeader.forEach(x => ws.getCell(x).border = border);
-    rowHeader.forEach(x => ws.getCell(x).font = font);
+    rowHeader.forEach((x: any) => {
+      ws.getCell(x).fill = fill;
+      ws.getCell(x).alignment = alignment;
+      ws.getCell(x).border = border;
+      ws.getCell(x).font = font;
+    });
     ws.mergeCells('A1:H3');
 
     this.loadSizeHeader(ws);
@@ -334,10 +355,10 @@ export class Mov_ReposicionesComponent implements OnInit {
 
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws : any){
-    [3,8,7].forEach(x => ws.getColumn(x).width = 50);
-    [1].forEach(x => ws.getColumn(x).width = 5);
-    [4,5,6].forEach(x => ws.getColumn(x).width = 20);
-    [2].forEach(x => ws.getColumn(x).width = 15);
+    [3, 8, 7].forEach(x => ws.getColumn(x).width = 50);
+    ws.getColumn(1).width = 5;
+    ws.getColumn(2).width = 15;
+    [4, 5, 6].forEach(x => ws.getColumn(x).width = 20);
   }
 
  //Función para cargar los nombres de las columnas del header
@@ -360,35 +381,30 @@ export class Mov_ReposicionesComponent implements OnInit {
     let contador : any = 6;
     let row : any = ['A','B','C','D','E','F','G','H']; 
 
-    data.forEach(x => {
+    data.forEach((x: any) => {
       ws.addRow(x);
-      row.forEach(r => {
+      row.forEach((r: any) => {
         ws.getCell(`${r}${contador}`).border = border;
         ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
         ws.getCell(`${r}${contador}`).alignment = alignment;
       });
       contador++
     }); 
-    //row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
   }
 
   //.Función que contendrá la info al documento excel. 
-  dataExcel(data : any){
-    let info : any = [];
+  dataExcel(data : any): any[] {
     let count : number = 0;
-    data.forEach(x => {
-      info.push([
-        count += 1,
-        x.movement,
-        x.client,
-        `${x.date1.replace('T00:00:00', '')} - ${x.hour1}`,
-        x.status,
-        x.fail,
-        x.authorize,
-        x.observation1,
-      ]);
-    });
-    return info;
+    return data.map((x: any) => [
+      ++count,
+      x.movement,
+      x.client,
+      `${x.date1.replace('T00:00:00', '')} - ${x.hour1}`,
+      x.status,
+      x.fail,
+      x.authorize,
+      x.observation1,
+    ]);
   }
 }
 
