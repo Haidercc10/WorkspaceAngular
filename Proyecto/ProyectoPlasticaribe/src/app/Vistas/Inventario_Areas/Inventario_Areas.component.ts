@@ -354,7 +354,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
     if(item != null) {
       this.load = true;
       if(this.url == this.urlItems) {
-        this.svcBagPro.srvObtenerItemsBagproXClienteItem(item).subscribe(data => { this.cargarCamposBagPro(data[0]); }, error => {
+        this.svcBagPro.srvObtenerItemsBagproXClienteItem(item, '').subscribe(data => { this.cargarCamposBagPro(data[0]); }, error => {
           this.svcMsjs.mensajeError(`Error`, `El item ${item} no existe!`);
           this.load = false;
         });

@@ -10,7 +10,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
-import { log } from 'console';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Diferencias_Inventario',
@@ -46,23 +46,37 @@ export class Diferencias_InventarioComponent implements OnInit {
                     private svcExcel : CreacionExcelService,
                       private msjs : MensajesAplicacionService,
                         private svBagPro : BagproService,
-                          private svProductionProcess : Produccion_ProcesosService
+                          private svProductionProcess : Produccion_ProcesosService,
+                            private app : AppComponent
                     ) { }
 
   ngOnInit() {
+    this.lecturaStorage();
     this.items();
   }
 
+  lecturaStorage(){
+    this.storage_Id = this.app.storage_Id;
+    this.storage_Name = this.app.storage_Nombre;
+    this.ValidarRol = this.app.ValidarRol;
+  }
+
   items(){
+    let sales : any = this.ValidarRol == 2 ? String(this.storage_Id).padStart(3, '0') : null;
     this.inventory = [];
     this.load = true;
     this.zeusService.getInventoryZeus().subscribe(data => {
       this.svExistProducts.getInventoryProducts(data).subscribe(data2 => {
         this.inventory = data2.filter(x => x != null);
-        this.svBagPro.srvObtenerItemsBagproXClienteItem(data2.filter(x => x != null).map(z => z.item)).subscribe(dataBagPro => {
+        this.svBagPro.srvObtenerItemsBagproXClienteItem(data2.filter(x => x != null).map(z => z.item), '').subscribe(dataBagPro => {
           this.inventory.forEach(i => {
             i.client = dataBagPro.filter(x => x.clienteItems == i.item)[0].clienteNom;
+            i.sales = dataBagPro.filter(x => x.clienteItems == i.item)[0].nombreCompleto;
+            i.codeAsesor = dataBagPro.filter(x => x.clienteItems == i.item)[0].codigo_Asesor;
           });
+          console.log(sales);
+          
+          this.inventory = sales ? this.inventory.filter(x => x.codeAsesor == sales) : this.inventory;
           this.load = false;
         }, e => {
           this.load = false;

@@ -21,22 +21,12 @@
     <div class="mb-3">
       <div class="row g-4">
 
-        <!-- Id Vendedores -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="Id_Vendedor">
-          <span class="p-float-label">
-            <input formControlName="Id_Vendedor" id="Id_Vendedor" type="text" pInputText autocomplete="off" />
-            <label for="Id_Vendedor">Id Vendedor</label>
-          </span>
-        </div>
-
         <!-- Vendedores -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="Vendedor">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="vendedor">
           <span class="p-float-label">
-            <input formControlName="Vendedor" id="Vendedor" list="vendedores" (change)="llenarVendedor()" type="text"
-              pInputText autocomplete="off" />
-            <datalist id="vendedores">
-              <option value={{item.usua_Nombre}} *ngFor="let item of Vendedores">{{item.usua_Nombre}}</option>
-            </datalist>
+            <p-dropdown formControlName="Id_Vendedor" inputId="Vendedor" [options]="Vendedores"
+              optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre" [showClear]="true"
+              [autoDisplayFirst]="ValidarRol == 2" [readonly]="ValidarRol == 2" [required]="true"></p-dropdown>
             <label for="Vendedor">Vendedor</label>
           </span>
         </div>

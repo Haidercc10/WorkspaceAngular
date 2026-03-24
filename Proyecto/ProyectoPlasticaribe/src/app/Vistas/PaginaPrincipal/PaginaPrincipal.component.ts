@@ -39,6 +39,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.lecturaStorage();
     this.production = true;
+    this.ordenTrabajo = true;
   }
 
   ngOnDestroy(): void {

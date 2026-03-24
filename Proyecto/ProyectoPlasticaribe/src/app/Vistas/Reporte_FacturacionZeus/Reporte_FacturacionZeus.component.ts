@@ -115,7 +115,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   // Funcion que va a consultar los vendedores
   consultarVendedores() {
     this.usuariosService.GetVendedores().subscribe(data => {
-      if ([1, 6, 96, 12, 2, 69].includes(this.ValidarRol)) this.Vendedores = data;
+      if (![2].includes(this.ValidarRol)) this.Vendedores = data;
+      else {
+        this.Vendedores = data.filter(x => x.usua_Id == this.storage_Id);
+      }
       /*if (this.ValidarRol == 2) {
         this.Vendedores = data.filter(x => x.usua_Id == this.storage_Id);
         let Id_Vendedor : string = `${this.Vendedores[0].usua_Id}`;
@@ -179,8 +182,9 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
     let fechaInicial: any = this.formFiltros.value.rangoFechas == undefined ? this.eneroUno : moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
     let fechaFinal: any = this.formFiltros.value.rangoFechas == undefined ? this.today : moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
-    let vendedor = this.formFiltros.value.Id_Vendedor;
-    let nombreVendedor = this.formFiltros.value.Vendedor;
+    let vendedor = this.ValidarRol == 2
+      ? `${String(this.storage_Id).padStart(3, '0')}`
+      : this.formFiltros.value.Id_Vendedor != null ? `${String(this.formFiltros.value.Id_Vendedor).padStart(3, '0')}` : null;
     let producto = this.formFiltros.value.Item;
     let nombreItem = this.formFiltros.value.Referencia;
     let cliente = this.formFiltros.value.Id_Cliente;
@@ -188,7 +192,6 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     let ruta: string = '';
 
     if (vendedor != null) ruta += `vendedor=${vendedor}`;
-    if (nombreVendedor != null) ruta.length > 0 ? ruta += `&nombreVendedor=${nombreVendedor}` : ruta += `nombreVendedor=${nombreVendedor}`;
     if (producto != null) ruta.length > 0 ? ruta += `&producto=${producto}` : ruta += `producto=${producto}`;
     if (nombreItem != null) ruta.length > 0 ? ruta += `&nombreProducto=${nombreItem}` : ruta += `nombreProducto=${nombreItem}`;
     if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;

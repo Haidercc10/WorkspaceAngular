@@ -127,6 +127,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.ofDirect = false;
     this.detailsOF = 0;
     this.loadRankDates();
+    this.getSales();
   }
 
   getSales() {

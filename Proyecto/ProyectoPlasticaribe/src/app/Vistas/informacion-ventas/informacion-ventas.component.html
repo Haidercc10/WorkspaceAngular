@@ -30,8 +30,9 @@
                                 <div class="col-sm-12 col-md-6 col-xl-4">
                                         <span class="p-float-label">
                                                 <p-dropdown formControlName="asesor" inputId="asesor"
-                                                        [autoDisplayFirst]="false" [options]="asesors"
+                                                        [autoDisplayFirst]="ValidarRol == 2" [options]="asesors"
                                                         optionValue="code" optionLabel="asesor" [filter]="true"
+                                                        [readonly]="ValidarRol == 2"
                                                         filterBy="asesor"></p-dropdown>
                                                 <label for="asesor">Vendedores</label>
                                         </span>
@@ -96,13 +97,16 @@
                                         <ng-template pTemplate="header">
                                                 <tr class="font-size-16" id="filtros">
                                                         <th></th>
-                                                        <th pFrozenColumn><input pInputText type="text" style="width: 100%;"
+                                                        <th pFrozenColumn><input pInputText type="text"
+                                                                        style="width: 100%;"
                                                                         (input)="aplicarfiltro1($event, 'year', 'contains')">
                                                         </th>
-                                                        <th pFrozenColumn><input pInputText type="text" style="width: 100%;"
+                                                        <th pFrozenColumn><input pInputText type="text"
+                                                                        style="width: 100%;"
                                                                         (input)="aplicarfiltro1($event, 'asesorId', 'contains')">
                                                         </th>
-                                                        <th pFrozenColumn><input pInputText type="text" style="width: 100%;"
+                                                        <th pFrozenColumn><input pInputText type="text"
+                                                                        style="width: 100%;"
                                                                         (input)="aplicarfiltro1($event, 'asesor', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
@@ -218,12 +222,12 @@
                                                 </tr>
                                                 <tr>
                                                         <th>#</th>
-                                                        <th pFrozenColumn pResizableColumn pSortableColumn="year"><p-sortIcon
-                                                                        field=""></p-sortIcon> Año</th>
-                                                        <th pFrozenColumn pResizableColumn pSortableColumn="asesorId"><p-sortIcon
-                                                                        field=""></p-sortIcon> Codigo </th>
-                                                        <th pFrozenColumn pResizableColumn pSortableColumn="asesor"><p-sortIcon
-                                                                        field=""></p-sortIcon> Asesor</th>
+                                                        <th pFrozenColumn pResizableColumn pSortableColumn="year">
+                                                                <p-sortIcon field=""></p-sortIcon> Año</th>
+                                                        <th pFrozenColumn pResizableColumn pSortableColumn="asesorId">
+                                                                <p-sortIcon field=""></p-sortIcon> Codigo </th>
+                                                        <th pFrozenColumn pResizableColumn pSortableColumn="asesor">
+                                                                <p-sortIcon field=""></p-sortIcon> Asesor</th>
                                                         <th pResizableColumn pSortableColumn=""><p-sortIcon
                                                                         field=""></p-sortIcon> Fact.</th>
                                                         <th pResizableColumn pSortableColumn=""><p-sortIcon
@@ -296,7 +300,8 @@
                                                 <tr class="font-size-15">
                                                         <td>{{rowIndex + 1}}</td>
                                                         <td pFrozenColumn class="text-center">{{data.year}}</td>
-                                                        <td pFrozenColumn class="text-center"><b>{{data.asesorId}}</b></td>
+                                                        <td pFrozenColumn class="text-center"><b>{{data.asesorId}}</b>
+                                                        </td>
                                                         <td pFrozenColumn>{{data.asesor}}</td>
                                                         <td class="text-center"><b>$ {{getFactAsesor(data.year, "01",
                                                                         data.asesorId) |
@@ -361,8 +366,9 @@
                                                         <td class="text-center textGreen"><b>$
                                                                         {{getTotalFactAsesor(data.year, data.asesorId) |
                                                                         number}}</b></td>
-                                                        <td class="text-center textBlue"><b>{{getTotalKgAsesor(data.year,
-                                                                data.asesorId) | number : '1.2-2'}}</b>
+                                                        <td class="text-center textBlue">
+                                                                <b>{{getTotalKgAsesor(data.year,
+                                                                        data.asesorId) | number : '1.2-2'}}</b>
                                                         </td>
                                                 </tr>
                                         </ng-template>
@@ -452,7 +458,7 @@
                         </div>
                 </p-tabPanel>
 
-                <p-tabPanel header="" leftIcon="pi pi-box">
+                <p-tabPanel header="Consolidado por clientes" leftIcon="pi pi-box">
                         <div *ngIf="!load">
                                 <p-table #dt2 [value]="dataClients" rowGroupMode="rowspan" groupRowsBy="sales.asesor"
                                         sortField="sales.asesor" sortMode="single" [tableStyle]="{'min-width': '75rem'}"
@@ -465,10 +471,12 @@
                                                         <th><input pInputText type="text" style="width: 100%;"
                                                                         (input)="aplicarfiltro2($event, 'asesor', 'contains')">
                                                         </th>
-                                                        <th pFrozenColumn><input pInputText type="text" style="width: 100%;"
+                                                        <th pFrozenColumn><input pInputText type="text"
+                                                                        style="width: 100%;"
                                                                         (input)="aplicarfiltro2($event, 'clienteId', 'contains')">
                                                         </th>
-                                                        <th pFrozenColumn><input pInputText type="text" style="width: 100%;"
+                                                        <th pFrozenColumn><input pInputText type="text"
+                                                                        style="width: 100%;"
                                                                         (input)="aplicarfiltro2($event, 'cliente', 'contains')">
                                                         </th>
                                                         <th><input pInputText type="text" style="width: 100%;"
@@ -522,22 +530,39 @@
                                                 </tr>
                                                 <tr>
                                                         <th style="width:3rem">#</th>
-                                                        <th pFrozenColumn class="text-center"><p-sortIcon field="asesor"></p-sortIcon> Asesor</th>
-                                                        <th pFrozenColumn pReorderableColumn class="text-center"><p-sortIcon field="clienteId"></p-sortIcon> Cod. Cliente</th>
-                                                        <th pFrozenColumn pReorderableColumn class="text-center"><p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Enero </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Febrero </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Marzo </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Abril </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Mayo </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Junio </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Julio </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Agosto </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Septiembre </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Octubre </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Noviembre </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Diciembre </th>
-                                                        <th pReorderableColumn class="text-center"><p-sortIcon field="fuente"></p-sortIcon> Subtotal </th>
+                                                        <th pFrozenColumn class="text-center"><p-sortIcon
+                                                                        field="asesor"></p-sortIcon> Asesor</th>
+                                                        <th pFrozenColumn pReorderableColumn class="text-center">
+                                                                <p-sortIcon field="clienteId"></p-sortIcon> Cod. Cliente
+                                                        </th>
+                                                        <th pFrozenColumn pReorderableColumn class="text-center">
+                                                                <p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Enero </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Febrero </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Marzo </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Abril </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Mayo </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Junio </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Julio </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Agosto </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Septiembre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Octubre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Noviembre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Diciembre </th>
+                                                        <th pReorderableColumn class="text-center"><p-sortIcon
+                                                                        field="fuente"></p-sortIcon> Subtotal </th>
                                                 </tr>
                                         </ng-template>
                                         <ng-template pTemplate="body" let-data let-rowIndex="rowIndex"
@@ -551,31 +576,31 @@
                                                         <td pFrozenColumn>{{data.clienteId}}</td>
                                                         <td pFrozenColumn>{{data.cliente}}</td>
                                                         <td class="text-center">$ {{data.mes01 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes02 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes03|
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes04 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes05 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes06 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes07 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes08 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes09 | number}}
                                                         </td>
                                                         <td class="text-center">$ {{data.mes10 |
-                                                                        number}}</td>
+                                                                number}}</td>
                                                         <td class="text-center">$ {{data.mes11 | number}}
                                                         </td>
                                                         <td class="text-center">${{data.mes12 | number}}
                                                         </td>
                                                         <td class="text-center"><b>${{getSubtotalFactClient(data.year,
-                                                                data.asesorId, data.clienteId) | number}}</b>
+                                                                        data.asesorId, data.clienteId) | number}}</b>
                                                         </td>
                                                 </tr>
                                         </ng-template>

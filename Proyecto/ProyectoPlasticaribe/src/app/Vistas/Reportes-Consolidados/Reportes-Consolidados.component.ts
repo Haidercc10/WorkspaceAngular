@@ -54,7 +54,7 @@ export class ReportesConsolidadosComponent implements OnInit {
     tab == `Facturación de Items` ?  this.facturacionItems = true : this.facturacionItems = false;
     tab == `Pedidos` ?  this.pedidos = true : this.pedidos = false;
     tab == `Inventario` ?  this.inventarioProductos = true : this.inventarioProductos = false;
-    tab == `Estadisticas Ventas` ?  this.estadisticasVentas = true : this.estadisticasVentas = false;
+    //tab == `Estadisticas Ventas` ?  this.estadisticasVentas = true : this.estadisticasVentas = false;
     //tab == `Rollos/Bultos` ?  this.rollos_bultos = true : this.rollos_bultos = false;
   }
 

@@ -57,7 +57,8 @@
               <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'genericQty', dt)"></th>
               <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'presentationPL', dt)"></th>
               <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'price', dt)"></th>
-              <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'subtotal', dt)"></th>
+              <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'sales', dt)"></th>
+              <th class=""><input pInputText style="width: 100%;" (input)="applyFilter($event, 'codeAsesor', dt)"></th>
               <th class=""></th>
           </tr> 
           <tr>
@@ -65,8 +66,9 @@
             <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-database"></i> Información del Producto</th>
             <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-box"></i> Stock</th>
             <th style="font-weight: 800;" class="text-center"></th>
-            <th style="font-weight: 800;" class="text-center">Cantidad</th>
-            <th style="font-weight: 800;" class="text-center" colspan="3"></th>
+            <th style="font-weight: 800;" class="text-center" colspan="3">Cantidad</th>
+            <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Asesor</th>
+            <th style="font-weight: 800;" class="text-center"></th>
           </tr>   
           <tr>
               <th class="text-center">#</th>
@@ -79,6 +81,8 @@
               <th class="text-center" pSortableColumn="genericQty"><p-sortIcon field="genericQty"></p-sortIcon> Estandar</th>
               <th class="text-center" pSortableColumn="presentationPL"><p-sortIcon field="presentationPL"></p-sortIcon> Und</th>
               <th class="text-center" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
+              <th class="text-center" pSortableColumn="codeAsesor"><p-sortIcon field="codeAsesor"></p-sortIcon> Código</th>
+              <th class="text-center" pSortableColumn="sales"><p-sortIcon field="sales"></p-sortIcon> Vendedor</th>
               <!--<th class="text-center" pSortableColumn="subtotal"><p-sortIcon field="subtotal"></p-sortIcon>Subtotal</th>-->
               <th class="text-center"> Ver</th>
           </tr>
@@ -88,6 +92,7 @@
               <td class="text-center">{{rowIndex + 1}}</td>
               <td class="text-center"><b>{{data.item}}</b></td>
               <td class="">{{data.client}}</td>
+              
               <td class=""><b>{{data.reference}}</b></td>
               <td class="text-center">{{data.qtyZeus | number : '1.2-2'}}</td>
               <td class="text-center">{{data.qtyPL | number : '1.2-2'}}</td>
@@ -95,6 +100,8 @@
               <td class="text-center">{{data.genericQty | number : '1.2-2'}}</td>
               <td class="text-center">{{data.presentationPL}}</td>
               <td class="text-center">$ {{data.price | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.codeAsesor}}</td>
+              <td class="">{{data.sales}}</td>
               <!--<td>$ {{data.subtotal | number : '1.2-2'}}</td>-->
               <td class="text-center">
                 <p-button id="iconos" icon="pi pi-eye" class="mr-2" styleClass="p-button-rounded p-button-danger" [style]="{ width: '28px', height: '28px' }" (click)="loadInfoRollsAvailables(data)"></p-button>    

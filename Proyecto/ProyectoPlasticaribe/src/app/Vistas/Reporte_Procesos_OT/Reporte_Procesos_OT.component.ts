@@ -421,8 +421,15 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que nu cliente y guardará su id y mostrará en el campo el nombre
   selectEventCliente = () => this.formularioOT.patchValue({ cliente : this.clientes.filter((item) => item.cli_Id == this.formularioOT.value.cliente)[0].cli_Nombre, });
 
-  // Funcion que traerá los vendedores
-  obtenerVendedores = () => this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
+  // Funcion que obtendrá los vendedores
+  obtenerVendedores(){
+    let asesor: any = this.ValidarRol == 2 ? this.AppComponent.storage_Id : null;
+    this.usuarioService.GetVendedores().subscribe(data => {
+      this.vendedores = data;
+      this.vendedores = asesor ? this.vendedores.filter(x => x.usua_Id == asesor) : this.vendedores
+      this.vendedores.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+    });
+  }
 
   // Funcion que va a llenar y buscar el campos vendedor
   buscarVendedor(){
@@ -491,13 +498,13 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     let ot : number = this.formularioOT.value.idDocumento;
     let fallas : any = this.formularioOT.value.fallasOT;
     let estado : number = this.formularioOT.value.estado;
-    let vendedor : any = this.formularioOT.value.Id_Vendedor;
+    let vendedor : any = this.formularioOT.value.Vendedor;
     let cliente : any = this.formularioOT.value.cliente;
     let producto : any = this.formularioOT.value.producto;
     let ruta : string = '';
 
     if (ot != null) ruta += `ot=${ot}`;
-    if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
+    if (cliente != null) ruta.length > 0 ? ruta += `&cli=${cliente}` : ruta += `cli=${cliente}`;
     if (producto != null) ruta.length > 0 ? ruta += `&prod=${producto}` : ruta += `prod=${producto}`;
     if (estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}`;
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;

@@ -115,15 +115,14 @@ export class InformacionVentasComponent implements OnInit {
   //*GET ASESORES Y CLIENTES
   //Funcion que cargará los asesores
   getAsesors() {
-    //this.load = true;
-    let count: number = 0;
+    let asesor: any = this.ValidarRol == 2 ? this.appComponent.storage_Id : null;
+
     this.svAsesors.GetVendedores().subscribe(data => {
       data.forEach(x => {
-        count++;
         if (x.usua_Id.toString().length == 1) this.asesors.push({ asesor: x.usua_Nombre, code: `00${x.usua_Id}` });
         else if (x.usua_Id.toString().length == 2) this.asesors.push({ asesor: x.usua_Nombre, code: `0${x.usua_Id}` });
         else this.asesors.push({ asesor: x.usua_Nombre, code: `${x.usua_Id}` });
-        //if (count == data.length) this.load = false;
+        this.asesors = asesor ? this.asesors.filter(x => x.code == `00${asesor}` || x.code == `0${asesor}` || x.code == `${asesor}`) : this.asesors;
       });
     }, error => console.log(error));
   }
@@ -265,7 +264,7 @@ export class InformacionVentasComponent implements OnInit {
 
   validateUrl() {
     let client: any = this.form.value.clienteId;
-    let asesor: any = this.form.value.asesor;
+    let asesor: any = this.ValidarRol == 2 ? `${String(this.storage_Id).padStart(3, '0')}` : null;
     let url: string = ``;
 
     if (asesor != null) url += `asesor=${asesor}`;

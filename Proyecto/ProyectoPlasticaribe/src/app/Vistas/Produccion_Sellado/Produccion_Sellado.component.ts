@@ -209,7 +209,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargarTurnoActual();
-    this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
+    this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot, '').subscribe(data => {
       let nitCliente : any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
       this.svcSedes.GetSedeClientexNitBagPro(nitCliente).subscribe(sede => {
         if (data.length > 0) {

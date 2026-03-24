@@ -168,7 +168,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   getStockInformation() {
     //if(!this.despacho) {
-    let sales :string = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id)}` : '';
+    let sales :string = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id)}` : null;
     this.load = true;
     //this.despacho = true;
     this.stockService.GetStockProducts_AvaibleProduction(sales).subscribe(data => {
@@ -176,6 +176,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       //this.getStockDeliveredNotAvaible();
       this.fillColumns();
       this.stockInformation = this.fillStockInformation(data);
+      this.stockInformation = sales ? this.stockInformation.filter(stock => stock.seller == this.storage_Nombre) : this.stockInformation;
       this.fillComparativeStock(data, true);
       //this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
       //this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
@@ -256,10 +257,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
           reference: stock.product.reference,
           client: stock.client,
           stock: stock.stock.stock,
-          price: stock.stock.price,
+          price: this.ValidarRol === 2 ? 0 : stock.stock.price,
           presentation: stock.stock.presentation,
           // subTotal: stock.stock.stockPrice,
-          subTotal: (stock.stock.stock * stock.stock.price),
+          subTotal: this.ValidarRol === 2 ? 0 : (stock.stock.stock * stock.stock.price),
           daysOnInv: moment().diff(moment(stock.date), 'days'),
           seller: stock.seller,
           cityClient: stock.cityClient,

@@ -6,7 +6,8 @@
 
 <div class="contain">
   <div class="mb-4 Titulo">
-    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-32">Reporte de Procesos OT</h2>
+    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-32">Reporte de
+      Procesos OT</h2>
   </div>
 
   <div class="mb-4">
@@ -15,12 +16,14 @@
 </div>
 
 <p-card>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}"
+      (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-22"><i class="pi pi-search"></i> Búsqueda por filtros</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-22"><i
+        class="pi pi-search"></i> Búsqueda por filtros</h4>
   </div>
 
   <!-- Inicio formulario Estado OT -->
@@ -31,7 +34,7 @@
         <!--OT-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="idDocumento" id="OT" type="text" pInputText/>
+            <input formControlName="idDocumento" id="OT" type="text" pInputText />
             <label for="OT">OT</label>
           </span>
         </div>
@@ -53,20 +56,32 @@
         </div>
 
         <!-- Vendedores -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-4 col-xxl-4">
+        <!--<div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="Vendedor" id="Vendedores" list="Vendedor" (change)="buscarVendedor()" type="text" pInputText/>
+            <input formControlName="Vendedor" id="Vendedores" list="Vendedor" (change)="buscarVendedor()" type="text"
+              pInputText />
             <datalist id="Vendedor">
               <option value={{item.usua_Id}} *ngFor="let item of vendedores">{{item.usua_Nombre}}</option>
             </datalist>
             <label for="Vendedores">Vendedor</label>
+          </span>
+        </div>-->
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="vendedor">
+          <span class="p-float-label">
+            <p-dropdown formControlName="Vendedor" inputId="Vendedor" [options]="vendedores"
+              optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre" [showClear]="true"
+              [autoDisplayFirst]="ValidarRol == 2" [readonly]="ValidarRol == 2" [required]="true"
+              (onChange)="buscarVendedor()"></p-dropdown>
+            <label for="Vendedor">Vendedor</label>
           </span>
         </div>
 
         <!-- Estados -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="estado" inputId="estado" [options]="estados" optionValue="estado_Id" optionLabel="estado_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+            <p-dropdown formControlName="estado" inputId="estado" [options]="estados" optionValue="estado_Id"
+              optionLabel="estado_Nombre" [autoDisplayFirst]="false"></p-dropdown>
             <label for="estado">Estado OT</label>
           </span>
         </div>
@@ -74,7 +89,8 @@
         <!-- Clientes -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="cliente" id="Cliente" list="clientes" type="text" pInputText (change)="selectEventCliente()"/>
+            <input formControlName="cliente" id="Cliente" list="clientes" type="text" pInputText
+              (change)="selectEventCliente()" />
             <datalist id="clientes">
               <option value={{item.cli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
             </datalist>
@@ -85,7 +101,7 @@
         <!-- Producto -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="producto" id="Producto" type="text" pInputText/>
+            <input formControlName="producto" id="Producto" type="text" pInputText />
             <label for="Producto">Producto</label>
           </span>
         </div>
@@ -93,7 +109,8 @@
         <!-- Fallas -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2" id="fallas">
           <span class="p-float-label">
-            <p-dropdown formControlName="fallasOT" inputId="Fallas" [options]="fallas" optionValue="falla_Id" optionLabel="falla_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+            <p-dropdown formControlName="fallasOT" inputId="Fallas" [options]="fallas" optionValue="falla_Id"
+              optionLabel="falla_Nombre" [autoDisplayFirst]="false"></p-dropdown>
             <label for="Fallas">Fallas OT</label>
           </span>
         </div>
@@ -111,10 +128,14 @@
     <!-- Botones para consultar OT -->
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton id="consultar" class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
-        <button pButton id="limpiarTodo" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-        <button pButton id="agregarFalla" class="p-button-warning" type="button" label="Agregar Falla" icon="pi pi-check-circle" (click)="anadirFalla()"></button>
-        <button pButton id="excel" class="p-button-success" type="button" label="Exportar a Excel" icon="pi pi-file-excel" (click)="exportToExcel()"></button>
+        <button pButton id="consultar" class="p-button-danger" type="submit" label="Consultar"
+          icon="pi pi-search"></button>
+        <button pButton id="limpiarTodo" class="p-button-secondary" type="button" label="Limpiar Campos"
+          icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <button pButton id="agregarFalla" class="p-button-warning" type="button" label="Agregar Falla"
+          icon="pi pi-check-circle" (click)="anadirFalla()"></button>
+        <button pButton id="excel" class="p-button-success" type="button" label="Exportar a Excel"
+          icon="pi pi-file-excel" (click)="exportToExcel()"></button>
       </div>
     </div>
   </form>
@@ -127,10 +148,12 @@
   <div class="mb-4">
     <div class="row g-3">
       <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24"><i class="pi pi-file-edit font-size-24"></i> Ordenes de Trabajo</h4>
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24"><i
+            class="pi pi-file-edit font-size-24"></i> Ordenes de Trabajo</h4>
       </div>
-      <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6" >
-        <p class="text-right"><b>Haz clic sobre los botones </b> <i class="pi pi-info-circle"></i> y observa que <b>indica cada color </b> <i class="pi pi-palette"></i></p>
+      <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <p class="text-right"><b>Haz clic sobre los botones </b> <i class="pi pi-info-circle"></i> y observa que
+          <b>indica cada color </b> <i class="pi pi-palette"></i></p>
       </div>
     </div>
   </div>
@@ -142,100 +165,125 @@
         <!-- Buscador de columnas -->
         <p-toolbar>
           <div id="rowToolbar" class="row g-3">
-            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
-              <p-multiSelect
-              [options]="columnas"
-              [(ngModel)]="columnasSeleccionada"
-              optionLabel="header"
-              selectedItemsLabel="{0} columnas seleccionadas"
-              placeholder="Elige las columnas que quieres ver"
-              pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
-              tooltipPosition="top">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="columnasSeleccionables">
+              <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header"
+                selectedItemsLabel="{0} columnas seleccionadas" placeholder="Elige las columnas que quieres ver"
+                pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla" tooltipPosition="top">
               </p-multiSelect>
             </div>
 
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4 text-center" id="cambiarEstados">
-              <button *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101" pButton icon="pi pi-pencil" label="Cambiar Estado" class="p-button-success p-mr-2" [disabled]="ordenesSeleccionadas.length == 0" (click)="abrirModalCambioEstado()"></button>
+              <button *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101" pButton icon="pi pi-pencil"
+                label="Cambiar Estado" class="p-button-success p-mr-2" [disabled]="ordenesSeleccionadas.length == 0"
+                (click)="abrirModalCambioEstado()"></button>
             </div>
 
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4 text-right" id="botonesColores">
-              <p-button class="btnAmarillo" styleClass="p-button-rounded mr-1" label="{{cantidadOTIniciada}}" (click)="mostrarDescripcion($event, 'amarillo')" pTooltip="Iniciada(s)" tooltipPosition="left"></p-button>
-              <p-button class="btnNaranja" styleClass="p-button-rounded mr-1" label="{{catidadOTAbiertas}}" (click)="mostrarDescripcion($event, 'naranja')" pTooltip="Abierta(s)" tooltipPosition="left"></p-button>
-              <p-button class="btnVerde" styleClass="p-button-rounded mr-1" label="{{cantidadOTTerminada}}" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Terminada(s)" tooltipPosition="left"></p-button>
-              <p-button class="btnAzul" styleClass="p-button-rounded mr-1" label="{{cantidadOTAsignadas}}" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Asignada(s)" tooltipPosition="left"></p-button>
-              <p-button class="btnRojo" styleClass="p-button-rounded mr-1" label="{{cantidadOtAnulada}}" (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Anulada(s)" tooltipPosition="left"></p-button>
-              <p-button class="btnVerde2" styleClass="p-button-rounded mr-1" label="{{cantidadOTCerrada}}" (click)="mostrarDescripcion($event, 'verde2')" pTooltip="Cerrada(s)" tooltipPosition="left"></p-button>
-              <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciada(s)" (click)="mostrarDescripcion($event, 'gris')" tooltipPosition="left"></p-button>
+              <p-button class="btnAmarillo" styleClass="p-button-rounded mr-1" label="{{cantidadOTIniciada}}"
+                (click)="mostrarDescripcion($event, 'amarillo')" pTooltip="Iniciada(s)"
+                tooltipPosition="left"></p-button>
+              <p-button class="btnNaranja" styleClass="p-button-rounded mr-1" label="{{catidadOTAbiertas}}"
+                (click)="mostrarDescripcion($event, 'naranja')" pTooltip="Abierta(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnVerde" styleClass="p-button-rounded mr-1" label="{{cantidadOTTerminada}}"
+                (click)="mostrarDescripcion($event, 'verde')" pTooltip="Terminada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnAzul" styleClass="p-button-rounded mr-1" label="{{cantidadOTAsignadas}}"
+                (click)="mostrarDescripcion($event, 'azul')" pTooltip="Asignada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnRojo" styleClass="p-button-rounded mr-1" label="{{cantidadOtAnulada}}"
+                (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Anulada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnVerde2" styleClass="p-button-rounded mr-1" label="{{cantidadOTCerrada}}"
+                (click)="mostrarDescripcion($event, 'verde2')" pTooltip="Cerrada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciada(s)"
+                (click)="mostrarDescripcion($event, 'gris')" tooltipPosition="left"></p-button>
             </div>
           </div>
         </p-toolbar>
 
         <!-- Tabla con información de la orden de trabajo -->
-        <p-table
-          #dt
-          [columns]="columnasSeleccionada"
-          [value]="ArrayDocumento"
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [paginator]="true"
-          [rows]="30"
-          [showCurrentPageReport]="true"
+        <p-table #dt [columns]="columnasSeleccionada" [value]="ArrayDocumento" [resizableColumns]="true"
+          columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll"
+          [paginator]="true" [rows]="30" [showCurrentPageReport]="true"
           currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
           [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayDocumento.length > 100 ? ArrayDocumento.length : 200]"
-          [rowHover]="true"
-          dataKey="ot"
-          [scrollable]="true"
-          scrollHeight="50rem"
-          [(selection)]="ordenesSeleccionadas">
+          [rowHover]="true" dataKey="ot" [scrollable]="true" scrollHeight="50rem" [(selection)]="ordenesSeleccionadas">
 
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>
             <tr class="font-size-16" id="filtros">
               <th pFrozenColumn></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cli', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'prod', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ext', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'rot', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'perf', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'lam', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cor', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'sel', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'wik', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'desp', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cant', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'est', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
-              <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cli', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'prod', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ext', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'rot', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'perf', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'lam', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cor', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'sel', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'wik', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'desp', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'cant', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'est', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+              <th *ngFor="let col of columns"><input pInputText style="width: 100%;"
+                  (input)="aplicarfiltro($event, col.field, 'contains')"></th>
               <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
             </tr>
             <tr class="font-size-13" id="columnas">
-              <th pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo" *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableHeaderCheckbox></th>
-              <th scope="col" pResizableColumn pSortableColumn="ot" id="ordenTrabajo">OT <p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
+              <th pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo"
+                  *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableHeaderCheckbox></th>
+              <th scope="col" pResizableColumn pSortableColumn="ot" id="ordenTrabajo">OT <p-sortIcon field="ot"
+                  title="Order por OT"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="cli">Cliente <p-sortIcon field="cli"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="prod">Producto <p-sortIcon field="prod"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="mp">Materia Prima <p-sortIcon field="mp"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="ext">Extrusión <p-sortIcon field="ext"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="imp">Impresión <p-sortIcon field="imp"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="rot">Rotograbado <p-sortIcon field="rot"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="perf">Perforado <p-sortIcon field="perf"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="prod">Producto <p-sortIcon field="prod"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="mp">Materia Prima <p-sortIcon field="mp"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="ext">Extrusión <p-sortIcon field="ext"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="imp">Impresión <p-sortIcon field="imp"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="rot">Rotograbado <p-sortIcon field="rot"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="perf">Perforado <p-sortIcon field="perf"></p-sortIcon>
+              </th>
               <th scope="col" pResizableColumn pSortableColumn="dbl">Doblado <p-sortIcon field="dbl"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="lam">Laminado <p-sortIcon field="lam"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="cor">Corte <p-sortIcon field="cor"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="emp">Empaque <p-sortIcon field="emp"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="sel">Sellado <p-sortIcon field="sel"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="wik">Wiketiado <p-sortIcon field="wik"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="desp">Despacho <p-sortIcon field="desp"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="cant">Cant. Producir <p-sortIcon field="cant"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="wik">Wiketiado <p-sortIcon field="wik"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="desp">Despacho <p-sortIcon field="desp"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="cant">Cant. Producir <p-sortIcon
+                  field="cant"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="est">Estados <p-sortIcon field="est"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="fecha">Fecha Creación <p-sortIcon field="fecha"></p-sortIcon></th>
-              <th *ngFor="let col of columns" pSortableColumn="{{col.field}}" pResizableColumn>{{col.header}} <p-sortIcon field="{{col.field}}"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="fecha">Fecha Creación <p-sortIcon
+                  field="fecha"></p-sortIcon></th>
+              <th *ngFor="let col of columns" pSortableColumn="{{col.field}}" pResizableColumn>{{col.header}}
+                <p-sortIcon field="{{col.field}}"></p-sortIcon></th>
               <th id="cambiarEstado" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
             </tr>
           </ng-template>
@@ -243,7 +291,8 @@
           <ng-template pTemplate="body" let-data let-columns="columns">
             <tr style="cursor: pointer; cursor: hand;">
               <td pFrozenColumn>
-                <p-tableCheckbox [value]="data" *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableCheckbox>
+                <p-tableCheckbox [value]="data"
+                  *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableCheckbox>
               </td>
               <td (click)="reporteOT(data.ot)"><b>{{data.ot}}</b></td>
               <td>{{data.cli}}</td>
@@ -338,7 +387,8 @@
                 'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
                 'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.sel == 0 && data.sel < data.cant) && data.est == 'ANULADO',
                 'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.sel == 0 && data.sel < data.cant,
-              }" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
+              }" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg -
+                  {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
 
               <!-- Wiketiado -->
               <td [ngClass]="{
@@ -348,9 +398,12 @@
                 'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
                 'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.wik == 0 && data.wik < data.cant) && data.est == 'ANULADO',
                 'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.wik == 0 && data.wik < data.cant,
-              }" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
+              }" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}}
+                Und</td>
 
-              <td id="desp" scope="col" (click)="data.desp != 0 || data.despUnd != 0 ? consultarRollosDespacho_OT(data.ot) : 0"><b><b>{{data.desp | number}} Kg - {{data.despUnd | number}} Und</b></b></td>
+              <td id="desp" scope="col"
+                (click)="data.desp != 0 || data.despUnd != 0 ? consultarRollosDespacho_OT(data.ot) : 0">
+                <b><b>{{data.desp | number}} Kg - {{data.despUnd | number}} Und</b></b></td>
               <td id="cant" scope="col"><b>{{data.cantUnd | number : '1.2-2'}}</b></td>
 
               <td [ngClass]="{
@@ -366,7 +419,9 @@
               <td id="fecha" scope="col">{{data.fecha | date : 'yyyy-MM-dd'}}</td>
               <td *ngFor="let col of columns">{{data[col.field]}}</td>
               <td pFrozenColumn alignFrozen="right" [frozen]="true">
-                <button *ngIf="ValidarRol == 1 && storage_Id != 101" pButton pRipple icon="pi pi-pencil" [style]="{width: '30px', height: '30px'}" class="p-button-rounded p-button-success p-mr-2" (click)="abrirModalCambioEstado(data)"></button>
+                <button *ngIf="ValidarRol == 1 && storage_Id != 101" pButton pRipple icon="pi pi-pencil"
+                  [style]="{width: '30px', height: '30px'}" class="p-button-rounded p-button-success p-mr-2"
+                  (click)="abrirModalCambioEstado(data)"></button>
               </td>
             </tr>
           </ng-template>
@@ -377,48 +432,42 @@
 </p-card>
 
 <!-- Modal que mostrará los rollos pesados en cada proceso -->
-<p-dialog [(visible)]="modalProcesos" [draggable]="false" [style]="{width: '70%'}" header="Rollos de la OT" [modal]="true" >
+<p-dialog [(visible)]="modalProcesos" [draggable]="false" [style]="{width: '70%'}" header="Rollos de la OT"
+  [modal]="true">
   <ng-template pTemplate="content">
     <!-- Tabla datos OT por procesos -->
     <div class="mb-3">
       <div class="row g-3">
-        <p-table
-        #dt_Procesos
-        [value]="ArrayDatosProcesos"
-        [resizableColumns]="true"
-        columnResizeMode="expand"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [rowHover]="true"
-        dataKey="id">
-        <ng-template pTemplate="header">
-          <tr class="font-size-13">
-            <th scope="col" pResizableColumn>#</th>
-            <th scope="col" pResizableColumn>Item</th>
-            <th scope="col" pResizableColumn>Cliente</th>
-            <th scope="col" pResizableColumn>producto</th>
-            <th scope="col" pResizableColumn>Peso</th>
-            <th scope="col" pResizableColumn>Operador</th>
-            <th scope="col" pResizableColumn>Maquina</th>
-            <th scope="col" pResizableColumn>Turno</th>
-            <th scope="col" pResizableColumn>Proceso</th>
-            <th scope="col" pResizableColumn>Fecha</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-ArrayDatosProcesos let-rowIndex="rowIndex">
-          <tr class="font-size-13">
-            <td id="id" class="TextosInfoTabla"><b>{{rowIndex + 1}}</b></td>
-            <td id="id" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Rollo}}</b></td>
-            <td id="cliente" class="TextosInfoTabla">{{ArrayDatosProcesos.Cliente}}</td>
-            <td id="producto" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Producto}}</b></td>
-            <td id="peso" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Peso}}</b></td>
-            <td id="operador" class="TextosInfoTabla">{{ArrayDatosProcesos.Operador}}</td>
-            <td id="maquina" class="TextosInfoTabla">{{ArrayDatosProcesos.Maquina}}</td>
-            <td id="turno" class="TextosInfoTabla">{{ArrayDatosProcesos.Turno}}</td>
-            <td id="status" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Status}}</b></td>
-            <td id="fecha" class="TextosInfoTabla">{{ArrayDatosProcesos.Fecha}} - {{ArrayDatosProcesos.Hora}}</td>
-          </tr>
-        </ng-template>
+        <p-table #dt_Procesos [value]="ArrayDatosProcesos" [resizableColumns]="true" columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true" dataKey="id">
+          <ng-template pTemplate="header">
+            <tr class="font-size-13">
+              <th scope="col" pResizableColumn>#</th>
+              <th scope="col" pResizableColumn>Item</th>
+              <th scope="col" pResizableColumn>Cliente</th>
+              <th scope="col" pResizableColumn>producto</th>
+              <th scope="col" pResizableColumn>Peso</th>
+              <th scope="col" pResizableColumn>Operador</th>
+              <th scope="col" pResizableColumn>Maquina</th>
+              <th scope="col" pResizableColumn>Turno</th>
+              <th scope="col" pResizableColumn>Proceso</th>
+              <th scope="col" pResizableColumn>Fecha</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-ArrayDatosProcesos let-rowIndex="rowIndex">
+            <tr class="font-size-13">
+              <td id="id" class="TextosInfoTabla"><b>{{rowIndex + 1}}</b></td>
+              <td id="id" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Rollo}}</b></td>
+              <td id="cliente" class="TextosInfoTabla">{{ArrayDatosProcesos.Cliente}}</td>
+              <td id="producto" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Producto}}</b></td>
+              <td id="peso" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Peso}}</b></td>
+              <td id="operador" class="TextosInfoTabla">{{ArrayDatosProcesos.Operador}}</td>
+              <td id="maquina" class="TextosInfoTabla">{{ArrayDatosProcesos.Maquina}}</td>
+              <td id="turno" class="TextosInfoTabla">{{ArrayDatosProcesos.Turno}}</td>
+              <td id="status" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Status}}</b></td>
+              <td id="fecha" class="TextosInfoTabla">{{ArrayDatosProcesos.Fecha}} - {{ArrayDatosProcesos.Hora}}</td>
+            </tr>
+          </ng-template>
         </p-table>
       </div>
     </div>
@@ -434,33 +483,26 @@
     <!-- Tabla de datos consolidados -->
     <div class="mb-3">
       <div class="row g-3">
-        <p-table
-        #dt2
-        [value]="ArrayDatosAgrupados"
-        [resizableColumns]="true"
-        columnResizeMode="expand"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [rowHover]="true"
-        dataKey="id">
-        <ng-template pTemplate="header">
-          <tr class="font-size-13">
-            <th scope="col" pResizableColumn>Producto</th>
-            <th scope="col" pResizableColumn>Operador</th>
-            <th scope="col" pResizableColumn>Peso</th>
-            <th scope="col" pResizableColumn>Fecha</th>
-            <th scope="col" pResizableColumn>N° Rollos</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-ArrayDatosAgrupados>
-          <tr class="font-size-13">
-            <td id="Producto" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Producto}}</b></td>
-            <td id="Operador" class="TextosInfoTabla">{{ArrayDatosAgrupados.Operador}}</td>
-            <td id="Peso" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Peso | number: '1.2-2' }}</b></td>
-            <td id="Fecha" class="TextosInfoTabla">{{ArrayDatosAgrupados.Fecha}}</td>
-            <td id="Count" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.NroRollos}}</b></td>
-          </tr>
-        </ng-template>
+        <p-table #dt2 [value]="ArrayDatosAgrupados" [resizableColumns]="true" columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true" dataKey="id">
+          <ng-template pTemplate="header">
+            <tr class="font-size-13">
+              <th scope="col" pResizableColumn>Producto</th>
+              <th scope="col" pResizableColumn>Operador</th>
+              <th scope="col" pResizableColumn>Peso</th>
+              <th scope="col" pResizableColumn>Fecha</th>
+              <th scope="col" pResizableColumn>N° Rollos</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-ArrayDatosAgrupados>
+            <tr class="font-size-13">
+              <td id="Producto" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Producto}}</b></td>
+              <td id="Operador" class="TextosInfoTabla">{{ArrayDatosAgrupados.Operador}}</td>
+              <td id="Peso" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Peso | number: '1.2-2' }}</b></td>
+              <td id="Fecha" class="TextosInfoTabla">{{ArrayDatosAgrupados.Fecha}}</td>
+              <td id="Count" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.NroRollos}}</b></td>
+            </tr>
+          </ng-template>
         </p-table>
       </div>
     </div>
@@ -468,20 +510,14 @@
 </p-dialog>
 
 <!-- Modal que mostrará el inventario de despacho -->
-<p-dialog [(visible)]="modalInventarioDespacho" [style]="{width: '70vw'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="modalInventarioDespacho" [style]="{width: '70vw'}" [resizable]="true"
+  header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
-    <p-table
-      #dtDespacho
-      [value]="inventarioDetallado"
-      [resizableColumns]="true"
-      columnResizeMode="expand"
-      styleClass="p-datatable-gridlines p-datatable-sm"
-      responsiveLayout="scroll"
-      [rowHover]="true"
-      dataKey="id"
-      [scrollable]="true"
-      scrollHeight="50rem">
-      <ng-template pTemplate="header"><tr>
+    <p-table #dtDespacho [value]="inventarioDetallado" [resizableColumns]="true" columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true" dataKey="id"
+      [scrollable]="true" scrollHeight="50rem">
+      <ng-template pTemplate="header">
+        <tr>
           <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
           <th pSortableColumn="Rollo">Rollo <p-sortIcon field="Rollo"></p-sortIcon></th>
           <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
@@ -491,7 +527,8 @@
           <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
           <th pSortableColumn="Fecha">Fecha <p-sortIcon field="Fecha"></p-sortIcon></th>
           <th pSortableColumn="Extrusion">Extrusión <p-sortIcon field="Extrusion"></p-sortIcon></th>
-          <th pSortableColumn="ProductoIntermedio">Prod. Intermedio <p-sortIcon field="ProductoIntermedio"></p-sortIcon></th>
+          <th pSortableColumn="ProductoIntermedio">Prod. Intermedio <p-sortIcon field="ProductoIntermedio"></p-sortIcon>
+          </th>
           <th pSortableColumn="Impresion">Impresión <p-sortIcon field="Impresion"></p-sortIcon></th>
           <th pSortableColumn="Rotograbado">Rotograbado <p-sortIcon field="Rotograbado"></p-sortIcon></th>
           <th pSortableColumn="Sellado">Sellado <p-sortIcon field="Sellado"></p-sortIcon></th>
@@ -521,14 +558,16 @@
 </p-dialog>
 
 <!-- Modal que mostrará el reporte de costos -->
-<p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '95%'}" header="Reporte de costos" [modal]="true" >
+<p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '95%'}" header="Reporte de costos"
+  [modal]="true">
   <ng-template pTemplate="content">
     <app-reporteCostosOT></app-reporteCostosOT>
   </ng-template>
 </p-dialog>
 
 <!-- Modal Para cambiar el estado de la orden de trabajo -->
-<p-dialog [(visible)]="modalEstadosOT" [draggable]="false" [style]="{width: '350px'}" header="Cambio de estado de OT" [modal]="true" >
+<p-dialog [(visible)]="modalEstadosOT" [draggable]="false" [style]="{width: '350px'}" header="Cambio de estado de OT"
+  [modal]="true">
   <ng-template pTemplate="content">
     <div class="p-field">
       <h6 for="name">Orden de Trabajo <b>{{otSeleccionada}}</b></h6>
@@ -547,19 +586,23 @@
         </div>
         <div class="p-field-radiobutton p-col-6">
           <p-radioButton id="asignada" name="category" value="14" [(ngModel)]="estadoModal"></p-radioButton>
-          <label for="asignada" style="padding-left: 3%;">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <label for="asignada"
+            style="padding-left: 3%;">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
         </div>
         <div class="p-field-radiobutton p-col-6">
           <p-radioButton id="enProceso" name="category" value="16" [(ngModel)]="estadoModal"></p-radioButton>
-          <label for="enProceso" style="padding-left: 3%;">En Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <label for="enProceso" style="padding-left: 3%;">En
+            Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
         </div>
         <div class="p-field-radiobutton p-col-6">
           <p-radioButton id="terminada" name="category" value="17" [(ngModel)]="estadoModal"></p-radioButton>
-          <label for="terminada" style="padding-left: 3%;">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <label for="terminada"
+            style="padding-left: 3%;">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
         </div>
         <div class="p-field-radiobutton p-col-6" style="margin-left: 30%;">
-          <p-radioButton id="cerrada"name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
-          <label class="font-size-20" for="cerrada" style="padding-left: 3%; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <p-radioButton id="cerrada" name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
+          <label class="font-size-20" for="cerrada"
+            style="padding-left: 3%; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
         </div>
       </div>
     </div>
@@ -567,11 +610,12 @@
 
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="cambirEstadoOT()"></button>
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+      (click)="cambirEstadoOT()"></button>
   </ng-template>
 </p-dialog>
 
-<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" >
+<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }">
   <ng-template pTemplate>
     <div [innerHTML]="infoColor"></div>
   </ng-template>
