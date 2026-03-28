@@ -160,7 +160,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
         next: data => {
           if (data.length == 0) return this.msg.mensajeAdvertencia(`¡No se encontraron órdenes de facturación con los parámetros consultados!`);
           const today = moment();
-          this.serchedData = ![5, 83].includes(this.validateRole) ? data : []
+          this.serchedData = data;
           this.serchedData = this.serchedData.map(order => {
 
             const fechaInicio = moment(order.fechaHora);

@@ -16,14 +16,11 @@
   </div>
 </div>
 
+<!--Contenedor principal-->
 <p-card>
   <p class="mb-4"><i class="pi pi-exclamation-triangle"></i> <b> Nota: </b> Los campos marcados con (*) son requeridos
     para la generación del pedido</p>
-  <!--
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-  -->
+  
   <!--TODO: 
   <ng-container *ngIf="ValidarRol == 1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -80,7 +77,9 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="vendedor">
           <span class="p-float-label">
             <p-dropdown formControlName="PedUsuarioNombre" inputId="PedUsuarioNombre" [autoDisplayFirst]="false"
-              [options]="usuarioVende" optionLabel="" [required]="true"></p-dropdown>
+              [autoDisplayFirst]="ValidarRol == 2" [options]="usuarioVende" optionLabel="" [required]="true"
+              optionValue="usua_Id" optionLabel="usua_Nombre" [readonly]="ValidarRol == 2">
+            </p-dropdown>
             <label for="PedUsuarioNombre">Vendedor*</label>
           </span>
         </div>
@@ -430,8 +429,6 @@
           </span>
         </div>
 
-        
-
         <!--* Impresion Doble Cara-->
         <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
           <div class="field-checkbox">
@@ -465,7 +462,9 @@
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" id="agregar" type="submit" label="Agregar Producto" icon="pi pi-send"
-          [disabled]="!FormPedidoExternoProductos.valid"> </button>
+          [disabled]="!FormPedidoExternoProductos.valid || !formProdTerminado.valid"></button>
+        <button pButton class="p-button-danger p-button-outlined" id="agregar" type="submit" label="Validar Formularios"
+          icon="pi pi-send" (click)="log()"></button>
         <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser"
           (click)="LimpiarCamposProductos()"> </button>
       </div>

@@ -26,6 +26,7 @@ import { FormatosService } from 'src/app/Servicios/Formato/Formatos.service';
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
 import { Tipos_ImpresionService } from 'src/app/Servicios/TipoImpresion/Tipos_Impresion.service';
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,7 +82,7 @@ export class PedidoExternoComponent implements OnInit {
   sealedTypes: any = [];
   formats: any = [];
   treatys: any = [];
-  printingFD : string[] = ['FRENTE', 'DORSO'];
+  printingFD: string[] = ['FRENTE', 'DORSO'];
 
 
   constructor(private pedidoproductoService: OpedidoproductoService,
@@ -105,6 +106,7 @@ export class PedidoExternoComponent implements OnInit {
     private svFormats: TipoProductoService,
     private svSealed: TiposSelladoService,
     private svTratados: TratadoService,
+    private svUsuarios: UsuarioService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -118,9 +120,9 @@ export class PedidoExternoComponent implements OnInit {
       PedUsuarioNombre: [null, Validators.required],
       PedFechaEnt: moment(this.today).format('YYYY-MM-DD'),
       PedEstadoId: 11,
-      PedObservacion: '',
+      PedObservacion: null,
       PedDireccionEntrega: [null, Validators.required],
-      PedOc: '',
+      PedOc: null,
     });
 
     //Datos para la tabla de productos.
@@ -135,6 +137,7 @@ export class PedidoExternoComponent implements OnInit {
       ProdFechaEnt: [null, Validators.required],
     });
 
+    //Datos para el producto terminado
     this.formProdTerminado = this.frmBuilderPedExterno.group({
       weightMillar: [null, Validators.required],
       weightRoll: [null, Validators.required],
@@ -157,10 +160,12 @@ export class PedidoExternoComponent implements OnInit {
       caliber: [null, Validators.required],
       unitsCaliber: [null, Validators.required],
       unitsALF: [null, Validators.required],
-      solapa : [null, Validators.required],
+      solapa: [null, Validators.required],
+      laminated: [false, Validators.required],
     })
   }
 
+  //Funcion que se ejecuta al iniciar el componente
   ngOnInit(): void {
     this.lecturaStorage();
     this.getMaterials();
@@ -174,14 +179,6 @@ export class PedidoExternoComponent implements OnInit {
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
-  tutorial() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
-  }
-
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
@@ -190,12 +187,7 @@ export class PedidoExternoComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
-  }
-
-  //! Funcion que va a dar un valor a la variable iva dependiendo de si fue seleccionada o no la casilla del iva
-  checkboxIva() {
-    if (this.checked) this.iva = 19;
-    else this.iva = 0;
+    this.getSales();
   }
 
   //Cargar modal de crear producto
@@ -205,7 +197,10 @@ export class PedidoExternoComponent implements OnInit {
   LlamarModalCrearCliente = () => this.ModalCrearCliente = true;
 
   // Funcion para limpiar los campos de el apartado de productos
-  LimpiarCamposProductos = () => this.FormPedidoExternoProductos.reset();
+  LimpiarCamposProductos() {
+    this.FormPedidoExternoProductos.reset();
+    this.formProdTerminado.reset();
+  }
 
   //Funcion que limpiará TODOS los campos de la vista de pedidos
   limpiarTodosCampos() {
@@ -242,6 +237,21 @@ export class PedidoExternoComponent implements OnInit {
 
   getTreatys = () => this.svTratados.srvObtenerLista().subscribe(data => { this.treatys = data; });
 
+  //Funcion que va a traer la información de los vendedores para mostrarla en el combo box de vendedores
+  getSales() {
+    let asesor: any = this.ValidarRol == 2 ? this.AppComponent.storage_Id : null;
+    this.svUsuarios.GetVendedores().subscribe(resp => {
+      this.usuarioVende = resp;
+      this.usuarioVende = asesor ? this.usuarioVende.filter(x => x.usua_Id == asesor) : this.usuarioVende;
+      console.log(this.usuarioVende);
+
+    });
+  }
+
+  log() {
+    console.log(this.FormPedidoExternoProductos.value, this.formProdTerminado.value);
+  }
+
   //*CLIENTES
   // Funcion que va a buscar los posibles clientes a los que se les puede hacer el pedido de productos
   buscarClientes() {
@@ -275,22 +285,25 @@ export class PedidoExternoComponent implements OnInit {
     this.sedesClientesService.srvObtenerListaPorCliente(cliente).subscribe(data => {
       this.ciudad = data.map(sede => sede.sedeCliente_Ciudad);
       if (data.length <= 1) {
-        this.usuarioVende = data.map(x => x.usua_Nombre);
+
+        //this.usuarioVende = data.map(x => x.usua_Nombre);
         this.sedeCliente = data.map(x => x.sedeCliente_Direccion);
+
+
         data.forEach(item => {
           this.FormPedidoExternoClientes.patchValue({
             'PedSedeCli_Id': item.sedeCliente_Direccion,
             'ciudad_sede': item.sedeCliente_Ciudad,
-            'PedUsuarioNombre': item.usua_Nombre,
+            'PedUsuarioNombre': item.usua_Id,
             'PedUsuarioId': item.usua_Id,
             'PedDireccionEntrega': item.sedeCliente_Direccion,
           });
         });
         this.verificarCartera();
       } else {
-        this.usuarioVende.push(data[0].usua_Nombre);
+        this.usuarioVende.push(data[0].usua_Id);
         this.FormPedidoExternoClientes.patchValue({
-          'PedUsuarioNombre': data[0].usua_Nombre,
+          'PedUsuarioNombre': data[0].usua_Id,
           'PedUsuarioId': data[0].usua_Id,
         });
         this.sedeCliente = [];
@@ -368,93 +381,111 @@ export class PedidoExternoComponent implements OnInit {
     //this.presentacion = [];
     if ([null, undefined, ''].includes(idProducto)) this.productoCliente();
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(data => {
+      console.log('existencias:', data);
       if (data.length > 0) this.productoConExistencia(data, idProducto);
       else if (data.length == 0) this.productoSinExistencia(idProducto);
     });
   }
 
+  //Funcion encargada de cargar la información de un producto que no tiene existencia en el inventario
   productoSinExistencia(idProducto: number) {
-    let datos_producto = this.producto.filter(x => x.prod_Id == idProducto);
-    
-    this.FormPedidoExternoProductos.patchValue({
-      'ProdId': datos_producto[0].prod_Id,
-      'ProdNombre': datos_producto[0].prod_Nombre,
-      'ProdPrecioUnd': 0,
-      'ProdUltFacturacion': 0,
-      'ProdStock': 0,
-      'ProdUnidadMedidaCant': datos_producto[0].undMed_Id,
+
+    this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(data => {
+      let unit = data[0].exist.undMed_Id;
+      this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), unit).subscribe(dataPed => {
+        console.log(dataPed);
+        if (dataPed) {
+          this.FormPedidoExternoProductos.patchValue({ 'ProdUltFacturacion': dataPed.precioUnidad | 0 });
+          this.ultimoPrecio = dataPed.precioUnidad;
+          console.log('entré');
+        } else {
+          this.FormPedidoExternoProductos.patchValue({
+            'ProdId': data[0].prod.prod_Id,
+            'ProdNombre': data[0].prod.prod_Nombre,
+            'ProdPrecioUnd': 0,
+            'ProdUltFacturacion': 0,
+            'ProdStock': 0,
+            'ProdUnidadMedidaCant': data[0].exist.undMed_Id,
+          });
+        }
+      }, error => console.log(error));
+
+      this.formProdTerminado.patchValue({
+        format: data[0].prod.tpProd_Id,
+        margin: data[0].prod.prod_Margen,
+        weightMillar: data[0].prod.prod_Peso_Millar,
+        weightRoll: data[0].prod.prod_Peso,
+        weightUnit: 0,
+        qtyBagxBulto: data[0].prod.prod_CantBolsasBulto,
+        qtyBagxPaq: data[0].prod.prod_CantBolsasPaquete,
+        tpSealed: data[0].prod.tpSellado_Id,
+        tpPrinting: data[0].prod.tpImpresion_Id,
+        width: data[0].prod.prod_Ancho,
+        long: data[0].prod.prod_Largo,
+        bellow: data[0].prod.prod_Fuelle,
+        material: data[0].prod.material_Id,
+        pigment: data[0].prod.pigmt_Id,
+        printing: '',
+        embobinate: 0,
+        treaty: data[0].prod.tratado_Id,
+        caliber: data[0].prod.prod_Calibre,
+        unitsALF: data[0].prod.undMedACF,
+        unitsCaliber: data[0].prod.undMedCalibre,
+        solapa: 0,
+        laminated: 0,
+      })
     });
 
-    this.formProdTerminado.patchValue({
-      margin : datos_producto[0].prod_Margen,
-      weightMillar : datos_producto[0].prod_Peso_Millar,
-      weightRoll : datos_producto[0].prod_Peso,
-      weightUnit : 0,
-      qtyBagxBulto : datos_producto[0].prod_CantBolsasBulto,
-      qtyBagxPaq : datos_producto[0].prod_CantBolsasPaquete,
-      tpSealed : datos_producto[0].tpSellado_Id,
-      tpPrinting : datos_producto[0].tpImpresion_Id,
-      format: datos_producto[0].tpProd_Id,
-      width: datos_producto[0].prod_Ancho,
-      long: datos_producto[0].prod_Largo,
-      bellow: datos_producto[0].prod_Fuelle,
-      material: datos_producto[0].material_Id,
-      pigment: datos_producto[0].pigmt_Id,
-      printing: '',
-      printingDouble: '',
-      embobinate: 0,
-      treaty: datos_producto[0].tratado_Id,
-      caliber: datos_producto[0].prod_Calibre,
-      unitsALF: datos_producto[0].undMedACF,
-    })
   }
 
   productoConExistencia(stock, idProducto: number) {
-    stock.forEach(exis => 
+    stock.forEach(exis =>
       this.FormPedidoExternoProductos.patchValue({ 'ProdStock': parseFloat(exis.disponibles) }));
-      this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
-        console.log(2, datos_prod);
-        
-        datos_prod.forEach(p => {
-          this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), p.exist.undMed_Id).subscribe(dataPed => {
-            this.FormPedidoExternoProductos.patchValue({ 'ProdUltFacturacion': dataPed.precioUnidad | 0 });
-            this.fechaUltFacuracion = dataPed.fechaDocumento.replace('T00:00:00', '');
-          });
-          setTimeout(() => {
-            console.log(p.prod.undMed_Id);
-            
-            this.FormPedidoExternoProductos.patchValue({
-              'ProdId': p.prod.prod_Id,
-              'ProdNombre': p.prod.prod_Nombre,
-              'ProdUnidadMedidaCant': p.exist.undMed_Id,
-              'ProdPrecioUnd': p.exist.exProd_PrecioVenta,
-            });
-            
-            this.formProdTerminado.patchValue({
-              margin : p.prod.prod_Margen,
-              weightMillar : p.prod.prod_Peso_Millar,
-              weightRoll : p.prod.prod_Peso,
-              weightUnit : 0,
-              qtyBagxBulto : p.prod.prod_CantBolsasBulto,
-              qtyBagxPaq : p.prod.prod_CantBolsasPaquete,
-              tpSealed : p.prod.tpSellado_Id,
-              tpPrinting : p.prod.tpImpresion_Id,
-              format: p.prod.tpProd_Id,
-              width: p.prod.prod_Ancho,
-              long: p.prod.prod_Largo,
-              bellow: p.prod.prod_Fuelle,
-              material: p.prod.material_Id,
-              pigment: p.prod.pigmt_Id,
-              printing: '',
-              printingDouble: '',
-              embobinate: 0,
-              treaty: p.prod.tratado_Id,
-              caliber: p.prod.prod_Calibre,
-              unitsALF: p.prod.undMedACF,
-            })
-          }, 1000);
+    this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
+      console.log(2, datos_prod);
+
+      datos_prod.forEach(p => {
+        this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), p.exist.undMed_Id).subscribe(dataPed => {
+          this.FormPedidoExternoProductos.patchValue({ 'ProdUltFacturacion': dataPed.precioUnidad | 0 });
+          this.fechaUltFacuracion = dataPed.fechaDocumento.replace('T00:00:00', '');
         });
+        setTimeout(() => {
+          console.log(p.prod.undMed_Id);
+
+          this.FormPedidoExternoProductos.patchValue({
+            'ProdId': p.prod.prod_Id,
+            'ProdNombre': p.prod.prod_Nombre,
+            'ProdUnidadMedidaCant': p.exist.undMed_Id,
+            'ProdPrecioUnd': p.exist.exProd_PrecioVenta,
+          });
+
+          this.formProdTerminado.patchValue({
+            margin: p.prod.prod_Margen,
+            weightMillar: p.prod.prod_Peso_Millar,
+            weightRoll: p.prod.prod_Peso,
+            weightUnit: 0,
+            qtyBagxBulto: p.prod.prod_CantBolsasBulto,
+            qtyBagxPaq: p.prod.prod_CantBolsasPaquete,
+            tpSealed: p.prod.tpSellado_Id,
+            tpPrinting: p.prod.tpImpresion_Id,
+            format: p.prod.tpProd_Id,
+            width: p.prod.prod_Ancho,
+            long: p.prod.prod_Largo,
+            bellowRight: p.prod.prod_Fuelle,
+            bellowLeft: p.prod.prod_Fuelle,
+            bellowBottom: p.prod.prod_Fuelle,
+            material: p.prod.material_Id,
+            pigment: p.prod.pigmt_Id,
+            printing: '',
+            printingDouble: '',
+            embobinate: 0,
+            treaty: p.prod.tratado_Id,
+            caliber: p.prod.prod_Calibre,
+            unitsALF: p.prod.undMedACF,
+          })
+        }, 1000);
       });
+    });
   }
 
   // VALIDACION PARA CAMPOS VACIOS
@@ -468,23 +499,54 @@ export class PedidoExternoComponent implements OnInit {
     let precioProducto: number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;
     let item: number = this.FormPedidoExternoProductos.value.ProdId;
     let ref: number = this.FormPedidoExternoProductos.value.ProdNombre;
-    if (this.ArrayProducto.filter(x => x.Id == item).length > 0) this.msj.mensajeAdvertencia(`Advertencia`, `El item ${item} ${ref} ya se encuentra en la tabla`)
+    let itemTabla = this.ArrayProducto.filter(x => x.Id == item).length;
+
+    if (itemTabla > 0) this.msj.mensajeAdvertencia(`Advertencia`, `El item ${item} ${ref} ya se encuentra en la tabla`)
     else {
       if (precioProducto > 0 && precioProducto >= this.ultimoPrecio) {
-        this.ArrayProducto.push({
-          Id: this.FormPedidoExternoProductos.get('ProdId')?.value,
-          Nombre: this.FormPedidoExternoProductos.value.ProdNombre,
-          Cant: this.FormPedidoExternoProductos.get('ProdCantidad').value,
-          UndCant: this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-          PrecioUnd: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
-          Stock: this.FormPedidoExternoProductos.get('ProdStock').value,
-          SubTotal: (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
-          FechaEntrega: moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
-        });
+        this.ArrayProducto.push(this.addItemToTable());
         this.LimpiarCamposProductos();
         this.productoCliente();
       } else this.msj.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
     }
+  }
+
+  addItemToTable() {
+    let item: any = {
+      'Id': this.FormPedidoExternoProductos.get('ProdId')?.value,
+      'Nombre': this.FormPedidoExternoProductos.value.ProdNombre,
+      'Cant': this.FormPedidoExternoProductos.get('ProdCantidad').value,
+      'UndCant': this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
+      'PrecioUnd': this.FormPedidoExternoProductos.value.ProdPrecioUnd,
+      'Stock': this.FormPedidoExternoProductos.get('ProdStock').value,
+      'SubTotal': (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
+      'FechaEntrega': moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
+      'Margen' : this.formProdTerminado.value.margin,
+      'PesoMillar' : this.formProdTerminado.value.weightMillar,
+      'PesoRoll' : this.formProdTerminado.value.weightRoll,
+      'WeightUnit' : this.formProdTerminado.value.weightUnit,
+      'CantBolsasBulto' : this.formProdTerminado.value.qtyBagxBulto,
+      'CantBolsasPaquete' : this.formProdTerminado.value.qtyBagxPaq,
+      'TpSellado' : this.formProdTerminado.value.tpSealed,
+      'TpImpresion' : this.formProdTerminado.value.tpPrinting,
+      'Format' : this.formProdTerminado.value.format,
+      'Ancho' : this.formProdTerminado.value.width,
+      'Largo' : this.formProdTerminado.value.long,
+      'FuelleRight' : this.formProdTerminado.value.bellowRight,
+      'FuelleLeft' : this.formProdTerminado.value.bellowLeft,
+      'FuelleBottom' : this.formProdTerminado.value.bellowBottom,
+      'Material' : this.formProdTerminado.value.material,
+      'Pigment' : this.formProdTerminado.value.pigment,
+      'Printing' : this.formProdTerminado.value.printing,
+      'Embobinate' : this.formProdTerminado.value.embobinate,
+      'Treaty' : this.formProdTerminado.value.treaty,
+      'Caliber' : this.formProdTerminado.value.caliber,
+      'UnitsCaliber' : this.formProdTerminado.value.unitsCaliber,
+      'UnitsALF' : this.formProdTerminado.value.unitsALF,
+      'Solapa' : this.formProdTerminado.value.solapa,
+      'Laminated' : this.formProdTerminado.value.laminated,
+    }
+    return item;
   }
 
   // Funcion que va a retornar el valor total del pedido
