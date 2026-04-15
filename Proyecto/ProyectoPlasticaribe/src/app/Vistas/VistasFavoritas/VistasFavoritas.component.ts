@@ -22,11 +22,11 @@ export class VistasFavoritasComponent implements OnInit {
   displayTerminal: boolean; //Variable que permitirá mostrar o no el apartado donde se pueden escoger las vistas favoritas
   dockItems: MenuItem[] = []; //Variable que mostrará las vistas favoritas que feuron escogidas por el usuario logeado
   responsiveOptions: any[]; //Variable que hará que el docker, donde estan las vistas favoritas, sea responsive
-  targetProducts = []; //Variable que tendrá las vistas seleccionadas por el usuario como favoritas
-  disponibles = []; //Variable que tendrá la información de todas las vistas disponibles
-  seleccionados = []; //Variable que almacenará los id de las vistas seleccionadas por el usuario como favoritas
+  targetProducts: any[] = []; //Variable que tendrá las vistas seleccionadas por el usuario como favoritas
+  disponibles: any[] = []; //Variable que tendrá la información de todas las vistas disponibles
+  seleccionados: number[] = []; //Variable que almacenará los id de las vistas seleccionadas por el usuario como favoritas
   vistasFavoritas : any [] = []; // Variable que almacenará las vistas favoritas del usuario
-  disponiblesMostrar = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
+  disponiblesMostrar: any[] = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,

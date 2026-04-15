@@ -78,6 +78,7 @@
             <th><input pInputText (input)="aplicarfiltro($event, 'Ronda', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Referencia', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Material', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Pigmento', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'AnchoTubular', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'PesoMetro', 'contains')"></th>
@@ -106,7 +107,7 @@
             <th></th>
         </tr>
         <tr>
-            <th colspan="9"></th>
+            <th colspan="10"></th>
             <th></th>
             <th colspan="3" class="text-center">Calibres ± 5%</th>
             <th colspan="4" class="text-center">Evaluación física</th>
@@ -123,6 +124,7 @@
             <th style="min-width : 100px">Ronda</th>
             <th style="min-width : 200px">Nombre Cliente</th>
             <th style="min-width : 300px">Nombre Referencia</th>
+            <th style="min-width : 80px">Material</th>
             <th style="min-width : 80px">Pigmento</th>
             <th style="min-width : 90px">Ancho Tub.</th>
             <th style="min-width : 100px">Peso Metro (g)</th>
@@ -235,6 +237,19 @@
                     </ng-template>
                     <ng-template pTemplate="output">
                         <b>{{registro.Referencia}}</b>
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--*Material-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="materials" appendTo="body" [(ngModel)]="registro.Material"
+                            optionLabel="material_Nombre" optionValue="material_Nombre"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Material}}
                     </ng-template>
                 </p-cellEditor>
             </td>

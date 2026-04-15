@@ -470,10 +470,10 @@ export class Movimientos_MantenimientoComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla del pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

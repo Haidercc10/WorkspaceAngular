@@ -35,17 +35,17 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   public FormMateriaPrimaRetirada !: FormGroup;
 
   /* Variables*/
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   load: boolean = true; //Variable para validar que aparezca el icono de carga o no
-  materiaPrima = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  materiasPrimasSeleccionadas: any[] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
-  procesos = []; //Variable que va a almacenar los procesos que tiene la empresa (extrusio, impresion, etc...)
+  materiaPrima: any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  materiasPrimasSeleccionadas: any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  unidadMedida: any = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
+  procesos: any = []; //Variable que va a almacenar los procesos que tiene la empresa (extrusio, impresion, etc...)
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  kgOT: number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
+  kgOT: number = 0; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
   cantRestante: number = 0; //Variable que va a almacenar la cantidad que resta por asignar de una orden de trabajo
   estadoOT: any; //Variable que va a almacenar el estado de la orden de trabajo
   infoOrdenTrabajo: any[] = []; //Variable en la que se almacenará la información de la orden de trabajo consultada
@@ -614,6 +614,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               'Hora_Entrada': mov.hora_Entrada,
               'Precio_EstandarUnitario': mov.precio_EstandarUnitario
             }
+            let id : number | undefined = detalle.Id;
             if (mp.Cantidad2 > 0) {
               if (mp.Cantidad2 > detalle.Cantidad_Disponible) {
                 salidaReal = detalle.Cantidad_Disponible;
@@ -634,8 +635,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 detalle.Estado_Id = 19;
                 mp.Cantidad2 = 0;
               }
-              this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
-              this.crearRegistrosSalidasMP(detalle, salidaReal, idAsignacion);
+              if (id !== undefined) {
+                this.srvMovEntradasMP.Put(id, detalle).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
+                this.crearRegistrosSalidasMP(detalle, salidaReal, idAsignacion);  
+              }
             }
           })
         }

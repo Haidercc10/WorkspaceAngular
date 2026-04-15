@@ -1,7 +1,6 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
-import { log } from 'console';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
@@ -43,10 +42,10 @@ export class OcompraComponent implements OnInit {
   ModalCrearTintas: boolean = false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenets
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   cargando: boolean = false; //Variable para validar que aparezca o no el icono de carga
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id: number = 0; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: number = 0; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   proveedores: any[] = []; //Variable que almacenará los proveedores
   materiaPrima: any[] = []; //Variable que almacenará las materias primas
   unidadesMedida: any[] = []; //Variable que va a almacenar las unidades de medida
@@ -56,10 +55,10 @@ export class OcompraComponent implements OnInit {
   categoriasMP: any[] = []; //Variable que almcanará las categorias de la tabla Materia_Prima
   categoriasTintas: any[] = []; //Variable que almcanará las categorias de la tabla Tintas
   categoriasBOPP: any[] = []; //Variable que almcanará las categorias de la tabla BOPP
-  mpSeleccionada: any[];
+  mpSeleccionada: any[] = [];
   edicionOrdenCompra: boolean = false;
   llave: string = 'pdf';
-  ordenCreada: number;
+  ordenCreada: number = 0;
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   solicitud: boolean = false;
   iva: number = 19;
@@ -681,10 +680,10 @@ export class OcompraComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data: any, columns: any) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });

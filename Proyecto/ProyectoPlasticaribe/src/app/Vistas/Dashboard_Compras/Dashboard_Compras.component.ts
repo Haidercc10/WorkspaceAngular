@@ -17,9 +17,9 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 export class Dashboard_ComprasComponent implements OnInit {
 
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   @ViewChild('dt_comprasAgrupadas') dt_comprasAgrupadas: Table | undefined;
@@ -29,9 +29,9 @@ export class Dashboard_ComprasComponent implements OnInit {
   compraTotalAnioPlasticaribe : number = 0; //Variable que almacenará el costo total de las compras de plasticaribe realizadas en lo que va del año
   compraTotalAnioInvergoal : number = 0; //Variable que almacenará el costo total de las compras de Invergoal realizadas en lo que va del año
   compraTotalAnioInversuez : number = 0; //Variable que almacenará el costo total de las compras de Inversuez realizadas en lo que va del año
-  comprasAgrupadasPlasticaribe : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Plasticaribe
-  comprasAgrupadasInvergoal : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Invergoal
-  comprasAgrupadasInversuez : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Inversuez
+  comprasAgrupadasPlasticaribe : any[] = []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Plasticaribe
+  comprasAgrupadasInvergoal : any[] = []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Invergoal
+  comprasAgrupadasInversuez : any[] = []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Inversuez
   opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
   graficaComprasPlasticaribe : any; //Variable que va a almacenar los costos de las compras de plasticaribe
   graficaComprasInvergoal : any; //Variable que va a almacenar los costos de las compras de invergoal
@@ -123,6 +123,7 @@ export class Dashboard_ComprasComponent implements OnInit {
   }
 
   estiloGraficas(){
+    const labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -134,9 +135,10 @@ export class Dashboard_ComprasComponent implements OnInit {
           ticks: {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value : any, index : any, values : any) {
+              const label = labels[index];
+              if (label.length > 4) return `${label.substring(0, 4)}...`;
+              else return label;
             }
           },
           grid: { color: '#ebedef' }

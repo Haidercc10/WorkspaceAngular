@@ -171,8 +171,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       Proveedor: data.proveedor,
       Material: data.material,
       Cantidad: data.cantidad,
-      Precio: data.precio,
-      Subtotal: data.subTotal,
+      Precio: data.precio_Unitario,
+      Subtotal: data.cantidad * data.precio_Unitario,
     }
     this.registrosConsultados.push(info);
     this.registrosConsultados.sort((a, b) => Number(a.Oc) - Number(b.Oc));
@@ -325,10 +325,10 @@ export class Reporte_OrdenCompraComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data: any, columns: any) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });

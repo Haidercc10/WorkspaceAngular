@@ -18,16 +18,16 @@ import { AppComponent } from 'src/app/app.component';
 
 export class Informe_ConsumosComponent implements OnInit {
   load : boolean = false; //Variable para controlar la carga de la pagina
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   rangoFechas : any = []; //Variable que se usará para almacenar el rango de fechas que se seleccionarán en el filtro
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora : any = moment().format('HH:mm:ss'); //Variable que se usará para llenar la hora actual
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD');
   ultimoDiaMes : any = moment().endOf('month').format('YYYY-MM-DD');
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
   consumos : any = []; //Variable que se usará para almacenar los datos de los consumos
   @ViewChild('dt') dt: Table | undefined; // Tabla que contendrá la información de la tabla inicialmente

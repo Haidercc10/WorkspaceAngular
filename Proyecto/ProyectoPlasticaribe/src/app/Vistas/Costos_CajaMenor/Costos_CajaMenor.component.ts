@@ -19,10 +19,10 @@ import { AppComponent } from 'src/app/app.component';
 export class Costos_CajaMenorComponent implements OnInit {
 
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load: boolean = false; //Variable que validará cuando vaya a salir la animacion de carga
   FormCajaMenor !: FormGroup; //Formulario de ingreso de nómina
@@ -34,7 +34,7 @@ export class Costos_CajaMenorComponent implements OnInit {
   areas : any = []; //Array que guardará las diferentes areas de la empresa. 
   modalTiposGastos : boolean = false; //Variable que validará si se muestra o no el modal para crear un tipo de gasto
 
-  @ViewChild ('dt_CajaMenor') dt_CajaMenor : Table; //Variable que se usará para hacer referencia al datatable')
+  @ViewChild ('dt_CajaMenor') dt_CajaMenor : Table | undefined; //Variable que se usará para hacer referencia al datatable')
   FormFiltrosCajaMenor : FormGroup; //Funcion que va a tener la información de los filtros de busqueda de la información de caja menor
   registrosCajaMenor : any [] = []; //Array que guardará los registros de la información de caja menor
 

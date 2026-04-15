@@ -23,11 +23,11 @@ export class InformacionVentasComponent implements OnInit {
   clients: any = [];
   form !: FormGroup;
   load: boolean = false; // Variable para indicar la espera en la carga de un proceso. 
-  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  modoSeleccionado: boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   years: any[] = [2019];
   monthNames: any[] = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   dataAsesors: any = [];

@@ -84,7 +84,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   totalQtyQuality: number = 0;
   traceability: boolean = false;
   selectedRoll: any = null;
-  @ViewChild(Movimientos_RollosComponent) cmpMovRolls: Movimientos_RollosComponent;
+  @ViewChild(Movimientos_RollosComponent) cmpMovRolls: Movimientos_RollosComponent | undefined;
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
@@ -168,8 +168,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   getStockInformation() {
     //if(!this.despacho) {
-    let sales : string = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id)}` : null;
-    let salesEndPoint : string = [undefined, null].includes(sales) ? '' : sales;
+    let sales : string | null = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id)}` : null;
+    let salesEndPoint : string | null = [undefined, null, ''].includes(sales) ? '' : sales;
     this.load = true;
     //this.despacho = true;
     this.stockService.GetStockProducts_AvaibleProduction(salesEndPoint).subscribe(data => {
@@ -312,8 +312,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   groupInfoAvailableByOt(data) {
-    let info: any = this.fillAvaibleProduction(data).reduce((a, b) => {
-      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+    let info: any = this.fillAvaibleProduction(data).reduce((a : any, b : any) => {
+      if (!a.map((x : any) => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
       return a;
     }, [])
     return info;
@@ -392,11 +392,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   showPopUpCreateAndEdit(data: any = "") {
     this.recetaProducto = true;
-    this.recetas_ProductosComponent.limpiarTodo();
+    this.recetas_ProductosComponent?.limpiarTodo();
     if (data != "") {
-      this.recetas_ProductosComponent.FormProductos.patchValue({ Nombre: data.Id, });
-      this.recetas_ProductosComponent.buscarProductos();
-      setTimeout(() => this.recetas_ProductosComponent.cambiarNombreProducto(), 500);
+      this.recetas_ProductosComponent?.FormProductos.patchValue({ Nombre: data.Id, });
+      this.recetas_ProductosComponent?.buscarProductos();
+      setTimeout(() => this.recetas_ProductosComponent?.cambiarNombreProducto(), 500);
     }
   }
 
@@ -593,7 +593,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   fillDataExcel(dataDocument: Array<StockInformation>): any[] {
-    let dataStock = [];
+    let dataStock : any = [];
     dataDocument.forEach(stock => {
       dataStock.push([
         stock.item,
@@ -679,7 +679,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   fillDataSheet2Excel(dataDocument: Array<StockInformation>): any[] {
-    let dataStock = [];
+    let dataStock : any = [];
     let count = 0;
     dataDocument.forEach(stock => {
       stock.AvaibleProdution.forEach(prod => {
@@ -1156,7 +1156,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     setTimeout(() => {
       this.traceability = true;
       this.selectedRoll = data.number_BagPro;
-      this.cmpMovRolls.searchMovements(data, `Producto Terminado`);
+      this.cmpMovRolls?.searchMovements(data, `Producto Terminado`);
       this.load = false;
     }, 500);
   }

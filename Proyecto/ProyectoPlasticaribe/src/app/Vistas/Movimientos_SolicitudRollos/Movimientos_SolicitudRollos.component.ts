@@ -489,9 +489,9 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
+    var body : any = [];
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

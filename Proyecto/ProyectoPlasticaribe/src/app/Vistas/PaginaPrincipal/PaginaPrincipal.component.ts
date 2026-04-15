@@ -18,19 +18,19 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  ordenTrabajo : boolean = false;
-  facturacion : boolean = false;
-  materiaPrima : boolean = false;
-  pedidos: boolean = false;
-  facturacionVendedores : boolean = false;
-  recaudos : boolean = false;
-  cuentasPagar : boolean = false;
-  gerencia : boolean = false;
-  costos : boolean = false;
-  compras : boolean = false;
-  inventarioAreas : boolean = false;
-  calidad : boolean = false;
-  production : boolean = false;
+  ordenTrabajo : boolean = false; //Variable que se usará para mostrar el módulo de ordenes de trabajo
+  facturacion : boolean = false; //Variable que se usará para mostrar el módulo de facturación
+  materiaPrima : boolean = false; //Variable que se usará para mostrar el módulo de materia prima
+  pedidos: boolean = false; //Variable que se usará para mostrar el módulo de pedidos
+  facturacionVendedores : boolean = false; //Variable que se usará para mostrar el módulo de facturación vendedores
+  recaudos : boolean = false; // Variable que se usará para mostrar el módulo de recaudos
+  cuentasPagar : boolean = false; // Variable que se usará para mostrar el módulo de cuentas por pagar
+  gerencia : boolean = false; // Variable que se usará para mostrar el módulo de gerencia
+  costos : boolean = false; // Variable que se usará para mostrar el módulo de costos
+  compras : boolean = false; // Variable que se usará para mostrar el módulo de compras
+  inventarioAreas : boolean = false; // Variable que se usará para mostrar el módulo de inventario áreas
+  calidad : boolean = false; // Variable que se usará para mostrar el módulo de calidad
+  production : boolean = false; // Variable que se usará para mostrar el módulo de producción
 
   constructor(private AppComponent : AppComponent,
     private svUseModules : UsabilidadModulosService,
@@ -122,9 +122,15 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     index == 2 && [2].includes(this.ValidarRol) ? this.facturacionVendedores = true : null;
     index == 3 && [2].includes(this.ValidarRol) ? this.recaudos = true : null;
 
+    
+    index == 5 && [104].includes(this.ValidarRol) ? this.costos = true : null;
+    index == 6 && [104].includes(this.ValidarRol) ? this.compras = true : null;
+    index == 7 && [104].includes(this.ValidarRol) ? this.inventarioAreas = true : null;
+
     this.saveLogModule(tab);
   }
 
+  //Funcion que guardará el log de los módulos a los que se acceda, se guardará el id del usuario, el módulo al que se accedió, la fecha y hora de acceso y la acción realizada
   saveLogModule(module : string){
     let model : modelUsabilidad_Modulos = {
       Usm_Modulo: 'Dashboard ' + module,

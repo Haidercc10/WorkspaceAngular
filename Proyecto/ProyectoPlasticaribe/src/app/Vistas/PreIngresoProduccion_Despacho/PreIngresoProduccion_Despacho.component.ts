@@ -161,8 +161,8 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   }
 
   getConsolidateProduction() {
-    this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
-      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+    this.consolidatedProduction = this.productionSelected.reduce((a : any[], b : any) => {
+      if (!a.map((x : any) => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
       return a;
     }, []);
   }
@@ -191,7 +191,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     let observation: string = this.formData.value.observation;
     const data: modelPreentregaRollos = {
       PreEntRollo_Fecha: moment().format('YYYY-MM-DD'),
-      PreEntRollo_Observacion: ![null, undefined].includes(observation) ? observation.toUpperCase() : '',
+      PreEntRollo_Observacion: ![null, undefined, ''].includes(observation) ? observation.toUpperCase() : '',
       Usua_Id: this.storage_Id,
       PreEntRollo_Hora: moment().format('H:mm:ss'),
     }
@@ -200,7 +200,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
 
   saveDetailsPreIn(idPreIn: number) {
     let count: number = 0;
-    this.productionSelected.forEach(pp => {
+    this.productionSelected.forEach((pp : any) => {
       const data: modelDtPreEntregaRollos = {
         PreEntRollo_Id: idPreIn,
         Rollo_Id: pp.numberProduction,
@@ -446,11 +446,11 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

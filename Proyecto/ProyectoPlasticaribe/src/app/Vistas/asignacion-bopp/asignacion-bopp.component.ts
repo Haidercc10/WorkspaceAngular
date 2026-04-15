@@ -23,25 +23,25 @@ export class AsignacionBOPPComponent implements OnInit {
   public comboUnidadMedida = []; /** Combobox unidad de medida */
   public comboCategoriasMatPri = []; /** Combobox Categorias materia prima */
   public comboBOPP = []; /** Combobox BOPP */
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
-  ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
-  ArrayBoppPedida = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
+  ArrayBOPP : any = []; //Varibale que almacenará los BOPP existentes
+  ArrayBoppPedida : any = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
   boppSeleccionado : any = []; //Variable que almacenará la informacion del bopp que haya sido selccionado
   ot : any = [];
   boppArray : any = [];
   cantidadBOPP : number = 0;
-  ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
+  ordenesTrabajo : any = []; //Variable que almacenará las ordenes de trabajo que se consulten
   micras : number = 0; //Variable que almacenará las micras que se solicitan en la OT
   ancho : number = 0; //Variable que almacenará el ancho que se solicita en la OT
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   anchoBOPP : number = 0;
   cantidadKgBOPP : number = 0;
   arrayOT : any = [];
-  keyword = 'name';
+  keyword : string = 'name';
   public historyHeading: string = 'Seleccionado Recientemente';
   validarInput : any;
   kgRollo : number = 0;

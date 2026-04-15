@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject, forkJoin } from 'rxjs';
+import { takeUntil, switchMap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -27,12 +29,15 @@ import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
   styleUrls: ['./pedidomateriaprima.component.css']
 })
 
-export class PedidomateriaprimaComponent implements OnInit {
+export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
 
-  public FormMateriaPrimaFactura !: FormGroup;
-  public FormRemisiones !: FormGroup;
+  public FormMateriaPrimaFactura !: FormGroup; //Variable que se usará para registrar la factura o remisión de materia prima por su id, consecutivo, proveedor y observacion
+  public FormRemisiones !: FormGroup; //Variable que se usará para registrar las remisiones por su id
 
-  public consultaRemisiones !: FormGroup;
+  public consultaRemisiones !: FormGroup; //Variable que se usará para consultar las remisiones por su id
+
+  private _intervalTema: any; //Variable que se usará para guardar el intervalo del tema seleccionado y limpiarlo al cerrar la vista
+  private destroy$ = new Subject<void>(); //Variable que se usará para limpiar los intervalos de la vista al cerrarla
 
   /* Vaiables*/
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -41,28 +46,28 @@ export class PedidomateriaprimaComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista
   facturaMateriaPrima = []; //Funcion que guardará la informacion de la factura de materia prima comprada que ha sido consultada
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
+  titulosTabla : any = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
   ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
   valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de materia prima
-  proveedor = []; //Variable que almacenará los diferentes proveedores de materia prima
-  ultimoIdFactura : number = 0;
-  ultimoIdRemision : number = 0;
-  ArrayRemisiones = [];
-  precioRemision = [];
-  titulosTablaRemisiones = [];
-  mpAgregada = [];
+  proveedor : any = []; //Variable que almacenará los diferentes proveedores de materia prima
+  ultimoIdFactura : number = 0; //Variable que se usará para almacenar el ultimo id de factura registrado en la base de datos y colocar su consecutivo en el campo correspondiente
+  ultimoIdRemision : number = 0; //Variable que se usará para almacenar el ultimo id de remision registrado en la base de datos y colocar su consecutivo en el campo correspondiente
+  ArrayRemisiones : any = []; //Variable que se usará para almacenar las remisiones que se van a relacionar con la factura o remisión que se va a registrar
+  precioRemision : any = []; //Variable que se usará para almacenar el precio total de la remision que se va a relacionar con la factura o remisión que se va a registrar
+  titulosTablaRemisiones : any = []; //Variable que se usará para almacenar los titulos de la tabla de remisiones que se muestra en la parte inferior de la vista
+  mpAgregada : any = []; //Variable que se usará para almacenar las materias primas que se han agregado a la factura o remisión para deshabilitar el boton de agregar a la tabla
   /* CONSULTAS DE MATERIA PRIMA */
-  MpConsultada = [];
-  remision : any = [];
-  remConFac : any = [];
-  mostrarCheck : boolean = true;
+  MpConsultada = []; //Variable que se usará para almacenar la informacion de la materia prima que se ha consultado por su id
+  remision : any = []; // Variable que se usará para almacenar la informacion de la remision que se ha consultado por su id
+  remConFac : any = []; //Variable que se usará para almacenar la informacion de las remisiones que se han relacionado con la factura o remisión consultada
+  mostrarCheck : boolean = true; //Variable que se usará para mostrar o ocultar el check de seleccionar todos dependiendo si la orden de compra tiene bopp o no
 
-  public load: boolean;
-  public arrayOrdenCompra : any [] = [];
-  public arrayMatPrimaFactura : any [] = [];
-  public arrayInfoMatPrima : any [] = [];
+  public load: boolean; //Variable que se usará para mostrar o ocultar el cargando dependiendo de las consultas que se estén realizando
+  public arrayOrdenCompra : any [] = []; //Variable que se usará para almacenar la informacion de la orden de compra que se ha consultado por su id y mostrarla en la tabla para seleccionar las materias primas a ingresar
+  public arrayMatPrimaFactura : any [] = []; //Variable que se usará para almacenar la informacion de las materias primas que se han registrado en la factura o remisión para mostrarla en la tabla
+  public arrayInfoMatPrima : any [] = []; //Variable que se usará para almacenar la informacion de las materias primas que vienen en la orden de compra para mostrarlas en la tabla y seleccionarlas para ingresar
 
-  modalMode : boolean = false;
+  modalMode : boolean = false; //Variable que se usará para mostrar u ocultar el modal de consulta de remisiones dependiendo de si se ha consultado una factura o remisión y esta tiene remisiones relacionadas
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -105,7 +110,14 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.ColumnasTabla();
     this.ColumnasTablaRemisiones();
     this.obtenerProveeedor();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this._intervalTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  //Funcion que se ejecutará al cerrar la vista para limpiar el intervalo del tema seleccionado
+  ngOnDestroy(): void {
+    clearInterval(this._intervalTema);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   tutorial(){
@@ -129,7 +141,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
     let id : number = this.FormMateriaPrimaFactura.value.proveedorNombre;
-    this.proveedorservices.srvObtenerListaPorId(id).subscribe(datos_proveedor => {
+    this.proveedorservices.srvObtenerListaPorId(id).pipe(takeUntil(this.destroy$)).subscribe(datos_proveedor => {
       this.FormMateriaPrimaFactura.patchValue({
         ConsecutivoFactura : this.ultimoIdFactura,
         proveedor: id,
@@ -142,7 +154,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   // Funcion que se encargará de obtener los proveedores
-  obtenerProveeedor = () => this.proveedorservices.srvObtenerLista().subscribe(datos => this.proveedor = datos);
+  obtenerProveeedor = () => this.proveedorservices.srvObtenerLista().pipe(takeUntil(this.destroy$)).subscribe(datos => this.proveedor = datos);
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
@@ -196,7 +208,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
 
     if (Orden_Compra != null){
-      this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
+      this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).pipe(takeUntil(this.destroy$)).subscribe(datos_orden => {
         if(datos_orden.length > 0) {
           for (let i = 0; i < datos_orden.length; i++) {
             let mp : number = 0;
@@ -204,7 +216,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
             else if (datos_orden[i].bopP_Id != 1) mp = datos_orden[i].bopP_Id;
             let mpArray : number [] = [];
-            this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp).subscribe(datos_facturacion => {
+            this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp).pipe(takeUntil(this.destroy$)).subscribe(datos_facturacion => {
               for (let j = 0; j < datos_facturacion.length; j++) {
                 let info : any = {
                   Id : mp,
@@ -308,25 +320,18 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que va a calcular el precio total de la factura o remision
   calcularPrecio() {
-    let total : number = 0;
-    this.ArrayMateriaPrima.filter((data) => !data.Exits).reduce((a, b) => {
-      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) total += (b.Cantidad_Faltante_Editar /** this.promedioCantidadCono(b.Nombre))*/ * b.Precio);
-      else total += (b.Cantidad_Faltante_Editar * b.Precio);
-      return total; 
+    return this.ArrayMateriaPrima.filter((data) => !data.Exits).reduce((acc, b) => {
+      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) return acc + (b.Cantidad_Faltante_Editar /** this.promedioCantidadCono(b.Nombre))*/ * b.Precio);
+      return acc + (b.Cantidad_Faltante_Editar * b.Precio);
     }, 0);
-    return total; 
   }
 
   // Funcion que va a calcular el subtotal de la factura o remision
   calcularSubtotal(id : any){
-    let total : number = 0;
-    this.ArrayMateriaPrima.filter((data) => !data.Exits && data.Id == id).reduce((a, b) => {
-      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) a += (b.Cantidad_Faltante_Editar /** this.promedioCantidadCono(b.Nombre))*/ * b.Precio);
-      else a += (b.Cantidad_Faltante_Editar * b.Precio);
-      total = a;
-      return a; 
+    return this.ArrayMateriaPrima.filter((data) => !data.Exits && data.Id == id).reduce((acc, b) => {
+      if(b.Medida == 'Cms' && b.Nombre.includes('CONO')) return acc + (b.Cantidad_Faltante_Editar /** this.promedioCantidadCono(b.Nombre))*/ * b.Precio);
+      return acc + (b.Cantidad_Faltante_Editar * b.Precio);
     }, 0);
-    return total; 
   }
 
   // Funcion que va a calcular el IVA de la factura o remision
@@ -336,9 +341,6 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //Funcion que validará el campo sobre el que se está colocando del consecutivo, factura o remisimos
   validarCampos(){
-    console.log(this.FormMateriaPrimaFactura.value.MpRemision);
-    console.log(this.FormMateriaPrimaFactura.value.MpFactura);
-
     if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.msj.mensajeAdvertencia(`Advertencia`, "Solo debe llenar el campo Remisión o Factura.");
     else if (this.FormMateriaPrimaFactura.value.MpRemision != '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.registrarRemisionMP();
     else if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura != '') this.registrarFacturaMP();
@@ -359,7 +361,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       Usua_Id : this.storage_Id,
       TpDoc_Id : 'FCO',
     }
-    this.facturaMpComService.srvGuardar(datosFactura).subscribe(() => this.obtenerUltimoIdFacturaCompra(), () => {
+    this.facturaMpComService.srvGuardar(datosFactura).pipe(takeUntil(this.destroy$)).subscribe(() => this.obtenerUltimoIdFacturaCompra(), () => {
       this.msj.mensajeError(`Error`, `¡Error al crear la factura!`);
       this.load = true;
     });
@@ -367,7 +369,7 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funicion que va a colocar el id de la ultimo factura
   obtenerUltimoIdFacturaCompra(){
-    this.facturaMpComService.UltimoIdFactura().subscribe(datos_facturas => this.creacionFacturaMateriaPrima(datos_facturas), () => {
+    this.facturaMpComService.UltimoIdFactura().pipe(takeUntil(this.destroy$)).subscribe(datos_facturas => this.creacionFacturaMateriaPrima(datos_facturas), () => {
       this.msj.mensajeError(`Error`, `¡Error al obtener la ultima factura creada!`);
       this.load = true;
     });
@@ -375,43 +377,43 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //Funcion que creará el registro de la materia que viene en un pedido
   creacionFacturaMateriaPrima(idFactura : any){
-    let errorConsulta : boolean;
     if (this.ArrayMateriaPrima.length == 0) {
       this.msj.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
       this.load = true;
-    } else {
-      for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-        const datosFacturaMp : any = {
-          Facco_Id : idFactura,
-          MatPri_Id : this.ArrayMateriaPrima[index].Id_Mp,
-          Tinta_Id : this.ArrayMateriaPrima[index].Id_Tinta,
-          Bopp_Id : this.ArrayMateriaPrima[index].Id_Bopp,
-          FaccoMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Faltante_Editar,
-          UndMed_Id : this.ArrayMateriaPrima[index].Medida,
-          FaccoMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
-        }
-        this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(null, () => {
-          errorConsulta = true;
-          this.msj.mensajeAdvertencia(`Advertencia`, `¡Error al crear la factura con las materia primas seleccionadas!`);
-          this.load = true;
-        });
-      }
-      setTimeout(() => {
-        if (!errorConsulta) {
-          this.relacionOrdenFactura(idFactura);
-          this.cargarRemisionEnFactura(idFactura);
-          setTimeout(() => {
-            this.estadoOrdenCompra();
-            this.moverInventarioMP();
-            this.moverInventarioTintas();
-            this.msj.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`);
-            let data : any = { 'Id' : idFactura, Movimiento : 'FCO' }; 
-            this.cmpMovMatPrimas.entradasMateriasPrimas(data);
-            setTimeout(() => this.limpiarTodosCampos(), 1500);
-          }, 2000);
-        }
-      }, 3500);
+      return;
     }
+
+    const peticiones = this.ArrayMateriaPrima.map(mp => {
+      const datosFacturaMp : any = {
+        Facco_Id : idFactura,
+        MatPri_Id : mp.Id_Mp,
+        Tinta_Id : mp.Id_Tinta,
+        Bopp_Id : mp.Id_Bopp,
+        FaccoMatPri_Cantidad : mp.Cantidad_Faltante_Editar,
+        UndMed_Id : mp.Medida,
+        FaccoMatPri_ValorUnitario : mp.Precio,
+      };
+      return this.facturaMpService.srvGuardar(datosFacturaMp);
+    });
+
+    forkJoin(peticiones).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.relacionOrdenFactura(idFactura);
+        this.cargarRemisionEnFactura(idFactura);
+        this.estadoOrdenCompra();
+        this.moverInventarioMP();
+        this.moverInventarioTintas();
+        this.cmpMovMatPrimas.entradasMateriasPrimas({ Id: idFactura, Movimiento: 'FCO' });
+        setTimeout(() => {
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`);
+          this.limpiarTodosCampos();
+        }, 1500);
+      },
+      error: () => {
+        this.msj.mensajeAdvertencia(`Advertencia`, `¡Error al crear la factura con las materia primas seleccionadas!`);
+        this.load = true;
+      }
+    });
   }
 
   // Funcion que va a crear la relacion entre la orden de compra y las posibles facturas que puede tener
@@ -420,7 +422,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
       Facco_Id : factura,
     }
-    this.OrdenesFacturasService.insert_OrdenCompra(info).subscribe(null, () => {
+    this.OrdenesFacturasService.insert_OrdenCompra(info).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
       this.msj.mensajeError(`Error`, `¡No se ha creado la relacion entre la factura y la orden de compra!`);
       this.load = true;
     });
@@ -428,45 +430,66 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que le a cambiar el estado a la orden de compra
   estadoOrdenCompra(){
-    let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra, estado : number;
-    this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
-      for (let i = 0; i < datos_orden.length; i++) {
-        let mp : number = 0;
-        if (datos_orden[i].matPri_Id != 84) mp = datos_orden[i].matPri_Id;
-        else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
-        else if (datos_orden[i].bopP_Id != 1) mp = datos_orden[i].bopP_Id;
-        this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp).subscribe(datos_facturacion => {
-          for (let j = 0; j < datos_facturacion.length; j++) {
-            if (datos_facturacion[j].cantidad_Faltante <= 0) estado = 5
-            else {
-              estado = 11;
+    const Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
+
+    this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).pipe(
+      switchMap(datos_orden => {
+        // Construir una petición por cada ítem de la orden (sin break: procesa todos)
+        const peticionesFacturacion = datos_orden.map((item : any) => {
+          let mp : number = 0;
+          if (item.matPri_Id != 84) mp = item.matPri_Id;
+          else if (item.tinta_Id != 2001) mp = item.tinta_Id;
+          else if (item.bopP_Id != 1) mp = item.bopP_Id;
+          return this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp);
+        });
+
+        // Esperar que todas las consultas de facturación terminen
+        return forkJoin(peticionesFacturacion);
+      }),
+      switchMap((resultados : any[]) => {
+        // Determinar estado revisando TODOS los resultados (no solo el primero)
+        let estado : number = 5; // asumir completo
+        for (const datos_facturacion of resultados) {
+          for (const item of datos_facturacion) {
+            if (item.cantidad_Faltante > 0) {
+              console.log('Faltante encontrado:', item);
+              estado = 11; // hay faltante → en proceso
               break;
             }
           }
-        });
-        break;
+          if (estado === 11) break;
+        }
+
+        // Obtener datos actuales de la OC para hacer el PUT
+        return this.servicioOCMatPrima.getId_OrdenCompra(Orden_Compra).pipe(
+          switchMap(datos_orden => {
+            const info : any = {
+              Oc_Id : datos_orden.oc_Id,
+              Usua_Id : datos_orden.usua_Id,
+              Oc_Fecha : datos_orden.oc_Fecha,
+              Oc_Hora : datos_orden.oc_Hora,
+              Prov_Id : datos_orden.prov_Id,
+              Estado_Id : estado,
+              Oc_ValorTotal : datos_orden.oc_ValorTotal,
+              Oc_PesoTotal : datos_orden.oc_PesoTotal,
+              TpDoc_Id : datos_orden.tpDoc_Id,
+              Oc_Observacion : datos_orden.oc_Observacion,
+              IVA : datos_orden.iva,
+            };
+            return this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info);
+          })
+        );
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        //this.load = true;
+        console.log('Estado de la orden de compra actualizado correctamente');
+      },
+      error: () => {
+        this.msj.mensajeError(`Error`, `¡Error al cambiar el estado de la orden de compra!`);
+        this.load = true;
       }
-      setTimeout(() => {
-        this.servicioOCMatPrima.getId_OrdenCompra(Orden_Compra).subscribe(datos_orden => {
-          let info : any = {
-            Oc_Id : datos_orden.oc_Id,
-            Usua_Id : datos_orden.usua_Id,
-            Oc_Fecha : datos_orden.oc_Fecha,
-            Oc_Hora : datos_orden.oc_Hora,
-            Prov_Id : datos_orden.prov_Id,
-            Estado_Id : estado,
-            Oc_ValorTotal : datos_orden.oc_ValorTotal,
-            Oc_PesoTotal : datos_orden.oc_PesoTotal,
-            TpDoc_Id : datos_orden.tpDoc_Id,
-            Oc_Observacion : datos_orden.oc_Observacion,
-            IVA : datos_orden.iva,
-          }
-          this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info).subscribe(null, () => {
-            this.msj.mensajeError(`Error`,`¡Error al cambiar el estado de la orden de compra!`);
-            this.load = true;
-          });
-        });
-      }, 2000);
     });
   }
 
@@ -477,7 +500,7 @@ export class PedidomateriaprimaComponent implements OnInit {
         Rem_Id : rem.remisionId,
         Facco_Id : idFactura,
       }
-      this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(null, () => {
+      this.remisionFacturaService.srvGuardar(datosFacRem).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
         this.msj.mensajeError(`Error`, `¡Error al añadir la(s) remision(es) a la factura!`);
         this.load = true;
       });
@@ -498,7 +521,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       TpDoc_Id : 'REM',
       Rem_Observacion : this.FormMateriaPrimaFactura.value.MpObservacion,
     }
-    this.remisionService.srvGuardar(datosRemision).subscribe(() => this.obtenerUltimoIdRemision(), () => {
+    this.remisionService.srvGuardar(datosRemision).pipe(takeUntil(this.destroy$)).subscribe(() => this.obtenerUltimoIdRemision(), () => {
       this.msj.mensajeError(`Error`, `¡Error al crear la remisión!`);
       this.load = true;
     });
@@ -506,7 +529,7 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
   obtenerUltimoIdRemision(){
-    this.remisionService.UltimoIdRemision().subscribe(datos_remision => this.creacionRemisionMateriaPrima(datos_remision), () => {
+    this.remisionService.UltimoIdRemision().pipe(takeUntil(this.destroy$)).subscribe(datos_remision => this.creacionRemisionMateriaPrima(datos_remision), () => {
       this.msj.mensajeError(`Error`, `¡Error al obtener el Id de la ultima remisión!`);
       this.load = true;
     });
@@ -514,41 +537,43 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //Funcion que creará el registro de la materia que viene en un pedido
   creacionRemisionMateriaPrima(idRemision : any){
-    let errorConsulta : boolean;
     if (this.ArrayMateriaPrima.length == 0) {
       this.msj.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
       this.load = true;
-    } else {
-      for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-        const datosRemisionMp : any = {
-          Rem_Id : idRemision,
-          MatPri_Id : this.ArrayMateriaPrima[index].Id_Mp,
-          Tinta_Id : this.ArrayMateriaPrima[index].Id_Tinta,
-          Bopp_Id : this.ArrayMateriaPrima[index].Id_Bopp,
-          RemiMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Faltante_Editar,
-          UndMed_Id : this.ArrayMateriaPrima[index].Medida,
-          RemiMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
-        }
-        this.remisionMPService.srvGuardar(datosRemisionMp).subscribe(() => { }, () => {
-          errorConsulta = true;
-          this.msj.mensajeError(`Error`, `¡Error al añadir la(s) materia(s) prima(s) a la remisión!`);
-          this.load = true;
-        });
-      }
-      setTimeout(() => {
-        if (!errorConsulta) {
-          this.relacionOrdenRemision(idRemision);
-          setTimeout(() => {
-            this.estadoOrdenCompra();
-            this.moverInventarioMP();
-            this.moverInventarioTintas();
-            let data : any = { 'Id' : idRemision, Movimiento : 'REM' }; 
-            this.cmpMovMatPrimas.entradasMateriasPrimas(data);
-            setTimeout(() => this.limpiarTodosCampos(), 1500);
-          }, 2000);
-        }
-      }, 3500);
+      return;
     }
+
+    const peticiones = this.ArrayMateriaPrima.map(mp => {
+      const datosRemisionMp : any = {
+        Rem_Id : idRemision,
+        MatPri_Id : mp.Id_Mp,
+        Tinta_Id : mp.Id_Tinta,
+        Bopp_Id : mp.Id_Bopp,
+        RemiMatPri_Cantidad : mp.Cantidad_Faltante_Editar,
+        UndMed_Id : mp.Medida,
+        RemiMatPri_ValorUnitario : mp.Precio,
+      };
+      return this.remisionMPService.srvGuardar(datosRemisionMp);
+    });
+    console.log('peticiones :', peticiones)
+
+    forkJoin(peticiones).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.relacionOrdenRemision(idRemision);
+        this.estadoOrdenCompra();
+        this.moverInventarioMP();
+        this.moverInventarioTintas();
+        this.cmpMovMatPrimas.entradasMateriasPrimas({ Id: idRemision, Movimiento: 'REM' });
+        setTimeout(() => { 
+          this.limpiarTodosCampos(); 
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡Registro de remisión creado con exito!`);
+        }, 1500);
+      },
+      error: () => {
+        this.msj.mensajeError(`Error`, `¡Error al añadir la(s) materia(s) prima(s) a la remisión!`);
+        this.load = true;
+      }
+    });
   }
 
   // Funcion que va a crear la relacion entre la orden de compra y las posibles facturas que puede tener
@@ -557,7 +582,9 @@ export class PedidomateriaprimaComponent implements OnInit {
       Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
       Rem_Id : idRemision,
     }
-    this.ordenCompraRemisionService.insert_OrdenCompra(info).subscribe(null, () => {
+    this.ordenCompraRemisionService.insert_OrdenCompra(info).pipe(takeUntil(this.destroy$)).subscribe(data => {
+      console.log('Relacion OC-REM creada:', data);
+    }, () => {
       this.msj.mensajeError(`Error`, `¡No se ha creado la relacion entre la remisión y la orden de compra!`);
       this.load = true;
     });
@@ -565,67 +592,79 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que va a mosver el inventario de materia prima
   moverInventarioMP(){
-    for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id_Mp).subscribe(datos_materiaPrima => {
-        if (datos_materiaPrima.matPri_Id != 84) {
-          const datosMPActualizada : any = {
-            MatPri_Id : datos_materiaPrima.matPri_Id,
-            MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
-            MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
-            MatPri_Stock : (datos_materiaPrima.matPri_Stock + this.ArrayMateriaPrima[index].Cantidad_Faltante_Editar),
-            UndMed_Id : datos_materiaPrima.undMed_Id,
-            CatMP_Id : datos_materiaPrima.catMP_Id,
-            MatPri_Precio : datos_materiaPrima.matPri_Precio,
-            TpBod_Id : datos_materiaPrima.tpBod_Id,
-            MatPri_PrecioEstandar : datos_materiaPrima.matPri_PrecioEstandar,
-            SubCatMP_Id : datos_materiaPrima.subCatMP_Id
-          }
+    const peticiones = this.ArrayMateriaPrima
+      .filter(item => item.Id_Mp != 84)
+      .map(item =>
+        this.materiaPrimaService.srvObtenerListaPorId(item.Id_Mp).pipe(
+          switchMap(datos_materiaPrima => {
+            const datosMPActualizada : any = {
+              MatPri_Id : datos_materiaPrima.matPri_Id,
+              MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
+              MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
+              MatPri_Stock : datos_materiaPrima.matPri_Stock + item.Cantidad_Faltante_Editar,
+              UndMed_Id : datos_materiaPrima.undMed_Id,
+              CatMP_Id : datos_materiaPrima.catMP_Id,
+              MatPri_Precio : datos_materiaPrima.matPri_Precio,
+              TpBod_Id : datos_materiaPrima.tpBod_Id,
+              MatPri_PrecioEstandar : datos_materiaPrima.matPri_PrecioEstandar,
+              SubCatMP_Id : datos_materiaPrima.subCatMP_Id
+            };
+            return this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada);
+          })
+        )
+      );
 
-          this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(() => {
-            //this.msj.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`);
-            this.load = true;
-           }, () => {
-            this.msj.mensajeError(`Error`, `¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
-            this.load = true;
-          });
-        }
-      }, () => {
-        this.msj.mensajeError(`Error`, `¡No se ha encontrado la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
+    if (peticiones.length === 0) return;
+
+    forkJoin(peticiones).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { 
+        this.load = true; 
+        console.log('Existencia de materias primas actualizada correctamente');
+      },
+      error: () => {
+        this.msj.mensajeError(`Error`, `¡No se ha podido actualizar la existencia de las materias primas!`);
         this.load = true;
-      });
-    }
+      }
+    });
   }
 
   //Función que restará a las tintas de categoria diferente a TINTAS TIPO COLORES.
   moverInventarioTintas(){
-    for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-      this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id_Tinta).subscribe(datos_tinta => {
-        const datosTintaActualizada : any = {
-          Tinta_Id : datos_tinta.tinta_Id,
-          Tinta_Nombre : datos_tinta.tinta_Nombre,
-          Tinta_Descripcion : datos_tinta.tinta_Descripcion,
-          Tinta_Stock : (datos_tinta.tinta_Stock + this.ArrayMateriaPrima[index].Cantidad_Faltante_Editar),
-          Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
-          UndMed_Id : datos_tinta.undMed_Id,
-          CatMP_Id : datos_tinta.catMP_Id,
-          Tinta_Precio : datos_tinta.tinta_Precio,
-          TpBod_Id : datos_tinta.tpBod_Id,
-          Tinta_InvInicial : datos_tinta.tinta_InvInicial,
-          Tinta_PrecioEstandar : datos_tinta.tinta_PrecioEstandar,
-        }
+    const peticiones = this.ArrayMateriaPrima
+      .filter(item => item.Id_Tinta != 2001)
+      .map(item =>
+      this.tintasService.srvObtenerListaPorId(item.Id_Tinta).pipe(
+        switchMap(datos_tinta => {
+          const datosTintaActualizada : any = {
+            Tinta_Id : datos_tinta.tinta_Id,
+            Tinta_Nombre : datos_tinta.tinta_Nombre,
+            Tinta_Descripcion : datos_tinta.tinta_Descripcion,
+            Tinta_Stock : datos_tinta.tinta_Stock + item.Cantidad_Faltante_Editar,
+            Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
+            UndMed_Id : datos_tinta.undMed_Id,
+            CatMP_Id : datos_tinta.catMP_Id,
+            Tinta_Precio : datos_tinta.tinta_Precio,
+            TpBod_Id : datos_tinta.tpBod_Id,
+            Tinta_InvInicial : datos_tinta.tinta_InvInicial,
+            Tinta_PrecioEstandar : datos_tinta.tinta_PrecioEstandar,
+          };
+          return this.tintasService.srvActualizar(datos_tinta.tinta_Id, datosTintaActualizada);
+        })
+      )
+    );
 
-        this.tintasService.srvActualizar(datos_tinta.tinta_Id, datosTintaActualizada).subscribe(() => {
-          //this.msj.mensajeConfirmacion(`Confirmación`, `Registro de factura/remisión creado con exito!`);
-          this.load = true;
-        }, () => {
-          this.msj.mensajeError(`Error`,`¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Tinta}!`);
-          this.load = true;
-        });
-      }, () => {
-        this.msj.mensajeError(`Error`,`¡No se ha podido encontrar la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
+    if (peticiones.length === 0) return;
+
+    forkJoin(peticiones).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { 
+        this.load = true; 
+        console.log('Existencia de tintas actualizada correctamente');
+      },
+      error: () => {
+        this.msj.mensajeError(`Error`, `¡No se ha podido actualizar la existencia de las tintas!`);
         this.load = true;
-      });
-    }
+      }
+    });
   }
 
   //Consultar Remisiones por Codigo
@@ -635,7 +674,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.remConFac = [];
     this.load = false;
 
-    this.remisionMPService.GetRemisionSinFactura(idRemision).subscribe(datos_remision => {
+    this.remisionMPService.GetRemisionSinFactura(idRemision).pipe(takeUntil(this.destroy$)).subscribe(datos_remision => {
       for (let i = 0; i < datos_remision.length; i++) {
         let datosTablaRemisiones : any = {
           remisionId : datos_remision[i].rem_Id,
@@ -659,7 +698,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   //
   cargarPDF(formulario : any){
     let id : any = formulario.remisionCodigo;
-    this.remisionMPService.srvObtenerpdfMovimientos(id).subscribe(datos_remision => {
+    this.remisionMPService.srvObtenerpdfMovimientos(id).pipe(takeUntil(this.destroy$)).subscribe(datos_remision => {
       for (let i = 0; i < datos_remision.length; i++) {
         for (let j = 0; j < this.mpAgregada.length; j++) {
           const pdfDefinicion : any = {
@@ -753,7 +792,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   llenarDocumento(formulario : any){
     let id : any = formulario.remisionCodigo;
     this.mpAgregada = [];
-    this.remisionMPService.srvObtenerpdfMovimientos(id).subscribe(datos_remision => {
+    this.remisionMPService.srvObtenerpdfMovimientos(id).pipe(takeUntil(this.destroy$)).subscribe(datos_remision => {
       for (let i = 0; i < datos_remision.length; i++) {
         let items : any = {
           Id : datos_remision[i].matPri_Id,
@@ -774,10 +813,10 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

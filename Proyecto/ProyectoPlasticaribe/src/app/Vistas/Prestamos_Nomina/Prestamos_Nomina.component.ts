@@ -150,7 +150,7 @@ export class Prestamos_NominaComponent implements OnInit {
     this.form.get('dateTerm')?.enable();
     this.closeMsgWarning('validation');
     this.load = true;
-    let loanUser: loan = null;
+    let loanUser: loan;
     let observation: string = !this.form.value.observation ? '' : this.form.value.observation;
 
     loanUser = {

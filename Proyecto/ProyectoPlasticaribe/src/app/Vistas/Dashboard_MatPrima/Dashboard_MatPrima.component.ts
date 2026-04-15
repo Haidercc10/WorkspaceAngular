@@ -21,7 +21,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   @ViewChild('op') op: OverlayPanel | undefined;
 
   /** Variables generales */
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   /** Variables para materias primas */
@@ -135,7 +135,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.totalExtruidoMes = 0;
     this.materiasPrimasMasUtilizadasCrearTintaMes = [];
 
-    if([1,3,60,12,85,98,85,94,4,89,88,87].includes(this.ValidarRol)) {
+    if([1,3,60,12,85,98,85,94,4,89,88,87,104].includes(this.ValidarRol)) {
       this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
         for (let i = 0; i < datos_materiaPrima.length; i++) {
           if (datos_materiaPrima[i].id_Materia_Prima != 84 && datos_materiaPrima[i].id_Materia_Prima != 2001 && datos_materiaPrima[i].id_Materia_Prima != 449) {

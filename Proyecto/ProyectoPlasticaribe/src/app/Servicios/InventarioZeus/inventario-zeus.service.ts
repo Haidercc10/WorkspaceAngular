@@ -119,8 +119,8 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos${sales}`);
   }
 
-  GetTodosPedidos() {
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getTodosPedidos`);
+  GetTodosPedidos(date1: string, date2: string, route: string = '') {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getTodosPedidos/${date1}/${date2}${route}`);
   }
 
   getArticulosxCliente(id: any) {
@@ -211,8 +211,10 @@ export class InventarioZeusService {
 
   getBillingClientsAnnual = (year : any, url? : string) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getBillingClientsAnnual/${year}${url}`);
 
+  getFactForSales = (sales : number, item : string) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getFactForSales/${sales}/${item }`);
+  
   //*********************************************************************** TRANSAC ******************************************************************************/
-  GetRecibosCaja = (fecha1: any, fecha2: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
+  GetRecibosCaja = (fecha1: any, fecha2: any, sales?: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}${sales}`);
 
   ValorTotalFacturadoHoy = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/ValorTotalFacturadoHoy2`);
 

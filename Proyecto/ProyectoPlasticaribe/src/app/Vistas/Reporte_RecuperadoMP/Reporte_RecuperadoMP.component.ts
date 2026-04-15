@@ -20,13 +20,13 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   @ViewChild(Modal_RptRecuperadoMPComponent) modalRecuperado : Modal_RptRecuperadoMPComponent;
 
   public formReporteRMP !: FormGroup; /** Formulario de filtros */
-  public materiasPrimas = []; /** Array que contendrá los datos de la consulta */
+  public materiasPrimas : any[] = []; /** Array que contendrá los datos de la consulta */
   turnos : any [] = []; //Variable que va a almacenar los diferenes turnos
   operarios : any [] = []; //Variable que almacenará a los diferentes operarios de el area de recuperado
   registros : any [] = []; //Variable que almacenará los diferentes registros de los filtros consultados
   columnas : any [] = []; //Variable que va a almacenar las columnas
-  idOperario : number = null; //Variable que va a almacenar el id del operario escogido
-  idMateriaPrima : number = null; //Variable que va a almacenar el id de la materia prima escogida
+  idOperario : number = 0; //Variable que va a almacenar el id del operario escogido
+  idMateriaPrima : number = 0; //Variable que va a almacenar el id de la materia prima escogida
   first = 0;
   rows = 20;
   consultaTurno : string = '';
@@ -135,8 +135,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     this.formReporteRMP.reset();
     this.registros = [];
     this.columnas = [];
-    this.idMateriaPrima = null;
-    this.idOperario = null;
+    this.idMateriaPrima = 0;
+    this.idOperario = 0;
     this.consultaTurno = ''
   }
 

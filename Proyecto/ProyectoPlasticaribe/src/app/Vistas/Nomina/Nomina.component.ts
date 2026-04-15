@@ -28,7 +28,7 @@ export class NominaComponent implements OnInit {
 
   FormEdicionMateriaPrima !: FormGroup;
 
-  @ViewChild('dt') dt: Table | undefined;
+  @ViewChild('dt') dt: Table | undefined; 
   @ViewChild('dtDespacho') dtDespacho: Table | undefined;
   @ViewChild('dtDetallada') dtDetallada: Table | undefined;
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -48,8 +48,8 @@ export class NominaComponent implements OnInit {
   detalladoxBultos: any[] = []; /** Variable que cargará en el formato excel la nomina detallada por bultos para cada operario */
   nominaIngresada: any[] = []; /** Variable que almacenará la información de la nomina de ingresos */
   tiposNomina: any[] = []; /** Variable que almacenará la información de los tipos de nomina */
-  @ViewChild(Nomina_CorteComponent) cmpNomina_Corte : Nomina_CorteComponent;
-  activeTab : string = `Sellado`;
+  @ViewChild(Nomina_CorteComponent) cmpNomina_Corte : Nomina_CorteComponent | undefined; /** Variable que se usará para llamar funciones del componente de nómina corte y así mostrar la información en la misma vista */;
+  activeTab : string = `Sellado`; // Variable que se usará para validar que pestaña está activa y así mostrar la información correspondiente a cada una, por defecto se mostrará la de sellado
 
   constructor(private AppComponent: AppComponent,
     private servicioBagPro: BagproService,
@@ -147,8 +147,8 @@ export class NominaComponent implements OnInit {
     let fechaInicial: any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
     let fechaFinal: any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
 
-    this.cmpNomina_Corte.rankDates = [fechaInicial, fechaFinal];  
-    this.cmpNomina_Corte.searchPayRoll();
+    this.cmpNomina_Corte!.rankDates = [fechaInicial, fechaFinal];  
+    this.cmpNomina_Corte?.searchPayRoll();
 
     this.servicioBagPro.GetNominaSelladoAcumuladaItem(fechaInicial, fechaFinal).subscribe(data => {
       console.log(data);
@@ -262,7 +262,7 @@ export class NominaComponent implements OnInit {
     data!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
     setTimeout(() => {
-      if (this.dt.filteredValue != null) {
+      if (this.dt?.filteredValue != null) {
         let total: number = 0;
         this.totalNominaSellado = 0;
         for (const item of this.dt.filteredValue) total += item.PagoTotal;
@@ -343,7 +343,7 @@ export class NominaComponent implements OnInit {
     if(['Sellado', 'Nomina Ingresada'].includes(this.activeTab)) {
       this.createPDF();
     } else {
-      if(this.cmpNomina_Corte.payRollConsolidate.length > 0) this.cmpNomina_Corte.createPDF();
+      if(this.cmpNomina_Corte?.payRollConsolidate.length > 0) this.cmpNomina_Corte?.createPDF();
       else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos de la nómina de corte para exportar a PDF.`);
     }
   }
@@ -352,7 +352,7 @@ export class NominaComponent implements OnInit {
     if(['Sellado', 'Nomina Ingresada'].includes(this.activeTab)) {
       this.createExcel();
     } else {
-      if(this.cmpNomina_Corte.payRollConsolidate.length > 0) this.cmpNomina_Corte.createExcel();
+      if(this.cmpNomina_Corte?.payRollConsolidate.length > 0) this.cmpNomina_Corte?.createExcel();
       else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos de la nómina de corte para exportar a Excel.`);
     }
   }
@@ -381,25 +381,25 @@ export class NominaComponent implements OnInit {
   }
 
   dataPageOneExcel(): Array<any> {
-    let data = [];
+    let data : any = [];
     this.nominaDespacho.forEach(d => data.push([d.Cedula, d.Operario, d.Cargo, d.PagoTotal]));
     return data;
   }
 
   dataPageTwoExcel(): Array<any> {
-    let data = [];
+    let data : any = [];
     this.detalladoxBultos.forEach(d => data.push([d.Cedula, d.Operario, d.Fecha, d.Ot, d.Bulto, d.Referencia, d.Nombre_Referencia, d.Cantidad_Total, d.Cantidad, d.Presentacion, d.Maquina, d.Peso, d.Turno, d.Proceso, d.Precio, d.Valor_Total, d.Pesado_Entre, d.EnvioZeus]));
     return data;
   }
 
   dataPageThreeExcel(): Array<any> {
-    let data = [];
+    let data : any = [];
     this.arraySellado.forEach(d => data.push([d.Cedula, d.Operario, d.Cargo, d.PagoTotal]));
     return data;
   }
 
   dataPageFourExcel(): Array<any> {
-    let data = [];
+    let data : any = [];
     this.detalladoxBultos.forEach(d => data.push([d.Cedula, d.Operario, d.Fecha, d.Ot, d.Bulto, d.Referencia, d.Nombre_Referencia, d.Cantidad_Total, d.Cantidad, d.Presentacion, d.Maquina, d.Peso, d.Turno, d.Proceso, d.Precio, d.Valor_Total, d.Pesado_Entre, d.EnvioZeus]));
     return data;
   }
@@ -559,11 +559,11 @@ export class NominaComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title: string) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 5, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column]));
       body.push(dataRow);
     });

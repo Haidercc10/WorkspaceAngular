@@ -57,10 +57,10 @@ export class OrdenesTrabajoComponent implements OnInit {
   FormOrdenTrabajoSellado !: FormGroup;
   FormOrdenTrabajoMezclas !: FormGroup;
 
-  arrayTintas = []; /** Array que colocará las tintas en los combobox al momento de crear la OT */
-  arrayPigmentos = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
-  arrayMateriales = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
-  arrayUnidadesMedidas = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
+  arrayTintas : any = []; /** Array que colocará las tintas en los combobox al momento de crear la OT */
+  arrayPigmentos : any = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
+  arrayMateriales : any = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
+  arrayUnidadesMedidas : any = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   edicionOrdenTrabajo : boolean = false; //Variable para validar que se está editando o no una orden de trabajo
   vistaPedidos : boolean = false; //Funcion que validará si se muestra el navbar de ordenes de trabajo o no
@@ -646,8 +646,8 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
       setTimeout(() => {
         this.FormOrdenTrabajoMezclas.disable();
-        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
-        this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
+        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas')?.enable();
+        this.FormOrdenTrabajoMezclas.get('Id_Mezcla')?.enable();
         this.FormOrdenTrabajoMezclas.patchValue({
           Id_Mezcla : datos_mezcla.mezcla_Id,
           Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
@@ -2320,8 +2320,8 @@ export class OrdenesTrabajoComponent implements OnInit {
   //
   initFormCrearMezclas(){
     this.formCrearMezclas.disable();
-    this.formCrearMezclas.get('mezclaId').enable();
-    this.formCrearMezclas.get('Nombre_Mezclas').enable();
+    this.formCrearMezclas.get('mezclaId')?.enable();
+    this.formCrearMezclas.get('Nombre_Mezclas')?.enable();
     this.checkedCapa1 = false;
     this.checkedCapa2 = false;
     this.checkedCapa2 = false;
@@ -2741,23 +2741,23 @@ export class OrdenesTrabajoComponent implements OnInit {
   habilitarCapa1(){
     setTimeout(() => {
       this.formCrearMezclas.disable();
-      this.formCrearMezclas.get('mezclaId').enable();
-      this.formCrearMezclas.get('Nombre_Mezclas').enable();
-      this.formCrearMezclas.get('Material_MatPrima').enable();
-      this.formCrearMezclas.get('Proc_Capa1').enable();
-      this.formCrearMezclas.get('Chechbox_Capa1').enable();
-      this.formCrearMezclas.get('materialP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa1').enable();
-      this.formCrearMezclas.get('materialP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa1').enable();
-      this.formCrearMezclas.get('materialP3_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa1').enable();
-      this.formCrearMezclas.get('materialP4_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1').enable();
+      this.formCrearMezclas.get('mezclaId')?.enable();
+      this.formCrearMezclas.get('Nombre_Mezclas')?.enable();
+      this.formCrearMezclas.get('Material_MatPrima')?.enable();
+      this.formCrearMezclas.get('Proc_Capa1')?.enable();
+      this.formCrearMezclas.get('Chechbox_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP1_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP2_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP3_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP4_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa1')?.enable();
+      this.formCrearMezclas.get('MezclaPigmentoP1_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa1')?.enable();
+      this.formCrearMezclas.get('MezclaPigmentoP2_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1')?.enable();
       this.cambiarNroCapas1();
     }, 500);
   }
@@ -2766,19 +2766,19 @@ export class OrdenesTrabajoComponent implements OnInit {
   habilitarCapa2(){
     setTimeout(() => {
       this.formCrearMezclas.enable();
-      this.formCrearMezclas.get('Proc_Capa3').disable();
-      this.formCrearMezclas.get('materialP1_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa3').disable();
-      this.formCrearMezclas.get('materialP2_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa3').disable();
-      this.formCrearMezclas.get('materialP3_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa3').disable();
-      this.formCrearMezclas.get('materialP4_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa3').disable();
-      this.formCrearMezclas.get('MezclaPigmento1_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa3').disable();
-      this.formCrearMezclas.get('MezclaPigmento2_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3').disable();
+      this.formCrearMezclas.get('Proc_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP1_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP2_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP3_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP4_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa3')?.disable();
+      this.formCrearMezclas.get('MezclaPigmento1_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa3')?.disable();
+      this.formCrearMezclas.get('MezclaPigmento2_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3')?.disable();
       this.cambiarNroCapas2();
     }, 300);
   }

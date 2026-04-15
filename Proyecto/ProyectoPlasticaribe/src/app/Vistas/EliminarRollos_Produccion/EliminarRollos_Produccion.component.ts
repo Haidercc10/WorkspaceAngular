@@ -38,9 +38,9 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   rollsToDelete : Array<rollsToDelete> = []; 
   arrayDiscardRolls : Array<modelRollosDesechos> = [];
   users : any = [];
-  storage_Id: number;
-  storage_Name: number;
-  validateRole: number;
+  storage_Id: any;
+  storage_Name: any;
+  validateRole: any;
 
   constructor(private AppComponent : AppComponent,
     private frmBld : FormBuilder,

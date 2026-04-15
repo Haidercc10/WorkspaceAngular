@@ -379,7 +379,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
 
   /** Obtener datos del detalle del mantenimiento por codigo y luego actualizarlo */
   getDetalleMttoForUpdate(detalle : any, estadoMtto : any, precioMtto : any, descripcionMtto : any){
-    let estadoNuevo : number;
+    let estadoNuevo : number = 0;
 
     if(estadoMtto == 'Pendiente') estadoNuevo = 11;
     else if(estadoMtto == 'En proceso') estadoNuevo = 16;

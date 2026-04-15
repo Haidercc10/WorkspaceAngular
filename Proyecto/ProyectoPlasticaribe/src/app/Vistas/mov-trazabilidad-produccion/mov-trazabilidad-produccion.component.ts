@@ -2,10 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
-import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 import { TrazabilidadProduccionService } from 'src/app/Servicios/Trazabilidad_Produccion/trazabilidad-produccion.service';
 import moment from 'moment';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -132,7 +130,6 @@ export class MovTrazabilidadProduccionComponent {
       this.load = true;
       if(bulto) {
          this.getTraceForRoll(date1, date2, ot, process, bulto);
-         console.log(count);
       } else {
          this.svTraceability.getTraceability(date1, date2, process, this.validateRoute()).subscribe(data => {
           if(data) {
@@ -142,7 +139,6 @@ export class MovTrazabilidadProduccionComponent {
               let dataRoto : any[] = data.filter(x => ['ROT', 'LAM'].includes(x.motherProcess_Id));
               let dataPerfDob : any[] = data.filter(x => ['PERF', 'DBLD'].includes(x.motherProcess_Id));
               data = dataExtMatPrima.length > 0 ? dataExtMatPrima : dataImp.length > 0 ? dataImp : dataPerfDob.length > 0 ? dataImp : dataRoto;
-              console.log(data);
               if(data.length > 0) this.loadDataFromBagpro(data, count);
               else this.warningMsj(`Advertencia`, `No se encontraron registros de producción.`);
             } else this.warningMsj(`Advertencia`, `No se encontraron resultados de búsqueda!`);
@@ -154,7 +150,6 @@ export class MovTrazabilidadProduccionComponent {
 
   ///. Cargar datos de bagpro para productos madre.
   loadDataFromBagpro(data : any, count : number){
-    console.log(count, data.length);
     data.forEach(x => {
       count++
       this.svBagpro.getRollProduction(x.motherRoll, `?process=${x.motherProcess.toUpperCase()}`).subscribe(dataBag => {
@@ -167,7 +162,6 @@ export class MovTrazabilidadProduccionComponent {
         x.motherMachine = dataBag.maquina;
         this.groupTraceability.push(x);
       }, error => { console.log(error); });
-      console.log(count, data.length);
       if(count == data.length) {
         setTimeout(() => {
           this.groupTraceability.sort((a, b) => Number(a.motherRoll) - Number(b.motherRoll));

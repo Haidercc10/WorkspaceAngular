@@ -37,11 +37,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   load: boolean = true; //Variable para validar que aparezca el icono de carga o no
-  materiaPrima = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  materiaPrima : any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   materiasPrimasSeleccionadas : any [] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   materiasPrimasSeleccionada_ID : any [] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
-  unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
-  procesos = []; //Variable que va a almacenar los procesos que tiene la empresa (extrusio, impresion, etc...)
+  unidadMedida : any = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
+  procesos : any = []; //Variable que va a almacenar los procesos que tiene la empresa (extrusio, impresion, etc...)
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   error : boolean = false; //Variabla que nos ayudarápara saber si hubo un error
   kgOT : number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
@@ -605,9 +605,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
+    var body : any[] = [];
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });
@@ -617,7 +617,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table(data, columns) {
+  table(data: any, columns: any) {
     return {
       table: {
         headerRows: 1,

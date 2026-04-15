@@ -25,10 +25,10 @@ export class AsignarProductosFacturasComponent implements OnInit {
   public FormConsultarProductos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
   cargando : boolean = false; //Variable para validar que salga la animacion de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   arrayClientes : any [] = []; // Variable que guardará los clientes en el select input
   rollosDisponibles : any [] = []; //Variable que guardará la informacion de los rollos estan disponibles para facturar
   rollosSeleccionados : any [] = []; //Variable que guardará la informacion de los rollos que se seleccionaron para facturar
@@ -37,7 +37,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   cantTotalSeleccionados : number = 0; //Variable que almacenará la cantidad total que hay del producto seleccionado
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada para mostrarlos en el pdf
-  Productos = []; //Variable que va a almcanenar el consolidado de los productos para mostrarlos en el pdf
+  Productos : any[] = []; //Variable que va a almcanenar el consolidado de los productos para mostrarlos en el pdf
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   scrollToTop: any = () => window.scroll(0, 999999999999);
@@ -597,10 +597,10 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any[] = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

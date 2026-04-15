@@ -14,8 +14,8 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 })
 export class DashBoard_PedidosComponent implements OnInit {
 
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  storage_Id: number;
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  storage_Id: any;
   storage_Nombre: any;
   today: any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes: any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
@@ -36,18 +36,21 @@ export class DashBoard_PedidosComponent implements OnInit {
   pedidosStock: any[] = []; //Variable que se llenará con los pedidos con un stock (de producto pedido) igual o mayor a la cantidad pediente
 
   mostrarTabla: boolean = false; //Variable que mostrará o no la información graficada
-  multiAxisData: any;
-  multiAxisOptions: any;
+  multiAxisData: any; //Variable que se llenará con la información para graficar la cantidad de pedidos por estado
+  multiAxisOptions: any; //Variable que se llenará con las opciones para la grafica de cantidad de pedidos por estado
 
-  nombreGrafica: string;
-  graficaPedidosClientes: any;
-  opcionesGraficas: any;
+  nombreGrafica: string = ''; //Variable que se usará para colocar el nombre a la tabla modal dependiendo del ranking que se seleccione
+  graficaPedidosClientes: any; //Variable que se llenará con la información para graficar el ranking de pedidos por clientes
+  opcionesGraficas1: any; //Variable que se llenará con las opciones para las graficas de ranking de pedidos por clientes, productos y vendedores
+  opcionesGraficas2: any; //Variable que se llenará con las opciones para las graficas de ranking de pedidos por clientes, productos y vendedores
+  opcionesGraficas3: any; //Variable que se llenará con las opciones para las graficas de ranking de pedidos por clientes, productos y vendedores
 
-  graficaPedidosProductos: any;
 
-  graficaPedidosVendedores: any;
+  graficaPedidosProductos: any; //Variable que se llenará con la información para graficar el ranking de pedidos por productos
 
-  infoTablaModal: any[] = [];
+  graficaPedidosVendedores: any; //Variable que se llenará con la información para graficar el ranking de pedidos por vendedores
+
+  infoTablaModal: any[] = []; //Variable que se llenará con la información para mostrar en la tabla modal dependiendo del ranking que se seleccione
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent: AppComponent,
@@ -60,14 +63,14 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    if ([1, 60, 61, 6, 12, 96, 85, 97, 2, 98, 10, 103].includes(this.ValidarRol)) this.tiempoExcedido();
+    if ([1, 60, 61, 6, 12, 96, 85, 97, 2, 98, 10, 103, 104].includes(this.ValidarRol)) this.tiempoExcedido();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
       this.multiAxisOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas.scales.y1.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas1.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas1.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas1.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas1.scales.y1.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
     }, 2000);
   }
 
@@ -127,6 +130,7 @@ export class DashBoard_PedidosComponent implements OnInit {
     }, 2000);
   }
 
+  // Funcion que va a consultar la cantidad de pedidos agrupados por estado, va a llenar el arreglo de pedidosEstados con la información de cada estado y su respectiva cantidad, y va a llenar el arreglo de pedidosTotales con la cantidad total de pedidos y el costo total de los pedidos
   consultarPedidosEstados(sales: any) {
     this.zeusService.getPedidosEstados(sales).subscribe(datos_pedidos => {
       this.pedidosTotales = [];
@@ -150,6 +154,7 @@ export class DashBoard_PedidosComponent implements OnInit {
     });
   }
 
+  // Funcion que va a consultar los pedidos que tengan ordenes de trabajo asociadas y va a llenar el arreglo de pedidos_Ot con la información de cada pedido y su respectiva orden de trabajo
   consultarPedidosOrdenesTrabajo(sales: any) {
     this.zeusService.GetPedidos(sales).subscribe(async datos_pedidos => {
       this.pedidos_Ot = [];
@@ -219,45 +224,7 @@ export class DashBoard_PedidosComponent implements OnInit {
         { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#6475FF'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
       ]
     };
-    this.estilosGrafica();
-  }
-
-  estilosGrafica() {
-    this.opcionesGraficas = {
-      stacked: false,
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
-        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
-      },
-      tooltip: { usePointStyle: true, },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-            font: { size: 18 },
-            callback: function (value) {
-              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-              else return this.getLabelForValue(value);
-            }
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { color: '#ebedef' }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { drawOnChartArea: false, color: '#ebedef' }
-        },
-      },
-    };
+    this.estilosGrafica1();
   }
 
   // Funcion que va a llenar la grafica de los productos con mas pedidos
@@ -277,6 +244,7 @@ export class DashBoard_PedidosComponent implements OnInit {
         { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#A453FD',], yAxisID: 'y1', data: costo },
       ]
     };
+    this.estilosGrafica2();
   }
 
   // Funcion que va a llenar la grafica de los vendedores con mas pedidos
@@ -302,8 +270,130 @@ export class DashBoard_PedidosComponent implements OnInit {
       { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#FFCA28'], yAxisID: 'y1', data: costo }
       ]
     };
+    this.estilosGrafica3();
   }
 
+  // Funcion que va a colocar los estilos a las graficas dependiendo del modo oscuro o claro que se tenga seleccionado
+  estilosGrafica1() {
+    const labels = this.graficaPedidosClientes.labels;
+    this.opcionesGraficas1 = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
+      },
+      tooltip: { usePointStyle: true, },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 18 },
+            callback: function (value, index, values) {
+              const label = labels[index];
+              if (label && label.length > 8) return `${label.substring(0, 5)}...`;
+              return label;
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
+          grid: { drawOnChartArea: false, color: '#ebedef' }
+        },
+      },
+    };
+  }
+
+  estilosGrafica2() {
+    const labels = this.graficaPedidosProductos.labels;
+
+    this.opcionesGraficas2 = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
+      },
+      tooltip: { usePointStyle: true, },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 18 },
+            callback: function (value, index, values) {
+              const label = labels[index];
+              if (label && label.length > 8) return `${label.substring(0, 5)}...`;
+              return label;
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
+          grid: { drawOnChartArea: false, color: '#ebedef' }
+        },
+      },
+    };
+  }
+
+  estilosGrafica3() {
+    const labels = this.graficaPedidosVendedores.labels;
+    this.opcionesGraficas3 = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
+      },
+      tooltip: { usePointStyle: true, },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 18 },
+            callback: function (value, index, values) {
+              const label = labels[index];
+              if (label && label.length > 8) return `${label.substring(0, 5)}...`;
+              return label;
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
+          grid: { drawOnChartArea: false, color: '#ebedef' }
+        },
+      },
+    };
+  }
   // Funcion que va a mostrar la tabla detallada de cada una de los ranking de pedidos
   mostrarModal(tipo: string) {
     this.mostrarTabla = true;
@@ -314,6 +404,7 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.infoTablaModal.sort((a, b) => Number(b.Cantidad) - Number(a.Cantidad));
   }
 
+  //Funcion que va a llenar la información de la tabla modal dependiendo del ranking que se haya seleccionado
   mostrarModalClientes() {
     this.nombreGrafica = 'Información detallada del ranking de pedidos por clientes';
     for (let i = 0; i < this.pedidosClientes.length; i++) {
@@ -325,6 +416,7 @@ export class DashBoard_PedidosComponent implements OnInit {
     }
   }
 
+  //Funcion que va a llenar la información de la tabla modal dependiendo del ranking que se haya seleccionado
   mostrarModalProductos() {
     this.nombreGrafica = 'Información detallada del ranking de pedidos por productos';
     for (let i = 0; i < this.pedidosProductos.length; i++) {
@@ -336,6 +428,7 @@ export class DashBoard_PedidosComponent implements OnInit {
     }
   }
 
+  //Funcion que va a llenar la información de la tabla modal dependiendo del ranking que se haya seleccionado
   mostrarModalVendedores() {
     this.nombreGrafica = 'Información detallada del ranking de pedidos por vendedores';
     for (let i = 0; i < this.pedidosVendedores.length; i++) {

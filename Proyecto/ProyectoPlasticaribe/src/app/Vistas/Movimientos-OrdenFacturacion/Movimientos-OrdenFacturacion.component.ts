@@ -38,13 +38,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   formEndDevolutions !: FormGroup;
   load: boolean = false;
   modoSeleccionado: boolean;
-  validateRole: number;
-  storage_Id: number;
+  validateRole: number = 0;
+  storage_Id: number = 0;
   storage_Nombre: any;
   serchedData: any[] = [];
-  @ViewChild('dt') dt: Table;
+  @ViewChild('dt') dt: Table | undefined;
   states: Array<string> = ['PENDIENTE', 'DESPACHADO',];
-  anulledOrder: number | undefined;
+  anulledOrder: any | undefined;
   ofDirect: boolean = false;
   detailsOF: number = 0;
   modalReposition: boolean = false;
@@ -122,8 +122,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.load = false;
     this.serchedData = [];
     this.formFilters.reset();
-    this.dt.clear();
-    this.anulledOrder = null;
+    this.dt?.clear();
+    this.anulledOrder = undefined;
     this.ofDirect = false;
     this.detailsOF = 0;
     this.loadRankDates();
@@ -144,7 +144,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let typeMov: any = this.formFilters.value.typeMov;
 
     this.serchedData = [];
-    this.dt.clear();
+    this.dt?.clear();
 
     if (typeMov == 'OF') this.searchDataOrders(startDate, endDate, this.validateUrl());
     else if (typeMov == 'DV') this.searchDataDevolutions(startDate, endDate, this.validateUrl());

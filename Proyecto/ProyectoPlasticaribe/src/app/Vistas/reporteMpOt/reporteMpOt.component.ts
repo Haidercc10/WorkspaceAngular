@@ -32,23 +32,23 @@ export class ReporteMpOtComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   ultimoIdMateriaPrima : number; //Varibale que va a almacenar el id de la ultima materia prima registrada y le va a sumar 1
-  materiasPrimas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  materiasPrimasRetiradas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  nombreCategoriasMP = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
-  unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
-  usuarios = []; //Variable que va a almacenar todos los usuarios de la empresa
-  estado = []; //Variable que va a almacenar todos los tipos de estados de documentos
-  procesos = []; //Variable que va a almacenar los procesos que tiene la empresa (extrusio, impresion, etc...)
-  areas = []; //Varibale que va a almacenar las areas de la empresa
-  materiaPrimaBuscadaId = []; //Variable que almacenará la informacion de la materia prima buscada por ID
+  materiasPrimas : any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  materiasPrimasRetiradas : any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  nombreCategoriasMP : any = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
+  unidadMedida : any = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
+  usuarios : any = []; //Variable que va a almacenar todos los usuarios de la empresa
+  estado : any = []; //Variable que va a almacenar todos los tipos de estados de documentos
+  procesos : any = []; //Variable que va a almacenar los procesos que tiene la empresa (extrusio, impresion, etc...)
+  areas : any = []; //Varibale que va a almacenar las areas de la empresa
+  materiaPrimaBuscadaId : any = []; //Variable que almacenará la informacion de la materia prima buscada por ID
   categoriaMPBuscadaID : string; //Variable que almacenará el nombre de la categoria de la materia prima buscada por Id
   tipobodegaMPBuscadaId : string; //Variable que almacenará el nombrede la bodega en la que se encuentra la materia prima buscada
-  materiaPrimaSeleccionada = []; //Variable que almacenará la informacion de la materia prima seleccionada
+  materiaPrimaSeleccionada : any = []; //Variable que almacenará la informacion de la materia prima seleccionada
   categoriaMPSeleccionada : string; //Variable que almacenará el nombre de la categoria de la materia prima seleccionada
   tipoBodegaMPSeleccionada : string; //Variable que almacenará el nombrede la bodega en la que se encuentra la materia prima seleccionada
-  facturaMateriaPrima = []; //Funcion que guardará la informacion de la factura de materia prima comprada que ha sido consultada
+  facturaMateriaPrima : any = []; //Funcion que guardará la informacion de la factura de materia prima comprada que ha sido consultada
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
-  titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
+  titulosTabla : any = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
   ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
   ArrayMateriaPrimaRetirada : any [] = []; //Variable que tendrá la informacion de los productos que se piden para uan OT
   AccionBoton = "Agregar"; //Variable que almanará informacio para saber si una materia prima está en edicion o no (Se editará una materia prima cargada en la tabla, no una en la base de datos)
@@ -76,12 +76,12 @@ export class ReporteMpOtComponent implements OnInit {
   desp_wik : number = 0;
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
   totalPorcentajePerida : number = 0; //Variable que ayudará a calcular el total de perdida en una OT
-  arrayOtConsultada = [];
+  arrayOtConsultada  : any = [];
   porcentajeTotal : number = 0;
   totalPerdidaPorcentaje : number = 0;
 
-  titulosTablaprocesos = [];
-  titulosTablaprocesosDiferencias = [];
+  titulosTablaprocesos : any = [];
+  titulosTablaprocesosDiferencias : any = [];
   ArrayProcesos : any [] = [];
   ArrayProcesosDiferencias : any [] = [];
   totalKgPedida : number = 0;
@@ -90,7 +90,7 @@ export class ReporteMpOtComponent implements OnInit {
   cantidadAsignada : number = 0;
 
   /* CONSULTAS DE MATERIA PRIMA */
-  MpConsultada = [];
+  MpConsultada : any = [];
   public load: boolean;
   name = 'Reporte_OT.xlsx'; //Variable que le da nombre al archivo de excel que se genera
 
@@ -897,10 +897,10 @@ export class ReporteMpOtComponent implements OnInit {
   }
 
   buildTableBody(data, columns) {
-    var body = [];
+    var body: any = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
+        var dataRow: any = [];
         columns.forEach(function(column) {
             dataRow.push(row[column].toString());
         });

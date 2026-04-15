@@ -5,9 +5,9 @@ export interface modelProduccionProcesos {
     Prod_Id: number;
     Cli_Id: number;
     Operario1_Id: number;
-    Operario2_Id: number;
-    Operario3_Id: number;
-    Operario4_Id: number;
+    Operario2_Id: number | null;
+    Operario3_Id: number | null;
+    Operario4_Id: number | null;
     Pesado_Entre: number;
     Maquina: number;
     Cono_Id: string;
@@ -28,7 +28,7 @@ export interface modelProduccionProcesos {
     Hora: string;
     Creador_Id: number;
     NumeroRollo_BagPro?: number;
-    Rollo_Asociado?: number;
+    Rollo_Asociado?: number | null;
     Observacion?: string;
     Estado_Rollo? : number;
     PrecioVenta_Producto? : number;

@@ -26,11 +26,11 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 export class CertificadoCalidadComponent implements OnInit {
 
   cargando : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   FormOrden !: FormGroup; //Variable que almacenará la información del formulario donde esta la información general de la orden de trabajo
   unidadesMedidas : any [] = []; //Variable que almacenará la información de las unidades de medida

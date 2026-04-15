@@ -22,7 +22,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   load: boolean = false;
   validateRole: number | undefined;
-  storage_Id: number | undefined;
+  storage_Id: any;
   storage_Name: string | undefined;
   selectedMode: boolean = false;
   rangeDates: Array<any> = [];
@@ -122,7 +122,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     this.load = false;
     this.formPayrollWorker.reset();
     this.payroll = [];
-    this.rangeDates = null;
+    this.rangeDates = [];
     this.selectedAreas = [];
     this.userSelected = [];
     this.payrollForAdvance = [];
@@ -683,7 +683,9 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   showDetailsDisabilities() {
     let worker: number = this.formPayrollWorker.value.idWorker;
-    this.detailsDisabilities = this.payroll.find(x => x.idWorker == worker).detailsDisability;
+    let payrollWorker = this.payroll.find(x => x.idWorker == worker);
+    if (!payrollWorker) return;
+    this.detailsDisabilities = payrollWorker.detailsDisability;
     this.modalDataDisability = true;
   }
 
@@ -758,7 +760,9 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   showDetailsLoan() {
     let worker: number = this.formPayrollWorker.value.idWorker;
-    this.detailsLoan = this.payroll.find(x => x.idWorker == worker).detailsLoans;
+    let payrollWorker = this.payroll.find(x => x.idWorker == worker);
+    if (!payrollWorker) return;
+    this.detailsLoan = payrollWorker.detailsLoans;    
     this.modalDataLoan = true;
   }
 
@@ -784,13 +788,17 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   showDetailsMoneySave() {
     let worker: number = this.formPayrollWorker.value.idWorker;
-    this.detailsSaving = this.payroll.find(x => x.idWorker == worker).detailsMoneySave;
+    let payrollWorker = this.payroll.find(x => x.idWorker == worker);
+    if (!payrollWorker) return;
+    this.detailsSaving = payrollWorker.detailsMoneySave;
     this.modalDataSaving = true;
   }
 
   showDetailsAdvance() {
     let worker: number = this.formPayrollWorker.value.idWorker;
-    this.detailsAdvances = this.payroll.find(x => x.idWorker == worker).detailsAdvance;
+    let payrollWorker = this.payroll.find(x => x.idWorker == worker);
+    if (!payrollWorker) return;
+    this.detailsAdvances = payrollWorker.detailsAdvance;
     this.modalDataAdvance = true;
   }
 
@@ -839,7 +847,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   }
 
   fillDataPayroll(worker: number, typePayroll: 1 | 2 | 3 | 4): DataPayroll {
-    let data = this.payroll.find(x => x.idWorker == worker);
+    let data : any = this.payroll.find(x => x.idWorker == worker);
     let payroll: DataPayroll = {
       id_Trabajador: data.idWorker,
       salarioBase: data.baseSalary,
@@ -1030,7 +1038,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         hora: moment().format('HH:mm:ss'),
         observacaion: '',
         estado_Id: 11,
-        creador_Id: this.storage_Id
+        creador_Id: this.storage_Id 
       });
     });
     return movements;

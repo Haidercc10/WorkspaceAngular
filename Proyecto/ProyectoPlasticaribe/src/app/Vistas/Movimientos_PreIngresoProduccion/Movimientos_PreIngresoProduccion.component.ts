@@ -144,8 +144,8 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   //. Función para filtrar la tabla. (FILTRO)
   applyFilter($event, campo : any, valorCampo : string) {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => { if(this.dt.filteredValue) this.movements = this.dt!.filteredValue; }, 500);
-    if(!this.dt.filteredValue) this.movements = this.infoTable;
+    setTimeout(() => { if(this.dt?.filteredValue) this.movements = this.dt!.filteredValue; }, 500);
+    if(!this.dt?.filteredValue) this.movements = this.infoTable;
   }
 
   //Función para calcular el total de rollos pre ingresados

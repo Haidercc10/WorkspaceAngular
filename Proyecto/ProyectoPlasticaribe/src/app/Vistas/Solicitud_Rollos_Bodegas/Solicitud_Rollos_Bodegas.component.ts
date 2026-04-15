@@ -593,7 +593,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       'Estado_Rollo' : 19, 
       'PrecioVenta_Producto' : data[0].price,
     }
-    console.log(production);
     return production;
   }
 
@@ -768,11 +767,11 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   //*
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body : any[] = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -781,11 +780,11 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   //*
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body: any[] = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

@@ -15,16 +15,16 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
   styleUrls: ['./reporte-clientes.component.css']
 })
 export class ReporteClientesComponent {
-  load: boolean = false;
-  storage_Id: number | undefined;
-  storage_Name: string | undefined;
-  validateRole: number | undefined;
-  form: FormGroup;
-  selectedMode: boolean = false;
-  clients: Array<any> = [];
-  dataClients : any = [];
-  @ViewChild('tableClients') tableClients : Table | undefined;
-  sales : any = [];
+  load: boolean = false; //Variable para mostrar el spinner de carga mientras se realiza la consulta de los clientes.
+  storage_Id: number | undefined; //Variable para almacenar el id del usuario que se encuentra en el storage.
+  storage_Name: string | undefined; //Variable para almacenar el nombre del usuario que se encuentra en el storage.
+  validateRole: number | undefined; //  Variable para almacenar el rol del usuario que se encuentra en el storage y así validar la información que se le mostrará al usuario dependiendo de su rol.
+  form: FormGroup; //Variable para almacenar el formulario reactivo que se utiliza para realizar las consultas de los clientes.
+  selectedMode: boolean = false; //Variable para almacenar el estado del tema seleccionado por el usuario y así mostrar el tema oscuro o claro en el formato excel dependiendo de su selección.
+  clients: Array<any> = []; //Variable para almacenar la información de los clientes que se muestra en la tabla después de realizar la consulta por nombre del cliente.
+  dataClients : any = []; //Variable para almacenar la información de los clientes que se muestra en la tabla después de realizar la consulta por el rango de fechas y el cliente seleccionado.
+  @ViewChild('tableClients') tableClients : Table | undefined; //Variable para almacenar la referencia de la tabla de clientes y así poder aplicar los filtros a la tabla después de realizar la consulta por nombre del cliente.
+  sales : any = []; //Variable para almacenar la información de los vendedores que se muestra en el formulario para filtrar por vendedor.
 
   constructor(private appComponent: AppComponent,
     private zeusInvService: InventarioZeusService,
@@ -38,10 +38,12 @@ export class ReporteClientesComponent {
     this.initForm();
   }
 
+  //Función que se ejecuta al iniciar el componente y que llama a la función para leer el storage y mostrar la información dependiendo del rol del usuario.
   ngOnInit(): void {
     this.readStorage();
   }
 
+  //Función para inicializar el formulario reactivo de la consulta de clientes.
   initForm() {
     this.form = this.frmBuilder.group({
       idClient: [null],
@@ -52,7 +54,7 @@ export class ReporteClientesComponent {
     });
   }
 
-  //Crea la función de lecturaStorage()
+  //Función para leer la información del usuario que se encuentra en el storage y así mostrar la información dependiendo del rol del usuario.
   readStorage(){
     this.storage_Id = this.appComponent.storage_Id;
     this.storage_Name = this.appComponent.storage_Nombre;
@@ -60,12 +62,14 @@ export class ReporteClientesComponent {
     this.getSales();
   }
 
+  //Función para limpiar los campos del formulario y las variables.
   clearFields() {
     this.form.reset();
     this.load = false;
     this.clients = [];
   }
 
+  //Función para mostrar el mensaje de error cuando no se pueda consultar la información de los clientes.
   errorMessage(message: string, error: HttpErrorResponse) {
     this.msg.mensajeError(message, `Error: ${error.error.title} | Status: ${error.status}`);
     this.load = false;
@@ -80,8 +84,10 @@ export class ReporteClientesComponent {
     })
   }
 
+  //Función para aplicar el filtro a la tabla de clientes después de realizar la consulta por nombre del cliente.
   aplyFilter = ($event, campo: string, table: Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
+  //Función para buscar un cliente por su id o por su nombre.
   searchClients() {
     let idClient = this.form.value.idClient;
     this.zeusInvService.getClientByIdThird(idClient).subscribe(data => {
@@ -89,25 +95,29 @@ export class ReporteClientesComponent {
     }, error => this.errorMessage(`¡No se encontró información del cliente consultado!`, error));
   }
 
+  //Función para buscar un cliente por su nombre.
   searchClientsByName() {
     let name = this.form.value.client;
     this.zeusInvService.getClientByName(name).subscribe(data => this.clients = data);
   }
 
+  //Función para seleccionar un cliente de la tabla después de realizar la consulta por nombre del cliente.
   selectClient() {
     let client = this.clients.find(x => x.idcliente == this.form.value.client);
     this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, });
   }
 
+  //Función para consultar los clientes que han facturado en un rango de fechas determinado.
   findClients(){
     this.dataClients = [];
     this.load = true;
     let date1 : any = moment(this.form.value.start).format('YYYY-MM-DD');
     let date2 : any = moment(this.form.value.end).format('YYYY-MM-DD');
     let client : any = this.form.value.idClient;
+    let sale : any = this.form.value.sales;
     let sales = this.validateRole == 2
       ? `${String(this.storage_Id).padStart(3, '0')}`
-      : '';
+      : `${String(sale).padStart(3, '0')}`;
 
     let url : string = ``;
 

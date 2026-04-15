@@ -80,13 +80,13 @@ export class Orden_TrabajoComponent implements OnInit {
   ModalCrearProductos: boolean = false; //Funcion que va a mostrar o no el modal de productos
   ModalCrearCliente: boolean = false; //Funcion que va a mostrar o no el modal de clientes
 
-  arrayMateriales = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
+  arrayMateriales: any = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
   formatos: any = []; //Variable que servirá para almacenar los formatos que se harán en extrusion
-  arrayPigmentos = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
+  arrayPigmentos: any = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
   tratado: any = []; //Vairbale que servirá para almacenar los tratado que puede tener una bolsa en el proceso de extrusion
-  arrayUnidadesMedidas = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
+  arrayUnidadesMedidas : any = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
   tiposImpresion: any = []; //Variable que guardará los diferentes tipos de impresion que hay en la empresa
-  arrayTintas = []; /** Array que colocará las tintas en los combobox al momento de crear la OT */
+  arrayTintas : any = []; /** Array que colocará las tintas en los combobox al momento de crear la OT */
   laminado_capas: any = []; //Vaiable qie almacenará los diferentes laminados
   tipoProductos: any[] = []; //Vairbla que almacenará la informacion de ls tipos de productos
   tipoSellado: any[] = []; //Variable que almacenará la informacion de los tipos de sellados
@@ -715,7 +715,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a consultar los productos de la empresa
   consultarProductos() {
-    let nombreProducto = this.FormOrdenTrabajo.get('Nombre_Producto').value;
+    let nombreProducto : any = this.FormOrdenTrabajo.get('Nombre_Producto')?.value;
     this.productoService.obtenerItemsLike(nombreProducto).subscribe(data => this.productos = data);
   }
 
@@ -1154,8 +1154,8 @@ export class Orden_TrabajoComponent implements OnInit {
       this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
       setTimeout(() => {
         this.FormOrdenTrabajoMezclas.disable();
-        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
-        this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
+        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas')?.enable();
+        this.FormOrdenTrabajoMezclas.get('Id_Mezcla')?.enable();
         this.FormOrdenTrabajoMezclas.patchValue({
           Id_Mezcla: datos_mezcla.mezcla_Id,
           Nombre_Mezclas: datos_mezcla.mezcla_Nombre,
@@ -1224,8 +1224,8 @@ export class Orden_TrabajoComponent implements OnInit {
   //
   initFormCrearMezclas() {
     this.formCrearMezclas.disable();
-    this.formCrearMezclas.get('mezclaId').enable();
-    this.formCrearMezclas.get('Nombre_Mezclas').enable();
+    this.formCrearMezclas.get('mezclaId')?.enable();
+    this.formCrearMezclas.get('Nombre_Mezclas')?.enable();
     this.checkedCapa1 = false;
     this.checkedCapa2 = false;
     this.checkedCapa2 = false;
@@ -1645,23 +1645,23 @@ export class Orden_TrabajoComponent implements OnInit {
   habilitarCapa1() {
     setTimeout(() => {
       this.formCrearMezclas.disable();
-      this.formCrearMezclas.get('mezclaId').enable();
-      this.formCrearMezclas.get('Nombre_Mezclas').enable();
-      this.formCrearMezclas.get('Material_MatPrima').enable();
-      this.formCrearMezclas.get('Proc_Capa1').enable();
-      this.formCrearMezclas.get('Chechbox_Capa1').enable();
-      this.formCrearMezclas.get('materialP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa1').enable();
-      this.formCrearMezclas.get('materialP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa1').enable();
-      this.formCrearMezclas.get('materialP3_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa1').enable();
-      this.formCrearMezclas.get('materialP4_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1').enable();
+      this.formCrearMezclas.get('mezclaId')?.enable();
+      this.formCrearMezclas.get('Nombre_Mezclas')?.enable();
+      this.formCrearMezclas.get('Material_MatPrima')?.enable();
+      this.formCrearMezclas.get('Proc_Capa1')?.enable();
+      this.formCrearMezclas.get('Chechbox_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP1_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP2_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP3_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa1')?.enable();
+      this.formCrearMezclas.get('materialP4_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa1')?.enable();
+      this.formCrearMezclas.get('MezclaPigmentoP1_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa1')?.enable();
+      this.formCrearMezclas.get('MezclaPigmentoP2_Capa1')?.enable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1')?.enable();
       this.cambiarNroCapas1();
     }, 500);
   }
@@ -1670,19 +1670,19 @@ export class Orden_TrabajoComponent implements OnInit {
   habilitarCapa2() {
     setTimeout(() => {
       this.formCrearMezclas.enable();
-      this.formCrearMezclas.get('Proc_Capa3').disable();
-      this.formCrearMezclas.get('materialP1_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa3').disable();
-      this.formCrearMezclas.get('materialP2_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa3').disable();
-      this.formCrearMezclas.get('materialP3_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa3').disable();
-      this.formCrearMezclas.get('materialP4_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa3').disable();
-      this.formCrearMezclas.get('MezclaPigmento1_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa3').disable();
-      this.formCrearMezclas.get('MezclaPigmento2_Capa3').disable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3').disable();
+      this.formCrearMezclas.get('Proc_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP1_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP2_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP3_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa3')?.disable();
+      this.formCrearMezclas.get('materialP4_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa3')?.disable();
+      this.formCrearMezclas.get('MezclaPigmento1_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa3')?.disable();
+      this.formCrearMezclas.get('MezclaPigmento2_Capa3')?.disable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3')?.disable();
       this.cambiarNroCapas2();
     }, 300);
   }
@@ -2360,7 +2360,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a crear el contenido del PDF
   contentPDF(datos_ot) {
-    let data = [];
+    let data : any = [];
     data.push(this.hoja1ContentPDF(datos_ot));
     data.push(this.hoja2ContentPDF(datos_ot));
     // if (this.impresion || this.rotograbado) data.push(this.hoja2ContentPDF(datos_ot));

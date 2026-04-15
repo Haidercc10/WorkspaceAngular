@@ -29,38 +29,37 @@ Injectable({
 
 export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
 
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : number = 0; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
- 
+  ValidarRol : number = 0; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora : any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual 
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  procesos = []; //Variable que va almacenar la información de todas las unidades de medida
+  procesos : any[] = []; //Variable que va almacenar la información de todas las unidades de medida
   formulario !: FormGroup; //Formulario de la vista
-  ordenes_trabajos : any = []; //Array que guardará las diferentes OT
-  inventario : any = []; //Array que guardará la información del inventario que se está cargando
-  area : string = ""; //Variable que guardará el area del usuario logueado segun su rol. 
-  arrayReferencias : any = []; //Variable que guardará la información de los productos/materias primas
+  ordenes_trabajos : any[] = []; //Array que guardará las diferentes OT
+  inventario : any[] = []; //Array que guardará la información del inventario que se está cargando
+  area : string | null = ""; //Variable que guardará el area del usuario logueado segun su rol. 
+  arrayReferencias : any[] = []; //Variable que guardará la información de los productos/materias primas
   nroFilas : number = 8; //Variable que guardará el numero de filas que ocupará el campo observación
   nroFilas2 : number = 0; //Variable que guardará el numero de filas que ocupará el campo observación
   registroSeleccionado : any; //Variable que guardará el registro seleccionado de la tabla
   contador : number = 0; //Variable que aumentará su valor cada vez que ingrese un registro a la tabla. 
   titulo = `Inventarios Areas`; //Variable que colocará el titulo del módulo
-  labels = []; //Variable que cargará los nombres de los label de id y nombre dependiendo la ruta
-  url = ``; //Variable que guardará la ruta actual
-  polietilenos : any = []; //Variable que guardará el id del polietileno que se está cargando en la tabla
+  labels : any[] = [] ; //Variable que cargará los nombres de los label de id y nombre dependiendo la ruta
+  url : string = ``; //Variable que guardará la ruta actual
+  polietilenos : any[] = []; //Variable que guardará el id del polietileno que se está cargando en la tabla
   subtitulo : any = ``; //Variable que guardará el subtitulo del modulo.
   urlItems = `/inventario-areas/items`; //Variable que guardará la ruta del modulo cuando se desee crear el inventario de items
   urlMateriales = `/inventario-areas/materiales`; //Variable que guardará la ruta del modulo cuando se desee crear el inventario de materias primas
-  categoriesMP : any = [];
-  categoriesBOPP : any = [];
-  categoriesTintas : any = [];
+  categoriesMP : any[] = [];
+  categoriesBOPP : any[] = [];
+  categoriesTintas : any[] = [];
 
   constructor(private AppComponent : AppComponent,
-               private frmBuilder : FormBuilder, 
+              private frmBuilder : FormBuilder, 
                 private svcMatPrimas : MateriaPrimaService,
                   private svcBopp : EntradaBOPPService,
                     private svcTintas : TintasService,

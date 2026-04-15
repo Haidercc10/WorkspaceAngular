@@ -43,7 +43,7 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   @ViewChild('dt2') dt2 : Table | undefined;
   @ViewChild('dt3') dt3 : Table | undefined;
   fieldFocus : boolean = false;
-  port: SerialPort;
+  //port: SerialPort;
   reader: any;
 
   constructor(private AppComponent : AppComponent, 
@@ -64,18 +64,18 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
     this.lecturaStorage();
     this.getRecoveries();
     this.getPresentations();
-    setTimeout(() => this.buscarPuertos(), 1000);
+    //setTimeout(() => this.buscarPuertos(), 1000);
     //console.clear()
   }
 
   async ngOnDestroy() {
     this.reader.releaseLock();
     this.reader.cancel();
-    await this.port.close();
+    //await this.port.close();
   }
 
   //*Funciones para cargar el puerto serial y mostrar el peso de la bascula.
-  chargeSerialPorts() {
+  /*chargeSerialPorts() {
     navigator.serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
@@ -124,7 +124,7 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
-
+  */
   lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
@@ -582,11 +582,11 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body : any[] = [];
     body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -594,11 +594,11 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any[] = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

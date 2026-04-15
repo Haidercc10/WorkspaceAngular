@@ -28,10 +28,10 @@ export class DashBoardRecaudosComponent implements OnInit {
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
   cargando: boolean = false; //Variable para validar que salga o no la imagen de carga  
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today: any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes: any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -124,9 +124,6 @@ export class DashBoardRecaudosComponent implements OnInit {
     let carteraOriginal: boolean = this.FormFiltros.value.CarteraOriginal;
 
     if (this.ValidarRol == 2) vendedor = `${this.storage_Nombre}`;
-
-    console.log(vendedor);
-
     this.carteraAgrupadaClientes = [];
     this.carteraAgrupadaVendedores = [];
     this.cartera = [];
@@ -201,6 +198,7 @@ export class DashBoardRecaudosComponent implements OnInit {
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number: any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
+  // Función que se encargará de generar el PDF, dependiendo de los filtros que se hayan seleccionado
   generarPDF() {
     if (this.cartera.length > 0) {
       this.cargando = true;
@@ -215,6 +213,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     }
   }
 
+  // Función que se encargará de organizar la información para el PDF dependiendo de los filtros seleccionados
   contenidoPDF(informacionPDF) {
     let data: any[] = [];
     let vendedores: any[] = this.obtenerVendedoresCartera(informacionPDF);
@@ -234,6 +233,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     return data;
   }
 
+  // Función que se encargará de organizar la información de los clientes dependiendo del vendedor para el PDF
   clientesVendedorPdf(vendedor: string, informacionPDF) {
     let clientes: any[] = informacionPDF.filter(x => x.id_Vendedor == vendedor);
     clientes.sort((a, b) => a.nombre_CLiente.localeCompare(b.nombre_CLiente));
@@ -255,6 +255,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     return data;
   }
 
+  // Función que se encargará de organizar la información de las facturas dependiendo del cliente para el PDF
   facturasClientes(cliente, informacionPDF) {
     let facturas: any[] = informacionPDF.filter(x => x.id_Cliente == cliente.id_Cliente);
     facturas.sort((a, b) => a.id_Fecha.localeCompare(b.id_Fecha));
@@ -283,6 +284,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     return data;
   }
 
+  // Función que se encargará de organizar la información del cliente para el PDF
   informacionClientePDF(cliente) {
     return [
       { border: [true, true, false, true], text: `${cliente.id_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'left' },
@@ -294,6 +296,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     ]
   }
 
+  // Función que se encargará de organizar la información de las facturas para el PDF
   datosFacturasPdf(facturas) {
     let data: any[] = [];
     data.push(this.titulosFacturasPdf());
@@ -325,6 +328,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     return data;
   }
 
+  // Función que se encargará de organizar la información de los títulos de las columnas para el PDF
   titulosFacturasPdf() {
     return [
       { border: [false, false, false, false], text: `Factura`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
@@ -339,6 +343,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     ];
   }
 
+  //Función que se encargará de organizar la información del total del cliente para el PDF
   totalClientePdf(facturas) {
     let total = facturas.reduce((a, b) => a + b.saldo_Cartera, 0)
     return [
@@ -359,6 +364,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     ]
   }
 
+  // Función que se encargará de organizar la información del total de la cartera para el PDF
   totalCarteraPdf(informacionPDF) {
     let totalCartera = informacionPDF.reduce((a, b) => a + b.saldo_Cartera, 0);
     return [
@@ -383,6 +389,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     ]
   }
 
+  // Función que se encargará de organizar la información de los vendedores para el PDF
   obtenerVendedoresCartera(informacionPDF) {
     let vendedores: any[] = [];
     informacionPDF.forEach(factura => {
@@ -397,6 +404,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     return vendedores;
   }
 
+  // Función que se encargará de organizar la información del total de la cartera para el PDF
   seleccionarInformacionPDf(): any[] {
     let informacion: any[] = this.cartera;
     let carteraOriginal: boolean = this.FormFiltros.value.CarteraOriginal;
@@ -721,84 +729,6 @@ export class DashBoardRecaudosComponent implements OnInit {
       count++;
     });
   }
-
-  //Hoja 4 Agrupada
-  addGroupedSheet4(workbook, fill, font, border, data: any, pageNumber: number) {
-    let page = workbook.worksheets[pageNumber - 1];
-    this.addGroupedHeader4(page, font, border, fill);
-    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-    this.addGroupedInfoExcel4(page, data);
-  }
-
-  //.Agregar encabezado de la hoja 3.
-  addGroupedHeader4(worksheet, font, border, fill) {
-    worksheet.addRow([]);
-    worksheet.addRow([]);
-    let rowHeader: any = ['A4', 'B4', 'C4',]
-    worksheet.addRow(['Asesor', 'Asesor Comercial', 'Total']);
-
-    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
-    rowHeader.forEach(x => worksheet.getCell(x).font = font);
-    rowHeader.forEach(x => worksheet.getCell(x).border = border);
-
-    let concatCells: any = ['A1:C3'];
-    this.stylesGroupedPage4(worksheet, concatCells, []);
-  }
-
-  //.Agregar información a la hoja 3.
-  addGroupedExcel4(worksheet: any, data: any) {
-    let formatNumber: Array<number> = [3];
-    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    data.forEach(d => worksheet.addRow(d));
-  }
-
-  //.Agregar información a la hoja 3.
-  addGroupedInfoExcel4(worksheet: any, data: any) {
-    let formatNumber: Array<number> = [3];
-    let contador: any = 5;
-    let row: any = ['A', 'B', 'C',];
-    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-
-    data.forEach(d => {
-      worksheet.addRow(d)
-      row.forEach(r => {
-        worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
-      });
-      contador++
-    });
-    row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold: true, });
-  }
-
-  //.Información agrupada de la hoja 3.
-  groupedInfoExcel4() {
-    let info: any = [];
-    this.carteraAgrupadaVendedores.forEach(d => info.push([d.idvende, d.nombvende, d.subTotal]));
-    this.addTotalSheetSales(info);
-    return info;
-  }
-
-  //.Estilos de la hoja 3.
-  stylesGroupedPage4(worksheet, concatCells, formatNumber) {
-    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    [1, 3].forEach(x => worksheet.getColumn(x).width = 20);
-    [2].forEach(x => worksheet.getColumn(x).width = 45);
-    concatCells.forEach(cell => worksheet.mergeCells(cell));
-  }
-
-  //Totalizado hoja 3
-  addTotalSheetSales4(info) {
-    let data: any = info;
-    let count: number = 0;
-    let total: number = 0;
-
-    data.forEach(x => {
-      total += x[2];
-      if ((data.length - 1) == count) info.push(['', 'TOTAL', total]);
-      count++;
-    });
-  }
-
-
 }
 
 

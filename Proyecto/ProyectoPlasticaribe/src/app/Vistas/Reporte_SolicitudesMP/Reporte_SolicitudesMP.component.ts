@@ -351,10 +351,10 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

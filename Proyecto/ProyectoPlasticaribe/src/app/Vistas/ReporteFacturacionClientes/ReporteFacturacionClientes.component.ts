@@ -78,7 +78,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     this.billsPerClient = [];
     this.items = [];
     this.clients = [];
-    this.billsClient.clear();
+    this.billsClient?.clear();
     this.loadRankDates();
   }
 
@@ -168,7 +168,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
     
     this.load = true;
     this.billsPerClient = [];
-    this.billsClient.clear();
+    this.billsClient?.clear();
     let errorMessage: string = `¡No se encontraron facturas del cliente seleccionado!`;
     let count: number = 0;
     let route: string = this.validateRoute();

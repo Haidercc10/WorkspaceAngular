@@ -57,14 +57,14 @@ export class PedidoExternoComponent implements OnInit {
   ModalCrearCliente: boolean = false; //Funcion que va a mostrar o no el modal de clientes
   ModalSedesClientes: boolean = false; //Funcion que va a mostrar o no el modal de sedes clientes
   clientesSeleccionar: any[] = []; //Variable que almacenará la información de los clientes que pueden ser buscados por el vendedor
-  cliente = []; //Variable que almacenará los clientes que estan siendo buscado por el vendedor
+  cliente : any = []; //Variable que almacenará los clientes que estan siendo buscado por el vendedor
   sedeCliente: any = []; //Varieble que almacenará las direcciones de las sedes de los cliente
   ciudad: any = []; //Variable que almacenará las ciudades de los clientes
   usuarioVendedor = []; //Variable que almacenara los nombres de los usuarios vendedores
-  producto = []; //Varibale que gusradará los productos dependiendo del cliente seleccionado
-  presentacion = []; //Variable que almacenará la presentacion de unproducto consultado
-  usuarioVende = [] //Variable que almacenará la informacion del vendedor de el cliente seleccionado
-  pedidosProductos = []; //Variable que se va a almacenar los pedidos consultados
+  producto : any = []; //Varibale que gusradará los productos dependiendo del cliente seleccionado
+  presentacion : any = []; //Variable que almacenará la presentacion de unproducto consultado
+  usuarioVende : any = [] //Variable que almacenará la informacion del vendedor de el cliente seleccionado
+  pedidosProductos : any = []; //Variable que se va a almacenar los pedidos consultados
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
   descuento: number = 0; //Variable que guardará el valor en porcentaje del descuento hecho al cliente
   iva: number = 0; //Variable que gusrdará la cantidad de iva sobre la venta
@@ -515,10 +515,10 @@ export class PedidoExternoComponent implements OnInit {
     let item: any = {
       'Id': this.FormPedidoExternoProductos.get('ProdId')?.value,
       'Nombre': this.FormPedidoExternoProductos.value.ProdNombre,
-      'Cant': this.FormPedidoExternoProductos.get('ProdCantidad').value,
+      'Cant': this.FormPedidoExternoProductos.get('ProdCantidad')?.value,
       'UndCant': this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
       'PrecioUnd': this.FormPedidoExternoProductos.value.ProdPrecioUnd,
-      'Stock': this.FormPedidoExternoProductos.get('ProdStock').value,
+      'Stock': this.FormPedidoExternoProductos.get('ProdStock')?.value,
       'SubTotal': (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
       'FechaEntrega': moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
       'Margen' : this.formProdTerminado.value.margin,
@@ -918,10 +918,10 @@ export class PedidoExternoComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

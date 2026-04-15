@@ -25,12 +25,12 @@ export class DevolucionesMPComponent implements OnInit {
   public FormDevolucion !: FormGroup;
 
   /* Vaiables*/
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  materiasPrimas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  materiasPrimasRetiradas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  materiasPrimas : any[] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  materiasPrimasRetiradas : any[] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load : boolean = true;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -374,7 +374,10 @@ export class DevolucionesMPComponent implements OnInit {
               element.Devolucion = 0;
               info.Estado_Id = 19;
             }
-            this.svcMovEntradas.Put(info.Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar los movimientos de entrada de materia prima!`));
+            if(info.Id) {
+              this.svcMovEntradas.Put(info.Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar los movimientos de entrada de materia prima!`));
+            }
+            
           });
         }
       });

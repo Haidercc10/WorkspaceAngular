@@ -16,6 +16,7 @@ import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionEx
 import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produccion.component';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,16 +30,16 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   load: boolean = false;
-  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado: boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   FormFiltros !: FormGroup; /** Formulario que contendrá los filtros de búsqueda */
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora: any = moment().format('HH:mm:ss'); //Variable que se usará para llenar la hora actual
 
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
   public registros: any = []; //Array que va a contener los registros de los controles de sellado
   eleccion: any = ["PASA", "NO PASA", "NO APLICA"]; //Array que va a contener los registros de los controles de sellado
@@ -61,7 +62,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   users: any = [];
   productionReport: boolean = false;
   productionMachines: any = [];
-  @ViewChild(ReporteProduccionComponent) cmpProduction: ReporteProduccionComponent;
+  @ViewChild(ReporteProduccionComponent) cmpProduction: ReporteProduccionComponent | undefined;
+  materials: any = [];
 
   constructor(private AppComponent: AppComponent,
     private srvBagpro: BagproService,
@@ -72,7 +74,9 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     private svExcel: CreacionExcelService,
     private frm: FormBuilder,
     private svTurns: TurnosService,
-    private svUsers: UsuarioService) {
+    private svUsers: UsuarioService, 
+    private svMaterials: MaterialProductoService,
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.loadForm();
   }
@@ -82,7 +86,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.lecturaStorage();
     this.cargarPigmentos();
     this.getCurrentTurn();
-
+    this.getMaterials();
     setTimeout(() => {
       this.getUsers();
       this.getTurns();
@@ -120,6 +124,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     const date = this.getTurnoDate(); 
     this.FormFiltros.patchValue({ 'rank': [date, date] });
   }
+
+  getMaterials = () => this.svMaterials.srvObtenerLista().subscribe(data => this.materials = data);
 
   //* Función para cargar turnos
   getTurns() {
@@ -219,7 +225,10 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que cargará los registros de las OT a los que se les ha guardado una ronda hoy.
   cargarRegistrosCCExtrusion(datos: any) {
+    console.log(datos);
+    
     let pigmento: any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == datos.cce.pigmento_Id);
+    let material: any = this.materials.filter(mat => mat.material_Id == datos.cce.material_Id);
     let info: any = {
       'Id': datos.cce.ccExt_Id,
       'Ronda': datos.cce.ccExt_Ronda,
@@ -229,6 +238,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       'Item': datos.cce.prod_Id,
       'Referencia': datos.cce.referencia,
       'Rollo': datos.cce.ccExt_Rollo,
+      'Material': material[0].material_Nombre,
       'Pigmento': pigmento[0].pigmt_Nombre,
       'AnchoTubular': datos.cce.ccExt_AnchoTubular,
       'PesoMetro': datos.cce.ccExt_PesoMetro,
@@ -290,7 +300,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         });
         this.cargarRegistro(data[0], indexTabla);
         this.load = false;
-        setTimeout(() => document.getElementById(`edit_${indexTabla}`).click(), 100);
+        setTimeout(() => document.getElementById(`edit_${indexTabla}`)?.click(), 100);
       } else {
         this.load = false;
         this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`);
@@ -344,7 +354,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
     // Encontrar la mayor frecuencia
     let maxFrecuencia = 0;
-    let modas = [];
+    let modas : number[] = [];
 
     for (let num in frecuencia) {
       if (frecuencia[num] > maxFrecuencia) {
@@ -380,7 +390,10 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
   cargarRegistro(data: any, indexTabla: number) {
+    console.log(data);
     let pigmento: any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == data.pigmentoId);
+    let material: any = this.materials.filter(mat => mat.material_Id == data.materialId);
+
     let info: any = {
       'Id': 0,
       'Ronda': this.validateRound(data, indexTabla),
@@ -390,6 +403,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       'Item': data.item,
       'Referencia': data.referencia,
       'Rollo': 'A',
+      'Material': material[0].material_Nombre,
       'Pigmento': pigmento[0].pigmt_Nombre,
       'AnchoTubular': data.anchoFuelle_Derecha,
       'PesoMetro': 0,
@@ -426,12 +440,12 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   agregarFila() {
     if (this.registros.length == 0 || this.registros[0] == undefined) {
       this.registros.unshift({});
-      setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200);
+      setTimeout(() => { this.dtExtrusion?.initRowEdit(this.dtExtrusion?.value[0]); }, 200);
     } else if (this.registros[0].Id == undefined) {
       this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     } else {
       this.registros.unshift({});
-      setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200);
+      setTimeout(() => { this.dtExtrusion?.initRowEdit(this.dtExtrusion?.value[0]); }, 200);
     }
   }
 
@@ -440,6 +454,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.getCurrentTurn();
     let esError: boolean = false;
     let pigmento: any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
+    let material: any = this.materials.filter(material => material.material_Nombre == fila.Material);
     this.load = true;
     this.onReject(`eleccion`);
 
@@ -454,6 +469,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       'Prod_Id': fila.Item,
       'Referencia': fila.Referencia,
       'CcExt_Rollo': fila.Rollo,
+      'Material_Id': material[0].material_Id,
       'Pigmento_Id': pigmento[0].pigmt_Id,
       'CcExt_AnchoTubular': fila.AnchoTubular,
       'CcExt_PesoMetro': fila.PesoMetro,
@@ -701,8 +717,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.productionReport = true;
     let date1 = moment(date).add(1, 'd').format('YYYY-MM-DD');
 
-    this.cmpProduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date1), new Date(date1)], 'Maquina': machine, 'proceso': 'EXTRUSION' });
-    this.cmpProduction.consultarProduccion();
+    this.cmpProduction?.formFiltros.patchValue({ 'rangoFechas': [new Date(date1), new Date(date1)], 'Maquina': machine, 'proceso': 'EXTRUSION' });
+    this.cmpProduction?.consultarProduccion();
   }
 
   //TODO: FORMATO EXCEL REAL

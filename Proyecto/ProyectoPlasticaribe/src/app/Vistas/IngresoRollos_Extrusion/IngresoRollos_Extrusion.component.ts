@@ -482,10 +482,10 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

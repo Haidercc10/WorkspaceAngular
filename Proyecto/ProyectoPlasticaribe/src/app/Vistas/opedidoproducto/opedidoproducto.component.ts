@@ -1,5 +1,5 @@
 import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, Validators, FormGroup, FormControl} from '@angular/forms';
+import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
@@ -43,118 +43,118 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export class OpedidoproductoComponent implements OnInit {
 
-  @ViewChild(OrdenesTrabajoComponent) CrearOrdenTrabajo : OrdenesTrabajoComponent;
+  @ViewChild(OrdenesTrabajoComponent) CrearOrdenTrabajo: OrdenesTrabajoComponent;
 
   public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos cliente
   public FormPedidoExternoProductos!: FormGroup; //Formuladio de pedidos productos
   public FormConsultaPedidoExterno !: FormGroup; //Formulario de pedidos consultados
-  public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
-  AccionBoton = "Agregar"; //Variable que almanará informacio para saber si un producto está en edicion o no (Se editará un producto cargado en la tabla, no uno en la base de datos)
-  Ide : number | undefined; //Variable para almacenar el ID del producto que está en la tabla y se va a editar
-  id_pedido : number; //Variable que almacenará el ID del pedido que se va a mostrar
+  public page: number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
+  AccionBoton : string = "Agregar"; //Variable que almanará informacio para saber si un producto está en edicion o no (Se editará un producto cargado en la tabla, no uno en la base de datos)
+  Ide: number | undefined; //Variable para almacenar el ID del producto que está en la tabla y se va a editar
+  id_pedido: number; //Variable que almacenará el ID del pedido que se va a mostrar
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
   public ModalCrearProductos: boolean = false;
   public ModalCrearCliente: boolean = false;
   public ModalSedesClientes: boolean = false;
 
-  temporal : boolean = true; //Variable momentanea que va a hacer que no se muestre una parte del codigo del HTML en la vista, esto mientras se soluciona el hecho de que se termine esta vista
-  modalOrdenTrabajo : boolean = false; //Variable para validar si se abre el modal o no
+  temporal: boolean = true; //Variable momentanea que va a hacer que no se muestre una parte del codigo del HTML en la vista, esto mientras se soluciona el hecho de que se termine esta vista
+  modalOrdenTrabajo: boolean = false; //Variable para validar si se abre el modal o no
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
-  cliente = []; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
-  clienteDatos = []; //Variable que almacenará la informacion completa de los clientes
-  sedeCliente:any=[]; //Varieble que almacenará las direcciones de las sedes de los cliente
-  ciudad :any=[]; //Variable que almacenará las ciudades de los clientes
-  usuarioVendedor=[]; //Variable que almacenara los nombres de los usuarios vendedores
-  usuarios=[]; //Variable que almacenara los nombres de los usuarios vendedores y los mostrará en la vista
-  estado=[]; //Variable que almacenará los estados que se mostrarán en la vista
-  estadoConsulta=[]; //Variable que almacenará los estados que se mostrarán en la vista
-  producto=[]; //Varibale que gusradará los productos dependiendo del cliente seleccionado
-  nombreProd : string; // Variable que guardará el nombre del producto que está seleccionado
-  productoInfo=[]; //Variable que almacenará la informacion completa del producto buscado o selccionado
-  tipoProducto=[]; //Variable que almacenará los tipos de productos y los mostrará en la vista
-  materialProducto = []; //Varibale que almacenará los materiables de los producto
-  pigmentoProducto =[]; //Varible que guardará los pigmentos de un producto
-  tipoProductoConsultado=[]; //Variable que guardará el tipo de producto consultado
-  undMed:UnidadMedidaService[]=[]; //Variable que guardará las unidades de medida
-  presentacion = []; //Variable que almacenará la presentacion de unproducto consultado
-  tipoMoneda:TipoMonedaService[]=[]; //Variable que almacenará los tipos de monedas y luego los mostrará en la vista
-  usuarioVende=[] //Variable que almacenará la informacion del vendedor de el cliente seleccionado
-  titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
-  existenciasProductos=[]; //Varible que almacenará las existencias de un producto
-  pedidosProductos = []; //Variable que se va a almacenar los pedidos consultados
-  contadorPedidosExternos : number; //Variable que tendrá el ID de un nuevo pedido, con base al ultimo pedido hecho sumandole 1
-  ArrayProducto : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
-  productosPedidos = []; //Variable que tendrá los productos que se han pedido en un pedido consultado y que se quiere mostrar
+  cliente: any = []; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
+  clienteDatos: any = []; //Variable que almacenará la informacion completa de los clientes
+  sedeCliente: any = []; //Varieble que almacenará las direcciones de las sedes de los cliente
+  ciudad: any = []; //Variable que almacenará las ciudades de los clientes
+  usuarioVendedor: any = []; //Variable que almacenara los nombres de los usuarios vendedores
+  usuarios: any = []; //Variable que almacenara los nombres de los usuarios vendedores y los mostrará en la vista
+  estado: any = []; //Variable que almacenará los estados que se mostrarán en la vista
+  estadoConsulta: any = []; //Variable que almacenará los estados que se mostrarán en la vista
+  producto: any = []; //Varibale que gusradará los productos dependiendo del cliente seleccionado
+  nombreProd: string; // Variable que guardará el nombre del producto que está seleccionado
+  productoInfo: any = []; //Variable que almacenará la informacion completa del producto buscado o selccionado
+  tipoProducto: any = []; //Variable que almacenará los tipos de productos y los mostrará en la vista
+  materialProducto: any = []; //Varibale que almacenará los materiables de los producto
+  pigmentoProducto: any = []; //Varible que guardará los pigmentos de un producto
+  tipoProductoConsultado: any = []; //Variable que guardará el tipo de producto consultado
+  undMed: UnidadMedidaService[] = []; //Variable que guardará las unidades de medida
+  presentacion: any = []; //Variable que almacenará la presentacion de unproducto consultado
+  tipoMoneda: TipoMonedaService[] = []; //Variable que almacenará los tipos de monedas y luego los mostrará en la vista
+  usuarioVende: any = [] //Variable que almacenará la informacion del vendedor de el cliente seleccionado
+  titulosTabla: any = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
+  existenciasProductos: any = []; //Varible que almacenará las existencias de un producto
+  pedidosProductos: any = []; //Variable que se va a almacenar los pedidos consultados
+  contadorPedidosExternos: number; //Variable que tendrá el ID de un nuevo pedido, con base al ultimo pedido hecho sumandole 1
+  ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
+  productosPedidos: any = []; //Variable que tendrá los productos que se han pedido en un pedido consultado y que se quiere mostrar
 
-/* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
-  valorTotal : number = 0; //Variable que guardará el valor total del pedido
-  EmpresaVendedora=[]; //Variable que tendrá la informacion de la empresa vendedora
-  EstadoDocumentos= []; //Variable que tendrá la informacion del estado que tiene el nuevo pedido
-  EstadoDeDocumentos : any; //Variable que tendrá el ID del estado que tiene el nuevo pedido
+  /* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
+  valorTotal: number = 0; //Variable que guardará el valor total del pedido
+  EmpresaVendedora: any = []; //Variable que tendrá la informacion de la empresa vendedora
+  EstadoDocumentos: any = []; //Variable que tendrá la informacion del estado que tiene el nuevo pedido
+  EstadoDeDocumentos: any; //Variable que tendrá el ID del estado que tiene el nuevo pedido
   SedeSeleccionada: any; ////Variable que tendrá la informacion de la sede que tiene el nuevo pedido
-  IDSedeSeleccionada : any = 0; //Variable que tendrá el ID de la sede que tiene el nuevo pedido
-  UsuarioSeleccionado : any = 0; //Variable que tendrá el ID del vendedor que tiene el nuevo pedido
-  pedidosID = []; //variable que va a tener los id de los pedidos que ya se han creado
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  IDSedeSeleccionada: any = 0; //Variable que tendrá el ID de la sede que tiene el nuevo pedido
+  UsuarioSeleccionado: any = 0; //Variable que tendrá el ID del vendedor que tiene el nuevo pedido
+  pedidosID : any = []; //variable que va a tener los id de los pedidos que ya se han creado
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
   //variable para almacenar el id del cliente que esta seleccionado
-  clienteId : number; //Variable que almacenará  el id del cliente sleccionado al momento de crear un producto
-  fechaCreacionCortada = []; //Variable que tendrá la fecha de creacion de pedidos cortada de los pedidos consultados (La fecha en la base de datos de datetime por lo que viene con una hora pero esa hora no se debe mostrar)
-  fechaEntregaCortada = []; //Variable que tendrá la fecha de entrega de pedidos cortada de los pedidos consultados (La fecha en la base de datos de datetime por lo que viene con una hora pero esa hora no se debe mostrar)
-  fechaCreacion : any; //Variable que tendrá la fecha de creacion de pedido de los pedidos consultados
-  fechaEntrega : any; //Variable que tendrá la fecha de creacion de entrega de los pedidos consultados
-  nombreProducto : string; //Varible que almacenará el nombre de un producto consultado o seleccionado
-  productoEliminado : number; //Variable que tendrá el id de un producto que se va a eliminar de la base de datos o de un pedido nuevo
-  ultimoPrecio : number = 0; //Variable que almacenará el ultimo precio por el que se facturó un producto
-  Productospedidos : any; //Variable que tendrá la informacion de un producto buscado o seleccionado
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
-  enPedido : string = 'no'; //Variable que se usará para saber si el cliente se encuentra en una actualizacion de pedido o no
-  pigmento : any = ''; //Variable que se usará para almacenar el pigmento del producto consultado o seleccionado
-  material : any = ''; //Variable que se usará para almacenar el material del producto consultado o seleccionado
-  public load : boolean = true; //Variable que va a servir para mostrar o no la imagen de carga
+  clienteId: number; //Variable que almacenará  el id del cliente sleccionado al momento de crear un producto
+  fechaCreacionCortada : any = []; //Variable que tendrá la fecha de creacion de pedidos cortada de los pedidos consultados (La fecha en la base de datos de datetime por lo que viene con una hora pero esa hora no se debe mostrar)
+  fechaEntregaCortada : any = []; //Variable que tendrá la fecha de entrega de pedidos cortada de los pedidos consultados (La fecha en la base de datos de datetime por lo que viene con una hora pero esa hora no se debe mostrar)
+  fechaCreacion: any; //Variable que tendrá la fecha de creacion de pedido de los pedidos consultados
+  fechaEntrega: any; //Variable que tendrá la fecha de creacion de entrega de los pedidos consultados
+  nombreProducto: string; //Varible que almacenará el nombre de un producto consultado o seleccionado
+  productoEliminado: number; //Variable que tendrá el id de un producto que se va a eliminar de la base de datos o de un pedido nuevo
+  ultimoPrecio: number = 0; //Variable que almacenará el ultimo precio por el que se facturó un producto
+  Productospedidos: any; //Variable que tendrá la informacion de un producto buscado o seleccionado
+  today: any = new Date(); //Variable que se usará para llenar la fecha actual
+  enPedido: string = 'no'; //Variable que se usará para saber si el cliente se encuentra en una actualizacion de pedido o no
+  pigmento: any = ''; //Variable que se usará para almacenar el pigmento del producto consultado o seleccionado
+  material: any = ''; //Variable que se usará para almacenar el material del producto consultado o seleccionado
+  public load: boolean = true; //Variable que va a servir para mostrar o no la imagen de carga
 
   /** Variables para inputs de autocompletados */
-  validarInputClientes : any;
-  validarInputClienteConsulta : any;
-  validarInputVendedorConsulta : any;
+  validarInputClientes: any;
+  validarInputClienteConsulta: any;
+  validarInputVendedorConsulta: any;
   keywordClientes = 'cli_Nombre';
   keywordVendedorConsulta = 'usua_Nombre';
-  validarInputNombresProductos : any;
+  validarInputNombresProductos: any;
   keywordNombresProductos = 'prod_Nombre';
   public historyHeading: string = 'Seleccionado Recientemente';
   public historyHeading2: string = 'Seleccionado Recientemente';
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
 
-  constructor(private pedidoproductoService : OpedidoproductoService,
-    private productosServices : ProductoService,
-      private clientesService :ClientesService,
-        private sedesClientesService: SedeClienteService,
-          private usuarioService: UsuarioService,
-            private tipoEstadoService : TipoEstadosService,
-              private unidadMedidaService : UnidadMedidaService,
-                private frmBuilderPedExterno : FormBuilder,
-                  private estadosService : EstadosService,
-                    private existenciasProductosServices : ExistenciasProductosService,
-                      private tiposProductosService : TipoProductoService,
-                        private tipoMonedaService : TipoMonedaService,
-                          private SrvEmpresa : EmpresaService,
-                            private PedidoProductosService : PedidoProductosService,
-                              private tipoClientService : TipoClienteService,
-                                private rolService : RolesService,
-                                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                    private ClientesProductosService : ClientesProductosService,
-                                      private materialService : MaterialProductoService,
-                                        private pigmentoServices : PigmentoProductoService,
-                                          private ordenTrabajoService : Orden_TrabajoService,
-                                            private AppComponent : AppComponent ) {
+  constructor(private pedidoproductoService: OpedidoproductoService,
+    private productosServices: ProductoService,
+    private clientesService: ClientesService,
+    private sedesClientesService: SedeClienteService,
+    private usuarioService: UsuarioService,
+    private tipoEstadoService: TipoEstadosService,
+    private unidadMedidaService: UnidadMedidaService,
+    private frmBuilderPedExterno: FormBuilder,
+    private estadosService: EstadosService,
+    private existenciasProductosServices: ExistenciasProductosService,
+    private tiposProductosService: TipoProductoService,
+    private tipoMonedaService: TipoMonedaService,
+    private SrvEmpresa: EmpresaService,
+    private PedidoProductosService: PedidoProductosService,
+    private tipoClientService: TipoClienteService,
+    private rolService: RolesService,
+    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+    private ClientesProductosService: ClientesProductosService,
+    private materialService: MaterialProductoService,
+    private pigmentoServices: PigmentoProductoService,
+    private ordenTrabajoService: Orden_TrabajoService,
+    private AppComponent: AppComponent) {
 
-     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       //Datos para la tabla de pedidos.
@@ -169,24 +169,24 @@ export class OpedidoproductoComponent implements OnInit {
     });
 
     this.FormPedidoExternoProductos = this.frmBuilderPedExterno.group({
-       //Datos para la tabla de productos.
-       ProdId: ['', Validators.required],
-       ProdNombre: ['', Validators.required],
-       ProdAncho: ['', Validators.required],
-       ProdFuelle: ['', Validators.required],
-       ProdCalibre: ['', Validators.required],
-       ProdLargo: ['', Validators.required],
-       ProdUnidadMedidaACF: ['', Validators.required],
-       ProdTipo: ['', Validators.required],
-       ProdMaterial: ['', Validators.required],
-       ProdPigmento: ['', Validators.required],
-       ProdCantidad: ['', Validators.required],
-       ProdUnidadMedidaCant: ['', Validators.required],
-       ProdPrecioUnd: ['', Validators.required],
-       ProdUltFacturacion : ['', Validators.required],
-       ProdTipoMoneda: ['', Validators.required],
-       ProdStock: ['', Validators.required],
-       ProdDescripcion: ['', Validators.required],
+      //Datos para la tabla de productos.
+      ProdId: ['', Validators.required],
+      ProdNombre: ['', Validators.required],
+      ProdAncho: ['', Validators.required],
+      ProdFuelle: ['', Validators.required],
+      ProdCalibre: ['', Validators.required],
+      ProdLargo: ['', Validators.required],
+      ProdUnidadMedidaACF: ['', Validators.required],
+      ProdTipo: ['', Validators.required],
+      ProdMaterial: ['', Validators.required],
+      ProdPigmento: ['', Validators.required],
+      ProdCantidad: ['', Validators.required],
+      ProdUnidadMedidaCant: ['', Validators.required],
+      ProdPrecioUnd: ['', Validators.required],
+      ProdUltFacturacion: ['', Validators.required],
+      ProdTipoMoneda: ['', Validators.required],
+      ProdStock: ['', Validators.required],
+      ProdDescripcion: ['', Validators.required],
     });
 
     this.FormConsultaPedidoExterno = this.frmBuilderPedExterno.group({
@@ -194,9 +194,9 @@ export class OpedidoproductoComponent implements OnInit {
       PedExtFechaConsulta: [, Validators.required],
       PedExtFechaEntregaConsulta: [, Validators.required],
       PedExtEstadoConsulta: [, Validators.required],
-      PedExtUsuarioConsulta : ['',],
-      PedExtClienteConsulta : ['',],
-      PedExtIdClienteConsulta : ['',],
+      PedExtUsuarioConsulta: ['',],
+      PedExtClienteConsulta: ['',],
+      PedExtIdClienteConsulta: ['',],
     });
 
     this.validarInputClientes = true;
@@ -241,7 +241,7 @@ export class OpedidoproductoComponent implements OnInit {
     // And reassign the 'data' which is binded to 'data' property.
   }
 
-  onFocusedClienteConsulta(e){
+  onFocusedClienteConsulta(e) {
     if (!e.isTrusted) this.validarInputClienteConsulta = false;
     else this.validarInputClienteConsulta = true;
     if (this.FormConsultaPedidoExterno.value.ProdNombre != null) this.validarInputClienteConsulta = false;
@@ -256,7 +256,7 @@ export class OpedidoproductoComponent implements OnInit {
     // And reassign the 'data' which is binded to 'data' property.
   }
 
-  onFocusedNombreCliente(e){
+  onFocusedNombreCliente(e) {
     if (!e.isTrusted) this.validarInputClientes = false;
     else this.validarInputClientes = true;
     if (this.FormPedidoExternoClientes.value.PedClienteNombre != null) this.validarInputClientes = false;
@@ -278,7 +278,7 @@ export class OpedidoproductoComponent implements OnInit {
     // And reassign the 'data' which is binded to 'data' property.
   }
 
-  onFocusedNombreProductos(e){
+  onFocusedNombreProductos(e) {
     if (!e.isTrusted) this.validarInputNombresProductos = false;
     else this.validarInputNombresProductos = true;
     if (this.FormPedidoExternoProductos.value.ProdNombre != null) this.validarInputNombresProductos = false;
@@ -300,7 +300,7 @@ export class OpedidoproductoComponent implements OnInit {
     // And reassign the 'data' which is binded to 'data' property.
   }
 
-  onFocusedVendedorConsulta(e){
+  onFocusedVendedorConsulta(e) {
     if (!e.isTrusted) this.validarInputVendedorConsulta = false;
     else this.validarInputVendedorConsulta = true;
     if (this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta != null) this.validarInputVendedorConsulta = false;
@@ -312,11 +312,11 @@ export class OpedidoproductoComponent implements OnInit {
   formatonumeros = (number) => {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
-    return number.toString().replace(exp,rep);
+    return number.toString().replace(exp, rep);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
@@ -331,11 +331,11 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
+  fecha() {
     this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
+    var dd: any = this.today.getDate();
+    var mm: any = this.today.getMonth() + 1;
+    var yyyy: any = this.today.getFullYear();
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
     this.today = yyyy + '-' + mm + '-' + dd;
@@ -363,8 +363,8 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // VALIDACION PARA CAMPOS VACIOS
-  validarCamposVacios(){
-    if(this.FormPedidoExternoProductos.valid) this.cargarFormProductoEnTablas(this.ArrayProducto);
+  validarCamposVacios() {
+    if (this.FormPedidoExternoProductos.valid) this.cargarFormProductoEnTablas(this.ArrayProducto);
     else Swal.fire("Hay campos vacios en el formulario de producto");
   }
 
@@ -385,7 +385,7 @@ export class OpedidoproductoComponent implements OnInit {
       ProdCantidad: '',
       ProdUnidadMedidaCant: '',
       ProdPrecioUnd: '',
-      ProdUltFacturacion : '',
+      ProdUltFacturacion: '',
       ProdTipoMoneda: '',
       ProdStock: '',
       ProdDescripcion: '',
@@ -395,7 +395,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para limpiar los campos de el apartado de productos
-  LimpiarCamposProductos(){
+  LimpiarCamposProductos() {
     this.FormPedidoExternoProductos = this.frmBuilderPedExterno.group({
       //Productos
       ProdId: '',
@@ -411,7 +411,7 @@ export class OpedidoproductoComponent implements OnInit {
       ProdCantidad: '',
       ProdUnidadMedidaCant: '',
       ProdPrecioUnd: '',
-      ProdUltFacturacion : '',
+      ProdUltFacturacion: '',
       ProdTipoMoneda: '',
       ProdStock: '',
       ProdDescripcion: '',
@@ -419,7 +419,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion que limpiará TODOS los campos de la vista de pedidos
-  limpiarTodosCampos(){
+  limpiarTodosCampos() {
     this.ArrayProducto = [];
     this.valorTotal = 0;
     this.FormConsultaPedidoExterno.reset();
@@ -441,7 +441,7 @@ export class OpedidoproductoComponent implements OnInit {
       ProdCantidad: '',
       ProdUnidadMedidaCant: '',
       ProdPrecioUnd: '',
-      ProdUltFacturacion : '',
+      ProdUltFacturacion: '',
       ProdTipoMoneda: '',
       ProdStock: '',
       ProdDescripcion: '',
@@ -457,25 +457,25 @@ export class OpedidoproductoComponent implements OnInit {
             this.cliente.push(datos_clientes[index]);
             this.clienteDatos.push(datos_clientes[index]);
             continue;
-          }else {
+          } else {
             this.cliente.push(datos_clientes[index]);
             this.clienteDatos.push(datos_clientes[index]);
           }
-          this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
+          this.cliente.sort((a, b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
         }
       });
     });
   }
 
   //Funcion para llenar las ciudades del cliente en donde tiene sedes
-  ciudadClienteComboBox(itemsNombre? : any){
+  ciudadClienteComboBox(itemsNombre?: any) {
     this.FormPedidoExternoClientes.value.PedClienteNombre = itemsNombre.cli_Id;
     if (this.FormPedidoExternoClientes.value.PedClienteNombre != '') this.validarInputClientes = false;
     else this.validarInputClientes = true;
     this.LimpiarCamposProductos();
     this.ciudad = [];
-    this.sedeCliente=[];
-    this.usuarioVende=[];
+    this.sedeCliente = [];
+    this.usuarioVende = [];
     let clienteBD: any = this.FormPedidoExternoClientes.value.PedClienteNombre;
     this.sedesClientesService.srvObtenerListaPorCliente(clienteBD).subscribe(datos_sedesClientes => {
       for (let i = 0; i < datos_sedesClientes.length; i++) {
@@ -483,7 +483,7 @@ export class OpedidoproductoComponent implements OnInit {
         this.sedeCliente.push(datos_sedesClientes[i]);
       }
 
-      if (this.sedeCliente.length <= 1 ) {
+      if (this.sedeCliente.length <= 1) {
         for (const item of this.sedeCliente) {
           this.sedeCliente = [];
           this.usuarioVende.push(item.usua_Nombre);
@@ -523,17 +523,17 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
-  usuarioComboBox(){
+  usuarioComboBox() {
     this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
       if (datos_usuarios.rolUsu_Id == 2) {
         this.usuarios.push(datos_usuarios);
-        this.usuarios.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
-      }else {
+        this.usuarios.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+      } else {
         this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
           for (let index = 0; index < datos_usuarios.length; index++) {
             if (datos_usuarios[index].rolUsu_Id == 2) {
               this.usuarios.push(datos_usuarios[index]);
-              this.usuarios.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+              this.usuarios.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
             }
           }
         });
@@ -542,46 +542,46 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar el comboBox de estados
-  estadoComboBox(){
+  estadoComboBox() {
     // FORMA DE HACER QUE SOLO SE RETORNEN LOS ESTADOS CON EL TIPO DE ESTADO "1", QUE ES EL EXCLUSIOVO PARA DOCUMENTOS
     this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estados=>{
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
         for (let index = 0; index < datos_estados.length; index++) {
           if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) {
-            if (this.ValidarRol == 2){
+            if (this.ValidarRol == 2) {
               if (datos_estados[index].estado_Id == 11) {
                 this.estado.push(datos_estados[index].estado_Nombre);
                 break;
               }
-            } else if (this.ValidarRol == 1){
+            } else if (this.ValidarRol == 1) {
               this.estado.push(datos_estados[index].estado_Nombre);
             }
           }
         }
         this.estado.sort();
-      }, error =>{ console.log("error"); });
+      }, error => { console.log("error"); });
     });
   }
 
   // Funcion para llenar el comboBox de estados
-  estadoComboBoxConsulta(){
+  estadoComboBoxConsulta() {
     // FORMA DE HACER QUE SOLO SE RETORNEN LOS ESTADOS CON EL TIPO DE ESTADO "1", QUE ES EL EXCLUSIOVO PARA DOCUMENTOS
     this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estados=>{
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
         for (let index = 0; index < datos_estados.length; index++) {
           if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) {
             this.estadoConsulta.push(datos_estados[index].estado_Nombre);
           }
         }
         this.estado.sort();
-      }, error =>{ console.log("error"); });
+      }, error => { console.log("error"); });
     });
   }
 
   // Funcion para cargar los productos de un solo cliente
-  productoCliente(){
+  productoCliente() {
     this.producto = [];
-    let Id_Cliente : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let Id_Cliente: any = this.FormPedidoExternoClientes.value.PedClienteNombre;
     this.ClientesProductosService.srvObtenerListaPorNombreCliente(Id_Cliente).subscribe(datos_clientesProductos => {
       for (let index = 0; index < datos_clientesProductos.length; index++) {
         this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => {
@@ -592,7 +592,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar el comboBox de tipos de Productos con los tipos de productos
-  tipoProductoComboBox(){
+  tipoProductoComboBox() {
     this.tiposProductosService.srvObtenerLista().subscribe(datos_tiposProductos => {
       for (let index = 0; index < datos_tiposProductos.length; index++) {
         this.tipoProducto.push(datos_tiposProductos[index].tpProd_Nombre);
@@ -601,7 +601,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar el comboBox de material del producto
-  matrialProductoComboBox(){
+  matrialProductoComboBox() {
     this.materialService.srvObtenerLista().subscribe(datos_material => {
       for (let index = 0; index < datos_material.length; index++) {
         this.materialProducto.push(datos_material[index].material_Nombre)
@@ -610,7 +610,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar el comboBox de pigmentos del producto
-  pigmentoProductocomboBox(){
+  pigmentoProductocomboBox() {
     this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => {
       for (let index = 0; index < datos_pigmentos.length; index++) {
         this.pigmentoProducto.push(datos_pigmentos[index].pigmt_Nombre)
@@ -619,7 +619,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar el combobox de tipo de moneda con los tipos de monedas
-  tipoMonedaComboBox(){
+  tipoMonedaComboBox() {
     this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => {
       for (let index = 0; index < datos_tiposMoneda.length; index++) {
         this.tipoMoneda.push(datos_tiposMoneda[index].tpMoneda_Id);
@@ -628,15 +628,15 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion encargada de buscar un producto por el id del producto
-  buscarProducto(){
+  buscarProducto() {
     this.producto = [];
     this.presentacion = [];
-    let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
+    let idProducto: number = this.FormPedidoExternoProductos.value.ProdId;
 
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
       for (let i = 0; i < datos_producto.length; i++) {
         this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
-          let datos : any = [];
+          let datos: any = [];
           datos.push(datos_productoPedido);
           for (const item of datos) {
             this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
@@ -672,21 +672,21 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar los datos de los productos en cada uno de los campos
-  llenadoProducto(item : any){
+  llenadoProducto(item: any) {
     this.productoInfo = [];
     this.presentacion = [];
     this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
 
-    let idProducto : any = this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
+    let idProducto: any = this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
       for (let i = 0; i < datos_producto.length; i++) {
-      this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
-        let datos : any = [];
-        datos.push(datos_productoPedido);
-        for (const item of datos) {
-          this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
-        }
-      });
+        this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
+          let datos: any = [];
+          datos.push(datos_productoPedido);
+          for (const item of datos) {
+            this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
+          }
+        });
 
         this.presentacion.push(datos_producto[i].undMed_Id);
         this.FormPedidoExternoProductos.setValue({
@@ -724,17 +724,17 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para validar los campos vacios de las consultas
-  validarCamposVaciosConsulta(){
+  validarCamposVaciosConsulta() {
     this.load = false;
     this.fechaCreacionCortada = [];
     this.fechaEntregaCortada = [];
-    let fechaPedido : any = this.FormConsultaPedidoExterno.value.PedExtFechaConsulta;
-    let fechaEntrega : any = this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta;
-    let estadoNombre : string = this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta;
-    let idPedido : number = this.FormConsultaPedidoExterno.value.PedExtIdConsulta;
-    let nombreVendedor : string = this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta;
-    let idCliente : number = this.FormConsultaPedidoExterno.value.PedExtIdClienteConsulta;
-    let nombreCliente : any = this.FormConsultaPedidoExterno.value.PedExtClienteConsulta;
+    let fechaPedido: any = this.FormConsultaPedidoExterno.value.PedExtFechaConsulta;
+    let fechaEntrega: any = this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta;
+    let estadoNombre: any = this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta;
+    let idPedido: any = this.FormConsultaPedidoExterno.value.PedExtIdConsulta;
+    let nombreVendedor: any = this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta;
+    let idCliente: number = this.FormConsultaPedidoExterno.value.PedExtIdClienteConsulta;
+    let nombreCliente: any = this.FormConsultaPedidoExterno.value.PedExtClienteConsulta;
     if (nombreCliente != null) nombreCliente = this.FormConsultaPedidoExterno.value.PedExtClienteConsulta.cli_Nombre;
     else nombreCliente = null;
     if (nombreVendedor != null) nombreVendedor = this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta.usua_Nombre;
@@ -749,7 +749,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -763,7 +763,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -776,7 +776,7 @@ export class OpedidoproductoComponent implements OnInit {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
@@ -789,7 +789,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -803,7 +803,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -817,7 +817,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -831,7 +831,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -845,13 +845,13 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
     }
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha en que se hizo el pedido, estado y cliente
-    else if (fechaPedido != null && estadoNombre != null && (idCliente != null || nombreCliente != null)){
+    else if (fechaPedido != null && estadoNombre != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListaFechaCreacionEstado(fechaPedido, estadoNombre).subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
@@ -859,7 +859,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -873,7 +873,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -887,7 +887,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -901,7 +901,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -915,7 +915,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -929,7 +929,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -943,7 +943,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -957,7 +957,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -971,7 +971,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -985,7 +985,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -998,7 +998,7 @@ export class OpedidoproductoComponent implements OnInit {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
@@ -1011,7 +1011,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -1025,7 +1025,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -1039,7 +1039,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -1054,7 +1054,7 @@ export class OpedidoproductoComponent implements OnInit {
               if (this.ValidarRol == 2) {
                 if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
               } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-              this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+              this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
             }
           }
         }
@@ -1069,7 +1069,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (this.ValidarRol == 2) {
               if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
             } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-            this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+            this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
           }
         }
       });
@@ -1082,7 +1082,7 @@ export class OpedidoproductoComponent implements OnInit {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
@@ -1094,43 +1094,43 @@ export class OpedidoproductoComponent implements OnInit {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
     //Buscará los pedidos del usuario que se ha seleccionado
-    else if (nombreVendedor !== null){
+    else if (nombreVendedor !== null) {
       this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListanomberVendeder(nombreVendedor).subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
     //Buscará los pedidos del cliente que se buscó por su Id
-    else if (idCliente !== null){
+    else if (idCliente !== null) {
       this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListaIdCliente(idCliente).subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
     //Buscará los pedidos de los clientes por el que se seleccionó
-    else if (nombreCliente !== null){
+    else if (nombreCliente !== null) {
       this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListaNombreCliente(nombreCliente).subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
@@ -1142,7 +1142,7 @@ export class OpedidoproductoComponent implements OnInit {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
@@ -1154,7 +1154,7 @@ export class OpedidoproductoComponent implements OnInit {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
@@ -1166,7 +1166,7 @@ export class OpedidoproductoComponent implements OnInit {
           if (this.ValidarRol == 2) {
             if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
           } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
-          this.pedidosProductos.sort((a,b)=> Number(b.pedExt_Id) - Number(a.pedExt_Id));
+          this.pedidosProductos.sort((a, b) => Number(b.pedExt_Id) - Number(a.pedExt_Id));
         }
       });
     }
@@ -1177,8 +1177,8 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion que organiza los campos de la tabla de pedidos de mayor a menor
-  organizacionPrecioDblClick(){
-    this.pedidosProductos.sort((a,b)=> Number(b.pedExt_PrecioTotal) - Number(a.pedExt_PrecioTotal));
+  organizacionPrecioDblClick() {
+    this.pedidosProductos.sort((a, b) => Number(b.pedExt_PrecioTotal) - Number(a.pedExt_PrecioTotal));
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -1197,8 +1197,8 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion que organiza los campos de la tabla de pedidos de menor a mayor
-  organizacionPrecio(){
-    this.pedidosProductos.sort((a,b)=> Number(a.pedExt_PrecioTotal) - Number(b.pedExt_PrecioTotal));
+  organizacionPrecio() {
+    this.pedidosProductos.sort((a, b) => Number(a.pedExt_PrecioTotal) - Number(b.pedExt_PrecioTotal));
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -1217,15 +1217,15 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion que limpia los campos de consulta de pedidos
-  limpiarCamposConsulta(){
+  limpiarCamposConsulta() {
     this.FormConsultaPedidoExterno.reset();
     this.pedidosProductos = [];
   }
 
   //Se obtiene el ultimo codigo del pedido y se incrementa en 1. (Contador)
   ObtenerUltimoPedido() {
-    this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos =>{
-      let datos : any = [];
+    this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos => {
+      let datos: any = [];
       datos.push(dataPedExternos);
       for (const item of datos) {
         this.contadorPedidosExternos = item.pedExt_Id + 1;
@@ -1234,63 +1234,63 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes
-  ColumnasTabla(){
+  ColumnasTabla() {
     this.titulosTabla = [];
     this.titulosTabla = [{
-      pID : "Id",
-      pNombre : "Nombre",
-      pAncho :   "Ancho",
-      pFuelle : "Fuelle",
-      pCalibre : "Cal",
-      pUndMedACF : "Und.",
-      pTipoProd : "TipoProd",
-      pMaterial : 'Material',
-      pPigmento : 'Pigmento',
-      pCantidad : "Cantidad",
-      pLargo : "Largo",
-      pUndMedCant : "Und. Cant",
-      pPrecioU : "Precio U",
-      pMoneda : "Moneda",
-      pStock : "Stock",
-      pDescripcion : "Descripción",
-      pSubtotal : "Subtotal",
+      pID: "Id",
+      pNombre: "Nombre",
+      pAncho: "Ancho",
+      pFuelle: "Fuelle",
+      pCalibre: "Cal",
+      pUndMedACF: "Und.",
+      pTipoProd: "TipoProd",
+      pMaterial: 'Material',
+      pPigmento: 'Pigmento',
+      pCantidad: "Cantidad",
+      pLargo: "Largo",
+      pUndMedCant: "Und. Cant",
+      pPrecioU: "Precio U",
+      pMoneda: "Moneda",
+      pStock: "Stock",
+      pDescripcion: "Descripción",
+      pSubtotal: "Subtotal",
     }]
   }
 
   // Funcion que envia la informacion de los productos a la tabla.
-  cargarFormProductoEnTablas(formulario : any){
+  cargarFormProductoEnTablas(formulario: any) {
 
     this.ultimoPrecio = 0;
-    let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
-    let precioProducto : number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;
-    let presentacion : string = this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant;
-    let cantidad : number = this.FormPedidoExternoProductos.value.ProdCantidad;
-    let subtotalProd : number = precioProducto * cantidad;
-    let nombreProducto : any = this.FormPedidoExternoProductos.value.ProdNombre;
+    let idProducto: number = this.FormPedidoExternoProductos.value.ProdId;
+    let precioProducto: number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;
+    let presentacion: string = this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant;
+    let cantidad: number = this.FormPedidoExternoProductos.value.ProdCantidad;
+    let subtotalProd: number = precioProducto * cantidad;
+    let nombreProducto: any = this.FormPedidoExternoProductos.value.ProdNombre;
 
     this.valorTotal = this.valorTotal + subtotalProd;
 
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_existencias => {
       for (let index = 0; index < datos_existencias.length; index++) {
         if (precioProducto >= datos_existencias[index].exProd_PrecioVenta) {
-          let productoExt : any = {
-            Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
-            Nombre : nombreProducto,
-            Ancho : this.FormPedidoExternoProductos.get('ProdAncho').value,
-            Fuelle : this.FormPedidoExternoProductos.get('ProdFuelle').value,
-            Cal : this.FormPedidoExternoProductos.get('ProdCalibre').value,
-            Und : this.FormPedidoExternoProductos.get('ProdUnidadMedidaACF').value,
-            Tipo : this.FormPedidoExternoProductos.get('ProdTipo').value,
-            Material : this.FormPedidoExternoProductos.value.ProdMaterial,
+          let productoExt: any = {
+            Id: this.FormPedidoExternoProductos.get('ProdId')?.value,
+            Nombre: nombreProducto,
+            Ancho: this.FormPedidoExternoProductos.get('ProdAncho')?.value,
+            Fuelle: this.FormPedidoExternoProductos.get('ProdFuelle')?.value,
+            Cal: this.FormPedidoExternoProductos.get('ProdCalibre')?.value,
+            Und: this.FormPedidoExternoProductos.get('ProdUnidadMedidaACF')?.value,
+            Tipo: this.FormPedidoExternoProductos.get('ProdTipo')?.value,
+            Material: this.FormPedidoExternoProductos.value.ProdMaterial,
             Pigmento: this.FormPedidoExternoProductos.value.ProdPigmento,
-            Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
-            Largo : this.FormPedidoExternoProductos.get('ProdLargo').value,
-            UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-            PrecioUnd : precioProducto,
-            TpMoneda : this.FormPedidoExternoProductos.get('ProdTipoMoneda').value,
-            Stock : this.FormPedidoExternoProductos.get('ProdStock').value,
-            Produ_Descripcion : this.FormPedidoExternoProductos.get('ProdDescripcion').value,
-            SubTotal : this.FormPedidoExternoProductos.get('ProdCantidad').value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
+            Cant: this.FormPedidoExternoProductos.get('ProdCantidad')?.value,
+            Largo: this.FormPedidoExternoProductos.get('ProdLargo')?.value,
+            UndCant: this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
+            PrecioUnd: precioProducto,
+            TpMoneda: this.FormPedidoExternoProductos.get('ProdTipoMoneda')?.value,
+            Stock: this.FormPedidoExternoProductos.get('ProdStock')?.value,
+            Produ_Descripcion: this.FormPedidoExternoProductos.get('ProdDescripcion')?.value,
+            SubTotal: this.FormPedidoExternoProductos.get('ProdCantidad')?.value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
           }
 
           let campoId = this.FormPedidoExternoProductos.get('ProdId')?.value;
@@ -1298,13 +1298,13 @@ export class OpedidoproductoComponent implements OnInit {
             this.ArrayProducto.push(productoExt);
             this.LimpiarCamposProductos();
 
-          } else if (this.AccionBoton == "Agregar" && this.ArrayProducto.length != 0){
+          } else if (this.AccionBoton == "Agregar" && this.ArrayProducto.length != 0) {
             this.ArrayProducto.push(productoExt);
             this.LimpiarCamposProductos();
             productoExt = [];
           } else {
             for (let index = 0; index < formulario.length; index++) {
-              if(productoExt.Id == this.ArrayProducto[index].Id) {
+              if (productoExt.Id == this.ArrayProducto[index].Id) {
                 this.ArrayProducto.splice(index, 1);
                 this.ArrayProducto.push(productoExt);
                 this.AccionBoton = "Agregar";
@@ -1314,30 +1314,30 @@ export class OpedidoproductoComponent implements OnInit {
             }
           }
         } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
-        }
+      }
       // for (let index = 0; index < this.ArrayProducto.length; index++) {
       //   this.valorTotal = this.ArrayProducto.reduce((accion) => accion + (cantidad * precioProducto), 0);
       // }
-      this.ArrayProducto.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+      this.ArrayProducto.sort((a, b) => Number(a.PrecioUnd) - Number(b.PrecioUnd));
     });
   }
 
   // Funcion para crear los pedidos de productos y añadirlos a la base de datos
   CrearPedidoExterno() {
-    let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
-    let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
-    let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
-    let idProducto : any;
-    let cantidadProducto : any;
-    let unidadMedida : any;
-    let precioUnidad : number;
+    let direccionSede: string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
+    let ciudad: string = this.FormPedidoExternoClientes.value.ciudad_sede;
+    let clienteNombre: any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let idProducto: any;
+    let cantidadProducto: any;
+    let unidadMedida: any;
+    let precioUnidad: number;
     let campoEstado = this.FormPedidoExternoClientes.get('PedEstadoId')?.value;
 
     this.estadosService.srvObtenerListaPorNombreEstado(campoEstado).subscribe(datos_estado => {
       for (let j = 0; j < datos_estado.length; j++) {
         this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre.cli_Nombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
           for (let i = 0; i < datos_sedeCliente.length; i++) {
-            const camposPedido : any = {
+            const camposPedido: any = {
               PedExt_FechaCreacion: this.FormPedidoExternoClientes.get('PedFecha')?.value,
               PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
               Empresa_Id: this.EmpresaVendedora,
@@ -1347,17 +1347,17 @@ export class OpedidoproductoComponent implements OnInit {
               PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
               PedExt_PrecioTotal: this.valorTotal,
               PedExt_Archivo: 0,
-              PedExt_HoraCreacion : moment().format('H:mm:ss'),
+              PedExt_HoraCreacion: moment().format('H:mm:ss'),
             }
 
-            if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
+            if (!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
             else if (campoEstado == "Finalizado" || campoEstado == "Cancelado" || campoEstado == "Anulado") Swal.fire('No puede crear un pedido con el estado seleccionado. Por favor verifique.');
             else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion) Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
-            else{
-              this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
+            else {
+              this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data => {
 
-                this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos =>{
-                  let datos : any = [];
+                this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos => {
+                  let datos: any = [];
                   datos.push(dataPedExternos);
                   for (const item of datos) {
                     for (let index = 0; index < this.ArrayProducto.length; index++) {
@@ -1366,15 +1366,15 @@ export class OpedidoproductoComponent implements OnInit {
                       unidadMedida = this.ArrayProducto[index].UndCant;
                       precioUnidad = this.ArrayProducto[index].PrecioUnd;
 
-                      const productosPedidos : any = {
+                      const productosPedidos: any = {
                         Prod_Id: idProducto,
                         PedExt_Id: item.pedExt_Id,
-                        PedExtProd_Cantidad : cantidadProducto,
-                        UndMed_Id : unidadMedida,
-                        PedExtProd_PrecioUnitario : precioUnidad
+                        PedExtProd_Cantidad: cantidadProducto,
+                        UndMed_Id: unidadMedida,
+                        PedExtProd_PrecioUnitario: precioUnidad
                       }
 
-                      this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => {}, error => { console.log(error); });
+                      this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => { }, error => { console.log(error); });
                     }
                     const Toast = Swal.mixin({
                       toast: true,
@@ -1410,7 +1410,7 @@ export class OpedidoproductoComponent implements OnInit {
   //Función para obtener el ID de la empresa, apartir de la posición
   /*La idea es que al iniciar sesión se deje en algún lado del programa el ID
   de la empresa y se capte de ahí su Identificación*/
-  obtenerEmpresa(){
+  obtenerEmpresa() {
     this.SrvEmpresa.srvObtenerLista().subscribe((dataEmpresa) => {
       for (let index = 0; index < dataEmpresa.length; index++) {
         this.EmpresaVendedora = dataEmpresa[0].empresa_Id;
@@ -1420,38 +1420,38 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Función para limpiar la tabla en la que se muestran los productos del pedido
-  LimpiarTablaTotal(){
+  LimpiarTablaTotal() {
     this.ArrayProducto = [];
     this.valorTotal = 0;
   }
 
   // Funcion para llenar la tabla de productos con la informacion que se inserte en los modales
-  llenarTablaProductosCreador(id : any, nombre : string, ancho : any, fuelle : any, calibre : any, largo : any, undMed : string, tpProducto : string, material : string, pigmento : string, cantidad : any, undMed2 : string, precio : any, moneda : string, descripcion : string){
+  llenarTablaProductosCreador(id: any, nombre: string, ancho: any, fuelle: any, calibre: any, largo: any, undMed: string, tpProducto: string, material: string, pigmento: string, cantidad: any, undMed2: string, precio: any, moneda: string, descripcion: string) {
     if (precio != null && cantidad != null) {
-      let productoExt : any = {
-        Id : id,
-        Nombre : nombre,
-        Ancho : ancho,
-        Fuelle : fuelle,
-        Cal : calibre,
-        Und : undMed,
-        Tipo : tpProducto,
-        Material : material,
-        Pigmento : pigmento,
-        Cant : cantidad,
-        Largo : largo,
-        UndCant : undMed2,
-        PrecioUnd : precio,
-        TpMoneda : moneda,
-        Stock : cantidad,
-        Produ_Descripcion : descripcion,
-        SubTotal : this.formatonumeros(cantidad * precio),
+      let productoExt: any = {
+        Id: id,
+        Nombre: nombre,
+        Ancho: ancho,
+        Fuelle: fuelle,
+        Cal: calibre,
+        Und: undMed,
+        Tipo: tpProducto,
+        Material: material,
+        Pigmento: pigmento,
+        Cant: cantidad,
+        Largo: largo,
+        UndCant: undMed2,
+        PrecioUnd: precio,
+        TpMoneda: moneda,
+        Stock: cantidad,
+        Produ_Descripcion: descripcion,
+        SubTotal: this.formatonumeros(cantidad * precio),
       }
 
-      if(this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
+      if (this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
       else {
         for (let index = 0; index < this.ArrayProducto.length; index++) {
-          if(this.FormPedidoExternoProductos.value.ProdId == this.ArrayProducto[index].Id) Swal.fire('No se pueden cargar datos identicos a la tabla.');
+          if (this.FormPedidoExternoProductos.value.ProdId == this.ArrayProducto[index].Id) Swal.fire('No se pueden cargar datos identicos a la tabla.');
           else this.ArrayProducto.push(productoExt);
           break;
         }
@@ -1463,23 +1463,23 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar los datos de los clientes que se son creados en el modal
-  llenarClientesCreado(id : any, tipoId : any, nombre : any, telefono : any, email : any, tipoCliente : any, ciudadSede : any, vendedor : any, codigoPostal : any, direccionSede : any, sedeCLiID :any){
+  llenarClientesCreado(id: any, tipoId: any, nombre: any, telefono: any, email: any, tipoCliente: any, ciudadSede: any, vendedor: any, codigoPostal: any, direccionSede: any, sedeCLiID: any) {
     this.cliente.push(nombre);
     this.sedeCliente.push(direccionSede);
     this.usuarioVendedor.push(vendedor);
   }
 
   // Fucnion para que crear ub pdf apenas se realiza el pedido de productos
-  crearpdf(){
-    this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos =>{
-      let nombreCliente : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
-      let datos : any = [];
+  crearpdf() {
+    this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos => {
+      let nombreCliente: any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+      let datos: any = [];
       datos.push(dataPedExternos);
       for (const item of datos) {
         this.sedesClientesService.srvObtenerListaPorNombreCliente(nombreCliente.cli_Nombre).subscribe(datos_sedeCliente => {
           for (let i = 0; i < datos_sedeCliente.length; i++) {
             for (let j = 0; j < this.ArrayProducto.length; j++) {
-              const pdfDefinicion : any = {
+              const pdfDefinicion: any = {
                 info: {
                   title: `${item.pedExt_Id}`
                 },
@@ -1487,7 +1487,7 @@ export class OpedidoproductoComponent implements OnInit {
                   width: 630,
                   height: 760
                 },
-                content : [
+                content: [
                   {
                     text: `Plasticaribe S.A.S ---- Orden de Pedidos de Productos`,
                     alignment: 'center',
@@ -1594,14 +1594,14 @@ export class OpedidoproductoComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body: any = [];
     body.push(columns);
-    data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+    data.forEach(function (row) {
+      var dataRow: any = [];
+      columns.forEach(function (column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
 
     return body;
@@ -1610,22 +1610,22 @@ export class OpedidoproductoComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [18, 60, 20, 20, 20, 20, 20, 40, 45, 38, 30, 15, 25, 55],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [18, 60, 20, 20, 20, 20, 20, 40, 45, 38, 30, 15, 25, 55],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
-  llenarPDFConBD(id : any){
+  llenarPDFConBD(id: any) {
     this.pedidoproductoService.srvObtenerListaPorIdPedidoLlenarPDF(id).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
         for (const item of this.productosPedidos) {
@@ -1637,7 +1637,7 @@ export class OpedidoproductoComponent implements OnInit {
           let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
           let fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
 
-          const pdfDefinicion : any = {
+          const pdfDefinicion: any = {
             info: {
               title: `${datos_pedido[i].pedExt_Id}`
             },
@@ -1645,7 +1645,7 @@ export class OpedidoproductoComponent implements OnInit {
               width: 630,
               height: 760
             },
-            content : [
+            content: [
               {
                 text: `Orden de Pedidos de Productos N° ${datos_pedido[i].pedExt_Id}`,
                 alignment: 'right',
@@ -1774,7 +1774,7 @@ export class OpedidoproductoComponent implements OnInit {
                       },
                       {
                         border: [false, false, true, true],
-                        text: `${this.formatonumeros((datos_pedido[i].pedExt_PrecioTotal + ((datos_pedido[i].pedExt_PrecioTotal* datos_pedido[i].pedExt_Iva) / 100)).toFixed(2))}`
+                        text: `${this.formatonumeros((datos_pedido[i].pedExt_PrecioTotal + ((datos_pedido[i].pedExt_PrecioTotal * datos_pedido[i].pedExt_Iva) / 100)).toFixed(2))}`
                       },
                     ],
                     [
@@ -1817,31 +1817,31 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion que llena el array con los productos que pertenecen al pedido que se consulta
-  llenarProductoPedido(formulario : any){
-    let id : any = formulario.pedExt_Id
+  llenarProductoPedido(formulario: any) {
+    let id: any = formulario.pedExt_Id
     this.productosPedidos = [];
 
     this.PedidoProductosService.srvObtenerListaPorIdProductoPedido(id).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
         this.existenciasProductosServices.srvObtenerListaPorIdProducto(datos_pedido[i].prod_Id).subscribe(datos_producto => {
           for (let j = 0; j < datos_producto.length; j++) {
-            const producto : any = {
+            const producto: any = {
               Id: datos_producto[j].prod_Id,
-              Nombre : datos_producto[j].prod_Nombre,
-              Ancho : datos_producto[j].prod_Ancho,
-              Fuelle : datos_producto[j].prod_Fuelle,
+              Nombre: datos_producto[j].prod_Nombre,
+              Ancho: datos_producto[j].prod_Ancho,
+              Fuelle: datos_producto[j].prod_Fuelle,
               Largo: datos_producto[j].prod_Largo,
-              Cal : datos_producto[j].prod_Calibre,
-              Und : datos_producto[j].undMedACF,
-              Tipo : datos_producto[j].tpProd_Nombre,
+              Cal: datos_producto[j].prod_Calibre,
+              Und: datos_producto[j].undMedACF,
+              Tipo: datos_producto[j].tpProd_Nombre,
               Material: datos_producto[j].material_Nombre,
               Pigmento: datos_producto[j].pigmt_Nombre,
-              Cant : this.formatonumeros(datos_pedido[i].pedExtProd_Cantidad),
-              UndCant : datos_pedido[i].undMed_Id,
-              PrecioUnd : this.formatonumeros(datos_pedido[i].pedExtProd_PrecioUnitario),
-              Moneda : datos_producto[j].tpMoneda_Id,
-              Stock : datos_producto[j].exProd_Cantidad,
-              SubTotal : this.formatonumeros((datos_pedido[i].pedExtProd_Cantidad * datos_pedido[i].pedExtProd_PrecioUnitario).toFixed(2)),
+              Cant: this.formatonumeros(datos_pedido[i].pedExtProd_Cantidad),
+              UndCant: datos_pedido[i].undMed_Id,
+              PrecioUnd: this.formatonumeros(datos_pedido[i].pedExtProd_PrecioUnitario),
+              Moneda: datos_producto[j].tpMoneda_Id,
+              Stock: datos_producto[j].exProd_Cantidad,
+              SubTotal: this.formatonumeros((datos_pedido[i].pedExtProd_Cantidad * datos_pedido[i].pedExtProd_PrecioUnitario).toFixed(2)),
             }
             this.productosPedidos.push(producto);
           }
@@ -1854,7 +1854,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Función para quitar un producto de la tabla
-  QuitarProductoTabla(index : number, formulario : any) {
+  QuitarProductoTabla(index: number, formulario: any) {
     this.productoEliminado = formulario.Id
     Swal.fire({
       title: '¿Estás seguro de eliminar el producto del pedido?',
@@ -1874,37 +1874,37 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Función para editar uno de los productos de la tabla
-  EditarProductoTabla(formulario : any) {
+  EditarProductoTabla(formulario: any) {
     this.Ide = formulario.Id;
     this.AccionBoton = "Editar";
     this.producto = [];
     this.presentacion = [];
 
     this.PedidoProductosService.srvObtenerListaPorIdProducto(formulario.Id, formulario.UndCant).subscribe(datos_productoPedido => {
-      let datos : any = [];
+      let datos: any = [];
       datos.push(datos_productoPedido);
       for (const item of datos) {
         this.existenciasProductosServices.srvObtenerListaPorIdProducto(formulario.Id).subscribe(datos_producto => {
           for (let i = 0; i < datos_producto.length; i++) {
             this.presentacion.push(datos_producto[i].undMed_Id);
             this.FormPedidoExternoProductos.patchValue({
-              ProdId : formulario.Id,
+              ProdId: formulario.Id,
               ProdNombre: formulario.Nombre,
-              ProdAncho : formulario.Ancho,
-              ProdFuelle : formulario.Fuelle,
-              ProdCalibre : formulario.Cal,
-              ProdLargo : formulario.Largo,
-              ProdUnidadMedidaACF : formulario.Und,
-              ProdTipo : formulario.Tipo,
-              ProdCantidad : formulario.Cant,
-              ProdUnidadMedidaCant : formulario.UndCant,
-              ProdPrecioUnd : formulario.PrecioUnd,
-              ProdTipoMoneda : formulario.TpMoneda,
-              ProdStock : datos_producto[i].exProd_Cantidad,
-              ProdDescripcion : formulario.Produ_Descripcion,
+              ProdAncho: formulario.Ancho,
+              ProdFuelle: formulario.Fuelle,
+              ProdCalibre: formulario.Cal,
+              ProdLargo: formulario.Largo,
+              ProdUnidadMedidaACF: formulario.Und,
+              ProdTipo: formulario.Tipo,
+              ProdCantidad: formulario.Cant,
+              ProdUnidadMedidaCant: formulario.UndCant,
+              ProdPrecioUnd: formulario.PrecioUnd,
+              ProdTipoMoneda: formulario.TpMoneda,
+              ProdStock: datos_producto[i].exProd_Cantidad,
+              ProdDescripcion: formulario.Produ_Descripcion,
               ProdMaterial: formulario.Material,
               ProdPigmento: formulario.Pigmento,
-              ProdUltFacturacion : item.pedExtProd_PrecioUnitario,
+              ProdUltFacturacion: item.pedExtProd_PrecioUnitario,
             });
             if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
             else this.validarInputNombresProductos = true;
@@ -1915,40 +1915,40 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para guardar clientes en la base de datos
-  insertarClientes(id : any, tipoId : any, nombre : any, telefono : string, email : any, tipoCliente : string, ciudadSede : any, vendedor : any, codigoPostal : number, direccionSede : any, sedeCLiID : any){
+  insertarClientes(id: any, tipoId: any, nombre: any, telefono: string, email: any, tipoCliente: string, ciudadSede: any, vendedor: any, codigoPostal: number, direccionSede: any, sedeCLiID: any) {
     this.tipoClientService.srvObtenerListaPorNombreTipoCliente(tipoCliente).subscribe(datos_tipoCliente => {
       for (let index = 0; index < datos_tipoCliente.length; index++) {
         this.usuarioService.srvObtenerListaPorNombreUsuario(vendedor).subscribe(datos_usuario => {
           for (let index = 0; index < datos_usuario.length; index++) {
-              if (this.ValidarRol == 2) {
-                const datosClientes : modelCliente = {
-                  Cli_Id: id,
-                  TipoIdentificacion_Id : tipoId,
-                  Cli_Nombre: nombre,
-                  Cli_Telefono: telefono,
-                  Cli_Email: email,
-                  TPCli_Id: datos_tipoCliente[index].tpCli_Id,
-                  Usua_Id: datos_usuario[index].usua_Id,
-                  Estado_Id : 8,
-                  Cli_Fecha : moment().format('YYYY-MM-DD'),
-                  Cli_Hora : moment().format('H:mm:ss'),
-                }
-                this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
-              }else if (this.ValidarRol == 1){
-                const datosClientes : modelCliente = {
-                  Cli_Id: id,
-                  TipoIdentificacion_Id : tipoId,
-                  Cli_Nombre: nombre,
-                  Cli_Telefono: telefono,
-                  Cli_Email: email,
-                  TPCli_Id: datos_tipoCliente[index].tpCli_Id,
-                  Usua_Id: datos_usuario[index].usua_Id,
-                  Estado_Id : 1,
-                  Cli_Fecha : moment().format('YYYY-MM-DD'),
-                  Cli_Hora : moment().format('H:mm:ss'),
-                }
-                this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
+            if (this.ValidarRol == 2) {
+              const datosClientes: modelCliente = {
+                Cli_Id: id,
+                TipoIdentificacion_Id: tipoId,
+                Cli_Nombre: nombre,
+                Cli_Telefono: telefono,
+                Cli_Email: email,
+                TPCli_Id: datos_tipoCliente[index].tpCli_Id,
+                Usua_Id: datos_usuario[index].usua_Id,
+                Estado_Id: 8,
+                Cli_Fecha: moment().format('YYYY-MM-DD'),
+                Cli_Hora: moment().format('H:mm:ss'),
               }
+              this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
+            } else if (this.ValidarRol == 1) {
+              const datosClientes: modelCliente = {
+                Cli_Id: id,
+                TipoIdentificacion_Id: tipoId,
+                Cli_Nombre: nombre,
+                Cli_Telefono: telefono,
+                Cli_Email: email,
+                TPCli_Id: datos_tipoCliente[index].tpCli_Id,
+                Usua_Id: datos_usuario[index].usua_Id,
+                Estado_Id: 1,
+                Cli_Fecha: moment().format('YYYY-MM-DD'),
+                Cli_Hora: moment().format('H:mm:ss'),
+              }
+              this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
+            }
             break;
           }
         });
@@ -1957,11 +1957,11 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para guardar en la base de datos las sede de clientes
-  llenarSedeCliente(id : number, ciudadSede : any, codigoPostal : number, direccionSede : any){
-    let sedes_id = [];
-    let nuevoID : any;
+  llenarSedeCliente(id: number, ciudadSede: any, codigoPostal: number, direccionSede: any) {
+    let sedes_id : any = [];
+    let nuevoID: any;
 
-    this.sedesClientesService.srvObtenerListaPorId(id+1).subscribe(datos_sedePorID => {
+    this.sedesClientesService.srvObtenerListaPorId(id + 1).subscribe(datos_sedePorID => {
       this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
         for (let index = 0; index < datos_sedes.length; index++) {
           if (datos_sedes[index].cli_Id == id) sedes_id.push(datos_sedes[index].sedeCli_Id);
@@ -1969,39 +1969,39 @@ export class OpedidoproductoComponent implements OnInit {
 
         let ultimoId = Math.max.apply(null, sedes_id);
         nuevoID = ultimoId + 1;
-        const datosSedes : any = {
+        const datosSedes: any = {
           sedeCli_Id: nuevoID,
           SedeCliente_Ciudad: ciudadSede,
           SedeCliente_Direccion: direccionSede,
           SedeCli_CodPostal: codigoPostal,
-          Cli_Id : id,
-          SedeCli_Fecha : this.today,
-          SedeCli_Hora : moment().format('H:mm:ss'),
+          Cli_Id: id,
+          SedeCli_Fecha: this.today,
+          SedeCli_Hora: moment().format('H:mm:ss'),
         }
         this.sedesClientesService.srvGuardar(datosSedes).subscribe(datos_sede => {
           this.clientesComboBox();
           Swal.fire('Sede de cliente guardada con éxito!');
-       }, error => { console.log(error); });
+        }, error => { console.log(error); });
 
       });
     }, error => {
-      nuevoID = id +""+ 1;
-      const datosSedess : any = {
+      nuevoID = id + "" + 1;
+      const datosSedess: any = {
         sedeCli_Id: nuevoID,
         SedeCliente_Ciudad: ciudadSede,
         SedeCliente_Direccion: direccionSede,
         SedeCli_CodPostal: codigoPostal,
-        Cli_Id : id,
+        Cli_Id: id,
       }
       this.sedesClientesService.srvGuardar(datosSedess).subscribe(datos_sede => {
         this.clientesComboBox();
         Swal.fire('Sede de cliente guardada con éxito!');
-       }, error => { console.log(error); });
+      }, error => { console.log(error); });
     });
   }
 
   // Funcion para guardar productos en la base de datos
-  registrarProducto(id : any, nombre : any, ancho : any, fuelle : any, calibre : any, largo : any, undMed : any, tpProducto : any, material : any, pigmento : any, descripcion : any, cliente : any){
+  registrarProducto(id: any, nombre: any, ancho: any, fuelle: any, calibre: any, largo: any, undMed: any, tpProducto: any, material: any, pigmento: any, descripcion: any, cliente: any) {
     let tipoProductos_nombre = tpProducto;
     this.tiposProductosService.srvObtenerListaPorNombreTipoProducto(tipoProductos_nombre).subscribe(datos_tipoProducto => {
       for (let index = 0; index < datos_tipoProducto.length; index++) {
@@ -2010,7 +2010,7 @@ export class OpedidoproductoComponent implements OnInit {
             this.materialService.srvObtenerListaPorNombreMaterial(material).subscribe(datos_material => {
               for (let mat = 0; mat < datos_material.length; mat++) {
                 if (this.ValidarRol == 2) {
-                  const datosProductos : any = {
+                  const datosProductos: any = {
                     Prod_Id: id,
                     Prod_Nombre: nombre,
                     Prod_Descripcion: descripcion,
@@ -2026,17 +2026,17 @@ export class OpedidoproductoComponent implements OnInit {
                     Prod_Largo: largo,
                     Pigmt_Id: datos_pigmentos[pigm].pigmt_Id,
                     Material_Id: datos_material[mat].material_Id,
-                    Prod_Fecha : this.today,
-                    Prod_Hora : moment().format('H:mm:ss'),
+                    Prod_Fecha: this.today,
+                    Prod_Hora: moment().format('H:mm:ss'),
                   };
                   this.clientesService.srvObtenerListaPorNombreCliente(cliente).subscribe(datos_clientes => {
                     for (let i = 0; i < datos_clientes.length; i++) {
-                      const clienteproducto : any = {
+                      const clienteproducto: any = {
                         Cli_Id: datos_clientes[i].cli_Id,
                         Prod_Id: id
                       }
                       this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
-                        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+                        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos => {
                           const Toast = Swal.mixin({
                             toast: true,
                             position: 'center',
@@ -2053,12 +2053,12 @@ export class OpedidoproductoComponent implements OnInit {
                             title: `Producto creado con exito`
                           });
                         });
-                      }, error => {console.log(error)});
+                      }, error => { console.log(error) });
                       break;
                     }
                   });
-                }else if (this.ValidarRol == 1){
-                  const datosProductos : any = {
+                } else if (this.ValidarRol == 1) {
+                  const datosProductos: any = {
                     Prod_Id: id,
                     Prod_Nombre: nombre,
                     Prod_Descripcion: descripcion,
@@ -2077,12 +2077,12 @@ export class OpedidoproductoComponent implements OnInit {
                   };
                   this.clientesService.srvObtenerListaPorNombreCliente(cliente).subscribe(datos_clientes => {
                     for (let i = 0; i < datos_clientes.length; i++) {
-                      const clienteproducto : any = {
+                      const clienteproducto: any = {
                         Cli_Id: datos_clientes[i].cli_Id,
                         Prod_Id: id
                       }
                       this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
-                        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+                        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos => {
                           const Toast = Swal.mixin({
                             toast: true,
                             position: 'center',
@@ -2099,7 +2099,7 @@ export class OpedidoproductoComponent implements OnInit {
                             title: `Producto creado con exito`
                           });
                         });
-                      }, error => {console.log(error)});
+                      }, error => { console.log(error) });
                       break;
                     }
                   });
@@ -2113,40 +2113,40 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para guardarr las existencias de los productos en la base de datos
-  registrarExistenciaProducto(id : any, cantidad : any, undMed2 : any, precio : any, precioFinal : string, moneda : any){
-      const datosExistencias : any = {
-        Prod_Id: id,
-        ExProd_Cantidad: cantidad,
-        TpBod_Id: 2,
-        UndMed_Id: undMed2,
-        ExProd_Precio: precio,
-        ExProd_PrecioExistencia: precio * cantidad,
-        ExProd_PrecioSinInflacion: 0,
-        TpMoneda_Id: moneda,
-        ExProd_PrecioVenta: precio,
-      };
-      this.existenciasProductosServices.srvGuardar(datosExistencias).subscribe(datos_existencias => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 3500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: `La existencia del producto con el ID ${id} ha sido creada correctamente`
-        });
-      }, error => { console.log(error)});
+  registrarExistenciaProducto(id: any, cantidad: any, undMed2: any, precio: any, precioFinal: string, moneda: any) {
+    const datosExistencias: any = {
+      Prod_Id: id,
+      ExProd_Cantidad: cantidad,
+      TpBod_Id: 2,
+      UndMed_Id: undMed2,
+      ExProd_Precio: precio,
+      ExProd_PrecioExistencia: precio * cantidad,
+      ExProd_PrecioSinInflacion: 0,
+      TpMoneda_Id: moneda,
+      ExProd_PrecioVenta: precio,
+    };
+    this.existenciasProductosServices.srvGuardar(datosExistencias).subscribe(datos_existencias => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 3500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: 'success',
+        title: `La existencia del producto con el ID ${id} ha sido creada correctamente`
+      });
+    }, error => { console.log(error) });
   }
 
   // Funcion para actualizar un producto
-  actualizarProducto(){
-    let nombreProd : string = this.FormPedidoExternoProductos.value.ProdNombre;
+  actualizarProducto() {
+    let nombreProd: string = this.FormPedidoExternoProductos.value.ProdNombre;
     Swal.fire({
       title: '¿Está seguro de actualizar este producto?',
       icon: 'warning',
@@ -2155,9 +2155,9 @@ export class OpedidoproductoComponent implements OnInit {
       confirmButtonText: 'Si, actualizar!'
     }).then((result) => {
       if (result.isConfirmed) {
-        let id : number = this.FormPedidoExternoProductos.value.ProdId;
-        let presentacion : any = this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant;
-        this.tiposProductosService.srvObtenerListaPorNombreTipoProducto( this.FormPedidoExternoProductos.value.ProdTipo).subscribe(datos_tipos => {
+        let id: number = this.FormPedidoExternoProductos.value.ProdId;
+        let presentacion: any = this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant;
+        this.tiposProductosService.srvObtenerListaPorNombreTipoProducto(this.FormPedidoExternoProductos.value.ProdTipo).subscribe(datos_tipos => {
           for (let index = 0; index < datos_tipos.length; index++) {
             this.materialService.srvObtenerListaPorNombreMaterial(this.FormPedidoExternoProductos.value.ProdMaterial).subscribe(datos_material => {
               for (let index = 0; index < datos_material.length; index++) {
@@ -2166,7 +2166,7 @@ export class OpedidoproductoComponent implements OnInit {
                     this.existenciasProductosServices.srvObtenerListaPorIdProductoPresentacion(id, presentacion).subscribe(datos_existencias => {
                       for (let i = 0; i < datos_existencias.length; i++) {
                         const datosProducto = {
-                          Prod_Id : id,
+                          Prod_Id: id,
                           Prod_Nombre: nombreProd,
                           Prod_Descripcion: this.FormPedidoExternoProductos.value.ProdDescripcion,
                           TpProd_Id: datos_tipos[index].tpProd_Id,
@@ -2194,7 +2194,7 @@ export class OpedidoproductoComponent implements OnInit {
                           ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
                           ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
                           TpMoneda_Id: this.FormPedidoExternoProductos.value.ProdTipoMoneda,
-                          exProd_PrecioVenta : this.FormPedidoExternoProductos.value.ProdPrecioUnd
+                          exProd_PrecioVenta: this.FormPedidoExternoProductos.value.ProdPrecioUnd
                         }
                         this.productosServices.srvActualizar(id, datosProducto).subscribe(datos_productos => {
                           this.existenciasProductosServices.srvActualizarProductoPresentacion(id, presentacion, datosExistencias).subscribe(datos_existencias => {
@@ -2218,7 +2218,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para editar un pedido
-  MostrarPedido(formulario : any) {
+  MostrarPedido(formulario: any) {
     this.enPedido = 'si';
     this.ArrayProducto = [];
     this.sedeCliente = [];
@@ -2271,27 +2271,27 @@ export class OpedidoproductoComponent implements OnInit {
                     if (this.FormPedidoExternoClientes.value.PedClienteNombre != '') this.validarInputClientes = false;
                     else this.validarInputClientes = true;
 
-                    let productoExt : any = {
-                      Id : datos_productos[k].prod_Id,
-                      Nombre : datos_productos[k].prod_Nombre,
-                      Ancho : datos_productos[k].prod_Ancho,
-                      Fuelle : datos_productos[k].prod_Fuelle,
-                      Cal : datos_productos[k].prod_Calibre,
-                      Und : datos_productos[k].undMedACF,
-                      Tipo : datos_productos[k].tpProd_Nombre,
-                      Material : datos_productos[k].material_Nombre,
-                      Pigmento : datos_productos[k].pigmt_Nombre,
-                      Cant : datos_productosPedidos[j].pedExtProd_Cantidad,
-                      Largo : datos_productos[k].prod_Largo,
-                      UndCant : datos_productosPedidos[j].undMed_Id,
-                      PrecioUnd : datos_productosPedidos[j].pedExtProd_PrecioUnitario,
-                      TpMoneda : datos_productos[k].tpMoneda_Id,
-                      Stock : datos_productos[k].ExProd_Cantidad,
-                      Produ_Descripcion : datos_productos[k].prod_Descripcion,
-                      SubTotal : datos_productosPedidos[j].pedExtProd_Cantidad * datos_productosPedidos[j].pedExtProd_PrecioUnitario,
+                    let productoExt: any = {
+                      Id: datos_productos[k].prod_Id,
+                      Nombre: datos_productos[k].prod_Nombre,
+                      Ancho: datos_productos[k].prod_Ancho,
+                      Fuelle: datos_productos[k].prod_Fuelle,
+                      Cal: datos_productos[k].prod_Calibre,
+                      Und: datos_productos[k].undMedACF,
+                      Tipo: datos_productos[k].tpProd_Nombre,
+                      Material: datos_productos[k].material_Nombre,
+                      Pigmento: datos_productos[k].pigmt_Nombre,
+                      Cant: datos_productosPedidos[j].pedExtProd_Cantidad,
+                      Largo: datos_productos[k].prod_Largo,
+                      UndCant: datos_productosPedidos[j].undMed_Id,
+                      PrecioUnd: datos_productosPedidos[j].pedExtProd_PrecioUnitario,
+                      TpMoneda: datos_productos[k].tpMoneda_Id,
+                      Stock: datos_productos[k].ExProd_Cantidad,
+                      Produ_Descripcion: datos_productos[k].prod_Descripcion,
+                      SubTotal: datos_productosPedidos[j].pedExtProd_Cantidad * datos_productosPedidos[j].pedExtProd_PrecioUnitario,
                     }
 
-                    if(this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
+                    if (this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
                     else {
                       for (let index = 0; index < this.ArrayProducto.length; index++) {
                         this.ArrayProducto.push(productoExt);
@@ -2314,22 +2314,22 @@ export class OpedidoproductoComponent implements OnInit {
   editarPedido() {
     this.enPedido = 'no';
     this.id_pedido;
-    let estadoNombre : string = this.FormPedidoExternoClientes.value.PedEstadoId;
-    let idProducto = [];
-    let productoArray = [];
-    let info_producto = [];
-    let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let estadoNombre: string = this.FormPedidoExternoClientes.value.PedEstadoId;
+    let idProducto : any = [];
+    let productoArray : any = [];
+    let info_producto : any = [];
+    let clienteNombre: any = this.FormPedidoExternoClientes.value.PedClienteNombre;
 
-    this.sedesClientesService.srvObtenerListaPorNombreCliente(clienteNombre).subscribe(datos_sede =>{
+    this.sedesClientesService.srvObtenerListaPorNombreCliente(clienteNombre).subscribe(datos_sede => {
       for (let sede = 0; sede < datos_sede.length; sede++) {
         if (datos_sede[sede].sedeCliente_Ciudad == this.FormPedidoExternoClientes.get('ciudad_sede')?.value) {
           this.estadosService.srvObtenerListaPorNombreEstado(estadoNombre).subscribe(datos_estado => {
             for (let index = 0; index < datos_estado.length; index++) {
 
               //Empezamos a llenar la informacion del pedido actualizado
-              const camposPedido : any = {
-                PedExt_Id : this.id_pedido,
-                PedExt_FechaCreacion:  this.FormPedidoExternoClientes.get('PedFecha')?.value,
+              const camposPedido: any = {
+                PedExt_Id: this.id_pedido,
+                PedExt_FechaCreacion: this.FormPedidoExternoClientes.get('PedFecha')?.value,
                 PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
                 Empresa_Id: this.EmpresaVendedora,
                 SedeCli_Id: datos_sede[sede].sedeCli_Id,
@@ -2341,7 +2341,7 @@ export class OpedidoproductoComponent implements OnInit {
               }
 
               //Validamos que la tabla no este vacia, si está vacia entonces le enviamos un mensaje de confirmacion
-              if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
+              if (!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
               //Validamos que la fecha de entrega no sea menor a la fecha en que se crea el pedido
               else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion) Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
               //Si ninguna de las validaciones anteriores se cumple entonces empezamos con la actualizacion del pedido
@@ -2356,25 +2356,25 @@ export class OpedidoproductoComponent implements OnInit {
                   //Validamos el estado del pedido (2: En proceso, 5: Finalizado, 6: Iniciado)
                   if (datos_estado[index].estado_Id == 2 || datos_estado[index].estado_Id == 5 || datos_estado[index].estado_Id == 6) {
                     //Empezamos a tomar la informacion del cliente para actualizarlo
-                    const datosClienteActualizado : any = {
+                    const datosClienteActualizado: any = {
                       Cli_Id: datos_sede[sede].cli_Id,
-                      TipoIdentificacion_Id : datos_sede[sede].tipoIdentificacion_Id,
+                      TipoIdentificacion_Id: datos_sede[sede].tipoIdentificacion_Id,
                       Cli_Nombre: datos_sede[sede].cli_Nombre,
                       Cli_Telefono: datos_sede[sede].cli_Telefono,
                       Cli_Email: datos_sede[sede].cli_Email,
                       TPCli_Id: datos_sede[sede].tpCli_Id,
                       Usua_Id: datos_sede[sede].usua_Id,
-                      Estado_Id : 1,
+                      Estado_Id: 1,
                     }
-                    this.clientesService.srvActualizar(datos_sede[sede].cli_Id, datosClienteActualizado).subscribe(cliente_Actualizado => {});
+                    this.clientesService.srvActualizar(datos_sede[sede].cli_Id, datosClienteActualizado).subscribe(cliente_Actualizado => { });
 
                     //Luego de terminar con el cliente empezamos a actualizar el producto
                     for (const item of idProducto) {
                       this.productosServices.srvObtenerListaPorId(item).subscribe(datos_productos => {
                         info_producto.push(datos_productos);
                         for (let i = 0; i < info_producto.length; i++) {
-                          const datosProducto : any = {
-                            Prod_Id : item,
+                          const datosProducto: any = {
+                            Prod_Id: item,
                             Prod_Nombre: info_producto[i].prod_Nombre,
                             Prod_Descripcion: info_producto[i].prod_Descripcion,
                             TpProd_Id: info_producto[i].tpProd_Id,
@@ -2387,10 +2387,10 @@ export class OpedidoproductoComponent implements OnInit {
                             UndMedACF: info_producto[i].undMedACF,
                             Estado_Id: 10,
                             Prod_Largo: 0,
-                            Pigmt_Id : info_producto[i].pigmt_Id,
-                            Material_Id : info_producto[i].material_Id,
+                            Pigmt_Id: info_producto[i].pigmt_Id,
+                            Material_Id: info_producto[i].material_Id,
                           }
-                          this.productosServices.srvActualizar(item, datosProducto).subscribe(datos_producto_actualizado => {}, error => {console.log(error);});
+                          this.productosServices.srvActualizar(item, datosProducto).subscribe(datos_producto_actualizado => { }, error => { console.log(error); });
                         }
 
                         /*Luego se consulta la tabla de Clientes_Productos para saber si los productos que estan en el pedido
@@ -2435,8 +2435,8 @@ export class OpedidoproductoComponent implements OnInit {
                       });
                     }
 
-                  //Si el estado llega a ser (9: En pedido) solo se podrán agregar productos al pedido
-                  } else if (datos_estado[index].estado_Id == 11){
+                    //Si el estado llega a ser (9: En pedido) solo se podrán agregar productos al pedido
+                  } else if (datos_estado[index].estado_Id == 11) {
                     for (let prod = 0; prod < this.ArrayProducto.length; prod++) {
                       idProducto.push(this.ArrayProducto[prod].Id);
 
@@ -2494,20 +2494,20 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion que se encarga de tomar el producto eliminado de la tabla en la vista y eliminarlo en la base de datos
-  eliminarProductoPedido(item : number){
+  eliminarProductoPedido(item: number) {
     // this.PedidoProductosService.srvObtenerListaPorId(item, this.id_pedido).subscribe(datos_productosPedidos => {
     //   this.PedidoProductosService.srvEliminar(item, this.id_pedido).subscribe(datos_productosPedidos_eliminado => {});
     // });
   }
 
   //Funcion que crea un pdf del pedido una vez es actualizado
-  crearpdfPedidoActualizado(idPedido : number){
-    let nombreCliente : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+  crearpdfPedidoActualizado(idPedido: number) {
+    let nombreCliente: any = this.FormPedidoExternoClientes.value.PedClienteNombre;
     this.sedesClientesService.srvObtenerListaPorNombreCliente(nombreCliente).subscribe(datos_sedeCliente => {
       for (let i = 0; i < datos_sedeCliente.length; i++) {
         if (datos_sedeCliente[i].sedeCliente_Ciudad == this.FormPedidoExternoClientes.get('ciudad_sede')?.value) {
           for (let j = 0; j < this.ArrayProducto.length; j++) {
-            const pdfDefinicion : any = {
+            const pdfDefinicion: any = {
               info: {
                 title: `${idPedido}`
               },
@@ -2515,7 +2515,7 @@ export class OpedidoproductoComponent implements OnInit {
                 width: 630,
                 height: 760
               },
-              content : [
+              content: [
                 {
                   text: `Plasticaribe S.A.S ---- Orden de Pedidos de Productos`,
                   alignment: 'center',
@@ -2619,7 +2619,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //
-  CrearOT(item : any){
+  CrearOT(item: any) {
     this.ordenTrabajoService.srvObtenerListaNumeroPedido(item.pedExt_Id).subscribe(datos_ot => {
       if (datos_ot.length == 0) {
         this.modalOrdenTrabajo = true;
@@ -2627,21 +2627,21 @@ export class OpedidoproductoComponent implements OnInit {
         let FechaEntregaDatetime = item.pedExt_FechaEntrega;
         let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
         let fechaEntrega = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-        let itemOt : any = {
-          id : item.pedExt_Id,
-          nombre : `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
-          fecha : fechaEntrega,
+        let itemOt: any = {
+          id: item.pedExt_Id,
+          nombre: `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
+          fecha: fechaEntrega,
         }
         // this.CrearOrdenTrabajo.consultarPedido(itemOt);
-      } else if (datos_ot.length >= 1){
-        let productosOT : any = [];
+      } else if (datos_ot.length >= 1) {
+        let productosOT: any = [];
 
         for (let i = 0; i < datos_ot.length; i++) {
           productosOT.push(datos_ot[i].prod_Id);
         }
 
         this.PedidoProductosService.srvObtenerListaPorIdProductoPedido(item.pedExt_Id).subscribe(datos_productosPedidos => {
-          let productos : any = [];
+          let productos: any = [];
           for (let j = 0; j < datos_productosPedidos.length; j++) {
             if (!productosOT.includes(datos_productosPedidos[j].prod_Id)) {
               productos.push(datos_productosPedidos[j].prod_Id)
@@ -2650,10 +2650,10 @@ export class OpedidoproductoComponent implements OnInit {
               let FechaEntregaDatetime = item.pedExt_FechaEntrega;
               let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
               let fechaEntrega = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-              let itemOt : any = {
-                id : item.pedExt_Id,
-                nombre : `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
-                fecha : fechaEntrega,
+              let itemOt: any = {
+                id: item.pedExt_Id,
+                nombre: `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
+                fecha: fechaEntrega,
               }
               // this.CrearOrdenTrabajo.consultarPedido(itemOt);
             } else continue;

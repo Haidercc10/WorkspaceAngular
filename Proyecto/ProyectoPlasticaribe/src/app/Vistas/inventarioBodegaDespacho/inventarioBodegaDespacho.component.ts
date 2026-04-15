@@ -63,9 +63,9 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   }
 
   editClassProtectedPanel(newClass: string) {
-    document.getElementById('B0031_protectedPanel').className = newClass;
-    document.getElementById('B0032_protectedPanel').className = newClass;
-    document.getElementById('B0033_protectedPanel').className = newClass;
+    document.getElementById('B0031_protectedPanel')!.className = newClass;
+    document.getElementById('B0032_protectedPanel')!.className = newClass;
+    document.getElementById('B0033_protectedPanel')!.className = newClass;
   }
 
   clearUbicationsFound() {
@@ -111,14 +111,14 @@ export class InventarioBodegaDespachoComponent implements OnInit {
         this.editClassProtectedPanel('protectedPanel');
         if (!ubicationIncluded.includes(d.ubicacion)) {
           ubicationIncluded.push(d.ubicacion);
-          document.getElementById((d.ubicacion).trim()).className += ' ubicationFound';
-          let newUbication = document.getElementById((d.ubicacion).trim()).id;
+          document.getElementById((d.ubicacion).trim())!.className += ' ubicationFound';
+          let newUbication = document.getElementById((d.ubicacion).trim())!.id;
           let cutString : number = newUbication.indexOf('_PL') > 0 ? newUbication.indexOf('_PL') : newUbication.indexOf('_ESTB');
           
           if(newUbication.startsWith('B0033_')) {
             newUbication = newUbication.substring(0, cutString);
             newUbication = newUbication.replace('B0033_', '');
-            document.getElementById((newUbication).trim()).className += ' ubicationFound';
+            document.getElementById((newUbication).trim())!.className += ' ubicationFound';
           }
         }
       });
@@ -142,7 +142,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   GetStoreByUbication(ubication: string) {
     this.load = true;
     this.ubicationModal = this.ubicationModal.length >= 14 ? this.ubicationModal.substring(0, 14) : this.ubicationModal;
-    this.ubicationModal += document.getElementById(ubication).getAttribute('pTooltip');
+    this.ubicationModal += document.getElementById(ubication)!.getAttribute('pTooltip');
     this.storehouseService.GetInventarioPorUbicacion(ubication).subscribe(data => {
       this.dataSearched = this.getConsolidateInformation(data);
       this.showDataStore = true;

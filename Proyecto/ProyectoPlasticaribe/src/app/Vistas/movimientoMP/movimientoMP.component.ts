@@ -469,6 +469,8 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   entradasMateriasPrimas(data: any) {
+    console.log('data PDF:', data);
+    
     this.datosPdf = [];
     let informacionPdf: any = null;
     this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
@@ -512,6 +514,8 @@ export class MovimientoMPComponent implements OnInit {
         //}, 500);
       }
       informacionPdf = datos;
+      console.log('InformacionPDF', informacionPdf);
+      
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
@@ -590,11 +594,11 @@ export class MovimientoMPComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data: any, columns: any, title: string) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });

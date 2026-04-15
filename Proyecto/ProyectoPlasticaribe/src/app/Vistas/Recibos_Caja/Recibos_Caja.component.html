@@ -29,8 +29,8 @@
   </div>
 
   <p-toolbar>
-    <div class="row g-3 p-2" style="width: 100%;">
-      <div class="col-sm-12 col-md-3 text-left">
+    <div class="row g-3" style="width: 100%;">
+      <div class="col-sm-12 col-md-3">
         <span class="p-float-label" id="rango-fechas">
           <!-- Rango de Fechas -->
           <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
@@ -38,12 +38,21 @@
         </span>
       </div>
 
-      <div class="col-sm-12 col-md-3 text-left">
-        <button pButton pRipple pTooltip="Consultar Recibos" label="Consultar" (click)="consultarRecibos()" icon="pi pi-search" class="p-button-danger ml-2" id="consultar"></button>
+      <div class="col-sm-12 col-md-3">
+        <span class="p-float-label" id="vendedor">
+          <!-- Vendedor -->
+          <p-dropdown [options]="vendedores" [autoDisplayFirst]="ValidarRol == 2" [readonly]="ValidarRol == 2" [(ngModel)]="vendedorSeleccionado" optionLabel="usua_Nombre" optionValue="usua_Id" placeholder="Seleccione un vendedor"></p-dropdown>
+          <label for="vendedor">Vendedor</label>
+        </span>
       </div>
 
-      <div class="col-sm-12 col-md-6 text-right">
-        <!-- Exportar excel -->
+      <div class="col-sm-12 col-md-1 mr-2">
+         <!-- Botón Consultar -->
+        <button pButton pRipple pTooltip="Consultar Recibos" label="Consultar" (click)="consultarRecibos()" icon="pi pi-search" class="p-button-danger" id="consultar"></button>
+      </div>
+
+      <div class="col-sm-12 col-md-1">
+          <!-- Botón Exportar -->
         <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="exportarExcel(fecha, fechaFinal)"></button>
       </div>
     </div>

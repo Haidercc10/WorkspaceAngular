@@ -46,8 +46,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   cantParciales : number = 0; /** Variable que mostrará el número de solicitudes parciales */
   estadoSolicitud : string = ''; /** Variable que servirá para no permitir cancelar solicitudes en estado cancelado o finalizado. */
   clave : string = ''; /** Variable que contendrá una palabra clave ya sea para finalizar o cancelar una solicitud.*/
-  nroSolicitud : number = 0;
-  arrayId : any = [];
+  nroSolicitud : number = 0; /// Variable que se usará para almacenar el nro de solicitud al momento de generar el PDF y cargar la información de la solicitud seleccionada.
+  arrayId : any = []; /// Array que se usará para almacenar los id de las solicitudes que se muestran en la tabla, esto con el fin de no mostrar solicitudes repetidas en caso de que una solicitud tenga varias materias primas.
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -384,9 +384,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   // funcion que se encargará de llenar la tabla en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
+    var body : any = [];
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });
@@ -396,7 +396,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   }
 
   // Funcion que genera la tabla donde se mostrará la información
-  table(data, columns) {
+  table(data: any, columns: any) {
     return {
       table: {
         headerRows: 1,

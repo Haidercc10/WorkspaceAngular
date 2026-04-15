@@ -343,8 +343,10 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
       Solicitud_Hora: moment().format('H:mm:ss'),
       Estado_Id: 11,
     }
-    this.solicitudService.Put(this.formSolicitud.value.Id_Solicitud, info).subscribe(data => this.editarDtSolicitud(info.Solicitud_Id),
-    error => { this.msj.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la solicitud de materia prima!`); this.cargando = false; });
+
+    this.solicitudService.Put(this.formSolicitud.value.Id_Solicitud, info).subscribe(data => {
+      if(info.Solicitud_Id != null) this.editarDtSolicitud(info.Solicitud_Id);
+    }, error => { this.msj.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la solicitud de materia prima!`); this.cargando = false; });
   }
 
   // Funcion que agregará las materias primas a la solicitud que está siendo editada
@@ -465,10 +467,10 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

@@ -28,38 +28,34 @@ import { Mov_IngresoPeletizadoComponent } from '../Mov_IngresoPeletizado/Mov_Ing
 
 export class MateriaPrimaRecuperadaComponent implements OnInit {
 
-  public FormMateriaPrimaRecuperada !: FormGroup;
-  public FormMateriaPrima !: FormGroup;
-  public FormRemisiones !: FormGroup;
-  public consultaRemisiones !: FormGroup;
-  public FormMateriaPrimaRetiro !: FormGroup;
-  public FormMateriaPrimaRetirada !: FormGroup;
-
+  public FormMateriaPrimaRecuperada !: FormGroup; //Variable que almacenará la información de la materia prima recuperada que se va a registrar
+  public FormMateriaPrima !: FormGroup; //Variable que almacenará la información de la materia prima que se va a agregar a la tabla, esta información no se guardará en la base de datos, solo se usará para mostrarla en la tabla y luego cargarla en el FormMateriaPrimaRecuperada para registrar el recuperado
+  
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
-  public ModalCrearProveedor: boolean = false;
-  public ModalCrearMateriaPrima: boolean= false;
+  public ModalCrearProveedor: boolean = false; //Modal para crear un nuevo proveedor
+  public ModalCrearMateriaPrima: boolean= false; //Modal para crear una nueva materia prima
 
   /* Vaiables*/
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  materiasPrimas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  nombreCategoriasMP = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
-  unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
-  usuarios = []; //Variable que va a almacenar todos los usuarios de la empresa
-  materiaPrimaSeleccionada = []; //Variable que almacenará la informacion de la materia prima seleccionada
+  materiasPrimas : any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  nombreCategoriasMP : any = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
+  unidadMedida : any = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
+  usuarios : any = []; //Variable que va a almacenar todos los usuarios de la empresa
+  materiaPrimaSeleccionada : any = []; //Variable que almacenará la informacion de la materia prima seleccionada
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
   AccionBoton = "Agregar"; //Variable que almanará informacio para saber si una materia prima está en edicion o no (Se editará una materia prima cargada en la tabla, no una en la base de datos)
   turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
-  mpSeleccionada : any = [];
+  mpSeleccionada : any = []; //Variable que almacenará la información de la materia prima seleccionada para quitar de la tabla
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  modalMode : boolean = false;
-  fieldFocus : boolean = false;
-  title : boolean = true;
+  modalMode : boolean = false; //Variable que se usará para cambiar el titulo del modal de agregar materia prima dependiendo de si se está editando o agregando una nueva materia prima
+  fieldFocus : boolean = false; //Variable que se usará para validar el foco en el campo de cantidad de la materia prima en la tabla, para mostrar un mensaje de advertencia si la cantidad ingresada es mayor a la cantidad inicial
+  title : boolean = true; //Variable que se usará para mostrar el titulo de la vista dependiendo del rol del usuario, si es tipo 2 se mostrará "Registrar materia prima recuperada" y si es otro tipo de rol se mostrará "Registrar materia prima retirada"
   load : boolean = false; //Variable para validar que salga o no la imagen de carga
-  outputsToUpdate : any [] = []; //
+  outputsToUpdate : any [] = []; //Variable que almacenará las salidas de peletizado que se deben actualizar al crear una entrada de recuperado desde la salida de peletizado
   
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -152,7 +148,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos => this.unidadMedida = datos.map(x => x.undMed_Id));
 
   //Funcion que se encargará de buscary almacenar todos los usuarios
-  obtenerUsuarios = () => this.usuarioService.srvObtenerListaUsuario().subscribe(datos => this.usuarios = datos.filter(x => [3,1].includes(x.rolUsu_Id) && [123456789,112,4169].includes(x.usua_Id)));
+  obtenerUsuarios = () => this.usuarioService.srvObtenerListaUsuario().subscribe(datos => this.usuarios = datos.filter(x => [3].includes(x.rolUsu_Id) && x.estado_Id == 1));
 
   //Funcion que traerá la información del usuario seleccionado
   llenarUsuarioSeleccionado(){
@@ -260,6 +256,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     }
   }
 
+  //Funcion que actualizará el estado de las salidas de peletizado relacionadas al crear una entrada de recuperado desde la salida de peletizado
   updateOutputPeletizado(outputs : any){
     //let output : any = this.FormMateriaPrimaRecuperada.value.ConsecutivoSalida;
     this.svOutputsPele.putStatusOutput(this.storage_Id, outputs).subscribe(data => {

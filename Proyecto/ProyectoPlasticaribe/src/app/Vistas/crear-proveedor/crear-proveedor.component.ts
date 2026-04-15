@@ -20,11 +20,11 @@ import { Conceptos_AutomaticosService } from 'src/app/Servicios/Conceptos_Automa
 export class CrearProveedorComponent implements OnInit {
 
   public FormCrearProveedor !: FormGroup; /** Formulario para crear proveedores */
-  tipoIdentificacion = []; /** Array para cargar los tipos de identificación */
-  tiposProveedores = []; /** Array para cargar los proveedores */
-  conceptsRteIva = []; //Variable que cargará los conceptos de tipo reteiva
-  conceptsRteIca = []; //Variable que cargará los conceptos de tipo reteica
-  conceptsRteFuente = []; //Variable que cargará los conceptos de tipo retefuente
+  tipoIdentificacion : any = []; /** Array para cargar los tipos de identificación */
+  tiposProveedores : any = []; /** Array para cargar los proveedores */
+  conceptsRteIva : any = []; //Variable que cargará los conceptos de tipo reteiva
+  conceptsRteIca : any = []; //Variable que cargará los conceptos de tipo reteica
+  conceptsRteFuente : any = []; //Variable que cargará los conceptos de tipo retefuente
 
   constructor(private formBuilderCrearProveedor : FormBuilder,
                 private Crearproveerdor : ProveedorService,

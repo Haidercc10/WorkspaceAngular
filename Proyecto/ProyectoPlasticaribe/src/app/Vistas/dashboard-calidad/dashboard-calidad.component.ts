@@ -14,77 +14,76 @@ import { MovDevolucionesCalidadComponent } from '../mov-devoluciones-calidad/mov
 })
 export class DashboardCalidadComponent implements OnInit {
 
-  @ViewChild(MovDevolucionesCalidadComponent) cmpMovDevQuality : MovDevolucionesCalidadComponent;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  @ViewChild(MovDevolucionesCalidadComponent) cmpMovDevQuality : MovDevolucionesCalidadComponent | undefined;
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   cargando : boolean = false; //Variable que va a validar si se esta cargando algo o no
 
-  modoSeleccionado : boolean;
-  monthNames: any = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', ''];
-  monthSelected : any = null;
-  typeRejected : any = ['', 'INTERNO', 'EXTERNO', ''];
+  modoSeleccionado : boolean; //Variable que almacenará el modo seleccionado, claro u oscuro, esta información se obtiene del componente principal para que se pueda cambiar de forma dinámica
+  monthNames: any = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', '']; //Variable que almacenará el nombre de los meses para mostrar en las opciones de filtrado y en las graficas
+  monthSelected : any = null; //Variable que almacenará el mes seleccionado para filtrar la información, por defecto no se selecciona ningún mes para mostrar toda la información del año
+  typeRejected : any = ['', 'INTERNO', 'EXTERNO', '']; //Variable que almacenará los tipos de rechazo para filtrar la información, por defecto no se selecciona ningún tipo de rechazo para mostrar toda la información
   typeRejectedSelected : any = null;
 
   years : any [] = [2025]; //Variable que almacenará los años desde el 2025 hasta el año actual
   selectedYear : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
 
-  modalClients : boolean = false;
-  modalAreas : boolean = false;
+  modalClients : boolean = false; //Variable que se usará para mostrar o no el modal de los clientes con mas devoluciones
+  modalAreas : boolean = false; //Variable que se usará para mostrar o no el modal de las areas con mas devoluciones
 
-  totalRejectedInt : number = 0;
-  totalRejectedExt : number = 0;
-  devolutionsForArea : any = [];
-  devolutionsForAreaKg : any = [];
-  devolutionsForClient : any = [];
-  devolutionsForMonth : any = [];
-  devolutionsForClientTable : any = [];
+  totalRejectedInt : number = 0; //Variable que almacenará el total de dinero perdido por devoluciones internas
+  totalRejectedExt : number = 0; //Variable que almacenará el total de dinero perdido por devoluciones externas
+  devolutionsForArea : any = []; //Variable que almacenará la información de las devoluciones por area
+  devolutionsForAreaKg : any = []; //Variable que almacenará la información de las devoluciones por area ordenada por kilos
+  devolutionsForClient : any = []; //Variable que almacenará la información de las devoluciones por cliente ordenada por kilos
+  devolutionsForMonth : any = []; //Variable que almacenará la información de las devoluciones por mes
+  devolutionsForClientTable : any = []; //Variable que almacenará la información de las devoluciones por cliente ordenada por dinero
   
   /* GRAFICA */
-  ComparativoData: any;
-  ComparativoOptions: any;
-  ComparativoPlugins = [ DataLabelsPlugin ];
+  ComparativoData: any; //Variable que almacenará la información de la grafica comparativa entre devoluciones internas y externas
+  ComparativoOptions: any; //Variable que almacenará las opciones de la grafica comparativa entre devoluciones internas y externas
+  ComparativoPlugins = [ DataLabelsPlugin ]; //Variable que almacenará los plugins de la grafica comparativa entre devoluciones internas y externas
 
-  multiAxisData: any;
-  multiAxisOptions: any;
+  multiAxisData: any; //Variable que almacenará la información de la grafica multi-eje
+  multiAxisOptions: any; //Variable que almacenará las opciones de la grafica multi-eje
 
   //Areas en pesos
-  nombreGrafica : string;
-  graficaPedidosClientes : any;
-  opcionesGraficas : any;
+  nombreGrafica : string = ''; //Variable que almacenará el nombre de la grafica de areas con mas devoluciones
+  graficaPedidosClientes : any; //Variable que almacenará la información de la grafica de areas con mas devoluciones
+  opcionesGraficas : any; //Variable que almacenará las opciones de la grafica de areas con mas devoluciones
 
   //Areas en kilos
-  graphicName : string;
-  graphicForKg : any;
-  graphicOptionsKg : any;
+  graphicName : string = ''; //Variable que almacenará el nombre de la grafica de areas con mas devoluciones ordenada por kilos
+  graphicForKg : any; //Variable que almacenará la información de la grafica de areas con mas devoluciones ordenada por kilos
+  graphicOptionsKg : any; //Variable que almacenará las opciones de la grafica de areas con mas devoluciones ordenada por kilos
 
   //Grafica de clientes en pesos
-  graphicNameClient : string;
-  graphicForClientMoney : any;
-  graphicOptionsClientMoney : any;
+  graphicNameClient : string = ''; // Variable que almacenará el nombre de la grafica de clientes con mas devoluciones
+  graphicForClientMoney : any; //Variable que almacenará la información de la grafica de clientes con mas devoluciones ordenada por dinero
+  graphicOptionsClientMoney : any; //Variable que almacenará las opciones de la grafica de clientes con mas devoluciones ordenada por dinero
 
   //Grafica de clientes en kilos
-  graphicForClientKg : any;
-  graphicOptionsClientKg : any;
+  graphicForClientKg : any; //Variable que almacenará la información de la grafica de clientes con mas devoluciones ordenada por kilos
+  graphicOptionsClientKg : any; //Variable que almacenará las opciones de la grafica de clientes con mas devoluciones ordenada por kilos
 
-  totalforMonth : any [] = []; 
-  graphicForMonth : any; 
-  graphicOptions : any;
-  graphicYears : any = [2025];
+  totalforMonth : any [] = [];  //Variable que almacenará el total de devoluciones por mes para la grafica comparativa entre facturación y mala calidad
+  graphicForMonth : any; //Variable que almacenará la información de la grafica comparativa entre facturación y mala calidad
+  graphicOptions : any; //Variable que almacenará las opciones de la grafica comparativa entre facturación y mala calidad
+  graphicYears : any = [2025]; //Variable que almacenará los años para la grafica comparativa entre facturación y mala calidad
 
-  qualityVsFact : any = [];
+  qualityVsFact : any = []; //Variable que almacenará la información de la grafica comparativa entre facturación y mala calidad
 
-  devolutionsForRejected : any = [];
-  devolutionsForMonthExtern : any = [];
+  devolutionsForRejected : any = []; //Variable que almacenará la información de las devoluciones por tipo de rechazo para la grafica comparativa entre tipos de rechazo
+  devolutionsForMonthExtern : any = []; //Variable que almacenará la información de las devoluciones externas por mes para la grafica comparativa entre facturación y mala calidad
 
   constructor(private AppComponent : AppComponent,
                 private mainPage : PaginaPrincipalComponent,
                   private svDevolutions : DevolucionesCalidadService,
                     private svFact : InventarioZeusService,
-                      //private cmpMovDevQuality : MovDevolucionesCalidadComponent,
                       ) {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
@@ -310,6 +309,7 @@ export class DashboardCalidadComponent implements OnInit {
   }
 
   estilosGrafica(){
+    const labels = this.graficaPedidosClientes.labels;
     this.opcionesGraficas = {
       stacked: false,
       plugins: {
@@ -322,9 +322,12 @@ export class DashboardCalidadComponent implements OnInit {
           ticks: {
               color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value, index, values) {
+              const label = labels[index];
+              if (label.length > 8) return `${label.substring(0, 5)}...`;
+              else return label;
+              //if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
+              //else return this.getLabelForValue(value);
             }
           },
           grid: {color: '#ebedef'}
@@ -371,6 +374,7 @@ export class DashboardCalidadComponent implements OnInit {
   }
 
   estilosGraficaPorKg(){
+    const labels = this.graphicForKg.labels;
     this.graphicOptionsKg = {
       stacked: false,
       plugins: {
@@ -383,9 +387,10 @@ export class DashboardCalidadComponent implements OnInit {
           ticks: {
               color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value, index, values) {
+              const label = labels[index];
+              if (label.length > 8) return `${label.substring(0, 5)}...`;
+              else return label;
             }
           },
           grid: {color: '#ebedef'}
@@ -432,6 +437,7 @@ export class DashboardCalidadComponent implements OnInit {
 
   //
   estilosGraficaClientes(){
+    const labels = this.graphicForClientMoney.labels;
     this.graphicOptionsClientMoney = {
       stacked: false,
       plugins: {
@@ -444,9 +450,15 @@ export class DashboardCalidadComponent implements OnInit {
           ticks: {
               color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value, index, values) {
+              const label = labels[index];
+              if (label.length > 4) return `${label.substring(0, 4)}...`;
+              else return label;
+
+              //if (value.length > 4) return `${value.substring(0, 5)}...`;
+              //else return value;  
+              //if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
+              //else return this.getLabelForValue(value);   
             }
           },
           grid: {color: '#ebedef'}
@@ -493,6 +505,7 @@ export class DashboardCalidadComponent implements OnInit {
 
   //
   estilosGraficaClientesPorKg(){
+    const labels = this.graphicForClientKg.labels;
     this.graphicOptionsClientKg = {
       stacked: false,
       plugins: {
@@ -505,9 +518,14 @@ export class DashboardCalidadComponent implements OnInit {
           ticks: {
               color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value, index, values) {
+              const label = labels[index];
+              if (label.length > 4) return `${label.substring(0, 4)}...`;
+              else return label;
+              //if (value.length > 4) return `${value.substring(0, 4)}...`;
+              //else return value;
+              //if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
+              //else return this.getLabelForValue(value);   
             }
           },
           grid: {color: '#ebedef'}
@@ -583,6 +601,7 @@ export class DashboardCalidadComponent implements OnInit {
 
   //TODO: Llenar opciones de graficas (3)
   llenarOpcionesGrafica(){
+    let labels = this.formatoGraficas().labels;
     this.graphicOptions = {
       stacked: false,
       plugins: {
@@ -594,9 +613,10 @@ export class DashboardCalidadComponent implements OnInit {
           ticks: {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value, index, values) {
+              const label = labels[index];
+              if (label.length > 4) return `${label.substring(0, 4)}...`;
+              else return label;
             }
           },
           grid: { color: '#ebedef' }
@@ -701,7 +721,7 @@ export class DashboardCalidadComponent implements OnInit {
       let mm = month ? month : this.monthSelected;
       let monthIndex = this.monthNames.indexOf(mm);
 
-      this.cmpMovDevQuality.formFilters.patchValue({
+      this.cmpMovDevQuality?.formFilters.patchValue({
         startDate : new Date(moment({ 'year' : this.selectedYear, 'month': monthIndex, 'day' : 1 }).add(1, 'd').format('YYYY-MM-DD')),
         endDate : new Date(moment({ 'year' : this.selectedYear, 'month': monthIndex, 'day' : 30 }).add(1, 'd').format('YYYY-MM-DD')),
         process : typeData == 'area' ? data.areaId : null, 
@@ -709,7 +729,7 @@ export class DashboardCalidadComponent implements OnInit {
         client : typeData == 'client' ? data.client : null,
         typeMov : typeData == 'rejected' ? data.rejectedType : null,
       });
-      this.cmpMovDevQuality.searchData(); 
+      this.cmpMovDevQuality?.searchData(); 
     }, 500);
   }
 

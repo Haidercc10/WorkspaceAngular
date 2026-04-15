@@ -38,7 +38,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   totalProductos : number = 0; //Variable que almacenará la suma del valor total de todos los productos consultados
   columnas : any = []; //Variable que tendrá las posibles columnas que se pueden seleccionar para ver
   columnasSeleccionada : any [] = []; //Variable que almcanará las columnas que se han elegido para ver adicional a las iniciales
-  ArrayProductoZeus = []; //Variable que almacenará la informacion de todos los productos consultados
+  ArrayProductoZeus : any = []; //Variable que almacenará la informacion de todos los productos consultados
   fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
   mesActual : string; //Variable que va a almacenar el nombre del mes actual
   public cantProductos : number = 0;
@@ -89,13 +89,13 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         const title = `Inventario de Productos Terminados ${this.today}`;
         const header = ["Item", "Cliente", "Nombre", "Existencias", "Precio", "Subtotal", "Presentación", "Cantidad Minima", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         let datos : any =[];
-        if (this.dt.filteredValue != undefined) {
-          for (const item of this.dt.filteredValue) {
+        if (this.dt?.filteredValue != undefined) {
+          for (const item of this.dt?.filteredValue) {
             const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
             datos.push(datos1);
           }
-        } else if (this.dt._value != undefined) {
-          for (const item of this.dt._value) {
+        } else if (this.dt?._value != undefined) {
+          for (const item of this.dt?._value) {
             const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
             datos.push(datos1);
           }
@@ -169,7 +169,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                 count++
                 if(count == datos_Inventario.length) {
                   this.load = true;
-                  this.invPlasticaribe.getStockInformation();
+                  this.invPlasticaribe?.getStockInformation();
                 }
               } 
             });
@@ -300,11 +300,11 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   // Funcion que permitirá mostrar el modal de la creación y edición de la receta
   mostrarModalCrearEditar(data : any = "") {
     this.recetaProducto = true;
-    this.receta.limpiarTodo();
+    this.receta?.limpiarTodo();
     if (data != "") {
-      this.receta.FormProductos.patchValue({ Nombre : data.Id, });
-      this.receta.buscarProductos();
-      setTimeout(() => this.receta.cambiarNombreProducto(), 500);
+      this.receta?.FormProductos.patchValue({ Nombre : data.Id, });
+      this.receta?.buscarProductos();
+      setTimeout(() => this.receta?.cambiarNombreProducto(), 500);
     }
   }
 }

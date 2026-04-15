@@ -21,12 +21,12 @@ import { forkJoin } from 'rxjs';
 
 export class DashboardOTComponent implements OnInit {
 
-  @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT: Reporte_Procesos_OTComponent;
+  @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT: Reporte_Procesos_OTComponent | undefined;
 
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today: any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes: any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   cargando: boolean = false; //Variable que va a validar si se esta cargando algo o no
@@ -117,7 +117,7 @@ export class DashboardOTComponent implements OnInit {
     this.totalOrdenesMes = 0;
     this.costoTotalOrdenesMes = 0;
 
-    if ([1, 60, 12, 94, 85, 2, 98, 5, 103].includes(this.ValidarRol)) {
+    if ([1, 60, 12, 94, 85, 2, 98, 5, 103, 104].includes(this.ValidarRol)) {
       this.estadosOrdenes = [
         { Nombre: 'ABIERTA', Cantidad: 0, Class: 'bg-naranja', },
         { Nombre: 'ASIGNADA', Cantidad: 0, Class: 'bg-azul', },
@@ -320,7 +320,7 @@ export class DashboardOTComponent implements OnInit {
   }
 
   colorProgresoMetaProduccion(data: any): string {
-    let color: string;
+    let color: string = '';
     let porcentaje: number = data.PorcentajeMeta;
     if (porcentaje >= 0 && porcentaje < 21) color = 'Red';
     else if (porcentaje >= 21 && porcentaje < 41) color = 'Orange';
@@ -367,8 +367,10 @@ export class DashboardOTComponent implements OnInit {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 15 },
             callback: function (value) {
-              if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
-              else return this.getLabelForValue(value);
+              if (value.length > 6) return `${value.substring(0, 6)}...`;
+              else return value;
+              //if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
+              //else return this.getLabelForValue(value);
             }
           },
           grid: { color: '#ebedef' }
@@ -588,8 +590,8 @@ export class DashboardOTComponent implements OnInit {
 
   mostrarModalEstados(estado: string) {
     this.modalEstadosOrdenes = true;
-    this.modalEstadosProcesos_OT.modeModal = true;
-    this.modalEstadosProcesos_OT.formularioOT.reset()
+    this.modalEstadosProcesos_OT!.modeModal = true;
+    this.modalEstadosProcesos_OT?.formularioOT.reset()
     if (estado == 'ABIERTA') this.mostrarModalEstadosProcesos(15, 'Ordenes de Trabajo Abiertas y No Iniciadas');
     else if (estado == 'ASIGNADA') this.mostrarModalEstadosProcesos(14, 'Ordenes de Trabajo Asignadas y No Iniciadas');
     else if (estado == 'EN PROCESO') this.mostrarModalEstadosProcesos(16, 'Ordenes de Trabajo En Proceso');
@@ -600,12 +602,12 @@ export class DashboardOTComponent implements OnInit {
 
   mostrarModalEstadosProcesos(estado: 13 | 14 | 15 | 16 | 17 | 18, nombre: string) {
     this.nombreModalEstados = nombre;
-    this.modalEstadosProcesos_OT.formularioOT.patchValue({
+    this.modalEstadosProcesos_OT?.formularioOT.patchValue({
       fecha: this.primerDiaMes,
       fechaFinal: this.today,
       estado: estado,
     });
-    this.modalEstadosProcesos_OT.consultarInformacionOrdenesTrabajo();
+    this.modalEstadosProcesos_OT?.consultarInformacionOrdenesTrabajo();
   }
 
   actualizarMetaProduccion(id: number, $event: any) {

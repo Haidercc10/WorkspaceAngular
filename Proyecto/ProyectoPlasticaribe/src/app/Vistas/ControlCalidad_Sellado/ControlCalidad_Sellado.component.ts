@@ -34,10 +34,10 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   ronda : number = 0;  //.Variable que cargará el numero de la ronda de una OT.
   registroClonado : any = {};
 
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   @ViewChild('dtSellado') dtSellado: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de sellado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -70,12 +70,12 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   agregarFila() {
     if(this.registros.length == 0 || this.registros[0] == undefined) {
       this.registros.unshift({});
-      setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
+      setTimeout(() => { this.dtSellado?.initRowEdit(this.dtSellado?.value[0]); }, 200); 
     } else if(this.registros[0].Id == undefined) {
       this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     } else {
       this.registros.unshift({});
-      setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
+      setTimeout(() => { this.dtSellado?.initRowEdit(this.dtSellado?.value[0]); }, 200); 
     }
   }
 
@@ -172,7 +172,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
             }
             this.registros[index] = info;
             this.load = false;
-            setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 500); 
+            setTimeout(() => { this.dtSellado?.initRowEdit(this.dtSellado?.value[0]); }, 500); 
           } else {
             this.load = false;
             this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de la OT N° ${datos.OT} en el proceso de SELLADO`);

@@ -23,18 +23,18 @@ export class CalendarioComponent implements OnInit {
 
   FormEvento !: FormGroup; //Formulario que tendrá la informacion del evento a crear o el evento a editar
   cargando : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   modalEvento : boolean = false; //Variable que validará si se ve el modal de creación, edición y eliminación de eventos
   accion : string = 'Crear'; //Variable que tendrá la información del titulo que tendrá el modal
   visibilidadSeleccionable: any[] = [{ key: `A`, label: `Solo Yo`, data: `Solo Yo`, icon: 'pi pi-fw pi-user', children: [] }]; //Variable que almacenará las opciones de usuarios a ver el evento
   visibilidadSeleccionada: any; //VAriable que almacenará los usuarios que podrán ver el evento
   eventoSeleccionado : number = 0; //VAriable que almacenará el id del evento a editar o eliminar
   events : any [] = []; //Variable que almacenará la información de los eventos
-  options : CalendarOptions; //Variable que almacenará la configuración del calendario
+  options : CalendarOptions | undefined; //Variable que almacenará la configuración del calendario
 
   constructor(private eventosCalService : EventosCalendarioService,
                 private AppComponent : AppComponent,
@@ -253,7 +253,8 @@ export class CalendarioComponent implements OnInit {
         EventoCal_HoraFinal: moment(this.FormEvento.value.FechaFin).format('H:mm:ss'),
         EventoCal_Visibilidad: visibilidad += '|',
       }
-      this.eventosCalService.Put(datos.EventoCal_Id, datos).subscribe(() => {
+
+      this.eventosCalService.Put(this.eventoSeleccionado, datos).subscribe(() => {
         this.mensajesService.mensajeConfirmacion(`¡Evento Editado!`, `¡Se ha editado un evento!`);
         this.obtenerEventos('');
         setTimeout(() => this.limpiarModal(), 500);

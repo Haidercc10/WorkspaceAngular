@@ -30,20 +30,20 @@ import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.com
 
 export class Reporte_Procesos_OTComponent implements OnInit {
 
-  @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent;
+  @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent | undefined; //Variable que hará referencia al componente del reporte de costos para poder mostrar el modal desde este componente
 
   modeModal : boolean = false; //Variable que validará cuando el componente aparezca en un modal
 
   @ViewChild('dt') dt: Table | undefined;
   formularioOT !: FormGroup; //Variable de tipo formulario
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  ArrayDocumento = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
+  ArrayDocumento : any = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   load : boolean = true; //Variable que permitirá validar si debe salir o no la imagen de carga
   fallas : any = []; //Variable que almacenará las posibles fallas que puede tener una orden de trabajo en produccion
-  otSeleccionada : number = 0; //Variable que almacenará el numero de la OT que fue previamente seleccionada
+  otSeleccionada : any = 0; //Variable que almacenará el numero de la OT que fue previamente seleccionada
   estados : any = []; //Variable que almacenará los estados de las ordenes de trabajo
   catidadOTAbiertas : number = 0; //Variable que almacenará la cantidad de ordenes de trabajo que están abiertas
   cantidadOTAsignadas : number = 0; //Variable que almacenará la cantidad de ordenes de trabajo que tiene asignaciones
@@ -57,7 +57,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   vendedores : any [] = []; //Varibale que va a almacenar la informacion de los vendedores
   columnas : any [] = []; //Variable que almacenará las columnas de la tabla que no se verá inicialmente pero que se podrá elegir
   _columnasSeleccionada : any [] = []; //variable que almacenará las columnas de la tabla que han sido seleccionadas
-  modalEstadosOT: boolean; //Variable que validará cuando se muestra el modal en el que se le puede cambiar el estado a la orden de trabajo
+  modalEstadosOT: boolean = false; //Variable que validará cuando se muestra el modal en el que se le puede cambiar el estado a la orden de trabajo
   otInfo : any; //Variable que guardará la informacion de la orden de trabajo a la cual se le va a cambiar el estado
   clientes: any[] = []; //Variable que almacencará la informacion de los clientes
   mostrarModalCostos : boolean = false; //Variable que validará cuando se muetra el modal de costos
@@ -68,7 +68,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   ordenesSeleccionadas : any [] = []; //Variable que se utilizará para almacenar las ordenes de trabajo que hayan sido elegidas
   inventarioDetallado : any [] = []; //Vaariable que almacenará la información del inventario de rollos detallado
   modalInventarioDespacho : boolean = false; //Variable que validará cuando se muestra el modal de inventario de rollos despachados
-  ArrayDatosProcesos = [];
+  ArrayDatosProcesos : any[] = [];
   ArrayDatosAgrupados : any [] = [] //variable que va a almacenar todos los agrupados de la OT en el proceso seleccionado
 
   constructor(private frmBuilder : FormBuilder,
@@ -151,7 +151,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         let datos : any =[];
 
         for (const item of this.ArrayDocumento) {
-          const datos1  : any = [item.usu, item.ot, item.mp, item.ext, item.imp, item.rot, item.lam, item.perf, item.cor, item.emp, item.sel, item.wik, item.cant, item.cantUnd, item.und, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicio, item.fechaFinal];
+          const datos1 : any = [item.usu, item.ot, item.mp, item.ext, item.imp, item.rot, item.lam, item.perf, item.cor, item.emp, item.sel, item.wik, item.cant, item.cantUnd, item.und, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicio, item.fechaFinal];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -222,16 +222,16 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let row = worksheet.addRow(d);
           let CantPedida = row.getCell(13);
 
-          let qtyExt = row.getCell(4);
-          let qtyImp = row.getCell(5);
-          let qtyRot = row.getCell(6);
-          let qtyLam = row.getCell(7);
-          let qtyPerf = row.getCell(8);
-          let qtyCor = row.getCell(9);
-          let qtyEmp = row.getCell(10);
-          let qtySel = row.getCell(11);
-          let qtyWik = row.getCell(12);
-          let qtyEstado = row.getCell(20);
+          let qtyExt : any = row.getCell(4);
+          let qtyImp : any = row.getCell(5);
+          let qtyRot : any = row.getCell(6);
+          let qtyLam : any = row.getCell(7);
+          let qtyPerf : any = row.getCell(8);
+          let qtyCor : any = row.getCell(9);
+          let qtyEmp : any = row.getCell(10);
+          let qtySel : any = row.getCell(11);
+          let qtyWik : any = row.getCell(12);
+          let qtyEstado : any = row.getCell(20);
 
           // Extrusion
           row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
@@ -685,10 +685,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.otSeleccionada = ot;
     this.mostrarModalCostos = true;
     setTimeout(() => {
-      this.reporteCostos.load = false;
-      this.reporteCostos.modeModal = true;
-      this.reporteCostos.infoOT.patchValue({ot : ot});
-      setTimeout(() => this.reporteCostos.consultaOTBagPro(), 500);
+      this.reporteCostos!.load = false;
+      this.reporteCostos!.modeModal = true;
+      this.reporteCostos?.infoOT.patchValue({ot : ot});
+      setTimeout(() => this.reporteCostos?.consultaOTBagPro(), 500);
     }, 500);
   }
 

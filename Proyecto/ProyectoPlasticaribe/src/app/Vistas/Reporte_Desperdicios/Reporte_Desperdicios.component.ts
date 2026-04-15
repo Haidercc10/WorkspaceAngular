@@ -30,13 +30,13 @@ import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produc
 })
 
 export class Reporte_DesperdiciosComponent implements OnInit {
-  @ViewChild(ReporteProduccionComponent) cmproduction: ReporteProduccionComponent;
-  @ViewChild('dt') dt: Table | undefined;
-  @ViewChild('dt2') dt2: Table | undefined;
+  @ViewChild(ReporteProduccionComponent) cmproduction: ReporteProduccionComponent | undefined;
+  @ViewChild('dt') dt: Table | undefined; //Variable para la tabla principal
+  @ViewChild('dt2') dt2: Table | undefined; //Variable para la tabla del modal
   formFiltros !: FormGroup; /** Formulario de filtros */
   load: boolean = true; /** Variable que realizará la carga al momento de consultar */
-  arrayMateriales = []; /** array que contendrá los materiales de materia prima*/
-  arrayProductos = []; /** array que cargará los productos con la consulta de tipo LIKE*/
+  arrayMateriales : any = []; /** array que contendrá los materiales de materia prima*/
+  arrayProductos : any = []; /** array que cargará los productos con la consulta de tipo LIKE*/
   idProducto: any = 0; /** ID de producto que se cargará en el campo ITEM, pero se mostrará el nombre. */
   arrayConsulta: any = []; /** Array que cargará la consulta inicial */
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
@@ -51,12 +51,12 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   arrayDesperdicios: any = []; //Array que guardará la información total de los desperdicios consultados.
   date: any | undefined = [new Date(), new Date()] //Variable que guardará la fecha seleccionada en el campo de rango de fechas
-  turnos: string[] = [];
-  process: any = [];
-  fails: any = [];
-  pesoTotal: number = 0;
-  production: any = [];
-  productionReport: boolean = false;
+  turnos: string[] = []; //Variable que guardará los turnos obtenidos de la consulta al API
+  process: any = []; //Variable que guardará los procesos obtenidos de la consulta al API
+  fails: any = []; //Variable que guardará las fallas técnicas obtenidos de la consulta al API
+  pesoTotal: number = 0; //Variable que guardará el peso total producido por OT y proceso para calcular el porcentaje de desperdicio.
+  production: any = []; //Variable que guardará la información de producción obtenida del API para mostrarla en la tabla y calcular el porcentaje de desperdicio.
+  productionReport: boolean = false; //Variable que se usará para mostrar u ocultar el reporte de producción al momento de consultar la producción por OT desde el modal de desperdicios.
 
   constructor(private formBuilder: FormBuilder,
     private servicioMateriales: MaterialProductoService,
@@ -258,7 +258,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
 
-  getDetailsProductionForOT(process?: string, ot?: string, maquina? : any) {
+  getDetailsProductionForOT(process?: any, ot?: string, maquina? : any) {
     let date1 = moment(this.formFiltros.value.RangoFechas[0]).add(1, 'd').format('YYYY-MM-DD');
     let date2 = moment(this.formFiltros.value.RangoFechas[1]).add(1, 'd').format('YYYY-MM-DD');
     let turn : string = this.formFiltros.value.turn;
@@ -267,8 +267,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     process == 'CORTE' ? process = 'EMPAQUE' : process = process;
 
     this.productionReport = true;
-    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(date1), new Date(date2)], 'proceso': process.toUpperCase(), 'OrdenTrabajo': ot, 'Turno' : turn});
-    this.cmproduction.consultarProduccion();
+    this.cmproduction?.formFiltros.patchValue({ 'rangoFechas': [new Date(date1), new Date(date2)], 'proceso': process.toUpperCase(), 'OrdenTrabajo': ot, 'Turno' : turn});
+    this.cmproduction?.consultarProduccion();
   }
 
   productionForOTProcess(ot: any, process: any) {
@@ -632,11 +632,11 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   //Constructor tabla 1 (area)
   builderTableBody(data, columns, tittle) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 5, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {}, {},]);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -645,11 +645,11 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   //Constructor tabla 2 (Tipo)
   builderTableBody2(data, columns, tittle) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 4, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {},]);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -658,11 +658,11 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   //Constructor tabla 3 (Detalles)
   builderTableBody3(data, columns, tittle) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 11, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},]);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

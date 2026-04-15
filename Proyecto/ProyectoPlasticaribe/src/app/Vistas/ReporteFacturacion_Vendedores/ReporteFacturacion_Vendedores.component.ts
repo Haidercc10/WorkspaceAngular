@@ -226,9 +226,10 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
           ticks: {
              color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
-              else return this.getLabelForValue(value);
+            callback: (value: any) => {
+              const label = this.facturasData.labels[value];
+              if (label && label.length > 6) return `${label.substring(0, 6)}...`;
+              else return label;
             }
           },
           grid: { color: '#ebedef' }

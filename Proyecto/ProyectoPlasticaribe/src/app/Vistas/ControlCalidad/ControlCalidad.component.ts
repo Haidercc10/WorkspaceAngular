@@ -19,14 +19,14 @@ import { defaultStepOptions, ControlCalidad as defaultSteps } from 'src/app/data
 export class ControlCalidadComponent implements OnInit {
 
   cargando : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
-  @ViewChild ('dt_Doblado') dt_Doblado : Table; //Variable que se usará para almacenar la tabla de la vista'
-  @ViewChild ('dt_Impresion') dt_Impresion : Table; //Variable que se usará para almacenar la tabla de la vista)
+  @ViewChild ('dt_Doblado') dt_Doblado : Table | undefined; //Variable que se usará para almacenar la tabla de la vista'
+  @ViewChild ('dt_Impresion') dt_Impresion : Table | undefined; //Variable que se usará para almacenar la tabla de la vista)
   rangoFechas : any [] = []; //Variable que se usará para almacenar el rango de fechas
 
   rondas : string [] = ['1', '2', '3']; //Variable que se usará para almacenar las rondas
@@ -83,7 +83,7 @@ export class ControlCalidadComponent implements OnInit {
         Id : this.datosControlCal_Impresion.length == 0 ? 1 : Math.max(...this.datosControlCal_Impresion.map(o => o.Id)) + 2, 
         Id_PkBd : 0 
       });
-      setTimeout(() => { this.dt_Impresion.initRowEdit(this.dt_Impresion.value[0]); }, 200);
+      setTimeout(() => { this.dt_Impresion?.initRowEdit(this.dt_Impresion?.value[0]); }, 200);
     } else this.msj.mensajeAdvertencia(`¡Solo puede agregar un dato a la vez!`);
   }
 

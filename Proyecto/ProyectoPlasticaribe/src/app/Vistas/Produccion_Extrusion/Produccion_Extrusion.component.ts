@@ -20,7 +20,6 @@ import { AppComponent } from 'src/app/app.component';
 import { RePrint } from '../Produccion_Sellado/Produccion_Sellado.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { log } from 'node:console';
 
 @Component({
   selector: 'app-Produccion_Extrusion',
@@ -45,7 +44,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   datosOrdenTrabajo: Array<any> = [];
   showNameBussiness: boolean = true;
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
-  area : number;
+  area : number = 0;
   modalReImpresion: boolean = false;
   dataRePrint: Array<RePrint> = [];
   selectedMode: boolean = false;
@@ -181,7 +180,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.obtenerTurnos();
   }
 
-  chargeSerialPorts() {
+  /*chargeSerialPorts() {
     navigator.serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
@@ -237,10 +236,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
-
+  */
   eliminarDiacriticos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
-  async test(){
+  /*async test(){
     try {
       const port = await navigator.serial.requestPort();
       await port.open({ baudRate: 9600 });
@@ -260,7 +259,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       const reader = port.readable.getReader();
       console.log(reader);
     }
-  }
+  }*/
 
   limpiarCampos() {
     this.cargando = false;
@@ -317,7 +316,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   obtenerOperarios() {
     this.operariosService.GetOperariosProduccion().subscribe(data => {
-      this.operarios = [undefined, null].includes(this.area) ? data : data.filter(x => x.area_Id == this.area);
+      this.operarios = [undefined, null, 0].includes(this.area) ? data : data.filter(x => x.area_Id == this.area);
       this.operarios.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
     });
   }
@@ -330,7 +329,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   buscarDatosConoSeleccionado() {
-    let cono = this.formDatosProduccion.get('cono').value;
+    let cono = this.formDatosProduccion.get('cono')?.value;
     if (cono) {
       let datosCono = this.conos.find(x => x.cono_Id == cono);
       let ancho: number = datosCono.cono_KgXCmsAncho;
@@ -341,8 +340,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   validarAnchoCono() {
     let ancho: number = 0;
-    let ancho1 = this.formDatosProduccion.get('ancho1').value;
-    let proceso = this.proceso;
+    let ancho1 : any = this.formDatosProduccion.get('ancho1')?.value;
+    let proceso : any = this.proceso;
     if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.formDatosProduccion.value.anchoProducto;
     else if (['Doblado'].includes(proceso)) {
       if (ancho1 == 0) ancho1 = this.formDatosProduccion.value.anchoProducto;
@@ -358,7 +357,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   consultarDatosProducto() {
-    let item = this.formDatosProduccion.get('item').value;
+    let item = this.formDatosProduccion.get('item')?.value;
     let datosItem;
     this.productoService.srvObtenerListaPorId(item).subscribe(data => datosItem = data);
     return datosItem.prod_Ancho;
@@ -366,9 +365,9 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   validarTaraCono(ancho: number): number {
     let tara: number = 0;
-    let anchoCono = this.formDatosProduccion.get('anchoCono').value;
-    let undExtrusion = this.formDatosProduccion.get('undExtrusion').value;
-    let ancho1 = this.formDatosProduccion.get('ancho1').value;
+    let anchoCono = this.formDatosProduccion.get('anchoCono')?.value;
+    let undExtrusion = this.formDatosProduccion.get('undExtrusion')?.value;
+    let ancho1 = this.formDatosProduccion.get('ancho1')?.value;
     if (ancho1 && anchoCono) {
       if (undExtrusion == 'Plgs') tara = ancho * 2.54 * anchoCono;
       else tara = ancho * anchoCono;
@@ -382,7 +381,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   buscraOrdenTrabajo() {
     if (this.formDatosProduccion.value.proceso) {
-      let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
+      let ordenTrabajo : any = this.formDatosProduccion.get('ordenTrabajo')?.value;
       this.cargando = true;
       this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
         this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => this.cargando = false, () => this.cargando = false);
@@ -519,7 +518,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   datosProduccion() : modelProduccionProcesos {
-    let presentation = this.formDatosProduccion.value.presentacion;
+    let presentation : any = this.formDatosProduccion.value.presentacion;
     if (presentation == 'Kilo') presentation = 'Kg';
     else if (presentation == 'Unidad') presentation = 'Und';
     let datos: modelProduccionProcesos = {

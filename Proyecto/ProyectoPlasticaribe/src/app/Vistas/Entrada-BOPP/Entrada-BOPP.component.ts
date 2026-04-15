@@ -33,22 +33,22 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 })
 export class EntradaBOPPComponent implements OnInit {
 
-  @ViewChild(CrearBoppComponent) CrearBopp : CrearBoppComponent;
+  @ViewChild(CrearBoppComponent) CrearBopp : CrearBoppComponent | undefined;
   load: boolean = true;
   public FormEntradaBOPP !: FormGroup;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  ArrayBOPP = []; //Varibale que almacenará los BOPP que estarán entrando
+  ArrayBOPP : any = []; //Varibale que almacenará los BOPP que estarán entrando
   categorias : any = []; //Variable que almacenará las categorias que se podrán seleccionar para la materia prima a ingresar
   nombresBopp : any =[]; /** Variable que cargará los nombres de BOPP que más suelen comprarse en la empresa */
   micrasBopp : any =[]; /** Variable que cargará las micras de BOPP que más suelen utilizarse en la empresa */
   anchosBopp : any =[]; /** Variable que cargará los anchos de BOPP que más suelen utilizarse en la empresa */
   precioBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
   serialesBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
-  proveedor = []; //Variable que almacenará los diferentes proveedores de materia prima
+  proveedor : any = []; //Variable que almacenará los diferentes proveedores de materia prima
   public FormOpcional !: FormGroup;
   arrayBopps : any = [];
   campoRemi_Faccompra: any = null;
@@ -57,7 +57,7 @@ export class EntradaBOPPComponent implements OnInit {
   arrayBoppsRemisionados : any = [];
   tipoDoc : any = null;
   boppSeleccionado : any = [];
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   boppsGenericos : any = [];  /** Variable que contendrá los bopp genericos. */
   modalCrearBopp : boolean = false; /** Variable para abrir el modal que creará nuevos bopp's genericos para sociarlos al que se desea ingresar */
   createSuppliers : boolean = false;
@@ -249,7 +249,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   validarBodega(categoria : number){
-    let bodega : number;
+    let bodega : number = 0;
     if (categoria == 6) bodega = 8;
     else if (categoria == 14) bodega = 11;
     else if (categoria == 15) bodega = 12;
@@ -295,7 +295,7 @@ export class EntradaBOPPComponent implements OnInit {
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
     let id : number = this.FormOpcional.value.PrvNombre;
-    let nuevo : any [] = this.proveedor.filter((item) => item.prov_Id == id);
+    let nuevo : any [] = this.proveedor.filter((item : any) => item.prov_Id == id);
     this.FormOpcional.patchValue({
       PrvId: nuevo[0].prov_Id,
       PrvNombre: nuevo[0].prov_Nombre,
@@ -747,11 +747,11 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title) {
-    var body = [];
+    var body : any= [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

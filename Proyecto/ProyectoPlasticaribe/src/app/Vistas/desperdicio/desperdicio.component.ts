@@ -2,10 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
@@ -29,10 +26,10 @@ import { Table } from 'primeng/table';
 export class DesperdicioComponent implements OnInit {
 
   FormDesperdicio !: FormGroup;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   cargando : boolean = false; //Variable que permitirá validar si debe salir o no la imagen de carga
   fallas : any [] = []; //Variable que almacenará los diferentes tipos de fallas por los que se puede dar un desperdicio
@@ -335,7 +332,7 @@ export class DesperdicioComponent implements OnInit {
   }
 
   //Función que carga los puertos seriales
-  cargarPuertosSeriales() {
+  /*cargarPuertosSeriales() {
     navigator.serial.getPorts().then(ports => {
       ports.forEach(port => {
         port.open({ baudRate: 9600 }).then(async () => this.cargarDatosPuertoSerial(port), error => this.mensajeService.mensajeError(`${error}`));
@@ -348,7 +345,7 @@ export class DesperdicioComponent implements OnInit {
     const port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     this.cargarDatosPuertoSerial(port);
-  }
+  }*/
 
   //Función que lee los datos del puerto serial
   async cargarDatosPuertoSerial(port: any) {
@@ -362,7 +359,7 @@ export class DesperdicioComponent implements OnInit {
             break;
           }
           if (value) {
-            let valor = this.ab2str(value);
+            let valor = new TextDecoder().decode(value);
             valor = valor.replace(/[^\d.-]/g, '');
             this.FormDesperdicio.patchValue({
               CantidadKg: valor,
@@ -376,7 +373,7 @@ export class DesperdicioComponent implements OnInit {
   }
 
   //Función que convierte un buffer a un valor
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   //Función que carga el turno actual.
   cargarTurnoActual() {
@@ -418,7 +415,7 @@ export class DesperdicioComponent implements OnInit {
   //Función que filtra la info de la tabla
   aplicarfiltro($event, campo: any, valorCampo: string) {
     this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => { if(this.dt2.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 300);
-    if(!this.dt2.filteredValue) this.desperdicios = this.copiaDesperdicios;
+    setTimeout(() => { if(this.dt2?.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 300);
+    if(!this.dt2?.filteredValue) this.desperdicios = this.copiaDesperdicios;
   }
 }

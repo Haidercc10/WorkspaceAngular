@@ -37,33 +37,33 @@ import { Crear_FallasComponent } from '../Crear_Fallas/Crear_Fallas.component';
 export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
 
   load : boolean = false; //Variable que servirá para mostrar el spinner de carga
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   form !: FormGroup; //Variable que contiene el formulario
   materials : any = [];
   typesRecovery : any = [];
   fails : any = [];
   process : any = [];
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   presentations : Array<string> = [];
   matPrimas : any = [];
   products : any = [];  
   modalFails : boolean = false;
   recoveries : Array<modelIngreso_Peletizado> = [];
-  productSelected : number; 
+  productSelected : any; 
   @ViewChild('dtPeletizado') dtPeletizado : Table | undefined; 
-  indexTable : number = null;
+  indexTable : any = null;
   rolls : any = [];
   typeRecoveries : any = [];
   disableField : boolean = true;
   failsProcess : any = [];
-  port: SerialPort;
+  //port: SerialPort;
   reader: any;
   modalRecovery : boolean = false;
-  @ViewChild(CrearMateriaprimaComponent) createRecovery : CrearMateriaprimaComponent;
-  @ViewChild(Crear_FallasComponent) cmpCreateFails : Crear_FallasComponent;
+  @ViewChild(CrearMateriaprimaComponent) createRecovery : CrearMateriaprimaComponent | undefined;
+  @ViewChild(Crear_FallasComponent) cmpCreateFails : Crear_FallasComponent | undefined;
   modalPeletizado : boolean = false;
   peletizado : any = [];
   groupPeletizado : any = [];
@@ -94,7 +94,6 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     private svDevolutions : DetallesDevolucionesProductosService,
     private svProdProcess : Produccion_ProcesosService,
     private svDtlDv_Products : DetallesDevolucionesProductosService
-    //private createRecovery : CrearMateriaprimaComponent,
   ) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
@@ -107,7 +106,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     this.getFails();
     this.getProcess();
     this.getUnits();
-    setTimeout(() => this.buscarPuertos(), 1000);
+    //setTimeout(() => this.buscarPuertos(), 1000);
     //this.getMatPrimas();
     //this.createPDF('2024-06-13', '2024-06-13', '14:55:49', 'creada');
   }
@@ -116,10 +115,10 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   async ngOnDestroy() {
     this.reader.releaseLock();
     this.reader.cancel();
-    await this.port.close();
+    //await this.port.close();
   }
 
-  chargeSerialPorts() {
+  /*chargeSerialPorts() {
     navigator.serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.svMsjs.mensajeError(`${error}`));
@@ -166,9 +165,9 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
         this.reader.releaseLock();
       }
     }
-  }
+  }*/
 
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
@@ -273,7 +272,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   loadModalFails(){
     this.modalFails = true;
     setTimeout(() => {
-      this.cmpCreateFails.typeFails = this.cmpCreateFails.typeFails.filter(x => [16,17,18,19,20,21].includes(x.tipoFalla_Id));
+      this.cmpCreateFails!.typeFails = this.cmpCreateFails?.typeFails.filter(x => [16,17,18,19,20,21].includes(x.tipoFalla_Id));
     }, 1500);
   }
 
@@ -281,9 +280,9 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   loadModalRecovery() {
     this.modalRecovery = true;
     setTimeout(() => {
-      this.createRecovery.nombreCategoriasMP = this.createRecovery.nombreCategoriasMP.filter(x => x.catMP_Id == 10);
-      this.createRecovery.materiPrima.patchValue({ 'mpCategoria' : 10 });
-      this.createRecovery.recovery = true;
+      this.createRecovery!.nombreCategoriasMP = this.createRecovery?.nombreCategoriasMP.filter(x => x.catMP_Id == 10);
+      this.createRecovery!.materiPrima.patchValue({ 'mpCategoria' : 10 });
+      this.createRecovery!.recovery = true;
       this.fieldFocus = false;
     }, 2000);
     
@@ -911,11 +910,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -923,11 +922,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

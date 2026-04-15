@@ -20,13 +20,13 @@ import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.s
 })
 export class FormEditarPrestamosComponent implements OnInit {
   
-  modeSelected: boolean;
+  modeSelected : boolean = false;
   form !: FormGroup;
   moments : any = ["SEMANAL", "QUINCENAL", "MENSUAL"];
   statusLoan : any[] = [];
-  storage_Id : number;
+  storage_Id : any;
   storage_Nombre : any;
-  rol : number;
+  rol : any;
   load : boolean = false;
   dataLoan : any = null;
 

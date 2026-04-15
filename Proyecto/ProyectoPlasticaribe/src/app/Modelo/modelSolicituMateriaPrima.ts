@@ -1,5 +1,5 @@
 export interface modelSolicitudMateriaPrima {
-  Solicitud_Id? : number;
+  Solicitud_Id? : number | null;
   Usua_Id : number;
   Solicitud_Observacion : string;
   Solicitud_Fecha : any;

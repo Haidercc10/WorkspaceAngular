@@ -22,8 +22,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   cargando : boolean = false;
   modoSeleccionado : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   formFiltros !: FormGroup;
   dataFacturacion : any [] = [];
   dataPDF : any [] = [];

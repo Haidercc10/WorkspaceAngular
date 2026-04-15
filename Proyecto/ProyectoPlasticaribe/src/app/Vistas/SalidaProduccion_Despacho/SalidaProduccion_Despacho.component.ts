@@ -129,7 +129,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.sendProductionZeus = [];
     this.productionSearched = null;
     this.formProduction.reset();
-    document.getElementById('RolloBarCode').focus();
+    document.getElementById('RolloBarCode')?.focus();
     this.count = 0;
     this.remainingProduction = [];
     this.rollsConsolidate = [];
@@ -192,9 +192,16 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         let ofDirect : boolean = ![null, false, undefined].includes(data.of_Directa) ? true : false;
         this.formProduction.patchValue({ 'ofDirect':  ofDirect, 'client': data.cli_Id, });
         this.getInformationOrderFact(orderFact, ofDirect);
-      } else if(data.estado_Id == 21) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} ya fue despachada!`);
-      else if(data.estado_Id == 3) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} fue anulada!`);
-      else this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} no se encuentra disponible para despachar!`);
+      } else if(data.estado_Id == 21) {
+        this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} ya fue despachada!`);
+        this.load = false;
+      } else if(data.estado_Id == 3) {
+        this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} fue anulada!`);
+        this.load = false;
+      } else {
+        this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} no se encuentra disponible para despachar!`);
+        this.load = false;
+      } 
     }, error => {
       this.msj.mensajeError('Error', `Error al consultar la OF N° ${orderFact} | ${error.status} ${error.statusText}`);
     });
@@ -271,7 +278,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           this.msj.mensajeError(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`, ``, 12000000);
         } else {
           this.formProduction.patchValue({ production: null });
-          document.getElementById('RolloBarCode').focus();
+          document.getElementById('RolloBarCode')?.focus();
           let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
           if (productionSearched.includes(production)) {
             this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`, ``, 12000000);
@@ -295,7 +302,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   enabledFieldRoll(){
     this.load = false;
     this.formProduction.get('production')?.enable();
-    document.getElementById('RolloBarCode').focus();
+    document.getElementById('RolloBarCode')?.focus();
   }
 
   //Función para evitar que escriban el numero del bulto en el campo rollo leído
@@ -383,7 +390,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   clearFieldProduction(){
     this.formProduction.patchValue({ production : null });
     this.formProduction.get('production')?.enable();
-    document.getElementById('RolloBarCode').focus();
+    document.getElementById('RolloBarCode')?.focus();
     this.load = false;
   }
 
@@ -802,10 +809,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   }
 
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });
@@ -884,8 +891,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   loadForPallets(production : any, productionOrderSearched : any, of : any){
     this.count = 0
     let pallet = this.production.filter(x => x.pallet == production);
-    let codePallet = production.split('-')[0].replace('ENTRLL#', '');
-    let item = production.split('-')[1].replace('ITEM#', '');
+    let codePallet : string = production.split('-')[0].replace('ENTRLL#', '');
+    let item : string = production.split('-')[1].replace('ITEM#', '');
     this.productionInPallet = [];
     this.productionOutPallet = [];
     this.count = pallet.length;
@@ -893,7 +900,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     if(pallet.length > 0) {
       pallet.forEach(x => {
         if(!productionOrderSearched.includes(x.numberProduction)) this.warningMsj(`¡Hay rollos del pallet N° ${codePallet} que no pertenecen a la orden N° ${of}!`, ``);
-        else this.verifyLoadInfoProduction(x.numberProduction, `Pallet N° ${codePallet}`, codePallet, x);
+        else if(x.numberProduction !== undefined) this.verifyLoadInfoProduction(x.numberProduction, `Pallet N° ${codePallet}`, codePallet, x);
       });
     } else {
       this.warningMsj(`El pallet ${codePallet} del item ${item} no pertenece a la orden N° ${of}`, ``);
@@ -909,11 +916,12 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
     if (!productionOrderSearched.includes(production)) this.warningMsj(`El rollo/bulto N° ${production} no pertenece a la orden ${of}`, ``);
     else {
-      let palletFind : any[] = this.production.filter(x => x.pallet == this.production.find(x => x.numberProduction == production).pallet && ![0, null, undefined, ''].includes(x.pallet));
+      let infoProduction = this.production.find(x => x.numberProduction == production);
+      let palletFind : any[] = this.production.filter(x => x.pallet == infoProduction!.pallet && ![0, null, undefined, ''].includes(x.pallet));
       
       if(palletFind.length > 0) {
         if(palletFind.some(x => x.numberProduction == production)) {
-          let idPallet = palletFind.find(x => x.numberProduction == production).pallet.split('-')[0].replace('ENTRLL#', '');
+          let idPallet = palletFind.find(x => x.numberProduction == production)!.pallet.split('-')[0].replace('ENTRLL#', '');
           this.warningMsj(`El rollo/bulto N° ${production} pertenece al pallet N° ${idPallet}`, ``);
         } else this.verifyLoadInfoProduction(production, `Rollo/Bulto N° ${production}`, ``);
       } else this.verifyLoadInfoProduction(production, `Rollo/Bulto N° ${production}`, ``)
@@ -929,7 +937,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   clearFocusBarCode(){
     this.formProduction.patchValue({ 'production' : null });
-    document.getElementById('RolloBarCode').focus(); 
+    document.getElementById('RolloBarCode')?.focus(); 
   }
   
   getDataProduction2(production: number, barcodeRead : any, idPallet : any, info : any) {

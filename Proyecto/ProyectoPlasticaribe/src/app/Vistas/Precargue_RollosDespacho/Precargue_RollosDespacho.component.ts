@@ -1,6 +1,5 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { log } from 'console';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
@@ -202,7 +201,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     this.load = false;
     this.form.get('roll')?.enable();
     this.form.patchValue({ roll : null});
-    document.getElementById('roll').focus();
+    document.getElementById('roll')?.focus();
   }
 
 
@@ -573,11 +572,11 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -585,11 +584,11 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '',]);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

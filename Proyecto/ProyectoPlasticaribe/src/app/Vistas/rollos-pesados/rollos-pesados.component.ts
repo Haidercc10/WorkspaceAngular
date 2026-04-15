@@ -28,7 +28,7 @@ export class RollosPesadosComponent {
   @ViewChild('tableConsolidate') tableConsolidate : Table | undefined;
   @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
   traceability : boolean = false;
-  selectedRoll : number = null;
+  selectedRoll : number | null = null;
 
   constructor(private appComponent: AppComponent,
       private frmBuilder: FormBuilder,

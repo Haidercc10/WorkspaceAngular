@@ -569,11 +569,11 @@ export class Nomina_CorteComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title: string) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column]));
       body.push(dataRow);
     });

@@ -1,9 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { dv } from '@fullcalendar/core/internal-common';
 import moment from 'moment';
-import { error, log } from 'node:console';
 import { Table } from 'primeng/table';
 import { modelDevolucionProductos } from 'src/app/Modelo/modelDevolucionProductos';
 import { modelDtProductoDevuelto } from 'src/app/Modelo/modelDtProductoDevuelto';
@@ -28,10 +26,10 @@ import { AppComponent } from 'src/app/app.component';
 
 export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
-  storage_Id: number;
-  ValidarRol: number;
+  storage_Id: number = 0;
+  ValidarRol: number = 0;
   load: boolean = false;
-  modoSeleccionado: boolean;
+  modoSeleccionado: boolean = false;
   formDataOrder: FormGroup;
   production: Array<production> = [];
   productionSelected: Array<production> = [];
@@ -308,12 +306,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   selectionForFilters(){
-    let data = this.tableOrder.filteredValue ? this.tableOrder.filteredValue : this.tableOrder.value;
+    let data = this.tableOrder!.filteredValue ? this.tableOrder!.filteredValue : this.tableOrder!.value;
 
     if(data.length > 0) {
       this.load = true;
       this.productionSelected = this.productionSelected.concat(data); 
-      if(!this.tableOrder.filteredValue) this.production = [];
+      if(!this.tableOrder!.filteredValue) this.production = [];
       else {
         data.forEach(x => {
           let index : number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
@@ -327,12 +325,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   deselectionForFilters(){
-    let data = this.tableDevolution.filteredValue ? this.tableDevolution.filteredValue : this.tableDevolution.value;
+    let data = this.tableDevolution!.filteredValue ? this.tableDevolution!.filteredValue : this.tableDevolution!.value;
 
     if(data.length > 0) {
       this.load = true;
       this.production = this.production.concat(data); 
-      if(!this.tableDevolution.filteredValue) this.productionSelected = [];
+      if(!this.tableDevolution!.filteredValue) this.productionSelected = [];
       else {
         data.forEach(x => {
           let index : number = this.productionSelected.findIndex(p => p.numberProduction == x.numberProduction);
@@ -346,8 +344,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   getConsolidateProduction() {
-    this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
-      if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
+    this.consolidatedProduction = this.productionSelected.reduce((a: any[], b: any) => {
+      if (!a.map((x : any)=>  x.item).includes(b.item)) a = [...a, b];
       return a;
     }, []);
   }
@@ -435,6 +433,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
           'DtDevprodFact_PesoNeto': prod.presentation == 'Kg' ? prod.quantity : prod.weight,
           'Of_Id': prod.of ? prod.of : null,
         }
+        
         this.dtDevService.srvGuardar(info).subscribe(data => {
           count++;
           if (count == this.productionSelected.filter(z => z.preIn == false).length) this.isDevolution ? this.changeStatus(data, 53, 24) : this.changeStatus(data, 23, 53);
@@ -683,11 +682,11 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body : any[] = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -695,11 +694,11 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any[] = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

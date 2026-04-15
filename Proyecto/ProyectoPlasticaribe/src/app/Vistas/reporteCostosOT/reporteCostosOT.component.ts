@@ -23,19 +23,19 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 })
 export class ReporteCostosOTComponent implements OnInit {
 
-  public infoOT !: FormGroup;
+  infoOT !: FormGroup;
   load: boolean = true;
 
   /* Vaiables*/
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  ArrayMateriaPrima = []; //Variable quetendrá la información de la materia prima que se asignó en la ot consultada
-  ArrayMateriaPrima2 = [];
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ArrayMateriaPrima : any = []; //Variable quetendrá la información de la materia prima que se asignó en la ot consultada
+  ArrayMateriaPrima2 : any = [];
   totalMPEntregada : number = 0; //Variable que servirá pra almacenar el total de materia prima que se entregó en una OT
   ValorMPEntregada : number = 0; //Variable que almacenará el valor total de la materia entregada a una OT
-  ArrayProcesos = []; //Variable que almacenará la informacion de la cantidad en kg que se hizo en cada proceso
+  ArrayProcesos : any = []; //Variable que almacenará la informacion de la cantidad en kg que se hizo en cada proceso
   cantidadTotalExt : number = 0; //Variable que va a almacenar el total de la cantidad extruida en una OT
   cantidadTotalImp : number = 0; //Variable que va a almacenar el total de la cantidad impresa en una OT
   cantidadTotalDbl : number = 0; //Variable que va a almacenar el total de la cantidad doblada en una OT
@@ -51,7 +51,7 @@ export class ReporteCostosOTComponent implements OnInit {
   cantidadSellandoUnidad : number = 0; //Varibale que calculará la cantidad total de unidades selladas, esto se en caso de que la presentación del producto sea en unidad
   cantidadWiketiadoUnidad : number = 0; //Varibale que calculará la cantidad total de unidades en wiketiado, esto se en caso de que la presentación del producto sea en unidad
   cantidadEmpaqueUnidad : number = 0; //Varibale que calculará la cantidad total de unidades en empaque, esto se en caso de que la presentación del producto sea en unidad
-  estados = []; //Variable que va a almacenar los estados que tendrá la orden de trabajo
+  estados : any = []; //Variable que va a almacenar los estados que tendrá la orden de trabajo
   sumaValorExtruido : number = 0; //Variable que servirá para mostrar el valor total de la materia prima que se utulizó en extrusion
   sumaValorImpresion : number = 0; //Variable que servirá para mostrar el valor total de materia prima utilizada en impresión
   sumaValorRotograbado : number = 0; //Variable que servirá para mostrar el valor total de la materia prima utilizada en rotograbado
@@ -60,21 +60,21 @@ export class ReporteCostosOTComponent implements OnInit {
 
   // Variables globlales que almacenarán la informacion general de la orden de trabajo que se mostrará en el PDF
   ordenTrabajo : number = 0;
-  NombreCliente : string;
-  idProducto : number;
-  nombreProducto : string;
-  cantProdSinMargenUnd : number;
-  cantProdSinMargenKg : number;
-  CantidadMargen : number;
-  cantProdConMargenKg : number;
-  presentacionProducto : string;
-  valorUnitarioProdUnd : number;
-  valorUnitarioProdKg : number;
-  valorEstimadoOT : number;
-  fechaOT : any;
-  fechaFinalOT : any;
-  usuarioCreador : any;
-  estado : any;
+  NombreCliente : string = '';
+  idProducto : number = 0;
+  nombreProducto : string = '';
+  cantProdSinMargenUnd : number = 0;
+  cantProdSinMargenKg : number = 0;
+  CantidadMargen : number = 0;
+  cantProdConMargenKg : number = 0;
+  presentacionProducto : string = '';
+  valorUnitarioProdUnd : number = 0;
+  valorUnitarioProdKg : number = 0;
+  valorEstimadoOT : number = 0;
+  fechaOT : any = null;
+  fechaFinalOT : any = null;
+  usuarioCreador : any = null;
+  estado : any = null;
   arrayEstados : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
@@ -398,10 +398,10 @@ export class ReporteCostosOTComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach((row) => {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -722,8 +722,8 @@ export class ReporteCostosOTComponent implements OnInit {
 
   inhabilitarCampos = () => setTimeout(() => {
     this.infoOT.disable(); 
-    this.infoOT.get('ot').enable();
-    this.infoOT.get('estadoOT').enable();
+    this.infoOT.get('ot')?.enable();
+    this.infoOT.get('estadoOT')?.enable();
   }, 1000);
 
   cargarEstados = () => this.arrayEstados = [{valor: '0', nombre: 'Abierto'}, {valor: '4', nombre: 'Anulado'}];

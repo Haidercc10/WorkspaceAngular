@@ -20,10 +20,10 @@ export class Gestion_TicketsComponent implements OnInit {
   @ViewChild('dt') dt: Table | undefined; //Variable identificadora en la que se verán los tickets
   cargando : boolean = false;
   FormTicketResuelto !: FormGroup;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   ticketsAbiertos : number = 0; //Variable que va a almacenar la cantidad de tickets que están pendientes
   ticketsEnRevision : number = 0; //Variable que va a almacenar la cantidad de tickets que está siendo revisados
   ticketsResuletosMes : number = 0; //Variable que almacenará la cantidad de tickets que han sido revisados en el mes
@@ -31,7 +31,7 @@ export class Gestion_TicketsComponent implements OnInit {
   ticketSeleccionado : any = { Codigo : '', Fecha : '', Estado : '', Descripcion: '' }; //Variable que almcanerá la información del ticket seleccionado
   imagenesTicket : any [] = []; //Variable que va a almacenar la información de las imagenes que se adjuntaron al ticket
   visible : boolean = false; //Variable que validará cuando se verá el modal de ticket resuelto y cuando no
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,

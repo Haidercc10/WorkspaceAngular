@@ -2,13 +2,13 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProduccionAreasService } from 'src/app/Servicios/ProduciconAreas/ProduccionAreas.service';
 import { ProduccionDiariaService } from 'src/app/Servicios/Produccion_Diaria/produccion-diaria.service';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produccion.component';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
+import { plugins } from 'chart.js/dist/core';
 
 @Injectable({
   providedIn: 'root'
@@ -20,25 +20,25 @@ import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.se
   styleUrls: ['./dashboard-produccion.component.css']
 })
 export class DashboardProduccionComponent implements OnInit {
-  @ViewChild(ReporteProduccionComponent) cmproduction: ReporteProduccionComponent;
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  @ViewChild(ReporteProduccionComponent) cmproduction: ReporteProduccionComponent | undefined;
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today: any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes: any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   cargando: boolean = false; //Variable que va a validar si se esta cargando algo o no
   procesosOrdenesMes: any[] = []; //Variable que va a almcencar la cantidad de que se ha hecho en cada proceso de produccion
-  productionExt: any[] = [];
-  productionImp: any[] = [];
-  productionCorte: any[] = [];
-  productionSella: any[] = [];
-  productionCami: any[] = [];
-  productionPerf: any[] = [];
-  productionMachines: any[] = [];
-  productionReport: boolean = false;
-  wasteReport: boolean = false;
-  arrayModal: any = [];
+  productionExt: any[] = []; //Variable que va a almacenar la cantidad de que se ha hecho en extrusión
+  productionImp: any[] = []; //Variable que va a almacenar la cantidad de que se ha hecho en impresión
+  productionCorte: any[] = []; //Variable que va a almacenar la cantidad de que se ha hecho en corte
+  productionSella: any[] = []; //Variable que va a almacenar la cantidad de que se ha hecho en sellado
+  productionCami: any[] = []; //Variable que va a almacenar la cantidad de que se ha hecho en camisilla
+  productionPerf: any[] = []; //Variable que va a almacenar la cantidad de que se ha hecho en perforado
+  productionMachines: any[] = []; //Variable que va a almacenar la información de producción por maquina
+  productionReport: boolean = false; //Variable que va a validar si se muestra el reporte de producción o no
+  wasteReport: boolean = false; //Variable que va a validar si se muestra el reporte de desperdicios o no
+  arrayModal: any = []; //Variable que va a almacenar la información que se mostrará en el modal de desperdicios
 
   //* Variables grafica comparativa
   ComparativoData: any;
@@ -91,7 +91,6 @@ export class DashboardProduccionComponent implements OnInit {
   constructor(
     private AppComponent: AppComponent,
     private mainPage: PaginaPrincipalComponent,
-    private svBagpro: BagproService,
     private svMsj: MensajesAplicacionService,
     private svProdAreas: ProduccionAreasService,
     private svDailyProd: ProduccionDiariaService,
@@ -106,9 +105,6 @@ export class DashboardProduccionComponent implements OnInit {
     this.lecturaStorage();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       //EXTRUSIÓN
       this.ComparativoOptionsExtrusion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsExtrusion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
@@ -117,6 +113,14 @@ export class DashboardProduccionComponent implements OnInit {
       this.ComparativoOptionsImpresion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsImpresion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsImpresion.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      //PERFORADO
+      this.ComparativoOptionsPerforado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsPerforado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsPerforado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      //CAMISILLA
+      this.ComparativoOptionsCamisilla.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsCamisilla.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsCamisilla.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       //EMPAQUE
       this.ComparativoOptionsEmpaque.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsEmpaque.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
@@ -169,9 +173,6 @@ export class DashboardProduccionComponent implements OnInit {
 
   //TODO: Solo información del dashboard
   loadDataProduction() {
-    //let date1: any = moment().subtract(1, 'd').format('YYYY-MM-DD');
-    //let date2: any = moment().subtract(1, 'd').format('YYYY-MM-DD');
-    //this.dateSelected = moment(this.dateSelected).format('YYYY-MM-DD')
     this.consultarPesoProducidoOrdenes();
     this.getDataForMachine2(moment(this.dateSelected).format('YYYY-MM-DD'), moment(this.dateSelected).format('YYYY-MM-DD'));
   }
@@ -181,7 +182,6 @@ export class DashboardProduccionComponent implements OnInit {
     this.clearFields();
 
     this.svDailyProd.getProductionDay(date1, date2).subscribe(data => {
-      console.log(data);
       this.productionMachines = data;
       this.totalPercentageCami = this.totalPercentageForProcess('CAMISILLA');
       this.totalPercentageExt = this.totalPercentageForProcess('EXT');
@@ -464,7 +464,7 @@ export class DashboardProduccionComponent implements OnInit {
   }
 
   colorProgresoMetaProduccion(data: any): string {
-    let color: string;
+    let color: string = '';
     let porcentaje: number = data.PorcentajeMeta;
     if (porcentaje >= 0 && porcentaje < 21) color = 'Red';
     else if (porcentaje >= 21 && porcentaje < 41) color = 'Orange';
@@ -477,8 +477,8 @@ export class DashboardProduccionComponent implements OnInit {
   getDetailsProductionForMachine(process?: string, machine?: number, turn?: string) {
     //let date: any = moment().format('YYYY-MM-DD');
     this.productionReport = true;
-    this.cmproduction.formFiltros.patchValue({ 'rangoFechas': [new Date(this.dateSelected), new Date(this.dateSelected)], 'proceso': process.toUpperCase(), 'Maquina': machine, 'Turno': turn, });
-    this.cmproduction.consultarProduccion();
+    this.cmproduction?.formFiltros.patchValue({ 'rangoFechas': [new Date(this.dateSelected), new Date(this.dateSelected)], 'proceso': process?.toUpperCase(), 'Maquina': machine, 'Turno': turn, });
+    this.cmproduction?.consultarProduccion();
   }
 
   //TODO: GRAFICA 1 BARRAS ACOSTADAS

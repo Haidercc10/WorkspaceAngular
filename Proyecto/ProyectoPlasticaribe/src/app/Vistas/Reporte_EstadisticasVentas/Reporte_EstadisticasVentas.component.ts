@@ -144,8 +144,8 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
   /** Función para filtrar la tabla. */
   applyFilter($event, campo : any, valorCampo : string) {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => { if(this.dt.filteredValue) this.info = this.dt!.filteredValue; }, 500); 
-    if(!this.dt.filteredValue) this.info = this.infoTable;  
+    setTimeout(() => { if(this.dt?.filteredValue) this.info = this.dt!.filteredValue; }, 500); 
+    if(!this.dt?.filteredValue) this.info = this.infoTable;  
   }
 
   /** Función para calcular el total de la tabla. */

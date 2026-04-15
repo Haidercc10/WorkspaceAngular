@@ -15,7 +15,7 @@ import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/
 export class CrearTerceroComponent implements OnInit {
 
   FormCrearTercero !: FormGroup;
-  tipoIdentificacion = [];
+  tipoIdentificacion : any = [];
 
   constructor(private formBuilder : FormBuilder,
                 private terceroService : TercerosService,

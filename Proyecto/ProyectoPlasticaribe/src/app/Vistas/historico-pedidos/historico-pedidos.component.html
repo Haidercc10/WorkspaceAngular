@@ -1,0 +1,204 @@
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+    <div style="margin: auto;">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</div>
+
+<!--* Título de la vista -->
+<div class="contain">
+    <div class="container-fluid">
+        <div class="mb-4 Titulo">
+            <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" id="usuarios"
+                class="font-size-32">Histórico de Pedidos</h2>
+        </div>
+        <div class="mb-4">
+            <hr class="colorLinea">
+        </div>
+    </div>
+</div>
+
+<p-card>
+    <!--* Título del formulario -->
+    <div class="mb-5">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+                class="pi pi-search"></i> Filtros de búsqueda</h4>
+    </div>
+
+    <!--* Formulario -->
+    <form [formGroup]="formFiltros" (ngSubmit)="consultarPedidosHistoricos()">
+        <div class="mb-4" id="formulario1">
+            <div class="row g-3 justify-content-md-center">
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl col-xxl">
+                    <span class="p-float-label">
+                        <p-calendar formControlName="date1" inputId="date1" [showIcon]="true"
+                            dateFormat="yy-mm-dd"></p-calendar>
+                        <label for="date1">Fecha Inicial</label>
+                    </span>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl col-xxl">
+                    <span class="p-float-label">
+                        <p-calendar formControlName="date2" inputId="date2" [showIcon]="true"
+                            dateFormat="yy-mm-dd"></p-calendar>
+                        <label for="date2">Fecha Final</label>
+                    </span>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                    <span class="p-float-label">
+                        <p-dropdown formControlName="sales" inputId="asesor" [autoDisplayFirst]="ValidarRol == 2"
+                            [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true"
+                            [readonly]="ValidarRol == 2" filterBy="usua_Nombre"></p-dropdown>
+                        <label for="asesor">Vendedores (Opcional)</label>
+                    </span>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                    <span class="p-input-icon-left p-float-label">
+                        <i class="pi pi-user"></i>
+                        <input formControlName="client" id="client" list="clientes" type="text" pInputText
+                            (keydown)="obtenerClientes()" (change)="clienteSeleccionado()" autocomplete="off" />
+                        <datalist id="clientes">
+                            <option value={{item.idcliente}} *ngFor="let item of clientes">
+                                {{ item.razoncial }}
+                            </option>
+                        </datalist>
+                        <label for="client">Cliente (Opcional)</label>
+                    </span>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+                    <span class="p-input-icon-left p-float-label">
+                        <i class="pi pi-file"></i>
+                        <input formControlName="oc" id="oc" type="text" pInputText />
+                        <label for="oc">OC (Opcional)</label>
+                    </span>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl col-xxl">
+                    <span class="p-float-label">
+                        <p-dropdown formControlName="estado" inputId="estado" [options]="estadoPedido"
+                            [autoDisplayFirst]="false"></p-dropdown>
+                        <label for="estado">Estado (Opcional)</label>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <small class="text-danger"
+                *ngIf="formFiltros.controls['date1'].invalid && formFiltros.controls['date1'].touched">La fecha inicial
+                es
+                obligatoria.</small>
+            <small class="text-danger d-block"
+                *ngIf="formFiltros.controls['date2'].invalid && formFiltros.controls['date2'].touched">La fecha final es
+                obligatoria.</small>
+        </div>
+
+        <div class="mb-3" *ngIf="!cargando">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
+                <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+                <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel"
+                    (click)="exportExcel()" [disabled]="pedidosHistoricos.length === 0"></button>
+                <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
+                    (click)="limpiarCampos()"></button>
+            </div>
+        </div>
+    </form>
+
+    <!--<div class="mb-3" *ngIf="cargando">
+        <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
+    </div>-->
+
+    <p-divider></p-divider>
+
+    <div class="mb-3" *ngIf="!cargando">
+
+        <div class="mb-3" *ngIf="pedidosHistoricos.length > 0;">
+            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+                    class="pi pi-search"></i> Resultados de búsqueda</h4>
+        </div>
+
+        <div class="row g-3" id="tabla1">
+            <div class="table-responsive" *ngIf="pedidosHistoricos.length > 0; else noData">
+                <p-table #dt [value]="pedidosHistoricos" styleClass="p-datatable-gridlines p-datatable-sm"
+                    responsiveLayout="scroll" [scrollable]="true" scrollHeight="50rem" [rowHover]="true">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th *ngFor="let columna of columnasTabla">{{ renombrarColumna(columna) }}</th>
+                        </tr>
+                        <tr ptooltip="Doble click para ver factura relacionada" tooltipPosition="top">
+                            <th *ngFor="let columna of columnasTabla">
+                                <input pInputText type="text" style="width: 100%;"
+                                    (input)="aplicarFiltro($event, columna, dt)">
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-pedido>
+                        <tr (dblclick)="viewFact(pedido)" class="cursor">
+                            <td *ngFor="let columna of columnasTabla" [ngClass]="{'font-weight-bold': esBold(columna)}">
+                                {{ esNumero(pedido[columna]) ? formatoNumero(pedido[columna], columna) : pedido[columna]
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <tr>
+                            <td colspan="15" class="text-right">Costo total</td>
+                            <td>{{ totalizador('costo_Cant_Total', 'pedido') | number:'1.2-2' }}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <ng-template #noData>
+                <div class="col-12">
+                    <p class="mb-0">No hay pedidos para mostrar. Realice una consulta.</p>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+
+</p-card>
+
+<p-dialog header="Pedido N° {{ selectedSaleOrder }}" [(visible)]="displayDialog" [modal]="true" [style]="{width: '80vw'}"
+    [closable]="true">
+    <div *ngIf="facturaSeleccionada">
+        <p-table #dt2 [value]="facturaSeleccionada" styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll" [scrollable]="true" scrollHeight="50rem" [rowHover]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th *ngFor="let columna of columnasTabla2">{{ capitalizarClave(columna) }}</th>
+                </tr>
+                <tr>
+                    <th *ngFor="let columna of columnasTabla2">
+                        <input pInputText type="text" style="width: 100%;"
+                            (input)="aplicarFiltro($event, columna, dt2)">
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-pedido>
+                <tr>
+                    <td *ngFor="let columna of columnasTabla2" [ngClass]="{'font-weight-bold': esBold(columna)}">
+                        {{ esNumero(pedido[columna]) ? formatoNumero(pedido[columna], columna) : pedido[columna]
+                        }}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="7" class="text-right">Total Factura</td>
+                    <td>{{ totalizador('subtotal', 'factura') | number:'1.2-2' }}</td>
+                    <td colspan="2"></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <ng-template #noData>
+        <div class="col-12">
+            <p class="mb-0">No hay facturas del pedido seleccionado</p>
+        </div>
+    </ng-template>
+
+</p-dialog>

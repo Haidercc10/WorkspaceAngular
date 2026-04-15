@@ -18,12 +18,12 @@ import { AppComponent } from 'src/app/app.component';
 export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDestroy {
 
   load: boolean = false;
-  storage_Id: number;
-  storage_Name: number;
-  validateRole: number;
+  storage_Id: number = 0;
+  storage_Name: number = 0;
+  validateRole: number = 0;
   selectedMode: boolean = false;
   dataSearched: Array<any> = [];
-  barCode: string = ``;
+  barCode: string | null = null;
   storehouse: Array<any> = [];
   storehouseSelected: any;
   ubicationsStorehouse: Array<any> = [];
@@ -123,8 +123,8 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
 
   getInformactionAboutPreIn_ById() {
     this.load = true;
-    let preIn: number = parseInt(this.barCode.split('-')[0].replace(`ENTRLL#`, ''));
-    let item: number = parseInt(this.barCode.split('-')[1].replace(`ITEM#`, ''));
+    let preIn: number = parseInt(this.barCode!.split('-')[0].replace(`ENTRLL#`, ''));
+    let item: number = parseInt(this.barCode!.split('-')[1].replace(`ITEM#`, ''));
     this.barCode = preIn.toString();
     this.detailsPreInService.GetInformactionAboutPreInToSendDesp_ById(preIn, item).subscribe(data => this.updateProductionZeus(data), (error: HttpErrorResponse) => {
       let message: string = error.status == 404 ? `¡No se encontró la información del la Pre Entrega!` : `¡Ocurrió un error al buscar la información de la Pre Entrega!`;
@@ -137,7 +137,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
     let consolidateData: Array<any> = this.getConsolidateProduction(data);
     let count: number = 0;
     consolidateData.forEach(prod => {
-      let preIn: number = parseInt(this.barCode.replace('ENTRLL #', ''));
+      let preIn: number = parseInt(this.barCode!.replace('ENTRLL #', ''));
       let details: string = `ENTRADA DE ROLLOS N° ${preIn} DE LA OT ${prod.details.orderProduction} DESDE PLASTICARIBE`;
       let item: string = prod.details.item;
       let presentation: string = this.validatePresentation(prod.details.presentation);
@@ -167,7 +167,8 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
   setUbication(): string {
     let ubicationSelected = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     let subUbicationSelected = this.subUbicationsStorehouse.find(x => x.idSubUbicacion == this.subUbicationSelected);
-    let ubicationName: string, subUbicationName: string;
+    let ubicationName: string = ''; 
+    let subUbicationName: string = '';
     let cube: string = this.cubeSelected == '' ? `` : `_${this.cubeSelected.replace('CUBO', '').replace('P.', '')}`
     if (ubicationSelected.nombreUbicacion == 'ESTANTE') ubicationName = 'EST';
     else if (ubicationSelected.nombreUbicacion == 'PLATAFORMA DINAMICA') ubicationName = 'PD';

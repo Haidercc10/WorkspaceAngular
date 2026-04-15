@@ -21,7 +21,7 @@ import { defaultStepOptions, stepsDashboardGerencia as defaultSteps } from 'src/
 export class Dashboard_GeneralComponent implements OnInit {
 
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -175,9 +175,11 @@ export class Dashboard_GeneralComponent implements OnInit {
           ticks: {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value: any) {
+              const labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+              const label = labels[value];
+              if (label && label.length > 4) return `${label.substring(0, 4)}...`;
+              else return label;
             }
           },
           grid: { color: '#ebedef' }

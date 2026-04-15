@@ -9,6 +9,7 @@ export interface modelControlCalidad_Extrusion {
     Prod_Id : string;
     Referencia : string;
     CcExt_Rollo : string;
+    Material_Id? : number;
     Pigmento_Id : number;
     CcExt_AnchoTubular : number;
     CcExt_PesoMetro : number;

@@ -21,7 +21,6 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { DepartamentosMunicipiosColombiaService } from 'src/app/Servicios/DepartamentosMunicipiosColombia/DepartamentosMunicipiosColombia.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
-import { group } from 'console';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
@@ -46,7 +45,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente.
   infoColor: string = ''; //Varable que almcanerá la descripcion del un color
   pedidosOriginales: Array<any> = [];
-  ArrayPedidos = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
+  ArrayPedidos  : any[] = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   virtualPedidos !: any[];
   modalEditar: boolean = false; //Variable que validará si el pedido está en edición o no
   columnas: any[] = [];
@@ -170,9 +169,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     setTimeout(() => {
       this.getClientes();
       this.getVendedores();
-      this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+      this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
       // Utiliza un enfoque de mapeo para expandir las filas
-      this.expandedRows = this.ArrayPedidos.reduce((acc, pedido) => {
+      this.expandedRows = this.ArrayPedidos.reduce((acc : any, pedido : any) => {
         acc[pedido.consecutivo] = true;
         return acc;
       }, {});
@@ -207,9 +206,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   getSalesAsesor(asesor: any) {
     this.salesAsesor = [];
     this.selectedAsesor = asesor.vendedor
-    let sales: any = this.ArrayPedidos.filter(x => x.idVendedor == asesor.codigo);
+    let sales: any = this.ArrayPedidos.filter((x : any) => x.idVendedor == asesor.codigo);
     if (sales?.length) {
-      this.salesAsesor = sales.map(x => ({
+      this.salesAsesor = sales.map((x : any) => ({
         ...x,
         sales: {
           cliente: x.cliente
@@ -531,7 +530,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.ArrayPedidos = this.seleccionarInformacionPDf();
     this.ArrayPedidos.sort((a, b) => Number(a.id) - Number(b.id));
     this.cargando = false;
-    this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+    this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
     const thisRef = this;
     this.ArrayPedidos.forEach((pedido) => thisRef.expandedRows[pedido.consecutivo] = true);
   }
@@ -594,7 +593,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         row.getCell(15).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         row.getCell(16).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
 
-        let colorEstadoPedido: string, colorEstadoOT: string;
+        let colorEstadoPedido: string = 'FFFFFF'; 
+        let colorEstadoOT: string = 'FFFFFF';
         // OT con Estado
         if (row.getCell(21).value == 17) {
           colorEstadoOT = '8AFC9B';
@@ -658,7 +658,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         });
         setTimeout(() => {
           this.msj.mensajeConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!');
-          this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+          this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
         }, 3500);
         this.datosExcel = this.ArrayPedidos;
         this.cargando = false;
@@ -699,7 +699,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   aplicarfiltro($event, campo: any, valorCampo: string) {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
-      if (this.dt.filteredValue != null) this.datosExcel = this.dt.filteredValue;
+      if (this.dt?.filteredValue != null) this.datosExcel = this.dt.filteredValue;
       else this.datosExcel = this.ArrayPedidos;
     }, 400);
   }
@@ -820,7 +820,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             }
             this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(() => {
               this.msj.mensajeConfirmacion(`Confirmación`, `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`);
-              this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+              this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
             });
           }
         }
@@ -867,7 +867,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             }
             this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(() => {
               this.msj.mensajeConfirmacion(`Confirmación`, `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`);
-              this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+              this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
             });
           } else this.msj.mensajeAdvertencia(`Advertencia`, `¡El producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`);
         } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
@@ -916,7 +916,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
         this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} aceptado con exito!`);
-        this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
@@ -948,7 +948,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
         this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} cancelado con exito!`);
-        this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
@@ -1079,7 +1079,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         pdf.open();
         this.cargando = false;
         this.msj.mensajeConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
-        this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
         break;
       }
     });
@@ -1257,7 +1257,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
         this.msj.mensajeConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
-        this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
         break;
       }
     });
@@ -1282,10 +1282,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que se encagará de llenar la tabla del pd
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column]));
       body.push(dataRow);
     });
@@ -1670,7 +1670,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         this.svExcel.creacionExcel(`Pedidos Zeus ${moment().format('DD-MM-YYYY')}`, workbook);
         setTimeout(() => {
           this.msj.mensajeConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!');
-          this.dt.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
+          this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
         }, 3500);
         this.cargando = false;
         this.datosExcel = this.ArrayPedidos;

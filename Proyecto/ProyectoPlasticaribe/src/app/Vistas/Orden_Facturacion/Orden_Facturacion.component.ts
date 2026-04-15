@@ -207,8 +207,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   changeNameProduct(production: Array<production>) {
-    let orderProduction = production.reduce((a, b) => {
-      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+    let orderProduction : any = production.reduce((a : any, b) => {
+      if (!a.map((x : any) => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
       return a;
     }, []);
     orderProduction.forEach(d => {
@@ -453,7 +453,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.load = true;
     let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
     this.production.splice(index, 1);
-    !this.editOrderFact ? this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction)) : this.productionSelected.sort((a, b) => +a.inOrder - +b.inOrder);
+    !this.editOrderFact ? this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction)) : this.productionSelected.sort((a : any, b : any) => +a.inOrder - +b.inOrder);
     //this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction))
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 5);
@@ -487,8 +487,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   getConsolidateProduction() {
-    this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
-      if (!a.map(x => x.item).includes(b.item)) {
+    this.consolidatedProduction = this.productionSelected.reduce((a: any, b: any) => {
+      if (!a.map((x: any) => x.item).includes(b.item)) {
           let object : any = {
             'saleOrder' : b.saleOrder,
             'item' : b.item, 
@@ -567,7 +567,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   totalProducts(){
     let total : number = 0;
-    this.consolidatedProduction.forEach(x => total += x.cuontProduction);
+    this.consolidatedProduction.forEach((x : any) => total += x.cuontProduction);
     return total;
   }
 
@@ -611,7 +611,7 @@ export class Orden_FacturacionComponent implements OnInit {
     let order : any = data == null ? of : data.id;
     let fact : any = data == null ? '' : data.factura;
     
-    this.productionSelected.forEach(production => {
+    this.productionSelected.forEach((production : any) => {
       let dtOrderFact: modelDt_OrdenFacturacion = {
         'Id_OrdenFacturacion': order,
         'Numero_Rollo': production.numberProduction,
@@ -639,7 +639,7 @@ export class Orden_FacturacionComponent implements OnInit {
     let count: number = 0;
     let lengthFact : number = this.consolidatedProduction.length;
 
-    this.consolidatedProduction.forEach(x => {
+    this.consolidatedProduction.forEach((x : any) => {
       let dtOrderFact: modelFacturacion_Productos = {
         'FactPro_Pedido': x.saleOrder.toString(),
         'Of_Id': of,
@@ -902,11 +902,11 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -1143,7 +1143,7 @@ export class Orden_FacturacionComponent implements OnInit {
   addRollsToOrderFact(dataOrder : any){
     this.selectedProductSaleOrder = null;
     let count : number = 0; 
-    this.productionSelected.filter(x => !x.inOrder).forEach(x => {
+    this.productionSelected.filter((x : any) => !x.inOrder).forEach((x : any) => {
       let detailOF : modelDt_OrdenFacturacion = {
         'Id_OrdenFacturacion': dataOrder.id,
         'Numero_Rollo': x.numberProduction,

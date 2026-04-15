@@ -9,6 +9,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import * as fs from 'file-saver';
 import { ShepherdService } from 'angular-shepherd';
 import { defaultStepOptions, stepsReporteRecibosCaja as defaultSteps } from 'src/app/data';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-Recibos_Caja',
@@ -29,17 +30,46 @@ export class Recibos_CajaComponent implements OnInit {
   totalRecibos : number = 0; // Variable que almacenará el total de recibos de caja según el rango de fechas consultado
   fecha : any; /** Variable que almacenará la fecha de inicio */
   fechaFinal : any; /** Variable que almacenará la fecha final */
+  vendedores : any [] = []; /** Array que almacenará la información de los vendedores para el formulario */
+  vendedorSeleccionado : any; /** Variable que almacenará el vendedor seleccionado para el filtro */
 
   constructor(private AppComponent : AppComponent,
                 private servicioInventarioZeus : InventarioZeusService,
                   private msj : MensajesAplicacionService,
-                    private shepherdService: ShepherdService) {
+                    private shepherdService: ShepherdService,
+                      private svSales: UsuarioService,
+                  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.obtenerVendedores();
+    this.loadRankDates();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  //*Función para cargar fechas en el rango.
+    loadRankDates(){
+      this.rangoFechas = [new Date(), new Date()]
+    }
+  // Funcion que consulta los vendedores desde el servicio de usuarios para el formulario.
+  obtenerVendedores() {
+    const vendedorUsuario = this.ValidarRol == 2 ? String(this.storage_Id).padStart(3, '0') : null;
+
+    this.svSales.GetVendedores().subscribe(resp => {
+      const vendedores = Array.isArray(resp) ? resp : [];
+      const vendedorFiltrado = vendedores.find((item: any) => parseInt(`${item.usua_Id}`) === parseInt(`${vendedorUsuario}`));
+      console.log(vendedorFiltrado);
+      
+      this.vendedores = vendedorUsuario == null
+        ? vendedores
+        : vendedorFiltrado != null
+          ? [vendedorFiltrado]
+          : [];
+
+      this.vendedorSeleccionado = vendedorFiltrado?.usua_Id ?? null;
+    });
   }
 
   //Función que se encarga de leer la información que se almacena en el storage del navegador
@@ -56,11 +86,13 @@ export class Recibos_CajaComponent implements OnInit {
     this.fecha = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format().replace('-05:00', '') : this.today;
     this.fechaFinal = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format().replace('T00:00:00-05:00', 'T23:59:59') : this.fecha;
     this.totalRecibos = 0;
+    let vendedor = this.vendedorSeleccionado != null ? `?sales=${String(this.vendedorSeleccionado).padStart(3, '0')}` : '';
 
     this.fecha = this.fecha == 'Fecha inválida' ? this.today : this.fecha;
     this.fechaFinal = this.fechaFinal == 'Fecha inválida' ? this.fecha : this.fechaFinal;
+    
 
-    this.servicioInventarioZeus.GetRecibosCaja(this.fecha, this.fechaFinal).subscribe(data => {
+    this.servicioInventarioZeus.GetRecibosCaja(this.fecha, this.fechaFinal, vendedor).subscribe(data => {
       if(data.length > 0) data.forEach(datos => this.llenarTabla(datos));
       else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
     }, () => this.load = false, () => this.load = false);
@@ -102,9 +134,9 @@ export class Recibos_CajaComponent implements OnInit {
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
-      if(this.dt.filteredValue != null) {
+      if(this.dt?.filteredValue != null) {
         this.totalRecibos = 0;
-        this.dt.filteredValue.forEach(element => { this.totalRecibos += element.valor; });
+        this.dt?.filteredValue.forEach(element => { this.totalRecibos += element.valor; });
       } else {
         this.totalRecibos = 0;
         this.arrayRecibos.forEach(element => { this.totalRecibos += element.valor; });
@@ -120,7 +152,7 @@ export class Recibos_CajaComponent implements OnInit {
       let infoDocumento : any [] = [];
       let title : string = ``;
 
-      this.dt.filteredValue != null ? datos = this.dt.filteredValue : datos = this.arrayRecibos;
+      this.dt?.filteredValue != null ? datos = this.dt.filteredValue : datos = this.arrayRecibos;
       title = `Recibos de Caja de ${fecha.replace('T00:00:00', '')} a ${fechaFinal.replace('T23:59:59', '')}`;
 
       setTimeout(() => {

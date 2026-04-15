@@ -569,11 +569,11 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
-  buildTableBody(data, columns) {
-    var body = [];
+  buildTableBody(data: any, columns: any) {
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });
@@ -584,7 +584,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los rollos
-  table(data, columns) {
+  table(data: any, columns: any) {
     return {
         table: {
           headerRows: 1,
@@ -601,7 +601,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los rollos
-  table2(data, columns) {
+  table2(data: any, columns: any) {
     return {
       table: {
         headerRows: 1,

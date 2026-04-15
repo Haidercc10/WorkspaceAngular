@@ -27,24 +27,24 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   public load: boolean = true;
   public FormAsignacionBopp !: FormGroup;
   public FormularioBOPP !: FormGroup;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  storage_Id : number = 0; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any = ''; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any = ''; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number = 0; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
-  ArrayBoppPedida = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
-  boppSeleccionado : any; //Variable que almacenará la informacion del bopp que haya sido selccionado
-  ordenesTrabajo = [ ]; //Variable que almacenará las ordenes de trabajo que se consulten {ot : 121333}, {ot : 121334}, {ot : 121335}
+  ArrayBOPP : any = []; //Varibale que almacenará los BOPP existentes
+  ArrayBoppPedida : any = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
+  boppSeleccionado : any = null; //Variable que almacenará la informacion del bopp que haya sido selccionado
+  ordenesTrabajo : any = []; //Variable que almacenará las ordenes de trabajo que se consulten {ot : 121333}, {ot : 121334}, {ot : 121335}
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   arrayOT : any = [];
   itemSeleccionado : any;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  kgOT : number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
+  kgOT : number = 0; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
   hora : any = moment().format('H:mm:ss'); //Variable que va a almacenar la hora actual
   entradas : any = [];
   salidas : any = [];
-  idAsignacion : number;
+  idAsignacion : number = 0;
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -295,7 +295,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   // Funcion que va a validar que todas las asignaciones a cada orden sean correctas
   validarAsignaciones() : boolean {
-    let valor : boolean;
+    let valor : boolean = false;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
       let asignacion = ((this.ArrayBoppPedida.reduce((a, b) => a + b.Cantidad2, 0)) / this.ordenesTrabajo.length) + this.ordenesTrabajo[i].cantAsignada;
       if (asignacion > this.ordenesTrabajo[i].kg) {

@@ -25,7 +25,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined;
   cargando: boolean = false;
-  ValidarRol: number;
+  ValidarRol : any;
   modoSeleccionado: boolean;
   formFiltros: FormGroup;
   clientes: any[] = [];
@@ -36,7 +36,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   columnas: any[] = [];
   columnasSeleccionadas: any[] = [];
   sales: any = [];
-  storage_Id: number;
+  storage_Id : any;
   storage_Nombre: any;
 
   constructor(private frmBuilder: FormBuilder,
@@ -260,7 +260,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   crearOrdenTrabajo(data: any) {
     let tipoBusqueda: 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
-    let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id);
+    let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id) as HTMLDivElement;
     tabCrearOrden2.click();
     this.orden_TrabajoComponent.consultarClientes();
     if (tipoBusqueda == 'Item') {

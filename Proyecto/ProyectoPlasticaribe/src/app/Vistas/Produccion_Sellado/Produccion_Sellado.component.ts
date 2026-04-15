@@ -106,7 +106,7 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Función que carga los puertos seriales
-  cargarPuertosSeriales() {
+  /*cargarPuertosSeriales() {
     navigator.serial.getPorts().then(ports => {
       ports.forEach(port => {
         port.open({ baudRate: 9600 }).then(async () => this.cargarDatosPuertoSerial(port), error => this.svcMsjs.mensajeError(`${error}`));
@@ -156,10 +156,10 @@ export class Produccion_SelladoComponent implements OnInit {
         reader.releaseLock();
       }
     }
-  }
+  }*/
 
   //Función que convierte un buffer a un valor
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   //Función que carga los turnos en el combobox
   getTurnos = () => this.svcTurnos.srvObtenerLista().subscribe(data => this.turnos = data);
@@ -322,7 +322,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que valida la entrada del registro
   validarEntrada() {
     this.cargando = true;
-    this.getPuertoSerial();
+    //this.getPuertoSerial();
     this.buscarOT(true);
     if(this.repacking) this.formSellado.patchValue({ idOperario : [0] });
     setTimeout(() => {

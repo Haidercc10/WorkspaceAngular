@@ -1,8 +1,6 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
-import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -12,7 +10,6 @@ import { TipoMonedaService } from 'src/app/Servicios/TipoMoneda/tipo-moneda.serv
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
@@ -28,10 +25,10 @@ export class CrearProductoComponent implements OnInit {
 
   public FormCrearProducto : FormGroup;
   public FormCrearPresentacionProducto : FormGroup;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   unidadMedida : any [] = []; //Variable que almacemará las unidades de medida
   presentacionesProductos : any [] = []; //Variable que almacenará las presentaciones de los productos

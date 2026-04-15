@@ -16,7 +16,7 @@ import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacio
 export class Facturacion_Vs_IngresosDespachoComponent implements OnInit {
 
   cargando : boolean = false;
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
 
@@ -172,8 +172,10 @@ export class Facturacion_Vs_IngresosDespachoComponent implements OnInit {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
             callback: function(value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
+              if (value.length > 4) return `${value.substring(0, 4)}...`;
+              else return value;
+              //if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
+              //else return this.getLabelForValue(value);
             }
           },
           grid: { color: '#ebedef' }

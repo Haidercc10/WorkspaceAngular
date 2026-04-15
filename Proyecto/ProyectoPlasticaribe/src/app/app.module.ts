@@ -253,6 +253,7 @@ import { DashboardProduccionComponent } from './Vistas/dashboard-produccion/dash
 import { InformacionVentasComponent } from './Vistas/informacion-ventas/informacion-ventas.component';
 import { InventarioVsTomaFisicaComponent } from './Vistas/inventario-vs-toma-fisica/inventario-vs-toma-fisica.component';
 import { MovimientosTomaFisicaComponent } from './Vistas/movimientos-toma-fisica/movimientos-toma-fisica.component';
+import { HistoricoPedidosComponent } from './Vistas/historico-pedidos/historico-pedidos.component';
 
 @NgModule({
   declarations: [
@@ -423,7 +424,7 @@ import { MovimientosTomaFisicaComponent } from './Vistas/movimientos-toma-fisica
     RequerimientosCalidadComponent, 
     MovDevolucionesCalidadComponent, 
     DashboardProduccionComponent, 
-    InformacionVentasComponent, InventarioVsTomaFisicaComponent, MovimientosTomaFisicaComponent,
+    InformacionVentasComponent, InventarioVsTomaFisicaComponent, MovimientosTomaFisicaComponent, HistoricoPedidosComponent,
   ],
 
   imports: [

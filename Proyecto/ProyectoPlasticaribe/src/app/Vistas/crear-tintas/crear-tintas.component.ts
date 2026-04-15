@@ -15,7 +15,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 export class CrearTintasComponent implements OnInit {
 
   public formularioTintas !: FormGroup; /** Formulario de tintas */
-  public unidadMedida = [] /** Almacena unidades de medida y las coloca en el combobox. */
+  public unidadMedida : any = [] /** Almacena unidades de medida y las coloca en el combobox. */
   categorias : any [] = []; /** Array para cargar las categorias de Tintas */
 
   /** Inyeccion httpClient y servicios */

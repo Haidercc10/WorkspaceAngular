@@ -85,6 +85,7 @@ export class Dashboard_AreasComponent implements OnInit {
   }
 
   llenarOpcionesGrafica(){
+    const labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -96,9 +97,10 @@ export class Dashboard_AreasComponent implements OnInit {
           ticks: {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
+            callback: function(value : any, index : any, values : any) {
+              const label = labels[index];
+              if (label.length > 4) return `${label.substring(0, 4)}...`;
+              else return label;
             }
           },
           grid: { color: '#ebedef' }
@@ -154,8 +156,10 @@ export class Dashboard_AreasComponent implements OnInit {
   consultarInformacion(){
     this.cargando = true;
     this.bagProService.GetProduccionAreas(this.anioSeleccionado).subscribe(datos => {
+      console.log(datos);
       this.aniosGraficados.push(this.anioSeleccionado);
-      let proceso : string [] = [], count : number = 0;
+      let proceso : string [] = []; 
+      let count : number = 0;
       datos.forEach(prod => !proceso.includes(prod.area) ? proceso.push(prod.area) : null);
       proceso.forEach(area => {
         let produccion : any = [

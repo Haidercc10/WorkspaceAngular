@@ -23,10 +23,10 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
   rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
@@ -567,10 +567,10 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body : any[] = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

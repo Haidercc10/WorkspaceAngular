@@ -49,7 +49,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
   edition : boolean = false; //
   rollsSelected : any = {};
   action : string = `Generar`;
-  lastRepo : number = null;
+  lastRepo : number | null = null;
   repositionForDv : boolean = false;
   fails : any = [];
   users : any = [];
@@ -610,7 +610,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
 
   createPDF(id : number, action : string) {
     this.svDtlRepo.getRepositionId(id).subscribe(data => {
-      let title: string = null; 
+      let title: string = `Carta de Reposición N° 00${id} ${action}`; 
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
       this.msjs(`Confirmación`, `Carta de Reposición N° ${id} ${action} exitosamente!`);
@@ -861,11 +861,11 @@ export class ReposicionesComponent implements OnInit, OnChanges {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -873,11 +873,11 @@ export class ReposicionesComponent implements OnInit, OnChanges {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '',]);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

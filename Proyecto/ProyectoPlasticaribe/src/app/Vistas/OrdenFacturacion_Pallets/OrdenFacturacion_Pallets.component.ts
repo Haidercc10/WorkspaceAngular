@@ -417,11 +417,11 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //Función para filtrar los pallets por referencia.
   selectByFilter(){
    this.load = true;
-    let data = this.t1.filteredValue ? this.t1.filteredValue : this.t1.value; 
+    let data : any = this.t1?.filteredValue ? this.t1.filteredValue : this.t1?.value; 
     
     this.selectedPallets = this.selectedPallets.concat(data);
     
-    if(!this.t1.filteredValue) this.pallets = []; 
+    if(!this.t1?.filteredValue) this.pallets = []; 
     else {
       data.forEach(d => {
         let index = this.pallets.findIndex(x => x.pallet == d.pallet);
@@ -553,8 +553,8 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     let count : number = 0; 
     let order : number = data.id;
 
-    this.selectedPallets.forEach(x => {
-      x.rolls.forEach(y => {
+    this.selectedPallets.forEach((x : any)  => {
+      x.rolls.forEach((y : any) => {
         let dtOrderFact : modelDt_OrdenFacturacion = {
           'Id_OrdenFacturacion' : order,
           'Numero_Rollo' : y.roll_BagPro,
@@ -563,7 +563,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
           'Presentacion' : y.presentation,
           'Consecutivo_Pedido' : (x.saleOrder).toString(),
           'Estado_Id' : 20,
-          'Pallet_Id' : y.pallet.startsWith('FP-') ? null : parseInt(y.pallet.replace('PL-', '')),
+          'Pallet_Id' : y.pallet.startsWith('FP-') ? 0 : parseInt(y.pallet.replace('PL-', '')),
         }
         this.svDetOrdFact.Post(dtOrderFact).subscribe(() => {
           count++;
@@ -593,8 +593,8 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
     this.infoConsolidate = [];
     this.selectedQty = 0;
     this.selectedProductSaleOrder = null;
-    this.t1.clear(); 
-    this.t2.clear();
+    this.t1?.clear(); 
+    this.t2?.clear();
   }
 
   //FUNCIONES PARA CREAR PDF
@@ -763,11 +763,11 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title) {
-    var body = [];
+    var body : any[] = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -775,11 +775,11 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any[] = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any[] = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

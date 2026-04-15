@@ -20,10 +20,10 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
   rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
@@ -32,10 +32,10 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos escogidos
   rollosPDF : any [] = []; //Variable que almacenará la informacion de los rollos salientes
   error : boolean = false; //Variable que ayudará a saber si ocurre un error con la eliminación de algun rollo
-  public arrayProcesos = [];
+  public arrayProcesos : any[] = [];
   scrolly : number = 0;
   scrollx : number = 0;
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   unMesAtras : any = moment().subtract(30, 'days').format('YYYY-MM-DD'); /** Variable que contendrá la fecha de hace un mes atrás para consultar desde esa fecha hasta hoy. */
   nroRollo : any = []; /** Variable que contendrá el id de los rollos consultados en el formulario de filtros. */
   bodegaElegida : string = '';
@@ -65,7 +65,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerProcesos();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    window.onscroll = function() {
+    window.onscroll = () => {
       this.scrolly = window.scrollY;
       this.scrollx = window.scrollX;
     };

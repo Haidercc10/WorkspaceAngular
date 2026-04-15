@@ -282,12 +282,12 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
 
   //Función para seleccionar según lo que esté filtrado en la tabla.
   selectionForFilters() {
-    let data = this.tableOrder.filteredValue ? this.tableOrder.filteredValue : this.tableOrder.value;
+    let data : any[] | undefined = this.tableOrder?.filteredValue ? this.tableOrder?.filteredValue : this.tableOrder?.value;
 
-    if (data.length > 0) {
+    if (data && data.length > 0) {
       this.load = true;
       this.productionSelected = this.productionSelected.concat(data);
-      if (!this.tableOrder.filteredValue) {
+      if (!this.tableOrder?.filteredValue) {
         this.production = [];
         this.validateSelectionAllProduction(this.productionSelected, this.status, this.statuses.find(x => x.estado_Id == this.status).estado_Nombre, this.tableDevolution);
       } else {
@@ -306,12 +306,12 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
 
   //Función para seleccionar según lo que esté filtrado en la tabla.
   deselectionForFilters() {
-    let data = this.tableDevolution.filteredValue ? this.tableDevolution.filteredValue : this.tableDevolution.value;
+    let data : any[] | undefined = this.tableDevolution?.filteredValue ? this.tableDevolution?.filteredValue : this.tableDevolution?.value;
 
-    if (data.length > 0) {
+    if (data && data.length > 0) {
       this.load = true;
       this.production = this.production.concat(data);
-      if (!this.tableDevolution.filteredValue) {
+      if (!this.tableDevolution?.filteredValue) {
         this.productionSelected = [];
       } else {
         data.forEach(x => {
@@ -329,8 +329,8 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
 
   //Función para consolidar la información de lo que se ha seleccionado.
   getConsolidateProduction() {
-    this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
-      if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
+    this.consolidatedProduction = this.productionSelected.reduce((a: any[], b: any) => {
+      if (!a.map((x : any) => x.item).includes(b.item)) a = [...a, b];
       return a;
     }, []);
   }
@@ -345,7 +345,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   //Función para calcular la cantidad consolidada por bulto.
   totalWeightByProduct(item: number): number {
     let total: number = 0;
-    this.productionSelected.filter(x => x.item == item).forEach(x => total += x.weight);
+    this.productionSelected.filter((x : any) => x.item == item).forEach((x : any) => total += x.weight);
     return total;
   }
 

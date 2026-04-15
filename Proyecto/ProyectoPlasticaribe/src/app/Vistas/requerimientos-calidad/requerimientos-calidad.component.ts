@@ -19,8 +19,8 @@ import { DevolucionesCalidadComponent } from '../devoluciones-calidad/devolucion
 })
 export class RequerimientosCalidadComponent {
   form !: FormGroup; //Variable que se usará para validar el formulario 
-  load : boolean = false;
-  typeReqs : any = [];
+  load : boolean = false; //Variable para mostrar el cargando mientras se crea el requerimiento
+  typeReqs : any = []; //Variable para almacenar los tipos de requerimientos y mostrarlos en el select
   selectedMode : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuild : FormBuilder, 

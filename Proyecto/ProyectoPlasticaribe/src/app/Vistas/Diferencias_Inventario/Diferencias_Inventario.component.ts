@@ -20,11 +20,11 @@ import { AppComponent } from 'src/app/app.component';
 export class Diferencias_InventarioComponent implements OnInit {
 
   load: boolean = false;
-  storage_Id: number | undefined;
-  storage_Name: string | undefined;
-  ValidarRol: number | undefined;
+  storage_Id: any;
+  storage_Name: any;
+  ValidarRol: any;
   form !: FormGroup;
-  modoSeleccionado: boolean;
+  modoSeleccionado: boolean = false;
   inventory : any = [];
   dataPL : Array<any> = [];
   dataZeus : Array<any> = [];

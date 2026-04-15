@@ -126,11 +126,11 @@ export class MenuLateralComponent implements OnInit {
 
   cambiarColorIcono(){
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    const icono1 = this.document.getElementById('iconoTanamoLetra1');
-    const icono2 = this.document.getElementById('iconoTanamoLetra2');
-    const icono3 = this.document.getElementById('iconoTanamoLetra3');
-    const icono4 = this.document.getElementById('iconoTanamoLetra4');
-    const icono5 = this.document.getElementById('iconoTanamoLetra5');
+    const icono1 = this.document.getElementById('iconoTanamoLetra1') as HTMLElement;
+    const icono2 = this.document.getElementById('iconoTanamoLetra2') as HTMLElement;
+    const icono3 = this.document.getElementById('iconoTanamoLetra3') as HTMLElement;
+    const icono4 = this.document.getElementById('iconoTanamoLetra4') as HTMLElement;
+    const icono5 = this.document.getElementById('iconoTanamoLetra5') as HTMLElement;
 
     fontSize > 0.66 && fontSize < 0.68 ? icono1.className = 'pi pi-circle-fill font-size-25' : icono1.className = 'pi pi-circle font-size-16';
     fontSize > 0.68 && fontSize < 0.89 ? icono2.className = 'pi pi-circle-fill font-size-25' : icono2.className = 'pi pi-circle font-size-16';

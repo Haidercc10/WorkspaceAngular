@@ -23,10 +23,10 @@ export class ClientesComponent implements OnInit {
 
   public FormCrearClientes !: FormGroup; //Formulario de creacion de clientes
   public FormCrearSedeClientes !: FormGroup //Formulario de creacion de sedes
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   tipoIdentificacion = []; //Variable que almacena los tipos deidentificacion
   tiposClientes = []; //Variable que almacena los tipos de clientes

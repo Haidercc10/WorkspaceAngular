@@ -26,10 +26,10 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
 
   formFacturacionOrden !: FormGroup;
   cargando : boolean = false; //Variable que validará cuando se muestra el icono con la animacion de cargando y cuando no
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   materiasPrimas : any [] = []; //Variable donde se guardarán las materias primas que vienen de la orden de maquila
   materiaPrimasSeleccionadas : any [] = []; //Variable donde se guardará la informacion de las materia primas elegidas para facturar
@@ -37,7 +37,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   precioTotal : number = 0; //Variable que almacenará el precio total de las materias primas elegidas
   informacionPDF : any [] = []; //Variable que almcenará la informacion de la factura consultada para crear el pdf
   documento : number = 0;
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -210,7 +210,8 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   // Funcion que va a crear el registro de facturación de orden de maquila
   crearFacturacionMaquila() {
     this.cargando = true;
-    let tpDoc : string, Codigo : string;
+    let tpDoc : string = '';
+    let Codigo : string = '';
     if (this.formFacturacionOrden.value.Factura != null) {
       tpDoc = 'FOM';
       Codigo = this.formFacturacionOrden.value.Factura;
@@ -311,7 +312,8 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
             break;
           }
 
-          let tpDoc : string, Codigo : string;
+          let tpDoc : string = ''; 
+          let Codigo : string = '';
           if (this.formFacturacionOrden.value.Factura != null) {
             tpDoc = 'FOM';
             Codigo = this.formFacturacionOrden.value.Factura;
@@ -558,16 +560,16 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
         pdf.open();
         this.limpiarTodo();
         break;
-      }
-    });
+          }
+        });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });
@@ -577,7 +579,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table(data, columns) {
+  table(data: any, columns: any) {
     return {
       table: {
         headerRows: 1,

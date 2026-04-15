@@ -19,8 +19,8 @@ import { defaultStepOptions, stepsDashboardCostos as defaultSteps } from 'src/ap
 export class Dashboard_CostosComponent implements OnInit {
 
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado : any; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
   rangoFechas : any [] = []; //Variable que almacenará la información de la fecha de inicio y la fecha de fin
@@ -54,8 +54,8 @@ export class Dashboard_CostosComponent implements OnInit {
   arrayCostos : any = []; /** Array que cargará la información de las cuentas empezadas con 71, 51, 52, ó 53 en la tabla del primero modal */
   arrayGastos1 : any = []; /** Array que cargará la información de una cuenta en un periodo en especifico en la tabla del segundo modal */
   totalCostoSeleccionado : number = 0; /** Variable que almacenará el valor total de el tipo de costos cargados en el modal */
-  @ViewChild('dt') dt: Table | undefined;
-  load : boolean = false;
+  @ViewChild('dt') dt: Table | undefined; //Variable que se usará para el filtro de la tabla del primer modal
+  load : boolean = false; //Variable que se usará para mostrar o no la imagen de carga en el segundo modal
   abrirModal1 : boolean = false; /** Variable que servirá para abrir el primer modal */
   abrirModal2 : boolean = false; /** Variable que servirá para abrir el segundo modal */
   graficaSeleccionada : string = ''; /** Titulo que se mostrará en el modal según la grafica seleccionada */
@@ -139,8 +139,10 @@ export class Dashboard_CostosComponent implements OnInit {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
             callback: function(value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
+              const labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+              const label = labels[value];
+              if (label && label.length > 4) return `${label.substring(0, 4)}...`;
+              else return label;
             }
           },
           grid: { color: '#ebedef' }
@@ -530,7 +532,7 @@ export class Dashboard_CostosComponent implements OnInit {
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
-      if (this.dt.filteredValue != null) this.dt.filteredValue.forEach(element => this.totalCostoSeleccionado += element.valor);
+      if (this.dt!.filteredValue != null) this.dt!.filteredValue.forEach(element => this.totalCostoSeleccionado += element.valor);
       else {
         this.totalCostoSeleccionado = 0;
         this.arrayCostos.forEach(element => this.totalCostoSeleccionado += element.valor);

@@ -19,7 +19,7 @@ import { forkJoin, map, Observable } from 'rxjs';
 export class DashBoard_FacturacionComponent implements OnInit {
 
   cargando: boolean = false;
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today: any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes: any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
 
@@ -104,7 +104,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   //
   facturacion2() {
-    if (![1, 60, 6, 12, 96, 98, 10, 2, 69, 103].includes(this.ValidarRol)) {
+    if (![1, 60, 6, 12, 96, 98, 10, 2, 69, 103, 104].includes(this.ValidarRol)) {
       return;
     }
 
@@ -175,7 +175,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Funcion que va a consultar la información de la facturación
   facturacion() {
-    if ([1, 60, 6, 12, 96, 98, 10, 2, 69, 103].includes(this.ValidarRol)) {
+    if ([1, 60, 6, 12, 96, 98, 10, 2, 69, 103, 104].includes(this.ValidarRol)) {
       this.zeusService.ValorTotalFacturadoHoy().subscribe(datos_facturacion => this.totalFacturadoDia = datos_facturacion);
       this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
         if (moment().month() == 7 && this.anoSeleccionado == 2023) this.totalFacturadoMes = (datos_facturacion + 6249600 + 12091700);
@@ -258,9 +258,10 @@ export class DashBoard_FacturacionComponent implements OnInit {
           ticks: {
             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
-            callback: function (value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
+            callback: (value : any) => {
+              const label = this.facturasData.labels[value];
+              if (label && label.length > 4) return `${label.substring(0, 4)}...`;
+              return label;
             }
           },
           grid: { color: '#ebedef' }

@@ -139,7 +139,8 @@ export class Ubicaciones_RollosComponent implements OnInit {
   setUbication(): string {
     let ubicationSelected = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     let subUbicationSelected = this.subUbicationsStorehouse.find(x => x.idSubUbicacion == this.subUbicationSelected);
-    let ubicationName: string, subUbicationName: string;
+    let ubicationName: string = ''; 
+    let subUbicationName: string = '';
     let cube: string = this.cubeSelected == '' ? `` : `_${this.cubeSelected.replace('CUBO', '').replace('P.', '')}`
     if (ubicationSelected.nombreUbicacion == 'ESTANTE') ubicationName = 'EST';
     else if (ubicationSelected.nombreUbicacion == 'PLATAFORMA DINAMICA') ubicationName = 'PD';

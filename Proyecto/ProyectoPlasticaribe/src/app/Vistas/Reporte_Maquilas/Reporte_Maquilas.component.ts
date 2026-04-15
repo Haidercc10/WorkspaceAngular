@@ -174,7 +174,7 @@ export class Reporte_MaquilasComponent implements OnInit {
   }
 
   cambiarNumeroMes_NombreMes(mes : number) : string {
-    let nombreMes : string;
+    let nombreMes : string = '';
     switch (mes) {
       case 1:
         nombreMes = `Enero`;
@@ -219,7 +219,7 @@ export class Reporte_MaquilasComponent implements OnInit {
   }
 
   colocarIdMateriaPrima(data) : number {
-    let id : number;
+    let id : number = 0 ;
     if (data.materiaPrima_Id != 84) id = data.materiaPrima_Id;
     else if (data.tinta_Id != 2001) id = data.tinta_Id;
     else if (data.bopp_Id != 449) id = data.bopp_Id;
@@ -227,7 +227,7 @@ export class Reporte_MaquilasComponent implements OnInit {
   }
 
   colocarNombreMateriaPrima(data) : string {
-    let nombre : string;
+    let nombre : string = '';
     if (data.materiaPrima_Id != 84) nombre = data.materiaPrima;
     else if (data.tinta_Id != 2001) nombre = data.tinta;
     else if (data.bopp_Id != 449) nombre = data.bopp;
@@ -710,10 +710,10 @@ export class Reporte_MaquilasComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
+    var body : any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

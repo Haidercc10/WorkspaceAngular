@@ -33,11 +33,11 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   modal : boolean = false;
   dataSelected : any = [];
   traceability : boolean = false;
-  @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent;
+  @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent | undefined;
   selectedRoll : any = null;
   action : string = '';
   
-  @ViewChild(Ubicaciones_RollosComponent) ubicationRolls : Ubicaciones_RollosComponent;
+  @ViewChild(Ubicaciones_RollosComponent) ubicationRolls : Ubicaciones_RollosComponent | undefined;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -101,7 +101,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     this.load = true;
     this.dataSearched = [];
     this.dataSelected = [];
-    this.table.clear();
+    this.table?.clear();
 
     this.detailsProductionIncomeService.GetDataProductionIncome(startDate, endDate, route).subscribe(data => {
       data.forEach(dataProduction => this.fillDataProductionIncome(dataProduction));
@@ -180,7 +180,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
         let totalWeight : number = 0;
         data.filter(x => x.item == prod.item).forEach(x => {
           totalQuantity += x.quantity, 
-          totalWeight += x.weight
+          totalWeight += (x.weight || 0);
         });
         count++;
         consolidatedInformation.push({
@@ -208,7 +208,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
         "Item": { text: prod.item, alignment: 'right', fontSize: 7 },
         "Referencia": prod.reference,
         "Cantidad": { text: this.formatNumbers((prod.quantity).toFixed(2)), alignment: 'right', fontSize: 7 },
-        "Peso": { text: this.formatNumbers((prod.weight).toFixed(2)), alignment: 'right', fontSize: 7 },
+        "Peso": { text: this.formatNumbers((prod.weight || 0).toFixed(2)), alignment: 'right', fontSize: 7 },
         "Presentación": prod.presentation,
         "Ubicación": prod.ubication
       });
@@ -256,12 +256,12 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   }
 
   buildTableBody(data, columns, title: string, type: 'COLIDATED' | 'DETAIL') {
-    var body = [];
+    var body: any = [];
     if (type == 'COLIDATED') body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     else body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column]));
       body.push(dataRow);
     });
@@ -392,11 +392,11 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   //Función que cargará el modal de traslados/reubicaciones
   loadModal(validateTraslate : boolean) {
     this.modal = true;
-    validateTraslate ? this.ubicationRolls.traslate = true : this.ubicationRolls.traslate = false; 
+    validateTraslate ? this.ubicationRolls!.traslate = true : this.ubicationRolls!.traslate = false; 
     validateTraslate ? this.action = `Traslado/Salida de rollos` : this.action = `Actualizar ubicaciones de rollos`;
-    this.ubicationRolls.fails = [];
-    this.ubicationRolls.getFails();
-    this.ubicationRolls.loadRolls();
+    this.ubicationRolls!.fails = [];
+    this.ubicationRolls!.getFails();
+    this.ubicationRolls!.loadRolls();
   }
 
   loadRollsAvailables(){
@@ -411,7 +411,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     setTimeout(() => {
       this.traceability = true;
       this.selectedRoll = data.production;
-      this.cmpMovRolls.searchMovements(data, `Despacho`);
+      this.cmpMovRolls!.searchMovements(data, `Despacho`);
       this.load = false;
     }, 500);
   }  

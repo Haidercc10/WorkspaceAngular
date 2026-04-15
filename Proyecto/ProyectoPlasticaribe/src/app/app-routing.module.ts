@@ -118,6 +118,7 @@ export const routes: Routes = [
   /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
   { path: 'Pedidos-Zeus', loadChildren: () => import('./Modules/pedidos-zeus/pedidos-zeus.module').then(m => m.PedidosZeusModule) },
   { path: 'rpt-facturacion-zeus', loadChildren: () => import('./Modules/consolidad-facturacion/consolidad-facturacion.module').then(m => m.ConsolidadFacturacionModule) },
+  { path: 'pedidos-historicos', loadChildren: () => import('./Modules/historico-pedidos/historico-pedidos.module').then(m => m.HistoricoPedidosModule) },
 
   /*************************************************************** DESPERDICIO *********************************************************************************/
   { path: 'desperdicio', loadChildren: () => import('./Modules/desperdicios/desperdicios.module').then(m => m.DesperdiciosModule) },
