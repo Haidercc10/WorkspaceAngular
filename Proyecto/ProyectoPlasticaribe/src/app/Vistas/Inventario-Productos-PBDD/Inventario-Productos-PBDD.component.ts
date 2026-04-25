@@ -23,7 +23,7 @@ import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_R
 
 export class InventarioProductosPBDDComponent implements OnInit {
 
-  load: boolean = false;
+  load: boolean = false; 
   storage_Id: number;
   storage_Nombre: string;
   ValidarRol: number;

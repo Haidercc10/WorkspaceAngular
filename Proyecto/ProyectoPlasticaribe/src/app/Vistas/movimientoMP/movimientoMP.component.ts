@@ -376,8 +376,8 @@ export class MovimientoMPComponent implements OnInit {
           Nombre: '',
           Cantidad: this.formatonumeros(datos[i].cantidad),
           "Presentación": datos[i].unidad_Medida,
-          Precio: this.formatonumeros(datos[i].precio),
-          SubTotal: this.formatonumeros(datos[i].subTotal),
+          Precio: this.formatonumeros(0),
+          SubTotal: this.formatonumeros(0),
         }
         if (data.Movimiento == 'ASIGMP') {
           info.Id = datos[i].materia_Prima_Id;
@@ -404,8 +404,8 @@ export class MovimientoMPComponent implements OnInit {
           Nombre: '',
           Cantidad: this.formatonumeros(datos[i].cantidad),
           "Presentación": datos[i].unidad_Medida,
-          Precio: this.formatonumeros(datos[i].precio),
-          SubTotal: this.formatonumeros(datos[i].subTotal),
+          Precio: this.formatonumeros(0),
+          SubTotal: this.formatonumeros(0),
         }
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001) {
           info.Id = datos[i].materia_Prima_Id;
@@ -414,17 +414,7 @@ export class MovimientoMPComponent implements OnInit {
           info.Id = datos[i].tinta_Id;
           info.Nombre = datos[i].tinta;
         }
-
-        setTimeout(() => {
-          this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
-            for (let j = 0; j < datoMP.length; j++) {
-              info.Precio = this.formatonumeros(datoMP[j].precio);
-              datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
-              info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
-            }
-          });
-          this.datosPdf.push(info);
-        }, 500);
+        this.datosPdf.push(info);
       }
       informacionPdf = datos;
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
@@ -439,8 +429,8 @@ export class MovimientoMPComponent implements OnInit {
           Nombre: '',
           Cantidad: this.formatonumeros(datos[i].cantidad),
           "Presentación": datos[i].unidad_Medida,
-          Precio: this.formatonumeros(datos[i].precio),
-          SubTotal: this.formatonumeros(datos[i].subTotal),
+          Precio: this.formatonumeros(0),
+          SubTotal: this.formatonumeros(0),
         }
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
@@ -452,25 +442,13 @@ export class MovimientoMPComponent implements OnInit {
           info.Id = datos[i].bopp_Id;
           info.Nombre = datos[i].bopp;
         }
-
-        setTimeout(() => {
-          this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
-            for (let j = 0; j < datoMP.length; j++) {
-              info.Precio = this.formatonumeros(datoMP[j].precio);
-              datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
-              info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
-            }
-          });
-          this.datosPdf.push(info);
-        }, 500);
+        this.datosPdf.push(info);
       }
       informacionPdf = datos;
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
   entradasMateriasPrimas(data: any) {
-    console.log('data PDF:', data);
-    
     this.datosPdf = [];
     let informacionPdf: any = null;
     this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
@@ -484,8 +462,7 @@ export class MovimientoMPComponent implements OnInit {
           Precio: `$${this.formatonumeros(datos[i].precio)}`,
           SubTotal: `$${this.formatonumeros(datos[i].subTotal)}`,
         }
-        console.log(datos[i].subTotal);
-
+        
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
           info.Nombre = datos[i].materia_Prima;
@@ -514,8 +491,6 @@ export class MovimientoMPComponent implements OnInit {
         //}, 500);
       }
       informacionPdf = datos;
-      console.log('InformacionPDF', informacionPdf);
-      
     }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
@@ -619,7 +594,7 @@ export class MovimientoMPComponent implements OnInit {
             { border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data).toFixed(2))}`, bold: true, },
             {},
             { border: [true, false, true, true], text: `Valor Total`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data).toFixed(2))}`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(0)}`, bold: true, },
           ],
         ]
       },

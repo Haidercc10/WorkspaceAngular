@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { modelOpedidoproducto } from '../../Modelo/modelOpedidoproducto';
+import { modelPedidoExterno } from 'src/app/Modelo/modelPedidoExterno';
 
 @Injectable({
   providedIn: 'root'
@@ -65,6 +66,6 @@ export class OpedidoproductoService {
     
   srvActualizarPedidosProductos = (id:number|string, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/PedidoExterno/${id}`, data);
 
-  srvGuardarPedidosProductos = (data : modelOpedidoproducto): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data);
+  srvGuardarPedidosProductos = (data : modelPedidoExterno): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data);
 
 }

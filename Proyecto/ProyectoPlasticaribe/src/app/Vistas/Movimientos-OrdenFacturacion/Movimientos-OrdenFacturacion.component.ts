@@ -102,6 +102,8 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   loadFormEndDevolution() {
     this.formEndDevolutions = this.frmBuilder.group({
       dv: [null, Validators.required],
+      nc: [null,],
+      reposition: [null,],
       observationFinal: [null, Validators.required],
     });
   }
@@ -310,7 +312,11 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
     } else if (data.type == 'DV' && [39, 54].includes(data.or.estado_Id)) {
       this.modalEndOrders = true;
-      this.formEndDevolutions.patchValue({ dv: data.or.id });
+      this.formEndDevolutions.patchValue({
+        'dv': data.or.id,
+        'nc': data.or.nc,
+        'reposition': data.or.reposicion,
+      });
     } else if (data.type == 'DV' && [11, 29].includes(data.or.estado_Id)) {
       if ([5, 1].includes(this.validateRole)) {
         this.managementDevolutions.clearFields();
@@ -325,6 +331,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   //Limpiar campos del formulario de cierre de devoluciones
   clearFieldsDV() {
     this.formEndDevolutions.patchValue({
+      'dv': null,
+      'nc': null,
+      'reposition': null,
       'observationFinal': null,
     });
   }
@@ -333,11 +342,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   endDevolution() {
     let dv: number = this.formEndDevolutions.value.dv;
     let observation: string = this.formEndDevolutions.value.observationFinal;
+    let reposition: boolean = this.formEndDevolutions.value.reposition;
+    let nc : boolean = this.formEndDevolutions.value.nc;
     let date: any = moment().format('YYYY-MM-DD');
     let hour: string = moment().format('HH:mm:ss');
     this.load = true;
 
-    this.svDevolutions.PutStatusDevolution(dv, 18, date, hour, this.storage_Id, true, false, `?observation=${observation}`).subscribe(data => {
+    this.svDevolutions.PutStatusDevolution(dv, 18, date, hour, this.storage_Id, reposition, nc, `?observation=${observation}`).subscribe(data => {
       this.cmpDevolutions.createPDF(dv, 'cerrada');
       this.modalDevolution = false;
       this.formEndDevolutions.reset();
@@ -359,11 +370,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     }, error => this.errorMessage(`¡No se encontró información del cliente consultado!`, error));
   }
 
+  //Función para buscar clientes por nombre.
   searchClientsByName() {
     let name = this.formFilters.value.client;
     this.svZeusInv.getClientByName(name).subscribe(data => this.clients = data);
   }
 
+  //Funcion que va a colocar el id del cliente seleccionado
   selectClient() {
     let client = this.clients.find(x => x.idcliente == this.formFilters.value.client);
     this.formFilters.patchValue({ 'clientId': client.idcliente, 'client': client.razoncial, });

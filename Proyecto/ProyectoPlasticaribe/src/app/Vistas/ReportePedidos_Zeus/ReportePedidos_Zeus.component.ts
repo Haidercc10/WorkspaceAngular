@@ -44,8 +44,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente.
   infoColor: string = ''; //Varable que almcanerá la descripcion del un color
-  pedidosOriginales: Array<any> = [];
-  ArrayPedidos  : any[] = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
+  pedidosOriginales: Array<any> = []; 
+  ArrayPedidos: any[] = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   virtualPedidos !: any[];
   modalEditar: boolean = false; //Variable que validará si el pedido está en edición o no
   columnas: any[] = [];
@@ -100,9 +100,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.lecturaStorage();
     this.consultarDepartamentos();
     this.seleccionarColumnas();
-    this.consultarPedidosZeus();
-    this.getBillingSales();
-    //this.consultarPedidos();    
+    //this.consultarPedidosZeus();
+    //this.getBillingSales();
+    this.consultarPedidos();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -136,6 +136,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     });
   }
 
+  // Funcion que agregará el municipio de cartagena de forma manual para poder filtrar por él
   agregarMunicipio() {
     return { "region": "Región Caribe", "c_digo_dane_del_departamento": "0", "departamento": "Bolívar", "c_digo_dane_del_municipio": "0", "municipio": "Cartagena" }
   }
@@ -171,7 +172,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       this.getVendedores();
       this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
       // Utiliza un enfoque de mapeo para expandir las filas
-      this.expandedRows = this.ArrayPedidos.reduce((acc : any, pedido : any) => {
+      this.expandedRows = this.ArrayPedidos.reduce((acc: any, pedido: any) => {
         acc[pedido.consecutivo] = true;
         return acc;
       }, {});
@@ -206,9 +207,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   getSalesAsesor(asesor: any) {
     this.salesAsesor = [];
     this.selectedAsesor = asesor.vendedor
-    let sales: any = this.ArrayPedidos.filter((x : any) => x.idVendedor == asesor.codigo);
+    let sales: any = this.ArrayPedidos.filter((x: any) => x.idVendedor == asesor.codigo);
     if (sales?.length) {
-      this.salesAsesor = sales.map((x : any) => ({
+      this.salesAsesor = sales.map((x: any) => ({
         ...x,
         sales: {
           cliente: x.cliente
@@ -222,7 +223,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   //
   totalSalesPending(asesor: string) {
-    console.log(asesor);
     let total: number = 0;
     total = this.salesAsesor.filter(x => x.vendedor == asesor).reduce((acc, x) => acc += parseFloat(x.costo_Cant_Pendiente), 0);
     return total;
@@ -233,6 +233,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
   consultarPedidos() {
+    this.cargando = true;
     this.pedidoProductosService.getPedidoPendiente().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2) {
@@ -485,41 +486,42 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos
   llenarArrayPedidos(datos: any, index: number) {
+    console.log(datos);
     if (datos.undMed_Id == 'Und') datos.undMed_Id = 'UND';
     if (datos.undMed_Id == 'Kg') datos.undMed_Id = 'KLS';
     if (datos.undMed_Id == 'Paquete') datos.undMed_Id = 'PAQ';
 
     let info: any = {
-      id: index,
-      id_color: 3,
-      color: 'rojo',
-      consecutivo: datos.pedExt_Id,
-      cliente: datos.cli_Nombre,
-      producto: datos.prod_Nombre,
-      id_Producto: datos.prod_Id,
-      cant_Pedida: datos.pedExtProd_Cantidad,
-      cant_Pendiente: datos.pedExtProd_Cantidad,
-      cant_Facturada: 0,
-      existencias: datos.existencias,
-      presentacion: datos.undMed_Id,
-      estado: datos.estado_Nombre,
-      vendedor: datos.usua_Nombre,
-      precioUnidad: datos.pedExtProd_PrecioUnitario,
-      orden_Compra_CLiente: datos.orden_Compra_CLiente,
-      costo_Cant_Pendiente: datos.costo_Cant_Pendiente,
-      costo_Cant_Total: datos.pedExtProd_Cantidad * datos.pedExtProd_PrecioUnitario,
-      fecha_Creacion: datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
-      fecha_Entrega: datos.pedExtProd_FechaEntrega.replace('T00:00:00', ''),
-      OT: '',
-      Proceso_OT: '',
-      CantPesada: '',
-      Estado_OT: '',
-      CantPedidaKg_OT: '',
-      CantPedidaUnd_OT: '',
-      Zeus: 0,
+      'id': index,
+      'id_color': 3,
+      'color': 'rojo',
+      'consecutivo': datos.pedExt_Id,
+      'cliente': datos.cli_Nombre,
+      'producto': datos.prod_Nombre,
+      'id_Producto': datos.prod_Id,
+      'cant_Pedida': datos.pedExtProd_Cantidad,
+      'cant_Pendiente': datos.pedExtProd_Cantidad,
+      'cant_Facturada': 0,
+      'existencias': datos.existencias,
+      'presentacion': datos.undMed_Id,
+      'estado': datos.estado_Nombre,
+      'vendedor': datos.usua_Nombre,
+      'precioUnidad': datos.pedExtProd_PrecioUnitario,
+      'orden_Compra_CLiente': datos.orden_Compra_CLiente,
+      'costo_Cant_Pendiente': datos.costo_Cant_Pendiente,
+      'costo_Cant_Total': datos.pedExtProd_Cantidad * datos.pedExtProd_PrecioUnitario,
+      'fecha_Creacion': datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
+      'fecha_Entrega': datos.pedExtProd_FechaEntrega.replace('T00:00:00', ''),
+      'OT': '',
+      'Proceso_OT': '',
+      'CantPesada': '',
+      'Estado_OT': '',
+      'CantPedidaKg_OT': '',
+      'CantPedidaUnd_OT': '',
+      'Zeus': 0,
     };
 
-    this.inventarioZeusService.getExistenciasProductos(datos.prod_Id.toString(), datos.undMed_Id).subscribe(data => data.forEach(exi => info.existencias = exi.existencias));
+    //this.inventarioZeusService.getExistenciasProductos(datos.prod_Id.toString(), datos.undMed_Id).subscribe(data => data.forEach(exi => info.existencias = exi.existencias));
     this.ArrayPedidos.push(info);
     this.datosExcel = this.ArrayPedidos;
     this.ArrayPedidos.sort((a, b) => Number(a.id) - Number(b.id));
@@ -593,7 +595,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         row.getCell(15).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         row.getCell(16).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
 
-        let colorEstadoPedido: string = 'FFFFFF'; 
+        let colorEstadoPedido: string = 'FFFFFF';
         let colorEstadoOT: string = 'FFFFFF';
         // OT con Estado
         if (row.getCell(21).value == 17) {
@@ -727,22 +729,21 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       this.modalPedidoExterno.limpiarTodosCampos();
       this.modalPedidoExterno.modalMode = true;
       this.pedidoExternoService.GetInfoEditarPedido(data.consecutivo).subscribe(datos_pedido => {
-        for (let i = 0; i < datos_pedido.length; i++) {
-          this.modalPedidoExterno.FormPedidoExternoClientes.patchValue({
-            PedClienteNombre: datos_pedido[i].cliente,
-            PedObservacion: datos_pedido[i].observacion,
-            PedDescuento: datos_pedido[i].descuento,
-            PedIva: datos_pedido[i].iva,
+        console.log(datos_pedido);
+
+        datos_pedido.forEach(dato => {
+          this.modalPedidoExterno.pedidoEditar = dato.consecutivo;
+          this.modalPedidoExterno.form1.patchValue({
+            'PedClienteId': dato.id_Cliente,
+            'PedClienteNombre': dato.cliente,
           });
-          this.modalPedidoExterno.pedidoEditar = data.consecutivo;
-          this.modalPedidoExterno.clienteSeleccionado();
+          this.modalPedidoExterno.buscarClientes();
           setTimeout(() => {
-            this.modalPedidoExterno.FormPedidoExternoClientes.patchValue({ ciudad_sede: datos_pedido[i].ciudad, });
-            this.modalPedidoExterno.llenarDireccionCliente();
-          }, 500);
-          break;
-        }
-        for (let i = 0; i < datos_pedido.length; i++) {
+            this.modalPedidoExterno.clienteSeleccionado();
+          }, 500); 
+        });
+
+        /*for (let i = 0; i < datos_pedido.length; i++) {
           this.modalPedidoExterno.iva = datos_pedido[i].iva;
           if (datos_pedido[i].iva > 0) this.modalPedidoExterno.checked = true;
           this.modalPedidoExterno.descuento = datos_pedido[i].descuento;
@@ -757,7 +758,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             FechaEntrega: datos_pedido[i].fecha_Entrega.replace('T00:00:00', ''),
           }
           this.modalPedidoExterno.ArrayProducto.push(productoExt);
-        }
+        }*/
       });
     }, 500);
   }
@@ -1178,8 +1179,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    { border: [false, false, false, true], text: `Comercial:  ${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}` },
-                    { border: [false, false, false, true], text: `Estado del pedido:  ${datos_pedido[i].estado}` },
+                    { border: [false, false, false, true], text: `Comercial:  ${String(datos_pedido[i].vendedor_Id).padStart(3, '0')} - ${datos_pedido[i].vendedor}` },
+                    { border: [false, false, false, true], text: `Estado:  ${datos_pedido[i].estado}` },
                     { border: [false, false, false, true], text: `Código:  ${datos_pedido[i].consecutivo}` },
                   ],
                 ]
@@ -1213,34 +1214,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                 body: [
                   [
                     '',
-                    { border: [true, false, true, true], text: `SUBTOTAL` },
+                    { border: [true, false, true, true], text: `TOTAL` },
                     { border: [false, false, true, true], text: `$${this.formatonumeros(datos_pedido[i].precio_Total)}` },
                   ],
-                  [
-                    '',
-                    { border: [true, false, true, true], text: `DESCUENTO (%)` },
-                    { border: [false, false, true, true], text: `${datos_pedido[i].descuento}%` },
-                  ],
-                  [
-                    '',
-                    { border: [true, false, true, true], text: `SUBTOTAL DESCUENTO` },
-                    { border: [false, false, true, true], text: `$${this.formatonumeros((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100)}` },
-                  ],
-                  [
-                    '',
-                    { border: [true, false, true, true], text: `IVA (%)` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].iva)}%` },
-                  ],
-                  [
-                    '',
-                    { border: [true, false, true, true], text: `SUBTOTAL IVA` },
-                    { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}` },
-                  ],
-                  [
-                    '',
-                    { border: [true, false, true, true], text: `TOTAL` },
-                    { border: [false, false, true, true], text: `$${this.formatonumeros(datos_pedido[i].precio_Final)}` },
-                  ]
                 ]
               },
               layout: { defaultBorder: false, },
@@ -1282,10 +1258,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que se encagará de llenar la tabla del pd
   buildTableBody(data, columns) {
-    var body : any = [];
+    var body: any = [];
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow : any = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column]));
       body.push(dataRow);
     });

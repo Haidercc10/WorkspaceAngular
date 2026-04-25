@@ -29,7 +29,7 @@ export class AuthenticationService {
                         private authenticationBagPro : authentication_BagPro,
                           private encriptacion : EncriptacionService,) {
 
-    let token = this.encriptacion.decrypt(localStorage.getItem('user') == undefined ? '' : localStorage.getItem('user'));
+    let token = this.encriptacion.decrypt(localStorage.getItem('user') ?? '');
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }

@@ -74,7 +74,7 @@
         </div>
 
         <!-- Precio -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1;">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="[1, 3, 104].includes(ValidarRol)">
           <span class="p-float-label">
             <p-inputNumber formControlName="precio" id="precio" [minFractionDigits]="2" [readonly]="true" [required]="true"></p-inputNumber>
             <label for="precio">Precio (Kg)</label>
@@ -82,7 +82,7 @@
         </div>
 
         <!--Procesos-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1;">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="[1, 3, 104].includes(ValidarRol)">
           <span class="p-float-label">
             <p-dropdown formControlName="proceso" inputId="proceso" optionValue="proceso_Id" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre"></p-dropdown>
             <label for="proceso">Área</label>
@@ -138,8 +138,8 @@
             <th class="text-center" scope="col">{{labels[0]}}</th>
             <th class="text-center" scope="col">{{labels[1]}}</th>
             <th class="text-center" scope="col">Cantidad (Kg)</th>
-            <th class="text-center" scope="col" *ngIf="ValidarRol == 1;">Precio (Kg)</th>
-            <th class="text-center" scope="col" *ngIf="ValidarRol == 1;">Subtotal</th>
+            <th class="text-center" scope="col" *ngIf="[1, 3, 104].includes(ValidarRol)">Precio (Kg)</th>
+            <th class="text-center" scope="col" *ngIf="[1, 3, 104].includes(ValidarRol)">Subtotal</th>
             <th class="text-center" scope="col">Área</th>
             <th class="text-center" scope="col">Observacion</th>
             <th class="text-center" scope="col" id="quitar">Quitar</th>
@@ -155,8 +155,8 @@
             </ng-template>
             <td>{{inv.Referencia}}</td>
             <td class="text-center"><b>{{inv.InvStock | number: '1.2-2'}}</b></td>
-            <td class="text-center" *ngIf="ValidarRol == 1;">{{inv.InvPrecio | number: '1.2-2'}}</td>
-            <td class="text-center fontBlue" *ngIf="ValidarRol == 1;"><b>{{inv.Subtotal | number: '1.2-2'}}</b></td>
+            <td class="text-center" *ngIf="[1, 3, 104].includes(ValidarRol)">{{inv.InvPrecio | number: '1.2-2'}}</td>
+            <td class="text-center fontBlue" *ngIf="[1, 3, 104].includes(ValidarRol)"><b>{{inv.Subtotal | number: '1.2-2'}}</b></td>
             <td class="text-center"><b>{{inv.Proceso_Id }}</b></td>
             <td class="text-center">{{inv.InvObservacion }}</td>
             <td class="text-center">
@@ -164,7 +164,7 @@
             </td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="footer" *ngIf="ValidarRol == 1;">
+        <ng-template pTemplate="footer" *ngIf="[1, 3, 104].includes(ValidarRol)">
           <tr>
             <td [colSpan]="url=='/inventario-areas/materiales' ? 5 : 6" class="text-right">Totales</td>
             <td class="fontBlue" colspan="4">{{precioTotal() | number: '1.2-2'}} COP</td>

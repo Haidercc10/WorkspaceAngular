@@ -150,6 +150,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.production = [];
     this.productionSelected = [];
     this.consolidatedProduction = [];
+    this.tableOrder?.clear();
   }
 
   //Función para cargar la información de la devolución. 
@@ -200,6 +201,100 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
       });
     } else this.msg.mensajeAdvertencia('Número de devolución no valido!');
   }
+
+  // Función para limpiar tablas.
+clearTables2() {
+  this.status = null;
+  this.production = [];
+  this.productionSelected = [];
+  this.consolidatedProduction = [];
+  this.tableOrder?.clear();
+}
+
+// Función para cargar la información de la devolución.
+searchData2() {
+  // BLOQUEO: evita doble ejecución (doble Enter)
+  if (this.load) return;
+
+  let dev = this.form.value.dev;
+  if (!dev) {
+    this.msg.mensajeAdvertencia('Número de devolución no valido!');
+    return;
+  }
+
+  this.load = true; // activar ANTES de cualquier async
+  this.clearTables2();
+
+  const date = moment().format('YYYY-MM-DD');
+  const hour = moment().format('HH:mm:ss');
+  const reposition = !!this.form.value.reposition;
+  const creditNote = !!this.form.value.creditNote;
+  const observation = this.form.value.observation 
+    ? `?observation=${this.form.value.observation}` 
+    : '';
+  const user = this.appComponent.storage_Id;
+
+  this.qtyRollsDv = 0;
+
+  this.svDetailsDevolutions.GetInformationDevById(dev).subscribe({
+    next: (data) => {
+
+      if (![11, 29].includes(data[0].dev.estado_Id)) {
+        this.msg.mensajeAdvertencia(
+          `Devolución no disponible`,
+          `La devolución N° ${dev} se encuentra por reponer y/o cerrada!`
+        );
+        this.clearFields();
+        this.load = false;
+        return;
+      }
+
+      this.svDevolutions.PutStatusDevolution(
+        dev, 29, date, hour, user, reposition, creditNote, observation
+      ).subscribe({
+        next: () => {
+
+          this.qtyRollsDv = data.length;
+
+          // NO más push → asignación directa (inmutable)
+          this.production = data.map(x => ({
+            item: x.prod.prod_Id,
+            reference: x.prod.prod_Nombre,
+            numberProduction: x.dtDev.numero_Rollo,
+            quantity: x.dtDev.cantidad,
+            weight: x.dtDev.weight ?? x.weight,
+            of: x.dtDev.of ?? x.dev.id_OrdenFact,
+            ot: x.dtDev.ot ?? x.ot,
+            fact: x.dtDev.fact ?? x.dev.devProdFact_Factura,
+            presentation: x.dtDev.presentacion,
+            statusId: 23,
+            statusName: 'NO DISPONIBLE',
+          }));
+
+          // ✅ ejecutar lógica adicional fuera del map
+          data.forEach(x => this.changeInformationDev(x));
+
+          this.load = false;
+        },
+        error: (error) => {
+          this.msg.mensajeError(
+            'No fue posible actualizar el estado de la devolución!',
+            error
+          );
+          this.clearFields();
+          this.load = false;
+        }
+      });
+    },
+    error: (error: HttpErrorResponse) => {
+      this.errorMessage(
+        `No fue posible consultar la devolución N° ${dev}!`,
+        error
+      );
+      this.load = false;
+    }
+  });
+}
 
   //Función para cargar la información de la factura.
   changeInformationDev(data: any) {

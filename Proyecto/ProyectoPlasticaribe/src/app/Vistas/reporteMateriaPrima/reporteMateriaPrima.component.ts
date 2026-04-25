@@ -215,7 +215,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarTabla(data: any) {
     if (![2001, 2072, 84, 88, 89].includes(data.id)) {
-      this.valorTotal = this.ValidarRol == 1 ? this.valorTotal + data.precio * data.stock : 0;
+      this.valorTotal = [1,104].includes(this.ValidarRol) ? this.valorTotal + data.precio * data.stock : 0;
       this.cantInicial += data.inicial;
       this.cantEntrante += data.entrada;
       this.cantSaliente += data.salida;
@@ -236,18 +236,18 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Cant2: data.stock,
         Diferencia: data.diferencia,
         UndCant: data.presentacion,
-        PrecioUnd: this.ValidarRol == 1 ? data.precio : 0,
+        PrecioUnd: [1,104].includes(this.ValidarRol) ? data.precio : 0,
         PrecioEstandar: data.precioEstandar,
-        SubTotal: this.ValidarRol == 1 ? data.subTotal : 0,
+        SubTotal: [1,104].includes(this.ValidarRol) ? data.subTotal : 0,
         Categoria: data.categoria,
         Categoria_Id: data.categoria_Id,
         Subcategoria: data.subcategoria,
         Subcategoria_Id: data.subcategoria_Id,
       }
-      if ([1, 3, 12, 85, 98, 2].includes(this.ValidarRol)) this.ArrayMateriaPrima.push(info);
+      if ([1, 3, 12, 85, 98, 2, 104].includes(this.ValidarRol)) this.ArrayMateriaPrima.push(info);
       this.ArrayMateriaPrima.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
 
-      if (this.categoriasMP.includes(data.categoria_Id) && ([1, 3, 12, 85, 98, 2].includes(this.ValidarRol))) {
+      if (this.categoriasMP.includes(data.categoria_Id) && ([1, 3, 12, 85, 98, 2, 104].includes(this.ValidarRol))) {
         this.polietilenos.push(info);
         this.valorTotalPolietileno += data.precio * data.stock;
         this.cantInicialPolietileno += data.inicial;
@@ -256,7 +256,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.cantExistenciasPolientileno += data.stock;
         this.cantDiferenciaPolietileno += data.diferencia;
       }
-      if (this.categoriasTintas.includes(data.categoria_Id) && ([1, 3, 12, 85, 98, 2].includes(this.ValidarRol))) {
+      if (this.categoriasTintas.includes(data.categoria_Id) && ([1, 3, 12, 85, 98, 2, 104].includes(this.ValidarRol))) {
         this.tintas.push(info);
         this.valorTotalTintas += data.precio * data.stock;
         this.cantInicialTintas += data.inicial;
@@ -265,9 +265,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.cantExistenciasTintas += data.stock;
         this.cantDiferenciaTintas += data.diferencia;
       }
-      if (this.categoriasBOPP.includes(data.categoria_Id) && ([1, 3, 4, 89, 63, 12, 85, 98, 2].includes(this.ValidarRol))) {
+      if (this.categoriasBOPP.includes(data.categoria_Id) && ([1, 3, 4, 89, 63, 12, 85, 98, 2, 104].includes(this.ValidarRol))) {
         this.biorientados.push(info);
-        this.valorTotalBiorientado += this.ValidarRol == 1 ? data.precio * data.stock : 0;
+        this.valorTotalBiorientado += [1,104].includes(this.ValidarRol) ? data.precio * data.stock : 0;
         this.cantInicialBiorientado += data.inicial;
         this.cantEntranteBiorientado += data.entrada;
         this.cantSalienteBiorientado += data.salida;

@@ -20,7 +20,7 @@
 <p-card>
   <p class="mb-4"><i class="pi pi-exclamation-triangle"></i> <b> Nota: </b> Los campos marcados con (*) son requeridos
     para la generación del pedido</p>
-  
+
   <!--TODO: 
   <ng-container *ngIf="ValidarRol == 1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -38,7 +38,7 @@
   <br>
 
   <!--*Formulario 1-->
-  <form [formGroup]="FormPedidoExternoClientes" id="formulario1">
+  <form [formGroup]="form1" id="formulario1">
     <div class="mb-3">
       <div class="row g-4">
 
@@ -126,7 +126,7 @@
   <br>
 
   <!--*Formulario 2-->
-  <form [formGroup]="FormPedidoExternoProductos" autocomplete="off" id="formulario2" (ngSubmit)="validarCamposVacios()">
+  <form [formGroup]="form2" autocomplete="off" id="formulario2" (ngSubmit)="validarCamposVacios()">
     <div class="mb-3">
       <div class="row g-4">
 
@@ -135,7 +135,7 @@
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ProdId" id="ProdId" type="text" pInputText
-              (keyup)="buscarProducto(FormPedidoExternoProductos.value.ProdId)" required />
+              (keyup)="buscarProducto(form2.value.ProdId)" required />
             <label for="ProdId">Item</label>
           </span>
         </div>
@@ -145,7 +145,7 @@
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ProdNombre" id="ProdNombre" list="producto" type="text" pInputText
-              (change)="buscarProducto(FormPedidoExternoProductos.value.ProdNombre)" required />
+              (change)="buscarProducto(form2.value.ProdNombre)" required />
             <datalist id="producto">
               <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
             </datalist>
@@ -174,7 +174,7 @@
         <!-- Precio Producto -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" [min]="ultimoPrecio" inputId="Precio"
+            <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" inputId="Precio"
               [minFractionDigits]="2"></p-inputNumber>
             <label for="Precio">Precio Unitario</label>
           </span>
@@ -208,32 +208,38 @@
         </div>
 
         <!-- Ultima fecha Facturada -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-4" id="ultFecha">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="ultFecha">
           <span class="p-float-label">
-            <p-chip label="Última facturación: {{fechaUltFacuracion}}" icon="pi pi-calendar"></p-chip>
+            <p-chip label="Últ. factura: {{fechaUltFacuracion}}" icon="pi pi-calendar"></p-chip>
+          </span>
+        </div>
+
+        <!-- Campo Observacion -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="observacion">
+          <span class="p-float-label">
+            <textarea formControlName="ProdObservacion" [rows]="1" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
           </span>
         </div>
 
       </div>
     </div>
-  </form>
 
+
+    <!--
   <div class="mb-4">
     <hr class="Linea">
   </div>
 
-  <!-- Titulo PT -->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-database"></i>
       Producto Terminado</h4>
   </div>
 
-  <!--*Formulario 3-->
   <form [formGroup]="formProdTerminado" autocomplete="off" id="formulario2" (ngSubmit)="validarCamposVacios()">
     <div class="mb-3">
-      <div class="row g-4">
-
-        <!-- Formato -->
+      <div class="row g-4"> 
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-dropdown formControlName="format" inputId="format" [autoDisplayFirst]="false" optionValue="tpProd_Id"
@@ -242,7 +248,6 @@
           </span>
         </div>
 
-        <!-- * Material -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="material" inputId="material" optionValue="material_Id"
@@ -251,8 +256,7 @@
             <label for="material">Material</label>
           </span>
         </div>
-
-        <!-- * Pigmento -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="pigment" inputId="Pigmento" [options]="pigments" optionLabel="pigmt_Nombre"
@@ -263,8 +267,7 @@
             <label for="Pigmento">Pigmento</label>
           </span>
         </div>
-
-        <!--* Tratado -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="treaty" inputId="Tratado" [options]="treatys" optionLabel="tratado_Nombre"
@@ -275,8 +278,7 @@
             <label for="Tratado">Tratado</label>
           </span>
         </div>
-
-        <!-- * Calibre -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="caliber">
           <span class="p-float-label">
             <p-inputNumber formControlName="caliber" mode="decimal" [min]="0" inputId="caliber"
@@ -284,8 +286,7 @@
             <label for="caliber">Calibre</label>
           </span>
         </div>
-
-        <!--* Unidad Calibre -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="units">
           <span class="p-float-label">
             <p-dropdown formControlName="unitsALF" inputId="unit" [autoDisplayFirst]="false" optionValue="undMed_Id"
@@ -293,8 +294,7 @@
             <label for="units">Und. Calibre</label>
           </span>
         </div>
-
-        <!-- Ancho -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="width" mode="decimal" [min]="0" inputId="width"
@@ -302,8 +302,7 @@
             <label for="width">Ancho</label>
           </span>
         </div>
-
-        <!-- Largo -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="long" mode="decimal" [min]="0" inputId="long"
@@ -311,8 +310,7 @@
             <label for="long">Largo</label>
           </span>
         </div>
-
-        <!-- Fuelle Izquierdo -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="bellowLeft" mode="decimal" [min]="0" inputId="bellowLeft"
@@ -320,8 +318,7 @@
             <label for="bellowLeft">Fuelle Izq.</label>
           </span>
         </div>
-
-        <!-- Fuelle Derecho -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="bellowRight" mode="decimal" [min]="0" inputId="bellowRight"
@@ -329,8 +326,7 @@
             <label for="bellowRight">Fuelle Der.</label>
           </span>
         </div>
-
-        <!-- Fuelle Derecho -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="bellowBottom" mode="decimal" [min]="0" inputId="bellowBottom"
@@ -338,8 +334,7 @@
             <label for="bellowBottom">Fuelle Fondo</label>
           </span>
         </div>
-
-        <!--* Unidad Ancho/Largo/Fuelle -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="units">
           <span class="p-float-label">
             <p-dropdown formControlName="unitsALF" inputId="unit" [autoDisplayFirst]="false" optionValue="undMed_Id"
@@ -347,8 +342,7 @@
             <label for="units">Und. Medida</label>
           </span>
         </div>
-
-        <!-- Solapa -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="solapa" mode="decimal" [min]="0" inputId="solapa"
@@ -356,8 +350,7 @@
             <label for="solapa">Solapa</label>
           </span>
         </div>
-
-        <!--Millar-->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-inputNumber formControlName="weightMillar" mode="decimal" inputId="weightMillar" [minFractionDigits]="2"
@@ -365,8 +358,7 @@
             <label for="weightMillar">Peso millar</label>
           </span>
         </div>
-
-        <!-- Peso rollo -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-inputNumber formControlName="weightRoll" mode="decimal" inputId="weightRoll" [minFractionDigits]="2"
@@ -374,8 +366,7 @@
             <label for="weightRoll">Peso rollo</label>
           </span>
         </div>
-
-        <!-- Peso Und -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-inputNumber formControlName="weightUnit" mode="decimal" inputId="weightUnit" [minFractionDigits]="2"
@@ -384,23 +375,20 @@
           </span>
         </div>
 
-        <!--  -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-inputNumber formControlName="qtyBagxBulto" inputId="qtyBagxBulto" [readonly]="true"></p-inputNumber>
             <label for="qtyBagxBulto">Cant. Bolsas x Bulto</label>
           </span>
         </div>
-
-        <!---->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-inputNumber formControlName="qtyBagxPaq" inputId="qtyBagxPaq" [readonly]="true"></p-inputNumber>
             <label for="qtyBagxPaq">Cant. Bolsas x Paquete</label>
           </span>
         </div>
-
-        <!-- Tipo impresión -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-dropdown formControlName="tpPrinting" inputId="tpPrinting" [autoDisplayFirst]="false"
@@ -409,8 +397,7 @@
             <label for="tpPrinting">Tipo Impresión</label>
           </span>
         </div>
-
-        <!-- Tipo Sellado -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="">
           <span class="p-float-label">
             <p-dropdown formControlName="tpSealed" inputId="tpSealed" [autoDisplayFirst]="false"
@@ -419,8 +406,7 @@
             <label for="tpSealed">Tipo Sellado</label>
           </span>
         </div>
-
-        <!--* impresión -->
+        
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="units">
           <span class="p-float-label">
             <p-dropdown formControlName="printing" inputId="printing" [autoDisplayFirst]="false" optionValue=""
@@ -428,17 +414,15 @@
             <label for="printing">Impresión</label>
           </span>
         </div>
-
-        <!--* Impresion Doble Cara-->
-        <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+        
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
           <div class="field-checkbox">
             <p-checkbox formControlName="printingDouble" [binary]="true" inputId="printingDouble"
               id="printingDouble"></p-checkbox>
             <label for="printingDouble">Impresión Doble Cara</label>
           </div>
-        </div>-->
+        </div>
 
-        <!--* Embobinado -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="embobinate">
           <span class="p-float-label">
             <p-inputNumber formControlName="embobinate" [min]="0" inputId="embobinate" [minFractionDigits]="2"
@@ -447,7 +431,7 @@
           </span>
         </div>
 
-        <!--* Laminado -->
+
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
           <div class="field-checkbox">
             <p-checkbox formControlName="laminated" [binary]="true" inputId="laminated" id="laminated"></p-checkbox>
@@ -458,13 +442,15 @@
       </div>
     </div>
 
+  -->
+
     <!-- Inicio botones -->
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" id="agregar" type="submit" label="Agregar Producto" icon="pi pi-send"
-          [disabled]="!FormPedidoExternoProductos.valid || !formProdTerminado.valid"></button>
-        <button pButton class="p-button-danger p-button-outlined" id="agregar" type="submit" label="Validar Formularios"
-          icon="pi pi-send" (click)="log()"></button>
+          [disabled]="!form2.valid"></button>
+        <!--<button pButton class="p-button-danger p-button-outlined" id="agregar" type="submit" label="Validar Formularios"
+        icon="pi pi-send" (click)="log()"></button>-->
         <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser"
           (click)="LimpiarCamposProductos()"> </button>
       </div>
@@ -505,8 +491,8 @@
               <td>{{listaProductos.Nombre}}</td>
               <td>{{listaProductos.Cant | number : '1.2-2'}}</td>
               <td>{{listaProductos.UndCant}}</td>
-              <td>{{listaProductos.PrecioUnd | number : '1.2-2'}}</td>
-              <td>{{listaProductos.SubTotal | number : '1.2-2'}}</td>
+              <td>${{listaProductos.PrecioUnd | number : '1.2-2'}}</td>
+              <td>${{listaProductos.SubTotal | number : '1.2-2'}}</td>
               <td>{{listaProductos.FechaEntrega}}</td>
               <td *ngIf="!modalMode" style="text-align: center;">
                 <button id="quitarEliminar" pButton class="p-button-danger p-button-rounded" type="button"
@@ -520,11 +506,24 @@
               </td>
             </tr>
           </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8" class="text-center">No hay productos agregados al pedido.</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="5" style="text-align: right; font-weight: 800;">Valor Total:</td>
+              <td>{{valorTotalPedido() | number : '1.2-2'}}</td>
+              <td colspan="2"></td>
+            </tr>
+          </ng-template>  
         </p-table>
       </div>
     </div>
   </div>
 
+<!--
   <div class="mb-5" id="costosPedidos">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <div class="mb-3">
@@ -543,7 +542,7 @@
         <div class="row g-3">
           <p-chip label="SubTotal Descuento" pTooltip="Subtotal descuento" tooltipPosition="top"
             icon="pi pi-wallet"></p-chip>
-          <label class="text-center" for="">${{valorTotalMenosDescuentoPedido() | number : '1.2-2'}}</label>
+          <label class="text-center" for="">${{0 | number : '1.2-2'}}</label>
         </div>
       </div>
       <div class="mb-3">
@@ -555,25 +554,25 @@
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="SubTotal Iva" icon="pi pi-money-bill"></p-chip>
-          <label class="text-center" for="">${{valorTotalMasIvaPedido() | number : '1.2-2'}}</label>
+          <label class="text-center" for="">${{0 | number : '1.2-2'}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Costo Final" icon="pi pi-shopping-cart"></p-chip>
-          <label class="text-center" for="">${{valorFinalPedido() | number : '1.2-2'}}</label>
+          <label class="text-center" for="">${{0 | number : '1.2-2'}}</label>
         </div>
       </div>
     </div>
   </div>
-
+-->
   <div class="mb-4">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" id="crearPedido" type="button" label="Crear Pedido" *ngIf="!modalMode"
-        [disabled]="!FormPedidoExternoClientes.valid || ArrayProducto.length == 0" icon="pi pi-check"
+        [disabled]="!form1.valid || ArrayProducto.length == 0" icon="pi pi-check"
         (click)="confirmarPedido()"> </button>
       <button pButton class="p-button-danger" id="crearPedido" type="button" label="Editar Pedido" icon="pi pi-pencil"
-        *ngIf="modalMode" [disabled]="!FormPedidoExternoClientes.valid || ArrayProducto.length == 0"
+        *ngIf="modalMode" [disabled]="!form1.valid || ArrayProducto.length == 0"
         (click)="confirmarPedido()"> </button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser"
         (click)="limpiarTodosCampos()"> </button>

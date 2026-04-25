@@ -45,7 +45,7 @@
         <!-- Con existencias -->
         <button pButton pRipple pTooltip="Materias primas con existencias" label="Stock" icon="pi pi-eject" class="p-button-warning mr-2" id="con-existencias" (click)="existenciasMayorCero()"></button>
         <!-- Nueva materias prima -->
-        <button *ngIf="ValidarRol == 1" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-danger mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
+        <button *ngIf="[1,104].includes(ValidarRol)" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-danger mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
         <!-- Exportar excel -->
         <button pButton pRipple label="Exportar a excel inventario de todos los materiales" pTooltip="Exportar a excel" icon="pi pi-file-excel" class="p-button-success" id="exportar1" label="Exportar" (click)="exportarExcel(1)"></button>            
       </ng-template>
@@ -93,7 +93,7 @@
               <tr class="font-size-16" id="filtros">
                 <th></th>
                 <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+                <th *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
@@ -101,24 +101,24 @@
                   {{col.header}} 
                   <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
                 <td><b>{{rowIndex + 1}}</b></td>
                 <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
+                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(ArrayMateriaPrima) | number}}</td>
-                <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(ArrayMateriaPrima) | number}}</td>
-                <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
+                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(ArrayMateriaPrima) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(ArrayMateriaPrima) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
+                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -167,7 +167,7 @@
               <tr class="font-size-16" id="filtros">
                 <th></th>
                 <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, col.field, 'contains')"></th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+                <th *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
@@ -175,24 +175,24 @@
                   {{col.header}} 
                   <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
                 <td><b>{{rowIndex + 1}}</b></td>
                 <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
+                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(polietilenos) | number}}</td>
-                <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(polietilenos) | number}}</td>
-                <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
+                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(polietilenos) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(polietilenos) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
+                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -241,7 +241,7 @@
               <tr class="font-size-16" id="filtros">
                 <th></th>
                 <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarFiltroTintas($event, col.field, 'contains')"></th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+                <th *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
@@ -249,24 +249,24 @@
                   {{col.header}} 
                   <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
                 <td><b>{{rowIndex + 1}}</b></td>
                 <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
+                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(tintas) | number}}</td>
-                <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(tintas) | number}}</td>
-                <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
+                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(tintas) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(tintas) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
+                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -314,7 +314,7 @@
               <tr class="font-size-16" id="filtros">
                 <th></th>
                 <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, col.field, 'contains')"></th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+                <th *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
@@ -322,24 +322,24 @@
                   {{col.header}} 
                   <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
                 <td><b>{{rowIndex + 1}}</b></td>
                 <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
+                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(biorientados) | number}}</td>
-                <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(biorientados) | number}}</td>
-                <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"></td>
+                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(biorientados) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(biorientados) | number}}</td>
+                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
+                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -352,7 +352,7 @@
       header="Bopps agrupados"
       leftIcon="pi pi-table"
       tooltip="Información del Inventario de los Bopps genéricos"
-      *ngIf="[1,3,4,89,63,12,98,2].includes(this.ValidarRol)">
+      *ngIf="[1,3,4,89,63,12,98,2,104].includes(this.ValidarRol)">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
           <p-toolbar>
@@ -429,12 +429,12 @@
                 <td>{{materiaPrima.Rollos | number}}</td>
                 <td class="columnaCantidad"><b>{{materiaPrima.Stock | number : '1.2-2'}}</b></td>
                 <td>{{materiaPrima.Medida}}</td>
-                <td *ngIf="[1,3,4,89,63,98,2].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="llamarModalBopp(materiaPrima)"></p-button></td>
+                <td *ngIf="[1,3,4,89,63,98,2,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="llamarModalBopp(materiaPrima)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr id="totales">
-                <td colspan="7" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
+                <td colspan="7" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
                 <td class="text-left">{{stockTotalBopps | number: '1.2-2'}}</td>
                 <td colspan="2" class="text-center"></td>
               </tr>
@@ -449,7 +449,7 @@
       header="Subcategorias"
       leftIcon="pi pi-list"
       tooltip="Información del Inventario por Subcategorias"
-      *ngIf="[1,3,4,89,63,12,98,2].includes(this.ValidarRol)">
+      *ngIf="[1,3,4,89,63,12,98,2,104].includes(this.ValidarRol)">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
           <p-toolbar>
@@ -510,7 +510,7 @@
                 <td class="text-center"><b>{{mp.stock | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{mp.unit }}</td>
                 <td class="text-center"><b>${{mp.subtotal | number : '1.2-2'}}</b></td>
-                <td class="text-center" *ngIf="[1,3,4,89,63,98,2].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="loadModalSubcategories(mp)"></p-button></td>
+                <td class="text-center" *ngIf="[1,3,4,89,63,98,2,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="loadModalSubcategories(mp)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
@@ -698,8 +698,8 @@
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'Cant', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'Diferencia', 'contains')"></th>
             <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'UndCant', 'contains')"></th>
-            <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'PrecioUnd', 'contains')"></th>
-            <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'SubTotal', 'contains')"></th>
+            <th *ngIf="[1,104].includes(ValidarRol)"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'PrecioUnd', 'contains')"></th>
+            <th *ngIf="[1,104].includes(ValidarRol)"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'SubTotal', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados2($event, 'Categoria', 'contains')"></th>
           </tr>
           <tr>
@@ -733,10 +733,10 @@
             </th>
             <th scope="col">Medida
             </th>
-            <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
+            <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="[1,104].includes(ValidarRol)">Precio Und
               <p-sortIcon field="PrecioUnd"></p-sortIcon>
             </th>
-            <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
+            <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="[1,104].includes(ValidarRol)">SubTotal
               <p-sortIcon field="SubTotal"></p-sortIcon>
             </th>
             <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
@@ -757,7 +757,7 @@
             <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
             <td>{{materiaPrima.Diferencia | number}}</td>
             <td>{{materiaPrima.UndCant}}</td>
-            <ng-container *ngIf="ValidarRol == 1">
+            <ng-container *ngIf="[1,104].includes(ValidarRol)">
               <td>{{materiaPrima.PrecioUnd | number}}</td>
               <td>{{materiaPrima.SubTotal | number}}</td>
             </ng-container>
@@ -766,15 +766,15 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-            <td *ngIf="ValidarRol == 1">{{cantInicialBopp | number}}</td>
-            <td *ngIf="ValidarRol == 1">{{cantEntranteBopp | number}}</td>
-            <td *ngIf="ValidarRol == 1">{{cantSalienteBopp | number}}</td>
-            <td *ngIf="ValidarRol == 1">{{cantExistenciasBopp | number}}</td>
-            <td *ngIf="ValidarRol == 1">{{cantDiferenciaBopp | number}}</td>
-            <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-            <td *ngIf="ValidarRol == 1">{{valorTotalBopp | number}}</td>
-            <td *ngIf="ValidarRol == 1">COP</td>
+            <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
+            <td *ngIf="[1,104].includes(ValidarRol)">{{cantInicialBopp | number}}</td>
+            <td *ngIf="[1,104].includes(ValidarRol)">{{cantEntranteBopp | number}}</td>
+            <td *ngIf="[1,104].includes(ValidarRol)">{{cantSalienteBopp | number}}</td>
+            <td *ngIf="[1,104].includes(ValidarRol)">{{cantExistenciasBopp | number}}</td>
+            <td *ngIf="[1,104].includes(ValidarRol)">{{cantDiferenciaBopp | number}}</td>
+            <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
+            <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalBopp | number}}</td>
+            <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
           </tr>
         </ng-template>
       </p-table>

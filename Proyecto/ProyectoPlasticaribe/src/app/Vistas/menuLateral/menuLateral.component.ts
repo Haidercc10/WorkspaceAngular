@@ -92,10 +92,10 @@ export class MenuLateralComponent implements OnInit {
   mostrarMenuLateral() {
     let ruta : any = this.router.url;
     this.display = true;
-    if([85,7,3,8,86,63,89,62,4,88,12,2].includes(this.ValidarRol)) {
+    if([85,7,3,8,86,63,89,62,4,88,12,2,104].includes(this.ValidarRol)) {
       setTimeout(() => {
         this.categorias.forEach(x => {
-          if([85,7,3,8,86,63,89,62,4,88,12,2].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
+          if([85,7,3,8,86,63,89,62,4,88,12,2,104].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
         });
         this.router.navigate([ruta]);
       }, 20);
@@ -224,7 +224,7 @@ export class MenuLateralComponent implements OnInit {
           }
         }
         if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
-        if(![1, 3, 7, 61, 85, 63, 89, 62, 4, 88, 12, 2].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1);
+        if(![1, 3, 7, 61, 85, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1);
         count++;
         if (count == this.categorias.length) this.cargando = false;
       });

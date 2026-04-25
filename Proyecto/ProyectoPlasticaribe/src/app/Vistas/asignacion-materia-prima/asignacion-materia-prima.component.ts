@@ -301,8 +301,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.soloTintas = true;
           this.crearAsignacion();
         } else {
-          if (this.ValidarRol != 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
-          else if (this.ValidarRol == 1) this.confirmarAsignacion(idOrdenTrabajo);
+          if (![1,104].includes(this.ValidarRol)) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
+          else if ([1,104].includes(this.ValidarRol)) this.confirmarAsignacion(idOrdenTrabajo);
         }
       }
     } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);

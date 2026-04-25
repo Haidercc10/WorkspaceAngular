@@ -246,6 +246,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     if (this.FormMateriaPrimaRetirada.valid) {
       if (this.FormMateriaPrimaRetirada.value.MpCantidadRetirada != 0) {
         if (!this.materiasPrimasSeleccionada_ID.includes(this.FormMateriaPrimaRetirada.value.MpIdRetirada)){
+          if(this.FormMateriaPrimaRetirada.value.MpCantidadRetirada > this.cantRestante){
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante a asignar: ${this.cantRestante} Kg!`);
+            return;
+          }
           let info : any = {
             Id : this.FormMateriaPrimaRetirada.value.MpIdRetirada,
             Id_Mp: 84,

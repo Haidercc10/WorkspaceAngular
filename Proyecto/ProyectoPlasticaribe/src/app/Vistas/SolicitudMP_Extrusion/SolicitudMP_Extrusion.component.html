@@ -64,7 +64,7 @@
         <!-- Proceso -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="proceso">
           <span class="p-float-label">
-            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [readonly]="![1].includes(ValidarRol)" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
+            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [readonly]="![1,104,3].includes(ValidarRol)" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
             <label for="Proceso">Proceso</label>
           </span>
         </div>
