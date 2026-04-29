@@ -15,6 +15,8 @@ import { AuthenticationService } from './_Services/authentication.service';
 import { authentication_BagPro } from './_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
+import { Subject } from 'rxjs/internal/Subject';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
@@ -41,6 +43,7 @@ export class AppComponent implements OnInit {
   rutaCarpetaArchivos: string = 'D:\\Calidad'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
   tamanoLetra: number = 1;
   temaSeleccionado: boolean = false;
+  private destroy$ = new Subject<void>(); // Crear un Subject para controlar el ciclo de vida
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
     private authenticationService: AuthenticationService,
@@ -52,10 +55,10 @@ export class AppComponent implements OnInit {
     private encriptacion: EncriptacionService,
     @Inject(DOCUMENT) private document: Document,) {
 
-    this.authenticationService.user.subscribe(x => this.user = x);
-    this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
-    this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
-    this.authenticationBagProService.user.subscribe(x => this.user_BagPro = x);
+    this.authenticationService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user = x);
+    this.authenticationInvZeusService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user_InvZeus = x);
+    this.authenticationContaZeusService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user_ContaZeus = x);
+    this.authenticationBagProService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user_BagPro = x);
     this.inactividad();
     this.mostrar();
   }
@@ -109,6 +112,12 @@ export class AppComponent implements OnInit {
       upload: 'Cargar',
       cancel: 'Cancelar'
     });
+  }
+
+  ngOnDestroy(): void {
+    // LIMPIAR TODAS LAS SUBSCRIPCIONES
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

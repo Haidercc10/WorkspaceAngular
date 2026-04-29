@@ -5,6 +5,10 @@ import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { finalize, tap, of, map } from 'rxjs';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { catchError } from 'rxjs/internal/operators/catchError';
+import { switchMap } from 'rxjs/internal/operators/switchMap';
 import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
 import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -52,7 +56,9 @@ export class LoginComponentComponent implements OnInit {
     private mensajeService: MensajesAplicacionService,
     private appComponent: AppComponent,) {
 
-    if (!this.storage.get('Token')) localStorage.clear();
+    if (!this.storage.get('Token')) {
+      localStorage.clear();
+    }
     if ((this.storage.get('Token')
       && this.storage.get('Token_BagPro')
       && this.storage.get('Token_Inv_Zeus')
@@ -97,6 +103,7 @@ export class LoginComponentComponent implements OnInit {
     let idUsuario: number = this.formularioUsuario.value.Identificacion;
     let contrasena: string = this.formularioUsuario.value.Contrasena;
     let data: any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa };
+
     this.authenticationService.login(data).subscribe(datos => {
       this.authenticationInvZeusService.login().subscribe(() => {
         this.authenticationContaZeusService.login().subscribe(() => {
@@ -137,4 +144,101 @@ export class LoginComponentComponent implements OnInit {
       this.cargando = false;
     });
   }
+
+  consultaLogin2() {
+    this.cargando = true;
+
+    const { Empresa, Identificacion, Contrasena } = this.formularioUsuario.value;
+
+    const data = {
+      id_Usuario: Identificacion,
+      contrasena: Contrasena,
+      empresa: Empresa
+    };
+
+    this.authenticationService.login(data).pipe(
+
+      // Ejecutar logins secundarios en paralelo
+      switchMap((datos) => {
+
+        return forkJoin({
+          inv: this.authenticationInvZeusService.login().pipe(
+            catchError((error: HttpErrorResponse) => {
+              this.mensajeService.mensajeError(
+                `¡Error al conectarse con Inventario de Zeus!`,
+                `Error: ${error.statusText} | Status: ${error.status}`
+              );
+              return of(null); // evita que se caiga todo
+            })
+          ),
+          conta: this.authenticationContaZeusService.login().pipe(
+            catchError((error: HttpErrorResponse) => {
+              this.mensajeService.mensajeError(
+                `¡Error al conectarse con Contabilidad de Zeus!`,
+                `Error: ${error.statusText} | Status: ${error.status}`
+              );
+              return of(null);
+            })
+          ),
+          bag: this.authenticationBagPro.login().pipe(
+            catchError((error: HttpErrorResponse) => {
+              this.mensajeService.mensajeError(
+                `¡Error al conectarse con BagPro!`,
+                `Error: ${error.statusText} | Status: ${error.status}`
+              );
+              return of(null);
+            })
+          )
+        }).pipe(
+          map(() => datos) // mantenemos datos del login principal
+        );
+      }),
+
+      // 🔹 Registrar movimiento
+      switchMap((datos) => {
+
+        const idUsuario = datos.usua_Id;
+        const nombre = datos.usuario;
+        const rol = datos.rolUsu_Id;
+
+        const fecha = moment();
+        const infoMovimientoAplicacion = {
+          Usua_Id: idUsuario,
+          MovApp_Nombre: `Inicio de sesión`,
+          MovApp_Descripcion: `El usuario "${nombre}" con el ID ${idUsuario} inició sesión el día ${fecha.format('YYYY-MM-DD')} a las ${fecha.format('H:mm:ss')} horas.`,
+          MovApp_Fecha: fecha.format('YYYY-MM-DD'),
+          MovApp_Hora: fecha.format('H:mm:ss')
+        };
+
+        return this.movAplicacionService.insert(infoMovimientoAplicacion).pipe(
+          map(() => ({ idUsuario, nombre, rol }))
+        );
+      }),
+
+      // 🔹 Guardar en storage + navegación
+      tap(({ idUsuario, nombre, rol }) => {
+        this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
+        this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre));
+        this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
+
+        this.router.navigate(['/home']); // ✅ sin recargar página
+      }),
+
+      // 🔴 Manejo global de errores (login principal)
+      catchError((error: HttpErrorResponse) => {
+        this.mensajeService.mensajeError(
+          `¡No fue posible iniciar sesión!`,
+          `Error: ${error.statusText} | Status: ${error.status}`
+        );
+        return of(null);
+      }),
+
+      finalize(() => {
+        this.cargando = false;
+      })
+
+    ).subscribe();
+  }
 }
+
+

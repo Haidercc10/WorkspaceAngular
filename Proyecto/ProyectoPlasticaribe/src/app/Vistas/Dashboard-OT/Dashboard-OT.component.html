@@ -174,7 +174,7 @@
               <th>#</th>
               <th pSortableColumn="cliente"><p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
               <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cant.</th>
-              <th *ngIf="ValidarRol == 1" pSortableColumn="costo" ><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th pSortableColumn="costo" ><p-sortIcon field="costo"></p-sortIcon> Costo</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
@@ -182,7 +182,7 @@
               <td>{{rowIndex + 1}}</td>
               <td><b>{{item.cliente}}</b></td>
               <td>{{item.cantidad | number}}</td>
-              <td *ngIf="ValidarRol == 1"><b>{{item.costo | currency : '$'}}</b></td>
+              <td><b>{{item.costo | currency : '$'}}</b></td>
             </tr>
           </ng-template>
         </p-table>
@@ -212,7 +212,7 @@
               <th>#</th>
               <th pSortableColumn="producto"><p-sortIcon field="producto"></p-sortIcon> Producto</th>
               <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
-              <th *ngIf="ValidarRol == 1" pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
@@ -220,7 +220,7 @@
               <td>{{rowIndex + 1}}</td>
               <td><b>{{item.producto}}</b></td>
               <td>{{item.cantidad | number}}</td>
-              <td *ngIf="ValidarRol == 1"><b>{{item.costo | number}}</b></td>
+              <td><b>{{item.costo | number}}</b></td>
             </tr>
           </ng-template>
         </p-table>
@@ -247,7 +247,7 @@
               <th scope="col">#</th>
               <th pSortableColumn="vendedor"><p-sortIcon field="vendedor"></p-sortIcon> Vendedor</th>
               <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
-              <th *ngIf="ValidarRol == 1" pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
@@ -255,7 +255,7 @@
               <td>{{rowIndex + 1}}</td>
               <td><b>{{item.vendedor}}</b></td>
               <td>{{item.cantidad | number}}</td>
-              <td *ngIf="ValidarRol == 1"><b>{{item.costo | currency : ' COP $'}}</b></td>
+              <td><b>{{item.costo | currency : ' COP $'}}</b></td>
             </tr>
           </ng-template>
         </p-table>
@@ -290,7 +290,7 @@
               <th style="max-width:8%">#</th>
               <th pSortableColumn="clienteNom" style="max-width:50%; min-width:50%"><p-sortIcon field="clienteNom"></p-sortIcon> Cliente</th>
               <th pSortableColumn="cantidad" style="max-width:8%; min-width:8%"><p-sortIcon field="cantidad"></p-sortIcon> Cant.</th>
-              <th *ngIf="ValidarRol == 1" pSortableColumn="costo" style="max-width:20%; min-width:20%"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th pSortableColumn="costo" style="max-width:20%; min-width:20%"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
               <th pSortableColumn="peso" style="max-width:14%"><p-sortIcon field="peso"></p-sortIcon> Peso (Kg)</th>
             </tr>
           </ng-template>
@@ -299,7 +299,7 @@
               <td style="max-width:8%">{{rowIndex + 1}}</td>
               <td style="max-width:50%; min-width:50%"><b>{{item.clienteNom}}</b></td>
               <td style="max-width:8%; min-width:8%">{{item.cantidad | number}}</td>
-              <td *ngIf="ValidarRol == 1" style="max-width:20%; min-width:20%"><b>{{item.costo | currency : '$'}}</b></td>
+              <td style="max-width:20%; min-width:20%"><b>{{item.costo | currency : '$'}}</b></td>
               <td style="max-width:14%">{{item.peso | number}}</td>
             </tr>
           </ng-template>
@@ -364,7 +364,7 @@
               <th scope="col">#</th>
               <th pSortableColumn="nombreCompleto"><p-sortIcon field="nombreCompleto"></p-sortIcon> Vendedor</th>
               <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
-              <th *ngIf="ValidarRol == 1" pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
               <th pSortableColumn="peso"><p-sortIcon field="peso"></p-sortIcon> Peso (Kg)</th>
             </tr>
           </ng-template>
@@ -373,7 +373,7 @@
               <td>{{rowIndex + 1}}</td>
               <td><b>{{item.nombreCompleto}}</b></td>
               <td>{{item.cantidad | number}}</td>
-              <td *ngIf="ValidarRol == 1"><b>{{item.costo | currency : ' COP $'}}</b></td>
+              <td><b>{{item.costo | currency : ' COP $'}}</b></td>
               <td>{{item.peso | number}}</td>
             </tr>
           </ng-template>

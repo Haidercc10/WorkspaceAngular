@@ -118,6 +118,7 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
 
     //Campos que vienen del formulario
     this.form1 = this.frmBuilderPedExterno.group({
+      PedId : [null, Validators.required],
       PedClienteId: [null, Validators.required],
       PedClienteNombre: [null, Validators.required],
       PedSedeCli_Id: [null, Validators.required],
@@ -175,6 +176,7 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
   //Funcion que se ejecuta al iniciar el componente
   ngOnInit(): void {
     this.lecturaStorage();
+    this.getLastSale();
     //this.getMaterials();
     //this.getPigments();
     //this.getPrintingTypes();
@@ -185,6 +187,8 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
     this.buscarClientes();
     this._intervalTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
+
+  getLastSale = () => this.pedidoproductoService.srvObtenerUltimoPedido().pipe(takeUntil(this.destroy$)).subscribe(data => this.form1.patchValue({ 'PedId': data.pedExt_Id + 1 }));
 
   //Funcion que se ejecuta al destruir el componente
   ngOnDestroy() {
@@ -225,15 +229,15 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
     this.pedidosProductos = [];
     this.form1.reset();
     this.form1.patchValue({
-      PedFechaEnt: moment(this.today).format('YYYY-MM-DD'),
-      PedEstadoId: 11,
-      PedDescuento: 0,
-      PedIva: true,
+      'PedId': null,
+      'PedFechaEnt': moment(this.today).format('YYYY-MM-DD'),
+      'PedEstadoId': 11,
     });
     this.cargando = false;
     this.presentacion = [];
     this.productosPedidos = [];
     this.form2.reset();
+    this.getLastSale();
   }
 
   //*LISTAS

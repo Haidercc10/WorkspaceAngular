@@ -44,7 +44,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente.
   infoColor: string = ''; //Varable que almcanerá la descripcion del un color
-  pedidosOriginales: Array<any> = []; 
+  pedidosOriginales: Array<any> = [];
   ArrayPedidos: any[] = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   virtualPedidos !: any[];
   modalEditar: boolean = false; //Variable que validará si el pedido está en edición o no
@@ -732,35 +732,35 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         console.log(datos_pedido);
 
         datos_pedido.forEach(dato => {
+          console.log(dato);
           this.modalPedidoExterno.pedidoEditar = dato.consecutivo;
           this.modalPedidoExterno.form1.patchValue({
+            'PedId': dato.consecutivo,
             'PedClienteId': dato.id_Cliente,
             'PedClienteNombre': dato.cliente,
+            'PedOc': dato.orden_Compra,
+            'PedObservacion': dato.observacion,
           });
           this.modalPedidoExterno.buscarClientes();
+          this.loadArrayPedidos(dato);
           setTimeout(() => {
             this.modalPedidoExterno.clienteSeleccionado();
-          }, 500); 
+          }, 500);
         });
-
-        /*for (let i = 0; i < datos_pedido.length; i++) {
-          this.modalPedidoExterno.iva = datos_pedido[i].iva;
-          if (datos_pedido[i].iva > 0) this.modalPedidoExterno.checked = true;
-          this.modalPedidoExterno.descuento = datos_pedido[i].descuento;
-          let productoExt: any = {
-            Id: datos_pedido[i].id_Producto,
-            Nombre: datos_pedido[i].producto,
-            Cant: datos_pedido[i].cantidad_Pedida,
-            UndCant: datos_pedido[i].presentacion,
-            PrecioUnd: datos_pedido[i].precio_Unitario,
-            Stock: 0,
-            SubTotal: (datos_pedido[i].cantidad_Pedida * datos_pedido[i].precio_Unitario),
-            FechaEntrega: datos_pedido[i].fecha_Entrega.replace('T00:00:00', ''),
-          }
-          this.modalPedidoExterno.ArrayProducto.push(productoExt);
-        }*/
       });
     }, 500);
+  }
+
+  loadArrayPedidos(dato: any) {
+    this.modalPedidoExterno.ArrayProducto.push({
+      'Id': dato.id_Producto,
+      'Nombre': dato.producto,
+      'Cant': dato.cantidad_Pedida,
+      'UndCant': dato.presentacion,
+      'PrecioUnd': dato.precio_Unitario,
+      'SubTotal': (dato.cantidad_Pedida * dato.precio_Unitario),
+      'FechaEntrega': dato.fecha_Entrega.replace('T00:00:00', ''),
+    })
   }
 
   //Funcion que va a cargar un modal con la informacion de la orden de trabajo que tiene asignada el pedido

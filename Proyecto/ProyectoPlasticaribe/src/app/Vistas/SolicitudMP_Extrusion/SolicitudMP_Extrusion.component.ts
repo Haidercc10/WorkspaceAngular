@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -20,6 +20,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudMaterialProduccion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-SolicitudMP_Extrusion',
@@ -60,6 +61,13 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   nroSolicitud : number = 9; /** Variable que guardará el ID de la solicitud para crear el pdf. */
   esSolicitud : boolean = false; /** Variable que se encargará de limpiar campos */
   ultimoNroSolicitud : number = 0;
+  viewSubcategories : boolean = false; /** Variable para mostrar el modal de subcategorias */
+  subcategories : any [] = [];
+  materials : any [] = [];
+  materialsFiltered : any[] = [];
+  viewMaterials : boolean = false;
+  @ViewChild('dtSubcategories') dtSubcategories: Table | undefined;
+  @ViewChild('dtMaterials') dtMaterials: Table | undefined;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -136,6 +144,33 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     else process = '';  
     return process;
   }
+
+  //Función que va a cargar las subcategorias para mostrarlas en un modal y que el usuario pueda elegir a cual de ellas pertenece la materia prima que desea solicitar
+  loadSubcategories(){
+    this.subcategories = [];
+    this.materials = [];
+    this.materiaPrimaService.getSubcategories().subscribe(datos => {
+      this.materials = datos;
+      this.viewSubcategories = true;
+      this.subcategories = datos.reduce((a: any, b: any) => {
+        if(!a.map(x => x.id_Subcategoria).includes(b.id_Subcategoria)) a = [...a, b];
+        else {
+        }
+        return a;
+      }, []);
+      console.log(this.subcategories)
+    });
+  }
+
+  filterForSubcategory(data : any){
+    this.viewMaterials = true;
+    this.materialsFiltered = [];
+    this.materialsFiltered = this.materials.filter(x => x.id_Subcategoria == data.id_Subcategoria);
+    console.log(this.materialsFiltered);
+    
+  }
+
+  applyFilter = ($event, campo : any, table : any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');

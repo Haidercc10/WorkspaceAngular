@@ -18,6 +18,7 @@ export class AuthenticationService {
 
   readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
   private userSubject: BehaviorSubject<User | null>;
+  private userSubject1: BehaviorSubject<User | null>;
   public user: Observable<User | null>;
   data:any=[];
 
@@ -31,6 +32,7 @@ export class AuthenticationService {
 
     let token = this.encriptacion.decrypt(localStorage.getItem('user') ?? '');
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
+    //this.userSubject = new BehaviorSubject<any>(null);
     this.user = this.userSubject.asObservable();
   }
 

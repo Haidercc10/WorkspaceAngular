@@ -31,7 +31,7 @@
   -->
 
   <!-- Inicio titulo -->
-  <div class="my-4">
+  <div class="my-4" *ngIf="!editarPedido">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
         class="pi pi-plus-circle"></i> Crear Pedido</h4>
   </div>
@@ -42,8 +42,16 @@
     <div class="mb-3">
       <div class="row g-4">
 
+        <!-- N° Pedido -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-1 col-xl-1 col-xxl-1">
+          <span class="p-float-label">
+            <input formControlName="PedId" id="id" type="number" pInputText />
+            <label for="id">N° Pedido</label>
+          </span>
+        </div>
+
         <!-- Cliente -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="cliente">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="cliente">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="PedClienteNombre" id="PedClienteNombre" list="clientes" type="text"
@@ -489,7 +497,16 @@
             <tr class="font-size-14">
               <td>{{listaProductos.Id}}</td>
               <td>{{listaProductos.Nombre}}</td>
-              <td>{{listaProductos.Cant | number : '1.2-2'}}</td>
+              <td [pEditableColumn]="listaProductos.Cant" pEditableColumnField="price" class="cursor">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputNumber [(ngModel)]="listaProductos.Cant" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ listaProductos.Cant | number : '1.2-2' }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
               <td>{{listaProductos.UndCant}}</td>
               <td>${{listaProductos.PrecioUnd | number : '1.2-2'}}</td>
               <td>${{listaProductos.SubTotal | number : '1.2-2'}}</td>
