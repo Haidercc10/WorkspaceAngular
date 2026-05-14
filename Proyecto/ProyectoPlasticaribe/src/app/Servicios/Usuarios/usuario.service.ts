@@ -42,4 +42,6 @@ export class UsuarioService {
   GetUsersAthorizedForTeoricWeight = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/GetUsersAthorizedForTeoricWeight/${id}`);
 
   getListAuthorizeUsers = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getListAuthorizeUsers`);
+
+  getSupervisors = (area : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getSupervisors/${area}`);
 }

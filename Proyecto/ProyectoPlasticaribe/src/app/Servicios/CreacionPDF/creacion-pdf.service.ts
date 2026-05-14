@@ -7,6 +7,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { EncriptacionService } from '../Encriptacion/Encriptacion.service';
 import { ReImpresionEtiquetas, ReImpresionEtiquetasService } from '../ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { referenceWike } from './referenciaWiketiado';
+import { MensajesAplicacionService } from '../MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,9 @@ export class CreacionPdfService {
 
   constructor(private rePrintService: ReImpresionEtiquetasService,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
-    private encriptacion: EncriptacionService,) { }
+    private encriptacion: EncriptacionService,
+    private svcMsjs: MensajesAplicacionService,
+  ) { }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   private formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -105,23 +108,38 @@ export class CreacionPdfService {
 
   /* ============================================================== CREATE TAG PRODUCTION ===================================================================== */
   createTagProduction(dataTag: modelTagProduction) {
-    let code: number = dataTag.reel;
-    const pdfDefinition: any = {
-      pageOrientation: 'landscape',
-      info: { title: `Etiqueta ${code}` },
-      pageSize: { width: 188.97640176, height: 377.95280352 },
-      pageMargins: [10, 10, 10, 20],
-      footer: this.footerPDF(dataTag.productionProcess, dataTag.operator),
-      content: this.contentPDF(dataTag),
+    try {
+      if (!dataTag.reel) {
+        console.warn(`Etiqueta no diponible aún`);
+        return;
+      }
+
+      let code: number = dataTag.reel;
+      const pdfDefinition: any = {
+        pageOrientation: 'landscape',
+        info: { title: `Etiqueta ${code}` },
+        pageSize: { width: 188.97640176, height: 377.95280352 },
+        pageMargins: [10, 10, 10, 20],
+        footer: this.footerPDF(dataTag.productionProcess, dataTag.operator),
+        content: this.contentPDF(dataTag),
+      }
+      pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => {
+        try {
+          let data: any = {
+            nameTag: `Etiqueta ${dataTag.productionProcess} - N${dataTag.reel}`,
+            buffer: buffer,
+          };
+          console.info('Generando etiqueta...', data);
+          window.electron.send('print-pdf', data);
+        } catch (error) {
+          console.warn('Error al generar la etiqueta', error);
+        }
+      });
+      if (dataTag.copy) this.createRePrint(dataTag);
+    } catch (error) {
+      console.warn('Error al generar la etiqueta:', error);
     }
-    pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => {
-      let data: any = {
-        nameTag: `Etiqueta ${dataTag.productionProcess} - N${dataTag.reel}`,
-        buffer: buffer,
-      };
-      window.electron.send('print-pdf', data);
-    });
-    if (dataTag.copy) this.createRePrint(dataTag);
+
   }
 
   private contentPDF(dataTag: modelTagProduction) {
@@ -310,7 +328,7 @@ export class TagProduction_2 {
   private formatNumbers = (number: string) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   createTagProduction(dataTag: modelTagProduction) {
-    let code: number = dataTag.reel;
+    /*let code: number = dataTag.reel;
     const pdfDefinition: any = {
       pageOrientation: 'portrait',
       info: { title: `Etiqueta ${code}` },
@@ -325,7 +343,41 @@ export class TagProduction_2 {
       };
       window.electron.send('print-pdf', data);
     });
-    if (dataTag.copy) this.createRePrint(dataTag);
+    if (dataTag.copy) this.createRePrint(dataTag);*/
+
+
+    try {
+      if (!dataTag.reel) {
+        console.warn(`Etiqueta no diponible aún`);
+        return;
+      }
+
+      let code: number = dataTag.reel;
+      const pdfDefinition: any = {
+        pageOrientation: 'portrait',
+        info: { title: `Etiqueta ${code}` },
+        pageSize: { width: 377.95280352, height: 188.97640176 },
+        pageMargins: [10, 10, 10, 20],
+
+        content: this.contentPDF(dataTag),
+      }
+      pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => {
+        try {
+          let data: any = {
+            nameTag: `Etiqueta ${dataTag.productionProcess} - N${dataTag.reel}`,
+            buffer: buffer,
+          };
+          console.warn('Generando etiqueta...', data);
+          window.electron.send('print-pdf', data);
+
+        } catch (error) {
+          console.warn('Error al generar la etiqueta', error);
+        }
+      });
+      if (dataTag.copy) this.createRePrint(dataTag);
+    } catch (error) {
+      console.warn('Error al generar la etiqueta:', error);
+    }
   }
 
   private contentPDF(dataTag: modelTagProduction) {
@@ -588,6 +640,6 @@ export interface modelTagProduction {
   dataTagForClient?: string;
   showDataTagForClient?: boolean;
   machine?: string;
-  date? : any;
-  hour? : any;
+  date?: any;
+  hour?: any;
 }

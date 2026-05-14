@@ -31,9 +31,13 @@ export class Produccion_ProcesosService {
 
   getOtSentToPeletizado = (ot : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getOtSentToPeletizado/${ot}`);
   
-  GetInfoProduction = (date1 : any, date2 : any, url? : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProduction/${date1}/${date2}${url}`);
+  GetInfoProduction = (date1 : any, date2 : any, url? : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getI nfoProduction/${date1}/${date2}${url}`);
 
   putStateDeletedRolls = (data : Array<rollsToDelete>) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateDeletedRolls`, data);
 
   putChangeStateProduction = (production: any[]) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putCambiarEstadoRollo`, production);
+
+  getEtiquetaForId = (id: any): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getEtiquetaForId/${id}`);
+
+  getEtiquetaForOT = (ot: any, process : any): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getEtiquetaForOT/${ot}/${process}`);
 }

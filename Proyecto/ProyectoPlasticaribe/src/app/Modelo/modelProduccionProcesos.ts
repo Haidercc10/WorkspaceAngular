@@ -32,4 +32,5 @@ export interface modelProduccionProcesos {
     Empacador_Id? : number;
     Autoriza_Id? : number;
     Estado_Rollo? : number;
+    Supervisor_Id? : number;
 }

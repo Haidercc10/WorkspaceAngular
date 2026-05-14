@@ -22,28 +22,41 @@ function createWindow() {
 
   ipcMain.on('print-pdf', async (event, data) => {
     const pdfPath = path.join(Os.tmpdir(), `${data.nameTag}.pdf`);
-    deleteFolderRecursively(Os.tmpdir());
+
     fs.writeFile(pdfPath, data.buffer, async (error) => {
       if (error) {
-        log.error(error);
-        throw error;
+        event.reply('print-result', { success: false, error });
+        return;
       }
+
       let options = {
         paperSize: 'PLASTICARIBE',
         orientation: 'landscape'
       }
-      print.print(pdfPath, options).then(success => {
-        log.info(pdfPath);
-        deleteFolderRecursively(Os.tmpdir());
-      }).catch(error => log.error(error));
+
+      print.print(pdfPath, options).then(() => {
+        event.reply('print-result', { success: true, data });
+        log.info('PDF impreso con exito:', pdfPath);
+        fs.unlink(pdfPath, (error) => {
+          if (error) {
+            console.warn('Error al eliminar el archivo PDF:', error);
+          } else {
+            console.warn('Archivo PDF eliminado con exito:', pdfPath);
+          }
+        });
+      }).catch(error => {
+        event.reply('print-result', { success: false, error : error.message, data });
+        console.warn('Error al imprimir el PDF:', error);
+      }); 
     });
   });
+
 
   const deleteFolderRecursively = function (directory_path) {
     if (fs.existsSync(directory_path)) {
       fs.readdirSync(directory_path).forEach(function (file, index) {
         var currentPath = path.join(directory_path, file);
-        if(currentPath.endsWith('.pdf')) fs.unlinkSync(currentPath); // delete file
+        if (currentPath.endsWith('.pdf')) fs.unlinkSync(currentPath); // delete file
       });
     }
   };
