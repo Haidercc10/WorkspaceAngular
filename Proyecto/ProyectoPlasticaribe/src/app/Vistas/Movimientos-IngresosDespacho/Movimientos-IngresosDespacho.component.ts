@@ -87,7 +87,11 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
    //Función que carga item y referencia dependiendo el que se seleccione en la lista.
   selectedProduct() {
     let producto: any = this.formFilters.value.ref;
-    this.formFilters.patchValue({ 'item': producto, 'ref': this.products.find(x => x.prod_Id == producto).prod_Nombre });
+    let data = this.products.find(x => x.prod_Id == producto);
+    this.formFilters.patchValue({ 
+      'item': producto, 
+      'ref': data ? data.prod_Nombre : '' 
+    });
   }
 
 

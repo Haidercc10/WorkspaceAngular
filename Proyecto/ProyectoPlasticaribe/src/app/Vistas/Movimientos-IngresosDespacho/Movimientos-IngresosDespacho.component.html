@@ -34,9 +34,9 @@
     <!-- ITEM -->
     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-4 col-xl-4 col-xxl-4">
       <span class="p-float-label">
-        <input formControlName="ref" id="prod" list="producto" type="text" pInputText (change)="selectedProduct()"
-          (keydown)="searchProduct()" />
-        <datalist id="producto">
+        <input formControlName="ref" id="prod" list="products" type="text" pInputText autocomplete="off"
+          (keydown)="searchProduct()" (change)="selectedProduct()"/>
+        <datalist id="products">
           <option value={{item.prod_Id}} *ngFor="let item of products">{{item.prod_Nombre}}</option>
         </datalist>
         <label for="prod">Producto</label>

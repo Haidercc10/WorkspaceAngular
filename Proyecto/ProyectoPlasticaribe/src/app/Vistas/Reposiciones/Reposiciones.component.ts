@@ -329,7 +329,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
         Rep_ObservacionSalida: '',
         Falla_Id : this.form.value.fail,
         Usua_Autoriza : this.form.value.user, 
-        Usua_Vendedor : this.form.value.asesor == undefined ? null : this.form.value.sales,
+        Usua_Vendedor : this.form.value.sales == undefined ? null : this.form.value.sales,
       };
       this.svRepo.Post(info).subscribe(data => { this.saveDetailsReposition(data.rep_Id, dev); }, error => { 
         this.msjs(`Error`, `Error guardando el encabezado de la reposición | ${error.status} ${error.statusText}`); 

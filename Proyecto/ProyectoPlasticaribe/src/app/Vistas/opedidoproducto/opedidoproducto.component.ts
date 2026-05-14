@@ -15,8 +15,6 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service'
 import { CookieService } from 'ngx-cookie-service';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoClienteService } from 'src/app/Servicios/TipoCliente/tipo-cliente.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -29,7 +27,12 @@ import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Traba
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+const pdfMake = require('pdfmake/build/pdfmake');
+const pdfFonts = require('pdfmake/build/vfs_fonts');
+
+if (pdfFonts && pdfFonts.pdfMake) {
+  pdfMake.vfs = pdfFonts.pdfMake.vfs;
+}
 
 @Injectable({
   providedIn: 'root'

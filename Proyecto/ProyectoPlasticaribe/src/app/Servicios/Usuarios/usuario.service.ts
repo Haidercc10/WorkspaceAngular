@@ -42,4 +42,6 @@ export class UsuarioService {
   getEmployees = (data : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getEmployees/${data}`);
 
   getOperatorsCourt = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getOperatorsCourt`);
+
+  getAllSupervisors = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getAllSupervisors`);
 }

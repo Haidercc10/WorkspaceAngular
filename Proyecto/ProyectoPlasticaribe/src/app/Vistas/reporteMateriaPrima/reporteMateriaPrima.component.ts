@@ -599,9 +599,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     //if (this.boppsAgrupados) this.exportarExcel2();
     //else {
     setTimeout(() => {
-      const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria", "Subcategoria"]
+      const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria", "Subcategoria", "Micras"]
       for (const item of datos) {
-        const datos1: any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria, item.Subcategoria];
+        const datos1: any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria, item.Subcategoria, item.Micras];
         infoDocumento.push(datos1);
       }
       let workbook = new Workbook();

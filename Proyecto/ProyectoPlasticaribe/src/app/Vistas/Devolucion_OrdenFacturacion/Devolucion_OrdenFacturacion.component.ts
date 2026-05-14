@@ -141,6 +141,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     return url;
   }
 
+  //Función para buscar la información de la orden de facturación por filtros.
   searchData() {
     this.isDevolution = false;
     this.clearTables();
@@ -152,7 +153,6 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
         this.load = true;
         this.dtOrderFactService.GetInformationOrderFactByFilters(this.validateUrl()).subscribe(dataOf => {
           if(this.productionSelected.length > 0) {
-            console.log(dataOf.factura, fact);
             if(fact != dataOf.factura) {
               this.msg.mensajeAdvertencia(`No es posible generar una misma devolución a facturas diferentes!`);
               this.load = false;
@@ -188,6 +188,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     } else this.msg.mensajeAdvertencia(`Debe elegir el motivo de la devolución!`);
   }
 
+  //Función para buscar la información de la devolución por número de devolución.
   searchDevolution(){
     let dv: any = this.formDataOrder.value.dv;
     
@@ -225,6 +226,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     } else this.msg.mensajeAdvertencia('Advertencia', `Debe digitar una devolución válida!`);
   }
 
+  //Función para cargar la información de la orden de facturación en el formulario.
   changeInformationFact(data: any) {
     this.formDataOrder.patchValue({ 
       'idClient': data.clientes.cli_Id, 
@@ -236,6 +238,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     });
   }
 
+  //Función para cargar la información de la devolución en el formulario.
   loadInfoDevolution(data: any) {
     this.formDataOrder.patchValue({
       'reason' : data.dtDev.falla_Id, 
@@ -251,6 +254,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.load = false;
   }
 
+  //Función para cargar la información de los detalles de la devolución en el formulario.
   loadInfoDetailsDevolution(data: any) {
     data.forEach(x => {
       this.production.push({  
@@ -273,6 +277,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     //this.getConsolidateProduction();
   }
 
+  //Funciones para seleccionar y deseleccionar los rollos a devolver.
   selectedProduction(production: production) {
     this.load = true;
     let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
@@ -281,6 +286,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  //Función para deseleccionar los rollos a devolver.
   deselectedProduction(production: production) {
     this.load = true;
     let index = this.productionSelected.findIndex(x => x.numberProduction == production.numberProduction);
@@ -289,6 +295,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  //Función para seleccionar todos los rollos a devolver.
   selectedAllProduction() {
     this.load = true;
     this.productionSelected = this.productionSelected.concat(this.production);
@@ -297,6 +304,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  //Función para deseleccionar todos los rollos a devolver.
   deselectedAllProduction() {
     this.load = true;
     this.production = this.production.concat(this.productionSelected);
@@ -305,6 +313,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     setTimeout(() => this.load = false, 50);
   }
 
+  //Funciones para seleccionar y deseleccionar los rollos a devolver con filtros.
   selectionForFilters(){
     let data = this.tableOrder!.filteredValue ? this.tableOrder!.filteredValue : this.tableOrder!.value;
 
@@ -324,6 +333,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     } else this.msg.mensajeAdvertencia(`No hay datos para seleccionar!`, ``);
   }
 
+  //Función para deseleccionar los rollos a devolver con filtros.
   deselectionForFilters(){
     let data = this.tableDevolution!.filteredValue ? this.tableDevolution!.filteredValue : this.tableDevolution!.value;
 
@@ -343,6 +353,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     } else this.msg.mensajeAdvertencia(`No hay datos para deseleccionar!`, ``);  
   }
 
+  //Función para consolidar la información de los rollos seleccionados a devolver.
   getConsolidateProduction() {
     this.consolidatedProduction = this.productionSelected.reduce((a: any[], b: any) => {
       if (!a.map((x : any)=>  x.item).includes(b.item)) a = [...a, b];
@@ -368,6 +379,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     return total;
   }
 
+  //Función para validar la información de la devolución
   validateInformation() {
     if (this.formDataOrder.valid) {
       if (this.productionSelected.length > 0) {
@@ -390,6 +402,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     } else this.msg.mensajeAdvertencia(`Debe pasar al modo ingreso de devolución!`);
   }
 
+  //Función para guardar la devolución.
   saveDev() {
     this.load = true;
     let order : number = this.formDataOrder.value.order;
@@ -414,6 +427,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
     this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), error => this.errorMessage(`¡Ocurrió un error al crear la devolución!`, error));
   }
 
+  //Función para guardar los detalles de la devolución.
   saveDetailsFact(dato: any) {
     let count: number = 0;
     let qtyRecords : number = this.productionSelected.filter(z => z.preIn == false).length;

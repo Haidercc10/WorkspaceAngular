@@ -3,8 +3,6 @@ import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PrimeNGConfig } from 'primeng/api';
 import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
 import { User } from './_Models/user';
@@ -17,7 +15,13 @@ import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.s
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
 import { Subject } from 'rxjs/internal/Subject';
 import { takeUntil } from 'rxjs/internal/operators/takeUntil';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+const pdfMake = require('pdfmake/build/pdfmake');
+const pdfFonts = require('pdfmake/build/vfs_fonts');
+
+if (pdfFonts && pdfFonts.pdfMake) {
+  pdfMake.vfs = pdfFonts.pdfMake.vfs;
+}
 
 @Component({
   selector: 'app-root',

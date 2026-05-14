@@ -33,13 +33,13 @@ import { AppComponent } from 'src/app/app.component';
 
 export class LoginComponentComponent implements OnInit {
 
-  cargando: boolean = false;
-  formularioUsuario !: FormGroup;
-  data: any = [];
-  ruta: any;
-  mostrarPass: boolean = false;
-  empresas: any[] = [];
-  ipAddress: any;
+  cargando: boolean = false; // Variable para mostrar el cargando mientras se valida el inicio de sesión
+  formularioUsuario !: FormGroup; // Formulario para capturar la información del usuario que desea iniciar sesión
+  data: any = []; // Variable para almacenar información que se guardará en el session storage
+  ruta: any; // Variable para almacenar la ruta a la que se redireccionará al usuario dependiendo de su rol
+  mostrarPass: boolean = false; // Variable para mostrar o ocultar la contraseña en el campo del formulario
+  empresas: any[] = []; //  Variable para almacenar la información de las empresas que se mostrará en el combo box del formulario
+  ipAddress: any; // Variable para almacenar la ip del usuario que inicia sesión
   modoSeleccionado: boolean; //Variable para validar el tema seleccionado, si la variable es true estará en modo oscuro, si es false estará en modo claro
 
   constructor(private empresaServices: EmpresaService,
@@ -77,8 +77,8 @@ export class LoginComponentComponent implements OnInit {
     this.storage.clear();
     this.cookiesServices.delete('MostrarEventosDia');
     localStorage.clear();
+    this.appComponent.ValidarRol = NaN;
     this.cargaDatosComboBox();
-    this.appComponent.ValidarRol = undefined;
   }
 
   // Funcion que guardará informacion a en la sesion
@@ -88,7 +88,25 @@ export class LoginComponentComponent implements OnInit {
   }
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
-  cargaDatosComboBox = () => this.empresaServices.srvObtenerLista().subscribe(datos => this.empresas = datos, () => this.mensajeService.mensajeError('Error', '¡No fue posible consultar la Empresa, verifique!'));
+  cargaDatosComboBox() {
+  this.empresaServices.srvObtenerLista().subscribe({
+    next: (datos) => {
+      this.empresas = datos;
+
+      if (this.empresas && this.empresas.length > 0) {
+        this.formularioUsuario.patchValue({
+          Empresa: this.empresas[0].empresa_Id
+        });
+      }
+    },
+    error: () => {
+      this.mensajeService.mensajeError(
+        'Error',
+        '¡No fue posible consultar la empresa, verifique!'
+      );
+    }
+  });
+}
 
   // Funcion que va a redireccionar al apartado de archivos
   redireccionarArchivos = () => this.router.navigate(['/Archivos']);

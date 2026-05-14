@@ -98,6 +98,13 @@
         </span>
       </div>
 
+      <!-- SUPERVISOR -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+            <p-dropdown formControlName="supervisor" inputId="supervisor" [autoDisplayFirst]="false" [options]="supervisores" optionLabel="supervisor_Name" optionValue="supervisor_Name" [filter]="true" filterBy="supervisor_Name"></p-dropdown>
+            <label for="supervisor">Supervisor</label>
+        </span>
+      </div>
     </div>
     
     <!-- BOTONES -->
@@ -146,6 +153,8 @@
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'turno')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'maquina')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'envioZeus')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'supervisor')"></th>
+
         <th alignFrozen="right" pFrozenColumn [frozen]="true">
           <p-columnFilter field="proceso" matchMode="contains" [showMenu]="false">
             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -170,6 +179,7 @@
         <th pSortableColumn="turno"> <p-sortIcon field="turno"></p-sortIcon> Turno </th>
         <th pSortableColumn="maquina"> <p-sortIcon field="maquina"></p-sortIcon> Maq. </th>
         <th pSortableColumn="envioZeus"> <p-sortIcon field="envioZeus"></p-sortIcon> Zeus </th>
+        <th pSortableColumn="supervisor"> <p-sortIcon field="supervisor"></p-sortIcon> Supervisor </th>
         <th pSortableColumn="proceso" alignFrozen="right" pFrozenColumn [frozen]="true"> <p-sortIcon field="proceso"></p-sortIcon> Área </th>
       </tr>
     </ng-template>
@@ -193,6 +203,7 @@
         <td>{{data.turno}}</td>
         <td>{{data.maquina}}</td>
         <td>{{data.envioZeus}}</td>
+        <td>{{data.supervisor}}</td>
         <td alignFrozen="right" pFrozenColumn [frozen]="true"><span class="badge" [ngClass]="{'bg-Extrusion': data.proceso == 'EXTRUSION',
                                             'bg-Impresion': data.proceso == 'IMPRESION',
                                             'bg-Rotograbado': data.proceso == 'ROTOGRABADO',
@@ -209,7 +220,7 @@
         <td colspan="6" class="text-left">Totales</td>
         <td>{{totalCantidadConsultada() | number : '1.2-2'}}</td>
         <td>{{totalPesoConsultado() | number : '1.2-2'}}</td>
-        <td colspan="8"></td>
+        <td colspan="9"></td>
       </tr>
     </ng-template>
   </p-table>

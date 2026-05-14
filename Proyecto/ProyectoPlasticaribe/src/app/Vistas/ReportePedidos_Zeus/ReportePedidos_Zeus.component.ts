@@ -100,9 +100,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.lecturaStorage();
     this.consultarDepartamentos();
     this.seleccionarColumnas();
-    //this.consultarPedidosZeus();
-    //this.getBillingSales();
-    this.consultarPedidos();
+    this.consultarPedidosZeus();
+    this.getBillingSales();
+    //this.consultarPedidos();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -184,6 +184,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     let previousMonth = moment().subtract(1, 'month').format('MM');
     let actualMonth = moment().format('MM');
     let months: any = [previousMonth, actualMonth];
+    let year: any = moment().format('YYYY');
 
     this.svUsers.GetVendedores().subscribe(data => {
       data.forEach(x => {
@@ -192,7 +193,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         x.asesor = x.usua_Nombre;
         x.id = asesorId
         months.forEach(month => {
-          this.inventarioZeusService.GetCostoFacturado_Vendedor(x.id, month, 2025).subscribe(fact => {
+          this.inventarioZeusService.GetCostoFacturado_Vendedor(x.id, month, year).subscribe(fact => {
             if (month == previousMonth) x.factMesAnterior = fact
             if (month == actualMonth) x.factMesActual = fact
           });

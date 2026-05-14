@@ -254,6 +254,8 @@ import { InformacionVentasComponent } from './Vistas/informacion-ventas/informac
 import { InventarioVsTomaFisicaComponent } from './Vistas/inventario-vs-toma-fisica/inventario-vs-toma-fisica.component';
 import { MovimientosTomaFisicaComponent } from './Vistas/movimientos-toma-fisica/movimientos-toma-fisica.component';
 import { HistoricoPedidosComponent } from './Vistas/historico-pedidos/historico-pedidos.component';
+import { UnifiedJwtInterceptor } from './_helpers/unified-jwt.interceptor';
+import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
 
 @NgModule({
   declarations: [
@@ -537,6 +539,9 @@ import { HistoricoPedidosComponent } from './Vistas/historico-pedidos/historico-
 
     { provide: HTTP_INTERCEPTORS, useClass: jwtInterceptor_BagPro, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: errorInterceptor_BagPro, multi: true },
+
+    //{ provide: HTTP_INTERCEPTORS, useClass: UnifiedJwtInterceptor, multi: true },
+    //{ provide: HTTP_INTERCEPTORS, useClass: UnifiedErrorInterceptor, multi: true }
   ],
 
   bootstrap: [AppComponent]

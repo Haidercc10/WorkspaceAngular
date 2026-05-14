@@ -39,6 +39,8 @@ export class ReporteProduccionComponent implements OnInit {
   area : any = null;
   operarios : any = [];
   operariosTotales : any = [];
+  supervisores : any = [];
+  supervisoresTotales : any = [];
 
   constructor(private AppComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -62,7 +64,8 @@ export class ReporteProduccionComponent implements OnInit {
       Turno: [null],
       EnvioZeus: [null],
       Maquina : [null],
-      operario : [null]
+      operario : [null], 
+      supervisor : [null],
     });
   }
 
@@ -70,6 +73,7 @@ export class ReporteProduccionComponent implements OnInit {
     this.lecturaStorage();
     this.validarProcesoPorUsuarioRegistrado();
     this.obtenerOperarios();
+    this.getSupervisores();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -79,7 +83,7 @@ export class ReporteProduccionComponent implements OnInit {
   }
 
   validarProcesoPorUsuarioRegistrado() {
-    if (![1, 10, 83, 12, 2, 5, 7, 85, 98, 103, 104].includes(this.ValidarRol)) {
+    if (![1, 10, 83, 12, 2, 5, 7, 85, 98, 103, 104, 105].includes(this.ValidarRol)) {
       if ([85,95,74,81].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION'];
       if ([86,8].includes(this.ValidarRol)) this.areasEmpresa = ['EXTRUSION', 'SELLADO', 'Wiketiado', 'CAMISILLA', 'IMPRESION', 'PERFORADO', 'DOBLADO'];
       if ([87,9,4].includes(this.ValidarRol)) this.areasEmpresa = ['EMPAQUE', 'IMPRESION'];
@@ -164,6 +168,7 @@ export class ReporteProduccionComponent implements OnInit {
     let turno = this.formFiltros.value.Turno;
     let maquina = this.formFiltros.value.Maquina;
     let operario = this.formFiltros.value.operario;
+    let supervisor = this.formFiltros.value.supervisor;
     let envioZeus = this.formFiltros.value.EnvioZeus == null ? 'Todo' : this.formFiltros.value.EnvioZeus ? '1' : '0';
 
     if (orden != null) ruta += `orden=${orden}`;
@@ -174,6 +179,7 @@ export class ReporteProduccionComponent implements OnInit {
     if (envioZeus != null) ruta.length > 0 ? ruta += `&envioZeus=${envioZeus}` : ruta += `envioZeus=${envioZeus}`;
     if (maquina != null) ruta.length > 0 ? ruta += `&maquina=${maquina}` : ruta += `maquina=${maquina}`;
     if (operario != null) ruta.length > 0 ? ruta += `&operario=${operario}` : ruta += `operario=${operario}`;
+    if(supervisor != null) ruta.length > 0 ? ruta += `&supervisor=${supervisor}` : ruta += `supervisor=${supervisor}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
     return ruta;
   }
@@ -572,7 +578,7 @@ export class ReporteProduccionComponent implements OnInit {
   //.Información de la producción.
   infoProduction(data){
     let info : any = [];
-    data.forEach(d => info.push([d.orden, d.rollo, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, d.turno, d.fecha.replace('T00:00:00', ''), d.hora, d.proceso, d.maquina, d.envioZeus == 1 ? 'SI' : 'NO', d.operario]));
+    data.forEach(d => info.push([d.orden, d.rollo, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, d.turno, d.fecha.replace('T00:00:00', ''), d.hora, d.proceso, d.maquina, d.envioZeus == 1 ? 'SI' : 'NO', d.operario, d.supervisor]));
     return info;
   }
 
@@ -585,14 +591,14 @@ export class ReporteProduccionComponent implements OnInit {
 
   //.Agregar encabezado a la hoja 1 del excel.
   addHeaderPage(worksheet, font, border, fill) {
-    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5']
-    worksheet.addRow(['OT', 'Rollo', 'Cliente', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Unidad', 'Turno', 'Fecha', 'Hora', 'Proceso', 'Maquina', 'Envio Zeus', 'Operario']);
+    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5', 'O5', 'P5'];
+    worksheet.addRow(['OT', 'Rollo', 'Cliente', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Unidad', 'Turno', 'Fecha', 'Hora', 'Proceso', 'Maquina', 'Envio Zeus', 'Operario', 'Supervisor']);
     
     rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
     rowHeader.forEach(x => worksheet.getCell(x).font = font);
     rowHeader.forEach(x => worksheet.getCell(x).border = border);
 
-    let concatCells : any = ['A1:O3'];
+    let concatCells : any = ['A1:P3'];
     this.stylesPage(worksheet, concatCells, []);
   }
 
@@ -600,7 +606,7 @@ export class ReporteProduccionComponent implements OnInit {
   stylesPage(worksheet, concatCells, formatNumber) {
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     [1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14].forEach(x => worksheet.getColumn(x).width = 12);
-    [3,5,15].forEach(x => worksheet.getColumn(x).width = 50)
+    [3,5,15,16].forEach(x => worksheet.getColumn(x).width = 50)
     concatCells.forEach(cell => worksheet.mergeCells(cell));
   }
 
@@ -731,12 +737,21 @@ export class ReporteProduccionComponent implements OnInit {
   //Función que cargará todos los operarios al iniciar el modulo.
   obtenerOperarios = () => this.svOperators.GetOperariosProduccion().subscribe(data => { this.operariosTotales = data; }, error => this.msj.mensajeError(error));
 
+  //Función que cargará todos los supervisores al iniciar el modulo.
+  getSupervisores(){ 
+    this.svOperators.getAllSupervisors().subscribe(data => { 
+      this.supervisoresTotales = data; 
+    }, error => this.msj.mensajeError(error));
+  } 
+
+
   //Función que cargará los operarios dependiendo el area de producción seleccionada.
   validarProceso(){
     this.operarios = [];
     let area : any = this.formFiltros.value.proceso; 
     area == 'CAMISILLA' ? area = 'SELLADO' : area = area; 
     this.operarios = this.operariosTotales.filter(x => x.area_Nombre == area);
+    this.supervisores = this.supervisoresTotales.filter(x => x.area_Name == area);
   }
 
   //*Función para cargar el modal de movimientos.

@@ -177,8 +177,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
       //this.getStockDeliveredNotAvaible();
       this.fillColumns();
       this.stockInformation = this.fillStockInformation(data);
-      this.stockInformation = sales ? this.stockInformation.filter(stock => stock.seller == this.storage_Nombre) : this.stockInformation;
-      this.fillComparativeStock(data, true);
+      this.stockInformation = sales ? this.stockInformation.filter(stock => stock.seller == this.storage_Nombre || stock.client == "STOCK") : this.stockInformation;
+      this.fillComparativeStock(data, true, sales);
       //this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
       //this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
       //this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
@@ -338,7 +338,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     return stockMonths[month];
   }
 
-  fillComparativeStock(data: any, avaible: boolean) {
+  fillComparativeStock(data: any, avaible: boolean, sales: string | null = null) {
     data.forEach(stock => {
       if (!this.comparativeStock.map(x => x.item).includes(stock.product.item)) {
         this.comparativeStock.push({
@@ -380,6 +380,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.comparativeStock[i].subTotal += (stock.stock.stock * stock.stock.price);
       }
     });
+    if(sales) this.comparativeStock = this.comparativeStock.filter(stock => stock.seller == this.storage_Nombre || stock.client == "STOCK");
   }
 
   apliedFilters = (data: Table, $event, campo: any) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');

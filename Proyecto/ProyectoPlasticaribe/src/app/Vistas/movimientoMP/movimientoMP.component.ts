@@ -449,11 +449,13 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   entradasMateriasPrimas(data: any) {
+    console.log('in: ', data );
+    
     this.datosPdf = [];
     let informacionPdf: any = null;
     this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
+      console.log('entrada:', datos);
       for (let i = 0; i < datos.length; i++) {
-
         let info: any = {
           Id: '',
           Nombre: '',
@@ -501,6 +503,7 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   crearPDF(data: any) {
+    console.log('entrada:', data)
     let movimientoOrdenesTrabajo: string[] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
     let tituloAdicional: string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';
     let titulo: string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;

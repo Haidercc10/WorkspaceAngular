@@ -130,6 +130,7 @@ export class DashboardOTComponent implements OnInit {
     }
   }
 
+  // Funcion que va a consultar los datos de las ordenes de trabajo
   consultarDatosOrdenesTrabajo() {
     const sales = this.ValidarRol == 2
       ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
@@ -148,43 +149,60 @@ export class DashboardOTComponent implements OnInit {
     })
       .subscribe({
         next: (response) => {
-
           // 1. ESTADOS
-          response.estados.forEach(element => {
-            const index = this.estadosOrdenes.findIndex(x => x.Nombre === element.estado_Nombre);
-            if (index !== -1) {
-              this.estadosOrdenes[index].Cantidad = element.cantidad;
-            }
-          });
-
+          if(response.estados) {
+            response.estados.forEach(element => {
+              const index = this.estadosOrdenes.findIndex(x => x.Nombre === element.estado_Nombre);
+              if (index !== -1) {
+                this.estadosOrdenes[index].Cantidad = element.cantidad;
+              }
+            });
+          }
+          
           // 2. CLIENTES
+          if(response.clientes) {
           this.clientesOrdenesMes = [...response.clientes]
             .sort((a, b) => b.cantidad - a.cantidad);
-
+          
           this.totalOrdenesMes = response.clientes
             .reduce((a, b) => a + b.cantidad, 0);
+          }
 
           // 3. PRODUCTOS
+          if(response.productos) {
           this.productosOrdenesMes = [...response.productos]
             .sort((a, b) => b.cantidad - a.cantidad);
+          }
 
           // 4. VENDEDORES
-          this.vendedorOrdenesMes = [...response.vendedores]
+          if(response.vendedores) {
+            this.vendedorOrdenesMes = [...response.vendedores]
             .sort((a, b) => b.cantidad - a.cantidad);
+          }
 
           // 5. MATERIALES
-          this.materialesOrdenesMes = [...response.materiales]
+          if(response.materiales) {
+            this.materialesOrdenesMes = [...response.materiales]
             .sort((a, b) => b.cantidad - a.cantidad);
+          }
 
           // 6. COSTO TOTAL
-          this.costoTotalOrdenesMes = response.costos
+          if(response.costos) {
+            this.costoTotalOrdenesMes = response.costos
             .reduce((a, b) => a + b.costo, 0);
+          }
 
           // 7. FACTURACIÓN
-          this.clientesFacturados = response.clientesFact;
-          this.productosFacturas = response.productosFact;
-          this.vendedoresFacturas = response.vendedoresFact;
-          
+          if(response.clientesFact) {
+            this.clientesFacturados = response.clientesFact;
+          }
+          if(response.productosFact) {
+            this.productosFacturas = response.productosFact;
+          }
+          if(response.vendedoresFact) {
+            this.vendedoresFacturas = response.vendedoresFact;
+          }
+
           // 8. OTROS MÉTODOS
           this.consultarPesoProducidoOrdenes();
 
@@ -196,8 +214,8 @@ export class DashboardOTComponent implements OnInit {
 
   }
 
-
-
+  //Función que va a consultar el peso producido en las ordenes de trabajo por cada proceso de producción y la meta establecida para el mes actual, 
+  // esta información se usará para llenar una grafica de barras y mostrar el progreso que se lleva en cada proceso con respecto a la meta establecida
   consultarPesoProducidoOrdenes() {
     this.produccionAreasService.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
       this.procesosOrdenesMes = [];
@@ -224,6 +242,7 @@ export class DashboardOTComponent implements OnInit {
     });
   }
 
+  // Funciones que van a calcular la meta mensual establecida para cada proceso de produccion y el peso producido en el mes actual
   metaMesActual(data: any) {
     let mesActual: number = moment().month() + 1;
     let metaMesActual: number = 0;
@@ -242,6 +261,7 @@ export class DashboardOTComponent implements OnInit {
     return metaMesActual;
   }
 
+  // Función que va a calcular el peso producido en el mes actual para cada proceso de producción
   produccionMesActual(data: any) {
     let mesActual: number = moment().month() + 1;
     let produccionMesActual: number = 0;
@@ -260,6 +280,8 @@ export class DashboardOTComponent implements OnInit {
     return produccionMesActual;
   }
 
+  //Función que va a asignar un orden a cada proceso de producción para que cuando se muestren en la grafica de barras 
+  // siempre estén en el mismo orden, este orden se asignará dependiendo del proceso al que correspondan
   ordenArrayProcesosOrdenesMes(area: string) {
     let orden: number = 0;
     switch (area) {
@@ -312,6 +334,8 @@ export class DashboardOTComponent implements OnInit {
     return porcentaje;
   }
 
+  // Función que va a calcular el rango que se le asignará al slider de cada proceso de producción dependiendo del porcentaje 
+  // de progreso que se lleve con respecto a la meta establecida
   rangoSliderPorcentajeProcesos(porcentaje: number) {
     let rango: number[];
     let porcentajeFinal: number = porcentaje < 0 ? -1 * porcentaje : 50 + porcentaje;
@@ -319,6 +343,7 @@ export class DashboardOTComponent implements OnInit {
     return rango;
   }
 
+  //Función que va a asignar un color dependiendo del porcentaje de progreso que se lleve con respecto a la meta establecida para cada proceso de producción
   colorProgresoMetaProduccion(data: any): string {
     let color: string = '';
     let porcentaje: number = data.PorcentajeMeta;
@@ -354,6 +379,7 @@ export class DashboardOTComponent implements OnInit {
     this.estilosGraficasTresDimensiones();
   }
 
+  //Función que va a llenar la grafica con la información de los productos
   estilosGraficasTresDimensiones() {
     this.multiAxisOptions = {
       stacked: false,
@@ -394,6 +420,7 @@ export class DashboardOTComponent implements OnInit {
     };
   }
 
+  //Función que va a llenar la grafica con la información de los productos
   estilosGraficasDosDimensiones() {
     this.multiAxisOptions = {
       stacked: false,
@@ -541,6 +568,8 @@ export class DashboardOTComponent implements OnInit {
     this.estilosGraficasDosDimensiones();
   }
 
+  // Funcion que va a llenar la grafica de barras con la informacion de los clientes a los que se les ha facturado en el mes, 
+  // el valor facturado y la cantidad de veces que se les ha facturado
   llenarGraficaFactClientes() {
     console.log('entré');
     
@@ -565,6 +594,7 @@ export class DashboardOTComponent implements OnInit {
     this.estilosGraficasTresDimensiones();
   }
 
+  // Funcion que va a llenar la grafica de barras con la informacion de los productos a los que se les ha facturado en el mes.
   llenarGraficaFactVendedores() {
     this.mostrarGraficaBarras = true;
     this.nombreGrafica = '';

@@ -984,7 +984,7 @@
         </p-table>
     </p-tabPanel>
 
-    <p-tabPanel header="Inventario Comparativo" leftIcon="pi pi-th-large" tooltip="" *ngIf="![2].includes(ValidarRol)">
+    <p-tabPanel header="Inventario Comparativo" leftIcon="pi pi-th-large" tooltip="">
         <p-table #comparativeTable [value]="comparativeStock" [columns]="selectedColumnsComparative" dataKey="item"
             styleClass="p-datatable-gridlines p-datatable-sm" [resizableColumns]="true" [reorderableColumns]="true"
             columnResizeMode="expand" responsiveLayout="scroll" [rowHover]="true" [scrollable]="true"
