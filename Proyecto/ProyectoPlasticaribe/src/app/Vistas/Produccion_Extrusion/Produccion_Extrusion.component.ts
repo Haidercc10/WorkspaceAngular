@@ -833,9 +833,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     let rebobinado: boolean = this.formDatosProduccion.value.rebobinado;
     let daipita: any = [0, '', null, undefined].includes(this.formDatosProduccion.value.daipita) ? null : this.formDatosProduccion.value.daipita;
     let motherProcess: any = this.formDatosProduccion.value.procesoAnterior;
+    let supervisorId: any = this.formDatosProduccion.value.supervisor;
 
     this.produccionProcesosService.postProduccionProcesos(this.datosProduccion(daipita)).subscribe(res => {
       //this.getEtiquetaPlasticaribe(res, infoEtiquetaAsociada, daipita, rebobinado);
+      let supervisor = supervisorId ? this.supervisores.find(x => x.supervisor_Id === supervisorId) : null;
       console.log('data:', res);
 
       if (res) {
@@ -863,7 +865,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           'showDataTagForClient': this.formDatosProduccion.value.mostratDatosProducto ? this.formDatosProduccion.value.mostratDatosProducto : '',
           'machine': res.maquina,
           'date': res.fecha.replace('T00:00:00', ''),
-          'hour': res.hora
+          'hour': res.hora,
+          'supervisor': supervisor ? supervisor?.supervisor_Name : '',
         }
         this.createPDFService.createTagProduction(etiqueta);
         this.createTraceability2(res, motherProcess, infoEtiquetaAsociada);

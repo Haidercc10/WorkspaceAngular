@@ -357,7 +357,7 @@ export class TagProduction_2 {
         pageOrientation: 'portrait',
         info: { title: `Etiqueta ${code}` },
         pageSize: { width: 377.95280352, height: 188.97640176 },
-        pageMargins: [10, 10, 10, 20],
+        pageMargins: [10, 10, 10, 10],
 
         content: this.contentPDF(dataTag),
       }
@@ -405,6 +405,7 @@ export class TagProduction_2 {
       this.presentationsTag(dataTag),
       this.processAndDate(dataTag),
       this.opertaros(dataTag),
+      this.supervisor(dataTag),
     );
 
     return content;
@@ -418,8 +419,8 @@ export class TagProduction_2 {
         table: {
           widths: ['100%'],
           body: [
-            [{ border: [false, false, false, false], bold: true, alignment: 'center', fontSize: 15, text: 'PLASTICARIBE S.A.S' }],
-            [{ border: [false, false, false, false], alignment: 'center', fontSize: 8, margin: [0, -3, 0, 0], text: 'CALLE 42 #52-105 BARRANQUILLA' }]
+            [{ border: [false, false, false, false], bold: true, alignment: 'center', fontSize: 13, text: 'PLASTICARIBE S.A.S', lineHeight: 0.8 }],
+            [{ border: [false, false, false, false], alignment: 'center', fontSize: 8, margin: [0, -3, 0, 0], text: 'CALLE 42 #52-105 BARRANQUILLA', lineHeight: 0.8 }],
           ]
         }
       },
@@ -429,7 +430,7 @@ export class TagProduction_2 {
 
   private adictionalInformationTag(): any[] {
     return [
-      { text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 8, alignment: 'center', colSpan: 2, margin: [-10, 0] },
+      { text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 8, alignment: 'center', colSpan: 2, margin: [-10, 0], lineHeight: 0.8 },
       {}
     ];
   }
@@ -440,8 +441,8 @@ export class TagProduction_2 {
         colSpan: 2,
         margin: [0, 0],
         columns: [
-          { width: 'auto', text: 'CLI.:', bold: true, fontSize: 10, alignment: 'left' },
-          { width: '*', text: (dataTag.client).toUpperCase(), fontSize: 10, alignment: 'left' },
+          { width: 'auto', text: 'CLI:', bold: true, fontSize: 9, alignment: 'left' },
+          { width: '*', text: (dataTag.client).toUpperCase(), fontSize: 9, alignment: 'left' },
         ]
       },
       {}
@@ -461,15 +462,15 @@ export class TagProduction_2 {
               {
                 border: [false, false, true, false],
                 columns: [
-                  { width: '30%', text: 'OT:', bold: true, fontSize: 12, alignment: 'left' },
-                  { width: '70%', text: (dataTag.orderProduction), fontSize: 12, alignment: 'left' },
+                  { width: '30%', text: 'OT:', bold: true, fontSize: 11, alignment: 'left' },
+                  { width: '70%', text: (dataTag.orderProduction), fontSize: 11, alignment: 'left' },
                 ]
               },
               {
                 border: [false, false, false, false],
                 columns: [
-                  { width: '40%', text: 'ITEM:', bold: true, fontSize: 12, alignment: 'left' },
-                  { width: '60%', text: dataTag.item, fontSize: 12, alignment: 'left' },
+                  { width: '40%', text: 'ITEM:', bold: true, fontSize: 11, alignment: 'left' },
+                  { width: '60%', text: dataTag.item, fontSize: 11, alignment: 'left' },
                 ]
               }
             ]
@@ -486,8 +487,8 @@ export class TagProduction_2 {
         colSpan: 2,
         margin: [0, 0],
         columns: [
-          { width: 'auto', text: 'REF.:', bold: true, fontSize: 10, alignment: 'left' },
-          { width: '*', text: (dataTag.reference).toUpperCase(), fontSize: 10, alignment: 'left' },
+          { width: 'auto', text: 'REF:', bold: true, fontSize: 9, alignment: 'left' },
+          { width: '*', text: (dataTag.reference).toUpperCase(), fontSize: 9, alignment: 'left' },
         ]
       },
       {}
@@ -543,10 +544,9 @@ export class TagProduction_2 {
   }
 
   private sizeBarcode(dataTag: modelTagProduction): number {
-    //console.clear();
     let sizeClient: number = dataTag.client.length;
     let sizeReference: number = dataTag.reference.length;
-    let size: number = 90;
+    let size: number = 85;
     size += sizeClient < 50 ? sizeClient < 24 ? 15 : 10 : 0;
     size += sizeReference < 50 ? sizeReference < 24 ? 15 : 10 : 0;
     return size;
@@ -568,8 +568,8 @@ export class TagProduction_2 {
 
   private presentationsTag(dataTag: modelTagProduction): any[] {
     return [
-      { text: dataTag.presentationItem1, bold: true, fontSize: 10, alignment: 'center' },
-      { text: dataTag.presentationItem2, bold: true, fontSize: 10, alignment: 'center' },
+      { text: dataTag.presentationItem1, bold: true, fontSize: 9, alignment: 'center' },
+      { text: dataTag.presentationItem2, bold: true, fontSize: 9, alignment: 'center' },
     ];
   }
 
@@ -582,7 +582,14 @@ export class TagProduction_2 {
 
   private opertaros(dataTag): Array<any> {
     return [
-      { text: dataTag.operator, bold: true, colSpan: 2, alignment: 'center', fontSize: dataTag.operator.length > 28 ? 7 : 9, margin: [-5, 0] },
+      { text: `OP: ${dataTag.operator}`, bold: true, colSpan: 2, alignment: 'center', fontSize: dataTag.operator.length > 25 ? 7 : 9, margin: [-5, 0] },
+      {},
+    ]
+  }
+
+  private supervisor(dataTag): Array<any> {
+    return [
+      { text: `SUP: ${dataTag.supervisor}`, bold: true, colSpan: 2, alignment: 'center', fontSize: dataTag.supervisor.length > 25 ? 7 : 9, margin: [-5, 0] },
       {},
     ]
   }
@@ -642,4 +649,5 @@ export interface modelTagProduction {
   machine?: string;
   date?: any;
   hour?: any;
+  supervisor?: string;
 }

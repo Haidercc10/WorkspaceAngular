@@ -616,7 +616,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.svcMsjs.mensajeError(ex);
         this.cargando = false;
       }
-      return 0; // Retorna 0 en caso de error
+      return 0; // Retorna 5 en caso de error
     }
   }
 
@@ -693,8 +693,10 @@ export class Produccion_SelladoComponent implements OnInit {
     let motherProcess: any = this.formSellado.value.procesoAnterior;
     let otAltern: any = this.formSellado.value.otAlterna;
     let tagAssociated = entrada.Etiqueta_Trazabilidad ? entrada.Etiqueta_Trazabilidad : this.formSellado.value.etiquetaAsociada;
+    let supervisorId = this.formSellado.value.supervisor ? this.formSellado.value.supervisor : 3197;
 
     this.svcProdProcesos.postProduccionProcesos(entrada).subscribe(data => {
+      let supervisor = supervisorId ? this.supervisores.find(x => x.supervisor_Id === supervisorId) : null;
       console.log('PostProduccionProcesos', data);
       if (data) {
         if (data.numeroRollo_BagPro) {
@@ -722,7 +724,8 @@ export class Produccion_SelladoComponent implements OnInit {
             'showDataTagForClient': this.formSellado.value.mostratDatosProducto ? this.formSellado.value.mostratDatosProducto : '',
             'machine': data.maquina,
             'date': data.fecha.replace('T00:00:00', ''),
-            'hour': data.hora
+            'hour': data.hora,
+            'supervisor': supervisor ? supervisor.supervisor_Name : 'N/A',
           }
           this.svcCrearPDF.createTagProduction(etiqueta);
           this.createTraceability2(data, motherProcess, dataTagAssociated);
