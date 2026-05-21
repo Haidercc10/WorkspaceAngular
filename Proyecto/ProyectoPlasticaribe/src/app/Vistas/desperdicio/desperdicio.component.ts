@@ -27,10 +27,10 @@ import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
 export class DesperdicioComponent implements OnInit {
 
   FormDesperdicio !: FormGroup;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   cargando : boolean = false; //Variable que permitirá validar si debe salir o no la imagen de carga
   fallas : any [] = []; //Variable que almacenará los diferentes tipos de fallas por los que se puede dar un desperdicio
@@ -396,10 +396,10 @@ export class DesperdicioComponent implements OnInit {
   async getPuertoSerial() {
     try {
       const port = await navigator.serial.requestPort();
-      port.close();
+      port.close(); 
       await port.open({ baudRate: 9600 });
       this.cargarDatosPuertoSerial(port);
-    } catch (ex) {
+    } catch (ex : any) {
       if (ex.name === 'NotFoundError') this.mensajeService.mensajeError('¡No hay dispositivos conectados!');
       else this.mensajeService.mensajeError(ex);
       this.cargando = false;
@@ -441,7 +441,9 @@ export class DesperdicioComponent implements OnInit {
   }
   
   //Función que convierte un buffer a un valor
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  ab2str = (buf: ArrayBuffer): string => String.fromCharCode(...Array.from(new Uint8Array(buf)));
+
 
   //Función que carga el turno actual.
   cargarTurnoActual() {
@@ -483,7 +485,7 @@ export class DesperdicioComponent implements OnInit {
   //Función que filtra la info de la tabla 
   aplicarfiltro($event, campo: any, valorCampo: string) {
     this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => { if(this.dt2.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 300); 
-    if(!this.dt2.filteredValue) this.desperdicios = this.copiaDesperdicios;
+    setTimeout(() => { if(this.dt2?.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 300); 
+    if(!this.dt2?.filteredValue) this.desperdicios = this.copiaDesperdicios;
   }
 }

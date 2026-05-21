@@ -17,16 +17,16 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
   styleUrls: ['./Reporte_RecuperadoMP.component.css']
 })
 export class Reporte_RecuperadoMPComponent implements OnInit {
-  @ViewChild(Modal_RptRecuperadoMPComponent) modalRecuperado : Modal_RptRecuperadoMPComponent;
+  @ViewChild(Modal_RptRecuperadoMPComponent) modalRecuperado : Modal_RptRecuperadoMPComponent | undefined;
 
   public formReporteRMP !: FormGroup; /** Formulario de filtros */
-  public materiasPrimas = []; /** Array que contendrá los datos de la consulta */
+  public materiasPrimas : any = []; /** Array que contendrá los datos de la consulta */
   turnos : any [] = []; //Variable que va a almacenar los diferenes turnos
   operarios : any [] = []; //Variable que almacenará a los diferentes operarios de el area de recuperado
   registros : any [] = []; //Variable que almacenará los diferentes registros de los filtros consultados
   columnas : any [] = []; //Variable que va a almacenar las columnas
-  idOperario : number = null; //Variable que va a almacenar el id del operario escogido
-  idMateriaPrima : number = null; //Variable que va a almacenar el id de la materia prima escogida
+  idOperario : any = null; //Variable que va a almacenar el id del operario escogido
+  idMateriaPrima : any = null; //Variable que va a almacenar el id de la materia prima escogida
   first = 0;
   rows = 20;
   consultaTurno : string = '';
@@ -209,14 +209,14 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   //
   limpiarModal(){
     this.modalInfoRecuperado = false;
-    this.modalRecuperado.arrayRegistros = [];
+    this.modalRecuperado!.arrayRegistros = [];
   }
 
   //
   consultarPeletizadoDia(item : any){
     if (item.cantDia > 0) {
       this.modalInfoRecuperado = true;
-      this.modalRecuperado.arrayRegistros = [];
+      this.modalRecuperado!.arrayRegistros = [];
       this.consultaTurno = 'Día';
       let fechaInicial : any = moment(this.formReporteRMP.value.FechaInicial).format('YYYY-MM-DD');
       let fechaFinal : any = moment(this.formReporteRMP.value.FechaFinal).format('YYYY-MM-DD');
@@ -233,7 +233,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
             fecha : datos_recuperado[i].recMp_FechaEntrega.replace('T00:00:00', ''),
             operario : datos_recuperado[i].usua_Nombre,
           }
-          this.modalRecuperado.arrayRegistros.push(info);
+          this.modalRecuperado!.arrayRegistros.push(info);
         }
       });
     } else if (item.cantDia <= 0) this.modalInfoRecuperado = false;
@@ -244,7 +244,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     this.modalInfoRecuperado = false;
     if (item.cantNoche > 0) {
       this.modalInfoRecuperado = true;
-      this.modalRecuperado.arrayRegistros = [];
+      this.modalRecuperado!.arrayRegistros = [];
       this.consultaTurno = 'Noche';
       let fechaInicial : any = moment(this.formReporteRMP.value.FechaInicial).format('YYYY-MM-DD');
       let fechaFinal : any = moment(this.formReporteRMP.value.FechaFinal).format('YYYY-MM-DD');
@@ -261,7 +261,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
             fecha : datos_recuperado[i].recMp_FechaEntrega.replace('T00:00:00', ''),
             operario : datos_recuperado[i].usua_Nombre,
           }
-          this.modalRecuperado.arrayRegistros.push(info);
+          this.modalRecuperado!.arrayRegistros.push(info);
         }
       });
     } else if (item.cantNoche <= 0) this.modalInfoRecuperado = false;

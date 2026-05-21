@@ -43,27 +43,27 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   typesRecovery : any = [];
   fails : any = [];
   process : any = [];
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   presentations : Array<string> = [];
   matPrimas : any = [];
   products : any = [];  
   modalFails : boolean = false;
   recoveries : Array<modelIngreso_Peletizado> = [];
-  productSelected : number; 
+  productSelected !: number; 
   @ViewChild('dtPeletizado') dtPeletizado : Table | undefined; 
-  indexTable : number = null;
+  indexTable : any = null;
   rolls : any = [];
   typeRecoveries : any = [];
   disableField : boolean = true;
   failsProcess : any = [];
-  port: SerialPort;
+  port !: any;
   reader: any;
   modalRecovery : boolean = false;
-  @ViewChild(CrearMateriaprimaComponent) createRecovery : CrearMateriaprimaComponent;
-  @ViewChild(Crear_FallasComponent) cmpCreateFails : Crear_FallasComponent;
+  @ViewChild(CrearMateriaprimaComponent) createRecovery : CrearMateriaprimaComponent | undefined;
+  @ViewChild(Crear_FallasComponent) cmpCreateFails : Crear_FallasComponent | undefined;
   modalPeletizado : boolean = false;
   peletizado : any = [];
   groupPeletizado : any = [];
@@ -120,7 +120,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   chargeSerialPorts() {
-    navigator.serial.getPorts().then((ports) => {
+    (navigator as any).serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.svMsjs.mensajeError(`${error}`));
       });
@@ -128,17 +128,17 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   async buscarPuertos() {
-    this.port = await navigator.serial.requestPort();
+    this.port = await (navigator as any).serial.requestPort();
     try {
       await this.port.open({ baudRate: 9600 });
       this.chargeDataFromSerialPort(this.port);
-    } catch (ex) {
+    } catch (ex : any) {
       if (ex.name === 'NotFoundError') this.svMsjs.mensajeError('¡No hay dispositivos conectados!');
       else this.svMsjs.mensajeError(ex);
     }
   }
 
-  async chargeDataFromSerialPort(port: SerialPort) {
+  async chargeDataFromSerialPort(port: any) {
     let keepReading: boolean = true;
     while (port.readable && keepReading) {
       this.reader = port.readable.getReader();
@@ -150,7 +150,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
             break;
           }
           if (value) {
-            let valor = this.ab2str(value);
+            let valor : any = this.ab2str(value);
             valor = valor.replace(/[^\d.-]/g, '');
             if (!this.load) {
               this.form.patchValue({
@@ -160,7 +160,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
             }
           }
         }
-      } catch (error) {
+      } catch (error : any) {
         this.svMsjs.mensajeError(error);
       } finally {
         this.reader.releaseLock();
@@ -168,7 +168,10 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
     }
   }
 
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+
+  ab2str = (buf: ArrayBuffer): string => String.fromCharCode(...Array.from(new Uint8Array(buf)));
+
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
@@ -234,7 +237,6 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
 
   //Cargar campos en función de los datos la OT. 
   loadFieldsForOT(data : any){
-    //console.log(this.matPrimas.filter(x => x.matPri_Nombre.includes(data.material)));
     this.getPeletizadosForParameters(data);
     this.form.patchValue({
       'otValidate' : data.numero_Orden,
@@ -280,7 +282,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   loadModalFails(){
     this.modalFails = true;
     setTimeout(() => {
-      this.cmpCreateFails.typeFails = this.cmpCreateFails.typeFails.filter(x => [16,17,18,19,20,21].includes(x.tipoFalla_Id));
+      this.cmpCreateFails!.typeFails = this.cmpCreateFails!.typeFails.filter(x => [16,17,18,19,20,21].includes(x.tipoFalla_Id));
     }, 1500);
   }
 
@@ -288,9 +290,9 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   loadModalRecovery() {
     this.modalRecovery = true;
     setTimeout(() => {
-      this.createRecovery.nombreCategoriasMP = this.createRecovery.nombreCategoriasMP.filter(x => x.catMP_Id == 10);
-      this.createRecovery.materiPrima.patchValue({ 'mpCategoria' : 10 });
-      this.createRecovery.recovery = true;
+      this.createRecovery!.nombreCategoriasMP = this.createRecovery!.nombreCategoriasMP.filter(x => x.catMP_Id == 10);
+      this.createRecovery!.materiPrima.patchValue({ 'mpCategoria' : 10 });
+      this.createRecovery!.recovery = true;
       this.fieldFocus = false;
     }, 2000);
     
@@ -919,11 +921,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body: any = [];
     body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -931,11 +933,11 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body: any = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

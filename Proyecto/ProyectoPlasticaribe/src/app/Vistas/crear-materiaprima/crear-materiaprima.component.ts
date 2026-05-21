@@ -23,12 +23,12 @@ import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service'
 export class CrearMateriaprimaComponent implements OnInit {
 
   public materiPrima !: FormGroup; /** Formulario de Materias Primas */
-  nombreCategoriasMP = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
-  unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
-  estado = []; //Variable que va a almacenar todos los tipos de estados de documentos
-  proveedores = []; /** Array para cargar los proveedores de materia prima. */
-  materials = [];
-  pigments = [];
+  nombreCategoriasMP : any = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
+  unidadMedida : any = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
+  estado : any = []; //Variable que va a almacenar todos los tipos de estados de documentos
+  proveedores : any = []; /** Array para cargar los proveedores de materia prima. */
+  materials : any = [];
+  pigments : any = [];
   recovery : boolean = false;
 
   constructor(private materiaPrimaService : MateriaPrimaService,

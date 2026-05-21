@@ -3,8 +3,6 @@ import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PrimeNGConfig } from 'primeng/api';
 import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
 import { User } from './_Models/user';
@@ -15,7 +13,13 @@ import { AuthenticationService } from './_Services/authentication.service';
 import { authentication_BagPro } from './_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+const pdfMake = require('pdfmake/build/pdfmake');
+const pdfFonts = require('pdfmake/build/vfs_fonts');
+
+if (pdfFonts && pdfFonts.pdfMake) {
+  pdfMake.vfs = pdfFonts.pdfMake.vfs;
+}
 
 @Component({
   selector: 'app-root',
@@ -34,10 +38,10 @@ export class AppComponent implements OnInit{
   user_ContaZeus?: user_Conta_Zeus | null;
   user_BagPro?: User_BagPro | null;
   title = 'ProyectoPlasticaribe';
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre !: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol !: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   rutaCarpetaArchivos : string = 'D:\\Calidad'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
   tamanoLetra : number = 1;
   temaSeleccionado : boolean = false;

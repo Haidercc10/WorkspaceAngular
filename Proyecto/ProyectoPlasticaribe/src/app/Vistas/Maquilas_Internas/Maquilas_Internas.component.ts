@@ -32,11 +32,11 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
 
   load : boolean = false; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado !: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   form !: FormGroup; //formulario para consultar y crear un ingreso de rollos
   process : any [] = [];
@@ -45,7 +45,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   operators : any [] = [];
   dataOrderProduction : any [] = [];
   loadedServices : any = [];
-  @ViewChild('dtServices') dtServices: Table;
+  @ViewChild('dtServices') dtServices: Table | undefined;
   turn : any = ``;
   turns : any = [];
   materials : any = [];
@@ -53,7 +53,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   realServices : any = [];
   selectedService : any = null;
   reader: any;
-  port : SerialPort;
+  port !: any;
   machines : any = []
 
   constructor(
@@ -146,10 +146,10 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
      //Función que obtiene los puertos seriales
   async getPuertoSerial() {
     try {
-      const port = await navigator.serial.requestPort();
+      const port = await (navigator as any).serial.requestPort();
       await port.open({ baudRate: 9600 });
       this.cargarDatosPuertoSerial(port);
-    } catch (ex) {
+    } catch (ex : any) {
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No se encontró una báscula conectada!');
       else this.msj.mensajeError(ex);
     }
@@ -174,7 +174,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
             break;
           }
           if (value) {
-            let valor = this.ab2str(value);
+            let valor : any = this.ab2str(value);
             let tara : number = this.form.value.weightTare;
             valor = valor.replace(/[^\d.-]/g, '');
             this.form.patchValue({ 'weight': valor, 'netWeight' : valor - tara });
@@ -347,7 +347,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   }
 
   buscarDatosConoSeleccionado() {
-    let cono = this.form.get('cono').value;
+    let cono : any = this.form.get('cono')?.value;
     if (cono) {
       let datosCono = this.conos.find(x => x.cono_Id == cono);
       let ancho: number = datosCono.cono_KgXCmsAncho;
@@ -375,9 +375,9 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
 
   validarTaraCono(ancho: number): number {
     let tara: number = 0;
-    let anchoCono = this.form.get('broadCono').value;
-    let undExtrusion = this.dataOrderProduction[0].unitExtrusion; //this.form.get('undExtrusion').value;
-    let ancho1 = this.dataOrderProduction[0].broad1;
+    let anchoCono : any = this.form.get('broadCono')?.value;
+    let undExtrusion : any = this.dataOrderProduction[0].unitExtrusion; //this.form.get('undExtrusion').value;
+    let ancho1 : any = this.dataOrderProduction[0].broad1;
 
     if (ancho1 && anchoCono) {
       if (undExtrusion == 'Plgs') tara = ancho * 2.54 * anchoCono;
@@ -432,7 +432,9 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   }*/
 
   //Función que convierte un buffer a un valor
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+
+  ab2str = (buf: ArrayBuffer): string => String.fromCharCode(...Array.from(new Uint8Array(buf)));
 
   addService(){
     this.getCurrentTurn();
@@ -442,7 +444,7 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     //let weight : number = this.form.get('weight').value;
     //let netWeight : number = this.form.get('netWeight').value;
     let today : any = moment().format('YYYY-MM-DD');
-    let dateSelected : any = moment(this.form.get('date').value).format('YYYY-MM-DD');
+    let dateSelected : any = moment(this.form.get('date')?.value).format('YYYY-MM-DD');
 
     days = moment(dateSelected).diff(moment(today), 'days');
 
@@ -468,13 +470,13 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     let ot : any = this.form.value.ot;
     
     if(ot == this.dataOrderProduction[0].ot) {
-      let operator : any = this.form.get('operator').value;
+      let operator : any = this.form.get('operator')?.value;
       let nameOperator : any = this.operators.find(x => x.usua_Id == operator).usua_Nombre;
-      let service : any = this.form.get('service').value;
+      let service : any = this.form.get('service')?.value;
       let date : any = moment().format('YYYY-MM-DD');
       let valueService : any = this.holidays.map(x => x).includes(date) ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDomFest : 
-                               this.turn == 'DIA' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDia : 
-                               this.turn == 'NOCHE' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorNoche : 0;
+                              this.turn == 'DIA' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDia : 
+                              this.turn == 'NOCHE' ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorNoche : 0;
 
       this.loadedServices.unshift({
         'operatorId' : operator, 
@@ -557,8 +559,8 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
     if(ot == this.dataOrderProduction[0].ot) {
       //setTimeout(() => {
         this.load = true;
-        let operator : any = this.form.get('operator').value;
-        let service : any = this.form.get('service').value;
+        let operator : any = this.form.get('operator')?.value;
+        let service : any = this.form.get('service')?.value;
         let nameOperator : any = this.operators.find(x => x.usua_Id == operator).usua_Nombre;
         let date : any = moment().format('YYYY-MM-DD');
         let valueService : any = this.holidays.map(x => x).includes(date) ? this.services.find(x => x.svcProd_Id == service).svcProd_ValorDomFest : 
@@ -789,11 +791,11 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body: any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -801,11 +803,11 @@ export class Maquilas_InternasComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body: any = [];
     body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

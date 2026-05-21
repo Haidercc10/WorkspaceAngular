@@ -18,12 +18,12 @@ import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionEx
 
 export class MovMaquilas_InternasComponent implements OnInit {
 
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
-  form: FormGroup;
+  form !: FormGroup;
   load: boolean = false;
   validateRole: number | undefined;
   selectedMode: boolean = false;

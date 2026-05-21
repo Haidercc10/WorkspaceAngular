@@ -16,8 +16,8 @@ import { AppComponent } from 'src/app/app.component';
 export class Movimientos_DespachoComponent implements OnInit {
 
   load: boolean = false;
-  storage_Id: number;
-  ValidarRol: number;
+  storage_Id !: number;
+  ValidarRol !: number;
   modoSeleccionado: boolean = false;
   formSearchDespacho: FormGroup;
   drivers: any[] = [];
@@ -209,10 +209,10 @@ export class Movimientos_DespachoComponent implements OnInit {
   }
 
   buildTableBody(data, columns) {
-    var body = [];
+    var body: any[] = [];
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any[] = [];
       columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });

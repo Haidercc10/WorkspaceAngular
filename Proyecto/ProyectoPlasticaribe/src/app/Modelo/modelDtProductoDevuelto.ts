@@ -3,7 +3,7 @@ export interface modelDtProductoDevuelto {
   Prod_Id : number;
   DtDevProdFact_Cantidad : number;
   UndMed_Id : string;
-  Rollo_Id : number;
+  Rollo_Id : number | undefined;
   Usua_Id : number;
   Falla_Id? : number;
 }

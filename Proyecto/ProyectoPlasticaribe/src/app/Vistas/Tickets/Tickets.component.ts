@@ -19,12 +19,12 @@ export class TicketsComponent implements OnInit {
 
   FormTickets !: FormGroup;
   cargando : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : string; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : number; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre !: string; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol !: number; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   archivoSeleccionado : any;
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado !: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private frmBuiler : FormBuilder,
@@ -90,8 +90,8 @@ export class TicketsComponent implements OnInit {
         this.crearPDF(data.ticket_Id);
         this.msj.mensajeConfirmacion(`¡Ticket #${data.ticket_Id} Creado!`, `¡Se ha creado un nuevo ticket!`);
       }, () => {
-         this.msj.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`);
-         this.cargando = false;
+        this.msj.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`);
+        this.cargando = false;
       });
       if (this.archivoSeleccionado != null) this.enviarArchivos(this.archivoSeleccionado);
       this.limpiarTodo();

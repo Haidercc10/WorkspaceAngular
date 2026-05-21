@@ -24,8 +24,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   @ViewChild('dt2') dt2: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros */
   load: boolean = true; /** Variable que realizará la carga al momento de consultar */
-  arrayMateriales = []; /** array que contendrá los materiales de materia prima*/
-  arrayProductos = []; /** array que cargará los productos con la consulta de tipo LIKE*/
+  arrayMateriales : any = []; /** array que contendrá los materiales de materia prima*/
+  arrayProductos : any = []; /** array que cargará los productos con la consulta de tipo LIKE*/
   idProducto: any = 0; /** ID de producto que se cargará en el campo ITEM, pero se mostrará el nombre. */
   arrayConsulta : any =[]; /** Array que cargará la consulta inicial */
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
@@ -33,10 +33,10 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   dialog : boolean = false; /** Variable que mostrará o no, el modal */
   totalDesperdicio : number = 0; /** Variable que contendrá la cantidad total de desperdicio por OT. */
   otSeleccionada : number = 0; /** Variable que contendrá la OT Seleccionada en la tabla */
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   arrayDatosAgrupadosPdf : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
@@ -219,9 +219,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   pesoTotalDesperdicio(){
     setTimeout(() => {
       this.totalDesperdicio = 0;
-      if(this.dt2.filteredValue != null) {
-        for (let indx = 0; indx < this.dt2.filteredValue.length; indx++) {
-          this.totalDesperdicio += this.dt2.filteredValue[indx].Peso;
+      if(this.dt2?.filteredValue != null) {
+        for (let indx = 0; indx < this.dt2?.filteredValue.length; indx++) {
+          this.totalDesperdicio += this.dt2?.filteredValue[indx].Peso;
         }
       } else {
       for (let index = 0; index < this.arrayModal.length; index++) {
@@ -380,10 +380,10 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   // Funcion que se encagará de llenar la tabla del pd
   buildTableBody(data, columns) {
-    var body = [];
+    var body: any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

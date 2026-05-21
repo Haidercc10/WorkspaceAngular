@@ -22,8 +22,8 @@ export class ReporteProduccionComponent implements OnInit {
   @ViewChild('dt') dt !: Table;
   cargando: boolean = false;
   modoSeleccionado: boolean = false;
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   formFiltros !: FormGroup;
   areasEmpresa: string[] = [];
   turnos : string[] = ['DIA', 'NOCHE'];
@@ -195,7 +195,7 @@ export class ReporteProduccionComponent implements OnInit {
     return ruta;
   }
 
-   totalCantidadConsultada() {
+  totalCantidadConsultada() {
     let total: number = 0;
     if(this.dt) {
       if(this.dt.filteredValue) {

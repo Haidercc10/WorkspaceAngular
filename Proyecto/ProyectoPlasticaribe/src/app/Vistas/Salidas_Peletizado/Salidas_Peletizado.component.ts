@@ -29,10 +29,10 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   load : boolean = false;
   presentations : any = []; 
   form !: FormGroup;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   recoveries : Array<any> = [];
   peletsAvailables : Array<any> = [];
   peletsSelected : Array<any> = [];
@@ -43,7 +43,7 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   @ViewChild('dt2') dt2 : Table | undefined;
   @ViewChild('dt3') dt3 : Table | undefined;
   fieldFocus : boolean = false;
-  port: SerialPort;
+  port !: any;
   reader: any;
 
   constructor(private AppComponent : AppComponent, 
@@ -76,7 +76,7 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
 
   //*Funciones para cargar el puerto serial y mostrar el peso de la bascula.
   chargeSerialPorts() {
-    navigator.serial.getPorts().then((ports) => {
+    (navigator as any).serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
       });
@@ -84,17 +84,17 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   async buscarPuertos() {
-    this.port = await navigator.serial.requestPort();
+    this.port = await (navigator as any).serial.requestPort();
     try {
       await this.port.open({ baudRate: 9600 });
       this.chargeDataFromSerialPort(this.port);
-    } catch (ex) {
+    } catch (ex : any) {
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
       else this.msj.mensajeError(ex);
     }
   }
 
-  async chargeDataFromSerialPort(port: SerialPort) {
+  async chargeDataFromSerialPort(port: any) {
     let keepReading: boolean = true;
     while (port.readable && keepReading) {
       this.reader = port.readable.getReader();
@@ -115,7 +115,7 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
             }
           }
         }
-      } catch (error) {
+      } catch (error : any) {
         this.msj.mensajeError(error);
       } finally {
         this.reader.releaseLock();
@@ -123,7 +123,8 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
     }
   }
 
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  ab2str = (buf: ArrayBuffer): string => String.fromCharCode(...Array.from(new Uint8Array(buf)));
 
   lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
@@ -582,11 +583,11 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body: any = [];
     body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -594,11 +595,11 @@ export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow : any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });

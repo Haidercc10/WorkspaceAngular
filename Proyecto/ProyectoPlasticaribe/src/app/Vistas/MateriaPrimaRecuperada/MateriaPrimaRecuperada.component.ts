@@ -40,15 +40,15 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   public ModalCrearMateriaPrima: boolean= false;
 
   /* Vaiables*/
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  materiasPrimas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  nombreCategoriasMP = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
-  unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
-  usuarios = []; //Variable que va a almacenar todos los usuarios de la empresa
-  materiaPrimaSeleccionada = []; //Variable que almacenará la informacion de la materia prima seleccionada
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  materiasPrimas : any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  nombreCategoriasMP : any = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
+  unidadMedida : any = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
+  usuarios : any = []; //Variable que va a almacenar todos los usuarios de la empresa
+  materiaPrimaSeleccionada : any = []; //Variable que almacenará la informacion de la materia prima seleccionada
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
   AccionBoton = "Agregar"; //Variable que almanará informacio para saber si una materia prima está en edicion o no (Se editará una materia prima cargada en la tabla, no una en la base de datos)

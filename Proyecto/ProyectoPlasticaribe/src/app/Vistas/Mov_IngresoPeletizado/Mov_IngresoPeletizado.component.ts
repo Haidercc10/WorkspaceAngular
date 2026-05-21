@@ -24,9 +24,9 @@ import { MateriaPrimaRecuperadaComponent } from '../MateriaPrimaRecuperada/Mater
 })
 
 export class Mov_IngresoPeletizadoComponent implements OnInit {
-  form: FormGroup;
+  form !: FormGroup;
   load: boolean = false;
-  storage_Id: number;
+  storage_Id !: number;
   validateRole: number | undefined;
   selectedMode: boolean = false;
   products: any[] = [];
@@ -40,7 +40,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   statuses : any = [];
   entries : any = [];
   outputs : any = []
-  @ViewChild(MateriaPrimaRecuperadaComponent) cmpRecovery : MateriaPrimaRecuperadaComponent;
+  @ViewChild(MateriaPrimaRecuperadaComponent) cmpRecovery : MateriaPrimaRecuperadaComponent | undefined;
   hiddenOutputs : any = [];
   modalOutputs : boolean = false;
   detailsOutputs : any = [];
@@ -220,15 +220,14 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   loadModalRecovery(data){
     if(data.status == 'PENDIENTE') {  
       this.modal = true
-      this.cmpRecovery.title = false
-      this.cmpRecovery.ArrayMateriaPrima = [];
-      let user : any = this.cmpRecovery.usuarios.find(x => x.usua_Id == this.storage_Id).usua_Id;
+      this.cmpRecovery!.title = false
+      this.cmpRecovery!.ArrayMateriaPrima = [];
+      let user : any = this.cmpRecovery!.usuarios.find(x => x.usua_Id == this.storage_Id).usua_Id;
       
-      this.cmpRecovery.FormMateriaPrimaRecuperada.patchValue({ 'usuarioId' : this.storage_Id, 'usuarioNombre' : user, 'ConsecutivoSalida' : data.mov.id, 'MpObservacion' : `Salida de peletizado N° ${data.mov.id}`, 'MpingresoFecha' : new Date() })
-      this.cmpRecovery.FormMateriaPrima.disable();
-      this.cmpRecovery.ArrayMateriaPrima.push({ 'Id' : data.matPrimas.id, 'Nombre' : data.matPrimas.matPrima, 'Cant' : this.groupQtyOutputs(data.matPrimas.id, data.status), 'UndCant' : 'Kg', 'Cant2' : this.groupQtyOutputs(data.matPrimas.id, data.status) });
-      this.cmpRecovery.outputsToUpdate = this.hiddenOutputs.filter(x => x.status == 'PENDIENTE').map(x => x.mov.code);
-      //console.log(this.cmpRecovery.outputsToUpdate);
+      this.cmpRecovery!.FormMateriaPrimaRecuperada.patchValue({ 'usuarioId' : this.storage_Id, 'usuarioNombre' : user, 'ConsecutivoSalida' : data.mov.id, 'MpObservacion' : `Salida de peletizado N° ${data.mov.id}`, 'MpingresoFecha' : new Date() })
+      this.cmpRecovery!.FormMateriaPrima.disable();
+      this.cmpRecovery!.ArrayMateriaPrima.push({ 'Id' : data.matPrimas.id, 'Nombre' : data.matPrimas.matPrima, 'Cant' : this.groupQtyOutputs(data.matPrimas.id, data.status), 'UndCant' : 'Kg', 'Cant2' : this.groupQtyOutputs(data.matPrimas.id, data.status) });
+      this.cmpRecovery!.outputsToUpdate = this.hiddenOutputs.filter(x => x.status == 'PENDIENTE').map(x => x.mov.code);
     } else this.modal = false;
   }
 }

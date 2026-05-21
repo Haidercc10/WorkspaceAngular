@@ -28,9 +28,9 @@ Injectable({
 export class MenuLateralComponent implements OnInit {
 
   display : boolean = false;
-  items: MenuItem[];
+  items !: MenuItem[];
   mode = new FormControl('over' as MatDrawerMode);
-  @ViewChild(AppComponent) appComponent : AppComponent;
+  @ViewChild(AppComponent) appComponent : AppComponent | undefined;
   public FormUsuarios !: FormGroup; // Formulario alojado en el modal para editar y eliminar usuarios
 
   categorias : any[] = [];
@@ -40,10 +40,10 @@ export class MenuLateralComponent implements OnInit {
   modalUsuario : boolean = false;
   modalCalendario : boolean = false;
   modalCorreos : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
   cantidadEventos : number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
   eventosHoy : any [] = []; //VAriable que almacenará los eventos que hay para el día actual
@@ -124,11 +124,11 @@ export class MenuLateralComponent implements OnInit {
 
   cambiarColorIcono(){
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    const icono1 = this.document.getElementById('iconoTanamoLetra1');
-    const icono2 = this.document.getElementById('iconoTanamoLetra2');
-    const icono3 = this.document.getElementById('iconoTanamoLetra3');
-    const icono4 = this.document.getElementById('iconoTanamoLetra4');
-    const icono5 = this.document.getElementById('iconoTanamoLetra5');
+    const icono1 : any = this.document.getElementById('iconoTanamoLetra1');
+    const icono2 : any = this.document.getElementById('iconoTanamoLetra2');
+    const icono3 : any = this.document.getElementById('iconoTanamoLetra3');
+    const icono4 : any = this.document.getElementById('iconoTanamoLetra4');
+    const icono5 : any = this.document.getElementById('iconoTanamoLetra5');
 
     fontSize > 0.66 && fontSize < 0.68 ? icono1.className = 'pi pi-circle-fill font-size-25' : icono1.className = 'pi pi-circle font-size-16';
     fontSize > 0.68 && fontSize < 0.89 ? icono2.className = 'pi pi-circle-fill font-size-25' : icono2.className = 'pi pi-circle font-size-16';

@@ -21,10 +21,10 @@ export class ReporteDespachoComponent implements OnInit {
 
   cargando : boolean = false; //Variable para validar que salga la animacion de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id !: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   FormConsultarFiltros !: FormGroup; //Variable que será el formulario en el que se buscará los filtros
   tiposdocumentos : any [] = [];
   infoDoc : any [] = []; //Variable que almacenará la información que se verá en la tabla
@@ -926,10 +926,10 @@ export class ReporteDespachoComponent implements OnInit {
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data, columns) {
-    var body = [];
+    var body: any = [];
     body.push(columns);
     data.forEach(function(row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach(function(column) {
         dataRow.push(row[column].toString());
       });

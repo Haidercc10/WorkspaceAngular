@@ -51,11 +51,11 @@ export class Produccion_SelladoComponent implements OnInit {
   cantActual: number = 0; //Guardará la cantidad pesada de unidades/paquetes/kilos del bulto del item de la ot consultada
   pesoActual: number = 0; //Guardará el peso actual de unidades/paquetes/kilos del bulto del item de la ot consultada
   medida: string = '';
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol
-  maquinaConsultada: number;
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol
+  maquinaConsultada: any;
   operariosConsultados: any = [];
   url: any = ``;
   repacking: boolean = false;
@@ -63,7 +63,7 @@ export class Produccion_SelladoComponent implements OnInit {
   process: any = []; //Variable que alojará los procesos de los cuales proviene un rollo anterior
   modalRolls: boolean = false;
   rolls: any = [];
-  orderProduction: number = null;
+  orderProduction: any = null;
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt0') dt0: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
@@ -219,9 +219,10 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que carga los puertos seriales
   cargarPuertosSeriales() {
-    navigator.serial.getPorts().then(ports => {
-      ports.forEach(port => {
-        port.open({ baudRate: 9600 }).then(async () => this.cargarDatosPuertoSerial(port), error => this.svcMsjs.mensajeError(`${error}`));
+    const serial = (navigator as any).serial;
+    serial.getPorts().then((ports: any[]) => {
+      ports.forEach((port: any) => {
+        port.open({ baudRate: 9600 }).then(async () => this.cargarDatosPuertoSerial(port), (error: any) => this.svcMsjs.mensajeError(`${error}`));
       });
     });
   }
@@ -229,10 +230,11 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que obtiene los puertos seriales
   async getPuertoSerial() {
     try {
-      const port = await navigator.serial.requestPort();
+      const serial = (navigator as any).serial;
+      const port = await serial.requestPort();
       await port.open({ baudRate: 9600 });
       this.cargarDatosPuertoSerial(port);
-    } catch (ex) {
+    } catch (ex: any) {
       if (ex.name === 'NotFoundError') this.svcMsjs.mensajeError('¡No se encontró una báscula conectada!');
       else this.svcMsjs.mensajeError(ex);
     }
@@ -271,7 +273,9 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Función que convierte un buffer a un valor
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+
+  ab2str = (buf: ArrayBuffer): string => String.fromCharCode(...Array.from(new Uint8Array(buf)));
 
   //Función que carga los turnos en el combobox
   getTurnos = () => this.svcTurnos.srvObtenerLista().subscribe(data => this.turnos = data);
@@ -583,7 +587,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que obtiene el peso desde la báscula conectada por puerto serial
   async getPesoDesdeBascula(): Promise<number> {
     try {
-      const port = await navigator.serial.requestPort();
+      const port = await (navigator as any).serial.requestPort();
       await port.open({ baudRate: 9600 });
 
       const reader = port.readable.getReader();

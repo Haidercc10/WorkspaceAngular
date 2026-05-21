@@ -20,28 +20,28 @@ export class ArchivosComponent implements OnInit {
 
   public formularioArchivo !: FormGroup;
   modoInvitado: boolean = true;
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number = null; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  ValidarRol: any = null; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today: any = moment().format('YYYY-MM-DD') //Variable que se usará para llenar la fecha actual
   ArrayArchivos: any[] = []; //Variable que almacenará los archivos que vienen de la base de datos
   categoriasArchivos: any[] = []; //Variable para almacenar las categorias de archivos que hay
   selectedFile: any;
   nombreCarpeta: string = 'D:\\Calidad'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
-  ruta: string; //Variable que almacenará el nombre de las carpetas que se estan vistando
+  ruta: any; //Variable que almacenará el nombre de las carpetas que se estan vistando
   mover: boolean = false; //Variable que va a validar si se está moviendo un archivo o no
   copiar: boolean = false; //Variable que va a validar si se esta copiando un archivo
-  rutaInicial: string; //Variable que va a almacenar la ruta inicial desde la cual se va a mover o copiar el archivo
+  rutaInicial: any; //Variable que va a almacenar la ruta inicial desde la cual se va a mover o copiar el archivo
   nombreArchivo: string = ''; //Variable que va a almacenar el nombre del archivo que se quiere mover o copiar
-  validarArchivo_Carpeta: boolean;
+  validarArchivo_Carpeta: any;
   descargandoArchivo: boolean = false; //Variable que va a validar si el si se está descargando un archivo o carpeta
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   modal: boolean = false; /** Variable que servirá para abrir el modal de crear categorias */
   clave: string = ''; /** Palabra clave para mostrar mensajes de elección de eliminación de archivos y carpetas */
   fileSeleccionado: any; /** Archivo/Carpeta seleccionado para ser eliminado */
   rutaSeleccionada: any; /** Ruta del Archivo/Carpeta seleccionado para ser eliminado */
-  accionMoverCopiar: number;
+  accionMoverCopiar: any;
   value: number = 0;
 
   constructor(private frmBuilder: FormBuilder,

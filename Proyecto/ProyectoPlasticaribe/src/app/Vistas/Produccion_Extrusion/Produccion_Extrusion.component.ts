@@ -36,8 +36,8 @@ import { AppComponent } from 'src/app/app.component';
 export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   cargando: boolean = false;
-  storage_Id: number;
-  ValidarRol: number;
+  storage_Id: any;
+  ValidarRol: any;
   modoSeleccionado: boolean = false;
   formDatosProduccion !: FormGroup;
   formWeight !: FormGroup;
@@ -50,15 +50,15 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   rollosPesados: Array<any> = [];
   datosOrdenTrabajo: Array<any> = [];
   showNameBussiness: boolean = true;
-  port: SerialPort;
+  port !: any;
   reader: any;
   reference: string = ``;
-  nuevoAnchoProducto: number = null;
+  nuevoAnchoProducto: any = null;
   //url : string = ``; 
   rebobinado: boolean = false;
   maquinas: any = [];
   rolls: any = [];
-  orderProduction: number = null;
+  orderProduction: any = null;
   modalRolls: boolean = false;
   packers: any = [];
   @ViewChild('dt1') dt1: Table | undefined;
@@ -67,7 +67,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
   processProduction: boolean = false;
   clase: any = ``;
-  client: number = null;
+  client: any = null;
   clientsRestrictionWeight: any = [];
   modalAuthorizeWeight: boolean = false;
   usersAuthorized: any = [];
@@ -246,12 +246,15 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   //Función que obtiene los puertos seriales
   async getPuertoSerial() {
     try {
-      const port = await navigator.serial.requestPort();
-      await port.open({ baudRate: 9600 });
+      const port = await (navigator as any).serial.requestPort();
+      await port.open({ 
+        baudRate: 9600 
+      });
       this.cargarDatosPuertoSerial(port);
-    } catch (ex) {
+    } catch (ex : any) {
+      const error = ex as Error;
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No se encontró una báscula conectada!');
-      else this.msj.mensajeError(ex);
+      else this.msj.mensajeError(error.message);
     }
   }
 
@@ -274,7 +277,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             break;
           }
           if (value) {
-            let valor = this.ab2str(value);
+            let valor : any = this.ab2str(value);
             let tara: number = this.formDatosProduccion.value.pesoTara;
             valor = valor.replace(/[^\d.-]/g, '');
             this.formDatosProduccion.patchValue({ 'pesoBruto': valor, 'pesoNeto': valor - tara });
@@ -340,11 +343,13 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }
   }*/
 
-  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+  //ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+
+  ab2str = (buf: ArrayBuffer): string => String.fromCharCode(...Array.from(new Uint8Array(buf)));
 
   eliminarDiacriticos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
-  limpiarCampos(consulta: boolean) {
+  limpiarCampos(consulta?: boolean) {
     this.cargando = false;
     let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
     this.formDatosProduccion.reset();
@@ -474,7 +479,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   buscarDatosConoSeleccionado() {
-    let cono = this.formDatosProduccion.get('cono').value;
+    let cono : any = this.formDatosProduccion.get('cono')?.value;
     if (cono) {
       let datosCono = this.conos.find(x => x.cono_Id == cono);
       let ancho: number = datosCono.cono_KgXCmsAncho;
@@ -485,7 +490,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   validarAnchoCono() {
     let ancho: number = 0;
-    let ancho1 = this.formDatosProduccion.get('ancho1').value;
+    let ancho1 : any = this.formDatosProduccion.get('ancho1')?.value;
     let proceso = this.proceso;
 
     if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.formDatosProduccion.value.anchoProducto;
@@ -504,9 +509,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   validarTaraCono(ancho: number): number {
     let tara: number = 0;
-    let anchoCono = this.formDatosProduccion.get('anchoCono').value;
-    let undExtrusion = this.formDatosProduccion.get('undExtrusion').value;
-    let ancho1 = this.formDatosProduccion.get('ancho1').value;
+    let anchoCono : any = this.formDatosProduccion.get('anchoCono')?.value;
+    let undExtrusion : any = this.formDatosProduccion.get('undExtrusion')?.value;
+    let ancho1 : any = this.formDatosProduccion.get('ancho1')?.value;
     if (ancho1 && anchoCono) {
       if (undExtrusion == 'Plgs') tara = ancho * 2.54 * anchoCono;
       else tara = ancho * anchoCono;
@@ -525,7 +530,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.getMachines();
     this.validarProceso();
     if (this.formDatosProduccion.value.proceso) {
-      let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
+      let ordenTrabajo : any = this.formDatosProduccion.get('ordenTrabajo')?.value;
       this.cargando = true;
       if (consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior': null, 'etiquetaAsociada': null, 'otAlterna': null, 'packer': null, 'supervisor': null });
       let proceso: string = this.formDatosProduccion.value.proceso == 'DBLD' ? 'DOBLADO' : this.formDatosProduccion.value.proceso;
@@ -635,7 +640,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   //Función que obtiene el peso desde la báscula conectada por puerto serial
   async getPesoDesdeBascula(): Promise<number> {
     try {
-      const port = await navigator.serial.requestPort();
+      const port = await (navigator as any).serial.requestPort();
       await port.open({ baudRate: 9600 });
 
       const reader = port.readable.getReader();
@@ -668,7 +673,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         this.msj.mensajeError(ex);
         this.cargando = false;
       }
-      return 0; // Retorna 5 en caso de error
+      return 0; // Retorna 0 en caso de error
     }
   }
 

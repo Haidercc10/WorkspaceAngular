@@ -26,8 +26,8 @@ import { AppComponent } from 'src/app/app.component';
 
 export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
-  storage_Id: number;
-  ValidarRol: number;
+  storage_Id !: number;
+  ValidarRol !: number;
   load: boolean = false;
   modoSeleccionado: boolean;
   formDataOrder: FormGroup;
@@ -191,12 +191,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   selectionForFilters(){
-    let data = this.tableOrder.filteredValue ? this.tableOrder.filteredValue : this.tableOrder.value;
+    let data : any = this.tableOrder?.filteredValue ? this.tableOrder.filteredValue : this.tableOrder?.value;
 
     if(data.length > 0) {
       this.load = true;
       this.productionSelected = this.productionSelected.concat(data); 
-      if(!this.tableOrder.filteredValue) this.production = [];
+      if(!this.tableOrder?.filteredValue) this.production = [];
       else {
         data.forEach(x => {
           let index : number = this.production.findIndex(p => p.numberProduction == x.numberProduction);
@@ -210,12 +210,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   deselectionForFilters(){
-    let data = this.tableDevolution.filteredValue ? this.tableDevolution.filteredValue : this.tableDevolution.value;
+    let data : any = this.tableDevolution?.filteredValue ? this.tableDevolution.filteredValue : this.tableDevolution?.value;
 
     if(data.length > 0) {
       this.load = true;
       this.production = this.production.concat(data); 
-      if(!this.tableDevolution.filteredValue) this.productionSelected = [];
+      if(!this.tableDevolution?.filteredValue) this.productionSelected = [];
       else {
         data.forEach(x => {
           let index : number = this.productionSelected.findIndex(p => p.numberProduction == x.numberProduction);
@@ -229,7 +229,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   getConsolidateProduction() {
-    this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
+    this.consolidatedProduction = this.productionSelected.reduce((a : any, b : any) => {
       if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
       return a;
     }, []);
@@ -489,11 +489,11 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   buildTableBody1(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
@@ -501,11 +501,11 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
   }
 
   buildTableBody2(data, columns, title) {
-    var body = [];
+    var body : any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
