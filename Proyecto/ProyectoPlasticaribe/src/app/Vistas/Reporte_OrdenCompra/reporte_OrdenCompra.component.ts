@@ -173,6 +173,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       Cantidad: data.cantidad,
       Precio: data.precio_Unitario,
       Subtotal: data.cantidad * data.precio_Unitario,
+      Fecha_Entrega: data.fecha_Entrega ? data.fecha_Entrega.replace('T00:00:00', '') : '',
     }
     this.registrosConsultados.push(info);
     this.registrosConsultados.sort((a, b) => Number(a.Oc) - Number(b.Oc));
@@ -465,8 +466,10 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             Cantidad: datos_orden[i].cantidad,
             Und_Medida: datos_orden[i].unidad_Medida,
             Precio: datos_orden[i].precio_Unitario,
-            SubTotal: datos_orden[i].subTotal //(datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+            SubTotal: datos_orden[i].subTotal, //(datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+            Fecha: datos_orden[i].fecha_Entrega ? (datos_orden[i].fecha_Entrega.replace('T00:00:00', '')) : null,
           };
+          console.log(info);
           /*if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
             info.Nombre = datos_orden[i].mp;

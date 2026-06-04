@@ -788,7 +788,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.svProductionProcess.getRollsForRepack().subscribe(data => {
       this.stockRepacking = data;
       this.calculateTotalRepack();
-      console.log(data);
       this.loading = false;
     }, error => {
       this.msg.mensajeError(`Error`, `Ocurrió un error al consultar la producción disponible`);

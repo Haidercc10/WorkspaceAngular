@@ -48,7 +48,7 @@ export class OcompraComponent implements OnInit {
   ValidarRol: number = 0; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   proveedores: any[] = []; //Variable que almacenará los proveedores
   materiaPrima: any[] = []; //Variable que almacenará las materias primas
-  unidadesMedida: any[] = []; //Variable que va a almacenar las unidades de medida
+  unidadesMedida: any[] = ['Kg', 'Cms', 'Und']; //Variable que va a almacenar las unidades de medida
   materiasPrimasSeleccionadas: any[] = []; //Variable que almacenará las materias primas que son escogidas para la orden de compra
   consecutivoOrdenCompra: any = 0; //Variable que almacenará el consecutivo de la orden de compra
   informacionPDF: any[] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de compra
@@ -103,12 +103,13 @@ export class OcompraComponent implements OnInit {
       PrecioOculto: [null, Validators.required],
       Categoria: [null, Validators.required],
       iva: [this.iva, Validators.required],
+      Fecha: [null, Validators.required],
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.obtenerUnidadesMedida();
+    //this.obtenerUnidadesMedida();
     this.obtenerMateriaPrima();
     this.generarConsecutivo();
     this.consultarCategorias();
@@ -209,6 +210,7 @@ export class OcompraComponent implements OnInit {
           Precio: parseFloat(datos_materiaPrima[i].precio),
           PrecioOculto: parseFloat(datos_materiaPrima[i].precio),
           Categoria: datos_materiaPrima[i].categoria,
+          Fecha: null,
         });
       }
     }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`));
@@ -240,6 +242,7 @@ export class OcompraComponent implements OnInit {
             Und_Medida: this.FormMateriaPrima.value.UndMedida,
             Precio: this.FormMateriaPrima.value.PrecioOculto,
             SubTotal: (cant * this.FormMateriaPrima.value.PrecioOculto),
+            Fecha: moment(this.FormMateriaPrima.value.Fecha).format('YYYY-MM-DD') ,
           }
           if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
           else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
@@ -333,6 +336,7 @@ export class OcompraComponent implements OnInit {
   consultarOrdenCompra() {
     let ordenCompra: number = this.FormOrdenCompra.value.ConsecutivoOrden;
     this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
+      console.log(datos_orden);
       if (datos_orden.length > 0) {
         this.ordenCreada = ordenCompra
         this.edicionOrdenCompra = true;
@@ -359,7 +363,9 @@ export class OcompraComponent implements OnInit {
             Precio: datos_orden[i].precio_Unitario,
             SubTotal: datos_orden[i].subTotal, //(datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
             iva: datos_orden[i].iva,
+            Fecha: datos_orden[i].fecha_Entrega ? new Date(moment(datos_orden[i].fecha_Entrega.replace('T00:00:00', '')).format('YYYY-MM-DD')) : null,
           };
+          console.log(info);
           /*if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
             info.Nombre = datos_orden[i].mp;
@@ -435,7 +441,7 @@ export class OcompraComponent implements OnInit {
       'IVA': this.iva,
       'ReteFuente': this.FormOrdenCompra.value.ReteFuente,
       'ReteIVA': this.FormOrdenCompra.value.ReteIVA,
-      'ReteICA': this.FormOrdenCompra.value.ReteICA
+      'ReteICA': this.FormOrdenCompra.value.ReteICA, 
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
@@ -476,6 +482,7 @@ export class OcompraComponent implements OnInit {
         'Doc_CantidadPedida': this.materiasPrimasSeleccionadas[j].Cantidad,
         'UndMed_Id': this.materiasPrimasSeleccionadas[j].Und_Medida,
         'Doc_PrecioUnitario': this.materiasPrimasSeleccionadas[j].Precio,
+        'Doc_FechaEntrega': this.materiasPrimasSeleccionadas[j].Fecha,
       }
       this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => {
         count++;
@@ -910,6 +917,7 @@ export class OcompraComponent implements OnInit {
             Doc_CantidadPedida: this.materiasPrimasSeleccionadas[i].Cantidad,
             UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
             Doc_PrecioUnitario: this.materiasPrimasSeleccionadas[i].Precio,
+            Doc_FechaEntrega: this.materiasPrimasSeleccionadas[i].Fecha,
           }
           this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => {
             count++;
@@ -932,6 +940,7 @@ export class OcompraComponent implements OnInit {
             Doc_CantidadPedida: this.materiasPrimasSeleccionadas[i].Cantidad,
             UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
             Doc_PrecioUnitario: this.materiasPrimasSeleccionadas[i].Precio,
+            Doc_FechaEntrega: this.materiasPrimasSeleccionadas[i].Fecha,
           }
           this.dtOrdenCompraService.putId_DtOrdenCompra(datos_orden[0], info).subscribe(() => {
             count++;

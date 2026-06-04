@@ -20,51 +20,51 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ReporteFacturacionDetalladaComponent implements OnInit {
 
-  cargando : boolean = false;
-  modoSeleccionado : boolean = false;
-  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  cargando: boolean = false;
+  modoSeleccionado: boolean = false;
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   formFiltros !: FormGroup;
-  dataFacturacion : any [] = [];
-  dataPDF : any [] = [];
-  vendedores : any [] = [];
-  clientes : any [] = [];
-  productos : any [] = [];
-  infoPdf : any[] = [];
-  infoDevoluciones : any[] = [];
+  dataFacturacion: any[] = [];
+  dataPDF: any[] = [];
+  vendedores: any[] = [];
+  clientes: any[] = [];
+  productos: any[] = [];
+  infoPdf: any[] = [];
+  infoDevoluciones: any[] = [];
   @ViewChild('dtFacturacion') dtFacturacion: Table | undefined;
   @ViewChild('dtDevolucion') dtDevolucion: Table | undefined;
-  modal : boolean = false;
-  facturasModal : any = [];
-  nroFactura : string = ``;
-  facturacionConsolidada : any = [];
-  nuevasFacturas : any = [];
+  modal: boolean = false;
+  facturasModal: any = [];
+  nroFactura: string = ``;
+  facturacionConsolidada: any = [];
+  nuevasFacturas: any = [];
   items = [];
   dataDevolucion = [];
-  devolutions : any = [];
-  transactions : any = [];
+  devolutions: any = [];
+  transactions: any = [];
 
-  constructor(private AppComponent : AppComponent,
-                private frmBuilder : FormBuilder,
-                  private zeusService : InventarioZeusService,
-                    private productosService : ProductoService,
-                      private vendedorService : UsuarioService,
-                        private pdfService : CreacionPdfService,
-                          private msj : MensajesAplicacionService, 
-                            private msg : MessageService, 
-                              private svcClientesProductos : ClientesProductosService, 
-                                private svcProductos : ProductoService,
-                                  private svExcel : CreacionExcelService,
-                                    private svZeusContabilidad : ZeusContabilidadService) {
+  constructor(private AppComponent: AppComponent,
+    private frmBuilder: FormBuilder,
+    private zeusService: InventarioZeusService,
+    private productosService: ProductoService,
+    private vendedorService: UsuarioService,
+    private pdfService: CreacionPdfService,
+    private msj: MensajesAplicacionService,
+    private msg: MessageService,
+    private svcClientesProductos: ClientesProductosService,
+    private svcProductos: ProductoService,
+    private svExcel: CreacionExcelService,
+    private svZeusContabilidad: ZeusContabilidadService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
-      rangoFechas : [null],
-      idCliente : [null],
-      cliente : [null],
-      vendedor : [null],
-      idProducto : [null],
-      producto : [null]
+      rangoFechas: [null],
+      idCliente: [null],
+      cliente: [null],
+      vendedor: [null],
+      idProducto: [null],
+      producto: [null]
     });
   }
 
@@ -75,10 +75,10 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que se encargará de limpiar todo
-  limpiarCampos(){
+  limpiarCampos() {
     this.formFiltros.reset();
     this.dataFacturacion = [];
     this.clientes = [];
@@ -89,13 +89,13 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //Función para cargar fechas en el rango.
-  loadRankDates(){
-    this.formFiltros.patchValue({ 'rangoFechas' : [new Date(), new Date()] });
+  loadRankDates() {
+    this.formFiltros.patchValue({ 'rangoFechas': [new Date(), new Date()] });
   }
 
   // Funcion que se encargará de obtener los vendedores
-  obtenerVendedores(){
-    let asesor : any = this.ValidarRol == 2 ? this.AppComponent.storage_Id : null;  
+  obtenerVendedores() {
+    let asesor: any = this.ValidarRol == 2 ? this.AppComponent.storage_Id : null;
     this.vendedorService.GetVendedores().subscribe(resp => {
       this.vendedores = resp;
       this.vendedores = asesor ? this.vendedores.filter(x => x.usua_Id == asesor) : this.vendedores
@@ -103,30 +103,30 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //Crea la función lecturaStorage()
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que se encargaá de buscar los clientes
-  obtenerClientes(){
-    let nombre : string = this.formFiltros.value.cliente;
+  obtenerClientes() {
+    let nombre: string = this.formFiltros.value.cliente;
     this.zeusService.LikeGetClientes(nombre).subscribe(resp => this.clientes = resp);
   }
 
   // Funcion que se encargará de colocar la información de los clientes en cada uno de los campos
-  clienteSeleccionado(){
-    this.productos = []; 
-    let cliente : any = this.formFiltros.value.cliente;
+  clienteSeleccionado() {
+    this.productos = [];
+    let cliente: any = this.formFiltros.value.cliente;
     this.formFiltros.patchValue({
-      idCliente : cliente,
-      cliente : this.clientes.find(x => x.idcliente == cliente).razoncial
+      idCliente: cliente,
+      cliente: this.clientes.find(x => x.idcliente == cliente).razoncial
     });
     this.cargarProductosxCliente(cliente)
   }
-  
+
   //Función que cargará los productos del cliente seleccionado en el combobox
-  cargarProductosxCliente(cliente : any){
+  cargarProductosxCliente(cliente: any) {
     this.svcClientesProductos.srvObtenerListaPorNombreCliente(cliente).subscribe(data => {
       data.forEach(d => {
         this.svcProductos.srvObtenerListaPorId(d.prod_Id).subscribe(datos => this.productos.push(datos));
@@ -135,136 +135,136 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   // Funcion que se encargará de buscar los productos
-  obtenerProductos(){
-    let nombre : string = this.formFiltros.value.producto;
+  obtenerProductos() {
+    let nombre: string = this.formFiltros.value.producto;
     this.productosService.obtenerItemsLike(nombre).subscribe(resp => this.productos = resp);
   }
 
   // Funcion que se encargará de colocar la información de los productos en cada uno de los campos
-  productoSeleccionado(){
-    let producto : any = this.formFiltros.value.producto;
+  productoSeleccionado() {
+    let producto: any = this.formFiltros.value.producto;
     this.formFiltros.patchValue({
-      idProducto : producto,
-      producto : this.productos.find(x => x.prod_Id == producto).prod_Nombre
+      idProducto: producto,
+      producto: this.productos.find(x => x.prod_Id == producto).prod_Nombre
     });
   }
 
   // Funcion que se encargará de buscar las facturas
-  buscarFacturacion(){
+  buscarFacturacion() {
     if (this.formFiltros.value.rangoFechas) {
       this.transactions = [];
       this.dataFacturacion = [];
-      let item : any = this.formFiltros.value.idProducto;
+      let item: any = this.formFiltros.value.idProducto;
       this.cargando = true;
-      let fechaInicial : any = moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
-      let fechaFinal : any = moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
-      
+      let fechaInicial: any = moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
+      let fechaFinal: any = moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
+
       //this.zeusService.getNuevaDevolucionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosDevoluciones(res))
       this.getTransactionReport(fechaInicial, fechaFinal);
 
       this.cargarFacturacionDetallada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
-      if(item != null && item != undefined && item != '') this.cargarDevolucionesDetalladas2(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)); 
+      if (item != null && item != undefined && item != '') this.cargarDevolucionesDetalladas2(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
       else {
         //this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true));
         this.editGroupedDevolutions(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true))
         this.editGroupedDevolutions(fechaInicial, fechaFinal, 2, this.validarParametrosConsulta(true))
-      }  
+      }
 
       this.colocarNombresVendedores();
-      setTimeout(() =>  { 
-        this.dataFacturacion.sort((a,b) => Number(parseInt(a.factura)) - Number(parseInt(b.factura)));
+      setTimeout(() => {
+        this.dataFacturacion.sort((a, b) => Number(parseInt(a.factura)) - Number(parseInt(b.factura)));
         this.cargando = false;
       }, 2000);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
   }
 
-  getTransactionReport(date1 : any, date2 : any){
+  getTransactionReport(date1: any, date2: any) {
     this.zeusService.getInformeTransacciones(date1, date2, this.validarParametrosConsulta(false)).subscribe(transactions => {
-        this.transactions = transactions;
-        transactions.filter(x => ['FV', 'NV', 'DV'].includes(x.idfuente) && ["FA"].includes(x.tipofac.trim()) && x.indcpitra == '2').forEach(x => {
-          this.zeusService.getFactWithoutIva(x.numefac).subscribe(fact => {
-            this.transactions = transactions;
-            this.dataFacturacion.push({
-              'fecha' : x.fechatra,
-              'factura' : x.numefac, 
-              'cliente' : x.descritra == 'ARRENDAMIENTO' ? 'HERRAJES ANDINA SAS' : x.descritra,
-              'suma' : ['NV', 'DV'].includes(x.idfuente) ? ((x.valortra)) : Math.abs(x.valortra), 
-              'recibo' : ['DV'].includes(x.idfuente) ? 'DEVOLUCIÓN' : ['NV'].includes(x.idfuente) ? 'NOTA DE VENTA' : ['FV'].includes(x.idfuente) && x.descritra == 'ARRENDAMIENTO' ? 'ARRIENDO' : '____________________________________',
-              'notIva' : fact ? fact.length > 0 ? fact[0].iva == 0 ? true : false : false : false,
-              'descuentos' : fact ? fact.length > 0 ? fact[0].descuentos : 0 : 0,
-              'cuenta' : x.codicta,
-              'table' : true,
-              'documento' : x.idfuente, 
-              'idCliente' : x.nittra,  
-              'idVendedor' : x.idvende,
-              'vendedor' : this.vendedores.filter(xy => xy.usua_Id == x.idvende)[0].usua_Nombre,
-            });
+      this.transactions = transactions;
+      transactions.filter(x => ['FV', 'NV', 'DV'].includes(x.idfuente) && ["FA"].includes(x.tipofac.trim()) && x.indcpitra == '2').forEach(x => {
+        this.zeusService.getFactWithoutIva(x.numefac).subscribe(fact => {
+          this.transactions = transactions;
+          this.dataFacturacion.push({
+            'fecha': x.fechatra,
+            'factura': x.numefac,
+            'cliente': x.descritra == 'ARRENDAMIENTO' ? 'HERRAJES ANDINA SAS' : x.descritra,
+            'suma': ['NV', 'DV'].includes(x.idfuente) ? ((x.valortra)) : Math.abs(x.valortra),
+            'recibo': ['DV'].includes(x.idfuente) ? 'DEVOLUCIÓN' : ['NV'].includes(x.idfuente) ? 'NOTA DE VENTA' : ['FV'].includes(x.idfuente) && x.descritra == 'ARRENDAMIENTO' ? 'ARRIENDO' : '_________________________________',
+            'notIva': fact ? fact.length > 0 ? fact[0].iva == 0 ? true : false : false : false,
+            'descuentos': fact ? fact.length > 0 ? fact[0].descuentos : 0 : 0,
+            'cuenta': x.codicta,
+            'table': true,
+            'documento': x.idfuente,
+            'idCliente': x.nittra,
+            'idVendedor': x.idvende,
+            'vendedor': this.vendedores.filter(xy => xy.usua_Id == x.idvende)[0].usua_Nombre,
           });
         });
-      }, error => { console.log(error); });
+      });
+    }, error => { console.log(error); });
   }
 
   // Funcion que retornará los parametros adicionales que tendrán las consultas de facturación y de devolución
-  validarParametrosConsulta(factura : boolean){
-    let cliente : any = this.formFiltros.value.idCliente;
-    let vendedor : string = this.formFiltros.value.vendedor;
-    let producto : any = this.formFiltros.value.idProducto;
-    let ruta : string = ``;
-    
-    if(vendedor != null && vendedor != '' && vendedor != undefined) {
+  validarParametrosConsulta(factura: boolean) {
+    let cliente: any = this.formFiltros.value.idCliente;
+    let vendedor: string = this.formFiltros.value.vendedor;
+    let producto: any = this.formFiltros.value.idProducto;
+    let ruta: string = ``;
+
+    if (vendedor != null && vendedor != '' && vendedor != undefined) {
       if (vendedor.toString().length == 2) vendedor = `0${vendedor}`;
       else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`;
     }
     if (cliente != null) ruta += `cliente=${cliente}`;
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
-    if (factura && producto != null) { ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`; } 
+    if (factura && producto != null) { ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`; }
     if (ruta.length > 0) ruta = `?${ruta}`;
-    
+
     return ruta;
   }
 
   // Funcion que se encargará de llenar la guardar la información de las facturas
-  llenarDatosFacturas(facturas : any []){
-    let filtroFacturas : any = [];
-    
+  llenarDatosFacturas(facturas: any[]) {
+    let filtroFacturas: any = [];
+
     facturas.forEach(fac => {
-      if(!filtroFacturas.includes(fac.factura)) {
+      if (!filtroFacturas.includes(fac.factura)) {
         filtroFacturas.push(fac.factura);
         this.dataFacturacion.push(fac);
       } else {
-        let index : number = this.dataFacturacion.findIndex(x => x.factura == fac.factura);
+        let index: number = this.dataFacturacion.findIndex(x => x.factura == fac.factura);
         this.dataFacturacion[index].totalIvaVentas += fac.totalIvaVentas;
         this.dataFacturacion[index].precioTotal += fac.precioTotal;
       }
-      this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
+      this.dataFacturacion.sort((a, b) => a.recibo.localeCompare(b.recibo));
     });
   }
 
   // Funcion que se encargará de llenar la guardar la información de las devoluciones
-  llenarDatosDevoluciones(devoluciones : any []){
-    let filtroFacturas : any = [];
+  llenarDatosDevoluciones(devoluciones: any[]) {
+    let filtroFacturas: any = [];
     devoluciones.forEach(dev => {
-      if(!filtroFacturas.includes(dev.factura)) {
+      if (!filtroFacturas.includes(dev.factura)) {
         filtroFacturas.push(dev.factura);
         this.dataFacturacion.push(dev);
       }
-      this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
+      this.dataFacturacion.sort((a, b) => a.recibo.localeCompare(b.recibo));
     });
   }
 
   // Funcion que devolverá la información que se mostrará en la tabla de facturas
-  tableFacturas(){
+  tableFacturas() {
     return this.dataFacturacion.filter(x => !['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(x.recibo));
   }
 
   // Funcion que devolverá la información que se mostrará en la tabla de devoluciones
-  tableDevoluciones(){
+  tableDevoluciones() {
     return this.dataFacturacion.filter(x => ['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(x.recibo) && x.table == true);
   }
 
   // Funcion que devolverá el total de facturas
-  totalFacturas(){
-    let total : number = 0;
+  totalFacturas() {
+    let total: number = 0;
     this.dataFacturacion.forEach(fac => {
       if (!['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(fac.recibo)) total += fac.suma;
     });
@@ -272,23 +272,24 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   // Funcion que devolverá el total de devoluciones
-  totalDevoluciones(){
-    let total : number = 0;
+  totalDevoluciones() {
+    let total: number = 0;
     this.dataFacturacion.forEach(fac => {
       if (['NOTA DE VENTA', 'DEVOLUCIÓN'].includes(fac.recibo) && fac.table == true) total += fac.suma;
     });
     return total;
   }
-  
+
   // Funcion que se encargará de generar el PDF de la información de las facturas y de las devoluciones realizadas en el rango de fechas seleccionado.
-  formatoPDF(){
+  formatoPDF() {
     if (this.dataFacturacion.filter(x => x.table == true).length > 0) {
       this.onReject();
       this.cargando = true;
       this.dataPDF = this.dataFacturacion.filter(x => x.table == true);
-      this.dataPDF.sort((a,b) => Number(parseInt(a.factura)) - Number(parseInt(b.factura)));
-      let headerAdicional : any [] = this.headerAdicional();
-      let contentPDf : any [] = this.pdfFacturaConsolidad(this.dataPDF);
+      this.dataPDF.sort((a, b) => Number(parseInt(a.factura)) - Number(parseInt(b.factura)));
+      this.dataPDF.sort((a, b) => a.recibo.localeCompare(b.recibo));
+      let headerAdicional: any[] = this.headerAdicional();
+      let contentPDf: any[] = this.pdfFacturaConsolidad(this.dataPDF);
       let titulo = 'Informe de Ventas';
       this.pdfService.formatoPDF(titulo, contentPDf, headerAdicional);
       setTimeout(() => this.cargando = false, 3000);
@@ -296,8 +297,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   // Funcion que retornará un header adicional al que el PDF tiene por defecto, en este caso son los titulos de cada columna
-  headerAdicional(){
-    let data : any = [];
+  headerAdicional() {
+    let data: any = [];
     data.push([
       {
         margin: [25, 0],
@@ -307,11 +308,11 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
           widths: ['10%', '12%', '35%', '15%', '28%'],
           body: [
             [
-              { text: `Fecha`, alignment: 'center',  fillColor: '#ccc', border: [true, true, false, true] },
-              { text: `Factura`, alignment: 'center',  fillColor: '#ccc', border: [false, true, false, true] },
-              { text: `Cliente`, alignment: 'center',  fillColor: '#ccc', border: [false, true, false, true] },
-              { text: `Total`, alignment: 'center',  fillColor: '#ccc', border: [false, true, false, true] },
-              { text: `RC`, alignment: 'center',  fillColor: '#ccc', border: [false, true, true, true] },
+              { text: `Fecha`, alignment: 'center', fillColor: '#ccc', border: [true, true, false, true] },
+              { text: `Factura`, alignment: 'center', fillColor: '#ccc', border: [false, true, false, true] },
+              { text: `Cliente`, alignment: 'center', fillColor: '#ccc', border: [false, true, false, true] },
+              { text: `Total`, alignment: 'center', fillColor: '#ccc', border: [false, true, false, true] },
+              { text: `RC`, alignment: 'center', fillColor: '#ccc', border: [false, true, true, true] },
             ]
           ]
         }
@@ -321,8 +322,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   // Funcion que retornará el contenido del PDF
-  pdfFacturaConsolidad(datos : any []){
-    let data : any = [];
+  pdfFacturaConsolidad(datos: any[]) {
+    let data: any = [];
     data.push([
       {
         margin: 5,
@@ -330,7 +331,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         border: [true, false, true, false],
         table: {
           dontBreakRows: true,
-          widths : ['10%', '12%', '35%', '15%', '28%'],
+          widths: ['13%', '12%', '35%', '15%', '25%'],
           body: this.facturas(datos)
         }
       },
@@ -340,7 +341,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         border: [true, false, true, false],
         table: {
           dontBreakRows: true,
-          widths : ['auto', 'auto'],
+          widths: ['auto', 'auto'],
           body: this.totalVentasGrabadas_Iva()
         }
       }
@@ -349,8 +350,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   // Funcion que retornará los datos de las facturas y devoluciones del PDF
-  facturas(datos : any []){
-    let data : any = [];
+  facturas(datos: any[]) {
+    let data: any = [];
     for (let i = 0; i < datos.length; i++) {
       data.push([
         { text: moment(datos[i].fecha).format('YYYY-MM-DD'), margin: 5, border: [false, false, false, false], alignment: 'center', },
@@ -371,22 +372,22 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   // Funcion que retornará el total de facturas y devolucione
-  subTotalFacturacion() : number {
-    let total : number = 0;
-    total = this.dataPDF.reduce((a,b) => a + b.suma, 0);
+  subTotalFacturacion(): number {
+    let total: number = 0;
+    total = this.dataPDF.reduce((a, b) => a + b.suma, 0);
     return total;
   }
 
-  totalVentasGrabadas_Iva(){
-    let data : any = [];
+  totalVentasGrabadas_Iva() {
+    let data: any = [];
     data.push(
       [
         { border: [false, false, false, false], text: `Ventas Gravadas (Clientes con Iva):`, fontSize: 11 },
-        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.ventasGravadas().toFixed(2)))}` },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.ventasGravadas().toFixed(2)))}` },
       ],
       [
         { border: [false, false, false, false], text: `Ventas Exentas (Clientes sin Iva):`, fontSize: 11 },
-        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.ventasExentas().toFixed(2)))}` },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.ventasExentas().toFixed(2)))}` },
       ],
       [
         { border: [false, false, false, false], text: `Total IVA:`, fontSize: 11 },
@@ -394,7 +395,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       ],
       [
         { border: [false, false, false, false], text: `Ventas Excluidas (Retenciones):`, fontSize: 11 },
-        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ -${this.formatonumeros((this.ventasExcluidas().toFixed(2)))}` },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ -${this.formatonumeros((this.ventasExcluidas().toFixed(2)))}` },
       ],
       [
         { border: [false, false, false, false], text: `Total Descuento:`, fontSize: 11 },
@@ -410,7 +411,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       ],
       [
         { border: [false, false, false, false], text: `Total Facturación:`, fontSize: 11 },
-        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.totalFacturas().toFixed(2)))}` },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.totalFacturas().toFixed(2)))}` },
       ],
       [
         { border: [false, false, false, false], text: `Total Ventas del día:`, fontSize: 11 },
@@ -421,78 +422,78 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //
-  ventasGravadas() : number {
-    let total : number = 0;
-    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac == 'FA ' && x.indcpitra == '1').reduce((a,b) => a += (Math.abs(b.valortra)), 0) - this.ventasExentas() + this.descuentos();
+  ventasGravadas(): number {
+    let total: number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac == 'FA ' && x.indcpitra == '1').reduce((a, b) => a += (Math.abs(b.valortra)), 0) - this.ventasExentas() + this.descuentos();
     return total;
   }
 
   //
-  ventasExentas() : number {
-    let total : number = 0;
-    total = this.dataFacturacion.filter(x => x.notIva == true).reduce((a,b) => a += (Math.abs(b.suma)), 0);
+  ventasExentas(): number {
+    let total: number = 0;
+    total = this.dataFacturacion.filter(x => x.notIva == true).reduce((a, b) => a += (Math.abs(b.suma)), 0);
     console.log('ventas exentas:', total);
-    
+
     return total;
   }
 
   //
-  descuentos() : number {
-    let total : number = 0;
-    total = this.dataFacturacion.reduce((a,b) => a += b.descuentos, 0);
+  descuentos(): number {
+    let total: number = 0;
+    total = this.dataFacturacion.reduce((a, b) => a += b.descuentos, 0);
     return total;
   }
 
   //
-  ventasExcluidas() : number {
-    let total : number = 0;
-    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == "" && x.indcpitra == '1' && !['24080505', '143005', '612050', '41205005', '13050501', '422010'].includes(x.codicta.trim())).reduce((a,b) => a += (b.valortra), 0);
+  ventasExcluidas(): number {
+    let total: number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == "" && x.indcpitra == '1' && !['24080505', '143005', '612050', '41205005', '13050501', '422010'].includes(x.codicta.trim())).reduce((a, b) => a += (b.valortra), 0);
     return total;
   }
 
   //
-  ivaVentas() : number {
-    let total : number = 0;
-    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == "" && x.indcpitra == '1' && x.codicta.trim() == '24080505').reduce((a,b) => a += (Math.abs(b.valortra)), 0);
+  ivaVentas(): number {
+    let total: number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == "" && x.indcpitra == '1' && x.codicta.trim() == '24080505').reduce((a, b) => a += (Math.abs(b.valortra)), 0);
     return total;
   }
 
   //
-  totalVenta() : number {
-    let total : number = 0;
-    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == 'FA' && x.indcpitra == '2').reduce((a,b) => a += (+(b.valortra)), 0) + (this.totalDVS() + this.totalNVS()) ;
+  totalVenta(): number {
+    let total: number = 0;
+    total = this.transactions.filter(x => x.idfuente == 'FV' && x.tipofac.trim() == 'FA' && x.indcpitra == '2').reduce((a, b) => a += (+(b.valortra)), 0) + (this.totalDVS() + this.totalNVS());
     return total;
   }
 
   //
-  totalDVS() : number {
-    let total : number = 0;
-    total = this.dataFacturacion.filter(x => x.fuente == 'DV').reduce((a,b) => a += (+(b.suma)), 0);
+  totalDVS(): number {
+    let total: number = 0;
+    total = this.dataFacturacion.filter(x => x.fuente == 'DV').reduce((a, b) => a += (+(b.suma)), 0);
     return total;
   }
 
   //
-  totalNVS() : number {
-    let total : number = 0;
-    total = this.dataFacturacion.filter(x => x.fuente == 'NV').reduce((a,b) => a += (+(b.suma)), 0);
+  totalNVS(): number {
+    let total: number = 0;
+    total = this.dataFacturacion.filter(x => x.fuente == 'NV').reduce((a, b) => a += (+(b.suma)), 0);
     return total;
   }
 
-  subTotalVentasGrabadas() : number {
-    let total : number = 0;
-    total = this.dataPDF.reduce((a,b) => a + b.suma, 0) - (this.dataPDF.reduce((a,b) => a + b.suma, 0) * 0.19);
+  subTotalVentasGrabadas(): number {
+    let total: number = 0;
+    total = this.dataPDF.reduce((a, b) => a + b.suma, 0) - (this.dataPDF.reduce((a, b) => a + b.suma, 0) * 0.19);
     return total;
   }
 
   // Funcion que retornará el total de IVA
-  subTotalIva() : number {
-    let total : number = 0;
-    total = this.dataPDF.reduce((a,b) => a + b.suma, 0) * 0.19;
+  subTotalIva(): number {
+    let total: number = 0;
+    total = this.dataPDF.reduce((a, b) => a + b.suma, 0) * 0.19;
     return total;
   }
 
   //Función que cargará la facturacion detallada segun los filtros especificados
-  cargarFacturacionDetallada(fecha1 : any, fecha2 : any, ruta? : string){
+  cargarFacturacionDetallada(fecha1: any, fecha2: any, ruta?: string) {
     this.infoPdf = []
     this.zeusService.GetFacturacionDetallada(fecha1, fecha2, ruta).subscribe(resp => {
       this.infoPdf = resp;
@@ -501,66 +502,66 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //Función que cargará las devoluciones detalladas segun los filtros especificados
-  cargarDevolucionesDetalladas(fecha1 : any, fecha2 : any, indicadorCPI : any, ruta? : string){
+  cargarDevolucionesDetalladas(fecha1: any, fecha2: any, indicadorCPI: any, ruta?: string) {
     this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, indicadorCPI, ruta).subscribe(devoluciones => {
       devoluciones.forEach(dv => {
-        let vendedoresDv : any = {
-          idVendedor : dv.idvende,
-          vendedor : '',
-          cliente : dv.descritra,
-          fecha : dv.fechatra,
-          factura : dv.numefac,
-          factura2 : dv.idfuente,
-          item : '',
-          referencia : '',
-          presentacion : '',
-          cantidad : 1,
-          precio : (-(dv.valortra)),
-          valorTotal : (-(dv.valortra)),
+        let vendedoresDv: any = {
+          idVendedor: dv.idvende,
+          vendedor: '',
+          cliente: dv.descritra,
+          fecha: dv.fechatra,
+          factura: dv.numefac,
+          factura2: dv.idfuente,
+          item: '',
+          referencia: '',
+          presentacion: '',
+          cantidad: 1,
+          precio: (-(dv.valortra)),
+          valorTotal: (-(dv.valortra)),
         }
-        this.infoPdf.push(vendedoresDv); 
+        this.infoPdf.push(vendedoresDv);
       });
       this.colocarNombresVendedores();
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
-    }); 
+    });
   }
 
-  cargarDevolucionesDetalladas2(fecha1 : any, fecha2 : any, ruta? : string){
+  cargarDevolucionesDetalladas2(fecha1: any, fecha2: any, ruta?: string) {
     this.zeusService.getNuevaDevolucionConsolidada(fecha1, fecha2, ruta).subscribe(devoluciones => {
       devoluciones.forEach(dv => {
-        let vendedoresDv : any = {
-          idVendedor : dv.idVendedor,
-          vendedor : '',
-          cliente : dv.cliente,
-          fecha : dv.fecha,
-          factura : dv.factura,
-          factura2 : dv.idfuente,
-          item : dv.item,
-          referencia : dv.referencia,
-          presentacion : dv.presentacion,
-          cantidad : dv.devolucion,
-          precio : (-(dv.precio)),
-          valorTotal : (-(dv.suma)),
+        let vendedoresDv: any = {
+          idVendedor: dv.idVendedor,
+          vendedor: '',
+          cliente: dv.cliente,
+          fecha: dv.fecha,
+          factura: dv.factura,
+          factura2: dv.idfuente,
+          item: dv.item,
+          referencia: dv.referencia,
+          presentacion: dv.presentacion,
+          cantidad: dv.devolucion,
+          precio: (-(dv.precio)),
+          valorTotal: (-(dv.suma)),
         }
-        this.infoPdf.push(vendedoresDv); 
+        this.infoPdf.push(vendedoresDv);
       });
       this.colocarNombresVendedores();
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
-    }); 
+    });
   }
 
   //Función que colocará el nombre de los vendedores de los registros que vienen de las devoluciones en vacío.
-  colocarNombresVendedores(){
+  colocarNombresVendedores() {
     this.infoPdf.forEach(inf => {
       this.vendedores.forEach(ven => {
-        if(inf.idVendedor == ven.usua_Id && inf.vendedor == '') inf.vendedor = ven.usua_Nombre;
+        if (inf.idVendedor == ven.usua_Id && inf.vendedor == '') inf.vendedor = ven.usua_Nombre;
       });
     });
   }
 
   //Tabla de encabezado de los items de cada factura
-  headerItems(){
-    let data : any = [];
+  headerItems() {
+    let data: any = [];
     data.push([
       {
         margin: [5, 0],
@@ -570,14 +571,14 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
           widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
           body: [
             [
-              { text: `Fecha`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
-              { text: `Factura`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
-              { text: `Item`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
-              { text: `Referencia`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
-              { text: `Und`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
-              { text: `Cant.`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
-              { text: `Precio`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
-              { text: `Subtotal`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Fecha`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Factura`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Item`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Referencia`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Und`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Cant.`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Precio`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Subtotal`, alignment: 'left', fillColor: '#ccc', border: [false, false, false, false] },
             ]
           ]
         }
@@ -587,134 +588,134 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //Funcion que retornará el contenido del PDF detallado por vendedor
-  getFormatoPdfDetallado(){
-    if(this.infoPdf.length > 0) {
+  getFormatoPdfDetallado() {
+    if (this.infoPdf.length > 0) {
       this.onReject();
       this.cargando = true;
-      let vendedores : any = [];
+      let vendedores: any = [];
       let titulo = `Facturación Detallada x Dia`;
-      this.infoPdf.forEach(inf => { 
-        if(vendedores.map(v => v.id).indexOf(inf.idVendedor) == -1) {
-          vendedores.push({ id : inf.idVendedor, nombre : inf.vendedor, clientes : [] });
+      this.infoPdf.forEach(inf => {
+        if (vendedores.map(v => v.id).indexOf(inf.idVendedor) == -1) {
+          vendedores.push({ id: inf.idVendedor, nombre: inf.vendedor, clientes: [] });
         }
       });
-      setTimeout(() => { 
-        this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {}); 
+      setTimeout(() => {
+        this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {});
         this.cargando = false;
-      }, 1000); 
+      }, 1000);
     }
   }
 
   //.Función que llenará la tabla con los vendedores, y los valores totales de ventas y devoluciones
-  tablaVendedores(vendedores : any) {
-    let data : any = [];
+  tablaVendedores(vendedores: any) {
+    let data: any = [];
     for (let index = 0; index < vendedores.length; index++) {
       data.push([{
         margin: [5, 10],
-          fontSize: 10,
-          bold: true,
-          table: {
-            widths: ['100%'],
-            body: this.llenarTablaVendedores(vendedores[index])
-          }
+        fontSize: 10,
+        bold: true,
+        table: {
+          widths: ['100%'],
+          body: this.llenarTablaVendedores(vendedores[index])
+        }
       }]);
       data.push(
-        [{ margin: [10, 0, 10, 3], border: [false, true, false, false], alignment: 'right', fontSize: 9, bold: true, text: `Total Vendedor: $ ${this.formatonumeros((this.subTotalVendedor(vendedores[index].id)))}`, }], 
-        [{ margin: [10, 0, 10, 5], border: [false, true, false, false], alignment: 'right', color : 'red', fontSize: 9, bold: true, text: `Total DV: $ ${this.formatonumeros((this.subTotalDevolucionesVendedor(vendedores[index].id)))}`, },]
+        [{ margin: [10, 0, 10, 3], border: [false, true, false, false], alignment: 'right', fontSize: 9, bold: true, text: `Total Vendedor: $ ${this.formatonumeros((this.subTotalVendedor(vendedores[index].id)))}`, }],
+        [{ margin: [10, 0, 10, 5], border: [false, true, false, false], alignment: 'right', color: 'red', fontSize: 9, bold: true, text: `Total DV: $ ${this.formatonumeros((this.subTotalDevolucionesVendedor(vendedores[index].id)))}`, },]
       );
     }
-    if(vendedores.length > 1){
-     data.push(
-      [{ margin: [10, 3, 10, 2], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Facturación: $ ${this.formatonumeros((this.totalFacturacion()).toFixed(2))}`, }],
-      [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Devoluciones: $ -${this.formatonumeros((this.totalDV()).toFixed(2))}`, }],
-      [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Notas de Venta: $ -${this.formatonumeros((this.totalNV()).toFixed(2))}`, }],
-      [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()).toFixed(2))}`, }],
-     );
+    if (vendedores.length > 1) {
+      data.push(
+        [{ margin: [10, 3, 10, 2], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Facturación: $ ${this.formatonumeros((this.totalFacturacion()).toFixed(2))}`, }],
+        [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Devoluciones: $ -${this.formatonumeros((this.totalDV()).toFixed(2))}`, }],
+        [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Notas de Venta: $ -${this.formatonumeros((this.totalNV()).toFixed(2))}`, }],
+        [{ margin: [10, 3, 10, 1], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()).toFixed(2))}`, }],
+      );
     }
     return data;
   }
 
   //.Función que cargará el id y nombre en la tabla de vendedores
-  llenarTablaVendedores(vendedores : any) {
-    let array : any[] = [];
+  llenarTablaVendedores(vendedores: any) {
+    let array: any[] = [];
     array.push(
-      [{ text: `${vendedores.id} - ${vendedores.nombre}`, alignment: 'center',  fillColor: '#ccc', border: [true, true, true, true] }, ], 
+      [{ text: `${vendedores.id} - ${vendedores.nombre}`, alignment: 'center', fillColor: '#ccc', border: [true, true, true, true] },],
     )
     array.push([this.getClientesVendedor(vendedores)]);
     return array;
   }
-  
+
   //.Función que retornará los clientes y las facturas por vendedor en el rango de fechas especificado. 
-  getClientesVendedor(vendedores : any){
-    let data : any = [];
-    let clientes : any[] = this.infoPdf.filter(x => x.idVendedor == vendedores.id);  
+  getClientesVendedor(vendedores: any) {
+    let data: any = [];
+    let clientes: any[] = this.infoPdf.filter(x => x.idVendedor == vendedores.id);
     clientes.sort((a, b) => a.cliente > b.cliente ? 1 : a.cliente < b.cliente ? -1 : 0);
-    let clientesVendedor : any[] = [];
+    let clientesVendedor: any[] = [];
     let count = 0;
     for (let index = 0; index < clientes.length; index++) {
-      
-      if(!clientesVendedor.includes(clientes[index].factura)){
+
+      if (!clientesVendedor.includes(clientes[index].factura)) {
         clientesVendedor.push(clientes[index].factura);
         data.push(this.tablaClientesVendedor(clientes[index]));
       }
       count++
-      let cantFacturasCliente : number = clientes.filter(x => x.cliente == clientes[index].cliente).length; 
-      if(count == cantFacturasCliente) {
+      let cantFacturasCliente: number = clientes.filter(x => x.cliente == clientes[index].cliente).length;
+      if (count == cantFacturasCliente) {
         data.push(this.tablaTotalesCliente(clientes, clientes[index].cliente));
         count = 0;
-      } 
+      }
     }
     return data;
   }
 
   //.Función que llenará en la tabla los clientes y facturas de cada vendedor.
-  tablaClientesVendedor(clientes : any) {
-    let data : any[] = [];
+  tablaClientesVendedor(clientes: any) {
+    let data: any[] = [];
     data.push({
       margin: [0, 5, 0, 5],
-        fontSize: 9,
-        bold: true,
-        colSpan : 2,
-        table: {
-          dontBreakRows : true,
-          widths: ['100%'],
-          body: [
-            [{ text: `FV${clientes.factura} - ${clientes.cliente}`, alignment: 'left', border: [true, true, true, true] }],
-          ], 
-        }  
+      fontSize: 9,
+      bold: true,
+      colSpan: 2,
+      table: {
+        dontBreakRows: true,
+        widths: ['100%'],
+        body: [
+          [{ text: `FV${clientes.factura} - ${clientes.cliente}`, alignment: 'left', border: [true, true, true, true] }],
+        ],
+      }
     });
     data.push(this.getItemsClientesVendedor(clientes))
     return data;
   }
 
   //.Función que colocará los totales de la factura.
-  tablaTotalesCliente(items : any, cliente : any){  
+  tablaTotalesCliente(items: any, cliente: any) {
     return {
-     margin: [0, 0],
-       fontSize: 8,
-       bold: false,
-       table: {
-         widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
-         body: [
-           [
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: `left`, border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: `Total Cliente`, alignment: 'left', border: [false, true, false, false], bold : true, color : 'green'}, 
-             { text: `$${this.formatonumeros(items.filter(x => x.cliente == cliente).reduce((a,b) => a += b.valorTotal, 0))}`, alignment: 'left', border: [false, true, false, false], bold : true, color : 'green' }
-           ],
-         ],
-       }  
-    } 
+      margin: [0, 0],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
+        body: [
+          [
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: `left`, border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: `Total Cliente`, alignment: 'left', border: [false, true, false, false], bold: true, color: 'green' },
+            { text: `$${this.formatonumeros(items.filter(x => x.cliente == cliente).reduce((a, b) => a += b.valorTotal, 0))}`, alignment: 'left', border: [false, true, false, false], bold: true, color: 'green' }
+          ],
+        ],
+      }
+    }
   }
 
   //Función que cargará items que compró cada cliente y las facturas asociadas.
-  getItemsClientesVendedor(clientes : any){
-    let data : any = [];
-    let items : any[] = this.infoPdf.filter(x => x.idVendedor == clientes.idVendedor && x.cliente == clientes.cliente && x.factura == clientes.factura);
+  getItemsClientesVendedor(clientes: any) {
+    let data: any = [];
+    let items: any[] = this.infoPdf.filter(x => x.idVendedor == clientes.idVendedor && x.cliente == clientes.cliente && x.factura == clientes.factura);
     data.push(this.headerItems());
     for (let index = 0; index < items.length; index++) {
       data.push(this.tablaItemsClientesVendedor(items[index]));
@@ -724,107 +725,106 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //.Función que colocará la información de los items de cada factura en la tabla.
-  tablaItemsClientesVendedor(items : any){  
+  tablaItemsClientesVendedor(items: any) {
     return {
-     margin: [0, 0],
-       fontSize: 8,
-       bold: false,
-       table: {
-         widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
-         body: [
-           [
-             { text: `${items.fecha}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
-             { text: `${items.factura2}`, alignment: ['DV', 'NV'].includes(items.factura2) ? `center` : `left`, border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black`}, 
-             { text: `${items.item}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
-             { text: `${items.referencia}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
-             { text: `${items.presentacion}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
-             { text: `${this.formatonumeros(items.cantidad)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
-             { text: `${this.formatonumeros(items.precio)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` }, 
-             { text: `${this.formatonumeros(items.valorTotal)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black`},
-           ],
-         ],
-       }  
-    } 
+      margin: [0, 0],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
+        body: [
+          [
+            { text: `${items.fecha}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` },
+            { text: `${items.factura2}`, alignment: ['DV', 'NV'].includes(items.factura2) ? `center` : `left`, border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` },
+            { text: `${items.item}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` },
+            { text: `${items.referencia}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` },
+            { text: `${items.presentacion}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` },
+            { text: `${this.formatonumeros(items.cantidad)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` },
+            { text: `${this.formatonumeros(items.precio)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` },
+            { text: `${this.formatonumeros(items.valorTotal)}`, alignment: 'left', border: [false, false, false, false], color: ['DV', 'NV'].includes(items.factura2) ? `red` : `black` },
+          ],
+        ],
+      }
+    }
   }
 
   //.Función que colocará los totales de la factura.
-  tablaTotalesFactura(items : any){  
+  tablaTotalesFactura(items: any) {
     return {
-     margin: [0, 0],
-       fontSize: 8,
-       bold: false,
-       table: {
-         widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
-         body: [
-           [
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: `left`, border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: ``, alignment: 'left', border: [false, false, false, false], }, 
-             { text: `Total Factura`, alignment: 'left', border: [false, false, false, false], bold : true, }, 
-             { text: `$${this.formatonumeros(items.reduce((a,b) => a += b.valorTotal, 0),)}`, alignment: 'left', border: [false, false, false, false], bold : true, }
-           ],
-         ],
-       }  
-    } 
+      margin: [0, 0],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['12%', '8%', '7%', '38%', '5%', '8%', '10%', '12%'],
+        body: [
+          [
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: `left`, border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: ``, alignment: 'left', border: [false, false, false, false], },
+            { text: `Total Factura`, alignment: 'left', border: [false, false, false, false], bold: true, },
+            { text: `$${this.formatonumeros(items.reduce((a, b) => a += b.valorTotal, 0),)}`, alignment: 'left', border: [false, false, false, false], bold: true, }
+          ],
+        ],
+      }
+    }
   }
 
   //Total de facturación en el rango de fechas especificado
-  totalFacturacion(){
-    let total : number = 0;
-    total = this.infoPdf.filter(x => !['NV', 'DV'].includes(x.factura2)).reduce((a,b) => a + b.valorTotal, 0);
+  totalFacturacion() {
+    let total: number = 0;
+    total = this.infoPdf.filter(x => !['NV', 'DV'].includes(x.factura2)).reduce((a, b) => a + b.valorTotal, 0);
     return total;
   }
 
   //Total de devoluciones en el rango de fechas especificado
-  totalDevolucion(){
-    let total : number = 0;
-    total = this.infoPdf.filter(x => ['DV', 'NV'].includes(x.factura2)).reduce((a,b) => a + b.valorTotal, 0);
+  totalDevolucion() {
+    let total: number = 0;
+    total = this.infoPdf.filter(x => ['DV', 'NV'].includes(x.factura2)).reduce((a, b) => a + b.valorTotal, 0);
     return Math.abs(total);
   }
 
   //Total de devoluciones en el rango de fechas especificado
-  totalNV(){
-    let total : number = 0;
-    total = this.infoPdf.filter(x => ['NV'].includes(x.factura2)).reduce((a,b) => a + b.valorTotal, 0);
+  totalNV() {
+    let total: number = 0;
+    total = this.infoPdf.filter(x => ['NV'].includes(x.factura2)).reduce((a, b) => a + b.valorTotal, 0);
     return Math.abs(total);
   }
 
   //Total de devoluciones en el rango de fechas especificado
-  totalDV(){
-    let total : number = 0;
-    total = this.infoPdf.filter(x => ['DV'].includes(x.factura2)).reduce((a,b) => a + (b.valorTotal), 0);
+  totalDV() {
+    let total: number = 0;
+    total = this.infoPdf.filter(x => ['DV'].includes(x.factura2)).reduce((a, b) => a + (b.valorTotal), 0);
     return Math.abs(total);
   }
-
 
   //Total de facturación por vendedor
-  subTotalVendedor(vendedor : any){
-    let subtotal : number = 0;
-    subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal > 0).reduce((a,b) => a + b.valorTotal, 0);
+  subTotalVendedor(vendedor: any) {
+    let subtotal: number = 0;
+    subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal > 0).reduce((a, b) => a + b.valorTotal, 0);
     return subtotal;
   }
 
   //Total de devoluciones por vendedor
-  subTotalDevolucionesVendedor(vendedor : any){
-    let subtotal : number = 0;
-    subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal < 0).reduce((a,b) => a + b.valorTotal, 0);
+  subTotalDevolucionesVendedor(vendedor: any) {
+    let subtotal: number = 0;
+    subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal < 0).reduce((a, b) => a + b.valorTotal, 0);
     return subtotal;
   }
 
   //.Función que quitará el mensaje de elección de formatos.
   onReject = () => this.msg.clear('eleccion');
-  
+
   //Función que filtrará en la tabla de facturas cuando esta contenga información
-  aplicarfiltroFacturacion = ($event, campo : any, valorCampo : string) => this.dtFacturacion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltroFacturacion = ($event, campo: any, valorCampo: string) => this.dtFacturacion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //Función que filtrará en la tabla de devoluciones cuando esta contenga información
-  aplicarfiltroDevolucion = ($event, campo : any, valorCampo : string) => this.dtDevolucion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltroDevolucion = ($event, campo: any, valorCampo: string) => this.dtDevolucion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //Función que filtrará la información del array de facturas detalladas y cargará los items de la factura seleccionada. 
-  filtrarFactura(facturas : any){
+  filtrarFactura(facturas: any) {
     this.nroFactura = facturas.factura;
     this.modal = true;
     this.facturasModal = [];
@@ -832,192 +832,192 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //Función que cargará el total de facturas seleccionadas
-  totalFacturasModal = () => this.facturasModal.reduce((a, b) => a + b.valorTotal, 0); 
+  totalFacturasModal = () => this.facturasModal.reduce((a, b) => a + b.valorTotal, 0);
 
   //.Función que cargará las devoluciones agrupadas con o sin filtros de busqueda. 
-  editGroupedDevolutions(date1 : any, date2 : any, indCPI : number, ruta : any) {
+  editGroupedDevolutions(date1: any, date2: any, indCPI: number, ruta: any) {
     this.zeusService.GetDevolucionesDetalladas(date1, date2, indCPI, ruta).subscribe(devolutions => {
       devolutions.forEach(x => {
-        if(indCPI == 1) this.devolutionsIndicatorCPI1(x);
-        else if(indCPI == 2) this.devolutionsIndicatorCPI2(x);
+        if (indCPI == 1) this.devolutionsIndicatorCPI1(x);
+        else if (indCPI == 2) this.devolutionsIndicatorCPI2(x);
       });
     });
   }
 
   //.Función que cargará el nombre del cliente en la tabla de devoluciones.
-  putNameClients = (idClient : any, info : any) => this.zeusService.getClientesxId(idClient).subscribe(data => { info.cliente = data[0].razoncial; });
+  putNameClients = (idClient: any, info: any) => this.zeusService.getClientesxId(idClient).subscribe(data => { info.cliente = data[0].razoncial; });
 
   //Devoluciones que tienen el indicador CPI 1 - Valor plano
-  devolutionsIndicatorCPI1(x : any){
-    let vendedoresDv : any = {
-      'idVendedor' : x.idvende,
-      'vendedor' : '',
-      'cliente' : x.descritra,
-      'fecha' : x.fechatra,
-      'factura' : x.numefac,
-      'factura2' : x.idfuente,
-      'item' : '',
-      'referencia' : '',
-      'presentacion' : '',
-      'cantidad' : 1,
-      'precio' : (-(x.valortra)),
-      'valorTotal' : (-(x.valortra)),
-      'descuentos' : 0,
+  devolutionsIndicatorCPI1(x: any) {
+    let vendedoresDv: any = {
+      'idVendedor': x.idvende,
+      'vendedor': '',
+      'cliente': x.descritra,
+      'fecha': x.fechatra,
+      'factura': x.numefac,
+      'factura2': x.idfuente,
+      'item': '',
+      'referencia': '',
+      'presentacion': '',
+      'cantidad': 1,
+      'precio': (-(x.valortra)),
+      'valorTotal': (-(x.valortra)),
+      'descuentos': 0,
     }
-    this.infoPdf.push(vendedoresDv); 
+    this.infoPdf.push(vendedoresDv);
     this.colocarNombresVendedores();
     this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
   }
 
   //Devoluciones que tienen el indicador CPI 2 - Valor con retenciones
-  devolutionsIndicatorCPI2(x : any){
-    let info : any = {
-      'idCliente' : x.cliprv,
-      'cliente' : '',
-      'item' : '',
-      'referencia' : '',
-      'cantidad' : 0,
-      'devolucion' : 1,
-      'presentacion' : '',
-      'precio' : 0,
-      'subTotal' : 0,
-      'suma' : x.valortra,
-      'idVendedor' : x.idvende,
-      'vendedor' : '',
-      'fecha' : x.fechatra,
-      'factura' : x.numefac,
-      'recibo' : x.idfuente == 'DV' ? 'DEVOLUCIÓN' : 'NOTA DE VENTA',
-      'descuentos' : 0,
-      'fuente' : x.idfuente,
-      'table' : false,
+  devolutionsIndicatorCPI2(x: any) {
+    let info: any = {
+      'idCliente': x.cliprv,
+      'cliente': '',
+      'item': '',
+      'referencia': '',
+      'cantidad': 0,
+      'devolucion': 1,
+      'presentacion': '',
+      'precio': 0,
+      'subTotal': 0,
+      'suma': x.valortra,
+      'idVendedor': x.idvende,
+      'vendedor': '',
+      'fecha': x.fechatra,
+      'factura': x.numefac,
+      'recibo': x.idfuente == 'DV' ? 'DEVOLUCIÓN' : 'NOTA DE VENTA',
+      'descuentos': 0,
+      'fuente': x.idfuente,
+      'table': false,
     }
-    this.putNameClients(x.cliprv, info); 
-    setTimeout(() => { this.dataFacturacion.push(info); }, 500); 
+    this.putNameClients(x.cliprv, info);
+    setTimeout(() => { this.dataFacturacion.push(info); }, 500);
   }
 
   //Función que exportará un formato excel con los datos de los clientes
-    exportExcel(){
-      if(this.dataFacturacion.length > 0) {
-        this.cargando = true; 
-        this.loadSheetAndStyles(this.dataFacturacion.filter(x => x.table == true)); 
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
-    }
-  
-    //Función que cargará la hoja y los estilos. 
-    loadSheetAndStyles(data : any){  
-      let title : any = `Reporte de Facturación Consolidado`;  
-      title += ` ${moment().format('DD-MM-YYYY')}`
-      let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
-      let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
-      let font = { name: 'Calibri', family: 4, size: 11, bold: true };
-      let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
-      let workbook = this.svExcel.formatoExcel(title, true);
-  
-      this.addNewSheet(workbook, title, fill, border, font, alignment, data);
-      this.svExcel.creacionExcel(title, workbook);
-      setTimeout(() => { 
-        this.cargando = false;
-      }, 2000);
-    }
-  
-    //Función para agregar una nueva hoja de calculo.
-    addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
-      let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-      let worksheet : any = wb.worksheets[0];
-      this.loadStyleTitle(worksheet, title, fontTitle, alignment);
-      this.loadHeader(worksheet, fill, border, font, alignment);
-      this.loadInfoExcel(worksheet, this.dataExcel(data), border,  alignment);
-    }
-  
-    //Cargar estilos del titulo de la hoja.
-    loadStyleTitle(ws: any, title : any, fontTitle : any, alignment : any){
-      ws.getCell('A1').alignment = alignment;
-      ws.getCell('A1').font = fontTitle;
-      ws.getCell('A1').value = title;
-    }
-  
-    //Función para cargar los titulos de el header y los estilos.
-    loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-      let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5']; 
-      //ws.addRow([]);
-      ws.addRow(this.loadFieldsHeader());
-      
-      rowHeader.forEach(x => ws.getCell(x).fill = fill);
-      rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
-      rowHeader.forEach(x => ws.getCell(x).border = border);
-      rowHeader.forEach(x => ws.getCell(x).font = font);
-      ws.mergeCells('A1:I3');
-  
-      this.loadSizeHeader(ws);
-    }
-  
-    //Función para cargar el tamaño y el alto de las columnas del header.
-    loadSizeHeader(ws : any){
-      [5].forEach(x => ws.getColumn(x).width = 50);
-      [4,9].forEach(x => ws.getColumn(x).width = 40);
-      [1].forEach(x => ws.getColumn(x).width = 5);
-      [2,3,4,6,10,7].forEach(x => ws.getColumn(x).width = 15);
-      [8].forEach(x => ws.getColumn(x).width = 10);
-    }
-  
-   //Función para cargar los nombres de las columnas del header
-    loadFieldsHeader(){
-      let headerRow = [
-        'N°',
-        'Fecha',
-        'Factura',
-        'NIT/CC',
-        'Razón Social',
-        'Valor', 
-        'Tipo Doc.',
-        'Id Asesor', 
-        'Asesor',
-      ];
-      return headerRow;
-    }
-  
-    //Cargar información con los estilos al formato excel. 
-    loadInfoExcel(ws : any, data : any, border : any, alignment : any){
-      let contador : any = 6;
-      let formatNumber: Array<number> = [6];
-      formatNumber.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
-      let row : any = ['A','B','C','D','E','F','G','H','I']; 
-      
-      data.forEach(x => {
-        ws.addRow(x);
-        row.forEach(r => {
-          ws.getCell(`${r}${contador}`).border = border;
-          ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
-          ws.getCell(`${r}${contador}`).alignment = alignment;
-        });
-        contador++
-      }); 
-      row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
-    }
-  
-    //.Función que contendrá la info al documento excel. 
-    dataExcel(data : any){
-      let info : any = [];
-      let count : number = 0;
-      data.forEach(x => {
-        info.push([
-          count += 1,
-          x.fecha,
-          x.factura,
-          x.idCliente,
-          x.cliente,
-          x.suma,
-          x.documento,
-          x.idVendedor,
-          x.vendedor,
-        ]);
-      });
-      this.addTotal(info);
-      return info;
-    }
+  exportExcel() {
+    if (this.dataFacturacion.length > 0) {
+      this.cargando = true;
+      this.loadSheetAndStyles(this.dataFacturacion.filter(x => x.table == true));
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  }
 
-    //Agregar fila de totales al formato excel.
-  addTotal(info : any){
+  //Función que cargará la hoja y los estilos. 
+  loadSheetAndStyles(data: any) {
+    let title: any = `Reporte de Facturación Consolidado`;
+    title += ` ${moment().format('DD-MM-YYYY')}`
+    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
+    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    let workbook = this.svExcel.formatoExcel(title, true);
+
+    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
+    this.svExcel.creacionExcel(title, workbook);
+    setTimeout(() => {
+      this.cargando = false;
+    }, 2000);
+  }
+
+  //Función para agregar una nueva hoja de calculo.
+  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
+    let worksheet: any = wb.worksheets[0];
+    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
+    this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
+  }
+
+  //Cargar estilos del titulo de la hoja.
+  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
+    ws.getCell('A1').alignment = alignment;
+    ws.getCell('A1').font = fontTitle;
+    ws.getCell('A1').value = title;
+  }
+
+  //Función para cargar los titulos de el header y los estilos.
+  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
+    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5'];
+    //ws.addRow([]);
+    ws.addRow(this.loadFieldsHeader());
+
+    rowHeader.forEach(x => ws.getCell(x).fill = fill);
+    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
+    rowHeader.forEach(x => ws.getCell(x).border = border);
+    rowHeader.forEach(x => ws.getCell(x).font = font);
+    ws.mergeCells('A1:I3');
+
+    this.loadSizeHeader(ws);
+  }
+
+  //Función para cargar el tamaño y el alto de las columnas del header.
+  loadSizeHeader(ws: any) {
+    [5].forEach(x => ws.getColumn(x).width = 50);
+    [4, 9].forEach(x => ws.getColumn(x).width = 40);
+    [1].forEach(x => ws.getColumn(x).width = 5);
+    [2, 3, 4, 6, 10, 7].forEach(x => ws.getColumn(x).width = 15);
+    [8].forEach(x => ws.getColumn(x).width = 10);
+  }
+
+  //Función para cargar los nombres de las columnas del header
+  loadFieldsHeader() {
+    let headerRow = [
+      'N°',
+      'Fecha',
+      'Factura',
+      'NIT/CC',
+      'Razón Social',
+      'Valor',
+      'Tipo Doc.',
+      'Id Asesor',
+      'Asesor',
+    ];
+    return headerRow;
+  }
+
+  //Cargar información con los estilos al formato excel. 
+  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
+    let contador: any = 6;
+    let formatNumber: Array<number> = [6];
+    formatNumber.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
+    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold: true, });
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(data: any) {
+    let info: any = [];
+    let count: number = 0;
+    data.forEach(x => {
+      info.push([
+        count += 1,
+        x.fecha,
+        x.factura,
+        x.idCliente,
+        x.cliente,
+        x.suma,
+        x.documento,
+        x.idVendedor,
+        x.vendedor,
+      ]);
+    });
+    this.addTotal(info);
+    return info;
+  }
+
+  //Agregar fila de totales al formato excel.
+  addTotal(info: any) {
     info.push([
       '',
       '',
@@ -1031,6 +1031,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     ]);
   }
 
-  qtyTotal = () => this.dataFacturacion.filter(x => x.table == true).reduce((a,b) => a += b.suma, 0);
-  
+  qtyTotal = () => this.dataFacturacion.filter(x => x.table == true).reduce((a, b) => a += b.suma, 0);
+
 }

@@ -1,5 +1,3 @@
-
-
 <div class="fondo">
   <div class="d-flex justify-content-center overlay" *ngIf="load">
     <div style="margin: auto;">
@@ -11,7 +9,8 @@
     <div class="container-fluid">
       <!-- principal -->
       <div class="mb-4 Titulo">
-        <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-32"> Creación de Tintas</h2>
+        <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-32">
+          Creación de Tintas</h2>
       </div>
       <div class="mb-4">
         <hr class="colorLinea">
@@ -20,19 +19,25 @@
   </div>
 
   <div class="contain">
+    <!-- Contenido -->
     <p-card>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning"
+          [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial"
+          tooltipPosition="left"></p-button>
       </div>
       <!-- Inicio Botones que llaman el modal de crear materias primas y Crear tintas-->
       <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="intro">
-        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Tinta" class="p-button-danger" (click)="llamarModalCrearTintas()"></button>
-        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Materia Prima" class="p-button-danger" (click)="llamarModalMateriasPrimas()"></button>
+        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Tinta" class="p-button-danger"
+          (click)="llamarModalCrearTintas()"></button>
+        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Materia Prima"
+          class="p-button-danger" (click)="llamarModalMateriasPrimas()"></button>
       </div>
 
       <!--Titulo Asignación -->
       <div class="mb-3">
-        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-check-circle"></i> Creación de Tintas</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+            class="pi pi-check-circle"></i> Creación de Tintas</h4>
       </div>
       <br>
 
@@ -41,11 +46,20 @@
         <div class="mb-3" id="creacion-tintas">
           <div class="row g-4">
 
+            <!-- Fecha Inicial -->
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="dateIn">
+              <span class="p-float-label">
+                <p-calendar formControlName="dateIn" inputId="dateIn" [showIcon]="true" [required]="true"></p-calendar>
+                <label for="dateIn" >Fecha entrega</label>
+              </span>
+            </div>
+
             <!-- Tinta -->
-            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-4">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-search"></i>
-                <input formControlName="Tinta" id="Tinta" list="ListaTinta" type="text" pInputText (change)="buscarTintaSeleccionada()" required/>
+                <input formControlName="Tinta" id="Tinta" list="ListaTinta" type="text" pInputText
+                  (change)="buscarTintaSeleccionada()" [required]="true" />
                 <datalist id="ListaTinta">
                   <option value={{item.tinta_Id}} *ngFor="let item of tintas">{{item.tinta_Nombre}}</option>
                 </datalist>
@@ -56,15 +70,17 @@
             <!-- Cantidad -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="cantidadTinta" mode="decimal" inputId="CantidadTinta" [minFractionDigits]="2"></p-inputNumber>
+                <p-inputNumber formControlName="cantidadTinta" mode="decimal" inputId="CantidadTinta"
+                  [minFractionDigits]="2" [required]="true"></p-inputNumber>
                 <label for="CantidadTinta">Cantidad</label>
               </span>
             </div>
 
             <!-- Unidad de Medida -->
-            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
               <span class="p-float-label">
-                <p-dropdown formControlName="undMedTinta" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
+                <p-dropdown formControlName="undMedTinta" inputId="Und" [autoDisplayFirst]="false"
+                  [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id" [required]="true"></p-dropdown>
                 <label for="Und">Und</label>
               </span>
             </div>
@@ -72,7 +88,7 @@
             <!-- Observación -->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-xxl-4">
               <span class="p-float-label">
-                <textarea formControlName="Observacion" [rows]="1" inputId="Observacion"  pInputTextarea></textarea>
+                <textarea formControlName="Observacion" [rows]="1" inputId="Observacion" pInputTextarea></textarea>
                 <label for="Observacion">Observación</label>
               </span>
             </div>
@@ -81,19 +97,22 @@
         </div>
       </form>
 
+      <p-divider></p-divider>
+
       <!-- Titulo Materia Prima -->
       <div class="mb-4">
-        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Materia Prima</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
+          Materia Prima</h4>
       </div>
 
       <!-- Formulario de Materia Prima -->
-      <form [formGroup]="FormMateriaPrima" >
+      <form [formGroup]="FormMateriaPrima">
         <div class="mb-3" id="asig-matprima">
           <div class="row g-4">
             <!-- Id Materia Prima -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <input formControlName="idMateriaPrima" id="IdMP"  type="number" pInputText required/>
+                <input formControlName="idMateriaPrima" id="IdMP" type="number" pInputText required />
                 <label for="IdMP">Id</label>
               </span>
             </div>
@@ -101,7 +120,8 @@
             <!-- Nombre Materia Prima -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
               <span class="p-float-label">
-                <input formControlName="nombreMateriaPrima" id="MP"  list="materiaprima" type="text" pInputText (change)="buscarMpSeleccionada()" required/>
+                <input formControlName="nombreMateriaPrima" id="MP" list="materiaprima" type="text" pInputText
+                  (change)="buscarMpSeleccionada()" required />
                 <datalist id="materiaprima">
                   <option value={{item.matPrima}} *ngFor="let item of materiasPrimas">{{item.nombreMP}}</option>
                 </datalist>
@@ -112,7 +132,8 @@
             <!-- Stock de Materia Prima  -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="stockMateriaPrima" mode="decimal" inputId="Stock" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="stockMateriaPrima" mode="decimal" inputId="Stock"
+                  [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
                 <label for="Stock">Stock</label>
               </span>
             </div>
@@ -120,7 +141,8 @@
             <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="cantidadMateriaPrima" mode="decimal" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
+                <p-inputNumber formControlName="cantidadMateriaPrima" mode="decimal" inputId="Cantidad"
+                  [minFractionDigits]="2" (keyup.enter)="validarCamposMateriaPrima()"></p-inputNumber>
                 <label for="Cantidad">Cantidad</label>
               </span>
             </div>
@@ -128,7 +150,8 @@
             <!-- Unidad de Medida -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-dropdown formControlName="undMedMateriaPrima" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
+                <p-dropdown formControlName="undMedMateriaPrima" inputId="Und" [autoDisplayFirst]="false"
+                  [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
                 <label for="Und">Und</label>
               </span>
             </div>
@@ -138,8 +161,10 @@
         <!-- BOTONES -->
         <div class="mb-4" id="botones-add">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple label="Agregar Materia Prima" type="button" icon="pi pi-send" class="p-button-danger" (click)="validarCamposMateriaPrima()"></button>
-            <button pButton pRipple label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
+            <button pButton pRipple label="Agregar Materia Prima" type="button" icon="pi pi-send"
+              class="p-button-danger" (click)="validarCamposMateriaPrima()"></button>
+            <button pButton pRipple label="Limpiar Campos MP" type="button" class="p-button-secondary"
+              icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
           </div>
         </div>
       </form>
@@ -150,22 +175,16 @@
       </div>
 
       <div class="mb-4">
-        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de materias primas asignadas</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i>
+          Tabla de materias primas asignadas</h4>
       </div>
 
       <!-- TABLA DE Materias Primas Asignadas -->
-      <div class="mb-3" id="tabla">
+      <div class="mb-5" id="tabla">
         <div class="row g-3">
-          <p-table
-          #dt
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [paginator]="true"
-          [rows]="20"
-          [rowHover]="true"
-          [value]="ArrayMateriaPrima">
+          <p-table #dt [resizableColumns]="true" columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll"
+            [rowHover]="true" [value]="ArrayMateriaPrima">
             <ng-template pTemplate="header">
               <tr>
                 <th scope="col">ID</th>
@@ -175,25 +194,27 @@
                 <th scope="col" id="quitar-mp">Eliminar</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-ArrayMateriaPrima >
+            <ng-template pTemplate="body" let-ArrayMateriaPrima>
               <tr>
                 <td>{{ArrayMateriaPrima.Id}}</td>
                 <td>{{ArrayMateriaPrima.Nombre}}</td>
                 <td>{{ArrayMateriaPrima.Cant | number}}</td>
                 <td>{{ArrayMateriaPrima.UndCant}}</td>
-                <td ><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion2(ArrayMateriaPrima)"></i></td>
+                <td><i class="pi pi-trash cursor" title="Quitar Materia Prima"
+                    (click)="mostrarEleccion2(ArrayMateriaPrima)"></i></td>
               </tr>
             </ng-template>
           </p-table>
         </div>
       </div>
 
-      <br>
       <div class="mb-3" id="botones">
         <div class="row g-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="mostrarEleccion()"></button>
-            <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"></button>
+            <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check"
+              class="p-button-danger" (click)="mostrarEleccion()"></button>
+            <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser"
+              (click)="limpiarTodosLosCampos()"></button>
           </div>
         </div>
       </div>
@@ -211,10 +232,12 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="asignarMPCrearTintas()" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" pButton (click)="asignarMPCrearTintas()" icon="pi pi-check" label="Si"
+            class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('asignacion')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+          <button type="button" pButton (click)="onReject('asignacion')" icon="pi pi-cancel" label="No"
+            class="p-button-secondary"></button>
         </div>
       </div>
     </div>
@@ -231,10 +254,12 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="QuitarMateriaPrimaTabla(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" pButton (click)="QuitarMateriaPrimaTabla(mp)" icon="pi pi-check" label="Si"
+            class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('mp')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+          <button type="button" pButton (click)="onReject('mp')" icon="pi pi-cancel" label="No"
+            class="p-button-secondary"></button>
         </div>
       </div>
     </div>
@@ -242,11 +267,14 @@
 </p-toast>
 
 <!--Modal para crear tintas -->
-<p-dialog header="Crear Tinta" [(visible)]="componenteCrearTintas" [contentStyle]="{'overflow':'visible'}" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Crear Tinta" [(visible)]="componenteCrearTintas" [contentStyle]="{'overflow':'visible'}"
+  [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
   <app-crear-tintas></app-crear-tintas>
 </p-dialog>
 
 <!--Modal para crear materias primas -->
-<p-dialog header="Crear Materia Prima" [(visible)]="componenteCrearMateriasPrimas" [contentStyle]="{'overflow':'visible'}" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Crear Materia Prima" [(visible)]="componenteCrearMateriasPrimas"
+  [contentStyle]="{'overflow':'visible'}" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false"
+  [resizable]="false">
   <app-crear-materiaprima></app-crear-materiaprima>
 </p-dialog>

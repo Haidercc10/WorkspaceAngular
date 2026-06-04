@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -23,13 +23,14 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsAsignacionMateriaPrima as defaultSteps } from 'src/app/data';
 import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-asignacion-materia-prima',
   templateUrl: './asignacion-materia-prima.component.html',
   styleUrls: ['./asignacion-materia-prima.component.css']
 })
-export class AsignacionMateriaPrimaComponent implements OnInit {
+export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
   public FormMateriaPrimaRetiro !: FormGroup;
   public FormMateriaPrimaRetirada !: FormGroup;
@@ -60,6 +61,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   esSolicitud: boolean = false;
   arrayMatPrimas: any = [];
   hora: any = moment().format('H:mm:ss');
+  private destroy$ = new Subject<void>(); // Variable para manejar la destrucción de las subscripciones y evitar fugas de memoria
 
   constructor(private materiaPrimaService: MateriaPrimaService,
     private unidadMedidaService: UnidadMedidaService,
@@ -91,6 +93,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Maquina: [null, Validators.required],
       kgOt: [null, Validators.required],
       ObservacionRetiro: [''],
+      dateIn: [null, Validators.required],
     });
 
     this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
@@ -111,6 +114,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.consultarCategorias();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  // Función que se ejecutará al cerrar el componente para limpiar las subscripciones y evitar fugas de memoria
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -152,14 +161,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   limpiarCamposMP = () => this.FormMateriaPrimaRetirada.reset();
 
   //Funcion que va almacenar todas las unidades de medida existentes en la empresa
-  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => this.unidadMedida = data);
+  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().pipe(takeUntil(this.destroy$)).subscribe(data => this.unidadMedida = data);
 
   //Funcion que se encagará de obtener los procesos de la empresa
-  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(data => this.procesos = data.filter((item) => item.proceso_Id != 'TINTAS'));
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().pipe(takeUntil(this.destroy$)).subscribe(data => this.procesos = data.filter((item) => item.proceso_Id != 'TINTAS'));
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriaPrima() {
-    this.materiaPrimaService.getMpTintaBopp().subscribe(data => {
+    this.materiaPrimaService.getMpTintaBopp().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.materiaPrima = data.filter((item) => item.categoria != 6);
       this.materiaPrima.sort((a, b) => a.nombre.localeCompare(b.nombre));
     });
@@ -167,14 +176,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
   consultarCategorias() {
-    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => this.categoriasMP = datos);
-    this.tintasService.GetCategoriasTintas().subscribe(datos => this.categoriasTintas = datos);
+    this.materiaPrimaService.GetCategoriasMateriaPrima().pipe(takeUntil(this.destroy$)).subscribe(datos => this.categoriasMP = datos);
+    this.tintasService.GetCategoriasTintas().pipe(takeUntil(this.destroy$)).subscribe(datos => this.categoriasTintas = datos);
   }
 
   // Funcion que va a consultar la orden de trabajo para saber que cantidad de materia prima se ha asignado y que cantidad se ha devuelto con respecto a la cantidad que se debe hacer en kg
   infoOT() {
     let ot: string = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_procesos => {
+    this.bagProServices.srvObtenerListaClienteOT_Item(ot).pipe(takeUntil(this.destroy$)).subscribe(datos_procesos => {
       if (datos_procesos.length != 0) {
         for (let index = 0; index < datos_procesos.length; index++) {
           let adicional: number = datos_procesos[index].datosotKg * 0.05;
@@ -189,7 +198,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   cargarInformacionOT(ot: string, datos_procesos) {
-    this.detallesAsignacionService.GetPolietilenoAsignada(parseInt(ot)).subscribe(datos_asignacion => {
+    this.detallesAsignacionService.GetPolietilenoAsignada(parseInt(ot)).pipe(takeUntil(this.destroy$)).subscribe(datos_asignacion => {
       this.cantRestante = this.kgOT - datos_asignacion;
 
       let info: any = {
@@ -213,7 +222,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(dato: number) {
     let id: number = dato == 1 ? this.FormMateriaPrimaRetirada.value.MpIdRetirada : this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
-    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
+    this.materiaPrimaService.getInfoMpTintaBopp(id).pipe(takeUntil(this.destroy$)).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
         if (this.categoriasMP.includes(datos_materiaPrima[i].categoria) || this.categoriasTintas.includes(datos_materiaPrima[i].categoria)) {
           if (![84, 2001, 88, 89, 2072].includes(datos_materiaPrima[i].id)) {
@@ -301,8 +310,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.soloTintas = true;
           this.crearAsignacion();
         } else {
-          if (![1,104].includes(this.ValidarRol)) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
-          else if ([1,104].includes(this.ValidarRol)) this.confirmarAsignacion(idOrdenTrabajo);
+          if (![1, 104].includes(this.ValidarRol)) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
+          else if ([1, 104].includes(this.ValidarRol)) this.confirmarAsignacion(idOrdenTrabajo);
         }
       }
     } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
@@ -322,8 +331,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Estado_OrdenTrabajo: 14,
       AsigMp_Hora: moment().format('H:mm:ss'),
       SolMpExt_Id: this.FormMateriaPrimaRetiro.value.Solicitud == null || this.FormMateriaPrimaRetiro.value.Solicitud == "" ? 1 : this.FormMateriaPrimaRetiro.value.Solicitud,
+      AsigMp_FechaRealEntrega: moment(this.FormMateriaPrimaRetiro.value.dateIn).format('YYYY-MM-DD'),
     }
-    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe((datos) => this.obtenerProcesoId(datos.asigMp_Id), () => {
+    this.asignacionMPService.srvGuardar(datosAsignacion).pipe(takeUntil(this.destroy$)).subscribe((datos) => this.obtenerProcesoId(datos.asigMp_Id), () => {
       this.mensajeService.mensajeError(`¡Error!`, `¡Error al crear la asignación de materia prima!`);
       this.load = true;
     });
@@ -376,7 +386,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       UndMed_Id: presentacion,
       Proceso_Id: proceso,
     }
-    this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(null, () => {
+    this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
       this.load = true;
       this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${nombreMatPrima}!`);
     });
@@ -402,7 +412,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
   moverInventarioMpPedida(idMateriaPrima: number, cantidadMateriaPrima: number) {
-    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
+    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).pipe(takeUntil(this.destroy$)).subscribe(datos_materiaPrima => {
       const datosMP: any = {
         MatPri_Id: idMateriaPrima,
         MatPri_Nombre: datos_materiaPrima.matPri_Nombre,
@@ -417,7 +427,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         MatPri_PrecioEstandar: datos_materiaPrima.matPri_PrecioEstandar,
         SubCatMP_Id: datos_materiaPrima.subCatMP_Id
       }
-      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(null, () => {
+      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
         this.load = true;
         this.mensajeService.mensajeError(`¡Error!`, `¡Error al mover el inventario de la materia prima ${datos_materiaPrima.matPri_Nombre}!`);
       });
@@ -442,7 +452,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         Tinta_Hora: datos_tintas.tinta_Hora,
         Tinta_PrecioEstandar: datos_tintas.tinta_PrecioEstandar,
       }
-      this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(null, () => {
+      this.tintasService.srvActualizar(idMateriaPrima, datosTintas).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
         this.load = true;
         this.mensajeService.mensajeError(`¡Error!`, `¡Error al mover el inventario de la tinta ${datos_tintas.tinta_Nombre}!`);
       });
@@ -466,17 +476,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.arrayMatPrimas = [];
     let solicitud: number = this.FormMateriaPrimaRetiro.value.Solicitud;
     this.esSolicitud = false;
-    if (solicitud != null) {
-      this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).subscribe(data => {
+
+    if (solicitud) {
+      this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).pipe(takeUntil(this.destroy$)).subscribe(data => {
+        console.log(data)
         if (data.length > 0) {
-          if (data[0].estado != 4 && data[0].estado != 5) {
+          if (![4,5].includes(data[0].estado)) {
             this.load = false;
-            this.FormMateriaPrimaRetiro.patchValue({ OTRetiro: data[0].ot, Maquina: data[0].maquina, ObservacionRetiro: data[0].observacion, })
-            setTimeout(() => {
-              this.infoOT();
-              this.esSolicitud = true;
-            }, 1000);
-            data.forEach(sol => this.llenarTablaMpConSolitudMP(sol));
+            this.llenarDatosAsignacion(data);
           } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible cargar solicitudes finalizadas o canceladas!`);
         } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} no existe!`);
       }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la solicitud de material consultada!`));
@@ -484,21 +491,35 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     setTimeout(() => this.load = true, 1500);
   }
 
+  // Función que llenará los campos de la asignación con la información de la solicitud consultada
+  llenarDatosAsignacion(data: any) {
+    this.FormMateriaPrimaRetiro.patchValue({ 
+      'OTRetiro': data[0].ot, 
+      'Maquina': data[0].maquina, 
+      'ObservacionRetiro': data[0].observacion, 
+    });
+    //setTimeout(() => {
+      this.infoOT();
+      this.esSolicitud = true;  
+    //}, 1000);
+    data.forEach((sol : any) => this.llenarTablaMpConSolitudMP(sol));
+  }
+
   /** Llenar la tabla de materias primas seleccionadas con la info de la solicitud. */
   llenarTablaMpConSolitudMP(datos_solicitud: any) {
-    let arrayIds: any = [];
+    //let arrayIds: any = [];
     let info: any = {
-      IdSolicitud: datos_solicitud.id,
-      Id: 0,
-      Id_Mp: datos_solicitud.matPrima_Id,
-      Id_Tinta: datos_solicitud.tinta_Id,
-      Nombre: '',
-      Stock: 0,
-      Cantidad: datos_solicitud.cantidad,
-      CantAprobada: 0,
-      CantOculta: datos_solicitud.cantidad,
-      Und_Medida: datos_solicitud.medida,
-      Proceso: '',
+      'IdSolicitud': datos_solicitud.id,
+      'Id': 0,
+      'Id_Mp': datos_solicitud.matPrima_Id,
+      'Id_Tinta': datos_solicitud.tinta_Id,
+      'Nombre': '',
+      'Stock': 0,
+      'Cantidad': datos_solicitud.cantidad_Restante,
+      'CantAprobada': datos_solicitud.cantidad_Entregada,
+      'CantOculta': datos_solicitud.cantidad_Pedida,
+      'Und_Medida': datos_solicitud.medida,
+      'Proceso': '',
     }
     if (info.Id_Mp != 84) {
       info.Id = info.Id_Mp;
@@ -511,12 +532,15 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       info.Stock = datos_solicitud.stock_Tinta;
       info.Proceso = 'IMP';
     }
-    arrayIds.push(info.Id);
-    this.llenarInformacionSolicitud(info, arrayIds);
+    //arrayIds.push(info.Id);
+    //this.llenarInformacionSolicitud(info, arrayIds);
+    this.materiasPrimasSeleccionadas.push(info);
+    console.log(this.materiasPrimasSeleccionadas);
+    
   }
 
   llenarInformacionSolicitud(info: any, arrayIds: any[]) {
-    this.servicioDetAsigMatPrima.GetAsignacionesConSolicitudes(info.IdSolicitud).subscribe(data2 => {
+    this.servicioDetAsigMatPrima.GetAsignacionesConSolicitudes(info.IdSolicitud).pipe(takeUntil(this.destroy$)).subscribe(data2 => {
       for (let i = 0; i < data2.length; i++) {
         let infoAsignaciones: any = {
           Ident: 0,
@@ -526,7 +550,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         }
         if (infoAsignaciones.Id_Mp != 84) infoAsignaciones.Ident = infoAsignaciones.Id_Mp;
         else if (infoAsignaciones.Id_Tinta != 2001) infoAsignaciones.Ident = infoAsignaciones.Id_Tinta;
-        if (arrayIds.includes(infoAsignaciones.Ident)) info.CantAprobada = infoAsignaciones.CantAsignaciones;
+        if (arrayIds.includes(infoAsignaciones.Ident)) {
+          info.CantAprobada = infoAsignaciones.CantAsignaciones;
+          info.Cantidad -= infoAsignaciones.CantAsignaciones;
+        } 
       }
     });
     this.arrayMatPrimas.push(info.Id);
@@ -571,7 +598,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   actualizarEstadoSolicitud(estado: number) {
     let solicitud_Id: number = this.FormMateriaPrimaRetiro.value.Solicitud;
 
-    this.servicioSolitudMaterial.GetId(solicitud_Id).subscribe(data => {
+    this.servicioSolitudMaterial.GetId(solicitud_Id).pipe(takeUntil(this.destroy$)).subscribe(data => {
       let modelo: modelSolicitudMP_Extrusion = {
         SolMpExt_Id: solicitud_Id,
         SolMpExt_OT: data.solMpExt_OT,
@@ -583,7 +610,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         Proceso_Id: data.proceso_Id,
         Usua_Id: data.usua_Id
       }
-      this.servicioSolitudMaterial.Put(modelo.SolMpExt_Id, modelo).subscribe(() => this.mensajeService.mensajeConfirmacion(`Confirmación`, `Asignación creada exitosamente!`),
+      this.servicioSolitudMaterial.Put(modelo.SolMpExt_Id, modelo).pipe(takeUntil(this.destroy$)).subscribe(() => this.mensajeService.mensajeConfirmacion(`Confirmación`, `Asignación creada exitosamente!`),
         () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la asignación de materia prima!`));
     })
   }
@@ -593,7 +620,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let salidaReal: number = 0;
     this.materiasPrimasSeleccionadas.forEach(mp => {
       mp.Cantidad2 = mp.Cantidad;
-      this.srvMovEntradasMP.GetInventarioxMaterial(mp.Id).subscribe(data => {
+      this.srvMovEntradasMP.GetInventarioxMaterial(mp.Id).pipe(takeUntil(this.destroy$)).subscribe(data => {
         if (data.length > 0) {
           data.forEach(mov => {
             let detalle: modeloMovimientos_Entradas_MP = {
@@ -614,7 +641,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               'Hora_Entrada': mov.hora_Entrada,
               'Precio_EstandarUnitario': mov.precio_EstandarUnitario
             }
-            let id : number | undefined = detalle.Id;
+            let id: number | undefined = detalle.Id;
             if (mp.Cantidad2 > 0) {
               if (mp.Cantidad2 > detalle.Cantidad_Disponible) {
                 salidaReal = detalle.Cantidad_Disponible;
@@ -636,8 +663,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 mp.Cantidad2 = 0;
               }
               if (id !== undefined) {
-                this.srvMovEntradasMP.Put(id, detalle).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
-                this.crearRegistrosSalidasMP(detalle, salidaReal, idAsignacion);  
+                this.srvMovEntradasMP.Put(id, detalle).pipe(takeUntil(this.destroy$)).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
+                this.crearRegistrosSalidasMP(detalle, salidaReal, idAsignacion);
               }
             }
           })
@@ -665,6 +692,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       'Cant_PedidaOT': this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].cantPedida,
       'UndMed_Id': this.infoOrdenTrabajo[0] == undefined ? 'Kg' : this.infoOrdenTrabajo[0].und,
     }
-    this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
+    this.srvMovSalidasMP.Post(salidas).pipe(takeUntil(this.destroy$)).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
   }
 }

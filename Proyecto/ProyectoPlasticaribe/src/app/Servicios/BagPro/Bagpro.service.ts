@@ -155,6 +155,8 @@ export class BagproService {
 
   srvObtenerItemsBagproXClienteItem = (codigo : any[], sales? : string) => this.http.post<any>(this.rutaBagPro + `/ClientesOtItems/OtItem${sales}`, codigo);
 
+  OtItem2 = (codigo : any[], sales? : string) => this.http.post<any>(this.rutaBagPro + `/ClientesOtItems/OtItem2${sales}`, codigo);
+
   LikeReferencia = (ref : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/likeReferencia/${ref}`);
 
   CalcularKilosItem = (items : any[]) => this.http.post<any>(this.rutaBagPro + `/ClientesOtItems/CalcularKilosItem`, items);
@@ -185,7 +187,7 @@ export class BagproService {
   GetHorarioProceso = (proceso : string) : Observable<string> => this.http.get<string>(`${this.rutaBagPro}/Horarios/getHorarioProceso/${proceso}`);
 
   /***************************************************************** PRUEBA *********************************************************************/
-  Prueba(){
+  /*Prueba(){
    return this.http.get(this.rutaBagPro + `/ClientesOt/Prueba`, { responseType: 'arraybuffer'}).subscribe((pdfData :  ArrayBuffer) => {
       console.log(pdfData)
       let blob = new Blob([pdfData], { type : 'application/pdf' });
@@ -201,5 +203,5 @@ export class BagproService {
         console.log('hola')
       }, 7000);
     });
-  }
+  }*/
 }

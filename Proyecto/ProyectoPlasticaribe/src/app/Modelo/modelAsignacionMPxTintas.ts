@@ -8,4 +8,5 @@ export interface modelAsignacionMPxTintas {
   Usua_Id : number;
   Estado_Id : number;
   AsigMPxTinta_Hora : string;
+  AsigMPxTinta_FechaRealEntrega? : any;
 }

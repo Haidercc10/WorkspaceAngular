@@ -370,27 +370,15 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.productionProcessSerivce.getProductsOFDirect(production, orderFact).subscribe(data => {
       let productionFound: number = data[0].pp.numeroRollo_BagPro;
       if (productionFound == production) {
-        //this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
         this.sendProductionZeus.push(data[0]);
         let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
         this.sendProductionZeus[i].dataExtrusion = {
           'numero_RolloBagPro': production,
-          //'precioProducto': data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
-          //'extrusion_Ancho1': res[0].ancho1_Extrusion,
-          //'extrusion_Ancho2': res[0].ancho2_Extrusion,
-          //'extrusion_Ancho3': res[0].ancho3_Extrusion,
-          //'undMed_Id': res[0].und_Extrusion,
-          //'extrusion_Calibre': res[0].calibre_Extrusion,  
-          //'material': res[0].material,
           'ofDirect': true,
         };
         this.sendProductionZeus[i].position = this.sendProductionZeus.length;
         this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
         this.validateItemsToDispatch(data);
-        //}, error => {
-        //  this.clearFieldProduction();
-        //  console.log(error);
-        //});
       } else this.clearFieldProduction();
     }, error => {
       this.errorMessage(`No se encontró información del rollo/bulto ${production} de la OF N° ${orderFact}!`, error);
@@ -427,26 +415,15 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     if (production) {
       let orderFact = this.formProduction.value.orderFact;
       this.productionProcessSerivce.GetInformationAboutProductionToSend(production, orderFact).subscribe(data => {
-        //this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
         this.sendProductionZeus.push(data[0]);
         let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
         this.sendProductionZeus[i].dataExtrusion = {
           numero_RolloBagPro: production,
-          //precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
-          //extrusion_Ancho1: res[0].ancho1_Extrusion,
-          //extrusion_Ancho2: res[0].ancho2_Extrusion,
-          //extrusion_Ancho3: res[0].ancho3_Extrusion,
-          //undMed_Id: res[0].und_Extrusion,
-          //extrusion_Calibre: res[0].calibre_Extrusion,
-          //material: res[0].material,
         };
         this.sendProductionZeus[i].position = this.sendProductionZeus.length;
         this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
         this.consolidateItems();
         this.enabledFieldRoll();
-        //}, error => {
-        //  this.enabledFieldRoll();
-        //});
       }, error => {
         this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`, error);
         this.enabledFieldRoll();
@@ -589,7 +566,13 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         'Cantidad': x.pp.presentacion == 'Kg' ? x.pp.peso_Neto : x.pp.cantidad,
         'Presentacion': x.pp.presentacion,
         'Consecutivo_Pedido': (x.salesOrder).toString(),
-        'Estado_Id': 20
+        'Estado_Id': 20, 
+        Pallet_Id: x.palletId ? x.palletId : null,
+        OT: x.otId ? x.otId : null,
+        Peso_Bruto: x.pp.peso_Bruto ? x.pp.peso_Bruto : null,
+        Peso_Neto: x.pp.peso_Neto ? x.pp.peso_Neto : null,
+        Ubicacion: x.ubicacion ? x.ubicacion : null,
+
       }
       this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
         //count++;

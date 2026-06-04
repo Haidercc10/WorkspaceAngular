@@ -140,23 +140,23 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     else {
       this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(production, searchInTable).subscribe(data => {
         if (data[0].proceso.proceso_Id != 'WIKE') {
-          this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
+          //this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
             this.sendProductionZeus.push(data[0]);
             let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
             this.sendProductionZeus[i].dataExtrusion = {
               numero_RolloBagPro: production,
-              precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
-              extrusion_Ancho1: res[0].ancho1_Extrusion,
-              extrusion_Ancho2: res[0].ancho2_Extrusion,
-              extrusion_Ancho3: res[0].ancho3_Extrusion,
-              undMed_Id: res[0].und_Extrusion,
-              extrusion_Calibre: res[0].calibre_Extrusion,
-              material: res[0].material,
+              //precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
+              //extrusion_Ancho1: res[0].ancho1_Extrusion,
+              //extrusion_Ancho2: res[0].ancho2_Extrusion,
+              //extrusion_Ancho3: res[0].ancho3_Extrusion,
+              //undMed_Id: res[0].und_Extrusion,
+              //extrusion_Calibre: res[0].calibre_Extrusion,
+              //material: res[0].material,
             }
             this.sendProductionZeus[i].position = this.sendProductionZeus.length;
             this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
             this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-          }, error => { this.msj.mensajeError(`Error`, `No fue posible consultar la OT N° ${data[0].pp.ot} en BagPro | ${error.status} ${error.statusText}`) });
+          //}, error => { this.msj.mensajeError(`Error`, `No fue posible consultar la OT N° ${data[0].pp.ot} en BagPro | ${error.status} ${error.statusText}`) });
         } else this.msj.mensajeError(`Advertencia`, `No es posible ingresar rollos/bultos del proceso de 'WIKETIADO'!`);
         //}, () => this.lookingForDataInBagpro(production));
       }, () => this.warningNotFound(production));
@@ -232,7 +232,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let presentation: string = this.validatePresentation(data.pp.presentacion);
     let reel: number = data.pp.numero_Rollo;
     let quantity: number = presentation != 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
-    let price: number = data.dataExtrusion.precioProducto;
+    let price: number = data.pp.precioVenta_Producto //data.dataExtrusion.precioProducto;
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, data.pp.numeroRollo_BagPro, quantity.toString(), price.toString()).subscribe(() => {
       this.saveDataEntrace(data);
     }, error => {
@@ -251,11 +251,12 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     return processMapping[process];
   }
 
-  validatePresentation(presentation: 'Und' | 'Kg' | 'Paquete'): 'UND' | 'KLS' | 'PAQ' {
+  validatePresentation(presentation: 'Und' | 'Kg' | 'Paquete' | 'MTS'): 'UND' | 'KLS' | 'PAQ' | 'MTS' {
     let presentations: any = {
       'Und': 'UND',
       'Kg': 'KLS',
       'Paquete': 'PAQ',
+      'MTS': 'MTS',
     }
     return presentations[presentation];
   }

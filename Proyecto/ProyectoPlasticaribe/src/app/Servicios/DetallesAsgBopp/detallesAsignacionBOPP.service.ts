@@ -18,4 +18,6 @@ export class DetalleAsignacion_BOPPService {
 
   GetBiorientadoAsignado = (ot : number) : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/getBiorientadoAsignado/${ot}`);
 
+  postMasivo = (data: any): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_BOPP/postMasivo', data);
+
 }

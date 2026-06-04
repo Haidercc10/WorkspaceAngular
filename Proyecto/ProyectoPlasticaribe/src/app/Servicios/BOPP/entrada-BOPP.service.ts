@@ -46,4 +46,5 @@ export class EntradaBOPPService {
 
   getEntryBOPP = (date1 : any, date2 : any, hour : string):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getEntryBOPP/${date1}/${date2}/${hour}`);
 
+  getSerialesBopp = (data: any): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/BOPP/getSerialesBopp', data);
 }

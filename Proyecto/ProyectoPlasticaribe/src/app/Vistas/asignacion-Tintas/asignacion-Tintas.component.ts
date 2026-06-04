@@ -41,7 +41,7 @@ export class AsignacionTintasComponent implements OnInit {
   mpSeleccionada: any = [];
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   hora: any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual
-  esError: boolean = false;
+  esError: boolean = false; //Variable que se usará para validar si se ha presentado un error en alguna consulta o acción y mostrar un mensaje de error en la vista
 
   constructor(private AppComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -63,7 +63,8 @@ export class AsignacionTintasComponent implements OnInit {
       cantidadTinta: [null, Validators.required],
       undMedTinta: [null, Validators.required],
       Observacion: [null],
-      Fecha: [null, Validators.required],
+      Fecha: [null,],
+      dateIn: [null, Validators.required],
     });
 
     this.FormMateriaPrima = this.frmBuilder.group({
@@ -133,7 +134,7 @@ export class AsignacionTintasComponent implements OnInit {
   obtenerMateriaPrima = () => this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(data => this.materiasPrimas = data.filter((item) => ![84, 2001, 88, 89, 2072].includes(item.matPrima)));
 
   //Funcion para  obtener las unidades de medidas
-  obtenerUnidadesMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos => this.unidadMedida = datos);
+  obtenerUnidadesMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos => this.unidadMedida = datos.filter((item) => item.undMed_Id == 'Kg'));
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
   buscarMpSeleccionada() {
@@ -192,23 +193,26 @@ export class AsignacionTintasComponent implements OnInit {
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
   asignarMPCrearTintas() {
     this.onReject('asignacion');
-    if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
-      this.load = true;
-      let info: modelAsignacionMPxTintas = {
-        AsigMPxTinta_Id: 0,
-        Tinta_Id: this.FormAsignacionMP.value.Id_Tinta,
-        AsigMPxTinta_Cantidad: this.FormAsignacionMP.value.cantidadTinta,
-        UndMed_Id: this.FormAsignacionMP.value.undMedTinta,
-        AsigMPxTinta_FechaEntrega: this.today,
-        AsigMPxTinta_Observacion: this.FormAsignacionMP.value.Observacion == null ? '' : this.FormAsignacionMP.value.Observacion,
-        Usua_Id: this.storage_Id,
-        Estado_Id: 13,
-        AsigMPxTinta_Hora: moment().format('H:mm:ss'),
-      }
-      this.asignacionMPxTintas.srvGuardar(info).subscribe(() => this.obtenerUltimoIdAsignacion(), error => {
-        this.mensajeService.mensajeError(`¡Error al registrar la creación de tinta!`, error.message);
-        this.load = false;
-      });
+    if (this.FormAsignacionMP.valid) {
+      if (this.ArrayMateriaPrima.length > 0) {
+        this.load = true;
+        let info: modelAsignacionMPxTintas = {
+          AsigMPxTinta_Id: 0,
+          Tinta_Id: this.FormAsignacionMP.value.Id_Tinta,
+          AsigMPxTinta_Cantidad: this.FormAsignacionMP.value.cantidadTinta,
+          UndMed_Id: this.FormAsignacionMP.value.undMedTinta,
+          AsigMPxTinta_FechaEntrega: this.today,
+          AsigMPxTinta_Observacion: this.FormAsignacionMP.value.Observacion == null ? '' : this.FormAsignacionMP.value.Observacion,
+          Usua_Id: this.storage_Id,
+          Estado_Id: 13,
+          AsigMPxTinta_Hora: moment().format('H:mm:ss'),
+          AsigMPxTinta_FechaRealEntrega: this.FormAsignacionMP.value.dateIn
+        }
+        this.asignacionMPxTintas.srvGuardar(info).subscribe(() => this.obtenerUltimoIdAsignacion(), error => {
+          this.mensajeService.mensajeError(`¡Error al registrar la creación de tinta!`, error.message);
+          this.load = false;
+        });
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe asignar al menos una materia prima para crear la tinta!");
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
 
@@ -405,7 +409,7 @@ export class AsignacionTintasComponent implements OnInit {
                 detalle.Estado_Id = 19;
                 mp.Cantidad2 = 0;
               }
-              if(detalle.Id != null) {
+              if (detalle.Id != null) {
                 this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(null, () => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`) });
                 this.crearRegistrosSalidasMP(detalle, salidaReal, idAsignacion);
               }

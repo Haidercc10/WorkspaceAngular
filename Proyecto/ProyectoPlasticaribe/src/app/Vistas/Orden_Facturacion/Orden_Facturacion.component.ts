@@ -866,7 +866,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   tableConsolidated(data) {
     let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Peso B.', 'Peso N.', 'Rollos', 'Cantidad', 'Unidad'];
-    let widths: Array<string> = ['2%', '12%', '6%', '40%', '8%', '8%', '5%', '12%', '7%'];
+    let widths: Array<string> = ['4%', '7%', '7%', '40%', '8%', '8%', '7%', '12%', '7%'];
     return {
       table: {
         headerRows: 2,
@@ -884,7 +884,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   tableProducts(data) {
     let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso'.replace('Peso', 'Peso B.'), 'Cantidad', 'Unidad', 'Ubicación'];
-    let widths: Array<string> = ['3%', '7%', '7%', '7%', '38%', '6%', '8%', '7%', '17%'];
+    let widths: Array<string> = ['4%', '8%', '7%', '7%', '36%', '7%', '8%', '7%', '16%'];
     return {
       margin: [0, 10],
       table: {
@@ -948,7 +948,7 @@ export class Orden_FacturacionComponent implements OnInit {
       fontSize: 8,
       bold: false,
       table: {
-        widths: ['2%', '12%', '6%', '40%', '8%', '8%', '5%', '12%', '7%'],
+        widths: ['4%', '7%', '7%', '40%', '8%', '8%', '7%', '12%', '7%'],
         body: [
           [
             { text: ``, alignment: 'center', border: [true, false, false, true], },
@@ -1550,7 +1550,7 @@ export class Orden_FacturacionComponent implements OnInit {
       fontSize: 8,
       bold: false,
       table: {
-        widths: ['2%', '12%', '6%', '40%', '8%', '8%', '5%', '12%', '7%'],
+        widths: ['4%', '7%', '7%', '40%', '8%', '8%', '7%', '12%', '7%'],
         body: [
           [
             { text: ``, alignment: 'center', border: [true, false, false, true], },

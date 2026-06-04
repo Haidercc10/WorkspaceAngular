@@ -139,11 +139,11 @@
               <th scope="col" pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor
                 <p-columnFilter type="text" field="Proveedor" display="menu" id="ver1"></p-columnFilter>
               </th>
-              <th scope="col" pSortableColumn="Usuario"><p-sortIcon field="Usuario"></p-sortIcon> Usuario
-                <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
-              </th>
-              <th scope="col" pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> Fecha
+              <th scope="col" pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> F. Creación
                 <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
+              </th>
+              <th id="ver2" scope="col" pSortableColumn="Fecha_Entrega"><p-sortIcon field="Fecha_Entrega"></p-sortIcon> F. Recepción
+                <p-columnFilter type="text" field="Fecha_Entrega" display="menu"></p-columnFilter>
               </th>
               <th scope="col" pSortableColumn="Material"><p-sortIcon field="Material"></p-sortIcon> Material
                 <p-columnFilter type="text" field="Material" display="menu"></p-columnFilter>
@@ -168,8 +168,8 @@
               <td>{{rowIndex + 1}}</td>
               <td>{{registros.Oc}}</td>
               <td><b>{{registros.Proveedor}}</b></td>
-              <td>{{registros.Usuario}}</td>
               <td>{{registros.Fecha}}</td>
+              <td>{{registros.Fecha_Entrega}}</td>
               <td><b>{{registros.Material}}</b></td>
               <td>{{registros.Cantidad | number }}</td>
               <td>${{registros.Precio | number }}</td>
@@ -178,7 +178,7 @@
                                                   'bg-danger1': registros.Estado == 'PENDIENTE', 
                                                   'bg-warning1': registros.Estado == 'PARCIAL',
                                                   'bg-blue1': registros.Estado == 'ANULADO', 
-                                       }">{{registros.Estado}}</span></td>
+                                      }">{{registros.Estado}}</span></td>
               <td class="text-center"><a style="font-size: medium; width: 30px; height: 30px; text-decoration: none;"
                   pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF"
                   (click)="buscarinfoOrdenCompra(registros.Oc)"></a></td>
@@ -190,7 +190,7 @@
               <td>{{ totalQty() | number }}</td>
               <td></td>
               <td>${{ totalOrders() | number }}</td>
-              <td colspan="2"></td>
+              <td colspan="3"></td>
             </tr>
           </ng-template>
         </p-table>

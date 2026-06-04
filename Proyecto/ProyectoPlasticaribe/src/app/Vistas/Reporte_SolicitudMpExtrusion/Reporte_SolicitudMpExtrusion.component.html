@@ -232,24 +232,24 @@
           </p-table>
         </div>
 
-        <ng-container *ngIf="arrayMatPrimas.length > 0 && (ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 7) then habilitar; else inhabilitar"></ng-container>
+        <ng-container *ngIf="arrayMatPrimas.length > 0 && ([1,3,7,104].includes(ValidarRol)) then habilitar; else inhabilitar"></ng-container>
         <ng-template #habilitar>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="">
-              <button pButton class="p-button-danger" type="button"  *ngIf="ValidarRol == 1 || ValidarRol == 3" label="Crear Asignación" pTooltip="Crear asignación de materia prima" (click)="cargarModalCrearAsignacion()" icon="pi pi-check-square" id="crear-oc"></button>
-              <button pButton class="p-button-success" type="button" *ngIf="ValidarRol == 1 || ValidarRol == 3" label="Finalizar" pTooltip="Finalizar Solicitud" (click)="mostrarEleccion(0, 'finalizar')" icon="pi pi-check" id="finalizar"></button>
-              <button pButton class="p-button-secondary" type="button" *ngIf="ValidarRol == 1 || ValidarRol == 7" label="Cancelar" pTooltip="Cancelar Solicitud" (click)="mostrarEleccion(0, 'cancelar')" icon="pi pi-ban" id="cancelar"></button>
-              <button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 7" (click)="infoSolicitudPDF(0)" pTooltip="Ver PDF"></button>
+              <button pButton class="p-button-danger" type="button"  *ngIf="[1,3,7,104].includes(ValidarRol)" label="Crear Asignación" pTooltip="Crear asignación de materia prima" (click)="cargarModalCrearAsignacion()" icon="pi pi-check-square" id="crear-oc"></button>
+              <button pButton class="p-button-success" type="button" *ngIf="[1,3,7,104].includes(ValidarRol)" label="Finalizar" pTooltip="Finalizar Solicitud" (click)="mostrarEleccion(0, 'finalizar')" icon="pi pi-check" id="finalizar"></button>
+              <button pButton class="p-button-secondary" type="button" *ngIf="[1,3,7,104].includes(ValidarRol)" label="Cancelar" pTooltip="Cancelar Solicitud" (click)="mostrarEleccion(0, 'cancelar')" icon="pi pi-ban" id="cancelar"></button>
+              <button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" *ngIf="[1,3,7,104].includes(ValidarRol)" (click)="infoSolicitudPDF(0)" pTooltip="Ver PDF"></button>
             </div>
           </div>
         </ng-template>
         <ng-template #inhabilitar>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="" #inhabilitar>
-              <button pButton [disabled]="true" class="p-button-danger" *ngIf="ValidarRol == 1 || ValidarRol == 3" type="button" pTooltip="Crear asignación de materia prima" label="Crear Solicitud" icon="pi pi-check-square" id="crear-oc"></button>
-              <button pButton [disabled]="true" class="p-button-success" *ngIf="ValidarRol == 1 || ValidarRol == 3" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" icon="pi pi-check" id="finalizar"></button>
-              <button pButton [disabled]="true" class="p-button-secondary" *ngIf="ValidarRol == 1 || ValidarRol == 7" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" icon="pi pi-ban" id="cancelar"></button>
-              <button pButton *ngIf="arrayMatPrimas.length > 0 && (ValidarRol == 1 || ValidarRol == 7)" class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="infoSolicitudPDF(0)" label="Ver PDF" pTooltip="Ver solicitud en formato PDF"></button>
+              <button pButton [disabled]="true" class="p-button-danger" *ngIf="[1,3,7,104].includes(ValidarRol)" type="button" pTooltip="Crear asignación de materia prima" label="Crear Solicitud" icon="pi pi-check-square" id="crear-oc"></button>
+              <button pButton [disabled]="true" class="p-button-success" *ngIf="[1,3,7,104].includes(ValidarRol)" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" icon="pi pi-check" id="finalizar"></button>
+              <button pButton [disabled]="true" class="p-button-secondary" *ngIf="[1,3,7,104].includes(ValidarRol)" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" icon="pi pi-ban" id="cancelar"></button>
+              <button pButton *ngIf="arrayMatPrimas.length > 0 && [1,3,7,104].includes(ValidarRol)" class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="infoSolicitudPDF(0)" label="Ver PDF" pTooltip="Ver solicitud en formato PDF"></button>
             </div>
           </div>
         </ng-template>

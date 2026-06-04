@@ -15,7 +15,7 @@ import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Product
 import { InventarioProductosPBDDComponent } from '../Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
 
 @Injectable({
-  providedIn : 'root'
+  providedIn: 'root'
 })
 
 @Component({
@@ -26,38 +26,38 @@ import { InventarioProductosPBDDComponent } from '../Inventario-Productos-PBDD/I
 
 export class ModalGenerarInventarioZeusComponent implements OnInit {
 
-  @Input() reporteConsolidado : boolean = false;
+  @Input() reporteConsolidado: boolean = false;
   @ViewChild('dt') dt: Table | undefined; //Variable identificadora de la tabla
-  @ViewChild(Recetas_ProductosComponent) receta: Recetas_ProductosComponent | undefined; 
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  load : boolean = true; //Variable que servirá para validar cuando mostrar la animacion de carga
-  totalProductos : number = 0; //Variable que almacenará la suma del valor total de todos los productos consultados
-  columnas : any = []; //Variable que tendrá las posibles columnas que se pueden seleccionar para ver
-  columnasSeleccionada : any [] = []; //Variable que almcanará las columnas que se han elegido para ver adicional a las iniciales
-  ArrayProductoZeus : any = []; //Variable que almacenará la informacion de todos los productos consultados
-  fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
-  mesActual : string; //Variable que va a almacenar el nombre del mes actual
-  public cantProductos : number = 0;
-  opcionFiltroFechas : string [] = ['Elija el filtro', 'Semana(s)', 'Mes(es)', 'Año(s)'];
-  filtroFechas : string;
-  cantidadDias : number;
-  numeroIdProd : number = 0;
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  recetaProducto : boolean = false;
-  @ViewChild(InventarioProductosPBDDComponent) invPlasticaribe: InventarioProductosPBDDComponent | undefined; 
+  @ViewChild(Recetas_ProductosComponent) receta: Recetas_ProductosComponent | undefined;
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  load: boolean = true; //Variable que servirá para validar cuando mostrar la animacion de carga
+  totalProductos: number = 0; //Variable que almacenará la suma del valor total de todos los productos consultados
+  columnas: any = []; //Variable que tendrá las posibles columnas que se pueden seleccionar para ver
+  columnasSeleccionada: any[] = []; //Variable que almcanará las columnas que se han elegido para ver adicional a las iniciales
+  ArrayProductoZeus: any = []; //Variable que almacenará la informacion de todos los productos consultados
+  fechaBusqueda: any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
+  mesActual: string; //Variable que va a almacenar el nombre del mes actual
+  public cantProductos: number = 0;
+  opcionFiltroFechas: string[] = ['Elija el filtro', 'Semana(s)', 'Mes(es)', 'Año(s)'];
+  filtroFechas: string;
+  cantidadDias: number;
+  numeroIdProd: number = 0;
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  recetaProducto: boolean = false;
+  @ViewChild(InventarioProductosPBDDComponent) invPlasticaribe: InventarioProductosPBDDComponent | undefined;
 
-  constructor(private existenciasZeus : InventarioZeusService,
-                private clienteOtItems : BagproService,
-                  private existencias_ProductosService : ExistenciasProductosService,
-                    private invMesProductoService : Inventario_Mes_ProductosService,
-                      private AppComponent : AppComponent,
-                        private shepherdService: ShepherdService,
-                          private mensajeService : MensajesAplicacionService,) {
-   this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  constructor(private existenciasZeus: InventarioZeusService,
+    private clienteOtItems: BagproService,
+    private existencias_ProductosService: ExistenciasProductosService,
+    private invMesProductoService: Inventario_Mes_ProductosService,
+    private AppComponent: AppComponent,
+    private shepherdService: ShepherdService,
+    private mensajeService: MensajesAplicacionService,) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
@@ -66,7 +66,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     //setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
-  tutorial(){
+  tutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
@@ -75,60 +75,60 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a exportar la informacion de los productos a un archivo de tipo excel
-  exportarExcel() : void {
+  exportarExcel(): void {
     if (this.ArrayProductoZeus.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Para generar el archivo de Excel, debe haber productos en la tabla");
     else {
       this.load = false;
-        const title = `Inventario de Productos Terminados ${this.today}`;
-        const header = ["Item", "Cliente", "Nombre", "Existencias", "Precio", "Subtotal", "Presentación", "Cantidad Minima", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        let datos : any =[];
-        if (this.dt?.filteredValue != undefined) {
-          for (const item of this.dt?.filteredValue) {
-            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
-            datos.push(datos1);
-          }
-        } else if (this.dt?._value != undefined) {
-          for (const item of this.dt?._value) {
-            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
-            datos.push(datos1);
-          }
+      const title = `Inventario de Productos Terminados ${this.today}`;
+      const header = ["Item", "Cliente", "Nombre", "Existencias", "Precio", "Subtotal", "Presentación", "Cantidad Minima", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      let datos: any = [];
+      if (this.dt?.filteredValue != undefined) {
+        for (const item of this.dt?.filteredValue) {
+          const datos1: any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
+          datos.push(datos1);
         }
-        let workbook = new Workbook();
-        let worksheet = workbook.addWorksheet(`Inventario de Productos Terminados ${this.today}`);
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
-        worksheet.addRow([]);
-        let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'eeeeee' }
-          }
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        });
-        worksheet.mergeCells('A1:U3');
-        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-        datos.forEach(d => {
-          let row = worksheet.addRow(d);
-          let formatNumber : number [] = [4, 5, 6, 8, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-          formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-        });
-        let tamano60 : number [] = [2, 3, 9];
-        let tamano20 : number [] = [4, 5, 6, 7, 8];
-        let tamano15 : number [] = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-        tamano60.forEach(e => worksheet.getColumn(e).width = 60);
-        tamano20.forEach(e => worksheet.getColumn(e).width = 20);
-        tamano15.forEach(e => worksheet.getColumn(e).width = 15);
-        worksheet.getColumn(1).width = 10;
+      } else if (this.dt?._value != undefined) {
+        for (const item of this.dt?._value) {
+          const datos1: any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
+          datos.push(datos1);
+        }
+      }
+      let workbook = new Workbook();
+      let worksheet = workbook.addWorksheet(`Inventario de Productos Terminados ${this.today}`);
+      let titleRow = worksheet.addRow([title]);
+      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+      worksheet.addRow([]);
+      worksheet.addRow([]);
+      let headerRow = worksheet.addRow(header);
+      headerRow.eachCell((cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'eeeeee' }
+        }
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      });
+      worksheet.mergeCells('A1:U3');
+      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      datos.forEach(d => {
+        let row = worksheet.addRow(d);
+        let formatNumber: number[] = [4, 5, 6, 8, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+        formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+      });
+      let tamano60: number[] = [2, 3, 9];
+      let tamano20: number[] = [4, 5, 6, 7, 8];
+      let tamano15: number[] = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+      tamano60.forEach(e => worksheet.getColumn(e).width = 60);
+      tamano20.forEach(e => worksheet.getColumn(e).width = 20);
+      tamano15.forEach(e => worksheet.getColumn(e).width = 15);
+      worksheet.getColumn(1).width = 10;
       setTimeout(() => {
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -136,31 +136,34 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             fs.saveAs(blob, `Inventario de Productos Terminados ${this.today}.xlsx`);
           });
           this.load = true;
-          this.mensajeService.mensajeConfirmacion(`Confirmación`,`Archivo excel generado con éxito!`)
+          this.mensajeService.mensajeConfirmacion(`Confirmación`, `Archivo excel generado con éxito!`)
         }, 500);
       }, 2000);
     }
   }
 
   // Funcion que va a consultar y guardar toda la informacio de los productos con existencias mayores a cero(0)
-  invetarioProductos(){
+  invetarioProductos() {
     this.load = false;
     this.ArrayProductoZeus = [];
     this.totalProductos = 0;
     this.columnas = [];
     this.columnasSeleccionada = [];
-    let count : number = 0;
-    let items : any = [];
+    let count: number = 0;
+    let items: any = [];
     const sales = this.ValidarRol == 2
       ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
       : '';
 
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_Existencias => {
+      console.log('Zeus', datos_Existencias, datos_Existencias.map(x => parseInt(x.codigo)));
       this.clienteOtItems.srvObtenerItemsBagproXClienteItem(datos_Existencias.map(x => parseInt(x.codigo)), sales).subscribe(datos_Cliente => {
+        console.log(datos_Cliente);
         for (let j = 0; j < datos_Cliente.length; j++) {
           if(!items.includes(datos_Cliente[j].clienteItems)) {
             items.push(datos_Cliente[j].clienteItems)
             this.invMesProductoService.GetCantidadMes_Producto(datos_Cliente[j].clienteItems, datos_Cliente[j].ptPresentacionNom).subscribe(datos_Inventario => {
+              
               for (let k = 0; k < datos_Inventario.length; k++) {
                 let item = datos_Inventario[k].id;
                 let und = datos_Inventario[k].und;
@@ -177,40 +180,60 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         }
       });
     });
+    /*
+    this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_Existencias => {
+      this.clienteOtItems.srvObtenerItemsBagproXClienteItem(datos_Existencias.map(x => parseInt(x.codigo)), sales).subscribe(datos_Cliente => {
+        datos_Cliente.forEach((cliente: any) => {
+          let item: any = cliente.clienteItems;
+          let und: any = cliente.ptPresentacionNom;
+          let existencias: any = datos_Existencias.find(x => x.codigo == item);
+          if (!items.includes(item)) {
+            items.push(item)
+            this.llenarArrayProductos(0, existencias, datos_Cliente[0]);
+            count++
+            if (count == items.length) {
+              this.load = true;
+              this.invPlasticaribe?.getStockInformation();
+            }
+          }
+        });
+      });
+    });
+    */
   }
 
   llenarArrayProductos(i, inv, exi, cli) {
-    let info : any = {
-      'Numero': i + 1,
-      'Id' : exi.codigo,
-      'Nombre' : exi.nombre,
-      'Cliente' : cli.clienteNom,
-      'Precio' : [2].includes(this.ValidarRol) ? 0 : exi.precioVenta,
-      'Cantidad' : exi.existencias,
-      'Presentacion' : exi.presentacion,
-      'Precio_Total' : [2].includes(this.ValidarRol) ? 0 : exi.precio_Total,
-      'Cant_Minima' : inv.cant_Minima,
-      'Vendedor' : cli.nombreCompleto,
-      'Mes_Actual' : 0,//this.llenarMesActual(mes, inv),
-      'Enero' : 0,//inv.enero,
-      'Febrero' : 0,//inv.febrero,
-      'Marzo' : 0,//inv.marzo,
-      'Abril' : 0,//inv.abril,
-      'Mayo' : 0,//inv.mayo,
-      'Junio' : 0,//inv.junio,
-      'Julio' : 0,//inv.julio,
-      'Agosto' : 0,//inv.agosto,
-      'Septiembre' : 0,//inv.septiembre,
-      'Octubre' : 0,//inv.octubre,
-      'Noviembre' : 0,//inv.noviembre,
-      'Diciembre' : 0,//inv.diciembre,
-      'ValidarCantMinima': exi.existencias <= inv.cant_Minima ? 1 : 0,
-    }
-    
+      let info: any = {
+        'Numero': i + 1,
+        'Id': exi.codigo,
+        'Nombre': exi.nombre,
+        'Cliente': cli.clienteNom,
+        'Precio': [2].includes(this.ValidarRol) ? 0 : exi.precioVenta,
+        'Cantidad': exi.existencias,
+        'Presentacion': exi.presentacion,
+        'Precio_Total': [2].includes(this.ValidarRol) ? 0 : exi.precio_Total,
+        'Cant_Minima': inv.cant_Minima,
+        'Vendedor': cli.nombreCompleto,
+        'Mes_Actual': 0,//this.llenarMesActual(mes, inv),
+        'Enero': 0,//inv.enero,
+        'Febrero': 0,//inv.febrero,
+        'Marzo': 0,//inv.marzo,
+        'Abril': 0,//inv.abril,
+        'Mayo': 0,//inv.mayo,
+        'Junio': 0,//inv.junio,
+        'Julio': 0,//inv.julio,
+        'Agosto': 0,//inv.agosto,
+        'Septiembre': 0,//inv.septiembre,
+        'Octubre': 0,//inv.octubre,
+        'Noviembre': 0,//inv.noviembre,
+        'Diciembre': 0,//inv.diciembre,
+        'ValidarCantMinima': exi.existencias <= inv.cant_Minima ? 1 : 0,
+      }
+
     this.ArrayProductoZeus.push(info);
-    this.ArrayProductoZeus.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-    this.ArrayProductoZeus.sort((a,b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima)); 
-  }
+      this.ArrayProductoZeus.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+      this.ArrayProductoZeus.sort((a, b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima));
+    }
 
   /*llenarMesActual(mes: number, datos_Inventario: any): number {
     switch (mes) {
@@ -273,15 +296,15 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }*/
 
   //
-  actualizarCantMinima(fila, $event){
-    if ($event.key == 'Enter') {
+  actualizarCantMinima(fila, $event) {
+      if($event.key == 'Enter') {
       this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(fila.Id, fila.Cant_Minima).subscribe(() => {
         this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${fila.nombreItem} actualizada con éxito!`);
         let i: number = this.ArrayProductoZeus.findIndex(x => x.Numero == fila.Numero);
         this.ArrayProductoZeus[i].ValidarCantMinima = fila.Cantidad <= fila.Cant_Minima ? 1 : 0;
-        this.ArrayProductoZeus.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-        this.ArrayProductoZeus.sort((a,b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima));
-      }, () => this.mensajeService.mensajeError(`¡Ocurrió un error al actualizar la cantidad minima!`,``));
+        this.ArrayProductoZeus.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+        this.ArrayProductoZeus.sort((a, b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima));
+      }, () => this.mensajeService.mensajeError(`¡Ocurrió un error al actualizar la cantidad minima!`, ``));
     }
   }
 
@@ -292,17 +315,17 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   // Funcion que permitirá filtrar la información de la tabla
-  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //
-  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+  aplicarfiltroGlobal = ($event, valorCampo: string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
 
   // Funcion que permitirá mostrar el modal de la creación y edición de la receta
-  mostrarModalCrearEditar(data : any = "") {
+  mostrarModalCrearEditar(data: any = "") {
     this.recetaProducto = true;
     this.receta?.limpiarTodo();
     if (data != "") {
-      this.receta?.FormProductos.patchValue({ Nombre : data.Id, });
+      this.receta?.FormProductos.patchValue({ Nombre: data.Id, });
       this.receta?.buscarProductos();
       setTimeout(() => this.receta?.cambiarNombreProducto(), 500);
     }

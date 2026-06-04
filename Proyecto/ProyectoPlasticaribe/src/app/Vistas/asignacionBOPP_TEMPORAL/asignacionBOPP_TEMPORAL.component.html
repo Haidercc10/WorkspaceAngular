@@ -20,6 +20,7 @@
   </div>
 </div>
 
+<!-- Formulario de búsqueda -->
 <p-card>
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
@@ -33,8 +34,16 @@
   <form [formGroup]="FormAsignacionBopp">
     <div class="mb-3" id="formulario1">
       <div class="row g-4">
+        <!-- Fecha Inicial -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="dateIn">
+          <span class="p-float-label">
+            <p-calendar formControlName="dateIn" inputId="dateIn" [showIcon]="true"></p-calendar>
+            <label for="dateIn">Fecha entrega</label>
+          </span>
+        </div>
+
         <!-- Buscar OT -->
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="AsgBopp_OT" id="ordenTrabajo" type="text" pInputText (keydown)="presionarTab($event)" (keyup.enter)="infoOT()"  required/>
@@ -43,7 +52,7 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-9 col-xxl-9">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-8 col-xl-8 col-xxl-8">
           <span class="p-float-label">
             <textarea formControlName="AsgBopp_Observacion" id="observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="observacion">Observación</label>
@@ -62,13 +71,12 @@
       columnResizeMode="expand"
       styleClass="p-datatable-gridlines p-datatable-sm"
       responsiveLayout="scroll"
-      [paginator]="true"
-      [rows]="20"
       [rowHover]="true"
       [value]="ordenesTrabajo">
         <ng-template pTemplate="header">
           <tr>
             <th>N°</th>
+            <th>OT</th>
             <th>Cliente</th>
             <th>Item</th>
             <th>Referencia</th>
@@ -78,8 +86,9 @@
             <th>Kg Asignado</th>
             <th id="quitar-OT">Quitar OT</th>
         </ng-template>
-        <ng-template pTemplate="body" let-ot>
+        <ng-template pTemplate="body" let-ot let-rowIndex="rowIndex">
           <tr>
+            <td>{{rowIndex + 1}}</td>
             <td>{{ot.ot}}</td>
             <td>{{ot.cliente}}</td>
             <td>{{ot.item}}</td>
@@ -88,7 +97,7 @@
             <td>{{ot.ancho | number}}</td>
             <td>{{ot.kg | number}}</td>
             <td>{{ot.cantAsignada | number}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Orden de Trabajo" (click)="mostrarEleccion(ot, 'OT', '')"></i></td>
+            <td class="text-center"><i class="pi pi-trash cursor" title="Quitar Orden de Trabajo" (click)="mostrarEleccion(ot, 'OT', '')"></i></td>
           </tr>
         </ng-template>
       </p-table>
@@ -159,8 +168,6 @@
       columnResizeMode="expand"
       styleClass="p-datatable-gridlines p-datatable-sm"
       responsiveLayout="scroll"
-      [paginator]="true"
-      [rows]="20"
       [rowHover]="true"
       [value]="ArrayBoppPedida">
         <ng-template pTemplate="header">
