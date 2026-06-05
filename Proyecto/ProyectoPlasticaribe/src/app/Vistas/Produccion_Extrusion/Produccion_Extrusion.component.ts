@@ -780,7 +780,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   //
   datosProduccion(daipita: any): modelProduccionProcesos {
     let presentation = this.formDatosProduccion.value.presentacion;
-
+    
     if (presentation == 'Kilo') presentation = 'Kg';
     else if (presentation == 'Unidad') presentation = 'Und';
     let datos: modelProduccionProcesos = {
@@ -799,7 +799,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Tara_Cono: this.formDatosProduccion.value.pesoTara,
       Peso_Bruto: this.formDatosProduccion.value.pesoBruto,
       Peso_Neto: this.formDatosProduccion.value.pesoNeto,
-      Cantidad: presentation == 'Und' && this.validateProcess() == 'EMP' ? [null, undefined, 0, ''].includes(daipita) ? 1 : daipita : 0,
+      Cantidad: ['Und', 'MTS'].includes(presentation) && this.validateProcess() == 'EMP' ? [null, undefined, 0, ''].includes(daipita) ? 1 : daipita : 1,
       Peso_Teorico: 0,
       Desviacion: 0,
       Precio: this.validarPrecio(this.datosOrdenTrabajo[0]),
@@ -855,8 +855,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           'quantity': this.validateProcess() != 'EMP' ? res.peso_Bruto : [0, '', null, undefined].includes(daipita) ? res.peso_Bruto : res.peso_Neto,
           'quantity2': this.validateProcess() != 'EMP' ? res.peso_Neto : [0, '', null, undefined].includes(daipita) ? res.peso_Neto : daipita,
           'reel': res.numeroRollo_BagPro,
-          'presentationItem1': [0, '', null, undefined].includes(daipita) ? 'Kg Bruto' : this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
-          'presentationItem2': [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
+          'presentationItem1': [0, '', null, undefined].includes(daipita) ? 'Kg Bruto' : this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg Neto',
+          'presentationItem2': [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : res.presentacion == 'MTS' ? 'Mts' : 'Und(s)',
           'productionProcess': res.proceso_Nombre.toUpperCase(),
           'showNameBussiness': true,
           'operator': rebobinado ? `${res.usua_Nombre + ' RB'}` : `${res.usua_Nombre}`,
@@ -923,7 +923,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       'quantity2': this.validateProcess() != 'EMP' ? data.peso_Neto : [0, '', null, undefined].includes(daipita) ? data.peso_Neto : daipita, //data.presentacion == 'Kg' ? data.peso_Neto : Math.trunc(data.cantidad),
       'reel': data.numeroRollo_BagPro,
       'presentationItem1': [0, '', null, undefined].includes(daipita) ? 'Kg Bruto' : this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
-      'presentationItem2': [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
+      'presentationItem2': [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : data.presentacion == 'MTS' ? 'Mts' : 'Und(s)',
       'productionProcess': data.proceso_Nombre.toUpperCase(),
       'showNameBussiness': true,
       'operator': rebobinado ? `${data.usua_Nombre + ' RB'}` : `${data.usua_Nombre}`,
