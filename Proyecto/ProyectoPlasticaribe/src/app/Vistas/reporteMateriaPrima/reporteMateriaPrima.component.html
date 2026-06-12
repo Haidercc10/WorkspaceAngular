@@ -108,7 +108,7 @@
               <tr>
                 <td><b>{{rowIndex + 1}}</b></td>
                 <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
+                <td *ngIf="[1,104,3].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">

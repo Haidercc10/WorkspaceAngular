@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -26,7 +26,7 @@ import { OverlayPanel } from 'primeng/overlaypanel';
   providedIn: 'root'
 })
 
-export class Gestion_DevolucionesOFComponent implements OnInit {
+export class Gestion_DevolucionesOFComponent implements OnInit, OnChanges {
 
   load: boolean = false;
   storage_Id: any | undefined;
@@ -50,6 +50,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
   @ViewChild('tableOrder') tableOrder: Table | undefined;
   @ViewChild('tableDevolution') tableDevolution: Table | undefined;
   @ViewChild('tableConsolidate') tableConsolidate: Table | undefined;
+  @Input() dato: any;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -71,6 +72,20 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.lecturaStorage();
     this.getFails();
     this.getStatuses();
+  }
+
+  ngOnChanges() {
+    if (this.dato) {
+      setTimeout(() => {
+        this.loadDevolutionForId();
+        this.searchData();
+      }, 500);
+    }
+  }
+
+  loadDevolutionForId(){
+    this.clearFields();
+    this.form.patchValue({ 'dev': this.dato.or.id, });
   }
 
   validateForm() {
@@ -103,7 +118,6 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
     console.log(this.storage_Id);
-
   }
 
   getStatuses = () => this.svStatus.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [19, 44, 45, 23].includes(x.estado_Id)) });
@@ -168,6 +182,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
     if (![null, undefined, ''].includes(dev)) {
       this.svDetailsDevolutions.GetInformationDevById(dev).subscribe(data => {
         if ([11, 29].includes(data[0].dev.estado_Id)) {
+          console.log('devolución:', dev);
           this.load = true;
           this.svDevolutions.PutStatusDevolution(dev, 29, date, hour, user, reposition, creditNote, observation).subscribe(() => {
             this.qtyRollsDv = data.length;
@@ -193,7 +208,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit {
             this.clearFields();
           });
         } else {
-          this.msg.mensajeAdvertencia(`Devolución no disponible`, `La devolución N° ${dev} se encuentra por reponer y/o cerrada!`);
+          //this.msg.mensajeAdvertencia(`Devolución no disponible`, `La devolución N° ${dev} se encuentra por reponer y/o cerrada!`);
           this.clearFields();
         }
       }, (error: HttpErrorResponse) => {

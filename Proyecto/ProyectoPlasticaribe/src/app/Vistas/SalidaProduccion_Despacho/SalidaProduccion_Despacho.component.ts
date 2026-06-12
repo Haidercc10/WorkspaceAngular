@@ -455,7 +455,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         // Buscar todos los rollos despachados del mismo producto (por ejemplo por código o id)
         let despachado = this.sendProductionZeus
           .filter(x => x.pp.prod_Id == prod.item)
-          .reduce((sum, item) => sum + (item.pp.cantidad || item.pp.peso_Neto), 0);
+          .reduce((sum, item) => sum + (item.pp.presentacion == 'Kg' ? item.pp.peso_Neto : item.pp.cantidad), 0);
 
         console.log(despachado, prod.quantity);
 
@@ -463,7 +463,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           errores.push(`El item ${prod.item} tiene ${despachado} de ${prod.quantity}`);
         }
       });
-
+      
       if (errores.length > 0) {
         if (ofDirect) this.modalProductsNotRead = true;
         else this.modalProductionNotRead = true;

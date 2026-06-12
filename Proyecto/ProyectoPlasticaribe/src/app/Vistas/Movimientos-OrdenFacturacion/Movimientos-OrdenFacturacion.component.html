@@ -216,9 +216,15 @@
 </p-dialog>
 
 <!--Modal para gestión de devoluciones -->
-<p-dialog header="Gestión de devoluciones de facturación" [(visible)]="modalDevolution" [modal]="true"
+<p-dialog header="Gestión de devoluciones de facturación" [(visible)]="modalManagerDevolution" [modal]="true"
   [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
-  <app-Gestion_DevolucionesOF></app-Gestion_DevolucionesOF>
+  <app-Gestion_DevolucionesOF [dato]="registroSeleccionado"></app-Gestion_DevolucionesOF>
+</p-dialog>
+
+<!--Modal para devoluciones -->
+<p-dialog header="Devoluciones de facturación" [(visible)]="modalDevolution" [modal]="true"
+  [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
+  <app-Devolucion_OrdenFacturacion [data]="registroSeleccionado"></app-Devolucion_OrdenFacturacion>
 </p-dialog>
 
 <!--Modal para finalizar ordenes -->

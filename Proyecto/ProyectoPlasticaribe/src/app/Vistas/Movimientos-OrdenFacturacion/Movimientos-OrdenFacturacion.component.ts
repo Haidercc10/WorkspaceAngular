@@ -49,6 +49,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   detailsOF: number = 0;
   modalReposition: boolean = false;
   modalDevolution: boolean = false;
+  modalManagerDevolution: boolean = false;
   //@ViewChild(Gestion_DevolucionesOFComponent) managementDevolutions : Gestion_DevolucionesOFComponent;
   //@ViewChild(ReposicionesComponent) Repositions : ReposicionesComponent;
 
@@ -302,6 +303,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   ///
   loadModalOrderFact(data: any) {
+    console.log(data);  
     this.registroSeleccionado = data;
     if (data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
       if ([1, 10, 97].includes(this.validateRole)) {
@@ -321,10 +323,12 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       if ([5, 1].includes(this.validateRole)) {
         this.managementDevolutions.clearFields();
         this.managementDevolutions.devolution = true;
-        this.modalDevolution = true;
-        this.managementDevolutions.form.patchValue({ dev: data.or.id, });
-        this.managementDevolutions.searchData();
+        this.modalManagerDevolution = true;
       } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para gestionar devoluciones.`);
+    } else if (data.type == 'DV' && [53].includes(data.or.estado_Id)) {
+      this.modalDevolution = true;
+      //this.cmpDevolutions.loadDevolutionForId();
+      //this.cmpDevolutions.searchDevolution(); 
     } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
   }
 

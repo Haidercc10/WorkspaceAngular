@@ -122,10 +122,12 @@ export class ReporteClientesComponent {
     let url : string = ``;
 
     if(client != null) url.length > 0 ? url += `&client=${client}` : url += `?client=${client}`;  
-    if(sales != null) url.length > 0 ? url += `&sales=${sales}` : url += `?sales=${sales}`;
+    if(sale != null) url.length > 0 ? url += `&sales=${sales}` : url += `?sales=${sales}`;
     
     if(date1 == 'Fecha inválida') date1 = moment().add(1, 'd').format('YYYY-MM-DD');
     if(date2 == 'Fecha inválida') date2 = moment().add(1, 'd').format('YYYY-MM-DD');
+
+    console.log(url);
 
     this.zeusInvService.getClientsForLastFact(date1, date2, url).subscribe(data => {
       this.dataClients = data;
