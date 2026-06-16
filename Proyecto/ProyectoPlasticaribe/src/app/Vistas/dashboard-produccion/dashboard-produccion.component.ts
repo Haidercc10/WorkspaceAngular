@@ -55,6 +55,10 @@ export class DashboardProduccionComponent implements OnInit {
   ComparativoOptionsCamisilla: any;
   ComparativoDataPerforado: any;
   ComparativoOptionsPerforado: any;
+  ComparativoDataLaminado: any;
+  ComparativoOptionsLaminado: any;
+  ComparativoDataDoblado: any;
+  ComparativoOptionsDoblado: any;
   ComparativoPlugins = [DataLabelsPlugin];
 
   totalProduction: any = [];
@@ -66,6 +70,8 @@ export class DashboardProduccionComponent implements OnInit {
   totalPercentageSella: number = 0;
   totalPercentagePerf: number = 0;
   totalPercentageCami: number = 0;
+  totalPercentageLaminado: number = 0;
+  totalPercentageDoblado: number = 0;
 
   wastePercentageExt: number = 0;
   wastePercentageImp: number = 0;
@@ -73,6 +79,8 @@ export class DashboardProduccionComponent implements OnInit {
   wastePercentageSella: number = 0;
   wastePercentagePerf: number = 0;
   wastePercentageCami: number = 0;
+  wastePercentageLaminado: number = 0;
+  wastePercentageDoblado: number = 0;
 
   totalPercentageMonth: number = 0;
 
@@ -85,6 +93,8 @@ export class DashboardProduccionComponent implements OnInit {
   maxCorte: number = 100;
   maxCamisilla: number = 100;
   maxSellado: number = 100;
+  maxLaminado: number = 100;
+  maxDoblado: number = 100;
   
   dateSelected : any;
 
@@ -129,6 +139,14 @@ export class DashboardProduccionComponent implements OnInit {
       this.ComparativoOptionsSellado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsSellado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
       this.ComparativoOptionsSellado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      //LAMINADO
+      this.ComparativoOptionsLaminado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsLaminado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsLaminado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      //DOBLADO
+      this.ComparativoOptionsDoblado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsDoblado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptionsDoblado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
     }, 500);
   }
 
@@ -151,6 +169,8 @@ export class DashboardProduccionComponent implements OnInit {
         this.llenarGraficaComparativoSellado();
         this.llenarGraficaComparativoCamisilla();
         this.llenarGraficaComparativoPerforado();
+        this.llenarGraficaComparativoLaminado();
+        this.llenarGraficaComparativoDoblado();
       }, 3000);
 
       let time = setInterval(() => {
@@ -164,6 +184,8 @@ export class DashboardProduccionComponent implements OnInit {
             this.llenarGraficaComparativoSellado();
             this.llenarGraficaComparativoCamisilla();
             this.llenarGraficaComparativoPerforado();
+            this.llenarGraficaComparativoLaminado();
+            this.llenarGraficaComparativoDoblado();
           }, 3000);
 
         } else clearInterval(time);
@@ -189,6 +211,8 @@ export class DashboardProduccionComponent implements OnInit {
       this.totalPercentageEmp = this.totalPercentageForProcess('EMP');
       this.totalPercentageSella = this.totalPercentageForProcess('SELLA');
       this.totalPercentagePerf = this.totalPercentageForProcess('PERF');
+      this.totalPercentageLaminado = this.totalPercentageForProcess('LAM');
+      this.totalPercentageDoblado = this.totalPercentageForProcess('DBLD');
 
       this.wastePercentageCami = this.totalPorcWaste('CAMISILLA');
       this.wastePercentageExt = this.totalPorcWaste('EXT');
@@ -196,6 +220,8 @@ export class DashboardProduccionComponent implements OnInit {
       this.wastePercentageEmp = this.totalPorcWaste('EMP');
       this.wastePercentageSella = this.totalPorcWaste('SELLA');
       this.wastePercentagePerf = this.totalPorcWaste('PERF');
+      this.wastePercentageLaminado = this.totalPorcWaste('LAM');
+      this.wastePercentageDoblado = this.totalPorcWaste('DBLD');
       //Cambiar porcentaje maximo si sobre pasa 100
       this.maxExtrusion = this.totalPercentageExt > 100 ? this.totalPercentageExt : this.maxExtrusion;
       this.maxImpresion = this.totalPercentageImp > 100 ? this.totalPercentageImp : this.maxImpresion;
@@ -203,6 +229,8 @@ export class DashboardProduccionComponent implements OnInit {
       this.maxCorte = this.totalPercentageEmp > 100 ? this.totalPercentageEmp : this.maxCorte;
       this.maxCamisilla = this.totalPercentageCami > 100 ? this.totalPercentageCami : this.maxCamisilla;
       this.maxSellado = this.totalPercentageSella > 100 ? this.totalPercentageSella : this.maxSellado;
+      this.maxLaminado = this.totalPercentageLaminado > 100 ? this.totalPercentageLaminado : this.maxLaminado;
+      this.maxDoblado = this.totalPercentageDoblado > 100 ? this.totalPercentageDoblado : this.maxDoblado;
     });
   }
 
@@ -214,13 +242,15 @@ export class DashboardProduccionComponent implements OnInit {
     this.totalPercentageEmp = 0;
     this.totalPercentageSella = 0;
     this.totalPercentagePerf = 0;
+    this.totalPercentageLaminado = 0;
+    this.totalPercentageDoblado = 0;
   }
 
   //Función para actualizar la meta del día por maquina.
   updateGoalForMachine(data: any, $event: any, process: string) {
     let goal = this.productionMachineProcess(process).find(x => x.machine == data.machine).goal;
 
-    this.svDailyProd.putGoalForMachine(data.machine, process, '2025-10-31', goal).subscribe(dataa => {
+    this.svDailyProd.putGoalForMachine(data.machine, process, moment(this.dateSelected).format('YYYY-MM-DD'), goal).subscribe(dataa => {
       if ($event.key == 'Enter') this.svMsj.mensajeConfirmacion(`¡Meta establecida con éxito!`);
     }, error => {
       this.svMsj.mensajeError('Error', ``)
@@ -603,11 +633,57 @@ export class DashboardProduccionComponent implements OnInit {
       labels: [''],
       datasets: [
         { label: 'Producción', backgroundColor: '#8255ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('PERFORADO')] },
-        { label: 'Meta', backgroundColor: '#2000b1ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('PERFORADO')] }
+        { label: 'Meta', backgroundColor: '#2000b1ff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('PERFORADO')] }
       ]
     };
 
     this.ComparativoOptionsPerforado = {
+      indexAxis: 'y',
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
+      },
+      scales: {
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+      }
+    };
+  }
+
+  /** Función para llamar la grafica de laminado*/
+  llenarGraficaComparativoLaminado() {
+    this.ComparativoDataLaminado = {
+      labels: [''],
+      datasets: [
+        { label: 'Producción', backgroundColor: 'rgb(255, 71, 215)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('LAMINADO')] },
+        { label: 'Meta', backgroundColor: 'rgb(201, 0, 191)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('LAMINADO')] }
+      ]
+    };
+
+    this.ComparativoOptionsLaminado = {
+      indexAxis: 'y',
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
+      },
+      scales: {
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+      }
+    };
+  }
+
+  /** Función para llamar la grafica de doblado*/
+  llenarGraficaComparativoDoblado() {
+    this.ComparativoDataDoblado = {
+      labels: [''],
+      datasets: [
+        { label: 'Producción', backgroundColor: 'rgb(114, 114, 114)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('DOBLADO')] },
+        { label: 'Meta', backgroundColor: 'rgb(41, 41, 41)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('DOBLADO')] }
+      ]
+    };
+
+    this.ComparativoOptionsDoblado = {
       indexAxis: 'y',
       plugins: {
         legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },

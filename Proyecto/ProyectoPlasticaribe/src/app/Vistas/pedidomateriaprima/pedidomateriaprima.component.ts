@@ -348,6 +348,7 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarFacturaMP(){
+    let oc : number = this.FormMateriaPrimaFactura.value.OrdenCompra;
     this.load = false;
     const datosFactura : any = {
       Facco_Codigo : this.FormMateriaPrimaFactura.value.MpFactura,
@@ -361,22 +362,22 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
       Usua_Id : this.storage_Id,
       TpDoc_Id : 'FCO',
     }
-    this.facturaMpComService.srvGuardar(datosFactura).pipe(takeUntil(this.destroy$)).subscribe(() => this.obtenerUltimoIdFacturaCompra(), () => {
+    this.facturaMpComService.srvGuardar(datosFactura).pipe(takeUntil(this.destroy$)).subscribe(() => this.obtenerUltimoIdFacturaCompra(oc), () => {
       this.msj.mensajeError(`Error`, `¡Error al crear la factura!`);
       this.load = true;
     });
   }
 
   // Funicion que va a colocar el id de la ultimo factura
-  obtenerUltimoIdFacturaCompra(){
-    this.facturaMpComService.UltimoIdFactura().pipe(takeUntil(this.destroy$)).subscribe(datos_facturas => this.creacionFacturaMateriaPrima(datos_facturas), () => {
+  obtenerUltimoIdFacturaCompra(oc : number){
+    this.facturaMpComService.UltimoIdFactura().pipe(takeUntil(this.destroy$)).subscribe(datos_facturas => this.creacionFacturaMateriaPrima(datos_facturas, oc), () => {
       this.msj.mensajeError(`Error`, `¡Error al obtener la ultima factura creada!`);
       this.load = true;
     });
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
-  creacionFacturaMateriaPrima(idFactura : any){
+  creacionFacturaMateriaPrima(idFactura : any, oc : number){
     if (this.ArrayMateriaPrima.length == 0) {
       this.msj.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
       this.load = true;
@@ -398,9 +399,9 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
 
     forkJoin(peticiones).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.relacionOrdenFactura(idFactura);
+        this.relacionOrdenFactura(idFactura, oc);
         this.cargarRemisionEnFactura(idFactura);
-        this.estadoOrdenCompra();
+        this.estadoOrdenCompra(oc);
         this.moverInventarioMP();
         this.moverInventarioTintas();
         this.cmpMovMatPrimas.entradasMateriasPrimas({ Id: idFactura, Movimiento: 'FCO' });
@@ -417,9 +418,9 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
   }
 
   // Funcion que va a crear la relacion entre la orden de compra y las posibles facturas que puede tener
-  relacionOrdenFactura(factura : any){
+  relacionOrdenFactura(factura : any, oc : number){
     let info : any = {
-      Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
+      Oc_Id : oc,
       Facco_Id : factura,
     }
     this.OrdenesFacturasService.insert_OrdenCompra(info).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
@@ -429,8 +430,8 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
   }
 
   // Funcion que le a cambiar el estado a la orden de compra
-  estadoOrdenCompra(){
-    const Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
+  estadoOrdenCompra(oc : number){
+    const Orden_Compra : any = oc;
 
     this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).pipe(
       switchMap(datos_orden => {
@@ -510,6 +511,8 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante en una remisión.
   registrarRemisionMP(){
     this.load = false;
+    let oc : number = this.FormMateriaPrimaFactura.value.OrdenCompra; 
+
     const datosRemision : any = {
       Rem_Codigo : this.FormMateriaPrimaFactura.value.MpRemision,
       Rem_Fecha : this.today,
@@ -521,22 +524,22 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
       TpDoc_Id : 'REM',
       Rem_Observacion : this.FormMateriaPrimaFactura.value.MpObservacion,
     }
-    this.remisionService.srvGuardar(datosRemision).pipe(takeUntil(this.destroy$)).subscribe(() => this.obtenerUltimoIdRemision(), () => {
+    this.remisionService.srvGuardar(datosRemision).pipe(takeUntil(this.destroy$)).subscribe(() => this.obtenerUltimoIdRemision(oc), () => {
       this.msj.mensajeError(`Error`, `¡Error al crear la remisión!`);
       this.load = true;
     });
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
-  obtenerUltimoIdRemision(){
-    this.remisionService.UltimoIdRemision().pipe(takeUntil(this.destroy$)).subscribe(datos_remision => this.creacionRemisionMateriaPrima(datos_remision), () => {
+  obtenerUltimoIdRemision(oc : number){
+    this.remisionService.UltimoIdRemision().pipe(takeUntil(this.destroy$)).subscribe(datos_remision => this.creacionRemisionMateriaPrima(datos_remision, oc), () => {
       this.msj.mensajeError(`Error`, `¡Error al obtener el Id de la ultima remisión!`);
       this.load = true;
     });
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
-  creacionRemisionMateriaPrima(idRemision : any){
+  creacionRemisionMateriaPrima(idRemision : any, oc : number){
     if (this.ArrayMateriaPrima.length == 0) {
       this.msj.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
       this.load = true;
@@ -559,8 +562,8 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
 
     forkJoin(peticiones).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.relacionOrdenRemision(idRemision);
-        this.estadoOrdenCompra();
+        this.relacionOrdenRemision(idRemision, oc);
+        this.estadoOrdenCompra(oc);
         this.moverInventarioMP();
         this.moverInventarioTintas();
         this.cmpMovMatPrimas.entradasMateriasPrimas({ Id: idRemision, Movimiento: 'REM' });
@@ -577,9 +580,9 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
   }
 
   // Funcion que va a crear la relacion entre la orden de compra y las posibles facturas que puede tener
-  relacionOrdenRemision(idRemision : any){
+  relacionOrdenRemision(idRemision : any, oc : number){
     let info : any = {
-      Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
+      Oc_Id : oc,
       Rem_Id : idRemision,
     }
     this.ordenCompraRemisionService.insert_OrdenCompra(info).pipe(takeUntil(this.destroy$)).subscribe(data => {

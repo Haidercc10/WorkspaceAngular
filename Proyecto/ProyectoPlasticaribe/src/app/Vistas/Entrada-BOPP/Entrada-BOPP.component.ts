@@ -128,7 +128,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   // Funcion que servirá para cargar las categorias
-  obtenerCategorias = () => this.categoriaService.srvObtenerLista().subscribe(datos => this.categorias = datos.filter((item) => [6,14,15,17].includes(item.catMP_Id)));
+  obtenerCategorias = () => this.categoriaService.srvObtenerLista().subscribe(datos => this.categorias = datos.filter((item) => [6,14,15,17,29].includes(item.catMP_Id)));
 
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
@@ -222,6 +222,7 @@ export class EntradaBOPPComponent implements OnInit {
     }
   }
 
+  // Función para validar los datos del BOPP antes de guardar
   validarDatosBopp(data : any){
     let bodega : number = this.validarBodega(data.Cat_Id);
     let datosBOPP : modelBOPP = {
@@ -248,12 +249,15 @@ export class EntradaBOPPComponent implements OnInit {
     return datosBOPP;
   }
 
+  // Función para validar a que bodega irá el rollo según la categoría seleccionada
   validarBodega(categoria : number){
     let bodega : number = 0;
     if (categoria == 6) bodega = 8;
     else if (categoria == 14) bodega = 11;
     else if (categoria == 15) bodega = 12;
     else if (categoria == 17) bodega = 8;
+    else if (categoria == 29) bodega = 14;
+    else bodega = 8;
     return bodega;
   }
 
