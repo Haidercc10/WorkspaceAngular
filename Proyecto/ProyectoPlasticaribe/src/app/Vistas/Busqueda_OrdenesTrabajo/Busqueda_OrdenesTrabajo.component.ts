@@ -175,7 +175,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     let calibre: any = this.formFiltros.value.calibre;
     let sales: any = this.ValidarRol == 2
       ? `${String(this.storage_Id).padStart(3, '0')}`
-      : '';
+      : null;
     let ruta: string = '';
 
     if (cliente != null) ruta += `cliente=${cliente}`;

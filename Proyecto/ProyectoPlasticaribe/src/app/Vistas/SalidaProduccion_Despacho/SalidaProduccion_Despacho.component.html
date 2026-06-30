@@ -46,7 +46,7 @@
       <div class="col-sm-12 col-md-1">
         <div class="field-checkbox">
           <p-checkbox formControlName="ofDirect" [binary]="true" [readonly]="true" inputId="ofDirect" id="ofDirect" pTooltip="Si este elemento aparece seleccionado significa que la orden fue creada de manera directa sin bultos"></p-checkbox>
-          <label for="ofDirect">Facturación Directa</label>
+          <label for="ofDirect">Fact. Directa</label>
         </div>
       </div>
 
@@ -57,18 +57,19 @@
           <label for="RolloBarCode">Rollo Leído</label>
         </span>
       </div>
-
-       <div class="col-sm-12 col-md-2">
+      
+      <!--*Facturas-->
+      <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
-          <input formControlName="fact" type="text" id="fact" pInputText [required]="true" /> <!--readonly-->
+          <p-dropdown formControlName="fact" id="fact" inputId="fact" [autoDisplayFirst]="false" [options]="factZeus" [required]="true"></p-dropdown>
           <label for="fact">Factura</label>
         </span>
       </div>
 
       <div class="col-sm-12 col-md-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="driver" inputId="production" [autoDisplayFirst]="false" [options]="drivers" optionLabel="nombre" optionValue="id" [required]="true" [filter]="true" filterBy="nombre"></p-dropdown>
-          <label for="operario">Conductores</label>
+          <p-dropdown formControlName="driver" id="driver" inputId="driver" [autoDisplayFirst]="false" [options]="drivers" optionLabel="nombre" optionValue="id" [required]="true" [filter]="true" filterBy="nombre"></p-dropdown>
+          <label for="driver">Conductores</label>
         </span>
       </div>
 

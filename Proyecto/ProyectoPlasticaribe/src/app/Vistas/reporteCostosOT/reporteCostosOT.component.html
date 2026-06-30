@@ -42,7 +42,7 @@
         <!-- Nombre del cliente -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="cliente" id="cliente" type="text" [disabled]="true" pInputText/> <!--readonly onmousedown="return false;"-->
+            <input formControlName="cliente" id="cliente" type="text" [disabled]="true"="true" pInputText/> <!--readonly onmousedown="return false;"-->
             <label for="cliente">Cliente</label>
           </span>
         </div>
@@ -50,7 +50,7 @@
         <!-- Id Producto -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="IdProducto" id="idproducto" type="text" [disabled] pInputText/>
+            <input formControlName="IdProducto" id="idproducto" type="text" [disabled]="true" pInputText/>
             <label for="idproducto">Item</label>
           </span>
         </div>
@@ -58,7 +58,7 @@
          <!-- Nombre Producto-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-5">
           <span class="p-float-label">
-            <input formControlName="NombreProducto" id="nombreProducto" type="text" [disabled] pInputText/>
+            <input formControlName="NombreProducto" id="nombreProducto" type="text" [disabled]="true" pInputText/>
             <label for="nombreProducto">Referencia</label>
           </span>
         </div>
@@ -66,7 +66,7 @@
         <!-- Cantidad Producto Unidad Sin Margen -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="cantProductoSinMargenUnd" id="cantProdSinMrgUnd" type="text" [disabled] pInputText/>
+            <input formControlName="cantProductoSinMargenUnd" id="cantProdSinMrgUnd" type="text" [disabled]="true" pInputText/>
             <label for="cantProdSinMrgUnd">Cantidad Prod. Und</label>
           </span>
         </div>
@@ -74,7 +74,7 @@
         <!-- Cantidad Producto Kg Sin Margen -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="cantProductoSinMargenKg" id="cantProdSinMrgKg" type="text" [disabled] pInputText/>
+            <input formControlName="cantProductoSinMargenKg" id="cantProdSinMrgKg" type="text" [disabled]="true" pInputText/>
             <label for="cantProdSinMrgKg">Cantidad Prod. Kg</label>
           </span>
         </div>
@@ -82,7 +82,7 @@
         <!-- Margen -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="margenAdicional" id="margen" type="text" [disabled] pInputText/>
+            <input formControlName="margenAdicional" id="margen" type="text" [disabled]="true" pInputText/>
             <label for="margen">Margen Adicional</label>
           </span>
         </div>
@@ -90,7 +90,7 @@
         <!-- Cantidad Producto Con Margen-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="cantProductoConMargen" id="cantProdMargen" type="text" [disabled] pInputText/>
+            <input formControlName="cantProductoConMargen" id="cantProdMargen" type="text" [disabled]="true" pInputText/>
             <label for="cantProdMargen">Cant. Kg Margen</label>
           </span>
         </div>
@@ -98,7 +98,7 @@
         <!--Presentación-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="PresentacionProducto" id="presentacion" type="text" [disabled] pInputText/> <!--readonly onmousedown="return false;"-->
+            <input formControlName="PresentacionProducto" id="presentacion" type="text" [disabled]="true" pInputText/> <!--readonly onmousedown="return false;"-->
             <label for="presentacion">Presentación</label>
           </span>
         </div>
@@ -106,7 +106,7 @@
         <!-- Valor Unidad Producto -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1" >
           <span class="p-float-label">
-            <input formControlName="ValorUnidadProductoUnd"id="presentacion" type="text" [disabled] pInputText/>
+            <input formControlName="ValorUnidadProductoUnd"id="presentacion" type="text" [disabled]="true" pInputText/>
             <label for="presentacion">$ Und Producto</label>
           </span>
         </div>
@@ -114,7 +114,7 @@
         <!-- Valor Kg Producto -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1">
           <span class="p-float-label">
-            <input formControlName="ValorUnidadProductoKg"  id="valorUnitProdKg" type="text" [disabled] pInputText/>
+            <input formControlName="ValorUnidadProductoKg"  id="valorUnitProdKg" type="text" [disabled]="true" pInputText/>
             <label for="valorUnitProdKg">$ Kg Producto</label>
           </span>
         </div>
@@ -122,7 +122,7 @@
         <!--Valor Estimado OT -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1">
           <span class="p-float-label">
-            <input formControlName="ValorEstimadoOt" id="valorOT" type="text" [disabled] pInputText/>
+            <input formControlName="ValorEstimadoOt" id="valorOT" type="text" [disabled]="true" pInputText/>
             <label for="valorOT">Valor OT</label>
           </span>
         </div>

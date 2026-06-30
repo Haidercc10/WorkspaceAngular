@@ -21,12 +21,12 @@ import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
 import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
-import { Subject, take, takeUntil } from 'rxjs';
+import { finalize, Subject, take, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
   templateUrl: './SalidaProduccion_Despacho.component.html',
-  styleUrls: ['./SalidaProduccion_Despacho.component.css'], 
+  styleUrls: ['./SalidaProduccion_Despacho.component.css'],
 })
 
 export class SalidaProduccion_DespachoComponent implements OnInit {
@@ -57,6 +57,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   validations: number = 0;
   private destroy$ = new Subject<void>();
   private focusInterval: NodeJS.Timeout | null = null;
+  factZeus: any = [];
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -161,6 +162,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.preload = false;
     this.validations = 0;
     this.preSendProductionZeus = [];
+    this.factZeus = [];
   }
 
   //Función para obtener los conductores disponibles.
@@ -202,13 +204,18 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     });
   }
 
-  //Función para obtener la información de la orden de facturación y validar su estado.
-  getInformationForDispatch() {
+  clearBeforeQuery() {
     this.production = [];
     this.rollsConsolidate = [];
     this.remainingProducts = [];
     this.remainingProduction = [];
     this.sendProductionZeus = [];
+    this.factZeus = [];
+  }
+
+  //Función para obtener la información de la orden de facturación y validar su estado.
+  getInformationForDispatch() {
+    this.clearBeforeQuery();
     let orderFact: number = this.formProduction.value.orderFact;
     this.load = true;
 
@@ -229,63 +236,80 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       }
     }, error => {
       this.msj.mensajeError('Error', `Error al consultar la OF N° ${orderFact} | ${error.status} ${error.statusText}`);
+      this.load = false;
     });
   }
 
   //Función para obtener la información de la orden de facturación.
   getInformationOrderFact(of: number, ofDirect: boolean) {
-    //let orderFact = this.formProduction.value.orderFact;
     this.reposition = false;
-    //this.load = true;
-    this.dtOrderFactService.GetInformacionOrderFactToSend(of, ofDirect).subscribe(data => {
-      this.production = [];
-      let saleOrders: Array<number> = [];
-      data.forEach(dataProduction => {
-        saleOrders.push(dataProduction.dtOrder.consecutivo_Pedido);
 
-        //if(dataProduction.dtOrder.numero_Rollo != 0) {
-        this.production.push({
-          'saleOrder': dataProduction.dtOrder.consecutivo_Pedido,
-          'item': dataProduction.producto.prod_Id,
-          'reference': dataProduction.producto.prod_Nombre,
-          'numberProduction': dataProduction.dtOrder.numero_Rollo,
-          'quantity': dataProduction.dtOrder.cantidad,
-          'presentation': dataProduction.dtOrder.presentacion,
-          'ofDirect': ofDirect
-        });
-        //}
-        this.load = false;
+    this.dtOrderFactService.GetInformacionOrderFactToSend(of, ofDirect).
+    pipe(finalize(() => { this.load = false; }))
+    .subscribe(data => {
+      this.production = [];
+      let saleOrders: Array<string> = [];
+      data.forEach((dataProduction : any) => {
+        saleOrders.push(dataProduction.dtOrder.consecutivo_Pedido);
+        this.loadProduction(dataProduction, ofDirect);
+        //this.load = false;
         if (saleOrders.length == data.length) {
-          //setTimeout(() => this.load = false, 50);
           let saleOrder: string = `${data[0].dtOrder.consecutivo_Pedido}`;
           if (!saleOrder.startsWith('DV')) {
-            this.zeusService.GetFactura(saleOrders[saleOrders.length - 1]).subscribe(factura => {
-              this.orderFactService.PutFactOrder(of, factura.documento).subscribe(() => {
-                this.formProduction.patchValue({ fact: factura.documento });
-                this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
-                this.load = false;
-                this.sendProductionZeus = this.preSendProductionZeus;
-                this.consolidateItems();
-                //Carga la info de la OF en la tabla. 
-              }, error => {
-                this.errorMessage(`¡No se pudo actualizar la factura de la orden #${of}!`, error);
-                this.formProduction.patchValue({ 'orderFact': '', });
-                this.preload = false;
-              });
-            }, error => {
-              this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${of}!`, error);
-              this.formProduction.patchValue({ 'orderFact': '', });
-              this.preload = false;
-            });
+            this.managementFactZeus(saleOrders, of);
           } else {
             this.reposition = true;
             this.formProduction.patchValue({ 'fact': dataProduction.order.factura, 'saleOrder': dataProduction.dtOrder.consecutivo_Pedido, });
-            this.msj.mensajeConfirmacion(`Orden de reposición consultada`, `¡Ingrese los rollos que van a ser enviados por reposición!`);
+            this.msj.mensajeConfirmacion(`Reposición consultada`, `¡Ingrese los rollos que van a ser enviados por reposición!`);
             this.load = false;
           }
         }
       });
     }, error => this.errorMessage(`¡No se encontró información de la orden de facturación N° ${of}!`, error));
+  }
+
+  //Función para obtener la factura asociada a los pedidos de la orden de facturación.
+  managementFactZeus(saleOrders: Array<string>, of: number) {
+    this.zeusService.GetFactura_PorPedidos(saleOrders).pipe(
+      finalize(() => {
+        this.load = false;
+      })
+    ).subscribe(factura => {
+      //this.orderFactService.PutFactOrder(of, factura.documento).subscribe(() => {
+        this.factZeus = factura;
+        //this.formProduction.patchValue({ fact: factura.documento });
+        this.msj.mensajeConfirmacion(`OF consultada`, `¡Ingrese los rollos/bultos a despachar!`);
+        this.load = false;
+        this.sendProductionZeus = this.preSendProductionZeus;
+        this.consolidateItems();
+        //Carga la info de la OF en la tabla. 
+      //}, error => {
+      //  this.errorMessage(`¡No se pudo actualizar la factura de la orden #${of}!`, error);
+      //  this.clearFieldOF();
+      //});
+    }, error => {
+      this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la OF N° ${of}!`, error);
+      this.clearFieldOF();
+    });
+  }
+
+  //Función para cargar la información de los rollos/bultos a despachar en la tabla.
+  loadProduction(data: any, ofDirect: boolean) {
+    this.production.push({
+      'saleOrder': data.dtOrder.consecutivo_Pedido,
+      'item': data.producto.prod_Id,
+      'reference': data.producto.prod_Nombre,
+      'numberProduction': data.dtOrder.numero_Rollo,
+      'quantity': data.dtOrder.cantidad,
+      'presentation': data.dtOrder.presentacion,
+      'ofDirect': ofDirect
+    });
+  }
+
+  //Función para limpiar el campo de la orden de facturación y reiniciar la variable preload.
+  clearFieldOF() {
+    this.formProduction.patchValue({ 'orderFact': '', });
+    this.preload = false;
   }
 
   //Función para obtener la información del rollo/bulto a despachar.
@@ -463,7 +487,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           errores.push(`El item ${prod.item} tiene ${despachado} de ${prod.quantity}`);
         }
       });
-      
+
       if (errores.length > 0) {
         if (ofDirect) this.modalProductsNotRead = true;
         else this.modalProductionNotRead = true;
@@ -566,7 +590,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         'Cantidad': x.pp.presentacion == 'Kg' ? x.pp.peso_Neto : x.pp.cantidad,
         'Presentacion': x.pp.presentacion,
         'Consecutivo_Pedido': (x.salesOrder).toString(),
-        'Estado_Id': 20, 
+        'Estado_Id': 20,
         Pallet_Id: x.palletId ? x.palletId : null,
         OT: x.otId ? x.otId : null,
         Peso_Bruto: x.pp.peso_Bruto ? x.pp.peso_Bruto : null,
@@ -586,19 +610,18 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //Colocar en estado enviado la orden de facturación 
   finishSaveData() {
     let orderFact = this.formProduction.value.orderFact;
-    this.orderFactService.PutStatusOrder(orderFact).subscribe(() => this.putStateReels(), error => {
+    let ofDirect = this.formProduction.value.ofDirect;
+    let preload = this.formProduction.value.preload;
+
+    this.orderFactService.PutStatusOrder(orderFact).subscribe(() => this.putStateReels(orderFact, ofDirect, preload), error => {
       this.msj.mensajeError(`¡No se actualizó el estado de la orden de facturación ${orderFact}!`, `Error: ${error.error.title} | Status: ${error.status}`);
       this.load = false;
     });
   }
 
-  //Función para colocar en estado NO DISPONIBLE los bultos despachados. 
-  putStateReels() {
-    let orderFact = this.formProduction.value.orderFact;
-    let ofDirect = this.formProduction.value.ofDirect;
-    let preload = this.formProduction.value.preload;
-
-    this.productionProcessSerivce.putStateNotAvaible(orderFact).subscribe(() => {
+  //*Función para colocar en estado NO DISPONIBLE los bultos despachados. 
+  putStateReels(orderFact: number, ofDirect: boolean, preload: number) {
+    this.productionProcessSerivce.putStateNotAvaible2(orderFact).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Orden despachada correctamente!`);
       let fact = this.formProduction.value.fact;
       if (this.reposition) this.updateDevolution();

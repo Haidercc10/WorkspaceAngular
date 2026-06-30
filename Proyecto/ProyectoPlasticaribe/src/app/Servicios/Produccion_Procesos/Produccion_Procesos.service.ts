@@ -52,6 +52,8 @@ export class Produccion_ProcesosService {
 
   putStateNotAvaible = (orderFac: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoNoDisponible/${orderFac}`, orderFac);
 
+  putStateNotAvaible2 = (orderFac: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateNotAvaible2/${orderFac}`, orderFac);
+
   putSendZeus = (production: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEnvioZeus/${production}`, production);
 
   putAsociateRoll = (roll1: number, roll2 : number, item : number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putAsociateRoll/${roll1}/${roll2}/${item}`, roll1);

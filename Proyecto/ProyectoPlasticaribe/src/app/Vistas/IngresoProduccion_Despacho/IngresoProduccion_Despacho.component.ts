@@ -18,6 +18,8 @@ import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTe
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { TomaFisicaInventario, TomaFisicaInventarioComponent } from '../TomaFisicaInventario/TomaFisicaInventario.component';
 import { InventarioVsTomaFisicaComponent } from '../inventario-vs-toma-fisica/inventario-vs-toma-fisica.component';
+import { catchError, finalize, map, Observable, switchMap, tap, throwError } from 'rxjs';
+type SearchSource = 'EMP' | 'SELLA' | 'EXT';
 
 @Component({
   selector: 'app-IngresoProduccion_Despacho',
@@ -44,14 +46,16 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   cubeSelected: any;
   dataSearched: Array<dataDesp> = [];
   searchIn: any = null;
-  @ViewChild(InventarioVsTomaFisicaComponent) cmpInvVsPhysical : InventarioVsTomaFisicaComponent;
+  @ViewChild(InventarioVsTomaFisicaComponent) cmpInvVsPhysical: InventarioVsTomaFisicaComponent;
+  private processingRolls = new Set<number>();
+
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
     private msj: MensajesAplicacionService,
     private createPDFService: CreacionPdfService,
     private bagproService: BagproService,
-    private entraceService: EntradaRollosService, 
+    private entraceService: EntradaRollosService,
     private dtEntracesService: DetallesEntradaRollosService,
     private storehouseService: BodegasDespachoService,
     private clients: SedeClienteService,
@@ -76,6 +80,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.storage_Name = this.appComponent.storage_Nombre;
   }
 
+  //Función que se encargará de enfocar el input del código del rollo/bulto
   focusInput(destroy: boolean) {
     let time = setInterval(() => {
       let preInBarsCode = document.getElementById('RolloBarsCode');
@@ -84,8 +89,10 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }, 1000);
   }
 
+  //Función que se encargará de traer las bodegas de despacho
   getStorehouse = () => this.storehouseService.GetBodegas().subscribe(data => this.storehouse = data);
 
+  //Función que se encargará de traer las ubicaciones de la bodega seleccionada
   getUbicationByStorehouse() {
     this.storehouseService.GetUbicacionesPorBodegas(this.storehouseSelected).subscribe(data => {
       this.ubicationsStorehouse = data;
@@ -97,6 +104,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     });
   }
 
+  //Función que se encargará de traer las sububicaciones de la ubicación seleccionada
   getSubUbicationByStorehouse() {
     let dataUbication: any = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     this.storehouseService.GetSubUbicacionesPorUbicacion(this.storehouseSelected, dataUbication.idUbicacion, dataUbication.nombreUbicacion).subscribe(data => {
@@ -107,6 +115,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     });
   }
 
+  //Función que se encargará de traer los cubos de la sububicación seleccionada
   getCubesBySubUbication() {
     let dataUbication: any = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     this.storehouseService.GetCubosPorSubUbicacion(this.storehouseSelected, dataUbication.idUbicacion, dataUbication.nombreUbicacion, this.subUbicationSelected).subscribe(data => {
@@ -115,6 +124,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     });
   }
 
+  //Función que se encargará de limpiar los campos de la vista
   clearFields() {
     this.sendProductionZeus = [];
     this.productionSearched = null;
@@ -124,40 +134,49 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.subUbicationSelected = null;
     this.cubes = [];
     this.cubeSelected = null;
+    this.processingRolls.clear();
   }
 
+  //Función que se encargará de validar que los campos de la ubicación estén llenos para poder buscar el rollo/bulto en la base de datos
   validateUbicationSelected() {
-    if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected != null) this.searchProductionByReel();
+    if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected != null) this.searchProductionByReel2();
     else this.msj.mensajeAdvertencia(`¡Debe llenar los campo para validar la ubicación que tendrá el rollo/bulto!`);
   }
 
+  //Función que se encargará de buscar el id del rollos/bultos que no estén ingresados en la base de datos de plasticaribe 
+  // y traer la información del mismo para ingresarlo en Zeus y luego cambiar su estado. 
   searchProductionByReel() {
     let production = parseInt(this.productionSearched);
+
+    if (this.processingRolls.has(production)) {
+      this.msj.mensajeAdvertencia('Por favor, espere...',
+        `El rollo/bulto ${production} ya se encuentra en proceso de ingreso. `
+      );
+      this.productionSearched = null;
+      return;
+    }
+    this.processingRolls.add(production);
     this.productionSearched = null;
-    let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLA' : 'EXT';
+    let searchInTable: string = this.searchIn == null ? 'EMP' : !this.searchIn ? 'SELLA' : 'EXT';
     let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
-    if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
-    else {
+
+    if (productionSearched.includes(production)) {
+      this.msj.mensajeAdvertencia(`El rollo/bulto ${production} ya ha sido registrado`);
+      this.processingRolls.delete(production);
+    } else {
       this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(production, searchInTable).subscribe(data => {
-        if (data[0].proceso.proceso_Id != 'WIKE') {
-          //this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot, '').subscribe(res => {
-            this.sendProductionZeus.push(data[0]);
-            let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-            this.sendProductionZeus[i].dataExtrusion = {
-              numero_RolloBagPro: production,
-              //precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
-              //extrusion_Ancho1: res[0].ancho1_Extrusion,
-              //extrusion_Ancho2: res[0].ancho2_Extrusion,
-              //extrusion_Ancho3: res[0].ancho3_Extrusion,
-              //undMed_Id: res[0].und_Extrusion,
-              //extrusion_Calibre: res[0].calibre_Extrusion,
-              //material: res[0].material,
-            }
-            this.sendProductionZeus[i].position = this.sendProductionZeus.length;
-            this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
-            this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-          //}, error => { this.msj.mensajeError(`Error`, `No fue posible consultar la OT N° ${data[0].pp.ot} en BagPro | ${error.status} ${error.statusText}`) });
-        } else this.msj.mensajeError(`Advertencia`, `No es posible ingresar rollos/bultos del proceso de 'WIKETIADO'!`);
+        if (['EXT', 'SELLA', 'EMP'].includes(data.pp.proceso_Id)) {
+          this.sendProductionZeus.push(data);
+          let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
+          this.sendProductionZeus[i].dataExtrusion = {
+            numero_RolloBagPro: production,
+          }
+          this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+          this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1], production);
+          this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
+        } else {
+          this.msj.mensajeError(`Advertencia`, `Solo se pueden ingresar rollos/bultos de procesos 'EXT', 'SELLA' o 'EMP'!`);
+        }
         //}, () => this.lookingForDataInBagpro(production));
       }, () => this.warningNotFound(production));
     }
@@ -202,7 +221,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
                   extrusion_Ancho3: data[0].ancho3_Extrusion,
                   undMed_Id: data[0].und_Extrusion,
                   extrusion_Calibre: data[0].calibre_Extrusion,
-                  material: ['SELLADO','Wiketiado'].includes(prod[0].nomStatus) ? prod[0].estado : prod[0].material,
+                  material: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].estado : prod[0].material,
                   precioProducto: data[0].presentacion == 'Kilo' ? data[0].valorKg : data[0].valorUnidad,
                 },
                 proceso: {
@@ -215,10 +234,10 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
                 dataFromExtrusion: prod[0],
               });
               let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
-              let process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' = this.validateProcess((this.sendProductionZeus[i].proceso.proceso_Nombre).toUpperCase());
+              let process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' = this.validateProcess((this.sendProductionZeus[i].pp.proceso_Id).toUpperCase());
               this.sendProductionZeus[i].position = this.sendProductionZeus.length;
-              this.saveInProductionProcess(this.sendProductionZeus[i].pp.numero_Rollo, process, i);
-              this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
+              this.saveInProductionProcess(this.sendProductionZeus[i].pp.numero_Rollo, process, i, production);
+              this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
             });
           });
         } else this.msj.mensajeAdvertencia(`¡No puede Ingresar Rollos/Bultos provenientes del procesos 'WIKETIADO'!`);
@@ -226,7 +245,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }, () => this.warningNotFound(production));
   }
 
-  updateProductionZeus(data: any) {
+  updateProductionZeus(data: any, production: any) {
     let ot: string = data.pp.ot;
     let item: string = data.producto.prod_Id;
     let presentation: string = this.validatePresentation(data.pp.presentacion);
@@ -234,11 +253,12 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let quantity: number = presentation != 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
     let price: number = data.pp.precioVenta_Producto //data.dataExtrusion.precioProducto;
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, data.pp.numeroRollo_BagPro, quantity.toString(), price.toString()).subscribe(() => {
-      this.saveDataEntrace(data);
+      this.saveDataEntrace(data, production);
     }, error => {
       let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == reel);
       this.sendProductionZeus.splice(i, 1);
       this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error);
+      this.processingRolls.delete(production);
     });
   }
 
@@ -266,8 +286,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.productionProcessSerivce.putSendZeus(reel).subscribe(null, error => this.errorMessageWhenTryUpdateReel(errorMessage, error));
   }
 
-  createProduction(numberProduction: number, process: 'EXT' | 'EMP' | 'SELLA') : modelProduccionProcesos {
-    let data: any = this.sendProductionZeus.filter(x => x.pp.numero_Rollo == numberProduction && x.proceso.proceso_Id == process)[0];
+  createProduction(numberProduction: number, process: 'EXT' | 'EMP' | 'SELLA'): modelProduccionProcesos {
+    let data: any = this.sendProductionZeus.filter(x => x.pp.numero_Rollo == numberProduction && x.pp.proceso_Id == process)[0];
     let sellado: boolean = ['SELLA'].includes(process);
     let datos: modelProduccionProcesos = {
       OT: data.pp.ot,
@@ -291,7 +311,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       Precio: 0,
       Presentacion: data.pp.presentacion,
       Proceso_Id: process,
-      Turno_Id: sellado ? data.dataFromExtrusion.turnos : data.dataFromExtrusion.turno ,
+      Turno_Id: sellado ? data.dataFromExtrusion.turnos : data.dataFromExtrusion.turno,
       Envio_Zeus: false,
       Datos_Etiqueta: sellado ? data.dataFromExtrusion.fechaCambio : '',
       Fecha: sellado ? data.dataFromExtrusion.fechaEntrada : data.dataFromExtrusion.fecha,
@@ -302,19 +322,20 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     return datos;
   }
 
-  saveInProductionProcess(numberProduction: number, process: 'EXT' | 'EMP' | 'SELLA', i: number){
+  saveInProductionProcess(numberProduction: number, process: 'EXT' | 'EMP' | 'SELLA', i: number, production: number) {
     this.productionProcessSerivce.Post(this.createProduction(numberProduction, process)).subscribe(data => {
       this.sendProductionZeus[i].pp.numero_Rollo = data.numero_Rollo;
-      this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
+      this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1], production);
     }, error => {
       let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == numberProduction);
       this.sendProductionZeus.splice(i, 1);
       let errorMessage: string = `¡No fue posible crear el registro del Rollo/Bulto #${numberProduction} proveniente de 'BagPro'!`;
       this.errorMessageWhenTryUpdateReel(errorMessage, error);
+      this.processingRolls.delete(production);
     });
   }
 
-  loadInventory(){
+  loadInventory() {
     this.cmpInvVsPhysical.getInventory();
   }
 
@@ -328,8 +349,9 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.msj.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`, 1200000);
   }
 
-  warningNotFound(production: number){
-    this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`, '', 1200000);
+  warningNotFound(production: number) {
+    this.msj.mensajeAdvertencia(`El rollo/bulto ${production} no está disponible para ingresar`, '', 1200000);
+    //this.processingRolls.delete(production);
     this.load = false;
   }
 
@@ -352,22 +374,25 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     return `B${this.storehouseSelected}_${ubicationName}${ubicationSelected.idUbicacion}_${subUbicationName}${subUbicationSelected.idSubUbicacion}${cube}`;
   }
 
-  saveDataEntrace(data: any) {
+  saveDataEntrace(data: any, production: number) {
     let info: any = {
       EntRolloProd_Fecha: moment().format('YYYY-MM-DD'),
       EntRolloProd_Observacion: this.setUbication(),
       Usua_Id: this.storage_Id,
       EntRolloProd_Hora: moment().format('H:mm:ss'),
     }
-    this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), () => {
+    this.entraceService.srvGuardar(info).subscribe(res => {
+      this.saveDataDetalleEntrance(res.entRolloProd_Id, data, production);
+    }, () => {
       this.load = false;
       let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
       this.sendProductionZeus.splice(i, 1);
       this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`, '', 1200000);
+      this.processingRolls.delete(production);
     });
   }
 
-  saveDataDetalleEntrance(id: number, data: any) {
+  saveDataDetalleEntrance(id: number, data: any, production: number) {
     let info: any = {
       EntRolloProd_Id: id,
       Rollo_Id: data.pp.numero_Rollo,
@@ -382,9 +407,12 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       Prod_CantBolsasBulto: 0,
       Prod_CantBolsasRestates: 0,
       Prod_CantBolsasFacturadas: 0,
-      Proceso_Id: data.proceso.proceso_Id,
+      Proceso_Id: data.pp.proceso_Id,
     }
-    this.dtEntracesService.srvGuardar(info).subscribe(() => this.messageConfirmationUpdateStore(), () => {
+    this.dtEntracesService.srvGuardar(info).subscribe(() => {
+      this.messageConfirmationUpdateStore();
+      this.processingRolls.delete(production);
+    }, () => {
       this.load = false;
       let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
       this.sendProductionZeus.splice(i, 1);
@@ -392,32 +420,9 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     });
   }
 
-  printTag(data: any) {
-    let proceso: string = data.proceso.proceso_Id;
-    let dataTagProduction: modelTagProduction = {
-      client: data.clientes.cli_Nombre,
-      item: data.producto.prod_Id,
-      reference: data.producto.prod_Nombre,
-      width: ['EMP', 'SELLA', 'WIKE'].includes(proceso) ? data.producto.prod_Ancho : data.dataExtrusion.extrusion_Ancho1,
-      height: ['EMP', 'SELLA', 'WIKE'].includes(proceso) ? data.producto.prod_Largo : data.dataExtrusion.extrusion_Ancho2,
-      bellows: ['EMP', 'SELLA', 'WIKE'].includes(proceso) ? data.producto.prod_Fuelle : data.dataExtrusion.extrusion_Ancho3,
-      und: data.dataExtrusion.undMed_Id,
-      cal: data.dataExtrusion.extrusion_Calibre,
-      orderProduction: data.pp.ot,
-      material: data.dataExtrusion.material,
-      quantity: ['SELLA', 'WIKE'].includes(proceso) ? data.pp.cantidad : data.pp.peso_Bruto,
-      quantity2: data.pp.peso_Neto,
-      reel: data.pp.numero_Rollo,
-      presentationItem1: ['SELLA', 'WIKE'].includes(proceso) ? data.pp.presentacion : 'Kg Bruto',
-      presentationItem2: ['SELLA', 'WIKE'].includes(proceso) ? 'Kg' : 'Kg Neto',
-      productionProcess: data.proceso.proceso_Nombre,
-      showNameBussiness: data.motrarEmpresaEtiquetas,
-    }
-    this.createPDFService.createTagProduction(dataTagProduction);
-  }
-
   removeProduction(data: any) {
     let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
+    this.processingRolls.delete(data.pp.numeroRollo_BagPro);
     this.sendProductionZeus.splice(i, 1);
   }
 
@@ -433,16 +438,16 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
           item: data.producto.prod_Id,
           reference: data.producto.prod_Nombre,
           production: data.dataExtrusion.numero_RolloBagPro,
-          quantity: data.pp.presentacion != 'Kg' ? data.pp.cantidad : data.pp.peso_Bruto,
+          quantity: data.pp.presentacion != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto,
           presentation: data.pp.presentacion,
           date: (data.pp.fecha).replace('T00:00:00', ''),
           hour: (data.pp.hora).length == 7 ? `0${data.pp.hora}` : data.pp.hora,
           user: (this.storage_Name).toString().toUpperCase(),
-          process: (data.proceso.proceso_Nombre).toString().toUpperCase(),
+          process: (data.proceso.proceso_Id).toString().toUpperCase(),
           ubication: (this.setUbication()).toString().toUpperCase(),
-          productionPL : 0,
-          stateRollPP : '',
-          price : 0,
+          productionPL: 0,
+          stateRollPP: '',
+          price: 0,
         });
 
         this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
@@ -454,7 +459,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
 
   changeTab(index: any) {
     if (index == 2) this.loadInventory();
-  }  
+  }
 
   createPDF() {
     this.load = true;
@@ -614,4 +619,172 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     ]
   }
 
+  /** Punto de entrada: valida el número, evita duplicados y ejecuta el flujo completo de ingreso. */
+  searchProductionByReel2(): void {
+    const production = Number.parseInt(this.productionSearched, 10);
+    this.productionSearched = null;
+
+    if (!this.isValidProductionNumber(production)) return;
+    if (!this.canStartProductionProcessing(production)) return;
+
+    const source = this.resolveSearchSource();
+
+    this.fetchAndIngress$(production, source).pipe(
+      finalize(() => this.processingRolls.delete(production))
+    ).subscribe({
+      next: () => this.messageConfirmationUpdateStore(),
+      error: (error) => this.handleSearchProductionError(error, production),
+    });
+  }
+
+  /** Valida que el dato de entrada sea un número usable para búsqueda. */
+  private isValidProductionNumber(production: number): boolean {
+    if (Number.isFinite(production)) return true;
+    this.msj.mensajeAdvertencia('Debe ingresar un número de rollo/bulto válido');
+    return false;
+  }
+
+  /** Valida si el rollo ya está en proceso o ya fue agregado; si pasa, bloquea su procesamiento. */
+  private canStartProductionProcessing(production: number): boolean {
+    if (this.processingRolls.has(production)) {
+      this.msj.mensajeAdvertencia(
+        'Por favor, espere...',
+        `El rollo/bulto ${production} ya se encuentra en proceso de ingreso. `
+      );
+      return false;
+    }
+
+    const alreadyRegistered = this.sendProductionZeus
+      .map(x => x?.pp?.numeroRollo_BagPro)
+      .includes(production);
+
+    if (alreadyRegistered) {
+      this.msj.mensajeAdvertencia(`El rollo/bulto ${production} ya ha sido registrado`);
+      return false;
+    }
+
+    this.processingRolls.add(production);
+    return true;
+  }
+
+  /** Traduce el filtro de UI al valor que espera el servicio de consulta. */
+  private resolveSearchSource(): SearchSource {
+    return this.searchIn == null ? 'EMP' : !this.searchIn ? 'SELLA' : 'EXT';
+  }
+
+  /** Ejecuta en cadena: consulta del rollo, validación de proceso, registro local y persistencia en Zeus/ingresos. */
+  private fetchAndIngress$(production: number, source: SearchSource): Observable<void> {
+    return this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(production, source).pipe(
+      tap((data: any) => this.validateAllowedProcessOrThrow(data)),
+      tap((data: any) => this.addProductionToQueue(data, production)),
+      switchMap((data: any) => this.sendToZeusAndSaveIngress$(data)),
+      map(() => void 0),
+      catchError((error) => {
+        // Si falla cualquier etapa después de registrar en cola, limpia el item local.
+        if (error?.reel) this.removeProductionByReel(error.reel);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /** Verifica que el proceso del rollo sea permitido; lanza error controlado si no cumple. */
+  private validateAllowedProcessOrThrow(data: any): void {
+    const isAllowed = ['EXT', 'SELLA', 'EMP'].includes(data?.pp?.proceso_Id);
+    if (!isAllowed) {
+      throw { code: 'INVALID_PROCESS' };
+    }
+  }
+
+  /** Agrega el rollo a la cola local, completa campos auxiliares y mantiene el orden en pantalla. */
+  private addProductionToQueue(data: any, production: number): void {
+    this.sendProductionZeus.push(data);
+
+    const i = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo === data.pp.numero_Rollo);
+    this.sendProductionZeus[i].dataExtrusion = { numero_RolloBagPro: production };
+    this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+
+    this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
+  }
+
+  /** Envía a Zeus y luego crea ingreso + detalle en despacho en una sola secuencia lineal. */
+  private sendToZeusAndSaveIngress$(data: any): Observable<any> {
+    const presentation = this.validatePresentation(data.pp.presentacion);
+    const quantity = presentation !== 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
+
+    return this.productionProcessSerivce.sendProductionToZeus(
+      data.pp.ot,
+      data.producto.prod_Id,
+      presentation,
+      data.pp.numeroRollo_BagPro,
+      quantity.toString(),
+      (data.pp.precioVenta_Producto).toString()
+    ).pipe(
+      switchMap(() => this.entraceService.srvGuardar(this.buildEntranceInfo())),
+      switchMap((res: any) => this.dtEntracesService.srvGuardar(this.buildEntranceDetailInfo(res.entRolloProd_Id, data))),
+      catchError((originalError) =>
+        throwError(() => ({ code: 'PIPELINE_ERROR', reel: data.pp.numero_Rollo, originalError }))
+      )
+    );
+  }
+
+  /** Construye la información de encabezado para guardar el ingreso. */
+  private buildEntranceInfo(): any {
+    return {
+      EntRolloProd_Fecha: moment().format('YYYY-MM-DD'),
+      EntRolloProd_Observacion: this.setUbication(),
+      Usua_Id: this.storage_Id,
+      EntRolloProd_Hora: moment().format('H:mm:ss'),
+    };
+  }
+
+  /** Construye la información de detalle para guardar el rollo dentro del ingreso. */
+  private buildEntranceDetailInfo(entranceId: number, data: any): any {
+    return {
+      EntRolloProd_Id: entranceId,
+      Rollo_Id: data.pp.numero_Rollo,
+      DtEntRolloProd_Cantidad: data.pp.presentacion !== 'Kg' ? data.pp.cantidad : data.pp.peso_Neto,
+      UndMed_Rollo: data.pp.presentacion,
+      Estado_Id: 19,
+      DtEntRolloProd_OT: data.pp.ot,
+      Prod_Id: data.producto.prod_Id,
+      UndMed_Prod: data.pp.presentacion,
+      Prod_CantPaquetesRestantes: 0,
+      Prod_CantBolsasPaquete: 0,
+      Prod_CantBolsasBulto: 0,
+      Prod_CantBolsasRestates: 0,
+      Prod_CantBolsasFacturadas: 0,
+      Proceso_Id: data.pp.proceso_Id,
+    };
+  }
+
+  /** Elimina de la cola local el item que falló para evitar inconsistencias visuales. */
+  private removeProductionByReel(reel: number): void {
+    const i = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo === reel);
+    if (i >= 0) this.sendProductionZeus.splice(i, 1);
+  }
+
+  /** Centraliza los mensajes de error del flujo de búsqueda e ingreso. */
+  private handleSearchProductionError(error: any, production: number): void {
+    this.load = false;
+
+    if (error?.code === 'INVALID_PROCESS') {
+      this.msj.mensajeError(
+        'Advertencia',
+        `Solo se pueden ingresar rollos/bultos de procesos 'EXT', 'SELLA' o 'EMP'!`
+      );
+      return;
+    }
+
+    if (error?.code === 'PIPELINE_ERROR') {
+      this.errorMessageWhenTryUpdateReel(
+        `¡Error al actualizar el inventario del rollo ${error.reel}!`,
+        error.originalError
+      );
+      return;
+    }
+
+    // Error de consulta inicial (no encontrado o fallo del servicio).
+    this.warningNotFound(production);
+  }
 }
+

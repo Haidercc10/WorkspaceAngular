@@ -79,6 +79,7 @@ export class InventarioVsTomaFisicaComponent implements OnInit {
     }
   }
 
+  //Función que obtiene los inventarios disponibles para comparar
   getInventoriesAdd() {
     this.svSnapshot.getInventoriesSnapshot().subscribe(data => {
       this.inventories = data;

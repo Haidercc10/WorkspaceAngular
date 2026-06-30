@@ -63,7 +63,7 @@
           <div class="field-checkbox my-2 mx-4">
             <p-triStateCheckbox [(ngModel)]="searchIn" inputId="tricheckbox"></p-triStateCheckbox>
             <label for="tricheckbox">
-              <p-chip [label]="searchIn == null ? 'Todos' : searchIn ? 'Extrusión/Empaque' : 'Sellado'"
+              <p-chip [label]="searchIn == null ? 'Empaque' : searchIn ? 'Extrusión' : 'Sellado'"
                       [icon]="searchIn == null ? 'pi pi-sync' : searchIn ? 'pi pi-bolt' : 'pi pi-box'"></p-chip>
             </label>
           </div>
@@ -99,7 +99,7 @@
 
             <th class="text-center">Fecha</th>
             <th class="text-center">Hora</th>
-            <th class="text-center">Turno</th>
+            <!--<th class="text-center">Turno</th>-->
             <th class="text-center">Proceso</th>
             <!-- <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th> -->
             <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
@@ -118,8 +118,8 @@
             <td class="text-center">{{data.pp.presentacion}}</td>
             <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
             <td class="text-center">{{data.pp.hora}}</td>
-            <td class="text-center">{{data.turno.turno_Nombre}}</td>
-            <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
+            <!--<td class="text-center">{{data.turno.turno_Nombre}}</td>-->
+            <td class="text-center">{{data.pp.proceso_Id | uppercase}}</td>
             <!-- <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
               <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button>
             </td> -->

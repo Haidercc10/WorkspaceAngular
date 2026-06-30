@@ -80,9 +80,9 @@ export class MenuLateralComponent implements OnInit {
 
   async ngOnInit() {
     this.lecturaStorage();
-    this.cantidadEventosMes();
-    this.consultarEventosHoy();
-    this.consultarEventosMes();
+    //this.cantidadEventosMes();
+    //this.consultarEventosHoy();
+    //this.consultarEventosMes();
     this.CargarCategorias();
     this.abrirModalUsuario();
   }

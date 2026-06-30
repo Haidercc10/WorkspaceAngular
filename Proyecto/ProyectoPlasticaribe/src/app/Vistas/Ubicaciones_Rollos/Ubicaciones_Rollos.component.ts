@@ -246,7 +246,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
       this.onReject();
       this.load = true
       this.groupedInfo.forEach(x => {
-        let unit : string = x.pp.presentacion == 'Kg' ? 'KLS' : x.pp.presentacion == 'Und' ? 'UND' : 'PAQ';
+        let unit : string = x.pp.presentacion == 'Kg' ? 'KLS' : x.pp.presentacion == 'Und' ? 'UND' : x.pp.presentacion == 'Paquete' ? 'PAQ' : 'MTS';
         let detailAdjustment : string = `Ajuste desde App Plasticaribe solicitado por ${user}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}, por el motivo ${this.form.value.observation}`;
         this.svInvZeus.getExistenciasProductos(x.producto.prod_Id, unit).subscribe(data => {
           if(!data) {
@@ -271,17 +271,10 @@ export class Ubicaciones_RollosComponent implements OnInit {
     let description : string = `${moment().format('YYYY-MM-DD')} ${moment().format('HH:mm:ss')}: ${user} solicita ajuste por motivo: ${observation}`;
     let errorMsj : string = 'No fue posible revertir el Envio Zeus de los rollos en Plasticaribe!';
 
-    this.productionProcessSerivce.putReversionEnvioZeus(fail, description, rollsPL).subscribe(data => { this.changeStateEntry(rollsPL, zeus); }, error => { this.msj.mensajeError('Error', errorMsj); });
-  }
-
-  //.Función que actualizará el envio zeus de los rollos en procextrusion
-  updateRollsBagproEmpaque(rolls: any) {
-    this.bagproService.putReversionEnvioZeus_ProcExtrusion(rolls).subscribe(null, () => this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos de Empaque en BagPro!'));
-  }
-
-  //.Función que actualizará el envio zeus de los rollos en procsellado
-  updateRollsBagproSellado(rolls: any) {
-    this.bagproService.putReversionEnvioZeus_ProcSellado(rolls).subscribe(null, () => this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos de Sellado en BagPro!'));
+    this.productionProcessSerivce.putReversionEnvioZeus(fail, description, rollsPL).subscribe(data => { 
+      this.changeStateEntry(rollsPL, zeus); 
+    }, error => { this.msj.mensajeError('Error', errorMsj); 
+    });
   }
 
   //.Función que colocará como devuelto el estado del rollo

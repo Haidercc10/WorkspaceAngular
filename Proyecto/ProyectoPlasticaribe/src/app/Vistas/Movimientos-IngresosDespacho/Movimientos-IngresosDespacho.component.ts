@@ -25,7 +25,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   formFilters: FormGroup;
   load: boolean = false;
   storage_Id: number;
-  validateRole: number | undefined;
+  validateRole: any;
   selectedMode: boolean = false;
   products: any[] = [];
   dataSearched: Array<dataDesp> = [];
