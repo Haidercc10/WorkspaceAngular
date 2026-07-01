@@ -399,6 +399,7 @@ export class TagProduction_2 {
       this.infoClient(dataTag),
       this.dataOrderAndItem(dataTag),
       this.nameReference(dataTag),
+      this.widthAndCalibre(dataTag),
       this.nameMaterial(dataTag),
       this.createBarcode(dataTag),
       this.quantity(dataTag),
@@ -527,6 +528,38 @@ export class TagProduction_2 {
     ]
   }
 
+  private widthAndCalibre(dataTag: modelTagProduction): any[] {
+    return [
+      {
+        margin: [-5, -3],
+        colSpan: 2,
+        table: {
+          widths: ['70%', '30%'],
+          margin: [0, 3],
+          body: [
+            [
+              {
+                border: [false, false, true, false],
+                columns: [
+                  { width: 'auto', text: 'ANCHO: ', bold: true, fontSize: 9, alignment: 'left' },
+                  { width: 'auto', text: ` ${(dataTag.width)} ${(dataTag.und)}`, fontSize: 9, alignment: 'left' },
+                ]
+              },
+              {
+                border: [false, false, false, false],
+                columns: [
+                  { width: 'auto', text: 'CAL: ', bold: true, fontSize: 9, alignment: 'left' },
+                  { width: 'auto', text: ` ${dataTag.cal}`, fontSize: 9, alignment: 'left' },
+                ]
+              }
+            ]
+          ]
+        }
+      },
+      {}
+    ]
+  }
+
   private createBarcode(dataTag: modelTagProduction) {
     let size: number = this.sizeBarcode(dataTag);
     const imageBarcode = document.createElement('img');
@@ -546,7 +579,7 @@ export class TagProduction_2 {
   private sizeBarcode(dataTag: modelTagProduction): number {
     let sizeClient: number = dataTag.client.length;
     let sizeReference: number = dataTag.reference.length;
-    let size: number = 85;
+    let size: number = 70;
     size += sizeClient < 50 ? sizeClient < 24 ? 15 : 10 : 0;
     size += sizeReference < 50 ? sizeReference < 24 ? 15 : 10 : 0;
     return size;
@@ -628,7 +661,7 @@ export interface modelTagProduction {
   client: string;
   item: number;
   reference: string;
-  width: number;
+  width: any;
   height: number;
   bellows: number;
   und: string;

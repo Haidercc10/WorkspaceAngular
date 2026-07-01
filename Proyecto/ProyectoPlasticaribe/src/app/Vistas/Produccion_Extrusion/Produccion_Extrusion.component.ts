@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { cA } from '@fullcalendar/core/internal-common';
 import { error, log } from 'console';
 import { subscribe } from 'diagnostics_channel';
 import moment from 'moment';
@@ -151,7 +152,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     //setTimeout(() => {
     //this.buscarPuertos()
     this.getMachines();
-    this.getPackers();
+    
     this.getUsersAuthorized();
     this.getClientsWithRestrictionWeight();
     this.getSupervisores();
@@ -219,6 +220,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       9: 'Empaque',
       80: 'Empaque',
       101: 'Perforado',
+      81: 'Sellado',
+      8: 'Sellado',
     };
     if (this.ValidarRol != 1) {
       this.proceso = process[this.ValidarRol];
@@ -228,6 +231,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       this.validateProcess();
     }
     this.obtenerTurnos();
+    this.getPackers(this.proceso.toUpperCase());
   }
 
   //Función que obtiene los clientes con restricción de peso
@@ -362,7 +366,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   getProcess() {
     this.processService.srvObtenerLista().subscribe(res => {
-      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP', 'MATPRIMA', 'PERF',].includes(x.proceso_Id)).forEach(process => {
+      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP', 'MATPRIMA', 'PERF', 'SELLA'].includes(x.proceso_Id)).forEach(process => {
         this.process.push({
           order: this.sortArrayProcess(process.proceso_Nombre),
           proceso_Id: process.proceso_Id,
@@ -374,7 +378,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   //Función que carga los empacadores de la producción de corte
-  getPackers = () => this.operariosService.GetPackersProduction('EMPAQUE').subscribe(data => { this.packers = data; }, error => console.log(error));
+  getPackers(process : string) {
+    this.operariosService.GetPackersProduction(process).subscribe(data => { this.packers = data; }, error => console.log(error));
+  } 
 
   sortArrayProcess(process: string) {
     let num: number = 0;
@@ -425,6 +431,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           9: 11,
           80: 11,
           101: 36,
+          81: 10,
+          8: 10,
         }
         this.operarios = data.filter(x => x.area_Id == validateAreas[this.ValidarRol]);
       }
@@ -443,7 +451,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       IMP: 19,
       ROT: 20,
       LAM: 22,
-      PERF: 36
+      PERF: 36,
+      SELLA: 10,
     };
     const area = areas[process] ?? 34;
     this.svUsers.getSupervisors(area).subscribe(data => {
@@ -530,8 +539,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       if (consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior': null, 'etiquetaAsociada': null, 'otAlterna': null, 'packer': null, 'supervisor': null });
       let proceso: string = this.formDatosProduccion.value.proceso == 'DBLD' ? 'DOBLADO' : this.formDatosProduccion.value.proceso;
       this.bagproService.GetOrdenDeTrabajo(ordenTrabajo, `?process=${proceso}`).subscribe(data => {
+        let quantity : number = proceso == 'SELLA' ? data[0].cantidad_Sellado : data[0].cantidad_Proceso;
+        let weight : number = proceso == 'SELLA' ? data[0].peso_Sellado : data[0].cantidad_Proceso;
         this.putDataOrderProduction(data, consulta);
-        if (!consulta) this.updateStatesProcessOT(data[0].numero_Orden, this.formDatosProduccion.value.proceso, data[0].cantidad_Proceso, data[0].cantidad_Proceso);
+        if (!consulta) this.updateStatesProcessOT(data[0].numero_Orden, this.formDatosProduccion.value.proceso, quantity, weight);
       }, error => {
         this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
         this.reference = ``;
@@ -552,7 +563,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           this.reference = datos.producto;
           this.datosOrdenTrabajo[0].id_Cliente = cli.id_Cliente;
           this.client = cli.id_Cliente;
-          console.log(this.client);
+
           this.formDatosProduccion.patchValue({
             'idCliente': cli.id_Cliente,
             'cliente': datos.cliente,
@@ -586,7 +597,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   msjTotalProduction(data: any) {
     let sales: number = data[0].peso_Neto;
-    let packed: number = this.sumarPesoNeto();
+    let packed: number = this.sumarCantidad();
     let unit: string = data[0].presentacion;
 
     if (packed > sales) this.warinigMessage(`La orden está sobrepasada. Se solicitaron ${sales.toLocaleString()} y se han producido ${packed.toLocaleString()} ${unit}.`);
@@ -615,20 +626,20 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let ordenTrabajo: string = this.formDatosProduccion.value.ordenTrabajo;
     this.rollosPesados = [];
-    this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
+    this.bagproService.getRegistrosPorOT(ordenTrabajo, proceso).subscribe(data => {
       this.rollosPesados = data;
-      this.rollosPesados.sort((a, b) => b.item - a.item);
+      this.rollosPesados.sort((a, b) => b.id - a.id);
       this.cargando = false;
     }, () => this.cargando = false);
   }
 
   sumarPesoBruto() {
-    let total: number = this.rollosPesados.reduce((a, b) => a + b.extBruto, 0);
+    let total: number = this.rollosPesados.reduce((a, b) => a + b.peso, 0);
     return total;
   }
 
-  sumarPesoNeto() {
-    let total: number = this.rollosPesados.reduce((a, b) => a + b.extnetokg, 0);
+  sumarCantidad() {
+    let total: number = this.rollosPesados.reduce((a, b) => a + b.cantidad, 0);
     return total;
   }
 
@@ -668,7 +679,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         this.msj.mensajeError(ex);
         this.cargando = false;
       }
-      return 0; // Retorna 5 en caso de error
+      return 0; // Retorna 0 en caso de error
     }
   }
 
@@ -698,7 +709,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             if (this.formDatosProduccion.value.pesoNeto > 1) {
               if (this.formDatosProduccion.value.proceso == 'EMP') {
                 if (this.formDatosProduccion.value.packer) {
-                  if(this.formDatosProduccion.value.supervisor) {
+                  if (this.formDatosProduccion.value.supervisor) {
                     if (this.formDatosProduccion.value.pesoNeto <= 65) {
                       if (tag) {
                         if (tag.toString().length >= 6) {
@@ -780,7 +791,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   //
   datosProduccion(daipita: any): modelProduccionProcesos {
     let presentation = this.formDatosProduccion.value.presentacion;
-    
+
     if (presentation == 'Kilo') presentation = 'Kg';
     else if (presentation == 'Unidad') presentation = 'Und';
     let datos: modelProduccionProcesos = {
@@ -789,9 +800,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Prod_Id: parseInt(this.formDatosProduccion.value.item),
       Cli_Id: parseInt(this.formDatosProduccion.value.idCliente),
       Operario1_Id: this.formDatosProduccion.value.operario,
-      Operario2_Id: null,
-      Operario3_Id: null,
-      Operario4_Id: null,
+      Operario2_Id: 0,
+      Operario3_Id: 0,
+      Operario4_Id: 0,
       Pesado_Entre: 1,
       Maquina: this.formDatosProduccion.value.maquina,
       Cono_Id: this.formDatosProduccion.value.cono,
@@ -815,7 +826,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Etiqueta_Trazabilidad: this.formDatosProduccion.value.etiquetaAsociada,
       Empacador_Id: [undefined, null].includes(this.formDatosProduccion.value.packer) ? 0 : this.formDatosProduccion.value.packer,
       Autoriza_Id: this.formDatosProduccion.value.userAuthorize ? this.formDatosProduccion.value.userAuthorize : 0,
-      Estado_Rollo: 19, 
+      Estado_Rollo: 19,
       Supervisor_Id: [undefined, null].includes(this.formDatosProduccion.value.supervisor) ? 3197 : this.formDatosProduccion.value.supervisor,
     }
     return datos;
@@ -837,19 +848,24 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
     this.produccionProcesosService.postProduccionProcesos(this.datosProduccion(daipita)).subscribe(res => {
       //this.getEtiquetaPlasticaribe(res, infoEtiquetaAsociada, daipita, rebobinado);
+      let caliber: any = this.formDatosProduccion.value.calibre;
+      let dataOrderProduction : any = this.datosOrdenTrabajo[0];
+      let widthTotal : number = this.formDatosProduccion.value.anchoProducto; 
+      let anchoProducto: any = this.loadWidthForOT2(res, dataOrderProduction, widthTotal) //this.validateProcess() != 'EMP' ? this.loadWidthForOT2(res) : this.formDatosProduccion.value.anchoProducto;
+      let und: any = this.formDatosProduccion.value.undExtrusion;
       let supervisor = supervisorId ? this.supervisores.find(x => x.supervisor_Id === supervisorId) : null;
-      console.log('data:', res);
+      
 
       if (res) {
         let etiqueta: modelTagProduction = {
           'client': res.cli_Nombre,
           'item': res.prod_Id,
           'reference': res.prod_Nombre,
-          'width': 0,
+          'width': anchoProducto ? anchoProducto : 0,
           'height': 0,
           'bellows': 0,
-          'und': '',
-          'cal': 0,
+          'und': und ? und : '',
+          'cal': caliber ? caliber : 0,
           'orderProduction': res.ot,
           'material': res.material_Nombre,
           'quantity': this.validateProcess() != 'EMP' ? res.peso_Bruto : [0, '', null, undefined].includes(daipita) ? res.peso_Bruto : res.peso_Neto,
@@ -878,6 +894,31 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }, error => {
       this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error);
     });
+  }
+
+  //Función que cargará el ancho del producto.
+  loadWidthForOT2(data: any, orderProduction : any, widthTotal): string {
+    if (!data) return '0';
+
+    const anchoCorte = Number(widthTotal);
+    const ancho1 = Number(orderProduction.ancho1_Extrusion);
+    const ancho2 = Number(orderProduction.ancho2_Extrusion);
+    const ancho3 = Number(orderProduction.ancho3_Extrusion);
+
+    if (data.material_Nombre === 'BOPP') {
+      return `${anchoCorte}`;
+    }
+
+    if (ancho1 > anchoCorte) {
+      if(this.validateProcess() == 'EMP') {
+        return `${anchoCorte}`;
+      }
+    }
+
+    const anchos = [ancho1, ancho2, ancho3]
+      .filter(x => x > 0);
+
+    return anchos.length ? anchos.join('+') : '0';
   }
 
   //Función que carga los datos del rollo creado en los campos correspondientes para facilitar la creación de la etiqueta en caso de que el proceso sea diferente a extrusión.
@@ -1009,7 +1050,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     });
   }
 
-  validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'PERF' {
+  validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'PERF' | 'SELLA' {
     const processMapping = {
       'EXTRUSION': 'EXT',
       'IMPRESION': 'IMP',
@@ -1070,7 +1111,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   createTagProduction(code: number, quantity: number, quantity2: number, copy: boolean = false) {
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
-    let data: Array<any> = this.rollosPesados.filter(data => data.item == code);
+    let data: Array<any> = this.rollosPesados.filter(data => data.id == code);
     let dataTagProduction: modelTagProduction = {
       client: this.formDatosProduccion.value.cliente,
       item: this.formDatosProduccion.value.item,

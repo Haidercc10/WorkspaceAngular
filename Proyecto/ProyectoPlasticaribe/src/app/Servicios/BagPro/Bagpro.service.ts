@@ -69,6 +69,8 @@ export class BagproService {
 
   GetDatosRollosPesados = (orden : string, proceso : string) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getDatosRollosPesados/${orden}/${proceso}`);
 
+  getRegistrosPorOT = (orden : string, proceso : string) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getRegistrosPorOT/${orden}/${proceso}`);
+
   GetInformactionProductionForTag = (production: number): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getInformactionProductionForTag/${production}`);
 
   getRollProduction = (roll: number, url: string): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getRollProduction/${roll}${url}`);

@@ -292,10 +292,10 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que carga los supervisores dependiendo del proceso seleccionado
   getSupervisores() {
     this.supervisores = [];
-    let process : string = this.formSellado.value.proceso;
+    let process: string = this.formSellado.value.proceso;
     const areas: Record<string, number> = {
-      SELLA : 10,
-      WIKE : 31,
+      SELLA: 10,
+      WIKE: 31,
     };
     if (!process) process = 'SELLA';
     const area = areas[process] ?? 34;
@@ -616,7 +616,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.svcMsjs.mensajeError(ex);
         this.cargando = false;
       }
-      return 0; // Retorna 5 en caso de error
+      return 0; // Retorna 0 en caso de error
     }
   }
 
@@ -685,11 +685,11 @@ export class Produccion_SelladoComponent implements OnInit {
       'Estado_Rollo': 19,
       'Supervisor_Id': [undefined, null].includes(this.formSellado.value.supervisor) ? 3197 : this.formSellado.value.supervisor
     }
-    this.guardarRegistroEntradaNuevo(entrada, data);
+    this.guardarRegistroEntradaNuevo(entrada, orden, data);
   }
 
   //Función que guarda el registro de entrada y realiza las acciones posteriores al registro.
-  guardarRegistroEntradaNuevo(entrada: any, dataTagAssociated?: any) {
+  guardarRegistroEntradaNuevo(entrada: any, orden: any, dataTagAssociated?: any) {
     let motherProcess: any = this.formSellado.value.procesoAnterior;
     let otAltern: any = this.formSellado.value.otAlterna;
     let tagAssociated = entrada.Etiqueta_Trazabilidad ? entrada.Etiqueta_Trazabilidad : this.formSellado.value.etiquetaAsociada;
@@ -697,6 +697,10 @@ export class Produccion_SelladoComponent implements OnInit {
 
     this.svcProdProcesos.postProduccionProcesos(entrada).subscribe(data => {
       let supervisor = supervisorId ? this.supervisores.find(x => x.supervisor_Id === supervisorId) : null;
+      let caliber: number = orden ? orden.calibre_Extrusion ? orden.calibre_Extrusion : 0 : 0;
+      let und: string = orden ? orden.und_Extrusion ? orden.und_Extrusion : '' : '';
+      let width: any = this.loadWidthForOT2(orden, data);
+
       console.log('PostProduccionProcesos', data);
       if (data) {
         if (data.numeroRollo_BagPro) {
@@ -704,11 +708,11 @@ export class Produccion_SelladoComponent implements OnInit {
             'client': data.cli_Nombre,
             'item': data.prod_Id,
             'reference': data.prod_Nombre,
-            'width': 0,
+            'width': width ? width : 0,
             'height': 0,
             'bellows': 0,
-            'und': '',
-            'cal': 0,
+            'und': und ? und : '',
+            'cal': caliber ? caliber : 0,
             'orderProduction': data.ot,
             'material': data.material_Nombre,
             'quantity': data.peso_Neto,
@@ -745,6 +749,29 @@ export class Produccion_SelladoComponent implements OnInit {
     }, error => {
       this.svcMsjs.mensajeError(`Error`, `Error al crear el registro de producción | ${error.status} ${error.statusText} ${error.message}`, 1200000);
     })
+  }
+
+  //Función que cargará el ancho del producto.
+  loadWidthForOT2(orden: any, data: any): string {
+    if (!orden) return '0';
+
+    const anchoSellado = Number(parseInt(orden.selladoCorte_Ancho));
+    const ancho1 = Number(orden.ancho1_Extrusion);
+    const ancho2 = Number(orden.ancho2_Extrusion);
+    const ancho3 = Number(orden.ancho3_Extrusion);
+
+    if (data.material_Nombre === 'BOPP') {
+      return `${anchoSellado}`;
+    }
+
+    if (ancho1 > anchoSellado) {
+      return `${anchoSellado}`;
+    }
+
+    const anchos = [ancho1, ancho2, ancho3]
+      .filter(x => x > 0);
+
+    return anchos.length ? anchos.join('+') : '0';
   }
 
   //Mensaje de Advertencia.
