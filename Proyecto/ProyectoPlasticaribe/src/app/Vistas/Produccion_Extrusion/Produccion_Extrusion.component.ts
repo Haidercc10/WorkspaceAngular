@@ -152,7 +152,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     //setTimeout(() => {
     //this.buscarPuertos()
     this.getMachines();
-    
+
     this.getUsersAuthorized();
     this.getClientsWithRestrictionWeight();
     this.getSupervisores();
@@ -378,9 +378,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   //Función que carga los empacadores de la producción de corte
-  getPackers(process : string) {
+  getPackers(process: string) {
     this.operariosService.GetPackersProduction(process).subscribe(data => { this.packers = data; }, error => console.log(error));
-  } 
+  }
 
   sortArrayProcess(process: string) {
     let num: number = 0;
@@ -539,8 +539,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       if (consulta) this.formDatosProduccion.patchValue({ 'procesoAnterior': null, 'etiquetaAsociada': null, 'otAlterna': null, 'packer': null, 'supervisor': null });
       let proceso: string = this.formDatosProduccion.value.proceso == 'DBLD' ? 'DOBLADO' : this.formDatosProduccion.value.proceso;
       this.bagproService.GetOrdenDeTrabajo(ordenTrabajo, `?process=${proceso}`).subscribe(data => {
-        let quantity : number = proceso == 'SELLA' ? data[0].cantidad_Sellado : data[0].cantidad_Proceso;
-        let weight : number = proceso == 'SELLA' ? data[0].peso_Sellado : data[0].cantidad_Proceso;
+        let quantity: number = proceso == 'SELLA' ? data[0].cantidad_Sellado : data[0].cantidad_Proceso;
+        let weight: number = proceso == 'SELLA' ? data[0].peso_Sellado : data[0].cantidad_Proceso;
         this.putDataOrderProduction(data, consulta);
         if (!consulta) this.updateStatesProcessOT(data[0].numero_Orden, this.formDatosProduccion.value.proceso, quantity, weight);
       }, error => {
@@ -584,6 +584,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             'pesoMin': datos.selladoCorte_PesoRollo > 0 ? datos.selladoCorte_PesoRollo - 0.5 : null,
             'pesoMax': datos.selladoCorte_PesoRollo > 0 ? datos.selladoCorte_PesoRollo + 0.5 : null,
             'observacion': datos.observacion,
+            'mostratDatosProducto': this.validateContactWithFood(datos),
           });
           this.buscarDatosConoSeleccionado();
           this.claseCantidadRealizada(datos)
@@ -593,6 +594,34 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         this.cargando = false;
       });
     });
+  }
+
+  //Función que valida si el producto tiene contacto con alimentos
+  validateContactWithFood(data: any): boolean {
+    console.log(data.material, data.pigmento_Extrusion, data.producto, data.cliente);
+    let contactWithFood: boolean = false;
+
+    if (data) {
+      if (['BAJA', 'RECUPERADO'].includes(data.material)) {
+        if (!['NATURAL'].includes(data.pigmento_Extrusion)) {
+          if (data.producto.includes('CINTA')) {
+            contactWithFood = true;
+          } else {
+            contactWithFood = false;
+          }
+        } else contactWithFood = true;
+      } else if (data.producto.includes('TUBULAR')) {
+        contactWithFood = false;
+      } else if (data.formato_Producto.includes('CAMISILLA')) {
+        contactWithFood = false;
+      } else if (data.cliente.includes('ASEO')) {
+        contactWithFood = false;
+      } else {
+        contactWithFood = true;
+      }
+    }
+    console.log(`Contacto con alimentos: ${contactWithFood}`);
+    return contactWithFood;
   }
 
   msjTotalProduction(data: any) {
@@ -849,12 +878,12 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.produccionProcesosService.postProduccionProcesos(this.datosProduccion(daipita)).subscribe(res => {
       //this.getEtiquetaPlasticaribe(res, infoEtiquetaAsociada, daipita, rebobinado);
       let caliber: any = this.formDatosProduccion.value.calibre;
-      let dataOrderProduction : any = this.datosOrdenTrabajo[0];
-      let widthTotal : number = this.formDatosProduccion.value.anchoProducto; 
+      let dataOrderProduction: any = this.datosOrdenTrabajo[0];
+      let widthTotal: number = this.formDatosProduccion.value.anchoProducto;
       let anchoProducto: any = this.loadWidthForOT2(res, dataOrderProduction, widthTotal) //this.validateProcess() != 'EMP' ? this.loadWidthForOT2(res) : this.formDatosProduccion.value.anchoProducto;
       let und: any = this.formDatosProduccion.value.undExtrusion;
       let supervisor = supervisorId ? this.supervisores.find(x => x.supervisor_Id === supervisorId) : null;
-      
+
 
       if (res) {
         let etiqueta: modelTagProduction = {
@@ -897,7 +926,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   //Función que cargará el ancho del producto.
-  loadWidthForOT2(data: any, orderProduction : any, widthTotal): string {
+  loadWidthForOT2(data: any, orderProduction: any, widthTotal): string {
     if (!data) return '0';
 
     const anchoCorte = Number(widthTotal);
@@ -910,7 +939,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }
 
     if (ancho1 > anchoCorte) {
-      if(this.validateProcess() == 'EMP') {
+      if (this.validateProcess() == 'EMP') {
         return `${anchoCorte}`;
       }
     }
@@ -970,7 +999,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       'operator': rebobinado ? `${data.usua_Nombre + ' RB'}` : `${data.usua_Nombre}`,
       'copy': false,
       'dataTagForClient': '',
-      'showDataTagForClient': this.formDatosProduccion.value.mostratDatosProducto ? this.formDatosProduccion.value.mostratDatosProducto : '',
+      'showDataTagForClient': this.formDatosProduccion.value.mostratDatosProducto ? this.formDatosProduccion.value.mostratDatosProducto : false,
       'machine': data.maquina,
       'date': data.fecha.replace('T00:00:00', ''),
       'hour': data.hora

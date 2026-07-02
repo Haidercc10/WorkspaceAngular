@@ -345,7 +345,6 @@ export class TagProduction_2 {
     });
     if (dataTag.copy) this.createRePrint(dataTag);*/
 
-
     try {
       if (!dataTag.reel) {
         console.warn(`Etiqueta no diponible aún`);
@@ -394,8 +393,9 @@ export class TagProduction_2 {
   private contentPrincipalTablePDF(dataTag: modelTagProduction): any[] {
     let content = [];
     if (dataTag.showNameBussiness) content.push(this.dataBussiness());
+    if (dataTag.showDataTagForClient) content.push(this.adictionalInformationTag());
+
     content.push(
-      this.adictionalInformationTag(),
       this.infoClient(dataTag),
       this.dataOrderAndItem(dataTag),
       this.nameReference(dataTag),
