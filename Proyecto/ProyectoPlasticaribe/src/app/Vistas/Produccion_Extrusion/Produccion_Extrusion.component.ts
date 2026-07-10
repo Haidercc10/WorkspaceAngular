@@ -602,20 +602,24 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     let contactWithFood: boolean = false;
 
     if (data) {
-      if (['BAJA', 'RECUPERADO'].includes(data.material)) {
-        if (!['NATURAL'].includes(data.pigmento_Extrusion)) {
+      if (data.producto.includes('TUBULAR') || 
+          data.producto.includes('BASURA') || 
+          data.producto.includes('CESTA') || 
+          data.producto.includes('BARRIDO') || 
+          data.producto.includes('OVALO')) {
+        contactWithFood = false;
+      } else if (data.formato_Producto.includes('CAMISILLA') || data.formato_Producto.includes('TUBULAR')) {
+        contactWithFood = false;
+      } else if (data.cliente.includes('ASEO') || data.cliente.includes('SERVICIOS')) {
+        contactWithFood = false;
+      } else if (['BAJA', 'RECUPERADO'].includes(data.material)) {
+        if (!['NATURAL', 'BLANCO'].includes(data.pigmento_Extrusion)) {
           if (data.producto.includes('CINTA')) {
             contactWithFood = true;
           } else {
             contactWithFood = false;
           }
-        } else contactWithFood = true;
-      } else if (data.producto.includes('TUBULAR')) {
-        contactWithFood = false;
-      } else if (data.formato_Producto.includes('CAMISILLA')) {
-        contactWithFood = false;
-      } else if (data.cliente.includes('ASEO')) {
-        contactWithFood = false;
+        } else contactWithFood = true;  
       } else {
         contactWithFood = true;
       }
@@ -624,6 +628,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     return contactWithFood;
   }
 
+  //Función que valida si la cantidad producida es mayor a la cantidad solicitada
   msjTotalProduction(data: any) {
     let sales: number = data[0].peso_Neto;
     let packed: number = this.sumarCantidad();

@@ -81,6 +81,7 @@ export class Produccion_SelladoComponent implements OnInit {
   modalReprint: boolean = false;
   supervisores: any = []
   supervisorSelected: any;
+  hasContactWithFood: boolean = false;
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -314,9 +315,9 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que limpia los campos del formulario
   limpiarCampos() {
-    let mostratDatosProducto: boolean = this.formSellado.value.mostratDatosProducto;
+    //let mostratDatosProducto: boolean = this.formSellado.value.mostratDatosProducto;
     this.formSellado.reset();
-    this.formSellado.patchValue({ mostratDatosProducto: mostratDatosProducto });
+    //this.formSellado.patchValue({ mostratDatosProducto: mostratDatosProducto });
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargando = false;
@@ -403,7 +404,18 @@ export class Produccion_SelladoComponent implements OnInit {
     this.produccion = [];
     this.cargarTurnoActual();
     this.getMachines();
-    if (newOT) this.formSellado.patchValue({ 'procesoAnterior': null, 'etiquetaAsociada': null, 'otAlterna': null, 'packer': null, 'minWeight': null, 'maxWeight': null, 'userAuthorize': null, 'cinta': false, 'supervisor': null });
+    if (newOT) this.formSellado.patchValue({ 
+      'procesoAnterior': null, 
+      'etiquetaAsociada': null, 
+      'otAlterna': null, 
+      'packer': null, 
+      'minWeight': null, 
+      'maxWeight': null, 
+      'userAuthorize': null, 
+      'cinta': false, 
+      'supervisor': null, 
+      'mostratDatosProducto': false 
+    });
 
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot, `?process=${this.formSellado.value.proceso}`).subscribe(data => {
       console.log('data OT:', data);
@@ -415,6 +427,8 @@ export class Produccion_SelladoComponent implements OnInit {
           this.ordenesTrabajo = data;
           this.ordenesTrabajo[0].nitCliente = sede[0].id_Cliente;
           this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
+          this.hasContactWithFood = this.validateContactWithFood(data[0]);
+          this.formSellado.patchValue({ mostratDatosProducto: this.hasContactWithFood });
           if (!validacionDatos) {
             let cantUnd: number = data[0].selladoCorte_CantBolsasBulto <= 0 ? this.formSellado.value.cantUnd : data[0].selladoCorte_CantBolsasBulto;
             this.formSellado.patchValue({ 'cantUnd': cantUnd, });
@@ -455,6 +469,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.packerSelected = this.formSellado.value.packer;
     this.cintaSelected = this.formSellado.value.cinta;
     this.supervisorSelected = this.formSellado.value.supervisor;
+    this.hasContactWithFood = this.formSellado.value.mostratDatosProducto;
     //this.authUserSelected = this.formSellado.value.userAuthorize;
   }
 
@@ -751,6 +766,40 @@ export class Produccion_SelladoComponent implements OnInit {
     })
   }
 
+  //Función que valida si el producto tiene contacto con alimentos
+  validateContactWithFood(data: any): boolean {
+    console.log(data.material, data.pigmento_Extrusion, data.producto, data.cliente);
+    let contactWithFood: boolean = false;
+
+    if (data) {
+      if (data.producto.includes('TUBULAR') || 
+          data.producto.includes('BASURA') || 
+          data.producto.includes('CESTA') || 
+          data.producto.includes('BARRIDO') || 
+          data.producto.includes('OVALO') ||
+          data.producto.includes('ASEO') ||
+          data.producto.includes('BIO')) {
+        contactWithFood = false;
+      } else if (data.formato_Producto.includes('CAMISILLA') || data.formato_Producto.includes('TUBULAR')) {
+        contactWithFood = false;
+      } else if (data.cliente.includes('ASEO') || data.cliente.includes('SERVICIOS')) {
+        contactWithFood = false;
+      } else if (['BAJA', 'RECUPERADO'].includes(data.material)) {
+        if (!['NATURAL', 'BLANCO'].includes(data.pigmento_Extrusion)) {
+          if (data.producto.includes('CINTA')) {
+            contactWithFood = true;
+          } else {
+            contactWithFood = false;
+          }
+        } else contactWithFood = true;  
+      } else {
+        contactWithFood = true;
+      }
+    }
+    console.log(`Contacto con alimentos: ${contactWithFood}`);
+    return contactWithFood;
+  }
+
   //Función que cargará el ancho del producto.
   loadWidthForOT2(orden: any, data: any): string {
     if (!orden) return '0';
@@ -845,7 +894,8 @@ export class Produccion_SelladoComponent implements OnInit {
         'packer': this.packerSelected,
         'userAuthorize': this.authUserSelected,
         'cinta': this.cintaSelected,
-        'supervisor': this.supervisorSelected
+        'supervisor': this.supervisorSelected,
+        'mostratDatosProducto': this.hasContactWithFood
       });
       this.buscarOT();
       //}, 1000);
@@ -875,7 +925,8 @@ export class Produccion_SelladoComponent implements OnInit {
       'packer': this.packerSelected,
       'userAuthorize': this.authUserSelected,
       'cinta': this.cintaSelected,
-      'supervisor': this.supervisorSelected
+      'supervisor': this.supervisorSelected,
+      'mostratDatosProducto': this.hasContactWithFood
     });
     this.buscarOT();
   }
