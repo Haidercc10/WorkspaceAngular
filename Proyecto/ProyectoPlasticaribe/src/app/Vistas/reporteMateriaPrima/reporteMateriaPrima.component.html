@@ -88,7 +88,10 @@
             [rowHover]="true"
             dataKey="Id"
             [scrollable]="true"
-            scrollHeight="50rem">
+            scrollHeight="50rem"
+            [virtualScroll]="true"
+            [virtualScrollItemSize]="46"
+            >
             <ng-template pTemplate="header" let-columns>
               <tr class="font-size-16" id="filtros">
                 <th></th>
@@ -104,7 +107,7 @@
                 <th id="editar" *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns" style="height:46px">
               <tr>
                 <td><b>{{rowIndex + 1}}</b></td>
                 <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>

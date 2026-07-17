@@ -13,6 +13,8 @@ export class ExistenciasProductosService {
 
   constructor(private http : HttpClient,) { }
 
+  getId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`);
+
   srvObtenerListaPorIdProducto = (id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProducto/${id}`);
 
   srvObtenerListaPorIdProducto2 = (id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPBDDXCodigoArticuloZeus/${id}`);
@@ -20,6 +22,8 @@ export class ExistenciasProductosService {
   srvObtenerListaPorIdProductoPresentacion = (id : any, presentacion : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacion/${id}/${presentacion}`);
   
   putConsolidateProductsOF = (of : number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/putConsolidateProductsOF/${of}`, data);
+
+  PutConsolidateProductsOF2 = (of : number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/PutConsolidateProductsOF2/${of}`, data);
 
   putStockThenAnullation = (of : number, data? : any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/putStockThenAnullation/${of}`, data);
 

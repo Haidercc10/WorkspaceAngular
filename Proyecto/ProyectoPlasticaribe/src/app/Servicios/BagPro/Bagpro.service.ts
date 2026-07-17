@@ -15,7 +15,7 @@ export class BagproService {
   constructor(private http : HttpClient) { }
 
   /********************************************************* PROCSELLADO **************************************************************/
-  srvObtenerListaProcSellado = () :Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/ProcSellado');
+  srvObtenerListaProcSellado = () :Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/ProcSellado'); //**
 
   srvObtenerListaProcSelladoOT = (ot : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ProcSellado/OT/${ot}`);
 

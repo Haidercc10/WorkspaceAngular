@@ -22,7 +22,7 @@ export class OrdenFacturacionService {
 
     Post = (data : modelOrdenFacturacion) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/OrdenFacturacion`, data);
 
-    PutStatusOrder = (fact: number) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putStatusOrder/${fact}`, fact);
+    PutStatusOrder = (orderFact: number, factZeus: string) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putStatusOrder/${orderFact}/${factZeus}`, orderFact);
 
     PutStatusOrderAnulled = (order: number) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putStatusOrderAnulled/${order}`, order)
 

@@ -527,7 +527,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit, OnChanges {
         'roll': row.numberProduction,
         'item': row.item,
         'currentStatus': 53,
-        'newStatus': 23,
+        'newStatus': 20,
         'envioZeus': true
       });
     });
@@ -901,6 +901,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit, OnChanges {
   }
 
   //*FUNCIONES NUEVAS  ...
+  //Función para validar si se puede procesar la devolución.
   private canProcessDevolution_(): boolean {
     if (!this.formDataOrder.valid) {
       this.msg.mensajeAdvertencia('Debe ingresar todos los datos!');
@@ -1032,7 +1033,8 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit, OnChanges {
         : '',
     };
 
-    // Guardar devolución y detalles de forma secuencial para asegurar que se tiene el ID de la devolución antes de guardar los detalles.
+    // Guardar devolución y detalles de forma secuencial para asegurar que se tiene el 
+    // ID de la devolución antes de guardar los detalles.
     this.devService.srvGuardar(info).pipe(
       switchMap((devResp: any) => this.saveDetailsFact$(devResp)),
       finalize(() => this.load = false),

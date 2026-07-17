@@ -28,47 +28,47 @@ Injectable({
 
 export class MenuLateralComponent implements OnInit {
 
-  display : boolean = false;
+  display: boolean = false;
   items: MenuItem[];
   mode = new FormControl('over' as MatDrawerMode);
-  @ViewChild(AppComponent) appComponent : AppComponent;
+  @ViewChild(AppComponent) appComponent: AppComponent;
   public FormUsuarios !: FormGroup; // Formulario alojado en el modal para editar y eliminar usuarios
 
-  categorias : any[] = [];
-  today : any = moment().format('YYYY-MM-DD');
-  menuConfiguracion : boolean = false;
-  menuUsuario : boolean = false;
-  modalUsuario : boolean = false;
-  modalCalendario : boolean = false;
-  modalCorreos : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
-  cantidadEventos : number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
-  eventosHoy : any [] = []; //VAriable que almacenará los eventos que hay para el día actual
-  eventosMes : any [] = []; //Variable que almacenará los eventos que hay para el mes actual
-  eventosDia : boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
-  cantidadCorreosNuevos : number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
+  categorias: any[] = [];
+  today: any = moment().format('YYYY-MM-DD');
+  menuConfiguracion: boolean = false;
+  menuUsuario: boolean = false;
+  modalUsuario: boolean = false;
+  modalCalendario: boolean = false;
+  modalCorreos: boolean = false;
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  mostrarMenu: boolean = false; //Variable que se utilizará para mostrar el menú
+  cantidadEventos: number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
+  eventosHoy: any[] = []; //VAriable que almacenará los eventos que hay para el día actual
+  eventosMes: any[] = []; //Variable que almacenará los eventos que hay para el mes actual
+  eventosDia: boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
+  cantidadCorreosNuevos: number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
   position: string = '';
-  modoSeleccionado : boolean;
-  roles : any [] = [];
-  cargando : boolean = false;
+  modoSeleccionado: boolean;
+  roles: any[] = [];
+  cargando: boolean = false;
 
-  constructor(private AppComponent : AppComponent,
-                private formBuilder : FormBuilder,
-                  private rolService : RolesService,
-                    private confirmationService: ConfirmationService,
-                      private messageService: MessageService,
-                        private authenticationService: AuthenticationService,
-                          private cookieService: CookieService,
-                            @Inject(DOCUMENT) private document : Document,
-                              private usuarioService : UsuarioService,
-                                private mensajeService : MensajesAplicacionService,
-                                  private eventosCalService : EventosCalendarioService,
-                                    private vistasPermisosService : Vistas_PermisosService,
-                                      private router : Router,) {
+  constructor(private AppComponent: AppComponent,
+    private formBuilder: FormBuilder,
+    private rolService: RolesService,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService,
+    private authenticationService: AuthenticationService,
+    private cookieService: CookieService,
+    @Inject(DOCUMENT) private document: Document,
+    private usuarioService: UsuarioService,
+    private mensajeService: MensajesAplicacionService,
+    private eventosCalService: EventosCalendarioService,
+    private vistasPermisosService: Vistas_PermisosService,
+    private router: Router,) {
 
     this.AppComponent.mostrar();
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -90,42 +90,42 @@ export class MenuLateralComponent implements OnInit {
   /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria
   materias primas  para los usuarios con roles de bopp, sellado, rotograbado e impresión */
   mostrarMenuLateral() {
-    let ruta : any = this.router.url;
+    let ruta: any = this.router.url;
     this.display = true;
-    if([85,7,3,8,86,63,89,62,4,88,12,2,104].includes(this.ValidarRol)) {
+    if ([85, 7, 3, 8, 86, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol)) {
       setTimeout(() => {
         this.categorias.forEach(x => {
-          if([85,7,3,8,86,63,89,62,4,88,12,2,104].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
+          if ([85, 7, 3, 8, 86, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
         });
         this.router.navigate([ruta]);
       }, 20);
     }
   }
 
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
     this.rolService.srvObtenerListaPorId(this.ValidarRol).subscribe(datos => this.storage_Rol = datos.rolUsu_Nombre);
-    if (['100','121'].includes(this.storage_Id.toString())) this.getMails();
+    if (['100', '121'].includes(this.storage_Id.toString())) this.getMails();
   }
 
   aumentarLetra() {
-    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     if (parseFloat(fontSize.toFixed(2)) < 1.2) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1569}`);
     this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')).toFixed(2)}`, { expires: 365, sameSite: 'Lax' });
     this.cambiarColorIcono();
   }
 
-  disminuirLetra(){
-    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+  disminuirLetra() {
+    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     if (parseFloat(fontSize.toFixed(2)) > 0.67) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.86437}`);
     this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')).toFixed(2)}`, { expires: 365, sameSite: 'Lax' });
     this.cambiarColorIcono();
   }
 
-  cambiarColorIcono(){
-    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+  cambiarColorIcono() {
+    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     const icono1 = this.document.getElementById('iconoTanamoLetra1') as HTMLElement;
     const icono2 = this.document.getElementById('iconoTanamoLetra2') as HTMLElement;
     const icono3 = this.document.getElementById('iconoTanamoLetra3') as HTMLElement;
@@ -139,20 +139,20 @@ export class MenuLateralComponent implements OnInit {
     fontSize > 1.19 && fontSize < 1.30 ? icono5.className = 'pi pi-circle-fill font-size-25' : icono5.className = 'pi pi-circle font-size-16';
   }
 
-  configuracion(){
+  configuracion() {
     this.menuConfiguracion = true;
     setTimeout(() => this.cambiarColorIcono(), 100);
   }
 
-  CargarCategorias(){
+  CargarCategorias() {
     this.vistasPermisosService.GetCategoriasMenu(this.ValidarRol).subscribe(data => {
       this.cargando = true;
       this.categorias = [];
-      for (let i = 0; i < data.length; i++){
+      for (let i = 0; i < data.length; i++) {
         data[i].split('|').forEach(element => {
           if (this.categorias.length > 0 && element != '' && !['Inicio', 'Pruebas', 'Vistas'].includes(element)) {
-            if (this.categorias.findIndex(item => item.label == element) == -1) this.categorias.push({label: element, icon: '', items: []});
-          } else if (element != '' && !['Inicio', 'Pruebas', 'Vistas'].includes(element)) this.categorias.push({label: element, icon: '', items: []});
+            if (this.categorias.findIndex(item => item.label == element) == -1) this.categorias.push({ label: element, icon: '', items: [] });
+          } else if (element != '' && !['Inicio', 'Pruebas', 'Vistas'].includes(element)) this.categorias.push({ label: element, icon: '', items: [] });
         });
       }
       this.categorias.sort((a, b) => a.label.localeCompare(b.label));
@@ -161,7 +161,7 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  agregarOpcionesAdiciones(){
+  agregarOpcionesAdiciones() {
     this.categorias.unshift({
       label: `Inicio`,
       icon: 'pi pi-home',
@@ -191,40 +191,41 @@ export class MenuLateralComponent implements OnInit {
     }
   }
 
-  cargarOpcionesMenu(){
-    let count : number = 0;
+  cargarOpcionesMenu() {
+    let count: number = 0;
+    let storage_Id: number = this.storage_Id;
     this.categorias.forEach(element => {
-      if(element.label == 'Calidad') {
+      if (element.label == 'Calidad' && storage_Id != 1081784961) {
         element.items.push(
           {
             label: 'Sistema de Gestión', icon: '', items: [
-              { label: 'Aseguramiento de la Calidad', icon: 'pi pi-flag-fill', command: () => { this.router.navigate(['/aseguramiento-calidad']); }},
-              { label: 'Sistemas de Gestión', icon: 'pi pi-check-circle', command: () => { this.router.navigate(['/sistema-gestion-calidad']); }}
+              { label: 'Aseguramiento de la Calidad', icon: 'pi pi-flag-fill', command: () => { this.router.navigate(['/aseguramiento-calidad']); } },
+              { label: 'Sistemas de Gestión', icon: 'pi pi-check-circle', command: () => { this.router.navigate(['/sistema-gestion-calidad']); } }
             ]
           }
-        );    
+        );
       }
-      
+
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
-        for (let i = 0; i < data.length; i++){
+        for (let i = 0; i < data.length; i++) {
           if (element.items) {
             element.items.push(
-            {
-              label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu,
-              command: () => {
-                this.router.navigate([data[i].vp_Ruta]);
-                if(element.label == `Materia Prima`) {
-                  if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
-                } else if (element.label == `Productos`) {
-                  if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]);
+              {
+                label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu,
+                command: () => {
+                  this.router.navigate([data[i].vp_Ruta]);
+                  if (element.label == `Materia Prima`) {
+                    if (data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
+                  } else if (element.label == `Productos`) {
+                    if (data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]);
+                  }
+                  this.display = false;
                 }
-                this.display = false;
-              }
-            });
+              });
           }
         }
         if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
-        if(![1, 3, 7, 61, 85, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1);
+        if (![1, 3, 7, 61, 85, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1);
         count++;
         if (count == this.categorias.length) this.cargando = false;
       });
@@ -233,7 +234,7 @@ export class MenuLateralComponent implements OnInit {
 
   mostrarMenuUsuario = () => this.menuUsuario = true;
 
-  abrirModalUsuario(){
+  abrirModalUsuario() {
     this.usuarioService.getUsuariosxId(this.storage_Id).subscribe(dataUsuarios => {
       this.FormUsuarios.patchValue({ usuNombre: dataUsuarios[0].usua_Nombre, usuPassword: dataUsuarios[0].usua_Contrasena, });
     });
@@ -243,50 +244,50 @@ export class MenuLateralComponent implements OnInit {
   actualizarUsuario() {
     this.usuarioService.getUsuariosxId(this.storage_Id).subscribe(dataUsuarios => {
       for (let i = 0; i < dataUsuarios.length; i++) {
-        const infoUsuarios : any = {
-          Usua_Id : dataUsuarios[i].usua_Id,
-          Usua_Nombre : this.FormUsuarios.value.usuNombre,
-          TpUsu_Id : dataUsuarios[i].tpUsu_Id,
-          Area_Id : dataUsuarios[i].area_Id,
-          RolUsu_Id : dataUsuarios[i].rolUsu_Id,
-          Estado_Id : dataUsuarios[i].estado_Id,
-          Usua_Telefono : dataUsuarios[i].usua_Telefono,
-          Usua_Contrasena : this.FormUsuarios.value.usuPassword,
-          Usua_Email : dataUsuarios[i].usua_Email,
-          TipoIdentificacion_Id : 'C.C',
-          Empresa_Id : 800188732,
-          cajComp_Id : dataUsuarios[i].cajComp_Id,
-          eps_Id : dataUsuarios[i].eps_Id,
-          fPen_Id : dataUsuarios[i].fPen_Id,
-          Usua_Fecha : dataUsuarios[i].usua_Fecha,
-          Usua_Hora : dataUsuarios[i].usua_Hora,
-          Usua_Cedula : dataUsuarios[i].usua_Cedula,
+        const infoUsuarios: any = {
+          Usua_Id: dataUsuarios[i].usua_Id,
+          Usua_Nombre: this.FormUsuarios.value.usuNombre,
+          TpUsu_Id: dataUsuarios[i].tpUsu_Id,
+          Area_Id: dataUsuarios[i].area_Id,
+          RolUsu_Id: dataUsuarios[i].rolUsu_Id,
+          Estado_Id: dataUsuarios[i].estado_Id,
+          Usua_Telefono: dataUsuarios[i].usua_Telefono,
+          Usua_Contrasena: this.FormUsuarios.value.usuPassword,
+          Usua_Email: dataUsuarios[i].usua_Email,
+          TipoIdentificacion_Id: 'C.C',
+          Empresa_Id: 800188732,
+          cajComp_Id: dataUsuarios[i].cajComp_Id,
+          eps_Id: dataUsuarios[i].eps_Id,
+          fPen_Id: dataUsuarios[i].fPen_Id,
+          Usua_Fecha: dataUsuarios[i].usua_Fecha,
+          Usua_Hora: dataUsuarios[i].usua_Hora,
+          Usua_Cedula: dataUsuarios[i].usua_Cedula,
         }
         this.usuarioService.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(() => {
           this.modalUsuario = false;
-          this.mensajeService.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
-        }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`));
+          this.mensajeService.mensajeConfirmacion(`¡Usuario Actualizado!`, `¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
+        }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`));
       }
     });
   }
 
   // Funcion que consultará la cantidad de eventos que hay en el mes
-  cantidadEventosMes(){
-    let inicio : any = moment().format('YYYY-MM-DD');
-    let fin : any = moment().endOf('month').format('YYYY-MM-DD');
+  cantidadEventosMes() {
+    let inicio: any = moment().format('YYYY-MM-DD');
+    let fin: any = moment().endOf('month').format('YYYY-MM-DD');
     this.eventosCalService.GetCantidadEventos(this.storage_Id, this.ValidarRol, inicio, fin).subscribe(data => this.cantidadEventos = data);
   }
 
   // Funcion que consultará los eventos de hoy
-  consultarEventosHoy(){
+  consultarEventosHoy() {
     this.eventosHoy = [];
     this.eventosCalService.GetEventosDia(this.storage_Id, this.ValidarRol).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.eventosHoy.push({
-          Fecha_Hora_Inicio : `${data[i].eventoCal_HoraInicial}`,
-          Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
-          Nombre : data[i].eventoCal_Nombre,
-          Descripcion : data[i].eventoCal_Descripcion,
+          Fecha_Hora_Inicio: `${data[i].eventoCal_HoraInicial}`,
+          Fecha_Hora_Fin: `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
+          Nombre: data[i].eventoCal_Nombre,
+          Descripcion: data[i].eventoCal_Descripcion,
           Dia: moment().format('DD'),
           Mes: moment().format('MMM').toUpperCase(),
         });
@@ -297,15 +298,15 @@ export class MenuLateralComponent implements OnInit {
 
   }
 
-  consultarEventosMes(){
+  consultarEventosMes() {
     this.eventosMes = [];
     this.eventosCalService.GEtEventosMes(this.storage_Id, this.ValidarRol).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.eventosMes.push({
-          Fecha_Hora_Inicio : `${data[i].eventoCal_HoraInicial}`,
-          Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
-          Nombre : data[i].eventoCal_Nombre,
-          Descripcion : data[i].eventoCal_Descripcion,
+          Fecha_Hora_Inicio: `${data[i].eventoCal_HoraInicial}`,
+          Fecha_Hora_Fin: `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
+          Nombre: data[i].eventoCal_Nombre,
+          Descripcion: data[i].eventoCal_Descripcion,
           Dia: moment(data[i].eventoCal_FechaInicial).format('DD'),
           Mes: moment().format('MMM').toUpperCase(),
         });
@@ -315,7 +316,7 @@ export class MenuLateralComponent implements OnInit {
 
   mostrarModalCalendario = () => this.modalCalendario = true;
 
-  noMostrarMasDialogoEventosDia(mostrar : string){
+  noMostrarMasDialogoEventosDia(mostrar: string) {
     this.cookieService.set('MostrarEventosDia', mostrar, { expires: 365, sameSite: 'Lax' });
     this.eventosDia = false;
   }
@@ -329,7 +330,7 @@ export class MenuLateralComponent implements OnInit {
       rejectLabel: 'No',
       accept: () => {
         this.authenticationService.logout();
-        this.messageService.add({severity:'info', summary:'Confirmed', detail:'You have accepted'});
+        this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
       },
     });
   }
@@ -346,12 +347,12 @@ export class MenuLateralComponent implements OnInit {
   // Funcion que cambiará el tema de la aplicación
   mostrar() {
     let modo = window.localStorage.getItem("theme");
-    if(modo) this.AppComponent.temaSeleccionado = this.modoSeleccionado;
+    if (modo) this.AppComponent.temaSeleccionado = this.modoSeleccionado;
     this.cambiar(this.modoSeleccionado);
   }
 
   // Funcion que cambiará el tema de la aplicación
-  cambiar(estado : any) {
+  cambiar(estado: any) {
     let tema = estado ? 'dark' : 'light';
     window.localStorage.setItem("theme", tema);
     this.cookieService.set('theme', tema, { expires: 365, sameSite: 'Lax' });
@@ -359,7 +360,7 @@ export class MenuLateralComponent implements OnInit {
     linkTema.href = 'lara-' + tema + '-blue' + '.css';
   }
 
-  async getMails(){
+  async getMails() {
     let count: number = 0;
     const querySnapshot = await getDocs(collection(db, "Correos"));
     querySnapshot.forEach((doc) => {

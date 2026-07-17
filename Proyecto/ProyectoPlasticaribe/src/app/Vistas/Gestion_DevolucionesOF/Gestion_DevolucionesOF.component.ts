@@ -286,7 +286,7 @@ searchData2() {
             statusName: 'NO DISPONIBLE',
           }));
 
-          // ✅ ejecutar lógica adicional fuera del map
+          // ejecutar lógica adicional fuera del map
           data.forEach(x => this.changeInformationDev(x));
 
           this.load = false;

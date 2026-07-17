@@ -132,20 +132,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Cant. Estandar', field: 'qtyStandard', type: 'number' },
       { header: 'Peso Bruto', field: 'weight', type: 'number' },
       { header: 'Unidades Producto', field: 'unityProducts', type: '' },
-
-      /*{ header: 'Mes Actual', field: 'actualMonth', type: 'number' },
-      { header: 'Enero', field: 'junuary', type: 'number' },
-      { header: 'Febrero', field: 'february', type: 'number' },
-      { header: 'Marzo', field: 'march', type: 'number' },
-      { header: 'Abril', field: 'april', type: 'number' },
-      { header: 'Mayo', field: 'may', type: 'number' },
-      { header: 'Junio', field: 'june', type: 'number' },
-      { header: 'Julio', field: 'july', type: 'number' },
-      { header: 'Agosto', field: 'august', type: 'number' },
-      { header: 'Septiembre', field: 'september', type: 'number' },
-      { header: 'Octubre', field: 'october', type: 'number' },
-      { header: 'Noviembre', field: 'november', type: 'number' },
-      { header: 'Diciembre', field: 'december', type: 'number' },*/
     ];
     /*if([86,4].includes(this.ValidarRol)) {
       let cols : any = [];
@@ -184,6 +170,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
       //this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
       //this.loadRollsProductionAvailable();
       this.load = false;
+    }, error => {
+      this.load = false;
+      this.msg.mensajeError(`¡Ocurrió un error al intentar obtener la información de stock!`, error);
     });
     //}
   }
@@ -268,20 +257,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           weight: stock.weight,
           qtyStandard: stock.qtyStandard,
           unityProducts: stock.count,
-          AvaibleProdution: [], // this.fillAvaibleProduction(stock.avaible_Production),
-          /*actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
-          junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
-          february: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].febrero,
-          march: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].marzo,
-          april: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].abril,
-          may: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].mayo,
-          june: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].junio,
-          july: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].julio,
-          august: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].agosto,
-          september: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].septiembre,
-          october: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].octubre,
-          november: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].noviembre,
-          december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,*/
+          AvaibleProdution: [], 
           process: process,
         });
       }

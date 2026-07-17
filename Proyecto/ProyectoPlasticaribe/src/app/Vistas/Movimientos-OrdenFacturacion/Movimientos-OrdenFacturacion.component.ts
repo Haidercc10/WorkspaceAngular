@@ -240,9 +240,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   ///Mensaje de confirmación de la orden a anular. 
   confirmSendData(data: any) {
+    console.log(data);
+    
     this.anulledOrder = data.or.id;
     this.ofDirect = data.or.of_Directa;
     this.detailsOF = data.of;
+
+    console.log(this.anulledOrder, this.ofDirect, this.detailsOF);
 
     this.messageService.add({
       severity: 'warn',

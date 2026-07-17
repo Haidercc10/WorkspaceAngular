@@ -370,7 +370,9 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
 
   // Funicion que va a colocar el id de la ultimo factura
   obtenerUltimoIdFacturaCompra(oc : number){
-    this.facturaMpComService.UltimoIdFactura().pipe(takeUntil(this.destroy$)).subscribe(datos_facturas => this.creacionFacturaMateriaPrima(datos_facturas, oc), () => {
+    this.facturaMpComService.UltimoIdFactura().pipe(takeUntil(this.destroy$)).subscribe(datos_facturas => {
+        this.creacionFacturaMateriaPrima(datos_facturas, oc)
+      }, () => {
       this.msj.mensajeError(`Error`, `¡Error al obtener la ultima factura creada!`);
       this.load = true;
     });

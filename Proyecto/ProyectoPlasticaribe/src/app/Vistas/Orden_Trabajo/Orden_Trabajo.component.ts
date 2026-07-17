@@ -1784,7 +1784,7 @@ export class Orden_TrabajoComponent implements OnInit {
         Ot_Hora: moment().format('H:mm:ss'),
         Estado_Id: 15,
         Usua_Id: this.storage_Id,
-        PedExt_Id: 497,
+        PedExt_Id: 517,
         Ot_Observacion: this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
         Ot_Cyrel: this.cyrel,
         Ot_Corte: this.corte,
@@ -1975,7 +1975,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.limpiarCampos();
     this.edicionOrdenTrabajo = true;
     this.cargando = true;
-    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
+    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT, '').subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         this.producto = datos_orden[i].id_Producto;
         this.presentacionProducto = datos_orden[i].id_Presentacion;
@@ -2245,7 +2245,7 @@ export class Orden_TrabajoComponent implements OnInit {
   pdfOrdenTrabajo(ot: number = this.FormOrdenTrabajo.value.OT_Id) {
     this.cargando = true;
     if (ot != null) {
-      this.ordenTrabajoService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
+      this.ordenTrabajoService.GetOrdenTrabajo(ot, '').subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
         this.bagProService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
           this.msj.mensajeError(`¡No se encontró una Orden con el Numero ${ot}!`);
           this.cargando = false;
@@ -3005,7 +3005,8 @@ export class Orden_TrabajoComponent implements OnInit {
         'Prod_PrecioDia_Sellado': this.FormOrdenTrabajoSellado.value.PrecioDia,
         'Prod_PrecioNoche_Sellado': this.FormOrdenTrabajoSellado.value.PrecioNoche,
       }
-      this.productoService.srvGuardar(item).subscribe(data => this.crearExistenciaProducto(data), () => this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`));
+      console.log(item);
+      //this.productoService.srvGuardar(item).subscribe(data => this.crearExistenciaProducto(data), () => this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`));
     });
   }
 

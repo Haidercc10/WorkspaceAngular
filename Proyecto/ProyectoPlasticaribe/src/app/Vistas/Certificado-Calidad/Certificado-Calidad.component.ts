@@ -181,7 +181,7 @@ export class CertificadoCalidadComponent implements OnInit {
         });
         this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(datos => {
           this.calcularParametrosCuantitativos(datos, ot);
-          console.log(datos);
+          console.log(datos, ot);
           this.llenarParametrosCualitativos(datos, ot);
         });
         this.cargando = false;
@@ -196,7 +196,7 @@ export class CertificadoCalidadComponent implements OnInit {
       {
         Nombre : `Calibre`,
         UndMedida : dataBagpro != null ? dataBagpro.extMaterialNom.trim() == 'BOPP' ? 'µm' : 'Mils Pulg' : 'N/E', //orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
-        Nominal : orden != null ? orden.nominal_Calibre : dataBagpro != null ? parseFloat(dataBagpro.extCalibre) : 0,
+        Nominal : orden != null ? orden.nominal_Calibre : dataBagpro != null ? [null, undefined, '0', ''].includes(dataBagpro.etiquetaLargo) ? parseFloat(dataBagpro.extCalibre) : parseFloat(dataBagpro.etiquetaLargo) : 0,
         Tolerancia : 10, //orden != null ? orden.tolerancia_Calibre : 0, 
         Minimo : orden != null ? orden.minimo_Calibre : 0,
         Maximo : orden != null ? orden.maximo_Calibre : 0,
@@ -552,7 +552,7 @@ export class CertificadoCalidadComponent implements OnInit {
 
   observacionesPDF(datos : any) : {} {
     return {
-      margin: [0, 20],
+      margin: [0, 10],
       table : {
         widths : ['*'],
         style : '',

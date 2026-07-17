@@ -170,7 +170,14 @@
           <td class="text-center">{{data.fechaDespacho }}</td>
           <td class="text-center">{{ data.dias }}</td>
           <td class="text-center"><span class="badge"
-              [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 'bg-success1': [21,18].includes(data.or.estado_Id), 'bg-violet': [29].includes(data.or.estado_Id), 'bg-warning': [3].includes(data.or.estado_Id), 'bg-secondary1': [38].includes(data.or.estado_Id), 'bg-blue1': [39].includes(data.or.estado_Id), 'bg-black1': [53].includes(data.or.estado_Id), 'bg-brown1': [54].includes(data.or.estado_Id)}">{{data.estado}}</span>
+              [ngClass]="{'bg-danger1': [19,11].includes(data.or.estado_Id), 
+                          'bg-success1': [21,18].includes(data.or.estado_Id), 
+                          'bg-violet': [29].includes(data.or.estado_Id), 
+                          'bg-warning': [3].includes(data.or.estado_Id), 
+                          'bg-secondary1': [38].includes(data.or.estado_Id), 
+                          'bg-blue1': [39].includes(data.or.estado_Id), 
+                          'bg-black1': [53].includes(data.or.estado_Id), 
+                          'bg-brown1': [54].includes(data.or.estado_Id)}">{{data.estado}}</span>
           </td>
           <td class="text-center" *ngIf="[1].includes(validateRole)">
             <p-button id="botonPdf" icon="pi pi-ban" styleClass="p-button-rounded p-button-warning"
@@ -186,6 +193,7 @@
   </div>
 </p-card>
 
+<!--Modal para confirmación de anulación de ordenes -->
 <p-toast position="center" key="confirmation" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">
     <div class="flex flex-column" style="flex: 1">
