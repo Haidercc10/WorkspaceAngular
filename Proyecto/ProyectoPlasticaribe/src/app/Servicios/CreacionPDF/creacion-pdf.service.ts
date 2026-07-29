@@ -394,12 +394,12 @@ export class TagProduction_2 {
     let content = [];
     if (dataTag.showNameBussiness) content.push(this.dataBussiness());
     if (dataTag.showDataTagForClient) content.push(this.adictionalInformationTag());
+    if (!['SELLADO', 'WIKETIADO', 'EMPAQUE'].includes(dataTag.productionProcess)) content.push(this.widthAndCalibre(dataTag));
 
     content.push(
       this.infoClient(dataTag),
       this.dataOrderAndItem(dataTag),
       this.nameReference(dataTag),
-      this.widthAndCalibre(dataTag),
       this.nameMaterial(dataTag),
       this.createBarcode(dataTag),
       this.quantity(dataTag),
