@@ -621,6 +621,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
 
   /** Punto de entrada: valida el número, evita duplicados y ejecuta el flujo completo de ingreso. */
   searchProductionByReel2(): void {
+    this.load = true;
     const production = Number.parseInt(this.productionSearched, 10);
     this.productionSearched = null;
 
@@ -630,7 +631,10 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     const source = this.resolveSearchSource();
 
     this.fetchAndIngress$(production, source).pipe(
-      finalize(() => this.processingRolls.delete(production))
+      finalize(() => {
+        this.load = false;
+        this.processingRolls.delete(production);
+      })
     ).subscribe({
       next: () => this.messageConfirmationUpdateStore(),
       error: (error) => this.handleSearchProductionError(error, production),
@@ -659,6 +663,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       .includes(production);
 
     if (alreadyRegistered) {
+      this.load = false;
       this.msj.mensajeAdvertencia(`El rollo/bulto ${production} ya ha sido registrado`);
       return false;
     }
@@ -681,6 +686,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       map(() => void 0),
       catchError((error) => {
         // Si falla cualquier etapa después de registrar en cola, limpia el item local.
+        this.load = false;
         if (error?.reel) this.removeProductionByReel(error.reel);
         return throwError(() => error);
       })

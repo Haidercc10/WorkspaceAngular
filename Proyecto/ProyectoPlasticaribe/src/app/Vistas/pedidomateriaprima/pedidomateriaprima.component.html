@@ -1,6 +1,6 @@
- <!-- Inicio Contenedor total -->
+<!-- Inicio Contenedor total -->
 <ng-container *ngIf="!modalMode">
-  
+
 </ng-container>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
@@ -21,13 +21,15 @@
 </div>
 
 <p-card>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}"
+      (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
   <!-- Inicio titulo -->
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i> Ingresar Factura</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+        class="pi pi-cloud-download"></i> Ingresar Factura</h4>
   </div>
   <br>
 
@@ -37,7 +39,8 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="ordenCompra">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="OrdenCompra" id="orden" type="text" pInputText (keyup.enter)="cargarInfoOrdenCompraEnTabla()"/>
+            <input formControlName="OrdenCompra" id="orden" type="text" pInputText
+              (keyup.enter)="cargarInfoOrdenCompraEnTabla()" />
             <label for="orden">N° OC</label>
           </span>
         </div>
@@ -45,7 +48,7 @@
         <!-- Factura -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="factura">
           <span class="p-float-label">
-            <input formControlName="MpFactura" id="Factura" type="text" pInputText/>
+            <input formControlName="MpFactura" id="Factura" type="text" pInputText />
             <label for="Factura">Factura</label>
           </span>
         </div>
@@ -53,7 +56,7 @@
         <!-- Remision -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="remision">
           <span class="p-float-label">
-            <input formControlName="MpRemision" id="Remision" type="text" pInputText/>
+            <input formControlName="MpRemision" id="Remision" type="text" pInputText />
             <label for="Remision">Remisión</label>
           </span>
         </div>
@@ -61,7 +64,8 @@
         <!-- Proveedor -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6" id="proveedor">
           <span class="p-float-label">
-            <input formControlName="proveedorNombre" id="Proveedor" list="proveedor" type="text" pInputText (change)="cambiarNombreProveedor()" readonly/>
+            <input formControlName="proveedorNombre" id="Proveedor" list="proveedor" type="text" pInputText
+              (change)="cambiarNombreProveedor()" readonly />
             <datalist id="proveedor">
               <option value={{item.prov_Id}} *ngFor="let item of proveedor">{{item.prov_Nombre}}</option>
             </datalist>
@@ -81,27 +85,17 @@
   </form>
 
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Materia Prima</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i>
+      Materia Prima</h4>
   </div>
 
   <!--Inicio tabla Mat. Primas de la OC -->
   <div class="mb-3" id="tabla1">
     <div class="row g-3">
-      <p-table
-      *ngIf="load"
-      #dt
-      [value]="arrayOrdenCompra"
-      selectionMode = "multiple"
-      styleClass="p-datatable-gridlines p-datatable-sm"
-      responsiveLayout="scroll"
-      [paginator]="true"
-      [rows]="10"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords}"
-      [rowsPerPageOptions]="[10,25,50]"
-      [rowHover]="true"
-      dataKey="Id"
-      [(selection)]="ArrayMateriaPrima">
+      <p-table *ngIf="load" #dt [value]="arrayOrdenCompra" selectionMode="multiple"
+        styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [paginator]="true" [rows]="10"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords}"
+        [rowsPerPageOptions]="[10,25,50]" [rowHover]="true" dataKey="Id" [(selection)]="ArrayMateriaPrima">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">Id</th>
@@ -110,37 +104,40 @@
             <th scope="col">Cant. Ingresada</th>
             <th scope="col">Cantidad Faltante</th>
             <th scope="col">Presentación</th>
-            <ng-template ></ng-template>
+            <ng-template></ng-template>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox id="elegirTodo" *ngIf="mostrarCheck" (click)="seleccionarTodosMateriaPrima()"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirTodo" *ngIf="mostrarCheck"
+                (click)="seleccionarTodosMateriaPrima()"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-arrayOrdenCompra>
-            <ng-container *ngIf="arrayOrdenCompra.Exits && arrayOrdenCompra.Cantidad_Ingresada == arrayOrdenCompra.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
-            <ng-template #thenTemplate>
-              <tr>
-                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Id}}</td>
-                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Nombre}}</td>
-                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad | number}}</td>
-                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
-                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
-                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Medida}}</td>
-              </tr>
-            </ng-template>
-            <ng-template #elseTemplate>
-              <tr [ngClass]="{'row-accessories': arrayOrdenCompra.Id > 10000}">
-                <td>{{arrayOrdenCompra.Id}}</td>
-                <td>{{arrayOrdenCompra.Nombre}}</td>
-                <td>{{arrayOrdenCompra.Cantidad | number}}</td>
-                <td>{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
-                <td>{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
-                <td>{{arrayOrdenCompra.Medida}}</td>
-                <td>
-                  <p-tableCheckbox *ngIf="arrayOrdenCompra.Id < 10000" [value]="arrayOrdenCompra" (click)="llenarMateriaPrimaAIngresar(arrayOrdenCompra)"></p-tableCheckbox>
-                </td>
-              </tr>
-            </ng-template>
+          <ng-container
+            *ngIf="arrayOrdenCompra.Exits && arrayOrdenCompra.Cantidad_Ingresada == arrayOrdenCompra.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
+          <ng-template #thenTemplate>
+            <tr>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Id}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Nombre}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Medida}}</td>
+            </tr>
+          </ng-template>
+          <ng-template #elseTemplate>
+            <tr [ngClass]="{'row-accessories': arrayOrdenCompra.Id > 10000}">
+              <td>{{arrayOrdenCompra.Id}}</td>
+              <td>{{arrayOrdenCompra.Nombre}}</td>
+              <td>{{arrayOrdenCompra.Cantidad | number}}</td>
+              <td>{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
+              <td>{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
+              <td>{{arrayOrdenCompra.Medida}}</td>
+              <td>
+                <p-tableCheckbox *ngIf="arrayOrdenCompra.Id < 10000" [value]="arrayOrdenCompra"
+                  (click)="llenarMateriaPrimaAIngresar(arrayOrdenCompra)"></p-tableCheckbox>
+              </td>
+            </tr>
+          </ng-template>
         </ng-template>
       </p-table>
     </div>
@@ -151,19 +148,14 @@
   </div>
 
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de Ingreso</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i>
+      Tabla de Ingreso</h4>
   </div>
 
   <div class="mb-3" *ngIf="load" id="tabla2">
     <div class="row g-3">
-      <p-table
-        #dt1
-        [value]="ArrayMateriaPrima"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [rowHover]="true"
-        dataKey="Id"
-        [(selection)]="arrayOrdenCompra">
+      <p-table #dt1 [value]="ArrayMateriaPrima" styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll" [rowHover]="true" dataKey="Id" [(selection)]="arrayOrdenCompra">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">Id</th>
@@ -184,7 +176,9 @@
             <td pEditableColumn id="cantidad">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad_Faltante_Editar" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
+                  <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad_Faltante_Editar" inputId="minmaxfraction"
+                    inputId="minmax" inputId="minmax" mode="decimal" [min]="0"
+                    [max]="ArrayMateriaPrima.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{ArrayMateriaPrima.Cantidad_Faltante_Editar | number : '1.2-2'}}
@@ -195,7 +189,8 @@
             <td *ngIf="ValidarRol == 1">{{ArrayMateriaPrima.Precio | number : '1.2-2'}}</td>
             <td *ngIf="ValidarRol == 1">{{calcularSubtotal(ArrayMateriaPrima.Id) | number : '1.2-2'}}</td>
             <td>
-              <p-tableCheckbox id="elegir2" [value]="ArrayMateriaPrima" (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
+              <p-tableCheckbox id="elegir2" [value]="ArrayMateriaPrima"
+                (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
@@ -218,13 +213,15 @@
   <p-accordion id="acordeon">
     <p-accordionTab header="Añadir Remisiones a una Factura">
       <div class="mb-4">
-        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-search"></i> Buscar Remisiones</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
+            class="pi pi-search"></i> Buscar Remisiones</h4>
       </div>
 
       <form [formGroup]="FormRemisiones">
         <div class="form-floating col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2" id="remision2">
           <span class="p-float-label">
-            <input formControlName="idRemision" id="rem" type="text" (keyup.enter)="consultarIdRemisiones()" pInputText/>
+            <input formControlName="idRemision" id="rem" type="text" (keyup.enter)="consultarIdRemisiones()"
+              pInputText />
             <label for="rem">Remisión</label>
           </span>
         </div>
@@ -234,15 +231,8 @@
 
       <div *ngIf="load" id="tabla3">
         <div class="mb-2">
-          <p-table
-            #dt1
-            [value]="ArrayRemisiones"
-            styleClass="p-datatable-gridlines p-datatable-sm"
-            responsiveLayout="scroll"
-            [paginator]="true"
-            [rows]="10"
-            [rowsPerPageOptions]="[10,25,50]"
-            [rowHover]="true"
+          <p-table #dt1 [value]="ArrayRemisiones" styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [rowHover]="true"
             dataKey="Id">
             <ng-template pTemplate="header">
               <tr>
@@ -263,7 +253,9 @@
                 <td>{{remisiones.remisionProveedor}}</td>
                 <td>{{remisiones.remisionUsuario}}</td>
                 <td>{{remisiones.remisionPrecio | number : '1.2-2'}}</td>
-                <td id="ver"><a><i style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" aria-hidden="true" (click)="llenarDocumento(remisiones)"></i></a></td>
+                <td id="ver"><a><i style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf"
+                      class="p-button-warning mr-2" pTooltip="PDF" aria-hidden="true"
+                      (click)="llenarDocumento(remisiones)"></i></a></td>
               </tr>
             </ng-template>
           </p-table>
@@ -279,8 +271,10 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="crearIngreso" type="button" label="Agregar Factura" icon="pi pi-check" (click)="validarCampos()"></button>
-      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
+      <button pButton class="p-button-danger" id="crearIngreso" type="button" label="Agregar Factura" icon="pi pi-check"
+        (click)="validarCampos()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser"
+        (click)="limpiarTodosCampos()"> </button>
     </div>
   </div>
 </p-card>

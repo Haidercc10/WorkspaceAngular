@@ -1,4 +1,4 @@
-import { Component, Injectable, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
@@ -13,6 +13,8 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsProductos as defaultSteps } from 'src/app/data';
 import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
 import { InventarioProductosPBDDComponent } from '../Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
+import { Observable, Subject } from 'rxjs';
+import { map, switchMap, takeUntil, } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +51,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   recetaProducto: boolean = false;
   @ViewChild(InventarioProductosPBDDComponent) invPlasticaribe: InventarioProductosPBDDComponent | undefined;
+  private destroy$ = new Subject<void>();
 
   constructor(private existenciasZeus: InventarioZeusService,
     private clienteOtItems: BagproService,
@@ -56,14 +59,22 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     private invMesProductoService: Inventario_Mes_ProductosService,
     private AppComponent: AppComponent,
     private shepherdService: ShepherdService,
-    private mensajeService: MensajesAplicacionService,) {
+    private mensajeService: MensajesAplicacionService,
+    private destroyRef: DestroyRef,
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.invetarioProductos();
+    this.inventarioProductos2();
     //setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   tutorial() {
@@ -156,25 +167,27 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       : '';
 
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_Existencias => {
+
+
       console.log('Zeus', datos_Existencias, datos_Existencias.map(x => parseInt(x.codigo)));
       this.clienteOtItems.srvObtenerItemsBagproXClienteItem(datos_Existencias.map(x => parseInt(x.codigo)), sales).subscribe(datos_Cliente => {
         console.log(datos_Cliente);
         for (let j = 0; j < datos_Cliente.length; j++) {
-          if(!items.includes(datos_Cliente[j].clienteItems)) {
+          if (!items.includes(datos_Cliente[j].clienteItems)) {
             items.push(datos_Cliente[j].clienteItems)
             this.invMesProductoService.GetCantidadMes_Producto(datos_Cliente[j].clienteItems, datos_Cliente[j].ptPresentacionNom).subscribe(datos_Inventario => {
-              
+
               for (let k = 0; k < datos_Inventario.length; k++) {
                 let item = datos_Inventario[k].id;
                 let und = datos_Inventario[k].und;
-                let existencias : any = datos_Existencias.find(x => x.codigo == item && x.presentacion == und);
+                let existencias: any = datos_Existencias.find(x => x.codigo == item && x.presentacion == und);
                 this.llenarArrayProductos(0, datos_Inventario[k], existencias, datos_Cliente[j]);
                 count++
-                if(count == datos_Inventario.length) {
+                if (count == datos_Inventario.length) {
                   this.load = true;
                   this.invPlasticaribe?.getStockInformation();
                 }
-              } 
+              }
             });
           }
         }
@@ -202,102 +215,124 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     */
   }
 
-  llenarArrayProductos(i, inv, exi, cli) {
-      let info: any = {
-        'Numero': i + 1,
-        'Id': exi.codigo,
-        'Nombre': exi.nombre,
-        'Cliente': cli.clienteNom,
-        'Precio': [2].includes(this.ValidarRol) ? 0 : exi.precioVenta,
-        'Cantidad': exi.existencias,
-        'Presentacion': exi.presentacion,
-        'Precio_Total': [2].includes(this.ValidarRol) ? 0 : exi.precio_Total,
-        'Cant_Minima': inv.cant_Minima,
-        'Vendedor': cli.nombreCompleto,
-        'Mes_Actual': 0,//this.llenarMesActual(mes, inv),
-        'Enero': 0,//inv.enero,
-        'Febrero': 0,//inv.febrero,
-        'Marzo': 0,//inv.marzo,
-        'Abril': 0,//inv.abril,
-        'Mayo': 0,//inv.mayo,
-        'Junio': 0,//inv.junio,
-        'Julio': 0,//inv.julio,
-        'Agosto': 0,//inv.agosto,
-        'Septiembre': 0,//inv.septiembre,
-        'Octubre': 0,//inv.octubre,
-        'Noviembre': 0,//inv.noviembre,
-        'Diciembre': 0,//inv.diciembre,
-        'ValidarCantMinima': exi.existencias <= inv.cant_Minima ? 1 : 0,
+  inventarioProductos2(): void {
+    this.load = false;
+    this.ArrayProductoZeus = [];
+    this.totalProductos = 0;
+    this.columnas = [];
+    this.columnasSeleccionada = [];
+
+    const sales = this.ValidarRol == 2
+      ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
+      : '';
+
+    this.existenciasZeus.srvObtenerExistenciasArticulosZeus().pipe(
+      switchMap(datosExistencias => {
+        let items = datosExistencias.map(x => parseInt(x.codigo));
+        return this.existencias_ProductosService.getSearchArticleFromZeus(items)
+          .pipe(map(datosProductos => ({ datosExistencias, datosProductos })));
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: ({ datosExistencias, datosProductos }) => {
+        // Índice de existencias Zeus por codigo + presentación -> lookup O(1)
+        const existenciasMap = new Map(
+          datosExistencias.map((x: any) => [`${parseInt(x.codigo)}_${x.presentacion}`, x])
+        );
+
+        // Deduplicar productos por item + presentación (el cliente es consecuencia de esa combinación)
+        const productosUnicos = Array.from(
+          new Map(datosProductos.map((p: any) => [`${p.item}_${p.presentation}`, p])).values()
+        );
+
+        productosUnicos.forEach((producto: any) => {
+          const existencias = existenciasMap.get(`${producto.item}_${producto.presentation}`);
+
+          if (!existencias) {
+            console.warn(`Sin existencia coincidente para item=${producto.item}, presentation=${producto.presentation}`);
+            return;
+          }
+
+          this.llenarArrayProductos2(0, producto, existencias);
+        });
+
+        this.load = true;
+        this.invPlasticaribe?.getStockInformation();
+      },
+      error: (err) => {
+        console.error('Error al cargar inventario de productos', err);
+        this.load = true;
       }
+    });
+  }
+
+  llenarArrayProductos2(i, prd, exi) {
+    let info: any = {
+      'Numero': i + 1,
+      'Id': exi.codigo,
+      'Nombre': exi.nombre,
+      'Cliente': prd.client,
+      'Precio': [2].includes(this.ValidarRol) ? 0 : exi.precioVenta,
+      'Cantidad': exi.existencias,
+      'Presentacion': exi.presentacion,
+      'Precio_Total': [2].includes(this.ValidarRol) ? 0 : exi.precio_Total,
+      'Cant_Minima': 0,
+      'Vendedor': prd.asesor,
+      'Mes_Actual': 0,//this.llenarMesActual(mes, inv),
+      'Enero': 0,//inv.enero,
+      'Febrero': 0,//inv.febrero,
+      'Marzo': 0,//inv.marzo,
+      'Abril': 0,//inv.abril,
+      'Mayo': 0,//inv.mayo,
+      'Junio': 0,//inv.junio,
+      'Julio': 0,//inv.julio,
+      'Agosto': 0,//inv.agosto,
+      'Septiembre': 0,//inv.septiembre,
+      'Octubre': 0,//inv.octubre,
+      'Noviembre': 0,//inv.noviembre,
+      'Diciembre': 0,//inv.diciembre,
+      'ValidarCantMinima': 0,
+    }
+    this.ArrayProductoZeus.push(info);
+  }
+
+  llenarArrayProductos(i, inv, exi, cli) {
+    let info: any = {
+      'Numero': i + 1,
+      'Id': exi.codigo,
+      'Nombre': exi.nombre,
+      'Cliente': cli.clienteNom,
+      'Precio': [2].includes(this.ValidarRol) ? 0 : exi.precioVenta,
+      'Cantidad': exi.existencias,
+      'Presentacion': exi.presentacion,
+      'Precio_Total': [2].includes(this.ValidarRol) ? 0 : exi.precio_Total,
+      'Cant_Minima': inv.cant_Minima,
+      'Vendedor': cli.nombreCompleto,
+      'Mes_Actual': 0,//this.llenarMesActual(mes, inv),
+      'Enero': 0,//inv.enero,
+      'Febrero': 0,//inv.febrero,
+      'Marzo': 0,//inv.marzo,
+      'Abril': 0,//inv.abril,
+      'Mayo': 0,//inv.mayo,
+      'Junio': 0,//inv.junio,
+      'Julio': 0,//inv.julio,
+      'Agosto': 0,//inv.agosto,
+      'Septiembre': 0,//inv.septiembre,
+      'Octubre': 0,//inv.octubre,
+      'Noviembre': 0,//inv.noviembre,
+      'Diciembre': 0,//inv.diciembre,
+      'ValidarCantMinima': exi.existencias <= inv.cant_Minima ? 1 : 0,
+    }
 
     this.ArrayProductoZeus.push(info);
-      this.ArrayProductoZeus.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-      this.ArrayProductoZeus.sort((a, b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima));
-    }
+    this.ArrayProductoZeus.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+    this.ArrayProductoZeus.sort((a, b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima));
+  }
 
-  /*llenarMesActual(mes: number, datos_Inventario: any): number {
-    switch (mes) {
-      case 0:
-        this.mesActual = 'Enero';
-        return datos_Inventario.enero;
-      case 1:
-        this.mesActual = 'Febrero';
-        return datos_Inventario.febrero;
-      case 2:
-        this.mesActual = 'Marzo';
-        return datos_Inventario.marzo;
-      case 3:
-        this.mesActual = 'Abril';
-        return datos_Inventario.abril;
-      case 4:
-        this.mesActual = 'Mayo';
-        return datos_Inventario.mayo;
-      case 5:
-        this.mesActual = 'Junio';
-        return datos_Inventario.junio;
-      case 6:
-        this.mesActual = 'Julio';
-        return datos_Inventario.julio;
-      case 7:
-        this.mesActual = 'Agosto';
-        return datos_Inventario.agosto;
-      case 8:
-        this.mesActual = 'Septiembre';
-        return datos_Inventario.septiembre;
-      case 9:
-        this.mesActual = 'Octubre';
-        return datos_Inventario.Octubre;
-      case 10:
-        this.mesActual = 'Noviembre';
-        return datos_Inventario.noviembre;
-      case 11:
-        this.mesActual = 'Diciembre';
-        return datos_Inventario.diciembre;            
-      default:
-        return 0;
-    }
-  }*/
-
-  /*llenarColumnas() {
-    this.columnas = [
-      { header: 'Enero', field: 'Enero'},
-      { header: 'Febrero', field: 'Febrero'},
-      { header: 'Marzo', field: 'Marzo'},
-      { header: 'Abril', field: 'Abril'},
-      { header: 'Mayo', field: 'Mayo'},
-      { header: 'Junio', field: 'Junio'},
-      { header: 'Julio', field: 'Julio'},
-      { header: 'Agosto', field: 'Agosto'},
-      { header: 'Septiembre', field: 'Septiembre'},
-      { header: 'Octubre', field: 'Octubre'},
-      { header: 'Noviembre', field: 'Noviembre'},
-      { header: 'Diciembre', field: 'Diciembre'},
-    ];
-  }*/
 
   //
   actualizarCantMinima(fila, $event) {
-      if($event.key == 'Enter') {
+    if ($event.key == 'Enter') {
       this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(fila.Id, fila.Cant_Minima).subscribe(() => {
         this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${fila.nombreItem} actualizada con éxito!`);
         let i: number = this.ArrayProductoZeus.findIndex(x => x.Numero == fila.Numero);
@@ -310,7 +345,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   precioTotalExistencia(): number {
     let total: number = 0;
-    this.ArrayProductoZeus.forEach(d => ![6, 12].includes(this.ValidarRol) ? total += d.Precio_Total : total = 0);
+    total = this.ArrayProductoZeus.reduce((acc, d) => acc + d.Precio_Total, 0);
     return total;
   }
 

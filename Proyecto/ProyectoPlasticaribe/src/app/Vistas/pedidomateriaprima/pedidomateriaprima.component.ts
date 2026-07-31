@@ -362,7 +362,9 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
       Usua_Id : this.storage_Id,
       TpDoc_Id : 'FCO',
     }
-    this.facturaMpComService.srvGuardar(datosFactura).pipe(takeUntil(this.destroy$)).subscribe(() => this.obtenerUltimoIdFacturaCompra(oc), () => {
+    this.facturaMpComService.srvGuardar(datosFactura).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.obtenerUltimoIdFacturaCompra(oc)
+    }, () => {
       this.msj.mensajeError(`Error`, `¡Error al crear la factura!`);
       this.load = true;
     });

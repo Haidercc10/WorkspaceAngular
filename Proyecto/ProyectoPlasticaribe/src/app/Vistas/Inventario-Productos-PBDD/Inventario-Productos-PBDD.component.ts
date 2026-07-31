@@ -189,6 +189,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }
   }
 
+  //!Función que traerá el stock de los productos en proceso de Extrusión
   getStockProcessExtrusion() {
     if (!this.tabStockExtrusion) {
       this.loading = true
@@ -704,7 +705,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     } else {
       this.indexTab == 1 ? this.loadRollsProductionAvailable() : null;
       this.indexTab == 2 ? this.loadRollsProductionAvailable() : null;
-      this.indexTab == 5 ? this.getStockProcessExtrusion() : null;
+      //this.indexTab == 5 ? this.getStockProcessExtrusion() : null;
       this.indexTab == 6 ? this.getStockInformationKg() : null;
       this.indexTab == 7 ? this.getStockInformationBulto() : null;
 

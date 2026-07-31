@@ -222,16 +222,16 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.orderFactService.getId(orderFact).pipe(
       finalize(() => { this.load = false; }),
       takeUntil(this.destroy$)).subscribe(data => {
-      if (data.estado_Id == 19) {
-        let ofDirect: boolean = ![null, false, undefined].includes(data.of_Directa) ? true : false;
-        this.formProduction.patchValue({ 'ofDirect': ofDirect, 'client': data.cli_Id, });
-        this.getInformationOrderFact(orderFact, ofDirect);
-      } else if (data.estado_Id == 21) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} ya fue despachada!`);
-      else if (data.estado_Id == 3) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} fue anulada!`);
-      else this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} no se encuentra disponible para despachar!`);
-    }, error => {
-      this.msj.mensajeError('Error', `Error al consultar la OF N° ${orderFact} | ${error.status} ${error.statusText}`);
-    });
+        if (data.estado_Id == 19) {
+          let ofDirect: boolean = ![null, false, undefined].includes(data.of_Directa) ? true : false;
+          this.formProduction.patchValue({ 'ofDirect': ofDirect, 'client': data.cli_Id, });
+          this.getInformationOrderFact(orderFact, ofDirect);
+        } else if (data.estado_Id == 21) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} ya fue despachada!`);
+        else if (data.estado_Id == 3) this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} fue anulada!`);
+        else this.msj.mensajeAdvertencia(`Advertencia`, `La orden N° ${orderFact} no se encuentra disponible para despachar!`);
+      }, error => {
+        this.msj.mensajeError('Error', `Error al consultar la OF N° ${orderFact} | ${error.status} ${error.statusText}`);
+      });
   }
 
   msjsWarning(message: string, detail: string) {
@@ -243,30 +243,30 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.reposition = false;
 
     this.dtOrderFactService.GetInformacionOrderFactToSend(of, ofDirect).
-    pipe(finalize(() => { this.load = false; }))
-    .subscribe(data => {
-      this.production = [];
-      let saleOrders: Array<string> = [];
-      let filteredSaleOrders: Array<string> = [];
+      pipe(finalize(() => { this.load = false; }))
+      .subscribe(data => {
+        this.production = [];
+        let saleOrders: Array<string> = [];
+        let filteredSaleOrders: Array<string> = [];
 
-      data.forEach((dataProduction : any) => {
-        let codeSale : string = dataProduction.dtOrder.consecutivo_Pedido
-        saleOrders.push(codeSale);
-        if(!filteredSaleOrders.includes(codeSale)) filteredSaleOrders.push(codeSale);
-        this.loadProduction(dataProduction, ofDirect);
-        if (saleOrders.length == data.length) {
-          let saleOrder: string = `${data[0].dtOrder.consecutivo_Pedido}`;
-          if (!saleOrder.startsWith('DV')) {
-            this.managementFactZeus(filteredSaleOrders, of);
-          } else {
-            this.reposition = true;
-            this.formProduction.patchValue({ 'fact': dataProduction.order.factura, 'saleOrder': dataProduction.dtOrder.consecutivo_Pedido, });
-            this.msj.mensajeConfirmacion(`Reposición consultada`, `¡Ingrese los rollos que van a ser enviados por reposición!`);
-            this.load = false;
+        data.forEach((dataProduction: any) => {
+          let codeSale: string = dataProduction.dtOrder.consecutivo_Pedido
+          saleOrders.push(codeSale);
+          if (!filteredSaleOrders.includes(codeSale)) filteredSaleOrders.push(codeSale);
+          this.loadProduction(dataProduction, ofDirect);
+          if (saleOrders.length == data.length) {
+            let saleOrder: string = `${data[0].dtOrder.consecutivo_Pedido}`;
+            if (!saleOrder.startsWith('DV')) {
+              this.managementFactZeus(filteredSaleOrders, of);
+            } else {
+              this.reposition = true;
+              this.formProduction.patchValue({ 'fact': dataProduction.order.factura, 'saleOrder': dataProduction.dtOrder.consecutivo_Pedido, });
+              this.msj.mensajeConfirmacion(`Reposición consultada`, `¡Ingrese los rollos que van a ser enviados por reposición!`);
+              this.load = false;
+            }
           }
-        }
-      });
-    }, error => this.errorMessage(`¡No se encontró información de la orden de facturación N° ${of}!`, error));
+        });
+      }, error => this.errorMessage(`¡No se encontró información de la orden de facturación N° ${of}!`, error));
   }
 
   //Función para obtener la factura asociada a los pedidos de la orden de facturación.
@@ -274,11 +274,11 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.zeusService.GetFactura_PorPedidos(saleOrders).pipe(
       finalize(() => { this.load = false; })
     ).subscribe(factura => {
-        this.factZeus = factura;
-        this.msj.mensajeConfirmacion(`OF consultada`, `¡Ingrese los rollos/bultos a despachar!`);
-        this.load = false;
-        this.sendProductionZeus = this.preSendProductionZeus;
-        this.consolidateItems();
+      this.factZeus = factura;
+      this.msj.mensajeConfirmacion(`OF consultada`, `¡Ingrese los rollos/bultos a despachar!`);
+      this.load = false;
+      this.sendProductionZeus = this.preSendProductionZeus;
+      this.consolidateItems();
     }, error => {
       this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la OF N° ${of}!`, error);
       this.clearFieldOF();
@@ -386,7 +386,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       if (productionFound == production) {
         this.sendProductionZeus.push(data[0]);
         let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-        console.log('index', this.sendProductionZeus[i].pp.numeroRollo_BagPro, i);  
+        console.log('index', this.sendProductionZeus[i].pp.numeroRollo_BagPro, i);
         this.sendProductionZeus[i].dataExtrusion = {
           'numero_RolloBagPro': production,
           'ofDirect': true,
@@ -451,7 +451,6 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   //Validar los datos a guardar 
   validateDataToSave() {
-    console.log('sendProductionZeus', this.sendProductionZeus);
     if (this.sendProductionZeus.length > 0) {
       let of: number = this.formProduction.value.orderFact;
       let ofDirect: boolean = this.formProduction.value.ofDirect;
@@ -516,8 +515,6 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   validateDataDispatch(of: number) {
     let productsOutOfDirect: any[] = this.sendProductionZeus.filter(x => x.inOfDirect == false);
 
-    console.log('productsOutOfDirect', productsOutOfDirect);
-
     if (this.formProduction.value.driver) {
       if (!['', null, undefined].includes(this.formProduction.value.car)) {
         if (this.formProduction.value.car.length == 6) {
@@ -573,16 +570,16 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         if (count == this.sendProductionZeus.length) {
           //this.saveProductionInOf(orderFact);
           this.finishSaveData();
-        } 
+        }
       }, error => this.errorMessage(`¡Ocurrió un error al amarrar los rollos a la factura!`, error));
     });
   }
 
   //Guardar producción de OF directas en los detalles de la orden de facturación.
   saveProductionInOf(of: number, productsOutOfDirect: any[]) {
-    let count : number = 0;
+    let count: number = 0;
 
-    if(productsOutOfDirect.length === 0) {
+    if (productsOutOfDirect.length === 0) {
       this.saveAsgFact();
       return;
     }
@@ -616,7 +613,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     let orderFact = this.formProduction.value.orderFact;
     let ofDirect = this.formProduction.value.ofDirect;
     let preload = this.formProduction.value.preload;
-    let factZeus : string = this.formProduction.value.fact;
+    let factZeus: string = this.formProduction.value.fact;
 
     this.orderFactService.PutStatusOrder(orderFact, factZeus).subscribe(() => {
       this.putStateReels(orderFact, ofDirect, preload)
