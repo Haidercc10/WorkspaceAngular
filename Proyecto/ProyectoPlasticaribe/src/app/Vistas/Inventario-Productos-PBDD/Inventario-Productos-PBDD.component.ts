@@ -154,9 +154,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   getStockInformation() {
     //if(!this.despacho) {
-    let sales : string | null = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id)}` : null;
+    let sales : string | null = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id).padStart(3, '0')}` : null;
     let salesEndPoint : string | null = [undefined, null, ''].includes(sales) ? '' : sales;
     this.load = true;
+    console.log(sales, salesEndPoint);
     //this.despacho = true;
     this.stockService.GetStockProducts_AvaibleProduction(salesEndPoint).subscribe(data => {
       //this.getStockProcess();
@@ -316,8 +317,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   fillComparativeStock(data: any, avaible: boolean, sales: string | null = null) {
+    console.log(data);
     data.forEach(stock => {
       if (!this.comparativeStock.map(x => x.item).includes(stock.product.item)) {
+        console.log('entrada 1')
         this.comparativeStock.push({
           item: stock.product.item,
           reference: stock.product.reference,
@@ -350,6 +353,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,*/
         });
       } else {
+        console.log('entrada 2')
         let i: number = this.comparativeStock.findIndex(x => x.item == stock.product.item);
         this.comparativeStock[i].stock += avaible ? stock.stock.stock : 0;
         this.comparativeStock[i].stockInProcess += !avaible ? stock.stock.stock : 0;
@@ -706,8 +710,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.indexTab == 1 ? this.loadRollsProductionAvailable() : null;
       this.indexTab == 2 ? this.loadRollsProductionAvailable() : null;
       //this.indexTab == 5 ? this.getStockProcessExtrusion() : null;
-      this.indexTab == 6 ? this.getStockInformationKg() : null;
-      this.indexTab == 7 ? this.getStockInformationBulto() : null;
+      this.indexTab == 5 ? this.getStockInformationKg() : null;
+      this.indexTab == 6 ? this.getStockInformationBulto() : null;
 
       if (this.indexTab == 3) {
         this.getStockProcessEmpaque();
@@ -718,7 +722,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.deployRows();
       } else null;
 
-      if (this.indexTab == 8) {
+      if (this.indexTab == 7) {
         this.getStockProcessEmpaque();
         this.getStockProcessSellado();
         this.deployRows();

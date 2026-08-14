@@ -177,8 +177,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
         } else {
           this.msj.mensajeError(`Advertencia`, `Solo se pueden ingresar rollos/bultos de procesos 'EXT', 'SELLA' o 'EMP'!`);
         }
-        //}, () => this.lookingForDataInBagpro(production));
-      }, () => this.warningNotFound(production));
+        }, error => {
+          this.lookingForDataInBagpro(production);
+          console.error(`Error al buscar el rollo/bulto ${production} en la base de datos de Plasticaribe:`, error);
+        });
+      //}, () => this.warningNotFound(production));
     }
   }
 
@@ -187,7 +190,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.bagproService.GetProductionByNumber(production, searchInTable).subscribe(prod => {
       if (prod.length > 0) {
         if (prod[0].nomStatus != 'Wiketiado') {
-          this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
+          this.bagproService.GetOrdenDeTrabajo(prod[0].ot, '').subscribe(data => {
             this.clients.GetSedeClientexNitBagPro(data[0].nitCliente).subscribe(cli => {
               this.sendProductionZeus.push({
                 pp: {
