@@ -25,6 +25,8 @@ export class Orden_TrabajoService {
 
   GetOrdenTrabajo = (orden : number, sales? : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getOrdenTrabajo/${orden}${sales}`);
 
+  GetOrdenesTrabajo = (inicio : any, fin : any, ruta : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Orden_Trabajo/getOrdenesTrabajo/${inicio}/${fin}${ruta}`);
+
   GetInfoUltOT = (producto : number, presentacion : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getInfoUltOT/${producto}/${presentacion}`);
 
   GetUlt_Numero_OT = () : Observable<number> => this.http.get<number>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getUlt_Numero_OT`);
