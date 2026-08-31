@@ -10,6 +10,7 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 import { CumplimientoFacturacionService } from 'src/app/Servicios/Cumplimiento_Facturacion/cumplimiento-facturacion.service';
 import { ColoresBarraProgresoService } from 'src/app/Servicios/Colores_BarraProgreso/colores-barra-progreso.service';
 import { forkJoin, map, Observable } from 'rxjs';
+import { setTimeout } from 'node:timers';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -58,7 +59,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.lecturaStorage();
     this.llenarArrayAnos();
     this.tiempoExcedido();
-    this.graficarDatos();
+    //this.graficarDatos();
 
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -82,10 +83,12 @@ export class DashBoard_FacturacionComponent implements OnInit {
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.paginaPrincial.facturacion) {
+      this.graficarDatos();
       this.facturacionAnio();
       this.facturacion2();
       let time = setInterval(() => {
         if (this.paginaPrincial.facturacion) {
+          this.graficarDatos();
           this.facturacionAnio(true);
           this.facturacion2();
         } else clearInterval(time);
