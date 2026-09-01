@@ -24,39 +24,43 @@
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
+  <!-- Tickets Abiertos -->
   <div class="row g-3 text-center" id="cantTickets">
     <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
       <p-card>
         <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-lock-open font-size-20"></i> Tickets Abiertos </h3>
         <div class="body">
-          <h4><b>{{ticketsAbiertos | number}}</b></h4>
+          <h1><b>{{ticketsAbiertos | number}}</b></h1>
         </div>
       </p-card>
     </div>
 
+    <!-- Tickets En Revisión -->
     <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
       <p-card>
         <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-eye font-size-20"></i> Tickets En Revisión</h3>
         <div class="body">
-          <h4><b>{{ticketsEnRevision | number}}</b></h4>
+          <h1><b>{{ticketsEnRevision | number}}</b></h1>
         </div>
       </p-card>
     </div>
 
-    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+    <!-- Tickets Resueltos en el Mes -->
+    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
       <p-card>
         <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-5 ajustar"><i class="pi pi-check-square font-size-20"></i> Tickets resueltos en el mes </h3>
         <div class="body">
-          <h4><b>{{ticketsResuletosMes | number}}</b></h4>
+          <h1><b>{{ticketsResuletosMes | number}}</b></h1>
         </div>
       </p-card>
     </div>
   </div>
 
+  <!-- Lista de tickets -->
   <div class="row g-3">
-    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12" id="tablaTickets">
-      <p-card>
-        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-wrench font-size-20"></i> Nuevos Tickets y En Revisión</h3>
+    <div class="p-3 col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12" id="tablaTickets">
+      <p-card styleClass="p-card-xl">
+        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-wrench font-size-20"></i> Lista de tickets</h3>
         <p-table
           #dt
           [resizableColumns]="true"
@@ -75,20 +79,28 @@
           *ngIf="!cargando">
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 40px"></th>
-              <th style="width: 50px"></th>
-              <th style="width: 150px">
+              <!-- Radios -->
+              <th></th>
+              <!-- # -->
+              <th></th>
+              <!-- Código -->
+              <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'codigo', 'contains')">
               </th>
-              <th style="width: 150px">
+              <!-- Fecha Creación -->
+              <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')">
               </th>
-              <th style="width: 150px">
+              <!-- Estado -->
+              <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
               </th>
-              <th style="width: 150px">
+              <!-- Descripción -->
+              <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'descripcion', 'contains')">
               </th>
+              <!-- Ver -->
+               <th></th>
             </tr>
             <tr>
               <th></th>
@@ -97,41 +109,51 @@
               <th pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha Creación</th>
               <th pSortableColumn="estado"><p-sortIcon field="estado"></p-sortIcon> Estado</th>
               <th>Descripción</th>
+              <th>Ver</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <ng-container *ngIf="item.estado == 'Abierto'; else elseTemplate">
+            <ng-container *ngIf="item.estado == 'ABIERTO'; else elseTemplate">
               <tr>
-                <td><p-tableRadioButton [value]="item"></p-tableRadioButton></td>
+                <td style="text-align: center;"><p-tableRadioButton [value]="item"></p-tableRadioButton></td>
                 <td>{{rowIndex + 1}}</td>
                 <td>{{item.codigo}}</td>
                 <td>{{item.fecha}}</td>
                 <td>{{item.estado}}</td>
                 <td>{{item.descripcion}}</td>
+                <td style="text-align: center;">
+                  <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="ticketSelccionado(item)"></p-button>
+                </td>
               </tr>
             </ng-container>
             <ng-template #elseTemplate>
               <tr style="background-color: oldlace; color: #071426">
-                <td><p-tableRadioButton [value]="item"></p-tableRadioButton></td>
+                <td style="text-align: center;"><p-tableRadioButton [value]="item"></p-tableRadioButton></td>
                 <td>{{rowIndex + 1}}</td>
                 <td>{{item.codigo}}</td>
                 <td>{{item.fecha}}</td>
                 <td>{{item.estado}}</td>
                 <td>{{item.descripcion}}</td>
+                <td style="text-align: center;">
+                  <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="ticketSelccionado(item)"></p-button>
+                </td>
               </tr>
             </ng-template>
           </ng-template>
         </p-table>
       </p-card>
     </div>
+  </div>
 
+  <div class="row">
+    <!-- Detalles/Descripcion ticket -->
     <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12" id="infoTicket">
       <p-card>
         <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-info-circle font-size-20"></i> Información de Tickets</h3>
         <div class="row p-2">
           <h5>Ticket # {{ticketSeleccionado.Codigo}}</h5>
         </div>
-        <div class="row p-2 font-size-20 text-justify">
+        <div class="row p-2 font-size-20 text-justify scrollable" Style="max-height: 300px; overflow-y: auto;">
           <p>{{ticketSeleccionado.Descripcion}}</p>
         </div>
         <div class="row p-2">
