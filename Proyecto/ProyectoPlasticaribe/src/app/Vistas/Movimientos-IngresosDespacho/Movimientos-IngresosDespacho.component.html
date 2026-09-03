@@ -6,7 +6,7 @@
 
 <form [formGroup]="formFilters" (ngSubmit)="searchaDataProductionIncome()">
   <div class="row g-4 my-4">
-    <!-- START DATE -->
+    <!-- FECHA INICIAL -->
     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
       <span class="p-float-label">
         <p-calendar formControlName="startDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
@@ -14,7 +14,7 @@
       </span>
     </div>
 
-    <!-- END DATE -->
+    <!-- FECHA FINAL -->
     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
       <span class="p-float-label">
         <p-calendar formControlName="endDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
@@ -22,7 +22,7 @@
       </span>
     </div>
 
-    <!-- ORDER PRODUCTION (OT) -->
+    <!-- ORDEN DE TRABAJO (OT) -->
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
       <span class="p-float-label">
         <p-inputNumber formControlName="orderProduction" [useGrouping]="false" inputId="orderProduction"
@@ -31,8 +31,8 @@
       </span>
     </div>
 
-    <!-- ITEM -->
-    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-4 col-xl-4 col-xxl-4">
+    <!-- ITEM (PRODUCTO) -->
+    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
       <span class="p-float-label">
         <input formControlName="ref" id="prod" list="products" type="text" pInputText autocomplete="off"
           (keydown)="searchProduct()" (change)="selectedProduct()"/>
@@ -43,7 +43,7 @@
       </span>
     </div>
 
-    <!-- PRODUCTION -->
+    <!-- ROLLO / BULTO -->
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
       <span class="p-float-label">
         <p-inputNumber formControlName="production" [useGrouping]="false" inputId="production"
@@ -51,8 +51,27 @@
         <label for="production">Rollo / Bulto</label>
       </span>
     </div>
+
+    <!-- ESTADO -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-dropdown formControlName="estado" inputId="estado" [options]="estados" optionValue="estado_Id" 
+          optionLabel="estado_Nombre"></p-dropdown>
+        <label for="estado">Estado</label>
+      </span>
+    </div>
+
+    <!-- Estados -->
+    <!-- <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-dropdown formControlName="estado" inputId="estado" [options]="estados" optionValue="estado_Id"
+          optionLabel="estado_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+        <label for="estado">Estado OT</label>
+      </span>
+    </div> -->
   </div>
 
+  <!-- BOTONES -->
   <div class="row my-4">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>

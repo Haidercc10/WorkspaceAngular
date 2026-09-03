@@ -9,6 +9,7 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
 import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 
 @Injectable({
   providedIn : 'root'
@@ -37,6 +38,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   @ViewChild(Movimientos_RollosComponent) cmpMovRolls : Movimientos_RollosComponent | undefined;
   selectedRoll : any = null;
   action : string = '';
+  estados : any = [];
   
   @ViewChild(Ubicaciones_RollosComponent) ubicationRolls : Ubicaciones_RollosComponent | undefined;
 
@@ -45,13 +47,15 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     private detailsProductionIncomeService: DetallesEntradaRollosService,
     private productsService: ProductoService,
     private msg: MensajesAplicacionService,
-    private createPDFService: CreacionPdfService,) {
+    private createPDFService: CreacionPdfService,
+    private estadosService : EstadosService) {
 
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.readStorage();
+    this.obtenerEstados();
     this.initForm();
   }
 
@@ -68,6 +72,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       item: [null],
       ref: [null],
       production: [null],
+      Estado: [null]
     });
   }
 
@@ -422,7 +427,18 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       this.cmpMovRolls!.searchMovements(data, `Despacho`);
       this.load = false;
     }, 500);
-  }  
+  }
+
+  //Funcion que consultará los estados de rollos/bultos que pasaron por despacho
+  obtenerEstados(){
+    this.estadosService.srvObtenerListaEstados().subscribe(datos => {
+      // this.estados = datos.filter((item) => item.estado_Id.includes([19,23,24,50,53]));
+      // this.estados = datos.filter((item) => item.Estado_Id == 19 && item.Estado_Id == 23 && item.Estado_Id == 24 && item.Estado_Id == 50 && item.Estado_Id == 53);
+      // this.estados = datos.filter((item) => [19,23,24,50,53].includes(item.estado_Id));
+      this.estados = datos.filter((item) => ["DISPONIBLE", "NO DISPONIBLE", "PRECARGADO", "DEVUELTO", "PRE-DEVUELTO"].includes(item.estado_Nombre));
+      this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
+    })
+  }
 }
 
 export interface dataDesp {
