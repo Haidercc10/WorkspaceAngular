@@ -73,9 +73,9 @@
 </form>
 
 <p-table #table [value]="dataSearched" columnResizeMode="expand" [resizableColumns]="true" styleClass="p-datatable-sm"
-  responsiveLayout="scroll" [rowHover]="true" [showCurrentPageReport]="true"
-  currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" [scrollable]="true"
-  scrollHeight="50rem" [(selection)]="dataSelected" dataKey="production">
+  [rowHover]="true" [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" [scrollable]="true"
+  scrollHeight="50rem" [(selection)]="dataSelected" dataKey="production" [paginator]="true" [rows]="100" [rowsPerPageOptions]="[10,25,50,100,200]">
   <ng-template pTemplate="header">
     <tr class="font-size-16">
       <th></th>

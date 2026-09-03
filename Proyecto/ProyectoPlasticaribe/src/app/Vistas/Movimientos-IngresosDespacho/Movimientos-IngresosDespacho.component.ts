@@ -29,6 +29,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   selectedMode: boolean = false;
   products: any[] = [];
   dataSearched: Array<dataDesp> = [];
+  dataSearchedFiltered: Array<dataDesp> = [];
   @ViewChild('table') table: Table | undefined;
   modal : boolean = false;
   dataSelected : any = [];
@@ -73,6 +74,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   clearFields() {
     this.products = [];
     this.dataSearched = [];
+    this.dataSearchedFiltered = [];
     this.formFilters.reset();
     this.load = false;
   }
@@ -104,11 +106,13 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     let route: string = this.validateRoute();
     this.load = true;
     this.dataSearched = [];
+    this.dataSearchedFiltered = [];
     this.dataSelected = [];
     this.table?.clear();
 
     this.detailsProductionIncomeService.GetDataProductionIncome(startDate, endDate, route).subscribe(data => {
       data.forEach(dataProduction => this.fillDataProductionIncome(dataProduction));
+      this.dataSearched = [...this.dataSearchedFiltered];
     }, error => {
       this.msg.mensajeError(`¡No se encontró información de ingresos a despacho con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
       this.load = false;
@@ -130,8 +134,8 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   }
 
   fillDataProductionIncome(data: any) {
-    if (!this.dataSearched.map(x => x.production).includes(data.detailsProduction.numeroRollo_BagPro)) {
-      this.dataSearched.push({
+    if (!this.dataSearchedFiltered.map(x => x.production).includes(data.detailsProduction.numeroRollo_BagPro)) {
+      this.dataSearchedFiltered.push({
         orderProduction: data.details.dtEntRolloProd_OT,
         item: data.product.prod_Id,
         reference: data.product.prod_Nombre,
@@ -148,8 +152,8 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
         stateRollPP : data.state.estado_Nombre,
         price : data.detailsProduction.precioVenta_Producto,
       });
-      this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
-      this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
+      this.dataSearchedFiltered.sort((a, b) => a.hour.localeCompare(b.hour));
+      this.dataSearchedFiltered.sort((a, b) => a.date.localeCompare(b.date));
     }
   }
 
