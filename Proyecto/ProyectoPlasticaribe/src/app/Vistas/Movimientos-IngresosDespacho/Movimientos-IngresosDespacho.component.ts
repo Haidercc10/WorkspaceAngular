@@ -129,10 +129,12 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     let production = this.formFilters.value.production;
     let orderProduction = this.formFilters.value.orderProduction;
     let item = this.formFilters.value.item;
+    let estado = this.formFilters.value.Estado;
 
     if (production != null) route += `production=${production}`;
     if (orderProduction != null) route.length > 0 ? route += `&orderProduction=${orderProduction}` : route += `orderProduction=${orderProduction}`;
     if (item != null) route.length > 0 ? route += `&item=${item}` : route += `item=${item}`;
+    if (estado != null) route.length > 0 ? route += `&estado=${estado}` : route += `estado=${estado}`;
     if (route.length > 0) route = `?${route}`;
 
     return route;
@@ -432,9 +434,6 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   //Funcion que consultará los estados de rollos/bultos que pasaron por despacho
   obtenerEstados(){
     this.estadosService.srvObtenerListaEstados().subscribe(datos => {
-      // this.estados = datos.filter((item) => item.estado_Id.includes([19,23,24,50,53]));
-      // this.estados = datos.filter((item) => item.Estado_Id == 19 && item.Estado_Id == 23 && item.Estado_Id == 24 && item.Estado_Id == 50 && item.Estado_Id == 53);
-      // this.estados = datos.filter((item) => [19,23,24,50,53].includes(item.estado_Id));
       this.estados = datos.filter((item) => ["DISPONIBLE", "NO DISPONIBLE", "PRECARGADO", "DEVUELTO", "PRE-DEVUELTO"].includes(item.estado_Nombre));
       this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
     })
