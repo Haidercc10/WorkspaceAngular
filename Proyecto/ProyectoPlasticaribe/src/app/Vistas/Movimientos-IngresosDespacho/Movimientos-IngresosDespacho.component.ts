@@ -72,7 +72,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       item: [null],
       ref: [null],
       production: [null],
-      Estado: [null]
+      estado: [null]
     });
   }
 
@@ -101,7 +101,6 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     });
   }
 
-
   searchaDataProductionIncome() {
     let lastMounth: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let startDate: any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
@@ -129,14 +128,14 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     let production = this.formFilters.value.production;
     let orderProduction = this.formFilters.value.orderProduction;
     let item = this.formFilters.value.item;
-    let estado = this.formFilters.value.Estado;
+    let estado = this.formFilters.value.estado;
 
     if (production != null) route += `production=${production}`;
     if (orderProduction != null) route.length > 0 ? route += `&orderProduction=${orderProduction}` : route += `orderProduction=${orderProduction}`;
     if (item != null) route.length > 0 ? route += `&item=${item}` : route += `item=${item}`;
     if (estado != null) route.length > 0 ? route += `&estado=${estado}` : route += `estado=${estado}`;
     if (route.length > 0) route = `?${route}`;
-
+    console.log(route);
     return route;
   }
 
