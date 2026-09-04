@@ -2,6 +2,7 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -47,6 +48,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     private detailsProductionIncomeService: DetallesEntradaRollosService,
     private productsService: ProductoService,
     private msg: MensajesAplicacionService,
+    private createExcelService: CreacionExcelService,
     private createPDFService: CreacionPdfService,
     private estadosService : EstadosService) {
 
@@ -169,10 +171,63 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
 
   createPDF() {
     this.load = true;
-    let title: string = `Ingresos a despacho`;
-    let content: any[] = this.contentPDF();
-    this.createPDFService.formatoPDF(title, content);
-    setTimeout(() => this.load = false, 3000);
+    setTimeout(() => {
+      let title: string = `Ingresos a despacho`;
+      let content: any[] = this.contentPDF();
+      this.createPDFService.formatoPDF(title, content);
+      setTimeout(() => this.load = false, 3000);
+    }, 0);
+  }
+
+  exportExcel() {
+    this.load = true;
+    setTimeout(() => this.createExcelFile(), 0);
+  }
+
+  private createExcelFile() {
+    let title: string = `Ingresos a despacho ${moment().format('DD-MM-YYYY')}`;
+    let workbook: any = this.createExcelService.formatoExcel(title, true);
+    let worksheet: any = workbook.worksheets[0];
+    let headers: string[] = ['#', 'OT', 'Item', 'Referencia', 'Rollo', 'Cantidad', 'Peso', 'Und.', 'Proceso', 'Ubicación', 'Estado', 'Usuario', 'Fecha', 'Hora'];
+    let fill: any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    let font: any = { name: 'Calibri', family: 4, size: 11, bold: true };
+    let alignment: any = { vertical: 'middle', horizontal: 'center', wrapText: true };
+
+    worksheet.mergeCells('A1:N3');
+    worksheet.getCell('A1').alignment = alignment;
+    worksheet.getRow(5).values = headers;
+    headers.forEach((_, index) => {
+      let cell: any = worksheet.getCell(5, index + 1);
+      cell.fill = fill;
+      cell.border = border;
+      cell.font = font;
+      cell.alignment = alignment;
+    });
+
+    this.dataSearched.forEach((data, index) => worksheet.addRow([
+      index + 1,
+      data.orderProduction,
+      data.item,
+      data.reference,
+      data.production,
+      data.quantity,
+      data.weight || 0,
+      data.presentation,
+      data.process,
+      data.ubication,
+      data.stateRollPP,
+      data.user,
+      data.date,
+      data.hour,
+    ]));
+
+    worksheet.columns.forEach(column => column.width = 16);
+    worksheet.getColumn(4).width = 40;
+    worksheet.getColumn(9).width = 20;
+    worksheet.getColumn(10).width = 25;
+    this.createExcelService.creacionExcel(title, workbook);
+    setTimeout(() => this.load = false, 1500);
   }
 
   contentPDF(): Array<any> {
