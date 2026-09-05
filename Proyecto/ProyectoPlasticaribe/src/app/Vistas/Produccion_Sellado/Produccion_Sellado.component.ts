@@ -82,6 +82,8 @@ export class Produccion_SelladoComponent implements OnInit {
   supervisores: any = []
   supervisorSelected: any;
   hasContactWithFood: boolean = false;
+  caja: boolean = false; //Variable que indicará si el producto es de tipo caja
+  private pesoTeoricoManualBase: number | null = null;
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -105,7 +107,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
     this.inicializateFormResidues();
-    this.initFormAuthorizeWeight();
+    //this.initFormAuthorizeWeight();
   }
 
   ngOnInit() {
@@ -119,7 +121,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getProcess();
     this.getPackers();
     //this.generateCodeBar()
-    this.getUsersAuthorized();
+    //this.getUsersAuthorized();
     this.getSupervisores();
     // this.getPuertoSerial();
   }
@@ -157,11 +159,13 @@ export class Produccion_SelladoComponent implements OnInit {
       maxWeight: [null,],
       userAuthorize: [null,],
       cinta: [false],
-      supervisor: [null,]
+      supervisor: [null,],
+      caja: [false,],
     });
     this.formSellado.get('saldo')?.disable();
   }
 
+  //Función para inicializar el formulario de residuos
   inicializateFormResidues() {
     this.form = this.frmBuilder.group({
       user: [null, Validators.required],
@@ -169,12 +173,14 @@ export class Produccion_SelladoComponent implements OnInit {
     });
   }
 
+  //!Función para inicializar el formulario de autorización de peso
   initFormAuthorizeWeight() {
     this.formWeight = this.frmBuilder.group({
       id: [null, Validators.required],
     });
   }
 
+  //!Función para obtener los usuarios autorizados
   getUsersAuthorized = () => this.svcUsuarios.getListAuthorizeUsers().subscribe(data => this.usersAuthorized = data, error => this.svcMsjs.mensajeError(error));
 
   //Función para obtener las maquinas
@@ -404,17 +410,18 @@ export class Produccion_SelladoComponent implements OnInit {
     this.produccion = [];
     this.cargarTurnoActual();
     this.getMachines();
-    if (newOT) this.formSellado.patchValue({ 
-      'procesoAnterior': null, 
-      'etiquetaAsociada': null, 
-      'otAlterna': null, 
-      'packer': null, 
-      'minWeight': null, 
-      'maxWeight': null, 
-      'userAuthorize': null, 
-      'cinta': false, 
-      'supervisor': null, 
-      'mostratDatosProducto': false 
+    if (newOT) this.formSellado.patchValue({
+      'procesoAnterior': null,
+      'etiquetaAsociada': null,
+      'otAlterna': null,
+      'packer': null,
+      'minWeight': null,
+      'maxWeight': null,
+      'userAuthorize': null,
+      'cinta': false,
+      'supervisor': null,
+      'mostratDatosProducto': false,
+      'caja': false,
     });
 
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot, `?process=${this.formSellado.value.proceso}`).subscribe(data => {
@@ -436,10 +443,13 @@ export class Produccion_SelladoComponent implements OnInit {
           //Cinta
           if (data[0].producto.includes('CINTA')) this.formSellado.patchValue({ cinta: true });
           else this.formSellado.patchValue({ cinta: false });
+          //Caja
+          if (data[0].producto.includes('BOLSA') && data[0].producto.includes('VACIO')) this.formSellado.patchValue({ caja: true });
+          else this.formSellado.patchValue({ caja: false });
           this.formSellado.get('saldo')?.enable();
           this.validarProceso();
           if (!newOT) this.updateStatesProcessOT(data[0].numero_Orden, this.formSellado.value.proceso, data[0].cantidad_Sellado, data[0].peso_Sellado);
-          setTimeout(() => this.calcularPesoTeorico(), 500);
+          setTimeout(() => this.getPesoTeoricoManual(), 500);
           this.claseCantidadRealizada(data[0]);
           this.cargarProduccionSellado(this.formSellado.value.ot, validacionDatos);
         }
@@ -449,6 +459,7 @@ export class Produccion_SelladoComponent implements OnInit {
       });
     }, () => {
       this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
+      this.limpiarCampos();
     });
   }
 
@@ -468,6 +479,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.operariosConsultados = this.formSellado.value.idOperario;
     this.packerSelected = this.formSellado.value.packer;
     this.cintaSelected = this.formSellado.value.cinta;
+    this.caja = this.formSellado.value.caja;
     this.supervisorSelected = this.formSellado.value.supervisor;
     this.hasContactWithFood = this.formSellado.value.mostratDatosProducto;
     //this.authUserSelected = this.formSellado.value.userAuthorize;
@@ -491,15 +503,57 @@ export class Produccion_SelladoComponent implements OnInit {
       let pesoMillar: number = this.ordenesTrabajo[0].selladoCorte_PesoMillar;
       let cantidad: number = this.formSellado.value.cantUnd;
       let cantBolsasPaq: number = this.ordenesTrabajo[0].selladoCorte_CantBolsasPaquete;
-      if (this.ordenesTrabajo[0].presentacion == 'Kilo') pesoTeorico = cantidad;
-      else if (this.ordenesTrabajo[0].presentacion == 'Unidad') pesoTeorico = ((cantidad * pesoMillar) / 1000);
-      else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad == 1) pesoTeorico = (cantidad * pesoMillar);
-      else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
-      minWeight = pesoTeorico - (pesoTeorico * 10 / 100);
-      maxWeight = pesoTeorico + (pesoTeorico * 10 / 100);
+      let presentacion: string = this.ordenesTrabajo[0].presentacion;
+      
+      if (presentacion == 'Kilo') pesoTeorico = cantidad;
+      else if (presentacion == 'Unidad') pesoTeorico = ((cantidad * pesoMillar) / 1000);
+      else if (presentacion == 'Paquete' && cantidad == 1) pesoTeorico = (cantidad * pesoMillar);
+      else if (presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
+
+      minWeight = pesoTeorico - (pesoTeorico * 7 / 100);
+      maxWeight = pesoTeorico + (pesoTeorico * 7 / 100);
       this.formSellado.patchValue({ 'pesoTeorico': pesoTeorico, 'minWeight': minWeight, 'maxWeight': maxWeight, });
     }
   }
+
+  //Función que obtiene el peso teórico manualmente ingresado por el usuario.
+  getPesoTeoricoManual() {
+    let formato: string = this.ordenesTrabajo[0].formato_Producto;
+    let referencia: string = this.ordenesTrabajo[0].producto;
+    let pesoTeoricoManual: number = 0;
+    let pesoMaximo: number = 0;
+    let pesoMinimo: number = 0;
+
+    if (formato == 'CAMISILLA') {
+      if (referencia.includes('BIOD')) {
+        if (referencia.includes('SUPER ESPECIAL')) {
+          if (referencia.includes('T0.5')) pesoTeoricoManual = 21;
+          else this.calcularPesoTeorico();
+        } else if (referencia.includes('ESPECIAL')) {
+          if (referencia.includes('T0.5')) pesoTeoricoManual = 17;
+          else if (referencia.includes('T1.0')) pesoTeoricoManual = 26;
+          else if (referencia.includes('T1.5')) pesoTeoricoManual = 33;
+          else if (referencia.includes('T2.0')) pesoTeoricoManual = 44;
+          else if (referencia.includes('T2.5')) pesoTeoricoManual = 35;
+          else if (referencia.includes('T3.0')) pesoTeoricoManual = 26;
+          else if (referencia.includes('T3.2')) pesoTeoricoManual = 28;
+        } else {
+          if (referencia.includes('T0.5')) pesoTeoricoManual = 14;
+          else if (referencia.includes('T1.0')) pesoTeoricoManual = 21;
+          else if (referencia.includes('T1.5')) pesoTeoricoManual = 28;
+          else if (referencia.includes('T2.0')) pesoTeoricoManual = 35;
+          else if (referencia.includes('T2.5')) pesoTeoricoManual = 30;
+          else if (referencia.includes('T3.0') && referencia.includes('X 70')) pesoTeoricoManual = 20;
+          else if (referencia.includes('T3.0')) pesoTeoricoManual = 23;
+        }
+      } else this.calcularPesoTeorico();
+    } else {
+      this.calcularPesoTeorico();
+    }
+   return pesoTeoricoManual;
+  }
+
+  
 
   //Funcion que agrega una clase con un color especifico al campo cantidad realizada de la tabla.
   claseCantidadRealizada(data) {
@@ -538,9 +592,10 @@ export class Produccion_SelladoComponent implements OnInit {
     let ot: number = this.formSellado.value.ot;
     let oldProcess: any = this.formSellado.value.procesoAnterior;
     let tag: any = this.formSellado.value.etiquetaAsociada;
+    let caja: boolean = this.formSellado.value.caja;
     let teoricWeight: number = this.formSellado.value.pesoTeorico;
-    let teoricW5PMost: number = (teoricWeight + ((teoricWeight * 10) / 100));
-    let teoricW5PLess: number = (teoricWeight - ((teoricWeight * 10) / 100));
+    let teoricW7PMost: number = (teoricWeight + ((teoricWeight * 7) / 100));
+    let teoricW7PLess: number = (teoricWeight - ((teoricWeight * 7) / 100));
     this.cargando = true;
     //this.getPuertoSerial();
     const peso = await this.getPesoDesdeBascula();
@@ -568,13 +623,13 @@ export class Produccion_SelladoComponent implements OnInit {
                             if (this.formSellado.value.cantUnd > 0) {
                               if (this.formSellado.value.cantKg > 1 && this.formSellado.value.cantKg <= 65) {
                                 if (this.esSoloLectura) {
-                                  if (this.formSellado.value.cantKg >= teoricW5PLess && this.formSellado.value.cantKg <= teoricW5PMost) {
+                                  if (caja) {
                                     this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
                                   } else {
-                                    if (this.formSellado.value.userAuthorize) this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
-                                    else {
-                                      this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW5PLess.toFixed(2)} y ${teoricW5PMost.toFixed(2)}!`);
-                                      this.modalAuthorizeWeight = true;
+                                    if (this.formSellado.value.cantKg >= teoricW7PLess && this.formSellado.value.cantKg <= teoricW7PMost) {
+                                      this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
+                                    } else {
+                                      this.warnMsj(`Advertencia`, `La cantidad de kilos debe ser entre ${teoricW7PLess.toFixed(2)} y ${teoricW7PMost.toFixed(2)}!`);
                                     }
                                   }
                                 } else this.createRecordProduction(this.ordenesTrabajo[0], tag, oldProcess);
@@ -696,7 +751,7 @@ export class Produccion_SelladoComponent implements OnInit {
       'Creador_Id': this.AppComponent.storage_Id,
       'Etiqueta_Trazabilidad': this.formSellado.value.etiquetaAsociada,
       'Empacador_Id': [undefined, null].includes(this.formSellado.value.packer) ? 0 : this.formSellado.value.packer,
-      'Autoriza_Id': this.formSellado.value.userAuthorize,
+      'Autoriza_Id': 0,
       'Estado_Rollo': 19,
       'Supervisor_Id': [undefined, null].includes(this.formSellado.value.supervisor) ? 3197 : this.formSellado.value.supervisor
     }
@@ -772,13 +827,13 @@ export class Produccion_SelladoComponent implements OnInit {
     let contactWithFood: boolean = false;
 
     if (data) {
-      if (data.producto.includes('TUBULAR') || 
-          data.producto.includes('BASURA') || 
-          data.producto.includes('CESTA') || 
-          data.producto.includes('BARRIDO') || 
-          data.producto.includes('OVALO') ||
-          data.producto.includes('ASEO') ||
-          data.producto.includes('BIO')) {
+      if (data.producto.includes('TUBULAR') ||
+        data.producto.includes('BASURA') ||
+        data.producto.includes('CESTA') ||
+        data.producto.includes('BARRIDO') ||
+        data.producto.includes('OVALO') ||
+        data.producto.includes('ASEO') ||
+        data.producto.includes('BIO')) {
         contactWithFood = false;
       } else if (data.formato_Producto.includes('CAMISILLA') || data.formato_Producto.includes('TUBULAR')) {
         contactWithFood = false;
@@ -791,7 +846,7 @@ export class Produccion_SelladoComponent implements OnInit {
           } else {
             contactWithFood = false;
           }
-        } else contactWithFood = true;  
+        } else contactWithFood = true;
       } else {
         contactWithFood = true;
       }
@@ -835,9 +890,9 @@ export class Produccion_SelladoComponent implements OnInit {
 
   msjsAltOT = () => 'Coloca el número de OT alternativa y presiona enter, para seleccionar un rollo madre de esta producción';
 
-  msjsMinWeight = () => 'Rango de peso (10%) minímo permitido para realizar el pesaje de producción';
+  msjsMinWeight = () => 'Rango de peso (7%) minímo permitido para realizar el pesaje de producción';
 
-  msjsMaxWeight = () => 'Rango de peso (10%) maxímo permitido para realizar el pesaje de producción';
+  msjsMaxWeight = () => 'Rango de peso (7%) maxímo permitido para realizar el pesaje de producción';
 
 
 
@@ -892,7 +947,7 @@ export class Produccion_SelladoComponent implements OnInit {
         'etiquetaAsociada': entrada.Etiqueta_Trazabilidad,
         'otAlterna': otAltern,
         'packer': this.packerSelected,
-        'userAuthorize': this.authUserSelected,
+        //'userAuthorize': this.authUserSelected,
         'cinta': this.cintaSelected,
         'supervisor': this.supervisorSelected,
         'mostratDatosProducto': this.hasContactWithFood
@@ -923,10 +978,11 @@ export class Produccion_SelladoComponent implements OnInit {
       'etiquetaAsociada': tagAssociated,
       'otAlterna': otAltern,
       'packer': this.packerSelected,
-      'userAuthorize': this.authUserSelected,
+      //'userAuthorize': this.authUserSelected,
       'cinta': this.cintaSelected,
       'supervisor': this.supervisorSelected,
-      'mostratDatosProducto': this.hasContactWithFood
+      'mostratDatosProducto': this.hasContactWithFood,
+      'caja': this.caja
     });
     this.buscarOT();
   }
@@ -1078,8 +1134,9 @@ export class Produccion_SelladoComponent implements OnInit {
         'etiquetaAsociada': data.etiqueta_Trazabilidad,
         'otAlterna': otAltern,
         'packer': this.packerSelected,
-        'userAuthorize': this.authUserSelected,
+        //'userAuthorize': this.authUserSelected,
         'cinta': this.cintaSelected,
+        'caja': this.caja,
         'supervisor': this.supervisorSelected,
       });
 
@@ -1289,7 +1346,7 @@ export class Produccion_SelladoComponent implements OnInit {
     });
   }
 
-  //
+  //! en desuso: función 
   authorizeWeight() {
     let id: number = this.formWeight.value.id;
     this.svcUsuarios.GetUsersAthorizedForTeoricWeight(id).subscribe(data => {

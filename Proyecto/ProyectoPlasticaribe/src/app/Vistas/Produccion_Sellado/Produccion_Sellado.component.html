@@ -103,7 +103,7 @@
         </span>
       </div>
 
-      <!--* Peso 10% menos -->
+      <!--* Peso 7% menos -->
       <div class="col-sm-12 col-md-6 col-xl-1 justify-content-end">
         <span class="p-float-label">
           <p-inputNumber formControlName="minWeight" inputId="minWeight" [readonly]="true" [useGrouping]="false"
@@ -112,7 +112,7 @@
         </span>
       </div>
 
-      <!--* Peso 10% más -->
+      <!--* Peso 7% más -->
       <div class="col-sm-12 col-md-6 col-xl-1 justify-content-end">
         <span class="p-float-label">
           <p-inputNumber formControlName="maxWeight" inputId="maxWeight" [readonly]="true" [useGrouping]="false"
@@ -188,21 +188,18 @@
         </span>
       </div>
 
-      <!-- Autoriza -->
-      <div class="col-sm-12 col-md-6 col-xl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="userAuthorize" inputId="userAuthorize" [options]="usersAuthorized"
-            [readonly]="true" optionLabel="userName" [autoDisplayFirst]="false" [filter]="true" filterBy="userName"
-            optionValue="user_Id"></p-dropdown>
-          <label for="userAuthorize">Autoriza</label>
-        </span>
-      </div>
-
       <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox">
         <p-checkbox formControlName="cinta" [binary]="true" inputId="cinta" id="cinta"
           pTooltip="Al activar este campo se redondea el peso del bulto. Ej: de 15.20 a 15.00"
           tooltipPosition="top"></p-checkbox>
-        <label for="cinta">Referencia Cinta</label>
+        <label for="cinta">Cinta</label>
+      </div>
+
+      <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox">
+        <p-checkbox formControlName="caja" [binary]="true" inputId="caja" id="caja"
+          pTooltip="Este campo indica que el producto es bolsa de empaque al vacío."
+          tooltipPosition="top"></p-checkbox>
+        <label for="caja">Bolsa al vacío</label>
       </div>
 
       <div class="mb-3">
@@ -521,6 +518,7 @@
   </form>
 </p-dialog>
 
+<!--
 <p-dialog [(visible)]="modalAuthorizeWeight" [draggable]="false" [style]="{width: '25%'}"
   header="Solicitud de registro de producción" [modal]="true">
   <form [formGroup]="formWeight" (ngSubmit)="authorizeWeight()">
@@ -549,6 +547,7 @@
     </div>
   </form>
 </p-dialog>
+-->
 
 <p-toast position="center" key="etiqueta" (onClose)="onReject('etiqueta')" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">
