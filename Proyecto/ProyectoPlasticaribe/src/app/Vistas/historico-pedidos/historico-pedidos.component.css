@@ -82,4 +82,31 @@ th {
 
 .font-weight-bold {
     font-weight: bold;
+}
+
+.bg-danger1 {
+    color: white;
+    background-color: palevioletred;
+    font-size: calc(var(--font-size) * 14px);
+    padding: 2% 3%;
+    font-weight: 700;
+    border-radius: 5px;
+}
+
+.bg-warning1 {
+    color: black;
+    background-color: rgba(255, 228, 78, 0.877);
+    font-size: calc(var(--font-size) * 14px);
+    padding: 2% 3%;
+    font-weight: 700;
+    border-radius: 5px;
+}
+
+.bg-success1 {
+    color: black;
+    background-color: palegreen;
+    font-size: calc(var(--font-size) * 14px);
+    padding: 2% 3%;
+    font-weight: 700;
+    border-radius: 5px;
 }   

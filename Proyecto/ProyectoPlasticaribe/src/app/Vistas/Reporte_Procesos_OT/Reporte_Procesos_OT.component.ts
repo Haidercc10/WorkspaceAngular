@@ -486,14 +486,13 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => {
       data.forEach(infoOt => this.llenarArray(infoOt));
-      
-      
     }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
       this.load = true;
     });
   }
 
+  //Funcion encargada de validar los parametros de consulta y construir la ruta para la solicitud HTTP
   validarParametrosConsulta(){
     let ot : number = this.formularioOT.value.idDocumento;
     let fallas : any = this.formularioOT.value.fallasOT;

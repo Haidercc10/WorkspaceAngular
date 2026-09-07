@@ -210,7 +210,7 @@
           <ng-template pTemplate="header" let-columns>
             <tr class="font-size-16" id="filtros">
               <th pFrozenColumn></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains')">
+              <th pFrozenColumn><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cli', 'contains')">
               </th>
@@ -222,15 +222,11 @@
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'rot', 'contains')">
-              </th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'perf', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'lam', 'contains')">
-              </th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cor', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')">
               </th>
@@ -253,27 +249,24 @@
             <tr class="font-size-13" id="columnas">
               <th pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo"
                   *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableHeaderCheckbox></th>
-              <th scope="col" pResizableColumn pSortableColumn="ot" id="ordenTrabajo">OT <p-sortIcon field="ot"
+              <th pFrozenColumn scope="col" pResizableColumn pSortableColumn="ot" id="ordenTrabajo">OT <p-sortIcon field="ot"
                   title="Order por OT"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="cli">Cliente <p-sortIcon field="cli"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="prod">Producto <p-sortIcon field="prod"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="mp">Materia Prima <p-sortIcon field="mp"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="mp">Mat. Prima <p-sortIcon field="mp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="ext">Extrusión <p-sortIcon field="ext"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="ext">EXT <p-sortIcon field="ext"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="imp">Impresión <p-sortIcon field="imp"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="imp">IMP <p-sortIcon field="imp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="rot">Rotograbado <p-sortIcon field="rot"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="perf">PERF. <p-sortIcon field="perf"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="perf">Perforado <p-sortIcon field="perf"></p-sortIcon>
-              </th>
-              <th scope="col" pResizableColumn pSortableColumn="dbl">Doblado <p-sortIcon field="dbl"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="lam">Laminado <p-sortIcon field="lam"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="cor">Corte <p-sortIcon field="cor"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="emp">Empaque <p-sortIcon field="emp"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="sel">Sellado <p-sortIcon field="sel"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="wik">Wiketiado <p-sortIcon field="wik"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="dbl">DOBL <p-sortIcon field="dbl"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="lam">LAM <p-sortIcon field="lam"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="emp">EMP <p-sortIcon field="emp"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="sel">SELLA <p-sortIcon field="sel"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="wik">WIKE <p-sortIcon field="wik"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="desp">Despacho <p-sortIcon field="desp"></p-sortIcon>
               </th>
@@ -294,7 +287,7 @@
                 <p-tableCheckbox [value]="data"
                   *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableCheckbox>
               </td>
-              <td (click)="reporteOT(data.ot)"><b>{{data.ot}}</b></td>
+              <td pFrozenColumn (click)="reporteOT(data.ot)"><b>{{data.ot}}</b></td>
               <td>{{data.cli}}</td>
               <td>{{data.prod}}</td>
               <td><b>{{data.mp | number : '1.2-2'}}</b></td>
@@ -318,16 +311,6 @@
                 'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.imp == 0 && data.imp < data.cant) && data.est == 'ANULADO',
                 'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.imp == 0 && data.imp < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
-
-              <!-- Rotograbado -->
-              <td [ngClass]="{
-                'verde' : data.rot >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
-                'amarillo' : data.rot < data.cant && data.rot > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.rot == 0 && data.rot < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.rot == 0 && data.rot < data.cant,
-              }" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
 
               <!-- Perforado -->
               <td [ngClass]="{
@@ -358,16 +341,6 @@
                 'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.lam == 0 && data.lam < data.cant) && data.est == 'ANULADO',
                 'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.lam == 0 && data.lam < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
-
-              <!-- Corte -->
-              <td [ngClass]="{
-                'verde' : data.cor >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
-                'amarillo' : data.cor < data.cant && data.cor > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
-                'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
-                'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.cor == 0 && data.cor < data.cant) && data.est == 'ANULADO',
-                'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.cor == 0 && data.cor < data.cant,
-              }" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.lam | number}}</td>
 
               <!-- Empaque -->
               <td [ngClass]="{

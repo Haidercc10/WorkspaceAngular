@@ -76,13 +76,13 @@
                     </span>
                 </div>
 
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl col-xxl">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl">
                     <span class="p-float-label">
-                        <p-dropdown formControlName="estado" inputId="estado" [options]="estadoPedido"
-                            [autoDisplayFirst]="false"></p-dropdown>
+                        <p-multiSelect formControlName="estado" inputId="estado"  [options]="estadoPedido"></p-multiSelect>
                         <label for="estado">Estado (Opcional)</label>
                     </span>
                 </div>
+
             </div>
         </div>
 
@@ -123,7 +123,11 @@
         <div class="row g-3" id="tabla1">
             <div class="table-responsive" *ngIf="pedidosHistoricos.length > 0; else noData">
                 <p-table #dt [value]="pedidosHistoricos" styleClass="p-datatable-gridlines p-datatable-sm"
-                    responsiveLayout="scroll" [scrollable]="true" scrollHeight="50rem" [rowHover]="true">
+                    responsiveLayout="scroll" [scrollable]="true" scrollHeight="50rem" [rowHover]="true"
+                    [paginator]="true" [rows]="100"
+                    [rowsPerPageOptions]="[25, 50, 100, 200, 300, 400, 500, 1000, {label: 'Todos', value: pedidosHistoricos.length}]"
+                    [showCurrentPageReport]="true"
+                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros">
                     <ng-template pTemplate="header">
                         <tr>
                             <th *ngFor="let columna of columnasTabla">{{ renombrarColumna(columna) }}</th>
@@ -138,8 +142,12 @@
                     <ng-template pTemplate="body" let-pedido>
                         <tr (dblclick)="viewFact(pedido)" class="cursor">
                             <td *ngFor="let columna of columnasTabla" [ngClass]="{'font-weight-bold': esBold(columna)}">
-                                {{ esNumero(pedido[columna]) ? formatoNumero(pedido[columna], columna) : pedido[columna]
-                                }}
+                                <span [ngClass]="{
+                                    'badge bg-danger1': columna === 'estado' && pedido[columna] === 'Pendiente',
+                                    'badge bg-warning1': columna === 'estado' && pedido[columna] === 'Parcialmente Satisfecho',
+                                    'badge bg-success1': columna === 'estado' && pedido[columna] === 'Liquidado'
+                                }">{{ esNumero(pedido[columna]) ? formatoNumero(pedido[columna], columna) :
+                                    pedido[columna] }}</span>
                             </td>
                         </tr>
                     </ng-template>
@@ -162,8 +170,8 @@
 
 </p-card>
 
-<p-dialog header="Pedido N° {{ selectedSaleOrder }}" [(visible)]="displayDialog" [modal]="true" [style]="{width: '80vw'}"
-    [closable]="true">
+<p-dialog header="Pedido N° {{ selectedSaleOrder }}" [(visible)]="displayDialog" [modal]="true"
+    [style]="{width: '80vw'}" [closable]="true">
     <div *ngIf="facturaSeleccionada">
         <p-table #dt2 [value]="facturaSeleccionada" styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll" [scrollable]="true" scrollHeight="50rem" [rowHover]="true">

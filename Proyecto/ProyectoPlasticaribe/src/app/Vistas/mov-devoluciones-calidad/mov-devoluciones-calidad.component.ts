@@ -74,12 +74,14 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     this.formFilters.patchValue({ 'startDate' : initialDate, 'endDate' : new Date() });
   }
 
+  //Función para leer la información que se almacenará en el storage del navegador.
   readStorage(){
     this.storage_Id = this.appComponent.storage_Id;
     this.storage_Nombre = this.appComponent.storage_Nombre;
     this.validateRole = this.appComponent.storage_Rol;
   }
 
+  //Función para inicializar el formulario de filtros.
   initForm(){
     this.formFilters = this.frmBuilder.group({
       startDate: [null, Validators.required],

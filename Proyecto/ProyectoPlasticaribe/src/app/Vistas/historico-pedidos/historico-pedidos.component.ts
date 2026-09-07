@@ -27,7 +27,11 @@ export class HistoricoPedidosComponent implements OnInit {
   vendedores: any[] = [];
   displayDialog: boolean = false;
   facturaSeleccionada: any = null;
-  estadoPedido: any = ['Liquidado', 'Pendiente', 'Parcialmente Satisfecho',];
+  estadoPedido: any = [
+    'Pendiente', 
+    'Parcialmente Satisfecho',
+    'Liquidado'
+  ];
   selectedSaleOrder: any = null;
 
   constructor(private AppComponent: AppComponent,
@@ -46,7 +50,7 @@ export class HistoricoPedidosComponent implements OnInit {
       clientId: [null],
       sales: [null],
       oc: [null],
-      estado: [null],
+      estado: [[]],
     });
 
 
@@ -56,6 +60,7 @@ export class HistoricoPedidosComponent implements OnInit {
     this.lecturaStorage();
     this.loadRankDates();
     this.obtenerVendedores();
+    this.formFiltros.patchValue({ 'estado': [] });
   }
 
   // Funcion que leera la informacion almacenada en el storage del navegador.
@@ -68,7 +73,7 @@ export class HistoricoPedidosComponent implements OnInit {
   // siendo los ultimos 30 dias a partir de la fecha actual.
   loadRankDates() {
     let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
-    this.formFiltros.patchValue({ 'date1': initialDate, 'date2': new Date(), 'estado': 'Liquidado' });
+    this.formFiltros.patchValue({ 'date1': initialDate, 'date2': new Date(), 'estado': [] });
   }
 
   // Funcion que valida y arma los parametros opcionales de consulta.
@@ -77,14 +82,13 @@ export class HistoricoPedidosComponent implements OnInit {
     let client: string = this.formFiltros.value.clientId?.toString().trim();
     let sales: string | null = this.formFiltros.value.sales?.toString().trim();
     let oc: string = this.formFiltros.value.oc?.toString().trim();
-    let status: string = this.formFiltros.value.estado?.toString().trim();
 
     sales = sales ? String(sales).padStart(3, '0') : null;
 
     if (client) ruta += `client=${encodeURIComponent(client)}`;
     if (sales) ruta.length > 0 ? ruta += `&sales=${encodeURIComponent(sales)}` : ruta += `sales=${encodeURIComponent(sales)}`;
     if (oc) ruta.length > 0 ? ruta += `&oc=${encodeURIComponent(oc)}` : ruta += `oc=${encodeURIComponent(oc)}`;
-    if (status) ruta.length > 0 ? ruta += `&status=${encodeURIComponent(status)}` : ruta += `status=${encodeURIComponent(status)}`;
+    //if (status) ruta.length > 0 ? ruta += `&status=${encodeURIComponent(status)}` : ruta += `status=${encodeURIComponent(status)}`;
 
     if (ruta.length > 0) ruta = `?${ruta}`;
     return ruta;
@@ -128,15 +132,18 @@ export class HistoricoPedidosComponent implements OnInit {
       this.msj.mensajeAdvertencia('Debe seleccionar el rango de fechas para consultar.');
       return;
     }
-
+    let status: any = this.formFiltros.value.estado == null ? [''] : this.formFiltros.value.estado;
     this.cargando = true;
     this.pedidosHistoricos = [];
+    console.log(status)
+
 
     let fecha1: string = moment(this.formFiltros.value.date1).format('YYYY-MM-DD');
     let fecha2: string = moment(this.formFiltros.value.date2).format('YYYY-MM-DD');
     let ruta: string = this.validarParametrosOpcionales();
 
-    this.inventarioZeusService.GetTodosPedidos(fecha1, fecha2, ruta).subscribe({
+    
+    this.inventarioZeusService.GetTodosPedidos(status, fecha1, fecha2, ruta).subscribe({
       next: (res) => {
         this.pedidosHistoricos = Array.isArray(res) ? res : [];
         this.columnasTabla = this.pedidosHistoricos.length > 0 ? Object.keys(this.pedidosHistoricos[0]) : [];
