@@ -54,9 +54,9 @@
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
-          <input formControlName="client" id="client" list="list" type="text" pInputText required
-            (keyup)="searchClientsByName()" (change)="selectClient()" />
-          <datalist id="list">
+          <input formControlName="client" id="client" list="client-list" type="text" pInputText required
+            (keyup)="searchClientsByName(form, 'client')" (change)="selectClient(form, 'client', 'idClient')" />
+          <datalist id="client-list">
             <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
           </datalist>
           <label for="client">Cliente*</label>
@@ -145,6 +145,7 @@
         </th>
         <th class="text-center" *ngIf="[1].includes(ValidarRol)">Anular Doc.</th>
         <th class="text-center" id="ver3">Ver</th>
+        <th class="text-center">Editar</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -155,7 +156,7 @@
         <td class=""><b>{{data.client}}</b></td>
         <td class="text-center">{{data.sales}}</td>
         <td class="text-center">{{data.date1 | date : 'yyyy-MM-dd'}} {{data.hour1}}</td>
-        <td class="text-center">{{data.date2.replace('T00:00:00', '') }} {{data.hour2}}</td>
+        <td class="text-center">{{(data.date1 == data.date2) ? '' : (data.date2 | date : 'yyyy-MM-dd')}} {{data.hour2}}</td>
         <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
                                                                 'bg-success1': [5].includes(data.statusId),
                                                                 'bg-blue1': [26].includes(data.statusId), 
@@ -168,10 +169,13 @@
           <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger"
             (onClick)="createPDF(data.movement)"></p-button>
         </td>
+        <td class="text-center">
+          <p-button id="btnEditar" icon="pi pi-pencil" styleClass="p-button-rounded p-button-success"
+            (onClick)="cargarModalEditarPrecargue(data)"></p-button>
+        </td>
       </tr>
     </ng-template>
   </p-table>
-
 </p-card>
 
 <!--<p-toast position="center" key="confirmation" (onClose)="onReject()" [baseZIndex]="5000">
@@ -196,7 +200,86 @@
   </ng-template>
 </p-toast>-->
 
-<p-dialog header="Orden de facturación por precargue" [(visible)]="modal" [modal]="true" [style]="{ width: '95vw' }"
-  [draggable]="false" [resizable]="false">
+<p-dialog header="Orden de facturación por precargue" [(visible)]="modal" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false"></p-dialog>
+<!-- dialog editar precargue -->
+<p-dialog [(visible)]="dialogPrecargue" [contentStyle]="{'overflow' : 'visible'}" [style]="{width: '500px'}" header="Editar Precargue" [modal]="true">
+  <ng-template pTemplate="content">
+    <div class="d-flex justify-content-center overlay" *ngIf="dialogLoad">
+      <div style="margin: auto;">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </div>
+    <br>
+    <form [formGroup]="formDialogPrecargue">
+      <div class="mb-3">
+        <div class="row g-4">
 
+          <!-- NUMERO DE PRECARGUE -->
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <input formControlName="nroPrecargue" id="nroPrecargue" type="number" pInputText readonly/>
+              <label for="nroPrecargue">N° Precargue</label>
+            </span>
+          </div>
+
+          <!-- OF ASOCIADA -->
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <input formControlName="ofAsociada" id="ofAsociada" type="text" pInputText readonly/>
+              <label for="ofAsociada">OF Asociada</label>
+            </span>
+          </div>
+
+          <!-- CLIENTE -->
+          <div class="col-md-12">
+            <span class="p-float-label">
+              <input formControlName="cliente" id="cliente" list="dialog-client-list" type="text" pInputText required
+                (keyup)="searchClientsByName(formDialogPrecargue, 'cliente')" (change)="selectClient(formDialogPrecargue, 'cliente')" />
+              <datalist id="dialog-client-list">
+                <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
+              </datalist>
+              <label for="cliente">Cliente</label>
+            </span>
+          </div>
+
+            <!-- ASESOR -->
+          <div class="col-md-12">
+            <span class="p-float-label">
+              <input formControlName="asesor" id="asesor" type="text" pInputText readonly/>
+              <label for="asesor">Asesor</label>
+            </span>
+          </div>
+
+          <!-- FECHA CREACION -->
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <input formControlName="fechaCreacion" id="fechaCreacion" type="text" pInputText readonly/>
+              <label for="fechaCreacion">Fecha de Creación</label>
+            </span>
+          </div>
+
+          <!-- FECHA CIERRE -->
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <input formControlName="fechaCierre" id="fechaCierre" type="text" pInputText readonly/>
+              <label for="fechaCierre">Fecha de Cierre</label>
+            </span>
+          </div>
+
+          <!-- ESTADO -->
+          <div class="col-md-12">
+            <span class="p-float-label">
+              <input formControlName="estado" id="estado" type="text" pInputText readonly/>
+              <label for="estado">Estado</label>
+            </span>
+          </div>
+
+          <!--BOTON EDITAR-->
+          <div class="mb-12 d-flex justify-content-center">
+            <button pButton pRipple type="button" label="Editar Precargue" (click)="editPrecargue()" class="p-button-success"></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </ng-template>
 </p-dialog>

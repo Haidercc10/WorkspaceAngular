@@ -3,14 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Precargue_RollosDespachoComponent } from '../Precargue_RollosDespacho/Precargue_RollosDespacho.component';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import { log } from 'node:console';
+import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 
 @Component({
   selector: 'app-Mov_PrecargueDespacho',
@@ -21,6 +19,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
 
   form !: FormGroup;
   load: boolean = false;
+  dialogLoad: boolean = false;
   modoSeleccionado: boolean;
   ValidarRol: number;
   storage_Id: number;
@@ -28,6 +27,8 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
   searchedData: any[] = [];
   @ViewChild('dt') dt: Table;
   modal: boolean = false;
+  dialogPrecargue: boolean = false;
+  formDialogPrecargue !: FormGroup;
   sales: any = [];
 
   clients: any = [];
@@ -37,12 +38,22 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
     private svStatuses: EstadosService,
-    private svMsjs: MensajesAplicacionService,
     private svZeus: InventarioZeusService,
     private svDtlPreload: Detalles_PrecargueDespachoService,
     private cmpPreload: Precargue_RollosDespachoComponent,
     private svSales: UsuarioService,
+    private svUtil: UtileriaService
   ) {
+    this.formDialogPrecargue = this.frmBuilder.group({
+      nroPrecargue: null,
+      ofAsociada: null,
+      cliente: null,
+      asesor: null,
+      fechaCreacion: null,
+      fechaCierre: null,
+      estado: null
+    });
+
     this.initForm();
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
@@ -59,10 +70,8 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     this.form.patchValue({ 'startDate': initialDate, 'endDate': new Date() });
   }
 
-  //*
-  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11, 5].includes(x.estado_Id)) }, error => { this.msjs(`Error`, `Error al consultar los estados.`) });
+  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11, 5].includes(x.estado_Id)) }, error => { this.svUtil.Notificacion(`Error`, `Error al consultar los estados.`) });
 
-  //*
   initForm() {
     this.form = this.frmBuilder.group({
       id: [null],
@@ -84,7 +93,6 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     });
   }
 
-
   //*Leer storage del navegador.  
   readStorage() {
     this.storage_Id = this.appComponent.storage_Id;
@@ -94,15 +102,21 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
   }
 
   //*
-  searchClientsByName() {
-    let name = this.form.value.client;
+  searchClientsByName(form: FormGroup, controlName: string) {
+    const name = form.value[controlName];
     this.svZeus.getClientByName(name).subscribe(data => this.clients = data);
   }
 
   //*
-  selectClient() {
-    let client = this.clients.find(x => x.idcliente == this.form.value.client);
-    this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, });
+  selectClient(form: FormGroup, controlName: string, idControlName?: string) {
+    const client = this.clients.find(x => x.idcliente == form.value[controlName]);
+    if (client) {
+      const values = { [controlName]: client.razoncial };
+      if (idControlName) {
+        values[idControlName] = client.idcliente;
+      }
+      form.patchValue(values);
+    }
   }
 
   //*
@@ -122,7 +136,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
       this.searchedData = data;
       this.load = false;
     }, error => {
-      this.msjs(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
+      this.svUtil.Notificacion(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
     });
   }
 
@@ -143,27 +157,45 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     return url;
   }
 
-  //*
-  msjs(msj1: string, msj2: string) {
-    this.load = false;
-    switch (msj1) {
-      case 'Confirmación':
-        return this.svMsjs.mensajeConfirmacion(msj1, msj2);
-      case 'Advertencia':
-        return this.svMsjs.mensajeAdvertencia(msj1, msj2);
-      case 'Error':
-        return this.svMsjs.mensajeError(msj1, msj2);
-      default:
-        return this.svMsjs.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`);
-    }``
-  }
-
-  discardPreload() {
-
-  }
-
-  //*
   createPDF(id: number) {
     this.cmpPreload.createPDF(id, `descargado`);
+  }
+
+  /*Funcion vacia que esta siendo utilizada en el frontend para descartar un precargue */
+  discardPreload() {}
+
+  cargarModalEditarPrecargue(item){
+    console.log(item);
+    this.dialogPrecargue = true;
+    this.formDialogPrecargue.patchValue({
+      nroPrecargue: item.movement,
+      ofAsociada: item.of,
+      cliente: item.client,
+      asesor: item.sales,
+      fechaCreacion: this.svUtil.formatearFechaYYYYMMDD(item.date1),
+      fechaCierre: item.date1 == item.date2 ? '' : this.svUtil.formatearFechaYYYYMMDD(item.date2),
+      estado: item.status
+    });
+  }
+
+  editPrecargue() {
+    this.dialogLoad = true;
+    console.log(this.formDialogPrecargue.value);
+    if (this.formDialogPrecargue.valid) {
+      // llamar al metodo de api para editar el precargue
+
+      // quitar la carga del modal
+      this.dialogLoad = false;
+      // luego quitar el modal y mostrar notificacion de exito
+      this.dialogPrecargue = false;
+      // mostrar notificacion de exito
+      this.svUtil.Notificacion(`Confirmación`, `Precargue editado correctamente.`);
+      this.searchData();
+    }else{
+      this.dialogPrecargue = false;
+      this.dialogLoad = false;
+      this.svUtil.Notificacion(`Error`, `Error al editar el precargue, por favor verifique los campos.`);
+      this.searchData();
+    }
   }
 }
