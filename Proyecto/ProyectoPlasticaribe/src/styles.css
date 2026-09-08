@@ -419,6 +419,8 @@ p-calendar span button {
   background-color: var(--rojo);
   border: 0;
   transition: all 1s;
+  /* width: 2rem !important;  */ /*afectaba al mes y año del calendario se quedaba pegado ambas palabras*/
+  height: 3.12rem !important;
 }
 
 .p-datepicker-buttonbar button {
