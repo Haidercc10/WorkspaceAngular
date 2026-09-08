@@ -180,7 +180,7 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que cargará la informacion del usuario seleccionado en el modal donde se podrá editar
   cargarModalEditarUsuario(item) {
-    console.log(item)
+    console.log(item);
     this.dialogUsuarios = true;
     this.accion = 'Editar'
     this.servicioUsuarios.getUsuariosxId(item.Id).subscribe(dataUsuarios => {
