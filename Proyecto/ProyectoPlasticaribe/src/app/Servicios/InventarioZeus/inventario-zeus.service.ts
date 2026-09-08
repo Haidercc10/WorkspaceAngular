@@ -118,9 +118,9 @@ export class InventarioZeusService {
   GetPedidos(sales? : any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos${sales}`);
   }
-
-  GetTodosPedidos(date1: string, date2: string, route: string = '') {
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getTodosPedidos/${date1}/${date2}${route}`);
+  
+  GetTodosPedidos(status: any, date1: string, date2: string, route: string = '') {
+    return this.http.post(this.rutaInventarioZeusAPI + `/MovimientoItems/getTodosPedidos/${date1}/${date2}${route}`, status);
   }
 
   getArticulosxCliente(id: any) {
