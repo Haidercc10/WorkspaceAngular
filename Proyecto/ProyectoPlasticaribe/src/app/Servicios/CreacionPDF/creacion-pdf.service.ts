@@ -376,7 +376,7 @@ export class CreacionPdfService {
             { text: `Fecha ingreso: ${data.date1.replace('T00:00:00', '')} ${data.hour1}` },
           ],
           [
-            { text: `Cliente: ${data.client.toUpperCase()}`, colSpan: 3},{},{}
+            { text: `Cliente: ${data.idClient} - ${data.client.toUpperCase()}`, colSpan: 3},{},{}
           ],
           [
             { text: `Estado: ${data.status}` },
