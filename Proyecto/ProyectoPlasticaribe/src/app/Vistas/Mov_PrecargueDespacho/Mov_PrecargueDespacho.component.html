@@ -156,7 +156,7 @@
         <td class=""><b>{{data.client}}</b></td>
         <td class="text-center">{{data.sales}}</td>
         <td class="text-center">{{data.date1 | date : 'yyyy-MM-dd'}} {{data.hour1}}</td>
-        <td class="text-center">{{(data.date1 == data.date2) ? '' : (data.date2 | date : 'yyyy-MM-dd')}} {{data.hour2}}</td>
+        <td class="text-center">{{(data.date1 == data.date2 && data.hour1 == data.hour2) ? '' : (data.date2 | date : 'yyyy-MM-dd')}} {{data.hour2}}</td>
         <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
                                                                 'bg-success1': [5].includes(data.statusId),
                                                                 'bg-blue1': [26].includes(data.statusId), 
