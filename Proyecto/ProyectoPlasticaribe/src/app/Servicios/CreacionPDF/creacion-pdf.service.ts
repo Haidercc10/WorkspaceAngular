@@ -8,6 +8,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { EncriptacionService } from '../Encriptacion/Encriptacion.service';
 import { ReImpresionEtiquetasService, ReImpresionEtiquetas } from '../ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { referenceWike } from './referenciaWiketiado';
+import { UtileriaService } from '../Utileria/utileria.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +20,8 @@ export class CreacionPdfService {
 
   constructor(private rePrintService: ReImpresionEtiquetasService,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
-    private encriptacion: EncriptacionService,) { }
-
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  private formatNumbers = (number: string) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    private encriptacion: EncriptacionService,
+    private utileria: UtileriaService) { }
 
   formatoPDF(titulo: string, content: any, headerAdicional: any = {}) {
     this.title = titulo; 
@@ -187,7 +186,7 @@ export class CreacionPdfService {
   }
 
   private dataOrderProduction(dataTag: modelTagProduction): any[] {
-    let infoTag: string = `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`;
+    let infoTag: string = `${this.utileria.formatoNumeros((dataTag.width).toFixed(2))} ${this.utileria.formatoNumeros((dataTag.bellows).toFixed(2))} ${this.utileria.formatoNumeros((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.utileria.formatoNumeros((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`;
     if (dataTag.productionProcess == 'SELLADO') infoTag = `${dataTag.dataTagForClient}      Material: ${dataTag.material}`;
     return [
       {
@@ -234,7 +233,7 @@ export class CreacionPdfService {
 
   private tableWithQuantity(quantity: number) {
     let size: number = quantity > 999 ? 18 : quantity > 9999 ? 14 : 24;
-    return { text: `${this.formatNumbers((quantity).toFixed(2))}`, bold: true, fontSize: size, alignment: 'center' };
+    return { text: `${this.utileria.formatoNumeros((quantity).toFixed(2))}`, bold: true, fontSize: size, alignment: 'center' };
   }
 
   private createBarcode(code: number) {
@@ -297,7 +296,6 @@ export class CreacionPdfService {
   }
 
   /* ======================================================== PDF para precargues ==================================================== */
-  formatonumeros = (number: any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   contentPDFPrecargue(data): any[] {
     let content: any[] = [];
@@ -451,9 +449,9 @@ export class CreacionPdfService {
             { text: ``, bold: true, border: [true, false, false, true], },
             { text: ``, bold: true, border: [false, false, false, true], },
             { text: `Totales`, alignment: 'right', bold: true, border: [false, false, true, true], },
-            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseInt(b.Rollos), 0)))}`, bold: true, border: [false, false, true, true], },
-            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseFloat(b.Peso), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
-            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseFloat(b.Cantidad), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
+            { text: `${this.utileria.formatoNumeros((data.reduce((a, b) => a += parseInt(b.Rollos), 0)))}`, bold: true, border: [false, false, true, true], },
+            { text: `${this.utileria.formatoNumeros((data.reduce((a, b) => a += parseFloat(b.Peso), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
+            { text: `${this.utileria.formatoNumeros((data.reduce((a, b) => a += parseFloat(b.Cantidad), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
             { text: ``, bold: true, border: [false, false, true, true], },
           ],
         ],

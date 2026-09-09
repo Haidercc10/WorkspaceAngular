@@ -8,6 +8,9 @@ export class UtileriaService {
 
   constructor(private msj: MensajesAplicacionService) { }
 
+  // Funcion que colocará la puntuacion a los numeros que se le pasen a la funcion
+  formatoNumeros = (number: any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
   formatearFechaYYYYMMDD(fecha: string | Date): string {
     if (!fecha) {return '';}
     const date = new Date(fecha);
