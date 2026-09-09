@@ -26,4 +26,6 @@ export class Detalles_PrecargueDespachoService {
       Put = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/${id}`, data);
 
       Delete = (id : any) => this.http.delete(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/${id}`);
+
+      EditPreloadClientName = (id : string, idClient : string) => this.http.put(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/EditPreloadClientName/${id}/${idClient}`, idClient);
 }

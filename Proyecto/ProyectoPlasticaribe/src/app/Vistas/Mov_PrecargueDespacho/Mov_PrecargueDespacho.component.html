@@ -22,7 +22,7 @@
       Filtros de búsqueda</h4>
   </div>
 
-  <form [formGroup]="form" (ngSubmit)="searchData()">
+  <form [formGroup]="formBusquedaPrecargue" (ngSubmit)="searchData()">
     <div class="row g-3 my-4 justify-content-md-center">
 
       <!--* Documento -->
@@ -55,7 +55,7 @@
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
           <input formControlName="client" id="client" list="client-list" type="text" pInputText required
-            (keyup)="searchClientsByName(form, 'client')" (change)="selectClient(form, 'client', 'idClient')" />
+            (keyup)="searchClientsByName(formBusquedaPrecargue, 'client')" (change)="selectClient(formBusquedaPrecargue, 'client')" />
           <datalist id="client-list">
             <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
           </datalist>
