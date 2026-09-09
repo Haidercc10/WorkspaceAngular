@@ -417,14 +417,18 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       });*/
   //}
 
-  createPDF(id: number, action: string) {
+  createPDF(id: number, action: string, onComplete?: () => void) {
     this.svDetailsPreload.getPreloadId(id).subscribe(data => {
       let title: string = `Orden de Precargue N° ${id}`;
       let content: any[] = this.contentPDF(data);
       this.svPDF.formatoPDF(title, content);
       this.msjs(`Confirmación`, `Orden de precargue N° ${id} ${action} exitosamente!`);
+      onComplete?.();
       setTimeout(() => this.clearAll(), 3000);
-    }, error => this.msjs(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`));
+    }, error => {
+      this.msjs(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
+      onComplete?.();
+    });
   }
 
   contentPDF(data): any[] {

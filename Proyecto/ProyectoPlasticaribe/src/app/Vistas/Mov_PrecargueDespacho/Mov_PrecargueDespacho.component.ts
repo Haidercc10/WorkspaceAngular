@@ -6,9 +6,9 @@ import { AppComponent } from 'src/app/app.component';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { Precargue_RollosDespachoComponent } from '../Precargue_RollosDespacho/Precargue_RollosDespacho.component';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 @Component({
   selector: 'app-Mov_PrecargueDespacho',
@@ -40,9 +40,9 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     private svStatuses: EstadosService,
     private svZeus: InventarioZeusService,
     private svDtlPreload: Detalles_PrecargueDespachoService,
-    private cmpPreload: Precargue_RollosDespachoComponent,
     private svSales: UsuarioService,
-    private svUtil: UtileriaService
+    private svUtil: UtileriaService,
+    private PDFService: CreacionPdfService
   ) {
     this.initForm();
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -161,8 +161,21 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
 
   createPDF(id: number) {
     this.load = true;
-    this.cmpPreload.createPDF(id, `descargado`);
-    this.load = false;
+    // Obtenemos la info completa del precargue
+    this.svDtlPreload.getPreloadId(id).subscribe(data => {
+      let title: string = `Orden de Precargue N° ${id}`;
+      // generamos el contenido del PDF con la info obtenida
+      let content: any[] = this.PDFService.contentPDFPrecargue(data);
+      // finalmente creamos el PDF con el titulo y contenido generado
+      this.PDFService.formatoPDF(title, content);
+      // notificamos la confirmacion de la generacion y su posterior muestra en una nueva pestaña.
+      this.svUtil.Notificacion(`Confirmación`, `Orden de precargue N° ${id} descargada exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
+    }, error => {
+      this.svUtil.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
+      this.load = false;
+    }, () => {
+      this.load = false;
+    });
   }
 
   /*Funcion vacia que esta siendo utilizada en el frontend para descartar un precargue */
