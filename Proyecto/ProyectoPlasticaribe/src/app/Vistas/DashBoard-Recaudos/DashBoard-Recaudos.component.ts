@@ -483,7 +483,7 @@ export class DashBoardRecaudosComponent implements OnInit {
         let font: any = { size: 10, bold: true, alignment: 'center', name: 'Calibri' };
         let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         let workbook = this.svExcel.formatoExcel(title, true);
-        this.addSheet2(workbook, fill, font, border, this.infoProduction2(), 1);
+        this.addSheet2(workbook, fill, font, border, this.seleccionarInformacionPDf(), 1);
         this.svExcel.creacionHoja(workbook, `Cartera por Clientes`, false);
         this.addGroupedSheet2(workbook, fill, font, border, this.groupedInfoExcel2(), 2);
         this.svExcel.creacionHoja(workbook, `Cartera por Vendedores`, false);
@@ -497,9 +497,98 @@ export class DashBoardRecaudosComponent implements OnInit {
   //.Agregar hoja al formato excel.
   addSheet2(workbook, fill, font, border, data: any, pageNumber: number) {
     let page = workbook.worksheets[pageNumber - 1];
-    this.addHeaderPage2(page, font, border, fill);
     page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-    this.addInfoExcel2(page, data);
+    this.stylesGroupedDetailedPage(page, ['A1:I3'], []);
+    this.addGroupedDetailedInfoExcel2(page, data, fill, font, border);
+  }
+
+  stylesGroupedDetailedPage(worksheet: any, concatCells: any[], formatNumber: number[]) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\\-""#,##0.00');
+    [1, 2, 3].forEach(x => worksheet.getColumn(x).width = 18);
+    worksheet.getColumn(4).width = 30;
+    worksheet.getColumn(5).width = 16;
+    worksheet.getColumn(6).width = 16;
+    [7, 8, 9].forEach(x => worksheet.getColumn(x).width = 16);
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  // Agrega la hoja detallada con la misma jerarquía del PDF: asesor, cliente y facturas.
+  addGroupedDetailedInfoExcel2(worksheet: any, data: any[], fill: any, font: any, border: any) {
+    const invoiceHeaders = ['Factura', 'Fecha', 'Fecha Vencimiento', 'Dias', '1-30 Dias', '31-60 Dias', '61-90 Dias', '91-120 Dias', '+120 Dias'];
+    const rows = [...data].sort((a, b) => {
+      const advisor = Number(a.id_Vendedor) - Number(b.id_Vendedor);
+      if (advisor !== 0) return advisor;
+      const client = String(a.nombre_CLiente ?? '').localeCompare(String(b.nombre_CLiente ?? ''));
+      if (client !== 0) return client;
+      return String(a.id_Fecha ?? '').localeCompare(String(b.id_Fecha ?? ''));
+    });
+    const numberFormat = '""#,##0.00;[Red]\\-""#,##0.00';
+
+    let totalPlazos = [0, 0, 0, 0, 0];
+    let index = 0;
+    while (index < rows.length) {
+      const advisorId = rows[index].id_Vendedor;
+      const advisorName = rows[index].nombre_Vendedor;
+      const advisorRow = worksheet.addRow([`${advisorId} - ${advisorName}`]);
+      worksheet.mergeCells(`A${advisorRow.number}:I${advisorRow.number}`);
+      advisorRow.getCell(1).font = { ...font, size: 11, bold: true };
+      advisorRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+
+      while (index < rows.length && rows[index].id_Vendedor == advisorId) {
+        const clientId = rows[index].id_Cliente;
+        const clientInvoices: any[] = [];
+        while (index < rows.length && rows[index].id_Vendedor == advisorId && rows[index].id_Cliente == clientId) {
+          clientInvoices.push(rows[index]);
+          index++;
+        }
+
+        const client = clientInvoices[0];
+        const clientRow = worksheet.addRow([
+          client.id_Cliente, client.nombre_CLiente, client.ciudad_Cliente,
+          client.direccion_Cliente, client.telefono_Cliente,
+          `Plazo: ${client.plazo_De_Pago} Días`,'','',''
+        ]);
+        this.formatExcelRow(clientRow, 9, border, fill, { size: 9, bold: true });
+
+        const headerRow = worksheet.addRow(invoiceHeaders);
+        this.formatExcelRow(headerRow, 9, border, fill, font);
+
+        const clientTotals: number[] = [0, 0, 0, 0, 0];
+        clientInvoices.forEach(invoice => {
+          const amounts = [invoice.saldoPlazo1, invoice.saldoPlazo2, invoice.saldoPlazo3, invoice.saldoPlazo4, invoice.saldoPlazo5]
+            .map(value => value == -1 ? '' : value);
+          const invoiceRow = worksheet.addRow([invoice.num_Factura, invoice.id_Fecha,
+            invoice.fecha_Vencimiento, invoice.cantidad_Dias, ...amounts]);
+          this.formatExcelRow(invoiceRow, 9, border, null, { name: 'Calibri', family: 4, size: 10 });
+          invoiceRow.getCell(4).alignment = { horizontal: 'left', vertical: 'middle' };
+          amounts.forEach((_, amountIndex) => invoiceRow.getCell(amountIndex + 5).numFmt = numberFormat);
+          amounts.forEach((value, amountIndex) => {
+            if (typeof value === 'number') {
+              clientTotals[amountIndex] += value;
+              totalPlazos[amountIndex] += value;
+            }
+          });
+        });
+
+        const subtotalRow = worksheet.addRow(['Total Cliente', '', '', '', ...clientTotals]);
+        this.formatExcelRow(subtotalRow, 9, border, null, { name: 'Calibri', family: 4, size: 10, bold: true });
+        clientTotals.forEach((_, amountIndex) => subtotalRow.getCell(amountIndex + 5).numFmt = numberFormat);
+        worksheet.addRow([]);
+      }
+    }
+
+    const totalRow = worksheet.addRow(['TOTAL CARTERA', '', '', '', ...totalPlazos]);
+    this.formatExcelRow(totalRow, 9, border, fill, { name: 'Calibri', family: 4, size: 11, bold: true });
+    totalPlazos.forEach((_, amountIndex) => totalRow.getCell(amountIndex + 5).numFmt = numberFormat);
+  }
+
+  formatExcelRow(row: any, columns: number, border: any, fill: any, font: any) {
+    for (let column = 1; column <= columns; column++) {
+      const cell = row.getCell(column);
+      cell.border = border;
+      cell.font = font;
+      if (fill) cell.fill = fill;
+    }
   }
 
   //.Información de la producción.
