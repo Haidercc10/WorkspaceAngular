@@ -30,8 +30,8 @@ import { Subject, takeUntil, } from 'rxjs';
 })
 export class SolicitudMP_ExtrusionComponent implements OnInit {
 
-  public FormMateriaPrimaRetiro !: FormGroup;
-  public FormMateriaPrimaRetirada !: FormGroup;
+  public formEncabezado !: FormGroup;
+  public formMP !: FormGroup;
 
   /* Variables*/
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -40,8 +40,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   load: boolean = true; //Variable para validar que aparezca el icono de carga o no
   materiaPrima: any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  materiasPrimasSeleccionadas: any[] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  materiasPrimasSeleccionada_ID: any[] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
+  subcategoriasSeleccionadas: any[] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  idSubcategorias: any[] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
   unidadMedida: any = [{ undMed_Id: 'Kg' }, { undMed_Id: 'Cms' }]; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
   procesos: any = []; //Variable que va a almacenar los procesos que tiene la empresa (extrusio, impresion, etc...)
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
@@ -63,6 +63,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   esSolicitud: boolean = false; /** Variable que se encargará de limpiar campos */
   ultimoNroSolicitud: number = 0;
   viewSubcategories: boolean = false; /** Variable para mostrar el modal de subcategorias */
+  subcategoriesInModal : any[] = [];
   subcategories: any[] = [];
   materials: any[] = [];
   materialsFiltered: any[] = [];
@@ -89,40 +90,36 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     private servicioDetSolicitudMpExt: DetSolicitudMP_ExtrusionService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-      OTRetiro: [null, Validators.required],
-      OTImp: [''],
-      FechaRetiro: [this.today, Validators.required],
-      Maquina: [null, Validators.required],
+    this.formEncabezado = this.frmBuilderMateriaPrima.group({
+      ot: [null, Validators.required],
+      fecha: [this.today, Validators.required],
+      maq: [null, Validators.required],
       kgOt: [null, Validators.required],
-      ProcesoRetiro: ['', Validators.required],
-      ObservacionRetiro: [''],
+      proceso: ['', Validators.required],
+      observacion: [''],
       Solicitud: [null],
     });
 
-    this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
-      MpIdRetirada: ['', Validators.required],
-      MpNombreRetirada: ['', Validators.required],
-      MpStockRetirada: [null, Validators.required],
-      MpCantidadRetirada: [null, Validators.required],
-      MpUnidadMedidaRetirada: ['', Validators.required],
-      Categoria: ['', Validators.required],
+    this.formMP = this.frmBuilderMateriaPrima.group({
+      subcat_Id: [null, Validators.required],
+      subcat_Nombre: [null, Validators.required],
+      stock: [null, Validators.required],
+      cantidad: [null, Validators.required],
+      und: [null, Validators.required],
+      Categoria: [null],
     });
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerProcesos();
-
-    //this.obtenerMateriaPrima();
-    //this.consultarCategorias();
     this.ultimoConsecutivoSolicitud();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    this.FormMateriaPrimaRetiro.patchValue({ 'ProcesoRetiro': this.validateProcess(), });
-    this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada: 'Kg' });
+    this.formEncabezado.patchValue({ 'proceso': this.validateProcess(), });
+    //this.formMP.patchValue({ und: 'Kg' });
   }
 
-  //Función 
+  //Función que se encarga de limpiar los recursos cuando el componente se destruye
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -157,12 +154,12 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   //Función que va a cargar las subcategorias para mostrarlas en un modal y que el usuario pueda elegir a cual de ellas pertenece la materia prima que desea solicitar
   loadSubcategories() {
-    this.subcategories = [];
+    this.subcategoriesInModal = [];
     this.materials = [];
     this.materiaPrimaService.getSubcategories().subscribe(datos => {
       this.materials = datos;
       this.viewSubcategories = true;
-      this.subcategories = this.materials.reduce((a: any, b: any) => {
+      this.subcategoriesInModal = this.materials.reduce((a: any, b: any) => {
         if (!a.map(x => x.id_Subcategoria).includes(b.id_Subcategoria)) a = [...a, b];
         else {
           let index = a.findIndex(x => x.id_Subcategoria == b.id_Subcategoria);
@@ -170,7 +167,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         }
         return a;
       }, []);
-      this.subcategories.sort((a, b) => Number(b.stock) - Number(a.stock));
+      this.subcategoriesInModal.sort((a, b) => Number(b.stock) - Number(a.stock));
     });
   }
 
@@ -182,13 +179,6 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.viewMaterials = true;
   }
 
-  getAllSubcategories() {
-    this.subcategories = [];
-    this.materiaPrimaService.getSubcategories().subscribe(datos => {
-      this.subcategories = datos;
-    });
-  }
-
   applyFilter = ($event, campo: any, table: any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -196,16 +186,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
-    this.FormMateriaPrimaRetirada.reset();
-    this.FormMateriaPrimaRetiro.reset();
-    this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro: 'EXT', FechaRetiro: this.today, });
+    this.formMP.reset();
+    this.formEncabezado.reset();
+    this.formEncabezado.patchValue({ fecha: moment().format('YYYY-MM-DD'), });
     this.ultimoConsecutivoSolicitud();
-    this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada: 'Kg' });
+    this.formMP.patchValue({ und: 'Kg' });
     this.cantRestante = 0;
     this.kgOT = 0;
     this.load = true;
-    this.materiasPrimasSeleccionada_ID = [];
-    this.materiasPrimasSeleccionadas = [];
+    this.idSubcategorias = [];
+    this.subcategoriasSeleccionadas = [];
     this.error = false;
     this.soloTintas = false;
     this.categoriasSeleccionadas = [];
@@ -216,8 +206,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   //Funcion que limpiará los campos de la materia pirma entrante
   limpiarCamposMP() {
-    this.FormMateriaPrimaRetirada.reset();
-    this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada: 'Kg' });
+    this.formMP.reset();
+    this.formMP.patchValue({ und: 'Kg' });
   }
 
   //Funcion que se encagará de obtener los procesos de la empresa
@@ -231,37 +221,36 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     ];
   }
 
-  //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
-  obtenerMateriaPrima() {
-    this.materiaPrimaService.getMpTintaBopp().pipe(takeUntil(this.destroy$)).subscribe(data => {
-      this.materiaPrima = data.filter((item) => item.categoria != 6)
-      this.materiaPrima.sort((a, b) => a.nombre.localeCompare(b.nombre));
-    });
-  }
-
-  // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
-  consultarCategorias() {
-    this.materiaPrimaService.GetCategoriasMateriaPrima().pipe(takeUntil(this.destroy$)).subscribe(datos => this.categoriasMP = datos);
-    this.tintasService.GetCategoriasTintas().pipe(takeUntil(this.destroy$)).subscribe(datos => this.categoriasTintas = datos);
-  }
 
   // Funcion que va a consultar la orden de trabajo para saber que cantidad de materia prima 
   // se ha asignado y que cantidad se ha devuelto con respecto a la cantidad que se debe hacer en kg
   infoOT() {
-    this.error = false;
-    let ot: string = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    this.bagProServices.srvObtenerListaClienteOT_Item(ot).pipe(takeUntil(this.destroy$)).subscribe(datos_procesos => {
-      if (datos_procesos.length > 0) {
-        let adicional: number = datos_procesos[0].datosotKg * 0.05;
-        this.kgOT = datos_procesos[0].datosotKg + adicional;
-        this.estadoOT = datos_procesos[0].estado;
-        this.FormMateriaPrimaRetiro.patchValue({ kgOt: parseFloat(datos_procesos[0].datosotKg + adicional), });
-        this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).pipe(takeUntil(this.destroy$)).subscribe(datos_asignacion => {
-          this.cantRestante = this.kgOT - datos_asignacion;
-          this.loadInfoOT(parseInt(ot), datos_procesos, datos_asignacion);
+    this.load = false;
+    let ot: string = this.formEncabezado.value.ot;
+    this.bagProServices.srvObtenerListaClienteOT_Item(ot).pipe(takeUntil(this.destroy$)).subscribe(data => {
+      if (data.length > 0) {
+        let adicional: number = (data[0].datosotKg * 0.05);
+        this.kgOT = data[0].datosotKg + adicional;
+        this.estadoOT = data[0].estado;
+        this.formEncabezado.patchValue({ kgOt: parseFloat(data[0].datosotKg + adicional), });
+        this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot))
+        .pipe( takeUntil(this.destroy$))
+        .subscribe(dataAsignacion => {
+          this.cantRestante = (this.kgOT - dataAsignacion);
+          this.loadInfoOT(parseInt(ot), data, dataAsignacion);
+          this.mensajeService.mensajeAdvertencia(`Advertencia`, `La orden de trabajo tiene '${this.cantRestante.toFixed(2)}' kg restantes.`);
+          this.load = true;
+        }, err => {
+          this.load = true;
         });
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no se encuentra registrada en BagPro!`);
-    }, () => this.mensajeService.mensajeError(`Error`, `Error al consultar la OT ${ot}!`));
+      } else if (data.length == 0) {
+        this.load = true;
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`);
+      }
+    }, error => {
+      this.load = true;
+      this.mensajeService.mensajeError(`Error`, `Error al consultar la OT ${ot}! ` + error);
+    }); 
   }
 
   // Funcion que va a consultar la informacion de la orden de trabajo
@@ -269,107 +258,96 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.infoOrdenTrabajo = [{
       ot: ot,
       cliente: datos_procesos[0].clienteNom,
-      item: datos_procesos[0].clienteItemsNom,
+      item: datos_procesos[0].clienteItems,
+      ref: datos_procesos[0].clienteItemsNom,
       kg: this.kgOT,
       kgAsignado: datos_asignacion,
       kgRestante: this.cantRestante,
     }];
   }
 
-  //Funcion que va a mostrar el nombre de la materia prima
-  cambiarNombreMateriaPrima(dato: number) {
-    let id: number = dato == 1 ? this.FormMateriaPrimaRetirada.value.MpIdRetirada : this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
-    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        if (this.categoriasMP.includes(datos_materiaPrima[i].categoria) || this.categoriasTintas.includes(datos_materiaPrima[i].categoria)) {
-          if (![84, 2001, 88, 89, 2072].includes(datos_materiaPrima[i].id)) {
-            this.loadMaterialInField(datos_materiaPrima[i])
-          }
-        }
-      }
-    }, () => {
-      this.load = true;
-      this.error = true;
-      this.limpiarCamposMP();
-    });
+  //Funcion que se va a ejecutar al aceptar la materia prima que el usuario desea solicitar
+  getAllSubcategories() {
+    //this.subcategories = [];
+    let material : string = this.formMP.value.subcat_Nombre;
+
+    if(material && material.trim().length > 2) {
+      this.materiaPrimaService.getAllSubcategoriesForName(material).subscribe(datos => {
+        this.subcategories = datos;
+      });
+    }
   }
 
   //Funcion que va a cargar la información de la materia prima seleccionada en los campos correspondientes
-  loadMaterialInField(data: any) {
-    this.FormMateriaPrimaRetirada.patchValue({
-      'MpIdRetirada': data.id,
-      'MpNombreRetirada': data.nombre,
-      'MpCantidadRetirada': 0,
-      'MpUnidadMedidaRetirada': data.undMedida,
-      'MpStockRetirada': data.stock,
-      'ProcesoRetiro': '',
-      'Categoria': data.categoria,
+  loadMaterialInField() {
+    let data : any = this.subcategories.find(x => x.id_Subcategoria == this.formMP.value.subcat_Nombre); 
+    
+    this.formMP.patchValue({
+      'subcat_Id': data.id_Subcategoria,
+      'subcat_Nombre': data.subcategoria,
+      'cantidad': 0,
+      'und': data.und,
+      'stock': data.stock,
     });
   }
 
-  // Funcion para colocar la materia prima en la tabla
+  // Funcion para colocar la subcategoría seleccionada en la tabla
   validarCamposVaciosMPRetirada() {
-    let categoria: number = this.FormMateriaPrimaRetirada.value.Categoria;
-    let mpId: any = this.FormMateriaPrimaRetirada.value.MpIdRetirada;
-    let qty: number = this.FormMateriaPrimaRetirada.value.MpCantidadRetirada;
-    if (this.FormMateriaPrimaRetirada.valid) {
-      if (qty > 0) {
-        if (!this.materiasPrimasSeleccionada_ID.includes(mpId)) {
-          if (qty > this.cantRestante) {
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante a asignar: ${this.cantRestante} Kg!`);
+    const subcategoryId = this.formMP.value.subcat_Id;
+    const quantity = this.formMP.value.cantidad;
+
+    if (this.formMP.valid) {
+      if (quantity > 0) {
+        if (!this.idSubcategorias.includes(subcategoryId)) {
+          if (quantity > this.cantRestante) {
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante a asignar: ${this.cantRestante.toFixed(2)} Kg!`);
             return;
           }
-          let info = this.materialSelected(this.FormMateriaPrimaRetirada.value);
-          if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
-          else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
-          this.categoriasSeleccionadas.push(this.FormMateriaPrimaRetirada.value.Categoria);
-          this.materiasPrimasSeleccionada_ID.push(mpId);
-          this.materiasPrimasSeleccionadas.push(info);
+
+          this.idSubcategorias.push(subcategoryId);
+          this.subcategoriasSeleccionadas.push(this.materialSelected(this.formMP.value));
           this.limpiarCamposMP();
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!`);
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La subcategoría ${this.formMP.value.subcat_Nombre} ya ha sido seleccionada!`);
       } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar debe ser mayor a cero (0)!`);
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Hay campos vacios en el formulario de materia prima!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Hay campos vacíos en el formulario de subcategoría!`);
   }
 
-  // Funcion que va a crear un objeto con la información de la materia prima seleccionada para luego ser almacenada en el array materiasPrimasSeleccionadas
+  // Funcion que va a crear un objeto con la información de la subcategoría seleccionada para luego ser almacenada en el array subcategoriasSeleccionadas
   materialSelected(form: any) {
-    let info: any = {
-      'Id': form.MpIdRetirada,
-      'Id_Mp': 84,
-      'Id_Tinta': 2001,
-      'Nombre': form.MpNombreRetirada,
-      'Cantidad': form.MpCantidadRetirada,
-      'Und_Medida': form.MpUnidadMedidaRetirada,
-      'Categoria': form.Categoria,
-      'Stock': form.MpStockRetirada,
+    const info: any = {
+      'Id': form.subcat_Id,
+      'Nombre': form.subcat_Nombre,
+      'Cantidad': form.cantidad,
+      'Und_Medida': form.und,
+      'Stock': form.stock,
     }
     return info;
   }
 
-  // Funcion que va a calcular la cantidad de materia prima solicitada
+  // Funcion que va a calcular la cantidad de subcategorías solicitadas
   calcularMateriaPrimaSolicitada(): number {
     let total: number = 0;
-    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-      total += this.materiasPrimasSeleccionadas[i].Cantidad;
+    for (let i = 0; i < this.subcategoriasSeleccionadas.length; i++) {
+      total += this.subcategoriasSeleccionadas[i].Cantidad;
     }
     return total;
   }
 
-  // Funcion que va a quitar la materia prima
+  // Funcion que va a quitar la subcategoría seleccionada
   quitarMateriaPrima(data: any) {
     this.onReject('eleccion');
     data = this.mpSeleccionada;
-    this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
-    this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item == data.Id), 1);
+    this.subcategoriasSeleccionadas.splice(this.subcategoriasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
+    this.idSubcategorias.splice(this.idSubcategorias.findIndex((item) => item == data.Id), 1);
   }
 
   // Funcion que hará validaciones antes de realizar la asignación
   validarCamposVaciosRetirada() {
-    let maquina: number = this.FormMateriaPrimaRetiro.value.Maquina;
-    let proceso: string = this.FormMateriaPrimaRetiro.value.ProcesoRetiro;
-    if (this.FormMateriaPrimaRetiro.valid) {
-      if (this.materiasPrimasSeleccionadas.length != 0) {
-        if ((maquina >= 1) && (!['', null].includes(proceso))) {
+    let maq: number = this.formEncabezado.value.maq;
+    let proceso: string = this.formEncabezado.value.proceso;
+    if (this.formEncabezado.valid) {
+      if (this.subcategoriasSeleccionadas.length > 0) {
+        if ((maq >= 1) && (!['', null].includes(proceso))) {
           this.solicitudMateriaPrima();
         } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe diligenciar los campos maquina y proceso, verifique!');
       } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe seleccionar minimo una materia prima para crear la solicitud!');
@@ -378,51 +356,62 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   //Funcion que creará la solicitud de materia prima a una OT Y lo guardará en la base de datos
   solicitudMateriaPrima() {
-    let idOrdenTrabajo: number = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    let idSolicitud: number = this.FormMateriaPrimaRetiro.value.Solicitud;
+    const idOrdenTrabajo: number = this.formEncabezado.value.ot;
+    const idSolicitud: number = this.formEncabezado.value.Solicitud;
     this.load = false;
-    if (!this.error) {
-      if ([null, '', 0].includes(this.estadoOT)) {
-        setTimeout(() => {
-          if (this.calcularMateriaPrimaSolicitada() <= this.cantRestante && !this.esSolicitud) this.crearSolicitudMatPrima();
-          else if (this.calcularMateriaPrimaSolicitada() <= this.cantRestante && this.esSolicitud) this.editarSolicitud();
-          else {
-            this.load = true;
-            if (this.ValidarRol != 1 && !this.esSolicitud) this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar supera el limite de kilos permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos al administrador.`);
-            else if (this.ValidarRol != 1 && this.esSolicitud) this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar supera el limite de kilos permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos al administrador.`);
-            else if (this.ValidarRol == 1 && !this.esSolicitud) this.confirmarSolicitud(idOrdenTrabajo);
-            else if (this.ValidarRol == 1 && this.esSolicitud) this.confirmarEditarSolicitud(idSolicitud);
-          }
-        }, 2000);
-      } else if ([4, 1].includes(this.estadoOT)) {
-        this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible crear/editar solicitudes a la OT ${idOrdenTrabajo}, porque está cerrada!`);
-        this.load = true;
-      }
-    } else this.load = true;
+    if (this.error) {
+      this.load = true;
+      return;
+    }
+
+    if ([4, 1].includes(this.estadoOT)) {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible crear/editar solicitudes a la OT ${idOrdenTrabajo}, porque está cerrada!`);
+      this.load = true;
+      return;
+    }
+
+    const cantidadSolicitada = this.calcularMateriaPrimaSolicitada();
+    if (cantidadSolicitada <= this.cantRestante && !this.esSolicitud) {
+      this.crearSolicitudMatPrima();
+      return;
+    }
+
+    this.load = true;
+    if (this.ValidarRol != 1) {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar supera el limite de kilos permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos al administrador.`);
+    } else if (this.esSolicitud) {
+      this.confirmarEditarSolicitud(idSolicitud);
+    } else {
+      this.confirmarSolicitud(idOrdenTrabajo);
+    }
   }
 
   // Crear solicitud mat. prima
   crearSolicitudMatPrima() {
     this.onReject('solicitud');
     this.load = false;
+
     const solicitud: modelSolicitudMP_Extrusion = {
-      SolMpExt_Id: 0,
-      SolMpExt_OT: this.FormMateriaPrimaRetiro.value.OTRetiro,
-      SolMpExt_Maquina: this.FormMateriaPrimaRetiro.value.Maquina,
-      SolMpExt_Fecha: this.today,
-      SolMpExt_Hora: moment().format('H:mm:ss'),
-      SolMpExt_Observacion: this.FormMateriaPrimaRetiro.value.ObservacionRetiro,
-      Estado_Id: 11,
-      Proceso_Id: this.FormMateriaPrimaRetiro.value.ProcesoRetiro,
-      Usua_Id: this.storage_Id
+      'SolMpExt_Id': 0,
+      'SolMpExt_OT': this.formEncabezado.value.ot,
+      'SolMpExt_Maquina': this.formEncabezado.value.maq,
+      'SolMpExt_Fecha': this.today,
+      'SolMpExt_Hora': moment().format('H:mm:ss'),
+      'SolMpExt_Observacion': this.formEncabezado.value.observacion,
+      'Estado_Id': 11,
+      'Proceso_Id': this.formEncabezado.value.proceso,
+      'Usua_Id': this.storage_Id
     }
-    this.servicioSolicitudMpExt.Post(solicitud).pipe(takeUntil(this.destroy$)).subscribe((datos) => {
-      this.crearDetalleSolicitud(datos.solMpExt_Id);
-      this.nroSolicitud = datos.solMpExt_Id;
-    }, () => {
-      this.error = true;
-      this.mensajeService.mensajeError(`Error`, `Error al crear la solicitud de material!`);
-      this.load = true;
+    this.servicioSolicitudMpExt.Post(solicitud).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (datos) => {
+        this.nroSolicitud = datos.solMpExt_Id;
+        this.crearDetalleSolicitud(this.nroSolicitud);
+      },
+      error: () => {
+        this.error = true;
+        this.mensajeService.mensajeError(`Error`, `Error al crear la solicitud de material!`);
+        this.load = true;
+      }
     });
   }
 
@@ -430,11 +419,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   crearDetalleSolicitud(solicitud: number) {
     let count: number = 0;
     if (!this.error) {
-      this.materiasPrimasSeleccionadas.forEach(x => {
+      this.subcategoriasSeleccionadas.forEach(x => {
         let detallesSolicitud = this.detailsRequest(x, solicitud);
         this.servicioDetSolicitudMpExt.Post(detallesSolicitud).subscribe(() => {
           count++;
-          if (count == this.materiasPrimasSeleccionadas.length) this.solicitudExitosa();
+          if (count == this.subcategoriasSeleccionadas.length) this.solicitudExitosa();
         }, () => {
           this.error = true;
           this.load = true;
@@ -445,12 +434,12 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que se encargará de crear el objeto para hacer la solicitud de materia prima
-  detailsRequest(data : any, solicitud: number): modelDetSolicitudMP_Extrusion   {
+  detailsRequest(data: any, solicitud: number): modelDetSolicitudMP_Extrusion {
     const detallesSolicitud: modelDetSolicitudMP_Extrusion = {
       'Codigo': 0,
       'SolMpExt_Id': solicitud,
-      'MatPri_Id': data.Id_Mp,
-      'Tinta_Id': data.Id_Tinta,
+      'SubCatMP_Id': data.Id,
+      'SubCatMP_Nombre': data.Nombre,
       'DtSolMpExt_Cantidad': data.Cantidad,
       'UndMed_Id': data.Und_Medida,
     }
@@ -479,235 +468,117 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   //Buscar informacion de la solicitud creada
   buscarinfoOrdenCompra() {
-    //this.onReject('');
     this.load = true;
-    setTimeout(() => {
-      this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(this.nroSolicitud).pipe(takeUntil(this.destroy$)).subscribe(datos_solicitud => {
-        for (let i = 0; i < datos_solicitud.length; i++) {
-          let info: any = {
-            Id: 0,
-            Id_Mp: datos_solicitud[i].matPrima_Id,
-            Id_Tinta: datos_solicitud[i].tinta_Id,
-            Nombre: '',
-            Cantidad: this.formatonumeros(datos_solicitud[i].cantidad),
-            Medida: datos_solicitud[i].medida,
-          }
-          if (info.Id_Mp != 84) {
-            info.Id = info.Id_Mp;
-            info.Nombre = datos_solicitud[i].matPrima;
-          } else if (info.Id_Tinta != 2001) {
-            info.Id = info.Id_Tinta;
-            info.Nombre = datos_solicitud[i].tinta;
-          }
-          this.informacionPDF.push(info);
-          this.informacionPDF.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-        }
-        this.generarPDF(datos_solicitud);
-      }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`));
-    }, 100);
+    this.informacionPDF = [];
+    this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(this.nroSolicitud).pipe(takeUntil(this.destroy$)).subscribe(datosSolicitud => {
+      if (datosSolicitud.length === 0) {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontraron subcategorías para la solicitud N° ${this.nroSolicitud}.`);
+        return;
+      }
+
+      this.informacionPDF = datosSolicitud
+        .map(dato => this.mapSubcategoryForPdf(dato))
+        .sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+      this.generarPDF(datosSolicitud[0]);
+    }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última solicitud creada!`));
   }
 
-  // Funcion que se encargará de poner la informcaion en el PDF y generarlo
-  generarPDF(data: any) {
-    let [ot, cliente, item, kg] = [this.infoOrdenTrabajo[0].ot, this.infoOrdenTrabajo[0].cliente, this.infoOrdenTrabajo[0].item, this.formatonumeros(this.infoOrdenTrabajo[0].kg)];
-    let nombre: string = this.AppComponent.storage_Nombre;
-    for (let i = 0; i < data.length; i++) {
-      const pdfDefinicion: any = {
-        info: { title: `Solicitud de material N° ${data[i].id}` },
-        pageSize: { width: 630, height: 760 },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        pageMargins: [25, 235, 25, 35],
-        header: function (currentPage: any, pageCount: any) {
-          return [
-            {
-              margin: [20, 1, 20, 0],
-              columns: [
-                { image: logoParaPdf, width: 150, height: 30, margin: [20, 25] },
-                {
-                  width: 300,
-                  alignment: 'center',
-                  table: {
-                    body: [
-                      [{ text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10 }],
-                      [{ text: `Fecha de Análisis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8 }],
-                      [{ text: `Hora: ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, }],
-                      [{ text: `Usuario: ${nombre}`, alignment: 'center', fontSize: 8, }],
-                      [{ text: `Solicitud de material N° ${data[i].id}`, bold: true, alignment: 'center', fontSize: 10 }],
-                    ]
-                  },
-                  layout: 'noBorders',
-                  margin: [85, 20],
-                },
-                {
-                  width: '*',
-                  alignment: 'center',
-                  margin: [20, 20, 20, 0],
-                  table: {
-                    body: [
-                      [{ text: `Código: `, alignment: 'left', fontSize: 8, bold: true }, { text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{ text: `Versión: `, alignment: 'left', fontSize: 8, bold: true }, { text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{ text: `Vigencia: `, alignment: 'left', fontSize: 8, bold: true }, { text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{ text: `Página: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                    ]
-                  },
-                  layout: 'noBorders',
-                },
-              ],
-            },
-            {
-              margin: [30, 0],
-              table: {
-                headerRows: 1,
-                widths: ['*'],
-                body: [
-                  [
-                    {
-                      border: [false, true, false, false],
-                      text: '',
-                    },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, }
-            },
-            /** Titulo tabla OT */
-            {
-              margin: [20, 0],
-              table: {
-                headerRows: 1,
-                widths: ['*'],
-                body: [
-                  [
-                    { border: [false, false, false, false], text: `Detalles de la Orden de Trabajo`, bold: true, fontSize: 10, alignment: 'center' },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, }
-            },
-            /** Encabezado y body tabla OT */
-            {
-              margin: [20, 0, 20, 28],
-              style: 'header2',
-              table: {
-                headerRows: 1,
-                widths: [60, 215, 215, 60],
-                body: [
-                  [
-                    { text: 'OT', fillColor: '#bbb', fontSize: 9, bold: true },
-                    { text: 'Cliente', fillColor: '#bbb', fontSize: 9, bold: true },
-                    { text: 'Referencia', fillColor: '#bbb', fontSize: 9, bold: true },
-                    { text: 'Cantidad', fillColor: '#bbb', fontSize: 9, bold: true },
-                  ],
-                  [ot, cliente, item, kg],
-                ]
-              },
-              layout: { defaultBorder: false, },
-            },
-            /** Titulo de tabla materia prima */
-            {
-              margin: [20, 0],
-              table: {
-                headerRows: 1,
-                widths: ['*'],
-                body: [
-                  [
-                    { border: [false, false, false, false], text: `Materiales de producción solicitados`, bold: true, fontSize: 10, alignment: 'center' },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, }
-            },
-            /**Encabezado tabla materia prima */
-            {
-              margin: [20, 0, 20, 0],
-              table: {
-                headerRows: 1,
-                widths: [60, 372, 60, 60],
-                body: [
-                  [
-                    { text: 'Id', fillColor: '#bbb', fontSize: 9 },
-                    { text: 'Materia Prima', fillColor: '#bbb', fontSize: 9 },
-                    { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
-                    { text: 'Medida', fillColor: '#bbb', fontSize: 9 },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-            },
+  // Mapea la información de la subcategoría para el PDF
+  mapSubcategoryForPdf(dato: any) {
+    return {
+      Id: dato.id_Subcategoria,
+      Nombre: dato.subcategoria ?? dato.subcategoria_Nombre,
+      Cantidad: Number(dato.cantidad_Pedida ?? dato.cantidad),
+      Medida: dato.medida,
+    };
+  }
+
+  // Genera el PDF de la solicitud
+  generarPDF(solicitud: any) {
+    const pdfDefinicion: any = {
+      info: { title: `Solicitud de material N° ${solicitud.id}` },
+      pageSize: { width: 630, height: 760 },
+      pageMargins: [25, 125, 25, 35],
+      watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true },
+      header: (currentPage: number, pageCount: number) => this.buildPdfHeader(solicitud.id, currentPage, pageCount),
+      content: [
+        { text: 'Información de la OT', style: 'sectionTitle' },
+        this.buildOrderSummary(),
+        { text: 'Subcategorías solicitadas', style: 'sectionTitle' },
+        this.buildSubcategoriesTable(),
+        this.buildPdfTotal(),
+        { text: `\nObservación sobre la solicitud:\n${solicitud.observacion || ''}`, style: 'observation' },
+      ],
+      styles: {
+        sectionTitle: { fontSize: 10, bold: true, alignment: 'center', margin: [0, 12, 0, 6] },
+        observation: { fontSize: 9, bold: true },
+      }
+    };
+
+    pdfMake.createPdf(pdfDefinicion).open();
+    this.nroSolicitud = 0;
+    setTimeout(() => this.LimpiarCampos(), 1500);
+  }
+
+  // Construye el encabezado del PDF
+  buildPdfHeader(solicitudId: number, currentPage: number, pageCount: number) {
+    return {
+      margin: [25, 15, 25, 0],
+      columns: [
+        { image: logoParaPdf, width: 150, height: 30, margin: [0, 10, 0, 0] },
+        {
+          width: '*', alignment: 'center', fontSize: 8,
+          stack: [
+            { text: 'NIT. 800188732', bold: true, fontSize: 10 },
+            { text: `Fecha de análisis: ${moment().format('YYYY-MM-DD')}` },
+            { text: `Hora: ${moment().format('H:mm:ss')}` },
+            { text: `Usuario: ${this.storage_Nombre}` },
+            { text: `Solicitud de material N° ${solicitudId}`, bold: true, fontSize: 10 },
           ]
         },
-
-        content: [
-          this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida']),
-          {
-            style: 'tablaTotales',
-            table: {
-              widths: [365, 60, 60, 60],
-              style: 'header',
-              body: [
-                [
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Peso Total`,
-                    alignment: 'right',
-                    bold: true
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `${this.formatonumeros((this.calcularMateriaPrimaSolicitada()).toFixed(2))}`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `Kg`,
-                    bold: true
-                  },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 8,
-          },
-          {
-            text: `\n \nObservación sobre la solicitud: \n ${data[i].observacion}\n`,
-            style: 'header',
-          }
-        ],
-
-        styles: {
-          header: { fontSize: 10, bold: true },
-          header2: { fontSize: 9, bold: false },
-          titulo: { fontSize: 20, bold: true }
-        }
-      }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
-      this.nroSolicitud = 0;
-      setTimeout(() => this.LimpiarCampos(), 1500);
-      break;
-    }
+        { width: 65, fontSize: 8, text: `Página: ${currentPage} de ${pageCount}`, margin: [0, 10, 0, 0] },
+      ]
+    };
   }
 
-  // funcion que se encagará de llenar la tabla de los productos en el pdf
-  buildTableBody(data: any, columns: any) {
-    var body: any[] = [];
-    data.forEach(function (row) {
-      var dataRow: any[] = [];
-      columns.forEach(function (column) {
-        dataRow.push(row[column].toString());
-      });
-      body.push(dataRow);
-    });
-    return body;
+  // Construye el resumen de la orden de trabajo
+  buildOrderSummary() {
+    const order = this.infoOrdenTrabajo[0] || {};
+    return {
+      table: {
+        headerRows: 1,
+        widths: [60, 215, 215, 60],
+        body: [
+          ['OT', 'Cliente', 'Referencia', 'Cantidad'].map(text => ({ text, fillColor: '#bbb', fontSize: 9, bold: true })),
+          [order.ot || '', order.cliente || '', order.ref || '', this.formatonumeros(order.kg || 0)],
+        ]
+      },
+      fontSize: 8,
+    };
   }
 
-  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table(data: any, columns: any) {
+  // Construye la tabla de subcategorías solicitadas
+  buildSubcategoriesTable() {
     return {
       table: {
         headerRows: 1,
         widths: [60, 365, 60, 60],
-        body: this.buildTableBody(data, columns),
+        body: [
+          ['Id', 'Subcategoría', 'Cantidad', 'Medida'].map(text => ({ text, fillColor: '#bbb', fontSize: 9, bold: true })),
+          ...this.informacionPDF.map(item => [item.Id, item.Nombre, this.formatonumeros(item.Cantidad), item.Medida]),
+        ]
+      },
+      fontSize: 8,
+    };
+  }
+
+  // Construye la sección del total en el PDF
+  buildPdfTotal() {
+    return {
+      margin: [0, 4, 0, 0],
+      table: {
+        widths: [365, 60, 60, 60],
+        body: [['', { text: 'Peso Total', alignment: 'right', bold: true }, this.formatonumeros(this.calcularMateriaPrimaSolicitada().toFixed(2)), { text: 'Kg', bold: true }]]
       },
       fontSize: 8,
     };
@@ -715,9 +586,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   //Buscar informacion de las solicitudes de materia prima creadas
   consultarSolicitudMaterial() {
-    let solicitud: number = this.FormMateriaPrimaRetiro.value.Solicitud;
-    this.materiasPrimasSeleccionada_ID = [];
-    this.materiasPrimasSeleccionadas = [];
+    let solicitud: number = this.formEncabezado.value.Solicitud;
+    this.idSubcategorias = [];
+    this.subcategoriasSeleccionadas = [];
 
     if (solicitud != null) {
       this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(solicitud).pipe(takeUntil(this.destroy$)).subscribe(data => {
@@ -725,7 +596,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           if (![4, 5].includes(data[0].estado)) {
             this.esSolicitud = true;
             this.load = false;
-            this.FormMateriaPrimaRetiro.patchValue({ OTRetiro: data[0].ot, Maquina: data[0].maquina, ObservacionRetiro: data[0].observacion, })
+            this.formEncabezado.patchValue({ ot: data[0].ot, maq: data[0].maq, observacion: data[0].observacion, })
             setTimeout(() => { this.infoOT(); }, 1000);
             for (let i = 0; i < data.length; i++) {
               this.llenarTablaMpConSolitudMP(data[i])
@@ -764,27 +635,27 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       info.Nombre = datos_solicitud.tinta;
       info.Stock = datos_solicitud.stock_Tinta;
     }
-    this.materiasPrimasSeleccionada_ID.push(info.Id);
-    this.materiasPrimasSeleccionadas.push(info);
+    this.idSubcategorias.push(info.Id);
+    this.subcategoriasSeleccionadas.push(info);
   }
 
   /** Editar Solicitudes de material de producción por Id */
-  editarSolicitud() {
+  /*editarSolicitud() {
     this.load = false;
-    let solicitudId: any = this.FormMateriaPrimaRetiro.value.Solicitud;
-    let maquina: number = this.FormMateriaPrimaRetiro.value.Maquina;
-    let ot: any = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    let observacion: any = this.FormMateriaPrimaRetiro.value.ObservacionRetiro;
+    let solicitudId: any = this.formEncabezado.value.Solicitud;
+    let maq: number = this.formEncabezado.value.maq;
+    let ot: any = this.formEncabezado.value.ot;
+    let observacion: any = this.formEncabezado.value.observacion;
     this.servicioSolicitudMpExt.GetId(solicitudId).subscribe(data => {
       const solicitud: modelSolicitudMP_Extrusion = {
         SolMpExt_Id: solicitudId,
         SolMpExt_OT: ot != null ? ot : data.solMpExt_OT,
-        SolMpExt_Maquina: maquina != null ? maquina : data.solMpExt_Maquina,
+        SolMpExt_maq: maq != null ? maq : data.solMpExt_maq,
         SolMpExt_Fecha: data.solMpExt_Fecha,
         SolMpExt_Hora: data.solMpExt_Hora,
         SolMpExt_Observacion: observacion != null ? observacion.toString() : '',
         Estado_Id: data.estado_Id,
-        Proceso_Id: this.FormMateriaPrimaRetiro.value.ProcesoRetiro,
+        Proceso_Id: this.formEncabezado.value.proceso,
         Usua_Id: this.storage_Id
       }
       this.servicioSolicitudMpExt.Put(parseInt(solicitudId), solicitud).subscribe((datos) => {
@@ -796,21 +667,21 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         this.load = true;
       });
     });
-  }
+  }*/
 
   /** Editar detalles de solicitudes de material de producción por Id */
-  editarDetallesSolicitud(solicitudId: number) {
+  /*editarDetallesSolicitud(solicitudId: number) {
     let errorId: boolean = false;
-    for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      this.servicioDetSolicitudMpExt.GetSolicitudesConMatPrimas(solicitudId, this.materiasPrimasSeleccionadas[index].Id).subscribe(data1 => {
+    for (let index = 0; index < this.subcategoriasSeleccionadas.length; index++) {
+      this.servicioDetSolicitudMpExt.GetSolicitudesConMatPrimas(solicitudId, this.subcategoriasSeleccionadas[index].Id).subscribe(data1 => {
         if (data1.length == 0) {
           let detSolicitud: modelDetSolicitudMP_Extrusion = {
             Codigo: 0,
             SolMpExt_Id: solicitudId,
-            MatPri_Id: this.materiasPrimasSeleccionadas[index].Id_Mp,
-            Tinta_Id: this.materiasPrimasSeleccionadas[index].Id_Tinta,
-            DtSolMpExt_Cantidad: this.materiasPrimasSeleccionadas[index].Cantidad,
-            UndMed_Id: this.materiasPrimasSeleccionadas[index].Und_Medida
+            MatPri_Id: this.subcategoriasSeleccionadas[index].Id_Mp,
+            Tinta_Id: this.subcategoriasSeleccionadas[index].Id_Tinta,
+            DtSolMpExt_Cantidad: this.subcategoriasSeleccionadas[index].Cantidad,
+            UndMed_Id: this.subcategoriasSeleccionadas[index].Und_Medida
           }
           this.servicioDetSolicitudMpExt.Post(detSolicitud).subscribe(data2 => { errorId = false; }, error => {
             errorId = true;
@@ -820,10 +691,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           let detSolicitud: modelDetSolicitudMP_Extrusion = {
             Codigo: data1[0],
             SolMpExt_Id: solicitudId,
-            MatPri_Id: this.materiasPrimasSeleccionadas[index].Id_Mp,
-            Tinta_Id: this.materiasPrimasSeleccionadas[index].Id_Tinta,
-            DtSolMpExt_Cantidad: this.materiasPrimasSeleccionadas[index].Cantidad,
-            UndMed_Id: this.materiasPrimasSeleccionadas[index].Und_Medida
+            MatPri_Id: this.subcategoriasSeleccionadas[index].Id_Mp,
+            Tinta_Id: this.subcategoriasSeleccionadas[index].Id_Tinta,
+            DtSolMpExt_Cantidad: this.subcategoriasSeleccionadas[index].Cantidad,
+            UndMed_Id: this.subcategoriasSeleccionadas[index].Und_Medida
           }
           this.servicioDetSolicitudMpExt.Put(data1[0], detSolicitud).subscribe(data3 => { errorId = false; }, error => {
             errorId = true;
@@ -833,21 +704,21 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       });
     }
     !errorId ? setTimeout(() => { this.load = true; this.solicitudExitosa(); }, 1000) : this.mensajeService.mensajeError(`Error`, 'No se mostrará la informacion del PDF, por favor, verifique!');
-  }
+  }*/
 
   /** Función que obtendrá el ultimo Id de la solicitud */
-  ultimoConsecutivoSolicitud(){
-    this.servicioSolicitudMpExt.GetUltimaSolicitud().pipe(takeUntil(this.destroy$)).subscribe(data => 
-      this.FormMateriaPrimaRetiro.patchValue({ Solicitud: (data + 1) })
-    ), error => { 
+  ultimoConsecutivoSolicitud() {
+    this.servicioSolicitudMpExt.GetUltimaSolicitud().pipe(takeUntil(this.destroy$)).subscribe(data =>
+      this.formEncabezado.patchValue({ Solicitud: (data + 1) })
+    ), error => {
       this.mensajeService.mensajeError(`Error cargando el N° de solicitud ${error.error.text}`);
     };
-  } 
+  }
 
   /** Función para eliminar la materia prima de la solicitud de material de la base de datos. */
   eliminarMatPrimaSolicitud(mp: any) {
     mp = this.mpSeleccionada;
-    this.servicioDetSolicitudMpExt.GetSolicitudesConMatPrimas(this.FormMateriaPrimaRetiro.value.Solicitud, mp.Id).subscribe(data => {
+    this.servicioDetSolicitudMpExt.GetSolicitudesConMatPrimas(this.formEncabezado.value.Solicitud, mp.Id).subscribe(data => {
       if (data.length > 0) {
         this.onReject('eleccion');
         for (let i = 0; i < data.length; i++) {
