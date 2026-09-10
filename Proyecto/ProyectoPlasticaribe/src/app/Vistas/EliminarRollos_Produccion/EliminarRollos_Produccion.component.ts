@@ -73,7 +73,24 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.validateRole = this.AppComponent.storage_Rol;
   }
 
-  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 3139, 123456789, 121, 115, 113, 3142, 3123, 101, 7676, 3130, 114, 116].includes(x.usua_Id)); });
+  /* 
+    Usuarios autorizadores
+    100       -> Fernando Lopez
+    110       -> Fernando Andres Lopez Garcia
+    117       -> Jefe Despacho
+    3139      -> Jefe Sellado
+    123456789 -> Sistemas
+    115       -> Supervisor Sellado
+    113       -> Jefe Impresion
+    3142      -> Cesar Cortes
+    3123      -> Salva
+    101       -> Raul
+    7676      -> Leydis Ripoll
+    3130      -> Jefe Rotograbado
+    114       -> Jefe Extrusion
+    59137     -> Eliseo Bustos
+  */
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 117, 3139, 123456789, 115, 113, 3142, 3123, 101, 7676, 3130, 114, 59137].includes(x.usua_Id)); });
 
   //Función para cargar fechas en el rango.
   loadRankDates(){
