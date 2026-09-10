@@ -15,7 +15,7 @@ export class EstadosProcesos_OTService {
   srvObtenerListaPorOT = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorOT/${dato}`);
 
   GetInfo_OrdenesTrabajo(fechaIni : any, fechaFin : any, ruta : string) : Observable<any> {
-    return this.http.get<any>(`${this.rutaPlasticaribeAPI}/Estados_ProcesosOT/getInfo_OrdenesTrabajo/${fechaIni}/${fechaFin}${ruta}`);
+    return this.http.get<any>(`${this.rutaPlasticaribeAPI}/Estados_ProcesosOT/getInfo_OrdenesTrabajo2/${fechaIni}/${fechaFin}${ruta}`);
   }
 
   GetProductosOrdenesUltimoMes = (fecha1 : any, fecha2 : any, sales? : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getProductosOrdenesUltimoMes/${fecha1}/${fecha2}${sales}`);

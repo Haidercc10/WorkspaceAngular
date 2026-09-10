@@ -85,7 +85,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
-      fecha: [null],
+      fechaCreacion : [null],
+      fechaInicio: [null],
       fechaFinal : [null],
       estado : [null],
       fallasOT : [null],
@@ -473,7 +474,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.ArrayDocumento = [];
     this.ordenesSeleccionadas = [];
     let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let fechaincial : any = moment(this.formularioOT.value.fecha).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formularioOT.value.fecha).format('YYYY-MM-DD');
+    let fechaincial : any = moment(this.formularioOT.value.fechaInicio).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formularioOT.value.fechaInicio).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD');
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;

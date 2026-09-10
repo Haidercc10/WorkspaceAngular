@@ -113,8 +113,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerProcesos();
-    this.obtenerMateriaPrima();
-    this.consultarCategorias();
+
+    //this.obtenerMateriaPrima();
+    //this.consultarCategorias();
     this.ultimoConsecutivoSolicitud();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.FormMateriaPrimaRetiro.patchValue({ 'ProcesoRetiro': this.validateProcess(), });
@@ -179,6 +180,13 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.materialsFiltered = this.materials.filter(x => x.id_Subcategoria == data.id_Subcategoria);
     this.materialsFiltered.sort((a, b) => Number(b.stock) - Number(a.stock));
     this.viewMaterials = true;
+  }
+
+  getAllSubcategories() {
+    this.subcategories = [];
+    this.materiaPrimaService.getSubcategories().subscribe(datos => {
+      this.subcategories = datos;
+    });
   }
 
   applyFilter = ($event, campo: any, table: any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
