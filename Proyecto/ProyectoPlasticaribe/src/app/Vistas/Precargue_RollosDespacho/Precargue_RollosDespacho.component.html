@@ -261,12 +261,11 @@
   <div *ngIf="!load">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollsToDispatch.length == 0" type="button"
-        label="Generar Precargue" icon="pi pi-check" (click)="savePreload()"></button>
+        label="Generar Precargue" icon="pi pi-check" (click)="viewConfirmMessage()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar todo" icon="pi pi-eraser"
         (click)="clearAll()"></button>
     </div>
   </div>
-
 </p-card>
 
 <!--Mensaje de confirmación de eliminación de rollos/bultos-->
@@ -289,3 +288,24 @@
     </div>
   </ng-template>
 </p-toast>-->
+
+<!--Confirmacion para crear un precargo-->
+<p-toast position="center" key="confirm" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6">
+          <button type="button" pButton icon="pi pi-check" label="Sí" (click)="savePreload()" class="p-button-warning" pTooltip="Una vez confirmado, se generará el precargue de los rollos seleccionados."></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject()" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
