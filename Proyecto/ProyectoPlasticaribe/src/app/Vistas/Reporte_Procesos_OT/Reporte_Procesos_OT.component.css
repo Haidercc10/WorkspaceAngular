@@ -42,6 +42,15 @@ span{
   color: #495057
 }
 
+.red {
+  color: palevioletred;
+}
+
+.blue {
+  color: paleturquoise;
+}
+
+
 a {
   color: #000;
 }
