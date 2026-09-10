@@ -1,7 +1,6 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/BodegasDespacho.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -9,7 +8,6 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { AppComponent } from 'src/app/app.component';
 import { dataDesp, MovimientosIngresosDespachoComponent } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import moment from 'moment';
@@ -58,7 +56,6 @@ export class Ubicaciones_RollosComponent implements OnInit {
   constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,
     private productionProcessSerivce: Produccion_ProcesosService,
-    private bagproService: BagproService,
     private dtEntracesService: DetallesEntradaRollosService,
     private storehouseService: BodegasDespachoService,
     private messageService: MessageService,

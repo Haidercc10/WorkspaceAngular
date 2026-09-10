@@ -41,7 +41,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     private svZeus: InventarioZeusService,
     private svDtlPreload: Detalles_PrecargueDespachoService,
     private svSales: UsuarioService,
-    private svUtil: UtileriaService,
+    private utileria: UtileriaService,
     private PDFService: CreacionPdfService
   ) {
     this.initForm();
@@ -60,7 +60,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     this.formBusquedaPrecargue.patchValue({ 'startDate': initialDate, 'endDate': new Date() });
   }
 
-  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11, 5].includes(x.estado_Id)) }, error => { this.svUtil.Notificacion(`Error`, `Error al consultar los estados.`) });
+  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11, 5].includes(x.estado_Id)) }, error => { this.utileria.Notificacion(`Error`, `Error al consultar los estados.`) });
 
   initForm() {
     this.formBusquedaPrecargue = this.frmBuilder.group({
@@ -135,7 +135,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     this.svDtlPreload.getMovementsPreload(date1, date2, this.validateUrl()).subscribe(data => {
       this.searchedData = data;
     }, error => {
-      this.svUtil.Notificacion(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
+      this.utileria.Notificacion(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
       this.load = false; // se pone aqui ya que cuando entra en error no se ejecuta el complete y se queda cargando la tabla de precargues
     }, () => {
       this.load = false;
@@ -169,9 +169,9 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
       // finalmente creamos el PDF con el titulo y contenido generado
       this.PDFService.formatoPDF(title, content);
       // notificamos la confirmacion de la generacion y su posterior muestra en una nueva pestaña.
-      this.svUtil.Notificacion(`Confirmación`, `Orden de precargue N° ${id} descargada exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
+      this.utileria.Notificacion(`Confirmación`, `Orden de precargue N° ${id} descargada exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
     }, error => {
-      this.svUtil.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
+      this.utileria.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
       this.load = false;
     }, () => {
       this.load = false;
@@ -189,8 +189,8 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
       ofAsociada: item.of,
       cliente: item.client,
       asesor: item.sales,
-      fechaCreacion: this.svUtil.formatearFechaYYYYMMDD(item.date1),
-      fechaCierre: item.date1 == item.date2 ? '' : this.svUtil.formatearFechaYYYYMMDD(item.date2),
+      fechaCreacion: this.utileria.formatearFechaYYYYMMDD(item.date1),
+      fechaCierre: item.date1 == item.date2 ? '' : this.utileria.formatearFechaYYYYMMDD(item.date2),
       estado: item.status
     });
   }
@@ -201,9 +201,9 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     let idCliente : string = this.formDialogPrecargue.value.idClient;
     let nroPrecargue : string = this.formDialogPrecargue.value.nroPrecargue;
     this.svDtlPreload.EditPreloadClientName(nroPrecargue, idCliente).subscribe(data => {
-      this.svUtil.Notificacion(`Confirmación`, `Precargue editado correctamente.`);
+      this.utileria.Notificacion(`Confirmación`, `Precargue editado correctamente.`);
     }, error => {
-      this.svUtil.Notificacion(`Error`, `Error al editar el precargue | ${error.status} ${error.statusText}.`);
+      this.utileria.Notificacion(`Error`, `Error al editar el precargue | ${error.status} ${error.statusText}.`);
       this.dialogLoad = false;
       this.dialogPrecargue = false;
       this.formDialogPrecargue.reset();
