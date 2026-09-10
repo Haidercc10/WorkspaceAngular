@@ -55,7 +55,7 @@ export class MateriaPrimaService {
 
   getSubcategories = () : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getSubcategories`);
 
-  getAllSubcategories = () : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getAllSubcategories`);
+  getAllSubcategoriesForName = (name : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getAllSubcategoriesForName/${name}`);
 
   srvAgregar = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
 
