@@ -78,7 +78,7 @@ export class CreacionPdfService {
       margin: [100, 20, 20, 0],
       table: {
         body: [
-          [{ text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+          [{ text: `Página: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
           [{ text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true }, { text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
           [{ text: `Hora: `, alignment: 'left', fontSize: 8, bold: true }, { text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
         ]
@@ -374,7 +374,8 @@ export class CreacionPdfService {
             { text: `Fecha ingreso: ${data.date1.replace('T00:00:00', '')} ${data.hour1}` },
           ],
           [
-            { text: `Cliente: ${data.idClient} - ${data.client.toUpperCase()}`, colSpan: 3},{},{}
+            { text: `CC/NIT: ${data.idClient}`},
+            { text: `Cliente: ${data.client.toUpperCase()}`, colSpan: 2},{}
           ],
           [
             { text: `Estado: ${data.status}` },
@@ -406,7 +407,7 @@ export class CreacionPdfService {
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody1(data, columns, 'Consolidado de rollos precargados por Item'),
+        body: this.buildTableBody1(data, columns, 'Consolidado de rollos precargados por item'),
       },
       fontSize: 8,
       layout: {
