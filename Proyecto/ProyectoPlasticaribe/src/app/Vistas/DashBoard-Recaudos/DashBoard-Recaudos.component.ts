@@ -570,16 +570,37 @@ export class DashBoardRecaudosComponent implements OnInit {
           });
         });
 
-        const subtotalRow = worksheet.addRow(['Total Cliente', '', '', '', ...clientTotals]);
+        const subtotalRow = worksheet.addRow(['Total', '', '', '', ...clientTotals]);
         this.formatExcelRow(subtotalRow, 9, border, null, { name: 'Calibri', family: 4, size: 10, bold: true });
         clientTotals.forEach((_, amountIndex) => subtotalRow.getCell(amountIndex + 5).numFmt = numberFormat);
+
+        const clientTotal = clientTotals.reduce((total, amount) => total + amount, 0);
+        const clientTotalRow = worksheet.addRow(['Total Cliente:', clientTotal]);
+        this.formatExcelRow(clientTotalRow, 9, border, null, { name: 'Calibri', family: 4, size: 10, bold: true });
+        worksheet.mergeCells(`B${clientTotalRow.number}:I${clientTotalRow.number}`);
+        clientTotalRow.getCell(2).numFmt = numberFormat;
+        clientTotalRow.getCell(2).alignment = { horizontal: 'right', vertical: 'middle' };
         worksheet.addRow([]);
       }
     }
 
-    const totalRow = worksheet.addRow(['TOTAL CARTERA', '', '', '', ...totalPlazos]);
+    const totalRow = worksheet.addRow(['TOTAL:', '', '', '', ...totalPlazos]);
     this.formatExcelRow(totalRow, 9, border, fill, { name: 'Calibri', family: 4, size: 11, bold: true });
-    totalPlazos.forEach((_, amountIndex) => totalRow.getCell(amountIndex + 5).numFmt = numberFormat);
+    worksheet.mergeCells(`A${totalRow.number}:D${totalRow.number}`);
+    totalRow.getCell(1).alignment = { horizontal: 'left', vertical: 'middle' };
+    totalPlazos.forEach((_, amountIndex) => {
+      totalRow.getCell(amountIndex + 5).numFmt = numberFormat;
+      totalRow.getCell(amountIndex + 5).alignment = { horizontal: 'right', vertical: 'middle' };
+    });
+
+    const totalCartera = totalPlazos.reduce((total, amount) => total + amount, 0);
+    const totalCarteraRow = worksheet.addRow(['TOTAL CARTERA:', '','','',totalCartera,'','','','']);
+    this.formatExcelRow(totalCarteraRow, 9, border, fill, { name: 'Calibri', family: 4, size: 11, bold: true });
+    worksheet.mergeCells(`A${totalCarteraRow.number}:D${totalCarteraRow.number}`);
+    worksheet.mergeCells(`E${totalCarteraRow.number}:I${totalCarteraRow.number}`);
+    totalCarteraRow.getCell(1).alignment = { horizontal: 'left', vertical: 'middle' };
+    totalCarteraRow.getCell(5).numFmt = numberFormat;
+    totalCarteraRow.getCell(5).alignment = { horizontal: 'right', vertical: 'middle' };
   }
 
   formatExcelRow(row: any, columns: number, border: any, fill: any, font: any) {
