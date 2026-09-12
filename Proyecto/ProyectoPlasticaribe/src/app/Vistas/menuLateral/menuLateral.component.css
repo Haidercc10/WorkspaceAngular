@@ -323,5 +323,8 @@ p-accordion span[class = 'vertical-align-middle'] {
 }
 
 .logo2 {
-  width: 10%;
+  width: 185px;
+  min-width: 185px;
+  height: auto;
+  flex-shrink: 0;
 }
