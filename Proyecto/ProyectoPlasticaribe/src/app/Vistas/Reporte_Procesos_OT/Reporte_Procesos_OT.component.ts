@@ -485,7 +485,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTCerrada = 0;
     let ruta : string = this.validarParametrosConsulta();
 
-    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => {
+    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(fechaincial, fechaFinal, ruta).subscribe(data => {
       data.forEach(infoOt => this.llenarArray(infoOt));
     }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);

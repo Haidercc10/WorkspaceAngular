@@ -185,3 +185,11 @@ p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
  ::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
   color : #ff5252;
  }
+
+::ng-deep #tableProcesos .proceso-inicio {
+  border-left: 3px solid #495057 !important;
+}
+
+::ng-deep #tableProcesos .proceso-fin {
+  border-right: 3px solid #495057 !important;
+}
