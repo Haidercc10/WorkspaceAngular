@@ -63,7 +63,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   esSolicitud: boolean = false; /** Variable que se encargará de limpiar campos */
   ultimoNroSolicitud: number = 0;
   viewSubcategories: boolean = false; /** Variable para mostrar el modal de subcategorias */
-  subcategoriesInModal : any[] = [];
+  subcategoriesInModal: any[] = [];
   subcategories: any[] = [];
   materials: any[] = [];
   materialsFiltered: any[] = [];
@@ -234,15 +234,15 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         this.estadoOT = data[0].estado;
         this.formEncabezado.patchValue({ kgOt: parseFloat(data[0].datosotKg + adicional), });
         this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot))
-        .pipe( takeUntil(this.destroy$))
-        .subscribe(dataAsignacion => {
-          this.cantRestante = (this.kgOT - dataAsignacion);
-          this.loadInfoOT(parseInt(ot), data, dataAsignacion);
-          this.mensajeService.mensajeAdvertencia(`Advertencia`, `La orden de trabajo tiene '${this.cantRestante.toFixed(2)}' kg restantes.`);
-          this.load = true;
-        }, err => {
-          this.load = true;
-        });
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(dataAsignacion => {
+            this.cantRestante = (this.kgOT - dataAsignacion);
+            this.loadInfoOT(parseInt(ot), data, dataAsignacion);
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La orden de trabajo tiene '${this.cantRestante.toFixed(2)}' kg restantes.`);
+            this.load = true;
+          }, err => {
+            this.load = true;
+          });
       } else if (data.length == 0) {
         this.load = true;
         this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`);
@@ -250,7 +250,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     }, error => {
       this.load = true;
       this.mensajeService.mensajeError(`Error`, `Error al consultar la OT ${ot}! ` + error);
-    }); 
+    });
   }
 
   // Funcion que va a consultar la informacion de la orden de trabajo
@@ -269,9 +269,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   //Funcion que se va a ejecutar al aceptar la materia prima que el usuario desea solicitar
   getAllSubcategories() {
     //this.subcategories = [];
-    let material : string = this.formMP.value.subcat_Nombre;
+    let material: string = this.formMP.value.subcat_Nombre;
 
-    if(material && material.trim().length > 2) {
+    if (material && material.trim().length > 2) {
       this.materiaPrimaService.getAllSubcategoriesForName(material).subscribe(datos => {
         this.subcategories = datos;
       });
@@ -280,8 +280,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   //Funcion que va a cargar la información de la materia prima seleccionada en los campos correspondientes
   loadMaterialInField() {
-    let data : any = this.subcategories.find(x => x.id_Subcategoria == this.formMP.value.subcat_Nombre); 
-    
+    let data: any = this.subcategories.find(x => x.id_Subcategoria == this.formMP.value.subcat_Nombre);
+
     this.formMP.patchValue({
       'subcat_Id': data.id_Subcategoria,
       'subcat_Nombre': data.subcategoria,
@@ -295,15 +295,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   validarCamposVaciosMPRetirada() {
     const subcategoryId = this.formMP.value.subcat_Id;
     const quantity = this.formMP.value.cantidad;
+    let kgAsignado: number = this.infoOrdenTrabajo[0].kgAsignado;
+    let cantidadesMp: number = (quantity + this.calcularMateriaPrimaSolicitada() + kgAsignado);
 
     if (this.formMP.valid) {
       if (quantity > 0) {
         if (!this.idSubcategorias.includes(subcategoryId)) {
-          if (quantity > this.cantRestante) {
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante a asignar: ${this.cantRestante.toFixed(2)} Kg!`);
+          if (cantidadesMp > this.cantRestante) {
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante por asignar: ${this.cantRestante.toFixed(2)} Kg!`);
             return;
           }
-
           this.idSubcategorias.push(subcategoryId);
           this.subcategoriasSeleccionadas.push(this.materialSelected(this.formMP.value));
           this.limpiarCamposMP();

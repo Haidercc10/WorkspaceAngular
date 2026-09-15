@@ -478,6 +478,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     let fecha2 = moment(this.formularioOT.value.fechaFinal);
     let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(fecha1).format('YYYY-MM-DD');
     let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(fecha2).format('YYYY-MM-DD');
+    let usarFechaCreacion : boolean = fechainicial == fechaMesAnterior;
+    console.log(fechainicial, fechaFinal, usarFechaCreacion);
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -487,7 +489,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTCerrada = 0;
     let ruta : string = this.validarParametrosConsulta();
 
-    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(fechainicial, fechaFinal, ruta).subscribe(data => {
+    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(fechainicial, fechaFinal, usarFechaCreacion, ruta).subscribe(data => {
       data.forEach(infoOt => this.llenarArray(infoOt));
     }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
@@ -535,8 +537,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       { header: 'Cant Ingresada a Despacho', field: 'entrada'},
       { header: 'Cant Facturada', field: 'salida'},
       { header: 'Fallas', field: 'falla'},
-      { header: 'Fecha Inicio OT', field: 'fechaInicio'},
-      { header: 'Fecha Fin OT', field: 'fechaFinal'}
     ];
 
     this.ArrayDocumento.push(data);

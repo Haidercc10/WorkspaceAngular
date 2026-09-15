@@ -241,11 +241,18 @@
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'est', 'contains')">
               </th>
               <!--FIN BALANCE-->
-
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'fechaInicio', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'fechaFinal', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'diff_Dias', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
               </th>
               <!--Extrusion-->
-              <th class="divisor-proceso">
+              <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ext', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -258,6 +265,9 @@
                   (input)="aplicarfiltro($event, 'balance_Ext', 'contains')">
               </th>
               <!--Impresion-->
+              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, '', 'contains')">
+              </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -270,6 +280,8 @@
                   (input)="aplicarfiltro($event, 'balance_Imp', 'contains')">
               </th>
               <!--Perforado-->
+              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, '', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'perf', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -279,6 +291,9 @@
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Perf', 'contains')"></th>
               <!--Doblado-->
+              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, '', 'contains')">
+              </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -288,6 +303,9 @@
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Dbl', 'contains')"></th>
               <!--Laminado-->
+              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, '', 'contains')">
+              </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'lam', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -297,6 +315,9 @@
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_lam', 'contains')"></th>
               <!--Empaque-->
+              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, '', 'contains')">
+              </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -306,6 +327,9 @@
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Emp', 'contains')"></th>
               <!--Sellado-->
+              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, '', 'contains')">
+              </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'sel', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -314,8 +338,7 @@
                   (input)="aplicarfiltro($event, 'sum_sel', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Sel', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+
               <th *ngFor="let col of columns"><input pInputText style="width: 100%;"
                   (input)="aplicarfiltro($event, col.field, 'contains')"></th>
               <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
@@ -326,16 +349,14 @@
               </th>
               <th style="font-weight: 800;" class="text-center" colspan=""></th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="6"> Balance General</th>
-              <th style="font-weight: 800;" class="text-center" colspan=""></th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Extrusión</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Impresión</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Laminado</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Perforado</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Doblado</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Empaque</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Sellado</th>
-              <th style="font-weight: 800;" class="text-center"><i class="pi pi-file"></i> Información OT
-              </th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Fechas</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Extrusión</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Impresión</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Laminado</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Perforado</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Doblado</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Empaque</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Sellado</th>
               <th style="font-weight: 900;" class="text-center" colspan=""></th>
             </tr>
             <tr class="font-size-13" id="columnas">
@@ -346,7 +367,8 @@
               <th scope="col" pResizableColumn pSortableColumn="cli">Cliente <p-sortIcon field="cli"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="prod">Producto <p-sortIcon field="prod"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="cant" pTooltip="Cantidad a producir en kilos/unds/paquete/metros" tooltipPosition="top">
+              <th scope="col" pResizableColumn pSortableColumn="cant"
+                pTooltip="Cantidad a producir en kilos/unds/paquete/metros" tooltipPosition="top">
                 Cant. Producir <p-sortIcon field="cant"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
                 tooltipPosition="top">MP <p-sortIcon field="mp"></p-sortIcon>
@@ -370,13 +392,25 @@
               <th scope="col" pResizableColumn pSortableColumn="est" pTooltip="Estado de la OT" tooltipPosition="top">
                 Estado <p-sortIcon field="est"></p-sortIcon></th>
 
+
+              <th scope="col" pResizableColumn pSortableColumn="fecha" pTooltip="Fecha Creación" tooltipPosition="top">
+                Creación <p-sortIcon field="fecha"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="fechaInicio" pTooltip="Fecha Inicio"
+                tooltipPosition="top">
+                Inicio <p-sortIcon field="fechaInicio"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="fechaFinal" pTooltip="Fecha Final"
+                tooltipPosition="top">
+                Final <p-sortIcon field="fechaFinal"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="diff_Dias" pTooltip="Diferencia de Días"
+                tooltipPosition="top">
+                Días <p-sortIcon field="diff_Dias"></p-sortIcon></th>
+
               <th scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
-                tooltipPosition="top">MP <p-sortIcon field="mp"></p-sortIcon>
-              </th>  
+                tooltipPosition="top"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="mp"></p-sortIcon>
+              </th>
               <!--Extrusion-->
               <th scope="col" pResizableColumn pSortableColumn="ext" pTooltip="Producción Extrusión"
-                tooltipPosition="top" class="divisor-proceso"><i class="pi pi-bolt"></i> <p-sortIcon
-                  field="ext"></p-sortIcon>
+                tooltipPosition="top"><i class="pi pi-bolt"></i> <p-sortIcon field="ext"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="desp_ext" pTooltip="Desperdicio Extrusión"
                 tooltipPosition="top"> <i class="pi pi-trash"></i> <p-sortIcon field="desp_ext"></p-sortIcon>
@@ -388,6 +422,9 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Ext"></p-sortIcon>
               </th>
               <!--Impresion-->
+              <th scope="col" pResizableColumn pSortableColumn="ext" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="ext"></p-sortIcon>
+              </th>
               <th scope="col" pResizableColumn pSortableColumn="imp" pTooltip="Producción Impresión"
                 tooltipPosition="top"><i class="pi pi-print"></i> <p-sortIcon field="imp"></p-sortIcon>
               </th>
@@ -401,6 +438,9 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Imp"></p-sortIcon>
               </th>
               <!--Laminado-->
+              <th scope="col" pResizableColumn pSortableColumn="lam" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="lam"></p-sortIcon>
+              </th>
               <th scope="col" pResizableColumn pSortableColumn="lam" pTooltip="Producción Laminado"
                 tooltipPosition="top"><i class="pi pi-clone"></i> <p-sortIcon field="lam"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="desp_lam" pTooltip="Desperdicio Laminado"
@@ -412,6 +452,9 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Lam"></p-sortIcon>
               </th>
               <!--Perforado-->
+              <th scope="col" pResizableColumn pSortableColumn="perf" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="perf"></p-sortIcon>
+              </th>
               <th scope="col" pResizableColumn pSortableColumn="perf" pTooltip="Producción Perforado"
                 tooltipPosition="top"><i class="pi pi-circle-off"></i> <p-sortIcon field="perf"></p-sortIcon>
               </th>
@@ -425,6 +468,9 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Perf"></p-sortIcon>
               </th>
               <!--Doblado-->
+              <th scope="col" pResizableColumn pSortableColumn="dbl" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="dbl"></p-sortIcon>
+              </th>
               <th scope="col" pResizableColumn pSortableColumn="dbl" pTooltip="Producción Doblado"
                 tooltipPosition="top"><i class="pi pi-map"></i> <p-sortIcon field="dbl"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="desp_dbl" pTooltip="Desperdicio Doblado"
@@ -437,6 +483,9 @@
               </th>
 
               <!--Empaque-->
+              <th scope="col" pResizableColumn pSortableColumn="emp" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="emp"></p-sortIcon>
+              </th>
               <th scope="col" pResizableColumn pSortableColumn="emp" pTooltip="Producción Empaque"
                 tooltipPosition="top"><i class="pi pi-box"></i> <p-sortIcon field="emp"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="desp_emp" pTooltip="Desperdicio Empaque"
@@ -449,6 +498,9 @@
               </th>
 
               <!--Sellado-->
+              <th scope="col" pResizableColumn pSortableColumn="sel" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="sel"></p-sortIcon>
+              </th>
               <th scope="col" pResizableColumn pSortableColumn="sel" pTooltip="Producción Sellado"
                 tooltipPosition="top"><i class="pi pi-tag"></i> <p-sortIcon field="sel"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="desp_sel" pTooltip="Desperdicio Sellado"
@@ -460,7 +512,7 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Sel"></p-sortIcon>
               </th>
 
-              
+
               <th scope="col" pResizableColumn pSortableColumn="fecha" pTooltip="Fecha Creación" tooltipPosition="top">
                 F. Creación <p-sortIcon field="fecha"></p-sortIcon></th>
               <th *ngFor="let col of columns" pSortableColumn="{{col.field}}" pResizableColumn>{{col.header}}
@@ -488,7 +540,8 @@
               <td class="">{{data.desperdicio_Final | number : '1.0-0'}}</td>
               <td class="">{{(data.reportado_Final) | number : '1.0-0'}}</td>
               <td class="" [ngClass]="{'red' : data.balance_General < 0,'green' : data.balance_General > 0} ">
-                <b>{{data.balance_General | number : '1.0-0'}}</b></td>
+                <b>{{data.balance_General | number : '1.0-0'}}</b>
+              </td>
 
               <td [ngClass]="{
                 'verde' : data.est == 'TERMINADA',
@@ -497,10 +550,17 @@
                 'naranja' : data.est == 'ABIERTA',
                 'rojo' : data.est == 'ANULADO',
                 'verde2' : data.est == 'CERRADA',
-              }"><b>{{data.est | uppercase}}</b></td>  
+              }"><b>{{data.est | uppercase}}</b></td>
+
+              <td id="fecha" class="proceso-inicio" scope="col">{{data.fecha | date : 'yyyy-MM-dd'}}</td>
+              <td>{{data.fechaInicio | date : 'yyyy-MM-dd'}}</td>
+              <td>{{data.fechaFinal | date : 'yyyy-MM-dd'}}</td>
+              <td> {{data.diff_Dias}}</td>
+
               <td class="proceso-inicio">{{data.mp | number : '1.0-0'}}</td>
               <!-- Extrusion -->
-              <td class="proceso-inicio" [ngClass]="{
+
+              <td [ngClass]="{
                 'verde' : data.ext >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.ext < data.cant && data.ext > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
                 'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
@@ -512,11 +572,14 @@
 
               <td id="desp_ext" scope="col" [ngClass]="{'red' : data.desp_ext > 0}">{{data.desp_ext | number : '1.0-0'}}
               </td>
-              <td id="sum_ext" scope="col">{{data.desp_ext + data.ext | number : '1.0-0'}}</td>
-              <td id="balance_Ext" scope="col" class="proceso-fin" [ngClass]="{'red' : data.balance_Ext < 0,'green' : data.balance_Ext > 0} "><b>{{data.balance_Ext | number : '1.0-0'}}</b></td>
+              <td id="sum_ext" scope="col">{{data.sum_ext | number : '1.0-0'}}</td>
+              <td id="balance_Ext" scope="col" class="proceso-fin"
+                [ngClass]="{'red' : data.balance_Ext < 0,'green' : data.balance_Ext > 0} "><b>{{data.balance_Ext |
+                  number : '1.0-0'}}</b></td>
 
               <!-- Impresion -->
-              <td class="proceso-inicio" [ngClass]="{
+              <td class="proceso-inicio" id="" scope="col">{{data.base_Imp | number : '1.0-0'}}</td>
+              <td [ngClass]="{
                 'verde' : data.imp >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.imp < data.cant && data.imp > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
                 'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
@@ -527,11 +590,14 @@
                 '1.0-0'}}</td>
               <td id="desp_imp" scope="col" [ngClass]="{'red' : data.desp_imp > 0}">{{data.desp_imp | number : '1.0-0'}}
               </td>
-              <td id="sum_imp" scope="col">{{data.desp_imp + data.imp | number : '1.0-0'}}</td>
-              <td id="balance_Imp" scope="col" class="proceso-fin" [ngClass]="{'red' : data.balance_Imp < 0,'green' : data.balance_Imp > 0} "><b>{{data.balance_Imp | number : '1.0-0'}}</b></td>
+              <td id="sum_imp" scope="col">{{data.sum_imp | number : '1.0-0'}}</td>
+              <td id="balance_Imp" scope="col" class="proceso-fin"
+                [ngClass]="{'red' : data.balance_Imp < 0,'green' : data.balance_Imp > 0} "><b>{{data.balance_Imp |
+                  number : '1.0-0'}}</b></td>
 
               <!-- laminado -->
-              <td class="proceso-inicio" [ngClass]="{
+              <td class="proceso-inicio" id="" scope="col">{{data.base_Lam | number : '1.0-0'}}</td>
+              <td [ngClass]="{
                 'verde' : data.lam >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.lam < data.cant && data.lam > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
                 'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
@@ -543,11 +609,14 @@
 
               <td id="desp_lam" scope="col" [ngClass]="{'red' : data.desp_lam > 0}">{{data.desp_lam | number : '1.0-0'}}
               </td>
-              <td id="sum_lam" scope="col">{{data.desp_lam + data.lam | number : '1.0-0'}}</td>
-              <td id="balance_Lam" scope="col" class="proceso-fin" [ngClass]="{'red' : data.balance_Lam < 0,'green' : data.balance_Lam > 0} "><b>{{data.balance_Lam | number : '1.0-0'}}</b></td>
+              <td id="sum_lam" scope="col">{{data.sum_lam | number : '1.0-0'}}</td>
+              <td id="balance_Lam" scope="col" class="proceso-fin"
+                [ngClass]="{'red' : data.balance_Lam < 0,'green' : data.balance_Lam > 0} "><b>{{data.balance_Lam |
+                  number : '1.0-0'}}</b></td>
 
               <!-- Perforado -->
-              <td class="proceso-inicio" [ngClass]="{
+              <td class="proceso-inicio" id="" scope="col">{{data.base_Perf | number : '1.0-0'}}</td>
+              <td [ngClass]="{
                 'verde' : data.perf >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.perf < data.cant && data.perf > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
                 'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
@@ -559,29 +628,35 @@
 
               <td id="desp_perf" scope="col" [ngClass]="{'red' : data.desp_perf > 0}">{{data.desp_perf | number :
                 '1.0-0'}} </td>
-              <td id="sum_perf" scope="col">{{data.desp_perf + data.perf | number : '1.0-0'}}</td>
-              <td id="balance_Perf" scope="col" class="proceso-fin" [ngClass]="{'red' : data.balance_Perf < 0,'green' : data.balance_Perf > 0} "><b>{{data.balance_Perf | number : '1.0-0'}}</b></td>
+              <td id="sum_perf" scope="col">{{data.sum_perf | number : '1.0-0'}}</td>
+              <td id="balance_Perf" scope="col" class="proceso-fin"
+                [ngClass]="{'red' : data.balance_Perf < 0,'green' : data.balance_Perf > 0} "><b>{{data.balance_Perf |
+                  number : '1.0-0'}}</b></td>
 
               <!--* Doblado -->
-              <td class="proceso-inicio" [ngClass]="{
+              <td class="proceso-inicio" id="" scope="col">{{data.base_Dbl | number : '1.0-0'}}</td>
+              <td [ngClass]="{
                 'verde' : data.dbl >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
-                'amarillo' : data.perf < data.cant && data.perf > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
+                'amarillo' : data.dbl < data.cant && data.dbl > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
                 'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
                 'naranja' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ABIERTA',
-                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.perf == 0 && data.perf < data.cant) && data.est == 'ANULADO',
+                'rojo' : ((data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 || (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) != 0  && data.dbl == 0 && data.dbl < data.cant) && data.est == 'ANULADO',
                 'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.dbl == 0 && data.dbl < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? '0' : data.dbl | number : '1.0-0'}}
               </td>
 
               <td id="desp_dbl" scope="col" [ngClass]="{'red' : data.desp_dbl > 0}">{{data.desp_dbl | number : '1.0-0'}}
               </td>
-              <td id="sum_dbl" scope="col">{{data.desp_dbl + data.dbl | number : '1.0-0'}}</td>
-              <td id="balance_Dbl" scope="col" class="proceso-fin" [ngClass]="{'red' : data.balance_Dbl < 0,'green' : data.balance_Dbl > 0} "><b>{{data.balance_Dbl | number : '1.0-0'}}</b></td>
+              <td id="sum_dbl" scope="col">{{data.sum_dbl | number : '1.0-0'}}</td>
+              <td id="balance_Dbl" scope="col" class="proceso-fin"
+                [ngClass]="{'red' : data.balance_Dbl < 0,'green' : data.balance_Dbl > 0} "><b>{{data.balance_Dbl |
+                  number : '1.0-0'}}</b></td>
 
 
 
               <!-- Empaque -->
-              <td class="proceso-inicio" [ngClass]="{
+              <td class="proceso-inicio" id="" scope="col">{{data.base_Emp | number : '1.0-0'}}</td>
+              <td [ngClass]="{
                 'verde' : data.emp >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.emp < data.cant && data.emp > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
                 'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
@@ -593,11 +668,14 @@
 
               <td id="desp_emp" scope="col" [ngClass]="{'red' : data.desp_emp > 0}">{{data.desp_emp | number : '1.0-0'}}
               </td>
-              <td id="sum_emp" scope="col">{{data.desp_emp + data.emp | number : '1.0-0'}}</td>
-              <td id="balance_Emp" scope="col" class="proceso-fin" [ngClass]="{'red' : data.balance_Emp < 0,'green' : data.balance_Emp > 0} "><b>{{data.balance_Emp | number : '1.0-0'}}</b></td>
+              <td id="sum_emp" scope="col">{{data.sum_emp | number : '1.0-0'}}</td>
+              <td id="balance_Emp" scope="col" class="proceso-fin"
+                [ngClass]="{'red' : data.balance_Emp < 0,'green' : data.balance_Emp > 0} "><b>{{data.balance_Emp |
+                  number : '1.0-0'}}</b></td>
 
               <!-- Sellado -->
-              <td class="proceso-inicio" [ngClass]="{
+              <td class="proceso-inicio" id="" scope="col">{{data.base_Sel | number : '1.0-0'}}</td>
+              <td [ngClass]="{
                 'verde' : data.sel >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.sel < data.cant && data.sel > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
                 'azul' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0 && data.est == 'ASIGNADA',
@@ -606,12 +684,15 @@
                 'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.sel == 0 && data.sel < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'SELLADO')">{{data.sel == 0 ? '0' : data.sel | number :
                 '1.0-0'}} Kg -
-                {{data.selUnd == 0 ? '0' : data.selUnd | number : '1.0-0'}} {{data.und == 'Paquete' ? 'Paq' : data.und}}</td>
+                {{data.selUnd == 0 ? '0' : data.selUnd | number : '1.0-0'}} {{data.und == 'Paquete' ? 'Paq' : data.und}}
+              </td>
 
               <td id="desp_sel" scope="col" [ngClass]="{'red' : data.desp_sel > 0}">{{data.desp_sel | number : '1.0-0'}}
               </td>
-              <td id="sum_sel" scope="col">{{data.desp_sel + data.sel | number : '1.0-0'}}</td>
-              <td id="balance_Sel" scope="col" class="proceso-fin" [ngClass]="{'red' : data.balance_Sel < 0,'green' : data.balance_Sel > 0} "><b>{{data.balance_Sel | number : '1.0-0'}}</b></td>
+              <td id="sum_sel" scope="col">{{data.sum_sel | number : '1.0-0'}}</td>
+              <td id="balance_Sel" scope="col" class="proceso-fin"
+                [ngClass]="{'red' : data.balance_Sel < 0,'green' : data.balance_Sel > 0} "><b>{{data.balance_Sel |
+                  number : '1.0-0'}}</b></td>
 
               <!-- Fecha Creacion OT -->
               <td id="fecha" scope="col">{{data.fecha | date : 'yyyy-MM-dd'}}</td>
@@ -696,7 +777,7 @@
             <tr class="font-size-13">
               <td id="Producto" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Producto}}</b></td>
               <td id="Operador" class="TextosInfoTabla">{{ArrayDatosAgrupados.Operador}}</td>
-              <td id="Peso" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Peso | number: '1.2-2' }}</b></td>
+              <td id="Peso" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Peso | number: '1.0-0' }}</b></td>
               <td id="Fecha" class="TextosInfoTabla">{{ArrayDatosAgrupados.Fecha}}</td>
               <td id="Count" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.NroRollos}}</b></td>
             </tr>
@@ -740,7 +821,7 @@
           <td>{{data.Orden}}</td>
           <td>{{data.Item}}</td>
           <td>{{data.Referencia}}</td>
-          <td>{{data.Cantidad | number : '1.2-2'}}</td>
+          <td>{{data.Cantidad | number : '1.0-0'}}</td>
           <td>{{data.Presentacion}}</td>
           <td>{{data.Fecha}}</td>
           <td>{{data.Extrusion}}</td>
