@@ -26,12 +26,15 @@ export class CreacionExcelService {
         return worksheet;
     }
 
-    creacionExcel(nombreArchivo : string, workbook : Workbook){
-      setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `${nombreArchivo}.xlsx`);
-        }); 
-      }, 500);
+        creacionExcel(nombreArchivo : string, workbook : Workbook): Promise<void>{
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    workbook.xlsx.writeBuffer().then((data) => {
+                            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                            fs.saveAs(blob, `${nombreArchivo}.xlsx`);
+                            resolve();
+                    }).catch(reject);
+                }, 500);
+            });
     }
 }

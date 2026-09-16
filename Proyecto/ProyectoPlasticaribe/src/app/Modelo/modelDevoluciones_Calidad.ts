@@ -18,4 +18,6 @@ export interface modelDevoluciones_Calidad {
   Dvc_Observacion? : string;
   Dvc_FechaRegistro : any;
   Dvc_Hora : string;
+  Usua_Operario : number;
+  Usua_Supervisor : number;
 }

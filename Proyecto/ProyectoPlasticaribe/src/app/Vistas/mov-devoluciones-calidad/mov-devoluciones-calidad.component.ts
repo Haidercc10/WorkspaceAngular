@@ -96,22 +96,6 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     });
   }
 
-  validateUrl(){
-    let ot: any = this.formFilters.value.ot;
-    let typeRejected: any = this.formFilters.value.typeMov;
-    let client : any = this.formFilters.value.clientId;
-    let process : any = this.formFilters.value.process;
-    let url : string = ``;
-
-    if(ot != null) url += `ot=${ot}`;
-    if(client != null) url.length > 0 ? url += `&client=${client}` : url += `client=${client}`;
-    if(process != null) url.length > 0 ? url += `&process=${process}` : url += `process=${process}`;
-    if(typeRejected != null) url.length > 0 ? url += `&typeRejected=${typeRejected}` : url += `typeRejected=${typeRejected}`;
-
-    if(url.length > 0) url = `?${url}`;
-    return url;
-  }
-
   //Función para obtener los procesos.
   getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => { this.processes = data }, error => { this.msg.mensajeError(`Error`, `Error en los procesos. | ${error}`); });
 
@@ -160,6 +144,22 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     });
   }
 
+  validateUrl(){
+    let ot: any = this.formFilters.value.ot;
+    let typeRejected: any = this.formFilters.value.typeMov;
+    let client : any = this.formFilters.value.clientId;
+    let process : any = this.formFilters.value.process;
+    let url : string = ``;
+
+    if(ot != null) url += `ot=${ot}`;
+    if(client != null) url.length > 0 ? url += `&client=${client}` : url += `client=${client}`;
+    if(process != null) url.length > 0 ? url += `&process=${process}` : url += `process=${process}`;
+    if(typeRejected != null) url.length > 0 ? url += `&typeRejected=${typeRejected}` : url += `typeRejected=${typeRejected}`;
+
+    if(url.length > 0) url = `?${url}`;
+    return url;
+  }
+
   errorMessage(message: string, error: HttpErrorResponse) {
     this.load = false;
     this.msg.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
@@ -172,13 +172,23 @@ export class MovDevolucionesCalidadComponent implements OnInit {
 
   //Función que exportará un formato excel con los datos de los clientes
   exportExcel(){
-    if(this.serchedData.length > 0) {
-      setTimeout(() => { this.loadSheetAndStyles(this.serchedData); }, 500);
-    } else this.msg.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+    if(this.serchedData.length == 0) {
+      this.msg.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+      return;
+    }
+
+    this.load = true;
+    setTimeout(async () => {
+      try {
+        await this.loadSheetAndStyles(this.serchedData);
+      } finally {
+        this.load = false;
+      }
+    }, 0);
   }
 
   //Función que cargará la hoja y los estilos. 
-  loadSheetAndStyles(data : any){  
+  async loadSheetAndStyles(data : any){  
     let title : any = `Movimientos de Devoluciones de`
     title += ` ${moment(this.formFilters.value.startDate).format('DD-MM-YYYY')} a ${moment(this.formFilters.value.endDate).format('DD-MM-YYYY')}`;
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
@@ -188,7 +198,7 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     let workbook = this.svExcel.formatoExcel(title, true);
 
     this.addNewSheet(workbook, title, fill, border, font, alignment, data);
-    this.svExcel.creacionExcel(title, workbook);
+    await this.svExcel.creacionExcel(title, workbook);
   }
 
   //Función para agregar una nueva hoja de calculo.
@@ -209,7 +219,7 @@ export class MovDevolucionesCalidadComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','J5','K5','L5','M5','N5','O5','P5','Q5']; 
+    let rowHeader : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5','N5','O5','P5','Q5','R5','S5']; 
     //ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
     
@@ -217,18 +227,18 @@ export class MovDevolucionesCalidadComponent implements OnInit {
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:Q3');
+    ws.mergeCells('A1:S3');
 
     this.loadSizeHeader(ws);
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
   loadSizeHeader(ws : any){
-    [7,17].forEach(x => ws.getColumn(x).width = 50);
-    [5,10,12,13,16].forEach(x => ws.getColumn(x).width = 40);
+    [7,19].forEach(x => ws.getColumn(x).width = 50);
+    [5,10,12,13,14,15,18].forEach(x => ws.getColumn(x).width = 40);
     [1].forEach(x => ws.getColumn(x).width = 5);
     [3].forEach(x => ws.getColumn(x).width = 10);
-    [2,3,4,6,8,9,11,14,15].forEach(x => ws.getColumn(x).width = 12);
+    [2,3,4,6,8,9,11,16,17].forEach(x => ws.getColumn(x).width = 12);
     
     [12].forEach(x => ws.getColumn(x).width = 20);
   }
@@ -249,6 +259,8 @@ export class MovDevolucionesCalidadComponent implements OnInit {
       'Rechazo', 
       'Responsable',
       'Requerimiento',
+      'Supervisor',
+      'Operario',
       'Peso',
       'Precio Kg', 
       'Precio Kg Mala Calidad',
@@ -260,9 +272,9 @@ export class MovDevolucionesCalidadComponent implements OnInit {
   //Cargar información con los estilos al formato excel. 
   loadInfoExcel(ws : any, data : any, border : any, alignment : any){
     let contador : any = 6;
-    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q']; 
-    let formatNumber: Array<number> = [15, 16];
-    let formatNumber2: Array<number> = [14];
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S']; 
+    let formatNumber: Array<number> = [17, 18];
+    let formatNumber2: Array<number> = [16];
 
     formatNumber.forEach(i => ws.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
     formatNumber2.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-"$"#,##0.00'); 
@@ -297,6 +309,8 @@ export class MovDevolucionesCalidadComponent implements OnInit {
         x.devs.dvc_TipoRechazo,
         x.process.proceso_Nombre,
         x.req.req_Nombre, 
+        x.sups?.usua_Nombre ?? '',
+        x.ops?.usua_Nombre ?? '',
         x.devs.dvc_PesoNeto, 
         x.devs.dvc_Precio, 
         x.devs.dvc_Subtotal,

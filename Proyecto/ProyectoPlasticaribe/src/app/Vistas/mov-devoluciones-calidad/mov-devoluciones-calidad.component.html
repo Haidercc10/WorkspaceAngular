@@ -18,8 +18,7 @@
 
 <p-card>
     <div class="my-4">
-        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i
-                class="pi pi-filter"></i> Filtros de búsqueda</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
     </div>
 
     <form [formGroup]="formFilters" (ngSubmit)="searchData()">
@@ -100,7 +99,7 @@
                 <button pButton class="p-button-secondary" (click)="clearFields()" type="button" label="Limpiar Campos" icon="pi pi-eraser"
                     [disabled]="load"></button>
                 <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel"
-                    [disabled]="serchedData.length == 0" (click)="exportExcel()"></button>
+                    [disabled]="serchedData.length == 0 || load" (click)="exportExcel()"></button>
             </div>
         </div>
     </form>
@@ -114,6 +113,7 @@
             Registros consultados</h4>
     </div>
 
+    <!-- TABLA DE DEVOLUCIONES -->
     <div class="mb-4">
         <p-table 
         #dt 
@@ -131,7 +131,7 @@
                 <tr>
                     <th></th>
                     <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-book"></i> Información OT</th>
-                    <th style="font-weight: 800;" class="text-center" colspan="5"><i class="pi pi-users"></i> Información Devolución</th>
+                    <th style="font-weight: 800;" class="text-center" colspan="7"><i class="pi pi-users"></i> Información Devolución</th>
                     <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-calendar"></i> Valores </th>
                     <th style="font-weight: 800;" class="text-center"></th>
                 </tr>
@@ -165,6 +165,14 @@
                         <p-sortIcon field="req.req_Nombre"></p-sortIcon> Requerimiento
                         <p-columnFilter type="text" field="req.req_Nombre" display="menu"></p-columnFilter>
                     </th>
+                    <th class="text-center" pSortableColumn="sups.usua_Nombre">
+                        <p-sortIcon field="sups.usua_Nombre"></p-sortIcon> Supervisor
+                        <p-columnFilter type="text" field="sups.usua_Nombre" display="menu"></p-columnFilter>
+                    </th>
+                    <th class="text-center" pSortableColumn="ops.usua_Nombre">
+                        <p-sortIcon field="ops.usua_Nombre"></p-sortIcon> Operario
+                        <p-columnFilter type="text" field="ops.usua_Nombre" display="menu"></p-columnFilter>
+                    </th>
                     <th class="text-center" pSortableColumn="devs.dvc_TipoRechazo">
                         <p-sortIcon field="devs.dvc_TipoRechazo"></p-sortIcon> Rechazo
                         <p-columnFilter type="text" field="devs.dvc_TipoRechazo" display="menu"></p-columnFilter>
@@ -177,7 +185,7 @@
                         <p-sortIcon field="devs.dvc_Subtotal"></p-sortIcon> Subtotal
                         <p-columnFilter type="text" field="devs.dvc_Subtotal" display="menu"></p-columnFilter>
                     </th>
-                    <th id="ver3" alignFrozen="right" pFrozenColumn [frozen]="true">Ver</th>
+                    <th class="text-center" id="ver3" alignFrozen="right" pFrozenColumn [frozen]="true">Ver</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -190,6 +198,8 @@
                     <td class="">{{data.fails.falla_Nombre}}</td>
                     <td class="text-center"><b>{{data.process.proceso_Nombre}}</b></td>
                     <td class="">{{data.req.req_Nombre }}</td>
+                    <td class="">{{data.sups?.usua_Nombre ?? ''}}</td>
+                    <td class="">{{data.ops?.usua_Nombre ?? ''}}</td>
                     <td class="text-center">
                         <span class="badge" [ngClass]="{
                                                         'bg-success1': data.devs.dvc_TipoRechazo == 'INTERNO', 
@@ -207,7 +217,7 @@
             </ng-template>
             <ng-template pTemplate="footer">
                 <tr>
-                    <td colspan="9" class="text-right">Totales</td>
+                    <td colspan="11" class="text-right">Totales</td>
                     <td class="text-center">{{totalKg() | number}}</td>
                     <td class="text-center">${{totalMoney() | number}}</td>
                     <td></td>
