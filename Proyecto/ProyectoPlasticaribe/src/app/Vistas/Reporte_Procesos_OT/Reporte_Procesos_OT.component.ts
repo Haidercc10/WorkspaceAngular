@@ -142,277 +142,158 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   // Funcion que exportará a excel todo el contenido de la tabla
-  exportToExcel() : void {
-    if (this.ArrayDocumento.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',"¡Para poder crear el archivo de Excel primero debe cargar minimo un OT en la tabla!");
-    else {
-      this.load = false;
-      setTimeout(() => {
-        const title = `Reporte de OT por Procesos - ${this.today}`;
-        const header = ["ID Vendedor", "OT", "Mat. Prima", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Perforado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Cant. Producir Und.", "Medida", "Cant. Ingresada", "Cant. Enviada", "Fallas", "Observación", "Estado", "Fecha Creación", "Fecha Inicio", "Fecha Fin"]
-        let datos : any =[];
+  async exportToExcel() : Promise<void> {
+    if (this.ArrayDocumento.length == 0) {
+      this.msj.mensajeAdvertencia('¡Advertencia!', "¡Para poder crear el archivo de Excel primero debe cargar minimo un OT en la tabla!");
+      return;
+    }
 
-        for (const item of this.ArrayDocumento) {
-          const datos1 : any = [item.usu, item.ot, item.mp, item.ext, item.imp, item.rot, item.lam, item.perf, item.cor, item.emp, item.sel, item.wik, item.cant, item.cantUnd, item.und, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicio, item.fechaFinal];
-          datos.push(datos1);
+    this.load = false;
+    const title = `Reporte de OT por Procesos - ${this.today}`;
+    const numberFormat = '#,##0.00;[Red]-#,##0.00';
+    const border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    const fill = (argb: string) => ({ type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb } });
+    const number = (value: any): number => Number(value) || 0;
+    const allProcessFields = ['ext', 'imp', 'lam', 'perf', 'dbl', 'emp', 'sel'];
+    const processColumns = [
+      { group: 'Extrusión', base: 'mp', field: 'ext', previous: 'mp', waste: 'desp_ext', reported: 'sum_ext', balance: 'balance_Ext' },
+      { group: 'Impresión', base: 'base_Imp', field: 'imp', previous: 'base_Imp', waste: 'desp_imp', reported: 'sum_imp', balance: 'balance_Imp' },
+      { group: 'Laminado', base: 'base_Lam', field: 'lam', previous: 'base_Lam', waste: 'desp_lam', reported: 'sum_lam', balance: 'balance_Lam' },
+      { group: 'Perforado', base: 'base_Perf', field: 'perf', previous: 'base_Perf', waste: 'desp_perf', reported: 'sum_perf', balance: 'balance_Perf' },
+      { group: 'Doblado', base: 'base_Dbl', field: 'dbl', previous: 'base_Dbl', waste: 'desp_dbl', reported: 'sum_dbl', balance: 'balance_Dbl' },
+      { group: 'Empaque', base: 'base_Emp', field: 'emp', previous: 'base_Emp', waste: 'desp_emp', reported: 'sum_emp', balance: 'balance_Emp' },
+      { group: 'Sellado', base: 'base_Sel', field: 'sel', previous: 'base_Sel', waste: 'desp_sel', reported: 'sum_sel', balance: 'balance_Sel' },
+    ];
+    const columns: any[] = [
+      { header: 'OT', field: 'ot', group: 'Información OT', value: (item: any) => item.ot },
+      { header: 'Cliente', field: 'cli', group: 'Información OT', value: (item: any) => item.cli },
+      { header: 'Producto', field: 'producto', group: 'Información OT', value: (item: any) => `${item.item || ''}${item.ref ? ` - ${item.ref}` : ''}` },
+      { header: 'Cant. Producir', field: 'cant', group: 'Información OT', value: (item: any) => item.cant },
+      { header: 'Cant. Producir Und.', field: 'cantUnd', group: 'Información OT', value: (item: any) => item.cantUnd },
+      { header: 'Medida', field: 'und', group: 'Información OT', value: (item: any) => item.und },
+      { header: 'MP', field: 'mp', group: 'Información OT', value: (item: any) => item.mp },
+      { header: 'Proceso inicial', field: 'cantidad_Inicial', group: 'Balance General', value: (item: any) => `${item.proceso_Inicial || ''}: ${number(item.cantidad_Inicial)}` },
+      { header: 'Proceso final', field: 'cantidad_Final', group: 'Balance General', value: (item: any) => `${item.proceso_Final || ''}: ${number(item.cantidad_Final)}` },
+      { header: 'Desperdicio', field: 'desperdicio_Final', group: 'Balance General', value: (item: any) => item.desperdicio_Final },
+      { header: 'PF + Desp.', field: 'reportado_Final', group: 'Balance General', value: (item: any) => item.reportado_Final },
+      { header: 'Balance', field: 'balance_General', group: 'Balance General', value: (item: any) => item.balance_General },
+      { header: 'Estado', field: 'est', group: 'Balance General', value: (item: any) => item.est },
+      { header: 'Creación', field: 'fecha', group: 'Fechas', value: (item: any) => item.fecha },
+      { header: 'Inicio', field: 'fechaInicio', group: 'Fechas', value: (item: any) => item.fechaInicio },
+      { header: 'Final', field: 'fechaFinal', group: 'Fechas', value: (item: any) => item.fechaFinal },
+      { header: 'Días', field: 'diff_Dias', group: 'Fechas', value: (item: any) => item.diff_Dias },
+    ];
+
+    processColumns.forEach(process => {
+      columns.push(
+        { header: 'Anterior', field: process.previous, group: process.group, process: process.field, kind: 'base', value: (item: any) => item[process.base] },
+        { header: 'Producción', field: process.field, group: process.group, process: process.field, kind: 'production', value: (item: any) => item[process.field] },
+        { header: 'Desperdicio', field: process.waste, group: process.group, process: process.field, kind: 'waste', value: (item: any) => item[process.waste] },
+        { header: 'Reportado', field: process.reported, group: process.group, process: process.field, kind: 'reported', value: (item: any) => item[process.reported] },
+        { header: 'Balance', field: process.balance, group: process.group, process: process.field, kind: 'balance', value: (item: any) => item[process.balance] },
+      );
+    });
+
+    this.columnas.forEach(column => columns.push({ ...column, group: 'Campos adicionales', value: (item: any) => item[column.field] }));
+
+    const getProcessColor = (item: any, field: string): string => {
+      const quantity = number(item[field]);
+      const requested = number(item.cant);
+      const status = `${item.est || ''}`.toUpperCase();
+      const totalProduced = allProcessFields.reduce((total, process) => total + number(item[process]), 0);
+      if (quantity >= requested && !['ABIERTA', 'ASIGNADA'].includes(status)) return '8AFC9B';
+      if (quantity > 0 && quantity < requested && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(status)) return 'F3FC20';
+      if (totalProduced == 0 && status == 'ABIERTA') return 'F6D45D';
+      if (totalProduced == 0 && status == 'ASIGNADA') return '83D3FF';
+      if (status == 'ANULADO' && quantity == 0) return 'FF7878';
+      if (quantity == 0 && totalProduced > 0 && status != 'ANULADO') return 'EAEAEA';
+      return 'FFFFFF';
+    };
+    const getStatusColor = (status: any): string => ({
+      'TERMINADA': '8AFC9B', 'EN PROCESO': 'F3FC20', 'ABIERTA': 'F6D45D',
+      'ASIGNADA': '83D3FF', 'ANULADO': 'FF7878', 'CERRADA': '53CC48'
+    }[`${status || ''}`.toUpperCase()] || 'FFFFFF');
+    const columnLetter = (index: number): string => {
+      let value = '';
+      while (index > 0) { const remainder = (index - 1) % 26; value = String.fromCharCode(65 + remainder) + value; index = Math.floor((index - 1) / 26); }
+      return value;
+    };
+
+    try {
+      const workbook = new Workbook();
+      const worksheet = workbook.addWorksheet(title);
+      const lastColumn = columns.length;
+      const lastLetter = columnLetter(lastColumn);
+      worksheet.views = [{ state: 'frozen', xSplit: 2, ySplit: 5 }];
+      worksheet.addRow([title]);
+      worksheet.mergeCells(`A1:${lastLetter}1`);
+      worksheet.getCell('A1').font = { name: 'Calibri', size: 16, bold: true, underline: 'double' };
+      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet.getRow(1).height = 25;
+
+      const legend = [
+        ['Iniciada', 'F3FC20'], ['Abierta', 'F6D45D'], ['No iniciada', 'EAEAEA'],
+        ['Terminada', '8AFC9B'], ['Asignada', '83D3FF'], ['Anulada', 'FF7878'], ['Cerrada', '53CC48']
+      ];
+      const legendRow = worksheet.addRow(legend.map(item => item[0]));
+      legend.forEach((item, index) => { legendRow.getCell(index + 1).fill = fill(item[1]); legendRow.getCell(index + 1).font = { bold: true }; });
+      worksheet.addRow([]);
+
+      const groupRow = worksheet.addRow(columns.map(column => column.group));
+      let groupStart = 1;
+      columns.forEach((column, index) => {
+        if (index == columns.length - 1 || columns[index + 1].group != column.group) {
+          const groupEnd = index + 1;
+          if (groupEnd > groupStart) worksheet.mergeCells(groupRow.number, groupStart, groupRow.number, groupEnd);
+          const cell = groupRow.getCell(groupStart);
+          cell.fill = fill('D9E2F3');
+          cell.font = { bold: true };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          groupStart = groupEnd + 1;
         }
-        let workbook = new Workbook();
-        let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${this.today}`);
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
+      });
 
-        const Colores = ['Iniciado', 'Abierta', 'No Iniciado', 'Terminada', 'Asignada', 'Anulado'];
+      const headerRow = worksheet.addRow(columns.map(column => column.header));
+      headerRow.eachCell(cell => {
+        cell.fill = fill('EEEEEE');
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        cell.border = border;
+      });
+      worksheet.getRow(4).height = 32;
+      worksheet.autoFilter = { from: 'A5', to: `${lastLetter}5` };
 
-        let coloresRow = worksheet.addRow(Colores);
-        let iniciado = coloresRow.getCell(1);
-        let abierta = coloresRow.getCell(2);
-        let noIniciado = coloresRow.getCell(3);
-        let terminado = coloresRow.getCell(4);
-        let asignado = coloresRow.getCell(5);
-        let anulada = coloresRow.getCell(6);
-
-        iniciado.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'F9FC5B' }
-        }
-
-        abierta.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'F6D45D' }
-        }
-
-        noIniciado.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'DDDDDD' }
-        }
-
-        terminado.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: '8AFC9B' }
-        }
-
-        asignado.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: '83D3FF' }
-        }
-
-        anulada.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FF7878' }
-        }
-
-        let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'eeeeee' }
+      this.ArrayDocumento.forEach(item => {
+        const row = worksheet.addRow(columns.map(column => column.value(item)));
+        columns.forEach((column, index) => {
+          const cell = row.getCell(index + 1);
+          cell.border = border;
+          cell.alignment = { vertical: 'middle', wrapText: true };
+          if (['cant', 'cantUnd', 'mp', 'desperdicio_Final', 'reportado_Final', 'balance_General', 'diff_Dias'].includes(column.field) || column.process) cell.numFmt = numberFormat;
+          if (column.field == 'est') cell.fill = fill(getStatusColor(item.est));
+          if (column.kind == 'production') cell.fill = fill(getProcessColor(item, column.process));
+          if (column.kind == 'waste' && number(column.value(item)) > 0) cell.font = { color: { argb: 'C00000' } };
+          if (column.kind == 'balance' || column.field == 'balance_General') {
+            const balance = number(column.value(item));
+            cell.font = { bold: true, color: { argb: balance < 0 ? 'C00000' : balance > 0 ? '008000' : '000000' } };
           }
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+          if (column.kind == 'base') cell.border = { ...border, left: { style: 'medium' } };
+          if (column.kind == 'balance') cell.border = { ...border, right: { style: 'medium' } };
         });
-        worksheet.mergeCells('A1:W2');
-        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      });
 
-        datos.forEach(d => {
-          let row = worksheet.addRow(d);
-          let CantPedida = row.getCell(13);
-
-          let qtyExt : any = row.getCell(4);
-          let qtyImp : any = row.getCell(5);
-          let qtyRot : any = row.getCell(6);
-          let qtyLam : any = row.getCell(7);
-          let qtyPerf : any = row.getCell(8);
-          let qtyCor : any = row.getCell(9);
-          let qtyEmp : any = row.getCell(10);
-          let qtySel : any = row.getCell(11);
-          let qtyWik : any = row.getCell(12);
-          let qtyEstado : any = row.getCell(20);
-
-          // Extrusion
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorExt;
-          if (+qtyExt.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorExt = 'C7FD7A'; //Terminada
-          else if (+qtyExt.value < d[12] && +qtyExt.value > 0) colorExt = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorExt = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorExt = 'ADD8E6'; //Asignada
-          else if (+qtyExt.value == 0 && (qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorExt = 'DDDDDD'; //No Iniciada
-          qtyExt.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorExt }
-          }
-
-          // Impresion
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorImp;
-          if (+qtyImp.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorImp = 'C7FD7A'; //Terminada
-          else if (+qtyImp.value < d[12] && +qtyImp.value > 0) colorImp = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorImp = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorImp = 'ADD8E6'; //Asignada
-          else if (+qtyImp.value == 0 && (qtyExt.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorImp = 'DDDDDD'; //No Iniciada
-          qtyImp.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorImp }
-          }
-
-          //Rotograbado
-          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorRot;
-          if (+qtyRot.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorRot = 'C7FD7A'; //Terminada
-          else if (+qtyRot.value < d[12] && +qtyRot.value > 0) colorRot = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorRot = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorRot = 'ADD8E6'; //Asignada
-          else if (+qtyRot.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorRot = 'DDDDDD'; //No Iniciada
-          qtyRot.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorRot }
-          }
-
-          //Laminado
-          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorLam;
-          if (+qtyLam.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorLam = 'C7FD7A'; //Terminada
-          else if (+qtyLam.value < d[12] && +qtyLam.value > 0) colorLam = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorLam = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorLam = 'ADD8E6'; //Asignada
-          else if (+qtyLam.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorLam = 'DDDDDD'; //No Iniciada
-          qtyLam.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorLam }
-          }
-
-          // Doblado
-          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorPerf;
-          if (+qtyPerf.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorPerf = 'C7FD7A'; //Terminada
-          else if (+qtyPerf.value < d[12] && +qtyPerf.value > 0) colorPerf = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorPerf = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorPerf = 'ADD8E6'; //Asignada
-          else if (+qtyPerf.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorPerf = 'DDDDDD'; //No Iniciada
-          qtyPerf.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorPerf }
-          }
-
-          // Corte
-          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorCor;
-          if (+qtyCor.value >= d[12] && d[19] != 'Asignada' && d[19] != 'Abierta') colorCor = 'C7FD7A'; //Terminada
-          else if (+qtyCor.value < d[12] && +qtyCor.value > 0) colorCor = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorCor = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorCor = 'ADD8E6'; //Asignada
-          else if (+qtyCor.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorCor = 'DDDDDD'; //No Iniciada
-          qtyCor.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorCor }
-          }
-
-          // Empaque
-          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorEmp;
-          if (+qtyEmp.value >=  (+CantPedida + (+CantPedida)) && d[19] != 'Asignada' && d[19] != 'Abierta') colorEmp = 'C7FD7A'; //Terminada
-          else if (+qtyEmp.value <  (+CantPedida + (+CantPedida)) && +qtyEmp.value > 0) colorEmp = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorEmp = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorEmp = 'ADD8E6'; //Asignada
-          else if (+qtyEmp.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorEmp = 'DDDDDD'; //No Iniciada
-          qtyEmp.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorEmp }
-          }
-
-          // Sellado
-          row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorSel;
-          if (+qtySel.value >= (+CantPedida + (+CantPedida)) && d[19] != 'Asignada' && d[19] != 'Abierta') colorSel = 'C7FD7A'; //Terminada
-          else if (+qtySel.value <  (+CantPedida + (+CantPedida)) && +qtySel.value > 0) colorSel = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorSel = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorSel = 'ADD8E6'; //Asignada
-          else if (+qtySel.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtyWik.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorSel = 'DDDDDD'; //No Iniciada
-          qtySel.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorSel }
-          }
-
-          // Wiketiado
-          row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          let colorWik;
-          if (+qtyWik.value >=  (+CantPedida + (+CantPedida)) && d[19] != 'Asignada' && d[19] != 'Abierta') colorWik = 'C7FD7A'; //Terminada
-          else if (+qtyWik.value < (+CantPedida + (+CantPedida)) && +qtyWik.value > 0) colorWik = 'F9FC5B'; //Iniciada
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[19] == 'Abierta') colorWik = 'FDCD7A'; //Abierta
-          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyPerf.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[19] == 'Asignada') colorWik = 'ADD8E6'; //Asignada
-          else if (+qtyWik.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyPerf.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 ) && d[19] != 'Asignada' && d[19] != 'Abierta') colorWik = 'DDDDDD'; //No Iniciada
-          qtyWik.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorWik }
-          }
-
-          // Estado
-          let colorEstado;
-          if (d[19] == 'Terminada') colorEstado = 'C7FD7A'; //Terminada
-          else if (d[19] == 'En proceso') colorEstado = 'F9FC5B'; //Iniciada
-          else if (d[19] == 'Abierta') colorEstado = 'FDCD7A'; //Abierta
-          else if (d[19] == 'Asignada') colorEstado = 'ADD8E6'; //Asignada
-          else if (d[19] == 'Anaulado') colorEstado = 'FF7878' //Anulada
-          qtyEstado.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorEstado }
-          }
-
-          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(14).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(16).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(17).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        });
-        worksheet.getColumn(1).width = 12;  //OT
-        worksheet.getColumn(2).width = 12;  //MP
-        worksheet.getColumn(3).width = 12;  //EXT
-        worksheet.getColumn(4).width = 12;  //IMP
-        worksheet.getColumn(5).width = 12;  //ROT
-        worksheet.getColumn(6).width = 12;  //LAM
-        worksheet.getColumn(7).width = 12;  //DOB
-        worksheet.getColumn(8).width = 12;  //CORTE
-        worksheet.getColumn(9).width = 12;  //EMP
-        worksheet.getColumn(10).width = 12; //SELL
-        worksheet.getColumn(11).width = 15; //WIK
-        worksheet.getColumn(12).width = 15; //PED KG
-        worksheet.getColumn(13).width = 15; //PED UND
-        worksheet.getColumn(14).width = 20; //UND MED
-        worksheet.getColumn(15).width = 10; //ING
-        worksheet.getColumn(16).width = 15; //ENV
-        worksheet.getColumn(17).width = 15; //FALLA
-        worksheet.getColumn(18).width = 20; //OBS
-        worksheet.getColumn(19).width = 15; //ESTADO
-        worksheet.getColumn(20).width = 20; //FCREACION
-        worksheet.getColumn(21).width = 15; //FINICIAL
-        worksheet.getColumn(22).width = 15; //FFINAL
-        worksheet.getColumn(23).width = 15;
-
-        setTimeout(() => {
-          workbook.xlsx.writeBuffer().then((data) => {
-            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Reporte de OT por Procesos - ${this.today}.xlsx`);
-            this.msj.mensajeConfirmacion('¡Archivo Creado!', '¡Se ha exportado la información a un archivo de tipo Excel!');
-          });
-          this.load = true;
-        }, 1000);
-      }, 3500);
+      columns.forEach((column, index) => {
+        const width = column.field == 'producto' ? 28 : column.field == 'est' ? 15 : column.kind == 'waste' || column.kind == 'balance' ? 14 : 13;
+        worksheet.getColumn(index + 1).width = width;
+      });
+      const buffer = await workbook.xlsx.writeBuffer();
+      fs.saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${title}.xlsx`);
+      this.msj.mensajeConfirmacion('¡Archivo Creado!', '¡Se ha exportado la información a un archivo de tipo Excel!');
+    } catch (error) {
+      this.msj.mensajeError('¡Error!', 'No fue posible generar el archivo de Excel.');
+      console.error(error);
+    } finally {
+      this.load = true;
     }
   }
 
