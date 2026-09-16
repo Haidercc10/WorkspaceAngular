@@ -43,8 +43,8 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaInicio" inputId="FechaInicio"
-              [disabled]="formularioOT.value.fechaCreacion != null" [showIcon]="true"></p-calendar>
-            <label for="FechaInicio">Fecha inicio </label>
+              [disabled]="formularioOT.value.fechaCreacion != null" [showIcon]="true" pTooltip="Si no se selecciona una fecha se consultará por la fecha de creación de la(s) OT, si se selecciona una fecha se consultará por la fecha de inicio de producción" tooltipPosition="top"></p-calendar>
+            <label for="FechaInicio">Fecha inicio/producción </label>
           </span>
         </div>
 
@@ -56,18 +56,7 @@
           </span>
         </div>
 
-        <!-- Vendedores -->
-        <!--<div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-4 col-xxl-4">
-          <span class="p-float-label">
-            <input formControlName="Vendedor" id="Vendedores" list="Vendedor" (change)="buscarVendedor()" type="text"
-              pInputText />
-            <datalist id="Vendedor">
-              <option value={{item.usua_Id}} *ngFor="let item of vendedores">{{item.usua_Nombre}}</option>
-            </datalist>
-            <label for="Vendedores">Vendedor</label>
-          </span>
-        </div>-->
-
+        <!--Asesor-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="vendedor">
           <span class="p-float-label">
             <p-dropdown formControlName="Vendedor" inputId="Vendedor" [options]="vendedores" optionValue="usua_Id"
@@ -365,11 +354,11 @@
               <th pFrozenColumn scope="col" pResizableColumn pSortableColumn="ot" id="ordenTrabajo">OT <p-sortIcon
                   field="ot" title="Order por OT"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="cli">Cliente <p-sortIcon field="cli"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="prod">Producto <p-sortIcon field="prod"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="prod">Referencia <p-sortIcon field="prod"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="cant"
                 pTooltip="Cantidad a producir en kilos/unds/paquete/metros" tooltipPosition="top">
-                Cant. Producir <p-sortIcon field="cant"></p-sortIcon></th>
+                Cant. Prod. Terminado <p-sortIcon field="cant"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
                 tooltipPosition="top">MP <p-sortIcon field="mp"></p-sortIcon>
               </th>
@@ -391,17 +380,15 @@
               </th>
               <th scope="col" pResizableColumn pSortableColumn="est" pTooltip="Estado de la OT" tooltipPosition="top">
                 Estado <p-sortIcon field="est"></p-sortIcon></th>
-
-
               <th scope="col" pResizableColumn pSortableColumn="fecha" pTooltip="Fecha Creación" tooltipPosition="top">
                 Creación <p-sortIcon field="fecha"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="fechaInicio" pTooltip="Fecha Inicio"
                 tooltipPosition="top">
-                Inicio <p-sortIcon field="fechaInicio"></p-sortIcon></th>
+                1er Pesaje <p-sortIcon field="fechaInicio"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="fechaFinal" pTooltip="Fecha Final"
                 tooltipPosition="top">
-                Final <p-sortIcon field="fechaFinal"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="diff_Dias" pTooltip="Diferencia de Días"
+                Ult. Pesaje <p-sortIcon field="fechaFinal"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="diff_Dias" pTooltip="Diferencia de Días entre el primer y último pesaje"
                 tooltipPosition="top">
                 Días <p-sortIcon field="diff_Dias"></p-sortIcon></th>
 
@@ -512,9 +499,6 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Sel"></p-sortIcon>
               </th>
 
-
-              <th scope="col" pResizableColumn pSortableColumn="fecha" pTooltip="Fecha Creación" tooltipPosition="top">
-                F. Creación <p-sortIcon field="fecha"></p-sortIcon></th>
               <th *ngFor="let col of columns" pSortableColumn="{{col.field}}" pResizableColumn>{{col.header}}
                 <p-sortIcon field="{{col.field}}"></p-sortIcon>
               </th>
@@ -694,8 +678,6 @@
                 [ngClass]="{'red' : data.balance_Sel < 0,'green' : data.balance_Sel > 0} "><b>{{data.balance_Sel |
                   number : '1.0-0'}}</b></td>
 
-              <!-- Fecha Creacion OT -->
-              <td id="fecha" scope="col">{{data.fecha | date : 'yyyy-MM-dd'}}</td>
               <td *ngFor="let col of columns">{{data[col.field]}}</td>
               <td pFrozenColumn alignFrozen="right" [frozen]="true">
                 <button *ngIf="ValidarRol == 1 && storage_Id != 101" pButton pRipple icon="pi pi-pencil"
