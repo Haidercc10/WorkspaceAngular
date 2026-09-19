@@ -15,6 +15,7 @@ import { Table } from 'primeng/table';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } from 'src/app/data';
+import { finalize } from 'rxjs';
 
 
 @Component({
@@ -48,6 +49,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   clave : string = ''; /** Variable que contendrá una palabra clave ya sea para finalizar o cancelar una solicitud.*/
   nroSolicitud : number = 0; /// Variable que se usará para almacenar el nro de solicitud al momento de generar el PDF y cargar la información de la solicitud seleccionada.
   arrayId : any = []; /// Array que se usará para almacenar los id de las solicitudes que se muestran en la tabla, esto con el fin de no mostrar solicitudes repetidas en caso de que una solicitud tenga varias materias primas.
+  load : boolean = false; /** Variable que indicará si se está cargando información */
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -97,18 +99,25 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   /** Función que mostrará el numero de solicitudes por estado. */
   getEstadoSolitudes(){
+    this.cargando = true;
     this.cantPendientes = 0;
     this.cantParciales = 0;
     this.cantFinalizadas = 0;
     this.cantCanceladas = 0;
 
-    this.servicioSolicitudesMPExt.GetUltimas100Solicitudes().subscribe(data => {
-      for (let index = 0; index < data.length; index++) {
-        if(data[index].estado_Id == 11) this.cantPendientes += 1;
-        if(data[index].estado_Id == 5) this.cantFinalizadas += 1;
-        if(data[index].estado_Id == 4) this.cantCanceladas += 1;
-        if(data[index].estado_Id == 12) this.cantParciales += 1;
-      }
+    this.servicioSolicitudesMPExt.getEstadosSolicitudes()
+    .pipe(
+      finalize(() => this.cargando = false)
+    ).subscribe(data => {
+      data.forEach(x => {
+        if(x.estado_Id == 11) this.cantPendientes = x.suma;
+        if(x.estado_Id == 5) this.cantFinalizadas = x.suma;
+        if(x.estado_Id == 4) this.cantCanceladas = x.suma;
+        if(x.estado_Id == 12) this.cantParciales = x.suma;
+        
+      });
+    }, error => { 
+      this.msj.mensajeError(`Error`, `Error al consultar el estado de las solicitudes`) 
     });
   }
 
@@ -149,11 +158,11 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
   llenarTabla(datos : any){
     let info : any = {
-      id : datos.id,
-      ot : datos.ot,
-      fecha : datos.fecha.replace('T00:00:00', ''),
-      estadoId : datos.estado,
-      estado : datos.nombre_Estado,
+      'id' : datos.id,
+      'ot' : datos.ot,
+      'fecha' : datos.fecha.replace('T00:00:00', ''),
+      'estadoId' : datos.estado,
+      'estado' : datos.nombre_Estado,
     }
     this.arrayRegistros.push(info);
   }
@@ -425,22 +434,13 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     let info : any = {
       Codigo : data.codigo,
       Solicitud : data.id,
-      Id : 0,
-      Id_Mp: data.matPrima_Id,
-      Id_Tinta: data.tinta_Id,
-      Nombre : '',
-      Cantidad : data.cantidad,
+      Id : data.id_Subcategoria,
+      Nombre : data.subcategoria,
+      Cantidad : data.cantidad_Pedida,
       CantAprobada : 0,
       Und_Medida : data.medida,
       Usuario : data.nombre_Usuario,
       EstadoSolicitud : data.nombre_Estado,
-    }
-    if (info.Id_Mp != 84) {
-      info.Id = info.Id_Mp;
-      info.Nombre = data.matPrima;
-    } else if (info.Id_Tinta != 2001) {
-      info.Id = info.Id_Tinta;
-      info.Nombre = data.tinta;
     }
 
     this.estadoSolicitud = info.EstadoSolicitud;
@@ -525,7 +525,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.formFiltros.patchValue({estadoDoc : estado});
     this.cargando = true;
     setTimeout(() => {
-      this.servicioSolicitudesMPExt.GetUltimas100Solicitudes().subscribe(data => {
+      this.servicioSolicitudesMPExt.getEstadosSolicitudes().subscribe(data => {
         if(data.length > 0) {
           for (let index = 0; index < data.length; index++) {
             if(data[index].estado_Id == estado && data[index].solMpExt_Id != 1) this.llenarTablaConEstados(data[index]);

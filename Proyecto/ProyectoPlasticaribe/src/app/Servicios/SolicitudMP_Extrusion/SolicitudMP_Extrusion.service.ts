@@ -23,7 +23,7 @@ export class SolicitudMP_ExtrusionService {
 
   Delete = (id : number) => this.http.delete(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`);
 
-  GetUltimas100Solicitudes = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getUltimas100Solicitudes`);
+  getEstadosSolicitudes = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getEstadosSolicitudes`);
 
   GetUltimaSolicitud = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getUltimaSolicitud`);
 }

@@ -25,42 +25,46 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 
 export class CertificadoCalidadComponent implements OnInit {
 
-  cargando : boolean = false;
-  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  cargando: boolean = false;
+  storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado: boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   FormOrden !: FormGroup; //Variable que almacenará la información del formulario donde esta la información general de la orden de trabajo
-  unidadesMedidas : any [] = []; //Variable que almacenará la información de las unidades de medida
-  arrayBooleano : string [] = ['N/A', 'Si', 'No', 'Conforme']; //Variable que almacenará la información de los booleanos
-  transparencia : string [] = ['N/A', 'Alta', 'Baja', 'Media', 'Si', 'No']; //Variable que almacenará la información de los booleanos
-  resistenciaSellabilidad : string [] = ['Alta', '', 'N/A']; //Variable que almacenará la información de los booleanos
-  materiales : string [] = []; //Variable que almacenará la información de los materiales
-  parametrosCuantitativos : any [] = []; //Variable que almacenará la información de los parametros cuantitativos de la orden de trabajo
-  paramertosCualitativos : any [] = []; //Variable que almacenará la información de los parametros cualitativos de la orden de trabajo
-  clients : any = [];
+  unidadesMedidas: any[] = []; //Variable que almacenará la información de las unidades de medida
+  arrayBooleano: string[] = ['N/A', 'Si', 'No', 'Conforme']; //Variable que almacenará la información de los booleanos
+  transparencia: string[] = ['N/A', 'Alta', 'Baja', 'Media', 'Si', 'No']; //Variable que almacenará la información de los booleanos
+  resistenciaSellabilidad: string[] = ['Alta', '', 'N/A']; //Variable que almacenará la información de los booleanos
+  materiales: string[] = []; //Variable que almacenará la información de los materiales
+  parametrosCuantitativos: any[] = []; //Variable que almacenará la información de los parametros cuantitativos de la orden de trabajo
+  paramertosCualitativos: any[] = []; //Variable que almacenará la información de los parametros cualitativos de la orden de trabajo
+  clients: any = [];
+  private static readonly VALORES_EXCLUIDOS_CALIBRES = [null, undefined, '0', ''];
+  private static readonly VALORES_EXCLUIDOS_CAPAS = [null, undefined, '0', '', '1', '4', '5', '6'];
+  private static readonly VALOR_PULGADAS = 25.4;
+  private static readonly TINTA_ADHESIVO = 0.25;
 
-  constructor(private frmBuilder : FormBuilder,
-                private AppComponent : AppComponent,
-                  private msj : MensajesAplicacionService,
-                    private certCalidadService : Certificados_CalidadService,
-                      private undMedService : UnidadMedidaService,
-                        private bagproService : BagproService,
-                          private shepherdService: ShepherdService,
-                            private creacionPDFService : CreacionPdfService,
-                              private svZeus : InventarioZeusService){
+  constructor(private frmBuilder: FormBuilder,
+    private AppComponent: AppComponent,
+    private msj: MensajesAplicacionService,
+    private certCalidadService: Certificados_CalidadService,
+    private undMedService: UnidadMedidaService,
+    private bagproService: BagproService,
+    private shepherdService: ShepherdService,
+    private creacionPDFService: CreacionPdfService,
+    private svZeus: InventarioZeusService) {
 
     this.FormOrden = this.frmBuilder.group({
-      Orden : [null, Validators.required],
-      Cliente : [null, Validators.required],
-      Item : [null, Validators.required],
-      Referencia : [null, Validators.required],
-      Cantidad : [null, Validators.required],
-      Presentacion : [null, Validators.required],
-      Fecha_Orden : [null, Validators.required],
-      Observacion : ['Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.'],
+      Orden: [null, Validators.required],
+      Cliente: [null, Validators.required],
+      Item: [null, Validators.required],
+      Referencia: [null, Validators.required],
+      Cantidad: [null, Validators.required],
+      Presentacion: [null, Validators.required],
+      Fecha_Orden: [null, Validators.required],
+      Observacion: ['Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.'],
     });
   }
 
@@ -80,14 +84,14 @@ export class CertificadoCalidadComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  searchClientsByName(){
-    let client : any = this.FormOrden.value.Cliente;
+  searchClientsByName() {
+    let client: any = this.FormOrden.value.Cliente;
     this.svZeus.getClientByName(client).subscribe(data => { this.clients = data; });
   }
 
@@ -108,15 +112,15 @@ export class CertificadoCalidadComponent implements OnInit {
   // Funcion que va a limpiar todo 
   limpiarTodo() {
     this.FormOrden.reset();
-    this.FormOrden.patchValue({ Observacion : 'Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.' });
+    this.FormOrden.patchValue({ Observacion: 'Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.' });
     this.llenarMateriales();
     this.parametrosCuantitativos = [];
     this.paramertosCualitativos = [];
     this.cargando = false;
   }
-  
+
   // Funcion que va a llenar el array de materiales
-  llenarMateriales(){
+  llenarMateriales() {
     this.materiales = [
       '',
       'RESINA VIRGEN DE BOPP + RESINA VIRGEN DE PEBD',
@@ -163,21 +167,21 @@ export class CertificadoCalidadComponent implements OnInit {
   }
 
   // Funcion que va a consultar la información de la orden de trabajo
-  consultarOrdenTrabajo(){
-    let orden : number = this.FormOrden.value.Orden;
+  consultarOrdenTrabajo() {
+    let orden: number = this.FormOrden.value.Orden;
     this.limpiarTodo();
     this.bagproService.srvObtenerListaClienteOT_Item(orden).subscribe(data => {
       if (data.length == 0) this.msj.mensajeAdvertencia(`¡No se encontró información de la OT ${orden}!`, ``);
       data.forEach(ot => {
         this.cargando = true;
         this.FormOrden.patchValue({
-          Orden : orden,
-          Cliente : ot.clienteNom,
-          Item : parseInt(ot.clienteItems),
-          Referencia : ot.clienteItemsNom,
-          Cantidad : ot.ptPresentacionNom == 'Kilo' ? ot.datosotKg : ot.datoscantBolsa,
-          Presentacion : ot.ptPresentacionNom == 'Unidad' ? 'Und' : ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : ot.ptPresentacionNom == 'Kilo' ? 'Kg' : ot.ptPresentacionNom == 'Rollo' ? 'Rollo' : '',
-          Fecha_Orden : moment(ot.fechaCrea).format('YYYY-MM-DD'),
+          Orden: orden,
+          Cliente: ot.clienteNom,
+          Item: parseInt(ot.clienteItems),
+          Referencia: ot.clienteItemsNom,
+          Cantidad: ot.ptPresentacionNom == 'Kilo' ? ot.datosotKg : ot.datoscantBolsa,
+          Presentacion: ot.ptPresentacionNom == 'Unidad' ? 'Und' : ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : ot.ptPresentacionNom == 'Kilo' ? 'Kg' : ot.ptPresentacionNom == 'Rollo' ? 'Rollo' : '',
+          Fecha_Orden: moment(ot.fechaCrea).format('YYYY-MM-DD'),
         });
         this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(datos => {
           this.calcularParametrosCuantitativos(datos, ot);
@@ -188,54 +192,138 @@ export class CertificadoCalidadComponent implements OnInit {
     }, () => this.msj.mensajeAdvertencia(`¡No se encontró información de la OT ${orden}!`, ``));
   }
 
+  // Funcion que va a calcular el calibre nominal del material
+  getCalibreNominal2(dataBagpro: any = null) {
+    let calibre = 0;
+    let lamCalibre1 = [null, undefined, '0', '', '1', '4', '5', '6'].includes(dataBagpro.lamCapa1.trim()) ? 0 : parseFloat(dataBagpro.lamCalibre1);
+    let lamCalibre2 = [null, undefined, '0', '', '1', '4', '5', '6'].includes(dataBagpro.lamCapa2.trim()) ? 0 : parseFloat(dataBagpro.lamCalibre2);
+    let lamCalibre3 = [null, undefined, '0', '', '1', '4', '5', '6'].includes(dataBagpro.lamCapa3.trim()) ? 0 : parseFloat(dataBagpro.lamCalibre3);
+    let tintaAdhesivo = 0.25;
+    let valorPulgadas: number = 25.4;
+    let valorCalibre1: number = 0;
+    let valorCalibre2: number = 0;
+    let valorCalibre3: number = 0;
+    if (dataBagpro == null) return calibre;
+
+
+
+    if ([null, undefined, '0', ''].includes(dataBagpro.etiquetaLargo)) calibre = parseFloat(dataBagpro.extCalibre);
+    else calibre = parseFloat(dataBagpro.etiquetaLargo);
+
+    if (![null, undefined, '0', '', '1', '4', '5', '6'].includes(dataBagpro.lamCapa1.trim())) {
+      valorCalibre1 = lamCalibre1 > 0 ? (lamCalibre1 / valorPulgadas) : 0;
+      valorCalibre2 = lamCalibre2 > 0 ? (lamCalibre2 / valorPulgadas) : 0;
+      valorCalibre3 = lamCalibre3 > 0 ? (lamCalibre3 / valorPulgadas) : 0;
+
+      console.log('valorCalibre1:', valorCalibre1);
+      console.log('valorCalibre2:', valorCalibre2);
+      console.log('valorCalibre3:', valorCalibre3);
+      console.log('tintaAdhesivo:', tintaAdhesivo);
+      console.log('calibre antes de sumar capas y adhesivo:', calibre);
+
+      calibre += (valorCalibre1 + valorCalibre2 + valorCalibre3) + tintaAdhesivo;
+      console.log('calibre después de sumar capas y adhesivo:', calibre);
+    };
+
+    return calibre;
+  }
+
+  /**
+   * Calcula el calibre nominal del material sumando el aporte
+   * de cada capa de laminado (si aplica) más el calibre base.
+   */
+  getCalibreNominal(dataBagpro: any = null): number {
+    if (dataBagpro == null) return 0;
+
+    // Calibre base: etiqueta o calibre de extrusión
+    const calibreBase = this.esValorExcluidoCalibre(dataBagpro.etiquetaLargo)
+      ? parseFloat(dataBagpro.extCalibre)
+      : parseFloat(dataBagpro.etiquetaLargo);
+
+      console.log('calibreBase:', calibreBase);
+
+    // Si no hay capa 1, no hay laminado que sumar
+    if (this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim())) {
+      return calibreBase;
+    }
+
+    const aporteLaminado =
+      this.calcularAporteCapa(dataBagpro.lamCapa1.trim(), dataBagpro.lamCalibre1) +
+      this.calcularAporteCapa(dataBagpro.lamCapa2.trim(), dataBagpro.lamCalibre2) +
+      this.calcularAporteCapa(dataBagpro.lamCapa3.trim(), dataBagpro.lamCalibre3);
+
+      console.log('aporteLaminado:', aporteLaminado);
+
+    return calibreBase + aporteLaminado + CertificadoCalidadComponent.TINTA_ADHESIVO;
+  }
+
+  private esValorExcluidoCapas(valor: any): boolean {
+    return CertificadoCalidadComponent.VALORES_EXCLUIDOS_CAPAS  .includes(valor);
+  }
+
+  private esValorExcluidoCalibre(valor: any): boolean {
+    return CertificadoCalidadComponent.VALORES_EXCLUIDOS_CALIBRES.includes(valor);
+  }
+
+  private calcularAporteCapa(capa: any, calibre: any): number {
+    if (this.esValorExcluidoCapas(capa)) return 0;
+    const valorCalibre = parseFloat(calibre);
+
+    console.log('valorCalibre:', valorCalibre);
+
+    return valorCalibre > 0 ? valorCalibre / CertificadoCalidadComponent.VALOR_PULGADAS : 0;
+  }
+
   // Funcion que va a calcular los datos del parametro cuantitativo
-  calcularParametrosCuantitativos(orden : any, dataBagpro : any = null){
+  calcularParametrosCuantitativos(orden: any, dataBagpro: any = null) {
+    console.log('Orden:', orden);
+    console.log('DataBagpro:', dataBagpro);
     this.parametrosCuantitativos = [
       {
-        Nombre : `Calibre`,
-        UndMedida : dataBagpro != null ? dataBagpro.extMaterialNom.trim() == 'BOPP' ? 'µm' : 'Mils Pulg' : 'N/E', //orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
-        Nominal : orden != null ? orden.nominal_Calibre : dataBagpro != null ? [null, undefined, '0', ''].includes(dataBagpro.etiquetaLargo) ? parseFloat(dataBagpro.extCalibre) : parseFloat(dataBagpro.etiquetaLargo) : 0,
-        Tolerancia : 10, //orden != null ? orden.tolerancia_Calibre : 0, 
-        Minimo : orden != null ? orden.minimo_Calibre : 0,
-        Maximo : orden != null ? orden.maximo_Calibre : 0,
+        Nombre: `Calibre`,
+        UndMedida: dataBagpro != null ? dataBagpro.extMaterialNom.trim() == 'BOPP' ? 'µm' : 'Mils Pulg' : 'N/E', //orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
+        Nominal: this.getCalibreNominal(dataBagpro),
+        Tolerancia: 10, //orden != null ? orden.tolerancia_Calibre : 0, 
+        Minimo: orden != null ? orden.minimo_Calibre : 0,
+        Maximo: orden != null ? orden.maximo_Calibre : 0,
       },
       {
-        Nombre : `Ancho Frente`,
-        UndMedida : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_AnchoFrente.trim() : 'N/E',
-        Nominal : orden != null ? orden.nominal_AnchoFrente : dataBagpro != null ? parseFloat(dataBagpro.ptAnchopt) : 0,
-        Tolerancia : 1, //orden != null ? orden.tolerancia_AnchoFrente : 0,
-        Minimo : orden != null ? orden.minimo_AnchoFrente : 0,
-        Maximo : orden != null ? orden.maximo_AnchoFrente : 0,
+        Nombre: `Ancho Frente`,
+        UndMedida: dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_AnchoFrente.trim() : 'N/E',
+        Nominal: orden != null ? orden.nominal_AnchoFrente : dataBagpro != null ? parseFloat(dataBagpro.ptAnchopt) : 0,
+        Tolerancia: 1, //orden != null ? orden.tolerancia_AnchoFrente : 0,
+        Minimo: orden != null ? orden.minimo_AnchoFrente : 0,
+        Maximo: orden != null ? orden.maximo_AnchoFrente : 0,
       },
       {
-        Nombre : `Ancho Fuelle`,
-        UndMedida : dataBagpro != null && parseFloat(dataBagpro.ptFuelle) > 0 ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_AnchoFuelle.trim() : 'N/E',
-        Nominal : orden != null ? orden.nominal_AnchoFuelle : dataBagpro != null ? parseFloat(dataBagpro.ptFuelle) : 0,
-        Tolerancia : orden != null ? orden.tolerancia_AnchoFuelle : 0,
-        Minimo : orden != null ? orden.minimo_AnchoFuelle : 0,
-        Maximo : orden != null ? orden.maximo_AnchoFuelle : 0,
+        Nombre: `Ancho Fuelle`,
+        UndMedida: dataBagpro != null && parseFloat(dataBagpro.ptFuelle) > 0 ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_AnchoFuelle.trim() : 'N/E',
+        Nominal: orden != null ? orden.nominal_AnchoFuelle : dataBagpro != null ? parseFloat(dataBagpro.ptFuelle) : 0,
+        Tolerancia: orden != null ? orden.tolerancia_AnchoFuelle : 0,
+        Minimo: orden != null ? orden.minimo_AnchoFuelle : 0,
+        Maximo: orden != null ? orden.maximo_AnchoFuelle : 0,
       },
       {
-        Nombre : `Largo / Repetición`,
-        UndMedida : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_LargoRepeticion.trim() : 'N/E',
-        Nominal : orden != null ? orden.nominal_LargoRepeticion : dataBagpro != null ? parseFloat(dataBagpro.ptLargopt) : 0,
-        Tolerancia : 1, //orden != null ? orden.tolerancia_LargoRepeticion : 0,
-        Minimo : orden != null ? orden.minimo_LargoRepeticion : 0,
-        Maximo : orden != null ? orden.maximo_LargoRepeticion : 0,
+        Nombre: `Largo / Repetición`,
+        UndMedida: dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : orden != null ? orden.unidad_LargoRepeticion.trim() : 'N/E',
+        Nominal: orden != null ? orden.nominal_LargoRepeticion : dataBagpro != null ? parseFloat(dataBagpro.ptLargopt) : 0,
+        Tolerancia: 1, //orden != null ? orden.tolerancia_LargoRepeticion : 0,
+        Minimo: orden != null ? orden.minimo_LargoRepeticion : 0,
+        Maximo: orden != null ? orden.maximo_LargoRepeticion : 0,
       },
       {
-        Nombre : `COF`,
-        UndMedida : orden != null ? orden.unidad_Cof.trim() : 'N/E',
-        Nominal : orden != null ? orden.nominal_Cof : 0,
-        Tolerancia : orden != null ? orden.tolerancia_Cof : 0,
-        Minimo : orden != null ? orden.minimo_Cof : 0,
-        Maximo : orden != null ? orden.maximo_Cof : 0,
+        Nombre: `COF`,
+        UndMedida: orden != null ? orden.unidad_Cof.trim() : 'N/E',
+        Nominal: orden != null ? orden.nominal_Cof : 0,
+        Tolerancia: orden != null ? orden.tolerancia_Cof : 0,
+        Minimo: orden != null ? orden.minimo_Cof : 0,
+        Maximo: orden != null ? orden.maximo_Cof : 0,
       },
     ];
   }
 
   // Funcion que va a calular el minimo de los parametros cuantitativos
-  calcularMinParametrosCuantitativos(data : any){
+  calcularMinParametrosCuantitativos(data: any) {
     let i = this.parametrosCuantitativos.findIndex(item => item.Nombre == data.Nombre);
     if (data.Nombre == 'Calibre') this.parametrosCuantitativos[i].Minimo = this.parametrosCuantitativos[i].Nominal - ((this.parametrosCuantitativos[i].Nominal * this.parametrosCuantitativos[i].Tolerancia) / 100);
     else this.parametrosCuantitativos[i].Minimo = this.parametrosCuantitativos[i].Nominal - this.parametrosCuantitativos[i].Tolerancia;
@@ -243,7 +331,7 @@ export class CertificadoCalidadComponent implements OnInit {
   }
 
   // Funcion que va a calular el maximo de los parametros cuantitativos
-  calcularMaxParametrosCuantitativos(data : any){
+  calcularMaxParametrosCuantitativos(data: any) {
     let i = this.parametrosCuantitativos.findIndex(item => item.Nombre == data.Nombre);
     if (data.Nombre == 'Calibre') this.parametrosCuantitativos[i].Maximo = this.parametrosCuantitativos[i].Nominal + ((this.parametrosCuantitativos[i].Nominal * this.parametrosCuantitativos[i].Tolerancia) / 100);
     else this.parametrosCuantitativos[i].Maximo = this.parametrosCuantitativos[i].Nominal + this.parametrosCuantitativos[i].Tolerancia;
@@ -251,42 +339,42 @@ export class CertificadoCalidadComponent implements OnInit {
   }
 
   // Funcion que va a llenar los paramatros cualitativos de la orden de trabajo
-  llenarParametrosCualitativos(orden : any, dataBagpro : any){
+  llenarParametrosCualitativos(orden: any, dataBagpro: any) {
     this.paramertosCualitativos = [
       {
-        Nombre : `Material`,
-        Resulatado : dataBagpro != null ? dataBagpro.extMaterialNom.trim() : orden.material,
+        Nombre: `Material`,
+        Resulatado: dataBagpro != null ? dataBagpro.extMaterialNom.trim() : orden.material,
       },
       {
-        Nombre : `Resistencia`,
-        Resulatado : 'Alta', //orden != null ? orden.resistencia : 'N/A',
+        Nombre: `Resistencia`,
+        Resulatado: 'Alta', //orden != null ? orden.resistencia : 'N/A',
       },
       {
-        Nombre : `Sellabilidad`,
-        Resulatado : 'Alta', //orden != null ? orden.sellabilidad : '',
+        Nombre: `Sellabilidad`,
+        Resulatado: 'Alta', //orden != null ? orden.sellabilidad : '',
       },
       {
-        Nombre : `Transparencia`,
-        Resulatado : 'Alta', //orden != null ? orden.transparencia : 'N/A',
+        Nombre: `Transparencia`,
+        Resulatado: 'Alta', //orden != null ? orden.transparencia : 'N/A',
       },
       {
-        Nombre : `Tratado`,
-        Resulatado : orden != null ? orden.tratado : dataBagpro != null ? ['1', '2', '0', null].includes(dataBagpro.extTratado.trim()) ? 'No' : 'Sí' : 'N/A',
+        Nombre: `Tratado`,
+        Resulatado: orden != null ? orden.tratado : dataBagpro != null ? ['1', '2', '0', null].includes(dataBagpro.extTratado.trim()) ? 'No' : 'Sí' : 'N/A',
       },
       {
-        Nombre : `Impresión`,
-        Resulatado : orden != null ? orden.impresion : dataBagpro != null ? dataBagpro.impTinta1.trim() == '1' ? 'No' : 'Sí' : 'N/A',
+        Nombre: `Impresión`,
+        Resulatado: orden != null ? orden.impresion : dataBagpro != null ? dataBagpro.impTinta1.trim() == '1' ? 'No' : 'Sí' : 'N/A',
       },
     ];
   }
 
   // Funcion que va a enviar de los certificados a la base de datos
-  guardarCertificados(){
+  guardarCertificados() {
     this.cargando = true;
-    let datosCertificado : modelCertificadosCalidad = {
+    let datosCertificado: modelCertificadosCalidad = {
       Orden_Trabajo: this.FormOrden.value.Orden,
       Cliente: this.FormOrden.value.Cliente,
-      Item : this.FormOrden.value.Item,
+      Item: this.FormOrden.value.Item,
       Referencia: this.FormOrden.value.Referencia,
       Cantidad_Producir: this.FormOrden.value.Cantidad,
       Presentacion_Producto: this.FormOrden.value.Presentacion,
@@ -326,7 +414,7 @@ export class CertificadoCalidadComponent implements OnInit {
       Fecha_Registro: moment().format('YYYY-MM-DD'),
       Hora_Registro: moment().format('H:mm:ss'),
       Usua_Id: this.storage_Id
-      
+
     }
     this.certCalidadService.Post(datosCertificado).subscribe(res => {
       this.crearPdfCertificado(res.consecutivo);
@@ -339,10 +427,10 @@ export class CertificadoCalidadComponent implements OnInit {
   }
 
   // Funcion que va a crear el pdf con la información del certificado 
-  crearPdfCertificado(id : number){
+  crearPdfCertificado(id: number) {
     this.certCalidadService.Get_Id(id).subscribe(datos => {
-      let titulo : string = `Certificado de Calidad N° ${datos.consecutivo}`;
-      let content : any = [
+      let titulo: string = `Certificado de Calidad N° ${datos.consecutivo}`;
+      let content: any = [
         this.datosOrdenTrabajo(datos),
         this.tituloParametrosCuantitativos(),
         this.parametrosCuantitativosPDF(datos),
@@ -356,7 +444,7 @@ export class CertificadoCalidadComponent implements OnInit {
     });
   }
 
-  datosOrdenTrabajo(datos : any) : {} {
+  datosOrdenTrabajo(datos: any): {} {
     return {
       table: {
         widths: [60, '*', 60, '*'],
@@ -379,18 +467,18 @@ export class CertificadoCalidadComponent implements OnInit {
             {
               table: {
                 widths: [65, '*', 60, '*'],
-									body: [
-										[
-                      { border: [false, false, false, false], text: `Fin Producción`, bold: true,  }, 
-                      { border: [false, false, false, false], text: `${datos.fecha_Fin_Produccion == null ? '' : datos.fecha_Fin_Produccion.replace('T00:00:00', '')}` },
-                      { border: [false, false, false, false], text: `Fecha Vence`, bold: true, }, 
-                      { border: [false, false, false, false], text: `${datos.fecha_Vencimiento == null ? '' : datos.fecha_Vencimiento.replace('T00:00:00', '')}` },
-                    ],
-									], 
-								},
-                border: [false, false, false, true]
+                body: [
+                  [
+                    { border: [false, false, false, false], text: `Fin Producción`, bold: true, },
+                    { border: [false, false, false, false], text: `${datos.fecha_Fin_Produccion == null ? '' : datos.fecha_Fin_Produccion.replace('T00:00:00', '')}` },
+                    { border: [false, false, false, false], text: `Fecha Vence`, bold: true, },
+                    { border: [false, false, false, false], text: `${datos.fecha_Vencimiento == null ? '' : datos.fecha_Vencimiento.replace('T00:00:00', '')}` },
+                  ],
+                ],
+              },
+              border: [false, false, false, true]
             },
-            {  
+            {
               border: [false, false, true, true], text: ``
             }
           ],
@@ -401,7 +489,7 @@ export class CertificadoCalidadComponent implements OnInit {
     }
   }
 
-  tituloParametrosCuantitativos() : {} {
+  tituloParametrosCuantitativos(): {} {
     return {
       margin: [5, 10],
       table: {
@@ -422,8 +510,8 @@ export class CertificadoCalidadComponent implements OnInit {
     }
   }
 
-  parametrosCuantitativosPDF(datos : any) : {} {
-    let bodyTable : any [] = [
+  parametrosCuantitativosPDF(datos: any): {} {
+    let bodyTable: any[] = [
       this.parametroCuantitativoCalibrePDF(datos),
       this.parametroCuantitativoAnchoFrentePDF(datos),
       this.parametroCuantitativoAnchoFuellePDF(datos),
@@ -440,9 +528,9 @@ export class CertificadoCalidadComponent implements OnInit {
     }
   }
 
-  parametroCuantitativoCalibrePDF(datos : any) : any [] {
+  parametroCuantitativoCalibrePDF(datos: any): any[] {
     return [
-      { text: 'Calibre', fontSize: 9, bold : true },
+      { text: 'Calibre', fontSize: 9, bold: true },
       { text: `${datos.unidad_Calibre}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_Calibre}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_Calibre}`, fontSize: 9, alignment: 'center' },
@@ -451,9 +539,9 @@ export class CertificadoCalidadComponent implements OnInit {
     ];
   }
 
-  parametroCuantitativoAnchoFrentePDF(datos : any) : any [] {
+  parametroCuantitativoAnchoFrentePDF(datos: any): any[] {
     return [
-      { text: 'Ancho Frente', fontSize: 9, bold : true },
+      { text: 'Ancho Frente', fontSize: 9, bold: true },
       { text: `${datos.nominal_AnchoFrente == 0 ? 'N/E' : datos.unidad_AnchoFrente}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_AnchoFrente}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_AnchoFrente}`, fontSize: 9, alignment: 'center' },
@@ -462,9 +550,9 @@ export class CertificadoCalidadComponent implements OnInit {
     ];
   }
 
-  parametroCuantitativoAnchoFuellePDF(datos : any) : any [] {
+  parametroCuantitativoAnchoFuellePDF(datos: any): any[] {
     return [
-      { text: 'Ancho Fuelle', fontSize: 9, bold : true },
+      { text: 'Ancho Fuelle', fontSize: 9, bold: true },
       { text: `${datos.nominal_AnchoFuelle == 0 ? 'N/E' : datos.unidad_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
@@ -473,9 +561,9 @@ export class CertificadoCalidadComponent implements OnInit {
     ];
   }
 
-  parametroCuantitativoLargoRepeticionPDF(datos : any) : any [] {
+  parametroCuantitativoLargoRepeticionPDF(datos: any): any[] {
     return [
-      { text: 'Largo / Repetición', fontSize: 9, bold : true },
+      { text: 'Largo / Repetición', fontSize: 9, bold: true },
       { text: `${datos.nominal_LargoRepeticion == 0 ? 'N/E' : datos.unidad_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
@@ -484,9 +572,9 @@ export class CertificadoCalidadComponent implements OnInit {
     ];
   }
 
-  parametroCuantitativoCofPDF(datos : any) : any [] {
+  parametroCuantitativoCofPDF(datos: any): any[] {
     return [
-      { text: 'COF', fontSize: 9, bold : true },
+      { text: 'COF', fontSize: 9, bold: true },
       { text: `${datos.unidad_Cof}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.nominal_Cof}`, fontSize: 9, alignment: 'center' },
       { text: `${datos.tolerancia_Cof}`, fontSize: 9, alignment: 'center' },
@@ -495,7 +583,7 @@ export class CertificadoCalidadComponent implements OnInit {
     ];
   }
 
-  tituloParametrosCualitativos() : {} {
+  tituloParametrosCualitativos(): {} {
     return {
       margin: [5, 10],
       table: {
@@ -512,7 +600,7 @@ export class CertificadoCalidadComponent implements OnInit {
     }
   }
 
-  parametrosCualitativosPDF(datos : any) : {} {
+  parametrosCualitativosPDF(datos: any): {} {
     return {
       margin: [8, 0],
       table: {
@@ -520,27 +608,27 @@ export class CertificadoCalidadComponent implements OnInit {
         widths: [150, '*'],
         body: [
           [
-            { text: 'Material', fontSize: 9, bold : true },
+            { text: 'Material', fontSize: 9, bold: true },
             { text: `${datos.material}`, fontSize: 9, alignment: 'center' },
           ],
           [
-            { text: 'Resistencia', fontSize: 9, bold : true },
+            { text: 'Resistencia', fontSize: 9, bold: true },
             { text: `${datos.resistencia}`, fontSize: 9, alignment: 'center' },
           ],
           [
-            { text: 'Sellabilidad', fontSize: 9, bold : true },
+            { text: 'Sellabilidad', fontSize: 9, bold: true },
             { text: `${datos.sellabilidad}`, fontSize: 9, alignment: 'center' },
           ],
           [
-            { text: 'Transparencia', fontSize: 9, bold : true },
+            { text: 'Transparencia', fontSize: 9, bold: true },
             { text: `${datos.transparencia}`, fontSize: 9, alignment: 'center' },
           ],
           [
-            { text: 'Tratado', fontSize: 9, bold : true },
+            { text: 'Tratado', fontSize: 9, bold: true },
             { text: `${datos.tratado}`, fontSize: 9, alignment: 'center' },
           ],
           [
-            { text: 'Impresión', fontSize: 9, bold : true },
+            { text: 'Impresión', fontSize: 9, bold: true },
             { text: `${datos.impresion}`, fontSize: 9, alignment: 'center' },
           ],
         ]
@@ -548,15 +636,15 @@ export class CertificadoCalidadComponent implements OnInit {
     }
   }
 
-  observacionesPDF(datos : any) : {} {
+  observacionesPDF(datos: any): {} {
     return {
       margin: [0, 10],
-      table : {
-        widths : ['*'],
-        style : '',
-        body : [
-          [ { border : [true, true, true, false], text : `Observación: `, bold : true } ],
-          [ { border : [true, false, true, true], text : `${datos.observacion}` } ]
+      table: {
+        widths: ['*'],
+        style: '',
+        body: [
+          [{ border: [true, true, true, false], text: `Observación: `, bold: true }],
+          [{ border: [true, false, true, true], text: `${datos.observacion}` }]
         ]
       },
       layout: { defaultBorder: false, },
@@ -564,16 +652,16 @@ export class CertificadoCalidadComponent implements OnInit {
     }
   }
 
-  datosJefeCalidadPDF() : {} {
+  datosJefeCalidadPDF(): {} {
     return {
       margin: [0, 100],
-      table : {
-        widths : ['*'],
-        style : '',
-        body : [
-          [ { image : firmaJefeCalidad2, width : 110, height : 40}],
-          [ {text : `Jefe de Calidad`, fontSize : 11, bold: true } ],
-          [ {text : `Plasticaribe SAS`, fontSize : 11, bold: true } ]
+      table: {
+        widths: ['*'],
+        style: '',
+        body: [
+          [{ image: firmaJefeCalidad2, width: 110, height: 40 }],
+          [{ text: `Jefe de Calidad`, fontSize: 11, bold: true }],
+          [{ text: `Plasticaribe SAS`, fontSize: 11, bold: true }]
         ]
       },
       layout: { defaultBorder: false, },

@@ -169,7 +169,9 @@
                 <td>{{registros.ot}}</td>
                 <td>{{registros.fecha}}</td>
                 <td><b>{{registros.estado}}</b></td>
-                <td pTooltip="Ver detalle de la solicitud N° {{registros.id}}" style="text-align: center;"><p-button id="botonPdf" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="cargarDetalleSolicitud(registros.id)"></p-button></td>
+                <td pTooltip="Ver detalle de la solicitud N° {{registros.id}}" style="text-align: center;">
+                  <p-button id="botonPdf" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="cargarDetalleSolicitud(registros.id)"></p-button>
+                </td>
               </tr>
             </ng-template>
           </p-table>
@@ -206,19 +208,19 @@
               </tr>
               <tr id="tabla2">
                 <th>Id</th>
-                <th>Mat. Prima</th>
+                <th>Subcategoria</th>
                 <th>Solicitada</th>
                 <th id="aprobada">Aprobada</th>
                 <th>Unidad</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-matPrimas>
+            <ng-template pTemplate="body" let-mp>
               <tr>
-                <td><b>{{matPrimas.Id}}</b></td>
-                <td>{{matPrimas.Nombre}}</td>
-                <td><b>{{matPrimas.Cantidad | number : '1.2-2'}}</b></td>
-                <td><b>{{matPrimas.CantAprobada | number : '1.2-2'}}</b></td>
-                <td>{{matPrimas.Und_Medida}}</td>
+                <td><b>{{mp.Id}}</b></td>
+                <td>{{mp.Nombre}}</td>
+                <td><b>{{mp.Cantidad | number : '1.2-2'}}</b></td>
+                <td><b>{{mp.CantAprobada | number : '1.2-2'}}</b></td>
+                <td>{{mp.Und_Medida}}</td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">

@@ -233,12 +233,14 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         this.kgOT = data[0].datosotKg + adicional;
         this.estadoOT = data[0].estado;
         this.formEncabezado.patchValue({ kgOt: parseFloat(data[0].datosotKg + adicional), });
-        this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot))
+        this.detallesAsignacionService.getMateriasPrimaSolicitada(parseInt(ot))
           .pipe(takeUntil(this.destroy$))
-          .subscribe(dataAsignacion => {
-            this.cantRestante = (this.kgOT - dataAsignacion);
-            this.loadInfoOT(parseInt(ot), data, dataAsignacion);
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La orden de trabajo tiene '${this.cantRestante.toFixed(2)}' kg restantes.`);
+          .subscribe(asig => {
+            console.log('Datos de asignación de materia prima solicitada:', asig);
+            let cantPorSolicitar: number = this.kgOT - asig.cantidad_Solicitada;
+            this.cantRestante = (this.kgOT - asig.cantidad_Asignada);
+            this.loadInfoOT(parseInt(ot), data, asig);
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
             this.load = true;
           }, err => {
             this.load = true;
@@ -254,15 +256,17 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que va a consultar la informacion de la orden de trabajo
-  loadInfoOT(ot: number, datos_procesos: any, datos_asignacion: number) {
+  loadInfoOT(ot: number, datos_procesos: any, datos_asignacion: any) {
     this.infoOrdenTrabajo = [{
       ot: ot,
       cliente: datos_procesos[0].clienteNom,
       item: datos_procesos[0].clienteItems,
       ref: datos_procesos[0].clienteItemsNom,
       kg: this.kgOT,
-      kgAsignado: datos_asignacion,
+      kgSolicitados: datos_asignacion.cantidad_Solicitada,
+      kgAsignado: datos_asignacion.cantidad_Asignada,
       kgRestante: this.cantRestante,
+      kgPorSolicitar: this.kgOT - datos_asignacion.cantidad_Solicitada,
     }];
   }
 
@@ -295,14 +299,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   validarCamposVaciosMPRetirada() {
     const subcategoryId = this.formMP.value.subcat_Id;
     const quantity = this.formMP.value.cantidad;
-    let kgAsignado: number = this.infoOrdenTrabajo[0].kgAsignado;
-    let cantidadesMp: number = (quantity + this.calcularMateriaPrimaSolicitada() + kgAsignado);
+    let kgSolicitado: number = this.infoOrdenTrabajo[0].kgSolicitados;
+    let cantidadesMp: number = (quantity + this.calcularMateriaPrimaSolicitada() + kgSolicitado);
+    let kgPorSolicitar: number = this.infoOrdenTrabajo[0].kgPorSolicitar;
+    let cantRestante: number = this.infoOrdenTrabajo[0].kg;
 
     if (this.formMP.valid) {
       if (quantity > 0) {
         if (!this.idSubcategorias.includes(subcategoryId)) {
-          if (cantidadesMp > this.cantRestante) {
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante por asignar: ${this.cantRestante.toFixed(2)} Kg!`);
+          if (cantidadesMp > cantRestante) {
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante por asignar: ${kgPorSolicitar.toFixed(2)} Kg!`);
             return;
           }
           this.idSubcategorias.push(subcategoryId);

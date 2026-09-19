@@ -49,7 +49,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="ot" id="ordenTrabajo" type="text" pInputText (keyup.enter)="infoOT()"
+            <input formControlName="ot" id="ordenTrabajo" type="text" autocomplete="off" pInputText (keyup.enter)="infoOT()"
               required />
             <label for="ordenTrabajo">OT</label>
           </span>
@@ -69,7 +69,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-wrench"></i>
-            <input formControlName="maq" id="maquina" type="number" pInputText required />
+            <input formControlName="maq" id="maquina" type="number" pInputText autocomplete="off" required />
             <label for="maquina">Maquina</label>
           </span>
         </div>
@@ -99,13 +99,21 @@
         responsiveLayout="scroll" [rows]="20" [rowHover]="true" [value]="infoOrdenTrabajo">
         <ng-template pTemplate="header">
           <tr>
-            <th scope="col">N°</th>
-            <th scope="col">Cliente</th>
-            <th scope="col">Item</th>
-            <th scope="col">Referencia</th>
-            <th scope="col">Kg Total OT</th>
-            <th scope="col">Kg Asignados</th>
-            <th scope="col">Kg Restante</th>
+            <th class="text-center textRed" colspan="5">Información de la OT</th>
+            <th class="text-center textBlue" colspan="2">Información de la solicitud</th>
+            <th class="text-center textOrange" colspan="2">Información de la asignación</th>
+          </tr>
+          <tr>
+            <th class="text-center" scope="col">N°</th>
+            <th class="text-center" scope="col">Cliente</th>
+            <th class="text-center" scope="col">Item</th>
+            <th class="text-center" scope="col">Referencia</th>
+            <th class="text-center" scope="col" pTooltip="Kilos totales permitidos para solicitar de la OT" tooltipPosition="top">Kg total OT</th>
+            <th class="text-center" scope="col" pTooltip="Kilos solicitados de materia prima de la OT" tooltipPosition="top">Kg solicitados</th>
+            <th class="text-center" scope="col" pTooltip="Kilos pendientes por solicitar de materia prima de la OT" tooltipPosition="top">Kg por solicitar</th>
+            <th class="text-center" scope="col" pTooltip="Kilos asignados/entregados de materia prima de la OT" tooltipPosition="top">Kg asignados</th>
+            <th class="text-center" scope="col" pTooltip="Kilos restantes de materia prima por asignar de la OT" tooltipPosition="top">Kg restantes por asignar</th>
+          </tr>
         </ng-template>
         <ng-template pTemplate="body" let-ot>
           <tr>
@@ -113,9 +121,11 @@
             <td>{{ot.cliente}}</td>
             <td>{{ot.item}}</td>
             <td>{{ot.ref}}</td>
-            <td>{{ot.kg | number}}</td>
+            <td><b>{{ot.kg | number}}</b></td>
+            <td>{{ot.kgSolicitados | number}}</td>
+            <td [ngClass]="{'colorRojo' : ot.kgPorSolicitar <= 0, 'colorVerde' : ot.kgPorSolicitar > 0 }"><b>{{ot.kgPorSolicitar | number}}</b> </td>
             <td>{{ot.kgAsignado | number}}</td>
-            <td [ngClass]="{'colorRojo' : ot.kgRestante <= 0 }">{{ot.kgRestante | number}}</td>
+            <td [ngClass]="{'colorRojo' : ot.kgRestante <= 0, 'colorVerde' : ot.kgRestante > 0 }"><b>{{ot.kgRestante | number}}</b></td>
           </tr>
         </ng-template>
       </p-table>

@@ -29,7 +29,11 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
 }
 
 .colorRojo {
-  color: var(--rojo);
+  color: palevioletred;
+}
+
+.colorVerde {
+  color: rgb(0, 207, 0);
 }
 
 .colorNegro {
