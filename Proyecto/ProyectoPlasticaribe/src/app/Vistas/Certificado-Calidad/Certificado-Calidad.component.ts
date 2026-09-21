@@ -12,6 +12,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
 import { firmaJefeCalidad2 } from './FirmaJefeCalidad2';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { finalize } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -168,28 +169,43 @@ export class CertificadoCalidadComponent implements OnInit {
 
   // Funcion que va a consultar la información de la orden de trabajo
   consultarOrdenTrabajo() {
+    this.cargando = true;
     let orden: number = this.FormOrden.value.Orden;
     this.limpiarTodo();
-    this.bagproService.srvObtenerListaClienteOT_Item(orden).subscribe(data => {
+    this.bagproService.srvObtenerListaClienteOT_Item(orden)
+    .pipe(finalize(() => this.cargando = false))
+    .subscribe((data : any) => {
       if (data.length == 0) this.msj.mensajeAdvertencia(`¡No se encontró información de la OT ${orden}!`, ``);
       data.forEach(ot => {
-        this.cargando = true;
-        this.FormOrden.patchValue({
-          Orden: orden,
-          Cliente: ot.clienteNom,
-          Item: parseInt(ot.clienteItems),
-          Referencia: ot.clienteItemsNom,
-          Cantidad: ot.ptPresentacionNom == 'Kilo' ? ot.datosotKg : ot.datoscantBolsa,
-          Presentacion: ot.ptPresentacionNom == 'Unidad' ? 'Und' : ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : ot.ptPresentacionNom == 'Kilo' ? 'Kg' : ot.ptPresentacionNom == 'Rollo' ? 'Rollo' : '',
-          Fecha_Orden: moment(ot.fechaCrea).format('YYYY-MM-DD'),
-        });
+        this.loadDatosOrdenTrabajo(ot);
         this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(datos => {
           this.calcularParametrosCuantitativos(datos, ot);
           this.llenarParametrosCualitativos(datos, ot);
+        }, error => {
+          this.msj.mensajeError(`¡Ocurrió un error al obtener el último certificado del item ${ot.clienteItems}!`, error);
+          this.cargando = false;
         });
         this.cargando = false;
       });
-    }, () => this.msj.mensajeAdvertencia(`¡No se encontró información de la OT ${orden}!`, ``));
+    }, () => {
+      this.msj.mensajeAdvertencia(`¡No se encontró información de la OT ${orden}!`, ``);
+      this.cargando = false;
+    });
+  }
+
+  loadDatosOrdenTrabajo(ot: any) {
+    this.FormOrden.patchValue({
+      'Orden': ot.item,
+      'Cliente': ot.clienteNom,
+      'Item': parseInt(ot.clienteItems),
+      'Referencia': ot.clienteItemsNom,
+      'Cantidad': ot.ptPresentacionNom == 'Kilo' ? ot.datosotKg : ot.datoscantBolsa,
+      'Presentacion': ot.ptPresentacionNom == 'Unidad' ? 'Und' : 
+                      ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : 
+                      ot.ptPresentacionNom == 'Kilo' ? 'Kg' : 
+                      ot.ptPresentacionNom == 'MTS' ? 'MTS' : '',
+      'Fecha_Orden': moment(ot.fechaCrea).format('YYYY-MM-DD'),
+    });
   }
 
   // Funcion que va a calcular el calibre nominal del material
@@ -204,8 +220,6 @@ export class CertificadoCalidadComponent implements OnInit {
     let valorCalibre2: number = 0;
     let valorCalibre3: number = 0;
     if (dataBagpro == null) return calibre;
-
-
 
     if ([null, undefined, '0', ''].includes(dataBagpro.etiquetaLargo)) calibre = parseFloat(dataBagpro.extCalibre);
     else calibre = parseFloat(dataBagpro.etiquetaLargo);
@@ -234,31 +248,28 @@ export class CertificadoCalidadComponent implements OnInit {
    */
   getCalibreNominal(dataBagpro: any = null): number {
     if (dataBagpro == null) return 0;
+    let isBopp : boolean = dataBagpro.extMaterialNom.trim() == 'BOPP' ? true : false;
 
     // Calibre base: etiqueta o calibre de extrusión
     const calibreBase = this.esValorExcluidoCalibre(dataBagpro.etiquetaLargo)
-      ? parseFloat(dataBagpro.extCalibre)
-      : parseFloat(dataBagpro.etiquetaLargo);
-
-      console.log('calibreBase:', calibreBase);
+      ? isBopp ? (parseFloat(dataBagpro.extCalibre) / CertificadoCalidadComponent.VALOR_PULGADAS) : parseFloat(dataBagpro.extCalibre)
+      : isBopp ? (parseFloat(dataBagpro.etiquetaLargo) / CertificadoCalidadComponent.VALOR_PULGADAS) : parseFloat(dataBagpro.etiquetaLargo);
 
     // Si no hay capa 1, no hay laminado que sumar
     if (this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim())) {
       return calibreBase;
     }
 
-    const aporteLaminado =
+    const aporteLaminado = isBopp ? 0 :
       this.calcularAporteCapa(dataBagpro.lamCapa1.trim(), dataBagpro.lamCalibre1) +
       this.calcularAporteCapa(dataBagpro.lamCapa2.trim(), dataBagpro.lamCalibre2) +
       this.calcularAporteCapa(dataBagpro.lamCapa3.trim(), dataBagpro.lamCalibre3);
-
-      console.log('aporteLaminado:', aporteLaminado);
 
     return calibreBase + aporteLaminado + CertificadoCalidadComponent.TINTA_ADHESIVO;
   }
 
   private esValorExcluidoCapas(valor: any): boolean {
-    return CertificadoCalidadComponent.VALORES_EXCLUIDOS_CAPAS  .includes(valor);
+    return CertificadoCalidadComponent.VALORES_EXCLUIDOS_CAPAS.includes(valor);
   }
 
   private esValorExcluidoCalibre(valor: any): boolean {
@@ -276,8 +287,7 @@ export class CertificadoCalidadComponent implements OnInit {
 
   // Funcion que va a calcular los datos del parametro cuantitativo
   calcularParametrosCuantitativos(orden: any, dataBagpro: any = null) {
-    console.log('Orden:', orden);
-    console.log('DataBagpro:', dataBagpro);
+
     this.parametrosCuantitativos = [
       {
         Nombre: `Calibre`,
