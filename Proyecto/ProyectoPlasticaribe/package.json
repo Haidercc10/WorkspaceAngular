@@ -67,7 +67,6 @@
     "ngx-mat-select-search": "^7.0.4",
     "ngx-pagination": "^6.0.3",
     "ngx-quill": "^23.0.0",
-    "ngx-tour": "^0.0.1",
     "ngx-webstorage-service": "^5.0.0",
     "notifyme": "^0.2.1",
     "pdfmake": "^0.2.7",
