@@ -248,19 +248,28 @@ export class CertificadoCalidadComponent implements OnInit {
    */
   getCalibreNominal(dataBagpro: any = null): number {
     if (dataBagpro == null) return 0;
-    let isBopp : boolean = dataBagpro.extMaterialNom.trim() == 'BOPP' ? true : false;
+    let isBopp : boolean = dataBagpro.extMaterialNom.trim() == 'BOPP'
+
+    console.log(isBopp, dataBagpro.extMaterialNom.trim(), dataBagpro.lamCapa1.trim(), this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim()));
+    //console.log('isBopp:', dataBagpro.extMaterialNom.trim() == 'BOPP', isBoppLaminado, dataBagpro.lamCapa1.trim(), this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim()), !this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim()));
 
     // Calibre base: etiqueta o calibre de extrusión
-    const calibreBase = this.esValorExcluidoCalibre(dataBagpro.etiquetaLargo)
-      ? isBopp ? (parseFloat(dataBagpro.extCalibre) / CertificadoCalidadComponent.VALOR_PULGADAS) : parseFloat(dataBagpro.extCalibre)
-      : isBopp ? (parseFloat(dataBagpro.etiquetaLargo) / CertificadoCalidadComponent.VALOR_PULGADAS) : parseFloat(dataBagpro.etiquetaLargo);
+    const calibreBase = this.esValorExcluidoCalibre(dataBagpro.etiquetaLargo) 
+      ? parseFloat(dataBagpro.extCalibre) 
+      : parseFloat(dataBagpro.etiquetaLargo);
+
+
+    // Si no hay capa 1, no hay laminado que sumar
+    if (!this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim()) && isBopp) {
+      return (calibreBase / CertificadoCalidadComponent.VALOR_PULGADAS) + CertificadoCalidadComponent.TINTA_ADHESIVO;
+    }
 
     // Si no hay capa 1, no hay laminado que sumar
     if (this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim())) {
       return calibreBase;
     }
 
-    const aporteLaminado = isBopp ? 0 :
+    const aporteLaminado = //isBoppLaminado ? 0 :
       this.calcularAporteCapa(dataBagpro.lamCapa1.trim(), dataBagpro.lamCalibre1) +
       this.calcularAporteCapa(dataBagpro.lamCapa2.trim(), dataBagpro.lamCalibre2) +
       this.calcularAporteCapa(dataBagpro.lamCapa3.trim(), dataBagpro.lamCalibre3);
@@ -280,18 +289,22 @@ export class CertificadoCalidadComponent implements OnInit {
     if (this.esValorExcluidoCapas(capa)) return 0;
     const valorCalibre = parseFloat(calibre);
 
-    console.log('valorCalibre:', valorCalibre);
-
     return valorCalibre > 0 ? valorCalibre / CertificadoCalidadComponent.VALOR_PULGADAS : 0;
   }
 
   // Funcion que va a calcular los datos del parametro cuantitativo
   calcularParametrosCuantitativos(orden: any, dataBagpro: any = null) {
+    let isBopp : boolean = dataBagpro.extMaterialNom.trim() == 'BOPP'
+    let medidaCalibre = 'Mils Pulg';
+
+    if (this.esValorExcluidoCapas(dataBagpro.lamCapa1.trim()) && isBopp) { 
+      medidaCalibre = 'µm';
+    }
 
     this.parametrosCuantitativos = [
       {
         Nombre: `Calibre`,
-        UndMedida: dataBagpro != null ? dataBagpro.extMaterialNom.trim() == 'BOPP' ? 'µm' : 'Mils Pulg' : 'N/E', //orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
+        UndMedida: medidaCalibre, //orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
         Nominal: this.getCalibreNominal(dataBagpro),
         Tolerancia: 10, //orden != null ? orden.tolerancia_Calibre : 0, 
         Minimo: orden != null ? orden.minimo_Calibre : 0,
