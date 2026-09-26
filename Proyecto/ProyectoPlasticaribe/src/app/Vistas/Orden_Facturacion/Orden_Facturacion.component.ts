@@ -28,6 +28,7 @@ import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
 import { modelFacturacion_Productos } from 'src/app/Modelo/Facturacion_Productos';
+import { finalize, Subject, takeUntil } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -714,7 +715,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   createPDF(id_OrderFact: number, fact: string) {
-    this.dtOrderFactService.GetInformacionOrderFact(id_OrderFact).subscribe(data => {
+    this.load = true;
+    this.dtOrderFactService.GetInformacionOrderFactAsync(id_OrderFact).pipe(finalize(() => this.load = false)).subscribe(data => {
       let saleOrder: string = `${data[0].dtOrder.consecutivo_Pedido}`;
       let title: string = saleOrder.startsWith('DV') ? `Orden de Reposición N° ${id_OrderFact}` : `Orden de Facturación N° ${id_OrderFact}`;
       title += `${fact.length > 0 ? ` \n Factura N° ${fact}` : ''}`;

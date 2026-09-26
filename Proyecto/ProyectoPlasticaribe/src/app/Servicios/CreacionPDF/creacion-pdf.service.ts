@@ -118,9 +118,11 @@ export class CreacionPdfService {
     }
     let windoeFeatures = `height=500,width=500`;
     let win = window.open('', 'Print', windoeFeatures);
-    pdfMake.createPdf(pdfDefinition).print({}, win);
-    if (dataTag.copy) this.createRePrint(dataTag);
-    setTimeout(() => win.close(), 8000);
+    if (win){
+      pdfMake.createPdf(pdfDefinition).print({}, win);
+      if (dataTag.copy) this.createRePrint(dataTag);
+      setTimeout(() => win.close(), 8000);
+    }
   }
 
   private contentPDF(dataTag: modelTagProduction) {
@@ -135,7 +137,7 @@ export class CreacionPdfService {
   }
 
   private contentPrincipalTablePDF(dataTag: modelTagProduction): any[] {
-    let content = [];
+    let content: any[] = [];
     if (dataTag.showNameBussiness) content.push(this.infoBussinessPDF(dataTag));
     content.push(this.adictionalInformationTag(dataTag));
     content.push(
@@ -224,7 +226,7 @@ export class CreacionPdfService {
   }
 
   private quantityAndBarcode(dataTag: modelTagProduction) {
-    let data = [];
+    let data: any[] = [];
     data.push(this.tableWithQuantity(dataTag.quantity));
     data.push(this.tableWithQuantity(dataTag.quantity2));
     data.push(this.createBarcode(dataTag.reel));
@@ -295,7 +297,9 @@ export class CreacionPdfService {
     return processMapping[proceso] || proceso;
   }
 
-  /* ======================================================== PDF para precargues ==================================================== */
+  // ===========================================================================================================================
+  //                                               PDF PARA CREAR ORDEN DE PRECARGUES
+  // ===========================================================================================================================
 
   contentPDFPrecargue(data): any[] {
     let content: any[] = [];
@@ -528,7 +532,7 @@ export class TagProduction_2 {
   }
 
   private contentPrincipalTablePDF(dataTag: modelTagProduction): any[] {
-    let content = [];
+    let content: any[] = [];
     if (dataTag.showNameBussiness) content.push(this.dataBussiness());
     content.push(
       this.adictionalInformationTag(),
@@ -689,7 +693,7 @@ export class TagProduction_2 {
   }
 
   private quantity(dataTag: modelTagProduction) {
-    let data = [];
+    let data: any[] = [];
     data.push(this.tableWithQuantity(dataTag.quantity));
     data.push(this.tableWithQuantity(dataTag.quantity2));
     return data;

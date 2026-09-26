@@ -9,6 +9,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-Mov_PrecargueDespacho',
@@ -162,19 +163,19 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
   createPDF(id: number) {
     this.load = true;
     // Obtenemos la info completa del precargue
-    this.svDtlPreload.getPreloadId(id).subscribe(data => {
-      let title: string = `Orden de Precargue N° ${id}`;
-      // generamos el contenido del PDF con la info obtenida
-      let content: any[] = this.PDFService.contentPDFPrecargue(data);
-      // finalmente creamos el PDF con el titulo y contenido generado
-      this.PDFService.formatoPDF(title, content);
-      // notificamos la confirmacion de la generacion y su posterior muestra en una nueva pestaña.
-      this.utileria.Notificacion(`Confirmación`, `Orden de precargue N° ${id} descargada exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
-    }, error => {
-      this.utileria.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
-      this.load = false;
-    }, () => {
-      this.load = false;
+    this.svDtlPreload.getPreloadIdAsync(id).pipe(finalize (() => this.load = false)).subscribe({
+      next: data => {
+        // generamos el contenido del PDF con la info obtenida
+        let content: any[] = this.PDFService.contentPDFPrecargue(data);
+        // finalmente creamos el PDF con el titulo y contenido generado
+        this.PDFService.formatoPDF(`Orden de Precargue N° ${id}`, content); // si se demora 2 segundos siempre, es por este metodo, tiene un timeout.
+        // notificamos la confirmacion de la generacion y su posterior muestra en una nueva pestaña.
+        this.utileria.Notificacion(`Confirmación`, `Orden de precargue N° ${id} descargada exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
+      },
+      error: error => {
+        this.utileria.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
+        console.log(error);
+      }
     });
   }
 
