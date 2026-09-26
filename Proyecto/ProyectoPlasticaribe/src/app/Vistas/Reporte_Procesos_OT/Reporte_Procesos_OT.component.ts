@@ -322,6 +322,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     });
   }
 
+  // Función que sumará (totalizará) los valores numéricos de una columna de la tabla, usada en el footer totalizador
+  totalizarColumna = (campo : string) : number => this.ArrayDocumento.reduce((total, item) => total + (Number(item[campo]) || 0), 0);
+
+  // Función que validará si una columna adicional (seleccionable) contiene valores numéricos para poder totalizarla en el footer
+  esColumnaNumerica = (campo : string) : boolean => this.ArrayDocumento.some(item => item[campo] !== null && item[campo] !== undefined && item[campo] !== '' && !isNaN(Number(item[campo])));
+
   // Funcion que va a validar la que un vendedor sea quien inició sesión
   validarVendedor(){
     if (this.ValidarRol == 2) {
@@ -354,13 +360,13 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.otSeleccionada = 0;
     this.ArrayDocumento = [];
     this.ordenesSeleccionadas = [];
-    let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let fecha1 = moment(this.formularioOT.value.fechaInicio);
-    let fecha2 = moment(this.formularioOT.value.fechaFinal);
-    let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(fecha1).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(fecha2).format('YYYY-MM-DD');
-    let usarFechaCreacion : boolean = fechainicial == fechaMesAnterior;
-    console.log(fechainicial, fechaFinal, usarFechaCreacion);
+    //let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
+    //let fecha1 = moment(this.formularioOT.value.fechaInicio);
+    //let fecha2 = moment(this.formularioOT.value.fechaFinal);
+    //let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
+    //let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
+    //let usarFechaCreacion : boolean = fechainicial == fechaMesAnterior;
+    //console.log(fechainicial, fechaFinal, usarFechaCreacion);
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -370,7 +376,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTCerrada = 0;
     let ruta : string = this.validarParametrosConsulta();
 
-    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(fechainicial, fechaFinal, usarFechaCreacion, ruta).subscribe(data => {
+    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(ruta).subscribe(data => {
       data.forEach(infoOt => this.llenarArray(infoOt));
     }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
@@ -380,15 +386,23 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Funcion encargada de validar los parametros de consulta y construir la ruta para la solicitud HTTP
   validarParametrosConsulta(){
+    let fecha1 = moment(this.formularioOT.value.fechaInicio);
+    let fecha2 = moment(this.formularioOT.value.fechaFinal);
+    let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
     let ot : number = this.formularioOT.value.idDocumento;
     let fallas : any = this.formularioOT.value.fallasOT;
     let estado : number = this.formularioOT.value.estado;
-    let vendedor : any = this.formularioOT.value.Vendedor;
+    let vendedor : any = this.formularioOT.value.Id_Vendedor;
     let cliente : any = this.formularioOT.value.cliente;
     let producto : any = this.formularioOT.value.producto;
     let ruta : string = '';
 
-    if (ot != null) ruta += `ot=${ot}`;
+    console.log(ot, fallas, estado, vendedor, cliente, producto);
+
+    if (fechainicial != null) ruta.length > 0 ? ruta += `&fechaInicial=${fechainicial}` : ruta += `fechaInicial=${fechainicial}`;
+    if (fechaFinal != null) ruta.length > 0 ? ruta += `&fechaFinal=${fechaFinal}` : ruta += `fechaFinal=${fechaFinal}`;
+    if (ot != null) ruta.length > 0 ? ruta += `&ot=${ot}` : ruta += `ot=${ot}`;
     if (cliente != null) ruta.length > 0 ? ruta += `&cli=${cliente}` : ruta += `cli=${cliente}`;
     if (producto != null) ruta.length > 0 ? ruta += `&prod=${producto}` : ruta += `prod=${producto}`;
     if (estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}`;

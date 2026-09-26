@@ -36,17 +36,25 @@
       <div class="row g-4">
 
         <!-- Solicitud -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Solicitud" id="solicitud" type="text" pInputText
               (keyup.enter)="consultarSolicitudMaterial()" required />
-            <label for="solicitud">N° Solicitud</label>
+            <label for="solicitud">Solicitud</label>
+          </span>
+        </div>
+
+        <!-- Fecha estimada de Entrega -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="fechaEntrega">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaEntrega" inputId="fechaEntrega" [showIcon]="true" [minDate]="minDate"></p-calendar>
+            <label for="fechaEntrega">Fecha entrega</label>
           </span>
         </div>
 
         <!-- Orden de Trabajo -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ot" id="ordenTrabajo" type="text" autocomplete="off" pInputText (keyup.enter)="infoOT()"
@@ -66,7 +74,7 @@
         </div>
 
         <!-- Maquina -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-wrench"></i>
             <input formControlName="maq" id="maquina" type="number" pInputText autocomplete="off" required />
@@ -75,7 +83,7 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-5">
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-4">
           <span class="p-float-label">
             <textarea formControlName="observacion" id="observacion" [rows]="1" maxlength="200"
               pInputTextarea></textarea>

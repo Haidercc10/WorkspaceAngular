@@ -71,6 +71,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   @ViewChild('dtSubcategories') dtSubcategories: Table | undefined;
   @ViewChild('dtMaterials') dtMaterials: Table | undefined;
   private destroy$ = new Subject<void>();
+  minDate: Date = new Date(); //Variable que contendrá la fecha mínima para el calendario de fecha de entrega
 
 
   constructor(private materiaPrimaService: MateriaPrimaService,
@@ -92,12 +93,13 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formEncabezado = this.frmBuilderMateriaPrima.group({
       ot: [null, Validators.required],
-      fecha: [this.today, Validators.required],
+      fecha: [moment().format('YYYY-MM-DD'), Validators.required],
       maq: [null, Validators.required],
       kgOt: [null, Validators.required],
       proceso: ['', Validators.required],
       observacion: [''],
       Solicitud: [null],
+      fechaEntrega: [null, ],
     });
 
     this.formMP = this.frmBuilderMateriaPrima.group({
@@ -236,11 +238,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         this.detallesAsignacionService.getMateriasPrimaSolicitada(parseInt(ot))
           .pipe(takeUntil(this.destroy$))
           .subscribe(asig => {
-            console.log('Datos de asignación de materia prima solicitada:', asig);
             this.cantRestante = (this.kgOT - asig.cantidad_Asignada);
-            let cantPorSolicitar: number = this.cantRestante;
+            let cantPorSolicitar: number = this.cantRestante - asig.cantidad_Solicitada;
             this.loadInfoOT(parseInt(ot), data, asig);
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
+            if(cantPorSolicitar > 0) this.mensajeService.mensajeConfirmacion(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
+            else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no tiene kg restantes por solicitar.`);
             this.load = true;
           }, err => {
             this.load = true;
@@ -266,7 +268,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       kgSolicitados: datos_asignacion.cantidad_Solicitada,
       kgAsignado: datos_asignacion.cantidad_Asignada,
       kgRestante: this.cantRestante,
-      kgPorSolicitar: this.cantRestante,
+      kgPorSolicitar: this.cantRestante - datos_asignacion.cantidad_Solicitada,
     }];
   }
 
@@ -301,14 +303,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     const quantity = this.formMP.value.cantidad;
     let kgSolicitado: number = this.infoOrdenTrabajo[0].kgSolicitados;
     let cantidadesMp: number = (quantity + this.calcularMateriaPrimaSolicitada() + kgSolicitado);
-    let kgPorSolicitar: number = this.infoOrdenTrabajo[0].kgPorSolicitar;
+    let kgPorSolicitarEstatico: number = this.cantRestante - kgSolicitado;
     let cantRestante: number = this.infoOrdenTrabajo[0].kgRestante;
+    let kgPorSolicitar: number = cantRestante - cantidadesMp;
+    
 
     if (this.formMP.valid) {
       if (quantity > 0) {
         if (!this.idSubcategorias.includes(subcategoryId)) {
           if (cantidadesMp > cantRestante) {
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante por asignar: ${kgPorSolicitar.toFixed(2)} Kg!`);
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar excede la cantidad restante por asignar!`);
             return;
           }
           this.idSubcategorias.push(subcategoryId);
@@ -537,9 +541,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           width: '*', alignment: 'center', fontSize: 8,
           stack: [
             { text: 'NIT. 800188732', bold: true, fontSize: 10 },
-            { text: `Fecha de análisis: ${moment().format('YYYY-MM-DD')}` },
+            /*{ text: `Fecha de análisis: ${moment().format('YYYY-MM-DD')}` },
             { text: `Hora: ${moment().format('H:mm:ss')}` },
-            { text: `Usuario: ${this.storage_Nombre}` },
+            { text: `Usuario: ${this.storage_Nombre}` },*/
             { text: `Solicitud de material N° ${solicitudId}`, bold: true, fontSize: 10 },
           ]
         },

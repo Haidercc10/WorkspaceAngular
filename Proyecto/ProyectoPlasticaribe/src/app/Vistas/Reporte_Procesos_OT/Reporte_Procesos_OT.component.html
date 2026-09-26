@@ -16,11 +16,6 @@
 </div>
 
 <p-card>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}"
-      (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-22"><i
         class="pi pi-search"></i> Búsqueda por filtros</h4>
@@ -106,7 +101,7 @@
         </div>-->
 
         <!-- Observación -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-4 col-xxl-4" id="observacion">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-6 col-xxl-6" id="observacion">
           <span class="p-float-label">
             <textarea formControlName="ObservacionOT" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -200,7 +195,9 @@
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>
             <tr class="font-size-16" id="filtros">
+              <th></th>
               <th pFrozenColumn></th>
+              <!--Información de la OT-->
               <th pFrozenColumn><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'ot', 'contains')">
               </th>
@@ -211,18 +208,19 @@
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'cant', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'bopp', 'contains')">
               </th>
               <!--INICIO BALANCE-->
               <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'proceso_Inicial', 'contains')">
+                  (input)="aplicarfiltro($event, 'cantidad_Inicial', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'proceso_Final', 'contains')">
+                  (input)="aplicarfiltro($event, 'cantidad_Final', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, '', 'contains')">
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'desp', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'proceso_Final', 'contains')">
+                  (input)="aplicarfiltro($event, 'reportado_Final', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_General', 'contains')">
@@ -238,9 +236,9 @@
                   (input)="aplicarfiltro($event, 'fechaFinal', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'diff_Dias', 'contains')"></th>
+              <!--Extrusion-->
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
               </th>
-              <!--Extrusion-->
               <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ext', 'contains')">
               </th>
@@ -255,7 +253,7 @@
               </th>
               <!--Impresion-->
               <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, '', 'contains')">
+                  (input)="aplicarfiltro($event, 'base_Imp', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')">
               </th>
@@ -268,11 +266,23 @@
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Imp', 'contains')">
               </th>
+              <!--Laminado-->
+              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'base_Lam', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'lam', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'desp_lam', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'sum_lam', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'balance_Lam', 'contains')"></th>
               <!--Perforado-->
               <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, '', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'perf', 'contains')"></th>
+                  (input)="aplicarfiltro($event, 'base_Perf', 'contains')">
+              </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'perf', 'contains')">
+              </th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_perf', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
@@ -281,7 +291,7 @@
                   (input)="aplicarfiltro($event, 'balance_Perf', 'contains')"></th>
               <!--Doblado-->
               <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, '', 'contains')">
+                  (input)="aplicarfiltro($event, 'base_Dbl', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')">
               </th>
@@ -291,21 +301,9 @@
                   (input)="aplicarfiltro($event, 'sum_dbl', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Dbl', 'contains')"></th>
-              <!--Laminado-->
-              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, '', 'contains')">
-              </th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'lam', 'contains')">
-              </th>
-              <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'desp_lam', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'sum_lam', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, 'balance_lam', 'contains')"></th>
               <!--Empaque-->
               <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, '', 'contains')">
+                  (input)="aplicarfiltro($event, 'base_Emp', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')">
               </th>
@@ -317,7 +315,7 @@
                   (input)="aplicarfiltro($event, 'balance_Emp', 'contains')"></th>
               <!--Sellado-->
               <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
-                  (input)="aplicarfiltro($event, '', 'contains')">
+                  (input)="aplicarfiltro($event, 'base_Sel', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'sel', 'contains')">
               </th>
@@ -333,11 +331,12 @@
               <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
             </tr>
             <tr>
-              <th style="font-weight: 900;" class="text-center" colspan=""></th>
+              <th style="font-weight: 900;" class="text-center" colspan="1"></th>
+              <th style="font-weight: 900;" class="text-center" colspan="1"></th>
               <th style="font-weight: 800;" class="text-center" colspan="4"><i class="pi pi-file"></i> Información OT
               </th>
-              <th style="font-weight: 800;" class="text-center" colspan=""></th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="6"> Balance General</th>
+              <th style="font-weight: 800;" class="text-center" colspan="1"></th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="7"> Balance General</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Fechas</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Extrusión</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Impresión</th>
@@ -346,15 +345,16 @@
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Doblado</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Empaque</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Sellado</th>
-              <th style="font-weight: 900;" class="text-center" colspan=""></th>
+              <th style="font-weight: 900;" class="text-center" colspan="1"></th>
             </tr>
             <tr class="font-size-13" id="columnas">
+              <th style="font-weight: 900;" class="text-center" colspan="">#</th>
               <th pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo"
                   *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableHeaderCheckbox></th>
               <th pFrozenColumn scope="col" pResizableColumn pSortableColumn="ot" id="ordenTrabajo">OT <p-sortIcon
                   field="ot" title="Order por OT"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="cli">Cliente <p-sortIcon field="cli"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="prod">Referencia <p-sortIcon field="prod"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="ref">Referencia <p-sortIcon field="ref"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="cant"
                 pTooltip="Cantidad a producir en kilos/unds/paquete/metros" tooltipPosition="top">
@@ -362,21 +362,24 @@
               <th scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
                 tooltipPosition="top">MP <p-sortIcon field="mp"></p-sortIcon>
               </th>
-              <!--Balance general-->
-              <th scope="col" pResizableColumn pSortableColumn="ext" pTooltip="Proceso inicial" tooltipPosition="top"
-                class="divisor-proceso"> PI <p-sortIcon field="ext"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="bopp" pTooltip="Materia prima asignada"
+                tooltipPosition="top">BOPP <p-sortIcon field="bopp" pTooltip="Cant. Bopp asignado" tooltipPosition="top"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_ext" pTooltip="Proceso final"
-                tooltipPosition="top"> PF <p-sortIcon field="desp_ext"></p-sortIcon>
+              <!--Balance general-->
+              <th scope="col" pResizableColumn pSortableColumn="cantidad_Inicial" pTooltip="Proceso inicial" tooltipPosition="top"
+                class="divisor-proceso"> PI <p-sortIcon field="cantidad_Inicial"></p-sortIcon>
+              </th>
+              <th scope="col" pResizableColumn pSortableColumn="cantidad_Final" pTooltip="Proceso final"
+                tooltipPosition="top"> PF <p-sortIcon field="cantidad_Final"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="desp" pTooltip="Desperdicio Total"
                 tooltipPosition="top"> Desp. <p-sortIcon field="desp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="desp" pTooltip="Proceso final + Desperdicio Total"
-                tooltipPosition="top"> PF + Desp. <p-sortIcon field="desp"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="reportado_Final" pTooltip="Proceso final + Desperdicio Total"
+                tooltipPosition="top"> PF + Desp. <p-sortIcon field="reportado_Final"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Ext" pTooltip="Balance General en Kilos"
-                tooltipPosition="top"> Balance<p-sortIcon field="balance_Ext"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="balance_General" pTooltip="Balance General en Kilos"
+                tooltipPosition="top"> Balance<p-sortIcon field="balance_General"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="est" pTooltip="Estado de la OT" tooltipPosition="top">
                 Estado <p-sortIcon field="est"></p-sortIcon></th>
@@ -409,8 +412,8 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Ext"></p-sortIcon>
               </th>
               <!--Impresion-->
-              <th scope="col" pResizableColumn pSortableColumn="ext" pTooltip="Proceso anterior" tooltipPosition="top"
-                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="ext"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="base_Imp" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Imp"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="imp" pTooltip="Producción Impresión"
                 tooltipPosition="top"><i class="pi pi-print"></i> <p-sortIcon field="imp"></p-sortIcon>
@@ -425,8 +428,8 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Imp"></p-sortIcon>
               </th>
               <!--Laminado-->
-              <th scope="col" pResizableColumn pSortableColumn="lam" pTooltip="Proceso anterior" tooltipPosition="top"
-                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="lam"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="base_Lam" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Lam"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="lam" pTooltip="Producción Laminado"
                 tooltipPosition="top"><i class="pi pi-clone"></i> <p-sortIcon field="lam"></p-sortIcon></th>
@@ -439,8 +442,8 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Lam"></p-sortIcon>
               </th>
               <!--Perforado-->
-              <th scope="col" pResizableColumn pSortableColumn="perf" pTooltip="Proceso anterior" tooltipPosition="top"
-                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="perf"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="base_Perf" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Perf"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="perf" pTooltip="Producción Perforado"
                 tooltipPosition="top"><i class="pi pi-circle-off"></i> <p-sortIcon field="perf"></p-sortIcon>
@@ -455,8 +458,8 @@
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Perf"></p-sortIcon>
               </th>
               <!--Doblado-->
-              <th scope="col" pResizableColumn pSortableColumn="dbl" pTooltip="Proceso anterior" tooltipPosition="top"
-                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="dbl"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="base_Dbl" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Dbl"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="dbl" pTooltip="Producción Doblado"
                 tooltipPosition="top"><i class="pi pi-map"></i> <p-sortIcon field="dbl"></p-sortIcon></th>
@@ -470,8 +473,8 @@
               </th>
 
               <!--Empaque-->
-              <th scope="col" pResizableColumn pSortableColumn="emp" pTooltip="Proceso anterior" tooltipPosition="top"
-                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="emp"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="base_Emp" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Emp"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="emp" pTooltip="Producción Empaque"
                 tooltipPosition="top"><i class="pi pi-box"></i> <p-sortIcon field="emp"></p-sortIcon></th>
@@ -485,8 +488,8 @@
               </th>
 
               <!--Sellado-->
-              <th scope="col" pResizableColumn pSortableColumn="sel" pTooltip="Proceso anterior" tooltipPosition="top"
-                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="sel"></p-sortIcon>
+              <th scope="col" pResizableColumn pSortableColumn="base_Sel" pTooltip="Proceso anterior" tooltipPosition="top"
+                class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Sel"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="sel" pTooltip="Producción Sellado"
                 tooltipPosition="top"><i class="pi pi-tag"></i> <p-sortIcon field="sel"></p-sortIcon></th>
@@ -506,8 +509,9 @@
             </tr>
           </ng-template>
           <!-- Cuerpo -->
-          <ng-template pTemplate="body" let-data let-columns="columns">
+          <ng-template pTemplate="body" let-data let-columns="columns" let-rowIndex="rowIndex">
             <tr style="cursor: pointer; cursor: hand;">
+              <td>{{rowIndex + 1}}</td>
               <td pFrozenColumn>
                 <p-tableCheckbox [value]="data"
                   *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableCheckbox>
@@ -518,10 +522,10 @@
               <td id="cant" scope="col"><b>{{data.cant | number : '1.0-0'}} Kg - {{data.cantUnd | number : '1.0-0'}}
                   {{data.und == 'Paquete' ? 'Paq' : data.und}}</b></td>
               <td class="proceso-inicio">{{data.mp | number : '1.0-0'}}</td>
-
+              <td class="">{{data.bopp | number : '1.0-0'}}</td>
               <td class=""><b>{{data.proceso_Inicial}}:</b> {{data.cantidad_Inicial | number : '1.0-0'}}</td>
               <td class=""><b>{{data.proceso_Final}}:</b> {{data.cantidad_Final | number : '1.0-0'}}</td>
-              <td class="">{{data.desperdicio_Final | number : '1.0-0'}}</td>
+              <td class="">{{data.desp | number : '1.0-0'}}</td>
               <td class="">{{(data.reportado_Final) | number : '1.0-0'}}</td>
               <td class="" [ngClass]="{'red' : data.balance_General < 0,'green' : data.balance_General > 0} ">
                 <b>{{data.balance_General | number : '1.0-0'}}</b>
@@ -684,6 +688,93 @@
                   [style]="{width: '30px', height: '30px'}" class="p-button-rounded p-button-success p-mr-2"
                   (click)="abrirModalCambioEstado(data)"></button>
               </td>
+            </tr>
+          </ng-template>
+          <!-- Footer totalizador: suma los valores de cada columna numérica para verificar lo producido en el rango filtrado -->
+          <ng-template pTemplate="footer" let-columns>
+            <tr class="font-size-13" id="footerTotales">
+              <td></td>
+              <td pFrozenColumn></td>
+              <td pFrozenColumn class="text-right"><b>Totales:</b></td>
+              <td></td>
+              <td></td>
+              <td id="cant"><b>{{totalizarColumna('cant') | number : '1.0-0'}} Kg - {{totalizarColumna('cantUnd') |
+                    number : '1.0-0'}}</b></td>
+              <td class="proceso-inicio">{{totalizarColumna('mp') | number : '1.0-0'}}</td>
+              <td>{{totalizarColumna('bopp') | number : '1.0-0'}}</td>
+              <td><b>{{totalizarColumna('cantidad_Inicial') | number : '1.0-0'}}</b></td>
+              <td><b>{{totalizarColumna('cantidad_Final') | number : '1.0-0'}}</b></td>
+              <td>{{totalizarColumna('desp') | number : '1.0-0'}}</td>
+              <td>{{totalizarColumna('reportado_Final') | number : '1.0-0'}}</td>
+              <td><b>{{totalizarColumna('balance_General') | number : '1.0-0'}}</b></td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{{totalizarColumna('diff_Dias') | number : '1.0-0'}}</td>
+
+              <td class="proceso-inicio">{{totalizarColumna('mp') | number : '1.0-0'}}</td>
+              <!-- Extrusión -->
+              <td>{{totalizarColumna('ext') | number : '1.0-0'}}</td>
+              <td id="desp_ext">{{totalizarColumna('desp_ext') | number : '1.0-0'}}</td>
+              <td id="sum_ext">{{totalizarColumna('sum_ext') | number : '1.0-0'}}</td>
+              <td id="balance_Ext" class="proceso-fin"><b>{{totalizarColumna('balance_Ext') | number :
+                    '1.0-0'}}</b></td>
+
+              <!-- Impresión -->
+              <td class="proceso-inicio">{{totalizarColumna('base_Imp') | number : '1.0-0'}}</td>
+              <td>{{totalizarColumna('imp') | number : '1.0-0'}}</td>
+              <td id="desp_imp">{{totalizarColumna('desp_imp') | number : '1.0-0'}}</td>
+              <td id="sum_imp">{{totalizarColumna('sum_imp') | number : '1.0-0'}}</td>
+              <td id="balance_Imp" class="proceso-fin"><b>{{totalizarColumna('balance_Imp') | number :
+                    '1.0-0'}}</b></td>
+
+              <!-- Laminado -->
+              <td class="proceso-inicio">{{totalizarColumna('base_Lam') | number : '1.0-0'}}</td>
+              <td>{{totalizarColumna('lam') | number : '1.0-0'}}</td>
+              <td id="desp_lam">{{totalizarColumna('desp_lam') | number : '1.0-0'}}</td>
+              <td id="sum_lam">{{totalizarColumna('sum_lam') | number : '1.0-0'}}</td>
+              <td id="balance_Lam" class="proceso-fin"><b>{{totalizarColumna('balance_Lam') | number :
+                    '1.0-0'}}</b></td>
+
+              <!-- Perforado -->
+              <td class="proceso-inicio">{{totalizarColumna('base_Perf') | number : '1.0-0'}}</td>
+              <td>{{totalizarColumna('perf') | number : '1.0-0'}}</td>
+              <td id="desp_perf">{{totalizarColumna('desp_perf') | number : '1.0-0'}}</td>
+              <td id="sum_perf">{{totalizarColumna('sum_perf') | number : '1.0-0'}}</td>
+              <td id="balance_Perf" class="proceso-fin"><b>{{totalizarColumna('balance_Perf') | number :
+                    '1.0-0'}}</b></td>
+
+              <!-- Doblado -->
+              <td class="proceso-inicio">{{totalizarColumna('base_Dbl') | number : '1.0-0'}}</td>
+              <td>{{totalizarColumna('dbl') | number : '1.0-0'}}</td>
+              <td id="desp_dbl">{{totalizarColumna('desp_dbl') | number : '1.0-0'}}</td>
+              <td id="sum_dbl">{{totalizarColumna('sum_dbl') | number : '1.0-0'}}</td>
+              <td id="balance_Dbl" class="proceso-fin"><b>{{totalizarColumna('balance_Dbl') | number :
+                    '1.0-0'}}</b></td>
+
+              <!-- Empaque -->
+              <td class="proceso-inicio">{{totalizarColumna('base_Emp') | number : '1.0-0'}}</td>
+              <td>{{totalizarColumna('emp') | number : '1.0-0'}}</td>
+              <td id="desp_emp">{{totalizarColumna('desp_emp') | number : '1.0-0'}}</td>
+              <td id="sum_emp">{{totalizarColumna('sum_emp') | number : '1.0-0'}}</td>
+              <td id="balance_Emp" class="proceso-fin"><b>{{totalizarColumna('balance_Emp') | number :
+                    '1.0-0'}}</b></td>
+
+              <!-- Sellado -->
+              <td class="proceso-inicio">{{totalizarColumna('base_Sel') | number : '1.0-0'}}</td>
+              <td><b>{{totalizarColumna('sel') | number : '1.0-0'}} Kg - {{totalizarColumna('selUnd') | number :
+                    '1.0-0'}}</b></td>
+              <td id="desp_sel">{{totalizarColumna('desp_sel') | number : '1.0-0'}}</td>
+              <td id="sum_sel">{{totalizarColumna('sum_sel') | number : '1.0-0'}}</td>
+              <td id="balance_Sel" class="proceso-fin"><b>{{totalizarColumna('balance_Sel') | number :
+                    '1.0-0'}}</b></td>
+
+              <td *ngFor="let col of columns">
+                <b *ngIf="esColumnaNumerica(col.field)">{{totalizarColumna(col.field) | number : '1.0-0'}}</b>
+              </td>
+              <td pFrozenColumn alignFrozen="right" [frozen]="true"></td>
             </tr>
           </ng-template>
         </p-table>
