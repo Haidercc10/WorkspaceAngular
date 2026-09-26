@@ -237,8 +237,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           .pipe(takeUntil(this.destroy$))
           .subscribe(asig => {
             console.log('Datos de asignación de materia prima solicitada:', asig);
-            let cantPorSolicitar: number = this.kgOT - asig.cantidad_Solicitada;
             this.cantRestante = (this.kgOT - asig.cantidad_Asignada);
+            let cantPorSolicitar: number = this.cantRestante;
             this.loadInfoOT(parseInt(ot), data, asig);
             this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
             this.load = true;
@@ -266,7 +266,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       kgSolicitados: datos_asignacion.cantidad_Solicitada,
       kgAsignado: datos_asignacion.cantidad_Asignada,
       kgRestante: this.cantRestante,
-      kgPorSolicitar: this.kgOT - datos_asignacion.cantidad_Solicitada,
+      kgPorSolicitar: this.cantRestante,
     }];
   }
 
@@ -302,7 +302,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     let kgSolicitado: number = this.infoOrdenTrabajo[0].kgSolicitados;
     let cantidadesMp: number = (quantity + this.calcularMateriaPrimaSolicitada() + kgSolicitado);
     let kgPorSolicitar: number = this.infoOrdenTrabajo[0].kgPorSolicitar;
-    let cantRestante: number = this.infoOrdenTrabajo[0].kg;
+    let cantRestante: number = this.infoOrdenTrabajo[0].kgRestante;
 
     if (this.formMP.valid) {
       if (quantity > 0) {
