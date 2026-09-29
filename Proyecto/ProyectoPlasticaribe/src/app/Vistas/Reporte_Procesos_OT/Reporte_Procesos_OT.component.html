@@ -231,6 +231,8 @@
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
+                  (input)="aplicarfiltro($event, 'fecha_AsignacionMP', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'fechaInicio', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'fechaFinal', 'contains')"></th>
@@ -337,7 +339,7 @@
               </th>
               <th style="font-weight: 800;" class="text-center" colspan="1"></th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="7"> Balance General</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="4"> Fechas</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Fechas</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Extrusión</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Impresión</th>
               <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Laminado</th>
@@ -357,7 +359,7 @@
               <th scope="col" pResizableColumn pSortableColumn="ref">Referencia <p-sortIcon field="ref"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="cant"
-                pTooltip="Cantidad a producir en kilos/unds/paquete/metros" tooltipPosition="top">
+                pTooltip="Cantidad a producir según la orden de trabajo" tooltipPosition="top">
                 Cant. Prod. Terminado <p-sortIcon field="cant"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
                 tooltipPosition="top">MP <p-sortIcon field="mp"></p-sortIcon>
@@ -383,8 +385,10 @@
               </th>
               <th scope="col" pResizableColumn pSortableColumn="est" pTooltip="Estado de la OT" tooltipPosition="top">
                 Estado <p-sortIcon field="est"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="fecha" pTooltip="Fecha Creación" tooltipPosition="top">
+                <th scope="col" pResizableColumn pSortableColumn="fecha" pTooltip="Fecha Creación" tooltipPosition="top">
                 Creación <p-sortIcon field="fecha"></p-sortIcon></th>
+              <th scope="col" pResizableColumn pSortableColumn="fecha_AsignacionMP" pTooltip="Fecha de la primera asignación de materia prima" tooltipPosition="top">
+                Asignación <p-sortIcon field="fecha_AsignacionMP"></p-sortIcon></th>
               <th scope="col" pResizableColumn pSortableColumn="fechaInicio" pTooltip="Fecha Inicio"
                 tooltipPosition="top">
                 1er Pesaje <p-sortIcon field="fechaInicio"></p-sortIcon></th>
@@ -516,13 +520,13 @@
                 <p-tableCheckbox [value]="data"
                   *ngIf="[98,1,12].includes(ValidarRol) && storage_Id != 101"></p-tableCheckbox>
               </td>
-              <td pFrozenColumn (click)="reporteOT(data.ot)"><b>{{data.ot}}</b></td>
+              <td pFrozenColumn (click)="reporteOT(data.ot)" pTooltip="Ver Reporte de costos OT {{data.ot}}" tooltipPosition="top"><b>{{data.ot}}</b></td>
               <td>{{data.cli}}</td>
               <td>{{data.item}} - {{data.ref}}</td>
               <td id="cant" scope="col"><b>{{data.cant | number : '1.0-0'}} Kg - {{data.cantUnd | number : '1.0-0'}}
                   {{data.und == 'Paquete' ? 'Paq' : data.und}}</b></td>
-              <td class="proceso-inicio">{{data.mp | number : '1.0-0'}}</td>
-              <td class="">{{data.bopp | number : '1.0-0'}}</td>
+              <td class="proceso-inicio" (click)="reporteOT(data.ot)" pTooltip="Ver Reporte de costos OT {{data.ot}}" tooltipPosition="top">{{data.mp | number : '1.0-0'}}</td>
+              <td class="" (click)="reporteOT(data.ot)" pTooltip="Ver Reporte de costos OT {{data.ot}}" tooltipPosition="top">{{data.bopp | number : '1.0-0'}}</td>
               <td class=""><b>{{data.proceso_Inicial}}:</b> {{data.cantidad_Inicial | number : '1.0-0'}}</td>
               <td class=""><b>{{data.proceso_Final}}:</b> {{data.cantidad_Final | number : '1.0-0'}}</td>
               <td class="">{{data.desp | number : '1.0-0'}}</td>
@@ -541,6 +545,7 @@
               }"><b>{{data.est | uppercase}}</b></td>
 
               <td id="fecha" class="proceso-inicio" scope="col">{{data.fecha | date : 'yyyy-MM-dd'}}</td>
+              <td>{{data.fecha_AsignacionMP | date : 'yyyy-MM-dd'}}</td>
               <td>{{data.fechaInicio | date : 'yyyy-MM-dd'}}</td>
               <td>{{data.fechaFinal | date : 'yyyy-MM-dd'}}</td>
               <td> {{data.diff_Dias}}</td>
@@ -707,7 +712,7 @@
               <td>{{totalizarColumna('desp') | number : '1.0-0'}}</td>
               <td>{{totalizarColumna('reportado_Final') | number : '1.0-0'}}</td>
               <td><b>{{totalizarColumna('balance_General') | number : '1.0-0'}}</b></td>
-
+              <td></td>
               <td></td>
               <td></td>
               <td></td>

@@ -111,12 +111,20 @@
     </div>
   </div>
 
+   <!-- Solicitudes de material -->
+  <div class="mb-5" id="opcional" *ngIf="esSolicitud">
+    <p-accordion [activeIndex]="0"> 
+      <p-accordionTab header="Asignación de materia prima basada en categorias">
+      </p-accordionTab>
+    </p-accordion>
+  </div>
+
   <!--Inicio titulo -->
   <div class="mb-5">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
       Seleccionar Materia Prima</h4>
   </div>
-  
+
 
   <!-- Formulario de seleccion de materia prima  -->
   <form [formGroup]="FormMateriaPrimaRetirada">

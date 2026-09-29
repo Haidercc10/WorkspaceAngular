@@ -541,8 +541,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           width: '*', alignment: 'center', fontSize: 8,
           stack: [
             { text: 'NIT. 800188732', bold: true, fontSize: 10 },
-            /*{ text: `Fecha de análisis: ${moment().format('YYYY-MM-DD')}` },
-            { text: `Hora: ${moment().format('H:mm:ss')}` },
+            { text: `` },
+            /*{ text: `Hora: ${moment().format('H:mm:ss')}` },
             { text: `Usuario: ${this.storage_Nombre}` },*/
             { text: `Solicitud de material N° ${solicitudId}`, bold: true, fontSize: 10 },
           ]

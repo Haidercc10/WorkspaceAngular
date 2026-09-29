@@ -21,7 +21,7 @@
 <p-card>
   <!--Ver tutorial-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <p-button icon="pi pi-info" (onClick)="tutorial()" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+    <!--<p-button icon="pi pi-info" (onClick)="tutorial()" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>-->
   </div>
 
   <!--Solicitudes-->
@@ -63,8 +63,8 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-filter"></i> <b> Filtros de búsqueda</b></h4>
   </div>
 
-   <!-- Formulario para consultar filtros -->
-   <form [formGroup]="formFiltros">
+  <!-- Formulario para consultar filtros -->
+  <form [formGroup]="formFiltros">
     <div class="mb-4" id="formulario1">
       <div class="row g-3 justify-content-md-center">
 
@@ -123,14 +123,14 @@
   <div class="mb-3" *ngIf=" !cargando">
     <div class="row g-3" id="">
       <!-- Encabezado -->
-      <div class="col-md-6 px-4">
+      <div class="col-md-5 px-4">
 
         <!--Titulo tabla-->
         <div class="mb-5 text-center">
           <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-list"></i> <b> Registros consultados</b></h4>
         </div>
 
-        <div class="table-responsive" id="tabla1">
+        <div class="table-responsive" id="tabla1" style="overflow-x: auto;">
           <p-table
             [tableStyle]="{ 'min-width': '45%' }"
             #dt1
@@ -142,7 +142,7 @@
             [showCurrentPageReport]="true"
             responsiveLayout="scroll"
             currentPageReportTemplate="{first} al {last} de {totalRecords} registros"
-            [rowsPerPageOptions]="[10,20,30,50,70,100]"
+            [rowsPerPageOptions]="[10,20,30,50,70,100,arrayRegistros.length]"
             [rowHover]="true"
             [value]="arrayRegistros"
             [scrollable]="true"
@@ -152,26 +152,24 @@
                 <th><input pInputText type="text" style="width: 100%; " (input)="aplicarFiltro($event, 'id', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'ot', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'fecha', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'fechaEntrega', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltro($event, 'estado', 'contains')"></th>
-                <th></th>
               </tr>
-              <tr>
+              <tr pTooltip="Ver detalle de solicitudes" ptooltipPosition="top">
                 <th>N° Solicitud</th>
                 <th>OT</th>
-                <th>Fecha</th>
+                <th>F. Creación</th>
+                <th>F. Entrega</th>
                 <th>Estado</th>
-                <th id="detalle" pTooltip="Ver detalle de solicitudes">Ver</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-registros>
-              <tr>
+              <tr (click)="cargarDetalleSolicitud(registros.id)">
                 <td><b>{{registros.id}}</b></td>
                 <td>{{registros.ot}}</td>
                 <td>{{registros.fecha}}</td>
+                <td>{{''}}</td>
                 <td><b>{{registros.estado}}</b></td>
-                <td pTooltip="Ver detalle de la solicitud N° {{registros.id}}" style="text-align: center;">
-                  <p-button id="botonPdf" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="cargarDetalleSolicitud(registros.id)"></p-button>
-                </td>
               </tr>
             </ng-template>
           </p-table>
@@ -179,7 +177,7 @@
       </div>
 
       <!--Detalles-->
-      <div class="col-md-6 px-4" id="matprimas">
+      <div class="col-md-7 px-4" id="matprimas">
         <div class="mb-5 text-center">
           <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-table"></i> <b> Detalles de la solicitud N° {{solicitudSeleccionada}}</b></h4>
         </div>
@@ -211,15 +209,17 @@
                 <th>Subcategoria</th>
                 <th>Solicitada</th>
                 <th id="aprobada">Aprobada</th>
+                <th id="diferencia">Diferencia</th>
                 <th>Unidad</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-mp>
-              <tr>
+              <tr class="cursor">
                 <td><b>{{mp.Id}}</b></td>
                 <td>{{mp.Nombre}}</td>
                 <td><b>{{mp.Cantidad | number : '1.2-2'}}</b></td>
                 <td><b>{{mp.CantAprobada | number : '1.2-2'}}</b></td>
+                <td>{{mp.CantFaltante | number : '1.2-2'}}</td>
                 <td>{{mp.Und_Medida}}</td>
               </tr>
             </ng-template>
@@ -228,6 +228,7 @@
                 <td colspan="2">Total</td>
                 <td>{{calcularCantSolicitada() | number: '1.2-2'}}</td>
                 <td>{{calcularCantAprobada() | number: '1.2-2' }}</td>
+                <td>{{calcularCantFaltante() | number: '1.2-2'}}</td>
                 <td>{{'Kg'}}</td>
               </tr>
             </ng-template>

@@ -827,8 +827,8 @@ export class Orden_FacturacionComponent implements OnInit {
           ],
           [
             { text: `E-mail: ${data.clientes.cli_Email}` },
-            { text: `Ciudad: ${data.city}` },
-            { text: `Dirección: ${data.direction}` },
+            { text: `Ciudad: ${data.sede ? data.sede.city : data.city}` },
+            { text: `Dirección: ${data.sede ? data.sede.direction : data.direction}` },
           ],
           [
             { text: `Asesor: ${data.asesor.usua_Nombre}`, },
@@ -1472,6 +1472,8 @@ export class Orden_FacturacionComponent implements OnInit {
     content.push(this.observationPDF(data[0]));
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.directTableTotals(data));
+
+    console.log(informationProducts);
     informationProducts.length > 0 ? content.push(this.tableProducts(informationProducts)) : null;
     return content;
   }
@@ -1502,6 +1504,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   /// Función para cargar la información detallada de las referencias.
   getDirectInformationProducts(data: any): Array<any> {
+    console.log(data);
     let informationProducts: Array<any> = [];
     if (![null, undefined].includes(data)) {
       let count: number = 0;
@@ -1512,11 +1515,11 @@ export class Orden_FacturacionComponent implements OnInit {
         informationProducts.push({
           "#": count,
           "Rollo": prod.dtOrder.numero_Rollo,
-          "OT": prod.orderProduction,
+          "OT": prod.dataProduction.ordenProduction,
           "Item": prod.producto.prod_Id,
           "Referencia": prod.producto.prod_Nombre,
-          "Peso": this.formatNumbers((prod.weight).toFixed(2)),
-          "Peso B.": this.formatNumbers((prod.weight).toFixed(2)),
+          "Peso": this.formatNumbers((prod.dataProduction.weight).toFixed(2)),
+          "Peso B.": this.formatNumbers((prod.dataProduction.weight).toFixed(2)),
           "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
           "Unidad": prod.dtOrder.presentacion,
           "Ubicación": prod.ubication == null ? '' : prod.ubication,

@@ -15,7 +15,7 @@ import { Table } from 'primeng/table';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } from 'src/app/data';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 
 
 @Component({
@@ -50,6 +50,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   nroSolicitud : number = 0; /// Variable que se usará para almacenar el nro de solicitud al momento de generar el PDF y cargar la información de la solicitud seleccionada.
   arrayId : any = []; /// Array que se usará para almacenar los id de las solicitudes que se muestran en la tabla, esto con el fin de no mostrar solicitudes repetidas en caso de que una solicitud tenga varias materias primas.
   load : boolean = false; /** Variable que indicará si se está cargando información */
+  private destroy$ = new Subject<void>(); // Variable para manejar la destrucción de las subscripciones y evitar fugas de memoria
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -74,6 +75,12 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.lecturaStorage();
     this.getEstadoSolitudes();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  /** Función que se ejecutará al cerrar el componente para limpiar las subscripciones y evitar fugas de memoria */
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -142,7 +149,11 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     if(estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}` ;
     ruta.length > 0 ? ruta = `?${ruta}` : ruta = ``;
 
-    this.servicioDtSolicitudesMPExt.GetQuerySolicitudesMp_Extrusion(fechaInicial, fechaFinal, ruta).subscribe(data => {
+    this.servicioDtSolicitudesMPExt.GetQuerySolicitudesMp_Extrusion(fechaInicial, fechaFinal, ruta)
+    .pipe(
+      finalize(() => this.cargando = false)
+    )
+    .subscribe(data => {
       if(data.length > 0) {
         for (let index = 0; index < data.length; index++) {
           if(!this.arrayId.includes(data[index].id)) {
@@ -152,7 +163,6 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
         }
       } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
     }, error => { this.msj.mensajeError(`Error`, `Error al consultar registros de solicitudes de material`)} );
-    setTimeout(() => { this.cargando = false; }, 1500);
   }
 
   /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
@@ -432,15 +442,16 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     let arrayIds : any = [];
 
     let info : any = {
-      Codigo : data.codigo,
-      Solicitud : data.id,
-      Id : data.id_Subcategoria,
-      Nombre : data.subcategoria,
-      Cantidad : data.cantidad_Pedida,
-      CantAprobada : 0,
-      Und_Medida : data.medida,
-      Usuario : data.nombre_Usuario,
-      EstadoSolicitud : data.nombre_Estado,
+      'Codigo' : data.codigo,
+      'Solicitud' : data.id,
+      'Id' : data.id_Subcategoria,
+      'Nombre' : data.subcategoria,
+      'Cantidad' : data.cantidad_Pedida,
+      'CantAprobada' : data.cantidad_Entregada || 0,
+      'CantFaltante' : data.cantidad_Faltante || 0,
+      'Und_Medida' : data.medida,
+      'Usuario' : data.nombre_Usuario,
+      'EstadoSolicitud' : data.nombre_Estado,
     }
 
     this.estadoSolicitud = info.EstadoSolicitud;
@@ -501,9 +512,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
         this.msj.mensajeConfirmacion(`Confirmación`, `Estado de la solicitud actualizado exitosamente!`);
         this.getEstadoSolitudes();
         this.consultarFiltros();
-       },
+      },
       error => this.msj.mensajeError(`Error`, `No fue posible actualizar el encabezado de la solicitud de material N° ${solicitud_Id}`));
-   });
+    });
   }
 
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
@@ -524,16 +535,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.arrayId = [];
     this.formFiltros.patchValue({estadoDoc : estado});
     this.cargando = true;
-    setTimeout(() => {
-      this.servicioSolicitudesMPExt.getEstadosSolicitudes().subscribe(data => {
-        if(data.length > 0) {
-          for (let index = 0; index < data.length; index++) {
-            if(data[index].estado_Id == estado && data[index].solMpExt_Id != 1) this.llenarTablaConEstados(data[index]);
-          }
-        }
-      });
-    }, 500);
-    setTimeout(() => { this.cargando = false; }, 1000);
+    this.consultarFiltros();  
   }
 
   limpiarTodo(){
@@ -551,9 +553,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     let info : any = {
       id : datos.solMpExt_Id,
       ot : datos.solMpExt_OT,
-      fecha : datos.solMpExt_Fecha.replace('T00:00:00', ''),
+      fecha : '', //datos.solMpExt_Fecha.replace('T00:00:00', ''),
       estadoId : datos.estado_Id,
-      estado : '',
+      estado : datos.estado,
     }
     if(info.estadoId == 5) info.estado = 'Finalizado';
     if(info.estadoId == 11) info.estado = 'Pendiente';
@@ -573,6 +575,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.shepherdService.start();
   }
 
+  /** Calcular la cantidad solicitada de materia prima */
   calcularCantSolicitada() {
     let valor : number = 0;
     for (const solicitud of this.arrayMatPrimas) {
@@ -581,10 +584,20 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     return valor;
   }
 
+  /** Calcular la cantidad aprobada de materia prima */
   calcularCantAprobada() {
     let valor : number = 0;
     for (const solicitud of this.arrayMatPrimas) {
       valor += solicitud.CantAprobada
+    }
+    return valor;
+  }
+
+  /** Calcular la cantidad faltante de materia prima */
+  calcularCantFaltante() {
+    let valor : number = 0;
+    for (const solicitud of this.arrayMatPrimas) {
+      valor += solicitud.CantFaltante
     }
     return valor;
   }
