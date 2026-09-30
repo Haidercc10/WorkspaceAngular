@@ -1,4 +1,4 @@
-import { Component, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -23,7 +23,8 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsAsignacionMateriaPrima as defaultSteps } from 'src/app/data';
 import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
+import { error } from 'node:console';
 
 @Component({
   selector: 'app-asignacion-materia-prima',
@@ -104,6 +105,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       MpStockRetirada: [null, Validators.required],
       ProcesoRetiro: ['', Validators.required],
       Categoria: ['', Validators.required],
+      Precio: [0]
     });
   }
 
@@ -137,9 +139,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
-
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
@@ -183,8 +182,25 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   // Funcion que va a consultar la orden de trabajo para saber que cantidad de materia prima se ha asignado y que cantidad se ha devuelto con respecto a la cantidad que se debe hacer en kg
   infoOT() {
     let ot: string = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    this.bagProServices.srvObtenerListaClienteOT_Item(ot).pipe(takeUntil(this.destroy$)).subscribe(datos_procesos => {
-      if (datos_procesos.length != 0) {
+    this.load = false;
+
+    if (!ot || !ot.trim()){
+      this.load = true;
+      this.mensajeService.mensajeError(`Error`,`Debe ingresar una OT.`);
+      return;
+    }
+
+    this.bagProServices.srvObtenerListaClienteOT_Item(ot)
+    .pipe(
+      takeUntil(this.destroy$),
+      finalize(() => this.load = true)
+    ).subscribe({
+      next: datos_procesos => {
+        if (!datos_procesos || datos_procesos.length === 0) {
+          this.mensajeService.mensajeError('¡Error!', `La OT N° ${ot} no se encuentra registrada en BagPro.`);
+          return;
+        }
+
         for (let index = 0; index < datos_procesos.length; index++) {
           let adicional: number = datos_procesos[index].datosotKg * 0.05;
           this.kgOT = datos_procesos[index].datosotKg + adicional;
@@ -193,8 +209,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
           this.cargarInformacionOT(ot, datos_procesos[index]);
           break;
         }
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no se encuentra registrada en BagPro`);
-    }, () => this.mensajeService.mensajeError(`¡Error!`, `¡Error al consultar la OT ${ot}!`));
+      },
+      error: error => {
+        const mensaje = error instanceof Error ? error.message : `Error al consultar la OT ${ot}.`;
+        this.mensajeService.mensajeError(`Error`, mensaje);
+      }
+    });
   }
 
   cargarInformacionOT(ot: string, datos_procesos) {
@@ -221,24 +241,38 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(dato: number) {
+    this.load = false;
     let id: number = dato == 1 ? this.FormMateriaPrimaRetirada.value.MpIdRetirada : this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
-    this.materiaPrimaService.getInfoMpTintaBopp(id).pipe(takeUntil(this.destroy$)).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        if (this.categoriasMP.includes(datos_materiaPrima[i].categoria) || this.categoriasTintas.includes(datos_materiaPrima[i].categoria)) {
-          if (![84, 2001, 88, 89, 2072].includes(datos_materiaPrima[i].id)) {
-            this.FormMateriaPrimaRetirada.patchValue({
-              MpIdRetirada: datos_materiaPrima[i].id,
-              MpNombreRetirada: datos_materiaPrima[i].nombre,
-              MpCantidadRetirada: 0,
-              MpUnidadMedidaRetirada: datos_materiaPrima[i].undMedida,
-              MpStockRetirada: datos_materiaPrima[i].stock,
-              ProcesoRetiro: this.categoriasMP.includes(datos_materiaPrima[i].categoria) ? 'EXT' : 'IMP',
-              Categoria: datos_materiaPrima[i].categoria,
-            });
+
+    if (id == null){
+      this.load = true;
+      this.mensajeService.mensajeError(`Error`, `Debe ingresar una materia prima.`);
+      return;
+    }
+
+    this.materiaPrimaService.getInfoMpTintaBopp(id).pipe(takeUntil(this.destroy$), finalize(() => this.load = true)).subscribe({
+      next: datos_materiaPrima => {
+        for (let i = 0; i < datos_materiaPrima.length; i++) {
+          if (this.categoriasMP.includes(datos_materiaPrima[i].categoria) || this.categoriasTintas.includes(datos_materiaPrima[i].categoria)) {
+            if (![84, 2001, 88, 89, 2072].includes(datos_materiaPrima[i].id)) {
+              this.FormMateriaPrimaRetirada.patchValue({
+                MpIdRetirada: datos_materiaPrima[i].id,
+                MpNombreRetirada: datos_materiaPrima[i].nombre,
+                MpCantidadRetirada: 0,
+                MpUnidadMedidaRetirada: datos_materiaPrima[i].undMedida,
+                MpStockRetirada: datos_materiaPrima[i].stock,
+                ProcesoRetiro: this.categoriasMP.includes(datos_materiaPrima[i].categoria) ? 'EXT' : 'IMP',
+                Categoria: datos_materiaPrima[i].categoria,
+                Precio: datos_materiaPrima[i].precio
+              });
+            }
           }
         }
+      }, error: error => {
+        console.log(error);
+        this.limpiarCamposMP();
       }
-    }, () => this.limpiarCamposMP());
+    });
   }
 
   // Funcion para colocar la materia prima en la tabla
@@ -249,7 +283,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
           if (this.FormMateriaPrimaRetirada.value.ProcesoRetiro != '') {
             if (this.FormMateriaPrimaRetirada.value.MpCantidadRetirada <= this.FormMateriaPrimaRetirada.value.MpStockRetirada) this.cargarMateriaPrimaSeleccionada();
             else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera a la cantidad en stock!`);
-          } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar hacia que proceso va la materia prima!`);
+          } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar el proceso el cuál va dirigida la materia prima!`);
         } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!`);
       } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar debe ser mayor a cero (0)!`);
     } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario de materia prima!`);
@@ -270,6 +304,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       Proceso: this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
       Categoria: this.FormMateriaPrimaRetirada.value.Categoria,
       Stock: this.FormMateriaPrimaRetirada.value.MpStockRetirada,
+      Precio: this.FormMateriaPrimaRetirada.value.Precio
     }
     if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
     else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
@@ -302,8 +337,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
   asignacionMateriaPrima() {
     let idOrdenTrabajo: number = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
 
+    // consultar en la base de datos donde se obtiene estos estados para comentarlos aqui y asi saber a que corresponde el nombre del estado por el numero.
+    if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
       if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
       else {
         if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)) {
@@ -333,9 +369,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       SolMpExt_Id: this.FormMateriaPrimaRetiro.value.Solicitud == null || this.FormMateriaPrimaRetiro.value.Solicitud == "" ? 1 : this.FormMateriaPrimaRetiro.value.Solicitud,
       AsigMp_FechaRealEntrega: moment(this.FormMateriaPrimaRetiro.value.dateIn).format('YYYY-MM-DD'),
     }
-    this.asignacionMPService.srvGuardar(datosAsignacion).pipe(takeUntil(this.destroy$)).subscribe((datos) => this.obtenerProcesoId(datos.asigMp_Id), () => {
-      this.mensajeService.mensajeError(`¡Error!`, `¡Error al crear la asignación de materia prima!`);
-      this.load = true;
+
+    // Se guarda la asignación en la base de datos, y posteriormente se llama al método para guardar los detalles de la asignación.
+    this.asignacionMPService.srvGuardar(datosAsignacion).pipe(takeUntil(this.destroy$), finalize(() => this.load = true)).subscribe({
+      next: datos => {this.obtenerProcesoId(datos.asigMp_Id)},
+      error: error => {
+        this.mensajeService.mensajeError(`¡Error!`, `¡Error al crear la asignación de materia prima!`);
+        console.log(error);
+      }
     });
   }
 
@@ -350,9 +391,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       let cantidad = this.materiasPrimasSeleccionadas[i].Cantidad;
       let presentacion = this.materiasPrimasSeleccionadas[i].Und_Medida;
       let proceso = this.materiasPrimasSeleccionadas[i].Proceso;
+      let precio = this.materiasPrimasSeleccionadas[i].Precio;
 
-      if (polietileno_Id == 84 && tinta_Id != 2001) this.guardarAsignacionTinta(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso);
-      else if (polietileno_Id != 84 && tinta_Id == 2001 && !this.soloTintas) this.guardarAsignacionPolietileno(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso);
+      // Validar antes de asignar si la materia prima es un polietileno o es tinta.
+      if (polietileno_Id == 84 && tinta_Id != 2001) 
+        this.guardarAsignacionTinta(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso, precio);
+      else if (polietileno_Id != 84 && tinta_Id == 2001 && !this.soloTintas) 
+        this.guardarAsignacionPolietileno(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso, precio);
       count++;
     }
     setTimeout(() => {
@@ -363,14 +408,17 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     }, 2000);
   }
 
-  guardarAsignacionTinta(asignacion, id_tinta, nombreTinta, cantidad, presentacion, proceso) {
+  guardarAsignacionTinta(asignacion, id_tinta, nombreTinta, cantidad, presentacion, proceso, precio) {
     const datosDetallesAsignacionTintas: any = {
       AsigMp_Id: asignacion,
       Tinta_Id: id_tinta,
       DtAsigTinta_Cantidad: cantidad,
       UndMed_Id: presentacion,
       Proceso_Id: proceso,
+      DtAsigTinta_Precio: precio,
+      DtAsigTinta_Subtotal: precio * cantidad
     }
+
     this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(null, () => {
       this.load = true;
       this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${nombreTinta}!`);
@@ -378,13 +426,15 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.moverInventarioTintas(id_tinta, cantidad);
   }
 
-  guardarAsignacionPolietileno(asignacion, idMatPrima, nombreMatPrima, cantidad, presentacion, proceso) {
+  guardarAsignacionPolietileno(asignacion, idMatPrima, nombreMatPrima, cantidad, presentacion, proceso, precio) {
     const datosDetallesAsignacion: modelDetallesAsignacion = {
       AsigMp_Id: asignacion,
       MatPri_Id: idMatPrima,
       DtAsigMp_Cantidad: cantidad,
       UndMed_Id: presentacion,
       Proceso_Id: proceso,
+      DtAsigMp_Precio: precio,
+      DtAsigMp_Subtotal: (precio * cantidad)
     }
     this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
       this.load = true;
@@ -397,7 +447,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   asignacionExitosa(asignId: number) {
     let data: any = {}
     if (!this.soloTintas && !this.esSolicitud) {
-      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!`);
+      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!. A continuación se mostrará un PDF en una nueva pestaña.`);
       data = { 'Id': asignId, 'Movimiento': 'ASIGMP' };
 
       this.cmpMovMatPrima.validarTipoMovimiento(data)
@@ -468,7 +518,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.messageService.add({ severity: 'warn', key: 'eleccion', summary: 'Elección', detail: `Está seguro que desea quitar la materia prima de la asignación?`, sticky: true });
   }
 
-  confirmarAsignacion = (OT: any) => this.messageService.add({ severity: 'warn', key: 'asignacion', summary: 'Confirmar Elección', detail: `La cantidad de Kg a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea asignar continuar con la asignación?`, sticky: true });
+  confirmarAsignacion = (OT: any) => this.messageService.add({ severity: 'warn', key: 'asignacion', summary: 'Confirmar Elección', detail: `La cantidad de Kg a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea continuar con la asignación?`, sticky: true });
 
   //Buscar informacion de las solicitudes de materia prima creadas
   consultarSolicitudMaterial() {
@@ -476,9 +526,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.arrayMatPrimas = [];
     let solicitud: number = this.FormMateriaPrimaRetiro.value.Solicitud;
     this.esSolicitud = false;
+    this.load = false;
 
     if (solicitud) {
-      this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).pipe(takeUntil(this.destroy$)).subscribe(data => {
+      this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).pipe(takeUntil(this.destroy$), finalize(() => this.load = true))
+      .subscribe({
+        next: data => {
         console.log(data)
         if (data.length > 0) {
           if (![4,5].includes(data[0].estado)) {
@@ -486,7 +539,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
             this.llenarDatosAsignacion(data);
           } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible cargar solicitudes finalizadas o canceladas!`);
         } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} no existe!`);
-      }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la solicitud de material consultada!`));
+      }, error: error => {
+        const mensaje = error instanceof Error ? error.message : `No se pudo obtener la solicitud de material consultada!`;
+        this.mensajeService.mensajeError(`Error`, mensaje);
+      }
+      })
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El valor ingresado en el campo solicitud no es válido`);
     setTimeout(() => this.load = true, 1500);
   }
@@ -562,6 +619,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
   /** Validar que los materiales de la asignación tengan un stock mayor a la cantidad solicitada */
   validarStockMateriales() {
+    this.load = false;
     let stockMenor: boolean = false;
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
       if (this.materiasPrimasSeleccionadas[index].Cantidad > this.materiasPrimasSeleccionadas[index].Stock) stockMenor = true;

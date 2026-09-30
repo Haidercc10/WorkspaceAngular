@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { Table } from 'primeng/table';
-import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
@@ -12,8 +11,8 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
 import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
-import { tableLayouts } from 'pdfmake/build/pdfmake';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 
 @Injectable({
   providedIn: 'root'
@@ -68,7 +67,9 @@ export class MovimientoMPComponent implements OnInit {
     private mensajeService: MensajesAplicacionService,
     private creacionPDFService: CreacionPdfService,
     private cmpEntryBOPP: EntradaBOPPComponent,
-    private svExcel: CreacionExcelService,) {
+    private svExcel: CreacionExcelService,
+    private util: UtileriaService
+  ) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo: [null, Validators.required],
@@ -96,9 +97,6 @@ export class MovimientoMPComponent implements OnInit {
     this.formMovimientos.patchValue({ 'FechaInicial': initialDate, 'FechaFinal' : new Date() });
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
   //Funcion para obtener los diferentes tipos de documentos que podemos encontrar
   obtenerTipoDocumento() {
     let type : any = this.formMovimientos.value.movement;
@@ -114,7 +112,7 @@ export class MovimientoMPComponent implements OnInit {
       { Id: 'REM', Nombre: 'Remisión', Tipo: 'ENTRADA' },
       { Id: 'ENTBIO', Nombre: 'Entrada de Biorientado', Tipo: 'ENTRADA' },
     ];
-    //this.copiaTiposMovimientos = this.tiposMovimientos;
+
     this.copiaTiposMovimientos = this.tiposMovimientos.filter(item => item.Tipo === type);
     this.tiposMovimientos.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
     this.copiaTiposMovimientos.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
@@ -172,9 +170,6 @@ export class MovimientoMPComponent implements OnInit {
     }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`), () => this.cargando = false);
     this.totalAsignadoRestanteAsignar();
   }
-
-  //Reescribe la función validacionParametrosConsulta() más simplificada
-
 
   validacionParametrosConsulta() {
     let url: string = ``;
@@ -374,10 +369,10 @@ export class MovimientoMPComponent implements OnInit {
         let info: any = {
           Id: '',
           Nombre: '',
-          Cantidad: this.formatonumeros(datos[i].cantidad),
+          Cantidad: this.util.formatoNumeros(datos[i].cantidad),
           "Presentación": datos[i].unidad_Medida,
-          Precio: this.formatonumeros(0),
-          SubTotal: this.formatonumeros(0),
+          Precio: this.util.formatoNumeros(0),
+          SubTotal: this.util.formatoNumeros(0),
         }
         if (data.Movimiento == 'ASIGMP') {
           info.Id = datos[i].materia_Prima_Id;
@@ -402,10 +397,10 @@ export class MovimientoMPComponent implements OnInit {
         let info: any = {
           Id: '',
           Nombre: '',
-          Cantidad: this.formatonumeros(datos[i].cantidad),
+          Cantidad: this.util.formatoNumeros(datos[i].cantidad),
           "Presentación": datos[i].unidad_Medida,
-          Precio: this.formatonumeros(0),
-          SubTotal: this.formatonumeros(0),
+          Precio: this.util.formatoNumeros(0),
+          SubTotal: this.util.formatoNumeros(0),
         }
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001) {
           info.Id = datos[i].materia_Prima_Id;
@@ -427,10 +422,10 @@ export class MovimientoMPComponent implements OnInit {
         let info: any = {
           Id: '',
           Nombre: '',
-          Cantidad: this.formatonumeros(datos[i].cantidad),
+          Cantidad: this.util.formatoNumeros(datos[i].cantidad),
           "Presentación": datos[i].unidad_Medida,
-          Precio: this.formatonumeros(0),
-          SubTotal: this.formatonumeros(0),
+          Precio: this.util.formatoNumeros(0),
+          SubTotal: this.util.formatoNumeros(0),
         }
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
@@ -459,27 +454,27 @@ export class MovimientoMPComponent implements OnInit {
         let info: any = {
           Id: '',
           Nombre: '',
-          Cantidad: this.formatonumeros(datos[i].cantidad),
+          Cantidad: this.util.formatoNumeros(datos[i].cantidad),
           "Presentación": datos[i].unidad_Medida,
-          Precio: `$${this.formatonumeros(datos[i].precio)}`,
-          SubTotal: `$${this.formatonumeros(datos[i].subTotal)}`,
+          Precio: `$${this.util.formatoNumeros(datos[i].precio)}`,
+          SubTotal: `$${this.util.formatoNumeros(datos[i].subTotal)}`,
         }
         
         if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].materia_Prima_Id;
           info.Nombre = datos[i].materia_Prima;
           info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
-          info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
+          info.SubTotal = `$${this.util.formatoNumeros((info.SubTotal).toFixed(2))}`;
         } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].tinta_Id;
           info.Nombre = datos[i].tinta;
           info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
-          info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
+          info.SubTotal = `$${this.util.formatoNumeros((info.SubTotal).toFixed(2))}`;
         } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
           info.Id = datos[i].bopp_Id;
           info.Nombre = datos[i].bopp;
           info.SubTotal = datos[i].subTotal = datos[i].categoria == 18 ? info.Nombre.includes('CONO') ? this.subTotalCono(info.Nombre, datos[i].precio, datos[i].cantidad) : (datos[i].precio * datos[i].cantidad) : (datos[i].precio * datos[i].cantidad);
-          info.SubTotal = `$${this.formatonumeros((info.SubTotal).toFixed(2))}`;
+          info.SubTotal = `$${this.util.formatoNumeros((info.SubTotal).toFixed(2))}`;
         }
         //setTimeout(() => {
         /*this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
@@ -505,7 +500,7 @@ export class MovimientoMPComponent implements OnInit {
   crearPDF(data: any) {
     console.log('entrada:', data)
     let movimientoOrdenesTrabajo: string[] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
-    let tituloAdicional: string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';
+    let tituloAdicional: string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Código Documento ${(data[0].codigo).toUpperCase()}` : '';
     let titulo: string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;
     let content: any = this.contenidoPDF(data, movimientoOrdenesTrabajo);
     this.creacionPDFService.formatoPDF(titulo, content);
@@ -522,34 +517,38 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   infoMovement(data: any) {
+    const body: any[] = [
+      [{ text: 'Información General del Movimiento', colSpan: 4, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}]
+    ];
+
+    if (['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento)) {
+      body.push([
+        { text: `Proveedor: ${data.proveedor}`, colSpan: 2 },
+        {},
+        { text: `NIT/CC: ${data.proveedor_Id}` },
+        { text: `Telefono: ${data.telefono_Proveedor}` }
+      ]);
+    }
+
+    body.push([
+      { text: ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? `OC N°: ${data.orden_Compra}` : `OT N°: ${data.codigo}` },
+      { text: `Usuario: ${data.usuario}` },
+      { text: `Fecha Registro: ${data.fecha.replace('T00:00:00', '')} ${data.hora}` },
+      { text: `Fecha Asignación: ${data.fechaReal ? data.fechaReal.replace('T00:00:00', '') : data.fecha.replace('T00:00:00', '')}` }
+    ]);
+
     return {
       table: {
-        widths: ['40%', '30%', '30%'],
-        body: [
-          [{ text: `Información General del Movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {},],
-          ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ?
-            [
-              { text: `Proveedor:  ${data.proveedor}`, },
-              { text: `NIT/CC: ${data.proveedor_Id}`, },
-              { text: `Telefono: ${data.telefono_Proveedor}`, }
-            ] : [
-              { text: ``, border: [false, false, false, false] },
-              { text: ``, border: [false, false, false, false] },
-              { text: ``, border: [false, false, false, false] }],
-          [
-            { text: ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? `N° Orden Compra: ${data.orden_Compra}` : `OT N°: ${data.codigo}` },
-            { text: `Usuario: ${data.usuario}` },
-            { text: `Fecha: ${data.fecha.replace('T00:00:00', '')} ${data.hora}` },
-          ],
-        ]
+        widths: ['15%', '30%', '25%', '30%'],
+        body
       },
       fontSize: 8,
       layout: {
         fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null;
+          return rowIndex === 0 ? '#DDDDDD' : null;
         }
       }
-    }
+    };
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
@@ -594,10 +593,10 @@ export class MovimientoMPComponent implements OnInit {
           [
             { border: [true, false, true, true], text: `Peso Total`, bold: true, colSpan: 2 },
             {},
-            { border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data).toFixed(2))}`, bold: true, },
+            { border: [false, false, true, true], text: `${this.util.formatoNumeros(this.calcularTotalCantidad(data).toFixed(2))}`, bold: true, },
             {},
             { border: [true, false, true, true], text: `Valor Total`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros(0)}`, bold: true, },
+            { border: [false, false, true, true], text: `$${this.util.formatoNumeros(0)}`, bold: true, },
           ],
         ]
       },
@@ -649,10 +648,10 @@ export class MovimientoMPComponent implements OnInit {
 
             { border: [true, false, true, true], text: `Peso Total`, colSpan: 2, alignment: 'right', bold: true, },
             {},
-            { border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(datos_orden))}`, bold: true, },
+            { border: [false, false, true, true], text: `${this.util.formatoNumeros(this.calcularTotalCantidad(datos_orden))}`, bold: true, },
             '',
             { border: [true, false, true, true], text: `Subtotal`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden[0].valor_Total).toFixed(2))}`, alignment: 'right', bold: true, },
+            { border: [false, false, true, true], text: `$${this.util.formatoNumeros((datos_orden[0].valor_Total).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
@@ -660,7 +659,7 @@ export class MovimientoMPComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `IVA ${datos_orden[0].iva}%`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden[0].valor_Total * datos_orden[0].iva) / 100).toFixed(2))}`, alignment: 'right', bold: true, },
+            { border: [false, false, true, true], text: `$${this.util.formatoNumeros(((datos_orden[0].valor_Total * datos_orden[0].iva) / 100).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
@@ -668,7 +667,7 @@ export class MovimientoMPComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE Fuente ${datos_orden[0].reteFuente}%`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right', bold: true, },
+            { border: [false, false, true, true], text: `$${this.util.formatoNumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
@@ -676,7 +675,7 @@ export class MovimientoMPComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE IVA ${datos_orden[0].reteIva}%`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right', bold: true, },
+            { border: [false, false, true, true], text: `$${this.util.formatoNumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
@@ -684,7 +683,7 @@ export class MovimientoMPComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE ICA ${datos_orden[0].reteIca}%`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right', bold: true, },
+            { border: [false, false, true, true], text: `$${this.util.formatoNumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
           [
             '',
@@ -692,7 +691,7 @@ export class MovimientoMPComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `Valor Total`, bold: true, },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right', bold: true, },
+            { border: [false, false, true, true], text: `$${this.util.formatoNumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right', bold: true, },
           ],
         ]
       },

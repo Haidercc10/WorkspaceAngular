@@ -4,4 +4,6 @@ export interface modelDetallesAsignacion {
   DtAsigMp_Cantidad : number;
   UndMed_Id : string;
   Proceso_Id : string;
+  DtAsigMp_Precio : number;
+  DtAsigMp_Subtotal : number;
 }

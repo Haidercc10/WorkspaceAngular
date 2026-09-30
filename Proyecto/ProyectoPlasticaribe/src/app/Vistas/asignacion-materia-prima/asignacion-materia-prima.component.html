@@ -27,7 +27,7 @@
       Consultar OT</h4>
   </div>
 
-  <!-- Formulario Orden de Trabajo -->
+  <!-- Formulario consultar Orden de Trabajo -->
   <form [formGroup]="FormMateriaPrimaRetiro" id="formulario">
     <div class="mb-5">
       <div class="row g-4">
@@ -43,8 +43,7 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg col-xl col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="Solicitud" id="solicitud" type="text" pInputText
-              (keyup.enter)="consultarSolicitudMaterial()" />
+            <input formControlName="Solicitud" id="solicitud" type="text" pInputText (keyup.enter)="consultarSolicitudMaterial()" />
             <label for="solicitud">Solicitud</label>
           </span>
         </div>
@@ -76,7 +75,6 @@
             <label for="textarea">Observación</label>
           </span>
         </div>
-
       </div>
     </div>
   </form>
@@ -107,11 +105,18 @@
             <td [ngClass]="{ 'colorRojo' : ot.kgRestante <= 0 }"><b>{{ot.kgRestante | number}}</b></td>
           </tr>
         </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center">
+              <h6>No hay una OT consultada.</h6>
+            </td>
+          </tr>
+        </ng-template>
       </p-table>
     </div>
   </div>
 
-   <!-- Solicitudes de material -->
+  <!-- Solicitudes de material -->
   <div class="mb-5" id="opcional" *ngIf="esSolicitud">
     <p-accordion [activeIndex]="0"> 
       <p-accordionTab header="Asignación de materia prima basada en categorias">
@@ -124,7 +129,6 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
       Seleccionar Materia Prima</h4>
   </div>
-
 
   <!-- Formulario de seleccion de materia prima  -->
   <form [formGroup]="FormMateriaPrimaRetirada">
@@ -156,8 +160,7 @@
         <!-- Stock de Materia Prima  -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" id="stockMp">
           <span class="p-float-label">
-            <p-inputNumber formControlName="MpStockRetirada" mode="decimal" inputId="Stock" [minFractionDigits]="2"
-              [readonly]="true"></p-inputNumber>
+            <p-inputNumber formControlName="MpStockRetirada" mode="decimal" inputId="Stock" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
             <label for="Stock">Stock</label>
           </span>
         </div>
@@ -190,7 +193,6 @@
             <label for="Proceso">Procesos</label>
           </span>
         </div>
-
       </div>
     </div>
 
@@ -229,7 +231,7 @@
             <th scope="col">Stock</th>
             <th scope="col">Und. Medida</th>
             <th scope="col">Proceso</th>
-            <th scope="col"></th>
+            <th scope="col">Quitar</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimasSeleccionadas>
@@ -252,8 +254,9 @@
               <b>{{materiasPrimasSeleccionadas.Stock}}</b></td>
             <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
             <td><b>{{materiasPrimasSeleccionadas.Proceso}}</b></td>
-            <td id="quitarMp"><i class="pi pi-trash cursor" title="Quitar Materia Prima"
-                (click)="mostrarEleccion(materiasPrimasSeleccionadas)"></i></td>
+            <td id="quitarMp" class="text-center">
+              <button pButton class="p-button-danger" id="btnQuitarMP" type="button" pTooltip="Quitar de la tabla este registro" (click)="mostrarEleccion(materiasPrimasSeleccionadas)" icon="pi pi-trash" style="width: 2rem !important; height: 2rem !important;"></button>
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -261,6 +264,13 @@
             <td colspan="3">Total</td>
             <td>{{calcularMateriaPrimaAsignada()}}</td>
             <td colspan="4"></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center">
+              <h6>Agrega materia prima para que aparezcan aquí.</h6>
+            </td>
           </tr>
         </ng-template>
       </p-table>
