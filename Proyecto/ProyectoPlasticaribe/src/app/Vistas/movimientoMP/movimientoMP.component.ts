@@ -7,12 +7,12 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
 import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { finalize } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +34,7 @@ export class MovimientoMPComponent implements OnInit {
   @ViewChild('dt6') dt6: Table | undefined;
   @ViewChild('dt7') dt7: Table | undefined;
   cargando: boolean = false;
+  dialogCargando: boolean = false;
   formMovimientos !: FormGroup;
   tiposMovimientos: any[] = [];
   materiasPrimas: any[] = [];
@@ -64,7 +65,6 @@ export class MovimientoMPComponent implements OnInit {
     private detallesAsignacionService: DetallesAsignacionService,
     private bagProServices: BagproService,
     private shepherdService: ShepherdService,
-    private mensajeService: MensajesAplicacionService,
     private creacionPDFService: CreacionPdfService,
     private cmpEntryBOPP: EntradaBOPPComponent,
     private svExcel: CreacionExcelService,
@@ -150,7 +150,8 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a consultar la información de los movimientos
   consultarMovimientos() {
-    this.cargando = true;
+    this.cargando = !this.modal? true : false;
+    this.dialogCargando = this.modal? true : false;
     this.cantRestante = 0;
     this.cantAsignada = 0;
     this.movimientosPolietilenos = [];
@@ -163,11 +164,17 @@ export class MovimientoMPComponent implements OnInit {
     let fechaFinal: any = moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD');
     let ruta: string = this.validacionParametrosConsulta();
 
-    this.materiaPrimaService.GetMoviemientos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
-      if (datos.length == 0) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
-      else this.llenarMateriasPrimasConsultadas(datos);
-      this.cargando = false;
-    }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`), () => this.cargando = false);
+    this.materiaPrimaService.GetMoviemientos(fechaInicial, fechaFinal, ruta).pipe(finalize(() => {this.cargando = false; this.dialogCargando = false})).subscribe({
+      next: datos => {
+        if (datos.length == 0) this.util.Notificacion(`Advertencia`, `No se encontró información con los parámetros consultados.`);
+        else this.llenarMateriasPrimasConsultadas(datos);
+      },
+      error: error => {
+        console.log(error);
+        this.util.Notificacion(`Error`, `No se pudo realizar la consulta, error en el servidor.`);
+      }
+    });
+  
     this.totalAsignadoRestanteAsignar();
   }
 
@@ -206,7 +213,9 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   llenarMateriasPrimasConsultadas(datos) {
-    this.cargando = true;
+    this.cargando = !this.modal? true : false;
+    this.dialogCargando = this.modal? true : false;
+
     let count: number = 0;
     for (let i = 0; i < datos.length; i++) {
       let info: any = {
@@ -235,7 +244,10 @@ export class MovimientoMPComponent implements OnInit {
       };
       this.agrupacionMateriasPrimas(datos[i], info);
       count++;
-      if (datos.length == count) this.cargando = false;
+      if (datos.length == count) {
+        this.cargando = false;
+        this.dialogCargando = false;
+      }
     }
   }
 
@@ -251,15 +263,15 @@ export class MovimientoMPComponent implements OnInit {
     // Tintas
     if (datos.materia_Prima_Id == 84 && datos.tinta_Id != 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) {
       this.movimientosTintas.push(infoMateriaPrima);
-      this.groupedInformation(this.movimientosTintas, 'tinta')
+      this.groupedInformation(this.movimientosTintas, 'tinta');
     }
     this.movimientosTintas.sort((a, b) => a.Codigo.localeCompare(b.Codigo));
     this.movimientosTintas.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
 
-    // Biorientado
+    // Biorientados
     if (datos.materia_Prima_Id == 84 && datos.tinta_Id == 2001 && (datos.bopp_Id != 449 || datos.bopp_Id != 1)) {
       this.movimientosBiorientados.push(infoMateriaPrima);
-      this.groupedInformation(this.movimientosBiorientados, 'bopp')
+      this.groupedInformation(this.movimientosBiorientados, 'bopp');
     }
     this.movimientosBiorientados.sort((a, b) => a.Codigo.localeCompare(b.Codigo));
     this.movimientosBiorientados.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
@@ -289,7 +301,6 @@ export class MovimientoMPComponent implements OnInit {
     }
   }
 
-  //Función que
   groupedInformation(data: any[], type: string) {
     data.forEach(d => {
       let count: number = 0;
@@ -317,29 +328,25 @@ export class MovimientoMPComponent implements OnInit {
 
   validateCount = (data: any, d: any) => data.filter(x => x.mp_Id == d.mp_Id && x.TipoMov == d.TipoMov).length;
 
-  //Función que
   groupedMatPrimas = () => this.groupedInfo.filter(x => x.type == 'mp');
 
   totalMatPrimas = () => this.groupedInfo.filter(x => x.type == 'mp').reduce((sum, current) => sum + current.subTotal, 0);
 
-  //Función que 
   groupedTintas = () => this.groupedInfo.filter(x => x.type == 'tinta');
 
   totalTintas = () => this.groupedInfo.filter(x => x.type == 'tinta').reduce((sum, current) => sum + current.subTotal, 0);
 
-  //Función que 
   groupedBopp = () => this.groupedInfo.filter(x => x.type == 'bopp');
 
   totalBopp = () => this.groupedInfo.filter(x => x.type == 'bopp').reduce((sum, current) => sum + current.subTotal, 0);
 
-  //Función que 
   loadDetailsMaterial(data: any) {
     this.selectedMovement = `${data.item} - ${data.reference}`
     this.detailInfo = [];
     this.modal = true;
     if (data.type == 'mp') this.detailInfo = this.movimientosPolietilenos.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov);
-    if (data.type == 'tinta') this.detailInfo = this.movimientosTintas.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov)
-    if (data.type == 'bopp') this.detailInfo = this.movimientosBiorientados.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov)
+    if (data.type == 'tinta') this.detailInfo = this.movimientosTintas.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov);
+    if (data.type == 'bopp') this.detailInfo = this.movimientosBiorientados.filter(x => x.mp_Id == data.item && x.TipoMov == data.typeMov);
   }
   
   totalDetailedInfo = () => this.detailInfo.reduce((sum, current) => sum + current.SubTotal, 0);
@@ -350,7 +357,9 @@ export class MovimientoMPComponent implements OnInit {
   validarTipoMovimiento(data: any) {
     console.log(data);
     this.datosPdf = [];
-    this.cargando = true;
+    this.cargando = !this.modal? true : false;
+    this.dialogCargando = this.modal? true : false;
+
     let movAsignaciones: string[] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS'];
     if (movAsignaciones.includes(data.Movimiento)) this.asignacionesMateriaPrima(data);
     else if (data.Movimiento == 'CRTINTAS') this.creacionTintas(data);
@@ -358,7 +367,11 @@ export class MovimientoMPComponent implements OnInit {
     else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') this.entradasMateriasPrimas(data);
     else if (data.Movimiento == 'ENTBIO') {
       this.cmpEntryBOPP.crearPDF(data.Fecha, data.Hora);
-      this.cargando = false;
+      setTimeout(() => {
+        this.cargando = false; 
+        this.dialogCargando = false;
+        this.util.Notificacion(`Confirmación`,`PDF generandose, se abrirá una nueva pestaña al finalizar la carga del documento.`, 2000);
+      }, 3000);
     }
   }
 
@@ -387,7 +400,10 @@ export class MovimientoMPComponent implements OnInit {
         this.datosPdf.push(info);
       }
       informacionPdf = datos;
-    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+    }, () => {
+      this.cargando = false; 
+      this.dialogCargando = false;
+    }, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
   creacionTintas(data: any) {
@@ -412,7 +428,10 @@ export class MovimientoMPComponent implements OnInit {
         this.datosPdf.push(info);
       }
       informacionPdf = datos;
-    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+    }, () => {
+      this.cargando = false; 
+      this.dialogCargando = false;
+    }, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
   devolucionesMateriaPrima(data: any) {
@@ -440,7 +459,10 @@ export class MovimientoMPComponent implements OnInit {
         this.datosPdf.push(info);
       }
       informacionPdf = datos;
-    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+    }, () => {
+      this.cargando = false; 
+      this.dialogCargando = false;
+    }, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
   entradasMateriasPrimas(data: any) {
@@ -488,7 +510,10 @@ export class MovimientoMPComponent implements OnInit {
         //}, 500);
       }
       informacionPdf = datos;
-    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+    }, () => {
+      this.cargando = false; 
+      this.dialogCargando = false;
+    }, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
   subTotalCono(cono: any, precio: number, cant: number) {
@@ -504,7 +529,7 @@ export class MovimientoMPComponent implements OnInit {
     let titulo: string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;
     let content: any = this.contenidoPDF(data, movimientoOrdenesTrabajo);
     this.creacionPDFService.formatoPDF(titulo, content);
-    setTimeout(() => this.cargando = false, 3000);
+    setTimeout(() => {this.cargando = false; this.dialogCargando = false;}, 3000);
   }
 
   contenidoPDF(data: any, movimientosOT: any[]) {
@@ -735,13 +760,22 @@ export class MovimientoMPComponent implements OnInit {
 
   //Función que exportará un formato excel con los datos de los clientes
   exportExcel(data: any) {
+    this.cargando = true;
+
     this.activeTab == `Materias Primas` ? data = this.movimientosPolietilenos :
       this.activeTab == `Tintas` ? data = this.movimientosTintas :
         this.activeTab == `Biorientados` ? data = this.movimientosBiorientados : data = [];
 
     if (data.length > 0) {
-      setTimeout(() => { this.loadSheetAndStyles(data, this.activeTab); }, 500);
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+      setTimeout(() => { 
+        this.loadSheetAndStyles(data, this.activeTab);
+        this.cargando = false;
+        this.util.Notificacion(`Confirmación`,`Se generó el documento Excel, en unos momentos iniciará la descarga.`);
+      }, 500);
+    } else {
+      this.cargando = false;
+      this.util.Notificacion(`Advertencia`, `No hay datos para exportar.`)
+    };
   }
 
   //Función que cargará la hoja y los estilos. 
@@ -870,5 +904,4 @@ export class MovimientoMPComponent implements OnInit {
     else if (tab == 'Tintas') this.activeTab = `Tintas`;
     else if (tab == 'Biorientados') this.activeTab = `Biorientados`;
   }
-
 }

@@ -15,4 +15,6 @@ export class MensajesAplicacionService {
   mensajeAdvertencia = (titulo : string, detalles : string = '', tiempo : number = 3000) => this.messageService.add({severity:'warn', summary: titulo, detail: detalles, life: tiempo });
 
   mensajeConfirmacion = (titulo : string, detalles : string = '', tiempo : number = 3000) => this.messageService.add({severity:'success', summary: titulo, detail: detalles, life: tiempo });
+
+  mensajeInformacion = (titulo : string, detalles : string = '', tiempo : number = 3000) => this.messageService.add({severity:'info', summary: titulo, detail: detalles, life: tiempo });
 }

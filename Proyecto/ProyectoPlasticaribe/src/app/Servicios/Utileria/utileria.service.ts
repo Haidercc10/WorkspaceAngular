@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MensajesAplicacionService } from '../MensajesAplicacion/MensajesAplicacion.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -20,16 +21,21 @@ export class UtileriaService {
     return `${year}-${month}-${day}`;
   }
 
-  Notificacion(mensaje1: string, mensaje2: string) {
-    switch (mensaje1) {
-      case 'Confirmación':
-        return this.msj.mensajeConfirmacion(mensaje1, mensaje2);
-      case 'Advertencia':
-        return this.msj.mensajeAdvertencia(mensaje1, mensaje2);
-      case 'Error':
-        return this.msj.mensajeError(mensaje1, mensaje2);
+  Notificacion(mensaje1: string, mensaje2: string, tiempo?: number, responseError?: HttpErrorResponse) {
+    switch (mensaje1.toUpperCase()) {
+      case 'CONFIRMACIÓN':
+        return this.msj.mensajeConfirmacion(mensaje1, mensaje2, tiempo);
+      case 'CONFIRMACION':
+        return this.msj.mensajeConfirmacion(mensaje1, mensaje2, tiempo);
+      case 'ADVERTENCIA':
+        return this.msj.mensajeAdvertencia(mensaje1, mensaje2, tiempo);
+      case 'ERROR':
+        return this.msj.mensajeError(mensaje1, mensaje2, tiempo);
+      case 'ERRORHTTP':
+        const errorhttp : any = responseError;
+        return this.msj.errorHttp(mensaje2, errorhttp);
       default:
-        return this.msj.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`);
+        return this.msj.mensajeInformacion(`Información`,mensaje2, tiempo);
     }
   }
 }
