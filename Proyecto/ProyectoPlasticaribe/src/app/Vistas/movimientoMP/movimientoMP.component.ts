@@ -164,9 +164,9 @@ export class MovimientoMPComponent implements OnInit {
     let fechaFinal: any = moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD');
     let ruta: string = this.validacionParametrosConsulta();
 
-    this.materiaPrimaService.GetMoviemientos(fechaInicial, fechaFinal, ruta).pipe(finalize(() => {this.cargando = false; this.dialogCargando = false})).subscribe({
+    this.materiaPrimaService.GetMovimientos(fechaInicial, fechaFinal, ruta).pipe(finalize(() => {this.cargando = false; this.dialogCargando = false})).subscribe({
       next: datos => {
-        if (datos.length == 0) this.util.Notificacion(`Advertencia`, `No se encontró información con los parámetros consultados.`);
+        if (datos.length == 0) this.util.Notificacion(`error`, `No se encontró información con los parámetros consultados.`);
         else this.llenarMateriasPrimasConsultadas(datos);
       },
       error: error => {

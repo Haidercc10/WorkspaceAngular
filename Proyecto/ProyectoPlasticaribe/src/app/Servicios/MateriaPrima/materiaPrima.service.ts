@@ -37,7 +37,7 @@ export class MateriaPrimaService {
 
   GetCategoriasMateriaPrima = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
 
-  GetMoviemientos = (fechaInicial : any, fechaFinal : any, ruta : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMovimientos/${fechaInicial}/${fechaFinal}/${ruta}`);
+  GetMovimientos = (fechaInicial : any, fechaFinal : any, ruta : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMovimientos/${fechaInicial}/${fechaFinal}/${ruta}`);
 
   GetInfoMovimientoAsignaciones = (codigo : string, tipoMov : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientoAsignaciones/${codigo}/${tipoMov}`);
 

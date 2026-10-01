@@ -22,20 +22,21 @@ export class UtileriaService {
   }
 
   Notificacion(mensaje1: string, mensaje2: string, tiempo?: number, responseError?: HttpErrorResponse) {
+    let titulo: string = mensaje1 ? mensaje1.charAt(0).toUpperCase() + mensaje1.slice(1) : ``; // titulo capitalizado de esta forma ya que siempre vendrá una sola palabra.
     switch (mensaje1.toUpperCase()) {
       case 'CONFIRMACIÓN':
-        return this.msj.mensajeConfirmacion(mensaje1, mensaje2, tiempo);
+        return this.msj.mensajeConfirmacion(titulo, mensaje2, tiempo);
       case 'CONFIRMACION':
-        return this.msj.mensajeConfirmacion(mensaje1, mensaje2, tiempo);
+        return this.msj.mensajeConfirmacion(titulo, mensaje2, tiempo);
       case 'ADVERTENCIA':
-        return this.msj.mensajeAdvertencia(mensaje1, mensaje2, tiempo);
+        return this.msj.mensajeAdvertencia(titulo, mensaje2, tiempo);
       case 'ERROR':
-        return this.msj.mensajeError(mensaje1, mensaje2, tiempo);
+        return this.msj.mensajeError(titulo, mensaje2, tiempo);
       case 'ERRORHTTP':
         const errorhttp : any = responseError;
         return this.msj.errorHttp(mensaje2, errorhttp);
       default:
-        return this.msj.mensajeInformacion(`Información`,mensaje2, tiempo);
+        return this.msj.mensajeInformacion(`Información`, mensaje2, tiempo);
     }
   }
 }

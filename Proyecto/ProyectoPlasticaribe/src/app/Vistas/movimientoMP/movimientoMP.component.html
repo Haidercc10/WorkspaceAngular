@@ -142,8 +142,8 @@
                 <td>{{data.item}}</td>
                 <td>{{data.reference}}</td>
                 <td><b>{{data.qty | number : '1.2-2'}}</b></td>
-                <td>${{data.price | number : '1.2-2'}}</td>
-                <td><b>${{data.subTotal | number : '1.2-2'}}</b></td>
+                <td>$ {{data.price | number : '1.2-2'}}</td>
+                <td><b>$ {{data.subTotal | number : '1.2-2'}}</b></td>
                 <td><b>{{data.count}}</b></td>
                 <td class="text-center">
                   <button pButton pRipple pTooltip="Ver detalles {{data.reference}}" icon="pi pi-eye"
@@ -154,7 +154,7 @@
             <ng-template pTemplate="footer">
               <tr id="pie-t1">
                 <td colspan="5"></td>
-                <td colspan="">{{totalMatPrimas() | number : '1.2-2'}}</td>
+                <td colspan="">$ {{totalMatPrimas() | number : '1.2-2'}}</td>
                 <td colspan="2"></td>
               </tr>
             </ng-template>
@@ -200,8 +200,8 @@
                 <td>{{data.item}}</td>
                 <td>{{data.reference}}</td>
                 <td><b>{{data.qty | number : '1.2-2'}}</b></td>
-                <td>${{data.price | number : '1.2-2'}}</td>
-                <td><b>${{data.subTotal | number : '1.2-2'}}</b></td>
+                <td>$ {{data.price | number : '1.2-2'}}</td>
+                <td><b>$ {{data.subTotal | number : '1.2-2'}}</b></td>
                 <td><b>{{data.count}}</b></td>
                 <td class="text-center">
                   <button pButton pRipple pTooltip="Ver detalles {{data.reference}}" icon="pi pi-eye" class="p-button-success" (click)="loadDetailsMaterial(data)"></button>
@@ -211,7 +211,7 @@
             <ng-template pTemplate="footer">
               <tr id="pie-t1">
                 <td colspan="5"></td>
-                <td colspan="">{{totalMatPrimas() | number : '1.2-2'}}</td>
+                <td colspan="">$ {{totalMatPrimas() | number : '1.2-2'}}</td>
                 <td colspan="2"></td>
               </tr>
             </ng-template>
@@ -250,8 +250,8 @@
                 <td>{{data.item}}</td>
                 <td>{{data.reference}}</td>
                 <td><b>{{data.qty | number : '1.2-2'}}</b></td>
-                <td>${{data.price | number : '1.2-2'}}</td>
-                <td><b>${{data.subTotal | number : '1.2-2'}}</b></td>
+                <td>$ {{data.price | number : '1.2-2'}}</td>
+                <td><b>$ {{data.subTotal | number : '1.2-2'}}</b></td>
                 <td>{{data.count}}</td>
                 <td class="text-center">
                   <button pButton pRipple pTooltip="Ver detalles {{data.reference}}" icon="pi pi-eye" class="p-button-success" (click)="loadDetailsMaterial(data)"></button>
@@ -261,7 +261,7 @@
             <ng-template pTemplate="footer">
               <tr id="pie-t1">
                 <td colspan="5"></td>
-                <td colspan="">{{totalBopp() | number : '1.2-2'}}</td>
+                <td colspan="">$ {{totalBopp() | number : '1.2-2'}}</td>
                 <td colspan="2"></td>
               </tr>
             </ng-template>
@@ -298,9 +298,9 @@
                 <th scope="col">OT / DOC.</th>
                 <th scope="col">Tipo Mov</th>
                 <th scope="col">Fecha Registro</th>
-                <th scope="col">Registrado Por:</th>
+                <th scope="col">Registrado Por</th>
                 <th scope="col">Proveedor</th>
-                <th scope="col">Subcategoria</th>
+                <th scope="col">Subcategoría</th>
                 <th scope="col">Id</th>
                 <th scope="col">Materia Prima</th>
                 <th scope="col">Cantidad</th>
@@ -320,14 +320,14 @@
                 <td>{{data.Id_MateriaPrima}}</td>
                 <td>{{data.Materia_Prima}}</td>
                 <td>{{data.Cantidad | number : '1.2-2'}}</td>
-                <td>{{data.Precio | number : '1.2-2'}}</td>
-                <!--<td>{{data.SubTotal | number : '1.2-2'}}</td>-->
+                <td>$ {{data.Precio | number : '1.2-2'}}</td>
+                <!--<td>$ {{data.SubTotal | number : '1.2-2'}}</td>-->
                 <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="8" class="text-right">Total Kg de Polietilenos Asignados</td>
+                <td colspan="8" class="text-right">Total Kgs de Polietilenos Asignados</td>
                 <td colspan="3">{{calcularTotalMaterialPrima(movimientosPolietilenos) | number : '1.0-2'}}</td>
               </tr>
               <tr id="pie-t1">
@@ -363,9 +363,9 @@
                 <th scope="col">OT / Tinta Creada</th>
                 <th scope="col">Tipo Mov.</th>
                 <th scope="col">Fecha Registro</th>
-                <th scope="col">Registrado Por:</th>
+                <th scope="col">Registrado Por</th>
                 <th scope="col">Proveedor</th>
-                <th scope="col">Subcategoria</th>
+                <th scope="col">Subcategoría</th>
                 <th scope="col">Id</th>
                 <th scope="col">Materia Prima</th>
                 <th scope="col">Cantidad</th>
@@ -385,14 +385,14 @@
                 <td>{{data.Id_Tinta}}</td>
                 <td>{{data.Tinta}}</td>
                 <td>{{data.Cantidad | number : '1.2-2'}}</td>
-                <td>{{data.Precio | number : '1.2-2'}}</td>
-                <!--<td>{{data.SubTotal | number : '1.2-2'}}</td>-->
+                <td>$ {{data.Precio | number : '1.2-2'}}</td>
+                <!--<td>$ {{data.SubTotal | number : '1.2-2'}}</td>-->
                 <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="8" class="text-right">Total Kg de Tintas Asignadas</td>
+                <td colspan="8" class="text-right">Total Kgs de Tintas Asignadas</td>
                 <td colspan="3">{{calcularTotalMaterialPrima(movimientosTintas) | number : '1.0-2'}}</td>
               </tr>
               <tr id="pie-t1">
@@ -429,9 +429,9 @@
                 <th scope="col">OT / DOC.</th>
                 <th scope="col">Tipo Mov.</th>
                 <th scope="col">Fecha Registro</th>
-                <th scope="col">Registrado Por:</th>
+                <th scope="col">Registrado Por</th>
                 <th scope="col">Proveedor</th>
-                <th scope="col">Subcategoria</th>
+                <th scope="col">Subcategoría</th>
                 <th scope="col">Id</th>
                 <th scope="col">Materia Prima</th>
                 <th scope="col">Cantidad</th>
@@ -451,14 +451,14 @@
                 <td>{{data.Id_Bopp}}</td>
                 <td>{{data.Bopp}}</td>
                 <td>{{data.Cantidad | number : '1.2-2'}}</td>
-                <td>{{data.Precio | number : '1.2-2'}}</td>
-                <!--<td>{{data.SubTotal | number : '1.2-2'}}</td>-->
+                <td>$ {{data.Precio | number : '1.2-2'}}</td>
+                <!--<td>$ {{data.SubTotal | number : '1.2-2'}}</td>-->
                 <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="8" class="text-right">Total Kg de Biorientados Asignados</td>
+                <td colspan="8" class="text-right">Total Kgs de Biorientados Asignados</td>
                 <td colspan="3">{{calcularTotalMaterialPrima(movimientosBiorientados) | number : '1.0-2'}}</td>
               </tr>
               <tr>
@@ -530,17 +530,17 @@
         <td>{{data.mp_Id}}</td>
         <td>{{data.mp}}</td>
         <td>{{data.Cantidad | number : '1.2-2'}}</td>
-        <td>${{data.Precio | number : '1.2-2'}}</td>
-        <td>${{data.SubTotal | number : '1.2-2'}}</td>
+        <td>$ {{data.Precio | number : '1.2-2'}}</td>
+        <td>$ {{data.SubTotal | number : '1.2-2'}}</td>
         <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="9" class="text-right">Total:</td>
-        <td>{{totalQtyDetailedInfo() | number }}</td>
+        <td>{{totalQtyDetailedInfo() | number : '1.2-2' }}</td>
         <td></td>
-        <td>${{totalDetailedInfo() | number}}</td>
+        <td>$ {{totalDetailedInfo() | number : '1.2-2'}}</td>
       </tr>
     </ng-template>
   </p-table>
