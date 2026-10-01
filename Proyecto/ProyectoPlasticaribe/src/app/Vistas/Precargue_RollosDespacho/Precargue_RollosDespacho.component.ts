@@ -421,7 +421,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       let title: string = `Orden de Precargue N° ${id}`;
       let content: any[] = this.PDFService.contentPDFPrecargue(data);
       this.PDFService.formatoPDF(title, content);
-      this.msjs(`Confirmación`, `Orden de precargue N° ${id} ${action} exitosamente!. . A continuación se abrirá el PDF en una nueva pestaña.`);
+      this.msjs(`Confirmación`, `Orden de precargue N° ${id} ${action} exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
       onComplete?.();
       setTimeout(() => this.clearAll(), 3000);
     }, error => {
