@@ -210,6 +210,7 @@
       </div>
     </div>
     <br>
+    <!-- Los campos queda inhabilitados (disabled) excepto el cliente, se configura desde el typescript -->
     <form [formGroup]="formDialogPrecargue">
       <div class="mb-3">
         <div class="row g-4">
@@ -217,7 +218,7 @@
           <!-- NUMERO DE PRECARGUE -->
           <div class="col-md-6">
             <span class="p-float-label">
-              <input formControlName="nroPrecargue" id="nroPrecargue" type="number" pInputText readonly/>
+              <input formControlName="nroPrecargue" id="nroPrecargue" type="number" pInputText/>
               <label for="nroPrecargue">N° Precargue</label>
             </span>
           </div>
@@ -225,7 +226,7 @@
           <!-- OF ASOCIADA -->
           <div class="col-md-6">
             <span class="p-float-label">
-              <input formControlName="ofAsociada" id="ofAsociada" type="text" pInputText readonly/>
+              <input formControlName="ofAsociada" id="ofAsociada" type="text" pInputText/>
               <label for="ofAsociada">OF Asociada</label>
             </span>
           </div>
@@ -234,7 +235,10 @@
           <div class="col-md-12">
             <span class="p-float-label">
               <input formControlName="cliente" id="cliente" list="dialog-client-list" type="text" pInputText required
-                (keyup)="searchClientsByName(formDialogPrecargue, 'cliente')" (change)="selectClient(formDialogPrecargue, 'cliente')" />
+                (input)="clearClientSelection(formDialogPrecargue, 'cliente')"
+                (keyup)="searchClientsByName(formDialogPrecargue, 'cliente')" 
+                (change)="selectClient(formDialogPrecargue, 'cliente')"
+                (click)="$any($event.target).select()" />
               <datalist id="dialog-client-list">
                 <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
               </datalist>
@@ -245,7 +249,7 @@
             <!-- ASESOR -->
           <div class="col-md-12">
             <span class="p-float-label">
-              <input formControlName="asesor" id="asesor" type="text" pInputText readonly/>
+              <input formControlName="asesor" id="asesor" type="text" pInputText/>
               <label for="asesor">Asesor</label>
             </span>
           </div>
@@ -253,7 +257,7 @@
           <!-- FECHA CREACION -->
           <div class="col-md-6">
             <span class="p-float-label">
-              <input formControlName="fechaCreacion" id="fechaCreacion" type="text" pInputText readonly/>
+              <input formControlName="fechaCreacion" id="fechaCreacion" type="text" pInputText/>
               <label for="fechaCreacion">Fecha de Creación</label>
             </span>
           </div>
@@ -261,7 +265,7 @@
           <!-- FECHA CIERRE -->
           <div class="col-md-6">
             <span class="p-float-label">
-              <input formControlName="fechaCierre" id="fechaCierre" type="text" pInputText readonly/>
+              <input formControlName="fechaCierre" id="fechaCierre" type="text" pInputText/>
               <label for="fechaCierre">Fecha de Cierre</label>
             </span>
           </div>
@@ -269,7 +273,7 @@
           <!-- ESTADO -->
           <div class="col-md-12">
             <span class="p-float-label">
-              <input formControlName="estado" id="estado" type="text" pInputText readonly/>
+              <input formControlName="estado" id="estado" type="text" pInputText/>
               <label for="estado">Estado</label>
             </span>
           </div>

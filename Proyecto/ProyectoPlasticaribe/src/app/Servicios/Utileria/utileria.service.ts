@@ -25,13 +25,13 @@ export class UtileriaService {
     let titulo: string = mensaje1 ? mensaje1.charAt(0).toUpperCase() + mensaje1.slice(1) : ``; // titulo capitalizado de esta forma ya que siempre vendrá una sola palabra.
     switch (mensaje1.toUpperCase()) {
       case 'CONFIRMACIÓN':
-        return this.msj.mensajeConfirmacion(titulo, mensaje2, tiempo);
+        return this.msj.mensajeConfirmacion('Confirmación', mensaje2, tiempo);
       case 'CONFIRMACION':
-        return this.msj.mensajeConfirmacion(titulo, mensaje2, tiempo);
+        return this.msj.mensajeConfirmacion('Confirmación', mensaje2, tiempo);
       case 'ADVERTENCIA':
-        return this.msj.mensajeAdvertencia(titulo, mensaje2, tiempo);
+        return this.msj.mensajeAdvertencia('Advertencia', mensaje2, tiempo);
       case 'ERROR':
-        return this.msj.mensajeError(titulo, mensaje2, tiempo);
+        return this.msj.mensajeError('Error', mensaje2, tiempo);
       case 'ERRORHTTP':
         const errorhttp : any = responseError;
         return this.msj.errorHttp(mensaje2, errorhttp);

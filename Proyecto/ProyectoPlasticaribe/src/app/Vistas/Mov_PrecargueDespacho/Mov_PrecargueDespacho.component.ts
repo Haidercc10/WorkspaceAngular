@@ -42,7 +42,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     private svZeus: InventarioZeusService,
     private svDtlPreload: Detalles_PrecargueDespachoService,
     private svSales: UsuarioService,
-    private utileria: UtileriaService,
+    private util: UtileriaService,
     private PDFService: CreacionPdfService
   ) {
     this.initForm();
@@ -61,7 +61,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     this.formBusquedaPrecargue.patchValue({ 'startDate': initialDate, 'endDate': new Date() });
   }
 
-  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11, 5].includes(x.estado_Id)) }, error => { this.utileria.Notificacion(`Error`, `Error al consultar los estados.`) });
+  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11, 5].includes(x.estado_Id)) }, error => { this.util.Notificacion(`Error`, `Error al consultar los estados.`) });
 
   initForm() {
     this.formBusquedaPrecargue = this.frmBuilder.group({
@@ -109,6 +109,14 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     this.svZeus.getClientByName(name).subscribe(data => this.clients = data);
   }
 
+  clearClientSelection(formulario: FormGroup, controlName: string) {
+    const clienteControl = formulario.get(controlName);
+    if (!clienteControl?.value?.trim()) {
+      clienteControl?.setValue(null, { emitEvent: false });
+    }
+    formulario.get('idClient')?.setValue(null);
+  }
+
   //*
   selectClient(formulario: FormGroup, controlName: string) {
     const clienteObtenido = this.clients.find(x => x.idcliente == formulario.value[controlName]);
@@ -136,7 +144,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
     this.svDtlPreload.getMovementsPreload(date1, date2, this.validateUrl()).subscribe(data => {
       this.searchedData = data;
     }, error => {
-      this.utileria.Notificacion(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
+      this.util.Notificacion(`Error`, `Error al consultar los datos de Precargue | ${error.status} ${error.statusText}.`);
       this.load = false; // se pone aqui ya que cuando entra en error no se ejecuta el complete y se queda cargando la tabla de precargues
     }, () => {
       this.load = false;
@@ -170,10 +178,10 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
         // finalmente creamos el PDF con el titulo y contenido generado
         this.PDFService.formatoPDF(`Orden de Precargue N° ${id}`, content); // si se demora 2 segundos siempre, es por este metodo, tiene un timeout.
         // notificamos la confirmacion de la generacion y su posterior muestra en una nueva pestaña.
-        this.utileria.Notificacion(`Confirmación`, `Orden de precargue N° ${id} descargada exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
+        this.util.Notificacion(`Confirmación`, `Orden de precargue N° ${id} generado exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
       },
       error: error => {
-        this.utileria.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
+        this.util.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
         console.log(error);
       }
     });
@@ -184,38 +192,48 @@ export class Mov_PrecargueDespachoComponent implements OnInit {
 
   //funcion que se encarga de cargar el modal para editar un precargue. El form group solo es para pegar la info del precargue seleccionado en el modal.
   cargarModalEditarPrecargue(item){
-    this.dialogPrecargue = true;
     this.formDialogPrecargue.patchValue({
       nroPrecargue: item.movement,
       ofAsociada: item.of,
+      idClient: item.idClient,
       cliente: item.client,
       asesor: item.sales,
-      fechaCreacion: this.utileria.formatearFechaYYYYMMDD(item.date1),
-      fechaCierre: item.date1 == item.date2 ? '' : this.utileria.formatearFechaYYYYMMDD(item.date2),
+      fechaCreacion: this.util.formatearFechaYYYYMMDD(item.date1),
+      fechaCierre: (item.date1 == item.date2 && item.hour1 == item.hour2) ? '-' : this.util.formatearFechaYYYYMMDD(item.date2),
       estado: item.status
     });
+    
+    this.formDialogPrecargue.disable();
+    this.formDialogPrecargue.get('idClient')?.enable();
+    this.formDialogPrecargue.get('cliente')?.enable();
+    this.dialogPrecargue = true;
   }
 
   editPrecargue() {
-    this.dialogLoad = true;
-    // llamar al metodo de api para editar el precargue
     let idCliente : string = this.formDialogPrecargue.value.idClient;
+    const cliente = this.formDialogPrecargue.value.cliente;
+    if (!cliente?.trim() || !idCliente) {
+      this.util.Notificacion('Error', 'Debe seleccionar o ingresar un cliente válido.');
+      return;
+    }
+
+    this.dialogLoad = true;
+    // para tratar campos disabled en formularios reactivos dinámicos tenemos que habilitar el campo para obtener el value.
+    // en formularios reactivos fijos no hace falta, asi como en reporte-costos.
+    this.formDialogPrecargue.get('nroPrecargue')?.enable(); 
     let nroPrecargue : string = this.formDialogPrecargue.value.nroPrecargue;
-    this.svDtlPreload.EditPreloadClientName(nroPrecargue, idCliente).subscribe(data => {
-      this.utileria.Notificacion(`Confirmación`, `Precargue editado correctamente.`);
-    }, error => {
-      this.utileria.Notificacion(`Error`, `Error al editar el precargue | ${error.status} ${error.statusText}.`);
-      this.dialogLoad = false;
-      this.dialogPrecargue = false;
-      this.formDialogPrecargue.reset();
-    }, () => {
-      // quitar la carga del modal
-      this.dialogLoad = false;
-      // luego quitar el modal y mostrar notificacion de exito
-      this.dialogPrecargue = false;
-      // resetear el form y recargar la tabla de precargues
-      this.formDialogPrecargue.reset();
-      this.searchData();
+    
+    // llamar al metodo de api para editar el precargue
+    this.svDtlPreload.EditPreloadClientName(nroPrecargue, idCliente).pipe(finalize(() => this.dialogLoad = false)).subscribe({
+      next: () => {
+        this.util.Notificacion('Confirmación', `Precargue N° ${nroPrecargue} editado correctamente.`);
+        this.dialogPrecargue = false;
+        this.formDialogPrecargue.reset();
+        this.searchData();
+      },
+      error: (error) => {
+        this.util.Notificacion(`Error`, `Error al editar el precargue | ${error.status} ${error.statusText}.`);
+      }
     });
   }
 }
