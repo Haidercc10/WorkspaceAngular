@@ -42,7 +42,7 @@ export class Movimientos_DespachoComponent implements OnInit {
   dataDetails : any = {};
   indice : number;
   modalUpdateSpreadsheet : boolean = false;
-  spreadSheet : number = null;
+  spreadSheet : number = 0;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -384,7 +384,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.dataSpreadSheet = data;
     this.dataDetails = details;
     this.indice = index;
-    this.spreadSheet = null;
+    this.spreadSheet = 0;
     console.log(data, details, index);
   }
 
@@ -513,11 +513,11 @@ export class Movimientos_DespachoComponent implements OnInit {
 
   //Función que contruye el cuerpo de la tabla
   buildTableBody(data, columns, title) {
-    var body = [];
+    var body: any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
-      var dataRow = [];
+      var dataRow: any = [];
       columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });
