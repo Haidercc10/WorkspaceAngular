@@ -9446,7 +9446,7 @@ export const stepsReporteCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'none',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Reporte de Costos!</h4>',
-    text: `<p>¡Con el reporte de costos vamos a poder saber que materia prima tiene una orden de trabajo, el costo de la materia prima, el proceso por el que está pasando y cuanto lleva pesado, las ganacias de la orden, podemos cambiar su estado si lo deseamos, etc...!</p>`
+    text: `<p>¡Con el reporte de costos vamos a conocer que materia prima tiene una orden de trabajo, el costo de la materia prima, el proceso por el que está pasando y cuanto lleva pesado, las ganacias de la orden, podemos cambiar su estado si lo deseamos, etc.!</p>`
   },
   {
     attachTo: {
@@ -9461,7 +9461,7 @@ export const stepsReporteCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Formulario!</h4>',
-    text: `<p>¡Para ver la información de una orden debemos buscar la orden, para eso tenemos el campo <b>OT</b>, en el que <b>digitamos el número de la OT y presionamos enter o el botón Consultar OT</b>. Los otros campos se llenarán dependiendo de la información de la OT!</p>`
+    text: `<p>¡Para ver la información de una orden debemos buscar la orden, para eso tenemos el campo <b>OT</b>, en el que <b>digitamos el número de la OT y presionamos ENTER o el botón Consultar OT</b>. Los otros campos se llenarán dependiendo de la información de la OT!</p>`
   },
   {
     attachTo: {
@@ -9551,7 +9551,7 @@ export const stepsReporteCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'cerrarOrden',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Cerrar Orden!</h4>',
-    text: `<p>¡Si una orden de trabajo ya está completa y necesitamos que ya no deje pesar más, podemos cambiarle el estado a <b>Cerrada</b> solo con presionar este botón!</p>`
+    text: `<p>¡Si una orden de trabajo ya está completa y necesitamos que ya no deje pesar más, podemos cambiarle el estado a <b>CERRADA</b> solo con presionar este botón!</p>`
   },
   {
     attachTo: {
@@ -9566,7 +9566,7 @@ export const stepsReporteCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'tablaMatPrima',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
-    text: `<p>¡En esta tabla estará la información de las materias peimas asignadas a la orden de trabajo!</p>`
+    text: `<p>¡En esta tabla estará la información de las materias primas asignadas a la orden de trabajo!</p>`
   },
   {
     attachTo: {

@@ -166,7 +166,7 @@
         <button pButton id="consultarOT" class="p-button-danger" type="button" label="Consultar OT" icon="pi pi-search" (click)="consultaOTBagPro()"></button>
         <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton id="pdf" class="p-button-danger" type="button" label="Reporte en PDF" icon="pi pi-file-pdf" *ngIf="ValidarRol == 1" (click)="CrearPDF()"></button>
-        <button pButton id="cerrarOrden" class="p-button-success" type="button" label="Revisada" icon="pi pi-check-square" *ngIf="ValidarRol == 1 && storage_Id != 101" (click)="cerrarOrden()"></button>
+        <button pButton id="cerrarOrden" class="p-button-success" type="button" label="Revisada" icon="pi pi-check-square" *ngIf="ValidarRol == 1 && storage_Id != 101" (click)="cerrarOrden()" pTooltip="Al presionar este botón se cambiará el estado de la orden de trabajo a CERRADA. Presiona si la orden de trabajo está completa y no quiere permitir que se sigan pesando sobre la misma."></button>
       </div>
     </div>
   </form>

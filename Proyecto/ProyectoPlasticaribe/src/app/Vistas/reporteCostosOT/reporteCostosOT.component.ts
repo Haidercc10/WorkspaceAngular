@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { finalize } from 'rxjs';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
@@ -15,6 +16,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteCostos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -26,7 +28,7 @@ export class ReporteCostosOTComponent implements OnInit {
   infoOT !: FormGroup;
   load: boolean = true;
 
-  /* Vaiables*/
+  /* Variables */
   storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -89,7 +91,8 @@ export class ReporteCostosOTComponent implements OnInit {
                               private tintaService : TintasService,
                                 private estadosProcesos_OTService : EstadosProcesos_OTService,
                                     private shepherdService: ShepherdService,
-                                      private msj : MensajesAplicacionService) {
+                                      private msj : MensajesAplicacionService,
+                                        private util : UtileriaService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -164,15 +167,15 @@ export class ReporteCostosOTComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
-
   //Funcion que consultará la OT que le sea pasada y mostrará la información general de dicha Orden de Trabajo
   consultaOTBagPro(){
+    this.load = false;
     let ot : number = this.infoOT.value.ot;
     this.limpiarCampos();
-    this.bagProServices.srvObtenerListaClienteOT_ItemCostos(ot).subscribe(datos_OT => {
-      if (datos_OT.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `No se encuentran registros de la OT ${ot}`);
+    if(ot == null || ot == 0) this.util.Notificacion(`error`,`Debe ingresar una OT.`);
+
+    this.bagProServices.srvObtenerListaClienteOT_ItemCostos(ot).pipe(finalize(() => this.load = true)).subscribe(datos_OT => {
+      if (datos_OT.length == 0) this.util.Notificacion(`error`, `No se encuentran registros de la OT N°: ${ot}.`);
       else {
         for (const item of datos_OT) {
           let porcentajeMargen = (item.datosmargenKg / item.datosotKg) * 100;
@@ -200,14 +203,14 @@ export class ReporteCostosOTComponent implements OnInit {
             cliente : item.clienteNom,
             IdProducto : item.clienteItems,
             NombreProducto : item.clienteItemsNom,
-            cantProductoSinMargenUnd : this.formatonumeros(item.datoscantBolsa),
-            cantProductoSinMargenKg : this.formatonumeros((item.datosotKg - ((item.datosotKg * porcentajeMargen) / 100)).toFixed(2)),
-            margenAdicional : this.formatonumeros(porcentajeMargen.toFixed(2)) + "%",
-            cantProductoConMargen : this.formatonumeros(item.datosotKg),
+            cantProductoSinMargenUnd : this.util.formatoNumeros(item.datoscantBolsa),
+            cantProductoSinMargenKg : this.util.formatoNumeros((item.datosotKg - ((item.datosotKg * porcentajeMargen) / 100)).toFixed(2)),
+            margenAdicional : this.util.formatoNumeros(porcentajeMargen.toFixed(2)) + "%",
+            cantProductoConMargen : this.util.formatoNumeros(item.datosotKg),
             PresentacionProducto : item.ptPresentacionNom,
-            ValorUnidadProductoUnd : this.formatonumeros(item.datosvalorBolsa),
-            ValorUnidadProductoKg : this.formatonumeros(item.datosValorKg),
-            ValorEstimadoOt : this.formatonumeros(item.datosvalorOt),
+            ValorUnidadProductoUnd : this.util.formatoNumeros(item.datosvalorBolsa),
+            ValorUnidadProductoKg : this.util.formatoNumeros(item.datosValorKg),
+            ValorEstimadoOt : this.util.formatoNumeros(item.datosvalorOt),
             fechaInicioOT : this.fechaOT,
             fechaFinOT : '',
             estadoOT : this.estado,
@@ -223,10 +226,12 @@ export class ReporteCostosOTComponent implements OnInit {
               });
             }
           });
+
           this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
             if (datos_asignacionMP.length != 0) datos_asignacionMP.forEach(asg => this.llenarTablaMPAsignada(asg));
           });
         }
+        
         this.consultaProceso(ot);
       }
     });
@@ -273,8 +278,8 @@ export class ReporteCostosOTComponent implements OnInit {
       Lam : this.cantidadTotalLaminado,
       Emp : this.cantidadTotalEmpaque,
       Corte : this.cantidadTotalCorte,
-      Sel : `${this.formatonumeros(Math.round(this.cantidadTotalSella))} KG - ${this.formatonumeros(Math.round(this.cantidadSellandoUnidad))} Und`,
-      Wik : `${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))} KG - ${this.formatonumeros(Math.round(this.cantidadWiketiadoUnidad))} Und`,
+      Sel : `${this.util.formatoNumeros(Math.round(this.cantidadTotalSella))} KG - ${this.util.formatoNumeros(Math.round(this.cantidadSellandoUnidad))} Und`,
+      Wik : `${this.util.formatoNumeros(Math.round(this.cantidadTotalWiketiado))} KG - ${this.util.formatoNumeros(Math.round(this.cantidadWiketiadoUnidad))} Und`,
     }
     this.ArrayProcesos.push(cant);
     for (const item of this.ArrayProcesos) {
@@ -323,8 +328,8 @@ export class ReporteCostosOTComponent implements OnInit {
       Nombre : formulario.nombreMP,
       Cantidad : formulario.cantMP,
       Presentacion : formulario.undMedida,
-      PrecioUnd : this.formatonumeros(formulario.precio),
-      SubTotal : this.formatonumeros(Math.round(formulario.subTotal)),
+      PrecioUnd : this.util.formatoNumeros(formulario.precio),
+      SubTotal : this.util.formatoNumeros(Math.round(formulario.subTotal)),
       Proceso : formulario.nombreProceso,
     }
 
@@ -345,8 +350,8 @@ export class ReporteCostosOTComponent implements OnInit {
           Nombre : datos_materiaPrima.matPri_Nombre,
           Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
           Presentacion : datos_materiaPrima.undMed_Id,
-          PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
-          SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
+          PrecioUnd : this.util.formatoNumeros(datos_materiaPrima.matPri_Precio),
+          SubTotal : this.util.formatoNumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
           Proceso : 'Devolución',
         }
         this.totalMPEntregada -= infoDoc.Cantidad;
@@ -362,8 +367,8 @@ export class ReporteCostosOTComponent implements OnInit {
           Nombre : datos_tinta.tinta_Nombre,
           Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
           Presentacion : datos_tinta.undMed_Id,
-          PrecioUnd : this.formatonumeros(datos_tinta.tinta_Precio),
-          SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio)),
+          PrecioUnd : this.util.formatoNumeros(datos_tinta.tinta_Precio),
+          SubTotal : this.util.formatoNumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio)),
           Proceso : 'Devolución',
         }
         this.totalMPEntregada -= infoDoc.Cantidad;
@@ -381,8 +386,8 @@ export class ReporteCostosOTComponent implements OnInit {
             Nombre : datos_bopp[i].bopP_Nombre,
             Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
             Presentacion : datos_bopp[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_bopp[i].bopP_Precio),
-            SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio)),
+            PrecioUnd : this.util.formatoNumeros(datos_bopp[i].bopP_Precio),
+            SubTotal : this.util.formatoNumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio)),
             Proceso : 'Devolución',
           }
           this.totalMPEntregada -= infoDoc.Cantidad;
@@ -446,7 +451,7 @@ export class ReporteCostosOTComponent implements OnInit {
       });
 
       const pdfDefinicion : any = {
-        info: { title: titulo},
+        info: { title: titulo },
         pageSize: { width: 630, height: 760 },
         watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
         pageMargins : [25, 110, 25, 35],
@@ -501,7 +506,7 @@ export class ReporteCostosOTComponent implements OnInit {
                 [
                   `N°: ${this.ordenTrabajo}`,
                   `Nombre Cliente: ${this.NombreCliente}`,
-                  `Valor de la OT: ${this.formatonumeros(this.valorFinalOT)}`
+                  `Valor de la OT: ${this.util.formatoNumeros(this.valorFinalOT)}`
                 ],
                 [
                   `Item: ${this.idProducto}`,
@@ -509,14 +514,14 @@ export class ReporteCostosOTComponent implements OnInit {
                   `Presentación: ${this.presentacionProducto}`
                 ],
                 [
-                  `Cant Und: ${this.formatonumeros(this.cantProdSinMargenUnd.toFixed(2))}`,
-                  `Cant Kg: ${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`,
-                  `Cant Margen: ${this.formatonumeros(this.CantidadMargen.toFixed(2))}%`
+                  `Cant Und: ${this.util.formatoNumeros(this.cantProdSinMargenUnd.toFixed(2))}`,
+                  `Cant Kg: ${this.util.formatoNumeros(this.cantProdSinMargenKg.toFixed(2))}`,
+                  `Cant Margen: ${this.util.formatoNumeros(this.CantidadMargen.toFixed(2))}%`
                 ],
                 [
-                  `Cant Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg.toFixed(2))}`,
-                  `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd.toFixed(2))}`,
-                  `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg.toFixed(2))}`
+                  `Cant Kg Con Margen: ${this.util.formatoNumeros(this.cantProdConMargenKg.toFixed(2))}`,
+                  `Valor Unitario Und: ${this.util.formatoNumeros(this.valorUnitarioProdUnd.toFixed(2))}`,
+                  `Valor Unitario Kg: ${this.util.formatoNumeros(this.valorUnitarioProdKg.toFixed(2))}`
                 ],
               ]
             },
@@ -542,15 +547,15 @@ export class ReporteCostosOTComponent implements OnInit {
                 ],
                 [
                   `Producido`,
-                  `$${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
-                  `${this.formatonumeros(totalUnd)}`,
-                  `${this.formatonumeros(totalKg.toFixed(2))}`
+                  `$${this.util.formatoNumeros(this.valorFinalOT.toFixed(2))}`,
+                  `${this.util.formatoNumeros(totalUnd)}`,
+                  `${this.util.formatoNumeros(totalKg.toFixed(2))}`
                 ],
                 [
                   `Teorico`,
-                  `$${this.formatonumeros(this.valorEstimadoOT.toFixed(2))}`,
-                  `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd).toFixed(2))}`,
-                  `${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`
+                  `$${this.util.formatoNumeros(this.valorEstimadoOT.toFixed(2))}`,
+                  `${this.util.formatoNumeros(Math.round(this.cantProdSinMargenUnd).toFixed(2))}`,
+                  `${this.util.formatoNumeros(this.cantProdSinMargenKg.toFixed(2))}`
                 ],
               ]
             },
@@ -565,7 +570,7 @@ export class ReporteCostosOTComponent implements OnInit {
           },
           this.table(this.ArrayMateriaPrima, ['Id', 'Nombre', 'Cantidad', 'Presentacion', 'PrecioUnd', 'SubTotal', 'Proceso']),
           {
-            text: `\n Valor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada.toFixed(2))}`,
+            text: `\n Valor Total Materia Prima Utilizada: $${this.util.formatoNumeros(this.ValorMPEntregada.toFixed(2))}`,
             alignment: 'right',
             style: 'header',
           },
@@ -581,19 +586,19 @@ export class ReporteCostosOTComponent implements OnInit {
               style: 'header',
               body: [
                 [
-                  `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt).toFixed(2))}`,
-                  `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp).toFixed(2))}`,
-                  `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot).toFixed(2))}`
+                  `Extrusión: ${this.util.formatoNumeros(Math.round(this.cantidadTotalExt).toFixed(2))}`,
+                  `Impresión: ${this.util.formatoNumeros(Math.round(this.cantidadTotalImp).toFixed(2))}`,
+                  `Rotograbado: ${this.util.formatoNumeros(Math.round(this.cantidadTotalRot).toFixed(2))}`
                 ],
                 [
-                  `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl).toFixed(2))}`,
-                  `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado).toFixed(2))}`,
-                  `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque).toFixed(2))}`
+                  `Doblado: ${this.util.formatoNumeros(Math.round(this.cantidadTotalDbl).toFixed(2))}`,
+                  `Laminado: ${this.util.formatoNumeros(Math.round(this.cantidadTotalLaminado).toFixed(2))}`,
+                  `Empaque: ${this.util.formatoNumeros(Math.round(this.cantidadTotalEmpaque).toFixed(2))}`
                 ],
                 [
-                  `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado).toFixed(2))}`,
-                  `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella).toFixed(2))}`,
-                  `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte).toFixed(2))}`
+                  `Wiketiado: ${this.util.formatoNumeros(Math.round(this.cantidadTotalWiketiado).toFixed(2))}`,
+                  `Sellado: ${this.util.formatoNumeros(Math.round(this.cantidadTotalSella).toFixed(2))}`,
+                  `Corte: ${this.util.formatoNumeros(Math.round(this.cantidadTotalCorte).toFixed(2))}`
                 ],
               ]
             },
@@ -613,15 +618,15 @@ export class ReporteCostosOTComponent implements OnInit {
               body: [
                 [
                   '',
-                  `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
+                  `Valor Final de La OT: $${this.util.formatoNumeros(this.valorFinalOT.toFixed(2))}`,
                 ],
                 [
                   '',
-                  `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia.toFixed(2))}`,
+                  `Diferencia de Costos La OT: $${this.util.formatoNumeros(this.diferencia.toFixed(2))}`,
                 ],
                 [
                   '',
-                  `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje).toFixed(2))}%`,
+                  `Porcentaje de Diferencia de Costos de La OT: ${this.util.formatoNumeros(Math.round(this.diferenciaPorcentaje).toFixed(2))}%`,
                 ],
               ]
             },
@@ -643,7 +648,7 @@ export class ReporteCostosOTComponent implements OnInit {
       const pdf = pdfMake.createPdf(pdfDefinicion);
       pdf.open();
 
-    } else this.msj.mensajeAdvertencia(`Advertencia`, "Debe buscar una OT para crear el reporte");
+    } else this.util.Notificacion(`error`, "Debe buscar una OT para crear el reporte.");
   }
 
   // Cambia el estado de la orden de trabajo en la nueva base de datos
@@ -685,8 +690,9 @@ export class ReporteCostosOTComponent implements OnInit {
 
   // Funcion que cambiará el estado de una Orden de trabajo consultada
   cambiarEstado(){
+    this.load = false;
     let estado : any = this.infoOT.value.estadoOT;
-    if (this.ordenTrabajo == 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    if (this.ordenTrabajo == 0) this.util.Notificacion(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!.`);
     else {
       const data : any = {
         item : this.ordenTrabajo,
@@ -695,16 +701,18 @@ export class ReporteCostosOTComponent implements OnInit {
         usrCrea : this.usuarioCreador,
         estado : estado,
       }
-      this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(() => {
+      this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).pipe(finalize (() => this.load = true)).subscribe(() => {
         this.cambiarEstado2(this.ordenTrabajo, estado);
-        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`);
-      }, () => this.msj.mensajeError(`Error`, 'No se ha podido cambiar el estado de la OT'));
+        this.util.Notificacion(`Confirmación`, `¡Se ha cambiado el estado de la OT N°: ${this.ordenTrabajo}!.`);
+      }, (error) => this.util.Notificacion(`Error`, `No se ha podido cambiar el estado de la OT. ${error.statusText} | Status: ${error.status}`));
     }
   }
 
   // Cerrar Orden
   cerrarOrden(){
-    if (this.ordenTrabajo == 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    this.load = false;
+
+    if (this.ordenTrabajo == 0) this.util.Notificacion(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!.`);
     else {
       const data : any = {
         item : this.ordenTrabajo,
@@ -713,10 +721,10 @@ export class ReporteCostosOTComponent implements OnInit {
         usrCrea : this.usuarioCreador,
         estado : '1',
       }
-      this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(() => {
+      this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').pipe(finalize(() => this.load = true)).subscribe(() => {
         this.cambiarEstado2(this.ordenTrabajo, 18);
-        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`);
-      }, () => this.msj.mensajeError(`Error`, `No se ha podido cambiar el estado de la OT`));
+        this.util.Notificacion(`Confirmación`, `¡Se ha cambiado el estado de la OT N°: ${this.ordenTrabajo} a Cerrada!.`);
+      }, (error) => this.util.Notificacion(`Error`, `No se ha podido cambiar el estado de la OT. ${error.statusText} | Status: ${error.status}`));
     }
   }
 
