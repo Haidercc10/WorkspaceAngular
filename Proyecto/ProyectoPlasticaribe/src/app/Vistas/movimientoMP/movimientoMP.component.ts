@@ -306,6 +306,8 @@ export class MovimientoMPComponent implements OnInit {
       let count: number = 0;
       const existingItem = this.groupedInfo.find(x => x.item === d.mp_Id);
       if (!existingItem) {
+        count++;
+
         this.groupedInfo.push({
           'item': d.mp_Id,
           'reference': d.mp,
@@ -314,17 +316,20 @@ export class MovimientoMPComponent implements OnInit {
           'type': type,
           'price': d.Precio,
           'subTotal': d.Cantidad * d.Precio,
-          'count': count++
+          'movs': count // por alguna razon no hace count++ en algunos registros y por eso se movió el count arriba para solamente asignar el valor acá.
         });
       } else {
         existingItem.qty = this.validateQty(data, d);
-        existingItem.subTotal = existingItem.qty * existingItem.price;
-        existingItem.count = this.validateCount(data, d)
+        existingItem.subTotal = this.validateSubtotal(data, d);
+        existingItem.movs = this.validateCount(data, d);
+        existingItem.price = (existingItem.Subtotal === 0 || existingItem.qty === 0) ? 0 : existingItem.subTotal / existingItem.qty; // precio ponderado para la informacion consolidada
       }
     });
   }
 
   validateQty = (data: any, d: any) => data.filter(x => x.mp_Id == d.mp_Id && x.TipoMov == d.TipoMov).reduce((sum, current) => sum + current.Cantidad, 0);
+
+  validateSubtotal = (data: any, d: any) => data.filter(x => x.mp_Id == d.mp_Id && x.TipoMov == d.TipoMov).reduce((sum, current) => sum + (current.Cantidad * current.Precio), 0);
 
   validateCount = (data: any, d: any) => data.filter(x => x.mp_Id == d.mp_Id && x.TipoMov == d.TipoMov).length;
 
@@ -838,7 +843,7 @@ export class MovimientoMPComponent implements OnInit {
       'N°',
       'OT/Doc',
       'Tipo Mov.',
-      'Fecha Registro',
+      'Fecha Asignación',
       'Usuario',
       'Proveedor',
       'Subcategoria',

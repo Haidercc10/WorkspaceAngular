@@ -132,7 +132,7 @@
                 <th scope="col" pSortableColumn="qty"><p-sortIcon field="qty"></p-sortIcon> Cantidad</th>
                 <th scope="col" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
                 <th scope="col" pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> Subtotal</th>
-                <th scope="col" pSortableColumn="count"><p-sortIcon field="count"></p-sortIcon> N° Movimientos</th>
+                <th scope="col" pSortableColumn="movs"><p-sortIcon field="movs"></p-sortIcon> N° Movimientos</th>
                 <th scope="col">Ver</th>
               </tr>
             </ng-template>
@@ -144,10 +144,17 @@
                 <td><b>{{data.qty | number : '1.2-2'}}</b></td>
                 <td>$ {{data.price | number : '1.2-2'}}</td>
                 <td><b>$ {{data.subTotal | number : '1.2-2'}}</b></td>
-                <td><b>{{data.count}}</b></td>
+                <td><b>{{data.movs}}</b></td>
                 <td class="text-center">
                   <button pButton pRipple pTooltip="Ver detalles {{data.reference}}" icon="pi pi-eye"
                     class="p-button-success" (click)="loadDetailsMaterial(data)"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8" class="text-center">
+                  <h6>No se encontraron datos</h6>
                 </td>
               </tr>
             </ng-template>
@@ -190,7 +197,7 @@
                 <th scope="col" pSortableColumn="qty"><p-sortIcon field="qty"></p-sortIcon> Cantidad</th>
                 <th scope="col" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
                 <th scope="col" pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> Subtotal</th>
-                <th scope="col" pSortableColumn="count"><p-sortIcon field="count"></p-sortIcon> N° Movimientos</th>
+                <th scope="col" pSortableColumn="movs"><p-sortIcon field="movs"></p-sortIcon> N° Movimientos</th>
                 <th scope="col">Ver</th>
               </tr>
             </ng-template>
@@ -202,9 +209,16 @@
                 <td><b>{{data.qty | number : '1.2-2'}}</b></td>
                 <td>$ {{data.price | number : '1.2-2'}}</td>
                 <td><b>$ {{data.subTotal | number : '1.2-2'}}</b></td>
-                <td><b>{{data.count}}</b></td>
+                <td><b>{{data.movs}}</b></td>
                 <td class="text-center">
                   <button pButton pRipple pTooltip="Ver detalles {{data.reference}}" icon="pi pi-eye" class="p-button-success" (click)="loadDetailsMaterial(data)"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8" class="text-center">
+                  <h6>No se encontraron datos</h6>
                 </td>
               </tr>
             </ng-template>
@@ -240,7 +254,7 @@
                 <th scope="col" pSortableColumn="qty"><p-sortIcon field="qty"></p-sortIcon> Cantidad</th>
                 <th scope="col" pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
                 <th scope="col" pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> Subtotal</th>
-                <th scope="col" pSortableColumn="count"><p-sortIcon field="count"></p-sortIcon> N° Movimientos</th>
+                <th scope="col" pSortableColumn="movs"><p-sortIcon field="movs"></p-sortIcon> N° Movimientos</th>
                 <th scope="col"> Ver</th>
               </tr>
             </ng-template>
@@ -252,9 +266,16 @@
                 <td><b>{{data.qty | number : '1.2-2'}}</b></td>
                 <td>$ {{data.price | number : '1.2-2'}}</td>
                 <td><b>$ {{data.subTotal | number : '1.2-2'}}</b></td>
-                <td>{{data.count}}</td>
+                <td>{{data.movs}}</td>
                 <td class="text-center">
                   <button pButton pRipple pTooltip="Ver detalles {{data.reference}}" icon="pi pi-eye" class="p-button-success" (click)="loadDetailsMaterial(data)"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8" class="text-center">
+                  <h6>No se encontraron datos</h6>
                 </td>
               </tr>
             </ng-template>
@@ -297,7 +318,7 @@
               <tr>
                 <th scope="col">OT / DOC.</th>
                 <th scope="col">Tipo Mov</th>
-                <th scope="col">Fecha Registro</th>
+                <th scope="col">Fecha Asignación</th>
                 <th scope="col">Registrado Por</th>
                 <th scope="col">Proveedor</th>
                 <th scope="col">Subcategoría</th>
@@ -323,6 +344,13 @@
                 <td>$ {{data.Precio | number : '1.2-2'}}</td>
                 <!--<td>$ {{data.SubTotal | number : '1.2-2'}}</td>-->
                 <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="11" class="text-center">
+                  <h6>No se encontraron datos</h6>
+                </td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
@@ -362,7 +390,7 @@
               <tr>
                 <th scope="col">OT / Tinta Creada</th>
                 <th scope="col">Tipo Mov.</th>
-                <th scope="col">Fecha Registro</th>
+                <th scope="col">Fecha Asignación</th>
                 <th scope="col">Registrado Por</th>
                 <th scope="col">Proveedor</th>
                 <th scope="col">Subcategoría</th>
@@ -388,6 +416,13 @@
                 <td>$ {{data.Precio | number : '1.2-2'}}</td>
                 <!--<td>$ {{data.SubTotal | number : '1.2-2'}}</td>-->
                 <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="11" class="text-center">
+                  <h6>No se encontraron datos</h6>
+                </td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
@@ -428,7 +463,7 @@
               <tr>
                 <th scope="col">OT / DOC.</th>
                 <th scope="col">Tipo Mov.</th>
-                <th scope="col">Fecha Registro</th>
+                <th scope="col">Fecha Asignación</th>
                 <th scope="col">Registrado Por</th>
                 <th scope="col">Proveedor</th>
                 <th scope="col">Subcategoría</th>
@@ -454,6 +489,13 @@
                 <td>$ {{data.Precio | number : '1.2-2'}}</td>
                 <!--<td>$ {{data.SubTotal | number : '1.2-2'}}</td>-->
                 <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="11" class="text-center">
+                  <h6>No se encontraron datos</h6>
+                </td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
@@ -506,10 +548,10 @@
         <th>#</th>
         <th scope="col">Documento</th>
         <th scope="col">Tipo Mov.</th>
-        <th scope="col">Fecha Ingreso</th>
-        <th scope="col">Registrado Por:</th>
+        <th scope="col">Fecha Asignación</th>
+        <th scope="col">Registrado Por</th>
         <th scope="col">Proveedor</th>
-        <th scope="col">Subcategoria</th>
+        <th scope="col">Subcategoría</th>
         <th scope="col">Id</th>
         <th scope="col">Materia Prima</th>
         <th scope="col">Cantidad</th>
@@ -533,6 +575,13 @@
         <td>$ {{data.Precio | number : '1.2-2'}}</td>
         <td>$ {{data.SubTotal | number : '1.2-2'}}</td>
         <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf view-button" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="13" class="text-center">
+          <h6>No se encontraron datos</h6>
+        </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
