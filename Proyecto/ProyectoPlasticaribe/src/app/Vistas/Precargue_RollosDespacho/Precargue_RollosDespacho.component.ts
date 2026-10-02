@@ -2,6 +2,7 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { finalize } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { modelDetalles_PrecargueDespacho } from 'src/app/Modelo/modelDetalles_PrecargueDespacho';
 import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
@@ -52,7 +53,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     private svDetailsPreload: Detalles_PrecargueDespachoService,
     private PDFService: CreacionPdfService,
     private msg: MessageService,
-    private utileria: UtileriaService
+    private util: UtileriaService
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
@@ -76,7 +77,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     }, 30000);
   }
 
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  // Función que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
@@ -97,25 +98,21 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     })
   }
 
-  //*
   searchClientsByName() {
     let name = this.form.value.client;
     this.svZeus.getClientByName(name).subscribe(data => this.clients = data);
   }
 
-  //*
   selectClient() {
     let client = this.clients.find(x => x.idcliente == this.form.value.client);
     this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, 'asesor': client.idvende, });
   }
 
-  //*
   searchProduct() {
     let nombre: string = this.form.value.reference;
     this.svProducts.obtenerItemsLike(nombre).subscribe(resp => this.products = resp);
   }
 
-  //*
   selectedProduct() {
     let product: any = this.form.value.reference;
     this.form.patchValue({
@@ -124,29 +121,25 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     });
   }
 
-  //*
   getItem() {
     this.load = true;
     let item: any = this.form.value.item;
     if (item) {
-      this.svProducts.GetProductsById(item).subscribe(data => {
+      this.svProducts.GetProductsById(item).pipe(finalize(() => this.load = false)).subscribe(data => {
         this.form.patchValue({ 'item': item, 'reference': data[0].prod.prod_Nombre, });
-        this.load = false;
       }, error => {
-        this.msjs(`Error`, `No se encontró el item N° ${item}`);
+        this.util.Notificacion(`Error`, `No se encontró el item N°: ${item}.`);
         this.form.patchValue({ 'item': null, 'reference': null, });
       });
-    } else this.msjs(`Advertencia`, `Debe llenar el campo ITEM`);
+    } else this.util.Notificacion(`Advertencia`, `Debe llenar el campo ITEM.`);
   }
 
-  //*
   searchRolls() {
     let roll: number = this.form.value.roll;
     let client: any = this.form.value.idClient;
     let clientReal: any;
     let clientStock: boolean = this.form.value.clientStock;
     let count: number = 0;
-    //let clients : any = this.clients.find(x => x.idcliente == client);
 
     if (this.form.valid) {
       this.disabledFieldRoll();
@@ -154,13 +147,12 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         clientStock ? clientReal = [1061, 1035] : clientReal = [client];
         if (this.rollsToDispatch.length > 0 && !clientStock) {
           if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
-            this.msjs(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
+            this.util.Notificacion(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
             this.enabledFieldRoll();
             return;
           }
           this.enabledFieldRoll();
         }
-        //this.load = true;
 
         clientReal.forEach(cr => {
           this.svProduction.getInformationDispatch(roll, cr).subscribe(data => {
@@ -172,26 +164,26 @@ export class Precargue_RollosDespachoComponent implements OnInit {
                 if (!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
                   this.rollsToDispatch.unshift(data[0]);
                   this.consolidateItems();
-                  this.msjs(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
+                  this.util.Notificacion(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
                   this.enabledFieldRoll();
                 } else {
-                  this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
+                  this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
                   this.enabledFieldRoll();
                 }
                 return;
               } else {
-                this.msjs(`Advertencia`, `El item N° ${item} no tiene stock disponible!`);
+                this.util.Notificacion(`Advertencia`, `El item N° ${item} no tiene stock disponible!`);
                 this.enabledFieldRoll();
                 return;
               }
             } else {
-              this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`);
+              this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`);
               this.enabledFieldRoll();
             }
           }, error => {
             count += 1;
             if (count == clientReal.length) {
-              [400, 404].includes(error.status) ? this.msjs(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.msjs(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
+              [400, 404].includes(error.status) ? this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.util.Notificacion(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
               this.enabledFieldRoll();
             }
           });
@@ -200,7 +192,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
         this.enabledFieldRoll();
       }
     } else {
-      this.msjs(`Advertencia`, `Debe llenar todos los campos`);
+      this.util.Notificacion(`Advertencia`, `Debe llenar todos los campos`);
       this.enabledFieldRoll();
     }
   }
@@ -217,7 +209,6 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     document.getElementById('roll')?.focus();
   }
 
-  //*
   consolidateItems() {
     this.rollsConsolidate = this.rollsToDispatch.reduce((acc, value) => {
       let find = acc.find(x => x.item == value.item);
@@ -225,23 +216,20 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       return acc;
     }, []);
   }
-
-  //*
+ 
   qtyRollsItem = (data: any) => this.rollsToDispatch.filter(x => x.item == data.item).length;
 
-  //*
   qtyTotalItem = (data: any) => this.rollsToDispatch.filter(x => x.item == data.item).reduce((a, b) => a += b.qty, 0);
 
-  //*
   weightTotalItem = (data: any) => this.rollsToDispatch.filter(x => x.item == data.item).reduce((a, b) => a += b.weight, 0);
 
-  //*
   quitRoll(data) {
+    console.log(data);
     this.load = true;
 
     setTimeout(() => {
-      this.msjs(`Advertencia`, `Se quitó el rollo N° ${data.roll} de la tabla!`);
-      let index = this.rollsToDispatch.findIndex(x => x.rollo == data.roll && x.ot == data.ot);
+      this.util.Notificacion(`confirmacion`, `Se quitó el rollo N° ${data.roll} de la tabla!`);
+      let index = this.rollsToDispatch.findIndex(x => x.roll == data.roll && x.ot == data.ot);
       console.log(index);
       this.rollsToDispatch.splice(index, 1);
       this.load = false;
@@ -249,10 +237,8 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     }, 500);
   }
 
-  //*
   applyFilter = ($event, campo: any, table: any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  //*
   savePreload() {
     if (this.rollsToDispatch.length > 0) {
       this.load = true;
@@ -276,12 +262,11 @@ export class Precargue_RollosDespachoComponent implements OnInit {
 
       this.onReject();
       this.svPreload.Post(info).subscribe(data => { this.saveDetailsPreload(data.pcd_Id); }, error => {
-        this.msjs(`Error`, `Error guardando el encabezado del precargue de despacho | ${error.status} ${error.statusText}`);
+        this.util.Notificacion(`Error`, `Error guardando el encabezado del precargue de despacho | ${error.status} ${error.statusText}`);
       });
     }
   }
 
-  //*
   saveDetailsPreload(id: number) {
     let count: number = 0;
     this.rollsToDispatch.forEach(x => {
@@ -299,12 +284,11 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     });
   }
 
-  //*
   updateStatusRolls(id: number) {
     let rolls: Array<any> = [];
     this.rollsToDispatch.forEach(x => rolls.push({ 'of': 0, 'roll': x.roll, 'item': x.item, 'currentStatus': 19, 'newStatus': 50, 'envioZeus': true }));
     this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => {
-      this.msjs(`Error`, `Error actualizando el estado de los rollos seleccionados`);
+      this.util.Notificacion(`Error`, `Error actualizando el estado de los rollos seleccionados.`);
     });
   }
 
@@ -322,20 +306,6 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     this.editMode = false;
   }
 
-  //* Función para acortar msjs 
-  msjs(msj1: string, msj2: string) {
-    this.load = false;
-    switch (msj1) {
-      case 'Confirmación':
-        return this.msj.mensajeConfirmacion(msj1, msj2);
-      case 'Advertencia':
-        return this.msj.mensajeAdvertencia(msj1, msj2);
-      case 'Error':
-        return this.msj.mensajeError(msj1, msj2);
-      default:
-        return this.msj.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`);
-    }
-  }
   /*
     getLastPreload = () => this.svPreload.getLastPreload().subscribe(data => this.form.patchValue({ 'doc': data.pcd_Id }), error => { this.msj.mensajeError(`Error`, `Error al consultar el último consecutivo del precargue.`) });
   
@@ -377,7 +347,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       this.consolidateItems();
     }
   
-    //* Función para mostrar el msj de confirmación de eliminación de rollos
+    // Función para mostrar el msj de confirmación de eliminación de rollos
     msgDeleteRolls(data : any) {
       this.load = true;
       this.rollsSelected = {};
@@ -391,7 +361,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       this.msg.clear(key);
     }
   
-    //* Función para eliminar rollos de una reposición
+    // Función para eliminar rollos de una reposición
     deleteRollsFromReposition(data: any, currentStatus : any, newStatus : any){
       this.onReject('deleteRoll');
       this.load = true;
@@ -421,12 +391,12 @@ export class Precargue_RollosDespachoComponent implements OnInit {
       let title: string = `Orden de Precargue N° ${id}`;
       let content: any[] = this.PDFService.contentPDFPrecargue(data);
       this.PDFService.formatoPDF(title, content);
-      this.msjs(`Confirmación`, `Orden de precargue N° ${id} ${action} exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
+      this.util.Notificacion(`Confirmación`, `Orden de precargue N° ${id} ${action} exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
       onComplete?.();
       setTimeout(() => this.clearAll(), 3000);
     }, error => {
       this.load = false;
-      this.msjs(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
+      this.util.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
       onComplete?.();
     });
   }

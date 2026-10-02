@@ -35,20 +35,10 @@
       <div class="row g-4">
 
         <!--* Rollo -->
-        <!--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input pInputText formControlName="doc" inputId="doc" autocomplete="off" type="number" (keyup.enter)="searchPreload()"/>
-            <label for="doc">N° Precargue</label>
-          </span>
-        </div>-->
-
-        <!--* Rollo -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input pInputText formControlName="roll" id="roll" inputId="roll" autocomplete="off" type="number"
-              (keyup.enter)="searchRolls()" />
+            <input pInputText formControlName="roll" id="roll" inputId="roll" autocomplete="off" type="number" (keyup.enter)="searchRolls()" />
             <label for="roll">Rollo/Bulto</label>
           </span>
         </div>
@@ -66,46 +56,13 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="client" id="client" list="list" type="text" pInputText required
-              (keyup)="searchClientsByName()" (change)="selectClient()" />
+            <input formControlName="client" id="client" list="list" type="text" pInputText required (keyup)="searchClientsByName()" (change)="selectClient()" />
             <datalist id="list">
               <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
             </datalist>
             <label for="client">Cliente*</label>
           </span>
         </div>
-
-        <!--! Proceso-->
-        <!--div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2 justify-content-md-center">
-          <div div class="field-checkbox my-2 mx-4">
-            <p-triStateCheckbox formControlName="process" [(ngModel)]="searchIn" inputId="tricheckbox"></p-triStateCheckbox>
-            <label class="p-tristatecheckbox-label" for="tricheckbox">
-              <p-chip [label]="searchIn == null ? 'Tipo: SELLADO' : searchIn ? 'Tipo: EMPAQUE' : 'Tipo: EXTRUSIÓN'"
-                      [icon]="searchIn == null ? 'pi pi-database' : searchIn ? 'pi pi-box' : 'pi pi-bolt'"></p-chip>
-            </label>
-          </div>
-        </div>-->
-
-        <!--! Item -->
-        <!--<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input pInputText formControlName="item" inputId="item" autocomplete="off" type="number" (keyup.enter)="getItem()"/>
-            <label for="item">Item*</label>
-          </span>
-        </div>-->
-
-        <!--! Referencia -->
-        <!--<div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-4">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input formControlName="reference" id="prod" list="producto" type="text" pInputText (change)="selectedProduct()" (keydown)="searchProduct()"/>
-            <datalist id="producto">
-              <option value={{item.prod_Id}} *ngFor="let item of products">{{item.prod_Nombre}}</option>
-            </datalist>
-            <label for="prod">Producto*</label>
-          </span>
-        </div>-->
 
         <!--* Observación -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-6 col-xxl-6">
@@ -137,18 +94,16 @@
     <hr class="Linea">
   </div>
 
-  <!--* Titulo Items -->
+  <!--* Titulo Items Consolidados -->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla
       de referencias consolidadas</h4>
   </div>
 
-  <!--* Tabla Items -->
+  <!--* Tabla Items Consolidados -->
   <div class="mb-3">
     <div class="row g-3 font-size-14" id="tabla1">
-      <p-table #dt1 [value]="rollsConsolidate" styleClass="p-datatable-sm p-datatable-gridlines"
-        responsiveLayout="scroll" [rowHover]="true" dataKey="0" [scrollable]="true" scrollHeight="50rem"
-        [resizableColumns]="true" columnResizeMode="expand" *ngIf="!load">
+      <p-table #dt1 [value]="rollsConsolidate" styleClass="p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll" [rowHover]="true" dataKey="0" [scrollable]="true" scrollHeight="50rem" [resizableColumns]="true" columnResizeMode="expand" *ngIf="!load">
         <ng-template pTemplate="header">
           <tr>
             <th></th>
@@ -188,13 +143,12 @@
     <hr class="Linea">
   </div>
 
-  <!--* titulo tabla rollos -->
+  <!--* titulo tabla rollos agregados -->
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla
-      de rollos agregados</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de rollos agregados</h4>
   </div>
 
-  <!--* Tabla de rollos-->
+  <!--* Tabla de rollos agregados -->
   <div class="mb-4">
     <p-table #dt *ngIf="!load" [value]="rollsToDispatch" styleClass="p-datatable-sm" responsiveLayout="scroll"
       [resizableColumns]="true" columnResizeMode="expand" [rowHover]="true" [scrollable]="true" scrollHeight="50rem">
@@ -241,9 +195,7 @@
               'bg-Empaque': data.process == 'Empaque', }">{{data.process}}</span>
           </td>
           <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-            <p-button *ngIf="!editMode" icon="pi pi-trash" [rounded]="true" (click)="quitRoll(data)"
-              severity="danger"></p-button>
-            <!--<p-button *ngIf="editMode" icon="pi pi-trash" [rounded]="true" (click)="msgDeleteRolls(data)" severity="danger"></p-button>-->
+            <p-button *ngIf="!editMode" icon="pi pi-trash" [rounded]="true" (click)="quitRoll(data)" severity="danger" pTooltip="Al presionar aquí se quitará el elemento de la tabla."></p-button>
           </td>
         </tr>
       </ng-template>
