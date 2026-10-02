@@ -289,6 +289,24 @@ export class Dashboard_GeneralComponent implements OnInit {
     }
   }
 
+  calcularKilosFacturados(){
+    let index : number = this.facturadoAnios.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      this.dataMonths = [`Enero: ${0}`, `Febrero: ${0}`, `Marzo: ${0}`, `Abril: ${0}`, `Mayo: ${0}`, `Junio: ${0}`, `Julio: ${0}`, `Agosto ${0}`, `Septiembre: ${0}`, `Octubre: ${0}`, `Noviembre: ${0}`, `Diciembre: ${0}`];
+      let count : number = 0;
+      this.zeusService.KilosFacturadosMes(`${this.anioSeleccionado}`).subscribe(data => {
+        for (let index = 0; index < data.length; index++) {
+          let production : any = [];
+          data[index].filter(x => !['903'].includes(x.item)).forEach(x => { 
+            production.push({ 'item' : x.item, 'unit' : x.und, 'qty' : x.qty }); 
+          });
+
+          
+        }
+      });
+    }
+  }
+
   // Funcion que va a llenar la grafica de facturacion
   llenarGraficaFacturacion(data, title? : any){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);

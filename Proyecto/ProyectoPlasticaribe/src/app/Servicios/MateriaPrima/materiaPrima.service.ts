@@ -53,9 +53,9 @@ export class MateriaPrimaService {
 
   getPeletizados = () : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getPeletizados`);
 
-  getSubcategories = () : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getSubcategories`);
+  getSubcategories = (proceso : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getSubcategories/${proceso}`);
 
-  getAllSubcategoriesForName = (name : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getAllSubcategoriesForName/${name}`);
+  getAllSubcategoriesForName = (ref : string, proceso : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getAllSubcategoriesForName/${ref}/${proceso}`);
 
   srvAgregar = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
 

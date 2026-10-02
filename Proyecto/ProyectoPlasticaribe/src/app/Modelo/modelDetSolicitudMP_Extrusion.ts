@@ -5,4 +5,6 @@ export interface modelDetSolicitudMP_Extrusion {
   SubCatMP_Nombre : string;
   DtSolMpExt_Cantidad : number;
   UndMed_Id : string;
+  DtSolMpExt_CantidadEntregada : number;
+  DtSolMpExt_CantidadFaltante : number;
 }

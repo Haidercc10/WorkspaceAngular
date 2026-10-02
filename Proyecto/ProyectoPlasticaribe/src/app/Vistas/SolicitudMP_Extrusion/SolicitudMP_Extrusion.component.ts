@@ -21,7 +21,9 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudMaterialProduccion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { Table } from 'primeng/table';
-import { Subject, takeUntil, } from 'rxjs';
+import { finalize, Subject, takeUntil, } from 'rxjs';
+import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
+import { TpFallasTecnicasService } from 'src/app/Servicios/TipoFallasTecnicas/TpFallasTecnicas.service';
 
 @Component({
   selector: 'app-SolicitudMP_Extrusion',
@@ -72,6 +74,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   @ViewChild('dtMaterials') dtMaterials: Table | undefined;
   private destroy$ = new Subject<void>();
   minDate: Date = new Date(); //Variable que contendrá la fecha mínima para el calendario de fecha de entrega
+  maquinas: any[] = [];
 
 
   constructor(private materiaPrimaService: MateriaPrimaService,
@@ -88,7 +91,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     private shepherdService: ShepherdService,
     private mensajeService: MensajesAplicacionService,
     private servicioSolicitudMpExt: SolicitudMP_ExtrusionService,
-    private servicioDetSolicitudMpExt: DetSolicitudMP_ExtrusionService) {
+    private servicioDetSolicitudMpExt: DetSolicitudMP_ExtrusionService,
+    private svMaquinas: MaquinasService
+  ) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formEncabezado = this.frmBuilderMateriaPrima.group({
@@ -99,7 +104,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       proceso: ['', Validators.required],
       observacion: [''],
       Solicitud: [null],
-      fechaEntrega: [null, ],
+      fechaEntrega: [null,],
     });
 
     this.formMP = this.frmBuilderMateriaPrima.group({
@@ -118,7 +123,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.ultimoConsecutivoSolicitud();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.formEncabezado.patchValue({ 'proceso': this.validateProcess(), });
-    //this.formMP.patchValue({ und: 'Kg' });
+    if (this.validateProcess() != '') this.cargarMaquinas();
   }
 
   //Función que se encarga de limpiar los recursos cuando el componente se destruye
@@ -158,19 +163,25 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   loadSubcategories() {
     this.subcategoriesInModal = [];
     this.materials = [];
-    this.materiaPrimaService.getSubcategories().subscribe(datos => {
-      this.materials = datos;
-      this.viewSubcategories = true;
-      this.subcategoriesInModal = this.materials.reduce((a: any, b: any) => {
-        if (!a.map(x => x.id_Subcategoria).includes(b.id_Subcategoria)) a = [...a, b];
-        else {
-          let index = a.findIndex(x => x.id_Subcategoria == b.id_Subcategoria);
-          a[index] = { ...a[index], stock: a[index].stock + b.stock };
-        }
-        return a;
-      }, []);
-      this.subcategoriesInModal.sort((a, b) => Number(b.stock) - Number(a.stock));
-    });
+    let proceso = this.formEncabezado.get('proceso')?.value;
+    console.log('Proceso validado:', proceso);
+    if (proceso != '') {
+      this.materiaPrimaService.getSubcategories(proceso).subscribe(datos => {
+        this.materials = datos;
+        this.viewSubcategories = true;
+        this.subcategoriesInModal = this.materials.reduce((a: any, b: any) => {
+          if (!a.map(x => x.id_Subcategoria).includes(b.id_Subcategoria)) a = [...a, b];
+          else {
+            let index = a.findIndex(x => x.id_Subcategoria == b.id_Subcategoria);
+            a[index] = { ...a[index], stock: a[index].stock + b.stock };
+          }
+          return a;
+        }, []);
+        this.subcategoriesInModal.sort((a, b) => Number(b.stock) - Number(a.stock));
+      });
+    } else {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un proceso válido para cargar las subcategorías.`);
+    }
   }
 
   // Función que va a filtrar las materias primas dependiendo de la subcategoria que el usuario haya elegido
@@ -241,7 +252,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
             this.cantRestante = (this.kgOT - asig.cantidad_Asignada);
             let cantPorSolicitar: number = this.cantRestante - asig.cantidad_Solicitada;
             this.loadInfoOT(parseInt(ot), data, asig);
-            if(cantPorSolicitar > 0) this.mensajeService.mensajeConfirmacion(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
+            if (cantPorSolicitar > 0) this.mensajeService.mensajeConfirmacion(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
             else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no tiene kg restantes por solicitar.`);
             this.load = true;
           }, err => {
@@ -276,9 +287,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   getAllSubcategories() {
     //this.subcategories = [];
     let material: string = this.formMP.value.subcat_Nombre;
+    let proceso : string = this.formEncabezado.get('proceso')?.value;
 
     if (material && material.trim().length > 2) {
-      this.materiaPrimaService.getAllSubcategoriesForName(material).subscribe(datos => {
+      this.materiaPrimaService.getAllSubcategoriesForName(material, proceso).subscribe(datos => {
         this.subcategories = datos;
       });
     }
@@ -306,7 +318,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     let kgPorSolicitarEstatico: number = this.cantRestante - kgSolicitado;
     let cantRestante: number = this.infoOrdenTrabajo[0].kgRestante;
     let kgPorSolicitar: number = cantRestante - cantidadesMp;
-    
+
 
     if (this.formMP.valid) {
       if (quantity > 0) {
@@ -411,7 +423,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       'SolMpExt_Observacion': this.formEncabezado.value.observacion,
       'Estado_Id': 11,
       'Proceso_Id': this.formEncabezado.value.proceso,
-      'Usua_Id': this.storage_Id
+      'Usua_Id': this.storage_Id,
+      'SolMpExt_FechaEstimadaEntrega': this.formEncabezado.value.fechaEntrega
     }
     this.servicioSolicitudMpExt.Post(solicitud).pipe(takeUntil(this.destroy$)).subscribe({
       next: (datos) => {
@@ -453,6 +466,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       'SubCatMP_Nombre': data.Nombre,
       'DtSolMpExt_Cantidad': data.Cantidad,
       'UndMed_Id': data.Und_Medida,
+      'DtSolMpExt_CantidadEntregada': 0,
+      'DtSolMpExt_CantidadFaltante': data.Cantidad,
     }
     return detallesSolicitud;
   }
@@ -740,5 +755,23 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         }
       } else this.quitarMateriaPrima(mp);
     });
+  }
+
+  /** Función para cargar las máquinas disponibles */
+  cargarMaquinas() {
+    let proceso: string = this.formEncabezado.value.proceso;
+    this.maquinas = [];
+    if (proceso) {
+      this.svMaquinas.getMaquinasPorProceso(proceso)
+        .pipe(takeUntil(this.destroy$),
+          finalize(() => { this.load = true; }))
+        .subscribe(data => {
+          this.maquinas = data;
+          this.maquinas.sort((a, b) => Number(a.maq_Numero) - Number(b.maq_Numero));
+          this.mensajeService.mensajeConfirmacion('Confirmación', `Se han cargado las máquinas disponibles del proceso de '${proceso}' correctamente.`);
+        }, error => {
+          this.mensajeService.mensajeError(`Error`, `No fue posible cargar las máquinas disponibles: ${error.error}`);
+        });
+    }
   }
 }
