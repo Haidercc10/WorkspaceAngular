@@ -8,4 +8,5 @@ export interface modelSolicitudMP_Extrusion {
   Estado_Id : number;
   Proceso_Id : string;
   Usua_Id : number;
+  SolMpExt_FechaEstimadaEntrega? : any;
 }

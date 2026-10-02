@@ -171,6 +171,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
       'id' : datos.id,
       'ot' : datos.ot,
       'fecha' : datos.fecha.replace('T00:00:00', ''),
+      'fechaEntrega' : datos.fecha_Entrega ? datos.fecha_Entrega.replace('T00:00:00', '') : '',
       'estadoId' : datos.estado,
       'estado' : datos.nombre_Estado,
     }
@@ -178,7 +179,13 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   }
 
   /** Función para limpiar los campos del formulario */
-  limpiarCampos = () => this.formFiltros.reset();
+  limpiarCampos() {
+    this.solicitudSeleccionada = 0;
+    this.formFiltros.reset();
+    this.arrayId = [];
+    this.arrayRegistros = [];
+    this.arrayMatPrimas = [];
+  }
 
   /** Función para filtrar los registros de la tabla */
   aplicarFiltro = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -448,7 +455,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
       'Nombre' : data.subcategoria,
       'Cantidad' : data.cantidad_Pedida,
       'CantAprobada' : data.cantidad_Entregada || 0,
-      'CantFaltante' : data.cantidad_Faltante || 0,
+      'CantFaltante' : data.cantidad_Restante || 0,
       'Und_Medida' : data.medida,
       'Usuario' : data.nombre_Usuario,
       'EstadoSolicitud' : data.nombre_Estado,
@@ -505,7 +512,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
         SolMpExt_Observacion: data.solMpExt_Observacion,
         Estado_Id: this.clave == 'finalizar' ? 5 : 4,
         Proceso_Id: data.proceso_Id,
-        Usua_Id: data.usua_Id
+        Usua_Id: data.usua_Id, 
+        SolMpExt_FechaEstimadaEntrega: data.solMpExt_FechaEstimadaEntrega
       }
       this.servicioSolicitudesMPExt.Put(modelo.SolMpExt_Id, modelo).subscribe(updateData => {
         this.cargando = false;
@@ -519,13 +527,14 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearAsignacion(){
-    if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') {
+    if(['Finalizado', 'Cancelado'].includes(this.estadoSolicitud)) {
       this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear asignaciones con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalAsignacion = true;
       this.AsignacionMatPrima.esSolicitud = true;
       this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({Solicitud : this.solicitudSeleccionada});
-      this.AsignacionMatPrima.consultarSolicitudMaterial();
+      this.AsignacionMatPrima.consultarSolicitudMaterial(this.arrayMatPrimas);
+      //this.cargarSubcategoriasEnAsignaciones();
     }
   }
 
@@ -601,4 +610,6 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     }
     return valor;
   }
+
+  
 }
