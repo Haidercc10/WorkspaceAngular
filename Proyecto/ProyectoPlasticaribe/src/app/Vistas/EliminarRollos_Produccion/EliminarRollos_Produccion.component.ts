@@ -347,7 +347,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   confirmDeleteMessage(isError : boolean) {
     if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido actualizando la observación de los rollos eliminados en BagPro!`);
     else {
-      this.svcMsjs.mensajeConfirmacion(`Rollos eliminados exitosamente!`);
+      this.svcMsjs.mensajeConfirmacion(`OK!`,`Rollos eliminados exitosamente!`);
       setTimeout(() => { this.clearAll(); }, 1000);
     }
   }
