@@ -89,7 +89,7 @@ export class LoginComponentComponent implements OnInit {
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox() {
-  this.empresaServices.srvObtenerLista().subscribe({
+  this.empresaServices.getIdNombreEmpresas().subscribe({
     next: (datos) => {
       this.empresas = datos;
 

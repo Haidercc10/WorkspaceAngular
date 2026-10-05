@@ -14,4 +14,6 @@ export class EmpresaService {
 
   srvObtenerLista = () :Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Empresas');
 
+  getIdNombreEmpresas = () :Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Empresas/getIdNombreEmpresas');
+
 }
