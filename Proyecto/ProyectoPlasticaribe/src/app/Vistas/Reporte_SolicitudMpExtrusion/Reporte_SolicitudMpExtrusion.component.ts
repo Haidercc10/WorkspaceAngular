@@ -576,7 +576,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   }
 
    // Funcion que va a hacer que se inicie el tutorial in-app
-   tutorial(){
+  tutorial(){
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
