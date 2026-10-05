@@ -5,7 +5,6 @@
 </div>
 
 <div class="contain">
-  <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
       <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de Ordenes de
@@ -19,8 +18,7 @@
 
 <p-card>
   <div class="my-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i>
-      Filtros de búsqueda</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
 
   <form [formGroup]="formFilters" (ngSubmit)="searchData()">
@@ -28,8 +26,7 @@
       <!--* TYPE MOV. -->
       <div class="col-sm-12 col-md-6 col-xl-1">
         <span class="p-float-label">
-          <p-dropdown formControlName="typeMov" inputId="typeMov" [autoDisplayFirst]="false"
-            [options]="typesMovements"></p-dropdown>
+          <p-dropdown formControlName="typeMov" inputId="typeMov" [autoDisplayFirst]="false" [options]="typesMovements"></p-dropdown>
           <label for="typeMov">Tipo Mov.</label>
         </span>
       </div>
@@ -43,6 +40,7 @@
         </span>
       </div>
 
+      <!-- Fecha inicial -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-calendar formControlName="startDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
@@ -50,6 +48,7 @@
         </span>
       </div>
 
+      <!-- Fecha final -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-calendar formControlName="endDate" inputId="FechaFinal" [showIcon]="true"></p-calendar>
@@ -57,11 +56,10 @@
         </span>
       </div>
 
-      <!-- CLIENT -->
+      <!-- Cliente -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
         <span class="p-float-label">
-          <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText
-            (keyup)="searchClientsByName()" (change)="selectClient()" />
+          <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText (keyup)="searchClientsByName()" (change)="selectClient()" />
           <datalist id="clientes">
             <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
           </datalist>
@@ -69,17 +67,17 @@
         </span>
       </div>
 
-      <!--* SALES -->
+      <!--* Vendedores -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-dropdown formControlName="sales" inputId="sales" [autoDisplayFirst]="validateRole == 2"
-            [readonly]="validateRole == 2" [options]="sales" optionValue="usua_Id" optionLabel="usua_Nombre"
-            [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+            [readonly]="validateRole == 2" [options]="sales" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
           <label for="sales">Vendedores</label>
         </span>
       </div>
     </div>
 
+    <!-- Botones -->
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"
@@ -97,8 +95,7 @@
   </div>
 
   <div class="mb-5">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i>
-      Registros consultados</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Registros consultados</h4>
   </div>
 
   <div class="mb-4">
@@ -108,10 +105,8 @@
       [value]="serchedData" dataKey="Oc" [scrollable]="true" scrollHeight="50rem" *ngIf="!load">
       <ng-template pTemplate="header">
         <tr>
-          <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-book"></i> Datos
-            Orden/Devolución</th>
-          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Usuarios
-          </th>
+          <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-book"></i> Datos Orden/Devolución</th>
+          <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Usuarios</th>
           <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-calendar"></i> Fechas</th>
           <th style="font-weight: 800;" class="text-center"></th>
           <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-file-pdf"></i> Visualización
@@ -159,8 +154,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-data>
-        <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'DV'}"
-          pTooltip="{{msjDevolutions(data)}}" tooltipPosition="top">
+        <tr (dblclick)="loadModalOrderFact(data)" [ngClass]="{'cursor': data.type == 'DV'}" pTooltip="{{msjDevolutions(data)}}" tooltipPosition="top">
           <td class="text-center" alignFrozen="left" pFrozenColumn [frozen]="true">{{data.type}}-{{data.or.id}}</td>
           <td class="text-center">{{data.or.of_Directa == true ? 'SÍ' : 'NO'}}</td>
           <td class="text-center">{{data.or.factura}}</td>

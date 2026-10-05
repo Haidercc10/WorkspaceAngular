@@ -1,7 +1,7 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
 import { AppComponent } from 'src/app/app.component';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
@@ -10,8 +10,6 @@ import { Table } from 'primeng/table';
 import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
 import { MessageService } from 'primeng/api';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { OrdenFacturacion_PalletsComponent } from '../OrdenFacturacion_Pallets/OrdenFacturacion_Pallets.component';
 import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gestion_DevolucionesOF.component';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
@@ -21,6 +19,9 @@ import moment from 'moment';
 import { ReposicionesComponent } from '../Reposiciones/Reposiciones.component';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { finalize } from 'rxjs';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
@@ -50,8 +51,6 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   modalReposition: boolean = false;
   modalDevolution: boolean = false;
   modalManagerDevolution: boolean = false;
-  //@ViewChild(Gestion_DevolucionesOFComponent) managementDevolutions : Gestion_DevolucionesOFComponent;
-  //@ViewChild(ReposicionesComponent) Repositions : ReposicionesComponent;
 
   clients: any[] = [];
   sales: any[] = [];
@@ -62,13 +61,11 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
     private dtOrderFactService: Dt_OrdenFacturacionService,
-    private msg: MensajesAplicacionService,
-
+    private svFactProducts: FacturacionProductosService,
     private dtDevolutionsService: DetallesDevolucionesProductosService,
     private orderFactService: OrdenFacturacionService,
     private messageService: MessageService,
     private productionProcessService: Produccion_ProcesosService,
-    //private cmpOrdFact : OrdenFacturacion_PalletsComponent, 
     private svExistProduct: ExistenciasProductosService,
     private svZeusInv: InventarioZeusService,
     private svUsuarios: UsuarioService,
@@ -78,6 +75,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private cmpDevolutions: Devolucion_OrdenFacturacionComponent,
     private managementDevolutions: Gestion_DevolucionesOFComponent,
     private Repositions: ReposicionesComponent,
+    private PDFService: CreacionPdfService,
+    private bagproService: BagproService,
+    private util: UtileriaService
   ) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -151,7 +151,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
     if (typeMov == 'OF') this.searchDataOrders(startDate, endDate, this.validateUrl());
     else if (typeMov == 'DV') this.searchDataDevolutions(startDate, endDate, this.validateUrl());
-    else this.msg.mensajeAdvertencia(`¡Debe seleccionar un tipo de movimiento!`);
+    else this.util.Notificacion(`Advertencia`,`¡Debe seleccionar un tipo de movimiento!`);
   }
 
   searchDataOrders(startDate: any, endDate: any, route: string) {
@@ -161,7 +161,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       .pipe(finalize(() => this.load = false))
       .subscribe({
         next: data => {
-          if (data.length == 0) return this.msg.mensajeAdvertencia(`¡No se encontraron órdenes de facturación con los parámetros consultados!`);
+          if (data.length == 0) return this.util.Notificacion(`Advertencia`,`¡No se encontraron órdenes de facturación con los parámetros consultados!`);
           const today = moment();
           this.serchedData = data;
           this.serchedData = this.serchedData.map(order => {
@@ -184,13 +184,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
               // Luego por días
               return b.dias - a.dias;
             });
-
         },
-        error: (error) => {
-          this.msg.mensajeError(
-            `¡No se encontraron ordenes con los parametros consultados!`,
-            `Error: ${error.error?.title} | Status: ${error.status}`
-          );
+        error: () => {
+          this.util.Notificacion(`Error`, `¡No se encontraron órdenes con los parámetros consultados!`);
         }
       })
   }
@@ -211,31 +207,63 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
             ...x,
             dias: fechaFin.diff(fechaInicio, 'days')
           };
-
-          this.serchedData.sort((a, b) =>
-            b.estado.localeCompare(a.estado)
-          );
         })
-      }, error: (error) => {
-        this.msg.mensajeError(`¡No se encontraron devoluciones con los parametros consultados!`,
-          `Error: ${error.error?.title} | Status: ${error.status}`);
-      }
-    });
+      }, error: () => this.util.Notificacion(`Error`, `¡No se encontraron devoluciones con los parámetros consultados!`)});
   }
 
   ///Generar
   createPDF(id: number, fact: string, type: string, ofDirect: boolean) {
-    this.load = true;
+    // los cargandos se definen en los dos metodos de creacion de PDF
     if (type == 'OF') {
-      //this.dtOrderFactService.GetInformacionOrderFact(id).subscribe(data => {
-        //let pallet : boolean = data.some(x => x.dtOrder.pallet_Id != null);
-        //console.log(pallet, ofDirect);
-        /*!pallet ?*/ ofDirect ? this.cmpOrden_Facturacion.createPDFFactDirect(id, fact) : this.cmpOrden_Facturacion.createPDF(id, fact) /*: this.cmpOrdFact.createPDF(id, fact)*/;
-      //}, error => {
-      //this.msg.mensajeError(`Error`, `Error al consultar la OF N° ${id} | ${error.status} ${error.statusText}`);
-      //});
+        // Si es orden directa, crea PDF orden directa, sino, crea el PDF para ordenes NO directas.
+        // ofDirect ? this.cmpOrden_Facturacion.createPDFFactDirect(id, fact) : this.createNoDirectOF_PDF(id, fact);
+        ofDirect ? this.createDirectOF_PDF(id, fact) : this.createNoDirectOF_PDF(id, fact);
     } else if (type == 'DV') this.cmpDevolutions.createPDF(id, 'exportada');
-    setTimeout(() => this.load = false, 3000);
+    setTimeout(() => {
+      this.load = false;
+    }, 3000);
+  }
+
+  createDirectOF_PDF(OF_Id: number, fact: string){
+    this.load = true;
+    this.svFactProducts.getInfoOfDirect(OF_Id).pipe(finalize(() => {
+      this.load = false;
+      this.util.Notificacion('Confirmación',`Se generó la OF N°: ${OF_Id}. En unos momentos se cargará el PDF en una nueva pestaña.`);
+    })).subscribe(data => {
+      let title: string = `Orden de Facturación N° ${OF_Id}`;
+      title += `${fact.length > 0 ? ` \n Factura N° ${fact}` : ''}`;
+      let content: any[] = this.PDFService.DirectOFContent_PDF(data);
+      this.PDFService.formatoPDF(title, content);
+    }, error => this.util.Notificacion('error', `Error al momento de generar el documento N° ${OF_Id} | ${error.status} ${error.statusText}`));
+  }
+
+  createNoDirectOF_PDF(OF_Id: number, fact: string){
+    this.load = true;
+    this.dtOrderFactService.GetInformacionOrderFactAsync(OF_Id).pipe(finalize(() => {
+      this.load = false; 
+      this.util.Notificacion('Confirmación',`Se generó la OF N°: ${OF_Id}. En unos momentos se cargará el PDF en una nueva pestaña.`);
+    })).subscribe(data => {
+      let saleOrder: string = `${data[0].dtOrder.consecutivo_Pedido}`;
+      let title: string = saleOrder.startsWith('DV') ? `Orden de Reposición N° ${OF_Id}` : `Orden de Facturación N° ${OF_Id}`;
+      title += `${fact.length > 0 ? ` \n Factura N° ${fact}` : ''}`;
+      data = this.changeNameProductToPDF(data);
+      let content: any[] = this.PDFService.NoDirectOFContent_PDF(data);
+      this.PDFService.formatoPDF(title, content);
+    }, error => this.util.Notificacion('error', `Error al momento de generar el documento N° ${OF_Id} | ${error.status} ${error.statusText}`));
+  }
+
+  changeNameProductToPDF(production: Array<any>) {
+    let orderProduction = production.reduce((a, b) => {
+      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];return a;
+    }, []);
+    orderProduction.forEach(d => {
+      this.bagproService.GetOrdenDeTrabajo(d.orderProduction, '').subscribe(dataOrder => {
+        production.filter(x => x.orderProduction == d.orderProduction).forEach(prod => {
+          prod.Referencia = dataOrder[0].producto;
+        });
+      });
+    });
+    return production;
   }
 
   ///Mensaje de confirmación de la orden a anular. 
@@ -259,11 +287,6 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   onReject = () => this.messageService.clear('confirmation');
 
-  errorMessage(message: string, error: HttpErrorResponse) {
-    this.load = false;
-    this.msg.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
-  }
-
   ///Función para colocar en estado anulado la orden que se seleccione. 
   PutStatusOrderAnulled() {
     this.onReject();
@@ -280,60 +303,53 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       } else if (!this.ofDirect) {
         this.PutStatusDetailsOrder(false);
       }
-    }, error => this.errorMessage(`¡Ocurrió un error al intentar anular la orden N° ${this.anulledOrder}!`, error));
+    }, error => this.util.Notificacion(`Error`,`¡Ocurrió un error al intentar anular la orden N° ${this.anulledOrder}! | ${error.statusText} ${error.status}`));
   }
 
   ///Función para actualizar el estado de los rollos a disponibles.
   PutStatusDetailsOrder(viewMsj: boolean) {
-    this.productionProcessService.putStateAvaible(this.anulledOrder).subscribe(() => {
-      viewMsj ? this.msg.mensajeConfirmacion(`¡Orden de facturación anulada con éxito!`) : null;
-      this.load = false;
-    }, error => {
-      this.errorMessage(`¡Ocurrió un error al colocar en disponible los rollos de la orden N° ${this.anulledOrder}!`, error);
-      this.load = false;
-    });
+    this.load = true;
+    this.productionProcessService.putStateAvaible(this.anulledOrder).pipe(finalize(() => this.load = false)).subscribe(() => {
+      viewMsj ? this.util.Notificacion(`Confirmación`, `¡Orden de facturación anulada con éxito!`) : null;
+    }, error => this.util.Notificacion(`Error`, `¡Ocurrió un error al colocar en disponible los rollos de la orden N° ${this.anulledOrder}! ${error.statusText} ${error.status}`));
   }
 
   ///Actualizar stock de productos luego de anular una orden directa.
   updateStockProducts(viewMsj: boolean) {
-    this.svExistProduct.putStockThenAnullation(this.anulledOrder).subscribe(data => {
-      viewMsj ? this.msg.mensajeConfirmacion(`¡Orden de facturación N° ${this.anulledOrder} anulada exitosamente!`) : null;
-      this.load = false;
-    }, error => {
-      this.errorMessage(`¡Error al intentar devolver al stock los productos facturados de la orden N° ${this.anulledOrder}!`, error);
-      this.load = false;
-    });
+    this.load = true;
+    this.svExistProduct.putStockThenAnullation(this.anulledOrder).pipe(finalize(() => this.load = false)).subscribe(data => {
+      viewMsj ? this.util.Notificacion(`Confirmación`, `¡Orden de facturación N° ${this.anulledOrder} anulada con éxito!`) : null;
+    }, error => this.util.Notificacion(`Error`, `¡Error al intentar devolver al stock los productos facturados de la orden N° ${this.anulledOrder}! ${error.statusText} ${error.status}`));
   }
 
-  ///
   loadModalOrderFact(data: any) {
-    console.log(data);  
-    this.registroSeleccionado = data;
-    if (data.type == 'DV' && data.or.reposicion && data.or.estado_Id == 38) {
-      if ([1, 10, 97].includes(this.validateRole)) {
-        this.Repositions.clearAll();
-        this.modalReposition = true;
-        this.Repositions.loadClientReposition(data);
-        this.Repositions.repositionForDv = true;
-      } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
-    } else if (data.type == 'DV' && [39, 54].includes(data.or.estado_Id)) {
-      this.modalEndOrders = true;
-      this.formEndDevolutions.patchValue({
-        'dv': data.or.id,
-        'nc': data.or.nc,
-        'reposition': data.or.reposicion,
-      });
-    } else if (data.type == 'DV' && [11, 29].includes(data.or.estado_Id)) {
-      if ([5, 1].includes(this.validateRole)) {
-        this.managementDevolutions.clearFields();
-        this.managementDevolutions.devolution = true;
-        this.modalManagerDevolution = true;
-      } else this.msg.mensajeAdvertencia(`No cuenta con permisos suficientes para gestionar devoluciones.`);
-    } else if (data.type == 'DV' && [53].includes(data.or.estado_Id)) {
-      this.modalDevolution = true;
-      //this.cmpDevolutions.loadDevolutionForId();
-      //this.cmpDevolutions.searchDevolution(); 
-    } else this.msg.mensajeAdvertencia(`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
+    if (data.type == 'DV'){
+      console.log(data);
+      this.registroSeleccionado = data;
+      if (data.or.reposicion && data.or.estado_Id == 38) {
+        if ([1, 10, 97].includes(this.validateRole)) {
+          this.Repositions.clearAll();
+          this.modalReposition = true;
+          this.Repositions.loadClientReposition(data);
+          this.Repositions.repositionForDv = true;
+        } else this.util.Notificacion(`Advertencia`,`No cuenta con permisos suficientes para realizar ordenes de facturación.`);
+      } else if ([39, 54].includes(data.or.estado_Id)) {
+        this.modalEndOrders = true;
+        this.formEndDevolutions.patchValue({
+          'dv': data.or.id,
+          'nc': data.or.nc,
+          'reposition': data.or.reposicion,
+        });
+      } else if ([11, 29].includes(data.or.estado_Id)) {
+        if ([5, 1].includes(this.validateRole)) {
+          this.managementDevolutions.clearFields();
+          this.managementDevolutions.devolution = true;
+          this.modalManagerDevolution = true;
+        } else this.util.Notificacion(`Advertencia`,`No cuenta con permisos suficientes para gestionar devoluciones.`);
+      } else if ([53].includes(data.or.estado_Id)) {
+        this.modalDevolution = true;
+      } else this.util.Notificacion(`Advertencia`,`La devolución N° ${data.or.id} no está disponible para reposición y/o revisión!`);
+    }
   }
 
   //Limpiar campos del formulario de cierre de devoluciones
@@ -348,6 +364,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   //Función para cerrar la devolución.
   endDevolution() {
+    this.load = true;
     let dv: number = this.formEndDevolutions.value.dv;
     let observation: string = this.formEndDevolutions.value.observationFinal;
     let reposition: boolean = this.formEndDevolutions.value.reposition;
@@ -356,15 +373,11 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let hour: string = moment().format('HH:mm:ss');
     this.load = true;
 
-    this.svDevolutions.PutStatusDevolution(dv, 18, date, hour, this.storage_Id, reposition, nc, `?observation=${observation}`).subscribe(data => {
+    this.svDevolutions.PutStatusDevolution(dv, 18, date, hour, this.storage_Id, reposition, nc, `?observation=${observation}`).pipe(finalize(() => this.load = false)).subscribe(data => {
       this.cmpDevolutions.createPDF(dv, 'cerrada');
       this.modalDevolution = false;
       this.formEndDevolutions.reset();
-      this.load = false;
-    }, error => {
-      this.msg.mensajeError('Error', `No fue posible actualizar el estado de la devolución N° ${dv}!`);
-      this.load = false;
-    });
+    }, error => this.util.Notificacion('Error', `No fue posible actualizar el estado de la devolución N° ${dv}! ${error.statusText} ${error.status}`));
   }
 
   msjDevolutions(data) {
@@ -375,7 +388,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let idClient = this.formFilters.value.clientId;
     this.svZeusInv.getClientByIdThird(idClient).subscribe(data => {
       data.forEach(cli => { this.formFilters.patchValue({ 'clientId': cli.idcliente, 'client': cli.razoncial, }); });
-    }, error => this.errorMessage(`¡No se encontró información del cliente consultado!`, error));
+    }, error => this.util.Notificacion(`Error`,`¡No se encontró información del cliente consultado! ${error.statusText} ${error.status}`));
   }
 
   //Función para buscar clientes por nombre.
@@ -389,7 +402,6 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let client = this.clients.find(x => x.idcliente == this.formFilters.value.client);
     this.formFilters.patchValue({ 'clientId': client.idcliente, 'client': client.razoncial, });
   }
-
 
   // Funcion que va a colocar a llenar los campos correspondientes del vendedor
   llenarVendedor() {
@@ -420,9 +432,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   //Función que exportará un formato excel con los datos de los clientes
   exportExcel() {
+    this.load = true;
     if (this.serchedData.length > 0) {
-      setTimeout(() => { this.loadSheetAndStyles(this.serchedData); }, 500);
-    } else this.msg.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+      setTimeout(() => { 
+        this.loadSheetAndStyles(this.serchedData);
+        this.load = false;
+       }, 500);
+    } else this.util.Notificacion(`Advertencia`, `No hay datos para exportar.`);
   }
 
   //Función que cargará la hoja y los estilos. 

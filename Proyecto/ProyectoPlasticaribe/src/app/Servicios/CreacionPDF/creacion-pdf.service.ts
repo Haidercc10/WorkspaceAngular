@@ -21,7 +21,9 @@ export class CreacionPdfService {
   constructor(private rePrintService: ReImpresionEtiquetasService,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
     private encriptacion: EncriptacionService,
-    private utileria: UtileriaService) { }
+    private util: UtileriaService,
+    private tag: TagProduction_2 
+  ) { }
 
   formatoPDF(titulo: string, content: any, headerAdicional: any = {}) {
     this.title = titulo; 
@@ -188,7 +190,7 @@ export class CreacionPdfService {
   }
 
   private dataOrderProduction(dataTag: modelTagProduction): any[] {
-    let infoTag: string = `${this.utileria.formatoNumeros((dataTag.width).toFixed(2))} ${this.utileria.formatoNumeros((dataTag.bellows).toFixed(2))} ${this.utileria.formatoNumeros((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.utileria.formatoNumeros((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`;
+    let infoTag: string = `${this.util.formatoNumeros((dataTag.width).toFixed(2))} ${this.util.formatoNumeros((dataTag.bellows).toFixed(2))} ${this.util.formatoNumeros((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.util.formatoNumeros((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`;
     if (dataTag.productionProcess == 'SELLADO') infoTag = `${dataTag.dataTagForClient}      Material: ${dataTag.material}`;
     return [
       {
@@ -235,7 +237,7 @@ export class CreacionPdfService {
 
   private tableWithQuantity(quantity: number) {
     let size: number = quantity > 999 ? 18 : quantity > 9999 ? 14 : 24;
-    return { text: `${this.utileria.formatoNumeros((quantity).toFixed(2))}`, bold: true, fontSize: size, alignment: 'center' };
+    return { text: `${this.util.formatoNumeros((quantity).toFixed(2))}`, bold: true, fontSize: size, alignment: 'center' };
   }
 
   private createBarcode(code: number) {
@@ -278,23 +280,8 @@ export class CreacionPdfService {
         Hora: moment().format('HH:mm:ss'),
         Usua_Id: this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id')),
       }
-      this.rePrintService.insert(data).subscribe(null, error => console.log(error));
+      this.rePrintService.insert(data).subscribe({next: ()=> null, error: error => console.log(error)});
     }
-  }
-
-  validateProcess(proceso: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
-    const processMapping = {
-      'EXTRUSION': 'EXT',
-      'IMPRESION': 'IMP',
-      'ROTOGRABADO': 'ROT',
-      'LAMINADO': 'LAM',
-      'DOBLADO': 'DBLD',
-      'CORTE': 'CORTE',
-      'EMPAQUE': 'EMP',
-      'SELLADO': 'SELLA',
-      'WIKETIADO': 'WIKE'
-    };
-    return processMapping[proceso] || proceso;
   }
 
   // ===========================================================================================================================
@@ -303,16 +290,16 @@ export class CreacionPdfService {
 
   contentPDFPrecargue(data): any[] {
     let content: any[] = [];
-    let consolidatedInformation: Array<any> = this.getInfoGroupedPDF(data);
-    let informationProducts: Array<any> = this.getInfoDetailsPDF(data);
-    content.push(this.infoMovementPDF(data[0]));
-    content.push(this.tablaGroupedPDF(consolidatedInformation));
-    content.push(this.tableTotals(consolidatedInformation))
-    content.push(this.tablaDetailsPDF(informationProducts));
+    let consolidatedInformation: Array<any> = this.getInfoGroupedPrecarguePDF(data);
+    let informationProducts: Array<any> = this.getInfoDetailsPrecarguePDF(data);
+    content.push(this.infoMovementPrecarguePDF(data[0]));
+    content.push(this.tablaGroupedPrecarguePDF(consolidatedInformation));
+    content.push(this.tableTotalsPrecarguePDF(consolidatedInformation))
+    content.push(this.tablaDetailsPrecarguePDF(informationProducts));
     return content;
   }
 
-  getInfoGroupedPDF(data: any): Array<any> {
+  getInfoGroupedPrecarguePDF(data: any): Array<any> {
     let info: Array<any> = [];
     let contador: number = 0;
     data.forEach(d => {
@@ -340,7 +327,7 @@ export class CreacionPdfService {
     return info;
   }
 
-  getInfoDetailsPDF(data: any): Array<any> {
+  getInfoDetailsPrecarguePDF(data: any): Array<any> {
     let info: Array<any> = [];
     let count: number = 0;
 
@@ -361,7 +348,7 @@ export class CreacionPdfService {
   }
 
   //Función que muestra una tabla con la información general del ingreso.
-  infoMovementPDF(data: any): {} {
+  infoMovementPrecarguePDF(data: any): {} {
     let date1: any = data.date1.replace('T00:00:00', '');
     let date2: any = data.date2.replace('T00:00:00', '');
     return {
@@ -404,14 +391,14 @@ export class CreacionPdfService {
   }
 
   //Función que consolida la información por mat. primas
-  tablaGroupedPDF(data) {
+  tablaGroupedPrecarguePDF(data) {
     let columns: Array<string> = ['#', 'Item', 'Referencia', 'Rollos', 'Peso', 'Cantidad', 'Und'];
     let widths: Array<string> = ['5%', '10%', '45%', '10%', '10%', '10%', '10%'];
     return {
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody1(data, columns, 'Consolidado de rollos precargados por item'),
+        body: this.buildTableBodyPrecargue1(data, columns, 'Consolidado de rollos precargados por item'),
       },
       fontSize: 8,
       layout: {
@@ -423,7 +410,7 @@ export class CreacionPdfService {
   }
 
   //Tabla con materiales recuperados ingresados detallados
-  tablaDetailsPDF(data) {
+  tablaDetailsPrecarguePDF(data) {
     let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Und'];
     let widths: Array<string> = ['5%', '9%', '8%', '8%', '45%', '8%', '10%', '7%'];
     return {
@@ -431,7 +418,7 @@ export class CreacionPdfService {
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody2(data, columns, 'Información detallada de rollos precargados'),
+        body: this.buildTableBodyPrecargue2(data, columns, 'Información detallada de rollos precargados'),
       },
       fontSize: 8,
       layout: {
@@ -443,7 +430,7 @@ export class CreacionPdfService {
   }
 
   //Tabla con los valores totales de pesos y registros
-  tableTotals(data: any) {
+  tableTotalsPrecarguePDF(data: any) {
     return {
       fontSize: 8,
       bold: false,
@@ -454,9 +441,9 @@ export class CreacionPdfService {
             { text: ``, bold: true, border: [true, false, false, true], },
             { text: ``, bold: true, border: [false, false, false, true], },
             { text: `Totales`, alignment: 'right', bold: true, border: [false, false, true, true], },
-            { text: `${this.utileria.formatoNumeros((data.reduce((a, b) => a += parseInt(b.Rollos), 0)))}`, bold: true, border: [false, false, true, true], },
-            { text: `${this.utileria.formatoNumeros((data.reduce((a, b) => a += parseFloat(b.Peso), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
-            { text: `${this.utileria.formatoNumeros((data.reduce((a, b) => a += parseFloat(b.Cantidad), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
+            { text: `${this.util.formatoNumeros((data.reduce((a, b) => a += parseInt(b.Rollos), 0)))}`, bold: true, border: [false, false, true, true], },
+            { text: `${this.util.formatoNumeros((data.reduce((a, b) => a += parseFloat(b.Peso), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
+            { text: `${this.util.formatoNumeros((data.reduce((a, b) => a += parseFloat(b.Cantidad), 0)).toFixed(2))}`, bold: true, border: [false, false, true, true], },
             { text: ``, bold: true, border: [false, false, true, true], },
           ],
         ],
@@ -464,7 +451,7 @@ export class CreacionPdfService {
     }
   }
 
-  buildTableBody1(data, columns, title) {
+  buildTableBodyPrecargue1(data, columns, title) {
     var body: any = [];
     body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
@@ -476,7 +463,7 @@ export class CreacionPdfService {
     return body;
   }
 
-  buildTableBody2(data, columns, title) {
+  buildTableBodyPrecargue2(data, columns, title) {
     var body: any = [];
     body.push([{ colSpan: 8, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '',]);
     body.push(columns);
@@ -487,7 +474,348 @@ export class CreacionPdfService {
     });
     return body;
   }
-  /* ================================================= FIN PDF PARA PRECARGUES ===================================================== */
+
+  // ==============================================================================================================================
+  //                                             PDF PARA ORDEN DE FACTURACION NO DIRECTA
+  // ==============================================================================================================================
+
+  NoDirectOFContent_PDF(data): any[] {
+    let content: any[] = [];
+    let consolidatedInformation: Array<any> = this.consolidatedInformationOF_NoDirecta(data);
+    let informationProducts: Array<any> = this.getInformationProductsOF_NoDirecta(data);
+
+    content.push(this.informationClientOF(data[0]));
+    content.push(this.observationOF(data[0]));
+    content.push(this.tableConsolidatedOF(consolidatedInformation));
+    content.push(this.tableTotalsOF_NoDirecta(data))
+    content.push(this.tableProductsOF(informationProducts));
+    return content;
+  }
+
+  consolidatedInformationOF_NoDirecta(data: any): Array<any> {
+    let consolidatedInformation: Array<any> = [];
+    let count: number = 0;
+    data.forEach(prod => {
+      if (!consolidatedInformation.map(x => x.Item).includes(prod.producto.prod_Id)) {
+        count++;
+        let cuontProduction: number = data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).length;
+        let totalQuantity: number = 0;
+        let totalWeight: number = 0;
+        let totalNetWeight: number = 0;
+        data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => {
+          totalQuantity += x.dtOrder.cantidad,
+            totalWeight += x.weight,
+            totalNetWeight += x.netWeight
+        });
+        consolidatedInformation.push({
+          "#": count,
+          "Pedido": prod.dtOrder.consecutivo_Pedido,
+          "Item": prod.producto.prod_Id,
+          "Referencia": prod.producto.prod_Nombre,
+          "Rollos": this.util.formatoNumeros((cuontProduction)),
+          "Peso B.": this.util.formatoNumeros((totalWeight).toFixed(2)),
+          "Peso_Bruto": this.util.formatoNumeros((totalWeight).toFixed(2)),
+          "Peso N.": this.util.formatoNumeros((totalNetWeight).toFixed(2)),
+          "Peso_Neto": this.util.formatoNumeros((totalNetWeight).toFixed(2)),
+          "Cantidad": this.util.formatoNumeros((totalQuantity).toFixed(2)),
+          "Unidad": prod.dtOrder.presentacion
+        });
+      }
+    });
+    return consolidatedInformation;
+  }
+
+  getInformationProductsOF_NoDirecta(data: any): Array<any> {
+    let informationProducts: Array<any> = [];
+    let count: number = 0;
+    data.sort((a, b) => Number(a.dtOrder.numero_Rollo) - Number(b.dtOrder.numero_Rollo));
+    data.sort((a, b) => Number(a.producto.prod_Id) - Number(b.producto.prod_Id));
+    data.forEach(prod => {
+      count++;
+      informationProducts.push({
+        "#": count,
+        "Rollo": prod.dtOrder.numero_Rollo,
+        "OT": prod.orderProduction,
+        "Item": prod.producto.prod_Id,
+        "Referencia": prod.producto.prod_Nombre,
+        "Peso": this.util.formatoNumeros((prod.weight).toFixed(2)),
+        "Peso B.": this.util.formatoNumeros((prod.weight).toFixed(2)),
+        "Cantidad": this.util.formatoNumeros((prod.dtOrder.cantidad).toFixed(2)),
+        "Unidad": prod.dtOrder.presentacion,
+        "Ubicación": prod.ubication == null ? '' : prod.ubication,
+      });
+    });
+    return informationProducts;
+  }
+
+  informationClientOF(data): {} {
+    return {
+      table: {
+        widths: ['50%', '20%', '30%'],
+        body: [
+          [
+            { text: `Información detallada del Cliente`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
+          ],
+          [
+            { text: `Nombre: ${data.clientes.cli_Nombre}` },
+            { text: `ID: ${data.clientes.cli_Id}` },
+            { text: `Tel.: ${data.clientes.cli_Telefono}` },
+          ],
+          [
+            { text: `E-mail: ${data.clientes.cli_Email}` },
+            { text: `Ciudad: ${data.sede ? data.sede.city : data.city}` },
+            { text: `Dirección: ${data.sede ? data.sede.direction : data.direction}` },
+          ],
+          [
+            { text: `Asesor: ${data.asesor.usua_Nombre == undefined ? data.asesor.nombre : data.asesor.usua_Nombre}`, },
+            { text: `Tel.: ${data.clientes.cli_Telefono}` },
+            { text: `OF Directa: ${data.order.of_Directa}` },
+          ],
+          data.datosEnvio != null ? [
+            { text: `Conductor: ${data.datosEnvio.conductor}` },
+            { text: `Placa: ${data.datosEnvio.placa}` },
+            { text: `Despacha: ${data.datosEnvio.creadoPor}` },
+          ] : [
+            { border: [false, false, false, false], colSpan: 3, text: '' }, {}, {}
+          ],
+          data.datosEnvio != null ? [
+            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00', '')} ${data.order.hora}` },
+            { text: `Fecha de Despacho: ${(data.datosEnvio.fecha).replace('T00:00:00', '')} ${(data.datosEnvio.hora)}`, colSpan: 2 }, {}
+          ] : [
+            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00', '')} ${data.order.hora}`, colSpan: 3, }, {}, {}
+          ]
+        ]
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null;
+        }
+      }
+    }
+  }
+
+  tableConsolidatedOF(data) {
+    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Peso B.', 'Peso N.', 'Rollos', 'Cantidad', 'Unidad'];
+    let widths: Array<string> = ['4%', '7%', '7%', '40%', '8%', '8%', '7%', '12%', '7%'];
+    return {
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBodyOF(data, columns, 'Consolidado de producto(s)'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  tableProductsOF(data) {
+    let columns: Array<string> = ['#', 'Rollo', 'OT', 'Item', 'Referencia', 'Peso'.replace('Peso', 'Peso B.'), 'Cantidad', 'Unidad', 'Ubicación'];
+    let widths: Array<string> = ['4%', '8%', '7%', '7%', '36%', '7%', '8%', '7%', '16%'];
+    return {
+      margin: [0, 10],
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBodyOF(data, columns, 'Rollos Seleccionados'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  buildTableBodyOF(data, columns, title) {
+    var body: any = [];
+    body.push([{ colSpan: 9, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow: any = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  observationOF(data) {
+    return {
+      margin: [0, 20],
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación Orden:`, style: 'subtitulo', bold: true }],
+          [{ border: [true, false, true, true], text: `${data.order.observacion.toString().trim()}` }],
+          data.datosEnvio != null ? [{ border: [true, true, true, false], text: `Observación Despacho:`, style: 'subtitulo', bold: true }] : [{ border: [false, false, false, false], text: '' }],
+          data.datosEnvio != null ? [{ border: [true, false, true, true], text: `${data.datosEnvio.observacion.toString().trim()}` }] : [{ border: [false, false, false, false], text: '' }]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  // Tabla con totales finales. 
+  tableTotalsOF_NoDirecta(data) {
+    let qtyRolls = this.consolidatedInformationOF_NoDirecta(data).reduce((a, b) => a + parseInt(b.Rollos), 0);
+    let totalWeight = this.consolidatedInformationOF_NoDirecta(data).reduce((a, b) => a + parseFloat(b.Peso_Bruto.replace().replace(',', '')), 0);
+    let totalNetWeight = this.consolidatedInformationOF_NoDirecta(data).reduce((a, b) => a + parseFloat(b.Peso_Neto.replace().replace(',', '')), 0);
+    let totalQty = this.consolidatedInformationOF_NoDirecta(data).reduce((a, b) => a + parseFloat(b.Cantidad.replace(',', '')), 0);
+    let units: any = [];
+
+    this.consolidatedInformationOF_NoDirecta(data).forEach(x => {
+      if (!units.includes(x.Unidad)) {
+        units.push(x.Unidad);
+      }
+    });
+
+    return {
+      margin: [0, 0, 0, 0],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['4%', '7%', '7%', '40%', '8%', '8%', '7%', '12%', '7%'],
+        body: [
+          [
+            { text: ``, alignment: 'center', border: [true, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: `Totales`, alignment: 'right', bold: true, border: [false, false, false, true], },
+            { text: `${this.util.formatoNumeros((totalWeight).toFixed(2))}`, alignment: '', bold: true, border: [true, false, true, true], },
+            { text: `${this.util.formatoNumeros((totalNetWeight).toFixed(2))}`, alignment: '', bold: true, border: [true, false, true, true], },
+            { text: `${this.util.formatoNumeros((qtyRolls))}`, alignment: '', bold: true, border: [true, false, true, true] },
+            { text: `${this.util.formatoNumeros((totalQty).toFixed(2))}`, alignment: '', bold: true, border: [true, false, true, true], },
+            { text: `${units.length == 1 ? units : ``}`, alignment: '', bold: true, border: [false, false, true, true], },
+          ],
+        ],
+      }
+    }
+  }
+
+  // ==============================================================================================================================
+  //                                             PDF PARA ORDEN DE FACTURACION DIRECTA
+  // ==============================================================================================================================
+
+  DirectOFContent_PDF(data): any[] {
+    let content: any[] = [];
+    let consolidatedInformation: Array<any> = this.ConsolidatedInformationOF_Direct(data);
+    let informationProducts: Array<any> = this.getInformationProductsOF_Direct(data[0].detailsFact);
+
+    content.push(this.informationClientOF(data[0]));
+    content.push(this.observationOF(data[0]));
+    content.push(this.tableConsolidatedOF(consolidatedInformation));
+    content.push(this.TableTotalsOF_Direct(data));
+
+    informationProducts.length > 0 ? content.push(this.tableProductsOF(informationProducts)) : null;
+    return content;
+  }
+
+  /// Función para cargar la información consolidada de las referencias.
+  ConsolidatedInformationOF_Direct(data: any) {
+    let consolidatedInformation: any = [];
+    let count: number = 0;
+
+    data.forEach(x => {
+      count++
+      consolidatedInformation.push({
+        "#": count,
+        "Pedido": x.dtOrder.factPro_Pedido,
+        "Item": x.producto.prod_Id,
+        "Referencia": x.producto.prod_Nombre,
+        "Rollos": this.util.formatoNumeros((x.dtOrder.factPro_Unidades).toFixed(2)),
+        "Peso B.": this.util.formatoNumeros((x.dtOrder.peso_Bruto).toFixed(2)),
+        "Peso_Bruto": this.util.formatoNumeros((x.dtOrder.peso_Bruto).toFixed(2)),
+        "Peso N.": this.util.formatoNumeros((x.dtOrder.peso_Neto).toFixed(2)),
+        "Peso_Neto": this.util.formatoNumeros((x.dtOrder.peso_Neto).toFixed(2)),
+        "Cantidad": this.util.formatoNumeros((x.dtOrder.factPro_Cantidad).toFixed(2)),
+        "Unidad": x.dtOrder.undMed_Id
+      });
+    });
+    return consolidatedInformation;
+  }
+
+  /// Función para cargar la información detallada de las referencias.
+  getInformationProductsOF_Direct(data: any): Array<any> {
+    let informationProducts: Array<any> = [];
+    if (![null, undefined].includes(data)) {
+      let count: number = 0;
+      data.sort((a, b) => Number(a.dtOrder.numero_Rollo) - Number(b.dtOrder.numero_Rollo));
+      data.sort((a, b) => Number(a.producto.prod_Id) - Number(b.producto.prod_Id));
+      data.forEach(prod => {
+        count++;
+        informationProducts.push({
+          "#": count,
+          "Rollo": prod.dtOrder.numero_Rollo,
+          "OT": prod.dataProduction.ordenProduction,
+          "Item": prod.producto.prod_Id,
+          "Referencia": prod.producto.prod_Nombre,
+          "Peso": this.util.formatoNumeros((prod.dataProduction.weight).toFixed(2)),
+          "Peso B.": this.util.formatoNumeros((prod.dataProduction.weight).toFixed(2)),
+          "Cantidad": this.util.formatoNumeros((prod.dtOrder.cantidad).toFixed(2)),
+          "Unidad": prod.dtOrder.presentacion,
+          "Ubicación": prod.ubication == null ? '' : prod.ubication,
+        });
+      });
+    }
+    return informationProducts;
+  }
+
+  /// Tabla con los totales de la consolidada. 
+  TableTotalsOF_Direct(data) {
+    let qtyRolls = this.ConsolidatedInformationOF_Direct(data).reduce((a, b) => a + parseFloat(b.Rollos.replace().replace(',', '')), 0);
+    let totalWeight = this.ConsolidatedInformationOF_Direct(data).reduce((a, b) => a + parseFloat(b.Peso_Bruto.replace().replace(',', '')), 0);
+    let totalNetWeight = this.ConsolidatedInformationOF_Direct(data).reduce((a, b) => a + parseFloat(b.Peso_Neto.replace().replace(',', '')), 0);
+    let totalQty = this.ConsolidatedInformationOF_Direct(data).reduce((a, b) => a + parseFloat(b.Cantidad.replace(',', '')), 0);
+    let units: any = [];
+
+    this.ConsolidatedInformationOF_Direct(data).forEach(x => {
+      if (!units.includes(x.Unidad)) {
+        units.push(x.Unidad);
+      }
+    });
+
+    return {
+      margin: [0, 0, 0, 0],
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['4%', '7%', '7%', '40%', '8%', '8%', '7%', '12%', '7%'],
+        body: [
+          [
+            { text: ``, alignment: 'center', border: [true, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: ``, alignment: 'center', border: [false, false, false, true], },
+            { text: `Totales`, alignment: 'right', bold: true, border: [false, false, false, true], },
+            { text: `${this.util.formatoNumeros((totalWeight).toFixed(2))}`, alignment: '', bold: true, border: [true, false, true, true], },
+            { text: `${this.util.formatoNumeros((totalNetWeight).toFixed(2))}`, alignment: '', bold: true, border: [true, false, true, true], },
+            { text: `${this.util.formatoNumeros((qtyRolls))}`, alignment: '', bold: true, border: [true, false, true, true] },
+            { text: `${this.util.formatoNumeros((totalQty).toFixed(2))}`, alignment: '', bold: true, border: [true, false, true, true], },
+            { text: `${units.length == 1 ? units : ``}`, alignment: '', bold: true, border: [false, false, true, true], },
+          ],
+        ],
+      }
+    }
+  }
+
+  validateProcess(proceso: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
+    const processMapping = {
+      'EXTRUSION': 'EXT',
+      'IMPRESION': 'IMP',
+      'ROTOGRABADO': 'ROT',
+      'LAMINADO': 'LAM',
+      'DOBLADO': 'DBLD',
+      'CORTE': 'CORTE',
+      'EMPAQUE': 'EMP',
+      'SELLADO': 'SELLA',
+      'WIKETIADO': 'WIKE'
+    };
+    return processMapping[proceso] || proceso;
+  }
 }
 
 @Injectable({
@@ -725,20 +1053,6 @@ export class TagProduction_2 {
       { text: dataTag.operator, bold: true, colSpan: 2, alignment: 'center', fontSize: dataTag.operator.length > 28 ? 7 : 9, margin: [-5, 0] },
       {},
     ]
-  }
-
-  private createRePrint(dataTag: modelTagProduction) {
-    if (dataTag.copy) {
-      let data: ReImpresionEtiquetas = {
-        Orden_Trabajo: parseInt(dataTag.orderProduction),
-        NumeroRollo_BagPro: dataTag.reel,
-        Proceso_Id: this.validateProcess(dataTag.productionProcess),
-        Fecha: moment().format('YYYY-MM-DD'),
-        Hora: moment().format('HH:mm:ss'),
-        Usua_Id: this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id')),
-      }
-      this.rePrintService.insert(data).subscribe(null, error => console.log(error));
-    }
   }
 
   validateProcess(proceso: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' {
