@@ -40,7 +40,7 @@
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Solicitud" id="solicitud" type="text" pInputText
-              (keyup.enter)="consultarSolicitudMaterial()" required [readonly]="true"/>
+              (keyup.enter)="consultarSolicitudMaterial()" required [readonly]="![1,104].includes(ValidarRol)"/>
             <label for="solicitud">Solicitud</label>
           </span>
         </div>
@@ -48,7 +48,7 @@
         <!-- Proceso -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="proceso">
           <span class="p-float-label">
-            <p-dropdown formControlName="proceso" inputId="Proceso" [readonly]="![1,104,3].includes(ValidarRol)"
+            <p-dropdown formControlName="proceso" inputId="Proceso" [readonly]="![1,104].includes(ValidarRol)"
               [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre"
               optionValue="proceso_Id"
               (onChange)="cargarMaquinas()"
@@ -89,7 +89,7 @@
         <!-- Observacion -->
         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <textarea formControlName="observacion" id="observacion" [rows]="1" maxlength="200"
+            <textarea formControlName="observacion" id="observacion" [rows]="1" 
               pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
@@ -257,34 +257,38 @@
             <th class="text-center" scope="col">ID</th>
             <th class="text-center" scope="col">Nombre subcategoria</th>
             <th class="text-center" scope="col" id="cantidad2">Cantidad</th>
+            <th class="text-center" scope="col">Cantidad Entregada</th>
+            <th class="text-center" scope="col">Cantidad Faltante</th>
             <th class="text-center" scope="col">Und. Medida</th>
             <th class="text-center" scope="col" id="quitarMP">Quitar</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-subcategoriasSeleccionadas>
+        <ng-template pTemplate="body" let-subcat>
           <tr>
-            <td class="text-center">{{subcategoriasSeleccionadas.Id}}</td>
-            <td class="text-center">{{subcategoriasSeleccionadas.Nombre}}</td>
-            <td class="text-center" [pEditableColumn]="subcategoriasSeleccionadas.Cantidad" pEditableColumnField="price"
+            <td class="text-center">{{subcat.Id}}</td>
+            <td class="text-center">{{subcat.Nombre}}</td>
+            <td class="text-center" [pEditableColumn]="subcat.Cantidad" pEditableColumnField="price"
               class="cursor">
               <p-cellEditor class="text-center">
                 <ng-template pTemplate="input" class="text-center">
                   <input pInputText class="text-center" type="number"
-                    [(ngModel)]="subcategoriasSeleccionadas.Cantidad" />
+                    [(ngModel)]="subcat.Cantidad" />
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{ subcategoriasSeleccionadas.Cantidad | number : '1.2-2' }}
+                  {{ subcat.Cantidad | number : '1.2-2' }}
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td class="text-center">{{subcategoriasSeleccionadas.Und_Medida}}</td>
+            <td class="text-center">{{subcat.Cantidad_Entregada | number : '1.2-2'}}</td>
+            <td class="text-center">{{subcat.Cantidad_Faltante | number : '1.2-2'}}</td>
+            <td class="text-center">{{subcat.Und_Medida}}</td>
             <td class="text-center" id="quitarMp" *ngIf="!esSolicitud">
               <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Quitar material"
-                (onClick)="mostrarEleccion(subcategoriasSeleccionadas, 'quitar')"></p-button>
+                (onClick)="mostrarEleccion(subcat, 'quitar')"></p-button>
             </td>
             <td class="text-center" id="eliminarMp" *ngIf="esSolicitud">
               <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Eliminar material"
-                (onClick)="mostrarEleccion(subcategoriasSeleccionadas, 'eliminar')"></p-button>
+                (onClick)="mostrarEleccion(subcat, 'eliminar')"></p-button>
             </td>
           </tr>
         </ng-template>
@@ -292,6 +296,8 @@
           <tr>
             <td class="text-right" colspan="2">Total</td>
             <td class="text-center">{{calcularMateriaPrimaSolicitada() | number : '1.2-2'}}</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
             <td colspan="3"></td>
           </tr>
         </ng-template>
@@ -308,7 +314,7 @@
           (click)="validarCamposVaciosRetirada()"></button>
         <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check"
           class="p-button-danger" *ngIf="esSolicitud" [disabled]="subcategoriasSeleccionadas.length == 0"
-          (click)="solicitudMateriaPrima()"></button>
+          (click)="editarSolicitud()"></button>
         <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary"
           icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
       </div>
