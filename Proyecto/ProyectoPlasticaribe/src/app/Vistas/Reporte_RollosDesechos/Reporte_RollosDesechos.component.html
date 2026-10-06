@@ -69,9 +69,9 @@
         <!-- Item -->
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="producto" id="Item"  list="items" type="text" pInputText (change)='selectEventProducto()' [(ngModel)]="Item" (keyup)="obtenerProductos()"/>
+            <input formControlName="producto" id="Item" list="items" type="text" pInputText (change)='selectEventProducto()' [(ngModel)]="Item" (keyup)="obtenerProductos()"/>
             <datalist id="items">
-              <option value={{item.prod_Id}} *ngFor="let item of arrayProductos">{{item.prod_Nombre}}</option>
+              <option value={{$any(item).prod_Id}} *ngFor="let item of arrayProductos">{{$any(item).prod_Nombre}}</option>
             </datalist>
             <label for="Item">Item</label>
           </span>
@@ -84,7 +84,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="validateSearch()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
-        <button pButton class="p-button-success" type="button" label="Exportar excel" [disabled]="ArrayDocumento.length == 0" icon="pi pi-file-export" (click)="exportarExcel()"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar excel" [disabled]="ArrayDocumento.length == 0" icon="pi pi-file-excel" (click)="exportarExcel()"></button>
       </div>
     </div>
   </form>

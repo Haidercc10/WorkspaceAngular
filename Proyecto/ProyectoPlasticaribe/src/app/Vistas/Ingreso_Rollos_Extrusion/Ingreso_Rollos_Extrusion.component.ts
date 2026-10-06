@@ -1,10 +1,7 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
-import { info, log } from 'console';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelBodegasRollos } from 'src/app/Modelo/modelBodegasRollos';
 import { modelDtBodegasRollos } from 'src/app/Modelo/modelDtBodegasRollos';
@@ -12,12 +9,12 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { Bodegas_RollosService } from 'src/app/Servicios/Bodegas_Rollos/Bodegas_Rollos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_BodegaRollos/Ubicaciones_BodegaRollos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsBodegas as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { finalize, pipe } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +27,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 })
 export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
-  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
+  load : boolean = false; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -59,15 +56,14 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   
   constructor(private AppComponent : AppComponent,
                 private shepherdService: ShepherdService,
-                  private mensajeService : MensajesAplicacionService,
-                    private frmBuilder : FormBuilder,
-                      private bagProService : BagproService,
-                        private bgRollosService : Bodegas_RollosService,
-                          private dtBgRollosService : Detalle_BodegaRollosService,
-                            private svProcesos : ProcesosService, 
-                              private svPDF : CreacionPdfService,
-                                private msg : MessageService, 
-                                  private svUbicationsStore : Ubicaciones_BodegaRollosService) {
+                  private frmBuilder : FormBuilder,
+                    private bagProService : BagproService,
+                      private bgRollosService : Bodegas_RollosService,
+                        private dtBgRollosService : Detalle_BodegaRollosService,
+                          private svProcesos : ProcesosService, 
+                            private PDFService : CreacionPdfService,
+                              private svUbicationsStore : Ubicaciones_BodegaRollosService,
+                                private util : UtileriaService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
@@ -118,9 +114,6 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.shepherdService.start();
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
@@ -143,7 +136,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.rollosIngresar = [];
     this.rollosOT = [];
     this.rollosSeleccionados = [];
-    this.cargando = false;
+    this.load = false;
   }
 
   getAllUbicationsStore() {
@@ -155,7 +148,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
           return a;
       }, []); 
     }, error => {
-      this.mensajeService.mensajeError(`Error`, `No fue posible cargar las ubicaciones | ${error.status} ${error.statusText}`)
+      this.util.Notificacion(`Error`, `No fue posible cargar las ubicaciones | ${error.status} ${error.statusText}`)
     }); 
   }
 
@@ -171,7 +164,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       this.procesos2 = data.filter(x => [2,3,4,13,16].includes(x.proceso_Codigo));
       this.loadCurrentWareHouse(); 
     }, error => { 
-      this.mensajeService.mensajeError(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); 
+      this.util.Notificacion(`Error`, `Error al consultar los procesos. | ${error.status} ${error.statusText}`); 
     });
   } 
 
@@ -184,31 +177,31 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
           let rollo : number = this.FormConsultarRollos.value.Rollo;
           let area :  string =  this.FormConsultarRollos.value.Proceso;
           let proceso : string =  this.procesos.find(x => x.proceso_Id == area).proceso_Nombre;
-          this.cargando = true;
+          this.load = true;
 
-          this.dtBgRollosService.getRollo(rollo, area).subscribe(dataPl => {
+          this.dtBgRollosService.getRollo(rollo, area).pipe(finalize(()=> this.load = false)).subscribe(dataPl => {
             if(dataPl.length == 0) {
               this.bagProService.getRollProduction(rollo, `?process=${proceso.toUpperCase()}`).subscribe(data => {
                 if(data != null) this.ingresarRollos(data);
                 else {
-                  this.msjs(`Advertencia`, `No se encontró el rollo N° '${rollo}' en el proceso de '${proceso.toUpperCase()}'`);
+                  this.util.Notificacion(`Advertencia`, `No se encontró el rollo N° '${rollo}' en el proceso de '${proceso.toUpperCase()}'`);
                   this.cargarUltimoRollo();
                 } 
               }, error => { 
-                this.msjs(`Error`, `Error al consultar el rollo N° ${rollo} en BagPro!`); 
+                this.util.Notificacion(`Error`, `Error al consultar el rollo N° ${rollo} en BagPro! | ${error.statusText} ${error.status}`); 
                 this.cargarUltimoRollo();
               });
             } else {
-              this.msjs(`Advertencia`, `El rollo N° '${rollo}' ya está registrado en la bodega`);
+              this.util.Notificacion(`Advertencia`, `El rollo N° '${rollo}' ya está registrado en la bodega`);
               this.cargarUltimoRollo();
             }
           }, error => {
-            this.msjs(`Error`, `Se encontraron errores al consultar el rollo N° ${rollo} en Plasticaribe!`); 
+            this.util.Notificacion(`Error`, `Se encontraron errores al consultar el rollo N° ${rollo} en Plasticaribe!`); 
             this.cargarUltimoRollo();
           });  
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'Rollo'`);
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'Proceso'`);
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'Ubicación'`);
+        } else this.util.Notificacion(`Advertencia`, `Debe llenar el campo 'Rollo'`);
+      } else this.util.Notificacion(`Advertencia`, `Debe llenar el campo 'Proceso'`);
+    } else this.util.Notificacion(`Advertencia`, `Debe llenar el campo 'Ubicación'`);
   }
 
   agregarRollo(data : any){
@@ -222,11 +215,12 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       data.bodega = this.procesos2.find(x => x.proceso_Id == data.bodega_Actual).proceso_Nombre;
       
       this.rollosIngresar.unshift(data); 
-      this.mensajeService.mensajeConfirmacion(`Confirmación`, `El rollo N° ${bulto} ha sido agregado a la tabla correctamente`);
       this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null, 'Peso' : data.peso, });
-      this.cargando = false; 
+
+      this.util.Notificacion(`Confirmación`, `El rollo N° ${bulto} ha sido agregado a la tabla correctamente.`);
+      this.load = false; 
     } else {
-      this.msjs(`Advertencia`, `El rollo N° ${bulto} ya se encuentra agregado en la tabla`);
+      this.util.Notificacion(`Advertencia`, `El rollo N° ${bulto} ya se encuentra agregado en la tabla.`);
       this.cargarUltimoRollo();
     } 
   }
@@ -236,7 +230,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     if(![undefined, null].includes(data)) {
       this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.ot, 'Ultimo_Rollo' : data.rollo, 'Rollo' : null, 'Peso' : data.peso, });
     } else this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null, });
-    this.cargando = false;
+    this.load = false;
   }
 
   getRolloOrdenProduccion(){
@@ -252,29 +246,29 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
             let peso : number = this.FormConsultarRollos.value.Peso;
             this.rollosSeleccionados = [];
             this.rollosOT = [];
-            this.cargando = true;
+            this.load = true;
 
             this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
 
-            this.dtBgRollosService.getRollsForOT(ot).subscribe(dataPl => {
+            this.dtBgRollosService.getRollsForOT(ot).pipe(finalize(() => this.load = false)).subscribe(dataPl => {
               this.bagProService.getAvailablesRollsOT(ot, proceso, dataPl).subscribe(data => {
                 if(data.length > 0) this.cargarRolloSemejante(data, peso, dataPl);
                 else {
-                  this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontró información de la orden N° ${ot} en el proceso ${proceso.toUpperCase()} en BagPro!`);
+                  this.util.Notificacion(`Advertencia`, `No se encontró información de la orden N° ${ot} en el proceso ${proceso.toUpperCase()} en BagPro!`);
                   this.cargarUltimoRollo();
                 } 
               }, error => {
-                this.msjs(error.status == 400 ? `Advertencia` : `Error`, error.status == 400 ? `No se encontraron rollos pesados de la OT N° ${ot} en el proceso de ${proceso.toUpperCase()} BagPro!` : `Error en la busqueda de la OT N° ${ot} en BagPro!`); 
+                this.util.Notificacion(error.status == 400 ? `Advertencia` : `Error`, error.status == 400 ? `No se encontraron rollos pesados de la OT N° ${ot} en el proceso de ${proceso.toUpperCase()} BagPro!` : `Error en la busqueda de la OT N° ${ot} en BagPro!`); 
                 this.cargarUltimoRollo();
               });
             }, error => {
-                this.mensajeService.mensajeError(`Error`, `No fue posible consultar la OT N° ${ot} en la bodega de rollos`)
+                this.util.Notificacion(`Error`, `No fue posible consultar la OT N° ${ot} en la bodega de rollos`)
                 this.cargarUltimoRollo();
             });
-          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Para consultar un rollo por OT debe llenar el campo 'PESO'`);
-        }  else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'OT'`);
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'PROCESO'`);
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo 'UBICACIÓN'`);
+          } else this.util.Notificacion(`Advertencia`, `Para consultar un rollo por OT debe llenar el campo 'PESO'.`);
+        }  else this.util.Notificacion(`Advertencia`, `Debe llenar el campo 'OT'.`);
+      } else this.util.Notificacion(`Advertencia`, `Debe llenar el campo 'PROCESO'.`);
+    } else this.util.Notificacion(`Advertencia`, `Debe llenar el campo 'UBICACIÓN'.`);
   }
 
   cargarRolloSemejante(data : any, peso : number, dataInStore : any){
@@ -295,7 +289,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       this.loadModal = true;
       this.rollosOT = data.filter(x => !this.rollosIngresar.map(x => x.rollo).includes(x.item));
     } 
-    this.cargando = false;
+    this.load = false;
   }
 
   onRowSelect(event: any) {
@@ -312,35 +306,19 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.FormConsultarRollos.patchValue({ 'Rollo' : null, });
   }
 
-  msjs(msj1 : string, msj2 : string){
-    this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : null, 'Ultimo_Rollo' : null, 'Rollo' : null, 'Peso' : null });
-    this.cargando = false;
-
-    switch (msj1) {
-      case 'Confirmación' :
-        return this.mensajeService.mensajeConfirmacion(msj1, msj2);
-      case 'Advertencia' : 
-        return this.mensajeService.mensajeAdvertencia(msj1, msj2);
-      case 'Error' : 
-        return this.mensajeService.mensajeError(msj1, msj2);
-      default :
-        return this.mensajeService.mensajeAdvertencia(`No hay un tipo de mensaje asociado!`); 
-    }
-  }
-
   pesoTotal = () => this.rollosIngresar.reduce((acc, contador) => acc += contador.peso, 0);
   
   totalRollos = () => this.rollosIngresar.length;
 
   //Funcion que va a quitar lo rollos que se van a insertar
   quitarRolloTabla(item : any){
-    this.cargando = true;
+    this.load = true;
     
     setTimeout(() => {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `Se quitó el rollo N° ${item.rollo} de la tabla!`);
+      this.util.Notificacion(`Advertencia`, `Se quitó el rollo N° ${item.rollo} de la tabla!`);
       let index = this.rollosIngresar.findIndex(x => x.rollo == item.rollo && x.ot == item.ot);
       this.rollosIngresar.splice(index, 1);
-      this.cargando = false;
+      this.load = false;
       this.cargarUltimoRollo();
     }, 500); 
   }
@@ -348,7 +326,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   /// Funcion que va a crear los rollos en la base de datos
   ingresarRollos(dataBagpro : any){
     //if (this.rollosIngresar.length > 0){
-      this.cargando = true;
+      this.load = true;
       const info : modelBodegasRollos = {
         'BgRollo_FechaEntrada': moment().format('YYYY-MM-DD'),
         'BgRollo_HoraEntrada': moment().format('H:mm:ss'),
@@ -357,15 +335,13 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         'BgRollo_Observacion': this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion.toUpperCase(),
         'Usua_Id': this.storage_Id,
       }
-      this.bgRollosService.Post(info).subscribe(data => this.ingresarDetallesRollos(data.bgRollo_Id, dataBagpro), error => {
-        this.mensajeService.mensajeError(`Error`, `Se encontró un error al ingresar los rollos | ${error.status} ${error.statusText}`);
-        this.cargando = false;
+      this.bgRollosService.Post(info).pipe(finalize(()=> this.load = false)).subscribe(data => this.ingresarDetallesRollos(data.bgRollo_Id, dataBagpro), error => {
+        this.util.Notificacion(`Error`, `Se encontró un error al ingresar los rollos | ${error.status} ${error.statusText}`);
       });
-    //} else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar agregar mínimo un rollo para crear el ingreso!`);
   }
 
-  ///
   ingresarDetallesRollos(id : number, x : any){
+    this.load = true;
     let subUbicacion : any = [undefined, null].includes(this.FormConsultarRollos.value.SubUbicacion) ? 0 : this.FormConsultarRollos.value.SubUbicacion;
     let ubicacion : any = this.ubicaciones.find(x => x.ubR_Id == this.FormConsultarRollos.value.Ubicacion && x.ubR_SubId == subUbicacion).ubR_Nomenclatura;
     let proceso_Id : any = this.FormConsultarRollos.value.Proceso;
@@ -394,13 +370,10 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
       'DtBgRollo_FechaFab': x.fecha,
       'DtBgRollo_Maq': x.maquina,
     }
-    this.dtBgRollosService.Post(info).subscribe(() => {
+    this.dtBgRollosService.Post(info).pipe(finalize(()=> this.load = false)).subscribe(() => {
       this.listarRolloTabla(info, x);
       this.msjIngresoExitoso(info);
-    }, error => {
-      this.msjs(`Error`, `Ha ocurrido un error al ingresar el/los rollos | ${error.status} ${error.statusText}`);
-      this.cargando = false;
-    });
+    }, error => this.util.Notificacion(`Error`, `Ha ocurrido un error al ingresar el/los rollos | ${error.status} ${error.statusText}`));
   }
 
   //Función para 
@@ -426,189 +399,18 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   // Funcion que se va a ejecutar cuando se hayan ingresado todos los rollos
   msjIngresoExitoso(data : any){
     this.FormConsultarRollos.patchValue({ 'OrdenTrabajo' : data.BgRollo_OrdenTrabajo, 'Ultimo_Rollo' : data.DtBgRollo_Rollo, 'Rollo' : null, 'Peso' : data.DtBgRollo_Cantidad, });
-    this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se han ingresado el rollo N° ${data.DtBgRollo_Rollo} a la bodega correctamente`);
-    this.cargando = false;
-    //this.createPDF(id, ``);
+    this.util.Notificacion(`Confirmación`, `Se han ingresado el rollo N° ${data.DtBgRollo_Rollo} a la bodega con éxito.`);
+    this.load = false;
   }
 
   createPDF(id : number, action : string) {
-    this.dtBgRollosService.GetInformacionIngreso(id).subscribe(data => {
+    this.load = true;
+    this.dtBgRollosService.GetInformacionIngreso(id).pipe(finalize(()=> this.load = false)).subscribe(data => {
       let title: string = `Ingreso de rollos N° ${id}`;
-      let content: any[] = this.contentPDF(data);
-      this.svPDF.formatoPDF(title, content);
-      this.msjs(`Confirmación`, `Ingreso de rollos a bodega ${action} exitosamente!`);
+      let content: any[] = this.PDFService.IngresoBodegaRollos_contentPDF(data);
+      this.PDFService.formatoPDF(title, content);
+      this.util.Notificacion(`Confirmación`, `Se realizó el ingreso de rollos a bodega ${action} con éxito!.`);
       setTimeout(() => this.limpiarCampos(), 3000);
-    }, error => this.msjs(`Error`, `Error al consultar el ingreso de rollos N° ${id} | ${error.status} ${error.statusText}`));
+    }, error => this.util.Notificacion(`Error`, `Error al consultar el ingreso de rollos N° ${id} | ${error.status} ${error.statusText}`));
   }
-
-  contentPDF(data): any[] {
-    let content: any[] = [];
-    let consolidatedInformation: Array<any> = this.getInfoIngresoPDF(data);
-    let informationProducts: Array<any> = this.getInfoDetallesPDF(data);
-    content.push(this.infoMovementPDF(data[0]));
-    content.push(this.tablaIngresoPDF(consolidatedInformation));
-    content.push(this.tableTotals(consolidatedInformation))
-    content.push(this.tablaDetallesPDF(informationProducts));
-    return content;
-  }
-
-  getInfoIngresoPDF(data: any): Array<any> {
-    let info: Array<any> = [];
-    let contador: number = 0;
-    data.forEach(d => {
-      if (!info.map(x => x.OT).includes(d.orden_Trabajo)) {
-        contador++;
-        let cantRegistros : number = data.filter(x => x.orden_Trabajo == d.orden_Trabajo).length;
-        let pesoTotal: number = 0;
-        data.filter(x => x.orden_Trabajo == d.orden_Trabajo).forEach(x => pesoTotal += x.cantidad);
-        info.push({
-          "#": contador,
-          "OT": d.orden_Trabajo,
-          "Item": d.item,
-          "Referencia": d.referencia,
-          "Rollos" : cantRegistros,
-          "Peso": pesoTotal.toFixed(2),
-          "Presentación" : d.presentacion,
-        });
-      }
-    });
-    return info;
-  }
-
-  getInfoDetallesPDF(data: any): Array<any> {
-    let info: Array<any> = [];
-    let count: number = 0;
-
-    data.forEach(d => {
-      count++;
-      info.push({
-        "#": count,
-        "Rollo": d.rollo,
-        "OT": d.orden_Trabajo,
-        "Item": d.item,
-        "Referencia": d.referencia,
-        "Peso": d.cantidad,
-        "Und" : d.presentacion,
-        "Proceso" : d.bodega_Inicial,
-        "Bodega" : d.bodega_Ingreso,
-        "Ubicación" : d.ubicacion,
-      });
-    });
-    return info;
-  }
-
-  //Función que muestra una tabla con la información general del ingreso.
-  infoMovementPDF(data : any): {} {
-    return {
-      margin : [0, 0, 0, 20],
-      table: {
-        widths: ['34%', '33%', '33%'],
-        body: [
-          [
-            { text: `Información general del movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
-          ],
-          [
-            { text: `Usuario ingreso: ${data.usuario}` },
-            { text: `Fecha ingreso: ${data.fecha.replace('T00:00:00', '')}` },
-            { text: `Hora ingreso: ${data.hora}` },
-          ],
-          [
-            { text: `Observación: ${data.observacion}`, colSpan: 3, fontSize: 9, }, {}, {}
-          ], 
-        ]
-      },
-      fontSize: 9,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null;
-        }
-      }
-    }
-  }
-
-  //Función que consolida la información por mat. primas
-  tablaIngresoPDF(data) {
-    let columns: Array<string> = ['#', 'OT', 'Item', 'Referencia', 'Rollos', 'Peso', 'Presentación'];
-    let widths: Array<string> = ['5%', '10%', '10%', '45%', '10%', '10%', '10%'];
-    return {
-      table: {
-        headerRows: 2,
-        widths: widths,
-        body: this.buildTableBody1(data, columns, 'Consolidado de rollos ingresados por orden de producción'),
-      },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex <= 1) ? '#DDDDDD' : null;
-        }
-      }
-    };
-  }
-
-  //Tabla con materiales recuperados ingresados detallados
-  tablaDetallesPDF(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'Proceso', 'Bodega', 'Ubicación', 'OT', 'Item', 'Referencia', 'Peso', 'Und'];
-    let widths: Array<string> = ['3%', '8%', '7%', '6%', '12%', '7%', '7%', '40%', '7%', '3%'];
-    return {
-      margin: [0, 20],
-      table: {
-        headerRows: 2,
-        widths: widths,
-        body: this.buildTableBody2(data, columns, 'Información detallada de rollos ingresados'),
-      },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex <= 1) ? '#DDDDDD' : null;
-        }
-      }
-    };
-  }
-
-  //Tabla con los valores totales de pesos y registros
-  tableTotals(data : any){
-    return {
-      fontSize: 8,
-      bold: false,
-      table: {
-        widths: ['5%', '10%', '10%', '45%', '10%', '10%', '10%'],
-        body: [
-          [
-            { text: ``, bold : true, border: [true, false, false, true], },
-            { text: ``, bold : true, border: [false, false, false, true], },
-            { text: ``, bold : true, border: [false, false, false, true], },
-            { text: `Totales`, alignment: 'right', bold : true, border: [false, false, true, true], },
-            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseInt(b.Rollos), 0)))}`, bold : true, border: [false, false, true, true], },
-            { text: `${this.formatonumeros((data.reduce((a, b) => a += parseFloat(b.Peso), 0)).toFixed(2))}`, bold : true, border: [false, false, true, true], },
-            { text: `Kg`, bold : true, border: [false, false, true, true], },
-          ],
-        ],
-      }
-    }
-  }
-
-  buildTableBody1(data, columns, title) {
-    var body : any = [];
-    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
-    body.push(columns);
-    data.forEach(function (row) {
-      var dataRow: any = [];
-      columns.forEach((column) => dataRow.push(row[column].toString()));
-      body.push(dataRow);
-    });
-    return body;
-  }
-
-  buildTableBody2(data, columns, title) {
-    var body : any = [];
-    body.push([{ colSpan: 10, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '', '']);
-    body.push(columns);
-    data.forEach(function (row) {
-      var dataRow : any = [];
-      columns.forEach((column) => dataRow.push(row[column].toString()));
-      body.push(dataRow);
-    });
-    return body;
-  }
-
 }
