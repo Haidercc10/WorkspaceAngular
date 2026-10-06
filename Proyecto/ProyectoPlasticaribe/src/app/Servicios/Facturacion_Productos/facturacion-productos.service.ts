@@ -15,6 +15,8 @@ export class FacturacionProductosService {
     get = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Facturacion_Productos');
 
     getInfoOfDirect = (of : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Facturacion_Productos/getInfoOfDirect/${of }`);
+
+    getInfoOfDirectAsync = (of : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Facturacion_Productos/getInfoOfDirectAsync/${of }`);
   
     Post = (data: modelFacturacion_Productos) => this.http.post(`${this.rutaPlasticaribeAPI}/Facturacion_Productos`, data);
   

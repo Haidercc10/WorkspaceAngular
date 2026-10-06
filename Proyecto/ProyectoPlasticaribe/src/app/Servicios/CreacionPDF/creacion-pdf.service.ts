@@ -21,8 +21,7 @@ export class CreacionPdfService {
   constructor(private rePrintService: ReImpresionEtiquetasService,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
     private encriptacion: EncriptacionService,
-    private util: UtileriaService,
-    private tag: TagProduction_2 
+    private util: UtileriaService
   ) { }
 
   formatoPDF(titulo: string, content: any, headerAdicional: any = {}) {
@@ -38,7 +37,7 @@ export class CreacionPdfService {
       header: this.headerPDF(today, hour, titulo, headerAdicional),
       content: content,
     }
-    setTimeout(() => this.crearPDF(pdfDefinicion), 3000);
+    setTimeout(() => this.crearPDF(pdfDefinicion), 2000);
   }
 
   private headerPDF(today: any, hour: any, titulo: string, headerAdicional: any): {} {
@@ -815,6 +814,180 @@ export class CreacionPdfService {
       'WIKETIADO': 'WIKE'
     };
     return processMapping[proceso] || proceso;
+  }
+
+  // ==============================================================================================================================
+  //                                             PDF PARA INGRESO BODEGA ROLLOS
+  // ==============================================================================================================================
+
+  IngresoBodegaRollos_contentPDF(data): any[] {
+    let content: any[] = [];
+    let consolidatedInformation: Array<any> = this.getInfoIngresoRollosPDF(data);
+    let informationProducts: Array<any> = this.getInfoDetallesIngresoRollosPDF(data);
+    content.push(this.infoMovementIngresoRollosPDF(data[0]));
+    content.push(this.tablaIngresoRollosPDF(consolidatedInformation));
+    content.push(this.tableTotalsIngresoRollosPDF(consolidatedInformation))
+    content.push(this.tablaDetallesIngresoRollosPDF(informationProducts));
+    return content;
+  }
+
+  getInfoIngresoRollosPDF(data: any): Array<any> {
+    let info: Array<any> = [];
+    let contador: number = 0;
+    data.forEach(d => {
+      if (!info.map(x => x.OT).includes(d.orden_Trabajo)) {
+        contador++;
+        let cantRegistros : number = data.filter(x => x.orden_Trabajo == d.orden_Trabajo).length;
+        let pesoTotal: number = 0;
+        data.filter(x => x.orden_Trabajo == d.orden_Trabajo).forEach(x => pesoTotal += x.cantidad);
+        info.push({
+          "#": contador,
+          "OT": d.orden_Trabajo,
+          "Item": d.item,
+          "Referencia": d.referencia,
+          "Rollos" : cantRegistros,
+          "Peso": pesoTotal.toFixed(2),
+          "Presentación" : d.presentacion,
+        });
+      }
+    });
+    return info;
+  }
+
+  getInfoDetallesIngresoRollosPDF(data: any): Array<any> {
+    let info: Array<any> = [];
+    let count: number = 0;
+
+    data.forEach(d => {
+      count++;
+      info.push({
+        "#": count,
+        "Rollo": d.rollo,
+        "OT": d.orden_Trabajo,
+        "Item": d.item,
+        "Referencia": d.referencia,
+        "Peso": d.cantidad,
+        "Und" : d.presentacion,
+        "Proceso" : d.bodega_Inicial,
+        "Bodega" : d.bodega_Ingreso,
+        "Ubicación" : d.ubicacion,
+      });
+    });
+    return info;
+  }
+
+  //Función que muestra una tabla con la información general del ingreso.
+  infoMovementIngresoRollosPDF(data : any): {} {
+    return {
+      margin : [0, 0, 0, 20],
+      table: {
+        widths: ['34%', '33%', '33%'],
+        body: [
+          [
+            { text: `Información general del movimiento`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
+          ],
+          [
+            { text: `Usuario ingreso: ${data.usuario}` },
+            { text: `Fecha ingreso: ${data.fecha.replace('T00:00:00', '')}` },
+            { text: `Hora ingreso: ${data.hora}` },
+          ],
+          [
+            { text: `Observación: ${data.observacion}`, colSpan: 3, fontSize: 9, }, {}, {}
+          ], 
+        ]
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null;
+        }
+      }
+    }
+  }
+
+  //Función que consolida la información por mat. primas
+  tablaIngresoRollosPDF(data) {
+    let columns: Array<string> = ['#', 'OT', 'Item', 'Referencia', 'Rollos', 'Peso', 'Presentación'];
+    let widths: Array<string> = ['5%', '10%', '10%', '45%', '10%', '10%', '10%'];
+    return {
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBodyIngresoRollos1(data, columns, 'Consolidado de rollos ingresados por orden de producción'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex <= 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  //Tabla con materiales recuperados ingresados detallados
+  tablaDetallesIngresoRollosPDF(data) {
+    let columns: Array<string> = ['#', 'Rollo', 'Proceso', 'Bodega', 'Ubicación', 'OT', 'Item', 'Referencia', 'Peso', 'Und'];
+    let widths: Array<string> = ['3%', '8%', '7%', '6%', '12%', '7%', '7%', '40%', '7%', '3%'];
+    return {
+      margin: [0, 20],
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBodyIngresoRollos2(data, columns, 'Información detallada de rollos ingresados'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex <= 1) ? '#DDDDDD' : null;
+        }
+      }
+    };
+  }
+
+  //Tabla con los valores totales de pesos y registros
+  tableTotalsIngresoRollosPDF(data : any){
+    return {
+      fontSize: 8,
+      bold: false,
+      table: {
+        widths: ['5%', '10%', '10%', '45%', '10%', '10%', '10%'],
+        body: [
+          [
+            { text: ``, bold : true, border: [true, false, false, true], },
+            { text: ``, bold : true, border: [false, false, false, true], },
+            { text: ``, bold : true, border: [false, false, false, true], },
+            { text: `Totales`, alignment: 'right', bold : true, border: [false, false, true, true], },
+            { text: `${this.util.formatoNumeros((data.reduce((a, b) => a += parseInt(b.Rollos), 0)))}`, bold : true, border: [false, false, true, true], },
+            { text: `${this.util.formatoNumeros((data.reduce((a, b) => a += parseFloat(b.Peso), 0)).toFixed(2))}`, bold : true, border: [false, false, true, true], },
+            { text: `Kg`, bold : true, border: [false, false, true, true], },
+          ],
+        ],
+      }
+    }
+  }
+
+  buildTableBodyIngresoRollos1(data, columns, title) {
+    var body : any = [];
+    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow: any = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  buildTableBodyIngresoRollos2(data, columns, title) {
+    var body : any = [];
+    body.push([{ colSpan: 10, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '', '', '', '']);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow : any = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
   }
 }
 

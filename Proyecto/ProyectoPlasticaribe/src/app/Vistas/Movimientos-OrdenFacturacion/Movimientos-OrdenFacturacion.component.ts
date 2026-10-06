@@ -226,7 +226,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
 
   createDirectOF_PDF(OF_Id: number, fact: string){
     this.load = true;
-    this.svFactProducts.getInfoOfDirect(OF_Id).pipe(finalize(() => {
+    this.svFactProducts.getInfoOfDirectAsync(OF_Id).pipe(finalize(() => {
       this.load = false;
       this.util.Notificacion('Confirmación',`Se generó la OF N°: ${OF_Id}. En unos momentos se cargará el PDF en una nueva pestaña.`);
     })).subscribe(data => {
