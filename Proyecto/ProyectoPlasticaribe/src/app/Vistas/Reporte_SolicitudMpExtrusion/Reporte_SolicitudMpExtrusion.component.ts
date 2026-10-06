@@ -142,8 +142,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
     if (fechaInicial == 'Fecha inválida') fechaInicial = null;
     if (fechaFinal == 'Fecha inválida') fechaFinal = null;
-    if(fechaInicial == null) fechaInicial = this.today;
-    if(fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
+    if(fechaInicial == null) fechaInicial = moment().subtract(30, 'days').format('YYYY-MM-DD'); 
+    if(fechaInicial != null && fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
 
     if(solicitud != null) ruta = `id=${solicitud}`;
     if(estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}` ;
@@ -152,8 +152,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.servicioDtSolicitudesMPExt.GetQuerySolicitudesMp_Extrusion(fechaInicial, fechaFinal, ruta)
     .pipe(
       finalize(() => this.cargando = false)
-    )
-    .subscribe(data => {
+    ).subscribe(data => {
       if(data.length > 0) {
         for (let index = 0; index < data.length; index++) {
           if(!this.arrayId.includes(data[index].id)) {
@@ -435,12 +434,18 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   /** Cargar detalles de la solicitud en la segunda tabla. */
   cargarDetalleSolicitud(id : number) {
+    this.cargando = true;
     this.solicitudSeleccionada = id;
     this.arrayMatPrimas = [];
-    this.servicioDtSolicitudesMPExt.GetSolicitudMp_Extrusion(this.solicitudSeleccionada).subscribe(data => {
-      for (let index = 0; index < data.length; index++) {
-        this.llenarTablaDetalles(data[index]);
-      }
+
+    this.servicioDtSolicitudesMPExt.GetSolicitudMp_Extrusion(this.solicitudSeleccionada)
+    .pipe(
+      finalize(() => { this.cargando = false; })
+    ).subscribe(data => {
+      data.forEach((item) =>  this.llenarTablaDetalles(item));
+    }, error => {
+      this.msj.mensajeError(`Error`, 
+        `¡No se pudo obtener la información de la solicitud N° ${this.solicitudSeleccionada}!`);
     });
   }
 
@@ -465,7 +470,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.usuarioSolicitante = info.Usuario;
     arrayIds.push(info.Id)
 
-    this.ServicioDetAsignacionesMp.GetAsignacionesConSolicitudes(this.solicitudSeleccionada).subscribe(data2 => {
+    /*this.ServicioDetAsignacionesMp.GetAsignacionesConSolicitudes(this.solicitudSeleccionada).subscribe(data2 => {
       for (let i = 0; i < data2.length; i++) {
         let infoSolicitud : any = {
           Ident : 0,
@@ -478,7 +483,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
         if(arrayIds.includes(infoSolicitud.Ident)) info.CantAprobada = infoSolicitud.CantSolicitud;
       }
-    });
+    });*/
 
     this.arrayMatPrimas.push(info);
   }
@@ -488,8 +493,17 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     solicitud_Id = this.solicitudSeleccionada;
     this.clave = palabraClave;
     setTimeout(() => {
-      if (this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') this.msj.mensajeAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
-      else this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que desea ${this.clave} la solicitud N° ${solicitud_Id}?`, sticky: true});
+      if (this.estadoSolicitud == 'FINALIZADO' || this.estadoSolicitud == 'CANCELADO') {
+        this.msj.mensajeAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
+      } else {
+        this.messageService.add({
+          severity:'warn', 
+          key: this.clave, 
+          summary:'Elección', 
+          detail: `Está seguro que desea ${this.clave} la solicitud N° ${solicitud_Id}?`, 
+          sticky: true
+        });
+      } 
     }, 1000);
   }
 
@@ -515,24 +529,28 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
         Usua_Id: data.usua_Id, 
         SolMpExt_FechaEstimadaEntrega: data.solMpExt_FechaEstimadaEntrega
       }
-      this.servicioSolicitudesMPExt.Put(modelo.SolMpExt_Id, modelo).subscribe(updateData => {
-        this.cargando = false;
-        this.msj.mensajeConfirmacion(`Confirmación`, `Estado de la solicitud actualizado exitosamente!`);
+      this.servicioSolicitudesMPExt.Put(modelo.SolMpExt_Id, modelo)
+      .pipe(
+        finalize(() => this.cargando = false)
+      ).subscribe(updateData => {
+        this.msj.mensajeConfirmacion(`Confirmación`, `Estado de la solicitud N° ${solicitud_Id} actualizado exitosamente!`);
         this.getEstadoSolitudes();
         this.consultarFiltros();
-      },
-      error => this.msj.mensajeError(`Error`, `No fue posible actualizar el encabezado de la solicitud de material N° ${solicitud_Id}`));
+      }, error => {
+        this.cargando = false;
+        this.msj.mensajeError(`Error`, `No fue posible actualizar la solicitud N° ${solicitud_Id}`);
+      });
     });
   }
 
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearAsignacion(){
-    if(['Finalizado', 'Cancelado'].includes(this.estadoSolicitud)) {
+    if(['FINALIZADO', 'CANCELADO'].includes(this.estadoSolicitud)) {
       this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear asignaciones con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalAsignacion = true;
       this.AsignacionMatPrima.esSolicitud = true;
-      this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({Solicitud : this.solicitudSeleccionada});
+      this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({ Solicitud : this.solicitudSeleccionada});
       this.AsignacionMatPrima.consultarSolicitudMaterial(this.arrayMatPrimas);
       //this.cargarSubcategoriasEnAsignaciones();
     }

@@ -455,7 +455,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
     // Se guarda la asignación en la base de datos, y posteriormente se llama al método para guardar los detalles de la asignación.
     this.asignacionMPService.srvGuardar(datosAsignacion).pipe(takeUntil(this.destroy$), finalize(() => this.load = true)).subscribe({
-      next: datos => { this.obtenerProcesoId(datos.asigMp_Id) },
+      next: datos => { this.obtenerProcesoId(datos.asigMp_Id, this.FormMateriaPrimaRetiro.value.Solicitud == null || this.FormMateriaPrimaRetiro.value.Solicitud == "" ? 1 : this.FormMateriaPrimaRetiro.value.Solicitud) },
       error: error => {
         this.mensajeService.mensajeError(`¡Error!`, `¡Error al crear la asignación de materia prima!`);
         console.log(error);
@@ -464,7 +464,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   }
 
   //5. Funcion que se encargará de consultar el Id del proceso y hacer el ingreso de las materia primas asignadas
-  obtenerProcesoId(asignacion: number) {
+  obtenerProcesoId(asignacion: number, solicitud?: any) {
     let count: number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       let polietileno_Id = this.materiasPrimasSeleccionadas[i].Id_Mp;
@@ -486,7 +486,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       if (count == this.materiasPrimasSeleccionadas.length) {
         this.actualizarMovimientosEntradasMP(asignacion);
-        setTimeout(() => this.asignacionExitosa(asignacion), 2000);
+        setTimeout(() => this.asignacionExitosa(asignacion, solicitud), 2000);
       }
     }, 2000);
   }
@@ -527,20 +527,32 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   }
 
   // 11. Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien
-  asignacionExitosa(asignId: number) {
+  asignacionExitosa(asignId: number, solicitud?: any) {
     let data: any = {}
     if (!this.soloTintas && !this.esSolicitud) {
-      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!. A continuación se mostrará un PDF en una nueva pestaña.`);
+      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, 
+        `Asignación creada satisfactoriamente!. A continuación se mostrará un PDF en una nueva pestaña.`);
       data = { 'Id': asignId, 'Movimiento': 'ASIGMP' };
-
       this.cmpMovMatPrima.validarTipoMovimiento(data)
     } else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante && !this.esSolicitud) {
-      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
+      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, 
+        `Solo se crearon las asignaciones de tintas!`);
       data = { 'Id': asignId, 'Movimiento': 'ASIGTINTAS' };
     } else if (this.esSolicitud) {
-      console.log(this.esSolicitud);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `Asignación basada en solicitud generada satisfactoriamente!`);
+      this.putEstadoSolicitud(solicitud);
+      data = { 'Id': asignId, 'Movimiento': 'ASIGMP' };
+      this.cmpMovMatPrima.validarTipoMovimiento(data);
     }
     setTimeout(() => this.LimpiarCampos(), 1000);
+  }
+
+  //Funcion que va a actualizar el estado de la solicitud de material
+  putEstadoSolicitud(id: number) {
+    this.servicioSolitudMaterial.PutEstadoSolicitud(id).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
+      this.load = true;
+      this.mensajeService.mensajeError(`¡Error!`, `¡Error al actualizar el estado de la solicitud!`);
+    });
   }
 
   //6.2 Funcion que moverá el inventario de materia prima con base a la materia prima saliente
