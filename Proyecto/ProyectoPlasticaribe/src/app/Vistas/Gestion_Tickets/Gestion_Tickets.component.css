@@ -2,6 +2,20 @@ p-card, p-card ::ng-deep .p-card {
   height: 100%;
 }
 
+.titulo-encabezado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 30px;
+  text-align: center;
+}
+
+.titulo-encabezado h2 {
+  margin: 0;
+  text-align: center;
+}
+
 p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
   text-align: center;
   width: 100%;
@@ -78,6 +92,8 @@ p-chip ::ng-deep .p-chip-text {
   color : #495057;
 }
 
-::ng-deep .mt-25 {
-  margin-top: 25px;
+#tableButton ::ng-deep .p-button {
+  width: 30px;
+  height: 30px;
+  text-decoration: none;
 }

@@ -28,6 +28,11 @@ export class Gestion_TicketsComponent implements OnInit {
   ticketsEnRevision : number = 0; //Variable que va a almacenar la cantidad de tickets que está siendo revisados
   ticketsResuletosMes : number = 0; //Variable que almacenará la cantidad de tickets que han sido revisados en el mes
   tickets : any [] = []; //Variable que almacenará la información de los tickets que están sisndo revisado y los que están en revisión
+  ticketsDisponibles : any [] = [];
+  anios : number [] = Array.from({length: moment().year() - 2019 + 1}, (_, index) => 2019 + index);
+  meses : string [] = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+  anioSeleccionado : number | null = null;
+  mesSeleccionado : string | null = null;
   ticketSeleccionado : any = { Codigo : '', Fecha : '', Estado : '', Descripcion: '' }; //Variable que almcanerá la información del ticket seleccionado
   imagenesTicket : any [] = []; //Variable que va a almacenar la información de las imagenes que se adjuntaron al ticket
   visible : boolean = false; //Variable que validará cuando se verá el modal de ticket resuelto y cuando no
@@ -73,6 +78,7 @@ export class Gestion_TicketsComponent implements OnInit {
     this.imagenesTicket = [];
     this.cargando = true;
     this.tickets = [];
+    this.ticketsDisponibles = [];
     this.visible = false;
     this.consultarTickets();
     this.cantultarCantidadTickets();
@@ -81,17 +87,39 @@ export class Gestion_TicketsComponent implements OnInit {
   // Funcion que va a consultar la información de los tickets que estén abiertos y/o en revicion
   consultarTickets(){
     this.ticketService.Get_Tickets_AbiertosEnRevision().subscribe(datos => {
+      const tickets : any [] = [];
       for (let i = 0; i < datos.length; i++) {
         const {codigo, fecha, estado, descripcion} = datos[i];
         const descripcionTotal = descripcion;
         const descripcionCorta = descripcion.length > 50 ? `${descripcion.substring(0,50)}...` : descripcion;
         const info : any = {codigo, fecha, estado, descripcion: descripcionCorta, descripcionTotal};
-        this.tickets.push(info);
-        this.tickets.sort((a,b) => Number(a.codigo) - Number(b.codigo));
-        this.tickets.sort((a,b) => b.estado.localeCompare(a.estado));
+        tickets.push(info);
       }
+      tickets.sort((a,b) => Number(a.codigo) - Number(b.codigo));
+      tickets.sort((a,b) => b.estado.localeCompare(a.estado));
+      this.ticketsDisponibles = tickets;
+      this.filtrarTicketsPorFecha();
     });
     setTimeout(() => { this.cargando = false; }, 1000);
+  }
+
+  filtrarTicketsPorFecha(){
+    this.ticketDeseleccionado();
+    this.tickets = this.ticketsDisponibles.filter(ticket => {
+      const fecha = moment(ticket.fecha);
+      if (!fecha.isValid()) return this.anioSeleccionado == null && this.mesSeleccionado == null;
+
+      const coincideAnio = this.anioSeleccionado == null || fecha.year() === this.anioSeleccionado;
+      const indiceMes = this.meses.indexOf(this.mesSeleccionado ?? '');
+      const coincideMes = this.mesSeleccionado == null || fecha.month() === indiceMes;
+      return coincideAnio && coincideMes;
+    });
+  }
+
+  filtrarMesActual(){
+    this.anioSeleccionado = moment().year();
+    this.mesSeleccionado = this.meses[moment().month()];
+    this.filtrarTicketsPorFecha();
   }
 
   // Funcion que va a consultar la información de las cantidades de tickets que aparecen en las cards
