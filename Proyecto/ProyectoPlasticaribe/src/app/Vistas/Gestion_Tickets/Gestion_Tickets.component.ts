@@ -8,6 +8,7 @@ import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { Tickets_ResueltosService } from 'src/app/Servicios/Tickets_Resueltos/Tickets_Resueltos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsGetionTicktes as defaultSteps } from 'src/app/data';
+import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 
 @Component({
   selector: 'app-Gestion_Tickets',
@@ -30,11 +31,25 @@ export class Gestion_TicketsComponent implements OnInit {
   tickets : any [] = []; //Variable que almacenará la información de los tickets que están sisndo revisado y los que están en revisión
   ticketsDisponibles : any [] = [];
   anios : number [] = Array.from({length: moment().year() - 2019 + 1}, (_, index) => 2019 + index);
-  meses : string [] = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+  meses : { id: number, nombre: string } [] = [
+    { id: 1, nombre: 'ENERO' },
+    { id: 2, nombre: 'FEBRERO' },
+    { id: 3, nombre: 'MARZO' },
+    { id: 4, nombre: 'ABRIL' },
+    { id: 5, nombre: 'MAYO' },
+    { id: 6, nombre: 'JUNIO' },
+    { id: 7, nombre: 'JULIO' },
+    { id: 8, nombre: 'AGOSTO' },
+    { id: 9, nombre: 'SEPTIEMBRE' },
+    { id: 10, nombre: 'OCTUBRE' },
+    { id: 11, nombre: 'NOVIEMBRE' },
+    { id: 12, nombre: 'DICIEMBRE' }
+  ];
   anioSeleccionado : number | null = null;
-  mesSeleccionado : string | null = null;
-  ticketSeleccionado : any = { Codigo : '', Fecha : '', Estado : '', Descripcion: '' }; //Variable que almcanerá la información del ticket seleccionado
+  mesSeleccionado : number | null = null;
+  ticketSeleccionado : any = { Codigo : '', Fecha : '', Estado : '', EstadoId : null, Descripcion: '' }; //Variable que almcanerá la información del ticket seleccionado
   imagenesTicket : any [] = []; //Variable que va a almacenar la información de las imagenes que se adjuntaron al ticket
+  detalleVisible : boolean = false;
   visible : boolean = false; //Variable que validará cuando se verá el modal de ticket resuelto y cuando no
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
@@ -43,7 +58,8 @@ export class Gestion_TicketsComponent implements OnInit {
                   private ticketService : TicketsService,
                     private ticketsResueltosService : Tickets_ResueltosService,
                       private shepherdService: ShepherdService,
-                        private mensajeService : MensajesAplicacionService,) {
+                        private mensajeService : MensajesAplicacionService,
+                          private util : UtileriaService) {
 
     this.FormTicketResuelto = this.frmBuilder.group({
       Descripcion : [null],
@@ -74,17 +90,18 @@ export class Gestion_TicketsComponent implements OnInit {
 
   // Funcion que va a limpiar los campos y llamar a todas las funciones de consulta iniciales a que se ejecuten de nuevo
   limpiarTodo(){
-    this.ticketSeleccionado = { Codigo : '', Fecha : '', Estado : '', Descripcion: '' };
+    this.ticketSeleccionado = { Codigo : '', Fecha : '', Estado : '', EstadoId : null, Descripcion: '' };
     this.imagenesTicket = [];
     this.cargando = true;
     this.tickets = [];
     this.ticketsDisponibles = [];
+    this.detalleVisible = false;
     this.visible = false;
     this.consultarTickets();
     this.cantultarCantidadTickets();
   }
 
-  // Funcion que va a consultar la información de los tickets que estén abiertos y/o en revicion
+  // Funcion que va a consultar la información de los tickets que estén abiertos y/o en revision
   consultarTickets(){
     this.ticketService.Get_Tickets_AbiertosEnRevision().subscribe(datos => {
       const tickets : any [] = [];
@@ -110,15 +127,14 @@ export class Gestion_TicketsComponent implements OnInit {
       if (!fecha.isValid()) return this.anioSeleccionado == null && this.mesSeleccionado == null;
 
       const coincideAnio = this.anioSeleccionado == null || fecha.year() === this.anioSeleccionado;
-      const indiceMes = this.meses.indexOf(this.mesSeleccionado ?? '');
-      const coincideMes = this.mesSeleccionado == null || fecha.month() === indiceMes;
+      const coincideMes = this.mesSeleccionado == null || fecha.month() + 1 === this.mesSeleccionado;
       return coincideAnio && coincideMes;
     });
   }
 
   filtrarMesActual(){
     this.anioSeleccionado = moment().year();
-    this.mesSeleccionado = this.meses[moment().month()];
+    this.mesSeleccionado = moment().month() + 1;
     this.filtrarTicketsPorFecha();
   }
 
@@ -133,12 +149,15 @@ export class Gestion_TicketsComponent implements OnInit {
     });
   }
 
-  // Funcion que va a colocar en la card de la parte de la derecha la informacion del ticket seleccionado
+  // Funcion que va a mostrar la informacion del ticket seleccionado en el dialogo
   ticketSelccionado(data : any){
     this.imagenesTicket = [];
     this.ticketSeleccionado = { Codigo : data.codigo, Fecha : data.fecha, Estado : data.estado, Descripcion : data.descripcionTotal, }
+    this.detalleVisible = true;
     this.ticketService.Get_Id(this.ticketSeleccionado.Codigo).subscribe(datos => {
-      let imagenes : any = datos.ticket_NombreImagen.trim().split('|');
+      this.ticketSeleccionado.EstadoId = Number(datos.estado_Id);
+      const nombresImagenes = datos.ticket_NombreImagen?.trim();
+      const imagenes : string [] = nombresImagenes ? nombresImagenes.split('|') : [];
       for (let i = 0; i < imagenes.length; i++) {
         if (imagenes[i] != '') {
           this.ticketService.Get_ImagenesTicket(imagenes[i].trim(), datos.ticket_RutaImagen).subscribe(datos_img => {
@@ -150,8 +169,8 @@ export class Gestion_TicketsComponent implements OnInit {
     });
   }
 
-  // Funcion que va a quitar de la card el ticket deseleccionado
-  ticketDeseleccionado = () => this.ticketSeleccionado = { Codigo : '', Fecha : '', Estado : '', Descripcion: '' };
+  // Funcion que va a quitar la informacion del ticket seleccionado
+  ticketDeseleccionado = () => this.ticketSeleccionado = { Codigo : '', Fecha : '', Estado : '', EstadoId : null, Descripcion: '' };
 
   // Funcion que va a cambiar el estado del ticket a "En revisión"
   ticket_EnRevision(){

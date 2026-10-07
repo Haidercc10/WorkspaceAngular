@@ -26,6 +26,10 @@ textarea {
   height: 100%;
 }
 
+.texto-observacion {
+  white-space: pre-wrap;
+}
+
 ::ng-deep .p-card {
   align-items: center;
   margin: auto;
@@ -92,8 +96,6 @@ p-chip ::ng-deep .p-chip-text {
   color : #495057;
 }
 
-#tableButton ::ng-deep .p-button {
-  width: 30px;
-  height: 30px;
-  text-decoration: none;
+::ng-deep .p-datatable-tbody > tr {
+  cursor: pointer;
 }

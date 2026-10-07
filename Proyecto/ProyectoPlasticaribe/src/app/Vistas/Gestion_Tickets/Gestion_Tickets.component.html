@@ -46,6 +46,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtro de búsqueda</h4>
   </div>
 
+  <!-- FILTROS -->
   <div class="mb-3">
     <div class="row g-3 justify-content-center align-items-center" id="fila">
       <div class="col-md-4">
@@ -57,7 +58,7 @@
       </div>
       <div class="col-md-4">
         <span class="p-float-label">
-          <p-dropdown [options]="meses" [(ngModel)]="mesSeleccionado"
+          <p-dropdown [options]="meses" optionValue="id" optionLabel="nombre" [(ngModel)]="mesSeleccionado"
             inputId="mesTickets" [showClear]="true" (onChange)="filtrarTicketsPorFecha()"></p-dropdown>
           <label for="mesTickets">Mes</label>
         </span>
@@ -90,16 +91,13 @@
       [paginator]="true"
       [rows]="15"
       [rowsPerPageOptions]="[5,10,15,20,25,30,35,40,45,50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} tickets."
       dataKey="codigo"
       [value]="tickets"
-      selectionMode="single"
-      (onRowSelect)="ticketSelccionado($event.data)"
-      (onRowUnselect)="ticketDeseleccionado()"
       *ngIf="!cargando">
       <ng-template pTemplate="header">
         <tr>
-          <!-- Radios -->
-          <th></th>
           <!-- # -->
           <th></th>
           <!-- Código -->
@@ -118,103 +116,104 @@
           <th>
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'descripcion', 'contains')">
           </th>
-          <!-- Ver -->
-            <th></th>
         </tr>
         <tr>
-          <th></th>
           <th>#</th>
           <th pSortableColumn="codigo"><p-sortIcon field="codigo"></p-sortIcon> Código</th>
           <th pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha Creación</th>
           <th pSortableColumn="estado"><p-sortIcon field="estado"></p-sortIcon> Estado</th>
           <th>Descripción</th>
-          <th>Ver</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
         <ng-container *ngIf="item.estado == 'ABIERTO'; else elseTemplate">
-          <tr>
-            <td style="text-align: center;"><p-tableRadioButton [value]="item"></p-tableRadioButton></td>
+          <tr (click)="ticketSelccionado(item)">
             <td>{{rowIndex + 1}}</td>
             <td>{{item.codigo}}</td>
             <td>{{item.fecha}}</td>
             <td>{{item.estado}}</td>
             <td>{{item.descripcion}}</td>
-            <td style="text-align: center;">
-              <p-button id="tableButton" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="ticketSelccionado(item)"></p-button>
-            </td>
           </tr>
         </ng-container>
         <ng-template #elseTemplate>
-          <tr style="background-color: oldlace; color: #071426">
-            <td style="text-align: center;"><p-tableRadioButton [value]="item"></p-tableRadioButton></td>
+          <tr style="background-color: oldlace; color: #071426" (click)="ticketSelccionado(item)">
             <td>{{rowIndex + 1}}</td>
             <td>{{item.codigo}}</td>
             <td>{{item.fecha}}</td>
             <td>{{item.estado}}</td>
             <td>{{item.descripcion}}</td>
-            <td style="text-align: center;">
-              <p-button id="tableButton" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="ticketSelccionado(item)"></p-button>
-            </td>
           </tr>
         </ng-template>
       </ng-template>
     </p-table>
   </div>
+</p-card>
 
-  <div class="row">
-    <!-- Detalles/Descripcion ticket -->
-    <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12" id="infoTicket">
-      <p-card>
-        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-info-circle font-size-20"></i> Información de Tickets</h3>
-        <div class="row p-2">
-          <h5>Ticket # {{ticketSeleccionado.Codigo}}</h5>
-        </div>
-        <div class="row p-2 font-size-20 text-justify scrollable" Style="max-height: 300px; overflow-y: auto;">
-          <p>{{ticketSeleccionado.Descripcion}}</p>
-        </div>
-        <div class="row p-2">
-          <p-galleria
-            #galleria
-            [value]="imagenesTicket"
-            [numVisible]="5"
-            [showThumbnails]="false"
-            [showItemNavigators]="true"
-            [showItemNavigatorsOnHover]="true"
-            [circular]="true"
-            [autoPlay]="true"
-            [transitionInterval]="5000"
-            [containerStyle]="{'width':'100%'}"
-            containerClass="custom-galleria fullscreen">
-            <ng-template pTemplate="item" let-item>
-              <p-image src="data:image/*;base64,{{item}}" alt="Imagen Adjuntada a Ticket" [preview]="true" width="250"></p-image>
-            </ng-template>
-          </p-galleria>
-        </div>
-        <div class="row p-2">
-          <div class="p-5 d-grid gap-2 d-md-flex justify-content-md-center" id="botones">
-            <p-button label="En Revisión" icon="pi pi-wrench" iconPos="right" styleClass="p-button-danger" (click)="ticket_EnRevision()"></p-button>
-            <p-button label="Resuelto" icon="pi pi-check" iconPos="right" styleClass="p-button-success" (click)="mostrarModalTicket_Resuelto()"></p-button>
-          </div>
-        </div>
-      </p-card>
+<!-- DIALOG INFORMACION DE TICKETS -->
+<p-dialog header="Detalles de ticket N°: {{ticketSeleccionado.Codigo}}" [(visible)]="detalleVisible" [modal]="true" [style]="{ width: '80%' }" [draggable]="true" [resizable]="false">
+  <div class="row p-2">
+    <div class="col-md-6"><strong>Fecha:</strong> {{ticketSeleccionado.Fecha}}</div>
+    <div class="col-md-6"><strong>Estado:</strong> {{ticketSeleccionado.Estado}}</div>
+  </div>
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+  <div class="row p-2 font-size-20 text-justify scrollable" style="max-height: 300px; overflow-y: auto;">
+    <p class="texto-observacion">{{ticketSeleccionado.Descripcion}}</p>
+  </div>
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+  <div class="row p-2 text-center" *ngIf="!imagenesTicket.length">
+    <p>No tiene imágenes adjuntas</p>
+  </div>
+  <div class="row p-2" *ngIf="imagenesTicket.length">
+    <p-galleria
+      #galleria
+      [value]="imagenesTicket"
+      [numVisible]="5"
+      [showThumbnails]="false"
+      [showItemNavigators]="true"
+      [showItemNavigatorsOnHover]="true"
+      [circular]="true"
+      [autoPlay]="true"
+      [transitionInterval]="5000"
+      [containerStyle]="{'width':'100%'}"
+      containerClass="custom-galleria fullscreen">
+      <ng-template pTemplate="item" let-item>
+        <p-image src="data:image/*;base64,{{item}}" alt="Imagen Adjuntada a Ticket" [preview]="true" width="250"></p-image>
+      </ng-template>
+    </p-galleria>
+  </div>
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+  <div class="row p-2">
+    <div class="p-3 d-grid gap-2 d-md-flex justify-content-md-center" id="botones">
+      <p-button *ngIf="ticketSeleccionado.EstadoId === 28 || ticketSeleccionado.EstadoId === 30"
+        label="En Revisión" icon="pi pi-wrench" iconPos="left" styleClass="p-button-danger"
+        (click)="ticket_EnRevision()"></p-button>
+      <p-button *ngIf="ticketSeleccionado.EstadoId === 28 || ticketSeleccionado.EstadoId === 29"
+        label="Establecer como Resuelto" icon="pi pi-check" iconPos="left" styleClass="p-button-success"
+        (click)="mostrarModalTicket_Resuelto()"></p-button>
     </div>
   </div>
-</p-card>
+</p-dialog>
 
 <p-dialog header="Cambiar Estado De Ticket" [(visible)]="visible" [contentStyle]="{'overflow':'visible'}" [modal]="true" [style]="{ width: '80%' }" [draggable]="false" [resizable]="false">
   <div class="row g-4">
     <form [formGroup]="FormTicketResuelto" (ngSubmit)="ticket_Resuelto()">
       <div class="p-5 col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <span class="p-float-label">
-          <textarea formControlName="Descripcion" [rows]="3" id="float-input" pInputTextarea></textarea>
+          <textarea formControlName="Descripcion" [rows]="3" id="float-input" pInputTextarea
+            class="texto-observacion"></textarea>
           <label for="float-input">Descripción</label>
         </span>
       </div>
 
       <div class="p-2 d-grid gap-2 d-md-flex justify-content-md-center" >
-        <p-button label="Ticket Resuelto" type="submit" icon="pi pi-check" iconPos="right" styleClass="p-button-success"></p-button>
-        <p-button label="Cancelar" icon="pi pi-ban" iconPos="right" styleClass="p-button-secondary" (click)="this.visible = false"></p-button>
+        <p-button label="Enviar" type="submit" icon="pi pi-check" iconPos="left" styleClass="p-button-success"></p-button>
+        <p-button label="Cancelar" icon="pi pi-times" iconPos="left" styleClass="p-button-danger" (click)="this.visible = false"></p-button>
       </div>
     </form>
   </div>
