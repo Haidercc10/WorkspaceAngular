@@ -37,3 +37,47 @@ textarea {
   font-weight: 700;
   text-align: center;
 }
+
+::ng-deep .p-chip {
+  width: 90%;
+  justify-content: center;
+}
+
+p-chip ::ng-deep .p-chip-text {
+  font-weight: 700;
+  font-size: medium;
+}
+
+#fila {
+  text-align: center;
+}
+
+#rojo ::ng-deep .p-chip {
+  background-color: palevioletred;
+  color : white;
+}
+
+#amarillo ::ng-deep .p-chip {
+  background-color: rgb(255, 246, 152);
+  color : #495057;
+}
+
+#azul ::ng-deep .p-chip {
+  background-color: paleturquoise;
+  color : #495057;
+
+}
+
+#verde ::ng-deep .p-chip {
+  background-color: palegreen;
+  color : #495057;
+}
+
+#naranja ::ng-deep .p-chip {
+  background-color: rgb(255, 211, 101);
+  color : #495057;
+}
+
+::ng-deep .mt-25 {
+  margin-top: 25px;
+}
