@@ -98,9 +98,9 @@ export class Gestion_TicketsComponent implements OnInit {
   cantultarCantidadTickets(){
     this.ticketService.Get_CantidadTickets().subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
-        if (datos[i].estado === `Abierto`) this.ticketsAbiertos = datos[i].cantidad;
-        if (datos[i].estado === `En Revisión`) this.ticketsEnRevision = datos[i].cantidad;
-        if (datos[i].estado === `Resuelto`) this.ticketsResuletosMes = datos[i].cantidad;
+        if (datos[i].estado === `ABIERTO`) this.ticketsAbiertos = datos[i].cantidad;
+        if (datos[i].estado === `EN REVISIÓN`) this.ticketsEnRevision = datos[i].cantidad;
+        if (datos[i].estado === `RESUELTO`) this.ticketsResuletosMes = datos[i].cantidad;
       }
     });
   }

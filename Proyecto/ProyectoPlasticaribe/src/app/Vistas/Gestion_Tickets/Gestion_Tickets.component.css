@@ -23,6 +23,11 @@ textarea {
   margin-bottom: 5%;
 }
 
+::ng-deep .p-card ::ng-deep .p-card-xl.p-card.p-component{
+  align-items: stretch;
+  width: 97%;
+}
+
 ::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea, input {
   display: flex;
   width: 100%;
