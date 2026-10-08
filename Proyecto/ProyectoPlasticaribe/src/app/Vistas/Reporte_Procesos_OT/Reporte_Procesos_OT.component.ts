@@ -106,9 +106,53 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.ObternerFallas();
     this.obtenerEstados();
     this.loadRankDates();
+    this.construirColumnas(this.formularioOT.value.vistaGerencial);
+    this.formularioOT.get('vistaGerencial')?.valueChanges.subscribe(valor => this.construirColumnas(valor));
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     
     //setTimeout(() => this.validarVendedor(), 500);
+  }
+
+  // Funcion que arma las columnas seleccionables: las adicionales y, cuando no está la vista detallada, las que la tabla oculta
+  construirColumnas(vistaDetallada : boolean){
+    const procesos = [['Extrusión', 'Ext'], ['Impresión', 'Imp'], ['Laminado', 'Lam'], ['Perforado', 'Perf'], ['Doblado', 'Dbl'], ['Empaque', 'Emp'], ['Sellado', 'Sel']];
+    const adicionales : any[] = [
+      { header: 'Presentación', field: 'und'},
+      { header: 'Vendedor', field: 'usu' },
+      { header: 'Pedido', field: 'Ped'},
+      { header: 'Cant Ingresada a Despacho', field: 'entrada'},
+      { header: 'Cant Facturada', field: 'salida'},
+      { header: 'Fallas', field: 'falla'},
+    ];
+    let ocultas : any[] = [];
+
+    if (!vistaDetallada) {
+      ocultas = [
+        { header: 'MP', field: 'mp', tipo: 'numero' },
+        { header: 'BOPP', field: 'bopp', tipo: 'numero' },
+        { header: 'Proceso inicial', field: 'cantidad_Inicial', tipo: 'numero' },
+        { header: 'Proceso final', field: 'cantidad_Final', tipo: 'numero' },
+        { header: 'Desperdicio total', field: 'desp', tipo: 'numero' },
+        { header: 'PF + Desp.', field: 'reportado_Final', tipo: 'numero' },
+        { header: 'Balance general', field: 'balance_General', tipo: 'numero' },
+        { header: 'Asignación', field: 'fecha_AsignacionMP', tipo: 'fecha' },
+        { header: '1er Pesaje', field: 'fechaInicio', tipo: 'fecha' },
+        { header: 'Ult. Pesaje', field: 'fechaFinal', tipo: 'fecha' },
+        { header: 'Días', field: 'diff_Dias', tipo: 'numero' },
+      ];
+      procesos.forEach(([nombre, sufijo]) => {
+        if (sufijo != 'Ext') ocultas.push({ header: `Proceso anterior ${nombre}`, field: `base_${sufijo}`, tipo: 'numero' });
+        ocultas.push(
+          { header: `Desperdicio ${nombre}`, field: `desp_${sufijo.toLowerCase()}`, tipo: 'numero' },
+          { header: `Reportado ${nombre}`, field: `sum_${sufijo.toLowerCase()}`, tipo: 'numero' },
+          { header: `Balance ${nombre}`, field: `balance_${sufijo}`, tipo: 'numero' },
+        );
+      });
+    }
+
+    const camposSeleccionados = this._columnasSeleccionada.map(col => col.field);
+    this.columnas = [...adicionales, ...ocultas];
+    this._columnasSeleccionada = this.columnas.filter(col => camposSeleccionados.includes(col.field));
   }
 
   tutorial(){
@@ -132,7 +176,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que obtendrá la informacion de los clientes
   loadRankDates() {
       let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
-      this.formularioOT.patchValue({ 'fechaInicio': initialDate, 'fechaFinal': new Date(), vistaGerencial: true });
+      this.formularioOT.patchValue({ 'fechaInicio': initialDate, 'fechaFinal': new Date(), vistaGerencial: this.storage_Id == 3148 ? false : true });
     }
 
   // Funcion que limpiará todos los campos de la vista
@@ -204,7 +248,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       );
     });
 
-    this.columnas.forEach(column => columns.push({ ...column, group: 'Campos adicionales', value: (item: any) => item[column.field] }));
+    this.columnas.filter(column => !columns.some(fija => fija.field == column.field)).forEach(column => columns.push({ ...column, group: 'Campos adicionales', value: (item: any) => item[column.field] }));
 
     const getProcessColor = (item: any, field: string): string => {
       const quantity = number(item[field]);
@@ -428,15 +472,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     console.log(data, data.perf);
     
     data.perf == null ? data.perf = 0 : data.perf = data.perf;
-
-    this.columnas = [
-      { header: 'Presentación', field: 'und'},
-      { header: 'Vendedor', field: 'usu' },
-      { header: 'Pedido', field: 'Ped'},
-      { header: 'Cant Ingresada a Despacho', field: 'entrada'},
-      { header: 'Cant Facturada', field: 'salida'},
-      { header: 'Fallas', field: 'falla'},
-    ];
 
     this.ArrayDocumento.push(data);
     this.ArrayDocumento.sort((a,b) => Number(b.ot) - Number(a.ot));
