@@ -95,6 +95,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       cliente : [null],
       Id_Vendedor : [null],
       producto : [null],
+      vistaGerencial : [true],
     });
   }
 
@@ -104,7 +105,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.obtenerVendedores();
     this.ObternerFallas();
     this.obtenerEstados();
+    this.loadRankDates();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    
     //setTimeout(() => this.validarVendedor(), 500);
   }
 
@@ -126,10 +129,17 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
+  // Funcion que obtendrá la informacion de los clientes
+  loadRankDates() {
+      let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
+      this.formularioOT.patchValue({ 'fechaInicio': initialDate, 'fechaFinal': new Date(), vistaGerencial: true });
+    }
+
   // Funcion que limpiará todos los campos de la vista
   limpiarCampos(){
     this.ArrayDocumento = [];
     this.formularioOT.reset();
+    this.loadRankDates(); 
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -360,13 +370,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.otSeleccionada = 0;
     this.ArrayDocumento = [];
     this.ordenesSeleccionadas = [];
-    //let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    //let fecha1 = moment(this.formularioOT.value.fechaInicio);
-    //let fecha2 = moment(this.formularioOT.value.fechaFinal);
-    //let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
-    //let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
-    //let usarFechaCreacion : boolean = fechainicial == fechaMesAnterior;
-    //console.log(fechainicial, fechaFinal, usarFechaCreacion);
+    let fecha1 = moment(this.formularioOT.value.fechaInicio);
+    let fecha2 = moment(this.formularioOT.value.fechaFinal);
+    let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
+    let vistaGerencial : boolean = this.formularioOT.value.vistaGerencial; 
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -376,7 +384,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTCerrada = 0;
     let ruta : string = this.validarParametrosConsulta();
 
-    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(ruta).subscribe(data => {
+    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(fechainicial, fechaFinal, vistaGerencial, ruta).subscribe(data => {
       data.forEach(infoOt => this.llenarArray(infoOt));
     }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
@@ -386,10 +394,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Funcion encargada de validar los parametros de consulta y construir la ruta para la solicitud HTTP
   validarParametrosConsulta(){
-    let fecha1 = moment(this.formularioOT.value.fechaInicio);
-    let fecha2 = moment(this.formularioOT.value.fechaFinal);
-    let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
     let ot : number = this.formularioOT.value.idDocumento;
     let fallas : any = this.formularioOT.value.fallasOT;
     let estado : number = this.formularioOT.value.estado;
@@ -400,8 +404,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     console.log(ot, fallas, estado, vendedor, cliente, producto);
 
-    if (fechainicial != null) ruta.length > 0 ? ruta += `&fechaInicial=${fechainicial}` : ruta += `fechaInicial=${fechainicial}`;
-    if (fechaFinal != null) ruta.length > 0 ? ruta += `&fechaFinal=${fechaFinal}` : ruta += `fechaFinal=${fechaFinal}`;
+    //if (fechainicial != null) ruta.length > 0 ? ruta += `&fechaInicial=${fechainicial}` : ruta += `fechaInicial=${fechainicial}`;
+    //if (fechaFinal != null) ruta.length > 0 ? ruta += `&fechaFinal=${fechaFinal}` : ruta += `fechaFinal=${fechaFinal}`;
     if (ot != null) ruta.length > 0 ? ruta += `&ot=${ot}` : ruta += `ot=${ot}`;
     if (cliente != null) ruta.length > 0 ? ruta += `&cli=${cliente}` : ruta += `cli=${cliente}`;
     if (producto != null) ruta.length > 0 ? ruta += `&prod=${producto}` : ruta += `prod=${producto}`;

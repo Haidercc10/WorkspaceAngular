@@ -27,7 +27,7 @@
       <div class="row g-4">
 
         <!--OT-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl">
           <span class="p-float-label">
             <input formControlName="idDocumento" id="OT" type="text" pInputText />
             <label for="OT">OT</label>
@@ -38,8 +38,8 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaInicio" inputId="FechaInicio"
-              [disabled]="formularioOT.value.fechaCreacion != null" [showIcon]="true" pTooltip="Si no se selecciona una fecha se consultará por la fecha de creación de la(s) OT, si se selecciona una fecha se consultará por la fecha de inicio de producción" tooltipPosition="top"></p-calendar>
-            <label for="FechaInicio">Fecha inicio/producción </label>
+              [disabled]="formularioOT.value.fechaCreacion != null" [showIcon]="true"></p-calendar>
+            <label for="FechaInicio">Fecha {{formularioOT.value.vistaGerencial ? 'Inicio' : 'Creación'}} </label>
           </span>
         </div>
 
@@ -47,9 +47,19 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
+            <label for="FechaFinal">Fecha {{formularioOT.value.vistaGerencial ? 'Final' : 'Fin'}} </label>
           </span>
         </div>
+
+        <!-- Vista Gerencial -->
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl">
+            <div class="field-checkbox" >
+              <p-checkbox formControlName="vistaGerencial" [binary]="true" inputId="gerencial" id="gerencial" 
+              pTooltip="Activar este campo para consultar por rango de ordenes asignadas y/o con producción, sino se consultará por el rango según la fecha de creación de la OT" tooltipPosition="top"
+              ></p-checkbox>
+              <label for="gerencial">Vista gerencial</label>
+            </div>
+          </div>
 
         <!--Asesor-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="vendedor">
