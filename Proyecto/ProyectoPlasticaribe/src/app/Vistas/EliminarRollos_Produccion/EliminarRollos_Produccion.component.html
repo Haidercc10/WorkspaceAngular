@@ -128,7 +128,7 @@
             responsiveLayout="scroll"
             [rowHover]="true"
             dataKey="numeroRollo_BagPro"
-            [(selection)]="rollsInsert"
+            [(selection)]="rollsTableSelection"
             [scrollable]="true"
             scrollHeight="25rem"
             *ngIf="!load">
@@ -202,7 +202,7 @@
           columnResizeMode="expand"
           [value]="rollsInsert"
           dataKey="numeroRollo_BagPro"
-          [(selection)]="rolls"
+          [(selection)]="rollsInsertTableSelection"
           [scrollable]="true"
           scrollHeight="25rem"
           *ngIf="!load">

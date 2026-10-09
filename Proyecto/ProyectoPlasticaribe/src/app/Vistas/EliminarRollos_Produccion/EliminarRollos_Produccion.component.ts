@@ -30,6 +30,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   process : any = []; //Variable que almacenará la informacion de los procesos de producción
   rolls : any = []; //Variable que almacenará la informacion de los rollos de producción
   rollsInsert : any = []; //Variable que almacenará la informacion de los rollos a insertar en la base de datos
+  rollsTableSelection : any[] = [];
+  rollsInsertTableSelection : any[] = [];
   consolidatedInfo : any = []; //Variable que almacenará la informacion consolidada de los rollos de producción
   fails : any = [];
   @ViewChild('dt1') dt1: Table | undefined;
@@ -90,7 +92,11 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     114       -> Jefe Extrusion
     59137     -> Eliseo Bustos
   */
-  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 117, 3139, 123456789, 115, 113, 3142, 3123, 101, 7676, 3130, 114, 59137].includes(x.usua_Id)); });
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => {
+    this.users = d
+      .filter(x => [100, 110, 117, 3139, 123456789, 115, 113, 3142, 3123, 101, 7676, 3130, 114, 59137].includes(x.usua_Id))
+      .sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre, 'es', { sensitivity: 'base' }));
+  });
 
   //Función para cargar fechas en el rango.
   loadRankDates(){
@@ -106,7 +112,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
       Rollo : [null],
       OT : [null],
       Falla : [null, Validators.required],
-      Observacion : [null],
+      Observacion : [null, Validators.required],
       user : [null, Validators.required],
     });
   }
@@ -115,7 +121,9 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   getProcess = () => this.svcProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [8,4,3,7,2,1,9,5,6,18].includes(x.proceso_Codigo)));
 
   //Función para obtener las fallas técnicas.
-  getFails = () =>  this.failsService.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 12) });
+  getFails = () =>  this.failsService.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 12)
+    .sort((a, b) => a.falla_Nombre.localeCompare(b.falla_Nombre, 'es', { sensitivity: 'base' })); 
+  });
 
   //Función para buscar los rollos a eliminar.
   searchRolls(){
@@ -138,7 +146,10 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
         this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de busqueda!`);
         this.load = false;
       });
-    } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar los campos 'Autoriza' y 'Motivo'!`);
+    } else {
+      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar los campos requeridos!`);
+      this.load = false;
+    }
   }
 
   loadTable(data : any, ){
@@ -146,7 +157,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     let autoriza : any = this.form.value.user;
     let observacion : any = this.form.value.Observacion
      data.forEach(x => {
-      if(!this.rolls.map(z => z.numeroRollo_BagPro).includes(x.numeroRollo_BagPro)) {
+      if(!this.rolls.concat(this.rollsInsert).some(z => z.numeroRollo_BagPro == x.numeroRollo_BagPro)) {
         this.rolls.push({
           'id': x.id,
           'ot': x.ot,
@@ -190,38 +201,42 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
 
   //Función para seleccionar todos los rollos consultados a la tabla de rollos a eliminar.
   selectAllRolls(){
-    this.load = true;
+    this.rollsInsert = [...this.rollsInsert, ...this.rolls];
     this.rolls = [];
-    this.rollsInsert = this.rollsInsert.concat(this.rolls);
+    this.rollsTableSelection = [];
+    this.rollsInsertTableSelection = [];
     this.getInfoConsolidated();
-    setTimeout(() => this.load = false, 5);
   }
 
   //Función para seleccionar un rollo consultado a la tabla de rollos a eliminar.
   loadRollInsert(roll : any){
-    this.load = true;
-    let index = this.rolls.findIndex(x => x.numeroRollo_BagPro == roll.numeroRollo_BagPro);
-    this.rolls.splice(index, 1);
+    if(!this.rollsInsert.some(x => x.numeroRollo_BagPro == roll.numeroRollo_BagPro)) {
+      this.rollsInsert = [...this.rollsInsert, roll];
+    }
+    this.rolls = this.rolls.filter(x => x.numeroRollo_BagPro != roll.numeroRollo_BagPro);
+    this.rollsTableSelection = [];
+    this.rollsInsertTableSelection = [];
     this.getInfoConsolidated();
-    setTimeout(() => this.load = false, 5);
   }
 
   //Función para deseleccionar todos los rollos a eliminar.
   quitAllRolls(){
-    this.load = true;
+    this.rolls = [...this.rolls, ...this.rollsInsert];
     this.rollsInsert = [];
-    this.rolls = this.rolls.concat(this.rollsInsert);
+    this.rollsTableSelection = [];
+    this.rollsInsertTableSelection = [];
     this.getInfoConsolidated();
-    setTimeout(() => this.load = false, 5);
   }
 
   //Función para deseleccionar un rollo a eliminar.
   quitRollInsert(roll : any){
-    this.load = true;
-    let index = this.rollsInsert.findIndex(x => x.numeroRollo_BagPro == roll.numeroRollo_BagPro);
-    this.rollsInsert.splice(index, 1);
+    if(!this.rolls.some(x => x.numeroRollo_BagPro == roll.numeroRollo_BagPro)) {
+      this.rolls = [...this.rolls, roll];
+    }
+    this.rollsInsert = this.rollsInsert.filter(x => x.numeroRollo_BagPro != roll.numeroRollo_BagPro);
+    this.rollsTableSelection = [];
+    this.rollsInsertTableSelection = [];
     this.getInfoConsolidated();
-    setTimeout(() => this.load = false, 5);
   }
 
   //Función para mostrar la información consolidada de los rollos a eliminar
@@ -315,9 +330,11 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
 
       this.svcProdProcess.putStateDeletedRolls(this.rollsToDelete).subscribe(data => { this.createDiscardRolls(); }, error => {
          this.svcMsjs.mensajeError(`Error`, `No fue posible eliminar los rollos!`);
-         this.load = false;
       });
-    } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe justificar el motivo de eliminación de rollos/bultos.`);
+    } else {
+      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos requeridos.`);
+      this.load = false;
+    }
   }
 
   //Función que creará los rollos eliminados en la tabla rollos desechos.
@@ -345,9 +362,12 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
 
   //Función para mostrar mensaje de confirmación de eliminación de rollos.
   confirmDeleteMessage(isError : boolean) {
-    if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido actualizando la observación de los rollos eliminados en BagPro!`);
+    if(isError) {
+      this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error actualizando la observación de los rollos eliminados en BagPro!`);
+      this.load = false;
+    }
     else {
-      this.svcMsjs.mensajeConfirmacion(`OK!`,`Rollos eliminados exitosamente!`);
+      this.svcMsjs.mensajeConfirmacion(`OK!`,`Rollo(s) eliminado(s) con éxito!`);
       setTimeout(() => { this.clearAll(); }, 1000);
     }
   }
@@ -370,6 +390,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.form.reset();
     this.rolls = [];
     this.rollsInsert = [];
+    this.rollsTableSelection = [];
+    this.rollsInsertTableSelection = [];
     this.consolidatedInfo = [];
     this.load = false;
     this.loadRankDates();
