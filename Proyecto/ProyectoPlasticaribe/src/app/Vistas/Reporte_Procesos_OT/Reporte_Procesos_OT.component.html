@@ -27,7 +27,7 @@
       <div class="row g-4">
 
         <!--OT-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl">
           <span class="p-float-label">
             <input formControlName="idDocumento" id="OT" type="text" pInputText />
             <label for="OT">OT</label>
@@ -38,8 +38,8 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaInicio" inputId="FechaInicio"
-              [disabled]="formularioOT.value.fechaCreacion != null" [showIcon]="true" pTooltip="Si no se selecciona una fecha se consultará por la fecha de creación de la(s) OT, si se selecciona una fecha se consultará por la fecha de inicio de producción" tooltipPosition="top"></p-calendar>
-            <label for="FechaInicio">Fecha inicio/producción </label>
+              [disabled]="formularioOT.value.fechaCreacion != null" [showIcon]="true"></p-calendar>
+            <label for="FechaInicio">Fecha {{formularioOT.value.vistaGerencial ? 'Inicio' : 'Creación'}} </label>
           </span>
         </div>
 
@@ -47,9 +47,21 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
+            <label for="FechaFinal">Fecha {{formularioOT.value.vistaGerencial ? 'Final' : 'Fin'}} </label>
           </span>
         </div>
+
+        <!-- Vista Gerencial -->
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl">
+            <div class="field-checkbox" >
+              <p-checkbox formControlName="vistaGerencial" [binary]="true" inputId="gerencial" id="gerencial" 
+              pTooltip="Al Activar este campo se consultará por rango de fechas de ordenes asignadas y/o con producción y mostrará la información detallada de la OT. 
+              Al estar desactivado, se consultará por el rango según la fecha de creación de la OT y no mostrará toda la información detallada." 
+              tooltipPosition="top" (onChange)="consultarInformacionOrdenesTrabajo()"
+              ></p-checkbox>
+              <label for="gerencial">Vista detallada</label>
+            </div>
+          </div>
 
         <!--Asesor-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="vendedor">
@@ -207,22 +219,22 @@
               </th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'cant', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'bopp', 'contains')">
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'bopp', 'contains')">
               </th>
               <!--INICIO BALANCE-->
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'cantidad_Inicial', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'cantidad_Final', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'desp', 'contains')">
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'desp', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'reportado_Final', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_General', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'est', 'contains')">
@@ -230,102 +242,102 @@
               <!--FIN BALANCE-->
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'fecha_AsignacionMP', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'fechaInicio', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'fechaFinal', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'diff_Dias', 'contains')"></th>
               <!--Extrusion-->
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mp', 'contains')">
               </th>
               <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ext', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_ext', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'sum_ext', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Ext', 'contains')">
               </th>
               <!--Impresion-->
-              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial" class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'base_Imp', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_imp', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'sum_imp', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Imp', 'contains')">
               </th>
               <!--Laminado-->
-              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial" class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'base_Lam', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'lam', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_lam', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'sum_lam', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Lam', 'contains')"></th>
               <!--Perforado-->
-              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial" class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'base_Perf', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'perf', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_perf', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'sum_perf', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Perf', 'contains')"></th>
               <!--Doblado-->
-              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial" class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'base_Dbl', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_dbl', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'sum_dbl', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Dbl', 'contains')"></th>
               <!--Empaque-->
-              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial" class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'base_Emp', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_emp', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'sum_emp', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Emp', 'contains')"></th>
               <!--Sellado-->
-              <th class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial" class="divisor-proceso"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'base_Sel', 'contains')">
               </th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'sel', 'contains')">
               </th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'desp_sel', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'sum_sel', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;"
+              <th *ngIf="formularioOT.value.vistaGerencial"><input pInputText type="text" style="width: 100%;"
                   (input)="aplicarfiltro($event, 'balance_Sel', 'contains')"></th>
 
               <th *ngFor="let col of columns"><input pInputText style="width: 100%;"
@@ -337,16 +349,16 @@
               <th style="font-weight: 900;" class="text-center" colspan="1"></th>
               <th style="font-weight: 800;" class="text-center" colspan="4"><i class="pi pi-file"></i> Información OT
               </th>
-              <th style="font-weight: 800;" class="text-center" colspan="1"></th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="7"> Balance General</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Fechas</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Extrusión</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Impresión</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Laminado</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Perforado</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Doblado</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Empaque</th>
-              <th style="font-weight: 800;" class="text-center divisor-proceso" colspan="5"> Sellado</th>
+              <th *ngIf="formularioOT.value.vistaGerencial" style="font-weight: 800;" class="text-center" colspan="1"></th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 7 : 1"> Balance General</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Fechas</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Extrusión</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Impresión</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Laminado</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Perforado</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Doblado</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Empaque</th>
+              <th style="font-weight: 800;" class="text-center divisor-proceso" [attr.colspan]="formularioOT.value.vistaGerencial ? 5 : 1"> Sellado</th>
               <th style="font-weight: 900;" class="text-center" colspan="1"></th>
             </tr>
             <tr class="font-size-13" id="columnas">
@@ -361,148 +373,148 @@
               <th scope="col" pResizableColumn pSortableColumn="cant"
                 pTooltip="Cantidad a producir según la orden de trabajo" tooltipPosition="top">
                 Cant. Prod. Terminado <p-sortIcon field="cant"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
                 tooltipPosition="top">MP <p-sortIcon field="mp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="bopp" pTooltip="Materia prima asignada"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="bopp" pTooltip="Materia prima asignada"
                 tooltipPosition="top">BOPP <p-sortIcon field="bopp" pTooltip="Cant. Bopp asignado" tooltipPosition="top"></p-sortIcon>
               </th>
               <!--Balance general-->
-              <th scope="col" pResizableColumn pSortableColumn="cantidad_Inicial" pTooltip="Proceso inicial" tooltipPosition="top"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="cantidad_Inicial" pTooltip="Proceso inicial" tooltipPosition="top"
                 class="divisor-proceso"> PI <p-sortIcon field="cantidad_Inicial"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="cantidad_Final" pTooltip="Proceso final"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="cantidad_Final" pTooltip="Proceso final"
                 tooltipPosition="top"> PF <p-sortIcon field="cantidad_Final"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="desp" pTooltip="Desperdicio Total"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp" pTooltip="Desperdicio Total"
                 tooltipPosition="top"> Desp. <p-sortIcon field="desp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="reportado_Final" pTooltip="Proceso final + Desperdicio Total"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="reportado_Final" pTooltip="Proceso final + Desperdicio Total"
                 tooltipPosition="top"> PF + Desp. <p-sortIcon field="reportado_Final"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_General" pTooltip="Balance General en Kilos"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_General" pTooltip="Balance General en Kilos"
                 tooltipPosition="top"> Balance<p-sortIcon field="balance_General"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="est" pTooltip="Estado de la OT" tooltipPosition="top">
                 Estado <p-sortIcon field="est"></p-sortIcon></th>
                 <th scope="col" pResizableColumn pSortableColumn="fecha" pTooltip="Fecha Creación" tooltipPosition="top">
                 Creación <p-sortIcon field="fecha"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="fecha_AsignacionMP" pTooltip="Fecha de la primera asignación de materia prima" tooltipPosition="top">
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="fecha_AsignacionMP" pTooltip="Fecha de la primera asignación de materia prima" tooltipPosition="top">
                 Asignación <p-sortIcon field="fecha_AsignacionMP"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="fechaInicio" pTooltip="Fecha Inicio"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="fechaInicio" pTooltip="Fecha Inicio"
                 tooltipPosition="top">
                 1er Pesaje <p-sortIcon field="fechaInicio"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="fechaFinal" pTooltip="Fecha Final"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="fechaFinal" pTooltip="Fecha Final"
                 tooltipPosition="top">
                 Ult. Pesaje <p-sortIcon field="fechaFinal"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="diff_Dias" pTooltip="Diferencia de Días entre el primer y último pesaje"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="diff_Dias" pTooltip="Diferencia de Días entre el primer y último pesaje"
                 tooltipPosition="top">
                 Días <p-sortIcon field="diff_Dias"></p-sortIcon></th>
 
-              <th scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="mp" pTooltip="Materia prima asignada"
                 tooltipPosition="top"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="mp"></p-sortIcon>
               </th>
               <!--Extrusion-->
               <th scope="col" pResizableColumn pSortableColumn="ext" pTooltip="Producción Extrusión"
                 tooltipPosition="top"><i class="pi pi-bolt"></i> <p-sortIcon field="ext"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_ext" pTooltip="Desperdicio Extrusión"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp_ext" pTooltip="Desperdicio Extrusión"
                 tooltipPosition="top"> <i class="pi pi-trash"></i> <p-sortIcon field="desp_ext"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="sum_ext" pTooltip="Reportado por Extrusión"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="sum_ext" pTooltip="Reportado por Extrusión"
                 tooltipPosition="top"> <i class="pi pi-calculator"></i> <p-sortIcon field="sum_ext"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Ext" pTooltip="Balance Extrusión"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_Ext" pTooltip="Balance Extrusión"
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Ext"></p-sortIcon>
               </th>
               <!--Impresion-->
-              <th scope="col" pResizableColumn pSortableColumn="base_Imp" pTooltip="Proceso anterior" tooltipPosition="top"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="base_Imp" pTooltip="Proceso anterior" tooltipPosition="top"
                 class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Imp"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="imp" pTooltip="Producción Impresión"
                 tooltipPosition="top"><i class="pi pi-print"></i> <p-sortIcon field="imp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_imp" pTooltip="Desperdicio Impresión"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp_imp" pTooltip="Desperdicio Impresión"
                 tooltipPosition="top"><i class="pi pi-trash"></i> <p-sortIcon field="desp_imp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="sum_imp" pTooltip="Reportado por Impresión"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="sum_imp" pTooltip="Reportado por Impresión"
                 tooltipPosition="top"> <i class="pi pi-calculator"></i> <p-sortIcon field="sum_imp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Imp" pTooltip="Balance Impresión"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_Imp" pTooltip="Balance Impresión"
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Imp"></p-sortIcon>
               </th>
               <!--Laminado-->
-              <th scope="col" pResizableColumn pSortableColumn="base_Lam" pTooltip="Proceso anterior" tooltipPosition="top"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="base_Lam" pTooltip="Proceso anterior" tooltipPosition="top"
                 class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Lam"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="lam" pTooltip="Producción Laminado"
                 tooltipPosition="top"><i class="pi pi-clone"></i> <p-sortIcon field="lam"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_lam" pTooltip="Desperdicio Laminado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp_lam" pTooltip="Desperdicio Laminado"
                 tooltipPosition="top"><i class="pi pi-trash"></i> <p-sortIcon field="desp_lam"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="sum_lam" pTooltip="Reportado por Laminado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="sum_lam" pTooltip="Reportado por Laminado"
                 tooltipPosition="top"> <i class="pi pi-calculator"></i> <p-sortIcon field="sum_lam"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Lam" pTooltip="Balance Laminado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_Lam" pTooltip="Balance Laminado"
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Lam"></p-sortIcon>
               </th>
               <!--Perforado-->
-              <th scope="col" pResizableColumn pSortableColumn="base_Perf" pTooltip="Proceso anterior" tooltipPosition="top"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="base_Perf" pTooltip="Proceso anterior" tooltipPosition="top"
                 class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Perf"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="perf" pTooltip="Producción Perforado"
                 tooltipPosition="top"><i class="pi pi-circle-off"></i> <p-sortIcon field="perf"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_perf" pTooltip="Desperdicio Perforado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp_perf" pTooltip="Desperdicio Perforado"
                 tooltipPosition="top"><i class="pi pi-trash"></i> <p-sortIcon field="desp_perf"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="sum_perf" pTooltip="Reportado por Perforado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="sum_perf" pTooltip="Reportado por Perforado"
                 tooltipPosition="top"> <i class="pi pi-calculator"></i> <p-sortIcon field="sum_perf"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Perf" pTooltip="Balance Perforado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_Perf" pTooltip="Balance Perforado"
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Perf"></p-sortIcon>
               </th>
               <!--Doblado-->
-              <th scope="col" pResizableColumn pSortableColumn="base_Dbl" pTooltip="Proceso anterior" tooltipPosition="top"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="base_Dbl" pTooltip="Proceso anterior" tooltipPosition="top"
                 class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Dbl"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="dbl" pTooltip="Producción Doblado"
                 tooltipPosition="top"><i class="pi pi-map"></i> <p-sortIcon field="dbl"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_dbl" pTooltip="Desperdicio Doblado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp_dbl" pTooltip="Desperdicio Doblado"
                 tooltipPosition="top"><i class="pi pi-trash"></i> <p-sortIcon field="desp_dbl"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="sum_dbl" pTooltip="Reportado por Doblado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="sum_dbl" pTooltip="Reportado por Doblado"
                 tooltipPosition="top"> <i class="pi pi-calculator"></i> <p-sortIcon field="sum_dbl"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Dbl" pTooltip="Balance Doblado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_Dbl" pTooltip="Balance Doblado"
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Dbl"></p-sortIcon>
               </th>
 
               <!--Empaque-->
-              <th scope="col" pResizableColumn pSortableColumn="base_Emp" pTooltip="Proceso anterior" tooltipPosition="top"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="base_Emp" pTooltip="Proceso anterior" tooltipPosition="top"
                 class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Emp"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="emp" pTooltip="Producción Empaque"
                 tooltipPosition="top"><i class="pi pi-box"></i> <p-sortIcon field="emp"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_emp" pTooltip="Desperdicio Empaque"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp_emp" pTooltip="Desperdicio Empaque"
                 tooltipPosition="top"><i class="pi pi-trash"></i> <p-sortIcon field="desp_emp"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="sum_emp" pTooltip="Reportado por Empaque"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="sum_emp" pTooltip="Reportado por Empaque"
                 tooltipPosition="top"> <i class="pi pi-calculator"></i> <p-sortIcon field="sum_emp"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Emp" pTooltip="Balance Empaque"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_Emp" pTooltip="Balance Empaque"
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Emp"></p-sortIcon>
               </th>
 
               <!--Sellado-->
-              <th scope="col" pResizableColumn pSortableColumn="base_Sel" pTooltip="Proceso anterior" tooltipPosition="top"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="base_Sel" pTooltip="Proceso anterior" tooltipPosition="top"
                 class="divisor-proceso"><i class="pi pi-angle-double-left"></i> <p-sortIcon field="base_Sel"></p-sortIcon>
               </th>
               <th scope="col" pResizableColumn pSortableColumn="sel" pTooltip="Producción Sellado"
                 tooltipPosition="top"><i class="pi pi-tag"></i> <p-sortIcon field="sel"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="desp_sel" pTooltip="Desperdicio Sellado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="desp_sel" pTooltip="Desperdicio Sellado"
                 tooltipPosition="top"><i class="pi pi-trash"></i> <p-sortIcon field="desp_sel"></p-sortIcon></th>
-              <th scope="col" pResizableColumn pSortableColumn="sum_sel" pTooltip="Reportado por Sellado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="sum_sel" pTooltip="Reportado por Sellado"
                 tooltipPosition="top"> <i class="pi pi-calculator"></i> <p-sortIcon field="sum_sel"></p-sortIcon>
               </th>
-              <th scope="col" pResizableColumn pSortableColumn="balance_Sel" pTooltip="Balance Sellado"
+              <th *ngIf="formularioOT.value.vistaGerencial" scope="col" pResizableColumn pSortableColumn="balance_Sel" pTooltip="Balance Sellado"
                 tooltipPosition="top"> <i class="pi pi-percentage"></i> <p-sortIcon field="balance_Sel"></p-sortIcon>
               </th>
 
@@ -525,13 +537,13 @@
               <td>{{data.item}} - {{data.ref}}</td>
               <td id="cant" scope="col"><b>{{data.cant | number : '1.0-0'}} Kg - {{data.cantUnd | number : '1.0-0'}}
                   {{data.und == 'Paquete' ? 'Paq' : data.und}}</b></td>
-              <td class="proceso-inicio" (click)="reporteOT(data.ot)" pTooltip="Ver Reporte de costos OT {{data.ot}}" tooltipPosition="top">{{data.mp | number : '1.0-0'}}</td>
-              <td class="" (click)="reporteOT(data.ot)" pTooltip="Ver Reporte de costos OT {{data.ot}}" tooltipPosition="top">{{data.bopp | number : '1.0-0'}}</td>
-              <td class=""><b>{{data.proceso_Inicial}}:</b> {{data.cantidad_Inicial | number : '1.0-0'}}</td>
-              <td class=""><b>{{data.proceso_Final}}:</b> {{data.cantidad_Final | number : '1.0-0'}}</td>
-              <td class="">{{data.desp | number : '1.0-0'}}</td>
-              <td class="">{{(data.reportado_Final) | number : '1.0-0'}}</td>
-              <td class="" [ngClass]="{'red' : data.balance_General < 0,'green' : data.balance_General > 0} ">
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio" (click)="reporteOT(data.ot)" pTooltip="Ver Reporte de costos OT {{data.ot}}" tooltipPosition="top">{{data.mp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="" (click)="reporteOT(data.ot)" pTooltip="Ver Reporte de costos OT {{data.ot}}" tooltipPosition="top">{{data.bopp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class=""><b>{{data.proceso_Inicial}}:</b> {{data.cantidad_Inicial | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class=""><b>{{data.proceso_Final}}:</b> {{data.cantidad_Final | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="">{{data.desp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="">{{(data.reportado_Final) | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="" [ngClass]="{'red' : data.balance_General < 0,'green' : data.balance_General > 0} ">
                 <b>{{data.balance_General | number : '1.0-0'}}</b>
               </td>
 
@@ -545,12 +557,12 @@
               }"><b>{{data.est | uppercase}}</b></td>
 
               <td id="fecha" class="proceso-inicio" scope="col">{{data.fecha | date : 'yyyy-MM-dd'}}</td>
-              <td>{{data.fecha_AsignacionMP | date : 'yyyy-MM-dd'}}</td>
-              <td>{{data.fechaInicio | date : 'yyyy-MM-dd'}}</td>
-              <td>{{data.fechaFinal | date : 'yyyy-MM-dd'}}</td>
-              <td> {{data.diff_Dias}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial">{{data.fecha_AsignacionMP | date : 'yyyy-MM-dd'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial">{{data.fechaInicio | date : 'yyyy-MM-dd'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial">{{data.fechaFinal | date : 'yyyy-MM-dd'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial"> {{data.diff_Dias}}</td>
 
-              <td class="proceso-inicio">{{data.mp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{data.mp | number : '1.0-0'}}</td>
               <!-- Extrusion -->
 
               <td [ngClass]="{
@@ -563,15 +575,15 @@
               }" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext == 0 ? '0' : data.ext | number :
                 '1.0-0'}}</td>
 
-              <td id="desp_ext" scope="col" [ngClass]="{'red' : data.desp_ext > 0}">{{data.desp_ext | number : '1.0-0'}}
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_ext" scope="col" [ngClass]="{'red' : data.desp_ext > 0}">{{data.desp_ext | number : '1.0-0'}}
               </td>
-              <td id="sum_ext" scope="col">{{data.sum_ext | number : '1.0-0'}}</td>
-              <td id="balance_Ext" scope="col" class="proceso-fin"
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_ext" scope="col">{{data.sum_ext | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Ext" scope="col" class="proceso-fin"
                 [ngClass]="{'red' : data.balance_Ext < 0,'green' : data.balance_Ext > 0} "><b>{{data.balance_Ext |
                   number : '1.0-0'}}</b></td>
 
               <!-- Impresion -->
-              <td class="proceso-inicio" id="" scope="col">{{data.base_Imp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio" id="" scope="col">{{data.base_Imp | number : '1.0-0'}}</td>
               <td [ngClass]="{
                 'verde' : data.imp >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.imp < data.cant && data.imp > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
@@ -581,15 +593,15 @@
                 'gris' : (data.ext + data.imp + data.rot + data.perf + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) > 0 && data.est != 'ANULADO' && data.imp == 0 && data.imp < data.cant,
               }" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? '0' : data.imp | number :
                 '1.0-0'}}</td>
-              <td id="desp_imp" scope="col" [ngClass]="{'red' : data.desp_imp > 0}">{{data.desp_imp | number : '1.0-0'}}
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_imp" scope="col" [ngClass]="{'red' : data.desp_imp > 0}">{{data.desp_imp | number : '1.0-0'}}
               </td>
-              <td id="sum_imp" scope="col">{{data.sum_imp | number : '1.0-0'}}</td>
-              <td id="balance_Imp" scope="col" class="proceso-fin"
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_imp" scope="col">{{data.sum_imp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Imp" scope="col" class="proceso-fin"
                 [ngClass]="{'red' : data.balance_Imp < 0,'green' : data.balance_Imp > 0} "><b>{{data.balance_Imp |
                   number : '1.0-0'}}</b></td>
 
               <!-- laminado -->
-              <td class="proceso-inicio" id="" scope="col">{{data.base_Lam | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio" id="" scope="col">{{data.base_Lam | number : '1.0-0'}}</td>
               <td [ngClass]="{
                 'verde' : data.lam >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.lam < data.cant && data.lam > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
@@ -600,15 +612,15 @@
               }" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? '0' : data.lam | number :
                 '1.0-0'}}</td>
 
-              <td id="desp_lam" scope="col" [ngClass]="{'red' : data.desp_lam > 0}">{{data.desp_lam | number : '1.0-0'}}
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_lam" scope="col" [ngClass]="{'red' : data.desp_lam > 0}">{{data.desp_lam | number : '1.0-0'}}
               </td>
-              <td id="sum_lam" scope="col">{{data.sum_lam | number : '1.0-0'}}</td>
-              <td id="balance_Lam" scope="col" class="proceso-fin"
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_lam" scope="col">{{data.sum_lam | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Lam" scope="col" class="proceso-fin"
                 [ngClass]="{'red' : data.balance_Lam < 0,'green' : data.balance_Lam > 0} "><b>{{data.balance_Lam |
                   number : '1.0-0'}}</b></td>
 
               <!-- Perforado -->
-              <td class="proceso-inicio" id="" scope="col">{{data.base_Perf | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio" id="" scope="col">{{data.base_Perf | number : '1.0-0'}}</td>
               <td [ngClass]="{
                 'verde' : data.perf >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.perf < data.cant && data.perf > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
@@ -619,15 +631,15 @@
               }" (click)="seleccionarOTxProceso(data, 'PERFORADO')">{{data.perf == 0 ? '0' : data.perf | number :
                 '1.0-0'}}</td>
 
-              <td id="desp_perf" scope="col" [ngClass]="{'red' : data.desp_perf > 0}">{{data.desp_perf | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_perf" scope="col" [ngClass]="{'red' : data.desp_perf > 0}">{{data.desp_perf | number :
                 '1.0-0'}} </td>
-              <td id="sum_perf" scope="col">{{data.sum_perf | number : '1.0-0'}}</td>
-              <td id="balance_Perf" scope="col" class="proceso-fin"
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_perf" scope="col">{{data.sum_perf | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Perf" scope="col" class="proceso-fin"
                 [ngClass]="{'red' : data.balance_Perf < 0,'green' : data.balance_Perf > 0} "><b>{{data.balance_Perf |
                   number : '1.0-0'}}</b></td>
 
               <!--* Doblado -->
-              <td class="proceso-inicio" id="" scope="col">{{data.base_Dbl | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio" id="" scope="col">{{data.base_Dbl | number : '1.0-0'}}</td>
               <td [ngClass]="{
                 'verde' : data.dbl >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.dbl < data.cant && data.dbl > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
@@ -638,17 +650,17 @@
               }" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? '0' : data.dbl | number : '1.0-0'}}
               </td>
 
-              <td id="desp_dbl" scope="col" [ngClass]="{'red' : data.desp_dbl > 0}">{{data.desp_dbl | number : '1.0-0'}}
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_dbl" scope="col" [ngClass]="{'red' : data.desp_dbl > 0}">{{data.desp_dbl | number : '1.0-0'}}
               </td>
-              <td id="sum_dbl" scope="col">{{data.sum_dbl | number : '1.0-0'}}</td>
-              <td id="balance_Dbl" scope="col" class="proceso-fin"
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_dbl" scope="col">{{data.sum_dbl | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Dbl" scope="col" class="proceso-fin"
                 [ngClass]="{'red' : data.balance_Dbl < 0,'green' : data.balance_Dbl > 0} "><b>{{data.balance_Dbl |
                   number : '1.0-0'}}</b></td>
 
 
 
               <!-- Empaque -->
-              <td class="proceso-inicio" id="" scope="col">{{data.base_Emp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio" id="" scope="col">{{data.base_Emp | number : '1.0-0'}}</td>
               <td [ngClass]="{
                 'verde' : data.emp >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.emp < data.cant && data.emp > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
@@ -659,15 +671,15 @@
               }" (click)="seleccionarOTxProceso(data, 'EMPAQUE')">{{data.emp == 0 ? '0' : data.emp | number : '1.0-0'}}
               </td>
 
-              <td id="desp_emp" scope="col" [ngClass]="{'red' : data.desp_emp > 0}">{{data.desp_emp | number : '1.0-0'}}
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_emp" scope="col" [ngClass]="{'red' : data.desp_emp > 0}">{{data.desp_emp | number : '1.0-0'}}
               </td>
-              <td id="sum_emp" scope="col">{{data.sum_emp | number : '1.0-0'}}</td>
-              <td id="balance_Emp" scope="col" class="proceso-fin"
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_emp" scope="col">{{data.sum_emp | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Emp" scope="col" class="proceso-fin"
                 [ngClass]="{'red' : data.balance_Emp < 0,'green' : data.balance_Emp > 0} "><b>{{data.balance_Emp |
                   number : '1.0-0'}}</b></td>
 
               <!-- Sellado -->
-              <td class="proceso-inicio" id="" scope="col">{{data.base_Sel | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio" id="" scope="col">{{data.base_Sel | number : '1.0-0'}}</td>
               <td [ngClass]="{
                 'verde' : data.sel >= data.cant && data.est != 'ABIERTA' && data.est != 'ASIGNADA',
                 'amarillo' : data.sel < data.cant && data.sel > 0 && !['ABIERTA', 'ASIGNADA', 'ANULADO'].includes(data.est),
@@ -680,14 +692,14 @@
                 {{data.selUnd == 0 ? '0' : data.selUnd | number : '1.0-0'}} {{data.und == 'Paquete' ? 'Paq' : data.und}}
               </td>
 
-              <td id="desp_sel" scope="col" [ngClass]="{'red' : data.desp_sel > 0}">{{data.desp_sel | number : '1.0-0'}}
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_sel" scope="col" [ngClass]="{'red' : data.desp_sel > 0}">{{data.desp_sel | number : '1.0-0'}}
               </td>
-              <td id="sum_sel" scope="col">{{data.sum_sel | number : '1.0-0'}}</td>
-              <td id="balance_Sel" scope="col" class="proceso-fin"
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_sel" scope="col">{{data.sum_sel | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Sel" scope="col" class="proceso-fin"
                 [ngClass]="{'red' : data.balance_Sel < 0,'green' : data.balance_Sel > 0} "><b>{{data.balance_Sel |
                   number : '1.0-0'}}</b></td>
 
-              <td *ngFor="let col of columns">{{data[col.field]}}</td>
+              <td *ngFor="let col of columns">{{col.tipo == 'fecha' ? (data[col.field] | date : 'yyyy-MM-dd') : col.tipo == 'numero' ? (data[col.field] | number : '1.0-0') : data[col.field]}}</td>
               <td pFrozenColumn alignFrozen="right" [frozen]="true">
                 <button *ngIf="ValidarRol == 1 && storage_Id != 101" pButton pRipple icon="pi pi-pencil"
                   [style]="{width: '30px', height: '30px'}" class="p-button-rounded p-button-success p-mr-2"
@@ -705,75 +717,75 @@
               <td></td>
               <td id="cant"><b>{{totalizarColumna('cant') | number : '1.0-0'}} Kg - {{totalizarColumna('cantUnd') |
                     number : '1.0-0'}}</b></td>
-              <td class="proceso-inicio">{{totalizarColumna('mp') | number : '1.0-0'}}</td>
-              <td>{{totalizarColumna('bopp') | number : '1.0-0'}}</td>
-              <td><b>{{totalizarColumna('cantidad_Inicial') | number : '1.0-0'}}</b></td>
-              <td><b>{{totalizarColumna('cantidad_Final') | number : '1.0-0'}}</b></td>
-              <td>{{totalizarColumna('desp') | number : '1.0-0'}}</td>
-              <td>{{totalizarColumna('reportado_Final') | number : '1.0-0'}}</td>
-              <td><b>{{totalizarColumna('balance_General') | number : '1.0-0'}}</b></td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('mp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial">{{totalizarColumna('bopp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial"><b>{{totalizarColumna('cantidad_Inicial') | number : '1.0-0'}}</b></td>
+              <td *ngIf="formularioOT.value.vistaGerencial"><b>{{totalizarColumna('cantidad_Final') | number : '1.0-0'}}</b></td>
+              <td *ngIf="formularioOT.value.vistaGerencial">{{totalizarColumna('desp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial">{{totalizarColumna('reportado_Final') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial"><b>{{totalizarColumna('balance_General') | number : '1.0-0'}}</b></td>
               <td></td>
               <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{{totalizarColumna('diff_Dias') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial"></td>
+              <td *ngIf="formularioOT.value.vistaGerencial"></td>
+              <td *ngIf="formularioOT.value.vistaGerencial"></td>
+              <td *ngIf="formularioOT.value.vistaGerencial">{{totalizarColumna('diff_Dias') | number : '1.0-0'}}</td>
 
-              <td class="proceso-inicio">{{totalizarColumna('mp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('mp') | number : '1.0-0'}}</td>
               <!-- Extrusión -->
               <td>{{totalizarColumna('ext') | number : '1.0-0'}}</td>
-              <td id="desp_ext">{{totalizarColumna('desp_ext') | number : '1.0-0'}}</td>
-              <td id="sum_ext">{{totalizarColumna('sum_ext') | number : '1.0-0'}}</td>
-              <td id="balance_Ext" class="proceso-fin"><b>{{totalizarColumna('balance_Ext') | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_ext">{{totalizarColumna('desp_ext') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_ext">{{totalizarColumna('sum_ext') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Ext" class="proceso-fin"><b>{{totalizarColumna('balance_Ext') | number :
                     '1.0-0'}}</b></td>
 
               <!-- Impresión -->
-              <td class="proceso-inicio">{{totalizarColumna('base_Imp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('base_Imp') | number : '1.0-0'}}</td>
               <td>{{totalizarColumna('imp') | number : '1.0-0'}}</td>
-              <td id="desp_imp">{{totalizarColumna('desp_imp') | number : '1.0-0'}}</td>
-              <td id="sum_imp">{{totalizarColumna('sum_imp') | number : '1.0-0'}}</td>
-              <td id="balance_Imp" class="proceso-fin"><b>{{totalizarColumna('balance_Imp') | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_imp">{{totalizarColumna('desp_imp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_imp">{{totalizarColumna('sum_imp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Imp" class="proceso-fin"><b>{{totalizarColumna('balance_Imp') | number :
                     '1.0-0'}}</b></td>
 
               <!-- Laminado -->
-              <td class="proceso-inicio">{{totalizarColumna('base_Lam') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('base_Lam') | number : '1.0-0'}}</td>
               <td>{{totalizarColumna('lam') | number : '1.0-0'}}</td>
-              <td id="desp_lam">{{totalizarColumna('desp_lam') | number : '1.0-0'}}</td>
-              <td id="sum_lam">{{totalizarColumna('sum_lam') | number : '1.0-0'}}</td>
-              <td id="balance_Lam" class="proceso-fin"><b>{{totalizarColumna('balance_Lam') | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_lam">{{totalizarColumna('desp_lam') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_lam">{{totalizarColumna('sum_lam') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Lam" class="proceso-fin"><b>{{totalizarColumna('balance_Lam') | number :
                     '1.0-0'}}</b></td>
 
               <!-- Perforado -->
-              <td class="proceso-inicio">{{totalizarColumna('base_Perf') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('base_Perf') | number : '1.0-0'}}</td>
               <td>{{totalizarColumna('perf') | number : '1.0-0'}}</td>
-              <td id="desp_perf">{{totalizarColumna('desp_perf') | number : '1.0-0'}}</td>
-              <td id="sum_perf">{{totalizarColumna('sum_perf') | number : '1.0-0'}}</td>
-              <td id="balance_Perf" class="proceso-fin"><b>{{totalizarColumna('balance_Perf') | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_perf">{{totalizarColumna('desp_perf') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_perf">{{totalizarColumna('sum_perf') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Perf" class="proceso-fin"><b>{{totalizarColumna('balance_Perf') | number :
                     '1.0-0'}}</b></td>
 
               <!-- Doblado -->
-              <td class="proceso-inicio">{{totalizarColumna('base_Dbl') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('base_Dbl') | number : '1.0-0'}}</td>
               <td>{{totalizarColumna('dbl') | number : '1.0-0'}}</td>
-              <td id="desp_dbl">{{totalizarColumna('desp_dbl') | number : '1.0-0'}}</td>
-              <td id="sum_dbl">{{totalizarColumna('sum_dbl') | number : '1.0-0'}}</td>
-              <td id="balance_Dbl" class="proceso-fin"><b>{{totalizarColumna('balance_Dbl') | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_dbl">{{totalizarColumna('desp_dbl') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_dbl">{{totalizarColumna('sum_dbl') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Dbl" class="proceso-fin"><b>{{totalizarColumna('balance_Dbl') | number :
                     '1.0-0'}}</b></td>
 
               <!-- Empaque -->
-              <td class="proceso-inicio">{{totalizarColumna('base_Emp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('base_Emp') | number : '1.0-0'}}</td>
               <td>{{totalizarColumna('emp') | number : '1.0-0'}}</td>
-              <td id="desp_emp">{{totalizarColumna('desp_emp') | number : '1.0-0'}}</td>
-              <td id="sum_emp">{{totalizarColumna('sum_emp') | number : '1.0-0'}}</td>
-              <td id="balance_Emp" class="proceso-fin"><b>{{totalizarColumna('balance_Emp') | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_emp">{{totalizarColumna('desp_emp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_emp">{{totalizarColumna('sum_emp') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Emp" class="proceso-fin"><b>{{totalizarColumna('balance_Emp') | number :
                     '1.0-0'}}</b></td>
 
               <!-- Sellado -->
-              <td class="proceso-inicio">{{totalizarColumna('base_Sel') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" class="proceso-inicio">{{totalizarColumna('base_Sel') | number : '1.0-0'}}</td>
               <td><b>{{totalizarColumna('sel') | number : '1.0-0'}} Kg - {{totalizarColumna('selUnd') | number :
                     '1.0-0'}}</b></td>
-              <td id="desp_sel">{{totalizarColumna('desp_sel') | number : '1.0-0'}}</td>
-              <td id="sum_sel">{{totalizarColumna('sum_sel') | number : '1.0-0'}}</td>
-              <td id="balance_Sel" class="proceso-fin"><b>{{totalizarColumna('balance_Sel') | number :
+              <td *ngIf="formularioOT.value.vistaGerencial" id="desp_sel">{{totalizarColumna('desp_sel') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="sum_sel">{{totalizarColumna('sum_sel') | number : '1.0-0'}}</td>
+              <td *ngIf="formularioOT.value.vistaGerencial" id="balance_Sel" class="proceso-fin"><b>{{totalizarColumna('balance_Sel') | number :
                     '1.0-0'}}</b></td>
 
               <td *ngFor="let col of columns">

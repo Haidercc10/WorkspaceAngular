@@ -95,6 +95,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       cliente : [null],
       Id_Vendedor : [null],
       producto : [null],
+      vistaGerencial : [true],
     });
   }
 
@@ -104,8 +105,54 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.obtenerVendedores();
     this.ObternerFallas();
     this.obtenerEstados();
+    this.loadRankDates();
+    this.construirColumnas(this.formularioOT.value.vistaGerencial);
+    this.formularioOT.get('vistaGerencial')?.valueChanges.subscribe(valor => this.construirColumnas(valor));
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    
     //setTimeout(() => this.validarVendedor(), 500);
+  }
+
+  // Funcion que arma las columnas seleccionables: las adicionales y, cuando no está la vista detallada, las que la tabla oculta
+  construirColumnas(vistaDetallada : boolean){
+    const procesos = [['Extrusión', 'Ext'], ['Impresión', 'Imp'], ['Laminado', 'Lam'], ['Perforado', 'Perf'], ['Doblado', 'Dbl'], ['Empaque', 'Emp'], ['Sellado', 'Sel']];
+    const adicionales : any[] = [
+      { header: 'Presentación', field: 'und'},
+      { header: 'Vendedor', field: 'usu' },
+      { header: 'Pedido', field: 'Ped'},
+      { header: 'Cant Ingresada a Despacho', field: 'entrada'},
+      { header: 'Cant Facturada', field: 'salida'},
+      { header: 'Fallas', field: 'falla'},
+    ];
+    let ocultas : any[] = [];
+
+    if (!vistaDetallada) {
+      ocultas = [
+        { header: 'MP', field: 'mp', tipo: 'numero' },
+        { header: 'BOPP', field: 'bopp', tipo: 'numero' },
+        { header: 'Proceso inicial', field: 'cantidad_Inicial', tipo: 'numero' },
+        { header: 'Proceso final', field: 'cantidad_Final', tipo: 'numero' },
+        { header: 'Desperdicio total', field: 'desp', tipo: 'numero' },
+        { header: 'PF + Desp.', field: 'reportado_Final', tipo: 'numero' },
+        { header: 'Balance general', field: 'balance_General', tipo: 'numero' },
+        { header: 'Asignación', field: 'fecha_AsignacionMP', tipo: 'fecha' },
+        { header: '1er Pesaje', field: 'fechaInicio', tipo: 'fecha' },
+        { header: 'Ult. Pesaje', field: 'fechaFinal', tipo: 'fecha' },
+        { header: 'Días', field: 'diff_Dias', tipo: 'numero' },
+      ];
+      procesos.forEach(([nombre, sufijo]) => {
+        if (sufijo != 'Ext') ocultas.push({ header: `Proceso anterior ${nombre}`, field: `base_${sufijo}`, tipo: 'numero' });
+        ocultas.push(
+          { header: `Desperdicio ${nombre}`, field: `desp_${sufijo.toLowerCase()}`, tipo: 'numero' },
+          { header: `Reportado ${nombre}`, field: `sum_${sufijo.toLowerCase()}`, tipo: 'numero' },
+          { header: `Balance ${nombre}`, field: `balance_${sufijo}`, tipo: 'numero' },
+        );
+      });
+    }
+
+    const camposSeleccionados = this._columnasSeleccionada.map(col => col.field);
+    this.columnas = [...adicionales, ...ocultas];
+    this._columnasSeleccionada = this.columnas.filter(col => camposSeleccionados.includes(col.field));
   }
 
   tutorial(){
@@ -126,10 +173,17 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
+  // Funcion que obtendrá la informacion de los clientes
+  loadRankDates() {
+      let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
+      this.formularioOT.patchValue({ 'fechaInicio': initialDate, 'fechaFinal': new Date(), vistaGerencial: this.storage_Id == 3148 ? false : true });
+    }
+
   // Funcion que limpiará todos los campos de la vista
   limpiarCampos(){
     this.ArrayDocumento = [];
     this.formularioOT.reset();
+    this.loadRankDates(); 
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -194,7 +248,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       );
     });
 
-    this.columnas.forEach(column => columns.push({ ...column, group: 'Campos adicionales', value: (item: any) => item[column.field] }));
+    this.columnas.filter(column => !columns.some(fija => fija.field == column.field)).forEach(column => columns.push({ ...column, group: 'Campos adicionales', value: (item: any) => item[column.field] }));
 
     const getProcessColor = (item: any, field: string): string => {
       const quantity = number(item[field]);
@@ -360,13 +414,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.otSeleccionada = 0;
     this.ArrayDocumento = [];
     this.ordenesSeleccionadas = [];
-    //let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    //let fecha1 = moment(this.formularioOT.value.fechaInicio);
-    //let fecha2 = moment(this.formularioOT.value.fechaFinal);
-    //let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
-    //let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
-    //let usarFechaCreacion : boolean = fechainicial == fechaMesAnterior;
-    //console.log(fechainicial, fechaFinal, usarFechaCreacion);
+    let fecha1 = moment(this.formularioOT.value.fechaInicio);
+    let fecha2 = moment(this.formularioOT.value.fechaFinal);
+    let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
+    let vistaGerencial : boolean = this.formularioOT.value.vistaGerencial; 
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -376,7 +428,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTCerrada = 0;
     let ruta : string = this.validarParametrosConsulta();
 
-    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(ruta).subscribe(data => {
+    this.estadosProcesos_OTService.getInfo_OrdenesTrabajoConBalance(fechainicial, fechaFinal, vistaGerencial, ruta).subscribe(data => {
       data.forEach(infoOt => this.llenarArray(infoOt));
     }, error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
@@ -386,10 +438,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Funcion encargada de validar los parametros de consulta y construir la ruta para la solicitud HTTP
   validarParametrosConsulta(){
-    let fecha1 = moment(this.formularioOT.value.fechaInicio);
-    let fecha2 = moment(this.formularioOT.value.fechaFinal);
-    let fechainicial : any = moment(fecha1).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha1).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(fecha2).format('YYYY-MM-DD') == 'Fecha inválida' ? null : moment(fecha2).format('YYYY-MM-DD');
     let ot : number = this.formularioOT.value.idDocumento;
     let fallas : any = this.formularioOT.value.fallasOT;
     let estado : number = this.formularioOT.value.estado;
@@ -400,8 +448,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     console.log(ot, fallas, estado, vendedor, cliente, producto);
 
-    if (fechainicial != null) ruta.length > 0 ? ruta += `&fechaInicial=${fechainicial}` : ruta += `fechaInicial=${fechainicial}`;
-    if (fechaFinal != null) ruta.length > 0 ? ruta += `&fechaFinal=${fechaFinal}` : ruta += `fechaFinal=${fechaFinal}`;
+    //if (fechainicial != null) ruta.length > 0 ? ruta += `&fechaInicial=${fechainicial}` : ruta += `fechaInicial=${fechainicial}`;
+    //if (fechaFinal != null) ruta.length > 0 ? ruta += `&fechaFinal=${fechaFinal}` : ruta += `fechaFinal=${fechaFinal}`;
     if (ot != null) ruta.length > 0 ? ruta += `&ot=${ot}` : ruta += `ot=${ot}`;
     if (cliente != null) ruta.length > 0 ? ruta += `&cli=${cliente}` : ruta += `cli=${cliente}`;
     if (producto != null) ruta.length > 0 ? ruta += `&prod=${producto}` : ruta += `prod=${producto}`;
@@ -424,15 +472,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     console.log(data, data.perf);
     
     data.perf == null ? data.perf = 0 : data.perf = data.perf;
-
-    this.columnas = [
-      { header: 'Presentación', field: 'und'},
-      { header: 'Vendedor', field: 'usu' },
-      { header: 'Pedido', field: 'Ped'},
-      { header: 'Cant Ingresada a Despacho', field: 'entrada'},
-      { header: 'Cant Facturada', field: 'salida'},
-      { header: 'Fallas', field: 'falla'},
-    ];
 
     this.ArrayDocumento.push(data);
     this.ArrayDocumento.sort((a,b) => Number(b.ot) - Number(a.ot));

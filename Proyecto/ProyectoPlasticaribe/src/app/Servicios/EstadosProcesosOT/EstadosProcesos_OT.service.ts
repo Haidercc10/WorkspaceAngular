@@ -18,8 +18,8 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(`${this.rutaPlasticaribeAPI}/Estados_ProcesosOT/getInfo_OrdenesTrabajo2/${fechaIni}/${fechaFin}${ruta}`);
   }
 
-  getInfo_OrdenesTrabajoConBalance(ruta : string) : Observable<any> {
-    return this.http.get<any>(`${this.rutaPlasticaribeAPI}/Estados_ProcesosOT/getInfo_OrdenesTrabajoConBalance/${ruta}`);
+  getInfo_OrdenesTrabajoConBalance(fecha1 : any, fecha2 : any, vistaGerencial : boolean, ruta : string) : Observable<any> {
+    return this.http.get<any>(`${this.rutaPlasticaribeAPI}/Estados_ProcesosOT/getInfo_OrdenesTrabajoConBalance/${fecha1}/${fecha2}/${vistaGerencial}${ruta}`);
   }
 
   GetProductosOrdenesUltimoMes = (fecha1 : any, fecha2 : any, sales? : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getProductosOrdenesUltimoMes/${fecha1}/${fecha2}${sales}`);
