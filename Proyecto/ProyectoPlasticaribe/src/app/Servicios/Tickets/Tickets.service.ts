@@ -21,6 +21,8 @@ export class TicketsService {
 
   Get_Tickets_AbiertosEnRevision = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tickets/get_Tickets_AbiertosEnRevision`);
 
+  GetTicketsAbiertosEnRevisionAsync = (mostrarCompletados : boolean = false) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tickets/getTicketsAbiertosEnRevisionAsync?MostrarCompletados=${mostrarCompletados}`);
+
   Get_CantidadTickets = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tickets/get_CantidadTickets`);
 
   Get_ImagenesTicket = (archivo : any, path : any ) : any => this.http.request(new HttpRequest('GET', `${this.rutaPlasticaribeAPI}/Tickets/get_ImagenesTicket?file=${archivo}&filePath=${path}`, null, {responseType: 'text' } ));

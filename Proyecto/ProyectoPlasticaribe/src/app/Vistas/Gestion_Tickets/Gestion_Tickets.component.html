@@ -85,7 +85,7 @@
       #dt
       [resizableColumns]="true"
       columnResizeMode="expand"
-      styleClass="p-datatable-gridlines p-datatable-sm"
+      styleClass="p-datatable-gridlines p-datatable-sm tabla-tickets"
       responsiveLayout="scroll"
       [rowHover]="true"
       [paginator]="true"
@@ -113,7 +113,7 @@
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
           </th>
           <!-- Descripción -->
-          <th>
+          <th class="descripcion-encabezado">
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'descripcion', 'contains')">
           </th>
         </tr>
@@ -122,7 +122,7 @@
           <th pSortableColumn="codigo"><p-sortIcon field="codigo"></p-sortIcon> Código</th>
           <th pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha Creación</th>
           <th pSortableColumn="estado"><p-sortIcon field="estado"></p-sortIcon> Estado</th>
-          <th>Descripción</th>
+          <th class="descripcion-encabezado">Descripción</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
@@ -130,20 +130,27 @@
           <tr (click)="ticketSelccionado(item)">
             <td>{{rowIndex + 1}}</td>
             <td>{{item.codigo}}</td>
-            <td>{{item.fecha}}</td>
+            <td>{{item.fecha.replace('T00:00:00', '')}} {{item.hora}}</td>
             <td>{{item.estado}}</td>
-            <td>{{item.descripcion}}</td>
+            <td class="descripcion-celda"><span class="descripcion-ticket" [title]="item.descripcion">{{item.descripcion}}</span></td>
           </tr>
         </ng-container>
         <ng-template #elseTemplate>
           <tr style="background-color: oldlace; color: #071426" (click)="ticketSelccionado(item)">
             <td>{{rowIndex + 1}}</td>
             <td>{{item.codigo}}</td>
-            <td>{{item.fecha}}</td>
+            <td>{{item.fecha.replace('T00:00:00', '')}} {{item.hora}}</td>
             <td>{{item.estado}}</td>
-            <td>{{item.descripcion}}</td>
+            <td class="descripcion-celda"><span class="descripcion-ticket" [title]="item.descripcion">{{item.descripcion}}</span></td>
           </tr>
         </ng-template>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center">
+            <h6>No se encontraron tickets</h6>
+          </td>
+        </tr>
       </ng-template>
     </p-table>
   </div>
@@ -152,7 +159,7 @@
 <!-- DIALOG INFORMACION DE TICKETS -->
 <p-dialog header="Detalles de ticket N°: {{ticketSeleccionado.Codigo}}" [(visible)]="detalleVisible" [modal]="true" [style]="{ width: '80%' }" [draggable]="true" [resizable]="false">
   <div class="row p-2">
-    <div class="col-md-6"><strong>Fecha:</strong> {{ticketSeleccionado.Fecha}}</div>
+    <div class="col-md-6"><strong>Fecha:</strong> {{ticketSeleccionado.Fecha.replace('T00:00:00','')}} {{ticketSeleccionado.Hora}}</div>
     <div class="col-md-6"><strong>Estado:</strong> {{ticketSeleccionado.Estado}}</div>
   </div>
   <div class="mb-4">

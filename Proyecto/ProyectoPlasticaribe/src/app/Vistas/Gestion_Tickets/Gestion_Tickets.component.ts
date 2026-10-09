@@ -103,18 +103,8 @@ export class Gestion_TicketsComponent implements OnInit {
 
   // Funcion que va a consultar la información de los tickets que estén abiertos y/o en revision
   consultarTickets(){
-    this.ticketService.Get_Tickets_AbiertosEnRevision().subscribe(datos => {
-      const tickets : any [] = [];
-      for (let i = 0; i < datos.length; i++) {
-        const {codigo, fecha, estado, descripcion} = datos[i];
-        const descripcionTotal = descripcion;
-        const descripcionCorta = descripcion.length > 50 ? `${descripcion.substring(0,50)}...` : descripcion;
-        const info : any = {codigo, fecha, estado, descripcion: descripcionCorta, descripcionTotal};
-        tickets.push(info);
-      }
-      tickets.sort((a,b) => Number(a.codigo) - Number(b.codigo));
-      tickets.sort((a,b) => b.estado.localeCompare(a.estado));
-      this.ticketsDisponibles = tickets;
+    this.ticketService.GetTicketsAbiertosEnRevisionAsync(false).subscribe(datos => {
+      this.ticketsDisponibles = datos;
       this.filtrarTicketsPorFecha();
     });
     setTimeout(() => { this.cargando = false; }, 1000);
@@ -152,7 +142,7 @@ export class Gestion_TicketsComponent implements OnInit {
   // Funcion que va a mostrar la informacion del ticket seleccionado en el dialogo
   ticketSelccionado(data : any){
     this.imagenesTicket = [];
-    this.ticketSeleccionado = { Codigo : data.codigo, Fecha : data.fecha, Estado : data.estado, Descripcion : data.descripcionTotal, }
+    this.ticketSeleccionado = { Codigo : data.codigo, Fecha : data.fecha, Hora : data.hora, Estado : data.estado, Descripcion : data.descripcion, }
     this.detalleVisible = true;
     this.ticketService.Get_Id(this.ticketSeleccionado.Codigo).subscribe(datos => {
       this.ticketSeleccionado.EstadoId = Number(datos.estado_Id);

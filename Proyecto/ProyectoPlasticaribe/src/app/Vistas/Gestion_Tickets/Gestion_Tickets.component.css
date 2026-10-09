@@ -70,6 +70,24 @@ p-chip ::ng-deep .p-chip-text {
   text-align: center;
 }
 
+::ng-deep .tabla-tickets .p-datatable-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+::ng-deep .tabla-tickets .descripcion-encabezado,
+::ng-deep .tabla-tickets .descripcion-celda {
+  width: 35%;
+}
+
+.descripcion-ticket {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 #rojo ::ng-deep .p-chip {
   background-color: palevioletred;
   color : white;
