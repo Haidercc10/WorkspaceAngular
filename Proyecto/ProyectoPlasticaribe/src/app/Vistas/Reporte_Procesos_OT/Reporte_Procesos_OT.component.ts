@@ -352,10 +352,15 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   // Funcion que obtendrá los clientes
-  obtenerClientes = () => this.clientesService.srvObtenerLista().subscribe(datos_clientes => this.clientes = datos_clientes);
+  obtenerClientes = () => this.clientesService.srvObtenerResumenReporteOT().subscribe(datos_clientes => this.clientes = datos_clientes);
 
   // Funcion que nu cliente y guardará su id y mostrará en el campo el nombre
-  selectEventCliente = () => this.formularioOT.patchValue({ cliente : this.clientes.filter((item) => item.cli_Id == this.formularioOT.value.cliente)[0].cli_Nombre, });
+  selectEventCliente = () => {
+    const clienteSeleccionado = this.clientes.find(item => item.cli_Id == this.formularioOT.value.cliente);
+    if (clienteSeleccionado) {
+      this.formularioOT.patchValue({ cliente: clienteSeleccionado.cli_Nombre });
+    }
+  };
 
   // Funcion que obtendrá los vendedores
   obtenerVendedores(){

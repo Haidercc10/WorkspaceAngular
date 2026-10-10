@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { modelCliente } from '../../Modelo/modelCliente';
+import { modelClienteReporteOT } from '../../Modelo/modelClienteReporteOT';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,8 @@ export class ClientesService {
   constructor(private http : HttpClient,) { }
 
   srvObtenerLista = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Clientes');
+
+  srvObtenerResumenReporteOT = (): Observable<modelClienteReporteOT[]> => this.http.get<modelClienteReporteOT[]>(this.rutaPlasticaribeAPI + '/Clientes/resumenReporteOT');
 
   srvObtenerListaPorId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/${id}`);
 

@@ -1,0 +1,36 @@
+# Mapa de integraciones Angular → APIs
+
+> Alcance de verificación: las entradas de abajo son llamadas identificadas en código Angular y cotejadas con atributos de ruta y acciones de controladores. **La tabla es una muestra verificada, no el mapa completo de servicios ni de endpoints del sistema.** La verificación es estática; no se ejecutaron llamadas HTTP.
+
+## Bases URL
+
+En [environment.ts](../Proyecto/ProyectoPlasticaribe/src/environments/environment.ts), Angular declara estas propiedades bajo el sufijo base `/api`:
+
+| Propiedad usada por Angular | API que se cotejó | Desarrollo |
+|---|---|---|
+| `rutaPlasticaribeAPI` | PlasticaribeWebAPI | Host de `window.location.hostname`, puerto `9090` |
+| `rutaZeus` | ZeusInventarioAPI | Host de `window.location.hostname`, puerto `9091` |
+| `rutaZeusContabilidad` | ZeusContabilidadAPI | Host de `window.location.hostname`, puerto `9092` |
+| `rutaBagPro` | BagPro_WebApi | Host de `window.location.hostname`, puerto `9093` |
+
+El mismo archivo contiene referencias comentadas a entornos alternativos. [environment.prod.ts](../Proyecto/ProyectoPlasticaribe/src/environments/environment.prod.ts) configura otros puertos para las APIs en un host de red fijo; se omite aquí el host literal para no propagar direcciones internas. El reemplazo de archivo de producción está declarado en [angular.json](../Proyecto/ProyectoPlasticaribe/angular.json).
+
+## Llamadas cotejadas
+
+Las rutas abajo son relativas a la base terminada en `/api`. `[controller]` se sustituye por el nombre del controlador sin el sufijo `Controller`.
+
+| Integración | Servicio Angular y método | HTTP y endpoint | Controller y acción de destino | DTO o modelo relacionado | Evidencia y estado |
+|---|---|---|---|---|---|
+| Plasticaribe: lista de clientes | [ClientesService](../Proyecto/ProyectoPlasticaribe/src/app/Servicios/Clientes/clientes.service.ts), `srvObtenerLista` | `GET /Clientes` | [ClientesController](../../PlasticaribeWebAPI/PlasticaribeAPI/Controllers/ClientesController.cs), `GetClientes()` (`[HttpGet]`, responde `IEnumerable<Clientes>`) | Entidad `PlasticaribeAPI.Models.Clientes`, usada como tipo de respuesta en la acción. No hay DTO Angular explícito en este método (`any[]`). | La base `rutaPlasticaribeAPI` y `/Clientes` aparecen en el servicio; el controlador declara `api/[controller]` y `[HttpGet]`. **Verificado estáticamente.** |
+| Plasticaribe: clientes del Reporte de Procesos OT | [ClientesService](../Proyecto/ProyectoPlasticaribe/src/app/Servicios/Clientes/clientes.service.ts), `srvObtenerResumenReporteOT`; consumidor: [Reporte_Procesos_OTComponent](../Proyecto/ProyectoPlasticaribe/src/app/Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component.ts), `obtenerClientes()` | `GET /Clientes/resumenReporteOT` | [ClientesController](../../PlasticaribeWebAPI/PlasticaribeAPI/Controllers/ClientesController.cs), `GetClientesResumenReporteOT()` (`[HttpGet("resumenReporteOT")]`) | API `ClienteReporteOTDto`; Angular [modelClienteReporteOT](../Proyecto/ProyectoPlasticaribe/src/app/Modelo/modelClienteReporteOT.ts). Campos: `Cli_Id`, `Cli_Nombre`, `usua_Id`. | La acción proyecta esos tres campos con `AsNoTracking()`; el componente consume el nuevo método. El endpoint está cubierto por prueba aislada del controlador. **Verificado estáticamente y mediante prueba automatizada; no se llamó al servidor.** |
+| Plasticaribe: alta de cliente | [ClientesService](../Proyecto/ProyectoPlasticaribe/src/app/Servicios/Clientes/clientes.service.ts), `srvGuardar` | `POST /Clientes` | [ClientesController](../../PlasticaribeWebAPI/PlasticaribeAPI/Controllers/ClientesController.cs), `PostClientes(Clientes clientes)` (`[HttpPost]`) | El servicio recibe `modelCliente`, definido en [modelCliente.ts](../Proyecto/ProyectoPlasticaribe/src/app/Modelo/modelCliente.ts); la API enlaza el cuerpo a la entidad `Clientes`. La correspondencia de campos/contrato no se verificó campo por campo. | El método Angular llama `http.post` con `data`; la acción del controller recibe `Clientes`. **Verificado estáticamente; contrato detallado pendiente.** |
+| BagPro: producción de sellado por OT | [BagproService](../Proyecto/ProyectoPlasticaribe/src/app/Servicios/BagPro/Bagpro.service.ts), `srvObtenerListaProcSelladoOT` | `GET /ProcSellado/OT/{ot}` | [ProcSelladoController](../../BagPro_WebApi/Controllers/ProcSelladoController.cs), `GetOT(string ot)` (`[HttpGet("OT/{ot}")]`) | Consulta la entidad `ProcSellado` y agrupa resultados; la acción proyecta campos agregados, no se identificó un DTO dedicado. | Coinciden el sufijo del servicio y el atributo de ruta. La entidad está expuesta por `plasticaribeContext.ProcSellados`. **Verificado estáticamente.** |
+| Zeus Inventario: búsqueda de artículos por nombre | [InventarioZeusService](../Proyecto/ProyectoPlasticaribe/src/app/Servicios/InventarioZeus/inventario-zeus.service.ts), `GetItemsByName` | `GET /Articulos/getItemsByName/{name}` | [ArticulosController](../../ZeusInventarioAPI/ZeusInventarioWebAPI/Controllers/ArticulosController.cs), `GetItemsByName(string name)` (`[HttpGet("getItemsByName/{name}")]`) | Consulta `Articulo` y devuelve una proyección anónima con `Codigo` y `Nombre`; no se identificó un DTO explícito. | `rutaZeus` se usa para formar la llamada; ruta y acción coinciden. **Verificado estáticamente.** |
+| Zeus Inventario: existencias de artículos | [InventarioZeusService](../Proyecto/ProyectoPlasticaribe/src/app/Servicios/InventarioZeus/inventario-zeus.service.ts), `srvObtenerExistenciasArticulosZeus` | `GET /existencias/BusquedaCodigoArticulo` | [ExistenciasController](../../ZeusInventarioAPI/ZeusInventarioWebAPI/Controllers/ExistenciasController.cs), acción GET marcada `[HttpGet("BusquedaCodigoArticulo")]` | Consulta `Existencia` y su navegación `ArticuloNavigation`; devuelve una proyección de campos de artículo y existencias, no se identificó un DTO explícito. | Coinciden la URL del servicio y el atributo de ruta del controlador. **Verificado estáticamente.** |
+| Zeus Contabilidad: cartera de cliente | [ZeusContabilidadService](../Proyecto/ProyectoPlasticaribe/src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service.ts), `GetCarteraClientes(id)` | `GET /FacturasBU/getCarteraClientes/{cliente}` | [FacturasBUController](../../ZeusContabilidadAPI/Controllers/FacturasBUController.cs), `GetCarteraClientes(string cliente)` (`[HttpGet("getCarteraClientes/{cliente}")]`) | La consulta usa `Cliente`, `FacturasBu` y `Maevende`, y proyecta un objeto anónimo; no se identificó un DTO explícito. | `rutaZeusContabilidad` forma la URL y la ruta/action del controller coinciden. **Verificado estáticamente.** |
+
+## Lectura del estado
+
+- **Verificado estáticamente** significa que la llamada, la propiedad de base usada y la ruta/acción del controlador están visibles y son compatibles en el código fuente. No implica que se haya comprobado la respuesta con el servidor real.
+- Para el alta de cliente se comprobaron los tipos nominales utilizados en cada lado, pero no que todos los campos, validaciones, serialización y reglas de negocio formen un contrato completo.
+- La muestra no es exhaustiva: no se recorrieron ni cotejaron todos los servicios Angular. Antes de modificar cualquier otro flujo, debe añadirse y verificar su ruta, parámetros, cuerpo, respuesta y consumidor.
