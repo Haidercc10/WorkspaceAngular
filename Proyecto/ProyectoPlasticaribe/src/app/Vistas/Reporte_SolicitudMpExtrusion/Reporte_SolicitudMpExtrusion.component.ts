@@ -16,6 +16,7 @@ import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extr
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } from 'src/app/data';
 import { finalize, Subject, takeUntil } from 'rxjs';
+import { SolicitudMP_ExtrusionComponent } from '../SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
 
 
 @Component({
@@ -51,6 +52,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   arrayId : any = []; /// Array que se usará para almacenar los id de las solicitudes que se muestran en la tabla, esto con el fin de no mostrar solicitudes repetidas en caso de que una solicitud tenga varias materias primas.
   load : boolean = false; /** Variable que indicará si se está cargando información */
   private destroy$ = new Subject<void>(); // Variable para manejar la destrucción de las subscripciones y evitar fugas de memoria
+  @ViewChild(SolicitudMP_ExtrusionComponent) cmpSolicitudes : SolicitudMP_ExtrusionComponent;
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -60,7 +62,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
                           private servicioSolicitudesMPExt : SolicitudMP_ExtrusionService,
                             private servicioDtSolicitudesMPExt : DetSolicitudMP_ExtrusionService,
                               private msj : MensajesAplicacionService,
-                                private ServicioDetAsignacionesMp : DetallesAsignacionService) {
+                                private ServicioDetAsignacionesMp : DetallesAsignacionService, 
+                                ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       documento : [null],
@@ -191,245 +194,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   /** Cargar información de la solicitud */
   infoSolicitudPDF(nroSolicitud : number){
-    this.informacionPDF = [];
-    nroSolicitud = this.solicitudSeleccionada
-    this.servicioDtSolicitudesMPExt.GetSolicitudMp_Extrusion(nroSolicitud).subscribe(data => {
-      if(data.length > 0) {
-        for (let index = 0; index < data.length; index++) {
-          this.llenarTablaPDF(data[index]);
-        }
-        setTimeout(() => { this.generarPDF(data); }, 500);
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la solicitud de material N° ${nroSolicitud}`);
-    }, error => { this.msj.mensajeError(`Error`, `Error al cargar la información de la solicitud N° ${nroSolicitud}`); });
-  }
-
-  /** Cargar tabla de los detalles de la solicitud */
-  llenarTablaPDF(datos : any) {
-    let info : any = {
-      Id : 0,
-      Nombre : '',
-      Id_Mp : datos.matPrima_Id,
-      Id_Tinta : datos.tinta_Id,
-      Cantidad : datos.cantidad,
-      Stock : 0,
-      Und_Medida : datos.medida,
-      Proceso : 'EXT',
-    }
-
-    if(info.Id_Mp != 84 && info.Id_Tinta == 2001) {
-      info.Id = datos.matPrima_Id;
-      info.Nombre = datos.matPrima;
-      info.Stock = datos.stock_Mp;
-    } else if(info.Id_Mp == 84 && info.Id_Tinta != 2001) {
-      info.Id = datos.tinta_Id;
-      info.Nombre = datos.tinta;
-      info.Stock = datos.stock_Tinta;
-    }
-    this.informacionPDF.push(info);
-  }
-
-  // Funcion que se encargará de poner la informcaion en el PDF y generarlo
-  generarPDF(datos_solicitud : any){
-    let index = this.arrayId.indexOf(this.solicitudSeleccionada);
-    let [id, ot, fecha, estado] = [this.arrayRegistros[index].id, this.arrayRegistros[index].ot, this.arrayRegistros[index].fecha, this.arrayRegistros[index].estado];
-    let nombre : string = this.AppComponent.storage_Nombre;
-    //this.servicioDetlSolMP_Extrusion.getSolicitudMp_Extrusion(this.nroSolicitud).subscribe(datos_solicitud => {
-      for (let i = 0; i < datos_solicitud.length; i++) {
-        const pdfDefinicion : any = {
-          info: { title: `Solicitud de material N° ${datos_solicitud[i].id}` },
-          pageSize: { width: 630, height: 760 },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 235, 25, 35],
-          header: function(currentPage : any, pageCount : any) {
-            return [
-              /** Encabezado del pdf */
-              {
-                margin: [20, 1, 20, 0],
-                columns: [
-                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
-                  {
-                    width: 300,
-                    alignment: 'center',
-                    margin: [85, 20],
-                    table: {
-                      body: [
-                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                        [{text: `Fecha de Análisis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
-                        [{text: `Hora: ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, }],
-                        [{text: `Usuario: ${nombre}`, alignment: 'center', fontSize: 8, }],
-                        [{text: `Solicitud de material N° ${datos_solicitud[i].id}`, bold: true, alignment: 'center', fontSize: 10}],
-                      ]
-                    },
-                    layout: 'noBorders',
-                  },
-                  {
-                    width: '*',
-                    alignment: 'center',
-                    margin: [20, 20, 20, 0],
-                    table: {
-                      body: [
-                        [{text: `Código: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Versión: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Vigencia: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Página: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      ]
-                    },
-                    layout: 'noBorders',
-                  },
-                ]
-              },
-              /** Línea */
-              {
-                margin: [30, 0],
-                table: {
-                  headerRows: 1,
-                  widths: ['*'],
-                  body: [
-                    [
-                      {
-                        border: [false, true, false, false],
-                        text: '',
-                      },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, }
-              },
-              /** Titulo tabla OT */
-              {
-                margin: [20, 0],
-                table: {
-                  headerRows: 1,
-                  widths: ['*'],
-                  body: [
-                    [
-                      { border: [false, false, false, false], text: `Detalles de la solicitud`, bold: true, fontSize: 10, alignment: 'center' },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, }
-              },
-              /** Encabezado y body tabla OT */
-              {
-                margin: [20, 0, 20, 28],
-                style : 'header2',
-                table: {
-                  headerRows: 1,
-                  widths: [140, 135, 135, 140],
-                  body: [
-                    [
-                      { text: 'N° Solicitud', fillColor: '#bbb', fontSize: 9, bold : true },
-                      { text: 'OT', fillColor: '#bbb', fontSize: 9, bold : true },
-                      { text: 'Fecha Creación', fillColor: '#bbb', fontSize: 9, bold : true },
-                      { text: 'Estado Solicitud', fillColor: '#bbb', fontSize: 9, bold : true },
-                    ],
-                    [id, ot, fecha, estado],
-                  ]
-                },
-                layout: { defaultBorder: false, },
-              },
-              /** Titulo de tabla materia prima */
-              {
-                margin: [20, 0],
-                table: {
-                  headerRows: 1,
-                  widths: ['*'],
-                  body: [
-                    [
-                      { border: [false, false, false, false], text: `Materiales de producción solicitados`, bold: true, fontSize: 10, alignment: 'center' },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, }
-              },
-              /**Encabezado tabla materia prima */
-              {
-                margin: [20, 0, 20, 0],
-                table: {
-                  headerRows: 1,
-                  widths: [60, 372, 60, 60],
-                  body: [
-                    [
-                      { text: 'Id', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Materia Prima', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Medida', fillColor: '#bbb', fontSize: 9 },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, },
-              },
-            ]
-          },
-           content : [
-            this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Und_Medida', ]),
-            {
-              style: 'tablaTotales',
-              table: {
-                widths: [365, 60, 60, 60],
-                style: 'header',
-                body: [
-                  [
-                    '',
-                    {
-                      border: [true, false, true, true],
-                      text: `Peso Total`,
-                      alignment: 'right',
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros((this.calcularCantSolicitada()).toFixed(2))}`
-                    },
-                    '',
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 8,
-            },
-            {
-              text: `\n \n Observación sobre la solicitud: \n ${datos_solicitud[i].observacion}\n`,
-              style: 'header',
-            }
-          ],
-          styles: {
-            header: {fontSize: 10, bold: true },
-            titulo: { fontSize: 20, bold: true},
-            header2: { fontSize: 9, bold: false},
-          }
-        }
-        const pdf = pdfMake.createPdf(pdfDefinicion);
-        pdf.open();
-        this.nroSolicitud = 0;
-        setTimeout(() => this.limpiarCampos(), 1500);
-        break;
-      }
-    //}, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la solicitud N° ${this.nroSolicitud}!`); });
-  }
-
-  // funcion que se encargará de llenar la tabla en el pdf
-  buildTableBody(data : any, columns : any) {
-    var body : any = [];
-    data.forEach(function(row) {
-      var dataRow : any = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
-      body.push(dataRow);
-    });
-    return body;
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información
-  table(data: any, columns: any) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [60, 365, 60, 60],
-        body: this.buildTableBody(data, columns),
-      },
-      fontSize: 8,
-    };
+    console.log(nroSolicitud);
+    //this.informacionPDF = [];
+    this.cmpSolicitudes.getInfoPdf(nroSolicitud);
   }
 
   /** Cargar detalles de la solicitud en la segunda tabla. */
@@ -549,9 +316,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
       this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear asignaciones con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalAsignacion = true;
-      this.AsignacionMatPrima.esSolicitud = true;
-      this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({ Solicitud : this.solicitudSeleccionada});
-      this.AsignacionMatPrima.consultarSolicitudMaterial(this.arrayMatPrimas);
+      //this.AsignacionMatPrima.esSolicitud = true;
+      //this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({ Solicitud : this.solicitudSeleccionada});
+      //this.AsignacionMatPrima.consultarSolicitudMaterial(this.arrayMatPrimas);
       //this.cargarSubcategoriasEnAsignaciones();
     }
   }
