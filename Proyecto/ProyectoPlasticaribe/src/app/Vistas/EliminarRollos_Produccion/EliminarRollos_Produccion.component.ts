@@ -329,7 +329,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
       this.load = true;
 
       this.svcProdProcess.putStateDeletedRolls(this.rollsToDelete).subscribe(data => { this.createDiscardRolls(); }, error => {
-         this.svcMsjs.mensajeError(`Error`, `No fue posible eliminar los rollos!`);
+        this.load = false;
+        this.svcMsjs.mensajeError(`Error`, `No fue posible eliminar los rollos! | ${error.status} ${error.statusText}`);
       });
     } else {
       this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos requeridos.`);
