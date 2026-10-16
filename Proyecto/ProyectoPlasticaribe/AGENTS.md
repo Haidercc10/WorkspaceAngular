@@ -99,3 +99,28 @@ Al terminar una tarea, resumir:
 - Reglas de negocio afectadas.
 - Pruebas y validaciones ejecutadas.
 - Riesgos o pendientes.
+ 
+## 7. INTERPRETACIÓN DE REQUERIMIENTOS
+
+Los requerimientos proporcionados por el usuario pueden
+contener propuestas técnicas, reglas funcionales y
+soluciones preliminares.
+
+Antes de generar tareas:
+
+1. Identificar el problema funcional.
+2. Separar las reglas de negocio de las propuestas técnicas.
+3. Analizar las implementaciones existentes.
+4. Evaluar si las soluciones propuestas son adecuadas.
+5. Recomendar alternativas cuando existan opciones
+   más mantenibles, seguras o eficientes.
+6. Identificar decisiones funcionales pendientes.
+
+No interpretar automáticamente las propuestas técnicas
+del usuario como decisiones arquitectónicas definitivas.
+
+Priorizar el comportamiento esperado del sistema
+sobre una implementación específica.
+
+Si existen dudas críticas, solicitar aclaraciones
+antes de generar las tareas definitivas.

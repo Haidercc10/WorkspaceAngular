@@ -292,7 +292,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   }
 
   cargarInformacionOT(ot: string, datos_procesos) {
-    this.detallesAsignacionService.GetPolietilenoAsignada(parseInt(ot)).pipe(takeUntil(this.destroy$)).subscribe(datos_asignacion => {
+    this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).pipe(takeUntil(this.destroy$)).subscribe(datos_asignacion => {
       this.cantRestante = this.kgOT - datos_asignacion;
 
       let info: any = {
@@ -421,8 +421,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   asignacionMateriaPrima() {
     let idOrdenTrabajo: number = this.FormMateriaPrimaRetiro.value.OTRetiro;
 
-    // consultar en la base de datos donde se obtiene estos estados para comentarlos aqui y asi saber a que corresponde el nombre del estado por el numero.
-    if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
+    // Solo las OT en estado 1 o 4 (cerradas) bloquean la asignación
+    if (![1, 4].includes(Number(this.estadoOT))) {
       if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
       else {
         if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)) {
@@ -433,7 +433,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
           else if ([1, 104].includes(this.ValidarRol)) this.confirmarAsignacion(idOrdenTrabajo);
         }
       }
-    } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
+    } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
   }
 
   //4. Crear Asignacion
