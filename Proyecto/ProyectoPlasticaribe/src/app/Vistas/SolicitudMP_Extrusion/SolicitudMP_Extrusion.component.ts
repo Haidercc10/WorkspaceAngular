@@ -240,33 +240,40 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   infoOT() {
     this.load = false;
     let ot: string = this.formEncabezado.value.ot;
-    this.bagProServices.srvObtenerListaClienteOT_Item(ot).pipe(takeUntil(this.destroy$)).subscribe(data => {
-      if (data.length > 0) {
-        let adicional: number = (data[0].datosotKg * 0.05);
-        this.kgOT = data[0].datosotKg + adicional;
-        this.estadoOT = data[0].estado;
-        this.formEncabezado.patchValue({ kgOt: parseFloat(data[0].datosotKg + adicional), });
-        this.detallesAsignacionService.getMateriasPrimaSolicitada(parseInt(ot))
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(asig => {
-            this.cantRestante = (this.kgOT - asig.cantidad_Asignada);
-            let cantPorSolicitar: number = this.cantRestante - asig.cantidad_Solicitada;
-            this.loadInfoOT(parseInt(ot), data, asig);
-            this.esSolicitud ? this.cargarMaquinas() : null;
-            if (cantPorSolicitar > 0) this.mensajeService.mensajeConfirmacion(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
-            else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no tiene kg restantes por solicitar.`);
-            this.load = true;
-          }, err => {
-            this.load = true;
-          });
-      } else if (data.length == 0) {
+    this.bagProServices.srvObtenerListaClienteOT_Item(ot)
+      .pipe(takeUntil(this.destroy$), finalize(() => { this.load = true; }))
+      .subscribe(data => {
+        if (data.length > 0) {
+          let adicional: number = (data[0].datosotKg * 0.05);
+          this.kgOT = data[0].datosotKg + adicional;
+          this.estadoOT = data[0].estado;
+          this.formEncabezado.patchValue({ 'kgOt': parseFloat(data[0].datosotKg + adicional), });
+          this.getInfoMaterialSolicitada(parseInt(ot), data);
+        } else if (data.length == 0) {
+          this.load = true;
+          this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`);
+        }
+      }, error => {
         this.load = true;
-        this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`);
-      }
-    }, error => {
-      this.load = true;
-      this.mensajeService.mensajeError(`Error`, `Error al consultar la OT ${ot}! ` + error);
-    });
+        this.mensajeService.mensajeError(`Error`, `Error al consultar la OT ${ot}! ` + error);
+      });
+  }
+
+  // Funcion que va a obtener la informacion de la materia prima solicitada
+  getInfoMaterialSolicitada(ot: number, data: any) {
+    this.detallesAsignacionService.getMateriasPrimaSolicitada(ot)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(asig => {
+        this.cantRestante = (this.kgOT - asig.cantidad_Asignada);
+        let cantPorSolicitar: number = this.cantRestante - asig.cantidad_Solicitada;
+        this.loadInfoOT(ot, data, asig);
+        this.esSolicitud ? this.cargarMaquinas() : null;
+        if (cantPorSolicitar > 0) this.mensajeService.mensajeConfirmacion(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
+        else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no tiene kg restantes por solicitar.`);
+        this.load = true;
+      }, err => {
+        this.load = true;
+      });
   }
 
   // Funcion que va a consultar la informacion de la orden de trabajo
@@ -504,7 +511,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   getInfoPdf(solicitud: number) {
     this.load = true;
     this.informacionPDF = [];
-    this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(solicitud).pipe(takeUntil(this.destroy$)).subscribe(datosSolicitud => {
+    this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(solicitud)
+    .pipe(takeUntil(this.destroy$), finalize(() => this.load = false))
+    .subscribe(datosSolicitud => {
       if (datosSolicitud.length === 0) {
         this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontraron subcategorías para la solicitud N° ${solicitud}.`);
         return;
@@ -532,19 +541,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     const pdfDefinicion: any = {
       info: { title: `Solicitud de material N° ${solicitud.id}` },
       pageSize: { width: 630, height: 760 },
-      pageMargins: [25, 125, 25, 35],
+      pageMargins: [25, 90, 25, 35],
       watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true },
       header: (currentPage: number, pageCount: number) => this.buildPdfHeader(solicitud.id, currentPage, pageCount),
       content: [
-        { text: 'Información de la OT', style: 'sectionTitle' },
         this.buildOrderSummary(),
-        { text: 'Subcategorías solicitadas', style: 'sectionTitle' },
         this.buildSubcategoriesTable(),
         this.buildPdfTotal(),
         { text: `\nObservación sobre la solicitud:\n${solicitud.observacion || ''}`, style: 'observation' },
       ],
       styles: {
-        sectionTitle: { fontSize: 10, bold: true, alignment: 'center', margin: [0, 12, 0, 6] },
         observation: { fontSize: 9, bold: true },
       }
     };
@@ -557,21 +563,33 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   // Construye el encabezado del PDF
   buildPdfHeader(solicitudId: number, currentPage: number, pageCount: number) {
     return {
-      margin: [25, 15, 25, 0],
-      columns: [
-        { image: logoParaPdf, width: 150, height: 30, margin: [0, 10, 0, 0] },
+      stack: [
         {
-          width: '*', alignment: 'center', fontSize: 8,
-          stack: [
-            { text: 'NIT. 800188732', bold: true, fontSize: 10 },
-            { text: `` },
-            /*{ text: `Hora: ${moment().format('H:mm:ss')}` },
-            { text: `Usuario: ${this.storage_Nombre}` },*/
-            { text: `Solicitud de material N° ${solicitudId}`, bold: true, fontSize: 10 },
+          margin: [25, 15, 25, 0],
+          columns: [
+            { image: logoParaPdf, width: 150, height: 30, margin: [0, 10, 0, 0] },
+            {
+              width: '*', alignment: 'center', fontSize: 8,
+              stack: [
+                { text: 'NIT. 800188732', bold: true, fontSize: 10 },
+                { text: `` },
+                /*{ text: `Hora: ${moment().format('H:mm:ss')}` },
+                { text: `Usuario: ${this.storage_Nombre}` },*/
+                { text: `Solicitud de material N° ${solicitudId}`, bold: true, fontSize: 10 },
+              ]
+            },
+            { width: 65, fontSize: 8, text: `Página: ${currentPage} de ${pageCount}`, margin: [0, 10, 0, 0] },
           ]
         },
-        { width: 65, fontSize: 8, text: `Página: ${currentPage} de ${pageCount}`, margin: [0, 10, 0, 0] },
-      ]
+        {
+          margin: [25, 8, 25, 0],
+          table: {
+            widths: ['*'],
+            body: [[{ border: [false, true, false, false], text: '' }]],
+          },
+          layout: { defaultBorder: false },
+        },
+      ],
     };
   }
 
@@ -579,40 +597,64 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   buildOrderSummary() {
     const order = this.infoOrdenTrabajo[0] || {};
     return {
+      margin: [0, 0, 0, 10],
       table: {
-        headerRows: 1,
-        widths: [60, 215, 215, 60],
+        headerRows: 2,
+        keepWithHeaderRows: 1,
+        dontBreakRows: true,
+        widths: [45, 140, '*', 75, 80],
         body: [
-          ['OT', 'Cliente', 'Referencia', 'Cantidad'].map(text => ({ text, fillColor: '#bbb', fontSize: 9, bold: true })),
-          [order.ot || '', order.cliente || '', order.ref || '', this.formatonumeros(order.kg || 0)],
+          [{ text: 'Información de la OT', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, '', '', '', ''],
+          ['OT', 'Cliente', 'Ref.', 'Kg OT', 'Kg Sol.'],
+          [
+            order.ot || '',
+            order.cliente || '',
+            order.ref || '',
+            this.formatonumeros(order.kg || 0),
+            this.formatonumeros(this.calcularTotalSolicitadoPdf().toFixed(2)),
+          ],
         ]
       },
       fontSize: 8,
+      layout: {
+        fillColor: (rowIndex: number) => rowIndex === 0 || rowIndex === 1 ? '#DDDDDD' : null,
+      },
     };
   }
 
   // Construye la tabla de subcategorías solicitadas
   buildSubcategoriesTable() {
     return {
+      margin: [0, 0, 0, 6],
       table: {
-        headerRows: 1,
-        widths: [60, 365, 60, 60],
+        headerRows: 2,
+        keepWithHeaderRows: 1,
+        dontBreakRows: true,
+        widths: [40, '*', 75, 70],
         body: [
-          ['Id', 'Subcategoría', 'Cantidad', 'Medida'].map(text => ({ text, fillColor: '#bbb', fontSize: 9, bold: true })),
+          [{ text: 'Subcategorías solicitadas', colSpan: 4, alignment: 'center', fontSize: 10, bold: true }, '', '', ''],
+          ['Id', 'Subcategoría', 'Cantidad', 'Medida'],
           ...this.informacionPDF.map(item => [item.Id, item.Nombre, this.formatonumeros(item.Cantidad), item.Medida]),
         ]
       },
       fontSize: 8,
+      layout: {
+        fillColor: (rowIndex: number) => rowIndex === 0 || rowIndex === 1 ? '#DDDDDD' : null,
+      },
     };
+  }
+
+  calcularTotalSolicitadoPdf(): number {
+    return this.informacionPDF.reduce((total: number, item: any) => total + item.Cantidad, 0);
   }
 
   // Construye la sección del total en el PDF
   buildPdfTotal() {
     return {
-      margin: [0, 4, 0, 0],
+      margin: [0, 0, 0, 10],
       table: {
-        widths: [365, 60, 60, 60],
-        body: [['', { text: 'Peso Total', alignment: 'right', bold: true }, this.formatonumeros(this.calcularMateriaPrimaSolicitada().toFixed(2)), { text: 'Kg', bold: true }]]
+        widths: [40, '*', 75, 70],
+        body: [['', { text: 'Peso Total', alignment: 'right', bold: true }, { text: this.formatonumeros(this.calcularTotalSolicitadoPdf().toFixed(2)), alignment: 'right', noWrap: true }, { text: 'Kg', bold: true }]]
       },
       fontSize: 8,
     };
@@ -751,16 +793,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         // Lógica para las subcategorías que han sido solicitadas
         const detSolicitud = this.getDetallesSolicitud(solicitud, subcategoria, subcategoria.Codigo);
         this.servicioDetSolicitudMpExt.Put(subcategoria.Codigo, detSolicitud)
-        .subscribe(data => { }, error => {
-          this.mensajeService.mensajeError(`Error`, `Error al editar las subcategorias de la solicitud, por favor verifique! | ${error.error}`);
-        });
+          .subscribe(data => { }, error => {
+            this.mensajeService.mensajeError(`Error`, `Error al editar las subcategorias de la solicitud, por favor verifique! | ${error.error}`);
+          });
       } else {
         // Lógica para las subcategorías que no han sido solicitadas
         const detSolicitud = this.getDetallesSolicitud(solicitud, subcategoria, subcategoria.Codigo);
         this.servicioDetSolicitudMpExt.Post(detSolicitud)
-        .subscribe(data2 => { }, error => {
-          this.mensajeService.mensajeError(`Error`, `No fue posible insertar las subcategorias en la edición de la solicitud, por favor verifique!`)
-        });
+          .subscribe(data2 => { }, error => {
+            this.mensajeService.mensajeError(`Error`, `No fue posible insertar las subcategorias en la edición de la solicitud, por favor verifique!`)
+          });
       }
       if (count === this.subcategoriasSeleccionadas.length) {
         // Lógica a ejecutar después de procesar todas las subcategorías

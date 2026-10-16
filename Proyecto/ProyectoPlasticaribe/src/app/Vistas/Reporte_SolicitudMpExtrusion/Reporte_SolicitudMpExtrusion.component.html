@@ -253,7 +253,7 @@
                 label="Cancelar" pTooltip="Cancelar Solicitud" (click)="mostrarEleccion(0, 'cancelar')" icon="pi pi-ban"
                 id="cancelar"></button>
               <button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf"
-                *ngIf="[1,3,7,104].includes(ValidarRol)" (click)="infoSolicitudPDF(0)" pTooltip="Ver PDF"></button>
+                *ngIf="[1,3,7,104].includes(ValidarRol)" (click)="infoSolicitudPDF(solicitudSeleccionada)" pTooltip="Ver PDF"></button>
             </div>
           </div>
         </ng-template>
@@ -269,7 +269,7 @@
               <button pButton [disabled]="true" class="p-button-secondary" *ngIf="[1,3,7,104].includes(ValidarRol)"
                 type="button" label="Cancelar" pTooltip="Cancelar Solicitud" icon="pi pi-ban" id="cancelar"></button>
               <button pButton *ngIf="arrayMatPrimas.length > 0 && [1,3,7,104].includes(ValidarRol)"
-                class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="infoSolicitudPDF(0)"
+                class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="infoSolicitudPDF(solicitudSeleccionada)"
                 label="Ver PDF" pTooltip="Ver solicitud en formato PDF"></button>
             </div>
           </div>
