@@ -257,7 +257,10 @@ export class Ubicaciones_RollosComponent implements OnInit {
           } else {
             this.productionProcessSerivce.sendProductionToZeus(detailAdjustment, x.producto.prod_Id, unit, 0, (-(this.totalQuantityByItem(x.producto.prod_Id))).toString(), x.pp.precio.toString()).subscribe(data => { 
               this.extractRollsDespacho(true); 
-            }, error => {this.msj.mensajeError('Error', 'No fue posible enviar el ajuste a Zeus!'); });
+            }, error => {
+              this.load = false;
+              this.msj.mensajeError('Error', 'No fue posible enviar el ajuste a Zeus!');
+             });
           }
         }, error => { this.msj.mensajeError(`Ocurrió un error al consultar el item ${x.producto.prod_Id}`, `Error: ${error}`);  });
       });
@@ -285,7 +288,10 @@ export class Ubicaciones_RollosComponent implements OnInit {
     this.dtEntracesService.putStateReturnedRoll(rolls).subscribe(data => {
       this.load = false;
       this.confirmTraslateDespacho(zeus);
-    }, error => { this.msj.mensajeError('Error', 'No fue posible actualizar el estado del rollo en la entrada a despacho!') })
+    }, error => { 
+      this.load = false;
+      this.msj.mensajeError('Error', 'No fue posible actualizar el estado del rollo en la entrada a despacho!');
+    })
   }
 
   //.Función que enviará un mensaje de confirmación luego de que se saquen los rollos de despacho. 
