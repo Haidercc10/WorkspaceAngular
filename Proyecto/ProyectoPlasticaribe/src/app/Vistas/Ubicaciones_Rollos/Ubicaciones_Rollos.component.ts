@@ -83,7 +83,13 @@ export class Ubicaciones_RollosComponent implements OnInit {
     })
   }
 
-  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => { this.users = d.filter(x => [100, 110, 9520, 117, 3139, 123456789, 121, 115, 113, 3142, 3123, 101, 7676].includes(x.usua_Id)); });
+  getUsers = () => this.svUsers.srvObtenerListaUsuario().subscribe(d => {
+  const userIds = new Set([100, 110, 9520, 117, 3139, 123456789, 121, 115, 113, 3142, 3123, 101, 7676]);
+
+  this.users = d
+    .filter(x => userIds.has(x.usua_Id))
+    .sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre, 'es', { sensitivity: 'base' }));
+});
 
   //Leer storage del navegador.
   readStorage() {
@@ -327,7 +333,11 @@ export class Ubicaciones_RollosComponent implements OnInit {
   //Función para filtrar la tabla de rollos a eliminar.
   applyFilter = ($event, campo: any, valorCampo: string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  //Función para obtener las fallas técnicas.
-  getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => item.tipoFalla_Id == 23) });
+  /** Obtiene las fallas técnicas del tipo 23 y las ordena alfabéticamente por nombre. */
+  getFails = () => this.svFails.srvObtenerLista().subscribe(datos => {
+    this.fails = datos
+      .filter(item => item.tipoFalla_Id == 23)
+      .sort((a, b) => a.falla_Nombre.localeCompare(b.falla_Nombre, 'es', { sensitivity: 'base' }));
+  });
 
 }

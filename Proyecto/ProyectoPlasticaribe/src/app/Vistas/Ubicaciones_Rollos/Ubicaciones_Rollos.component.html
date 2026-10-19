@@ -16,7 +16,7 @@
       <!--* Usuario -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
-          <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre" optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre" optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true" styleClass="left-aligned-dropdown" panelStyleClass="left-aligned-dropdown"></p-dropdown>
           <label for="user">Usuario Solicitante</label>
         </span>
       </div>
@@ -24,7 +24,7 @@
       <!--* Motivo -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
-          <p-dropdown formControlName="fail" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+          <p-dropdown formControlName="fail" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre" styleClass="left-aligned-dropdown" panelStyleClass="left-aligned-dropdown"></p-dropdown>
           <label for="Falla">Motivo*</label>
         </span>
       </div>

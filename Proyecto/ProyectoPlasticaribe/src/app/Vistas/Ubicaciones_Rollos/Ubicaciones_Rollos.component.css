@@ -1,0 +1,4 @@
+:host ::ng-deep .left-aligned-dropdown .p-dropdown-label,
+:host ::ng-deep .left-aligned-dropdown .p-dropdown-item {
+  text-align: left;
+}
