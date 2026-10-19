@@ -2949,6 +2949,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Función que va a validar los formularios
   validarFormularios() {
+    this.cargando = true;
     if (this.FormOrdenTrabajo.valid) {
       setTimeout(() => {
         if (this.FormOrdenTrabajoExtrusion.valid) {
@@ -2964,11 +2965,15 @@ export class Orden_TrabajoComponent implements OnInit {
           } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
         } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
       }, 700);
-    } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+    } else {
+      this.cargando = false;
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+    }
   }
 
   // Función que va a crear un nuevo producto.
   validarNuevoProducto() {
+    this.cargando = true;
     this.productoService.GetProductsByName(this.FormOrdenTrabajo.value.Nombre_Producto).subscribe(data => {
       if (data.length > 0) this.msj.mensajeAdvertencia(`El producto ${this.FormOrdenTrabajo.value.Nombre_Producto} ya existe!`); //this.validarDatos();
     }, () => this.crearNuevoProducto());
@@ -3029,7 +3034,11 @@ export class Orden_TrabajoComponent implements OnInit {
     }
     this.svcExistencias.srvGuardar(existencia).subscribe(data => {
       this.FormOrdenTrabajo.patchValue({ OT_Id: null, Id_Producto: data.prod_Id });
+      this.cargando = false;
       this.msj.mensajeConfirmacion(`Confirmación`, `Producto ${data.prod_Nombre} creado con éxito!`);
-    }, () => this.msj.mensajeError(`Error`, `No fue posible la existencia del producto, verifique!`));
+    }, () => {
+      this.cargando = false;
+      this.msj.mensajeError(`Error`, `No fue posible la existencia del producto, verifique!`)
+    });
   }
 }
