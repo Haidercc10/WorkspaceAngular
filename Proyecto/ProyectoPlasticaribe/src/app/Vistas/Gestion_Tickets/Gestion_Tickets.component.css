@@ -26,6 +26,14 @@ textarea {
   height: 100%;
 }
 
+.acciones-filtros {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .texto-observacion {
   white-space: pre-wrap;
 }
@@ -73,6 +81,11 @@ p-chip ::ng-deep .p-chip-text {
 ::ng-deep .tabla-tickets .p-datatable-table {
   width: 100%;
   table-layout: fixed;
+}
+
+::ng-deep .tabla-tickets .numero-fila {
+  width: 5%;
+  white-space: nowrap;
 }
 
 ::ng-deep .tabla-tickets .descripcion-encabezado,

@@ -30,8 +30,9 @@ export class Gestion_TicketsComponent implements OnInit {
   ticketsResuletosMes : number = 0; //Variable que almacenará la cantidad de tickets que han sido revisados en el mes
   tickets : any [] = []; //Variable que almacenará la información de los tickets que están sisndo revisado y los que están en revisión
   ticketsDisponibles : any [] = [];
-  anios : number [] = Array.from({length: moment().year() - 2019 + 1}, (_, index) => 2019 + index);
-  meses : { id: number, nombre: string } [] = [
+  anios : number [] = [];
+  meses : { id: number, nombre: string } [] = [];
+  private readonly todosLosMeses : { id: number, nombre: string } [] = [
     { id: 1, nombre: 'ENERO' },
     { id: 2, nombre: 'FEBRERO' },
     { id: 3, nombre: 'MARZO' },
@@ -101,7 +102,9 @@ export class Gestion_TicketsComponent implements OnInit {
     this.cantultarCantidadTickets();
   }
 
-  // Funcion que va a consultar la información de los tickets que estén abiertos y/o en revision
+  /**
+   * Consulta los tickets abiertos o en revisión y actualiza las opciones de fecha disponibles.
+   */
   consultarTickets(){
     this.ticketService.GetTicketsAbiertosEnRevisionAsync(false).subscribe(datos => {
       this.ticketsDisponibles = datos;
@@ -110,7 +113,12 @@ export class Gestion_TicketsComponent implements OnInit {
     setTimeout(() => { this.cargando = false; }, 1000);
   }
 
-  filtrarTicketsPorFecha(){
+  /**
+   * Filtra los tickets y actualiza los años y meses según las fechas recibidas.
+   * @param limpiarFiltrosInvalidos Indica si se deben limpiar selecciones que no existen en los datos.
+   */
+  filtrarTicketsPorFecha(limpiarFiltrosInvalidos: boolean = true){
+    this.actualizarOpcionesFecha(limpiarFiltrosInvalidos);
     this.ticketDeseleccionado();
     this.tickets = this.ticketsDisponibles.filter(ticket => {
       const fecha = moment(ticket.fecha);
@@ -122,9 +130,45 @@ export class Gestion_TicketsComponent implements OnInit {
     });
   }
 
+  /**
+   * Construye las opciones de año y mes presentes en los tickets disponibles.
+   * @param limpiarFiltrosInvalidos Indica si se limpian selecciones que dejaron de estar disponibles.
+   */
+  private actualizarOpcionesFecha(limpiarFiltrosInvalidos: boolean): void {
+    const fechasValidas = this.ticketsDisponibles
+      .map(ticket => moment(ticket.fecha))
+      .filter(fecha => fecha.isValid());
+
+    this.anios = [...new Set(fechasValidas.map(fecha => fecha.year()))]
+      .sort((anioA, anioB) => anioA - anioB);
+
+    if (limpiarFiltrosInvalidos && this.anioSeleccionado !== null && !this.anios.includes(this.anioSeleccionado)) {
+      this.anioSeleccionado = null;
+      this.mesSeleccionado = null;
+    }
+
+    const idsMesesDisponibles = new Set(
+      fechasValidas
+        .filter(fecha => this.anioSeleccionado === null || fecha.year() === this.anioSeleccionado)
+        .map(fecha => fecha.month() + 1)
+    );
+
+    this.meses = this.todosLosMeses.filter(mes => idsMesesDisponibles.has(mes.id));
+
+    if (limpiarFiltrosInvalidos && this.mesSeleccionado !== null && !idsMesesDisponibles.has(this.mesSeleccionado)) {
+      this.mesSeleccionado = null;
+    }
+  }
+
   filtrarMesActual(){
     this.anioSeleccionado = moment().year();
     this.mesSeleccionado = moment().month() + 1;
+    this.filtrarTicketsPorFecha(false);
+  }
+
+  clearFilters(){
+    this.anioSeleccionado = null;
+    this.mesSeleccionado = null;
     this.filtrarTicketsPorFecha();
   }
 

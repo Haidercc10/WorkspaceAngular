@@ -63,9 +63,9 @@
           <label for="mesTickets">Mes</label>
         </span>
       </div>
-      <div class="col-md-4 text-justify">
-        <button pButton pRipple type="button" label="Mes Actual" icon="pi pi-search"
-          class="p-button-danger botonesOpciones" (click)="filtrarMesActual()"></button>
+      <div class="col-md-4 acciones-filtros">
+        <button pButton class="p-button-danger botonesOpciones" pRipple type="button" label="Mes Actual" icon="pi pi-search" (click)="filtrarMesActual()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFilters()"></button>
       </div>
     </div>
   </div>
@@ -99,7 +99,7 @@
       <ng-template pTemplate="header">
         <tr>
           <!-- # -->
-          <th></th>
+          <th class="numero-fila"></th>
           <!-- Código -->
           <th>
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'codigo', 'contains')">
@@ -118,7 +118,7 @@
           </th>
         </tr>
         <tr>
-          <th>#</th>
+          <th class="numero-fila">#</th>
           <th pSortableColumn="codigo"><p-sortIcon field="codigo"></p-sortIcon> Código</th>
           <th pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha Creación</th>
           <th pSortableColumn="estado"><p-sortIcon field="estado"></p-sortIcon> Estado</th>
@@ -128,7 +128,7 @@
       <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
         <ng-container *ngIf="item.estado == 'ABIERTO'; else elseTemplate">
           <tr (click)="ticketSelccionado(item)">
-            <td>{{rowIndex + 1}}</td>
+            <td class="numero-fila">{{rowIndex + 1}}</td>
             <td>{{item.codigo}}</td>
             <td>{{item.fecha.replace('T00:00:00', '')}} {{item.hora}}</td>
             <td>{{item.estado}}</td>
@@ -137,7 +137,7 @@
         </ng-container>
         <ng-template #elseTemplate>
           <tr style="background-color: oldlace; color: #071426" (click)="ticketSelccionado(item)">
-            <td>{{rowIndex + 1}}</td>
+            <td class="numero-fila">{{rowIndex + 1}}</td>
             <td>{{item.codigo}}</td>
             <td>{{item.fecha.replace('T00:00:00', '')}} {{item.hora}}</td>
             <td>{{item.estado}}</td>
