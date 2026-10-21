@@ -8,7 +8,6 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
 import { Orden_TrabajoComponent } from '../Orden_Trabajo/Orden_Trabajo.component';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
@@ -29,7 +28,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   modoSeleccionado: boolean;
   formFiltros: FormGroup;
   clientes: any[] = [];
-  productos: any[] = [];
   materiales: any[] = [];
   pigmentos: any[] = [];
   ordenesConsultadas: any[] = [];
@@ -42,7 +40,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   constructor(private frmBuilder: FormBuilder,
     private AppComponent: AppComponent,
     private clientesService: ClientesService,
-    private productoService: ProductoService,
     private materialesService: MaterialProductoService,
     private pigmentosService: PigmentoProductoService,
     private bagProService: BagproService,
@@ -142,20 +139,12 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar los productos de la empresa
-  consultarProductos() {
-    let nombreProducto = this.formFiltros.value.referencia;
-    this.productoService.obtenerItemsLike(nombreProducto).subscribe(data => this.productos = data);
-  }
-
-  // Funcion que va a colocar la información del producto seleccionado en cada campo
-  productoSeleccionado() {
-    let id_producto = this.formFiltros.value.referencia;
-    let producto = this.productos.find(x => x.prod_Id == id_producto);
-    this.formFiltros.patchValue({
-      item: producto.prod_Id,
-      referencia: producto.prod_Nombre,
-    });
+  /**
+   * Limpia el texto de referencia utilizado como filtro parcial.
+   * @returns No retorna un valor.
+   */
+  limpiarReferencia(): void {
+    this.formFiltros.patchValue({ referencia: null });
   }
 
   //Función que se encarga de 
@@ -167,7 +156,10 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar las ordenes de trabajo de la empresa
+  /**
+   * Consulta las órdenes de trabajo aplicando los filtros ingresados.
+   * @returns No retorna un valor.
+   */
   consultarOrdenes() {
     this.cargando = true;
     let fechaAnterior: any = moment().subtract(12, 'M').format('YYYY-MM-DD');
@@ -183,9 +175,14 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     }, () => this.cargando = false);
   }
 
+  /**
+   * Construye los parámetros opcionales de la consulta de órdenes de trabajo.
+   * @returns Parámetros de consulta codificados o una cadena vacía si no hay filtros.
+   */
   validarRutaConsulta(): string {
     let cliente: any = this.formFiltros.value.idCliente;
     let item: number = this.formFiltros.value.item;
+    let referencia = String(this.formFiltros.value.referencia ?? '').trim();
     let material: any = this.formFiltros.value.material;
     let pigmento: number = this.formFiltros.value.pigmento;
     let ancho: any = this.formFiltros.value.ancho;
@@ -199,6 +196,9 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
 
     if (cliente != null) ruta += `cliente=${cliente}`;
     if (item != null) ruta.length > 0 ? ruta += `&item=${item}` : ruta += `item=${item}`;
+    if (referencia) ruta.length > 0
+      ? ruta += `&referencia=${encodeURIComponent(referencia)}`
+      : ruta += `referencia=${encodeURIComponent(referencia)}`;
     if (material != null) ruta.length > 0 ? ruta += `&material=${material}` : ruta += `material=${material}`;
     if (pigmento != null) ruta.length > 0 ? ruta += `&pigmento=${pigmento}` : ruta += `pigmento=${pigmento}`;
     if (ancho != null) ruta.length > 0 ? ruta += `&ancho=${ancho}` : ruta += `ancho=${ancho}`;
