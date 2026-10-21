@@ -748,22 +748,36 @@ export class Orden_TrabajoComponent implements OnInit {
     setTimeout(() => this.consultarInfoProducto(), 500);
   }
 
-  // 
+  /**
+   * Actualiza el identificador cuando se selecciona un vendedor en el dropdown.
+   * @returns No retorna un valor.
+   */
   vendedorSeleccionado() {
     let nombre = this.FormOrdenTrabajo.value.Nombre_Vendedor;
-    console.log('Nombre del vendedor seleccionado 1:', nombre);
-    let vendedor = this.vendedores.find(x => x.usua_Id == nombre);
-    console.log('Nombre del vendedor seleccionado 2:', nombre);
-    let Id_vendedor = (vendedor.usua_Id).toString();
+    if (nombre === null || nombre === undefined) {
+      this.limpiarIdVendedor();
+      return;
+    }
 
-    console.log('Vendedor seleccionado:', vendedor);
-    //setTimeout(() => {
-      this.FormOrdenTrabajo.patchValue({
-      'Id_Vendedor': Id_vendedor.length == 2 ? Id_vendedor = `0${Id_vendedor}` : Id_vendedor.length == 1 ? `00${Id_vendedor}` : Id_vendedor,
-      'Nombre_Vendedor': nombre,
+    let vendedor = this.vendedores.find(x => x.usua_Id == nombre);
+    if (!vendedor) {
+      this.limpiarIdVendedor();
+      return;
+    }
+
+    const idVendedor = String(vendedor.usua_Id).padStart(3, '0');
+    this.FormOrdenTrabajo.patchValue({
+      Id_Vendedor: idVendedor,
+      Nombre_Vendedor: vendedor.usua_Id,
     });
-    //}, 500);
-    
+  }
+
+  /**
+   * Limpia el identificador del vendedor cuando se borra la selección del dropdown.
+   * @returns No retorna un valor.
+   */
+  limpiarIdVendedor(): void {
+    this.FormOrdenTrabajo.patchValue({ Id_Vendedor: null });
   }
 
   // Funcion que va a buscar la información del producto por su ID

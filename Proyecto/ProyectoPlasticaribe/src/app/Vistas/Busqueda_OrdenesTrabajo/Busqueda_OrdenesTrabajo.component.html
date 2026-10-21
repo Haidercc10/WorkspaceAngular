@@ -183,7 +183,7 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-data let-columns="columns">
-    <tr (dblclick)="crearOrdenTrabajo(data)" class="no-seleccionable cursor">
+    <tr (dblclick)="crearOrdenTrabajo(data)" class="no-seleccionable cursor" pTooltip="Al hacer doble click en la fila, se moverá los datos al formulario de crear OT." tooltipPosition="top">
       <td [pEditableColumn]="data" class="cursor" *ngFor="let col of columns">
         <p-cellEditor *ngIf="['Cantidad', 'Precio'].includes(col.header)"> <!---->
           <ng-template pTemplate="input">
