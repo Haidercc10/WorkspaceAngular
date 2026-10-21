@@ -38,9 +38,19 @@
       </div>-->
       <!--(click)="LlamarModalCrearProducto()"-->
 
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar / <i class="pi pi-plus-circle"></i> Crear OT</h4>
-        <br>
+      <div class="ot-header-actions mb-4">
+        <!-- subtitulo -->
+        <div class="ot-header-actions__title">
+          <h4 class="tituloRojo mb-0"><i class="pi pi-search"></i> Consultar / <i class="pi pi-plus-circle"></i> Crear OT</h4>
+        </div>
+
+        <!-- Botones -->
+        <div class="ot-header-actions__buttons">
+          <!-- <button pButton class="p-button-danger p-button-outlined" id="crearItem" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"></button> -->
+          <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check" *ngIf="!edicionOrdenTrabajo" (click)="validarDatos()"></button>
+          <button pButton class="p-button-danger" id="editar" type="button" label="Editar OT" icon="pi pi-check" *ngIf="edicionOrdenTrabajo" (click)="validarActualizacionOT()"></button>
+          <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        </div>
       </div>
 
       <form [formGroup]="FormOrdenTrabajo" id="formOrdenTrabajo">

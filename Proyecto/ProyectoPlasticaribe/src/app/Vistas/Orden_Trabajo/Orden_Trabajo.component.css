@@ -94,3 +94,27 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
   width: 20px;
   margin: auto;
 }
+
+.ot-header-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+}
+
+.ot-header-actions__buttons {
+  display: grid;
+  gap: 0.5rem;
+}
+
+@media (min-width: 1138px) {
+  .ot-header-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ot-header-actions__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

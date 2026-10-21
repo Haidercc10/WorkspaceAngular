@@ -671,13 +671,21 @@ export class Orden_TrabajoComponent implements OnInit {
     return colorHex;
   }
 
-  // Funcion que va a consultar los vendedores de la empresa
+  /**
+   * Consulta las opciones de vendedor y sincroniza el vendedor de la OT si ya tiene identificador.
+   * @returns No retorna un valor.
+   */
   consultarVendedores() {
     let asesor: any = this.ValidarRol == 2 ? this.AppComponent.storage_Id : null;
     this.usuarioService.GetVendedores().subscribe(data => {
       this.vendedores = data;
       this.vendedores = asesor ? this.vendedores.filter(x => x.usua_Id == asesor) : this.vendedores
       this.vendedores.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+
+      const idVendedor = this.FormOrdenTrabajo.get('Id_Vendedor')?.value;
+      if (idVendedor !== null && idVendedor !== undefined && String(idVendedor).trim() !== '') {
+        this.seleccionarVendedorPorId(idVendedor);
+      }
     });
   }
 
@@ -690,7 +698,10 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a colocar la información del cliente seleccionado en cada campo
+  /**
+   * Coloca la información del cliente seleccionado y su vendedor en el formulario.
+   * @returns No retorna un valor.
+   */
   clienteSeleccionado() {
     let id_cliente = this.FormOrdenTrabajo.value.Nombre_Cliente;
     let cliente = this.clientes.find(x => x.cli_Id == id_cliente);
@@ -700,7 +711,7 @@ export class Orden_TrabajoComponent implements OnInit {
         Id_Cliente: cliente.cli_Id,
         Nombre_Cliente: cliente.cli_Nombre,
         Id_Vendedor: vendedor.length == 2 ? vendedor = `0${vendedor}` : vendedor.length == 1 ? `00${vendedor}` : vendedor,
-        Nombre_Vendedor: data[0].usua_Nombre,
+        Nombre_Vendedor: this.idVendedorParaDropdown(data[0].usua_Id),
       });
     });
   }
@@ -859,7 +870,13 @@ export class Orden_TrabajoComponent implements OnInit {
     }, () => this.consultarInformaciónBagPro());
   }
 
-  //Función que cargará los diferentes formularios de la orden de trabajo
+  /**
+   * Carga los formularios con los datos de la sede y la orden de trabajo consultada.
+   * @param dataSedes Datos de la sede del cliente, si está disponible.
+   * @param dataOt Datos de la orden de trabajo consultada.
+   * @param ot Número de la orden de trabajo.
+   * @returns No retorna un valor.
+   */
   cargarFormularios(dataSedes: any, dataOt: any, ot: any) {
     this.llenarDatosCliente(dataSedes ? dataSedes : dataOt)
     this.llenarFormularioOrdenTrabajo(dataOt);
@@ -874,7 +891,71 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargarCombinacionMezclas();
   }
 
-  //Función que llenará la información del cliente, vendedor y producto
+  /**
+   * Sincroniza el código y la selección del dropdown a partir del identificador del vendedor.
+   * @param idVendedor Identificador del vendedor guardado en la orden de trabajo.
+   * @returns No retorna un valor.
+   */
+  private seleccionarVendedorPorId(idVendedor: unknown): void {
+     const idNumerico = Number(idVendedor);
+     if (idVendedor === null || idVendedor === undefined || String(idVendedor).trim() === '' || !Number.isFinite(idNumerico)) {
+      return;
+    }
+
+     const vendedorExistente = this.vendedores.find(opcion => Number(opcion.usua_Id) === idNumerico);
+    if (vendedorExistente) {
+      this.aplicarVendedorSeleccionado(vendedorExistente, idNumerico);
+      return;
+    }
+
+    this.usuarioService.getUsuariosxId(idNumerico).subscribe(data => {
+      const idActual = this.idVendedorParaDropdown(this.FormOrdenTrabajo.get('Id_Vendedor')?.value);
+      if (idActual === null || Number(idActual) !== idNumerico) {
+         return;
+      }
+
+      const vendedor = Array.isArray(data)
+         ? data.find(opcion => Number(opcion.usua_Id) === idNumerico)
+         : data;
+
+       if (!vendedor || Number(vendedor.usua_Id) !== idNumerico) {
+        this.msj.mensajeAdvertencia('Vendedor no encontrado', `No se encontró un vendedor con el Id ${idNumerico}.`);
+        return;
+      }
+
+       if (!this.vendedores.some(opcion => Number(opcion.usua_Id) === idNumerico)) {
+        this.vendedores = [...this.vendedores, vendedor];
+      }
+
+      this.aplicarVendedorSeleccionado(vendedor, idNumerico);
+    }, error => {
+      this.msj.mensajeError(`No fue posible consultar el vendedor con el Id ${idNumerico}.`, error.error);
+    });
+  }
+
+  /**
+   * Aplica la selección solo si el formulario todavía corresponde al mismo vendedor.
+   * @param vendedor Opción del vendedor que se mostrará en el dropdown.
+   * @param idVendedor Identificador numérico que se está cargando.
+   * @returns No retorna un valor.
+   */
+  private aplicarVendedorSeleccionado(vendedor: any, idVendedor: number): void {
+    const idActual = this.idVendedorParaDropdown(this.FormOrdenTrabajo.get('Id_Vendedor')?.value);
+    if (idActual === null || Number(idActual) !== idVendedor) {
+      return;
+    }
+
+    this.FormOrdenTrabajo.patchValue({
+      Id_Vendedor: String(idVendedor).padStart(3, '0'),
+      Nombre_Vendedor: vendedor.usua_Id,
+    });
+  }
+
+  /**
+   * Carga en el formulario los datos de cliente, vendedor y producto de una OT previa.
+   * @param data Datos de la orden de trabajo; puede ser nulo cuando no existe.
+   * @returns No retorna un valor.
+   */
   llenarDatosCliente(data: any) {
     let vendedor: string = data ? data.id_Vendedor : '';
     this.FormOrdenTrabajo.patchValue({
@@ -884,8 +965,30 @@ export class Orden_TrabajoComponent implements OnInit {
       Nombre_Producto: this.ArrayProducto[0].Nombre,
       Presentacion: this.ArrayProducto[0].Und,
       Id_Vendedor: !data ? '' : vendedor.length == 2 ? vendedor = `0${vendedor}` : (vendedor).length == 1 ? `00${vendedor}` : vendedor,
-      Nombre_Vendedor: !data ? '' : data.vendedor,
+      Nombre_Vendedor: !data ? '' : this.idVendedorParaDropdown(data.id_Vendedor),
     });
+    if (data?.id_Vendedor !== null && data?.id_Vendedor !== undefined) {
+      this.seleccionarVendedorPorId(data.id_Vendedor);
+    }
+  }
+
+  /**
+   * Convierte el identificador de vendedor al valor numérico usado por las opciones del dropdown.
+   * @param idVendedor Identificador del vendedor, con o sin ceros a la izquierda.
+   * @returns El identificador numérico o null cuando el valor está vacío o no es numérico.
+   */
+  private idVendedorParaDropdown(idVendedor: unknown): number | string | null {
+    if (idVendedor === null || idVendedor === undefined || String(idVendedor).trim() === '') {
+      return null;
+    }
+
+    const idNumerico = Number(idVendedor);
+    if (!Number.isFinite(idNumerico)) {
+      return null;
+    }
+
+    const vendedor = this.vendedores.find(opcion => Number(opcion.usua_Id) === idNumerico);
+    return vendedor ? vendedor.usua_Id : idNumerico;
   }
 
   // Funcion que va a consultar en la base de datos de bagpro la información de la ultima orden de trabajo creada para un producto
@@ -1984,7 +2087,11 @@ export class Orden_TrabajoComponent implements OnInit {
     this.clienteServise.PutEstadoCliente(id, 1).subscribe(null, err => this.msj.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${id}`, err.error));
   }
 
-  // Funcion que va a consultar la informacion de la una orden de trabajo
+  /**
+   * Consulta una orden de trabajo y carga sus datos en los formularios.
+   * @param numero Número de OT o desplazamiento relativo para consultar.
+   * @returns No retorna un valor.
+   */
   ConsultarOrdenTrabajo(numero: number) {
     let numeroOT: number = this.FormOrdenTrabajo.value.OT_Id;
     ([0, 1, -1].includes(numero)) ? numeroOT += numero : numeroOT = numero;
@@ -2000,7 +2107,7 @@ export class Orden_TrabajoComponent implements OnInit {
           this.FormOrdenTrabajo.patchValue({
             'OT_Id': datos_orden[i].numero_Orden,
             'Id_Vendedor': datos_orden[i].id_Vendedor,
-            'Nombre_Vendedor': datos_orden[i].vendedor,
+            'Nombre_Vendedor': this.idVendedorParaDropdown(datos_orden[i].id_Vendedor),
             'OT_FechaCreacion': datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
             'OT_FechaEntrega': datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
             'Id_Cliente': datos_orden[i].id_Cliente,
