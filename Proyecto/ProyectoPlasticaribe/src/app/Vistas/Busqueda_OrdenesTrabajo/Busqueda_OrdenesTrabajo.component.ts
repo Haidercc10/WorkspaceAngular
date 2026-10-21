@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -27,7 +26,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   ValidarRol : any;
   modoSeleccionado: boolean;
   formFiltros: FormGroup;
-  clientes: any[] = [];
   materiales: any[] = [];
   pigmentos: any[] = [];
   ordenesConsultadas: any[] = [];
@@ -39,7 +37,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
 
   constructor(private frmBuilder: FormBuilder,
     private AppComponent: AppComponent,
-    private clientesService: ClientesService,
     private materialesService: MaterialProductoService,
     private pigmentosService: PigmentoProductoService,
     private bagProService: BagproService,
@@ -56,7 +53,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       buscarPorItem_Ot: ['Item', Validators.required],
       fechaInicio: [null],
       fechaFin: [null],
-      idCliente: [null],
       cliente: [null],
       item: [null],
       referencia: [null],
@@ -101,42 +97,12 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a buscar los pigmentos que se utilizan en la creación del item en el área de extrusión
   obtenerPigmentos = () => this.pigmentosService.srvObtenerLista().subscribe(pigmentos => this.pigmentos = pigmentos);
 
-  //
-  getClientsBagpro() {
-    let nombre = this.formFiltros.value.cliente;
-    this.bagProService.GetClientesNombre(nombre).subscribe(data => {
-      this.clientes = data;
-      //this.clientes.sort((a, b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
-    })
-  }
-
   /**
-   * Selecciona el cliente escrito y limpia su identificador si el texto no corresponde a una opción.
-   * @returns No retorna un valor.
-   */
-  selectClientBagpro() {
-    let id_cliente = this.formFiltros.value.cliente;
-    let cliente = this.clientes.find(x => x.codBagpro == id_cliente);
-    if (!cliente) {
-      this.formFiltros.patchValue({ idCliente: null });
-      return;
-    }
-
-    this.formFiltros.patchValue({
-      'idCliente': cliente.codBagpro,
-      'cliente': cliente.nombreComercial,
-    });
-  }
-
-  /**
-   * Limpia el nombre y el identificador del cliente seleccionado en los filtros.
+   * Limpia el texto de cliente utilizado como filtro parcial.
    * @returns No retorna un valor.
    */
   limpiarClienteBagpro(): void {
-    this.formFiltros.patchValue({
-      cliente: null,
-      idCliente: null,
-    });
+    this.formFiltros.patchValue({ cliente: null });
   }
 
   /**
@@ -180,7 +146,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
    * @returns Parámetros de consulta codificados o una cadena vacía si no hay filtros.
    */
   validarRutaConsulta(): string {
-    let cliente: any = this.formFiltros.value.idCliente;
+    let nombreCliente = String(this.formFiltros.value.cliente ?? '').trim();
     let item: number = this.formFiltros.value.item;
     let referencia = String(this.formFiltros.value.referencia ?? '').trim();
     let material: any = this.formFiltros.value.material;
@@ -194,7 +160,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       : null;
     let ruta: string = '';
 
-    if (cliente != null) ruta += `cliente=${cliente}`;
+    if (nombreCliente) ruta += `nombreCliente=${encodeURIComponent(nombreCliente)}`;
     if (item != null) ruta.length > 0 ? ruta += `&item=${item}` : ruta += `item=${item}`;
     if (referencia) ruta.length > 0
       ? ruta += `&referencia=${encodeURIComponent(referencia)}`
