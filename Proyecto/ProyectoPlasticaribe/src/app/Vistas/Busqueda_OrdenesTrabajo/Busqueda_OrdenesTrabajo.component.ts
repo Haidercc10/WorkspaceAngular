@@ -260,7 +260,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   crearOrdenTrabajo(data: any) {
     let tipoBusqueda: 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
-    let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id) as HTMLDivElement;
+    let tabCrearOrden2 = document.getElementById(tabCrearOrden[1].id) as HTMLDivElement;
     tabCrearOrden2.click();
     this.orden_TrabajoComponent.consultarClientes();
     if (tipoBusqueda == 'Item') {

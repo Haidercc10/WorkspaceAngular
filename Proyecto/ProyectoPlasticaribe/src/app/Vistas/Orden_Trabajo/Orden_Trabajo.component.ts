@@ -740,12 +740,19 @@ export class Orden_TrabajoComponent implements OnInit {
   // 
   vendedorSeleccionado() {
     let nombre = this.FormOrdenTrabajo.value.Nombre_Vendedor;
-    let vendedor = this.vendedores.find(x => x.usua_Nombre == nombre);
+    console.log('Nombre del vendedor seleccionado 1:', nombre);
+    let vendedor = this.vendedores.find(x => x.usua_Id == nombre);
+    console.log('Nombre del vendedor seleccionado 2:', nombre);
     let Id_vendedor = (vendedor.usua_Id).toString();
-    this.FormOrdenTrabajo.patchValue({
-      Id_Vendedor: Id_vendedor.length == 2 ? Id_vendedor = `0${Id_vendedor}` : Id_vendedor.length == 1 ? `00${Id_vendedor}` : Id_vendedor,
-      Nombre_Vendedor: vendedor.usua_Nombre,
+
+    console.log('Vendedor seleccionado:', vendedor);
+    //setTimeout(() => {
+      this.FormOrdenTrabajo.patchValue({
+      'Id_Vendedor': Id_vendedor.length == 2 ? Id_vendedor = `0${Id_vendedor}` : Id_vendedor.length == 1 ? `00${Id_vendedor}` : Id_vendedor,
+      'Nombre_Vendedor': nombre,
     });
+    //}, 500);
+    
   }
 
   // Funcion que va a buscar la información del producto por su ID
@@ -837,7 +844,10 @@ export class Orden_TrabajoComponent implements OnInit {
       : '';
     this.limpiarProducto();
     this.bagProService.GetOrdenDeTrabajo(ot, sales).subscribe(datos_Ot => {
+      console.log(datos_Ot);
+      
       this.svcSedes.GetSedeClientexNitBagPro(datos_Ot[0].nitCliente).subscribe(datos_Sedes => {
+        console.log(datos_Sedes);
         this.producto = datos_Ot[0].id_Producto;
         this.presentacionProducto = datos_Ot[0].presentacion;
         if (this.presentacionProducto == 'Kilo') this.presentacionProducto = 'Kg';
@@ -851,7 +861,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Función que cargará los diferentes formularios de la orden de trabajo
   cargarFormularios(dataSedes: any, dataOt: any, ot: any) {
-    this.llenarDatosCliente(dataSedes)
+    this.llenarDatosCliente(dataSedes ? dataSedes : dataOt)
     this.llenarFormularioOrdenTrabajo(dataOt);
     this.llenarFormularioExtrusion(dataOt);
     this.llenarFormularioLaminado(dataOt);
@@ -866,7 +876,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Función que llenará la información del cliente, vendedor y producto
   llenarDatosCliente(data: any) {
-    let vendedor: string = data.id_Vendedor;
+    let vendedor: string = data ? data.id_Vendedor : '';
     this.FormOrdenTrabajo.patchValue({
       Id_Cliente: data == undefined ? '' : data.id_Cliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
@@ -1770,64 +1780,70 @@ export class Orden_TrabajoComponent implements OnInit {
   //Funcion que va a guardar la información de la orden de trabajo
   guardarOt(otCreadaBagPro: boolean = false) {
     this.cargando = true;
-    this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(numero_OT => {
-      let numeroOrden: number = numero_OT + 1;
-      if (!otCreadaBagPro) {
-        if (numeroOrden == 1) this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(numOT => numeroOrden = numOT.item + 1);
-      } else numeroOrden = this.FormOrdenTrabajo.value.OT_Id;
-      let infoOT: modelOrden_Trabajo = {
-        Numero_OT: numeroOrden,
-        SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
-        Prod_Id: this.producto,
-        UndMed_Id: this.presentacionProducto,
-        Ot_FechaCreacion: this.today,
-        Ot_Hora: moment().format('H:mm:ss'),
-        Estado_Id: 15,
-        Usua_Id: this.storage_Id,
-        PedExt_Id: 517,
-        Ot_Observacion: this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
-        Ot_Cyrel: this.cyrel,
-        Ot_Corte: this.corte,
-        Mezcla_Id: this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
-        Extrusion: this.extrusion,
-        Impresion: this.impresion,
-        Rotograbado: this.rotograbado,
-        Laminado: this.laminado,
-        Sellado: this.sellado,
-        Ot_MargenAdicional: this.FormOrdenTrabajo.value.Margen,
-        Ot_CantidadPedida: this.cantidadProducto,
-        Ot_ValorUnidad: this.valorProducto,
-        Ot_PesoNetoKg: this.netoKg,
-        Ot_ValorKg: this.valorKg,
-        Ot_ValorOT: this.valorOt,
-        Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
-        MotrarEmpresaEtiquetas: this.motrarEmpresaEtiquetas,
+    //this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(numero_OT => {
+     // let numeroOrden: number = numero_OT + 1;
+    //  if (!otCreadaBagPro) {
+      //  if (numeroOrden == 1) this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(numOT => numeroOrden = numOT.item + 1);
+      //} else numeroOrden = this.FormOrdenTrabajo.value.OT_Id;
+      
+      this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(numOT => {
+        let numeroOrden: number = numOT.item + 1;
+
+        let infoOT: modelOrden_Trabajo = {
+        'Numero_OT': numeroOrden,
+        'SedeCli_Id': parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
+        'Prod_Id': this.producto,
+        'UndMed_Id': this.presentacionProducto,
+        'Ot_FechaCreacion': this.today,
+        'Ot_Hora': moment().format('H:mm:ss'),
+        'Estado_Id': 15,
+        'Usua_Id': this.storage_Id,
+        'PedExt_Id': 517,
+        'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
+        'Ot_Cyrel': this.cyrel,
+        'Ot_Corte': this.corte,
+        'Mezcla_Id': this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+        'Extrusion': this.extrusion,
+        'Impresion': this.impresion,
+        'Rotograbado': this.rotograbado,
+        'Laminado': this.laminado,
+        'Sellado': this.sellado,
+        'Ot_MargenAdicional': this.FormOrdenTrabajo.value.Margen,
+        'Ot_CantidadPedida': this.cantidadProducto,
+        'Ot_ValorUnidad': this.valorProducto,
+        'Ot_PesoNetoKg': this.netoKg,
+        'Ot_ValorKg': this.valorKg,
+        'Ot_ValorOT': this.valorOt,
+        'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
+        'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
       }
       this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
         let ot: number = datos_ot.ot_Id;
-        let numeroOT: number = datos_ot.numero_OT;
+        let numeroOT: number = numeroOrden;
         this.guardarOt_Extrusion(ot, numeroOT);
+      });
+      
       }, error => {
         this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
         this.cargando = false;
       });
-    });
+    //});
   }
 
   //Funcion que va a guardar la informacion de extrusion de la orden de trabajo
   guardarOt_Extrusion(ordenTrabajo: number, numeroOT: number) {
     let infoOTExt: any = {
-      Ot_Id: ordenTrabajo,
-      Material_Id: this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
-      Formato_Id: this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
-      Pigmt_Id: this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
-      Extrusion_Calibre: this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-      Extrusion_Ancho1: this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1,
-      Extrusion_Ancho2: this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
-      Extrusion_Ancho3: this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
-      UndMed_Id: this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
-      Tratado_Id: this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
-      Extrusion_Peso: this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
+      'Ot_Id': ordenTrabajo,
+      'Material_Id': this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
+      'Formato_Id': this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
+      'Pigmt_Id': this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
+      'Extrusion_Calibre': this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
+      'Extrusion_Ancho1': this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1,
+      'Extrusion_Ancho2': this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
+      'Extrusion_Ancho3': this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
+      'UndMed_Id': this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
+      'Tratado_Id': this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
+      'Extrusion_Peso': this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
     this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => this.guardarOt_Impresion(ordenTrabajo, numeroOT), error => {
       this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.error);
@@ -1849,18 +1865,18 @@ export class Orden_TrabajoComponent implements OnInit {
     this.servicioTintas.srvObtenerListaConsultaImpresion(tinta1Impresion, tinta2Impresion, tinta3Impresion, tinta4Impresion, tinta5Impresion, tinta6Impresion, tinta7Impresion, tinta8Impresion).subscribe(datos_impresion => {
       for (let j = 0; j < datos_impresion.length; j++) {
         let infoOTImp: any = {
-          Ot_Id: ordenTrabajo,
-          TpImpresion_Id: this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
-          Rodillo_Id: rodilloImpresion,
-          Pista_Id: pistaImpresion,
-          Tinta1_Id: datos_impresion[j].tinta_Id1,
-          Tinta2_Id: datos_impresion[j].tinta_Id2,
-          Tinta3_Id: datos_impresion[j].tinta_Id3,
-          Tinta4_Id: datos_impresion[j].tinta_Id4,
-          Tinta5_Id: datos_impresion[j].tinta_Id5,
-          Tinta6_Id: datos_impresion[j].tinta_Id6,
-          Tinta7_Id: datos_impresion[j].tinta_Id7,
-          Tinta8_Id: datos_impresion[j].tinta_Id8,
+          'Ot_Id': ordenTrabajo,
+          'TpImpresion_Id': this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
+          'Rodillo_Id': rodilloImpresion,
+          'Pista_Id': pistaImpresion,
+          'Tinta1_Id': datos_impresion[j].tinta_Id1,
+          'Tinta2_Id': datos_impresion[j].tinta_Id2,
+          'Tinta3_Id': datos_impresion[j].tinta_Id3,
+          'Tinta4_Id': datos_impresion[j].tinta_Id4,
+          'Tinta5_Id': datos_impresion[j].tinta_Id5,
+          'Tinta6_Id': datos_impresion[j].tinta_Id6,
+          'Tinta7_Id': datos_impresion[j].tinta_Id7,
+          'Tinta8_Id': datos_impresion[j].tinta_Id8,
         }
         this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => this.guardarOt_Laminado(ordenTrabajo, numeroOT), error => {
           this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
@@ -1872,16 +1888,16 @@ export class Orden_TrabajoComponent implements OnInit {
   //Funcion que va a guardar la informacion de laminado de la orden de trabajo
   guardarOt_Laminado(ordenTrabajo: number, numeroOT: number) {
     let infoOTLam: any = {
-      OT_Id: ordenTrabajo,
-      Capa_Id1: this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
-      Capa_Id2: this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
-      Capa_Id3: this.FormOrdenTrabajoLaminado.value.Capa_Laminado3,
-      LamCapa_Calibre1: this.FormOrdenTrabajoLaminado.value.Calibre_Laminado1,
-      LamCapa_Calibre2: this.FormOrdenTrabajoLaminado.value.Calibre_Laminado2,
-      LamCapa_Calibre3: this.FormOrdenTrabajoLaminado.value.Calibre_Laminado3,
-      LamCapa_Cantidad1: this.FormOrdenTrabajoLaminado.value.cantidad_Laminado1,
-      LamCapa_Cantidad2: this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
-      LamCapa_Cantidad3: this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
+      'OT_Id': ordenTrabajo,
+      'Capa_Id1': this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
+      'Capa_Id2': this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
+      'Capa_Id3': this.FormOrdenTrabajoLaminado.value.Capa_Laminado3,
+      'LamCapa_Calibre1': this.FormOrdenTrabajoLaminado.value.Calibre_Laminado1,
+      'LamCapa_Calibre2': this.FormOrdenTrabajoLaminado.value.Calibre_Laminado2,
+      'LamCapa_Calibre3': this.FormOrdenTrabajoLaminado.value.Calibre_Laminado3,
+      'LamCapa_Cantidad1': this.FormOrdenTrabajoLaminado.value.cantidad_Laminado1,
+      'LamCapa_Cantidad2': this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
+      'LamCapa_Cantidad3': this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
     this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => this.guardarOt_Sellado_Corte(ordenTrabajo, numeroOT), error => {
       this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.error);
@@ -1894,34 +1910,34 @@ export class Orden_TrabajoComponent implements OnInit {
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
       let info: modelOrdenTrabajo_SelladoCorte = {
-        Ot_Id: ordenTrabajo,
-        Corte: this.corte,
-        Sellado: this.sellado,
-        Formato_Id: datos.tpProd_Id,
-        SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-        SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-        SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-        SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
-        TpSellado_Id: datos.tpSellado_Id,
-        SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
-        SelladoCorte_PrecioSelladoNoche: this.FormOrdenTrabajoSellado.value.PrecioNoche,
-        SelladoCorte_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-        SelladoCorte_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
-        SelladoCorte_PesoPaquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
-        SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
-        SelladoCorte_PesoProducto: this.pesoProducto,
-        SelladoCorte_Etiqueta_Ancho: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Largo: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Fuelle: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
-        SelladoCorte_PrecioDia_Wik_Mq50: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
-        SelladoCorte_PrecioNoche_Wik_Mq50: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
-        SelladoCorte_PrecioDia_Wik_Mq9: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
-        SelladoCorte_PrecioNoche_Wik_Mq9: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
+        'Ot_Id': ordenTrabajo,
+        'Corte': this.corte,
+        'Sellado': this.sellado,
+        'Formato_Id': datos.tpProd_Id,
+        'SelladoCorte_Ancho': this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+        'SelladoCorte_Largo': this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+        'SelladoCorte_Fuelle': this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+        'SelladoCorte_PesoMillar': this.FormOrdenTrabajoSellado.value.PesoMillar,
+        'TpSellado_Id': datos.tpSellado_Id,
+        'SelladoCorte_PrecioSelladoDia': this.FormOrdenTrabajoSellado.value.PrecioDia,
+        'SelladoCorte_PrecioSelladoNoche': this.FormOrdenTrabajoSellado.value.PrecioNoche,
+        'SelladoCorte_CantBolsasPaquete': this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+        'SelladoCorte_CantBolsasBulto': this.FormOrdenTrabajoSellado.value.CantidadBulto,
+        'SelladoCorte_PesoPaquete': this.FormOrdenTrabajoSellado.value.PesoPaquete,
+        'SelladoCorte_PesoBulto': this.FormOrdenTrabajoSellado.value.PesoBulto,
+        'SelladoCorte_PesoProducto': this.pesoProducto,
+        'SelladoCorte_Etiqueta_Ancho': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
+        'SelladoCorte_Etiqueta_Largo': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
+        'SelladoCorte_Etiqueta_Fuelle': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+        'SelladoCorte_PrecioDia_Wik_Mq50': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
+        'SelladoCorte_PrecioNoche_Wik_Mq50': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
+        'SelladoCorte_PrecioDia_Wik_Mq9': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
+        'SelladoCorte_PrecioNoche_Wik_Mq9': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
       }
       this.otSelladoCorteService.post(info).subscribe(() => {
         this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${numeroOT}`);
-        this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-        this.cambiarEstadoProducto(this.producto);
+        //this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
+        //this.cambiarEstadoProducto(this.producto);
         this.limpiarCampos();
         this.pdfOrdenTrabajo(numeroOT);
       }, error => this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error));
@@ -1982,21 +1998,21 @@ export class Orden_TrabajoComponent implements OnInit {
         this.buscarInformacionProducto();
         setTimeout(() => {
           this.FormOrdenTrabajo.patchValue({
-            OT_Id: datos_orden[i].numero_Orden,
-            Id_Vendedor: datos_orden[i].id_Vendedor,
-            Nombre_Vendedor: datos_orden[i].vendedor,
-            OT_FechaCreacion: datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
-            OT_FechaEntrega: datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
-            Id_Cliente: datos_orden[i].id_Cliente,
-            Nombre_Cliente: datos_orden[i].cliente,
-            Id_Producto: datos_orden[i].id_Producto,
-            Nombre_Producto: datos_orden[i].producto,
-            Cantidad: datos_orden[i].cantidad_Pedida,
-            Presentacion: datos_orden[i].id_Presentacion,
-            OT_Estado: datos_orden[i].estado_Orden,
-            OT_Observacion: datos_orden[i].observacion,
-            Margen: datos_orden[i].margen,
-            Precio: this.presentacionProducto == 'Kg' ? datos_orden[i].valorKg : datos_orden[i].valorUnidad,
+            'OT_Id': datos_orden[i].numero_Orden,
+            'Id_Vendedor': datos_orden[i].id_Vendedor,
+            'Nombre_Vendedor': datos_orden[i].vendedor,
+            'OT_FechaCreacion': datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
+            'OT_FechaEntrega': datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
+            'Id_Cliente': datos_orden[i].id_Cliente,
+            'Nombre_Cliente': datos_orden[i].cliente,
+            'Id_Producto': datos_orden[i].id_Producto,
+            'Nombre_Producto': datos_orden[i].producto,
+            'Cantidad': datos_orden[i].cantidad_Pedida,
+            'Presentacion': datos_orden[i].id_Presentacion,
+            'OT_Estado': datos_orden[i].estado_Orden,
+            'OT_Observacion': datos_orden[i].observacion,
+            'Margen': datos_orden[i].margen,
+            'Precio': this.presentacionProducto == 'Kg' ? datos_orden[i].valorKg : datos_orden[i].valorUnidad,
           });
           this.validarProcesosOrdenTrabajo(datos_orden[i]);
           this.llenarFormularioExtrusion(datos_orden[i]);
@@ -2012,7 +2028,7 @@ export class Orden_TrabajoComponent implements OnInit {
       }
     }, () => {
       this.busquedaOTBagPro(numeroOT);
-      this.cargando = false;
+      //this.cargando = false;
     });
   }
 
@@ -2316,7 +2332,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funaion que va a colocar la informacion del cliente y del item en el header
   informacionClienteItemHeader(datos_ot) {
     return {
-      widths: ['10%', '40%', '10%', '40%'],
+      widths: ['10%', '40%', '12%', '38%'],
       style: 'header',
       body: [
         [
