@@ -2,6 +2,23 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
     display: flex;
     width: 100%;
 }
+
+.cliente-input-container {
+    position: relative;
+}
+
+.cliente-input-container input {
+    padding-right: 2.5rem;
+}
+
+.cliente-clear-button {
+    position: absolute;
+    top: 50%;
+    right: 0.25rem;
+    z-index: 2;
+    transform: translateY(-50%);
+    color: #5d6d7e;
+}
   
 .no-seleccionable {
     -webkit-user-select: none;

@@ -24,10 +24,13 @@
 
     <!-- CLIENTE -->
     <div class="col-sm-12 col-md-6 col-xl-4">
-      <span class="p-input-icon-left p-float-label">
+      <span class="p-input-icon-left p-float-label cliente-input-container">
         <i class="pi pi-users"></i>
         <input formControlName="cliente" id="cliente" list="clientesConsultados" type="text" pInputText
-          (keyup)="getClientsBagpro()" (change)="selectClientBagpro()" autocomplete="off" />
+          (keyup)="getClientsBagpro()" (change)="selectClientBagpro()" autocomplete="off"/>
+        <button *ngIf="formFiltros.get('cliente')?.value || formFiltros.get('idCliente')?.value" pButton
+          type="button" class="p-button-text p-button-rounded p-button-sm cliente-clear-button"
+          icon="pi pi-times" aria-label="Limpiar cliente" (click)="limpiarClienteBagpro()"></button>
         <datalist id="clientesConsultados">
           <option value={{item.codBagpro}} *ngFor="let item of clientes">{{item.nombreComercial}}</option>
         </datalist>

@@ -113,13 +113,32 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     })
   }
 
-  //
+  /**
+   * Selecciona el cliente escrito y limpia su identificador si el texto no corresponde a una opción.
+   * @returns No retorna un valor.
+   */
   selectClientBagpro() {
     let id_cliente = this.formFiltros.value.cliente;
     let cliente = this.clientes.find(x => x.codBagpro == id_cliente);
+    if (!cliente) {
+      this.formFiltros.patchValue({ idCliente: null });
+      return;
+    }
+
     this.formFiltros.patchValue({
       'idCliente': cliente.codBagpro,
       'cliente': cliente.nombreComercial,
+    });
+  }
+
+  /**
+   * Limpia el nombre y el identificador del cliente seleccionado en los filtros.
+   * @returns No retorna un valor.
+   */
+  limpiarClienteBagpro(): void {
+    this.formFiltros.patchValue({
+      cliente: null,
+      idCliente: null,
     });
   }
 
