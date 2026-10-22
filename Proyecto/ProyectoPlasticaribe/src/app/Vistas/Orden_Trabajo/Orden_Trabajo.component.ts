@@ -651,8 +651,11 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a cerrar el mensaje de confirmación de edicion de una orden de trabajo
   cerrarMensaje = () => this.messageService.clear('editarOrden');
 
-  /** Función que cargará las tintas en los combobox al momento de crear la OT. */
-  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas.filter((item) => item.catMP_Id == 7));
+  /** Carga las tintas para impresión y ajusta las selecciones actuales al nombre de cada opción. */
+  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => {
+    this.arrayTintas = tintas.filter((item) => item.catMP_Id == 7);
+    this.sincronizarTintasFormulario();
+  });
 
   /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
   cargarPigmentosEnProcesoExtrusion = () => this.servicioPigmentos.srvObtenerLista().subscribe(pigmentos => this.arrayPigmentos = pigmentos);
@@ -715,11 +718,91 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Funcion que va a colocar el color correspondiente
-  colocarColor(color): string {
-    let colorHex: string = ``;
-    colorHex = this.arrayTintas.find(x => x.tinta_Nombre == color).tinta_CodigoHexadecimal;
-    return colorHex;
+  /**
+   * Obtiene el código hexadecimal de una tinta seleccionada por su nombre.
+   * @param color Nombre de la tinta seleccionada.
+   * @returns El código hexadecimal de la tinta o null si no existe coincidencia.
+   */
+  colocarColor(color: unknown): string | null {
+    const nombreNormalizado = String(color ?? '').trim().toLowerCase();
+    if (!nombreNormalizado) {
+      return null;
+    }
+
+    const tinta = this.arrayTintas.find((item) =>
+      String(item.tinta_Nombre ?? '').trim().toLowerCase() === nombreNormalizado);
+    return this.normalizarCodigoColor(tinta?.tinta_CodigoHexadecimal)
+      ?? this.colorPorNombre(tinta?.tinta_Nombre ?? color);
+  }
+
+  /**
+   * Obtiene un color CSS de respaldo a partir del nombre común de la tinta.
+   * @param nombre Nombre de la tinta.
+   * @returns El color asociado al nombre o null cuando no es un color conocido.
+   */
+  private colorPorNombre(nombre: unknown): string | null {
+    const nombreNormalizado = String(nombre ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+    const colores: Record<string, string> = {
+      blanco: '#ffffff',
+      amarillo: '#ffff00',
+      naranja: '#ffa500',
+      cafe: '#a52a2a',
+      marron: '#a52a2a',
+      rojo: '#ff0000',
+      negro: '#000000',
+      azul: '#0000ff',
+      verde: '#008000',
+      morado: '#800080',
+      violeta: '#800080',
+      rosado: '#ffc0cb',
+      rosa: '#ffc0cb',
+      gris: '#808080',
+      transparente: '#ffffff',
+      'no aplica': '#e5e7eb',
+    };
+    return colores[nombreNormalizado] ?? null;
+  }
+
+  /**
+   * Normaliza un código hexadecimal para poder aplicarlo como color CSS.
+   * @param codigo Código hexadecimal guardado, con o sin el prefijo #.
+   * @returns El código hexadecimal CSS normalizado o null si el formato no es válido.
+   */
+  normalizarCodigoColor(codigo: unknown): string | null {
+    const codigoNormalizado = String(codigo ?? '').trim().replace(/^#/, '');
+    return /^(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(codigoNormalizado)
+      ? `#${codigoNormalizado}`
+      : null;
+  }
+
+  /**
+   * Devuelve el nombre de tinta que coincide con las opciones del dropdown.
+   * @param nombre Nombre de tinta recibido desde una orden de trabajo.
+   * @returns El nombre canónico de la opción o el nombre recibido sin espacios exteriores.
+   */
+  private nombreTintaParaDropdown(nombre: unknown): string {
+    const nombreRecibido = String(nombre ?? '').trim();
+    const nombreNormalizado = nombreRecibido.toLowerCase();
+    const tinta = this.arrayTintas.find((item) =>
+      String(item.tinta_Nombre ?? '').trim().toLowerCase() === nombreNormalizado);
+    return tinta?.tinta_Nombre ?? nombreRecibido;
+  }
+
+  /**
+   * Sincroniza los valores actuales del formulario con los nombres canónicos de las tintas.
+   * @returns No retorna un valor.
+   */
+  private sincronizarTintasFormulario(): void {
+    for (let numeroTinta = 1; numeroTinta <= 8; numeroTinta++) {
+      const control = this.FormOrdenTrabajoImpresion.get(`Tinta_Impresion${numeroTinta}`);
+      if (control) {
+        control.setValue(this.nombreTintaParaDropdown(control.value), { emitEvent: false });
+      }
+    }
   }
 
   /**
@@ -1163,14 +1246,14 @@ export class Orden_TrabajoComponent implements OnInit {
       Tipo_Impresion: data.impresion ? 2 : data.rotograbado ? 5 : 1,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
       Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
-      Tinta_Impresion1: data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1,
-      Tinta_Impresion2: data.tinta2 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion2,
-      Tinta_Impresion3: data.tinta3 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion3,
-      Tinta_Impresion4: data.tinta4 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion4,
-      Tinta_Impresion5: data.tinta5 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion5,
-      Tinta_Impresion6: data.tinta6 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion6,
-      Tinta_Impresion7: data.tinta7 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion7,
-      Tinta_Impresion8: data.tinta8 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion8,
+      Tinta_Impresion1: this.nombreTintaParaDropdown(data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1),
+      Tinta_Impresion2: this.nombreTintaParaDropdown(data.tinta2 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion2),
+      Tinta_Impresion3: this.nombreTintaParaDropdown(data.tinta3 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion3),
+      Tinta_Impresion4: this.nombreTintaParaDropdown(data.tinta4 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion4),
+      Tinta_Impresion5: this.nombreTintaParaDropdown(data.tinta5 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion5),
+      Tinta_Impresion6: this.nombreTintaParaDropdown(data.tinta6 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion6),
+      Tinta_Impresion7: this.nombreTintaParaDropdown(data.tinta7 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion7),
+      Tinta_Impresion8: this.nombreTintaParaDropdown(data.tinta8 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion8),
       Impresion_Observacion: data.impresion_Observacion || null,
     });
   }

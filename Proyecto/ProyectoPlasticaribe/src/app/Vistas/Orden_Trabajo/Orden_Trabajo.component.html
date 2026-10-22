@@ -513,16 +513,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion1)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion1) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion1 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
@@ -539,16 +538,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion2)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion2) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion2 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
@@ -565,16 +563,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion3)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion3) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion3 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
@@ -591,16 +588,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion4)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion4) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion4 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
@@ -617,16 +613,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion5)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion5) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion5 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
@@ -643,16 +638,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion6)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion6) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion6 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
@@ -669,16 +663,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion7)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion7) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion7 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
@@ -695,16 +688,15 @@
                                 optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
                                 <ng-template pTemplate="selectedItem">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head"
-                                      value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion8)}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion8) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion8 }}</div>
                                   </div>
                                 </ng-template>
                                 <ng-template let-tinta pTemplate="item">
                                   <div class="flex align-items-center gap-2">
-                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}"
-                                      disabled />
+                                    <span style="display: inline-block; flex: 0 0 auto; width: 2rem; height: 1.5rem; border: 1px solid #ced4da; border-radius: 2px;"
+                                      [style.backgroundColor]="colocarColor(tinta.tinta_Nombre) || '#e5e7eb'"></span>
                                     <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
                                   </div>
                                 </ng-template>
