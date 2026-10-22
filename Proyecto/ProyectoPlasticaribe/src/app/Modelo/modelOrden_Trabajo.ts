@@ -5,6 +5,7 @@ export interface modelOrden_Trabajo {
   Prod_Id : number;
   UndMed_Id : string;
   Ot_FechaCreacion : any;
+  Ot_FechaEntrega? : string | null;
   Ot_Hora : string;
   Estado_Id : number;
   Usua_Id : number;

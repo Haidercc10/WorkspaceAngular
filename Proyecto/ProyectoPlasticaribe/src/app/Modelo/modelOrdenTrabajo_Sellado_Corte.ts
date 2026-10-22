@@ -7,6 +7,11 @@ export interface modelOrdenTrabajo_SelladoCorte {
   SelladoCorte_Ancho : number;
   SelladoCorte_Largo : number;
   SelladoCorte_Fuelle : number;
+  SelladoCorte_Solapa?: number | null;
+  SelladoCorte_Ancho1?: number | null;
+  SelladoCorte_Ancho2?: number | null;
+  SelladoCorte_Ancho3?: number | null;
+  SelladoCorte_Observacion?: string | null;
   SelladoCorte_PesoMillar : number;
   TpSellado_Id : number;
   SelladoCorte_PrecioSelladoDia : number;

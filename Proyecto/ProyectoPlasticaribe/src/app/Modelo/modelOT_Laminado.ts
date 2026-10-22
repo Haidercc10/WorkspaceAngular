@@ -9,4 +9,5 @@ export interface modelOT_Laminado {
   LamCapa_Cantidad1 : number;
   LamCapa_Cantidad2 : number;
   LamCapa_Cantidad3 : number;
+  Laminado_Observacion?: string | null;
 }

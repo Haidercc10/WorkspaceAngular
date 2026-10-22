@@ -9,4 +9,6 @@ export interface modelOT_Extrusion {
   Extrusion_Ancho3 : number;
   UdnMed_Id : string;
   Tratado_Id : number;
+  Extrusion_Grafilado?: boolean | null;
+  Extrusion_Observacion?: string | null;
 }
