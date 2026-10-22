@@ -203,8 +203,17 @@
               </span>
             </div>
 
+            <!-- Fecha entrega -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="fechaEntrega">
+              <span class="p-float-label">
+                <p-calendar formControlName="OT_FechaEntrega" inputId="FechaEntrega" dateFormat="yy-mm-dd"
+                  [showIcon]="true" [showButtonBar]="true" appendTo="body"></p-calendar>
+                <label for="FechaEntrega">Fecha Entrega</label>
+              </span>
+            </div>
+
             <!-- Campo Observacion -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-8 col-xxl-8" id="observacion">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-6 col-xxl-6" id="observacion">
               <span class="p-float-label">
                 <textarea formControlName="OT_Observacion" [rows]="1" pInputTextarea></textarea>
                 <label for="textarea">Observación general</label>
@@ -334,7 +343,7 @@
                           </div>
 
                           <!-- Formato -->
-                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
                             <span class="p-float-label">
                               <p-dropdown formControlName="Formato_Extrusion" inputId="Formato" optionValue="formato_Id"
                                 [autoDisplayFirst]="false" [options]="formatos" optionLabel="formato_Nombre"
@@ -356,12 +365,22 @@
                           </div>
 
                           <!-- Tratado -->
-                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
                             <span class="p-float-label">
                               <p-dropdown formControlName="Tratado_Extrusion" inputId="Tratado" [options]="tratado"
                                 optionLabel="tratado_Nombre" optionValue="tratado_Id" [autoDisplayFirst]="false"
                                 [required]="true"></p-dropdown>
                               <label for="Tratado">Tratado</label>
+                            </span>
+                          </div>
+
+                          <!-- Grafilado -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Grafilado_Extrusion" inputId="Grafilado"
+                                [options]="opcionesSiNo" optionLabel="label" optionValue="value"
+                                [autoDisplayFirst]="false"></p-dropdown>
+                              <label for="Grafilado">Grafilado</label>
                             </span>
                           </div>
 
@@ -379,7 +398,7 @@
                             <span class="p-float-label">
                               <p-inputNumber formControlName="Ancho_Extrusion2" inputId="Ancho2" mode="decimal"
                                 [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                              <label for="Ancho2">Ancho 2</label>
+                              <label for="Ancho2">Fuelle Izq.</label>
                             </span>
                           </div>
 
@@ -388,7 +407,7 @@
                             <span class="p-float-label">
                               <p-inputNumber formControlName="Ancho_Extrusion3" inputId="Ancho3" mode="decimal"
                                 [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                              <label for="Ancho3">Ancho 3</label>
+                              <label for="Ancho3">Fuelle Der.</label>
                             </span>
                           </div>
 
@@ -419,6 +438,15 @@
                               <label for="PesoExtrusion">Peso Extrusión</label>
                             </span>
                           </div>
+                        </div>
+                      </div>
+                      <div class="row mt-3">
+                        <div class="col-12">
+                          <span class="p-float-label">
+                            <textarea formControlName="Extrusion_Observacion" id="extrusionObservacion" class="w-100"
+                              [rows]="2" pInputTextarea></textarea>
+                            <label for="extrusionObservacion">Observación</label>
+                          </span>
                         </div>
                       </div>
                     </form>
@@ -686,6 +714,15 @@
                           </div>
                         </div>
                       </div>
+                      <div class="row mt-3">
+                        <div class="col-12">
+                          <span class="p-float-label">
+                            <textarea formControlName="Impresion_Observacion" id="impresionObservacion" class="w-100"
+                              [rows]="2" pInputTextarea></textarea>
+                            <label for="impresionObservacion">Observación</label>
+                          </span>
+                        </div>
+                      </div>
                     </form>
                   </ng-template>
                 </p-accordionTab>
@@ -793,6 +830,15 @@
                           </div>
                         </div>
                       </div>
+                      <div class="row mt-3">
+                        <div class="col-12">
+                          <span class="p-float-label">
+                            <textarea formControlName="Laminado_Observacion" id="laminadoObservacion" class="w-100"
+                              [rows]="2" pInputTextarea></textarea>
+                            <label for="laminadoObservacion">Observación</label>
+                          </span>
+                        </div>
+                      </div>
                     </form>
                   </ng-template>
                 </p-accordionTab>
@@ -886,6 +932,16 @@
                           </div>
                         </div>
                       </div>
+                      <div class="row mt-3">
+                        <div class="col-12">
+                          <span class="p-float-label">
+                            <textarea formControlName="SelladoCorte_Observacion" id="corteObservacion" class="w-100"
+                              (input)="actualizarObservacionSelladoCorte($event)" [rows]="2"
+                              pInputTextarea></textarea>
+                            <label for="corteObservacion">Observación</label>
+                          </span>
+                        </div>
+                      </div>
                     </form>
                   </ng-template>
                 </p-accordionTab>
@@ -921,10 +977,10 @@
                             <span class="p-float-label">
                               <p-inputNumber formControlName="Ancho_Sellado" inputId="Ancho" mode="decimal"
                                 [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                              <label for="Ancho">Ancho</label>
+                              <label for="Ancho">Ancho Total</label>
                             </span>
                           </div>
-
+                          
                           <!-- Largo-->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
@@ -943,6 +999,38 @@
                             </span>
                           </div>
 
+                          <!-- Ancho 1, 2 y 3 -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Sellado1" inputId="AnchoSellado1" mode="decimal"
+                                [minFractionDigits]="2"></p-inputNumber>
+                              <label for="AnchoSellado1">Ancho</label>
+                            </span>
+                          </div>
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Sellado2" inputId="AnchoSellado2" mode="decimal"
+                                [minFractionDigits]="2"></p-inputNumber>
+                              <label for="AnchoSellado2">Fuelle Izq.</label>
+                            </span>
+                          </div>
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Sellado3" inputId="AnchoSellado3" mode="decimal"
+                                [minFractionDigits]="2"></p-inputNumber>
+                              <label for="AnchoSellado3">Fuelle Der.</label>
+                            </span>
+                          </div>
+
+                          <!-- Solapa-->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Solapa_Sellado" inputId="Solapa" mode="decimal"
+                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Solapa">Solapa</label>
+                            </span>
+                          </div>
+
                           <!-- Etiqueta Ancho -->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
@@ -955,18 +1043,18 @@
                           <!-- Etiqueta Largo-->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
-                              <input formControlName="Etiqueta_Largo_Sellado" id="etiquetaAncho" type="text" pInputText
+                              <input formControlName="Etiqueta_Largo_Sellado" id="etiquetaLargo" type="text" pInputText
                                 autocomplete="off" [required]="true" />
-                              <label for="Largo">Etiq. Largo</label>
+                              <label for="etiquetaLargo">Etiq. Largo</label>
                             </span>
                           </div>
 
                           <!-- Etiqueta Fuelle-->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
-                              <input formControlName="Etiqueta_Fuelle_Sellado" id="etiquetaAncho" type="text" pInputText
+                              <input formControlName="Etiqueta_Fuelle_Sellado" id="etiquetaFuelle" type="text" pInputText
                                 autocomplete="off" [required]="true" />
-                              <label for="Fuelle">Etiq. Fuelle</label>
+                              <label for="etiquetaFuelle">Etiq. Fuelle</label>
                             </span>
                           </div>
 
@@ -1108,6 +1196,16 @@
 
                         </div>
                         <hr>
+                        <div class="row mt-3">
+                          <div class="col-12">
+                            <span class="p-float-label">
+                              <textarea formControlName="SelladoCorte_Observacion" id="selladoObservacion"
+                                class="w-100" (input)="actualizarObservacionSelladoCorte($event)" [rows]="2"
+                                pInputTextarea></textarea>
+                              <label for="selladoObservacion">Observación</label>
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </form>
                   </ng-template>
@@ -1896,12 +1994,10 @@
                       <!-- Nombre Mezcla -->
                       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
                         <span class="p-float-label">
-                          <input formControlName="Nombre_Mezclas" autocomplete="off" id="Mezcla" list="mezclas"
-                            type="text" pInputText (change)="cargarCombinacionMezclas()" required />
-                          <datalist id="mezclas">
-                            <option value={{item.mezcla_Nombre}} *ngFor="let item of mezclas">{{item.mezcla_Nombre}}
-                            </option>
-                          </datalist>
+                          <p-dropdown formControlName="Nombre_Mezclas" inputId="Mezcla" [options]="mezclas"
+                            optionLabel="mezcla_Nombre" optionValue="mezcla_Nombre" [filter]="true"
+                            filterBy="mezcla_Nombre" [autoDisplayFirst]="false" [required]="true"
+                            (onChange)="cargarCombinacionMezclas()"></p-dropdown>
                           <label for="Mezcla">Mezclas</label>
                         </span>
                       </div>

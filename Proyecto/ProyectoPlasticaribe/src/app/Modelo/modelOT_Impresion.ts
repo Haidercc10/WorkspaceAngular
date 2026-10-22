@@ -11,4 +11,5 @@ export interface modelOT_Impresion {
   Tinta6_Id : number;
   Tinta7_Id : number;
   Tinta8_Id : number;
+  Impresion_Observacion?: string | null;
 }
