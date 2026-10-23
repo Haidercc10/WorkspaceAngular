@@ -82,7 +82,7 @@
             <!-- ID CLIENTE -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="idCliente">
               <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-user"></i>
+                <i class="pi pi-id-card"></i>
                 <input formControlName="Id_Cliente" type="text" id="orden" pInputText [required]="true"
                   [readonly]="true" />
                 <label for="orden">Id Cliente</label>
@@ -92,7 +92,7 @@
             <!-- NOMBRE CLIENTE -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="cliente">
               <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-users"></i>
+                <i class="pi pi-user"></i>
                 <input formControlName="Nombre_Cliente" id="cliente" list="clientes" type="text" pInputText
                   (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off" [required]="true" />
                 <datalist id="clientes">
@@ -105,7 +105,7 @@
             <!-- ID PRODUCTO -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="idProducto">
               <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-box"></i>
+                <i class="pi pi-hashtag"></i>
                 <input formControlName="Id_Producto" type="text" id="Id_Producto" (keyup.enter)="buscarProductoPorId()"
                   pInputText [required]="true" />
                 <label for="Id_Producto">Item</label>
@@ -115,7 +115,7 @@
             <!-- NOMBRE PRODUCTO -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="producto">
               <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-th-large"></i>
+                <i class="pi pi-box"></i>
                 <input formControlName="Nombre_Producto" id="Nombre_Producto" list="productos" type="text" pInputText
                   (keyup)="consultarProductos()" (change)="productoSeleccionado()" autocomplete="off"
                   [required]="true" />
@@ -170,7 +170,7 @@
             <!-- ID Vendedor -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="idVendedor">
               <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-hashtag"></i>
+                <i class="pi pi-id-card"></i>
                 <input formControlName="Id_Vendedor" type="text" id="Id_Vendedor" pInputText [required]="true"
                   [readonly]="true" />
                 <label for="Id_Vendedor">Id Vendedor</label>
