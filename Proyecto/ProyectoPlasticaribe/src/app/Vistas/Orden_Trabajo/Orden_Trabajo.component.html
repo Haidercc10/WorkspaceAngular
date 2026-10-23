@@ -57,14 +57,14 @@
         <div class="mb-3">
           <div class="row g-4">
             
-            <!-- NUMERO ORDEN DE TRABAJO -->
+            <!-- N° OT -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
               <div class="p-inputgroup">
                 <span class="p-inputgroup-addon cursor" pTooltip="Anterior" tooltipPosition="top"
                   (click)="ConsultarOrdenTrabajo(-1)">
                   <i class="pi pi-chevron-left"></i>
                 </span>
-                <p-inputNumber formControlName="OT_Id" type="number" id="orden" placeholder="Nro. OT"
+                <p-inputNumber formControlName="OT_Id" type="number" id="orden" placeholder="N° OT"
                   [useGrouping]="false" (keyup.enter)="ConsultarOrdenTrabajo(0)"></p-inputNumber>
                 <span class="p-inputgroup-addon cursor" pTooltip="Siguiente" tooltipPosition="top"
                   (click)="ConsultarOrdenTrabajo(1)">
@@ -230,16 +230,21 @@
         </div>
       </form>
 
-      <div class="mb-4">
+      <div class="mb-3">
         <hr class="colorLinea">
       </div>
 
+      <!-- Titulo procesos -->
+      <div class="mb-5">
+        <h4 class="tituloRojo"><i class="pi pi-sitemap"></i> Procesos de Producción</h4>
+      </div>
+
       <!-- Información de Creación del Producto -->
-      <div class="mb-4" *ngIf="!cargando">
+      <div class="mb-3" *ngIf="!cargando">
         <div class="row">
 
           <!-- Checkbox Procesos  -->
-          <div class="mb-4" id="check">
+          <div id="check">
             <div class="row g-3 d-flex justify-content-center">
               <!-- Cyrel -->
               <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
@@ -311,14 +316,7 @@
           </div>
 
           <!-- Linea -->
-          <div class="mb-4">
-            <hr class="colorLinea">
-          </div>
-
-          <!-- Titulo procesos -->
-          <div class="mb-3">
-            <h4 class="tituloRojo"><i class="pi pi-sitemap"></i> Procesos de Producción</h4>
-          </div>
+          <hr class="colorLinea">
 
           <!-- Tabs de Procesos -->
           <p-tabView id="datos-ot" class="justify-content-md-center">
@@ -2573,10 +2571,7 @@
         </div>
       </div>
     </p-tabPanel>
-
-
   </p-tabView>
-
 </p-card>
 
 <!-- Modal de crear producto -->
