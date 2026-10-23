@@ -1,6 +1,7 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
+// const host = window.location.hostname;
 
 export const environment = {
   production: false,
@@ -11,11 +12,18 @@ export const environment = {
   //rutaZeus: "http://192.168.0.85:9055/api",
   //rutaZeusContabilidad: "http://192.168.0.85:9065/api",
 
+  // SERVIDOR 250
+  rutaPlasticaribeAPI: "http://192.168.0.250:9085/api",
+  rutaBagPro: "http://192.168.0.250:9095/api",
+  rutaZeus: "http://192.168.0.250:9055/api",
+  rutaZeusContabilidad: "http://192.168.0.250:9065/api"
+
   // LOCALES 1
-  rutaPlasticaribeAPI : "http://192.168.0.100:9085/api",
-  rutaBagPro : "http://192.168.0.100:9095/api",
-  rutaZeus : "http://192.168.0.100:9055/api",
-  rutaZeusContabilidad : "http://192.168.0.100:9065/api"
+  // rutaPlasticaribeAPI : `https://${host}:7137/api`,
+  // rutaPlasticaribeAPI : `http://${host}:9090/api`,
+  // rutaZeus : `http://${host}:9091/api`,
+  // rutaZeusContabilidad : `http://${host}:9092/api`,
+  // rutaBagPro : `http://${host}:9093/api`
 
   // LOCALES 2
   //rutaPlasticaribeAPI : "http://192.168.0.185:9085/api",
