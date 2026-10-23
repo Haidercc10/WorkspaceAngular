@@ -126,9 +126,10 @@
               </span>
             </div>
 
-            <!-- CANTIDAD A FABRICAR -->
+            <!-- CANTIDAD PEDIDA -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="cantidadFabricar">
-              <span class="p-float-label">
+              <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+                <i class="pi pi-hashtag"></i>
                 <p-inputNumber formControlName="Cantidad" inputId="Cant" (onKeyDown)="calcularDatosOt()"
                   [required]="true"></p-inputNumber>
                 <label for="Cant">Cant. Pedida</label>
@@ -137,7 +138,8 @@
 
             <!-- PRESENTACION PRODUCTO -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="presentacion">
-              <span class="p-float-label">
+              <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+                <i class="pi pi-th-large"></i>
                 <p-dropdown formControlName="Presentacion" inputId="Estado" [autoDisplayFirst]="false"
                   [options]="presentaciones" optionLabel="undMed_Nombre" optionValue="undMed_Id"
                   (onChange)="consultarInfoProducto()" [required]="true"></p-dropdown>
@@ -147,8 +149,9 @@
 
             <!-- PRECIO UNITARIO -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="precioUnitario">
-              <span class="p-float-label">
-                <p-inputNumber formControlName="Precio" mode="decimal" prefix="$ " inputId="Cant"
+              <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+                <i class="pi pi-dollar"></i>
+                <p-inputNumber formControlName="Precio" mode="decimal" inputId="Cant"
                   [minFractionDigits]="2" (onKeyDown)="calcularDatosOt()" [required]="true"></p-inputNumber>
                 <label for="Cant">Precio Unitario</label>
               </span>
@@ -156,8 +159,9 @@
 
             <!-- MARGEN ADICIONAL -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1" id="margenAdicional">
-              <span class="p-float-label">
-                <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant" prefix="% "
+              <span class="p-input-icon-left p-float-label">
+                <i class="pi pi-percentage"></i>
+                <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant"
                   [minFractionDigits]="2" [readonly]="true" [required]="true"></p-inputNumber>
                 <label for="Cant">Margen</label>
               </span>
@@ -166,7 +170,7 @@
             <!-- ID Vendedor -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="idVendedor">
               <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-user"></i>
+                <i class="pi pi-hashtag"></i>
                 <input formControlName="Id_Vendedor" type="text" id="Id_Vendedor" pInputText [required]="true"
                   [readonly]="true" />
                 <label for="Id_Vendedor">Id Vendedor</label>
@@ -175,7 +179,8 @@
 
             <!-- Nombre Vendedor -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="vendedor">
-              <span class="p-float-label">
+              <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+                <i class="pi pi-user"></i>
                 <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores"
                   optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"
                   [showClear]="true" [autoDisplayFirst]="ValidarRol == 2" [readonly]="ValidarRol == 2" [required]="true"
@@ -186,7 +191,8 @@
 
             <!-- ESTADO DE LA ORDEN -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="estadoOrden">
-              <span class="p-float-label">
+              <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+                <i class="pi pi-table"></i>
                 <p-dropdown formControlName="OT_Estado" inputId="Estado" [options]="estados" optionLabel="estado_Nombre"
                   optionValue="estado_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                 <label for="Estado">Estado OT</label>

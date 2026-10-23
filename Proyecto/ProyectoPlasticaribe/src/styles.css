@@ -246,6 +246,22 @@ th {
   width: 100%;
 }
 
+.p-dropdown-icon-left > i {
+  z-index: 1;
+}
+
+.p-dropdown-icon-left p-dropdown .p-dropdown-label {
+  padding-left: 2.5rem;
+}
+
+.p-inputnumber-icon-left > i {
+  z-index: 1;
+}
+
+.p-inputnumber-icon-left p-inputnumber .p-inputnumber-input {
+  padding-left: 2.5rem;
+}
+
 .p-inputtext:enabled:focus {
   box-shadow: 0 0 0 0.2rem #febfbf;
   border-color: #f63b3b;

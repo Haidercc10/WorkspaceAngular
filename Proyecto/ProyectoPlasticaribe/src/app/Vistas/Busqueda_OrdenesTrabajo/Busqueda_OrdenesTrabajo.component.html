@@ -24,7 +24,8 @@
 
     <!-- CLIENTE -->
     <div class="col-sm-12 col-md-6 col-xl-4">
-      <span class="p-float-label cliente-input-container">
+      <span class="p-input-icon-left p-float-label cliente-input-container">
+        <i class="pi pi-user"></i>
         <input formControlName="cliente" id="cliente" type="text" pInputText autocomplete="off"/>
         <button *ngIf="formFiltros.get('cliente')?.value" pButton
           type="button" class="p-button-text p-button-rounded p-button-sm cliente-clear-button"
@@ -52,7 +53,8 @@
 
     <!-- ITEM -->
     <div class="col-sm-12 col-md-6 col-xl-2">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+        <i class="pi pi-hashtag"></i>
         <p-inputNumber formControlName="item" inputId="item" [useGrouping]="false"></p-inputNumber>
         <label for="item">Item</label>
       </span>
@@ -60,7 +62,8 @@
 
     <!-- REFERENCIA -->
     <div class="col-sm-12 col-md-6 col-xl-4">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-float-label">
+        <i class="pi pi-box"></i>
         <input formControlName="referencia" id="referencias" type="text" pInputText autocomplete="off" />
         <button *ngIf="formFiltros.get('referencia')?.value" pButton
           type="button" class="p-button-text p-button-rounded p-button-sm cliente-clear-button"
@@ -71,7 +74,8 @@
 
     <!-- MATERIAL -->
     <div class="col-sm-12 col-md-6 col-xl-3">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-th-large"></i>
         <p-dropdown formControlName="material" inputId="Material" optionValue="material_Nombre"
           [autoDisplayFirst]="false" [options]="materiales" optionLabel="material_Nombre"></p-dropdown>
         <label for="Material">Material</label>
@@ -80,7 +84,8 @@
 
     <!-- PIGMENTO -->
     <div class="col-sm-12 col-md-6 col-xl-3">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-palette"></i>
         <p-dropdown formControlName="pigmento" inputId="Pigmento" optionValue="pigmt_Nombre" [autoDisplayFirst]="false"
           [options]="pigmentos" optionLabel="pigmt_Nombre"></p-dropdown>
         <label for="Pigmento">Pigmento</label>
@@ -89,7 +94,8 @@
 
     <!-- ANCHO -->
     <div class="col-sm-12 col-md-6 col-xl-2">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+        <i class="pi pi-arrows-h"></i>
         <p-inputNumber formControlName="ancho" inputId="anchoItem" mode="decimal"
           [minFractionDigits]="2"></p-inputNumber>
         <label for="anchoItem">Ancho</label>
@@ -98,7 +104,8 @@
 
     <!-- LARGO -->
     <div class="col-sm-12 col-md-6 col-xl-2">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+        <i class="pi pi-arrows-v"></i>
         <p-inputNumber formControlName="largo" inputId="largoItem" mode="decimal"
           [minFractionDigits]="2"></p-inputNumber>
         <label for="largoItem">Largo</label>
@@ -107,7 +114,8 @@
 
     <!-- FUELLE -->
     <div class="col-sm-12 col-md-6 col-xl-2">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+        <i class="pi pi-hashtag"></i>
         <p-inputNumber formControlName="fuelle" inputId="fuelleItem" mode="decimal"
           [minFractionDigits]="2"></p-inputNumber>
         <label for="fuelleItem">Fuelle</label>
@@ -116,7 +124,8 @@
 
     <!-- CALIBRE -->
     <div class="col-sm-12 col-md-6 col-xl-2">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+        <i class="pi pi-hashtag"></i>
         <p-inputNumber formControlName="calibre" inputId="calibreItem" mode="decimal"
           [minFractionDigits]="2"></p-inputNumber>
         <label for="calibreItem">Calibre</label>
@@ -125,7 +134,8 @@
 
     <!--* SALES -->
     <div class="col-sm-12 col-md-6 col-xl-4">
-      <span class="p-float-label">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-users"></i>
         <p-dropdown formControlName="sales" inputId="sales" [autoDisplayFirst]="ValidarRol == 2"
           [readonly]="ValidarRol == 2" [options]="sales" optionValue="usua_Id" optionLabel="usua_Nombre"
           [filter]="true" filterBy="usua_Nombre"></p-dropdown>
