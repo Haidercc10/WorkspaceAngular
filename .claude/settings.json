@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "C:/Dev/GitHub/PlasticaribeWebAPI",
+      "C:/Dev/GitHub/ZeusInventarioAPI",
+      "C:/Dev/GitHub/BagPro_WebApi",
+      "C:/Dev/GitHub/ZeusContabilidadAPI"
+    ],
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch)",
+      "Bash(git rev-parse:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(npm run build:*)"
+    ],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git merge:*)",
+      "Bash(git checkout:*)",
+      "Bash(dotnet ef migrations:*)",
+      "Bash(npm install:*)"
+    ],
+    "deny": [
+      "Bash(dotnet ef database:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean:*)",
+      "Bash(git push --force:*)",
+      "Bash(sqlcmd:*)"
+    ]
+  }
+}
