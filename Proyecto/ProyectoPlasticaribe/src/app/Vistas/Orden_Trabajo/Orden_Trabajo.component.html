@@ -96,7 +96,7 @@
                 <input formControlName="Nombre_Cliente" id="cliente" list="clientes" type="text" pInputText
                   (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off" [required]="true" />
                 <datalist id="clientes">
-                  <option value={{item.cli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
+                  <option value={{item.sedeCli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
                 </datalist>
                 <label for="cliente">Cliente</label>
               </span>

@@ -26,10 +26,10 @@ export const environment = {
   // rutaBagPro : `http://${host}:9093/api`
 
   // LOCALES 2
-  rutaPlasticaribeAPI : "http://192.168.101.10:9085/api",
-  rutaBagPro : "http://192.168.101.10:9095/api",
-  rutaZeus : "http://192.168.101.10:9075/api",
-  rutaZeusContabilidad : "http://192.168.101.10:9055/api",
+  rutaPlasticaribeAPI : "http://192.168.0.90:9085/api",
+  rutaBagPro : "http://192.168.0.90:9095/api",
+  rutaZeus : "http://192.168.0.90:9055/api",
+  rutaZeusContabilidad : "http://192.168.0.90:9065/api",
 };
 
 /*

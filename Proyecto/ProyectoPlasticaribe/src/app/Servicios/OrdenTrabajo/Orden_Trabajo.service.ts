@@ -36,4 +36,10 @@ export class Orden_TrabajoService {
   srvEliminar = (id:number|string) => this.http.delete(this.rutaPlasticaribeAPI + `/Orden_Trabajo/${id}`);
 
   srvGuardar = (data : modelOrden_Trabajo): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Orden_Trabajo', data);
+
+  /** Crea la OT y sus procesos (extrusión, impresión, laminado y sellado/corte) en una sola transacción. */
+  crearOrdenCompleta = (data : any): Observable<{ ot_Id: number, numero_OT: number }> => this.http.post<{ ot_Id: number, numero_OT: number }>(this.rutaPlasticaribeAPI + '/Orden_Trabajo/crearCompleta', data);
+
+  /** Actualiza la OT y sus procesos de forma atómica; la API crea los procesos que le falten a la OT. */
+  editarOrdenCompleta = (otId : number, data : any): Observable<{ ot_Id: number, numero_OT: number }> => this.http.put<{ ot_Id: number, numero_OT: number }>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/editarCompleta/${otId}`, data);
 }

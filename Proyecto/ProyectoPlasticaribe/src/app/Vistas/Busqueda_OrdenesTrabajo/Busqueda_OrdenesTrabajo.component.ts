@@ -247,6 +247,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
     let tabCrearOrden2 = document.getElementById(tabCrearOrden[1].id) as HTMLDivElement;
     tabCrearOrden2.click();
+    this.orden_TrabajoComponent.limpiarCampos();
     this.orden_TrabajoComponent.consultarClientes();
     if (tipoBusqueda == 'Item') {
       this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
