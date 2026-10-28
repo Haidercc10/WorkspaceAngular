@@ -51,6 +51,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   modalReposition: boolean = false;
   modalDevolution: boolean = false;
   modalManagerDevolution: boolean = false;
+  showAnularColumn: boolean = true;
 
   clients: any[] = [];
   sales: any[] = [];
@@ -126,6 +127,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.serchedData = [];
     this.formFilters.reset();
     this.dt?.clear();
+    this.showAnularColumn = true;
     this.anulledOrder = undefined;
     this.ofDirect = false;
     this.detailsOF = 0;
@@ -149,8 +151,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.serchedData = [];
     this.dt?.clear();
 
-    if (typeMov == 'OF') this.searchDataOrders(startDate, endDate, this.validateUrl());
-    else if (typeMov == 'DV') this.searchDataDevolutions(startDate, endDate, this.validateUrl());
+    if (typeMov == 'OF') {
+      this.showAnularColumn = true;
+      this.searchDataOrders(startDate, endDate, this.validateUrl());
+    } else if (typeMov == 'DV') {
+      this.showAnularColumn = false;
+      this.searchDataDevolutions(startDate, endDate, this.validateUrl());
+    }
     else this.util.Notificacion(`Advertencia`,`¡Debe seleccionar un tipo de movimiento!`);
   }
 
@@ -297,11 +304,11 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
         if (this.detailsOF == 0) {
           this.updateStockProducts(true);
         } else if (this.detailsOF > 0) {
-          this.updateStockProducts(true);
-          this.PutStatusDetailsOrder(false);
+          this.updateStockProducts(false);
+          this.PutStatusDetailsOrder(true);
         }
       } else if (!this.ofDirect) {
-        this.PutStatusDetailsOrder(false);
+        this.PutStatusDetailsOrder(true);
       }
     }, error => this.util.Notificacion(`Error`,`¡Ocurrió un error al intentar anular la orden N° ${this.anulledOrder}! | ${error.statusText} ${error.status}`));
   }
@@ -309,15 +316,17 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   ///Función para actualizar el estado de los rollos a disponibles.
   PutStatusDetailsOrder(viewMsj: boolean) {
     this.load = true;
-    this.productionProcessService.putStateAvaible(this.anulledOrder).pipe(finalize(() => this.load = false)).subscribe(() => {
-      viewMsj ? this.util.Notificacion(`Confirmación`, `¡Orden de facturación anulada con éxito!`) : null;
+    this.productionProcessService.putStateAvaible(this.anulledOrder).pipe(finalize(() => this.searchData())).subscribe(() => {
+      viewMsj ? this.util.Notificacion(`Confirmación`, `¡Orden de facturación N° ${this.anulledOrder} anulada con éxito!`) : null;
     }, error => this.util.Notificacion(`Error`, `¡Ocurrió un error al colocar en disponible los rollos de la orden N° ${this.anulledOrder}! ${error.statusText} ${error.status}`));
   }
 
   ///Actualizar stock de productos luego de anular una orden directa.
   updateStockProducts(viewMsj: boolean) {
     this.load = true;
-    this.svExistProduct.putStockThenAnullation(this.anulledOrder).pipe(finalize(() => this.load = false)).subscribe(data => {
+    this.svExistProduct.putStockThenAnullation(this.anulledOrder).pipe(finalize(() => {
+      viewMsj ? this.searchData() : this.load = false;
+    })).subscribe(data => {
       viewMsj ? this.util.Notificacion(`Confirmación`, `¡Orden de facturación N° ${this.anulledOrder} anulada con éxito!`) : null;
     }, error => this.util.Notificacion(`Error`, `¡Error al intentar devolver al stock los productos facturados de la orden N° ${this.anulledOrder}! ${error.statusText} ${error.status}`));
   }
