@@ -669,3 +669,7 @@ p-avatar div span {
   height: 30px;
   width: 30px;
 }
+
+.p-float-label textarea.p-inputtextarea:not(:focus):not(.p-filled) ~ label {
+  top: min(50%, 1.5rem);
+}
