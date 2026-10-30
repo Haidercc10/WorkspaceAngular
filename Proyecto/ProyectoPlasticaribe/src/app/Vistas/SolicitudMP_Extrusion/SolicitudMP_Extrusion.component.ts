@@ -40,7 +40,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  load: boolean = true; //Variable para validar que aparezca el icono de carga o no
+  load: boolean = false; //Indica si la vista está realizando una carga
   materiaPrima: any = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   subcategoriasSeleccionadas: any[] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   idSubcategorias: any[] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
@@ -197,16 +197,20 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
-  // Funcion que limpia los todos los campos de la vista
+  /** Limpia los campos de la vista y restablece el estado inicial. */
   LimpiarCampos() {
+    const proceso = this.formEncabezado.get('proceso')?.value;
     this.formMP.reset();
     this.formEncabezado.reset();
-    this.formEncabezado.patchValue({ fecha: moment().format('YYYY-MM-DD'), });
+    this.formEncabezado.patchValue({
+      fecha: moment().format('YYYY-MM-DD'),
+      proceso
+    });
     this.ultimoConsecutivoSolicitud();
     this.formMP.patchValue({ und: 'Kg' });
     this.cantRestante = 0;
     this.kgOT = 0;
-    this.load = true;
+    this.load = false;
     this.idSubcategorias = [];
     this.subcategoriasSeleccionadas = [];
     this.error = false;
@@ -235,13 +239,12 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   }
 
 
-  // Funcion que va a consultar la orden de trabajo para saber que cantidad de materia prima 
-  // se ha asignado y que cantidad se ha devuelto con respecto a la cantidad que se debe hacer en kg
+  /** Consulta la orden de trabajo y muestra el estado de carga mientras obtiene sus datos. */
   infoOT() {
-    this.load = false;
+    this.load = true;
     let ot: string = this.formEncabezado.value.ot;
     this.bagProServices.srvObtenerListaClienteOT_Item(ot)
-      .pipe(takeUntil(this.destroy$), finalize(() => { this.load = true; }))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
         if (data.length > 0) {
           let adicional: number = (data[0].datosotKg * 0.05);
@@ -250,16 +253,20 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           this.formEncabezado.patchValue({ 'kgOt': parseFloat(data[0].datosotKg + adicional), });
           this.getInfoMaterialSolicitada(parseInt(ot), data);
         } else if (data.length == 0) {
-          this.load = true;
+          this.load = false;
           this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`);
         }
       }, error => {
-        this.load = true;
+        this.load = false;
         this.mensajeService.mensajeError(`Error`, `Error al consultar la OT ${ot}! ` + error);
       });
   }
 
-  // Funcion que va a obtener la informacion de la materia prima solicitada
+  /**
+   * Obtiene la materia prima solicitada y actualiza la información de la orden.
+   * @param ot Número de la orden de trabajo consultada.
+   * @param data Datos obtenidos de la orden de trabajo.
+   */
   getInfoMaterialSolicitada(ot: number, data: any) {
     this.detallesAsignacionService.getMateriasPrimaSolicitada(ot)
       .pipe(takeUntil(this.destroy$))
@@ -270,9 +277,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         this.esSolicitud ? this.cargarMaquinas() : null;
         if (cantPorSolicitar > 0) this.mensajeService.mensajeConfirmacion(`Advertencia`, `La OT N° ${ot} tiene '${cantPorSolicitar.toFixed(2)}' kg restantes por solicitar.`);
         else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no tiene kg restantes por solicitar.`);
-        this.load = true;
+        this.load = false;
       }, err => {
-        this.load = true;
+        this.load = false;
       });
   }
 
@@ -389,19 +396,19 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe llenar los campos vacios!');
   }
 
-  //Funcion que creará la solicitud de materia prima a una OT Y lo guardará en la base de datos
+  /** Crea o valida la solicitud de materia prima para la orden de trabajo. */
   solicitudMateriaPrima() {
     const idOrdenTrabajo: number = this.formEncabezado.value.ot;
     const idSolicitud: number = this.formEncabezado.value.Solicitud;
-    this.load = false;
+    this.load = true;
     if (this.error) {
-      this.load = true;
+      this.load = false;
       return;
     }
 
     if ([4, 1].includes(this.estadoOT)) {
       this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible crear/editar solicitudes a la OT ${idOrdenTrabajo}, porque está cerrada!`);
-      this.load = true;
+      this.load = false;
       return;
     }
 
@@ -411,7 +418,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       return;
     }
 
-    this.load = true;
+    this.load = false;
     if (this.ValidarRol != 1) {
       this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar supera el limite de kilos permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos al administrador.`);
     } else if (this.esSolicitud) {
@@ -421,10 +428,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     }
   }
 
-  // Crear solicitud mat. prima
+  /** Guarda el encabezado de una nueva solicitud de materia prima. */
   crearSolicitudMatPrima() {
     this.onReject('solicitud');
-    this.load = false;
+    this.load = true;
 
     const solicitud: modelSolicitudMP_Extrusion = {
       'SolMpExt_Id': 0,
@@ -446,7 +453,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       error: () => {
         this.error = true;
         this.mensajeService.mensajeError(`Error`, `Error al crear la solicitud de material!`);
-        this.load = true;
+        this.load = false;
       }
     });
   }
@@ -462,7 +469,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           if (count == this.subcategoriasSeleccionadas.length) this.solicitudExitosa(solicitud);
         }, () => {
           this.error = true;
-          this.load = true;
+          this.load = false;
           this.mensajeService.mensajeError(`Error`, `Error al insertar la materia prima solicitada ${x.Nombre}!`);
         });
       });
@@ -507,7 +514,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   confirmarEditarSolicitud = (Id: any) => this.messageService.add({ severity: 'warn', key: 'solicitud', summary: 'Confirmar Elección', detail: `La cantidad a solicitar supera el limite de Kg permitidos para la OT ${Id}, ¿Desea solicitar de todas formas?`, sticky: true });
 
-  //Buscar informacion de la solicitud creada
+  /**
+   * Consulta la solicitud creada para generar su comprobante PDF.
+   * @param solicitud Identificador de la solicitud.
+   */
   getInfoPdf(solicitud: number) {
     this.load = true;
     this.informacionPDF = [];
@@ -660,7 +670,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     };
   }
 
-  //Buscar informacion de las solicitudes de materia prima creadas
+  /** Consulta una solicitud existente y activa el indicador durante la búsqueda. */
   consultarSolicitudMaterial() {
     let solicitud: number = this.formEncabezado.value.Solicitud;
     this.idSubcategorias = [];
@@ -668,9 +678,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.infoOrdenTrabajo = [];
 
     if (solicitud) {
-      this.load = false;
+      this.load = true;
       this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(solicitud)
-        .pipe(takeUntil(this.destroy$), finalize(() => this.load = true))
+        .pipe(takeUntil(this.destroy$), finalize(() => this.load = false))
         .subscribe(data => {
           if (data.length > 0) {
             if (![4, 5].includes(data[0].estado)) this.cargarDetallesSolicitud(data);
@@ -686,11 +696,14 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El N° de la solicitud no es válido`);
   }
 
-  //Función para cargar los detalles de la solicitud de materia prima en el formulario y la tabla.
+  /**
+   * Carga los detalles de una solicitud en el formulario y la tabla.
+   * @param data Detalles de la solicitud consultada.
+   */
   cargarDetallesSolicitud(data: any) {
     console.log(data);
     this.esSolicitud = true;
-    this.load = false;
+    this.load = true;
     this.formEncabezado.patchValue({
       'ot': data[0].ot,
       'observacion': data[0].observacion,
@@ -728,9 +741,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.subcategoriasSeleccionadas.push(info);
   }
 
-  //? Editar Solicitudes de material de producción por Id */
+  /** Actualiza el encabezado de una solicitud de material existente. */
   editarSolicitud() {
-    this.load = false;
+    this.load = true;
     let solicitud: any = this.formEncabezado.value.Solicitud;
     let maq: number = this.formEncabezado.value.maq;
     let ot: any = this.formEncabezado.value.ot;
@@ -740,20 +753,20 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
     if (solicitud == null) {
       this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡No se ha digitado un número de solicitud válida!`);
-      this.load = true;
+      this.load = false;
       return;
     }
 
     if (ot != otConsultada.ot) {
       this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT digitado ${ot} no coincide con la OT consultada ${otConsultada.ot}!`);
-      this.load = true;
+      this.load = false;
       return;
     }
     this.servicioSolicitudMpExt.GetId(solicitud)
       .subscribe(data => {
         this.encabezadoSolicitud(data, parseInt(solicitud), ot, maq, observacion, fechaEntrega)
         this.servicioSolicitudMpExt.Put(parseInt(solicitud), this.encabezadoSolicitud(data, parseInt(solicitud), ot, maq, observacion, fechaEntrega))
-          .pipe(finalize(() => { this.load = true; }))
+          .pipe(finalize(() => { this.load = false; }))
           .subscribe((datos) => {
             this.editarDetallesSolicitud(parseInt(solicitud));
             console.log(datos);
@@ -763,7 +776,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
             this.mensajeService.mensajeError(`Error`, `Error al actualizar el encabezado de la solicitud de material!`);
           });
       }, error => {
-        this.load = true;
+        this.load = false;
         this.mensajeService.mensajeError(`Error`, `Error al obtener la solicitud de material! | ${error.error}`);
       });
   }
