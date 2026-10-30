@@ -132,7 +132,7 @@
   <!-- Tabla -->
   <!-- Inicio tabla de registros consultados -->
 
-  <div class="mb-3" *ngIf=" !cargando">
+  <div class="mb-3" [style.visibility]="cargando ? 'hidden' : 'visible'" [attr.aria-hidden]="cargando">
     <div class="row g-3" id="">
       <!-- Encabezado -->
       <div class="col-md-5 px-4">
@@ -172,8 +172,7 @@
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-registros>
-              <tr (click)="cargarDetalleSolicitud(registros.id)" class="cursor" ptooltip="Ver detalle de solicitudes"
-                ptooltipPosition="top">
+              <tr (click)="cargarDetalleSolicitud(registros.id)" class="cursor" pTooltip="Haz click para ver el detalle de solicitudes" tooltipPosition="top">
                 <td><b>{{registros.id}}</b></td>
                 <td>{{registros.ot}}</td>
                 <td>{{registros.fecha}}</td>
@@ -280,8 +279,9 @@
 </p-card>
 
 <p-dialog header="Solicitud N° {{solicitudSeleccionada}}" [(visible)]="modalAsignacion" [modal]="true"
-  [style]="{ width: '90%' }" [draggable]="false" [resizable]="false">
-  <app-asignacion-materia-prima></app-asignacion-materia-prima>
+  [style]="{ width: '90%' }" [draggable]="false" [resizable]="false" (onHide)="alCerrarModalAsignacion()">
+  <app-asignacion-materia-prima
+    (asignacionCompletada)="finalizarModalAsignacion($event)"></app-asignacion-materia-prima>
 </p-dialog>
 
 <p-toast position="center" key="{{clave}}" (onClose)="onReject()" [baseZIndex]="5000">

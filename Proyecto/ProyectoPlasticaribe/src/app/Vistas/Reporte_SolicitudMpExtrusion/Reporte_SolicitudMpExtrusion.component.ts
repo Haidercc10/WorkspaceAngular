@@ -45,6 +45,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   solicitudSeleccionada : number = 0; /** Nro de la solicitud seleccionada */
   usuarioSolicitante : string = '' /** Variable que contendrá el nombre del usuario que solicitó la materia prima. */
   modalAsignacion : boolean = false; /** Variable que validará que se cargue o no, el componente del modal de ordenes de compras. */
+  private mensajeAsignacionPendiente: { summary: string; detail: string } | null = null;
   cantParciales : number = 0; /** Variable que mostrará el número de solicitudes parciales */
   estadoSolicitud : string = ''; /** Variable que servirá para no permitir cancelar solicitudes en estado cancelado o finalizado. */
   clave : string = ''; /** Variable que contendrá una palabra clave ya sea para finalizar o cancelar una solicitud.*/
@@ -315,12 +316,33 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     if(['FINALIZADO', 'CANCELADO'].includes(this.estadoSolicitud)) {
       this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear asignaciones con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
+      this.mensajeAsignacionPendiente = null;
       this.modalAsignacion = true;
-      //this.AsignacionMatPrima.esSolicitud = true;
-      //this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({ Solicitud : this.solicitudSeleccionada});
-      //this.AsignacionMatPrima.consultarSolicitudMaterial(this.arrayMatPrimas);
-      //this.cargarSubcategoriasEnAsignaciones();
+      this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({ Solicitud : this.solicitudSeleccionada });
+      this.AsignacionMatPrima.consultarSolicitudMaterial(this.arrayMatPrimas, true);
     }
+  }
+
+  /**
+   * Cierra el popup al completarse la asignación y prepara su mensaje de éxito.
+   * @param mensaje Mensaje de confirmación entregado por el formulario de asignación.
+   * @returns No retorna un valor.
+   */
+  finalizarModalAsignacion(mensaje: { summary: string; detail: string }): void {
+    this.mensajeAsignacionPendiente = mensaje;
+    this.modalAsignacion = false;
+  }
+
+  /**
+   * Muestra la confirmación después de terminar la animación de cierre del popup.
+   * @returns No retorna un valor.
+   */
+  alCerrarModalAsignacion(): void {
+    if (!this.mensajeAsignacionPendiente) return;
+
+    const mensaje = this.mensajeAsignacionPendiente;
+    this.mensajeAsignacionPendiente = null;
+    this.msj.mensajeConfirmacion(mensaje.summary, mensaje.detail);
   }
 
   /** Consultar solicitudes por estado. */
