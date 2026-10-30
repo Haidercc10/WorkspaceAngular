@@ -12,6 +12,23 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   width: 100%;
 }
 
+.solicitud-input-container {
+  position: relative;
+}
+
+.solicitud-input-container input {
+  padding-right: 2.5rem;
+}
+
+.solicitud-clear-button {
+  position: absolute;
+  top: 50%;
+  right: 0.25rem;
+  z-index: 2;
+  transform: translateY(-50%);
+  color: #5d6d7e;
+}
+
 ::ng-deep .p-card {
   align-items: center;
   margin: auto;

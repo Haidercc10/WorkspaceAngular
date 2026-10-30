@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -23,8 +23,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsAsignacionMateriaPrima as defaultSteps } from 'src/app/data';
 import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
-import { finalize, Subject, takeUntil } from 'rxjs';
-import { error } from 'node:console';
+import { finalize, interval, Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-asignacion-materia-prima',
@@ -33,6 +32,8 @@ import { error } from 'node:console';
 })
 export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
+  @ViewChild('formularioAsignacion') formularioAsignacion!: ElementRef<HTMLFormElement>;
+  @Output() asignacionCompletada = new EventEmitter<{ summary: string; detail: string }>();
   public FormMateriaPrimaRetiro !: FormGroup;
   public FormMateriaPrimaRetirada !: FormGroup;
 
@@ -60,6 +61,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   mpSeleccionada: any = [];
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   esSolicitud: boolean = false;
+  esSolicitudDesdeReporte: boolean = false;
   arrayMatPrimas: any = [];
   hora: any = moment().format('H:mm:ss');
   expandedRows: any = {}; //Variable que controla las filas desplegadas de la tabla de subcategorias
@@ -67,6 +69,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   materialAConfirmar: any = null; //Material pendiente de confirmación antes de enviarlo a la tabla de asignación
   subcategoriaAConfirmar: any = null; //Subcategoria del material pendiente de confirmación
   private destroy$ = new Subject<void>(); // Variable para manejar la destrucción de las subscripciones y evitar fugas de memoria
+  private operacionesAsignacionPendientes: number = 0;
+  private procesoAsignacionActivo: boolean = false;
+  private procesoAsignacionFallido: boolean = false;
+  private errorAsignacionMostrado: boolean = false;
+  private etapaAsignacion: 'guardando' | 'detalles' | 'movimientos' | 'estadoSolicitud' | 'completada' = 'guardando';
+  private asignacionActual: number | null = null;
+  private solicitudActual: number | null = null;
   subcategorias: any[] = [];
 
   constructor(private materiaPrimaService: MateriaPrimaService,
@@ -114,6 +123,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Inicializa los catálogos y sincroniza el tema mientras el componente está activo. */
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerUnidadMedida();
@@ -121,10 +131,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.obtenerMateriaPrima();
     this.consultarCategorias();
     this.obtenerMaterialesPorSubcategoria('EXT');
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    interval(1000).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    });
   }
 
-  // Función que se ejecutará al cerrar el componente para limpiar las subscripciones y evitar fugas de memoria
+  /** Cancela las suscripciones activas al destruir el componente. */
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
@@ -146,7 +158,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  // Funcion que limpia los todos los campos de la vista
+  /** Limpia los formularios y restablece el modo de consulta de asignación.
+   * @returns No retorna un valor.
+   */
   LimpiarCampos() {
     this.FormMateriaPrimaRetirada.reset();
     this.FormMateriaPrimaRetiro.reset();
@@ -159,8 +173,29 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.categoriasSeleccionadas = [];
     this.infoOrdenTrabajo = [];
     this.esSolicitud = false;
+    this.esSolicitudDesdeReporte = false;
     this.arrayMatPrimas = [];
     this.expandedRows = {};
+  }
+
+  /**
+   * Limpia la solicitud consultada, su OT y máquina, y elimina los datos derivados de esa consulta.
+   * @returns No retorna un valor.
+   */
+  limpiarSolicitudSeleccionada(): void {
+    this.FormMateriaPrimaRetiro.patchValue({
+      Solicitud: null,
+      OTRetiro: null,
+      Maquina: null,
+    });
+    this.infoOrdenTrabajo = [];
+    this.materiasPrimasSeleccionadas = [];
+    this.subcategorias = [];
+    this.arrayMatPrimas = [];
+    this.expandedRows = {};
+    this.cantRestante = 0;
+    this.kgOT = 0;
+    this.esSolicitud = false;
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
@@ -397,7 +432,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
   }
 
-  //2. Funcion que hará validaciones antes de realizar la asignación
+  /**
+   * Valida el formulario y los materiales antes de realizar la asignación.
+   * @returns No retorna un valor.
+   */
   validarCamposVaciosRetirada() {
     let maquina: number = this.FormMateriaPrimaRetiro.value.Maquina;
     if (this.FormMateriaPrimaRetiro.valid) {
@@ -414,7 +452,19 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     } else {
       this.load = true;
       this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, '¡Debe llenar los campos vacios!');
+      this.scrollToFirstInvalidField();
     }
+  }
+
+  /**
+   * Desplaza suavemente el formulario hasta el primer control inválido.
+   * @returns No retorna un valor.
+   */
+  private scrollToFirstInvalidField(): void {
+    const controlInvalido = this.formularioAsignacion.nativeElement
+      .querySelector<HTMLElement>('[formControlName].ng-invalid');
+
+    controlInvalido?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   //3. Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
@@ -436,10 +486,23 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
   }
 
-  //4. Crear Asignacion
+  /**
+   * Crea la asignación e inicia el seguimiento de sus operaciones asociadas.
+   * @returns No retorna un valor.
+   */
   crearAsignacion() {
+    if (this.procesoAsignacionActivo) return;
+
     this.onReject('asignacion');
     this.load = false;
+    this.procesoAsignacionActivo = true;
+    this.procesoAsignacionFallido = false;
+    this.errorAsignacionMostrado = false;
+    this.operacionesAsignacionPendientes = 0;
+    this.etapaAsignacion = 'guardando';
+    this.asignacionActual = null;
+    this.solicitudActual = this.FormMateriaPrimaRetiro.value.Solicitud || 1;
+
     const datosAsignacion: any = {
       AsigMP_OrdenTrabajo: this.FormMateriaPrimaRetiro.value.OTRetiro,
       AsigMp_FechaEntrega: this.today,
@@ -454,18 +517,30 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     }
 
     // Se guarda la asignación en la base de datos, y posteriormente se llama al método para guardar los detalles de la asignación.
-    this.asignacionMPService.srvGuardar(datosAsignacion).pipe(takeUntil(this.destroy$), finalize(() => this.load = true)).subscribe({
-      next: datos => { this.obtenerProcesoId(datos.asigMp_Id, this.FormMateriaPrimaRetiro.value.Solicitud == null || this.FormMateriaPrimaRetiro.value.Solicitud == "" ? 1 : this.FormMateriaPrimaRetiro.value.Solicitud) },
-      error: error => {
-        this.mensajeService.mensajeError(`¡Error!`, `¡Error al crear la asignación de materia prima!`);
-        console.log(error);
+    this.ejecutarOperacionAsignacion(
+      this.asignacionMPService.srvGuardar(datosAsignacion),
+      '¡Error al crear la asignación de materia prima!',
+      datos => {
+        const asignacion = datos?.asigMp_Id;
+        if (asignacion == null) {
+          this.fallarProcesoAsignacion('No se recibió el identificador de la asignación creada.');
+          return;
+        }
+
+        this.asignacionActual = asignacion;
+        this.etapaAsignacion = 'detalles';
+        this.obtenerProcesoId(asignacion, this.solicitudActual);
       }
-    });
+    );
   }
 
-  //5. Funcion que se encargará de consultar el Id del proceso y hacer el ingreso de las materia primas asignadas
+  /**
+   * Registra los detalles de asignación y actualiza el inventario de los materiales seleccionados.
+   * @param asignacion Identificador de la asignación creada.
+   * @param solicitud Identificador de la solicitud asociada.
+   * @returns No retorna un valor.
+   */
   obtenerProcesoId(asignacion: number, solicitud?: any) {
-    let count: number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       let polietileno_Id = this.materiasPrimasSeleccionadas[i].Id_Mp;
       let tinta_Id = this.materiasPrimasSeleccionadas[i].Id_Tinta;
@@ -481,16 +556,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
         this.guardarAsignacionTinta(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso, precio);
       else if (polietileno_Id != 84 && tinta_Id == 2001 && !this.soloTintas)
         this.guardarAsignacionPolietileno(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso, precio);
-      count++;
     }
-    setTimeout(() => {
-      if (count == this.materiasPrimasSeleccionadas.length) {
-        this.actualizarMovimientosEntradasMP(asignacion);
-        setTimeout(() => this.asignacionExitosa(asignacion, solicitud), 2000);
-      }
-    }, 2000);
   }
-  //6. Guardar asignación de tinta
+
+  /**
+   * Guarda el detalle de una tinta y descuenta su inventario.
+   * @param asignacion Identificador de la asignación.
+   * @param id_tinta Identificador de la tinta.
+   * @param nombreTinta Nombre de la tinta para el mensaje de error.
+   * @param cantidad Cantidad asignada.
+   * @param presentacion Unidad de medida.
+   * @param proceso Identificador del proceso.
+   * @param precio Precio unitario.
+   * @returns No retorna un valor.
+   */
   guardarAsignacionTinta(asignacion, id_tinta, nombreTinta, cantidad, presentacion, proceso, precio) {
     const datosDetallesAsignacionTintas: any = {
       AsigMp_Id: asignacion,
@@ -502,13 +581,24 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       DtAsigTinta_Subtotal: precio * cantidad
     }
 
-    this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(null, () => {
-      this.load = true;
-      this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${nombreTinta}!`);
-    });
+    this.ejecutarOperacionAsignacion(
+      this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas),
+      `¡Error al insertar la tinta asignada ${nombreTinta}!`
+    );
     this.moverInventarioTintas(id_tinta, cantidad);
   }
-  //7. Guardar asignación de polietileno
+
+  /**
+   * Guarda el detalle de materia prima y descuenta su inventario.
+   * @param asignacion Identificador de la asignación.
+   * @param idMatPrima Identificador de la materia prima.
+   * @param nombreMatPrima Nombre de la materia prima para el mensaje de error.
+   * @param cantidad Cantidad asignada.
+   * @param presentacion Unidad de medida.
+   * @param proceso Identificador del proceso.
+   * @param precio Precio unitario.
+   * @returns No retorna un valor.
+   */
   guardarAsignacionPolietileno(asignacion, idMatPrima, nombreMatPrima, cantidad, presentacion, proceso, precio) {
     const datosDetallesAsignacion: modelDetallesAsignacion = {
       AsigMp_Id: asignacion,
@@ -519,89 +609,209 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       DtAsigMp_Precio: precio,
       DtAsigMp_Subtotal: (precio * cantidad)
     }
-    this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
-      this.load = true;
-      this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${nombreMatPrima}!`);
-    });
+    this.ejecutarOperacionAsignacion(
+      this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion),
+      `¡Error al insertar la materia prima asignada ${nombreMatPrima}!`
+    );
     this.moverInventarioMpPedida(idMatPrima, cantidad);
   }
 
-  // 11. Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien
+  /**
+   * Continúa el proceso por etapas cuando ya terminaron las operaciones actuales.
+   * @returns No retorna un valor.
+   */
+  private avanzarProcesoAsignacion(): void {
+    if (!this.procesoAsignacionActivo || this.operacionesAsignacionPendientes > 0) return;
+
+    if (this.procesoAsignacionFallido) {
+      this.procesoAsignacionActivo = false;
+      return;
+    }
+
+    if (this.etapaAsignacion === 'guardando') {
+      this.fallarProcesoAsignacion('No se recibió respuesta al crear la asignación.');
+      return;
+    }
+
+    if (this.etapaAsignacion === 'detalles') {
+      this.etapaAsignacion = 'movimientos';
+      this.actualizarMovimientosEntradasMP(this.asignacionActual!);
+      this.avanzarProcesoAsignacion();
+      return;
+    }
+
+    if (this.etapaAsignacion === 'movimientos') {
+      if (this.esSolicitud) {
+        const solicitud = this.solicitudActual;
+        if (solicitud === null) {
+          this.fallarProcesoAsignacion('No se recibió el identificador de la solicitud.');
+          this.avanzarProcesoAsignacion();
+          return;
+        }
+
+        this.etapaAsignacion = 'estadoSolicitud';
+        this.ejecutarOperacionAsignacion(
+          this.servicioSolitudMaterial.PutEstadoSolicitud(solicitud),
+          '¡Error al actualizar el estado de la solicitud!'
+        );
+        return;
+      }
+
+      this.etapaAsignacion = 'completada';
+    } else if (this.etapaAsignacion === 'estadoSolicitud') {
+      this.etapaAsignacion = 'completada';
+    }
+
+    if (this.etapaAsignacion === 'completada') {
+      this.procesoAsignacionActivo = false;
+      this.load = true;
+      this.asignacionExitosa(this.asignacionActual!, this.solicitudActual);
+    }
+  }
+
+  /**
+   * Ejecuta y contabiliza una operación HTTP que forma parte de la asignación.
+   * @param operacion Observable de la operación HTTP.
+   * @param mensajeError Mensaje a mostrar si la operación falla.
+   * @param alExito Acción a ejecutar con la respuesta exitosa, si aplica.
+   * @returns No retorna un valor.
+   */
+  private ejecutarOperacionAsignacion<T>(
+    operacion: Observable<T>,
+    mensajeError: string,
+    alExito: (respuesta: T) => void = () => undefined
+  ): void {
+    this.operacionesAsignacionPendientes++;
+    operacion.pipe(takeUntil(this.destroy$)).subscribe({
+      next: respuesta => alExito(respuesta),
+      error: () => {
+        this.operacionesAsignacionPendientes--;
+        this.fallarProcesoAsignacion(mensajeError);
+        this.avanzarProcesoAsignacion();
+      },
+      complete: () => {
+        this.operacionesAsignacionPendientes--;
+        this.avanzarProcesoAsignacion();
+      }
+    });
+  }
+
+  /**
+   * Detiene el indicador de carga y notifica el primer error de la asignación.
+   * @param mensajeError Mensaje que describe la operación fallida.
+   * @returns No retorna un valor.
+   */
+  private fallarProcesoAsignacion(mensajeError: string): void {
+    this.procesoAsignacionFallido = true;
+    this.load = true;
+
+    if (!this.errorAsignacionMostrado) {
+      this.errorAsignacionMostrado = true;
+      this.mensajeService.mensajeError('¡Error!', mensajeError);
+    }
+  }
+
+  /**
+   * Prepara el mensaje de éxito, genera el PDF correspondiente y notifica al reporte si aplica.
+   * @param asignId Identificador de la asignación creada.
+   * @param solicitud Identificador de la solicitud asociada.
+   * @returns No retorna un valor.
+   */
   asignacionExitosa(asignId: number, solicitud?: any) {
-    let data: any = {}
+    let data: any = {};
+    let summary: string;
+    let detail: string;
+
     if (!this.soloTintas && !this.esSolicitud) {
-      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, 
-        `Asignación creada satisfactoriamente!. A continuación se mostrará un PDF en una nueva pestaña.`);
-      data = { 'Id': asignId, 'Movimiento': 'ASIGMP' };
-      this.cmpMovMatPrima.validarTipoMovimiento(data)
-    } else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante && !this.esSolicitud) {
-      this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, 
-        `Solo se crearon las asignaciones de tintas!`);
-      data = { 'Id': asignId, 'Movimiento': 'ASIGTINTAS' };
-    } else if (this.esSolicitud) {
-      this.mensajeService.mensajeConfirmacion(`Confirmación`, `Asignación basada en solicitud generada satisfactoriamente!`);
-      this.putEstadoSolicitud(solicitud);
+      summary = '¡Asignación Creada!';
+      detail = 'Asignación creada satisfactoriamente!. A continuación se mostrará un PDF en una nueva pestaña.';
       data = { 'Id': asignId, 'Movimiento': 'ASIGMP' };
       this.cmpMovMatPrima.validarTipoMovimiento(data);
+    } else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante && !this.esSolicitud) {
+      summary = '¡Asignación Creada!';
+      detail = 'Solo se crearon las asignaciones de tintas!';
+      data = { 'Id': asignId, 'Movimiento': 'ASIGTINTAS' };
+    } else if (this.esSolicitud) {
+      summary = 'Confirmación';
+      detail = 'Asignación basada en solicitud generada satisfactoriamente!';
+      data = { 'Id': asignId, 'Movimiento': 'ASIGMP' };
+      this.cmpMovMatPrima.validarTipoMovimiento(data);
+    } else {
+      summary = '¡Asignación Creada!';
+      detail = 'Asignación creada satisfactoriamente.';
     }
+
+    if (this.esSolicitudDesdeReporte) this.asignacionCompletada.emit({ summary, detail });
+    else this.mensajeService.mensajeConfirmacion(summary, detail);
+
     setTimeout(() => this.LimpiarCampos(), 1000);
   }
 
-  //Funcion que va a actualizar el estado de la solicitud de material
-  putEstadoSolicitud(id: number) {
-    this.servicioSolitudMaterial.PutEstadoSolicitud(id).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
-      this.load = true;
-      this.mensajeService.mensajeError(`¡Error!`, `¡Error al actualizar el estado de la solicitud!`);
-    });
-  }
-
-  //6.2 Funcion que moverá el inventario de materia prima con base a la materia prima saliente
+  /**
+   * Consulta y actualiza el stock de la materia prima asignada.
+   * @param idMateriaPrima Identificador de la materia prima.
+   * @param cantidadMateriaPrima Cantidad que se debe descontar.
+   * @returns No retorna un valor.
+   */
   moverInventarioMpPedida(idMateriaPrima: number, cantidadMateriaPrima: number) {
-    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).pipe(takeUntil(this.destroy$)).subscribe(datos_materiaPrima => {
-      const datosMP: any = {
-        MatPri_Id: idMateriaPrima,
-        MatPri_Nombre: datos_materiaPrima.matPri_Nombre,
-        MatPri_Descripcion: datos_materiaPrima.matPri_Descripcion,
-        MatPri_Stock: datos_materiaPrima.matPri_Stock - cantidadMateriaPrima,
-        UndMed_Id: datos_materiaPrima.undMed_Id,
-        CatMP_Id: datos_materiaPrima.catMP_Id,
-        MatPri_Precio: datos_materiaPrima.matPri_Precio,
-        TpBod_Id: datos_materiaPrima.tpBod_Id,
-        MatPri_Fecha: datos_materiaPrima.matPri_Fecha,
-        MatPri_Hora: datos_materiaPrima.matPri_Hora,
-        MatPri_PrecioEstandar: datos_materiaPrima.matPri_PrecioEstandar,
-        SubCatMP_Id: datos_materiaPrima.subCatMP_Id
+    this.ejecutarOperacionAsignacion(
+      this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima),
+      `¡Error al consultar el inventario de la materia prima ${idMateriaPrima}!`,
+      datosMateriaPrima => {
+        const datosMP: any = {
+          MatPri_Id: idMateriaPrima,
+          MatPri_Nombre: datosMateriaPrima.matPri_Nombre,
+          MatPri_Descripcion: datosMateriaPrima.matPri_Descripcion,
+          MatPri_Stock: datosMateriaPrima.matPri_Stock - cantidadMateriaPrima,
+          UndMed_Id: datosMateriaPrima.undMed_Id,
+          CatMP_Id: datosMateriaPrima.catMP_Id,
+          MatPri_Precio: datosMateriaPrima.matPri_Precio,
+          TpBod_Id: datosMateriaPrima.tpBod_Id,
+          MatPri_Fecha: datosMateriaPrima.matPri_Fecha,
+          MatPri_Hora: datosMateriaPrima.matPri_Hora,
+          MatPri_PrecioEstandar: datosMateriaPrima.matPri_PrecioEstandar,
+          SubCatMP_Id: datosMateriaPrima.subCatMP_Id
+        };
+        this.ejecutarOperacionAsignacion(
+          this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP),
+          `¡Error al mover el inventario de la materia prima ${datosMateriaPrima.matPri_Nombre}!`
+        );
       }
-      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
-        this.load = true;
-        this.mensajeService.mensajeError(`¡Error!`, `¡Error al mover el inventario de la materia prima ${datos_materiaPrima.matPri_Nombre}!`);
-      });
-    });
+    );
   }
 
-  //6.1 Funcion que va a mover el inventario de una tinta
+  /**
+   * Consulta y actualiza el stock de la tinta asignada.
+   * @param idMateriaPrima Identificador de la tinta.
+   * @param cantidad Cantidad que se debe descontar.
+   * @returns No retorna un valor.
+   */
   moverInventarioTintas(idMateriaPrima: number, cantidad: number) {
-    this.tintasService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_tintas => {
-      const datosTintas: any = {
-        Tinta_Id: idMateriaPrima,
-        Tinta_Nombre: datos_tintas.tinta_Nombre,
-        Tinta_Descripcion: datos_tintas.tinta_Descripcion,
-        Tinta_CodigoHexadecimal: datos_tintas.tinta_CodigoHexadecimal,
-        Tinta_Stock: datos_tintas.tinta_Stock - cantidad,
-        UndMed_Id: datos_tintas.undMed_Id,
-        Tinta_Precio: datos_tintas.tinta_Precio,
-        CatMP_Id: datos_tintas.catMP_Id,
-        TpBod_Id: datos_tintas.tpBod_Id,
-        Tinta_InvInicial: datos_tintas.tinta_InvInicial,
-        Tinta_FechaIngreso: datos_tintas.tinta_FechaIngreso,
-        Tinta_Hora: datos_tintas.tinta_Hora,
-        Tinta_PrecioEstandar: datos_tintas.tinta_PrecioEstandar,
+    this.ejecutarOperacionAsignacion(
+      this.tintasService.srvObtenerListaPorId(idMateriaPrima),
+      `¡Error al consultar el inventario de la tinta ${idMateriaPrima}!`,
+      datosTintas => {
+        const datosActualizacion: any = {
+          Tinta_Id: idMateriaPrima,
+          Tinta_Nombre: datosTintas.tinta_Nombre,
+          Tinta_Descripcion: datosTintas.tinta_Descripcion,
+          Tinta_CodigoHexadecimal: datosTintas.tinta_CodigoHexadecimal,
+          Tinta_Stock: datosTintas.tinta_Stock - cantidad,
+          UndMed_Id: datosTintas.undMed_Id,
+          Tinta_Precio: datosTintas.tinta_Precio,
+          CatMP_Id: datosTintas.catMP_Id,
+          TpBod_Id: datosTintas.tpBod_Id,
+          Tinta_InvInicial: datosTintas.tinta_InvInicial,
+          Tinta_FechaIngreso: datosTintas.tinta_FechaIngreso,
+          Tinta_Hora: datosTintas.tinta_Hora,
+          Tinta_PrecioEstandar: datosTintas.tinta_PrecioEstandar,
+        };
+        this.ejecutarOperacionAsignacion(
+          this.tintasService.srvActualizar(idMateriaPrima, datosActualizacion),
+          `¡Error al mover el inventario de la tinta ${datosTintas.tinta_Nombre}!`
+        );
       }
-      this.tintasService.srvActualizar(idMateriaPrima, datosTintas).pipe(takeUntil(this.destroy$)).subscribe(null, () => {
-        this.load = true;
-        this.mensajeService.mensajeError(`¡Error!`, `¡Error al mover el inventario de la tinta ${datos_tintas.tinta_Nombre}!`);
-      });
-    });
+    );
   }
 
   /** Cerrar Dialogo de eliminación*/
@@ -615,14 +825,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
   confirmarAsignacion = (OT: any) => this.messageService.add({ severity: 'warn', key: 'asignacion', summary: 'Confirmar Elección', detail: `La cantidad de Kg a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea continuar con la asignación?`, sticky: true });
 
-  //Buscar informacion de las solicitudes de materia prima creadas
-  consultarSolicitudMaterial(subcategoriasSolicitudes: any) {
+  /** Consulta una solicitud e identifica si se abrió desde el reporte.
+   * @param subcategoriasSolicitudes Subcategorías cargadas por el reporte, si aplica.
+   * @param desdeReporte Indica si la consulta se inició desde el popup del reporte.
+   * @returns No retorna un valor.
+   */
+  consultarSolicitudMaterial(subcategoriasSolicitudes: any, desdeReporte: boolean = false) {
     this.materiasPrimasSeleccionadas = [];
     this.arrayMatPrimas = [];
     this.expandedRows = {};
     this.subcategorias = [];
     let solicitud: number = this.FormMateriaPrimaRetiro.value.Solicitud;
     this.esSolicitud = false;
+    this.esSolicitudDesdeReporte = desdeReporte;
+    if (desdeReporte) this.FormMateriaPrimaRetiro.patchValue({ dateIn: null });
     this.load = false;
 
     if (solicitud) {
@@ -691,21 +907,25 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.materiasPrimasSeleccionadas.push(info);
   }
 
-  /** 1. Validar que los materiales de la asignación tengan un stock mayor a la cantidad solicitada */
+  /**
+   * Valida que todos los materiales seleccionados tengan stock suficiente.
+   * @returns No retorna un valor.
+   */
   validarStockMateriales() {
-    this.load = false;
-    let msjStockMenor: string = 'Existen materiales con cantidades solicitadas mayores a su stock, por favor, verifique!';
-    let stockMenor: boolean = false;
-    for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      if (this.materiasPrimasSeleccionadas[index].Cantidad > this.materiasPrimasSeleccionadas[index].Stock) {
-        this.load = true;
-        stockMenor = true;
-      } else {
-        stockMenor = false;
-      }
-      break;
+    const stockInsuficiente = this.materiasPrimasSeleccionadas.some(
+      material => Number(material.Cantidad) > Number(material.Stock)
+    );
+
+    if (stockInsuficiente) {
+      this.load = true;
+      this.mensajeService.mensajeAdvertencia(
+        'Advertencia',
+        'Existen materiales con cantidades solicitadas mayores a su stock, por favor, verifique!'
+      );
+      return;
     }
-    stockMenor ? this.mensajeService.mensajeAdvertencia(`Advertencia`, msjStockMenor) : this.validarCamposVaciosRetirada();
+
+    this.validarCamposVaciosRetirada();
   }
 
   //TODO: Función que validará el nuevo estado de la solicitud 
@@ -754,15 +974,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     })
   }
 
-  //8. Función que actualizará las entradas disponibles
+  /**
+   * Actualiza las entradas disponibles y registra las salidas asociadas a la asignación.
+   * @param idAsignacion Identificador de la asignación.
+   * @returns No retorna un valor.
+   */
   actualizarMovimientosEntradasMP(idAsignacion: number) {
-    let salidaReal: number = 0;
     this.materiasPrimasSeleccionadas.forEach(mp => {
       mp.Cantidad2 = mp.Cantidad;
-      this.srvMovEntradasMP.GetInventarioxMaterial(mp.Id).pipe(takeUntil(this.destroy$)).subscribe(data => {
-        if (data.length > 0) {
+      this.ejecutarOperacionAsignacion(
+        this.srvMovEntradasMP.GetInventarioxMaterial(mp.Id),
+        `No fue posible consultar el inventario del material ${mp.Id}.`,
+        data => {
           data.forEach(mov => {
-            let detalle: modeloMovimientos_Entradas_MP = {
+            const detalle: modeloMovimientos_Entradas_MP = {
               'Id': mov.id,
               'MatPri_Id': mov.matPri_Id,
               'Tinta_Id': mov.tinta_Id,
@@ -779,9 +1004,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
               'Fecha_Entrada': mov.fecha_Entrada,
               'Hora_Entrada': mov.hora_Entrada,
               'Precio_EstandarUnitario': mov.precio_EstandarUnitario
-            }
-            let id: number | undefined = detalle.Id;
+            };
+            const id: number | undefined = detalle.Id;
             if (mp.Cantidad2 > 0) {
+              let salidaReal: number = 0;
               if (mp.Cantidad2 > detalle.Cantidad_Disponible) {
                 salidaReal = detalle.Cantidad_Disponible;
                 mp.Cantidad2 -= detalle.Cantidad_Disponible;
@@ -802,17 +1028,26 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
                 mp.Cantidad2 = 0;
               }
               if (id !== undefined) {
-                this.srvMovEntradasMP.Put(id, detalle).pipe(takeUntil(this.destroy$)).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
+                this.ejecutarOperacionAsignacion(
+                  this.srvMovEntradasMP.Put(id, detalle),
+                  'No fue posible actualizar el movimiento de entrada.'
+                );
                 this.crearRegistrosSalidasMP(detalle, salidaReal, idAsignacion);
               }
             }
-          })
+          });
         }
-      });
+      );
     });
   }
 
-  //10. Función que guardará las salidas de material
+  /**
+   * Registra el movimiento de salida asociado a una entrada de inventario.
+   * @param detalle Movimiento de entrada que origina la salida.
+   * @param salidaReal Cantidad que se descuenta de la entrada.
+   * @param idAsignacion Identificador de la asignación.
+   * @returns No retorna un valor.
+   */
   crearRegistrosSalidasMP(detalle: any, salidaReal: number, idAsignacion: number) {
     let salidas: modelEntradas_Salidas_MP = {
       'Id_Entrada': detalle.Id,
@@ -831,7 +1066,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       'Cant_PedidaOT': this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].cantPedida,
       'UndMed_Id': this.infoOrdenTrabajo[0] == undefined ? 'Kg' : this.infoOrdenTrabajo[0].und,
     }
-    this.srvMovSalidasMP.Post(salidas).pipe(takeUntil(this.destroy$)).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
+    this.ejecutarOperacionAsignacion(
+      this.srvMovSalidasMP.Post(salidas),
+      'No fue posible crear la salida de material.'
+    );
   }
 
   /** Cargar subcategorias en las asignaciones de materia prima */
