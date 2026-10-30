@@ -48,6 +48,19 @@ Este registro separa las dependencias demostradas de las hipótesis que aún no 
 - **Pendiente:** documentar fuentes de verdad de esquema, responsables de cambios, política de migraciones/scaffolding y diferencias entre el esquema desplegado y los modelos en cada checkout.
 - No se inspeccionaron ni ejecutaron consultas, migraciones o procesos de scaffolding.
 
+## Módulo de Órdenes de Trabajo
+
+- **Confirmado:** las tablas `Orden_Trabajo`, `OT_Extrusion`, `OT_Impresion`, `OT_Laminado` y `OT_Sellado_Corte` declaran triggers en el `dataContext` de PlasticaribeWebAPI (`TR_CrearOTs`, `TR_ActualizarCampos_*`, `Auditoria_*`). Al guardar dentro de una transacción explícita, SQL Server informó que intentó promoverla a distribuida, lo que indica escritura por linked server (por inferencia, hacia BagPro). No se inspeccionó el código de los triggers.
+- **Pendiente (API):** `GET Orden_Trabajo/getOrdenTrabajo/{orden}` hace INNER JOIN con los cuatro procesos y responde 400 cuando no hay filas; una OT sin algún proceso no se puede abrir. Evaluar LEFT JOIN y 404 revisando los demás consumidores (PDF, búsqueda).
+- **Pendiente (seguridad):** el filtro por vendedor (`sales`) solo se aplica desde Angular y solo en la consulta a BagPro; la consulta a Plasticaribe no filtra por usuario. Debe validarse en el servidor con el usuario autenticado.
+- **Pendiente (integridad):** el número de OT se calcula en el cliente como `UltimaOT de BagPro + 1` y `Numero_OT` no tiene índice único. `crearCompleta` responde 409 ante duplicados, pero falta índice único (previa revisión de duplicados existentes) y asignación del número en el servidor.
+- **Pendiente (regla de negocio):** tras editar una OT, `cambiarEstadoProducto` hace PUT del producto completo con valores del formulario de la OT, fuera de la transacción. Confirmar si debe sobrescribir los datos maestros del producto.
+- **Confirmado (búsqueda por item):** la ficha del item se carga desde BagPro `ClientesOtItem` (`GET ClientesOt/OT_Cliente_Item_Presentacion/{item}/{presentacion}`, con `?sales=` opcional) y, si no existe, desde la última OT de Plasticaribe (`getInfoUltOT`). El vendedor de la ficha se toma de `ClientesOtItem.UsrModifica`, igual que en `GetOrdenDeTrabajo`.
+- **Pendiente (búsqueda por item):** confirmar que `UsrModifica` representa al vendedor del item; definir qué fila usar si hay varias por item+presentación (hoy se toma la primera); el respaldo a Plasticaribe no filtra por vendedor.
+- **Confirmado (Rotograbado descontinuado):** el módulo `Orden_Trabajo` ya no ofrece el proceso Rotograbado; las OTs/items antiguos con Rotograbado se cargan como Impresión (flexografía) y al guardar se envía `Rotograbado = false`. La columna `Orden_Trabajo.Rotograbado`, el contrato de la API, BagPro (`Lamiando`) y el catálogo `Tipos_Impresion` (id 5) se conservan.
+- **Pendiente (Rotograbado):** la vista antigua `ordenes-trabajo` (embebida en `opedidoproducto`) aún muestra y envía Rotograbado. Decidir si se retira la columna/campo del modelo y de los triggers hacia BagPro.
+- **Preguntas:** ¿qué hace `TR_CrearOTs` cuando la OT ya existe en BagPro? ¿El linked server/MSDTC está configurado igual en todos los ambientes?
+
 ## Próximos pasos sugeridos
 
 1. Acordar nombres canónicos y ubicación del repositorio de Zeus Inventario, así como la ubicación real de Electron.

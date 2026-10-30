@@ -111,7 +111,8 @@ export class BagproService {
 
   srvObtenerListaClienteOT_Item = (ot : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT/${ot}`);
 
-  srvObtenerListaClienteOT_Item_Presentacion = (producto : number, presentacion : string):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT_Cliente_Item_Presentacion/${producto}/${presentacion}`);
+  /** Consulta la ficha actual del item en ClientesOtItem; sales es opcional (`?sales=001`) y filtra por vendedor. */
+  srvObtenerListaClienteOT_Item_Presentacion = (producto : number, presentacion : string, sales : string = ''):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT_Cliente_Item_Presentacion/${producto}/${presentacion}${sales}`);
 
   srvObtenerListaClienteOT_ItemCostos = (ot : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/CostosOT/${ot}`);
 

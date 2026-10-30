@@ -65,7 +65,9 @@
                   <i class="pi pi-chevron-left"></i>
                 </span>
                 <p-inputNumber formControlName="OT_Id" type="number" id="orden" placeholder="N° OT"
-                  [useGrouping]="false" (keyup.enter)="ConsultarOrdenTrabajo(0)"></p-inputNumber>
+                  [useGrouping]="false" (keyup.enter)="ConsultarOrdenTrabajo(0)"
+                  pTooltip="Digite el número de OT y presione Enter para consultar" tooltipPosition="top"
+                  ></p-inputNumber>
                 <span class="p-inputgroup-addon cursor" pTooltip="Siguiente" tooltipPosition="top"
                   (click)="ConsultarOrdenTrabajo(1)">
                   <i class="pi pi-chevron-right"></i>
@@ -103,7 +105,7 @@
             </div>
 
             <!-- ID PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="idProducto">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1" id="idProducto">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-hashtag"></i>
                 <input formControlName="Id_Producto" type="text" id="Id_Producto" (keyup.enter)="buscarProductoPorId()"
@@ -113,7 +115,7 @@
             </div>
 
             <!-- NOMBRE PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="producto">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="producto">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-box"></i>
                 <input formControlName="Nombre_Producto" id="Nombre_Producto" list="productos" type="text" pInputText
@@ -148,7 +150,7 @@
             </div>
 
             <!-- PRECIO UNITARIO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="precioUnitario">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-3 col-xxl-3" id="precioUnitario">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-dollar"></i>
                 <p-inputNumber formControlName="Precio" mode="decimal" inputId="Cant"
@@ -157,8 +159,19 @@
               </span>
             </div>
 
+            <!-- PRECIO KILO (calculado en calcularCostosOT, se guarda como Ot_ValorKg) -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="precioKilo">
+              <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+                <i class="pi pi-money-bill"></i>
+                <p-inputNumber [ngModel]="valorKg" [ngModelOptions]="{ standalone: true }" mode="decimal"
+                  inputId="PrecioKg" [minFractionDigits]="2" [maxFractionDigits]="2" [readonly]="true"
+                  pTooltip="Calculado a partir del precio unitario y el peso del producto" tooltipPosition="top"></p-inputNumber>
+                <label for="PrecioKg">Precio Kilo</label>
+              </span>
+            </div>
+
             <!-- MARGEN ADICIONAL -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1" id="margenAdicional">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2" id="margenAdicional">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-percentage"></i>
                 <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant"
@@ -168,12 +181,12 @@
             </div>
 
             <!-- ID Vendedor -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="idVendedor">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1" id="idVendedor">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-id-card"></i>
                 <input formControlName="Id_Vendedor" type="text" id="Id_Vendedor" pInputText [required]="true"
                   [readonly]="true" />
-                <label for="Id_Vendedor">Id Vendedor</label>
+                <label for="Id_Vendedor">Asesor ID</label>
               </span>
             </div>
 
@@ -185,7 +198,7 @@
                   optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"
                   [showClear]="true" [autoDisplayFirst]="ValidarRol == 2" [readonly]="ValidarRol == 2" [required]="true"
                   (onChange)="vendedorSeleccionado()" (onClear)="limpiarIdVendedor()"></p-dropdown>
-                <label for="Nombre_Vendedor">Vendedor</label>
+                <label for="Nombre_Vendedor">Asesor</label>
               </span>
             </div>
 
@@ -194,13 +207,13 @@
               <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
                 <i class="pi pi-table"></i>
                 <p-dropdown formControlName="OT_Estado" inputId="Estado" [options]="estados" optionLabel="estado_Nombre"
-                  optionValue="estado_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                  optionValue="estado_Id" [autoDisplayFirst]="false" [required]="true" [readonly]="true"></p-dropdown>
                 <label for="Estado">Estado OT</label>
               </span>
             </div>
 
             <!-- Fecha creacion -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="fechaCreacion">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-3 col-xxl-3" id="fechaCreacion">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-calendar"></i>
                 <input formControlName="OT_FechaCreacion" id="FechaCrea" type="text" pInputText [readOnly]="true"
@@ -210,25 +223,72 @@
             </div>
 
             <!-- Fecha entrega -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="fechaEntrega">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-2 col-xl-3 col-xxl-3" id="fechaEntrega">
               <span class="p-float-label">
                 <p-calendar formControlName="OT_FechaEntrega" inputId="FechaEntrega" dateFormat="yy-mm-dd"
-                  [showIcon]="true" [showButtonBar]="true" appendTo="body"></p-calendar>
+                  [showIcon]="true" [showButtonBar]="true" appendTo="body" [minDate]="minDate"></p-calendar>
                 <label for="FechaEntrega">Fecha Entrega</label>
               </span>
             </div>
 
             <!-- Campo Observacion -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-6 col-xxl-6" id="observacion">
+            <div class="col-12" id="observacion">
               <span class="p-float-label">
-                <textarea formControlName="OT_Observacion" [rows]="1" pInputTextarea></textarea>
-                <label for="textarea">Observación general</label>
+                <textarea formControlName="OT_Observacion" id="otObservacion" class="w-100" [rows]="2"
+                  pInputTextarea></textarea>
+                <label for="otObservacion">Observación general</label>
               </span>
             </div>
 
           </div>
         </div>
       </form>
+
+      <!-- Producción por proceso de la OT consultada (solo lectura, desde Estados Procesos OT) -->
+      <ng-container *ngIf="otProduccion">
+        <div class="mb-3">
+          <hr class="colorLinea">
+        </div>
+
+        <div class="mb-3">
+          <h4 class="tituloRojo"><i class="pi pi-chart-bar"></i> Producción por Proceso — OT N° {{otProduccion}}</h4>
+        </div>
+
+        <div class="mb-3">
+          <p-table [value]="produccionProcesos" [loading]="cargandoProduccion" responsiveLayout="scroll"
+            styleClass="p-datatable-gridlines p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Extrusión</th>
+                <th>Impresión</th>
+                <th>Doblado</th>
+                <th>Laminado</th>
+                <th>Perforado</th>
+                <th>Empaque</th>
+                <th>Sellado</th>
+                <th>Wiketiado</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-proceso>
+              <tr>
+                <td>{{proceso.estProcOT_ExtrusionKg | number:'1.2-2'}}</td>
+                <td>{{proceso.estProcOT_ImpresionKg | number:'1.2-2'}}</td>
+                <td>{{(proceso.estProcOT_DobladoKg ?? 0) | number:'1.2-2'}}</td>
+                <td>{{proceso.estProcOT_LaminadoKg | number:'1.2-2'}}</td>
+                <td>{{(proceso.estProcOT_PerforadoKg ?? 0) | number:'1.2-2'}}</td>
+                <td>{{proceso.estProcOT_EmpaqueKg | number:'1.2-2'}}</td>
+                <td>{{proceso.estProcOT_SelladoKg | number:'1.2-2'}} Kg - {{proceso.estProcOT_SelladoUnd | number:'1.0-0'}} Und</td>
+                <td>{{proceso.estProcOT_WiketiadoKg | number:'1.2-2'}} Kg - {{proceso.estProcOT_WiketiadoUnd | number:'1.0-0'}} Und</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8" class="text-center">Sin datos de producción en Estados Procesos OT</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </ng-container>
 
       <div class="mb-3">
         <hr class="colorLinea">
@@ -268,15 +328,6 @@
                   <p-checkbox [(ngModel)]="impresion" [binary]="true" (onChange)="impresionSeleccionada()"
                     inputId="OT_Impresion" id="imp"></p-checkbox>
                   <label for="OT_Impresion">Impresión</label>
-                </div>
-              </div>
-
-              <!-- Rotograbado -->
-              <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-                <div class="field-checkbox">
-                  <p-checkbox [(ngModel)]="rotograbado" [binary]="true" (onChange)="rotograbadoSeleccionado()"
-                    inputId="OT_Rotograbado" id="rot"></p-checkbox>
-                  <label for="OT_Rotograbado">Rotograbado</label>
                 </div>
               </div>
 
@@ -456,7 +507,7 @@
                     </form>
                   </ng-template>
                 </p-accordionTab>
-                <p-accordionTab *ngIf="impresion || rotograbado">
+                <p-accordionTab *ngIf="impresion">
                   <ng-template pTemplate="header">
                     <div class="flex align-items-center">
                       <i class="pi pi-print mr-2"></i>
@@ -1100,7 +1151,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="CantidadPaquete" inputId="CantidadPaquete" mode="decimal"
-                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="0" [required]="true"></p-inputNumber>
                               <label for="CantidadPaquete">Cantidad Paquete</label>
                             </span>
                           </div>
@@ -1118,7 +1169,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="CantidadBulto" inputId="CantidadBulto" mode="decimal"
-                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="0" [required]="true"></p-inputNumber>
                               <label for="CantidadBulto">Cantidad Bulto</label>
                             </span>
                           </div>

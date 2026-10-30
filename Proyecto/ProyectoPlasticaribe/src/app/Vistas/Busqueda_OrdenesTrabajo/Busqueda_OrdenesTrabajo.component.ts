@@ -63,7 +63,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       fuelle: [null],
       calibre: [null],
       sales: [null,],
-
     });
   }
 
@@ -71,6 +70,14 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     this.obtenerMateriales();
     this.obtenerPigmentos();
     this.lecturaStorage();
+    this.loadRankDates();
+  }
+
+  // Carga las fechas de rango por defecto (últimos 12 meses) en el formulario de filtros.
+  loadRankDates() {
+    let fechaInicio: any = new Date(moment().subtract(12, 'M').format('YYYY-MM-DD'));
+    let fechaFin: any = new Date();
+    this.formFiltros.patchValue({ 'fechaInicio': fechaInicio, 'fechaFin': fechaFin });
   }
 
   limpiarCampos() {
@@ -78,6 +85,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     this.formFiltros.reset();
     this.ordenesConsultadas = [];
     this.formFiltros.patchValue({ buscarPorItem_Ot: 'Item' });
+    this.loadRankDates();
   }
 
   //Crea la función de lectura storage que tengo en otros modulos
@@ -128,10 +136,10 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
    */
   consultarOrdenes() {
     this.cargando = true;
-    let fechaAnterior: any = moment().subtract(12, 'M').format('YYYY-MM-DD');
-    let fechaIncio: any = this.formFiltros.value.fechaInicio != null ? moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD') : fechaAnterior;
-    let fechaFin: any = this.formFiltros.value.fechaFin != null ? moment(this.formFiltros.value.fechaFin).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+    let fechaIncio: any = moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD');
+    let fechaFin: any = moment(this.formFiltros.value.fechaFin).format('YYYY-MM-DD');
     let ruta: string = this.validarRutaConsulta();
+
     this.bagProService.GetOrdenesTrabajo(fechaIncio, fechaFin, ruta).subscribe(data => {
       this.ordenesConsultadas = data;
       this.llenarColumnas();
@@ -190,14 +198,16 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       return a;
     }, []);
     this.consultarExistenciasItems();
-    this.ordenesConsultadas.sort((a, b) => Number(a.ordenTrabajo) - Number(b.ordenTrabajo));
+    this.ordenesConsultadas.sort((a, b) => Number(b.ordenTrabajo) - Number(a.ordenTrabajo));
     this.columnas = [
       { header: 'Existencia', field: 'existencia', tipo: 'number' },
       { header: 'Cliente', field: 'cliente', tipo: 'text' },
       { header: 'Item', field: 'item', tipo: 'text' },
       { header: 'Referencia', field: 'referencia', tipo: 'text' },
       { header: 'Cantidad', field: 'cantidad', tipo: 'number' },
+      { header: 'Cant. Kilos', field: 'cantidad_Kilos', tipo: 'number' },
       { header: 'Precio', field: 'precio', tipo: 'number' },
+      { header: 'Precio Kilo', field: 'precio_Kilo', tipo: 'number' },
       { header: 'Presentación', field: 'presentacion', tipo: 'text' },
       { header: 'Material', field: 'material', tipo: 'text' },
       { header: 'Pigmento', field: 'pigmento', tipo: 'text' },
@@ -221,14 +231,16 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   }
 
   llenarColumnas_BusquedaPorOT() {
-    this.ordenesConsultadas.sort((a, b) => Number(a.ordenTrabajo) - Number(b.ordenTrabajo));
+    this.ordenesConsultadas.sort((a, b) => Number(b.ordenTrabajo) - Number(a.ordenTrabajo));
     this.columnas = [
       { header: 'OT', field: 'ordenTrabajo', tipo: 'text' },
       { header: 'Fecha', field: 'fechaCreacion', tipo: 'date' },
       { header: 'Item', field: 'item', tipo: 'text' },
       { header: 'Referencia', field: 'referencia', tipo: 'text' },
       { header: 'Cantidad', field: 'cantidad', tipo: 'number' },
+      { header: 'Cant. Kilos', field: 'cantidad_Kilos', tipo: 'number' },
       { header: 'Precio', field: 'precio', tipo: 'number' },
+      { header: 'Precio Kilo', field: 'precio_Kilo', tipo: 'number' },
       { header: 'Presentación', field: 'presentacion', tipo: 'text' },
       { header: 'Material', field: 'material', tipo: 'text' },
       { header: 'Pigmento', field: 'pigmento', tipo: 'text' },
@@ -259,24 +271,31 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     } else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
   }
 
+  /**
+   * Crea una OT nueva copiando la fila seleccionada: carga el item u OT, aplica la cantidad y el precio
+   * de la fila y guarda solo cuando la carga terminó.
+   * @param data Fila de la búsqueda (item u OT de BagPro).
+   * @returns No retorna un valor.
+   */
   crearCopiaOrdenTrabajo(data: any) {
     let tipoBusqueda: 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
-    this.orden_TrabajoComponent.consultarClientes();
-    this.orden_TrabajoComponent.cargando = true;
-    this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
+    const ordenTrabajo = this.orden_TrabajoComponent;
+    const guardarCopia = () => {
+      ordenTrabajo.FormOrdenTrabajo.patchValue({
+        Cantidad: data.cantidad,
+        Precio: data.precio,
+      });
+      ordenTrabajo.calcularDatosOtInmediato();
+      ordenTrabajo.guardarOt();
+    };
+    ordenTrabajo.consultarClientes();
+    ordenTrabajo.FormOrdenTrabajo.patchValue({
       Id_Producto: data.item,
       Nombre_Producto: data.referencia,
       Presentacion: data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' : data.presentacion,
     });
-    if (tipoBusqueda == 'Item') this.orden_TrabajoComponent.consultarInfoProducto();
-    else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
-    setTimeout(() => {
-      this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
-        Cantidad: data.cantidad,
-        Precio: data.precio,
-      });
-    }, 1000);
-    setTimeout(() => this.orden_TrabajoComponent.guardarOt(), 2500);
+    if (tipoBusqueda == 'Item') ordenTrabajo.consultarInfoProducto(guardarCopia);
+    else if (tipoBusqueda == 'OT') ordenTrabajo.busquedaOTBagPro(data, guardarCopia);
   }
 
   exportExcel() {

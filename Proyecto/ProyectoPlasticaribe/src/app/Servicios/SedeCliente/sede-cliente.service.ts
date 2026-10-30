@@ -32,6 +32,4 @@ export class SedeClienteService {
 
   GetSedeClientexNitBagPro = (cod : string) : any => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getSedeClientexNitBagPro/${cod}`);
 
-  getSedesClientes_NombreCliente = (nombre : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getSedesClientes_NombreCliente/${nombre}`);
-
 }

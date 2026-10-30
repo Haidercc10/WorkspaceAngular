@@ -4,7 +4,8 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
-import { Observable, forkJoin } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, Subscription, catchError, finalize, forkJoin, map, of, switchMap, throwError } from 'rxjs';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
@@ -38,6 +39,21 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { modelProducto } from 'src/app/Modelo/modelProducto';
 import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+
+/** OT encontrada al consultar por número: en Plasticaribe (editable) o solo en BagPro (plantilla). */
+interface ResultadoBusquedaOT {
+  origen: 'plasticaribe' | 'bagpro';
+  datos: any;
+  sede?: any;
+}
+
+/** Información encontrada al consultar por item: ficha de BagPro (ClientesOtItem) o, como respaldo, la última OT de Plasticaribe. */
+interface ResultadoBusquedaItem {
+  origen: 'item' | 'ultimaOT';
+  datos: any;
+  sede?: any;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -75,6 +91,12 @@ export class Orden_TrabajoComponent implements OnInit {
   presentaciones: any[] = []; //Variable que almacenará la informacion de las presentaciones
   estados: any[] = []; //Variable que almacenará la informacion de los estados
   edicionOrdenTrabajo: boolean = false; //Variable para validar que se está editando o no una orden de trabajo
+  otCargada: number | null = null; //Número de la OT cargada en pantalla; base para navegar con ◀ ▶ y para restaurar el campo si una búsqueda no encuentra la OT
+  private busquedaOT?: Subscription; //Búsqueda de OT en curso; se cancela al iniciar otra para no mezclar datos de dos OTs
+  produccionProcesos: any[] = []; //Fila de Estados Procesos OT con los kg (y und) producidos por proceso de la OT consultada
+  otProduccion: number | null = null; //Número de la OT a la que pertenece la tabla de producción por proceso
+  cargandoProduccion: boolean = false; //Indica si se está consultando la producción por proceso
+  private consultaProduccion?: Subscription; //Consulta de producción en curso; se cancela al consultar otra OT para no mezclar datos
   ModalCrearProductos: boolean = false; //Funcion que va a mostrar o no el modal de productos
   ModalCrearCliente: boolean = false; //Funcion que va a mostrar o no el modal de clientes
 
@@ -92,7 +114,6 @@ export class Orden_TrabajoComponent implements OnInit {
 
   extrusion: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   impresion: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
-  rotograbado: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   laminado: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   doblado: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   sellado: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
@@ -134,6 +155,7 @@ export class Orden_TrabajoComponent implements OnInit {
   dataBusquedaxItem: any;
   ultimoItem: number = 0;
   hora: any = moment().format('HH:mm:ss');
+  minDate: Date = new Date();
 
   constructor(private frmBuilderPedExterno: FormBuilder,
     private AppComponent: AppComponent,
@@ -161,7 +183,8 @@ export class Orden_TrabajoComponent implements OnInit {
     private messageService: MessageService,
     private shepherdService: ShepherdService,
     private svcSedes: SedeClienteService,
-    private svcExistencias: ExistenciasProductosService,) {
+    private svcExistencias: ExistenciasProductosService,
+    private estadosProcesosService: EstadosProcesos_OTService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -576,7 +599,6 @@ export class Orden_TrabajoComponent implements OnInit {
     this.limpiarFormMezclas();
     this.extrusion = false;
     this.impresion = false;
-    this.rotograbado = false;
     this.laminado = false;
     this.sellado = false;
     this.corte = false;
@@ -597,6 +619,7 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   limpiarCampos() {
+    console.log('Limpiando campos de la orden de trabajo');
     this.limpiarFormOrdenTrabajo();
     this.limpiarFormExtrusion();
     this.limpiarFormImpresion();
@@ -608,6 +631,8 @@ export class Orden_TrabajoComponent implements OnInit {
     this.limpiarFormMezclas();
     this.cerrarMensaje();
     this.edicionOrdenTrabajo = false;
+    this.otCargada = null;
+    this.limpiarProduccionProcesos();
     this.cyrel = false;
     this.corte = false;
     this.motrarEmpresaEtiquetas = true;
@@ -622,7 +647,6 @@ export class Orden_TrabajoComponent implements OnInit {
     this.nroCapasOT = 0;
     this.extrusion = false;
     this.impresion = false;
-    this.rotograbado = false;
     this.laminado = false;
     this.sellado = false;
     this.cargando = false;
@@ -697,20 +721,12 @@ export class Orden_TrabajoComponent implements OnInit {
   /** Función que cargará los materiales en el combobox al momento de llamar el modal de Crear Mezclas. */
   cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
 
-  // Funcion que va a validar cuando el campo marcado sea impresión (flexografia)
+  /**
+   * Al marcar Impresión fija el tipo de impresión en flexografía (único tipo vigente; Rotograbado fue descontinuado).
+   * @returns No retorna un valor.
+   */
   impresionSeleccionada() {
-    if (this.impresion) {
-      this.rotograbado = false;
-      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion: 2 });
-    }
-  }
-
-  // Funcion que va a validar cuando el campo marcado sea rotograbado
-  rotograbadoSeleccionado() {
-    if (this.rotograbado) {
-      this.impresion = false;
-      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion: 5 });
-    }
+    if (this.impresion) this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion: 2 });
   }
 
   /**
@@ -821,9 +837,13 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a consultar los clientes de la empresa
   consultarClientes = () => {
     let nombre = this.FormOrdenTrabajo.value.Nombre_Cliente;
-    this.svcSedes.getSedesClientes_NombreCliente(nombre).subscribe(data => {
+    if (!nombre || nombre.trim() === '' || nombre.trim().length < 3) return;
+
+    this.clienteServise.GetSedesClientes_NombreCliente(nombre).subscribe(data => {
       this.clientes = data;
       this.clientes.sort((a, b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
+    }, error => {
+      console.error(error);
     });
   }
 
@@ -832,16 +852,20 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   clienteSeleccionado() {
-    let id_cliente = this.FormOrdenTrabajo.value.Nombre_Cliente;
-    let cliente = this.clientes.find(x => x.cli_Id == id_cliente);
+    let id_cliente: any = this.FormOrdenTrabajo.value.Nombre_Cliente;
+    console.log(this.clientes, id_cliente);
+
+    let cliente = this.clientes.find(x => x.sedeCli_Id == parseInt(id_cliente));
+    console.log(cliente);
+
+    if (!cliente) return;
     let vendedor = (cliente.usua_Id).toString();
-    this.usuarioService.getUsuariosxId(vendedor).subscribe(data => {
-      this.FormOrdenTrabajo.patchValue({
-        Id_Cliente: cliente.sedecli_Id,
-        Nombre_Cliente: cliente.cli_Nombre,
-        Id_Vendedor: vendedor.length == 2 ? vendedor = `0${vendedor}` : vendedor.length == 1 ? `00${vendedor}` : vendedor,
-        Nombre_Vendedor: this.idVendedorParaDropdown(data[0].usua_Id),
-      });
+
+    this.FormOrdenTrabajo.patchValue({
+      'Id_Cliente': cliente.sedeCli_Id,
+      'Nombre_Cliente': cliente.cli_Nombre,
+      'Id_Vendedor': vendedor.length == 2 ? vendedor = `0${vendedor}` : vendedor.length == 1 ? `00${vendedor}` : vendedor,
+      'Nombre_Vendedor': this.idVendedorParaDropdown(cliente.usua_Id),
     });
   }
 
@@ -859,22 +883,34 @@ export class Orden_TrabajoComponent implements OnInit {
     this.productoService.obtenerItemsLike(nombreProducto).subscribe(data => this.productos = data);
   }
 
-  // Funcion que va a colocar la información del producto seleccionado en cada campo
+  /**
+   * Coloca el producto elegido en el formulario y, cuando BagPro responde su presentación, carga la información del item.
+   * @returns No retorna un valor.
+   */
   productoSeleccionado() {
     let id_producto = this.FormOrdenTrabajo.value.Nombre_Producto;
     let producto = this.productos.find(x => x.prod_Id == id_producto);
-    let presentacion: any;
-    this.bagProService.GetPresentacionItem(producto.prod_Id).subscribe(data => {
-      presentacion = `${data.ptPresentacionNom}`;
-      if (presentacion == 'Kilo') presentacion = 'Kg';
-      else if (presentacion == 'Unidad') presentacion = 'Und';
-      this.FormOrdenTrabajo.patchValue({ Presentacion: presentacion, });
-    }, null);
     this.FormOrdenTrabajo.patchValue({
       Id_Producto: producto.prod_Id,
       Nombre_Producto: producto.prod_Nombre,
     });
-    setTimeout(() => this.consultarInfoProducto(), 500);
+    this.cargarPresentacionYConsultarItem(producto.prod_Id);
+  }
+
+  /**
+   * Consulta en BagPro la presentación del item, la coloca en el formulario y luego carga la información del item.
+   * Si la presentación no se puede consultar, se usa la que tenga el formulario.
+   * @param idProducto Código del item.
+   * @returns No retorna un valor.
+   */
+  cargarPresentacionYConsultarItem(idProducto: number) {
+    this.bagProService.GetPresentacionItem(idProducto).subscribe(data => {
+      let presentacion: string = `${data.ptPresentacionNom}`;
+      if (presentacion == 'Kilo') presentacion = 'Kg';
+      else if (presentacion == 'Unidad') presentacion = 'Und';
+      this.FormOrdenTrabajo.patchValue({ Presentacion: presentacion, });
+      this.consultarInfoProducto();
+    }, () => this.consultarInfoProducto());
   }
 
   /**
@@ -909,31 +945,45 @@ export class Orden_TrabajoComponent implements OnInit {
     this.FormOrdenTrabajo.patchValue({ Id_Vendedor: null });
   }
 
-  // Funcion que va a buscar la información del producto por su ID
+  /**
+   * Busca el producto por el código digitado y, si existe, carga su presentación y la información del item.
+   * @returns No retorna un valor.
+   */
   buscarProductoPorId() {
     let id: any = this.FormOrdenTrabajo.value.Id_Producto;
-    let presentacion: any;
-    this.bagProService.GetPresentacionItem(id).subscribe(data => {
-      presentacion = `${data.ptPresentacionNom}`;
-      if (presentacion == 'Kilo') presentacion = 'Kg';
-      else if (presentacion == 'Unidad') presentacion = 'Und';
-      this.FormOrdenTrabajo.patchValue({ Presentacion: presentacion, });
-    }, null);
     this.productoService.srvObtenerListaPorId(id).subscribe(data => {
       this.FormOrdenTrabajo.patchValue({
-        Id_Producto: data.prod_Id,
-        Nombre_Producto: data.prod_Nombre,
+        'Id_Producto': data.prod_Id,
+        'Nombre_Producto': data.prod_Nombre,
       });
-      setTimeout(() => this.consultarInfoProducto(), 500);
+      this.cargarPresentacionYConsultarItem(data.prod_Id);
     }, () => this.msj.mensajeAdvertencia(`¡No se encontró información del Item buscado!`));
   }
 
   // Funcion que va a buscar la información de un producto
   buscarInformacionProducto() {
-    this.productoService.GetInfoProducto_Prod_Presentacion(this.producto, this.presentacionProducto).subscribe(datos_producto => {
-      if (datos_producto.length == 0) this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
-      else datos_producto.forEach(data => this.llenarProducto(data));
-    }, () => this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`));
+    this.obtenerInformacionProducto$().subscribe();
+  }
+
+  /**
+   * Consulta el producto y presentación actuales y llena ArrayProducto; avisa si no se encuentra.
+   * @returns Observable que emite true si se cargó el producto y false si no se encontró o falló la consulta.
+   */
+  obtenerInformacionProducto$(): Observable<boolean> {
+    return this.productoService.GetInfoProducto_Prod_Presentacion(this.producto, this.presentacionProducto).pipe(
+      map(datos_producto => {
+        if (datos_producto.length == 0) {
+          this.msj.mensajeAdvertencia(`Debe ingresar un producto válido y su presentación correspondiente.`);
+          return false;
+        }
+        datos_producto.forEach(data => this.llenarProducto(data));
+        return true;
+      }),
+      catchError(() => {
+        this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
+        return of(false);
+      })
+    );
   }
 
   /**
@@ -943,25 +993,25 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   llenarProducto(data: any) {
     this.ArrayProducto = [{
-      Id: data.produ.prod_Id,
-      Nombre: data.produ.prod_Nombre,
-      Ancho: data.produ.prod_Ancho,
-      Fuelle: data.produ.prod_Fuelle,
-      Largo: data.produ.prod_Largo,
-      Cal: data.produ.prod_Calibre,
-      Und: this.presentacionProducto,
-      Peso_Producto: data.produ.prod_Peso,
-      PesoMillar: data.produ.prod_Peso_Millar,
-      Solapa: data.produ.prod_Solapa,
-      Tipo: data.tipo_Producto,
-      Material: data.material,
-      Pigmento: data.pigmento,
-      CantPaquete: data.produ.prod_CantBolsasPaquete,
-      CantBulto: data.produ.prod_CantBolsasBulto,
-      TipoSellado: data.tipo_Sellado,
-      Cant: parseFloat(this.FormOrdenTrabajo.value.Cantidad) | 0,
-      UndCant: this.presentacionProducto,
-      PrecioUnd: this.FormOrdenTrabajo.value.Precio != null ? this.FormOrdenTrabajo.value.Precio : data.precioUnidad,
+      'Id': data.produ.prod_Id,
+      'Nombre': data.produ.prod_Nombre,
+      'Ancho': data.produ.prod_Ancho,
+      'Fuelle': data.produ.prod_Fuelle,
+      'Largo': data.produ.prod_Largo,
+      'Cal': data.produ.prod_Calibre,
+      'Und': this.presentacionProducto,
+      'Peso_Producto': data.produ.prod_Peso,
+      'PesoMillar': data.produ.prod_Peso_Millar,
+      'Solapa': data.produ.prod_Solapa,
+      'Tipo': data.tipo_Producto,
+      'Material': data.material,
+      'Pigmento': data.pigmento,
+      'CantPaquete': data.produ.prod_CantBolsasPaquete,
+      'CantBulto': data.produ.prod_CantBolsasBulto,
+      'TipoSellado': data.tipo_Sellado,
+      'Cant': parseFloat(this.FormOrdenTrabajo.value.Cantidad) | 0,
+      'UndCant': this.presentacionProducto,
+      'PrecioUnd': this.FormOrdenTrabajo.value.Precio != null ? this.FormOrdenTrabajo.value.Precio : data.precioUnidad,
     }];
   }
 
@@ -971,62 +1021,110 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a consultar los estados que puede tener la orden de trabajo
   consultarEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(data => this.estados = data.filter(x => [3, 4].includes(x.tpEstado_Id)));
 
-  // Funcion que va a consultar los datos de la ultima orden de trabajo realizada al producto que se seleccionó
-  consultarInfoProducto() {
+  /**
+   * Carga toda la información del item seleccionado tal como está guardado en BagPro (ClientesOtItem):
+   * cliente, vendedor, procesos, extrusión, impresión, laminado, sellado y mezclas.
+   * Si el item no está en BagPro usa la última OT de Plasticaribe; si tampoco existe, avisa sin borrar el producto.
+   * Cancela cualquier consulta anterior para que cambios rápidos de item no mezclen datos.
+   * @param alCargar Función opcional que se ejecuta cuando la información quedó cargada (p. ej. copiar OT).
+   * @returns No retorna un valor.
+   */
+  consultarInfoProducto(alCargar?: () => void) {
+    const producto = this.FormOrdenTrabajo.value.Id_Producto;
+    const presentacion = this.FormOrdenTrabajo.value.Presentacion;
+    if (producto == null || presentacion == null) return;
+
+    this.busquedaOT?.unsubscribe();
     this.limpiarProducto();
-    if (this.FormOrdenTrabajo.value.Id_Producto != null && this.FormOrdenTrabajo.value.Presentacion != null) {
-      this.cargando = true;
-      this.producto = this.FormOrdenTrabajo.value.Id_Producto;
-      this.presentacionProducto = this.FormOrdenTrabajo.value.Presentacion;
-      this.buscarInformacionProducto();
-      this.ordenTrabajoService.GetInfoUltOT(this.producto, this.presentacionProducto).subscribe(datos_Ot => {
-        this.llenarDatosCliente(datos_Ot);
-        this.llenarFormularioOrdenTrabajo(datos_Ot);
-        this.llenarFormularioExtrusion(datos_Ot);
-        this.llenarFormularioLaminado(datos_Ot);
-        this.llenarFormularioCorte(datos_Ot);
-        this.llenarFormularioSellado(datos_Ot);
-        this.llenarFormularioImpresion(datos_Ot);
-        this.validarProcesosOrdenTrabajo(datos_Ot);
-        this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_Ot.mezcla_Nombre, });
-        this.cargarCombinacionMezclas();
-        setTimeout(() => this.calcularDatosOt(), 500);
-      }, () => this.consultarInformaciónBagPro());
-    }
+    this.cargando = true;
+    this.producto = producto;
+    this.presentacionProducto = presentacion;
+    this.busquedaOT = this.buscarItem$(producto, presentacion).pipe(
+      switchMap(resultado => resultado ? this.prepararCargaItem$(resultado) : of(null))
+    ).subscribe(resultado => {
+      if (!resultado) {
+        this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No hay información del item ${producto} con la presentación ${presentacion}!`);
+        this.cargando = false;
+        return;
+      }
+      this.cargarItem(resultado);
+      alCargar?.();
+    }, error => {
+      this.msj.mensajeError(`¡No fue posible consultar la información del item ${producto}!`, error.error);
+      this.cargando = false;
+    });
   }
 
-  //Función que consultará una OT en bagpro y llenará todos los campos del formulario con dicha información
-  busquedaOTBagPro(ot: any) {
-    this.cargando = true;
-    ot = typeof (ot) == 'number' ? ot : ot.ordenTrabajo;
-    const sales = this.ValidarRol == 2
-      ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
-      : '';
-    this.limpiarProducto();
-    this.bagProService.GetOrdenDeTrabajo(ot, sales).subscribe(datos_Ot => {
-      console.log(datos_Ot);
+  /**
+   * Busca la ficha del item en BagPro (ClientesOtItem) y, si no existe, la última OT del item en Plasticaribe.
+   * Para el rol vendedor (2) la ficha de BagPro se filtra por su código.
+   * @param producto Código del item.
+   * @param presentacion Presentación en Plasticaribe (Kg, Und, Paquete, Rollo).
+   * @returns Observable con la información encontrada, o null si no existe en ninguna; otros errores se propagan.
+   */
+  buscarItem$(producto: number, presentacion: string): Observable<ResultadoBusquedaItem | null> {
+    const presentacionBagPro = presentacion == 'Kg' ? 'Kilo' : presentacion == 'Und' ? 'Unidad' : presentacion;
+    const sales = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id).padStart(3, '0')}` : '';
+    const ultimaOT$ = this.ordenTrabajoService.GetInfoUltOT(producto, presentacion).pipe(
+      map(datos => {
+        const ot = Array.isArray(datos) ? datos[0] : datos;
+        return ot ? { origen: 'ultimaOT', datos: ot } as ResultadoBusquedaItem : null;
+      }),
+      catchError(error => this.esOrdenNoEncontrada(error) ? of(null) : throwError(() => error))
+    );
+    return this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(producto, presentacionBagPro, sales).pipe(
+      catchError(error => this.esOrdenNoEncontrada(error) ? of([]) : throwError(() => error)),
+      switchMap(datos => datos?.length > 0
+        ? of({ origen: 'item', datos: datos[0] } as ResultadoBusquedaItem)
+        : ultimaOT$)
+    );
+  }
 
-      this.svcSedes.GetSedeClientexNitBagPro(datos_Ot[0].nitCliente).subscribe(datos_Sedes => {
-        console.log(datos_Sedes);
-        this.producto = datos_Ot[0].id_Producto;
-        this.presentacionProducto = datos_Ot[0].presentacion;
-        if (this.presentacionProducto == 'Kilo') this.presentacionProducto = 'Kg';
-        else if (this.presentacionProducto == 'Unidad') this.presentacionProducto = 'Und';
-        this.buscarInformacionProducto();
-        setTimeout(() => this.cargarFormularios(datos_Sedes[0], datos_Ot[0], ot), 500);
-        setTimeout(() => this.calcularDatosOt(), 800);
-      }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`));
-    }, () => this.consultarInformaciónBagPro());
+  /**
+   * Consulta lo necesario para cargar el item encontrado: el producto y, para la ficha de BagPro, la sede del cliente.
+   * @param resultado Información del item encontrada y su origen.
+   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro.
+   */
+  prepararCargaItem$(resultado: ResultadoBusquedaItem): Observable<ResultadoBusquedaItem> {
+    if (resultado.origen == 'ultimaOT') return this.obtenerInformacionProducto$().pipe(map(() => resultado));
+    return forkJoin({ producto: this.obtenerInformacionProducto$(), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
+      map(({ sede }) => ({ ...resultado, sede }))
+    );
+  }
+
+  /**
+   * Llena los formularios con la información del item sin tocar el número ni el modo de la OT.
+   * @param resultado Ficha del item (BagPro) o última OT de Plasticaribe, con la sede si se encontró.
+   * @returns No retorna un valor.
+   */
+  cargarItem(resultado: ResultadoBusquedaItem) {
+    if (resultado.origen == 'item' && !resultado.sede) this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`);
+    this.cargarFormularios(resultado.sede, resultado.datos, null);
+    this.calcularDatosOt();
+    this.cargando = false;
+    if (resultado.origen == 'ultimaOT') this.msj.mensajeInformacion(`Item ${this.producto} no encontrado en BagPro`, `Se cargó la información de la última OT del item en Plasticaribe.`, 5000);
+  }
+
+  /**
+   * Consulta la sede del cliente en Plasticaribe a partir del NIT que devuelve BagPro.
+   * @param nitCliente NIT del cliente.
+   * @returns Observable con la primera sede, o null si no existe o la consulta falla.
+   */
+  consultarSedeCliente$(nitCliente: any): Observable<any> {
+    return (this.svcSedes.GetSedeClientexNitBagPro(nitCliente) as Observable<any[]>).pipe(
+      map(sedes => sedes?.[0] ?? null),
+      catchError(() => of(null))
+    );
   }
 
   /**
    * Carga los formularios con los datos de la sede y la orden de trabajo consultada.
    * @param dataSedes Datos de la sede del cliente, si está disponible.
    * @param dataOt Datos de la orden de trabajo consultada.
-   * @param ot Número de la orden de trabajo.
+   * @param ot Número de la orden de trabajo; null conserva el número actual (carga por item).
    * @returns No retorna un valor.
    */
-  cargarFormularios(dataSedes: any, dataOt: any, ot: any) {
+  cargarFormularios(dataSedes: any, dataOt: any, ot: number | null) {
     this.llenarDatosCliente(dataSedes ? dataSedes : dataOt)
     this.llenarFormularioOrdenTrabajo(dataOt);
     this.llenarFormularioExtrusion(dataOt);
@@ -1036,7 +1134,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.llenarFormularioImpresion(dataOt);
     this.validarProcesosOrdenTrabajo(dataOt);
     this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: dataOt.mezcla_Nombre, });
-    this.FormOrdenTrabajo.patchValue({ OT_Id: ot, });
+    if (ot != null) this.FormOrdenTrabajo.patchValue({ OT_Id: ot, });
     this.cargarCombinacionMezclas();
   }
 
@@ -1110,9 +1208,9 @@ export class Orden_TrabajoComponent implements OnInit {
     this.FormOrdenTrabajo.patchValue({
       Id_Cliente: data == undefined ? '' : data.id_Cliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
-      Id_Producto: this.ArrayProducto[0].Id,
-      Nombre_Producto: this.ArrayProducto[0].Nombre,
-      Presentacion: this.ArrayProducto[0].Und,
+      Id_Producto: this.ArrayProducto[0]?.Id,
+      Nombre_Producto: this.ArrayProducto[0]?.Nombre,
+      Presentacion: this.ArrayProducto[0]?.Und,
       Id_Vendedor: !data ? '' : vendedor.length == 2 ? vendedor = `0${vendedor}` : (vendedor).length == 1 ? `00${vendedor}` : vendedor,
       Nombre_Vendedor: !data ? '' : this.idVendedorParaDropdown(data.id_Vendedor),
     });
@@ -1138,34 +1236,6 @@ export class Orden_TrabajoComponent implements OnInit {
 
     const vendedor = this.vendedores.find(opcion => Number(opcion.usua_Id) === idNumerico);
     return vendedor ? vendedor.usua_Id : idNumerico;
-  }
-
-  // Funcion que va a consultar en la base de datos de bagpro la información de la ultima orden de trabajo creada para un producto
-  consultarInformaciónBagPro() {
-    let presentacion: string = this.presentacionProducto;
-    if (presentacion == 'Kg') presentacion = 'Kilo';
-    else if (presentacion == 'Und') presentacion = 'Unidad';
-    this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(this.producto, presentacion).subscribe(datos_Ot => {
-      this.svcSedes.GetSedeClientexNitBagPro(datos_Ot[0].nitCliente).subscribe(data => {
-        for (const itemOt of datos_Ot) {
-          this.llenarDatosCliente(data[0]);
-          this.llenarFormularioOrdenTrabajo(itemOt);
-          this.validarProcesosOrdenTrabajo(itemOt);
-          this.llenarFormularioExtrusion(itemOt);
-          this.llenarFormularioImpresion(itemOt);
-          this.llenarFormularioLaminado(itemOt);
-          this.llenarFormularioCorte(itemOt);
-          this.llenarFormularioSellado(itemOt);
-          setTimeout(() => this.calcularDatosOt(), 1000);
-          this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: itemOt.mezcla_Nombre });
-          this.cargarCombinacionMezclas();
-        }
-      })
-    }, () => {
-      this.msj.mensajeAdvertencia(`¡Advertencia!`, `No se encuentra una OT anterior para el producto ${this.producto} y presentación ${presentacion}`);
-      this.cargando = false;
-    });
-    this.cargando = false;
   }
 
   /**
@@ -1197,13 +1267,18 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a validar los procesos por los cuales pasará el item
+  /**
+   * Marca los procesos por los que pasará el item. Rotograbado fue descontinuado: si la OT o el item lo tenía,
+   * se carga como Impresión para conservar rodillo, pista y tintas, y se avisa al usuario.
+   * @param data Datos de la OT o del item consultado.
+   * @returns No retorna un valor.
+   */
   validarProcesosOrdenTrabajo(data: any) {
     this.motrarEmpresaEtiquetas = data.motrarEmpresaEtiquetas;
     this.cyrel = data.cyrel;
     this.extrusion = data.extrusion;
-    this.impresion = data.impresion;
-    this.rotograbado = data.rotograbado;
+    this.impresion = !!(data.impresion || data.rotograbado);
+    if (data.rotograbado) this.msj.mensajeAdvertencia(`Proceso de Rotograbado`, `Esta OT/item tenía Rotograbado, que ya no existe; se cargó como Impresión. Revise los datos de impresión.`);
     this.laminado = data.laminado;
     this.corte = data.corte;
     this.sellado = data.sellado;
@@ -1238,7 +1313,7 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   llenarFormularioImpresion(data: any) {
     this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion: data.impresion ? 2 : data.rotograbado ? 5 : 1,
+      Tipo_Impresion: data.impresion || data.rotograbado ? 2 : 1,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
       Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
       Tinta_Impresion1: this.nombreTintaParaDropdown(data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1),
@@ -1345,26 +1420,34 @@ export class Orden_TrabajoComponent implements OnInit {
   calcularDatosOt() {
     setTimeout(() => {
       this.buscarInformacionProducto();
-      if (this.ArrayProducto.length > 0) {
-        this.cargando = true;
-        this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
-        this.ArrayProducto[0].PrecioUnd = this.FormOrdenTrabajo.value.Precio;
-        this.ArrayProducto[0].UndCant = this.presentacionProducto;
-        let margen_Adicional = this.calcularMargenAdicional();
-        if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
-          let material: number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
-          let fact: number = 0;
-          this.calcularPesoExtrusion(material, fact);
-          for (let i = 0; i < this.ArrayProducto.length; i++) {
-            if (this.ArrayProducto[i].Id == this.ArrayProducto[0].Id && this.ArrayProducto[i].UndCant == this.ArrayProducto[0].UndCant) {
-              this.calcularPesoProducto(material, fact);
-              this.calcularCostosOT(margen_Adicional);
-            }
-          }
-        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe elegir una unidad de medida para extrusión!`);
-        this.cargando = false;
-      }
+      this.calcularDatosOtInmediato();
     }, 500);
+  }
+
+  /**
+   * Calcula pesos y costos de la OT con los datos que ya están en pantalla, sin esperas ni nuevas consultas.
+   * @returns No retorna un valor.
+   */
+  calcularDatosOtInmediato() {
+    if (this.ArrayProducto.length > 0) {
+      this.cargando = true;
+      this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
+      this.ArrayProducto[0].PrecioUnd = this.FormOrdenTrabajo.value.Precio;
+      this.ArrayProducto[0].UndCant = this.presentacionProducto;
+      let margen_Adicional = this.calcularMargenAdicional();
+      if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
+        let material: number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
+        let fact: number = 0;
+        this.calcularPesoExtrusion(material, fact);
+        for (let i = 0; i < this.ArrayProducto.length; i++) {
+          if (this.ArrayProducto[i].Id == this.ArrayProducto[0].Id && this.ArrayProducto[i].UndCant == this.ArrayProducto[0].UndCant) {
+            this.calcularPesoProducto(material, fact);
+            this.calcularCostosOT(margen_Adicional);
+          }
+        }
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe elegir una unidad de medida para extrusión!`);
+      this.cargando = false;
+    }
   }
 
   calcularMargenAdicional(): number {
@@ -2058,7 +2141,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.calcularDatosOt();
     if (this.FormOrdenTrabajo.valid) {
       if (!this.extrusion) this.limpiarFormExtrusion();
-      if (!this.impresion && !this.rotograbado) this.limpiarFormImpresion();
+      if (!this.impresion) this.limpiarFormImpresion();
       if (!this.laminado) this.limpiarFormLaminado();
       if (!this.corte) this.limpiarFormCorte();
       if (!this.sellado) this.limpiarFormSellado();
@@ -2112,7 +2195,7 @@ export class Orden_TrabajoComponent implements OnInit {
             'Mezcla_Id': this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
             'Extrusion': this.extrusion,
             'Impresion': this.impresion,
-            'Rotograbado': this.rotograbado,
+            'Rotograbado': false, // Proceso descontinuado; se conserva la columna.
             'Laminado': this.laminado,
             'Sellado': this.sellado,
             'Ot_MargenAdicional': this.FormOrdenTrabajo.value.Margen,
@@ -2169,7 +2252,7 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   construirProcesosOt(datos: { datosImpresion: any[], datosSellado: any }): any {
     if (datos.datosImpresion.length == 0) {
-      this.msj.mensajeError(`¡No se encontraron las tintas seleccionadas para el área de 'Impresión' y 'Rotograbado'!`);
+      this.msj.mensajeError(`¡No se encontraron las tintas seleccionadas para el área de 'Impresión'!`);
       this.cargando = false;
       return null;
     }
@@ -2324,55 +2407,230 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Consulta una orden de trabajo y carga sus datos en los formularios.
-   * @param numero Número de OT o desplazamiento relativo para consultar.
+   * Consulta una orden de trabajo y carga sus datos en los formularios. Solo limpia la pantalla si la OT existe:
+   * en Plasticaribe queda en modo edición; si solo existe en BagPro se carga como plantilla para crear una nueva;
+   * si no existe se conserva lo que había en pantalla.
+   * @param numero Desplazamiento relativo (-1, 0, 1) sobre la OT actual o número absoluto de OT.
    * @returns No retorna un valor.
    */
   ConsultarOrdenTrabajo(numero: number) {
-    let numeroOT: number = this.FormOrdenTrabajo.value.OT_Id;
-    ([0, 1, -1].includes(numero)) ? numeroOT += numero : numeroOT = numero;
-    this.limpiarCampos();
-    this.edicionOrdenTrabajo = true;
+    const numeroOT = this.resolverNumeroOT(numero);
+    if (numeroOT == null) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Debe ingresar un número de OT válido para realizar la búsqueda!`);
+      return;
+    }
+
+    this.busquedaOT?.unsubscribe();
     this.cargando = true;
-    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT, '').subscribe(datos_orden => {
-      for (let i = 0; i < datos_orden.length; i++) {
-        this.producto = datos_orden[i].id_Producto;
-        this.presentacionProducto = datos_orden[i].id_Presentacion;
-        this.buscarInformacionProducto();
-        setTimeout(() => {
-          this.FormOrdenTrabajo.patchValue({
-            'OT_Id': datos_orden[i].numero_Orden,
-            'Id_Vendedor': datos_orden[i].id_Vendedor,
-            'Nombre_Vendedor': this.idVendedorParaDropdown(datos_orden[i].id_Vendedor),
-            'OT_FechaCreacion': datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
-            'OT_FechaEntrega': datos_orden[i].fecha_Entrega ? moment(datos_orden[i].fecha_Entrega.replace('T00:00:00', '')).toDate() : null,
-            'Id_Cliente': datos_orden[i].id_Cliente,
-            'Nombre_Cliente': datos_orden[i].cliente,
-            'Id_Producto': datos_orden[i].id_Producto,
-            'Nombre_Producto': datos_orden[i].producto,
-            'Cantidad': datos_orden[i].cantidad_Pedida,
-            'Presentacion': datos_orden[i].id_Presentacion,
-            'OT_Estado': datos_orden[i].estado_Orden,
-            'OT_Observacion': datos_orden[i].observacion,
-            'Margen': datos_orden[i].margen,
-            'Precio': this.presentacionProducto == 'Kg' ? datos_orden[i].valorKg : datos_orden[i].valorUnidad,
-          });
-          this.validarProcesosOrdenTrabajo(datos_orden[i]);
-          this.llenarFormularioExtrusion(datos_orden[i]);
-          this.llenarFormularioImpresion(datos_orden[i]);
-          this.llenarFormularioLaminado(datos_orden[i]);
-          this.llenarFormularioCorte(datos_orden[i]);
-          this.llenarFormularioSellado(datos_orden[i]);
-          this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden[i].mezcla_Nombre });
-          this.cargarCombinacionMezclas();
-          setTimeout(() => this.calcularDatosOt(), 1000);
-          this.cargando = false;
-        }, 1000);
+    this.busquedaOT = this.buscarOrdenTrabajo$(numeroOT).pipe(
+      switchMap(resultado => resultado ? this.prepararCargaOrdenTrabajo$(resultado) : of(null))
+    ).subscribe(resultado => {
+      if (!resultado) {
+        this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No existe una Orden de Trabajo con el número ${numeroOT}!`);
+        if (this.otCargada != null) this.FormOrdenTrabajo.patchValue({ OT_Id: this.otCargada });
+        this.cargando = false;
+        return;
       }
-    }, () => {
-      this.busquedaOTBagPro(numeroOT);
-      //this.cargando = false;
+      if (resultado.origen == 'plasticaribe') this.cargarOrdenTrabajoPlasticaribe(resultado.datos);
+      else this.cargarOrdenTrabajoBagPro(resultado, numeroOT);
+      this.otCargada = numeroOT;
+      this.consultarProduccionProcesos(numeroOT);
+    }, error => {
+      this.msj.mensajeError(`¡No fue posible consultar la Orden de Trabajo N° ${numeroOT}!`, error.error);
+      this.cargando = false;
     });
+  }
+
+  /**
+   * Calcula el número de OT a consultar sin modificar el estado de la pantalla.
+   * @param numero -1/1 navega desde la OT cargada (o la digitada); 0 usa la digitada; cualquier otro valor es un número absoluto.
+   * @returns Número de OT válido (entero mayor que cero) o null si no se puede determinar.
+   */
+  resolverNumeroOT(numero: number): number | null {
+    let numeroOT: number;
+    if ([0, 1, -1].includes(numero)) {
+      const base = numero == 0 ? this.FormOrdenTrabajo.value.OT_Id : (this.otCargada ?? this.FormOrdenTrabajo.value.OT_Id);
+      if (base == null || base === '') return null;
+      numeroOT = Number(base) + numero;
+    } else numeroOT = Number(numero);
+    return Number.isInteger(numeroOT) && numeroOT > 0 ? numeroOT : null;
+  }
+
+  /**
+   * Busca la OT primero en Plasticaribe y, si no está, en BagPro (filtrando por vendedor cuando el rol es 2).
+   * Solo un 400/404 se considera "no encontrada"; cualquier otro error se propaga.
+   * @param numeroOT Número de la OT a buscar.
+   * @returns Observable con la OT y su origen, o null si no existe en ninguno de los dos sistemas.
+   */
+  buscarOrdenTrabajo$(numeroOT: number): Observable<ResultadoBusquedaOT | null> {
+    return this.ordenTrabajoService.GetOrdenTrabajo(numeroOT, '').pipe(
+      catchError(error => this.esOrdenNoEncontrada(error) ? of([]) : throwError(() => error)),
+      switchMap(datos => datos?.length > 0
+        ? of({ origen: 'plasticaribe', datos: datos[0] } as ResultadoBusquedaOT)
+        : this.buscarOrdenTrabajoBagPro$(numeroOT))
+    );
+  }
+
+  /**
+   * Busca la OT solo en BagPro, filtrando por vendedor cuando el rol es 2.
+   * @param numeroOT Número de la OT a buscar.
+   * @returns Observable con la OT de BagPro, o null si no existe; cualquier error distinto de 400/404 se propaga.
+   */
+  buscarOrdenTrabajoBagPro$(numeroOT: number): Observable<ResultadoBusquedaOT | null> {
+    const sales = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id).padStart(3, '0')}` : '';
+    return this.bagProService.GetOrdenDeTrabajo(numeroOT, sales).pipe(
+      map(datos => datos?.length > 0 ? { origen: 'bagpro', datos: datos[0] } as ResultadoBusquedaOT : null),
+      catchError(error => this.esOrdenNoEncontrada(error) ? of(null) : throwError(() => error))
+    );
+  }
+
+  /**
+   * Indica si un error HTTP de consulta de OT significa "no encontrada" (las APIs responden 400 o 404).
+   * @param error Error devuelto por la consulta.
+   * @returns true si la OT no existe; false si es otro tipo de error.
+   */
+  private esOrdenNoEncontrada = (error: HttpErrorResponse): boolean => [400, 404].includes(error.status);
+
+  /**
+   * Carga una OT de BagPro como plantilla para crear una nueva. Lo usa la búsqueda de OTs (crear / copiar OT).
+   * Si la OT no existe en BagPro se avisa y no se modifica la pantalla.
+   * @param ot Número de la OT o fila de la búsqueda con la propiedad ordenTrabajo.
+   * @param alCargar Función opcional que se ejecuta cuando la OT quedó cargada (p. ej. copiar OT).
+   * @returns No retorna un valor.
+   */
+  busquedaOTBagPro(ot: any, alCargar?: () => void) {
+    const numeroOT = Number(typeof ot == 'number' ? ot : ot?.ordenTrabajo);
+    if (!Number.isInteger(numeroOT) || numeroOT <= 0) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Debe ingresar un número de OT válido para realizar la búsqueda!`);
+      return;
+    }
+
+    this.busquedaOT?.unsubscribe();
+    this.cargando = true;
+    this.busquedaOT = this.buscarOrdenTrabajoBagPro$(numeroOT).pipe(
+      switchMap(resultado => resultado ? this.prepararCargaOrdenTrabajo$(resultado) : of(null))
+    ).subscribe(resultado => {
+      if (!resultado) {
+        this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No existe en BagPro una Orden de Trabajo con el número ${numeroOT}!`);
+        this.cargando = false;
+        return;
+      }
+      this.cargarOrdenTrabajoBagPro(resultado, numeroOT, false);
+      this.otCargada = numeroOT;
+      this.consultarProduccionProcesos(numeroOT);
+      alCargar?.();
+    }, error => {
+      this.msj.mensajeError(`¡No fue posible consultar la Orden de Trabajo N° ${numeroOT} en BagPro!`, error.error);
+      this.cargando = false;
+    });
+  }
+
+  /**
+   * Consulta en Estados Procesos OT (Plasticaribe) los kg producidos por proceso de la OT, sin importar si la OT
+   * se cargó desde Plasticaribe o desde BagPro. No consulta BagPro. Cancela la consulta anterior para no mostrar
+   * datos de otra OT y un fallo no impide cargar ni editar la OT.
+   * @param ot Número de la OT cuya producción se va a mostrar.
+   * @returns No retorna un valor.
+   */
+  consultarProduccionProcesos(ot: number) {
+    this.consultaProduccion?.unsubscribe();
+    this.otProduccion = ot;
+    this.produccionProcesos = [];
+    this.cargandoProduccion = true;
+    this.consultaProduccion = this.estadosProcesosService.consultaPorOT(ot).pipe(
+      finalize(() => this.cargandoProduccion = false)
+    ).subscribe(datos => this.produccionProcesos = datos ?? [], () => {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No fue posible consultar la producción por proceso de la OT N° ${ot}!`);
+    });
+  }
+
+  /**
+   * Cancela la consulta de producción en curso y oculta la tabla de producción por proceso.
+   * @returns No retorna un valor.
+   */
+  limpiarProduccionProcesos() {
+    this.consultaProduccion?.unsubscribe();
+    this.produccionProcesos = [];
+    this.otProduccion = null;
+    this.cargandoProduccion = false;
+  }
+
+  /**
+   * Limpia la pantalla y consulta lo necesario para cargar la OT encontrada: el producto y, para BagPro, la sede del cliente.
+   * @param resultado OT encontrada y su origen.
+   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro.
+   */
+  prepararCargaOrdenTrabajo$(resultado: ResultadoBusquedaOT): Observable<ResultadoBusquedaOT> {
+    this.limpiarCampos();
+    this.cargando = true;
+    if (resultado.origen == 'plasticaribe') {
+      this.producto = resultado.datos.id_Producto;
+      this.presentacionProducto = resultado.datos.id_Presentacion;
+      return this.obtenerInformacionProducto$().pipe(map(() => resultado));
+    }
+
+    this.producto = resultado.datos.id_Producto;
+    this.presentacionProducto = resultado.datos.presentacion == 'Kilo' ? 'Kg' : resultado.datos.presentacion == 'Unidad' ? 'Und' : resultado.datos.presentacion;
+    return forkJoin({ producto: this.obtenerInformacionProducto$(), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
+      map(({ sede }) => ({ ...resultado, sede }))
+    );
+  }
+
+  /**
+   * Carga en los formularios una OT existente en Plasticaribe y habilita el modo edición.
+   * @param datos Fila de la OT devuelta por getOrdenTrabajo.
+   * @returns No retorna un valor.
+   */
+  cargarOrdenTrabajoPlasticaribe(datos: any) {
+    this.FormOrdenTrabajo.patchValue({
+      'OT_Id': datos.numero_Orden,
+      'Id_Vendedor': datos.id_Vendedor,
+      'Nombre_Vendedor': this.idVendedorParaDropdown(datos.id_Vendedor),
+      'OT_FechaCreacion': datos.fecha_Creacion.replace('T00:00:00', ''),
+      'OT_FechaEntrega': datos.fecha_Entrega ? moment(datos.fecha_Entrega.replace('T00:00:00', '')).toDate() : null,
+      'Id_Cliente': datos.id_Cliente,
+      'Nombre_Cliente': datos.cliente,
+      'Id_Producto': datos.id_Producto,
+      'Nombre_Producto': datos.producto,
+      'Cantidad': datos.cantidad_Pedida,
+      'Presentacion': datos.id_Presentacion,
+      'OT_Estado': datos.estado_Orden,
+      'OT_Observacion': datos.observacion,
+      'Margen': datos.margen,
+      'Precio': this.presentacionProducto == 'Kg' ? datos.valorKg : datos.valorUnidad,
+    });
+    this.llenarFormularios(datos);
+    this.edicionOrdenTrabajo = true;
+  }
+
+  /**
+   * Carga una OT que solo existe en BagPro como plantilla para crear una nueva; no habilita el modo edición.
+   * @param resultado OT de BagPro y la sede del cliente (puede ser null).
+   * @param numeroOT Número de la OT consultada.
+   * @param avisarSoloBagPro Muestra el aviso de que la OT no existe en Plasticaribe (consulta por número de OT).
+   * @returns No retorna un valor.
+   */
+  cargarOrdenTrabajoBagPro(resultado: ResultadoBusquedaOT, numeroOT: number, avisarSoloBagPro: boolean = true) {
+    if (!resultado.sede) this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`);
+    this.cargarFormularios(resultado.sede, resultado.datos, numeroOT);
+    this.calcularDatosOt();
+    this.edicionOrdenTrabajo = false;
+    this.cargando = false;
+    if (avisarSoloBagPro) this.msj.mensajeInformacion(`OT N° ${numeroOT} encontrada solo en BagPro`, `Se cargó como plantilla para crear una nueva Orden de Trabajo.`, 5000);
+  }
+
+  // Función que llena los formularios con los datos de la orden de trabajo
+  llenarFormularios(datos_orden: any) {
+    this.validarProcesosOrdenTrabajo(datos_orden);
+    this.llenarFormularioExtrusion(datos_orden);
+    this.llenarFormularioImpresion(datos_orden);
+    this.llenarFormularioLaminado(datos_orden);
+    this.llenarFormularioCorte(datos_orden);
+    this.llenarFormularioSellado(datos_orden);
+    this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden.mezcla_Nombre });
+    this.cargarCombinacionMezclas();
+    setTimeout(() => this.calcularDatosOt(), 1000);
+    this.cargando = false;
   }
 
   // Funcion que va a validar que si se desee actualizar la orden de trabajo
@@ -2381,7 +2639,7 @@ export class Orden_TrabajoComponent implements OnInit {
     if (this.FormOrdenTrabajo.valid) {
       let ot: number = this.FormOrdenTrabajo.value.OT_Id;
       if (!this.extrusion) this.limpiarFormExtrusion();
-      if (!this.impresion && !this.rotograbado) this.limpiarFormImpresion();
+      if (!this.impresion) this.limpiarFormImpresion();
       if (!this.laminado) this.limpiarFormLaminado();
       if (!this.corte) this.limpiarFormCorte();
       if (!this.sellado) this.limpiarFormSellado();
@@ -2419,41 +2677,12 @@ export class Orden_TrabajoComponent implements OnInit {
       this.cerrarMensaje();
       this.cargando = true;
       let ot: number = this.FormOrdenTrabajo.value.OT_Id;
-      
+
       this.ordenTrabajoService.GetDatosOrden(ot).subscribe(datos_Orden => {
         this.consultarDatosProcesos().subscribe(datosProcesos => {
           let procesos = this.construirProcesosOt(datosProcesos);
           if (!procesos) return;
-          let info: modelOrden_Trabajo = {
-            Ot_Id: datos_Orden.ot_Id,
-            Numero_OT: datos_Orden.numero_OT,
-            SedeCli_Id: this.FormOrdenTrabajo.value.Id_Cliente,
-            Prod_Id: this.producto,
-            UndMed_Id: this.presentacionProducto,
-            Ot_FechaCreacion: datos_Orden.ot_FechaCreacion,
-            Ot_FechaEntrega: this.fechaEntregaParaApi(),
-            Ot_Hora: datos_Orden.ot_Hora,
-            Estado_Id: this.FormOrdenTrabajo.value.OT_Estado,
-            Usua_Id: this.storage_Id,
-            PedExt_Id: 517,
-            Ot_Observacion: this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
-            Ot_Cyrel: this.cyrel,
-            Ot_Corte: this.corte,
-            Mezcla_Id: this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
-            Extrusion: this.extrusion,
-            Impresion: this.impresion,
-            Rotograbado: this.rotograbado,
-            Laminado: this.laminado,
-            Sellado: this.sellado,
-            Ot_MargenAdicional: this.FormOrdenTrabajo.value.Margen,
-            Ot_CantidadPedida: this.cantidadProducto,
-            Ot_ValorUnidad: this.valorProducto,
-            Ot_PesoNetoKg: this.netoKg,
-            Ot_ValorKg: this.valorKg,
-            Ot_ValorOT: this.valorOt,
-            Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
-            MotrarEmpresaEtiquetas: this.motrarEmpresaEtiquetas,
-          }
+          let info = this.informacionOrdenTrabajo(datos_Orden);
           this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).subscribe(datos_ot => {
             this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
             this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
@@ -2469,10 +2698,45 @@ export class Orden_TrabajoComponent implements OnInit {
           this.cargando = false;
         });
       }, () => {
-        this.guardarOt(true);
-        this.edicionOrdenTrabajo = false;
+        this.msj.mensajeError(`¡Error!`, `¡La Orden de Trabajo N° ${ot} ya no existe en Plasticaribe!`);
+        this.cargando = false;
       });
     }
+  }
+
+  // Funcion que va a construir la informacion de los procesos de la orden de trabajo
+  informacionOrdenTrabajo(datos_Orden) {
+    let info: modelOrden_Trabajo = {
+      'Ot_Id': datos_Orden.ot_Id,
+      'Numero_OT': datos_Orden.numero_OT,
+      'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
+      'Prod_Id': this.producto,
+      'UndMed_Id': this.presentacionProducto,
+      'Ot_FechaCreacion': datos_Orden.ot_FechaCreacion,
+      'Ot_FechaEntrega': this.fechaEntregaParaApi(),
+      'Ot_Hora': datos_Orden.ot_Hora,
+      'Estado_Id': this.FormOrdenTrabajo.value.OT_Estado,
+      'Usua_Id': this.storage_Id,
+      'PedExt_Id': 517,
+      'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
+      'Ot_Cyrel': this.cyrel,
+      'Ot_Corte': this.corte,
+      'Mezcla_Id': this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+      'Extrusion': this.extrusion,
+      'Impresion': this.impresion,
+      'Rotograbado': false, // Proceso descontinuado; se conserva la columna.
+      'Laminado': this.laminado,
+      'Sellado': this.sellado,
+      'Ot_MargenAdicional': this.FormOrdenTrabajo.value.Margen,
+      'Ot_CantidadPedida': this.cantidadProducto,
+      'Ot_ValorUnidad': this.valorProducto,
+      'Ot_PesoNetoKg': this.netoKg,
+      'Ot_ValorKg': this.valorKg,
+      'Ot_ValorOT': this.valorOt,
+      'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
+      'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
+    }
+    return info;
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
@@ -2597,7 +2861,7 @@ export class Orden_TrabajoComponent implements OnInit {
     let data: any = [];
     data.push(this.hoja1ContentPDF(datos_ot));
     data.push(this.hoja2ContentPDF(datos_ot));
-    // if (this.impresion || this.rotograbado) data.push(this.hoja2ContentPDF(datos_ot));
+    // if (this.impresion) data.push(this.hoja2ContentPDF(datos_ot));
     // if (this.sellado) data.push(this.hoja2ContentPDF(datos_ot));
     return data;
   }
@@ -2870,28 +3134,36 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Función que va a colocar la información de la hoja 2
+  /**
+   * Arma el contenido de la hoja 2: procesos, cyrel y, al final, la tabla de observaciones por proceso.
+   * Si la OT no lleva cyrel se omite su separador para que la tabla de observaciones quede más arriba.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Arreglo de nodos pdfmake de la hoja 2.
+   */
   hoja2ContentPDF(datos_ot) {
     let data: any[] = [];
-    data.push(
-      this.procesosHoja2(datos_ot),
-      '\n',
-      this.cyrelPDF(datos_ot),
-      '\n\n',
-      this.observacion(datos_ot),
-    )
+    const llevaCyrel: boolean = datos_ot.cyrel == true || datos_ot.cyrel == '1';
+    const observaciones = this.observacionesPorProcesoPDF(datos_ot);
+    data.push(this.procesosHoja2(datos_ot));
+    if (llevaCyrel) data.push('\n', this.cyrelPDF(datos_ot));
+    if (observaciones) data.push('\n', observaciones);
     return data;
   }
 
-  // Función que va a colocar en la hoja 2 la información de cada uno de los procesos
+  /**
+   * Coloca en la hoja 2 las tablas de cada proceso. El margen superior negativo acerca la primera fila
+   * a la tabla del encabezado para reducir el espacio que deja el margen superior de la página.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con las tablas de los procesos.
+   */
   procesosHoja2(datos_ot) {
     return {
       pageBreak: 'before',
+      margin: [0, -18, 0, 0],
       table: {
         widths: ['*', 20, '*'],
         body: [
           [this.procesoExtrusion(datos_ot), {}, this.procesoLaminado(datos_ot)],
-          [{}, {}, {}],
           [{}, {}, {}],
           [this.procesoImpresion(datos_ot), {}, this.productoTermiando(datos_ot),]
         ]
@@ -3125,6 +3397,58 @@ export class Orden_TrabajoComponent implements OnInit {
       },
       layout: { defaultBorder: false, },
     } : {}
+  }
+
+  /**
+   * Arma la tabla de observaciones por proceso de la hoja 2. Solo incluye las filas que tienen observación,
+   * para no ocupar espacio con procesos vacíos ni desbordar el contenido a otra hoja.
+   * "Producto Terminado" muestra la observación compartida de corte y sellado.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla, o null si ningún proceso tiene observación.
+   */
+  observacionesPorProcesoPDF(datos_ot) {
+    const filas = [
+      { proceso: `General`, texto: this.textoObservacionPDF(datos_ot.observacion) },
+      { proceso: `Extrusión`, texto: this.textoObservacionPDF(datos_ot.extrusion_Observacion) },
+      { proceso: `Laminado`, texto: this.textoObservacionPDF(datos_ot.laminado_Observacion) },
+      { proceso: `Impresión`, texto: this.textoObservacionPDF(datos_ot.impresion_Observacion) },
+      { proceso: `Producto Terminado`, texto: this.textoObservacionPDF(datos_ot.selladoCorte_Observacion) },
+    ].filter(fila => fila.texto != '');
+
+    if (filas.length == 0) return null;
+
+    return {
+      table: {
+        widths: [120, '*'],
+        headerRows: 2,
+        dontBreakRows: true,
+        body: [
+          [
+            { colSpan: 2, text: `OBSERVACIONES POR PROCESO`, style: 'titulosTablas', border: [true, true, true, true] },
+            {}
+          ],
+          [
+            { text: `Proceso`, style: 'subtituloTablas' },
+            { text: `Observación`, style: 'subtituloTablas' }
+          ],
+          ...filas.map(fila => [
+            { text: fila.proceso, style: 'subtitulo' },
+            { text: fila.texto }
+          ]),
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  /**
+   * Normaliza el texto de una observación para el PDF. Las OT que vienen de BagPro no traen
+   * las observaciones por proceso, por eso se toleran valores nulos o indefinidos.
+   * @param valor Observación tal como llega de la API.
+   * @returns Observación sin espacios sobrantes, o cadena vacía si no existe.
+   */
+  textoObservacionPDF(valor: any): string {
+    return valor == null ? '' : valor.toString().trim();
   }
 
   // Función que va a colocar el footer del PDF
