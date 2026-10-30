@@ -6,6 +6,8 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardPedidos as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-DashBoard_Pedidos',
@@ -38,13 +40,13 @@ export class DashBoard_PedidosComponent implements OnInit {
   mostrarTabla: boolean = false; //Variable que mostrará o no la información graficada
   multiAxisData: any; //Variable que se llenará con la información para graficar la cantidad de pedidos por estado
   multiAxisOptions: any; //Variable que se llenará con las opciones para la grafica de cantidad de pedidos por estado
+  private avisoSinPedidosMostrado: boolean = false;
 
   nombreGrafica: string = ''; //Variable que se usará para colocar el nombre a la tabla modal dependiendo del ranking que se seleccione
   graficaPedidosClientes: any; //Variable que se llenará con la información para graficar el ranking de pedidos por clientes
   opcionesGraficas1: any; //Variable que se llenará con las opciones para las graficas de ranking de pedidos por clientes, productos y vendedores
   opcionesGraficas2: any; //Variable que se llenará con las opciones para las graficas de ranking de pedidos por clientes, productos y vendedores
   opcionesGraficas3: any; //Variable que se llenará con las opciones para las graficas de ranking de pedidos por clientes, productos y vendedores
-
 
   graficaPedidosProductos: any; //Variable que se llenará con la información para graficar el ranking de pedidos por productos
 
@@ -57,20 +59,27 @@ export class DashBoard_PedidosComponent implements OnInit {
     private zeusService: InventarioZeusService,
     private ordenTrabajoService: EstadosProcesos_OTService,
     private shepherdService: ShepherdService,
+    private util: UtileriaService,
+    private mensajeService: MensajesAplicacionService,
     private paginaPrincial: PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
+  /**
+   * Inicializa la carga del tablero y actualiza periódicamente el tema de las gráficas.
+   * @returns No retorna un valor.
+   */
   ngOnInit() {
     this.lecturaStorage();
     if ([1, 60, 61, 6, 12, 96, 85, 97, 2, 98, 10, 103, 104].includes(this.ValidarRol)) this.tiempoExcedido();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.multiAxisOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas1.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas1.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas1.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGraficas1.scales.y1.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      const color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      if (this.multiAxisOptions?.plugins?.legend?.labels) this.multiAxisOptions.plugins.legend.labels.color = color;
+      if (this.opcionesGraficas1?.plugins?.legend?.labels) this.opcionesGraficas1.plugins.legend.labels.color = color;
+      if (this.opcionesGraficas1?.scales?.x?.ticks) this.opcionesGraficas1.scales.x.ticks.color = color;
+      if (this.opcionesGraficas1?.scales?.y?.ticks) this.opcionesGraficas1.scales.y.ticks.color = color;
+      if (this.opcionesGraficas1?.scales?.y1?.ticks) this.opcionesGraficas1.scales.y1.ticks.color = color;
     }, 2000);
   }
 
@@ -100,9 +109,6 @@ export class DashBoard_PedidosComponent implements OnInit {
     }
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
   // Funcion que va a consultar la información general de los pedidos creados en Zeus
   pedidosZeus() {
     let sales: any = '';
@@ -130,9 +136,24 @@ export class DashBoard_PedidosComponent implements OnInit {
     }, 2000);
   }
 
-  // Funcion que va a consultar la cantidad de pedidos agrupados por estado, va a llenar el arreglo de pedidosEstados con la información de cada estado y su respectiva cantidad, y va a llenar el arreglo de pedidosTotales con la cantidad total de pedidos y el costo total de los pedidos
+  /**
+   * Consulta los totales por estado y gestiona el tablero cuando la consulta no tiene pedidos.
+   * @param sales Filtro opcional del vendedor para consultar sus pedidos.
+   * @returns No retorna un valor.
+   */
   consultarPedidosEstados(sales: any) {
     this.zeusService.getPedidosEstados(sales).subscribe(datos_pedidos => {
+      if (!Array.isArray(datos_pedidos)) {
+        this.mensajeService.mensajeError('¡Error!', 'La respuesta al consultar los pedidos no tiene un formato válido.');
+        return;
+      }
+
+      if (datos_pedidos.length === 0) {
+        this.mostrarResumenSinPedidos();
+        return;
+      }
+
+      this.avisoSinPedidosMostrado = false;
       this.pedidosTotales = [];
       this.cantidadTotalPedidos = 0;
       this.costoTotalPedidos = 0;
@@ -154,6 +175,35 @@ export class DashBoard_PedidosComponent implements OnInit {
     });
   }
 
+  /**
+   * Restablece las métricas y gráficas cuando el usuario aún no tiene pedidos.
+   * @returns No retorna un valor.
+   */
+  private mostrarResumenSinPedidos(): void {
+    this.pedidosClientes = [];
+    this.pedidosProductos = [];
+    this.pedidosVendedores = [];
+    this.pedidosEstados = [];
+    this.pedidosTotales = [{ cantidad: 0, costo: 0 }];
+    this.pedidos_Ot = [];
+    this.pedidosStock = [];
+    this.cantidadTotalPedidos = 0;
+    this.costoTotalPedidos = 0;
+    this.cantidadPedidosPendientes = 0;
+    this.cantidadPedidosParciales = 0;
+    this.costoPedidosPendientes = 0;
+    this.costoPedidosParicles = 0;
+    this.llenarGraficaPedidosClientes();
+    this.llenarGraficaPedidosProductos();
+    this.llenarGraficaPedidosVendedores();
+    this.llenarGraficaPedidos();
+
+    if (!this.avisoSinPedidosMostrado) {
+      this.avisoSinPedidosMostrado = true;
+      this.mensajeService.mensajeAdvertencia('Advertencia', 'No tienes pedidos realizados.');
+    }
+  }
+
   // Funcion que va a consultar los pedidos que tengan ordenes de trabajo asociadas y va a llenar el arreglo de pedidos_Ot con la información de cada pedido y su respectiva orden de trabajo
   consultarPedidosOrdenesTrabajo(sales: any) {
     this.zeusService.GetPedidos(sales).subscribe(async datos_pedidos => {
@@ -169,15 +219,15 @@ export class DashBoard_PedidosComponent implements OnInit {
               producto: datos_pedidos[i].producto,
               proceso: ''
             }
-            if (datos_orden[j].estProcOT_ExtrusionKg > 0) info.proceso = `Extrusión ${this.formatonumeros(datos_orden[j].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_ImpresionKg > 0) info.proceso = `Impresión ${this.formatonumeros(datos_orden[j].estProcOT_ImpresionKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_RotograbadoKg > 0) info.proceso = `Rotograbado ${this.formatonumeros(datos_orden[j].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_LaminadoKg > 0) info.proceso = `Laminado ${this.formatonumeros(datos_orden[j].estProcOT_LaminadoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_CorteKg > 0) info.proceso = `Corte - ${this.formatonumeros(datos_orden[j].estProcOT_CorteKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_DobladoKg > 0) info.proceso = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_EmpaqueKg > 0) info.proceso = `Empaque ${this.formatonumeros(datos_orden[j].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_SelladoKg > 0) info.proceso = `Sellado ${this.formatonumeros(datos_orden[j].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_SelladoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_WiketiadoKg > 0) info.proceso = `Wiketiado ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_ExtrusionKg > 0) info.proceso = `Extrusión ${this.util.formatoNumeros(datos_orden[j].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_ImpresionKg > 0) info.proceso = `Impresión ${this.util.formatoNumeros(datos_orden[j].estProcOT_ImpresionKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_RotograbadoKg > 0) info.proceso = `Rotograbado ${this.util.formatoNumeros(datos_orden[j].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_LaminadoKg > 0) info.proceso = `Laminado ${this.util.formatoNumeros(datos_orden[j].estProcOT_LaminadoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_CorteKg > 0) info.proceso = `Corte - ${this.util.formatoNumeros(datos_orden[j].estProcOT_CorteKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_DobladoKg > 0) info.proceso = `Doblado ${this.util.formatoNumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_EmpaqueKg > 0) info.proceso = `Empaque ${this.util.formatoNumeros(datos_orden[j].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_SelladoKg > 0) info.proceso = `Sellado ${this.util.formatoNumeros(datos_orden[j].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.util.formatoNumeros(datos_orden[j].estProcOT_SelladoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_WiketiadoKg > 0) info.proceso = `Wiketiado ${this.util.formatoNumeros(datos_orden[j].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.util.formatoNumeros(datos_orden[j].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
             this.pedidos_Ot.push(info);
             this.pedidos_Ot.sort((a, b) => Number(a.pedido) - Number(b.pedido));
           }
@@ -186,7 +236,10 @@ export class DashBoard_PedidosComponent implements OnInit {
     });
   }
 
-  // Funcion que va a llenar la grafica de pie de la cantidad de pedidos por estados
+  /**
+   * Prepara los datos de la gráfica de pedidos por estado.
+   * @returns No retorna un valor.
+   */
   llenarGraficaPedidos() {
     this.multiAxisData = {
       labels: ['Pendiente', 'Parcialmente Satisfecho'],
@@ -207,12 +260,15 @@ export class DashBoard_PedidosComponent implements OnInit {
     };
   }
 
-  // Funcion que va a llenar la grafcia de los clientes con mas pedidos
+  /**
+   * Construye la gráfica de clientes con los resultados disponibles.
+   * @returns No retorna un valor.
+   */
   llenarGraficaPedidosClientes() {
     let clientes: any = [];
     let costo: any = [];
     let cantOt: any = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < Math.min(5, this.pedidosClientes.length); i++) {
       clientes.push(this.pedidosClientes[i].cliente);
       costo.push(this.pedidosClientes[i].costo);
       cantOt.push(this.pedidosClientes[i].cantidad);
@@ -227,12 +283,15 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.estilosGrafica1();
   }
 
-  // Funcion que va a llenar la grafica de los productos con mas pedidos
+  /**
+   * Construye la gráfica de productos con los resultados disponibles.
+   * @returns No retorna un valor.
+   */
   llenarGraficaPedidosProductos() {
     let clientes: any = [];
     let costo: any = [];
     let cantOt: any = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < Math.min(5, this.pedidosProductos.length); i++) {
       clientes.push(this.pedidosProductos[i].producto);
       costo.push(this.pedidosProductos[i].costo);
       cantOt.push(this.pedidosProductos[i].cantidad);
@@ -247,12 +306,15 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.estilosGrafica2();
   }
 
-  // Funcion que va a llenar la grafica de los vendedores con mas pedidos
+  /**
+   * Construye la gráfica de vendedores con los resultados disponibles.
+   * @returns No retorna un valor.
+   */
   llenarGraficaPedidosVendedores() {
     let vendedores: any = [];
     let costo: any = [];
     let cantidad_Pedidos: any = [];
-    let length: number = this.ValidarRol == 2 ? this.pedidosVendedores.length : 5;
+    let length: number = this.ValidarRol == 2 ? this.pedidosVendedores.length : Math.min(5, this.pedidosVendedores.length);
 
     for (let i = 0; i < length; i++) {
       vendedores.push(this.pedidosVendedores[i].vendedor);
