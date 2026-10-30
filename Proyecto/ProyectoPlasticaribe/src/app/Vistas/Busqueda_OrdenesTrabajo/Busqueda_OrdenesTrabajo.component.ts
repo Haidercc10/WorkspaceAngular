@@ -13,6 +13,7 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-Busqueda_OrdenesTrabajo',
@@ -140,7 +141,15 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     let fechaFin: any = moment(this.formFiltros.value.fechaFin).format('YYYY-MM-DD');
     let ruta: string = this.validarRutaConsulta();
 
-    this.bagProService.GetOrdenesTrabajo(fechaIncio, fechaFin, ruta).subscribe(data => {
+    this.bagProService.GetOrdenesTrabajo(fechaIncio, fechaFin, ruta)
+    .pipe(
+      finalize(() => this.cargando = false)
+    ).subscribe(data => {
+      if (!data || data.length == 0) {
+        this.msj.mensajeAdvertencia(`No se encontraron órdenes de trabajo con los filtros aplicados.`);
+        this.cargando = false;
+        return;
+      }
       this.ordenesConsultadas = data;
       this.llenarColumnas();
     }, () => {
