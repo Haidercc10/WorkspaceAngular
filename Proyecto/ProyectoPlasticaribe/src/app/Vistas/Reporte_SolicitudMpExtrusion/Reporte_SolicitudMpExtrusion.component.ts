@@ -137,6 +137,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.cargando = true;
     this.arrayRegistros = [];
     this.arrayMatPrimas = [];
+    this.solicitudSeleccionada = 0;
+    this.usuarioSolicitante = '';
+    this.estadoSolicitud = '';
     let solicitud : number = this.formFiltros.value.documento;
     let fechaInicial : any = moment(this.formFiltros.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
@@ -164,6 +167,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
             this.arrayId.push(data[index].id);
           }
         }
+        /** Se reasigna la referencia para que p-table recalcule totalRecords y el paginador. */
+        this.arrayRegistros = [...this.arrayRegistros];
       } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
     }, error => { this.msj.mensajeError(`Error`, `Error al consultar registros de solicitudes de material`)} );
   }
@@ -188,6 +193,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.arrayId = [];
     this.arrayRegistros = [];
     this.arrayMatPrimas = [];
+    this.usuarioSolicitante = '';
+    this.estadoSolicitud = '';
   }
 
   /** Función para filtrar los registros de la tabla */
