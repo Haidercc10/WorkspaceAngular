@@ -29,4 +29,11 @@ constructor(private http : HttpClient) { }
 
   putPreloadForOrderFact = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Precargue_Despacho/putPreloadForOrderFact/${id}`, data);
 
+  /**
+   * Anula un precargue pendiente o en proceso y libera sus rollos (estado 50 a 19).
+   * @param id Número del precargue.
+   * @returns Observable con la cantidad de rollos liberados (`rollosLiberados`).
+   */
+  anular = (id : number) : Observable<any> => this.http.put<any>(this.rutaPlasticaribeAPI + `/Precargue_Despacho/anular/${id}`, null);
+
 }

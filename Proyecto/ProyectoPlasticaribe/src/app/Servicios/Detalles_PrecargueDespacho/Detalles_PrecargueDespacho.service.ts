@@ -21,7 +21,13 @@ export class Detalles_PrecargueDespachoService {
 
       getPreloadIdAsync = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/getPreloadIdAsync/${id}`);
 
-      getMovementsPreload = (date1 : any, date2 : any, url? : string):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/getMovementsPreload/${date1}/${date2}${url}`);
+      /**
+       * Obtiene un precargue en proceso (estado 2) para retomarlo: `{ header, rolls }`.
+       * @param id Número del precargue.
+       */
+      getPreloadToResume = (id : number):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/getPreloadToResume/${id}`);
+
+      getMovementsPreload =(date1 : any, date2 : any, url? : string):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/getMovementsPreload/${date1}/${date2}${url}`);
 
       Post = (data : modelDetalles_PrecargueDespacho): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Detalles_PrecargueDespacho', data);
     
@@ -29,5 +35,12 @@ export class Detalles_PrecargueDespachoService {
 
       Delete = (id : any) => this.http.delete(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/${id}`);
 
-      EditPreloadClientName = (id : string, idClient : string) => this.http.put(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/EditPreloadClientName/${id}/${idClient}`, idClient);
+      /**
+       * Cambia el cliente de un precargue y actualiza su vendedor al asesor del cliente nuevo.
+       * @param id Número del precargue.
+       * @param idClient Identificador del cliente nuevo.
+       * @param idSales Identificador del vendedor (usuario) del cliente nuevo.
+       * @returns Observable de la petición PUT.
+       */
+      EditPreloadClientName = (id : string, idClient : string, idSales : number) => this.http.put(this.rutaPlasticaribeAPI + `/Detalles_PrecargueDespacho/EditPreloadClientName/${id}/${idClient}?sales=${idSales}`, idClient);
 }

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { finalize } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppComponent } from 'src/app/app.component';
 import { modelDetalles_PrecargueDespacho } from 'src/app/Modelo/modelDetalles_PrecargueDespacho';
 import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
@@ -53,7 +54,9 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     private svDetailsPreload: Detalles_PrecargueDespachoService,
     private PDFService: CreacionPdfService,
     private msg: MessageService,
-    private util: UtileriaService
+    private util: UtileriaService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.initForm();
@@ -62,7 +65,43 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.focusInput(false);
+    // Si se llega desde Mov_PrecargueDespacho con ?preload=N, se retoma ese precargue en proceso.
+    const preload = Number(this.route.snapshot.queryParamMap.get('preload'));
+    if (preload) this.loadPreloadToResume(preload);
   }
+
+  /**
+   * Retoma un precargue en proceso (estado 2): carga sus rollos en las tablas de detalle y consolidada,
+   * y su encabezado (N° en `doc`, cliente, vendedor y observación) con el cliente bloqueado (`editMode`).
+   * Los rollos que ya no estén en estado 50 no se cargan y se avisan.
+   * @param id Número del precargue.
+   */
+  loadPreloadToResume(id: number) {
+    this.load = true;
+    this.svDetailsPreload.getPreloadToResume(id).pipe(finalize(() => this.load = false)).subscribe({
+      next: data => {
+        const header = data.header;
+        const rolls: any[] = data.rolls ?? [];
+        const unavailable = rolls.filter(x => x.currentStatus != 50);
+        this.rollsToDispatch = rolls.filter(x => x.currentStatus == 50);
+        this.consolidateItems();
+        this.form.patchValue({ doc: id, idClient: header.idClient, client: header.client, asesor: header.salesId, observation: header.observation });
+        // viewConfirmMessage busca el nombre del cliente en esta lista.
+        this.clients = [{ idcliente: header.idClient, razoncial: header.client, idvende: header.salesId }];
+        this.editMode = true;
+        this.util.Notificacion(`Confirmación`, `Se cargó el precargue N° ${id} con ${this.rollsToDispatch.length} rollo(s)/bulto(s).`);
+        if (unavailable.length > 0) this.util.Notificacion(`Advertencia`, `Los rollos/bultos N° ${unavailable.map(x => x.roll).join(', ')} ya no están disponibles en el precargue y no se cargaron.`);
+      },
+      error: error => {
+        let message: string = typeof error.error == 'string' ? error.error : `Error al consultar el precargue N° ${id} | ${error.status} ${error.statusText}`;
+        this.util.Notificacion(`Error`, message);
+        this.clearPreloadParam();
+      }
+    });
+  }
+
+  /** Quita el query param `preload` para que recargar la página no vuelva a retomar el precargue. */
+  clearPreloadParam = () => this.router.navigate([], { relativeTo: this.route, queryParams: {} });
 
   ngOnDestroy(): void {
     this.focusInput(true);
@@ -293,7 +332,9 @@ export class Precargue_RollosDespachoComponent implements OnInit {
   }
 
   clearFields() {
-    this.form.reset();
+    // Con un precargue retomado se conserva su encabezado (N°, cliente y vendedor) porque los rollos de la tabla le pertenecen.
+    if (this.editMode) this.form.patchValue({ roll: null, observation: null });
+    else this.form.reset();
     this.load = false;
   }
 
@@ -303,6 +344,7 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     this.rollsConsolidate = [];
     this.searchIn = null;
     this.load = false;
+    if (this.editMode) this.clearPreloadParam();
     this.editMode = false;
   }
 

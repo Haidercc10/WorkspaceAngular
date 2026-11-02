@@ -46,7 +46,7 @@
         <!--* Cliente Stock -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
           <div class="field-checkbox">
-            <p-checkbox formControlName="clientStock" [binary]="true" inputId="clientStock" id="clientStock"
+            <p-checkbox formControlName="clientStock" [binary]="true" inputId="clientStock" id="clientStock" [readonly]="editMode"
               pTooltip="Al checar aquí indicas que el rollo/bulto fue pesado y en la etiqueta indica que es de Cliente Stock y deberás buscar el nombre real en el campo Cliente."></p-checkbox>
             <label for="clientStock">Cliente Stock</label>
           </div>
@@ -56,7 +56,8 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="client" id="client" list="list" type="text" pInputText required (keyup)="searchClientsByName()" (change)="selectClient()" />
+            <!-- Al retomar un precargue (editMode) el cliente queda de solo lectura; readonly conserva el valor en form.value -->
+            <input formControlName="client" id="client" list="list" type="text" pInputText required [readonly]="editMode" (keyup)="searchClientsByName()" (change)="selectClient()" />
             <datalist id="list">
               <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
             </datalist>
@@ -212,7 +213,8 @@
   <!--* Botones -->
   <div *ngIf="!load">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollsToDispatch.length == 0" type="button"
+      <!-- Con un precargue retomado (editMode) no se genera uno nuevo: los rollos ya están guardados en ese precargue -->
+      <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollsToDispatch.length == 0 || editMode" type="button"
         label="Generar Precargue" icon="pi pi-check" (click)="viewConfirmMessage()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar todo" icon="pi pi-eraser"
         (click)="clearAll()"></button>
