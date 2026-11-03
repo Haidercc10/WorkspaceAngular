@@ -31,4 +31,24 @@ constructor(private http : HttpClient) { }
 
   putPreloadForOrderFact = (id : any, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Precargue_Despacho/putPreloadForOrderFact/${id}`, data);
 
+  /**
+   * Anula un precargue pendiente o en proceso y libera sus rollos (estado 50 a 19).
+   * @param id Número del precargue.
+   * @returns Observable con la cantidad de rollos liberados (`rollosLiberados`).
+   */
+  anular = (id : number) : Observable<any> => this.http.put<any>(this.rutaPlasticaribeAPI + `/Precargue_Despacho/anular/${id}`, null);
+
+  // Precargue guardado rollo a rollo (estados En proceso → Pendiente o Anulado).
+  getPreloadRolls = (id : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/PrecargueRollos/${id}`);
+
+  getPreloadsInProcess = (user : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/PrecargueRollos/enProceso/${user}`);
+
+  addRollToPreload = (data : any) : Observable<any> => this.http.post<any>(`${this.rutaPlasticaribeAPI}/PrecargueRollos/agregarRollo`, data);
+
+  removeRollFromPreload = (id : number, roll : number, item : number) : Observable<any> => this.http.delete<any>(`${this.rutaPlasticaribeAPI}/PrecargueRollos/${id}/rollos/${roll}/${item}`);
+
+  finishPreload = (id : number, data : any) : Observable<any> => this.http.put<any>(`${this.rutaPlasticaribeAPI}/PrecargueRollos/${id}/finalizar`, data);
+
+  cancelPreload = (id : number, data : any) : Observable<any> => this.http.put<any>(`${this.rutaPlasticaribeAPI}/PrecargueRollos/${id}/anular`, data);
+
 }

@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
@@ -66,7 +65,10 @@ export class Mov_PrecargueDespachoComponent implements OnInit, OnDestroy {
     private svDtlPreload: Detalles_PrecargueDespachoService,
     private svSales: UsuarioService,
     private util: UtileriaService,
-    private PDFService: CreacionPdfService
+    private PDFService: CreacionPdfService,
+    private svPreload: Precargue_DespachoService,
+    private confirmationService: ConfirmationService,
+    private router: Router
   ) {
     this.initForm();
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
@@ -109,7 +111,8 @@ export class Mov_PrecargueDespachoComponent implements OnInit, OnDestroy {
     this.formBusquedaPrecargue.patchValue({ 'startDate': initialDate, 'endDate': new Date() });
   }
 
-  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => [11, 5].includes(x.estado_Id)) }, error => { this.util.Notificacion(`Error`, `Error al consultar los estados.`) });
+  // Función para obtener los estados disponibles.
+  getStatuses = () => this.svStatuses.srvObtenerListaEstados().subscribe(data => { this.statuses = data.filter(x => this.estadosFiltro.includes(x.estado_Id)) }, error => { this.util.Notificacion(`Error`, `Error al consultar los estados.`) });
 
   // Función para inicializar los formularios.
   initForm() {

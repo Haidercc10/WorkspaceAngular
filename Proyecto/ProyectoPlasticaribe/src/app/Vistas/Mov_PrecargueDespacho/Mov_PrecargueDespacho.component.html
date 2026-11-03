@@ -145,7 +145,7 @@
         </th>
         <th class="text-center" *ngIf="[1].includes(ValidarRol)">Anular</th>
         <th class="text-center" id="ver3">Ver</th>
-        <th class="text-center">Editar</th>
+        <th class="text-center" *ngIf="rolesEditarCliente.includes(ValidarRol)">Editar</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -161,9 +161,11 @@
         <td class="text-center">{{data.sales}}</td>
         <td class="text-center">{{data.date1 | date : 'yyyy-MM-dd'}} {{data.hour1}}</td>
         <td class="text-center">{{(data.date1 == data.date2 && data.hour1 == data.hour2) ? '' : (data.date2 | date : 'yyyy-MM-dd') + ' ' + data.hour2}}</td>
-        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
-                                                                'bg-success1': [5].includes(data.statusId),
-                                                                'bg-blue1': [26].includes(data.statusId), 
+        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': data.statusId == ESTADOS.PENDIENTE,
+                                                                'bg-success1': data.statusId == ESTADOS.FINALIZADO,
+                                                                'bg-blue1': data.statusId == ESTADOS.ACEPTADO,
+                                                                'bg-warning1': data.statusId == ESTADOS.ANULADO,
+                                                                'bg-secondary1': data.statusId == ESTADOS.EN_PROCESO
                                                                 }">{{data.status}}</span></td>
         <td class="text-center" *ngIf="[1].includes(ValidarRol)">
           <p-button *ngIf="estadosAnulables.includes(data.statusId)" icon="pi pi-ban" styleClass="p-button-rounded p-button-warning"
@@ -176,10 +178,6 @@
         <td class="text-center" *ngIf="rolesEditarCliente.includes(ValidarRol)">
           <p-button *ngIf="data.statusId != ESTADOS.ANULADO" id="btnEditar" icon="pi pi-pencil" styleClass="p-button-rounded p-button-success"
             (onClick)="cargarModalEditarPrecargue(data)"></p-button>
-        </td>
-        <td class="text-center">
-          <p-button *ngIf="data.statusId == 2" icon="pi pi-arrow-right" styleClass="p-button-rounded p-button-warning"
-            pTooltip="Continuar el precargue en proceso." (onClick)="continuePreload(data.movement)"></p-button>
         </td>
       </tr>
     </ng-template>
