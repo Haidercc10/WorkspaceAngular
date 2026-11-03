@@ -64,23 +64,26 @@
               </span>
             </div>
 
-            <!--* Cliente Stock -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
-              <div class="field-checkbox h-100 mb-0">
-                <p-checkbox formControlName="clientStock" [binary]="true" [inputId]="'clientStock-' + tab.key"
-                  pTooltip="Al checar aquí indicas que el rollo/bulto fue pesado y en la etiqueta indica que es de Cliente Stock y deberás buscar el nombre real en el campo Cliente."></p-checkbox>
-                <label [attr.for]="'clientStock-' + tab.key">Cliente Stock</label>
-              </div>
-            </div>
+        <!--* Cliente Stock -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+          <div class="field-checkbox">
+            <p-checkbox formControlName="clientStock" [binary]="true" inputId="clientStock" id="clientStock"
+              pTooltip="Al checar aquí indicas que el rollo/bulto fue pesado y en la etiqueta indica que es de Cliente Stock y deberás buscar el nombre real en el campo Cliente."></p-checkbox>
+            <label for="clientStock">Cliente Stock</label>
+          </div>
+        </div>
 
-            <!--* Rollo -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-              <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-search"></i>
-                <input pInputText formControlName="roll" [id]="'roll-' + tab.key" autocomplete="off" type="number" (keyup.enter)="searchRolls(tab)" />
-                <label [attr.for]="'roll-' + tab.key">Rollo/Bulto</label>
-              </span>
-            </div>
+        <!--* Cliente -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="client" id="client" list="list" type="text" pInputText required (keyup)="searchClientsByName()" (change)="selectClient()" />
+            <datalist id="list">
+              <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
+            </datalist>
+            <label for="client">Cliente*</label>
+          </span>
+        </div>
 
             <!--* Observación -->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-3 col-xxl-3">
@@ -230,22 +233,15 @@
         </p-table>
       </div>
 
-      <!--* Botones -->
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-success" type="button" [disabled]="!tab.pcdId || tab.rolls.length == 0"
-          label="Generar Precargue" icon="pi pi-check" (click)="viewConfirmMessage(tab, 'finish')"></button>
-        <button *ngIf="!tab.pcdId" pButton class="p-button-secondary" type="button" label="Limpiar todo" icon="pi pi-eraser"
-          (click)="clearAll(tab)"></button>
-      </div>
-    </p-tabPanel>
-
-    <!--* Pestaña para agregar un nuevo precargue -->
-    <p-tabPanel>
-      <ng-template pTemplate="header">
-        <i class="pi pi-plus" pTooltip="Nuevo precargue"></i>
-      </ng-template>
-    </p-tabPanel>
-  </p-tabView>
+  <!--* Botones -->
+  <div *ngIf="!load">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollsToDispatch.length == 0" type="button"
+        label="Generar Precargue" icon="pi pi-check" (click)="viewConfirmMessage()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar todo" icon="pi pi-eraser"
+        (click)="clearAll()"></button>
+    </div>
+  </div>
 </p-card>
 
 <!--Confirmacion para generar o cancelar un precargue-->

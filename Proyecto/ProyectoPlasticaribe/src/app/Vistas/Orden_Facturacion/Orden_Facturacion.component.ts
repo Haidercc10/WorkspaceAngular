@@ -1241,6 +1241,10 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   //* PRECARGUE DE DESPACHO
+  /**
+   * Consulta el precargue indicado (endpoint optimizado `getPreloadIdAsync`) y lo asocia al pedido seleccionado.
+   * No aplica para órdenes en edición ni para reposiciones; requiere número de precargue y de pedido.
+   */
   getPreloadForId() {
     let preload: number = this.formDataOrder.value.preload;
     let saleOrder: number = this.formDataOrder.value.saleOrder;
@@ -1251,12 +1255,6 @@ export class Orden_FacturacionComponent implements OnInit {
           if (![null, 0, undefined, ''].includes(saleOrder)) {
             this.load = true;
             this.svDtlPreload.getPreloadId(preload).subscribe(data => {
-              // Los precargues en proceso (2) o anulados (3) no se pueden facturar.
-              if ([2, 3].includes(data[0].statusId)) {
-                this.util.Notificacion(`Advertencia`, `El precargue N° ${preload} está en estado ${data[0].status} y no se puede facturar!`);
-                this.load = false;
-                return;
-              }
               //this.clearTables();
               this.getSalesOrders(data);
               console.log(data);

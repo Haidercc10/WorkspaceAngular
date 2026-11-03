@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { TabView } from 'primeng/tabview';
 import { finalize } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppComponent } from 'src/app/app.component';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
@@ -61,16 +62,14 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     private svDetailsPreload: Detalles_PrecargueDespachoService,
     private PDFService: CreacionPdfService,
     private msg: MessageService,
-    private util: UtileriaService,
-    private route: ActivatedRoute,
+    private util: UtileriaService
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.loadPreloadsInProcess();
-    this.focusTimer = setInterval(() => this.focusRoll(), 30000);
+    this.focusInput(false);
   }
 
   ngOnDestroy(): void {
@@ -321,54 +320,71 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
 
   applyFilter = ($event, campo: any, table: any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  clearFields(tab: PreloadTab) {
-    tab.form.reset({ clientStock: false });
-    tab.clients = [];
-    this.focusRoll(tab);
+  savePreload() {
+    if (this.rollsToDispatch.length > 0) {
+      this.load = true;
+      let fechaActual: any = moment().format('YYYY-MM-DD');
+      let horaActual: any = moment().format('HH:mm:ss');
+
+      let info: modelPrecargue_Despacho = {
+        Cli_Id: this.form.value.idClient,
+        OF_Id: 4472, //OF GENERICA
+        Pcd_FechaCrea: fechaActual,
+        Pcd_HoraCrea: horaActual,
+        Usua_Crea: this.storage_Id,
+        Pcd_Observacion: this.form.value.observation,
+        Estado_Id: 11,
+        Pcd_FechaModifica: fechaActual,
+        Pcd_HoraModifica: horaActual,
+        Usua_Modifica: 0,
+        Pcd_ObservacionModifica: '',
+        Usua_Vendedor: parseInt(this.form.value.asesor),
+      };
+
+      this.onReject();
+      this.svPreload.Post(info).subscribe(data => { this.saveDetailsPreload(data.pcd_Id); }, error => {
+        this.util.Notificacion(`Error`, `Error guardando el encabezado del precargue de despacho | ${error.status} ${error.statusText}`);
+      });
+    }
   }
 
-  clearAll(tab: PreloadTab) {
-    this.clearFields(tab);
-    tab.rolls = [];
-    tab.consolidated = [];
+  saveDetailsPreload(id: number) {
+    let count: number = 0;
+    this.rollsToDispatch.forEach(x => {
+      let info: modelDetalles_PrecargueDespacho = {
+        'Pcd_Id': id,
+        'Prod_Id': x.item,
+        'DtlPcd_Rollo': x.roll,
+        'DtlPcd_Cantidad': x.qty,
+        'UndMed_Id': x.unit,
+      }
+      this.svDetailsPreload.Post(info).subscribe(data => {
+        count += 1;
+        if (count == this.rollsToDispatch.length) this.updateStatusRolls(id);
+      });
+    });
   }
 
-  // Deja la pestaña lista para un nuevo precargue conservando los datos del formulario.
-  resetTab(tab: PreloadTab) {
-    tab.pcdId = null;
-    tab.rolls = [];
-    tab.consolidated = [];
-    tab.form.patchValue({ doc: null, roll: null });
-    tab.form.get('client')?.enable();
+  updateStatusRolls(id: number) {
+    let rolls: Array<any> = [];
+    this.rollsToDispatch.forEach(x => rolls.push({ 'of': 0, 'roll': x.roll, 'item': x.item, 'currentStatus': 19, 'newStatus': 50, 'envioZeus': true }));
+    this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => {
+      this.util.Notificacion(`Error`, `Error actualizando el estado de los rollos seleccionados.`);
+    });
   }
 
-  // Mostrar mensaje de confirmación para generar o cancelar el precargue de la pestaña.
-  viewConfirmMessage(tab: PreloadTab, action: 'finish' | 'cancel') {
-    this.confirmTab = tab;
-    this.confirmAction = action;
-    let client: string = tab.form.getRawValue().client;
-    this.message = action == 'finish'
-      ? `¿Está seguro que desea generar el precargue N° ${tab.pcdId} para el cliente ${client}?`
-      : `¿Está seguro que desea cancelar el precargue N° ${tab.pcdId}? Se anulará y sus ${tab.rolls.length} rollo(s)/bulto(s) volverán a estar disponibles.`;
-    setTimeout(() => {
-      this.msg.add({ severity: 'warn', key: 'confirm', summary: action == 'finish' ? 'Confirmación' : 'Cancelar precargue', detail: this.message, sticky: true });
-    }, 200);
+  clearFields() {
+    this.form.reset();
+    this.load = false;
   }
 
-  onConfirm() {
-    let tab = this.confirmTab;
-    let action = this.confirmAction;
-    this.onReject();
-    if (!tab) return;
-    if (action == 'finish') this.finishPreload(tab);
-    else if (action == 'cancel') this.cancelPreload(tab);
-  }
-
-  // Función para quitar mensaje confirmación.
-  onReject() {
-    this.msg.clear('confirm');
-    this.confirmTab = null;
-    this.confirmAction = null;
+  clearAll() {
+    this.form.reset();
+    this.rollsToDispatch = [];
+    this.rollsConsolidate = [];
+    this.searchIn = null;
+    this.load = false;
+    this.editMode = false;
   }
 
   // Pasa el precargue de En proceso a Pendiente, genera el PDF y cierra la pestaña.
