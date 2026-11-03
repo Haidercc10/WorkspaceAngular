@@ -20,6 +20,16 @@
   .tabla1{
     display: flex;
   }
+
+  /* La pestaña "+" solo tiene un ícono y su enlace quedaba más bajo que el de las demás pestañas,
+     dejando su borde inferior por encima de la línea de la barra; se estira a la altura de la barra. */
+  :host ::ng-deep .p-tabview-nav li.tab-add {
+    display: flex;
+  }
+
+  :host ::ng-deep .p-tabview-nav li.tab-add .p-tabview-nav-link {
+    height: 100%;
+  }
   
   .p-input-icon-left {
     width: 100%;

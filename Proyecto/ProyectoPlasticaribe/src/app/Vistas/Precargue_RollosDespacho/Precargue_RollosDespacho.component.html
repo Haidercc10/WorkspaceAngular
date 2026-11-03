@@ -17,11 +17,18 @@
 
 <!--* Contenido-->
 <p-card>
+  <!--* Precargues en proceso que no cupieron en las pestañas; desaparece al abrirlos todos -->
+  <div class="d-flex justify-content-center align-items-center gap-3 mb-3" *ngIf="remainingPreloads.length > 0">
+    <span><b>{{remainingPreloads.length == 1 ? 'Queda 1 precargue en proceso' : 'Quedan ' + remainingPreloads.length + ' precargues en proceso'}}</b></span>
+    <button pButton class="p-button-danger" type="button" label="Abrir siguiente" icon="pi pi-folder-open"
+      [disabled]="!canAddTab()" (click)="openNextPreload()"></button>
+  </div>
+
   <p-tabView #tabView *ngIf="tabs.length > 0" [(activeIndex)]="activeIndex" [scrollable]="true" [controlClose]="true"
     (onChange)="onTabChange($event.index)" (onClose)="closeTab($event.index)">
 
     <!--* Una pestaña por precargue -->
-    <p-tabPanel *ngFor="let tab of tabs; trackBy: trackTab" [closable]="tabs.length > 1 && !tab.pcdId">
+    <p-tabPanel *ngFor="let tab of tabs; trackBy: trackTab" [closable]="tabs.length > 1">
       <ng-template pTemplate="header">
         <i class="pi pi-file me-2"></i>
         <span>{{tab.pcdId ? 'Precargue N° ' + tab.pcdId : 'Nuevo precargue'}}</span>
@@ -248,28 +255,28 @@
       </div>
     </p-tabPanel>
 
-    <!--* Pestaña para agregar un nuevo precargue -->
-    <p-tabPanel>
+    <!--* Pestaña para agregar un nuevo precargue; se deshabilita al llegar al máximo de pestañas -->
+    <p-tabPanel headerStyleClass="tab-add" [disabled]="!canAddTab()">
       <ng-template pTemplate="header">
-        <i class="pi pi-plus" pTooltip="Nuevo precargue"></i>
+        <i class="pi pi-plus" [pTooltip]="canAddTab() ? 'Nuevo precargue' : 'Máximo ' + maxTabs + ' pestañas abiertas'"></i>
       </ng-template>
     </p-tabPanel>
   </p-tabView>
 </p-card>
 
-<!--Confirmacion para generar o cancelar un precargue-->
+<!--Confirmacion para generar o cancelar un precargue, o para retomar los precargues en proceso al entrar a la página-->
 <p-toast position="center" key="confirm" [baseZIndex]="5000" (onClose)="onReject()">
   <ng-template let-message pTemplate="message">
     <div class="flex flex-column" style="flex: 1">
       <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <i class="font-size-48" [ngClass]="confirmAction == 'resume' ? 'pi pi-info-circle' : 'pi pi-exclamation-triangle'"></i>
         <h4>{{message.summary}}</h4>
         <p>{{message.detail}}</p>
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6">
           <button type="button" pButton icon="pi pi-check" label="Sí" (click)="onConfirm()"
-            [ngClass]="confirmAction == 'cancel' ? 'p-button-danger' : 'p-button-warning'"></button>
+            [ngClass]="confirmAction == 'cancel' ? 'p-button-danger' : confirmAction == 'resume' ? 'p-button-info' : 'p-button-warning'"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject()" class="p-button-secondary"></button>

@@ -18,6 +18,9 @@ interface PreloadTab {
   key: number;
   form: FormGroup;
   pcdId: number | null;
+  // Cliente con el que se creó el precargue. El usuario puede cambiar el cliente del formulario antes de generarlo
+  // (despachar a otro cliente rollos pesados a nombre de este); al generarlo solo se envía el cliente si cambió.
+  originalClient: { id: number, name: string } | null;
   rolls: any[];
   consolidated: any[];
   clients: any[];
@@ -27,6 +30,8 @@ interface PreloadTab {
 
 const STATUS_IN_PROCESS: number = 2;
 const STATUS_ROLL_PRELOADED: number = 50;
+// Con más pestañas los botones de desplazamiento de la barra tapan la pestaña "+".
+const MAX_TABS: number = 10;
 
 @Injectable({
   providedIn: `root`
@@ -50,7 +55,9 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol
   message: string = '';
   confirmTab: PreloadTab | null = null;
-  confirmAction: 'finish' | 'cancel' | null = null;
+  confirmAction: 'finish' | 'cancel' | 'resume' | null = null;
+  private pendingPreloads: number[] = []; // Precargues en proceso que se abrirán si el usuario acepta retomarlos.
+  remainingPreloads: number[] = []; // Precargues que el usuario aceptó retomar pero no cupieron por el máximo de pestañas.
   private nextKey: number = 1;
   private focusTimer: any;
 
@@ -113,6 +120,7 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
         observation: [null,],
       }),
       pcdId: null,
+      originalClient: null,
       rolls: [],
       consolidated: [],
       clients: [],
@@ -123,15 +131,30 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     return tab;
   }
 
-  addTab = () => this.selectTab(this.createTab());
+  readonly maxTabs: number = MAX_TABS;
+
+  canAddTab = () => this.tabs.length < MAX_TABS;
+
+  addTab() {
+    if (!this.canAddTab()) {
+      this.util.Notificacion(`Advertencia`, `Solo se pueden tener ${MAX_TABS} pestañas abiertas. Cierra o termina alguna para crear un nuevo precargue.`);
+      this.selectTab(this.tabs[this.tabs.length - 1]);
+      return;
+    }
+    this.selectTab(this.createTab());
+  }
 
   // Se espera a que la pestaña se renderice para seleccionarla; se asigna también al TabView porque la pestaña "+" queda seleccionada al pulsarla.
+  // El TabView es OnPush y no redibuja la X ni el estado deshabilitado de las pestañas al cambiar sus inputs, por eso se marca para revisión.
   selectTab(tab: PreloadTab) {
     setTimeout(() => {
       let index: number = this.tabs.indexOf(tab);
       if (index < 0) return;
       this.activeIndex = index;
-      if (this.tabView) this.tabView.activeIndex = index;
+      if (this.tabView) {
+        this.tabView.activeIndex = index;
+        this.tabView.cd.markForCheck();
+      }
       setTimeout(() => this.focusRoll(tab));
     });
   }
@@ -141,7 +164,12 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     else this.focusRoll(this.tabs[index]);
   }
 
-  closeTab = (index: number) => this.removeTab(this.tabs[index]);
+  // Cerrar la pestaña de un precargue en proceso solo la oculta: el precargue sigue guardado y se retoma desde movimientos de precargue.
+  closeTab(index: number) {
+    let tab: PreloadTab = this.tabs[index];
+    if (tab?.pcdId) this.util.Notificacion(`Advertencia`, `El precargue N° ${tab.pcdId} sigue en proceso. Puedes retomarlo desde el módulo de movimientos de precargue.`);
+    this.removeTab(tab);
+  }
 
   removeTab(tab: PreloadTab) {
     let index: number = this.tabs.indexOf(tab);
@@ -151,25 +179,25 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     this.selectTab(this.tabs[Math.min(index, this.tabs.length - 1)]);
   }
 
-  // Abre una pestaña por cada precargue en proceso del usuario y por el que llegue en la url (?preload=) desde movimientos de precargue.
+  // Si se llega desde movimientos de precargue (?preload=) solo se abre el precargue seleccionado allí; si no, se pregunta
+  // si se retoman los precargues en proceso del usuario.
   loadPreloadsInProcess() {
     let requestedId: number = Number(this.route.snapshot.queryParamMap.get('preload')) || 0;
-    if (requestedId) this.clearPreloadParam();
+    if (requestedId) {
+      this.clearPreloadParam();
+      this.loadPreloadInTab(this.createTab(), requestedId, true);
+      return;
+    }
+
+    // La primera pestaña se muestra de inmediato para que la pregunta de retomar no aparezca sobre una página vacía.
+    this.createTab();
     this.load = true;
     this.svPreload.getPreloadsInProcess(this.storage_Id).pipe(finalize(() => this.load = false)).subscribe({
       next: (data: any[]) => {
         let ids: number[] = data.map(x => x.pcd_Id);
-        if (requestedId && !ids.includes(requestedId)) ids.push(requestedId);
-        if (ids.length == 0) {
-          this.createTab();
-          return;
-        }
-        ids.forEach(id => this.loadPreloadInTab(this.createTab(), id, id == requestedId));
-        if (data.length > 0) this.util.Notificacion(`Advertencia`, `Tienes ${data.length} precargue(s) en proceso. Se abrieron en pestañas para que puedas continuarlos.`);
+        if (ids.length > 0) this.askResumePreloads(ids);
       },
       error: (error: HttpErrorResponse) => {
-        if (requestedId) this.loadPreloadInTab(this.createTab(), requestedId, true);
-        else this.createTab();
         this.util.Notificacion(`Error`, `Error consultando los precargues en proceso | ${error.status} ${error.statusText}`);
       }
     });
@@ -188,8 +216,8 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
           return;
         }
         tab.pcdId = data.pcd_Id;
+        tab.originalClient = { id: Number(data.idClient), name: data.client };
         tab.form.patchValue({ doc: data.pcd_Id, idClient: data.idClient, client: data.client, asesor: data.salesId, observation: data.observation });
-        tab.form.get('client')?.disable();
         tab.rolls = data.rolls;
         this.consolidateItems(tab);
         let unavailable: any[] = this.unavailableRolls(tab);
@@ -272,8 +300,8 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
 
         if (!tab.pcdId) {
           tab.pcdId = data.pcd_Id;
+          tab.originalClient = { id: request.cli_Id, name: value.client };
           tab.form.patchValue({ doc: data.pcd_Id });
-          tab.form.get('client')?.disable();
           this.util.Notificacion(`Confirmación`, `Se creó el precargue N° ${data.pcd_Id} con el rollo/bulto N° ${roll}. Cada rollo que escanees quedará guardado.`);
         } else if (data.rolloYaRegistrado) this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en el precargue!`);
         else this.util.Notificacion(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado al precargue!`);
@@ -308,7 +336,9 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
   }
 
   // Rollos del precargue que otro proceso sacó del estado precargado (50); impiden generar el precargue hasta quitarlos.
-  isUnavailable = (roll: any) => roll.currentStatus != STATUS_ROLL_PRELOADED;
+  // Solo se marca cuando la API informa un estado distinto de 50: un rollo sin estado informado se trata como precargado
+  // (la API valida de nuevo al finalizar).
+  isUnavailable = (roll: any) => roll.currentStatus != null && roll.currentStatus != STATUS_ROLL_PRELOADED;
 
   unavailableRolls = (tab: PreloadTab) => tab.rolls.filter(x => this.isUnavailable(x));
 
@@ -347,13 +377,23 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     tab.consolidated = [];
   }
 
-  // Deja la pestaña lista para un nuevo precargue conservando los datos del formulario.
+  // Deja la pestaña como recién creada (formulario, cliente y rollos limpios) para empezar un nuevo precargue.
   resetTab(tab: PreloadTab) {
     tab.pcdId = null;
-    tab.rolls = [];
-    tab.consolidated = [];
-    tab.form.patchValue({ doc: null, roll: null });
-    tab.form.get('client')?.enable();
+    tab.originalClient = null;
+    this.clearAll(tab);
+  }
+
+  // Después de generar o anular el precargue: si hay más pestañas se cierra la suya; si es la única, se deja limpia.
+  releaseTab(tab: PreloadTab) {
+    if (this.tabs.length > 1) this.removeTab(tab);
+    else this.resetTab(tab);
+  }
+
+  // Cliente seleccionado en el formulario si es distinto al cliente con el que se creó el precargue.
+  changedClient(tab: PreloadTab): number | null {
+    let id: number = Number(tab.form.getRawValue().idClient);
+    return tab.originalClient && id && id != tab.originalClient.id ? id : null;
   }
 
   // Mostrar mensaje de confirmación para generar o cancelar el precargue de la pestaña.
@@ -361,38 +401,101 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     this.confirmTab = tab;
     this.confirmAction = action;
     let client: string = tab.form.getRawValue().client;
+    let changed: string = this.changedClient(tab) ? ` Los rollos se escanearon a nombre de ${tab.originalClient!.name}; el precargue quedará a nombre de ${client}.` : ``;
     this.message = action == 'finish'
-      ? `¿Está seguro que desea generar el precargue N° ${tab.pcdId} para el cliente ${client}?`
+      ? `¿Está seguro que desea generar el precargue N° ${tab.pcdId} para el cliente ${client}?${changed}`
       : `¿Está seguro que desea cancelar el precargue N° ${tab.pcdId}? Se anulará y sus ${tab.rolls.length} rollo(s)/bulto(s) volverán a estar disponibles.`;
     setTimeout(() => {
       this.msg.add({ severity: 'warn', key: 'confirm', summary: action == 'finish' ? 'Confirmación' : 'Cancelar precargue', detail: this.message, sticky: true });
     }, 200);
   }
 
+  // Pregunta si se retoman todos los precargues en proceso; las pestañas no se crean hasta que el usuario responda.
+  // Se respeta el máximo de pestañas: si hay más, se retoman los más antiguos (la API los devuelve en ese orden).
+  askResumePreloads(ids: number[]) {
+    this.pendingPreloads = ids;
+    this.confirmTab = null;
+    this.confirmAction = 'resume';
+    this.message = ids.length > MAX_TABS
+      ? `Tienes ${ids.length} precargues en proceso pendientes por continuar, pero solo se pueden abrir ${MAX_TABS} pestañas. ¿Deseas retomar los ${MAX_TABS} más antiguos? Los demás podrás retomarlos desde movimientos de precargue.`
+      : `Tienes ${ids.length} precargue(s) en proceso pendiente(s) por continuar. ¿Deseas retomarlos todos? Si no, puedes retomar el que necesites desde movimientos de precargue.`;
+    setTimeout(() => {
+      this.msg.add({ severity: 'info', key: 'confirm', summary: 'Precargues en proceso', detail: this.message, sticky: true });
+    }, 200);
+  }
+
   onConfirm() {
     let tab = this.confirmTab;
     let action = this.confirmAction;
-    this.onReject();
-    if (!tab) return;
-    if (action == 'finish') this.finishPreload(tab);
-    else if (action == 'cancel') this.cancelPreload(tab);
+    let pending = this.pendingPreloads;
+    this.closeConfirm();
+    if (action == 'resume') this.resumePreloads(pending);
+    else if (tab && action == 'finish') this.finishPreload(tab);
+    else if (tab && action == 'cancel') this.cancelPreload(tab);
   }
 
-  // Función para quitar mensaje confirmación.
+  // Abre una pestaña por precargue sin pasar del máximo de pestañas (la pestaña "+" queda deshabilitada al llegar a él);
+  // los que no caben quedan pendientes para abrirlos con "Abrir siguiente". El primero se carga en la pestaña vacía
+  // creada al entrar, si el usuario no alcanzó a usarla.
+  resumePreloads(ids: number[]) {
+    let pending: number[] = [...ids];
+    let blank: PreloadTab | undefined = this.tabs.find(x => !x.pcdId && !x.busy && x.form.pristine);
+    if (blank && pending.length > 0) this.loadPreloadInTab(blank, pending.shift()!, false);
+    let free: number = Math.max(0, MAX_TABS - this.tabs.length);
+    pending.slice(0, free).forEach(id => this.loadPreloadInTab(this.createTab(), id, false));
+    this.remainingPreloads = pending.slice(free);
+    this.selectTab(this.tabs[0]);
+  }
+
+  // Abre en una pestaña nueva el precargue pendiente más antiguo que siga en proceso; se consulta de nuevo a la API
+  // porque mientras tanto pudo finalizarse o anularse desde otra página.
+  openNextPreload() {
+    if (!this.canAddTab()) {
+      this.util.Notificacion(`Advertencia`, `Solo se pueden tener ${MAX_TABS} pestañas abiertas. Cierra o termina alguna para abrir el siguiente precargue.`);
+      return;
+    }
+    this.load = true;
+    this.svPreload.getPreloadsInProcess(this.storage_Id).pipe(finalize(() => this.load = false)).subscribe({
+      next: (data: any[]) => {
+        let inProcess: number[] = data.map(x => x.pcd_Id);
+        let open: number[] = this.tabs.map(x => x.pcdId).filter(id => id != null) as number[];
+        this.remainingPreloads = this.remainingPreloads.filter(id => inProcess.includes(id) && !open.includes(id));
+        let next: number | undefined = this.remainingPreloads.shift();
+        if (next) this.loadPreloadInTab(this.createTab(), next, true);
+        else this.util.Notificacion(`Advertencia`, `Los precargues pendientes ya no están en proceso.`);
+      },
+      error: (error: HttpErrorResponse) => this.util.Notificacion(`Error`, `Error consultando los precargues en proceso | ${error.status} ${error.statusText}`),
+    });
+  }
+
+  // Botón "No" o X del mensaje de confirmación. Si se rechaza retomar los precargues se queda la pestaña vacía creada al entrar.
   onReject() {
+    this.closeConfirm();
+  }
+
+  private closeConfirm() {
     this.msg.clear('confirm');
     this.confirmTab = null;
     this.confirmAction = null;
+    this.pendingPreloads = [];
   }
 
-  // Pasa el precargue de En proceso a Pendiente, genera el PDF y cierra la pestaña.
+  // Pasa el precargue de En proceso a Pendiente, genera el PDF y libera la pestaña (ver releaseTab).
   finishPreload(tab: PreloadTab) {
     let id: number = tab.pcdId!;
+    let value: any = tab.form.getRawValue();
+    let client: number | null = this.changedClient(tab);
+    let request: any = {
+      usuario: this.storage_Id,
+      observacion: value.observation,
+      cli_Id: client,
+      vendedor: client ? parseInt(value.asesor) || null : null,
+    };
     tab.busy = true;
-    this.svPreload.finishPreload(id, { usuario: this.storage_Id, observacion: tab.form.getRawValue().observation }).subscribe({
+    this.svPreload.finishPreload(id, request).subscribe({
       next: () => this.createPDF(id, `creada`, () => {
         tab.busy = false;
-        this.removeTab(tab);
+        this.releaseTab(tab);
       }),
       error: (error: HttpErrorResponse) => {
         this.setBusy(tab, false);
@@ -401,14 +504,14 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Anula el precargue, devuelve sus rollos a disponible y deja la pestaña editable para empezar de nuevo.
+  // Anula el precargue, devuelve sus rollos a disponible y libera la pestaña (ver releaseTab).
   cancelPreload(tab: PreloadTab) {
     let id: number = tab.pcdId!;
     this.setBusy(tab, true);
     this.svPreload.cancelPreload(id, { usuario: this.storage_Id, observacion: `Precargue cancelado desde la página de precargue de rollos.` })
       .pipe(finalize(() => this.setBusy(tab, false))).subscribe({
         next: data => {
-          this.resetTab(tab);
+          this.releaseTab(tab);
           this.util.Notificacion(`Confirmación`, `Se canceló el precargue N° ${id}. ${data.rollosLiberados} rollo(s)/bulto(s) volvieron a estar disponibles.`);
         },
         error: (error: HttpErrorResponse) => this.notifyHttpError(error, `Error cancelando el precargue N° ${id}`),
