@@ -276,6 +276,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Etiqueta_Ancho_Sellado: [null, Validators.required],
       Etiqueta_Largo_Sellado: [null, Validators.required],
       Etiqueta_Fuelle_Sellado: [null, Validators.required],
+      Calibre_Sellado: [0],
       Margen_Sellado: [null, Validators.required],
       PesoMillar: [0, Validators.required],
       TipoSellado: [0, Validators.required],
@@ -563,6 +564,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Etiqueta_Ancho_Sellado: 0,
       Etiqueta_Largo_Sellado: 0,
       Etiqueta_Fuelle_Sellado: 0,
+      Calibre_Sellado: 0,
       PesoMillar: 0,
       TipoSellado: 'NO APLICA',
       CantidadPaquete: 0,
@@ -1016,7 +1018,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a consultar las presentaciones de los productos
-  consultarPresentaciones = () => this.undService.srvObtenerLista().subscribe(data => this.presentaciones = data.filter(x => ['Kg', 'Paquete', 'Rollo', 'Und'].includes(x.undMed_Id)));
+  consultarPresentaciones = () => this.undService.srvObtenerLista().subscribe(data => this.presentaciones = data.filter(x => ['Kg', 'Paquete', 'Und', 'MTS'].includes(x.undMed_Id)));
 
   // Funcion que va a consultar los estados que puede tener la orden de trabajo
   consultarEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(data => this.estados = data.filter(x => [3, 4].includes(x.tpEstado_Id)));
@@ -1368,6 +1370,9 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Carga los parámetros de sellado, la solapa y la observación compartida con corte.
+   * Calibre Cliente toma la primera fuente con valor mayor a 0: `selladoCorte_Calibre` (guardado en Plasticaribe
+   * o calculado por BagPro desde EtiquetaLargo/ExtCalibre) y, en su defecto, el calibre de extrusión ya cargado.
+   * Requiere que el formulario de extrusión se haya llenado antes.
    * @param data Datos de la orden consultada.
    * @returns No retorna un valor.
    */
@@ -1386,6 +1391,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Etiqueta_Ancho_Sellado: data.selladoCorte_Etiqueta_Ancho || '0',
       Etiqueta_Largo_Sellado: data.selladoCorte_Etiqueta_Largo || '0',
       Etiqueta_Fuelle_Sellado: data.selladoCorte_Etiqueta_Fuelle || '0',
+      Calibre_Sellado: Number(data.selladoCorte_Calibre) > 0 ? Number(data.selladoCorte_Calibre) : (Number(this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion) || 0),
       Margen_Sellado: data.margen,
       PesoMillar: this.ArrayProducto[0].PesoMillar,
       TipoSellado: this.ArrayProducto[0].TipoSellado,
@@ -1401,6 +1407,54 @@ export class Orden_TrabajoComponent implements OnInit {
       PrecioWiketiadoNoche_Mq9: data.selladoCorte_PrecioNoche_Wik_Mq9 || 0.0,
       SelladoCorte_Observacion: observacionSelladoCorte,
     });
+    this.calcularPesosPaqueteBulto(true, true);
+    this.copiarAnchosExtrusionAProductoTerminado(true);
+  }
+
+  /**
+   * Copia Ancho 1, Fuelle Izq. y Fuelle Der. de extrusión a los campos equivalentes de producto terminado (sellado).
+   * Los campos de producto terminado siguen siendo editables; el valor corregido a mano se guarda tal cual.
+   * @param soloVacios true solo llena los campos de producto terminado que estén en 0 o vacíos (carga de OT o item),
+   * para no reemplazar valores guardados; false copia siempre (edición en extrusión).
+   * @returns No retorna un valor.
+   */
+  copiarAnchosExtrusionAProductoTerminado(soloVacios: boolean = false) {
+    const extrusion = this.FormOrdenTrabajoExtrusion.value;
+    const sellado = this.FormOrdenTrabajoSellado.value;
+    const campos: [string, string][] = [
+      ['Ancho_Extrusion1', 'Ancho_Sellado1'],
+      ['Ancho_Extrusion2', 'Ancho_Sellado2'],
+      ['Ancho_Extrusion3', 'Ancho_Sellado3'],
+    ];
+    const cambios: { [campo: string]: number } = {};
+    campos.forEach(([campoExtrusion, campoSellado]) => {
+      if (soloVacios && (Number(sellado[campoSellado]) || 0) > 0) return;
+      cambios[campoSellado] = Number(extrusion[campoExtrusion]) || 0;
+    });
+    this.FormOrdenTrabajoSellado.patchValue(cambios);
+  }
+
+  /**
+   * Calcula el peso del paquete (Peso Millar × Cantidad Paquete / 1000) y el del bulto (Peso Paquete × Cantidad Bulto)
+   * en el formulario de sellado. Los campos siguen siendo editables: si falta algún dato no se toca el valor actual.
+   * @param recalcularPaquete true recalcula el peso del paquete; false solo recalcula el bulto con el peso de paquete actual.
+   * @param soloVacios true solo llena los pesos que estén en 0 o vacíos (carga de OT o item), para no reemplazar valores guardados.
+   * @returns No retorna un valor.
+   */
+  calcularPesosPaqueteBulto(recalcularPaquete: boolean = true, soloVacios: boolean = false) {
+    const sellado = this.FormOrdenTrabajoSellado.value;
+    const pesoMillar: number = Number(sellado.PesoMillar) || 0;
+    const cantidadPaquete: number = Number(sellado.CantidadPaquete) || 0;
+    const cantidadBulto: number = Number(sellado.CantidadBulto) || 0;
+    let pesoPaquete: number = Number(sellado.PesoPaquete) || 0;
+
+    if (recalcularPaquete && pesoMillar > 0 && cantidadPaquete > 0 && (!soloVacios || pesoPaquete <= 0)) {
+      pesoPaquete = Math.round(pesoMillar * (cantidadPaquete / 1000) * 100) / 100;
+      this.FormOrdenTrabajoSellado.patchValue({ PesoPaquete: pesoPaquete });
+    }
+    if (pesoPaquete > 0 && cantidadBulto > 0 && (!soloVacios || (Number(sellado.PesoBulto) || 0) <= 0)) {
+      this.FormOrdenTrabajoSellado.patchValue({ PesoBulto: Math.round(pesoPaquete * cantidadBulto * 100) / 100 });
+    }
   }
 
   /**
@@ -2341,6 +2395,7 @@ export class Orden_TrabajoComponent implements OnInit {
       'SelladoCorte_Largo': this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
       'SelladoCorte_Fuelle': this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
       'SelladoCorte_Solapa': this.sellado ? this.FormOrdenTrabajoSellado.value.Solapa_Sellado : null,
+      'SelladoCorte_Calibre': this.sellado ? this.FormOrdenTrabajoSellado.value.Calibre_Sellado : null,
       'SelladoCorte_Ancho1': this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado1 : null,
       'SelladoCorte_Ancho2': this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado2 : null,
       'SelladoCorte_Ancho3': this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado3 : null,
@@ -2850,7 +2905,7 @@ export class Orden_TrabajoComponent implements OnInit {
           { text: `${this.formatonumeros((datos_ot.cantidad_Pedida).toFixed(2))}`, style: 'datosTablaExtrusion' },
           { text: `${this.formatonumeros((datos_ot.peso_Neto).toFixed(2))}`, style: 'datosTablaExtrusion' },
           { text: `${datos_ot.presentacion}`, style: 'datosTablaExtrusion' },
-          { text: `${datos_ot.fecha_Entrega.replace('T00:00:00', '')}`, style: 'datosTablaExtrusion' },
+          { text: `${datos_ot.fecha_Entrega ? datos_ot.fecha_Entrega.replace('T00:00:00', '') : ''}`, style: 'datosTablaExtrusion' },
         ]
       ]
     };
@@ -3088,11 +3143,26 @@ export class Orden_TrabajoComponent implements OnInit {
     };
   }
 
-  // Funcion que va a colocar la información de extrusión en la hoja 1
+  /**
+   * Devuelve el texto de grafilado a mostrar en el PDF de la OT.
+   * @param grafilado Valor de grafilado de extrusión (puede no venir si la OT se consultó desde BagPro).
+   * @returns 'SÍ' si es verdadero, 'NO' si es falso y 'NO APLICA' si no hay valor.
+   */
+  textoGrafiladoPDF(grafilado: boolean | null | undefined): string {
+    if (grafilado === true) return 'SÍ';
+    if (grafilado === false) return 'NO';
+    return 'NO APLICA';
+  }
+
+  /**
+   * Coloca en la hoja 1 la tabla con la información de extrusión, incluido el grafilado a la derecha de tratado.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla de extrusión.
+   */
   datosExtrusion(datos_ot) {
     return {
       table: {
-        widths: [65, 65, '*', 50, 70, 70, 60],
+        widths: [60, 60, '*', 40, 55, 55, 50, 55],
         body: [
           [
             { text: `Pigmento`, style: 'subtituloTablas' },
@@ -3101,9 +3171,10 @@ export class Orden_TrabajoComponent implements OnInit {
             { text: `Und Medida`, style: 'subtituloTablas' },
             { text: `Calibre`, style: 'subtituloTablas' },
             { text: `Peso MT \n(Min/Max)`, style: 'subtituloTablas' },
-            { text: `Tratado`, style: 'subtituloTablas' }
+            { text: `Tratado`, style: 'subtituloTablas' },
+            { text: `Grafilado`, style: 'subtituloTablas' }
           ],
-          [{}, {}, {}, {}, {}, {}, {}],
+          [{}, {}, {}, {}, {}, {}, {}, {}],
           [
             { border: [false, false, false, false], text: `${datos_ot.pigmento_Extrusion.toString().trim()}`, alignment: 'center', },
             { border: [false, false, false, false], text: `${datos_ot.formato_Extrusin.toString().trim()}`, alignment: 'center', },
@@ -3111,7 +3182,8 @@ export class Orden_TrabajoComponent implements OnInit {
             { border: [false, false, false, false], text: `${datos_ot.und_Extrusion}`, alignment: 'center', },
             { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.calibre_Extrusion).toFixed(2))}`, alignment: 'center', },
             { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.peso_Extrusion).toFixed(2))}`, alignment: 'center', },
-            { border: [false, false, false, false], text: `${datos_ot.tratado}`, alignment: 'center', }
+            { border: [false, false, false, false], text: `${datos_ot.tratado}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.textoGrafiladoPDF(datos_ot.extrusion_Grafilado)}`, alignment: 'center', }
           ]
         ]
       },
@@ -3173,7 +3245,11 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Función que va a colocar en la hoja 2 la información del proceso de extrusión
+  /**
+   * Coloca en la hoja 2 la información del proceso de extrusión, con el grafilado debajo de tratado caras.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla del proceso de extrusión.
+   */
   procesoExtrusion(datos_ot) {
     return {
       table: {
@@ -3217,6 +3293,11 @@ export class Orden_TrabajoComponent implements OnInit {
           [
             { text: `Tratado Caras: `, style: 'subtitulo' },
             { text: `${datos_ot.tratado.toString().trim()}` },
+            {}
+          ],
+          [
+            { text: `Grafilado: `, style: 'subtitulo' },
+            { text: `${this.textoGrafiladoPDF(datos_ot.extrusion_Grafilado)}` },
             {}
           ],
         ]
@@ -3322,7 +3403,11 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Función que va a colocar en la hoja 2 la información del proceso de sellado de corte
+  /**
+   * Coloca en la hoja 2 la información de producto terminado (sellado/corte), con la solapa antes del sellado.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla de producto terminado.
+   */
   productoTermiando(datos_ot) {
     return {
       table: {
@@ -3350,6 +3435,11 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [{}, {}, {}],
           [{}, {}, {}],
+          [
+            { text: `Solapa: `, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.selladoCorte_Solapa ?? 0).toFixed(2))}` },
+            {},
+          ],
           [
             { text: `Sellado: `, style: 'subtitulo' },
             { text: `${datos_ot.tpSellados_Nombre.toString().trim()}` },

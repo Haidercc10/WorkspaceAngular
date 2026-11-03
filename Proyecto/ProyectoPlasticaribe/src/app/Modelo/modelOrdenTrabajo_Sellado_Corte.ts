@@ -8,6 +8,8 @@ export interface modelOrdenTrabajo_SelladoCorte {
   SelladoCorte_Largo : number;
   SelladoCorte_Fuelle : number;
   SelladoCorte_Solapa?: number | null;
+  /** Calibre del cliente para producto terminado de sellado; null cuando la OT no tiene sellado. */
+  SelladoCorte_Calibre?: number | null;
   SelladoCorte_Ancho1?: number | null;
   SelladoCorte_Ancho2?: number | null;
   SelladoCorte_Ancho3?: number | null;

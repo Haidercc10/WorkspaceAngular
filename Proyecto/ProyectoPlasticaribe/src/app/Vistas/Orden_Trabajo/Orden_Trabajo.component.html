@@ -443,7 +443,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="Ancho_Extrusion1" inputId="Ancho1" mode="decimal"
-                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="2" [required]="true" (onInput)="copiarAnchosExtrusionAProductoTerminado()"></p-inputNumber>
                               <label for="Ancho1">Ancho 1</label>
                             </span>
                           </div>
@@ -452,7 +452,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="Ancho_Extrusion2" inputId="Ancho2" mode="decimal"
-                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="2" [required]="true" (onInput)="copiarAnchosExtrusionAProductoTerminado()"></p-inputNumber>
                               <label for="Ancho2">Fuelle Izq.</label>
                             </span>
                           </div>
@@ -461,7 +461,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="Ancho_Extrusion3" inputId="Ancho3" mode="decimal"
-                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="2" [required]="true" (onInput)="copiarAnchosExtrusionAProductoTerminado()"></p-inputNumber>
                               <label for="Ancho3">Fuelle Der.</label>
                             </span>
                           </div>
@@ -1078,12 +1078,12 @@
                             </span>
                           </div>
 
-                          <!-- Etiqueta Ancho -->
+                          <!-- Calibre Cliente (se guarda en SelladoCorte_Calibre) -->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
-                              <input formControlName="Etiqueta_Ancho_Sellado" id="etiquetaAncho" type="text" pInputText
-                                autocomplete="off" [required]="true" />
-                              <label for="etiquetaAncho">Calibre Cliente</label>
+                              <p-inputNumber formControlName="Calibre_Sellado" inputId="calibreSellado" mode="decimal"
+                                [minFractionDigits]="2"></p-inputNumber>
+                              <label for="calibreSellado">Calibre Cliente</label>
                             </span>
                           </div>
 
@@ -1151,7 +1151,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="CantidadPaquete" inputId="CantidadPaquete" mode="decimal"
-                                [minFractionDigits]="0" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="0" [required]="true" (onInput)="calcularPesosPaqueteBulto()"></p-inputNumber>
                               <label for="CantidadPaquete">Cantidad Paquete</label>
                             </span>
                           </div>
@@ -1160,7 +1160,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="PesoPaquete" inputId="PesoPaquete" mode="decimal"
-                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="2" [required]="true" (onInput)="calcularPesosPaqueteBulto(false)"></p-inputNumber>
                               <label for="PesoPaquete">Peso Paquete</label>
                             </span>
                           </div>
@@ -1169,7 +1169,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="CantidadBulto" inputId="CantidadBulto" mode="decimal"
-                                [minFractionDigits]="0" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="0" [required]="true" (onInput)="calcularPesosPaqueteBulto(false)"></p-inputNumber>
                               <label for="CantidadBulto">Cantidad Bulto</label>
                             </span>
                           </div>
