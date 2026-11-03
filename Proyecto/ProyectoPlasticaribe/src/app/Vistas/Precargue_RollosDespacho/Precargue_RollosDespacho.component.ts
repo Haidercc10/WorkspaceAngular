@@ -1,19 +1,31 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import moment from 'moment';
+import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { TabView } from 'primeng/tabview';
 import { finalize } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
-import { modelDetalles_PrecargueDespacho } from 'src/app/Modelo/modelDetalles_PrecargueDespacho';
-import { modelPrecargue_Despacho } from 'src/app/Modelo/modelPrecargue_Despacho';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_PrecargueDespacho/Detalles_PrecargueDespacho.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
-import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+
+// Cada pestaña gestiona un precargue independiente. pcdId es null hasta que se escanea el primer rollo.
+interface PreloadTab {
+  key: number;
+  form: FormGroup;
+  pcdId: number | null;
+  rolls: any[];
+  consolidated: any[];
+  clients: any[];
+  products: any[];
+  busy: boolean;
+}
+
+const STATUS_IN_PROCESS: number = 2;
 
 @Injectable({
   providedIn: `root`
@@ -25,56 +37,49 @@ import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
   styleUrls: ['./Precargue_RollosDespacho.component.css']
 })
 
-export class Precargue_RollosDespachoComponent implements OnInit {
+export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
 
   load: boolean = false;
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  form !: FormGroup;
-  rollsToDispatch: any = [];
-  rollsConsolidate: any = [];
-  clients: any = [];
-  searchIn: boolean | null = null;
-  @ViewChild('dt') dt: null | undefined;
-  products: any = [];
+  tabs: PreloadTab[] = [];
+  activeIndex: number = 0;
+  @ViewChild('tabView') tabView: TabView;
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol
-  editMode: boolean = false;
-  rollsSelected: any = {};
   message: string = '';
+  confirmTab: PreloadTab | null = null;
+  confirmAction: 'finish' | 'cancel' | null = null;
+  private nextKey: number = 1;
+  private focusTimer: any;
 
   constructor(private AppComponent: AppComponent,
     private fmBuild: FormBuilder,
     private svZeus: InventarioZeusService,
-    private msj: MensajesAplicacionService,
     private svProducts: ProductoService,
-    private svProduction: Produccion_ProcesosService,
     private svPreload: Precargue_DespachoService,
     private svDetailsPreload: Detalles_PrecargueDespachoService,
     private PDFService: CreacionPdfService,
     private msg: MessageService,
-    private util: UtileriaService
+    private util: UtileriaService,
+    private route: ActivatedRoute,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    this.initForm();
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.focusInput(false);
+    this.loadPreloadsInProcess();
+    this.focusTimer = setInterval(() => this.focusRoll(), 30000);
   }
 
   ngOnDestroy(): void {
-    this.focusInput(true);
+    clearInterval(this.focusTimer);
   }
 
-  // Función para mantener el puntero del mouse en un campo especifico. 
-  focusInput(destroy: boolean) {
-    let time = setInterval(() => {
-      let preInBarsCode = document.getElementById('roll');
-      if (!destroy && preInBarsCode) preInBarsCode.focus();
-      else if (destroy) clearInterval(time);
-    }, 30000);
+  // Función para mantener el puntero del mouse en el campo rollo de la pestaña activa.
+  focusRoll(tab: PreloadTab | undefined = this.activeTab) {
+    if (tab) document.getElementById(`roll-${tab.key}`)?.focus();
   }
 
   // Función que leerá la informacion que se almacenará en el storage del navegador
@@ -84,332 +89,328 @@ export class Precargue_RollosDespachoComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  initForm() {
-    this.form = this.fmBuild.group({
-      doc: [null],
-      roll: [null],
-      clientStock: [false,],
-      asesor: [null],
-      //item : [null, Validators.required], 
-      //reference : [null, Validators.required],
-      idClient: [null, Validators.required],
-      client: [null, Validators.required],
-      observation: [null,],
-    })
+  get activeTab(): PreloadTab | undefined {
+    return this.tabs[this.activeIndex];
   }
 
-  searchClientsByName() {
-    let name = this.form.value.client;
-    this.svZeus.getClientByName(name).subscribe(data => this.clients = data);
+  trackTab = (_: number, tab: PreloadTab) => tab.key;
+
+  //#region Pestañas
+  createTab(): PreloadTab {
+    let tab: PreloadTab = {
+      key: this.nextKey++,
+      form: this.fmBuild.group({
+        doc: [null],
+        roll: [null],
+        clientStock: [false,],
+        asesor: [null],
+        item: [null,],
+        reference: [null,],
+        idClient: [null, Validators.required],
+        client: [null, Validators.required],
+        observation: [null,],
+      }),
+      pcdId: null,
+      rolls: [],
+      consolidated: [],
+      clients: [],
+      products: [],
+      busy: false,
+    };
+    this.tabs.push(tab);
+    return tab;
   }
 
-  selectClient() {
-    let client = this.clients.find(x => x.idcliente == this.form.value.client);
-    this.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, 'asesor': client.idvende, });
-  }
+  addTab = () => this.selectTab(this.createTab());
 
-  searchProduct() {
-    let nombre: string = this.form.value.reference;
-    this.svProducts.obtenerItemsLike(nombre).subscribe(resp => this.products = resp);
-  }
-
-  selectedProduct() {
-    let product: any = this.form.value.reference;
-    this.form.patchValue({
-      'item': product,
-      'reference': this.products.find(x => x.prod_Id == product).prod_Nombre
+  // Se espera a que la pestaña se renderice para seleccionarla; se asigna también al TabView porque la pestaña "+" queda seleccionada al pulsarla.
+  selectTab(tab: PreloadTab) {
+    setTimeout(() => {
+      let index: number = this.tabs.indexOf(tab);
+      if (index < 0) return;
+      this.activeIndex = index;
+      if (this.tabView) this.tabView.activeIndex = index;
+      setTimeout(() => this.focusRoll(tab));
     });
   }
 
-  getItem() {
+  onTabChange(index: number) {
+    if (index == this.tabs.length) this.addTab();
+    else this.focusRoll(this.tabs[index]);
+  }
+
+  closeTab = (index: number) => this.removeTab(this.tabs[index]);
+
+  removeTab(tab: PreloadTab) {
+    let index: number = this.tabs.indexOf(tab);
+    if (index < 0) return;
+    this.tabs.splice(index, 1);
+    if (this.tabs.length == 0) this.createTab();
+    this.selectTab(this.tabs[Math.min(index, this.tabs.length - 1)]);
+  }
+
+  // Abre una pestaña por cada precargue en proceso del usuario y por el que llegue en la url (?id=) desde movimientos de precargue.
+  loadPreloadsInProcess() {
+    let requestedId: number = Number(this.route.snapshot.queryParamMap.get('id')) || 0;
     this.load = true;
-    let item: any = this.form.value.item;
+    this.svPreload.getPreloadsInProcess(this.storage_Id).pipe(finalize(() => this.load = false)).subscribe({
+      next: (data: any[]) => {
+        let ids: number[] = data.map(x => x.pcd_Id);
+        if (requestedId && !ids.includes(requestedId)) ids.push(requestedId);
+        if (ids.length == 0) {
+          this.createTab();
+          return;
+        }
+        ids.forEach(id => this.loadPreloadInTab(this.createTab(), id, id == requestedId));
+        if (data.length > 0) this.util.Notificacion(`Advertencia`, `Tienes ${data.length} precargue(s) en proceso. Se abrieron en pestañas para que puedas continuarlos.`);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.createTab();
+        this.util.Notificacion(`Error`, `Error consultando los precargues en proceso | ${error.status} ${error.statusText}`);
+      }
+    });
+  }
+
+  loadPreloadInTab(tab: PreloadTab, id: number, activate: boolean) {
+    tab.busy = true;
+    this.svPreload.getPreloadRolls(id).pipe(finalize(() => tab.busy = false)).subscribe({
+      next: data => {
+        if (data.statusId != STATUS_IN_PROCESS) {
+          this.util.Notificacion(`Advertencia`, `El precargue N° ${id} está en estado ${data.status} y no se puede continuar.`);
+          this.removeTab(tab);
+          return;
+        }
+        tab.pcdId = data.pcd_Id;
+        tab.form.patchValue({ doc: data.pcd_Id, idClient: data.idClient, client: data.client, asesor: data.salesId, observation: data.observation });
+        tab.form.get('client')?.disable();
+        tab.rolls = data.rolls;
+        this.consolidateItems(tab);
+        if (activate) this.selectTab(tab);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.notifyHttpError(error, `Error consultando el precargue N° ${id}`);
+        this.removeTab(tab);
+      }
+    });
+  }
+  //#endregion
+
+  searchClientsByName(tab: PreloadTab) {
+    let name: string = tab.form.value.client;
+    if (name) this.svZeus.getClientByName(name).subscribe(data => tab.clients = data);
+  }
+
+  selectClient(tab: PreloadTab) {
+    let client = tab.clients.find(x => x.idcliente == tab.form.value.client);
+    if (!client) return;
+    tab.form.patchValue({ 'idClient': client.idcliente, 'client': client.razoncial, 'asesor': client.idvende, });
+  }
+
+  searchProduct(tab: PreloadTab) {
+    let nombre: string = tab.form.value.reference;
+    this.svProducts.obtenerItemsLike(nombre).subscribe(resp => tab.products = resp);
+  }
+
+  selectedProduct(tab: PreloadTab) {
+    let product: any = tab.form.value.reference;
+    tab.form.patchValue({
+      'item': product,
+      'reference': tab.products.find(x => x.prod_Id == product)?.prod_Nombre
+    });
+  }
+
+  getItem(tab: PreloadTab) {
+    let item: any = tab.form.value.item;
     if (item) {
+      this.load = true;
       this.svProducts.GetProductsById(item).pipe(finalize(() => this.load = false)).subscribe(data => {
-        this.form.patchValue({ 'item': item, 'reference': data[0].prod.prod_Nombre, });
+        tab.form.patchValue({ 'item': item, 'reference': data[0].prod.prod_Nombre, });
       }, error => {
         this.util.Notificacion(`Error`, `No se encontró el item N°: ${item}.`);
-        this.form.patchValue({ 'item': null, 'reference': null, });
+        tab.form.patchValue({ 'item': null, 'reference': null, });
       });
     } else this.util.Notificacion(`Advertencia`, `Debe llenar el campo ITEM.`);
   }
 
-  searchRolls() {
-    let roll: number = this.form.value.roll;
-    let client: any = this.form.value.idClient;
-    let clientReal: any;
-    let clientStock: boolean = this.form.value.clientStock;
-    let count: number = 0;
+  // Guarda el rollo escaneado en el precargue de la pestaña; el primer rollo crea el precargue en estado En proceso.
+  searchRolls(tab: PreloadTab) {
+    let value: any = tab.form.getRawValue();
+    let roll: number = Number(value.roll);
+    if (!roll || tab.busy) return;
+    if (!value.idClient) {
+      this.util.Notificacion(`Advertencia`, `Debe seleccionar el cliente antes de escanear rollos/bultos!`);
+      tab.form.patchValue({ roll: null });
+      return;
+    }
 
-    if (this.form.valid) {
-      this.disabledFieldRoll();
-      if (roll) {
-        clientStock ? clientReal = [1061, 1035] : clientReal = [client];
-        if (this.rollsToDispatch.length > 0 && !clientStock) {
-          if (!this.rollsToDispatch.map(x => x.idClient).includes(parseInt(client))) {
-            this.util.Notificacion(`Advertencia`, `La orden de precargue solo puede tener un cliente!`);
-            this.enabledFieldRoll();
-            return;
-          }
-          this.enabledFieldRoll();
+    let request: any = {
+      pcd_Id: tab.pcdId,
+      cli_Id: Number(value.idClient),
+      clienteStock: !!value.clientStock,
+      rollo: roll,
+      usuario: this.storage_Id,
+      vendedor: parseInt(value.asesor) || null,
+      observacion: value.observation,
+    };
+
+    this.setBusy(tab, true);
+    this.svPreload.addRollToPreload(request).pipe(finalize(() => this.setBusy(tab, false))).subscribe({
+      next: data => {
+        if (!tab.rolls.some(x => x.roll == data.rollo.roll && x.item == data.rollo.item)) {
+          tab.rolls.unshift(data.rollo);
+          this.consolidateItems(tab);
         }
 
-        clientReal.forEach(cr => {
-          this.svProduction.getInformationDispatch(roll, cr).subscribe(data => {
-            if (data) {
-              let item: any = data[0].item;
-              let stock: any = data[0].stock;
+        if (!tab.pcdId) {
+          tab.pcdId = data.pcd_Id;
+          tab.form.patchValue({ doc: data.pcd_Id });
+          tab.form.get('client')?.disable();
+          this.util.Notificacion(`Confirmación`, `Se creó el precargue N° ${data.pcd_Id} con el rollo/bulto N° ${roll}. Cada rollo que escanees quedará guardado.`);
+        } else if (data.rolloYaRegistrado) this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en el precargue!`);
+        else this.util.Notificacion(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado al precargue!`);
+      },
+      error: (error: HttpErrorResponse) => this.notifyHttpError(error, `Error agregando el rollo/bulto N° ${roll}`),
+    });
+  }
 
-              if (stock > 0) {
-                if (!this.rollsToDispatch.map(x => x.roll).includes(roll)) {
-                  this.rollsToDispatch.unshift(data[0]);
-                  this.consolidateItems();
-                  this.util.Notificacion(`Confirmación`, `El rollo/bulto N° ${roll} ha sido agregado a la tabla!`);
-                  this.enabledFieldRoll();
-                } else {
-                  this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} ya se encuentra en la tabla!`);
-                  this.enabledFieldRoll();
-                }
-                return;
-              } else {
-                this.util.Notificacion(`Advertencia`, `El item N° ${item} no tiene stock disponible!`);
-                this.enabledFieldRoll();
-                return;
-              }
-            } else {
-              this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`);
-              this.enabledFieldRoll();
-            }
-          }, error => {
-            count += 1;
-            if (count == clientReal.length) {
-              [400, 404].includes(error.status) ? this.util.Notificacion(`Advertencia`, `El rollo/bulto N° ${roll} no se encuentra disponible!`) : this.util.Notificacion(`Error`, `Error consultando el rollo/bulto N° ${roll}`);
-              this.enabledFieldRoll();
-            }
-          });
-        });
-      } else {
-        this.enabledFieldRoll();
-      }
-    } else {
-      this.util.Notificacion(`Advertencia`, `Debe llenar todos los campos`);
-      this.enabledFieldRoll();
+  setBusy(tab: PreloadTab, busy: boolean) {
+    tab.busy = busy;
+    let roll = tab.form.get('roll');
+    if (busy) roll?.disable();
+    else {
+      roll?.enable();
+      roll?.setValue(null);
+      setTimeout(() => this.focusRoll(tab));
     }
   }
 
-  disabledFieldRoll() {
-    this.load = true;
-    this.form.get('roll')?.disable();
+  // Los 404/409 de la API traen en el cuerpo un mensaje para el usuario.
+  notifyHttpError(error: HttpErrorResponse, fallback: string) {
+    if ([404, 409].includes(error.status) && typeof error.error == 'string' && error.error) this.util.Notificacion(`Advertencia`, error.error);
+    else this.util.Notificacion(`Error`, `${fallback} | ${error.status} ${error.statusText}`);
   }
 
-  enabledFieldRoll() {
-    this.load = false;
-    this.form.get('roll')?.enable();
-    this.form.patchValue({ roll: null });
-    document.getElementById('roll')?.focus();
-  }
-
-  consolidateItems() {
-    this.rollsConsolidate = this.rollsToDispatch.reduce((acc, value) => {
+  consolidateItems(tab: PreloadTab) {
+    tab.consolidated = tab.rolls.reduce((acc, value) => {
       let find = acc.find(x => x.item == value.item);
       if (!find) acc.push(value);
       return acc;
     }, []);
   }
- 
-  qtyRollsItem = (data: any) => this.rollsToDispatch.filter(x => x.item == data.item).length;
 
-  qtyTotalItem = (data: any) => this.rollsToDispatch.filter(x => x.item == data.item).reduce((a, b) => a += b.qty, 0);
+  qtyRollsItem = (tab: PreloadTab, data: any) => tab.rolls.filter(x => x.item == data.item).length;
 
-  weightTotalItem = (data: any) => this.rollsToDispatch.filter(x => x.item == data.item).reduce((a, b) => a += b.weight, 0);
+  qtyTotalItem = (tab: PreloadTab, data: any) => tab.rolls.filter(x => x.item == data.item).reduce((a, b) => a += b.qty, 0);
 
-  quitRoll(data) {
-    console.log(data);
-    this.load = true;
+  weightTotalItem = (tab: PreloadTab, data: any) => tab.rolls.filter(x => x.item == data.item).reduce((a, b) => a += b.weight, 0);
 
-    setTimeout(() => {
-      this.util.Notificacion(`confirmacion`, `Se quitó el rollo N° ${data.roll} de la tabla!`);
-      let index = this.rollsToDispatch.findIndex(x => x.roll == data.roll && x.ot == data.ot);
-      console.log(index);
-      this.rollsToDispatch.splice(index, 1);
-      this.load = false;
-      this.consolidateItems();
-    }, 500);
+  // Quita el rollo del precargue en base de datos y lo devuelve a disponible.
+  quitRoll(tab: PreloadTab, data: any) {
+    if (!tab.pcdId) return;
+    this.setBusy(tab, true);
+    this.svPreload.removeRollFromPreload(tab.pcdId, data.roll, data.item).pipe(finalize(() => this.setBusy(tab, false))).subscribe({
+      next: () => {
+        let index: number = tab.rolls.findIndex(x => x.roll == data.roll && x.item == data.item);
+        if (index >= 0) tab.rolls.splice(index, 1);
+        this.consolidateItems(tab);
+        this.util.Notificacion(`Confirmación`, `Se quitó el rollo N° ${data.roll} del precargue!`);
+      },
+      error: (error: HttpErrorResponse) => this.notifyHttpError(error, `Error quitando el rollo N° ${data.roll}`),
+    });
   }
 
   applyFilter = ($event, campo: any, table: any) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  savePreload() {
-    if (this.rollsToDispatch.length > 0) {
-      this.load = true;
-      let fechaActual: any = moment().format('YYYY-MM-DD');
-      let horaActual: any = moment().format('HH:mm:ss');
-
-      let info: modelPrecargue_Despacho = {
-        Cli_Id: this.form.value.idClient,
-        OF_Id: 4472, //OF GENERICA
-        Pcd_FechaCrea: fechaActual,
-        Pcd_HoraCrea: horaActual,
-        Usua_Crea: this.storage_Id,
-        Pcd_Observacion: this.form.value.observation,
-        Estado_Id: 11,
-        Pcd_FechaModifica: fechaActual,
-        Pcd_HoraModifica: horaActual,
-        Usua_Modifica: 0,
-        Pcd_ObservacionModifica: '',
-        Usua_Vendedor: parseInt(this.form.value.asesor),
-      };
-
-      this.onReject();
-      this.svPreload.Post(info).subscribe(data => { this.saveDetailsPreload(data.pcd_Id); }, error => {
-        this.util.Notificacion(`Error`, `Error guardando el encabezado del precargue de despacho | ${error.status} ${error.statusText}`);
-      });
-    }
+  clearFields(tab: PreloadTab) {
+    tab.form.reset({ clientStock: false });
+    tab.clients = [];
+    this.focusRoll(tab);
   }
 
-  saveDetailsPreload(id: number) {
-    let count: number = 0;
-    this.rollsToDispatch.forEach(x => {
-      let info: modelDetalles_PrecargueDespacho = {
-        'Pcd_Id': id,
-        'Prod_Id': x.item,
-        'DtlPcd_Rollo': x.roll,
-        'DtlPcd_Cantidad': x.qty,
-        'UndMed_Id': x.unit,
+  clearAll(tab: PreloadTab) {
+    this.clearFields(tab);
+    tab.rolls = [];
+    tab.consolidated = [];
+  }
+
+  // Deja la pestaña lista para un nuevo precargue conservando los datos del formulario.
+  resetTab(tab: PreloadTab) {
+    tab.pcdId = null;
+    tab.rolls = [];
+    tab.consolidated = [];
+    tab.form.patchValue({ doc: null, roll: null });
+    tab.form.get('client')?.enable();
+  }
+
+  // Mostrar mensaje de confirmación para generar o cancelar el precargue de la pestaña.
+  viewConfirmMessage(tab: PreloadTab, action: 'finish' | 'cancel') {
+    this.confirmTab = tab;
+    this.confirmAction = action;
+    let client: string = tab.form.getRawValue().client;
+    this.message = action == 'finish'
+      ? `¿Está seguro que desea generar el precargue N° ${tab.pcdId} para el cliente ${client}?`
+      : `¿Está seguro que desea cancelar el precargue N° ${tab.pcdId}? Se anulará y sus ${tab.rolls.length} rollo(s)/bulto(s) volverán a estar disponibles.`;
+    setTimeout(() => {
+      this.msg.add({ severity: 'warn', key: 'confirm', summary: action == 'finish' ? 'Confirmación' : 'Cancelar precargue', detail: this.message, sticky: true });
+    }, 200);
+  }
+
+  onConfirm() {
+    let tab = this.confirmTab;
+    let action = this.confirmAction;
+    this.onReject();
+    if (!tab) return;
+    if (action == 'finish') this.finishPreload(tab);
+    else if (action == 'cancel') this.cancelPreload(tab);
+  }
+
+  // Función para quitar mensaje confirmación.
+  onReject() {
+    this.msg.clear('confirm');
+    this.confirmTab = null;
+    this.confirmAction = null;
+  }
+
+  // Pasa el precargue de En proceso a Pendiente, genera el PDF y cierra la pestaña.
+  finishPreload(tab: PreloadTab) {
+    let id: number = tab.pcdId!;
+    tab.busy = true;
+    this.svPreload.finishPreload(id, { usuario: this.storage_Id, observacion: tab.form.getRawValue().observation }).subscribe({
+      next: () => this.createPDF(id, `creada`, () => {
+        tab.busy = false;
+        this.removeTab(tab);
+      }),
+      error: (error: HttpErrorResponse) => {
+        this.setBusy(tab, false);
+        this.notifyHttpError(error, `Error generando el precargue N° ${id}`);
       }
-      this.svDetailsPreload.Post(info).subscribe(data => {
-        count += 1;
-        if (count == this.rollsToDispatch.length) this.updateStatusRolls(id);
-      });
     });
   }
 
-  updateStatusRolls(id: number) {
-    let rolls: Array<any> = [];
-    this.rollsToDispatch.forEach(x => rolls.push({ 'of': 0, 'roll': x.roll, 'item': x.item, 'currentStatus': 19, 'newStatus': 50, 'envioZeus': true }));
-    this.svProduction.putChangeStateProduction(rolls).subscribe(data => { this.createPDF(id, `creada`) }, error => {
-      this.util.Notificacion(`Error`, `Error actualizando el estado de los rollos seleccionados.`);
-    });
-  }
-
-  clearFields() {
-    this.form.reset();
-    this.load = false;
-  }
-
-  clearAll() {
-    this.form.reset();
-    this.rollsToDispatch = [];
-    this.rollsConsolidate = [];
-    this.searchIn = null;
-    this.load = false;
-    this.editMode = false;
-  }
-
-  /*
-    getLastPreload = () => this.svPreload.getLastPreload().subscribe(data => this.form.patchValue({ 'doc': data.pcd_Id }), error => { this.msj.mensajeError(`Error`, `Error al consultar el último consecutivo del precargue.`) });
-  
-    searchPreload(){
-      let preload : number = this.form.value.doc;
-  
-      if(preload){
-        this.editMode = true;
-        this.load = true;
-        this.rollsToDispatch = [];
-        this.rollsConsolidate = [];
-  
-        this.svDetailsPreload.getPreloadId(preload).subscribe(data => {
-          if(data) {
-            this.rollsToDispatch = data;
-            this.rollsToDispatch.forEach(x =>{
-              x.qty = x.quantity, 
-              x.unit = x.presentation
-            });
-            this.loadInformationDispatch(data);
-          } else {
-            this.msjs(`Advertencia`, `No se encontró la orden de precargue N° ${preload}`);
-            this.load = false;
-          } 
-        }, error => {
-          this.msjs(`Error`, `Error al consultar la orden de precargue N° ${preload} | ${error.status} ${error.statusText}`);
-          this.load = false;
-        });
-      }
-    }
-  
-    loadInformationDispatch(data : any){
-      this.load = false;
-      this.form.patchValue({
-        'idClient': data[0].idClient,
-        'client': data[0].client,
-        'observation': data[0].observation1,
+  // Anula el precargue, devuelve sus rollos a disponible y deja la pestaña editable para empezar de nuevo.
+  cancelPreload(tab: PreloadTab) {
+    let id: number = tab.pcdId!;
+    this.setBusy(tab, true);
+    this.svPreload.cancelPreload(id, { usuario: this.storage_Id, observacion: `Precargue cancelado desde la página de precargue de rollos.` })
+      .pipe(finalize(() => this.setBusy(tab, false))).subscribe({
+        next: data => {
+          this.resetTab(tab);
+          this.util.Notificacion(`Confirmación`, `Se canceló el precargue N° ${id}. ${data.rollosLiberados} rollo(s)/bulto(s) volvieron a estar disponibles.`);
+        },
+        error: (error: HttpErrorResponse) => this.notifyHttpError(error, `Error cancelando el precargue N° ${id}`),
       });
-      this.consolidateItems();
-    }
-  
-    // Función para mostrar el msj de confirmación de eliminación de rollos
-    msgDeleteRolls(data : any) {
-      this.load = true;
-      this.rollsSelected = {};
-      this.rollsSelected = data;
-      console.log(this.rollsSelected);
-      this.msg.add({ severity:'warn', key:'deleteRoll', summary:'Elección', detail: `¿Está seguro que desea quitar/eliminar el rollo/bulto N° ${data.roll}?`, sticky: true});
-    }
-          
-    onReject(key : any){
-      this.load = false;
-      this.msg.clear(key);
-    }
-  
-    // Función para eliminar rollos de una reposición
-    deleteRollsFromReposition(data: any, currentStatus : any, newStatus : any){
-      this.onReject('deleteRoll');
-      this.load = true;
-      let index : any = this.rollsToDispatch.findIndex(x => x.roll == data.roll);
-      let roll : number = this.rollsSelected.rollPl;
-      console.log(index, roll, newStatus, currentStatus);
-      
-      /*this.svDetailsPreload.Delete(roll).subscribe(dataPreload => {
-        let infoRoll : any = [{'roll': data.roll, 'item': data.item, 'currentStatus' : currentStatus, 'newStatus' : newStatus, 'envioZeus' : true }]; 
-        this.svProduction.putChangeStateProduction(infoRoll).subscribe(() => {
-          this.msjs(`Confirmación`, `Se eliminó el rollo N° ${data.roll} de la reposición N° ${this.form.value.repo}!`);
-          this.rollsToDispatch.splice(index, 1);
-          this.load = false;
-          this.consolidateItems();
-        }, error => {
-          this.msjs(`Error`, `No fue posible actualizar el estado del rollo N° ${data.roll} en producción | ${error.status} ${error.statusText}`);
-          this.load = false;
-        });
-      }, error => {
-        this.msjs(`Error`, `Error al eliminar el rollo N° ${data.roll} de la reposición N° ${this.form.value.repo} | ${error.status} ${error.statusText}`);
-        this.load = false;
-      });*/
-  //}
+  }
 
   createPDF(id: number, action: string, onComplete?: () => void) {
-    this.svDetailsPreload.getPreloadId(id).subscribe(data => {
+    this.svDetailsPreload.getPreloadIdAsync(id).subscribe(data => {
       let title: string = `Orden de Precargue N° ${id}`;
       let content: any[] = this.PDFService.contentPDFPrecargue(data);
       this.PDFService.formatoPDF(title, content);
       this.util.Notificacion(`Confirmación`, `Orden de precargue N° ${id} ${action} exitosamente!. A continuación se abrirá el PDF en una nueva pestaña.`);
       onComplete?.();
-      setTimeout(() => this.clearAll(), 3000);
     }, error => {
-      this.load = false;
-      this.util.Notificacion(`Error`, `Error al consultar la orden de precargue N° ${id} | ${error.status} ${error.statusText}`);
+      this.util.Notificacion(`Error`, `La orden de precargue N° ${id} fue ${action}, pero no se pudo generar el PDF. Puedes consultarlo en movimientos de precargue | ${error.status} ${error.statusText}`);
       onComplete?.();
     });
   }
-
-  // Mostrar mensaje de confirmación
-  viewConfirmMessage() {
-    let cliente = this.clients.find(x => x.idcliente == this.form.value.idClient).razoncial;
-    this.message = `Está seguro que desea crear la orden de precargue para el cliente ${cliente}?`;
-    setTimeout(() => {
-      this.msg.add({ severity: 'warn', key: 'confirm', summary: 'Confirmación', detail: this.message, sticky: true });
-    }, 200);
-  }
-
-  // Función para quitar mensaje confirmación.
-  onReject = () => this.msg.clear('confirm');
 }
