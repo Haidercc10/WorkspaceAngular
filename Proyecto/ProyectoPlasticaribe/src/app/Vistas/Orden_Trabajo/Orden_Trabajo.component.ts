@@ -274,8 +274,8 @@ export class Orden_TrabajoComponent implements OnInit {
       Ancho_Sellado2: [0],
       Ancho_Sellado3: [0],
       Etiqueta_Ancho_Sellado: [null, Validators.required],
-      Etiqueta_Largo_Sellado: [null, Validators.required],
-      Etiqueta_Fuelle_Sellado: [null, Validators.required],
+      Etiqueta_Largo_Sellado: [null], // Ya no se muestra en la vista; se conserva para no romper el contrato de la API
+      Etiqueta_Fuelle_Sellado: [null], // Ya no se muestra en la vista; se conserva para no romper el contrato de la API
       Calibre_Sellado: [0],
       Margen_Sellado: [null, Validators.required],
       PesoMillar: [0, Validators.required],
@@ -420,6 +420,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargarMezclas();
     this.cargarTiposProductos();
     this.cargarTiposSellado();
+    this.sincronizarAnchoTotalSellado();
     this.limpiarCampos();
     this.ultimaOTBagPro();
     this.ultimoIdProducto();
@@ -1470,6 +1471,19 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
+  /**
+   * Mantiene el Ancho Total de producto terminado como Ancho + Fuelle Izq. + Fuelle Der.
+   * Si los tres valores están en 0 (OT antiguas sin desglose) se conserva el ancho total existente.
+   * @returns No retorna un valor.
+   */
+  sincronizarAnchoTotalSellado(): void {
+    const controles = ['Ancho_Sellado1', 'Ancho_Sellado2', 'Ancho_Sellado3'];
+    controles.forEach(nombre => this.FormOrdenTrabajoSellado.get(nombre)?.valueChanges.subscribe(() => {
+      const total = controles.reduce((suma, c) => suma + (Number(this.FormOrdenTrabajoSellado.get(c)?.value) || 0), 0);
+      if (total > 0) this.FormOrdenTrabajoSellado.get('Ancho_Sellado')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
+    }));
+  }
+
   // Funcion que va a calcular los costos de la orden de trabajo
   calcularDatosOt() {
     setTimeout(() => {
@@ -1549,6 +1563,14 @@ export class Orden_TrabajoComponent implements OnInit {
     //Peso Millar
     this.pesoMillar = this.ArrayProducto[i].PesoMillar;
     if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
+  }
+
+  /**
+   * Kilos de la cantidad pedida; muestra el mismo valor que Neto Kg de Datos Costos OT (incluye el margen adicional).
+   * @returns Cantidad pedida en kilogramos.
+   */
+  get cantidadPedidaKg(): number {
+    return this.netoKg || 0;
   }
 
   calcularCostosOT(margen_Adicional: number) {
@@ -3192,14 +3214,18 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Función que va a colocar la observación de la OT
+  /**
+   * Coloca en la hoja 1 la observación del proceso de extrusión (la observación general ya no se usa).
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la observación de extrusión.
+   */
   observacion(datos_ot) {
     return {
       table: {
         widths: ['*'],
         body: [
-          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
-          [{ border: [true, false, true, true], text: `${datos_ot.observacion.toString().trim()}` }]
+          [{ border: [true, true, true, false], text: `Observación Extrusión: `, style: 'subtitulo' }],
+          [{ border: [true, false, true, true], text: this.textoObservacionPDF(datos_ot.extrusion_Observacion) }]
         ]
       },
       fontSize: 9,
@@ -3404,65 +3430,71 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Coloca en la hoja 2 la información de producto terminado (sellado/corte), con la solapa antes del sellado.
+   * Coloca en la hoja 2 la información de producto terminado (sellado/corte), con la solapa al lado del fuelle.
    * @param datos_ot Datos de la orden de trabajo consultada.
    * @returns Nodo pdfmake con la tabla de producto terminado.
    */
   productoTermiando(datos_ot) {
+    // Las OT que vienen de BagPro no traen la solapa, por eso se toma 0 por defecto
+    const solapa: number = Number(datos_ot.selladoCorte_Solapa) || 0;
     return {
       table: {
-        widths: ['*', '*', '*'],
+        widths: ['*', '*', '*', '*'],
         body: [
           [
-            { colSpan: 3, text: `PRODUCTO TERMINADO`, style: 'titulosTablas', border: [true, true, true, true] },
+            { colSpan: 4, text: `PRODUCTO TERMINADO`, style: 'titulosTablas', border: [true, true, true, true] },
+            {},
             {},
             {},
           ],
           [
             { text: `Formato Bolsa: `, style: 'subtitulo' },
-            { text: `${datos_ot.formato_Producto.toString().trim()}`, alignment: 'center', },
+            { colSpan: 2, text: `${datos_ot.formato_Producto.toString().trim()}`, alignment: 'center', },
+            {},
             { text: ``, },
           ],
           [
-            { text: `Ancho`, alignment: 'right', style: 'subtitulo' },
+            { text: `Ancho`, alignment: 'center', style: 'subtitulo' },
             { text: `Largo`, alignment: 'center', style: 'subtitulo' },
-            { text: `Fuelle`, alignment: 'left', style: 'subtitulo' },
+            { text: `Fuelle`, alignment: 'center', style: 'subtitulo' },
+            { text: `Solapa`, alignment: 'center', style: 'subtitulo' },
           ],
           [
-            { colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Ancho).toFixed(2))}`, alignment: 'right', },
-            { colspan: 3, text: `x     ${this.formatonumeros((datos_ot.selladoCorte_Largo).toFixed(2))}     x`, alignment: 'center', },
-            { colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Fuelle).toFixed(2))}     ${datos_ot.und_Extrusion.toString().trim()}`, },
+            { text: `${this.formatonumeros((datos_ot.selladoCorte_Ancho).toFixed(2))}   x`, alignment: 'center', },
+            { text: `${this.formatonumeros((datos_ot.selladoCorte_Largo).toFixed(2))}   x`, alignment: 'center', },
+            { text: `${this.formatonumeros((datos_ot.selladoCorte_Fuelle).toFixed(2))}`, alignment: 'center', },
+            { text: `${this.formatonumeros(solapa.toFixed(2))}   ${datos_ot.und_Extrusion.toString().trim()}`, alignment: 'center', },
           ],
-          [{}, {}, {}],
-          [{}, {}, {}],
-          [
-            { text: `Solapa: `, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.selladoCorte_Solapa ?? 0).toFixed(2))}` },
-            {},
-          ],
+          [{}, {}, {}, {}],
+          [{}, {}, {}, {}],
           [
             { text: `Sellado: `, style: 'subtitulo' },
-            { text: `${datos_ot.tpSellados_Nombre.toString().trim()}` },
+            { colSpan: 3, text: `${datos_ot.tpSellados_Nombre.toString().trim()}` },
+            {},
             {},
           ],
           [
             { text: `Margen: `, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.margen).toFixed(2))}` },
+            { colSpan: 3, text: `${this.formatonumeros((datos_ot.margen).toFixed(2))}` },
+            {},
             {},
           ],
           [
             { text: `Peso Millar: `, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.selladoCorte_PesoMillar).toFixed(2))}` },
+            { colSpan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_PesoMillar).toFixed(2))}` },
+            {},
             {},
           ],
           [
             { text: `Cant. x Paquete: `, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasPaquete).toFixed(2))}` },
+            { colSpan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasPaquete).toFixed(2))}` },
+            {},
             {},
           ],
           [
             { text: `Cant. x Bulto: `, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasBulto).toFixed(2))}` },
+            { colSpan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasBulto).toFixed(2))}` },
+            {},
             {},
           ]
         ]
@@ -3493,13 +3525,12 @@ export class Orden_TrabajoComponent implements OnInit {
    * Arma la tabla de observaciones por proceso de la hoja 2. Solo incluye las filas que tienen observación,
    * para no ocupar espacio con procesos vacíos ni desbordar el contenido a otra hoja.
    * "Producto Terminado" muestra la observación compartida de corte y sellado.
+   * La observación general ya no se usa y la de extrusión se muestra solo en la hoja 1.
    * @param datos_ot Datos de la orden de trabajo consultada.
    * @returns Nodo pdfmake con la tabla, o null si ningún proceso tiene observación.
    */
   observacionesPorProcesoPDF(datos_ot) {
     const filas = [
-      { proceso: `General`, texto: this.textoObservacionPDF(datos_ot.observacion) },
-      { proceso: `Extrusión`, texto: this.textoObservacionPDF(datos_ot.extrusion_Observacion) },
       { proceso: `Laminado`, texto: this.textoObservacionPDF(datos_ot.laminado_Observacion) },
       { proceso: `Impresión`, texto: this.textoObservacionPDF(datos_ot.impresion_Observacion) },
       { proceso: `Producto Terminado`, texto: this.textoObservacionPDF(datos_ot.selladoCorte_Observacion) },
