@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { CrearSolicitudRequest, EditarSolicitudRequest, ReservaInventario } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { environment } from 'src/environments/environment';
 
@@ -10,7 +11,7 @@ import { environment } from 'src/environments/environment';
 
 export class SolicitudMP_ExtrusionService {
   readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
-  
+
   constructor(private http : HttpClient) { }
 
   GetId = (id : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`);
@@ -21,11 +22,19 @@ export class SolicitudMP_ExtrusionService {
 
   Put = (id : number, data : modelSolicitudMP_Extrusion) => this.http.put(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`, data);
 
-  PutEstadoSolicitud = (id : number) => this.http.put(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/PutEstadoSolicitud/${id}`, id);
-
   Delete = (id : number) => this.http.delete(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`);
 
   getEstadosSolicitudes = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getEstadosSolicitudes`);
 
-  GetUltimaSolicitud = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getUltimaSolicitud`);
+  /** Crea la solicitud y sus detalles en una sola transacción. Responde 409 si falta confirmar la disponibilidad. */
+  crearSolicitud = (data : CrearSolicitudRequest) : Observable<{ solMpExt_Id : number; estado_Id : number }> =>
+    this.http.post<{ solMpExt_Id : number; estado_Id : number }>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion`, data);
+
+  /** Edita la solicitud y sus detalles en una sola transacción y recalcula su estado. */
+  editarSolicitud = (id : number, data : EditarSolicitudRequest) : Observable<{ solMpExt_Id : number; estado_Id : number }> =>
+    this.http.put<{ solMpExt_Id : number; estado_Id : number }>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/${id}`, data);
+
+  /** Consulta existencia, reserva informativa y disponible de las subcategorías indicadas. */
+  getReservas = (subcategorias : number[]) : Observable<ReservaInventario[]> =>
+    this.http.get<ReservaInventario[]>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/reservas`, { params: { subcategorias: subcategorias.join(',') } });
 }

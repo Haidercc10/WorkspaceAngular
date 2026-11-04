@@ -4,7 +4,7 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { CreacionPdfService, MOVIMIENTOS_ASIGNACION } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { AppComponent } from 'src/app/app.component';
@@ -360,13 +360,11 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a validar el tipo de movimiento para crear el pdf
   validarTipoMovimiento(data: any) {
-    console.log(data);
     this.datosPdf = [];
     this.cargando = !this.modal? true : false;
     this.dialogCargando = this.modal? true : false;
 
-    let movAsignaciones: string[] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS'];
-    if (movAsignaciones.includes(data.Movimiento)) this.asignacionesMateriaPrima(data);
+    if (MOVIMIENTOS_ASIGNACION.includes(data.Movimiento)) this.asignacionesMateriaPrima(data);
     else if (data.Movimiento == 'CRTINTAS') this.creacionTintas(data);
     else if (data.Movimiento == 'DEVMP') this.devolucionesMateriaPrima(data);
     else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') this.entradasMateriasPrimas(data);
@@ -380,35 +378,16 @@ export class MovimientoMPComponent implements OnInit {
     }
   }
 
+  /**
+   * Consulta los datos de una asignación y genera su PDF con CreacionPdfService.
+   * @param data Id de la asignación y tipo de movimiento (ASIGMP, ASIGTINTAS, ASIGBOPA, ASIGBOPP, ASIGPOLY).
+   */
   asignacionesMateriaPrima(data: any) {
-    let informacionPdf: any;
-    this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento).subscribe(datos => {
-      for (let i = 0; i < datos.length; i++) {
-        let info: any = {
-          Id: '',
-          Nombre: '',
-          Cantidad: this.util.formatoNumeros(datos[i].cantidad),
-          "Presentación": datos[i].unidad_Medida,
-          Precio: this.util.formatoNumeros(0),
-          SubTotal: this.util.formatoNumeros(0),
-        }
-        if (data.Movimiento == 'ASIGMP') {
-          info.Id = datos[i].materia_Prima_Id;
-          info.Nombre = datos[i].materia_Prima;
-        } else if (data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY') {
-          info.Id = datos[i].bopp_Id;
-          info.Nombre = datos[i].bopp;
-        } else if (data.Movimiento == 'ASIGTINTAS') {
-          info.Id = datos[i].tinta_Id;
-          info.Nombre = datos[i].tinta;
-        }
-        this.datosPdf.push(info);
-      }
-      informacionPdf = datos;
-    }, () => {
-      this.cargando = false; 
-      this.dialogCargando = false;
-    }, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+    this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento)
+      .pipe(finalize(() => { this.cargando = false; this.dialogCargando = false; }))
+      .subscribe(datos => {
+        if (datos.length > 0) this.creacionPDFService.asignacionMateriaPrimaPDF(datos);
+      });
   }
 
   creacionTintas(data: any) {
@@ -527,11 +506,11 @@ export class MovimientoMPComponent implements OnInit {
     return total;
   }
 
+  /** PDF de creación de tintas, devoluciones y entradas (las asignaciones se generan en CreacionPdfService). */
   crearPDF(data: any) {
-    console.log('entrada:', data)
-    let movimientoOrdenesTrabajo: string[] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
+    let movimientoOrdenesTrabajo: string[] = ['DEVMP'];
     let tituloAdicional: string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Código Documento ${(data[0].codigo).toUpperCase()}` : '';
-    let titulo: string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;
+    let titulo: string = [`${data[0].tipo_Movimiento} N° ${data[0].id}`, tituloAdicional].filter(linea => linea).join('\n');
     let content: any = this.contenidoPDF(data, movimientoOrdenesTrabajo);
     this.creacionPDFService.formatoPDF(titulo, content);
     setTimeout(() => {this.cargando = false; this.dialogCargando = false;}, 3000);

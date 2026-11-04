@@ -40,13 +40,18 @@ export class CreacionPdfService {
     setTimeout(() => this.crearPDF(pdfDefinicion), 2000);
   }
 
+  /**
+   * Cabecera común: logo (ancho fijo), título (ocupa todo el espacio restante) y paginado/fecha/hora (ancho fijo).
+   * En carta (612 pt) quedan ~572 pt: 135 para el logo, 95 para el paginado y ~340 para el título,
+   * suficiente para que cada línea del título (p. ej. "Asignación de Materia Prima N° 91510") quepa en un solo renglón.
+   */
   private headerPDF(today: any, hour: any, titulo: string, headerAdicional: any): {} {
     return (currentPage: any, pageCount: any) => {
       return [
         {
           margin: [20, 8, 20, 0],
           columns: [
-            { image: logoParaPdf, width: 150, height: 30, margin: [20, 25, 80, 10] },
+            { image: logoParaPdf, width: 125, height: 25, margin: [10, 24, 0, 8] },
             this.title == null ? null : this.empresaFechaHoraTituloPDF(titulo, today, hour),
             this.title == null ? null : this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
           ]
@@ -58,30 +63,32 @@ export class CreacionPdfService {
   }
 
   private empresaFechaHoraTituloPDF(titulo: string, today: any, hour: any): {} {
+    // Stack en lugar de tabla: las celdas de tabla agregan relleno entre filas y el espacio NIT → título quedaba
+    // mayor que entre las líneas del título. Así todas las líneas tienen el mismo interlineado.
     return {
       width: '*',
       alignment: 'center',
-      table: {
-        body: [
-          [{ text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10 }],
-          [{ text: titulo, bold: true, alignment: 'center', fontSize: 10 }],
-        ]
-      },
-      layout: 'noBorders',
-      margin: [80, 20, 0, 10],
+      bold: true,
+      fontSize: 10,
+      lineHeight: 1.15,
+      stack: [
+        { text: 'NIT. 800188732' },
+        { text: titulo },
+      ],
+      margin: [10, 18, 10, 8],
     }
   }
 
   private paginadoFechaHoraPDF(currentPage: { toString: () => string; }, pageCount: string, today: any, hour: any): {} {
     return {
-      width: '*',
-      alignment: 'center',
-      margin: [100, 20, 20, 0],
+      width: 95,
+      alignment: 'left',
+      margin: [0, 20, 0, 0],
       table: {
         body: [
-          [{ text: `Página: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-          [{ text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true }, { text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-          [{ text: `Hora: `, alignment: 'left', fontSize: 8, bold: true }, { text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+          [{ text: `Página: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8 }],
+          [{ text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true }, { text: today, alignment: 'left', fontSize: 8 }],
+          [{ text: `Hora: `, alignment: 'left', fontSize: 8, bold: true }, { text: hour, alignment: 'left', fontSize: 8 }],
         ]
       },
       layout: 'noBorders',
@@ -989,6 +996,250 @@ export class CreacionPdfService {
     });
     return body;
   }
+
+  /* ============================================================== SOLICITUD DE MATERIAL DE PRODUCCIÓN ===================================================================== */
+
+  /**
+   * Genera el PDF de una solicitud de material de producción con datos ya consultados (este servicio no llama al API).
+   * Copia del PDF que genera SolicitudMP_ExtrusionComponent, sin depender de esa pantalla y con estas correcciones:
+   * totales por unidad de medida (no suma Kg con Cms), Kg reales de la OT separados del límite, datos de la solicitud
+   * (estado, fechas, solicitante, máquina, proceso), cantidades entregadas/faltantes y la cabecera común de los PDFs.
+   * @param detalles Filas de `DetSolicitud_MatPrimaExtrusion/getSolicitudMp_Extrusion/{id}`: encabezado repetido en cada fila más el detalle.
+   * @param ot Datos de la OT en BagPro, o null si no se encontró.
+   */
+  solicitudMaterialProduccionPDF(detalles: any[], ot: DatosOTSolicitudPDF | null) {
+    const solicitud = detalles[0];
+    const subcategorias = detalles
+      .map(d => ({
+        id: d.id_Subcategoria,
+        nombre: d.subcategoria,
+        solicitada: Number(d.cantidad_Pedida) || 0,
+        entregada: Number(d.cantidad_Entregada) || 0,
+        faltante: Number(d.cantidad_Restante) || 0,
+        medida: d.medida,
+      }))
+      .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+
+    const titulo = `Solicitud de Material de Producción N° ${solicitud.id}\nOrden de Trabajo N° ${solicitud.ot}`;
+    const content = [
+      this.infoSolicitudMaterialPDF(solicitud),
+      this.infoOTSolicitudMaterialPDF(solicitud, ot),
+      this.tablaSubcategoriasSolicitudPDF(subcategorias),
+      this.observacionSolicitudMaterialPDF(solicitud.observacion),
+    ];
+    this.formatoPDF(titulo, content);
+  }
+
+  /** Formatea una cantidad con separador de miles y dos decimales. */
+  private cantidadPDF = (valor: number): string => this.util.formatoNumeros((Number(valor) || 0).toFixed(2));
+
+  /** Toma la fecha (yyyy-MM-dd) de un valor de fecha del API. */
+  private fechaPDF = (valor: any): string => valor ? String(valor).substring(0, 10) : 'Sin definir';
+
+  /** Estilo de tabla con las dos primeras filas (título y columnas) sombreadas. */
+  private layoutEncabezadoGris = { fillColor: (rowIndex: number) => rowIndex === 0 || rowIndex === 1 ? '#DDDDDD' : null };
+
+  /** Datos generales de la solicitud. */
+  private infoSolicitudMaterialPDF(solicitud: any): {} {
+    return {
+      margin: [0, 0, 0, 10],
+      fontSize: 8,
+      table: {
+        widths: ['*', '*', '*', '*'],
+        body: [
+          [{ text: 'Información de la Solicitud', colSpan: 4, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}],
+          [`Estado: ${solicitud.nombre_Estado ?? ''}`, `Proceso: ${solicitud.proceso ?? ''}`, `Máquina: ${solicitud.maquina ?? ''}`, `Solicitante: ${solicitud.nombre_Usuario ?? ''}`],
+          [
+            { text: `Fecha creación: ${this.fechaPDF(solicitud.fecha)} ${solicitud.hora ?? ''}`, colSpan: 2 }, {},
+            { text: `Fecha estimada de entrega: ${this.fechaPDF(solicitud.fecha_Entrega)}`, colSpan: 2 }, {},
+          ],
+        ]
+      },
+      layout: { fillColor: (rowIndex: number) => rowIndex === 0 ? '#DDDDDD' : null },
+    };
+  }
+
+  /** Datos de la OT: kg reales de la OT y kg límite (con el adicional permitido) por separado. */
+  private infoOTSolicitudMaterialPDF(solicitud: any, ot: DatosOTSolicitudPDF | null): {} {
+    return {
+      margin: [0, 0, 0, 10],
+      fontSize: 8,
+      table: {
+        widths: [45, 140, '*', 65, 65],
+        body: [
+          [{ text: 'Información de la OT', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}],
+          ['OT', 'Cliente', 'Referencia', 'Kg OT', 'Kg Límite'],
+          ot
+            ? [solicitud.ot, ot.cliente || '', ot.referencia || '', this.cantidadPDF(ot.kgOT), this.cantidadPDF(ot.kgLimite)]
+            : [solicitud.ot, { text: 'No se encontró la OT en BagPro', colSpan: 4, italics: true }, {}, {}, {}],
+        ]
+      },
+      layout: this.layoutEncabezadoGris,
+    };
+  }
+
+  /** Subcategorías solicitadas con lo entregado y lo faltante, y un total por cada unidad de medida. */
+  private tablaSubcategoriasSolicitudPDF(subcategorias: { id: any; nombre: string; solicitada: number; entregada: number; faltante: number; medida: string }[]): {} {
+    const totales = new Map<string, { solicitada: number; entregada: number; faltante: number }>();
+    subcategorias.forEach(s => {
+      const total = totales.get(s.medida) ?? { solicitada: 0, entregada: 0, faltante: 0 };
+      total.solicitada += s.solicitada;
+      total.entregada += s.entregada;
+      total.faltante += s.faltante;
+      totales.set(s.medida, total);
+    });
+
+    return {
+      margin: [0, 0, 0, 10],
+      fontSize: 8,
+      table: {
+        headerRows: 2,
+        keepWithHeaderRows: 1,
+        dontBreakRows: true,
+        widths: [40, '*', 65, 65, 65, 45],
+        body: [
+          [{ text: 'Subcategorías solicitadas', colSpan: 6, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}, {}],
+          ['Id', 'Subcategoría', 'Solicitada', 'Entregada', 'Faltante', 'Medida'],
+          ...subcategorias.map(s => [s.id, s.nombre, this.cantidadPDF(s.solicitada), this.cantidadPDF(s.entregada), this.cantidadPDF(s.faltante), s.medida]),
+          ...Array.from(totales.entries()).map(([medida, total]) => [
+            { text: `Total ${medida}`, colSpan: 2, bold: true, alignment: 'right' }, {},
+            { text: this.cantidadPDF(total.solicitada), bold: true },
+            { text: this.cantidadPDF(total.entregada), bold: true },
+            { text: this.cantidadPDF(total.faltante), bold: true },
+            { text: medida, bold: true },
+          ]),
+        ]
+      },
+      layout: this.layoutEncabezadoGris,
+    };
+  }
+
+  /** Observación de la solicitud. */
+  private observacionSolicitudMaterialPDF(observacion: string): {} {
+    return {
+      fontSize: 8,
+      table: {
+        widths: ['*'],
+        body: [[{ text: `Observación:\n${observacion || ''}`, margin: [0, 0, 0, 15] }]]
+      },
+    };
+  }
+
+  /* ============================================================== ASIGNACIÓN DE MATERIA PRIMA ===================================================================== */
+
+  /**
+   * Genera el PDF de una asignación (materia prima, tintas o BOPP) con datos ya consultados (este servicio no llama al API).
+   * Trasladado desde MovimientoMPComponent con estas correcciones: se quitan Precio, SubTotal y Valor Total (siempre
+   * se imprimían en $0), el peso total se suma por unidad de medida, el título de la tabla corresponde al tipo de
+   * material y se muestra la máquina.
+   * @param datos Filas de `Materia_Prima/getInfoMovimientoAsignaciones/{id}/{tipo}`: encabezado repetido en cada fila más el material.
+   */
+  asignacionMateriaPrimaPDF(datos: any[]) {
+    const asignacion = datos[0];
+    const solicitud = Number(asignacion.solicitud_Id) || 0;
+    const titulo = [
+      `${asignacion.tipo_Movimiento} N° ${asignacion.id}`,
+      // 0 = sin solicitud; 1 = solicitud genérica de las asignaciones manuales.
+      solicitud > 1 ? `Basado en Solicitud N° ${solicitud}` : '',
+      `Orden de Trabajo N° ${asignacion.codigo}`,
+    ].filter(linea => linea).join('\n');
+
+    const materiales = datos.map(d => ({ ...this.materialAsignadoPDF(d), cantidad: Number(d.cantidad) || 0, medida: d.unidad_Medida }));
+    const content = [
+      this.infoAsignacionPDF(asignacion),
+      this.tablaMaterialesAsignadosPDF(asignacion.movimiento, materiales),
+      this.observacionAsignacionPDF(asignacion.observacion),
+    ];
+    this.formatoPDF(titulo, content);
+  }
+
+  /** Id y nombre del material de la fila según el tipo de movimiento. */
+  private materialAsignadoPDF(dato: any): { id: any; nombre: string } {
+    switch (dato.movimiento) {
+      case 'ASIGTINTAS': return { id: dato.tinta_Id, nombre: dato.tinta };
+      case 'ASIGMP': return { id: dato.materia_Prima_Id, nombre: dato.materia_Prima };
+      default: return { id: dato.bopp_Id, nombre: dato.bopp };
+    }
+  }
+
+  /** Datos generales de la asignación. */
+  private infoAsignacionPDF(asignacion: any): {} {
+    return {
+      fontSize: 8,
+      table: {
+        widths: ['15%', '30%', '15%', '20%', '20%'],
+        body: [
+          [{ text: 'Información General del Movimiento', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}],
+          [
+            `OT N°: ${asignacion.codigo}`,
+            `Usuario: ${asignacion.usuario ?? ''}`,
+            `Máquina: ${asignacion.maquina || ''}`,
+            `Fecha Registro: ${this.fechaPDF(asignacion.fecha)} ${asignacion.hora ?? ''}`,
+            `Fecha Asignación: ${this.fechaPDF(asignacion.fechaReal ?? asignacion.fecha)}`,
+          ],
+        ]
+      },
+      layout: { fillColor: (rowIndex: number) => rowIndex === 0 ? '#DDDDDD' : null },
+    };
+  }
+
+  /** Materiales asignados con un peso total por cada unidad de medida. */
+  private tablaMaterialesAsignadosPDF(movimiento: string, materiales: { id: any; nombre: string; cantidad: number; medida: string }[]): {} {
+    const tituloTabla = movimiento === 'ASIGTINTAS' ? 'Información detallada de Tintas'
+      : movimiento === 'ASIGMP' ? 'Información detallada de Materias Primas'
+      : 'Información detallada de Biorientados';
+
+    const totales = new Map<string, number>();
+    materiales.forEach(m => totales.set(m.medida, (totales.get(m.medida) ?? 0) + m.cantidad));
+
+    return {
+      margin: [0, 15, 0, 0],
+      fontSize: 8,
+      table: {
+        headerRows: 2,
+        widths: ['12%', '*', '18%', '15%'],
+        body: [
+          [{ text: tituloTabla, colSpan: 4, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}],
+          ['Id', 'Nombre', 'Cantidad', 'Presentación'],
+          ...materiales.map(m => [m.id, m.nombre, this.cantidadPDF(m.cantidad), m.medida]),
+          ...Array.from(totales.entries()).map(([medida, total]) => [
+            { text: `Peso Total ${medida}`, colSpan: 2, bold: true, alignment: 'right' }, {},
+            { text: this.cantidadPDF(total), bold: true },
+            { text: medida, bold: true },
+          ]),
+        ]
+      },
+      layout: { fillColor: (rowIndex: number) => rowIndex === 0 || rowIndex === 1 ? '#CCCCCC' : null },
+    };
+  }
+
+  /** Observación de la asignación. */
+  private observacionAsignacionPDF(observacion: string): {} {
+    return {
+      margin: [0, 20],
+      fontSize: 9,
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: 'Observación: ' }],
+          [{ border: [true, false, true, true], text: observacion ? observacion.toString().toUpperCase().trim() : '' }],
+        ]
+      },
+    };
+  }
+}
+
+/** Movimientos de asignación que imprime CreacionPdfService.asignacionMateriaPrimaPDF. */
+export const MOVIMIENTOS_ASIGNACION: string[] = ['ASIGMP', 'ASIGTINTAS', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY'];
+
+/** Datos de la OT (consultados en BagPro) que se imprimen en el PDF de la solicitud de material. */
+export interface DatosOTSolicitudPDF {
+  cliente: string;
+  referencia: string;
+  /** Kg de la OT. */
+  kgOT: number;
+  /** Kg máximos permitidos (kg de la OT más el adicional). */
+  kgLimite: number;
 }
 
 @Injectable({

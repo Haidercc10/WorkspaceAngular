@@ -28,5 +28,4 @@ export class DetSolicitudMP_ExtrusionService {
 
   GetQuerySolicitudesMp_Extrusion = (fecha1 : number, fecha2 : any, ruta? : any) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/getQuerySolicitudesMp_Extrusion/${fecha1}/${fecha2}${ruta}`);
 
-  GetSolicitudesConMatPrimas = (id : number, matprima : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/getSolicitudesConMatPrimas/${id}/${matprima}`);
 }

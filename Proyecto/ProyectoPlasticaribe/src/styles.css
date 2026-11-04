@@ -673,3 +673,33 @@ p-avatar div span {
 .p-float-label textarea.p-inputtextarea:not(:focus):not(.p-filled) ~ label {
   top: min(50%, 1.5rem);
 }
+
+/* ===================== Contador de caracteres (directiva appContadorCaracteres) ===================== */
+/* El campo reserva una franja a la derecha (no abajo, para conservar la altura de los inputs) para que el texto
+   no quede debajo del contador. La directiva ajusta este valor al ancho real del contador. */
+.con-contador-caracteres {
+  padding-right: 4rem !important;
+}
+
+/* Contador superpuesto en la esquina inferior derecha del campo; no intercepta clics. */
+.contador-caracteres {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.35rem;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--text-color-secondary, #6c757d);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.contador-caracteres--alerta {
+  color: var(--orange-500, #f97316);
+  font-weight: 600;
+}
+
+.contador-caracteres--limite {
+  color: var(--red-500, #ef4444);
+  font-weight: 700;
+}

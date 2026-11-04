@@ -12,15 +12,16 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   width: 100%;
 }
 
-.solicitud-input-container {
+/* Inputs con botón X para limpiar su contenido */
+.input-limpiable {
   position: relative;
 }
 
-.solicitud-input-container input {
+.input-limpiable input {
   padding-right: 2.5rem;
 }
 
-.solicitud-clear-button {
+.boton-limpiar-input {
   position: absolute;
   top: 50%;
   right: 0.25rem;

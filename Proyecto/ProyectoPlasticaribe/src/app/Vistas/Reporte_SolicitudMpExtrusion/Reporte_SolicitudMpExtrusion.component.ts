@@ -15,8 +15,10 @@ import { Table } from 'primeng/table';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } from 'src/app/data';
-import { finalize, Subject, takeUntil } from 'rxjs';
-import { SolicitudMP_ExtrusionComponent } from '../SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
+import { catchError, finalize, map, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionPdfService, DatosOTSolicitudPDF } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { ADICIONAL_KG_OT, EstadoSolicitudMaterial } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 
 
 @Component({
@@ -47,13 +49,15 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   modalAsignacion : boolean = false; /** Variable que validará que se cargue o no, el componente del modal de ordenes de compras. */
   private mensajeAsignacionPendiente: { summary: string; detail: string } | null = null;
   cantParciales : number = 0; /** Variable que mostrará el número de solicitudes parciales */
-  estadoSolicitud : string = ''; /** Variable que servirá para no permitir cancelar solicitudes en estado cancelado o finalizado. */
+  estadoSolicitud : string = ''; /** Nombre del estado de la solicitud seleccionada, para los mensajes. */
+  estadoSolicitudId : number | null = null; /** Estado de la solicitud seleccionada; habilita o deshabilita las acciones. */
   clave : string = ''; /** Variable que contendrá una palabra clave ya sea para finalizar o cancelar una solicitud.*/
+  /** Key fija del toast de confirmación. Debe ser constante: si dependiera de `clave`, el toast aún tendría la key anterior al llegar el mensaje y lo descartaría. */
+  readonly claveConfirmacion : string = 'confirmarEstadoSolicitud';
   nroSolicitud : number = 0; /// Variable que se usará para almacenar el nro de solicitud al momento de generar el PDF y cargar la información de la solicitud seleccionada.
   arrayId : any = []; /// Array que se usará para almacenar los id de las solicitudes que se muestran en la tabla, esto con el fin de no mostrar solicitudes repetidas en caso de que una solicitud tenga varias materias primas.
   load : boolean = false; /** Variable que indicará si se está cargando información */
   private destroy$ = new Subject<void>(); // Variable para manejar la destrucción de las subscripciones y evitar fugas de memoria
-  @ViewChild(SolicitudMP_ExtrusionComponent) cmpSolicitudes : SolicitudMP_ExtrusionComponent;
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -63,7 +67,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
                           private servicioSolicitudesMPExt : SolicitudMP_ExtrusionService,
                             private servicioDtSolicitudesMPExt : DetSolicitudMP_ExtrusionService,
                               private msj : MensajesAplicacionService,
-                                private ServicioDetAsignacionesMp : DetallesAsignacionService, 
+                                private ServicioDetAsignacionesMp : DetallesAsignacionService,
+                                  private servicioBagPro : BagproService,
+                                    private servicioPDF : CreacionPdfService,
                                 ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
@@ -140,6 +146,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.solicitudSeleccionada = 0;
     this.usuarioSolicitante = '';
     this.estadoSolicitud = '';
+    this.estadoSolicitudId = null;
     let solicitud : number = this.formFiltros.value.documento;
     let fechaInicial : any = moment(this.formFiltros.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
@@ -195,16 +202,53 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.arrayMatPrimas = [];
     this.usuarioSolicitante = '';
     this.estadoSolicitud = '';
+    this.estadoSolicitudId = null;
   }
 
   /** Función para filtrar los registros de la tabla */
   aplicarFiltro = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  /** Cargar información de la solicitud */
+  /**
+   * Genera el PDF de la solicitud de material seleccionada. Primero consulta la solicitud (API) y la OT (BagPro)
+   * y luego entrega esos datos al servicio de creación de PDFs. Si la OT no se encuentra en BagPro, el PDF se
+   * genera igual indicándolo.
+   * @param nroSolicitud Solicitud seleccionada.
+   */
   infoSolicitudPDF(nroSolicitud : number){
-    console.log(nroSolicitud);
-    //this.informacionPDF = [];
-    this.cmpSolicitudes.getInfoPdf(nroSolicitud);
+    if (!nroSolicitud) return this.msj.mensajeAdvertencia(`Advertencia`, `Debe seleccionar una solicitud.`);
+
+    this.cargando = true;
+    this.servicioDtSolicitudesMPExt.GetSolicitudMp_Extrusion(nroSolicitud)
+      .pipe(
+        switchMap((detalles : any[]) => detalles.length == 0
+          ? of({ detalles, ot: null })
+          : this.servicioBagPro.srvObtenerListaClienteOT_Item(detalles[0].ot).pipe(
+            map(datosOT => ({ detalles, ot: this.mapearOTParaPDF(datosOT[0]) })),
+            catchError(() => of({ detalles, ot: null }))
+          )),
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: ({ detalles, ot }) => {
+          if (detalles.length == 0) return this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron subcategorías para la solicitud N° ${nroSolicitud}.`);
+          this.servicioPDF.solicitudMaterialProduccionPDF(detalles, ot);
+          this.msj.mensajeConfirmacion(`Confirmación`, `Generando el PDF de la solicitud N° ${nroSolicitud}; se abrirá en una nueva pestaña.`);
+        },
+        error: () => this.msj.mensajeError(`Error`, `¡No se pudo obtener la información de la solicitud N° ${nroSolicitud}!`)
+      });
+  }
+
+  /** Convierte los datos de la OT de BagPro al formato del PDF; null si la OT no existe. */
+  private mapearOTParaPDF(datosOT : any) : DatosOTSolicitudPDF | null {
+    if (!datosOT) return null;
+    const kgOT = Number(datosOT.datosotKg) || 0;
+    return {
+      cliente: datosOT.clienteNom,
+      referencia: datosOT.clienteItemsNom,
+      kgOT,
+      kgLimite: kgOT * (1 + ADICIONAL_KG_OT),
+    };
   }
 
   /** Cargar detalles de la solicitud en la segunda tabla. */
@@ -212,6 +256,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.cargando = true;
     this.solicitudSeleccionada = id;
     this.arrayMatPrimas = [];
+    this.estadoSolicitud = '';
+    this.estadoSolicitudId = null;
 
     this.servicioDtSolicitudesMPExt.GetSolicitudMp_Extrusion(this.solicitudSeleccionada)
     .pipe(
@@ -242,6 +288,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     }
 
     this.estadoSolicitud = info.EstadoSolicitud;
+    this.estadoSolicitudId = data.estado;
     this.usuarioSolicitante = info.Usuario;
     arrayIds.push(info.Id)
 
@@ -263,33 +310,44 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.arrayMatPrimas.push(info);
   }
 
-  /** Mostrar mensaje de confirmación al momento de presionar el botón de cancelar solicitud. */
-  mostrarEleccion(solicitud_Id : number, palabraClave : string) {
-    solicitud_Id = this.solicitudSeleccionada;
+  /** Indica si hay una solicitud seleccionada (habilita "Ver PDF"). */
+  get haySolicitudSeleccionada() : boolean {
+    return this.solicitudSeleccionada > 0;
+  }
+
+  /** Indica si la solicitud seleccionada está pendiente o parcial (habilita "Crear Asignación", "Finalizar" y "Cancelar"). */
+  get solicitudActiva() : boolean {
+    return this.estadoSolicitudId === EstadoSolicitudMaterial.Pendiente || this.estadoSolicitudId === EstadoSolicitudMaterial.Parcial;
+  }
+
+  /**
+   * Pide confirmación para finalizar o cancelar la solicitud seleccionada.
+   * @param palabraClave 'finalizar' o 'cancelar'; también es la clave del mensaje.
+   */
+  mostrarEleccion(palabraClave : string) {
     this.clave = palabraClave;
-    setTimeout(() => {
-      if (this.estadoSolicitud == 'FINALIZADO' || this.estadoSolicitud == 'CANCELADO') {
-        this.msj.mensajeAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
-      } else {
-        this.messageService.add({
-          severity:'warn', 
-          key: this.clave, 
-          summary:'Elección', 
-          detail: `Está seguro que desea ${this.clave} la solicitud N° ${solicitud_Id}?`, 
-          sticky: true
-        });
-      } 
-    }, 1000);
+    if (!this.solicitudActiva) {
+      this.msj.mensajeAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
+      return;
+    }
+    this.onReject();
+    this.messageService.add({
+      severity:'warn',
+      key: this.claveConfirmacion,
+      summary:'Elección',
+      detail: `Está seguro que desea ${this.clave} la solicitud N° ${this.solicitudSeleccionada}?`,
+      sticky: true
+    });
   }
 
   /** Quitar el mensaje que sale luego de presionar si o no, en el mensaje de cancelar solicitud. */
-  onReject = () => this.messageService.clear(this.clave);
+  onReject = () => this.messageService.clear(this.claveConfirmacion);
 
-  /** Función que cancelará una solicitud de materia prima y sus detalles. */
-  cancelarFinalizarSolicitud(solicitud_Id : number) {
+  /** Finaliza o cancela (según `clave`) la solicitud seleccionada. */
+  cancelarFinalizarSolicitud() {
     this.onReject();
     this.cargando = true;
-    solicitud_Id = this.solicitudSeleccionada;
+    const solicitud_Id : number = this.solicitudSeleccionada;
 
     this.servicioSolicitudesMPExt.GetId(solicitud_Id).subscribe(data => {
       let modelo : modelSolicitudMP_Extrusion = {
@@ -320,13 +378,13 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearAsignacion(){
-    if(['FINALIZADO', 'CANCELADO'].includes(this.estadoSolicitud)) {
+    if(!this.solicitudActiva) {
       this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear asignaciones con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.mensajeAsignacionPendiente = null;
       this.modalAsignacion = true;
       this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({ Solicitud : this.solicitudSeleccionada });
-      this.AsignacionMatPrima.consultarSolicitudMaterial(this.arrayMatPrimas, true);
+      this.AsignacionMatPrima.consultarSolicitudMaterial(true);
     }
   }
 
@@ -341,7 +399,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   }
 
   /**
-   * Muestra la confirmación después de terminar la animación de cierre del popup.
+   * Muestra la confirmación después de terminar la animación de cierre del popup y refresca el listado,
+   * porque la asignación cambia lo entregado y el estado de la solicitud.
    * @returns No retorna un valor.
    */
   alCerrarModalAsignacion(): void {
@@ -350,6 +409,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     const mensaje = this.mensajeAsignacionPendiente;
     this.mensajeAsignacionPendiente = null;
     this.msj.mensajeConfirmacion(mensaje.summary, mensaje.detail);
+    this.getEstadoSolitudes();
+    this.consultarFiltros();
   }
 
   /** Consultar solicitudes por estado. */
@@ -368,6 +429,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.solicitudSeleccionada = 0;
     this.usuarioSolicitante = '';
     this.estadoSolicitud = '';
+    this.estadoSolicitudId = null;
     this.clave = '';
   }
 
