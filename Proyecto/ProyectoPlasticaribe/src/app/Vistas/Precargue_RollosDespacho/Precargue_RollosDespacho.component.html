@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-center overlay" *ngIf="load">
+<div class="d-flex justify-content-center overlay" *ngIf="load || activeTab?.busy">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
@@ -17,242 +17,266 @@
 
 <!--* Contenido-->
 <p-card>
-
-  <!--* Subtitulo-->
-  <div class="mb-3">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-search"></i>
-      Consultar rollos/bultos</h4>
+  <!--* Precargues en proceso que no cupieron en las pestañas; desaparece al abrirlos todos -->
+  <div class="d-flex justify-content-center align-items-center gap-3 mb-3" *ngIf="remainingPreloads.length > 0">
+    <span><b>{{remainingPreloads.length == 1 ? 'Queda 1 precargue en proceso' : 'Quedan ' + remainingPreloads.length + ' precargues en proceso'}}</b></span>
+    <button pButton class="p-button-danger" type="button" label="Abrir siguiente" icon="pi pi-folder-open"
+      [disabled]="!canAddTab()" (click)="openNextPreload()"></button>
   </div>
 
-  <!--* Nota-->
-  <div class="mb-5">
-    Los campos marcados con (*) son obligatorios para realizar la consulta.
-  </div>
+  <p-tabView #tabView *ngIf="tabs.length > 0" [(activeIndex)]="activeIndex" [scrollable]="true" [controlClose]="true"
+    (onChange)="onTabChange($event.index)" (onClose)="closeTab($event.index)">
 
-  <!--* Formulario-->
-  <form [formGroup]="form">
-    <div class="mb-4" id="">
-      <div class="row g-4">
+    <!--* Una pestaña por precargue -->
+    <p-tabPanel *ngFor="let tab of tabs; trackBy: trackTab" [closable]="tabs.length > 1">
+      <ng-template pTemplate="header">
+        <i class="pi pi-file me-2"></i>
+        <span>{{tab.pcdId ? 'Precargue N° ' + tab.pcdId : 'Nuevo precargue'}}</span>
+      </ng-template>
 
-        <!--* Rollo -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input pInputText formControlName="roll" id="roll" inputId="roll" autocomplete="off" type="number" (keyup.enter)="searchRolls()" />
-            <label for="roll">Rollo/Bulto</label>
-          </span>
-        </div>
+      <!--* Subtitulo-->
+      <div class="mb-3">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-search"></i>
+          Consultar rollos/bultos</h4>
+      </div>
 
-        <!--* Cliente Stock -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
-          <div class="field-checkbox">
-            <p-checkbox formControlName="clientStock" [binary]="true" inputId="clientStock" id="clientStock"
-              pTooltip="Al checar aquí indicas que el rollo/bulto fue pesado y en la etiqueta indica que es de Cliente Stock y deberás buscar el nombre real en el campo Cliente."></p-checkbox>
-            <label for="clientStock">Cliente Stock</label>
+      <!--* Nota-->
+      <div class="mb-5">
+        Los campos marcados con (*) son obligatorios para realizar la consulta. El precargue se crea al escanear el primer rollo/bulto y cada rollo queda guardado al escanearlo.
+      </div>
+
+      <!--* Formulario-->
+      <form [formGroup]="tab.form">
+        <div class="mb-4">
+          <div class="row g-4">
+
+            <!-- Consecutivo -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+              <span class="p-input-icon-left p-float-label">
+                <i class="pi pi-hashtag"></i>
+                <input pInputText formControlName="doc" [id]="'doc-' + tab.key" autocomplete="off" type="number" [readonly]="true"/>
+                <label [attr.for]="'doc-' + tab.key">Consecutivo</label>
+              </span>
+            </div>
+
+            <!--* Cliente -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+              <span class="p-input-icon-left p-float-label">
+                <i class="pi pi-search"></i>
+                <input formControlName="client" [id]="'client-' + tab.key" [attr.list]="'clients-' + tab.key" type="text" pInputText required (keyup)="searchClientsByName(tab)" (change)="selectClient(tab)" />
+                <datalist [id]="'clients-' + tab.key">
+                  <option value={{item.idcliente}} *ngFor="let item of tab.clients">{{item.razoncial}}</option>
+                </datalist>
+                <label [attr.for]="'client-' + tab.key">Cliente*</label>
+              </span>
+            </div>
+
+            <!--* Cliente Stock -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
+              <div class="field-checkbox h-100 mb-0">
+                <p-checkbox formControlName="clientStock" [binary]="true" [inputId]="'clientStock-' + tab.key"
+                  pTooltip="Al checar aquí indicas que el rollo/bulto fue pesado y en la etiqueta indica que es de Cliente Stock y deberás buscar el nombre real en el campo Cliente."></p-checkbox>
+                <label [attr.for]="'clientStock-' + tab.key">Cliente Stock</label>
+              </div>
+            </div>
+
+            <!--* Rollo -->
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+              <span class="p-input-icon-left p-float-label">
+                <i class="pi pi-search"></i>
+                <input pInputText formControlName="roll" [id]="'roll-' + tab.key" autocomplete="off" type="number" (keyup.enter)="searchRolls(tab)" />
+                <label [attr.for]="'roll-' + tab.key">Rollo/Bulto</label>
+              </span>
+            </div>
+
+            <!--* Observación -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-3 col-xxl-3">
+              <span class="p-float-label">
+                <textarea formControlName="observation" [rows]="1" [id]="'observation-' + tab.key" pInputTextarea></textarea>
+                <label [attr.for]="'observation-' + tab.key">Observación</label>
+              </span>
+            </div>
           </div>
         </div>
 
-        <!--* Cliente -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input formControlName="client" id="client" list="list" type="text" pInputText required (keyup)="searchClientsByName()" (change)="selectClient()" />
-            <datalist id="list">
-              <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
-            </datalist>
-            <label for="client">Cliente*</label>
-          </span>
+        <!--* Botones 1: antes del primer escaneo se limpian los campos; después solo se puede cancelar el precargue -->
+        <div class="mb-3">
+          <div class="row g-3">
+            <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+              <ng-container *ngIf="!tab.pcdId">
+                <button pButton pRipple class="p-button-secondary" icon="pi pi-eraser" type="button" label="Limpiar campos"
+                  (click)="clearFields(tab)"></button>
+                <button pButton pRipple class="p-button-outlined p-button-secondary" type="button" icon="pi pi-eraser"
+                  (click)="clearAll(tab)" label="Limpiar todo"></button>
+              </ng-container>
+              <button *ngIf="tab.pcdId" pButton pRipple class="p-button-danger" type="button" icon="pi pi-times"
+                label="Cancelar Precargue" (click)="viewConfirmMessage(tab, 'cancel')"
+                pTooltip="Anula el precargue y devuelve sus rollos/bultos a disponible."></button>
+            </div>
+          </div>
         </div>
+      </form>
 
-        <!--* Observación -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-6 col-xxl-6">
-          <span class="p-float-label">
-            <textarea formControlName="observation" [rows]="1" inputId="observation" id="observation"
-              pInputTextarea></textarea>
-            <label for="observation">Observación</label>
-          </span>
-        </div>
-
+      <!--* Linea 1 -->
+      <div class="mb-4">
+        <hr class="Linea">
       </div>
-    </div>
 
-    <!--* Botones 1-->
-    <div class="mb-3">
-      <div class="row g-3">
-        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-          <button pButton pRipple class="p-button-secondary" icon="pi pi-eraser" type="button" label="Limpiar campos"
-            (click)="clearFields()" id="botones1"></button>
-          <button pButton pRipple class="p-button-outlined p-button-secondary" type="button" icon="pi pi-eraser"
-            (click)="clearAll()" label="Limpiar todo" id="botones1"></button>
+      <!--* Titulo Items Consolidados -->
+      <div class="mb-4">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla
+          de referencias consolidadas</h4>
+      </div>
+
+      <!--* Tabla Items Consolidados -->
+      <div class="mb-3">
+        <div class="row g-3 font-size-14">
+          <p-table [value]="tab.consolidated" styleClass="p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll" [rowHover]="true" dataKey="0" [scrollable]="true" scrollHeight="50rem" [resizableColumns]="true" columnResizeMode="expand">
+            <ng-template pTemplate="header">
+              <tr>
+                <th></th>
+                <th class="text-center" colspan="2">Información Producto</th>
+                <th class="text-center" colspan="3">Información Cantidades</th>
+                <th class="text-center" colspan="2">Información Peso</th>
+              </tr>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center" scope="col">Item </th>
+                <th class="text-center" scope="col">Referencia</th>
+                <th class="text-center" scope="col">Cant/Peso Neto</th>
+                <th class="text-center" scope="col">Presentación</th>
+                <th class="text-center" scope="col">Cant. Rollos</th>
+                <th class="text-center" scope="col">Peso Bruto</th>
+                <th class="text-center" scope="col">Unidad</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                <td>{{rowIndex + 1}}</td>
+                <td class="text-center"><b>{{data.item}}</b></td>
+                <td class="text-center">{{data.reference}}</td>
+                <td class="text-center textBlue"><b>{{qtyTotalItem(tab, data) | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{data.unit}}</td>
+                <td class="text-center">{{qtyRollsItem(tab, data)}}</td>
+                <td class="text-center textOrange"><b>{{ weightTotalItem(tab, data) | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{'Kg'}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
       </div>
-    </div>
-  </form>
 
-  <!--* Linea 1 -->
-  <div class="mb-4">
-    <hr class="Linea">
-  </div>
+      <!--* Linea 2  -->
+      <div class="mb-5">
+        <hr class="Linea">
+      </div>
 
-  <!--* Titulo Items Consolidados -->
-  <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla
-      de referencias consolidadas</h4>
-  </div>
+      <!--* titulo tabla rollos agregados -->
+      <div class="mb-4">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de rollos agregados</h4>
+      </div>
 
-  <!--* Tabla Items Consolidados -->
-  <div class="mb-3">
-    <div class="row g-3 font-size-14" id="tabla1">
-      <p-table #dt1 [value]="rollsConsolidate" styleClass="p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll" [rowHover]="true" dataKey="0" [scrollable]="true" scrollHeight="50rem" [resizableColumns]="true" columnResizeMode="expand" *ngIf="!load">
-        <ng-template pTemplate="header">
-          <tr>
-            <th></th>
-            <th class="text-center" colspan="2">Información Producto</th>
-            <th class="text-center" colspan="3">Información Cantidades</th>
-            <th class="text-center" colspan="2">Información Peso</th>
-          </tr>
-          <tr>
-            <th class="text-center">#</th>
-            <th class="text-center" scope="col">Item </th>
-            <th class="text-center" scope="col">Referencia</th>
-            <th class="text-center" scope="col">Cant/Peso Neto</th>
-            <th class="text-center" scope="col">Presentación</th>
-            <th class="text-center" scope="col">Cant. Rollos</th>
-            <th class="text-center" scope="col">Peso Bruto</th>
-            <th class="text-center" scope="col">Unidad</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-          <tr>
-            <td>{{rowIndex + 1}}</td>
-            <td class="text-center"><b>{{data.item}}</b></td>
-            <td class="text-center">{{data.reference}}</td>
-            <td class="text-center textBlue"><b>{{qtyTotalItem(data) | number : '1.2-2'}}</b></td>
-            <td class="text-center">{{data.unit}}</td>
-            <td class="text-center">{{qtyRollsItem(data)}}</td>
-            <td class="text-center textOrange"><b>{{ weightTotalItem(data) | number : '1.2-2'}}</b></td>
-            <td class="text-center">{{'Kg'}}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-  </div>
+      <!--* Tabla de rollos agregados -->
+      <div class="mb-4">
+        <p-table #dt [value]="tab.rolls" styleClass="p-datatable-sm" responsiveLayout="scroll"
+          [resizableColumns]="true" columnResizeMode="expand" [rowHover]="true" [scrollable]="true" scrollHeight="50rem">
+          <ng-template pTemplate="header">
+            <tr>
+              <th></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'roll', dt)"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', dt)"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', dt)"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'qty', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', dt)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process', dt)"></th>
+              <th></th>
+            </tr>
 
-  <!--* Linea 2  -->
-  <div class="mb-5">
-    <hr class="Linea">
-  </div>
+            <tr>
+              <th class="text-center">#</th>
+              <th class="text-center">Rollo</th>
+              <th class="text-center">OT</th>
+              <th class="text-center">Cliente</th>
+              <th class="text-center">Item</th>
+              <th class="text-center">Referencia</th>
+              <th class="text-center">Peso</th>
+              <th class="text-center">Unidad</th>
+              <th class="text-center">Proceso</th>
+              <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <!-- Rollo que otro proceso sacó del estado precargado: se resalta para que el usuario lo quite -->
+            <tr [ngClass]="{'text-danger': isUnavailable(data)}"
+              [pTooltip]="isUnavailable(data) ? 'Este rollo/bulto ya no está disponible en el precargue, debe quitarlo.' : ''" tooltipPosition="top">
+              <td class="text-center">{{(tab.rolls.length - rowIndex)}}</td>
+              <td class="text-center"><b>{{data.roll}}</b><i *ngIf="isUnavailable(data)" class="pi pi-exclamation-triangle ms-2"></i></td>
+              <td class="text-center">{{data.ot}}</td>
+              <td>{{data.client}}</td>
+              <td class="text-center">{{data.item}}</td>
+              <td><b>{{data.reference}}</b></td>
+              <td class="text-center textBlue"><b>{{data.qty | number : '1.2-2'}}</b></td>
+              <td class="text-center"><b>{{data.unit}}</b></td>
+              <td class="text-center">
+                <span class="badge" [ngClass]="{'bg-Extrusion': data.process == 'Extrusion',
+                  'bg-Sellado': data.process == 'Sellado',
+                  'bg-Empaque': data.process == 'Empaque', }">{{data.process}}</span>
+              </td>
+              <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+                <p-button icon="pi pi-trash" [rounded]="true" (click)="quitRoll(tab, data)" severity="danger"
+                  [pTooltip]="isUnavailable(data) ? 'Al presionar aquí se quitará el rollo/bulto del precargue; su estado actual no cambia.' : 'Al presionar aquí se quitará el rollo/bulto del precargue y volverá a estar disponible.'"></p-button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="10">
+                <h6><b>No hay rollos agregados.</b></h6>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
 
-  <!--* titulo tabla rollos agregados -->
-  <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de rollos agregados</h4>
-  </div>
+      <!--* Aviso de rollos no disponibles -->
+      <div class="mb-3 text-center text-danger" *ngIf="unavailableRolls(tab).length > 0">
+        <i class="pi pi-exclamation-triangle me-2"></i>
+        <b>Hay {{unavailableRolls(tab).length}} rollo(s)/bulto(s) que ya no están disponibles. Quítalos de la tabla para poder generar el precargue.</b>
+      </div>
 
-  <!--* Tabla de rollos agregados -->
-  <div class="mb-4">
-    <p-table #dt *ngIf="!load" [value]="rollsToDispatch" styleClass="p-datatable-sm" responsiveLayout="scroll"
-      [resizableColumns]="true" columnResizeMode="expand" [rowHover]="true" [scrollable]="true" scrollHeight="50rem">
+      <!--* Botones -->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-success" type="button" [disabled]="!tab.pcdId || tab.rolls.length == 0 || unavailableRolls(tab).length > 0"
+          label="Generar Precargue" icon="pi pi-check" (click)="viewConfirmMessage(tab, 'finish')"></button>
+        <button *ngIf="!tab.pcdId" pButton class="p-button-secondary" type="button" label="Limpiar todo" icon="pi pi-eraser"
+          (click)="clearAll(tab)"></button>
+      </div>
+    </p-tabPanel>
+
+    <!--* Pestaña para agregar un nuevo precargue; se deshabilita al llegar al máximo de pestañas -->
+    <p-tabPanel headerStyleClass="tab-add" [disabled]="!canAddTab()">
       <ng-template pTemplate="header">
-        <tr>
-          <th></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'roll', dt)"></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'ot', dt)"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'client', dt)"></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item', dt)"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', dt)"></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'qty', dt)"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', dt)"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process', dt)"></th>
-          <th></th>
-        </tr>
-
-        <tr>
-          <th class="text-center">#</th>
-          <th class="text-center">Rollo</th>
-          <th class="text-center">OT</th>
-          <th class="text-center">Cliente</th>
-          <th class="text-center">Item</th>
-          <th class="text-center">Referencia</th>
-          <th class="text-center">Peso</th>
-          <th class="text-center">Unidad</th>
-          <th class="text-center">Proceso</th>
-          <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
-        </tr>
+        <i class="pi pi-plus" [pTooltip]="canAddTab() ? 'Nuevo precargue' : 'Máximo ' + maxTabs + ' pestañas abiertas'"></i>
       </ng-template>
-      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-        <tr>
-          <td class="text-center">{{(rollsToDispatch.length - rowIndex)}}</td>
-          <td class="text-center"><b>{{data.roll}}</b></td>
-          <td class="text-center">{{data.ot}}</td>
-          <td>{{data.client}}</td>
-          <td class="text-center">{{data.item}}</td>
-          <td><b>{{data.reference}}</b></td>
-          <td class="text-center textBlue"><b>{{data.qty | number : '1.2-2'}}</b></td>
-          <td class="text-center"><b>{{data.unit}}</b></td>
-          <td class="text-center">
-            <span class="badge" [ngClass]="{'bg-Extrusion': data.process == 'Extrusion',
-              'bg-Sellado': data.process == 'Sellado',
-              'bg-Empaque': data.process == 'Empaque', }">{{data.process}}</span>
-          </td>
-          <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-            <p-button *ngIf="!editMode" icon="pi pi-trash" [rounded]="true" (click)="quitRoll(data)" severity="danger" pTooltip="Al presionar aquí se quitará el elemento de la tabla."></p-button>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="10">
-            <h6><b>No hay rollos agregados.</b></h6>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-
-  <!--* Botones -->
-  <div *ngIf="!load">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="ingresarRollo" [disabled]="rollsToDispatch.length == 0" type="button"
-        label="Generar Precargue" icon="pi pi-check" (click)="viewConfirmMessage()"></button>
-      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar todo" icon="pi pi-eraser"
-        (click)="clearAll()"></button>
-    </div>
-  </div>
+    </p-tabPanel>
+  </p-tabView>
 </p-card>
 
-<!--Mensaje de confirmación de eliminación de rollos/bultos-->
-<!--<p-toast position="center" key="deleteRoll" (onClose)="onReject('deleteRoll')" [baseZIndex]="5000">
+<!--Confirmacion para generar o cancelar un precargue, o para retomar los precargues en proceso al entrar a la página-->
+<p-toast position="center" key="confirm" [baseZIndex]="5000" (onClose)="onReject()">
   <ng-template let-message pTemplate="message">
     <div class="flex flex-column" style="flex: 1">
       <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton icon="pi pi-check" label="Sí, no está disponible" class="p-button-danger" (click)="deleteRollsFromReposition(rollsToDispatch, 50, 23)" pTooltip="El bulto seleccionado será ELIMINADO de la orden y cambiará su estado a NO DISPONIBLE."></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton icon="pi pi-times" label="Sí, pero vuelve a inventario" (click)="deleteRollsFromReposition(rollsToDispatch, 50, 19)" class="p-button-warning" pTooltip="El bulto seleccionado será ELIMINADO de la orden y cambiará su estado a DISPONIBLE."></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>-->
-
-<!--Confirmacion para crear un precargo-->
-<p-toast position="center" key="confirm" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <i class="font-size-48" [ngClass]="confirmAction == 'resume' ? 'pi pi-info-circle' : 'pi pi-exclamation-triangle'"></i>
         <h4>{{message.summary}}</h4>
         <p>{{message.detail}}</p>
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6">
-          <button type="button" pButton icon="pi pi-check" label="Sí" (click)="savePreload()" class="p-button-warning" pTooltip="Una vez confirmado, se generará el precargue de los rollos seleccionados."></button>
+          <button type="button" pButton icon="pi pi-check" label="Sí" (click)="onConfirm()"
+            [ngClass]="confirmAction == 'cancel' ? 'p-button-danger' : confirmAction == 'resume' ? 'p-button-info' : 'p-button-warning'"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject()" class="p-button-secondary"></button>

@@ -370,7 +370,7 @@ export class CreacionPdfService {
           [
             { text: `Estado: ${data.status}` },
             { text: `Usuario Modifica: ${data.user2 == 0 ? '' : data.user2}` },
-            { text: `Fecha Modifica: ${date1 == date2 ? '' : date2} ${data.hour1 == data.hour2 ? '' : data.hour2}` },
+            { text: `Fecha Modifica: ${date1 == date2 && data.hour1 == data.hour2 ? '' : `${date2} ${data.hour2}`}` },
           ],
           [
             { text: `Observación Precargue: ${data.observation1 == null ? '' : data.observation1}`, colSpan: 3, fontSize: 9, }, {}, {}

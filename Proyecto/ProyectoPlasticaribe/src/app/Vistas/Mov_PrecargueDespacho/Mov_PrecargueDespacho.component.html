@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-center overlay" *ngIf="load">
+<div class="d-flex justify-content-center overlay" *ngIf="load || processing">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
@@ -29,7 +29,7 @@
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-1 col-xxl-1">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
-          <input formControlName="id" id="orden" type="text" pInputText required />
+          <input formControlName="id" id="orden" type="text" pInputText/>
           <label for="orden">N° Doc.</label>
         </span>
       </div>
@@ -54,12 +54,12 @@
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
-          <input formControlName="client" id="client" list="client-list" type="text" pInputText required
+          <input formControlName="client" id="client" list="client-list" type="text" pInputText
             (keyup)="searchClientsByName(formBusquedaPrecargue, 'client')" (change)="selectClient(formBusquedaPrecargue, 'client')" />
           <datalist id="client-list">
             <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
           </datalist>
-          <label for="client">Cliente*</label>
+          <label for="client">Cliente</label>
         </span>
       </div>
 
@@ -88,9 +88,9 @@
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"
-          [disabled]="load"></button>
+          [disabled]="load || processing"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
-          [disabled]="load" (click)="clearFields()"></button>
+          [disabled]="load || processing" (click)="clearFields()"></button>
       </div>
     </div>
   </form>
@@ -110,97 +110,88 @@
   <p-table #dt [resizableColumns]="true" columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm"
     responsiveLayout="scroll" [showCurrentPageReport]="true"
     currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" [rowHover]="true"
-    [value]="searchedData" dataKey="Oc" [scrollable]="true" scrollHeight="50rem" *ngIf="!load">
+    [value]="searchedData" dataKey="movement" [scrollable]="true" scrollHeight="50rem" *ngIf="!load">
     <ng-template pTemplate="header">
       <tr>
         <th>#</th>
         <th class="text-center" pSortableColumn="movement">
-          <p-sortIcon field="movement"></p-sortIcon> N° Precargue
+          <p-sortIcon field="movement"></p-sortIcon> Precargue
           <p-columnFilter type="text" field="movement" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="of">
-          <p-sortIcon field="of"></p-sortIcon> OF Asociada
+          <p-sortIcon field="of"></p-sortIcon> OF
           <p-columnFilter type="text" field="of" display="menu"></p-columnFilter>
         </th>
 
         <th class="text-center" pSortableColumn="client">
           <p-sortIcon field="client"></p-sortIcon> Cliente
-          <p-columnFilter type="text" field="client" display="menu"></p-columnFilter>
+          <p-columnFilter type="text" field="client" display="menu" autocomplete="off"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="sales">
           <p-sortIcon field="sales"></p-sortIcon> Asesor
           <p-columnFilter type="text" field="sales" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="date1">
-          <p-sortIcon field="date1"></p-sortIcon> Fecha Creación
+          <p-sortIcon field="date1"></p-sortIcon> F. Creación
           <p-columnFilter type="text" field="date1" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="date2">
-          <p-sortIcon field="date2"></p-sortIcon> Fecha Cierre
+          <p-sortIcon field="date2"></p-sortIcon> F. Cierre
           <p-columnFilter type="text" field="date2" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="status">
           <p-sortIcon field="status"></p-sortIcon> Estado
           <p-columnFilter type="text" field="status" display="menu"></p-columnFilter>
         </th>
-        <th class="text-center" *ngIf="[1].includes(ValidarRol)">Anular Doc.</th>
+        <th class="text-center" *ngIf="[1].includes(ValidarRol)">Anular</th>
         <th class="text-center" id="ver3">Ver</th>
-        <th class="text-center">Editar</th>
+        <th class="text-center" *ngIf="rolesEditarCliente.includes(ValidarRol)">Editar</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-      <tr>
+      <!-- Doble clic en un precargue en proceso: se abre en el módulo de precargue para continuarlo -->
+      <tr (dblclick)="resumePreload(data, $event)"
+        [style.cursor]="data.statusId == ESTADOS.EN_PROCESO ? 'pointer' : null"
+        [pTooltip]="data.statusId == ESTADOS.EN_PROCESO ? 'Doble clic para continuar el precargue' : ''"
+        tooltipPosition="top">
         <td class="text-center">{{rowIndex + 1}}</td>
         <td class="text-center"><b>{{data.movement}}</b></td>
-        <td class="text-center">{{data.of == 4472 ? '' : data.of}}</td>
+        <td class="text-center">{{data.of == OF_GENERICA ? '' : data.of}}</td>
         <td class=""><b>{{data.client}}</b></td>
         <td class="text-center">{{data.sales}}</td>
         <td class="text-center">{{data.date1 | date : 'yyyy-MM-dd'}} {{data.hour1}}</td>
         <td class="text-center">{{(data.date1 == data.date2 && data.hour1 == data.hour2) ? '' : (data.date2 | date : 'yyyy-MM-dd') + ' ' + data.hour2}}</td>
-        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': [11].includes(data.statusId), 
-                                                                'bg-success1': [5].includes(data.statusId),
-                                                                'bg-blue1': [26].includes(data.statusId), 
+        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': data.statusId == ESTADOS.PENDIENTE,
+                                                                'bg-success1': data.statusId == ESTADOS.FINALIZADO,
+                                                                'bg-blue1': data.statusId == ESTADOS.ACEPTADO,
+                                                                'bg-warning1': data.statusId == ESTADOS.ANULADO,
+                                                                'bg-secondary1': data.statusId == ESTADOS.EN_PROCESO
                                                                 }">{{data.status}}</span></td>
         <td class="text-center" *ngIf="[1].includes(ValidarRol)">
-          <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-warning"
-            (onClick)="discardPreload()"></p-button>
+          <p-button *ngIf="estadosAnulables.includes(data.statusId)" icon="pi pi-ban" styleClass="p-button-rounded p-button-warning"
+            (onClick)="discardPreload(data)"></p-button>
         </td>
         <td class="text-center">
           <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger"
             (onClick)="createPDF(data.movement)"></p-button>
         </td>
-        <td class="text-center">
-          <p-button id="btnEditar" icon="pi pi-pencil" styleClass="p-button-rounded p-button-success"
+        <td class="text-center" *ngIf="rolesEditarCliente.includes(ValidarRol)">
+          <p-button *ngIf="data.statusId != ESTADOS.ANULADO" id="btnEditar" icon="pi pi-pencil" styleClass="p-button-rounded p-button-success"
             (onClick)="cargarModalEditarPrecargue(data)"></p-button>
         </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="11" class="text-center">No hay registros para mostrar</td>
       </tr>
     </ng-template>
   </p-table>
 </p-card>
 
-<!--<p-toast position="center" key="confirmation" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="PutStatusOrderAnulled()" icon="pi pi-check" label="Sí"
-            class="p-button-warning" pTooltip="Los rollos también serán eliminados de BagPro."></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No"
-            class="p-button-secondary"></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>-->
+<!-- Confirmación de anulación de precargue (ConfirmationService con key propia) -->
+<p-confirmDialog key="anularPrecargue" [style]="{width: '450px'}"></p-confirmDialog>
 
-<p-dialog header="Orden de facturación por precargue" [(visible)]="modal" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false"></p-dialog>
 <!-- dialog editar precargue -->
 <p-dialog [(visible)]="dialogPrecargue" [contentStyle]="{'overflow' : 'visible'}" [style]="{width: '500px'}" header="Editar Precargue" [modal]="true">
   <ng-template pTemplate="content">
@@ -234,7 +225,7 @@
           <!-- CLIENTE -->
           <div class="col-md-12">
             <span class="p-float-label">
-              <input formControlName="cliente" id="cliente" list="dialog-client-list" type="text" pInputText required
+              <input formControlName="cliente" id="cliente" list="dialog-client-list" type="text" pInputText
                 (input)="clearClientSelection(formDialogPrecargue, 'cliente')"
                 (keyup)="searchClientsByName(formDialogPrecargue, 'cliente')" 
                 (change)="selectClient(formDialogPrecargue, 'cliente')"
