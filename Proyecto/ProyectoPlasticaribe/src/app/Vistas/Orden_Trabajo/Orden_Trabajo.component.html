@@ -58,7 +58,10 @@
           <div class="row g-4">
             
             <!-- N° OT -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+            <!-- No usar "col-12" aquí: PrimeFlex (cargado después de Bootstrap) lo redefine y anula col-md/lg/xl.
+                 Sin breakpoint, Bootstrap 5 ya deja cada campo al 100% en pantallas pequeñas (.row > *). -->
+            <!-- Fila 1 (xl): N° OT · Id Cliente · Cliente · Item · Referencia -->
+            <div class="col-md-6 col-lg-3 col-xl-2">
               <div class="p-inputgroup">
                 <span class="p-inputgroup-addon cursor" pTooltip="Anterior" tooltipPosition="top"
                   (click)="ConsultarOrdenTrabajo(-1)">
@@ -82,7 +85,7 @@
             </div>
 
             <!-- ID CLIENTE -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="idCliente">
+            <div class="col-md-6 col-lg-2 col-xl-1" id="idCliente">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-id-card"></i>
                 <input formControlName="Id_Cliente" type="text" id="orden" pInputText [required]="true"
@@ -92,7 +95,7 @@
             </div>
 
             <!-- NOMBRE CLIENTE -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="cliente">
+            <div class="col-md-12 col-lg-7 col-xl-4" id="cliente">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-user"></i>
                 <input formControlName="Nombre_Cliente" id="cliente" list="clientes" type="text" pInputText
@@ -105,7 +108,7 @@
             </div>
 
             <!-- ID PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1" id="idProducto">
+            <div class="col-md-6 col-lg-2 col-xl-1" id="idProducto">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-hashtag"></i>
                 <input formControlName="Id_Producto" type="text" id="Id_Producto" (keyup.enter)="buscarProductoPorId()"
@@ -115,7 +118,7 @@
             </div>
 
             <!-- NOMBRE PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="producto">
+            <div class="col-md-6 col-lg-6 col-xl-4" id="producto">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-box"></i>
                 <input formControlName="Nombre_Producto" id="Nombre_Producto" list="productos" type="text" pInputText
@@ -128,8 +131,9 @@
               </span>
             </div>
 
+            <!-- Fila 2 (xl): Cant. Pedida · Cant. Pedida (Kg) · Presentación · Precio Unitario · Precio Kilo · Margen -->
             <!-- CANTIDAD PEDIDA -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="cantidadFabricar">
+            <div class="col-md-6 col-lg-2 col-xl-2" id="cantidadFabricar">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-hashtag"></i>
                 <p-inputNumber formControlName="Cantidad" inputId="Cant" (onKeyDown)="calcularDatosOt()"
@@ -138,8 +142,19 @@
               </span>
             </div>
 
+            <!-- CANTIDAD PEDIDA EN KG (calculada en calcularCostosOT, solo lectura) -->
+            <div class="col-md-6 col-lg-2 col-xl-2" id="cantidadPedidaKg">
+              <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+                <i class="pi pi-shopping-bag"></i>
+                <p-inputNumber [ngModel]="cantidadPedidaKg" [ngModelOptions]="{ standalone: true }" mode="decimal"
+                  inputId="CantKg" [minFractionDigits]="2" [maxFractionDigits]="2" [readonly]="true"
+                  pTooltip="Kilos de la cantidad pedida, igual a Neto Kg (incluye margen adicional)" tooltipPosition="top"></p-inputNumber>
+                <label for="CantKg">Cant. Pedida (Kg)</label>
+              </span>
+            </div>
+
             <!-- PRESENTACION PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="presentacion">
+            <div class="col-md-6 col-lg-3 col-xl-2" id="presentacion">
               <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
                 <i class="pi pi-th-large"></i>
                 <p-dropdown formControlName="Presentacion" inputId="Estado" [autoDisplayFirst]="false"
@@ -150,7 +165,7 @@
             </div>
 
             <!-- PRECIO UNITARIO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-3 col-xxl-3" id="precioUnitario">
+            <div class="col-md-6 col-lg-3 col-xl-2" id="precioUnitario">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-dollar"></i>
                 <p-inputNumber formControlName="Precio" mode="decimal" inputId="Cant"
@@ -160,7 +175,7 @@
             </div>
 
             <!-- PRECIO KILO (calculado en calcularCostosOT, se guarda como Ot_ValorKg) -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="precioKilo">
+            <div class="col-md-6 col-lg-3 col-xl-2" id="precioKilo">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-money-bill"></i>
                 <p-inputNumber [ngModel]="valorKg" [ngModelOptions]="{ standalone: true }" mode="decimal"
@@ -171,7 +186,7 @@
             </div>
 
             <!-- MARGEN ADICIONAL -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2" id="margenAdicional">
+            <div class="col-md-6 col-lg-3 col-xl-2" id="margenAdicional">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-percentage"></i>
                 <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant"
@@ -180,8 +195,9 @@
               </span>
             </div>
 
+            <!-- Fila 3 (xl): Asesor ID · Asesor · Estado OT · Fecha Creación · Fecha Entrega -->
             <!-- ID Vendedor -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1" id="idVendedor">
+            <div class="col-md-6 col-lg-2 col-xl-1" id="idVendedor">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-id-card"></i>
                 <input formControlName="Id_Vendedor" type="text" id="Id_Vendedor" pInputText [required]="true"
@@ -191,7 +207,7 @@
             </div>
 
             <!-- Nombre Vendedor -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="vendedor">
+            <div class="col-md-6 col-lg-4 col-xl-5" id="vendedor">
               <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
                 <i class="pi pi-user"></i>
                 <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores"
@@ -203,7 +219,7 @@
             </div>
 
             <!-- ESTADO DE LA ORDEN -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="estadoOrden">
+            <div class="col-md-4 col-lg-2 col-xl-2" id="estadoOrden">
               <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
                 <i class="pi pi-table"></i>
                 <p-dropdown formControlName="OT_Estado" inputId="Estado" [options]="estados" optionLabel="estado_Nombre"
@@ -213,7 +229,7 @@
             </div>
 
             <!-- Fecha creacion -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-3 col-xxl-3" id="fechaCreacion">
+            <div class="col-md-4 col-lg-2 col-xl-2" id="fechaCreacion">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-calendar"></i>
                 <input formControlName="OT_FechaCreacion" id="FechaCrea" type="text" pInputText [readOnly]="true"
@@ -223,20 +239,11 @@
             </div>
 
             <!-- Fecha entrega -->
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-2 col-xl-3 col-xxl-3" id="fechaEntrega">
+            <div class="col-md-4 col-lg-2 col-xl-2" id="fechaEntrega">
               <span class="p-float-label">
                 <p-calendar formControlName="OT_FechaEntrega" inputId="FechaEntrega" dateFormat="yy-mm-dd"
                   [showIcon]="true" [showButtonBar]="true" appendTo="body" [minDate]="minDate"></p-calendar>
                 <label for="FechaEntrega">Fecha Entrega</label>
-              </span>
-            </div>
-
-            <!-- Campo Observacion -->
-            <div class="col-12" id="observacion">
-              <span class="p-float-label">
-                <textarea formControlName="OT_Observacion" id="otObservacion" class="w-100" [rows]="2"
-                  pInputTextarea></textarea>
-                <label for="otObservacion">Observación general</label>
               </span>
             </div>
 
@@ -305,26 +312,26 @@
 
           <!-- Checkbox Procesos  -->
           <div id="check">
-            <div class="row g-3 d-flex justify-content-center">
+            <div class="row g-3 d-flex justify-content-center align-items-center">
               <!-- Cyrel -->
-              <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-                <div class="field-checkbox">
+              <div class="col-auto mx-3">
+                <div class="field-checkbox justify-content-center">
                   <p-checkbox [(ngModel)]="cyrel" [binary]="true" inputId="Cyrel" id="Cyrel"></p-checkbox>
                   <label for="Cyrel">Cyrel</label>
                 </div>
               </div>
 
               <!-- Extrusión -->
-              <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-                <div class="field-checkbox" id="ext2">
+              <div class="col-auto mx-3">
+                <div class="field-checkbox justify-content-center" id="ext2">
                   <p-checkbox [(ngModel)]="extrusion" [binary]="true" inputId="OT_Extrusion" id="ext1"></p-checkbox>
                   <label id="ext3" for="OT_Extrusion">Extrusión</label>
                 </div>
               </div>
 
               <!-- Impresion -->
-              <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-                <div class="field-checkbox">
+              <div class="col-auto mx-3">
+                <div class="field-checkbox justify-content-center">
                   <p-checkbox [(ngModel)]="impresion" [binary]="true" (onChange)="impresionSeleccionada()"
                     inputId="OT_Impresion" id="imp"></p-checkbox>
                   <label for="OT_Impresion">Impresión</label>
@@ -332,32 +339,32 @@
               </div>
 
               <!-- Laminado -->
-              <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-                <div class="field-checkbox">
+              <div class="col-auto mx-3">
+                <div class="field-checkbox justify-content-center">
                   <p-checkbox [(ngModel)]="laminado" [binary]="true" inputId="OT_Laminado" id="lam"></p-checkbox>
                   <label for="OT_Laminado">Laminado</label>
                 </div>
               </div>
 
               <!-- Corte -->
-              <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-                <div class="field-checkbox">
+              <div class="col-auto mx-3">
+                <div class="field-checkbox justify-content-center">
                   <p-checkbox [(ngModel)]="corte" [binary]="true" inputId="OT_Corte" id="corte"></p-checkbox>
                   <label for="OT_Corte">Corte</label>
                 </div>
               </div>
 
               <!-- Sellado -->
-              <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-                <div class="field-checkbox">
+              <div class="col-auto mx-3">
+                <div class="field-checkbox justify-content-center">
                   <p-checkbox [(ngModel)]="sellado" [binary]="true" inputId="OT_Sellado" id="sella"></p-checkbox>
                   <label for="OT_Sellado">Sellado</label>
                 </div>
               </div>
 
               <!-- Mostrar Empresas en Etiquetas -->
-              <div class="col-xs-12 col-sm-4 col-md-4 col-lg mx-3">
-                <div class="field-checkbox">
+              <div class="col-auto mx-3">
+                <div class="field-checkbox justify-content-center">
                   <p-checkbox [(ngModel)]="motrarEmpresaEtiquetas" [binary]="true" inputId="motrarEmpresaEtiquetas"
                     id="motrarEmpresaEtiquetas"></p-checkbox>
                   <label for="motrarEmpresaEtiquetas">Mostrar Empresa en Etiquetas</label>
@@ -1022,12 +1029,39 @@
                           <!-- Ancho -->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Sellado1" inputId="AnchoSellado1" mode="decimal"
+                                [minFractionDigits]="2"></p-inputNumber>
+                              <label for="AnchoSellado1">Ancho</label>
+                            </span>
+                          </div>
+
+                          <!-- Fuelle Izq. -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Sellado2" inputId="AnchoSellado2" mode="decimal"
+                                [minFractionDigits]="2"></p-inputNumber>
+                              <label for="AnchoSellado2">Fuelle Izq.</label>
+                            </span>
+                          </div>
+
+                          <!-- Fuelle Der. -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Sellado3" inputId="AnchoSellado3" mode="decimal"
+                                [minFractionDigits]="2"></p-inputNumber>
+                              <label for="AnchoSellado3">Fuelle Der.</label>
+                            </span>
+                          </div>
+
+                          <!-- Ancho Total = Ancho + Fuelle Izq. + Fuelle Der. (calculado) -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
                               <p-inputNumber formControlName="Ancho_Sellado" inputId="Ancho" mode="decimal"
-                                [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
                               <label for="Ancho">Ancho Total</label>
                             </span>
                           </div>
-                          
+
                           <!-- Largo-->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
@@ -1037,35 +1071,12 @@
                             </span>
                           </div>
 
-                          <!-- Fuelle-->
+                          <!-- Fuelle fondo (PtFuelle) -->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="Fuelle_Sellado" inputId="Fuelle" mode="decimal"
                                 [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                              <label for="Fuelle">Fuelle</label>
-                            </span>
-                          </div>
-
-                          <!-- Ancho 1, 2 y 3 -->
-                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                            <span class="p-float-label">
-                              <p-inputNumber formControlName="Ancho_Sellado1" inputId="AnchoSellado1" mode="decimal"
-                                [minFractionDigits]="2"></p-inputNumber>
-                              <label for="AnchoSellado1">Ancho</label>
-                            </span>
-                          </div>
-                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                            <span class="p-float-label">
-                              <p-inputNumber formControlName="Ancho_Sellado2" inputId="AnchoSellado2" mode="decimal"
-                                [minFractionDigits]="2"></p-inputNumber>
-                              <label for="AnchoSellado2">Fuelle Izq.</label>
-                            </span>
-                          </div>
-                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                            <span class="p-float-label">
-                              <p-inputNumber formControlName="Ancho_Sellado3" inputId="AnchoSellado3" mode="decimal"
-                                [minFractionDigits]="2"></p-inputNumber>
-                              <label for="AnchoSellado3">Fuelle Der.</label>
+                              <label for="Fuelle">Fuelle Fondo</label>
                             </span>
                           </div>
 
@@ -1084,24 +1095,6 @@
                               <p-inputNumber formControlName="Calibre_Sellado" inputId="calibreSellado" mode="decimal"
                                 [minFractionDigits]="2"></p-inputNumber>
                               <label for="calibreSellado">Calibre Cliente</label>
-                            </span>
-                          </div>
-
-                          <!-- Etiqueta Largo-->
-                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                            <span class="p-float-label">
-                              <input formControlName="Etiqueta_Largo_Sellado" id="etiquetaLargo" type="text" pInputText
-                                autocomplete="off" [required]="true" />
-                              <label for="etiquetaLargo">Etiq. Largo</label>
-                            </span>
-                          </div>
-
-                          <!-- Etiqueta Fuelle-->
-                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                            <span class="p-float-label">
-                              <input formControlName="Etiqueta_Fuelle_Sellado" id="etiquetaFuelle" type="text" pInputText
-                                autocomplete="off" [required]="true" />
-                              <label for="etiquetaFuelle">Etiq. Fuelle</label>
                             </span>
                           </div>
 
