@@ -37,6 +37,10 @@
   font-size: 0.85rem;
 }
 
+.texto-error {
+  color: #dc3545;
+}
+
 .detalle-imagenes {
   display: flex;
   flex-wrap: wrap;

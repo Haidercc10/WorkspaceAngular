@@ -34,7 +34,15 @@
     <h6>Imágenes ({{detalle.adjuntos.length}})</h6>
     <div class="detalle-imagenes">
       <p-image *ngFor="let img of imagenes" [src]="img.src" [alt]="img.nombre" [preview]="true" width="160"></p-image>
-      <span *ngIf="imagenes.length < detalle.adjuntos.length" class="texto-suave">Cargando imágenes...</span>
+      <span *ngIf="imagenesPendientes > 0" class="texto-suave">Cargando imágenes...</span>
+      <ng-container *ngIf="imagenesPendientes === 0 && imagenesFallidas > 0">
+        <span *ngIf="imagenesFallidas === detalle.adjuntos.length" class="texto-suave texto-error">
+          <i class="pi pi-exclamation-triangle"></i> No se pudieron cargar las imágenes.
+        </span>
+        <span *ngIf="imagenesFallidas < detalle.adjuntos.length" class="texto-suave texto-error">
+          <i class="pi pi-exclamation-triangle"></i> No se pudieron cargar {{imagenesFallidas}} de {{detalle.adjuntos.length}} imágenes.
+        </span>
+      </ng-container>
     </div>
   </div>
 

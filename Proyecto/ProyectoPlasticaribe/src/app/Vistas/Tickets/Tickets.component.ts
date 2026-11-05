@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { MessageService } from 'primeng/api';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { claseEstadoTicket, ReportanteTicket, TicketListado, TicketsService, TipoTicket } from 'src/app/Servicios/Tickets/Tickets.service';
+import { claseEstadoTicket, rangoFechasTicketsPorDefecto, ReportanteTicket, TicketListado, TicketsService, TipoTicket } from 'src/app/Servicios/Tickets/Tickets.service';
 import { AppComponent } from 'src/app/app.component';
 import { ClavesTutorialTickets, pasosTutorialTickets } from 'src/app/Tutoriales/Tutoriales_Tickets';
 
@@ -36,6 +36,12 @@ export class TicketsComponent implements OnInit, OnDestroy {
 
   misTickets : TicketListado[] = [];
   cargandoMisTickets : boolean = false;
+  /** Rango de fechas de creación de "Mis tickets" (por defecto, el último año). */
+  fechaInicio : Date = rangoFechasTicketsPorDefecto().inicio;
+  fechaFin : Date = rangoFechasTicketsPorDefecto().fin;
+  readonly hoy : Date = new Date();
+  /** Índice de la primera fila visible del paginador; se pone en 0 al cambiar el filtro. */
+  primeraFilaMisTickets : number = 0;
   esSoporte : boolean = false;
   /** Solo soporte: usuarios activos con la etiqueta "NOMBRE - ID - ÁREA" (por la que también se filtra). */
   reportantes : (ReportanteTicket & { etiqueta: string })[] = [];
@@ -196,12 +202,36 @@ export class TicketsComponent implements OnInit, OnDestroy {
     if (indice === 1) this.consultarMisTickets();
   }
 
-  consultarMisTickets() {
+  /**
+   * Consulta los tickets propios del rango de fechas.
+   * @param reiniciarPagina true cuando cambió el filtro; false al recargar tras comentar o cambiar un ticket.
+   */
+  consultarMisTickets(reiniciarPagina : boolean = false) {
+    if (!this.fechaInicio || !this.fechaFin) {
+      this.msj.mensajeAdvertencia('¡Faltan fechas!', 'Seleccione la fecha inicial y la fecha final.');
+      return;
+    }
+    if (this.fechaInicio > this.fechaFin) {
+      this.msj.mensajeAdvertencia('¡Rango inválido!', 'La fecha inicial no puede ser mayor que la fecha final.');
+      return;
+    }
     this.cargandoMisTickets = true;
-    this.ticketService.getMisTickets().subscribe({
-      next: tickets => { this.misTickets = tickets; this.cargandoMisTickets = false; },
+    this.ticketService.getMisTickets(this.fechaInicio, this.fechaFin).subscribe({
+      next: tickets => {
+        this.misTickets = tickets;
+        if (reiniciarPagina) this.primeraFilaMisTickets = 0;
+        this.cargandoMisTickets = false;
+      },
       error: () => { this.cargandoMisTickets = false; this.msj.mensajeError('¡No se pudieron consultar sus tickets!'); }
     });
+  }
+
+  /** Vuelve al rango por defecto (último año) y consulta. */
+  limpiarFiltrosMisTickets() {
+    const rango = rangoFechasTicketsPorDefecto();
+    this.fechaInicio = rango.inicio;
+    this.fechaFin = rango.fin;
+    this.consultarMisTickets(true);
   }
 
   abrirDetalle(ticket : TicketListado) {

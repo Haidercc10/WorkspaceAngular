@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import moment from 'moment';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -23,6 +24,17 @@ export function claseEstadoTicket(estadoId : number | null) : string {
     default: return 'bg-secondary1';
   }
 }
+
+/** Rango por defecto de los listados de tickets: desde el mismo día de hace un año hasta hoy. */
+export function rangoFechasTicketsPorDefecto() : { inicio: Date, fin: Date } {
+  const fin = moment().startOf('day');
+  return { inicio: fin.clone().subtract(1, 'year').toDate(), fin: fin.toDate() };
+}
+
+/** Las fechas viajan como 'YYYY-MM-DD' (sin hora ni zona) para que la API las tome como días completos. */
+const paramsRango = (inicio : Date, fin : Date) : HttpParams => new HttpParams()
+  .set('fechaInicio', moment(inicio).format('YYYY-MM-DD'))
+  .set('fechaFin', moment(fin).format('YYYY-MM-DD'));
 
 export interface TipoTicket { id: number; nombre: string; }
 
@@ -91,10 +103,14 @@ export class TicketsService {
     return this.http.post<{ codigo: number, reportante: string | null }>(`${this.rutaPlasticaribeAPI}/Tickets`, formData);
   }
 
-  getMisTickets = () : Observable<TicketListado[]> => this.http.get<TicketListado[]>(`${this.rutaPlasticaribeAPI}/Tickets/misTickets`);
+  /** Tickets propios creados entre `fechaInicio` y `fechaFin` (ambas inclusive). */
+  getMisTickets = (fechaInicio : Date, fechaFin : Date) : Observable<TicketListado[]> =>
+    this.http.get<TicketListado[]>(`${this.rutaPlasticaribeAPI}/Tickets/misTickets`, { params: paramsRango(fechaInicio, fechaFin) });
 
-  getGestion = (incluirFinalizados : boolean = false) : Observable<TicketListado[]> =>
-    this.http.get<TicketListado[]>(`${this.rutaPlasticaribeAPI}/Tickets/gestion?incluirFinalizados=${incluirFinalizados}`);
+  /** Tickets para soporte creados entre `fechaInicio` y `fechaFin` (ambas inclusive). */
+  getGestion = (fechaInicio : Date, fechaFin : Date, incluirFinalizados : boolean = false) : Observable<TicketListado[]> =>
+    this.http.get<TicketListado[]>(`${this.rutaPlasticaribeAPI}/Tickets/gestion`,
+      { params: paramsRango(fechaInicio, fechaFin).set('incluirFinalizados', String(incluirFinalizados)) });
 
   getCantidades = () : Observable<CantidadesTickets> => this.http.get<CantidadesTickets>(`${this.rutaPlasticaribeAPI}/Tickets/cantidades`);
 

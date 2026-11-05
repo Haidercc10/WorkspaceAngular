@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin, of, Subscription } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { claseEstadoTicket, EstadoTicket, TicketDetalle, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
@@ -29,6 +29,12 @@ export class Detalle_TicketComponent implements OnChanges {
   readonly EstadoTicket = EstadoTicket;
   detalle : TicketDetalle | null = null;
   imagenes : { nombre: string, src: string }[] = [];
+  /** Imágenes cuya descarga aún no termina (con éxito o error). */
+  imagenesPendientes : number = 0;
+  /** Imágenes que no se pudieron cargar (no están en la carpeta, error o tiempo agotado). */
+  imagenesFallidas : number = 0;
+  private subImagenes? : Subscription;
+  private static readonly TiempoMaximoImagenMs = 15000;
   comentario : string = '';
   cargando : boolean = false;
   enviando : boolean = false;
@@ -70,6 +76,9 @@ export class Detalle_TicketComponent implements OnChanges {
     this.detalle = null;
     this.acciones = [];
     this.imagenes = [];
+    this.subImagenes?.unsubscribe(); // evita que imágenes de una carga anterior lleguen al ticket nuevo
+    this.imagenesPendientes = 0;
+    this.imagenesFallidas = 0;
     this.comentario = '';
     if (this.codigo == null) return;
 
@@ -90,17 +99,34 @@ export class Detalle_TicketComponent implements OnChanges {
     });
   }
 
+  /**
+   * Descarga las imágenes del ticket. Las que no existan en el servidor (404), fallen o tarden más de
+   * `TiempoMaximoImagenMs` se cuentan en `imagenesFallidas` para mostrar el aviso en lugar de "Cargando...".
+   */
   private cargarImagenes() {
     const adjuntos = this.detalle?.adjuntos ?? [];
     if (!adjuntos.length) return;
-    forkJoin(adjuntos.map(a => this.ticketService.getAdjunto(a.url).pipe(catchError(() => of(null))))).subscribe(blobs => {
+    this.imagenesPendientes = adjuntos.length;
+    this.subImagenes = forkJoin(adjuntos.map(a => this.ticketService.getAdjunto(a.url).pipe(
+      timeout(Detalle_TicketComponent.TiempoMaximoImagenMs),
+      catchError(() => of(null))
+    ))).subscribe(blobs => {
       blobs.forEach((blob, i) => {
-        if (!blob) return;
+        if (!blob) return this.imagenTerminada(false);
         const lector = new FileReader();
-        lector.onload = () => this.imagenes = [...this.imagenes, { nombre: adjuntos[i].nombre, src: lector.result as string }];
+        lector.onload = () => {
+          this.imagenes = [...this.imagenes, { nombre: adjuntos[i].nombre, src: lector.result as string }];
+          this.imagenTerminada(true);
+        };
+        lector.onerror = () => this.imagenTerminada(false);
         lector.readAsDataURL(blob);
       });
     });
+  }
+
+  private imagenTerminada(exito : boolean) {
+    this.imagenesPendientes--;
+    if (!exito) this.imagenesFallidas++;
   }
 
   cambiarEstado(accion : AccionEstado) {

@@ -1,7 +1,7 @@
 import Step from 'shepherd.js/src/types/step';
-import { builtInButtons } from 'src/app/data';
 import { claseEstadoTicket, EstadoTicket } from 'src/app/Servicios/Tickets/Tickets.service';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { armar, paso } from 'src/app/Tutoriales/Tutoriales_Comun';
 
 /*
  * Tutoriales del módulo de Tickets. Los pasos se arman con funciones (no con arreglos fijos) para
@@ -16,37 +16,6 @@ export const ClavesTutorialTickets = {
   DETALLE: 'detalle-ticket-v1',
   DETALLE_SOPORTE: 'detalle-ticket-soporte-v1',
 } as const;
-
-const botonTerminar = {
-  classes: 'botonRojo',
-  text: `<i class="pi pi-check mr-2"></i> <b> Terminar</b>`,
-  type: 'next', // "siguiente" en el último paso finaliza el recorrido
-};
-
-/** Paso con el formato del proyecto. Sin `elemento` el paso sale centrado en la pantalla. */
-function paso(elemento : string | null, titulo : string, texto : string, extra : Partial<Step.StepOptions> = {}) : Step.StepOptions {
-  return {
-    ...(elemento ? { attachTo: { element: elemento, on: 'bottom' } } : {}),
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    title: `<h4 style="margin: auto; color: var(--rojo)">${titulo}</h4>`,
-    text: texto,
-    ...extra,
-  } as Step.StepOptions;
-}
-
-/** Pone ids únicos y los botones Cerrar/Atrás/Siguiente/Terminar según la posición de cada paso. */
-function armar(prefijo : string, pasos : (Step.StepOptions | null | false)[]) : Step.StepOptions[] {
-  const lista = pasos.filter(Boolean) as Step.StepOptions[];
-  return lista.map((p, i) => ({
-    ...p,
-    id: `${prefijo}-${i + 1}`,
-    buttons: [
-      i === 0 ? builtInButtons.cancel : builtInButtons.back,
-      i === lista.length - 1 ? botonTerminar : builtInButtons.next,
-    ],
-  }) as Step.StepOptions);
-}
 
 const badge = (estadoId : number, texto : string) => `<span class="badge badge-estado-ticket ${claseEstadoTicket(estadoId)}">${texto}</span>`;
 
@@ -125,6 +94,11 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
         : `<p>¡En esta pestaña vemos todos los tickets que hemos creado, del más reciente al más antiguo!</p>`,
       enMisTickets('#tablaMisTickets')),
 
+    paso('#filtrosMisTickets', '¡Filtro por fechas!',
+      `<p>Por defecto vemos los tickets creados en <b>el último año</b>.</p>
+       <p>Para ver otro periodo elegimos la <b>Fecha Inicial</b> y la <b>Fecha Final</b> y presionamos <b>Consultar</b>. <b>Limpiar</b> vuelve al último año.</p>`,
+      enMisTickets('#filtrosMisTickets')),
+
     paso('#tablaMisTickets', '¡Estados del ticket!',
       `<p>El color de la columna <b>Estado</b> nos dice en qué va cada ticket:</p>${leyendaEstados}`, enMisTickets('#tablaMisTickets')),
 
@@ -154,7 +128,9 @@ export function pasosTutorialGestionTickets() : Step.StepOptions[] {
       `<p>Muestra cuántos tickets están <b>Abiertos</b> (sin atender), cuántos están <b>En revisión</b> y cuántos se <b>resolvieron en el mes</b>.</p>`),
 
     paso('#filtrosFecha', '¡Filtros por fecha!',
-      `<p>Con <b>Año</b> y <b>Mes</b> vemos solo los tickets creados en ese periodo.</p>`),
+      `<p>Con <b>Fecha Inicial</b> y <b>Fecha Final</b> elegimos el periodo de los tickets <b>resueltos y cancelados</b> que queremos ver.</p>
+       <p>Por defecto se consulta <b>el último año</b> (de hoy hacia atrás).</p>
+       <p>Los tickets <b>pendientes</b> (abiertos y en revisión) salen siempre, sin importar la fecha, para que ninguno quede sin atender.</p>`),
 
     paso('#switchFinalizados', '¡Ver resueltos y cancelados!',
       `<p>Por defecto solo salen los tickets <b>pendientes</b> (abiertos y en revisión).</p>
@@ -162,8 +138,9 @@ export function pasosTutorialGestionTickets() : Step.StepOptions[] {
 
     paso('#accionesFiltros', '¡Botones de búsqueda!',
       `<ul>
-         <li><b>Mes Actual:</b> filtra los tickets de este mes.</li>
-         <li><b>Limpiar:</b> quita los filtros de año y mes.</li>
+         <li><b>Consultar:</b> busca los tickets del rango de fechas elegido.</li>
+         <li><b>Mes Actual:</b> consulta los tickets de este mes.</li>
+         <li><b>Limpiar:</b> vuelve al rango por defecto (el último año).</li>
          <li><b>Actualizar:</b> vuelve a consultar para ver los tickets nuevos.</li>
        </ul>`),
 
