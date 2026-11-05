@@ -65,6 +65,22 @@ export class TutorialesService {
     });
   }
 
+  /**
+   * Reemplazo de `localStorage.clear()` para login/logout: borra todo excepto las marcas de tutoriales vistos,
+   * así el usuario no vuelve a ver el tutorial automático cada vez que inicia sesión.
+   */
+  static limpiarLocalStorageConservandoTutoriales() {
+    try {
+      const conservar : [string, string][] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const llave = window.localStorage.key(i);
+        if (llave?.startsWith(TutorialesService.PREFIJO_CLAVE)) conservar.push([llave, window.localStorage.getItem(llave) ?? '1']);
+      }
+      window.localStorage.clear();
+      conservar.forEach(([llave, valor]) => window.localStorage.setItem(llave, valor));
+    } catch { /* sin almacenamiento: nada que limpiar */ }
+  }
+
   // localStorage puede no estar disponible (modo privado / bloqueado): nunca debe romper la pantalla.
   private leer(llave : string) : boolean {
     try { return window.localStorage.getItem(llave) === '1'; } catch { return false; }
