@@ -11,7 +11,9 @@ import { Detalles_PrecargueDespachoService } from 'src/app/Servicios/Detalles_Pr
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { ClaveTutorialPrecargue, pasosTutorialPrecargue } from 'src/app/Tutoriales/Tutoriales_Precargue';
 
 // Cada pestaña gestiona un precargue independiente. pcdId es null hasta que se escanea el primer rollo.
 interface PreloadTab {
@@ -72,6 +74,7 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     private util: UtileriaService,
     private route: ActivatedRoute,
     private router: Router,
+    private tutoriales: TutorialesService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
@@ -84,12 +87,31 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.focusTimer);
+    this.tutoriales.cancelar();
   }
 
-  // Función para mantener el puntero del mouse en el campo rollo de la pestaña activa.
+  // Función para mantener el puntero del mouse en el campo rollo de la pestaña activa (no durante el tutorial).
   focusRoll(tab: PreloadTab | undefined = this.activeTab) {
-    if (tab) document.getElementById(`roll-${tab.key}`)?.focus();
+    if (tab && !this.tutoriales.activo) document.getElementById(`roll-${tab.key}`)?.focus();
   }
+
+  //#region Tutorial
+  /** Mostrar tutorial escrito dentro del programa que especificará la funcionalidad de este módulo */
+  tutorial = () => this.tutoriales.iniciar(this.pasosTutorial());
+
+  private pasosTutorial = () => pasosTutorialPrecargue({
+    pestanaActiva: () => this.activeTab?.key,
+    hayPrecarguesPendientes: this.remainingPreloads.length > 0,
+    maxPestanas: MAX_TABS,
+  });
+
+  /**
+   * Muestra el tutorial solo la primera vez que el usuario entra (después queda el botón "i").
+   * Se llama cuando la página ya no tiene preguntas pendientes (retomar precargues) para que no se crucen.
+   */
+  private iniciarTutorialAutomatico = () =>
+    this.tutoriales.iniciarPrimeraVez(ClaveTutorialPrecargue, this.storage_Id, () => this.pasosTutorial());
+  //#endregion
 
   // Función que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
@@ -186,6 +208,7 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     if (requestedId) {
       this.clearPreloadParam();
       this.loadPreloadInTab(this.createTab(), requestedId, true);
+      this.iniciarTutorialAutomatico();
       return;
     }
 
@@ -195,10 +218,13 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     this.svPreload.getPreloadsInProcess(this.storage_Id).pipe(finalize(() => this.load = false)).subscribe({
       next: (data: any[]) => {
         let ids: number[] = data.map(x => x.pcd_Id);
+        // Con precargues en proceso el tutorial espera a que el usuario responda si los retoma (ver onConfirm/onReject).
         if (ids.length > 0) this.askResumePreloads(ids);
+        else this.iniciarTutorialAutomatico();
       },
       error: (error: HttpErrorResponse) => {
         this.util.Notificacion(`Error`, `Error consultando los precargues en proceso | ${error.status} ${error.statusText}`);
+        this.iniciarTutorialAutomatico();
       }
     });
   }
@@ -429,7 +455,10 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
     let action = this.confirmAction;
     let pending = this.pendingPreloads;
     this.closeConfirm();
-    if (action == 'resume') this.resumePreloads(pending);
+    if (action == 'resume') {
+      this.resumePreloads(pending);
+      this.iniciarTutorialAutomatico();
+    }
     else if (tab && action == 'finish') this.finishPreload(tab);
     else if (tab && action == 'cancel') this.cancelPreload(tab);
   }
@@ -470,7 +499,9 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
 
   // Botón "No" o X del mensaje de confirmación. Si se rechaza retomar los precargues se queda la pestaña vacía creada al entrar.
   onReject() {
+    let action = this.confirmAction;
     this.closeConfirm();
+    if (action == 'resume') this.iniciarTutorialAutomatico();
   }
 
   private closeConfirm() {
