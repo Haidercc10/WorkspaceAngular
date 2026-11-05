@@ -1,3 +1,4 @@
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 ﻿import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import moment from 'moment';
@@ -65,7 +66,7 @@ export class AuthenticationService {
       "MovApp_Hora" : moment().format('H:mm:ss'),
     }
     this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(() => {
-      localStorage.clear();
+      TutorialesService.limpiarLocalStorageConservandoTutoriales();
       this.storage.clear();
       this.userSubject.next(null);
       this.authenticationInvZeusService.logout();
@@ -73,7 +74,7 @@ export class AuthenticationService {
       this.authenticationBagPro.logout();
       window.location.pathname = '/';
     }, () => {
-      localStorage.clear();
+      TutorialesService.limpiarLocalStorageConservandoTutoriales();
       this.storage.clear();
       this.userSubject.next(null);
       window.location.pathname = '/';

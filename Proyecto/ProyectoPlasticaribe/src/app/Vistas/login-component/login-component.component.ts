@@ -1,3 +1,4 @@
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -57,7 +58,7 @@ export class LoginComponentComponent implements OnInit {
     private appComponent: AppComponent,) {
 
     if (!this.storage.get('Token')) {
-      localStorage.clear();
+      TutorialesService.limpiarLocalStorageConservandoTutoriales();
     }
     if ((this.storage.get('Token')
       && this.storage.get('Token_BagPro')
@@ -76,7 +77,7 @@ export class LoginComponentComponent implements OnInit {
   ngOnInit(): void {
     this.storage.clear();
     this.cookiesServices.delete('MostrarEventosDia');
-    localStorage.clear();
+    TutorialesService.limpiarLocalStorageConservandoTutoriales();
     this.appComponent.ValidarRol = NaN;
     this.cargaDatosComboBox();
   }
