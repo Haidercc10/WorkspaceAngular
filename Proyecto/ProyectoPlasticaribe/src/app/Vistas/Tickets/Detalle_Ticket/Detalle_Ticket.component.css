@@ -1,0 +1,89 @@
+/*
+ * Todo el detalle va alineado a la izquierda. Se fuerza porque hay estilos ::ng-deep de otras pantallas que se
+ * filtran a toda la aplicación (dashboard-produccion: `::ng-deep .row { text-align: center }`, que se carga en la
+ * Página Principal; Prestamos_Nomina: `::ng-deep .row > *`). Angular no quita esos estilos al salir de la pantalla,
+ * por eso a veces el detalle salía centrado y a veces no, según las pantallas visitadas antes.
+ */
+:host {
+  display: block;
+  text-align: left;
+}
+
+:host .row,
+:host .row > * {
+  text-align: left;
+}
+
+.detalle-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.detalle-datos {
+  font-size: 0.95rem;
+}
+
+.texto-observacion {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.texto-suave {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.detalle-imagenes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.historial {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.historial li {
+  border-left: 3px solid var(--rojo, #c62828);
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.historial-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.detalle-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-top: 1rem;
+}
+
+textarea {
+  width: 100%;
+}
+
+/*
+ * Sin [autoResize]: PrimeNG lo recalcula en cada ciclo de detección de cambios (height:auto → scrollHeight),
+ * lo que encoge el contenido un instante y hace saltar el scroll del diálogo. Altura acotada con scroll propio.
+ */
+.textarea-acotado {
+  min-height: 6rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  resize: vertical;
+}

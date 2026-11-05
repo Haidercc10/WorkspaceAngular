@@ -168,6 +168,7 @@ import { SolicitudMateriaPrimaComponent } from './Vistas/Solicitud-Materia-Prima
 import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
 import { Solicitud_Rollos_BodegasComponent } from './Vistas/Solicitud_Rollos_Bodegas/Solicitud_Rollos_Bodegas.component';
 import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
+import { Detalle_TicketComponent } from './Vistas/Tickets/Detalle_Ticket/Detalle_Ticket.component';
 import { VistasFavoritasComponent } from './Vistas/VistasFavoritas/VistasFavoritas.component';
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
@@ -327,6 +328,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     DashBoard_FacturacionComponent,
     DashBoard_PedidosComponent,
     TicketsComponent,
+    Detalle_TicketComponent,
     Gestion_TicketsComponent,
     DashboardOTComponent,
     ReporteFacturacion_VendedoresComponent,

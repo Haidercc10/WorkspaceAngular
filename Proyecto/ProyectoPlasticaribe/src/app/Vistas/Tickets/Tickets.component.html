@@ -1,5 +1,4 @@
 
-
 <!-- Animacion de Carga -->
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
@@ -7,11 +6,27 @@
   </div>
 </div>
 
+<!-- Mensaje de ticket creado: se cierra con la X o solo después de unos segundos -->
+<p-toast key="ticketCreado" position="center" [breakpoints]="{'920px': {width: '100%', right: '0', left: '0'}}">
+  <ng-template let-message pTemplate="message">
+    <div class="toast-ticket">
+      <i class="pi pi-check-circle toast-ticket-icono"></i>
+      <div class="toast-ticket-texto">
+        <div class="toast-ticket-titulo">{{message.summary}}</div>
+        <div>{{message.detail}}</div>
+        <button pButton type="button" class="p-button-sm p-button-success mt-2" icon="pi pi-list" label="VER MIS TICKETS" (click)="verMisTickets()"></button>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
 <!-- Titulo principal -->
 <div class="contain" id="form">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Tickets</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Tickets
+        <p-button class="boton-tutorial-titulo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+      </h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -20,42 +35,134 @@
 </div>
 
 <p-card>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" *ngIf="esSoporte">
+    <p-button id="btnGestion" label="Gestión de Tickets" icon="pi pi-cog" styleClass="p-button-sm p-button-secondary" (click)="irAGestion()"></p-button>
   </div>
 
-  <form [formGroup]="FormTickets">
-    <div class="row g-4">
+  <p-tabView [activeIndex]="tabActiva" (activeIndexChange)="cambioTab($event)">
 
-      <!-- Codigo Ticket -->
-      <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
-        <span class="p-input-icon-left p-float-label">
-          <i class="pi pi-ticket"></i>
-          <input formControlName="Codigo_Ticket" id="Ticket" type="text" pInputText readonly required/>
-          <label for="Ticket">Código Ticket</label>
-        </span>
+    <!-- ================= NUEVO TICKET ================= -->
+    <p-tabPanel header="Nuevo ticket" leftIcon="pi pi-plus">
+      <form [formGroup]="FormTickets" (ngSubmit)="enviarTickets()">
+        <div class="row g-4 pt-3">
+
+          <!-- Reportado por (solo soporte) -->
+          <div class="col-12" id="campoReportante" *ngIf="esSoporte">
+            <span class="p-float-label">
+              <p-dropdown formControlName="Reportante" inputId="reportante" [options]="reportantes"
+                          optionLabel="etiqueta" optionValue="id" [filter]="true" filterBy="etiqueta"
+                          [showClear]="true" [virtualScroll]="true" [virtualScrollItemSize]="38"
+                          emptyFilterMessage="No se encontraron usuarios" styleClass="w-100"></p-dropdown>
+              <label for="reportante">Reportado por (opcional)</label>
+            </span>
+            <small class="texto-suave">Busque por nombre, ID o área. Si lo deja vacío, el ticket queda a su nombre.</small>
+          </div>
+
+          <!-- Asunto -->
+          <div class="col-lg-8 col-md-8 col-sm-12" id="campoAsunto">
+            <span class="p-float-label">
+              <input formControlName="Asunto" id="asunto" type="text" pInputText maxlength="150" autocomplete="off" appContadorCaracteres/>
+              <label for="asunto">Asunto *</label>
+            </span>
+            <small class="p-error" *ngIf="FormTickets.get('Asunto')?.touched && FormTickets.get('Asunto')?.invalid">Escriba un asunto corto.</small>
+          </div>
+
+          <!-- Tipo -->
+          <div class="col-lg-4 col-md-4 col-sm-12" id="campoTipo">
+            <span class="p-float-label">
+              <p-dropdown formControlName="TipoTicket" inputId="tipoTicket" [options]="tiposTicket" optionLabel="nombre" optionValue="id" styleClass="w-100"></p-dropdown>
+              <label for="tipoTicket">Tipo de ticket *</label>
+            </span>
+          </div>
+
+          <!-- Descripcion -->
+          <div class="col-12" id="campoDescripcion">
+            <span class="p-float-label">
+              <textarea formControlName="Descripcion" id="descripcion" rows="5" maxlength="2000" pInputTextarea appContadorCaracteres class="textarea-acotado"></textarea>
+              <label for="descripcion">Descripción *</label>
+            </span>
+            <small class="p-error" *ngIf="FormTickets.get('Descripcion')?.touched && FormTickets.get('Descripcion')?.invalid">Cuéntenos qué está pasando.</small>
+          </div>
+
+          <!-- Imágenes -->
+          <div class="col-12" id="imagen">
+            <div class="zona-imagenes" [class.arrastrando]="arrastrando"
+                 (dragover)="$event.preventDefault(); arrastrando = true"
+                 (dragleave)="arrastrando = false"
+                 (drop)="soltarArchivos($event)">
+              <input #inputImagenes type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" multiple hidden (change)="seleccionarArchivos($event)">
+              <button pButton type="button" class="p-button-secondary p-button-sm" icon="pi pi-image" label="Elegir imágenes"
+                      [disabled]="imagenes.length >= maxImagenes" (click)="inputImagenes.click()"></button>
+              <span class="texto-suave">o arrástrelas aquí, o pegue una captura con <strong>Ctrl+V</strong>. Solo .png o .jpg, máximo {{maxImagenes}} de 5 MB.</span>
+
+              <div class="miniaturas" *ngIf="imagenes.length">
+                <div class="miniatura" *ngFor="let img of imagenes; let i = index">
+                  <img *ngIf="img.vistaPrevia" [src]="img.vistaPrevia" [alt]="img.archivo.name">
+                  <button type="button" class="miniatura-quitar" (click)="quitarImagen(i)" pTooltip="Quitar" tooltipPosition="top"><i class="pi pi-times"></i></button>
+                  <span class="miniatura-nombre" [title]="img.archivo.name">{{img.archivo.name}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="p-4 d-grid gap-2 d-md-flex justify-content-md-center">
+            <p-button label="Crear Ticket" type="submit" icon="pi pi-send" id="enviarTicket" iconPos="right" styleClass="p-button-danger" [disabled]="cargando"></p-button>
+            <p-button label="Limpiar Todo" icon="pi pi-eraser" id="limpiarTodo" iconPos="right" styleClass="p-button-secondary" (click)="limpiarTodo()"></p-button>
+          </div>
+        </div>
+      </form>
+    </p-tabPanel>
+
+    <!-- ================= MIS TICKETS ================= -->
+    <p-tabPanel header="Mis tickets" leftIcon="pi pi-list">
+      <div class="d-flex justify-content-end mb-2">
+        <button pButton id="btnActualizarMisTickets" class="p-button-secondary p-button-outlined" type="button" icon="pi pi-refresh" iconPos="left" label="Actualizar" (click)="consultarMisTickets()"></button>
       </div>
-
-      <!-- Descripcion -->
-      <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
-        <span class="p-float-label">
-          <textarea formControlName="Descripcion" id="descripcion" [autoResize]="true" rows="2" pInputTextarea required></textarea>
-          <label for="descripcion">Descripción</label>
-        </span>
+      <div id="tablaMisTickets">
+      <p-table [value]="misTickets" [loading]="cargandoMisTickets" [paginator]="misTickets.length > 10" [rows]="10"
+               styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true" dataKey="codigo">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="codigo" style="width: 90px">N° <p-sortIcon field="codigo"></p-sortIcon></th>
+            <th>Asunto</th>
+            <th style="width: 140px">Tipo</th>
+            <th *ngIf="esSoporte" pSortableColumn="usuario" style="width: 200px">Reportado por <p-sortIcon field="usuario"></p-sortIcon></th>
+            <th pSortableColumn="fechaCreacion" style="width: 160px">Creado <p-sortIcon field="fechaCreacion"></p-sortIcon></th>
+            <th pSortableColumn="estado" style="width: 140px">Estado <p-sortIcon field="estado"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr class="fila-clic" (click)="abrirDetalle(item)">
+            <td>{{item.codigo}}</td>
+            <td>{{item.asunto}}</td>
+            <td>{{item.tipo}}</td>
+            <td *ngIf="esSoporte">
+              {{item.usuario}}
+              <i *ngIf="item.registradoPor" class="pi pi-user-edit texto-suave" pTooltip="Registrado por {{item.registradoPor}}" tooltipPosition="top"></i>
+            </td>
+            <td>{{item.fechaCreacion | date:'yyyy-MM-dd HH:mm'}}</td>
+            <td class="text-center"><span class="badge badge-estado-ticket" [ngClass]="claseEstado(item.estadoId)">{{item.estado}}</span></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td [attr.colspan]="esSoporte ? 6 : 5" class="text-center">Todavía no tiene tickets.</td></tr>
+        </ng-template>
+      </p-table>
       </div>
-
-      <!-- Imagen -->
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <p-fileUpload (onSelect)="onUpload($event)" id="imagen" chooseIcon="pi pi-image" [multiple]="true" chooseLabel="Elegir una Imagen" [showUploadButton]="false" accept="image/*"></p-fileUpload>
-      </div>
-    </div>
-
-    <div class="row g-4">
-      <div class="p-5 d-grid gap-2 d-md-flex justify-content-md-center">
-        <p-button label="Crear Ticket" icon="pi pi-check" id="enviarTicket" iconPos="right" styleClass="p-button-danger" (click)="enviarTickets()"></p-button>
-        <p-button label="Limpiar Todo" icon="pi pi-eraser" id="limpiarTodo" iconPos="right" styleClass="p-button-secondary" (click)="limpiarTodo()"></p-button>
-      </div>
-    </div>
-
-  </form>
+    </p-tabPanel>
+  </p-tabView>
 </p-card>
+
+<!-- Detalle del ticket -->
+<p-dialog [(visible)]="detalleVisible" [modal]="true" [style]="{ width: '70%' }"
+          [breakpoints]="{'960px': '95vw'}" [draggable]="false" [resizable]="false" (onHide)="cerrarDetalle()">
+  <ng-template pTemplate="header">
+    <div class="titulo-dialogo-ticket">
+      <span class="p-dialog-title">Ticket N° {{codigoDetalle}}</span>
+      <p-button class="boton-tutorial-dialogo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="detalleTicket.tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+    </div>
+  </ng-template>
+  <app-detalle-ticket #detalleTicket [codigo]="codigoDetalle" [modoSoporte]="esSoporte" (actualizado)="consultarMisTickets()"></app-detalle-ticket>
+</p-dialog>
