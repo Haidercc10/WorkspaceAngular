@@ -43,10 +43,8 @@
       <!-- MATERIALES -->
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="material">
         <span class="p-float-label">
-          <input formControlName="NombreMaterial" id="Nombre" list="materiaprima" type="text" pInputText (change)="cambiarNombreMaterial()"/>
-          <datalist id="materiaprima">
-            <option value={{item.id_Materia_Prima}} *ngFor="let item of materiales">{{item.nombre_Materia_Prima}}</option>
-          </datalist>
+          <app-selector-material formControlName="NombreMaterial" inputId="Nombre" [opciones]="materiales"
+            campoId="id_Materia_Prima" campoNombre="nombre_Materia_Prima" (seleccionar)="cambiarNombreMaterial()"></app-selector-material>
           <label for="Orden">Materia Prima</label>
         </span>
       </div>

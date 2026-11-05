@@ -375,9 +375,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Consulta el material seleccionado en el campo Materia Prima (la opción del datalist envía su id) y carga sus datos. */
+  /**
+   * Consulta el material del campo Materia Prima y carga sus datos. El selector deja en el control
+   * el id de la opción elegida, o el texto escrito (id o nombre) si se presionó Enter sin coincidencia.
+   */
   cambiarNombreMateriaPrima() {
-    const id = this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
+    const id = this.FormMateriaPrimaRetirada.value.MpNombreRetirada?.toString().trim();
     if (id == null || id === '') return this.mensajeService.mensajeError(`Error`, `Debe ingresar una materia prima.`);
 
     this.cargando = true;

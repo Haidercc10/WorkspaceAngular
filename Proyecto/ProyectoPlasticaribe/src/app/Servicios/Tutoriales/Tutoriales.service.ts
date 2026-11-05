@@ -32,6 +32,16 @@ export class TutorialesService {
     this.shepherd.start();
   }
 
+  /** Si hay un tutorial en pantalla. */
+  get activo() : boolean {
+    return this.shepherd.isActive;
+  }
+
+  /** Cierra el tutorial abierto (p. ej. al salir de la página, para que no quede encima de otra). */
+  cancelar() {
+    if (this.shepherd.isActive) this.shepherd.cancel();
+  }
+
   /**
    * Inicia el tutorial solo la primera vez que ese usuario entra (se recuerda en este navegador).
    * Se guarda por usuario porque en planta varios trabajadores comparten el mismo equipo.

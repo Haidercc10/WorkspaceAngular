@@ -247,9 +247,9 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   // funcion que buscará la informacion del rollo seleccionado
-  BOPPSeleccionado() {
-    let serial: any = this.FormularioBOPP.value.boppNombre;
+  BOPPSeleccionado(serial: any = this.FormularioBOPP.value.boppNombre) {
     let nuevo: any[] = this.ArrayBOPP.filter((item) => item.bopP_Serial == serial);
+    if (!nuevo.length) return;
     this.FormularioBOPP.patchValue({
       boppId: nuevo[0].bopP_Id,
       boppGenerico: nuevo[0].boppGen_Id,

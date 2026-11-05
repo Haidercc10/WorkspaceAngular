@@ -1,0 +1,10 @@
+<p-autoComplete [ngModel]="texto" (ngModelChange)="alCambiarTexto($event)" [ngModelOptions]="{standalone: true}"
+  [inputId]="inputId" [field]="campoMostrado" [suggestions]="sugerencias" [minLength]="minLength" [delay]="150"
+  [readonly]="readonly" [disabled]="deshabilitado" [autoHighlight]="false" autocomplete="off" appendTo="body"
+  styleClass="w-100" inputStyleClass="w-100"
+  (completeMethod)="filtrar($event)" (onSelect)="alSeleccionar($event)" (keyup.enter)="alPresionarEnter()"
+  (onFocus)="alEnfocar()" (onBlur)="alDesenfocar()">
+  <ng-template let-item pTemplate="item">
+    <span>{{item[campoId]}} - {{item[campoNombre]}}<ng-container *ngIf="campoStock"> - Stock: {{item[campoStock] | number: '1.2-2'}}</ng-container></span>
+  </ng-template>
+</p-autoComplete>

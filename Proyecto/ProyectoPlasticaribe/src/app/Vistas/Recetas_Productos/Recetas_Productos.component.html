@@ -62,10 +62,8 @@
     <!-- Nombre la Materia Prima -->
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-5">
       <span class="p-float-label">
-        <input formControlName="Nombre" autocomplete="off" id="Nombre" list="materiaPrima" (change)="cambiarNombreMateriaPrima()" type="text" pInputText required/>
-        <datalist id="materiaPrima">
-          <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.nombre}}</option>
-        </datalist>
+        <app-selector-material formControlName="Nombre" inputId="Nombre" [opciones]="materiasPrimas"
+          (seleccionar)="cambiarNombreMateriaPrima()"></app-selector-material>
         <label for="Nombre">Materia Prima</label>
       </span>
     </div>

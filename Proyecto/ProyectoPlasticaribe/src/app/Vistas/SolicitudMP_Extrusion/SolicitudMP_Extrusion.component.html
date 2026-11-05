@@ -179,14 +179,9 @@
         <!-- Nombre subcategoria -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4" id="nombreMp">
           <span class="p-float-label">
-            <input formControlName="subcat_Nombre" id="MP" list="materiaprima" type="text" pInputText
-              (keyup)="getAllSubcategories()" (change)="loadMaterialInField()" autocomplete="off" required
-              [readonly]="!formEncabezado.valid" />
-            <datalist id="materiaprima">
-              <option value={{item.id_Subcategoria}} *ngFor="let item of subcategories">{{item.subcategoria}} - Stock:
-                {{item.stock | number: '1.2-2'}}</option> <!--- Stock: {{item.stock | number: '1.2-2'}}-->
-              <!--- Stock: {{item.stock | number: '1.2-2'}}-->
-            </datalist>
+            <app-selector-material formControlName="subcat_Nombre" inputId="MP" [opciones]="subcategories"
+              campoId="id_Subcategoria" campoNombre="subcategoria" campoStock="stock" [busquedaRemota]="true" [minLength]="3"
+              [readonly]="!formEncabezado.valid" (buscar)="getAllSubcategories()" (seleccionar)="loadMaterialInField()"></app-selector-material>
             <label for="MP"> Subcategoria</label>
           </span>
         </div>

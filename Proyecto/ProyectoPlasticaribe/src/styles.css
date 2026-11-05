@@ -262,6 +262,23 @@ th {
   padding-left: 2.5rem;
 }
 
+/*
+ * Íconos en campos que no son un <input> directo (p-autoComplete, app-selector-material, p-inputNumber, p-calendar, p-password).
+ * El contenedor de esos componentes tiene position: relative y, al estar después del <i> en el DOM, se pinta encima del ícono.
+ * Se eleva el ícono y se deja espacio en el input para que no quede tapado ni superpuesto al texto.
+ */
+:is(.p-input-icon-left, .p-input-icon-right):has(> :is(p-autocomplete, app-selector-material, p-inputnumber, p-calendar, p-password)) > i {
+  z-index: 1;
+}
+
+.p-input-icon-left > :is(p-autocomplete, app-selector-material, p-inputnumber, p-calendar, p-password) .p-inputtext {
+  padding-left: 2.5rem;
+}
+
+.p-input-icon-right > :is(p-autocomplete, app-selector-material, p-inputnumber, p-calendar, p-password) .p-inputtext {
+  padding-right: 2.5rem;
+}
+
 .p-inputtext:enabled:focus {
   box-shadow: 0 0 0 0.2rem #febfbf;
   border-color: #f63b3b;

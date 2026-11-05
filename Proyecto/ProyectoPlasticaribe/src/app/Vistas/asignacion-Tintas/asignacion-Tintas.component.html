@@ -120,11 +120,8 @@
             <!-- Nombre Materia Prima -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
               <span class="p-float-label">
-                <input formControlName="nombreMateriaPrima" id="MP" list="materiaprima" type="text" pInputText
-                  (change)="buscarMpSeleccionada()" required />
-                <datalist id="materiaprima">
-                  <option value={{item.matPrima}} *ngFor="let item of materiasPrimas">{{item.nombreMP}}</option>
-                </datalist>
+                <app-selector-material formControlName="nombreMateriaPrima" inputId="MP" [opciones]="materiasPrimas"
+                  campoId="matPrima" campoNombre="nombreMP" (seleccionar)="buscarMpSeleccionada()"></app-selector-material>
                 <label for="MP">Materia Prima</label>
               </span>
             </div>

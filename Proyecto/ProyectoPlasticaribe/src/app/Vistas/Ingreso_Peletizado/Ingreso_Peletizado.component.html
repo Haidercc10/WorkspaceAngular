@@ -215,10 +215,8 @@
         <!--Materia Prima-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="matprima" id="matprima" list="materiaprima" (change)="selectMatPrimas()" type="text" pInputText required/>
-            <datalist id="materiaprima">
-              <option value={{item.id}} *ngFor="let item of matPrimas">{{item.matPrima}}</option>
-            </datalist>
+            <app-selector-material formControlName="matprima" inputId="matprima" [opciones]="matPrimas"
+              campoNombre="matPrima" (seleccionar)="selectMatPrimas()"></app-selector-material>
             <label for="matprima">Materia Prima*</label>
           </span>
         </div>

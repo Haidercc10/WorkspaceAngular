@@ -232,11 +232,8 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="nombreMp">
           <span class="p-input-icon-left p-float-label input-limpiable">
             <i class="pi pi-box"></i>
-            <input formControlName="MpNombreRetirada" id="MP" list="materiaprima" type="text" pInputText
-              autocomplete="off" (change)="cambiarNombreMateriaPrima()" required />
-            <datalist id="materiaprima">
-              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}} - Stock: {{item.stock | number: '1.2-2'}}</option>
-            </datalist>
+            <app-selector-material formControlName="MpNombreRetirada" inputId="MP" [opciones]="materiaPrima" campoStock="stock"
+              (seleccionar)="cambiarNombreMateriaPrima()" (consultarTexto)="cambiarNombreMateriaPrima()"></app-selector-material>
             <button *ngIf="FormMateriaPrimaRetirada.get('MpNombreRetirada')?.value || FormMateriaPrimaRetirada.get('MpIdRetirada')?.value"
               pButton type="button" class="p-button-text p-button-rounded p-button-sm boton-limpiar-input"
               icon="pi pi-times" aria-label="Limpiar materia prima" pTooltip="Limpiar materia prima" tooltipPosition="top"
