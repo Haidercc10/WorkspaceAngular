@@ -172,6 +172,7 @@ import { VistasFavoritasComponent } from './Vistas/VistasFavoritas/VistasFavorit
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
+import { ContadorCaracteresDirective } from './Directivas/contador-caracteres.directive';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
@@ -276,6 +277,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     ReporteMateriaPrimaComponent,
     ReporteMpOtComponent,
     AsignacionMateriaPrimaComponent,
+    ContadorCaracteresDirective,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
     PruebaImagenCatInsumoComponent,

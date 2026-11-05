@@ -37,7 +37,8 @@
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-hashtag"></i>
             <input formControlName="Solicitud" id="solicitud" type="text" pInputText
-              (keyup.enter)="consultarSolicitudMaterial()" required [readonly]="![1,104].includes(ValidarRol)"/>
+              (keyup.enter)="consultarSolicitudMaterial()" [readonly]="![1,104].includes(ValidarRol)"
+              pTooltip="Digite el N° de una solicitud activa y presione Enter para editarla" tooltipPosition="top" />
             <label for="solicitud">Solicitud</label>
           </span>
         </div>
@@ -86,7 +87,7 @@
         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-4">
           <span class="p-float-label">
             <textarea formControlName="observacion" id="observacion" [rows]="1" 
-              pInputTextarea></textarea>
+              pInputTextarea appContadorCaracteres></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
@@ -118,7 +119,7 @@
             <th class="text-center" scope="col">Referencia</th>
             <th class="text-center" scope="col" pTooltip="Kilos totales permitidos para solicitar de la OT"
               tooltipPosition="top">Kg total OT</th>
-            <th class="text-center" scope="col" pTooltip="Kilos solicitados de materia prima de la OT"
+            <th class="text-center" scope="col" pTooltip="Kilos de materia prima solicitados que aún no se han asignado"
               tooltipPosition="top">Kg solicitados</th>
             <th class="text-center" scope="col" pTooltip="Kilos pendientes por solicitar de materia prima de la OT"
               tooltipPosition="top">Kg por solicitar</th>
@@ -196,6 +197,15 @@
             <p-inputNumber formControlName="stock" mode="decimal" inputId="Stock" [minFractionDigits]="2"
               [readonly]="true"></p-inputNumber>
             <label for="Stock">Stock</label>
+          </span>
+        </div>
+
+        <!-- Disponible subcategoria (stock menos lo reservado por solicitudes activas) -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" id="disponibleMp">
+          <span class="p-float-label" pTooltip="Stock menos lo solicitado y aún no asignado en otras solicitudes" tooltipPosition="top">
+            <p-inputNumber formControlName="disponible" mode="decimal" inputId="Disponible" [minFractionDigits]="2"
+              [readonly]="true"></p-inputNumber>
+            <label for="Disponible">Disponible</label>
           </span>
         </div>
 
@@ -277,13 +287,10 @@
             <td class="text-center">{{subcat.Cantidad_Entregada | number : '1.2-2'}}</td>
             <td class="text-center">{{subcat.Cantidad_Faltante | number : '1.2-2'}}</td>
             <td class="text-center">{{subcat.Und_Medida}}</td>
-            <td class="text-center" id="quitarMp" *ngIf="!esSolicitud">
-              <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Quitar material"
-                (onClick)="mostrarEleccion(subcat, 'quitar')"></p-button>
-            </td>
-            <td class="text-center" id="eliminarMp" *ngIf="esSolicitud">
-              <p-button icon="pi pi-trash" [rounded]="true" severity="danger" pTooltip="Eliminar material"
-                (onClick)="mostrarEleccion(subcat, 'eliminar')"></p-button>
+            <td class="text-center" id="quitarMp">
+              <p-button icon="pi pi-trash" [rounded]="true" severity="danger" [disabled]="subcat.Cantidad_Entregada > 0"
+                [pTooltip]="subcat.Cantidad_Entregada > 0 ? 'No se puede quitar: ya tiene entregas' : 'Quitar material'"
+                (onClick)="mostrarEleccion(subcat)"></p-button>
             </td>
           </tr>
         </ng-template>
@@ -309,7 +316,7 @@
           (click)="validarCamposVaciosRetirada()"></button>
         <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check"
           class="p-button-danger" *ngIf="esSolicitud" [disabled]="subcategoriasSeleccionadas.length == 0"
-          (click)="editarSolicitud()"></button>
+          (click)="validarCamposVaciosRetirada()"></button>
         <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary"
           icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
       </div>
@@ -327,13 +334,11 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" *ngIf="!esSolicitud" pButton (click)="quitarMateriaPrima(mp)" icon="pi pi-check"
-            label="Si" class="p-button-success"></button>
-          <button type="button" *ngIf="esSolicitud" pButton (click)="eliminarMatPrimaSolicitud(mp)" icon="pi pi-check"
-            label="Si" class="p-button-success"></button>
+          <button type="button" pButton (click)="quitarMateriaPrima()" icon="pi pi-check"
+            label="Sí (Enter)" class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No"
+          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No (Esc)"
             class="p-button-secondary"></button>
         </div>
       </div>
@@ -351,11 +356,11 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="crearSolicitudMatPrima()" icon="pi pi-check" label="Si"
+          <button type="button" pButton (click)="aceptarConfirmacion()" icon="pi pi-check" label="Sí (Enter)"
             class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('asignacion')" icon="pi pi-cancel" label="No"
+          <button type="button" pButton (click)="onReject('solicitud')" icon="pi pi-cancel" label="No (Esc)"
             class="p-button-secondary"></button>
         </div>
       </div>
@@ -376,12 +381,14 @@
           <th><input pInputText type="number" (input)="applyFilter($event, 'id_Subcategoria', dtSubcategories)"></th>
           <th><input pInputText type="text" (input)="applyFilter($event, 'subcategoria', dtSubcategories)"></th>
           <th><input pInputText type="number" (input)="applyFilter($event, 'stock', dtSubcategories)"></th>
+          <th><input pInputText type="number" (input)="applyFilter($event, 'disponible', dtSubcategories)"></th>
           <th></th>
         </tr>
         <tr>
           <th class="text-center" scope="col">Id</th>
           <th class="text-center" scope="col">Subcategoria</th>
-          <th class="text-center" scope="col" id="cantidad2">Cantidad Kg</th>
+          <th class="text-center" scope="col" id="cantidad2">Stock Kg</th>
+          <th class="text-center" scope="col" pTooltip="Stock menos lo solicitado y aún no asignado en solicitudes activas" tooltipPosition="top">Disponible Kg</th>
           <th class="text-center" scope="col" id="ver">Ver</th>
         </tr>
       </ng-template>
@@ -390,6 +397,7 @@
           <td class="text-center">{{data.id_Subcategoria}}</td>
           <td>{{data.subcategoria}}</td>
           <td class="text-center">{{data.stock | number : '1.2-2'}}</td>
+          <td class="text-center" [ngClass]="{ 'colorRojo' : data.disponible <= 0 }">{{data.disponible | number : '1.2-2'}}</td>
           <td class="text-center" id="ver">
             <p-button icon="pi pi-eye" [rounded]="true" severity="danger" pTooltip="Ver materiales"
               (onClick)="filterForSubcategory(data)"></p-button>

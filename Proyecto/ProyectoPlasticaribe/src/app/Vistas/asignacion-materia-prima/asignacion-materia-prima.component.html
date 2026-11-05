@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-center overlay" *ngIf="!load">
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
@@ -18,6 +18,9 @@
 
 <p-card>
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <p-button *ngIf="puedeExcederLimite && !esSolicitudDesdeReporte" icon="pi pi-shield" styleClass="p-button-rounded p-button-secondary"
+      [style]="{width: '25px', height: '25px'}" (click)="verAutorizacionesPendientes()"
+      pTooltip="Autorizaciones de exceso de OT pendientes" tooltipPosition="top"></p-button>
     <p-button *ngIf="!esSolicitudDesdeReporte" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}"
       (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
@@ -41,12 +44,12 @@
 
         <!-- Solicitud -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg col-xl col-xxl">
-          <span class="p-input-icon-left p-float-label solicitud-input-container">
+          <span class="p-input-icon-left p-float-label input-limpiable">
             <i class="pi pi-search"></i>
             <input formControlName="Solicitud" id="solicitud" type="text" pInputText [readonly]="esSolicitudDesdeReporte" pTooltip="Ingrese el número de solicitud y presione Enter" [tooltipDisabled]="esSolicitudDesdeReporte" tooltipPosition="top"
-              (keyup.enter)="!esSolicitudDesdeReporte && consultarSolicitudMaterial(null)" />
+              (keyup.enter)="!esSolicitudDesdeReporte && consultarSolicitudMaterial()" />
             <button *ngIf="FormMateriaPrimaRetiro.get('Solicitud')?.value && !esSolicitudDesdeReporte" pButton
-              type="button" class="p-button-text p-button-rounded p-button-sm solicitud-clear-button"
+              type="button" class="p-button-text p-button-rounded p-button-sm boton-limpiar-input"
               icon="pi pi-times" aria-label="Limpiar solicitud" (click)="limpiarSolicitudSeleccionada()"></button>
             <label for="solicitud">Solicitud</label>
           </span>
@@ -74,8 +77,8 @@
         <!-- Observacion -->
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6">
           <span class="p-float-label">
-            <textarea formControlName="ObservacionRetiro" id="observacion" [rows]="1" maxlength="200" [readonly]="esSolicitudDesdeReporte"
-              pInputTextarea></textarea>
+            <textarea formControlName="ObservacionRetiro" id="observacion" [rows]="1" maxlength="200"
+              pInputTextarea appContadorCaracteres></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
@@ -219,28 +222,33 @@
         <!-- Id Materia Prima -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl" id="idMp">
           <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input formControlName="MpIdRetirada" id="IdMP" type="number" pInputText min="0"
-              (keyup.enter)="cambiarNombreMateriaPrima(1)" required />
+            <i class="pi pi-hashtag"></i>
+            <input formControlName="MpIdRetirada" id="IdMP" type="number" pInputText [readonly]="true" required />
             <label for="IdMP">Id</label>
           </span>
         </div>
 
         <!-- Nombre Materia Prima -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="nombreMp">
-          <span class="p-float-label">
+          <span class="p-input-icon-left p-float-label input-limpiable">
+            <i class="pi pi-box"></i>
             <input formControlName="MpNombreRetirada" id="MP" list="materiaprima" type="text" pInputText
-              (change)="cambiarNombreMateriaPrima(2)" required />
+              autocomplete="off" (change)="cambiarNombreMateriaPrima()" required />
             <datalist id="materiaprima">
-              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
+              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}} - Stock: {{item.stock | number: '1.2-2'}}</option>
             </datalist>
+            <button *ngIf="FormMateriaPrimaRetirada.get('MpNombreRetirada')?.value || FormMateriaPrimaRetirada.get('MpIdRetirada')?.value"
+              pButton type="button" class="p-button-text p-button-rounded p-button-sm boton-limpiar-input"
+              icon="pi pi-times" aria-label="Limpiar materia prima" pTooltip="Limpiar materia prima" tooltipPosition="top"
+              (click)="limpiarCamposMP()"></button>
             <label for="MP">Materia Prima</label>
           </span>
         </div>
 
         <!-- Stock de Materia Prima  -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" id="stockMp">
-          <span class="p-float-label">
+          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+            <i class="pi pi-hashtag"></i>
             <p-inputNumber formControlName="MpStockRetirada" mode="decimal" inputId="Stock" [minFractionDigits]="2"
               [readonly]="true"></p-inputNumber>
             <label for="Stock">Stock</label>
@@ -249,7 +257,8 @@
 
         <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="cantidad">
-          <span class="p-float-label">
+          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+            <i class="pi pi-hashtag"></i>
             <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal"
               (keyup.enter)="validarCamposVaciosMPRetirada()" [showClear]="true" inputId="Cantidad"
               [minFractionDigits]="2"
@@ -261,7 +270,7 @@
         <!-- Unidad de Medida -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl" id="und">
           <span class="p-float-label">
-            <p-dropdown formControlName="MpUnidadMedidaRetirada" inputId="Und" [autoDisplayFirst]="false"
+            <p-dropdown formControlName="MpUnidadMedidaRetirada" inputId="Und" [autoDisplayFirst]="false" [readonly]="hayMaterialConsultado"
               [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
             <label for="Und">Und</label>
           </span>
@@ -270,7 +279,7 @@
         <!-- Proceso -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="proceso">
           <span class="p-float-label">
-            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [autoDisplayFirst]="false"
+            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [autoDisplayFirst]="false" [readonly]="hayMaterialConsultado"
               [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
             <label for="Proceso">Procesos</label>
           </span>
@@ -329,7 +338,7 @@
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td *ngIf="esSolicitud">{{materiasPrimasSeleccionadas.CantOculta | number : '1.2-2'}}</td>
+            <td *ngIf="esSolicitud">{{materiasPrimasSeleccionadas.CantPedida | number : '1.2-2'}}</td>
             <td *ngIf="esSolicitud">{{materiasPrimasSeleccionadas.CantAprobada | number : '1.2-2'}}</td>
             <td [ngClass]="{ 'colorRojo' : materiasPrimasSeleccionadas.Cantidad > materiasPrimasSeleccionadas.Stock }">
               <b>{{materiasPrimasSeleccionadas.Stock}}</b>
@@ -344,9 +353,9 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer" >
-          <tr ngIf="materiasPrimasSeleccionadas.length > 0">
+          <tr *ngIf="materiasPrimasSeleccionadas.length > 0">
             <td colspan="2">Total</td>
-            <td>{{calcularMateriaPrimaAsignada()}}</td>
+            <td>{{calcularTotalSeleccionado() | number : '1.2-2'}}</td>
             <td colspan="6"></td>
           </tr>
         </ng-template>
@@ -361,7 +370,7 @@
     </div>
   </div>
 
-  <div *ngIf="load">
+  <div *ngIf="!cargando">
     <div class="mb-3">
       <div class="row g-3">
         <div class="mb-3">
@@ -387,11 +396,11 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="quitarMateriaPrima(mp)" icon="pi pi-check" label="Si"
+          <button type="button" pButton (click)="quitarMateriaPrima()" icon="pi pi-check" label="Sí (Enter)"
             class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No"
+          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No (Esc)"
             class="p-button-secondary"></button>
         </div>
       </div>
@@ -409,11 +418,11 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="crearAsignacion()" icon="pi pi-check" label="Si"
+          <button type="button" pButton (click)="crearAsignacion(true)" icon="pi pi-check" label="Sí (Enter)"
             class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('asignacion')" icon="pi pi-cancel" label="No"
+          <button type="button" pButton (click)="onReject('asignacion')" icon="pi pi-cancel" label="No (Esc)"
             class="p-button-secondary"></button>
         </div>
       </div>
@@ -431,14 +440,76 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="confirmarAgregarMaterial()" icon="pi pi-check" label="Si"
+          <button type="button" pButton (click)="confirmarAgregarMaterial()" icon="pi pi-check" label="Sí (Enter)"
             class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('confirmarMaterial')" icon="pi pi-times" label="No"
+          <button type="button" pButton (click)="onReject('confirmarMaterial')" icon="pi pi-times" label="No (Esc)"
             class="p-button-secondary"></button>
         </div>
       </div>
     </div>
   </ng-template>
 </p-toast>
+<!-- Solicitar autorización para superar el límite de kg de la OT -->
+<p-dialog header="Solicitar autorización de exceso" [(visible)]="dialogoSolicitarAutorizacion" [modal]="true"
+  [style]="{ width: '40vw' }" [breakpoints]="{ '960px': '90vw' }" [draggable]="false" [resizable]="false">
+  <p>
+    La asignación supera en <b>{{excesoKgPorAutorizar | number : '1.2-2'}} kg</b> el límite de la OT
+    <b>{{FormMateriaPrimaRetiro.value.OTRetiro}}</b>. Indique el motivo para solicitar la autorización.
+  </p>
+  <span class="p-float-label mt-4">
+    <textarea id="motivoAutorizacion" [(ngModel)]="motivoAutorizacion" [rows]="3" maxlength="2000" pInputTextarea appContadorCaracteres
+      style="width: 100%"></textarea>
+    <label for="motivoAutorizacion">Motivo*</label>
+  </span>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Enviar solicitud" icon="pi pi-send" class="p-button-danger"
+      [disabled]="cargando" (click)="enviarSolicitudAutorizacion()"></button>
+    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-secondary"
+      (click)="dialogoSolicitarAutorizacion = false"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Autorizaciones de exceso pendientes (solo roles con permiso para exceder el límite) -->
+<p-dialog header="Autorizaciones de exceso de OT pendientes" [(visible)]="dialogoAutorizacionesPendientes" [modal]="true"
+  [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '95vw' }" [draggable]="false" [resizable]="false">
+  <div class="table-responsive">
+    <p-table styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [value]="autorizacionesPendientes">
+      <ng-template pTemplate="header">
+        <tr>
+          <th scope="col">OT</th>
+          <th scope="col">Kg</th>
+          <th scope="col">Motivo</th>
+          <th scope="col">Solicitado por</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Motivo de rechazo</th>
+          <th scope="col">Responder</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-autorizacion>
+        <tr>
+          <td>{{autorizacion.autEx_OrdenTrabajo}}</td>
+          <td><b>{{autorizacion.autEx_CantidadKg | number : '1.2-2'}}</b></td>
+          <td>{{autorizacion.autEx_Motivo}}</td>
+          <td>{{autorizacion.usuarioSolicita}}</td>
+          <td>{{autorizacion.autEx_FechaSolicitudUtc | date : 'yyyy-MM-dd'}}</td>
+          <td><input pInputText type="text" maxlength="1000" [(ngModel)]="autorizacion.motivoRechazo" /></td>
+          <td class="text-center" style="white-space: nowrap;">
+            <button pButton type="button" icon="pi pi-check" class="p-button-success p-button-sm me-2"
+              pTooltip="Aprobar" [disabled]="cargando" (click)="responderAutorizacion(autorizacion, true)"></button>
+            <button pButton type="button" icon="pi pi-times" class="p-button-danger p-button-sm"
+              pTooltip="Rechazar (requiere motivo)" [disabled]="cargando" (click)="responderAutorizacion(autorizacion, false)"></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center">
+            <h6>No hay autorizaciones pendientes.</h6>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
