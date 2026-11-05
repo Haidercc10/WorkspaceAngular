@@ -3,7 +3,7 @@ import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.servi
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { CantidadesTickets, claseEstadoTicket, TicketListado, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
+import { CantidadesTickets, claseEstadoTicket, rangoFechasTicketsPorDefecto, TicketListado, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { AppComponent } from 'src/app/app.component';
 import { ClavesTutorialTickets, pasosTutorialGestionTickets } from 'src/app/Tutoriales/Tutoriales_Tickets';
 
@@ -22,19 +22,12 @@ export class Gestion_TicketsComponent implements OnInit, OnDestroy {
 
   cantidades : CantidadesTickets = { abiertos: 0, enRevision: 0, resueltosMes: 0 };
   incluirFinalizados : boolean = false; // muestra también resueltos y cancelados
-  ticketsDisponibles : TicketListado[] = [];
   tickets : TicketListado[] = [];
 
-  anios : number [] = [];
-  meses : { id: number, nombre: string } [] = [];
-  private readonly todosLosMeses : { id: number, nombre: string } [] = [
-    { id: 1, nombre: 'ENERO' }, { id: 2, nombre: 'FEBRERO' }, { id: 3, nombre: 'MARZO' },
-    { id: 4, nombre: 'ABRIL' }, { id: 5, nombre: 'MAYO' }, { id: 6, nombre: 'JUNIO' },
-    { id: 7, nombre: 'JULIO' }, { id: 8, nombre: 'AGOSTO' }, { id: 9, nombre: 'SEPTIEMBRE' },
-    { id: 10, nombre: 'OCTUBRE' }, { id: 11, nombre: 'NOVIEMBRE' }, { id: 12, nombre: 'DICIEMBRE' }
-  ];
-  anioSeleccionado : number | null = null;
-  mesSeleccionado : number | null = null;
+  /** Rango de fechas de creación que se consulta en la API (por defecto, el último año). */
+  fechaInicio : Date = rangoFechasTicketsPorDefecto().inicio;
+  fechaFin : Date = rangoFechasTicketsPorDefecto().fin;
+  readonly hoy : Date = new Date();
 
   codigoDetalle : number | null = null;
   detalleVisible : boolean = false;
@@ -56,14 +49,25 @@ export class Gestion_TicketsComponent implements OnInit, OnDestroy {
 
   tutorial = () => this.tutoriales.iniciar(pasosTutorialGestionTickets());
 
-  /** Consulta las cantidades de las tarjetas y la lista de tickets. */
-  consultar(){
+  /**
+   * Consulta las cantidades de las tarjetas y la lista de tickets del rango de fechas.
+   * @param reiniciarPagina true cuando cambió el filtro; false al recargar tras atender un ticket (se queda en la misma página).
+   */
+  consultar(reiniciarPagina : boolean = false){
+    if (!this.fechaInicio || !this.fechaFin) {
+      this.mensajeService.mensajeAdvertencia('¡Faltan fechas!', 'Seleccione la fecha inicial y la fecha final.');
+      return;
+    }
+    if (this.fechaInicio > this.fechaFin) {
+      this.mensajeService.mensajeAdvertencia('¡Rango inválido!', 'La fecha inicial no puede ser mayor que la fecha final.');
+      return;
+    }
     this.cargando = true;
     this.ticketService.getCantidades().subscribe(c => this.cantidades = c);
-    this.ticketService.getGestion(this.incluirFinalizados).subscribe({
+    this.ticketService.getGestion(this.fechaInicio, this.fechaFin, this.incluirFinalizados).subscribe({
       next: datos => {
-        this.ticketsDisponibles = datos;
-        this.filtrarTicketsPorFecha();
+        this.tickets = datos;
+        if (reiniciarPagina && this.dt) this.dt.first = 0;
         this.cargando = false;
         // Primera vez: se inicia cuando la tabla ya tiene datos (y no está la animación de carga encima)
         this.tutoriales.iniciarPrimeraVez(ClavesTutorialTickets.GESTION, this.AppComponent.storage_Id, pasosTutorialGestionTickets);
@@ -75,51 +79,19 @@ export class Gestion_TicketsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Filtra los tickets y actualiza los años y meses según las fechas de creación.
-   * @param limpiarFiltrosInvalidos Indica si se deben limpiar selecciones que no existen en los datos.
-   */
-  filtrarTicketsPorFecha(limpiarFiltrosInvalidos: boolean = true){
-    this.actualizarOpcionesFecha(limpiarFiltrosInvalidos);
-    this.tickets = this.ticketsDisponibles.filter(ticket => {
-      const fecha = moment(ticket.fechaCreacion);
-      if (!fecha.isValid()) return this.anioSeleccionado == null && this.mesSeleccionado == null;
-      const coincideAnio = this.anioSeleccionado == null || fecha.year() === this.anioSeleccionado;
-      const coincideMes = this.mesSeleccionado == null || fecha.month() + 1 === this.mesSeleccionado;
-      return coincideAnio && coincideMes;
-    });
-  }
-
-  private actualizarOpcionesFecha(limpiarFiltrosInvalidos: boolean): void {
-    const fechasValidas = this.ticketsDisponibles.map(t => moment(t.fechaCreacion)).filter(f => f.isValid());
-
-    this.anios = [...new Set(fechasValidas.map(f => f.year()))].sort((a, b) => a - b);
-    if (limpiarFiltrosInvalidos && this.anioSeleccionado !== null && !this.anios.includes(this.anioSeleccionado)) {
-      this.anioSeleccionado = null;
-      this.mesSeleccionado = null;
-    }
-
-    const idsMesesDisponibles = new Set(
-      fechasValidas
-        .filter(f => this.anioSeleccionado === null || f.year() === this.anioSeleccionado)
-        .map(f => f.month() + 1)
-    );
-    this.meses = this.todosLosMeses.filter(mes => idsMesesDisponibles.has(mes.id));
-    if (limpiarFiltrosInvalidos && this.mesSeleccionado !== null && !idsMesesDisponibles.has(this.mesSeleccionado)) {
-      this.mesSeleccionado = null;
-    }
-  }
-
+  /** Consulta los tickets creados desde el primer día del mes actual hasta hoy. */
   filtrarMesActual(){
-    this.anioSeleccionado = moment().year();
-    this.mesSeleccionado = moment().month() + 1;
-    this.filtrarTicketsPorFecha(false);
+    this.fechaInicio = moment().startOf('month').toDate();
+    this.fechaFin = moment().startOf('day').toDate();
+    this.consultar(true);
   }
 
+  /** Vuelve al rango por defecto (último año) y consulta. */
   clearFilters(){
-    this.anioSeleccionado = null;
-    this.mesSeleccionado = null;
-    this.filtrarTicketsPorFecha();
+    const rango = rangoFechasTicketsPorDefecto();
+    this.fechaInicio = rango.inicio;
+    this.fechaFin = rango.fin;
+    this.consultar(true);
   }
 
   abrirDetalle(ticket : TicketListado) {

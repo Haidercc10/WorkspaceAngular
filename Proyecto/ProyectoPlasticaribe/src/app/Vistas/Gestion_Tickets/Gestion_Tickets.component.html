@@ -49,26 +49,27 @@
   <!-- FILTROS -->
   <div class="mb-3">
     <div class="row g-3 justify-content-center align-items-center" id="filtrosFecha">
-      <div class="col-md-3">
+      <div class="col-md-2">
         <span class="p-float-label">
-          <p-dropdown [options]="anios" [(ngModel)]="anioSeleccionado"
-            inputId="anioTickets" [showClear]="true" (onChange)="filtrarTicketsPorFecha()"></p-dropdown>
-          <label for="anioTickets">Año</label>
+          <p-calendar [(ngModel)]="fechaInicio" inputId="fechaInicioTickets" [showIcon]="true" dateFormat="yy-mm-dd"
+            [maxDate]="fechaFin || hoy" [readonlyInput]="true" appendTo="body"></p-calendar>
+          <label for="fechaInicioTickets">Fecha Inicial</label>
         </span>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <span class="p-float-label">
-          <p-dropdown [options]="meses" optionValue="id" optionLabel="nombre" [(ngModel)]="mesSeleccionado"
-            inputId="mesTickets" [showClear]="true" (onChange)="filtrarTicketsPorFecha()"></p-dropdown>
-          <label for="mesTickets">Mes</label>
+          <p-calendar [(ngModel)]="fechaFin" inputId="fechaFinTickets" [showIcon]="true" dateFormat="yy-mm-dd"
+            [minDate]="fechaInicio" [maxDate]="hoy" [readonlyInput]="true" appendTo="body"></p-calendar>
+          <label for="fechaFinTickets">Fecha Final</label>
         </span>
       </div>
       <div class="col-md-2 switch-finalizados" id="switchFinalizados">
-        <p-inputSwitch inputId="incluirFinalizados" [(ngModel)]="incluirFinalizados" (onChange)="consultar()"></p-inputSwitch>
+        <p-inputSwitch inputId="incluirFinalizados" [(ngModel)]="incluirFinalizados" (onChange)="consultar(true)"></p-inputSwitch>
         <label for="incluirFinalizados">Ver resueltos y cancelados</label>
       </div>
-      <div class="col-md-4 acciones-filtros" id="accionesFiltros">
-        <button pButton class="p-button-danger botonesOpciones" pRipple type="button" label="Mes Actual" icon="pi pi-search" (click)="filtrarMesActual()"></button>
+      <div class="col-md-6 acciones-filtros" id="accionesFiltros">
+        <button pButton class="p-button-danger botonesOpciones" pRipple type="button" label="Consultar" icon="pi pi-search" (click)="consultar(true)"></button>
+        <button pButton class="p-button-danger p-button-outlined" type="button" label="Mes Actual" icon="pi pi-calendar" (click)="filtrarMesActual()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser" (click)="clearFilters()"></button>
         <button pButton class="p-button-secondary p-button-outlined" type="button" icon="pi pi-refresh" iconPos="left" label="Actualizar" (click)="consultar()"></button>
       </div>
@@ -95,7 +96,7 @@
       [rows]="15"
       [rowsPerPageOptions]="[5,10,15,20,25,30,35,40,45,50]"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} tickets."
+      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} tickets"
       dataKey="codigo"
       [value]="tickets">
       <ng-template pTemplate="header">
@@ -121,7 +122,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-item>
-        <tr (click)="abrirDetalle(item)">
+        <tr (click)="abrirDetalle(item)" pTooltip="Haz click para ver el detalle del ticket" tooltipPosition="top">
           <td>{{item.codigo}}</td>
           <td><span class="descripcion-ticket" [title]="item.asunto">{{item.asunto}}</span></td>
           <td>{{item.tipo}}</td>
