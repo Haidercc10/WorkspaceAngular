@@ -600,6 +600,11 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
+/* Badges de estado de tickets */
+.badge-estado-ticket {
+  text-transform: uppercase;
+}
+
 #texto-centrado {
   text-align: center;
 }
@@ -702,4 +707,11 @@ p-avatar div span {
 .contador-caracteres--limite {
   color: var(--red-500, #ef4444);
   font-weight: 700;
+}
+
+/* En inputs de una sola línea el contador va centrado verticalmente (en textarea sigue en la esquina inferior). */
+input.con-contador-caracteres + .contador-caracteres {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
 }

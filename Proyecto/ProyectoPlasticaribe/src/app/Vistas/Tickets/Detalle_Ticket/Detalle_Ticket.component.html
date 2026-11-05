@@ -1,0 +1,70 @@
+<div class="text-center p-4" *ngIf="cargando">
+  <p-progressSpinner [style]="{width: '40px', height: '40px'}"></p-progressSpinner>
+</div>
+
+<ng-container *ngIf="detalle && !cargando">
+  <!-- Encabezado -->
+  <div id="infoTicket">
+    <div class="detalle-encabezado">
+      <h4 class="m-0">{{detalle.ticket.asunto}}</h4>
+      <span class="badge badge-estado-ticket" [ngClass]="claseEstado(detalle.ticket.estadoId)">{{detalle.ticket.estado}}</span>
+    </div>
+    <!-- Sin "col-12": PrimeFlex (cargado después de Bootstrap) también la define con width:100% y anula col-md/col-lg.
+         En pantallas pequeñas Bootstrap ya pone cada columna a todo el ancho (.row > *). -->
+    <div class="row g-2 detalle-datos">
+      <div class="col-md-6 col-lg-3"><strong>Tipo:</strong> {{detalle.ticket.tipo}}</div>
+      <div class="col-md-6 col-lg-3"><strong>Creado:</strong> {{detalle.ticket.fechaCreacion | date:'yyyy-MM-dd HH:mm'}}</div>
+      <div class="col-md-6 col-lg-3" *ngIf="detalle.ticket.fechaResolucion"><strong>Resuelto:</strong> {{detalle.ticket.fechaResolucion | date:'yyyy-MM-dd HH:mm'}}</div>
+      <div class="col-md-6 col-lg-3" *ngIf="modoSoporte || detalle.ticket.registradoPor"><strong>Reportado por:</strong> {{detalle.ticket.usuario}}</div>
+      <div class="col-md-6 col-lg-3" *ngIf="detalle.ticket.registradoPor"><strong>Registrado por:</strong> {{detalle.ticket.registradoPor}} (soporte)</div>
+      <div class="col-md-6 col-lg-3" *ngIf="modoSoporte && detalle.ticket.area"><strong>Área:</strong> {{detalle.ticket.area}}</div>
+    </div>
+  </div>
+
+  <hr class="Linea">
+
+  <!-- Descripción -->
+  <div id="descripcionTicket">
+    <h6>Descripción</h6>
+    <p class="texto-observacion">{{detalle.descripcion}}</p>
+  </div>
+
+  <!-- Imágenes -->
+  <div id="imagenesTicket" *ngIf="detalle.adjuntos.length">
+    <h6>Imágenes ({{detalle.adjuntos.length}})</h6>
+    <div class="detalle-imagenes">
+      <p-image *ngFor="let img of imagenes" [src]="img.src" [alt]="img.nombre" [preview]="true" width="160"></p-image>
+      <span *ngIf="imagenes.length < detalle.adjuntos.length" class="texto-suave">Cargando imágenes...</span>
+    </div>
+  </div>
+
+  <hr class="Linea">
+
+  <!-- Historial -->
+  <div id="seguimientoTicket">
+    <h6>Seguimiento</h6>
+    <p class="texto-suave" *ngIf="!detalle.historial.length">Aún no hay respuestas de soporte.</p>
+    <ul class="historial">
+      <li *ngFor="let h of detalle.historial">
+        <div class="historial-cabecera">
+          <strong>{{h.usuario}}</strong>
+          <span class="texto-suave">{{h.fecha | date:'yyyy-MM-dd'}} {{h.hora}}</span>
+          <span *ngIf="h.estado" class="badge badge-estado-ticket" [ngClass]="claseEstado(h.estadoId)">{{h.estado}}</span>
+        </div>
+        <p class="texto-observacion m-0" *ngIf="h.comentario">{{h.comentario}}</p>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Comentario y acciones -->
+  <div class="mt-3" id="campoComentario">
+    <span class="p-float-label">
+      <textarea id="comentarioTicket" pInputTextarea [(ngModel)]="comentario" rows="4" maxlength="2000" appContadorCaracteres class="w-100 textarea-acotado"></textarea>
+      <label for="comentarioTicket">{{modoSoporte ? 'Comentario / solución' : 'Comentario'}}</label>
+    </span>
+  </div>
+  <div class="detalle-acciones" id="botones">
+    <p-button label="Agregar comentario" icon="pi pi-send" styleClass="p-button-secondary" [disabled]="enviando" (click)="comentar()"></p-button>
+    <p-button *ngFor="let a of acciones; trackBy: trackAccion" [label]="a.etiqueta" [icon]="a.icono" [styleClass]="a.clase" [disabled]="enviando" (click)="cambiarEstado(a)"></p-button>
+  </div>
+</ng-container>

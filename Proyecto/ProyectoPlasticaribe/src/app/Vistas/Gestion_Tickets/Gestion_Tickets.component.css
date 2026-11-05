@@ -2,19 +2,7 @@ p-card, p-card ::ng-deep .p-card {
   height: 100%;
 }
 
-.titulo-encabezado {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  padding-top: 30px;
-  text-align: center;
-}
 
-.titulo-encabezado h2 {
-  margin: 0;
-  text-align: center;
-}
 
 p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
   text-align: center;
@@ -74,7 +62,7 @@ p-chip ::ng-deep .p-chip-text {
   font-size: medium;
 }
 
-#fila {
+#fila, #filtrosFecha {
   text-align: center;
 }
 
@@ -129,4 +117,40 @@ p-chip ::ng-deep .p-chip-text {
 
 ::ng-deep .p-datatable-tbody > tr {
   cursor: pointer;
+}
+
+.switch-finalizados {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.icono-registrado {
+  color: #6c757d;
+  margin-left: 0.25rem;
+}
+
+/*
+ * Botón de tutorial dentro del h2 del título: así el título conserva exactamente la altura y separación
+ * de las demás páginas (márgenes globales de .Titulo .tituloRojo en styles.css), como en Precargue de Rollos.
+ */
+.boton-tutorial-titulo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.4rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Encabezado del popup del ticket: título rojo y, a su derecha, el botón del tutorial del detalle. */
+.titulo-dialogo-ticket {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* styles.css pinta de rojo todo span del encabezado de un p-dialog; el ícono del botón debe seguir blanco. */
+.boton-tutorial-dialogo ::ng-deep .p-button-icon {
+  color: #fff;
 }
