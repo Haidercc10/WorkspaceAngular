@@ -21,7 +21,7 @@
             </li>
           </ul>
           <button *ngIf="estadoConexion == 'error'" pButton pRipple type="button" icon="pi pi-refresh" label="Reintentar"
-                  class="p-button-danger p-button-text" (click)="verificarConexion()"></button>
+                  class="p-button-danger p-button-text" (click)="recargarPagina()"></button>
         </div>
 
         <div *ngIf="estadoConexion == 'listo'" class="aparecer">

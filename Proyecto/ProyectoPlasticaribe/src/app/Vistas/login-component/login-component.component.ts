@@ -101,6 +101,9 @@ export class LoginComponentComponent implements OnInit {
     this.data[key] = this.storage.get(key);
   }
 
+  // Botón "Reintentar": recarga la página completa (también trae la versión más reciente del frontend si hubo despliegue).
+  recargarPagina = () => window.location.reload();
+
   // Si la red vuelve mientras se muestra un error de conexión, se reintenta solo.
   @HostListener('window:online')
   alRecuperarRed() {
