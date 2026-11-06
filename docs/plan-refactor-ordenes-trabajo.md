@@ -40,7 +40,8 @@
 | D2 | ¿Qué tipos (`LAMINADO`, `HOJA`) usan PesoMillar ÷ 2, y en qué presentaciones? | **Por confirmar.** | F1-04 **no se bloquea**: se conserva la regla actual (÷2 para LAMINADO/HOJA), pero calculada en una variable local, sin modificar `ArrayProducto`, y aplicada igual en todas las presentaciones. Cuando haya respuesta, se ajusta una sola constante. |
 | D3 | Roles autorizados para crear, editar y anular. | **Roles 1 y 98, por ahora.** El rol 2 (vendedor) **solo consulta sus propias OT**: no crea, no edita ni anula. | F2-04/F2-05: `CrearOT`, `EditarOT` y `AnularOT` = roles 1 y 98. Rol 2: solo lectura, filtrada por su código desde el token (F2-06). En Angular se ocultan o deshabilitan para el rol 2 los botones de crear, editar, anular y crear mezcla/material/pigmento. Es solo usabilidad: la restricción real la aplica el backend. |
 | D4 | ¿Se conserva el creador al editar? | **Sí, y se agrega una columna para el último editor.** | F2-03: nuevas columnas `Ot_UsuarioModifica` (FK a `Usuarios.Usua_Id`) y `Ot_FechaModifica`. |
-| D6 | Al **editar** una OT, el trigger actualiza el precio de venta y el costo del artículo en Zeus con el precio de esa OT. ¿Es lo deseado? ¿Y al anular? | **Pendiente.** | F2-16 |
+| D6 | Al **editar** una OT, el trigger actualiza el precio de venta y el costo del artículo en Zeus con el precio de esa OT. ¿Es lo deseado? ¿Y al anular? | **Sí al editar. No al anular.** | F2-16: el trigger no llama a `ActualizarArticulos_Zeus` cuando el `UPDATE` es una anulación. |
+| D7 | Al anular en Plasticaribe, ¿debe quedar anulada también en BagPro (`ClientesOT.Estado`)? ¿Qué valor de `Estado` significa anulada en BagPro? | **Pendiente.** | F2-05, F2-17 |
 | D5 | ¿Quién entrega `Numero_OT`? | **BagPro, por ahora**, hasta migrar todo a Plasticaribe. | F2-01 reescrita: el número lo calcula el servidor a partir de BagPro, no el navegador. |
 
 ---
@@ -60,10 +61,10 @@
 
 ### Resultados F0 (2026-11-06, extracción de Pruebas en `PlasticaribeDB/Pruebas`)
 
-**F0-00: OK, con una duda pendiente.**
+**F0-00: OK.**
 - Los triggers y SPs de `PlasticaribeBDD_Test` escriben en `plasticaribe2` (BagPro de pruebas) mediante nombres de tres partes, porque están en la misma instancia y no usan linked server. A Zeus llegan por el linked server `192.168.0.85` → `Inventario_Prea21`.
 - Las 6 referencias a bases de producción (`plasticaribe.dbo`, `PlasticaribeBDD.dbo`, `[192.168.0.85].Inventario`) están **comentadas**.
-- **Pendiente:** confirmar si `[192.168.0.85].Contabilidad_Prea21` es la base de pruebas o la de producción de contabilidad. La usan los SPs de BagPro que sincronizan clientes desde Zeus.
+- `[192.168.0.85].Contabilidad_Prea21` es la base **de pruebas** de contabilidad (confirmado 2026-11-06).
 - Los triggers tienen **el nombre de la base escrito en el código** (`plasticaribe2`, `PlasticaribeBDD_Test`). Las versiones de pruebas y de producción de un mismo trigger **son textos distintos**, y cualquier cambio de trigger se hace dos veces. Ver F4 (sinónimos).
 
 **F0-01: resuelto en su mayor parte.** Cadena real de creación:
@@ -94,7 +95,8 @@ Hallazgos nuevos derivados de F0 (se incorporan como F2-13 a F2-16):
 | T1 | **CRÍTICO** | Si se inserta una OT con un número **que ya existe en BagPro**, `TR_CrearOTs` entra en la rama `ELSE … inserted AND NOT deleted` y **sobrescribe en silencio la OT existente de BagPro** con el cliente, el producto y la mezcla de la nueva. Esto confirma que H1 (número calculado en el navegador) no solo duplica: corrompe una OT real. | `TR_CrearOTs`, rama `PRINT('7. …')` |
 | T2 | ALTO | Si el producto/presentación no existe en `ClientesOT_Item`, o el artículo no existe en Zeus, **la OT se crea solo en Plasticaribe, sin error**. Producción (BagPro) no la ve, y el siguiente número calculado desde BagPro **repetirá** ese número. | `TR_CrearOTs`, condiciones `EXISTS` de las dos ramas |
 | T3 | ALTO | Todos los triggers de OT son de una sola fila. Un `INSERT` o `UPDATE` de varias filas sobre `Orden_Trabajo` o las tablas de proceso falla ("subquery returned more than 1 value") o replica solo una fila. | `TR_CrearOTs` línea `DECLARE @id_OT`, `TR_ActualizarCampos_*`, `CrearOT_EnEstadoProcesosOT_PBdD` |
-| T4 | MEDIO / **DECISIÓN D6** | Cualquier `UPDATE` de `Orden_Trabajo` (editar, **anular**, cambiar estado) vuelve a ejecutar `Actualizar_ClientesOT` y **actualiza el precio de venta y el costo (precio × 0,75) del artículo en Zeus** con el precio de esa OT. | `TR_CrearOTs`, `ActualizarArticulos_Zeus` |
+| T4 | MEDIO / D6 | Cualquier `UPDATE` de `Orden_Trabajo` (editar, **anular**, cambiar estado) vuelve a ejecutar `Actualizar_ClientesOT` y **actualiza el precio de venta y el costo (precio × 0,75) del artículo en Zeus** con el precio de esa OT. D6: correcto al editar, **no** al anular. | `TR_CrearOTs`, `ActualizarArticulos_Zeus` |
+| T5 | ALTO / **D7** | `TR_CrearOTs` siempre envía `@estadoOT = ''` y `plasticaribe2.dbo.Actualizar_ClientesOT` hace `SET Estado = @estadoOT`. **Cada edición en Plasticaribe borra el `Estado` de la OT en BagPro**, y anular en Plasticaribe **no** marca la OT como anulada en BagPro. **Pendiente:** confirmar qué valores usa `ClientesOT.Estado` en producción (la creación inserta `'0'`). | `TR_CrearOTs` (`@estadoOTBagPro = ''`), `Actualizar_ClientesOT` línea ~184 |
 
 ---
 
@@ -136,7 +138,8 @@ Cada tarea cambia el contrato o la BD: plan detallado pendiente de aprobación a
 | F2-13 | **CRÍTICO** | `TR_CrearOTs` (T1) + `CrearAsync` | Insertar un número que ya existe en BagPro sobrescribe la OT de BagPro. | **Defensa doble:** (1) en `CrearAsync`, dentro de la transacción y después del `sp_getapplock` de F2-01, comprobar que el número **no exista en `plasticaribe2.dbo.ClientesOT`** y, si existe, responder 409; (2) **script de trigger** (lo aplica el responsable): en `TR_CrearOTs`, si es INSERT (`NOT EXISTS deleted`) y la OT ya existe en BagPro, ejecutar `THROW 50001, 'La OT ya existe en BagPro', 1;`. Entregar las versiones Pruebas y Producción. | Crear una OT con un número existente en BagPro devuelve 409 y la OT de BagPro queda intacta. |
 | F2-14 | ALTO | `TR_CrearOTs` (T2) + `CrearAsync` | Una OT puede crearse sin replicarse a BagPro ni a Zeus, sin error. | Validar en `CrearAsync`, **antes** de insertar, que existan `plasticaribe2.dbo.ClientesOT_Item` (producto + presentación) y el artículo en Zeus. Si falta alguno, responder 422 con el motivo. Después del `SaveChanges`, comprobar que la OT existe en `ClientesOT`; si no, hacer rollback y responder 502. | No es posible tener una OT en Plasticaribe sin su par en BagPro. |
 | F2-15 | ALTO | Todo código que escriba en `Orden_Trabajo` o en las tablas `OT_*` (T3) | Los triggers son de una sola fila. | **Regla para el developer:** prohibido `ExecuteUpdate`/`ExecuteDelete`, `UPDATE` masivos o `AddRange` de varias OT en una sola sentencia sobre estas tablas. La anulación (F2-05) y cualquier cambio de estado se hacen OT por OT. Documentarlo con un comentario en `OrdenTrabajoCompletaService`. A medio plazo, reescribir los triggers para varias filas (F4). | Revisión de código: no hay operaciones de varias filas sobre esas tablas. |
-| F2-16 | MEDIO | `TR_CrearOTs` → `ActualizarArticulos_Zeus` (T4) | Editar o anular una OT cambia el precio y el costo del artículo en Zeus. | **[DECISIÓN D6]** Según la respuesta: (a) se mantiene, documentado; (b) solo se actualiza Zeus en el INSERT o cuando cambia el precio (`UPDATE(Ot_ValorUnidad)`/`UPDATE(Ot_ValorKg)`); (c) se elimina del trigger. Como mínimo, la anulación no debe tocar Zeus. | Anular una OT no modifica el artículo en Zeus. |
+| F2-16 | MEDIO | `TR_CrearOTs` → `ActualizarArticulos_Zeus` (T4) | Anular una OT cambia el precio y el costo del artículo en Zeus. | **D6:** se mantiene la actualización de Zeus al crear y editar. **Script de trigger** (lo aplica el responsable, versiones Pruebas y Producción): no ejecutar `ActualizarArticulos_Zeus` cuando el `UPDATE` cambia `Estado_Id` a un estado de anulación (comparar `inserted.Estado_Id` con `deleted.Estado_Id`). | Anular una OT no modifica el artículo en Zeus. Editar el precio sí lo hace. |
+| F2-17 | ALTO | `TR_CrearOTs` + `plasticaribe2.dbo.Actualizar_ClientesOT` (T5) | Cada edición borra `ClientesOT.Estado` en BagPro. La anulación no se propaga. | **Script de SP/trigger** (lo aplica el responsable): `Actualizar_ClientesOT` **no** debe tocar `Estado` en las ediciones (quitarlo del `SET`, o `Estado = ISNULL(NULLIF(@estadoOT,''), Estado)`). **[D7]** Si se aprueba, en la anulación se envía el valor de anulación de BagPro. | Editar una OT conserva su `Estado` en BagPro. Anular deja el valor acordado en D7. |
 
 ---
 
@@ -203,7 +206,7 @@ Se aborda después de F1, sobre un código ya estabilizado.
 | PR1 | `refactor/ot-f1-frontend` | WorkspaceAngular | F1-01, 02, 03, 05, 06, 07, 08 | PR0 |
 | PR2 | `refactor/ot-f1-calculos` | WorkspaceAngular | F1-04 + F3-01 (servicio de costos puro con `.spec.ts`), D1 aplicada y D2 como constante | PR1 |
 | PR3 | `refactor/ot-f2-creacion` | PlasticaribeWebAPI + WorkspaceAngular | F2-01, F2-02, F2-03, F2-12, **F2-13, F2-14**, regla F2-15 y migración EF (índice único, `RowVersion`, columnas de último editor). Incluye el script de `TR_CrearOTs` (Pruebas y Producción) en el repo `PlasticaribeDB`, que aplica el responsable | F0 completa, PR1 |
-| PR4 | `refactor/ot-f2-autorizacion` | PlasticaribeWebAPI + WorkspaceAngular + BagPro_WebAPI (F2-06) | F2-04, F2-05, F2-06 | PR3 |
+| PR4 | `refactor/ot-f2-autorizacion` | PlasticaribeWebAPI + WorkspaceAngular + BagPro_WebAPI (F2-06) + PlasticaribeDB (scripts F2-16, F2-17) | F2-04, F2-05, F2-06, F2-16, F2-17 | PR3 |
 | PR5 | `refactor/ot-f2-endpoints` | PlasticaribeWebAPI + WorkspaceAngular | F2-07 a F2-11 | PR3 |
 | PR6 | `refactor/ot-f3-estructura` | WorkspaceAngular | F3-02 a F3-08 | PR2 |
 | PR7 | `refactor/ot-f4-*` | Según la tarea | Backlog F4 | — |
