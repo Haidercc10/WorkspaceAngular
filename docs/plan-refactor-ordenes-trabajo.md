@@ -59,6 +59,21 @@
 | F0-04 | Comprobar si hay solapamiento entre `SedeCli_CodBagPro` y `SedeCli_Id`. | F2-07 |
 | F0-05 | **Fuera de alcance, urgente:** `BagPro_WebAPI/Data/plasticaribeContext.cs` (línea ~120) tiene en un comentario una cadena de conexión con usuario `sa` y su contraseña, y está en el historial de git. Rotar la credencial y dejar de usar `sa` en las APIs. | Seguridad |
 
+### F0-06 · CRÍTICO · Producción escribe en bases de PRUEBAS (pendiente de verificar con datos)
+
+Extracción de Producción (2026-11-06, `PlasticaribeDB/Produccion`). Las APIs definen como producción `plasticaribe` (BagPro), `PlasticaribeBDD` e `Inventario` (Zeus), según las cadenas de conexión de BagPro_WebAPI, PlasticaribeWebAPI y ApiZeusInventario. Sin embargo, **9 triggers habilitados de `PlasticaribeBDD` (producción) escriben en `plasticaribe2` (BagPro de pruebas) y/o en `[192.168.0.85].Inventario_Prea21` (Zeus de pruebas)**:
+
+| Trigger (PlasticaribeBDD) | Destino de pruebas |
+|---|---|
+| `Orden_Trabajo.TR_CrearOTs` | `plasticaribe2` (ClientesOT, ClientesOT_Item, SPs) + `Inventario_Prea21.Articulo` |
+| `OT_Extrusion.TR_ActualizarCampos_OTExtrusion`, `OT_Impresion.TR_ActualizarCampos_OTImpresion`, `OT_Laminado.TR_ActualizarCampos_OTLaminado`, `OT_Sellado_Corte.ActualizarCampos_ProductoTerminado` | `plasticaribe2` (ClientesOT, ClientesOT_Item, Wiketiando) |
+| `Pedidos_Externos.CrearPedidos_Zeus` | `Inventario_Prea21` (PedidoDeCliente, Consecutivo) |
+| `Materiales_MatPrima.Crear_Material`, `Mezclas_Materiales.Crear_Mezclas_Materiales`, `Tintas.CrearTintas_DesdePBDD` | `plasticaribe2` |
+
+Además, varios SPs de producción (`SPInsertarCabeceraDoc_Zeus`, `SpInsertar_PedidoZeus`, `SPInsertarDetalle_PedidoZeus`, `SPInsertarDoc_DatosAdicionales`, `CrearOrden_TrabajoDesdeBagPro`, `SP_InsertarRollosEliminadosSinParametros`) y del BagPro de producción (`ActualizarArticulos_Zeus`, `CrearItem_Zeus`, `InsertarArticulo_Zeus`) apuntan a `plasticaribe2` o a `Inventario_Prea21`. El resto del código de producción apunta a `plasticaribe` (137 referencias frente a 75 a `plasticaribe2`).
+
+**Si se confirma:** cada OT creada o editada en Plasticaribe producción se replica al BagPro **de pruebas** y no al real, y los pedidos se envían al Zeus de pruebas. **No tocar nada hasta verificarlo con datos**: puede que esas funciones aún no se usen en producción, o que `Inventario_Prea21` no sea solo de pruebas. Se verifica con las consultas de solo lectura de la sección "Verificación F0-06". Esto **bloquea F2** (los scripts de trigger de Producción dependen de saber cuál es el destino correcto).
+
 ### Resultados F0 (2026-11-06, extracción de Pruebas en `PlasticaribeDB/Pruebas`)
 
 **F0-00: OK.**
