@@ -1,10 +1,41 @@
+/* El fondo se fija a la ventana: así no depende del margin-top global de html/body (styles.css)
+   y la página no genera barras de desplazamiento. Si la pantalla es muy baja, el scroll queda dentro del fondo. */
 .fondo {
-  margin-top: -80px;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 16px;
   background: url("/assets/Background/fondo-login.png") no-repeat center;
-  height: 100%;
-  min-height: 100vh;
   background-size: cover;
-  background-attachment: fixed;
+}
+
+.fondo > form {
+  margin: auto; /* centra la tarjeta vertical y horizontalmente */
+  width: 100%;
+}
+
+/* Mientras el usuario no interactúa, Chrome/Edge muestran el autocompletado como "vista previa" con la fuente
+   del sistema; al primer clic cambiaba a la del proyecto. ::first-line es lo único que permite darle estilo a esa vista previa. */
+:host ::ng-deep input:-webkit-autofill::first-line {
+  font-family: var(--font-family);
+  font-size: 1rem;
+}
+
+/* Quita el fondo azul claro del autocompletado: Chrome/Edge lo imponen con !important, así que no se puede
+   sobrescribir; en cambio se retrasa su transición indefinidamente y el campo conserva el fondo y color del tema
+   (claro u oscuro). Se mantienen las transiciones normales de borde y sombra del foco. */
+:host ::ng-deep input:-webkit-autofill,
+:host ::ng-deep input:-webkit-autofill:hover,
+:host ::ng-deep input:-webkit-autofill:focus {
+  transition: background-color 600000s 0s, color 600000s 0s, border-color 0.2s, box-shadow 0.2s;
+}
+
+/* El navegador autocompleta sin avisar a PrimeNG, y la etiqueta flotante quedaba encima del valor */
+:host ::ng-deep .p-float-label:has(input:-webkit-autofill) > label {
+  top: -0.75rem;
+  font-size: 12px;
 }
 
 p-dropdown ::ng-deep .p-dropdown {
@@ -13,6 +44,11 @@ p-dropdown ::ng-deep .p-dropdown {
 }
 
 p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
+  width: 100%;
+}
+
+/* Usuario con ícono a la izquierda (mismo patrón que crear/búsqueda de OT): el input ocupa todo el ancho */
+.p-input-icon-left > input {
   width: 100%;
 }
 
@@ -35,6 +71,7 @@ p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
 .contenedorLoginLigth {
   background-color: #fffd;
   width: 400px;
+  max-width: 100%;
   padding: 2%;
   margin: 0 auto;
   border-radius: 3%;
@@ -43,12 +80,13 @@ p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
   -webkit-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
   -moz-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
   box-shadow: 1px 18px 60px -19px rgba(0,0,0);
-  margin-top: 100px;
+
 }
 
 .contenedorLoginDark {
   background-color: #071426f8;
   width: 400px;
+  max-width: 100%;
   padding: 2%;
   margin: 0 auto;
   border-radius: 3%;
@@ -57,7 +95,7 @@ p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
   -webkit-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
   -moz-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
   box-shadow: 1px 18px 60px -19px rgba(0,0,0);
-  margin-top: 100px;
+
 }
 
 
@@ -156,6 +194,91 @@ a {
 
 .slide-in-fwd-center {
   animation: puff-in-center 0.7s cubic-bezier(0.470, 0.000, 0.745, 0.715) both;
+}
+
+/* ---------- Verificación de conexión (antes de mostrar el formulario) ---------- */
+.verificacionConexion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 1rem 0.5rem;
+  text-align: center;
+}
+
+.logoCarga {
+  width: 80%;
+  max-width: 300px;
+  animation: latido-logo 1.6s ease-in-out infinite;
+}
+
+/* Con error el logo deja de latir y se atenúa */
+.logoCargaError {
+  animation: none;
+  opacity: 0.45;
+  filter: grayscale(60%);
+}
+
+.mensajeConexion {
+  margin-top: 1.5rem;
+  max-width: 100%;
+  font-size: 1rem;
+}
+
+/* Un error por renglón: ícono a la izquierda y texto alineado, cada uno en su propia línea */
+.erroresConexion {
+  list-style: none;
+  margin: 1.5rem 0 0.5rem 0;
+  padding: 0;
+  width: 100%;
+  color: #db4149;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.erroresConexion li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  overflow-wrap: anywhere;
+}
+
+.erroresConexion li + li {
+  border-top: 1px solid rgba(219, 65, 73, 0.2);
+}
+
+.erroresConexion .pi {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+@keyframes latido-logo {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.94); opacity: 0.6; }
+}
+
+.aparecer {
+  animation: aparecer 0.4s ease-out both;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.recordarme {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -4% 0 6% 0;
+}
+
+.recordarme label {
+  cursor: pointer;
+  margin: 0;
 }
 
 @keyframes puff-in-center {

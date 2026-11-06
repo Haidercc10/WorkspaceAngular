@@ -1,5 +1,5 @@
 <div class="fondo">
-  <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()" autocomplete="off">
+  <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
 
     <!--<div class="titulo">
       <img class="logo slide-in-fwd-center" src="/assets/PLASTICARIBE_logo.png" alt="">
@@ -9,6 +9,22 @@
     <div class="container-fluid slide-in-fwd-center">
       <div [ngClass]="{'contenedorLoginLigth' : !modoSeleccionado, 'contenedorLoginDark' : modoSeleccionado}" >
 
+        <!--Verificación de conexión: logo animado + estado, antes de mostrar el formulario-->
+        <div *ngIf="estadoConexion != 'listo'" class="verificacionConexion">
+          <img class="logoCarga" [class.logoCargaError]="estadoConexion == 'error'"
+               [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="Plasticaribe">
+          <p *ngIf="estadoConexion == 'verificando'" class="mensajeConexion">{{ mensajeConexion }}</p>
+          <ul *ngIf="estadoConexion == 'error'" class="erroresConexion">
+            <li *ngFor="let error of erroresConexion" [title]="error">
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>{{ error }}</span>
+            </li>
+          </ul>
+          <button *ngIf="estadoConexion == 'error'" pButton pRipple type="button" icon="pi pi-refresh" label="Reintentar"
+                  class="p-button-danger p-button-text" (click)="verificarConexion()"></button>
+        </div>
+
+        <div *ngIf="estadoConexion == 'listo'" class="aparecer">
         <!--Titulo-->
         <div class="mb-3">
           <h4 class="tituloRojo"><i class="pi pi-sign-in"></i> Accede a tu cuenta de</h4>
@@ -16,29 +32,26 @@
         </div>
 
         <div class="col-md mb">
-          <div class="p-inputgroup">
-            <span class="p-float-label">
-              <input formControlName="Identificacion" autocomplete="off" placeholder="ID Usuario" id="usuario" pInputText required/>
-              <label for="usuario">Usuario</label>
-            </span>
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-user"></i>
-            </span>
-          </div>
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-user"></i>
+            <input formControlName="Identificacion" autocomplete="username" name="username" placeholder="ID Usuario" id="usuario" pInputText required/>
+            <label for="usuario">Usuario</label>
+          </span>
         </div>
 
         <div class="col-md mb">
-          <span class="p-float-label">
-            <p-password formControlName="Contrasena" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-key"></i>
+            <p-password formControlName="Contrasena" [feedback]="false" inputId="pass" autocomplete="current-password" [toggleMask]="true"></p-password>
             <label for="pass">Contraseña</label>
           </span>
         </div>
 
-        <div class="form-floating col-md mb">
-          <span class="p-float-label">
-            <p-dropdown formControlName="Empresa" id="Empresa" [options]="empresas" optionLabel="empresa_Nombre" type="number" optionValue="empresa_Id" [autoDisplayFirst]="true"></p-dropdown>
-            <label for="Empresa">Empresa</label>
-          </span>
+        <!--Empresa: oculta, se deja escogida automáticamente (PLASTICARIBE S.A.S) al verificar la conexión-->
+
+        <div class="recordarme">
+          <p-checkbox formControlName="Recordarme" [binary]="true" inputId="recordarme"></p-checkbox>
+          <label for="recordarme">Recuérdame</label>
         </div>
 
         <!--Boton Ingresar al sistema-->
@@ -49,6 +62,7 @@
         <!--Boton Ingresar como invitado-->
         <div class="mb-3">
           <button pButton pRipple type="button" icon="pi pi-users" label="Entrar como invitado" class="p-button-danger p-button-text" (click)="redireccionarArchivos()"></button>
+        </div>
         </div>
       </div>
     </div>

@@ -75,16 +75,19 @@ export class TutorialesService {
     });
   }
 
+  /** Prefijos de llaves que sobreviven a la limpieza: tutoriales vistos y preferencias del login ("Recuérdame"). */
+  private static readonly PREFIJOS_CONSERVADOS = [TutorialesService.PREFIJO_CLAVE, 'login:'];
+
   /**
-   * Reemplazo de `localStorage.clear()` para login/logout: borra todo excepto las marcas de tutoriales vistos,
-   * así el usuario no vuelve a ver el tutorial automático cada vez que inicia sesión.
+   * Reemplazo de `localStorage.clear()` para login/logout: borra todo excepto las marcas de tutoriales vistos
+   * y el usuario recordado del login, así no se pierden cada vez que se inicia o cierra sesión.
    */
   static limpiarLocalStorageConservandoTutoriales() {
     try {
       const conservar : [string, string][] = [];
       for (let i = 0; i < window.localStorage.length; i++) {
         const llave = window.localStorage.key(i);
-        if (llave?.startsWith(TutorialesService.PREFIJO_CLAVE)) conservar.push([llave, window.localStorage.getItem(llave) ?? '1']);
+        if (llave && TutorialesService.PREFIJOS_CONSERVADOS.some(prefijo => llave.startsWith(prefijo))) conservar.push([llave, window.localStorage.getItem(llave) ?? '1']);
       }
       window.localStorage.clear();
       conservar.forEach(([llave, valor]) => window.localStorage.setItem(llave, valor));

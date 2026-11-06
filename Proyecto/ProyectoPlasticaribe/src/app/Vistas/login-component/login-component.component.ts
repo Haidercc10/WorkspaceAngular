@@ -1,12 +1,12 @@
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, HostListener, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { finalize, tap, of, map } from 'rxjs';
+import { finalize, tap, of, map, timeout, Observable } from 'rxjs';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { switchMap } from 'rxjs/internal/operators/switchMap';
@@ -19,6 +19,7 @@ import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.s
 import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
 import { AppComponent } from 'src/app/app.component';
+import { environment } from 'src/environments/environment';
 
 /**
  * The `LoginComponentComponent` class handles the login functionality of the application.
@@ -43,6 +44,16 @@ export class LoginComponentComponent implements OnInit {
   ipAddress: any; // Variable para almacenar la ip del usuario que inicia sesión
   modoSeleccionado: boolean; //Variable para validar el tema seleccionado, si la variable es true estará en modo oscuro, si es false estará en modo claro
 
+  /** Llave de localStorage del usuario recordado. Usa el prefijo `login:` para sobrevivir a la limpieza de TutorialesService. */
+  static readonly CLAVE_USUARIO_RECORDADO = 'login:usuarioRecordado';
+  private static readonly SIN_INTERNET = 'No hay conexión a internet. Verifica tu red.';
+  private readonly tiempoMaximoConexionMs = 15000;
+
+  /** Estado de la verificación inicial: mientras no esté 'listo' la tarjeta muestra el logo animado y un mensaje en lugar del formulario. */
+  estadoConexion: 'verificando' | 'error' | 'listo' = 'verificando';
+  mensajeConexion: string = 'Iniciando...';
+  erroresConexion: string[] = []; // Un mensaje por API con problemas; la tarjeta muestra uno por renglón
+
   constructor(private empresaServices: EmpresaService,
     private frmBuilderUsuario: FormBuilder,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -55,7 +66,8 @@ export class LoginComponentComponent implements OnInit {
     private encriptacion: EncriptacionService,
     private cookiesServices: CookieService,
     private mensajeService: MensajesAplicacionService,
-    private appComponent: AppComponent,) {
+    private appComponent: AppComponent,
+    private http: HttpClient,) {
 
     if (!this.storage.get('Token')) {
       TutorialesService.limpiarLocalStorageConservandoTutoriales();
@@ -71,6 +83,7 @@ export class LoginComponentComponent implements OnInit {
       Identificacion: [null, Validators.required],
       Contrasena: [null, Validators.required],
       Empresa: [null, Validators.required],
+      Recordarme: [false],
     });
   }
 
@@ -79,7 +92,7 @@ export class LoginComponentComponent implements OnInit {
     this.cookiesServices.delete('MostrarEventosDia');
     TutorialesService.limpiarLocalStorageConservandoTutoriales();
     this.appComponent.ValidarRol = NaN;
-    this.cargaDatosComboBox();
+    this.verificarConexion();
   }
 
   // Funcion que guardará informacion a en la sesion
@@ -88,26 +101,101 @@ export class LoginComponentComponent implements OnInit {
     this.data[key] = this.storage.get(key);
   }
 
-  // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
-  cargaDatosComboBox() {
-  this.empresaServices.getIdNombreEmpresas().subscribe({
-    next: (datos) => {
-      this.empresas = datos;
+  // Si la red vuelve mientras se muestra un error de conexión, se reintenta solo.
+  @HostListener('window:online')
+  alRecuperarRed() {
+    if (this.estadoConexion == 'error') this.verificarConexion();
+  }
 
-      if (this.empresas && this.empresas.length > 0) {
-        this.formularioUsuario.patchValue({
-          Empresa: this.empresas[0].empresa_Id
-        });
-      }
-    },
-    error: () => {
-      this.mensajeService.mensajeError(
-        'Error',
-        '¡No fue posible consultar la empresa, verifique!'
-      );
-    }
-  });
-}
+  /**
+   * Verifica que haya red y que respondan las 4 APIs antes de mostrar el formulario.
+   * Plasticaribe se valida cargando las empresas; las demás, con una consulta sin efectos (ver `verificarServiciosSecundarios`).
+   */
+  verificarConexion() {
+    this.estadoConexion = 'verificando';
+    this.mensajeConexion = 'Iniciando...';
+    this.erroresConexion = [];
+    if (!navigator.onLine) return this.mostrarErrorConexion(LoginComponentComponent.SIN_INTERNET);
+
+    this.mensajeConexion = 'Cargando empresas...';
+    this.empresaServices.getIdNombreEmpresas().pipe(
+      timeout(this.tiempoMaximoConexionMs),
+      switchMap(empresas => {
+        this.empresas = empresas ?? [];
+        this.mensajeConexion = 'Conectando con los servicios...';
+        return this.verificarServiciosSecundarios();
+      }),
+    ).subscribe({
+      next: (erroresServicios) => {
+        if (!this.empresas.length) return this.mostrarErrorConexion('No hay empresas registradas.');
+        if (erroresServicios.length) return this.mostrarErrorConexion(erroresServicios);
+        this.prepararFormulario();
+      },
+      error: (error) => this.mostrarErrorConexion(this.mensajeErrorConexion('Plasticaribe', error)),
+    });
+  }
+
+  /**
+   * Comprueba Inventario Zeus, Contabilidad Zeus y BagPro con `GET api/Salud` (anónimo, no inicia sesión ni guarda tokens).
+   * Ese endpoint responde 200 si la API y su base de datos están bien, o 503 si la API está arriba pero sin base de datos.
+   * @returns Mensajes cortos de los servicios con problemas (vacío si todos respondieron bien).
+   */
+  private verificarServiciosSecundarios(): Observable<string[]> {
+    const servicios = [
+      { nombre: 'Inventario de Zeus', ruta: environment.rutaZeus },
+      { nombre: 'Contabilidad de Zeus', ruta: environment.rutaZeusContabilidad },
+      { nombre: 'BagPro', ruta: environment.rutaBagPro },
+    ];
+    return forkJoin(servicios.map(servicio => this.http.get(`${servicio.ruta}/Salud`).pipe(
+      timeout(this.tiempoMaximoConexionMs),
+      map(() => null),
+      catchError(error => of({ nombre: servicio.nombre, error })),
+    ))).pipe(map(resultados => {
+      const fallidos = resultados.filter(r => !!r) as { nombre: string, error: any }[];
+      if (fallidos.length && !navigator.onLine) return [LoginComponentComponent.SIN_INTERNET];
+      return fallidos.map(f => this.mensajeErrorConexion(f.nombre, f.error)); // un mensaje (renglón) por API
+    }));
+  }
+
+  private apiRespondio = (error: any): boolean => error instanceof HttpErrorResponse && error.status !== 0;
+
+  /** Mensaje corto para la tarjeta: nunca el error completo, que no cabe en la interfaz. */
+  private mensajeErrorConexion(api: string, error: any): string {
+    if (!navigator.onLine) return LoginComponentComponent.SIN_INTERNET;
+    if (this.apiRespondio(error) && error.status == 503) return `${api} no pudo conectarse a su base de datos.`;
+    if (this.apiRespondio(error)) return `${api} respondió con un error (${error.status}).`;
+    return `No se pudo conectar con ${api}.`;
+  }
+
+  private mostrarErrorConexion(mensajes: string | string[]) {
+    this.estadoConexion = 'error';
+    this.erroresConexion = Array.isArray(mensajes) ? mensajes : [mensajes];
+  }
+
+  /** Deja escogida la empresa (oculta en el formulario) y precarga el usuario recordado. */
+  private prepararFormulario() {
+    const empresa = this.empresas.find(e => `${e.empresa_Nombre ?? ''}`.toUpperCase().includes('PLASTICARIBE')) ?? this.empresas[0];
+    const usuarioRecordado = this.leerUsuarioRecordado();
+    this.formularioUsuario.patchValue({
+      Empresa: empresa.empresa_Id,
+      Identificacion: usuarioRecordado,
+      Recordarme: !!usuarioRecordado,
+    });
+    this.estadoConexion = 'listo';
+  }
+
+  // "Recuérdame" guarda solo el ID de usuario; la contraseña la sigue llenando el gestor de contraseñas del navegador.
+  private leerUsuarioRecordado(): string | null {
+    try { return window.localStorage.getItem(LoginComponentComponent.CLAVE_USUARIO_RECORDADO); } catch { return null; }
+  }
+
+  private guardarPreferenciaRecordarme() {
+    try {
+      const { Recordarme, Identificacion } = this.formularioUsuario.value;
+      if (Recordarme) window.localStorage.setItem(LoginComponentComponent.CLAVE_USUARIO_RECORDADO, `${Identificacion}`.trim());
+      else window.localStorage.removeItem(LoginComponentComponent.CLAVE_USUARIO_RECORDADO);
+    } catch { /* sin almacenamiento: simplemente no se recuerda */ }
+  }
 
   // Funcion que va a redireccionar al apartado de archivos
   redireccionarArchivos = () => this.router.navigate(['/Archivos']);
@@ -141,6 +229,7 @@ export class LoginComponentComponent implements OnInit {
               this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
               this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre.toString()));
               this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
+              this.guardarPreferenciaRecordarme();
               window.location.pathname = '/home';
             }, () => {
               this.mensajeService.mensajeError(`¡Error!`, `¡Error al registrar el inicio de sesión!`);
@@ -239,6 +328,7 @@ export class LoginComponentComponent implements OnInit {
         this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
         this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre));
         this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
+        this.guardarPreferenciaRecordarme();
 
         this.router.navigate(['/home']); // ✅ sin recargar página
       }),
