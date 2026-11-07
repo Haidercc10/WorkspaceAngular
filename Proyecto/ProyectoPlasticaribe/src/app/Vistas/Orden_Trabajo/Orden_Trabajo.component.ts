@@ -2008,9 +2008,15 @@ export class Orden_TrabajoComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "Nombre de Mezcla"`);
   }
 
-  // Función que va a crear la mezcla en la base de datos
+  /**
+   * Crea la mezcla predefinida con los valores del modal de mezclas.
+   * Las capas que no están activas tienen sus controles deshabilitados (no vienen en `value`):
+   * en ese caso se envía 0 en los porcentajes y 1 ("no aplica") en materiales y pigmentos.
+   * @returns No retorna un valor.
+   */
   infoMezclaCrear() {
-    let mezcla: any = this.formCrearMezclas.value.Nombre_Mezclas;
+    const v = this.formCrearMezclas.value;
+    let mezcla: any = v.Nombre_Mezclas;
     let modelo: modelMezclas = {
       Mezcla_Nombre: mezcla.replace('%25', '%'),
       Mezcla_NroCapas: this.nroCapas,
@@ -2029,34 +2035,34 @@ export class Orden_TrabajoComponent implements OnInit {
       Mezcla_PorcentajePigmto1_Capa1: this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa1,
       MezPigmto_Id2xCapa1: this.formCrearMezclas.value.MezclaPigmentoP2_Capa1,
       Mezcla_PorcentajePigmto2_Capa1: this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa1,
-      /** Mezcla porcentaje capa 2 */
-      Mezcla_PorcentajeCapa2: this.formCrearMezclas.value.Mezcla_PorcentajeCapa2 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa2,
-      MezMaterial_Id1xCapa2: this.formCrearMezclas.value.MezMaterial_Id1xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP1_Capa2,
-      Mezcla_PorcentajeMaterial1_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial1_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa2,
-      MezMaterial_Id2xCapa2: this.formCrearMezclas.value.MezMaterial_Id2xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP2_Capa2,
-      Mezcla_PorcentajeMaterial2_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial2_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa2,
-      MezMaterial_Id3xCapa2: this.formCrearMezclas.value.MezMaterial_Id3xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP3_Capa2,
-      Mezcla_PorcentajeMaterial3_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial3_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa2,
-      MezMaterial_Id4xCapa2: this.formCrearMezclas.value.MezMaterial_Id4xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP4_Capa2,
-      Mezcla_PorcentajeMaterial4_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial4_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa2,
-      MezPigmto_Id1xCapa2: this.formCrearMezclas.value.MezPigmto_Id1xCapa2 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmentoP1_Capa2,
-      Mezcla_PorcentajePigmto1_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajePigmto1_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa2,
-      MezPigmto_Id2xCapa2: this.formCrearMezclas.value.MezPigmto_Id2xCapa2 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmentoP2_Capa2,
-      Mezcla_PorcentajePigmto2_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajePigmto2_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa2,
+      /** Mezcla porcentaje capa 2 (si la capa no está activa sus controles están deshabilitados y no vienen en value) */
+      Mezcla_PorcentajeCapa2: v.Proc_Capa2 ?? 0,
+      MezMaterial_Id1xCapa2: v.materialP1_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial1_Capa2: v.PorcentajeMaterialP1_Capa2 ?? 0,
+      MezMaterial_Id2xCapa2: v.materialP2_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial2_Capa2: v.PorcentajeMaterialP2_Capa2 ?? 0,
+      MezMaterial_Id3xCapa2: v.materialP3_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial3_Capa2: v.PorcentajeMaterialP3_Capa2 ?? 0,
+      MezMaterial_Id4xCapa2: v.materialP4_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial4_Capa2: v.PorcentajeMaterialP4_Capa2 ?? 0,
+      MezPigmto_Id1xCapa2: v.MezclaPigmentoP1_Capa2 ?? 1,
+      Mezcla_PorcentajePigmto1_Capa2: v.PorcentajeMezclaPigmentoP1_Capa2 ?? 0,
+      MezPigmto_Id2xCapa2: v.MezclaPigmentoP2_Capa2 ?? 1,
+      Mezcla_PorcentajePigmto2_Capa2: v.PorcentajeMezclaPigmentoP2_Capa2 ?? 0,
       /** Mezcla porcentaje capa 3 */
-      Mezcla_PorcentajeCapa3: this.formCrearMezclas.value.Mezcla_PorcentajeCapa3 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa3,
-      MezMaterial_Id1xCapa3: this.formCrearMezclas.value.MezMaterial_Id1xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP1_Capa3,
-      Mezcla_PorcentajeMaterial1_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial1_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa3,
-      MezMaterial_Id2xCapa3: this.formCrearMezclas.value.MezMaterial_Id2xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP2_Capa3,
-      Mezcla_PorcentajeMaterial2_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial2_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa3,
-      MezMaterial_Id3xCapa3: this.formCrearMezclas.value.MezMaterial_Id3xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP3_Capa3,
-      Mezcla_PorcentajeMaterial3_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial3_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa3,
-      MezMaterial_Id4xCapa3: this.formCrearMezclas.value.MezMaterial_Id4xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP4_Capa3,
-      Mezcla_PorcentajeMaterial4_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial4_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa3,
-      MezPigmto_Id1xCapa3: this.formCrearMezclas.value.MezPigmto_Id1xCapa3 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmento1_Capa3,
-      Mezcla_PorcentajePigmto1_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajePigmto1_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa3,
-      MezPigmto_Id2xCapa3: this.formCrearMezclas.value.MezPigmto_Id2xCapa3 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmento2_Capa3,
-      Mezcla_PorcentajePigmto2_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajePigmto2_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa3,
+      Mezcla_PorcentajeCapa3: v.Proc_Capa3 ?? 0,
+      MezMaterial_Id1xCapa3: v.materialP1_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial1_Capa3: v.PorcentajeMaterialP1_Capa3 ?? 0,
+      MezMaterial_Id2xCapa3: v.materialP2_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial2_Capa3: v.PorcentajeMaterialP2_Capa3 ?? 0,
+      MezMaterial_Id3xCapa3: v.materialP3_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial3_Capa3: v.PorcentajeMaterialP3_Capa3 ?? 0,
+      MezMaterial_Id4xCapa3: v.materialP4_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial4_Capa3: v.PorcentajeMaterialP4_Capa3 ?? 0,
+      MezPigmto_Id1xCapa3: v.MezclaPigmento1_Capa3 ?? 1,
+      Mezcla_PorcentajePigmto1_Capa3: v.PorcentajeMezclaPigmentoP1_Capa3 ?? 0,
+      MezPigmto_Id2xCapa3: v.MezclaPigmento2_Capa3 ?? 1,
+      Mezcla_PorcentajePigmto2_Capa3: v.PorcentajeMezclaPigmentoP2_Capa3 ?? 0,
       Usua_Id: this.storage_Id,
       Mezcla_FechaIngreso: this.today
     }
