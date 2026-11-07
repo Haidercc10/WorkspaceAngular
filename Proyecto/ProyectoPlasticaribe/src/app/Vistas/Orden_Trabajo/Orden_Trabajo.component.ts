@@ -986,11 +986,12 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Refresca en segundo plano la información del producto actual (ArrayProducto). Cancela el refresco anterior
+   * Refresca en segundo plano la información del producto actual (ArrayProducto). Se usa solo cuando ArrayProducto
+   * falta o es de otro item/presentación (`calcularDatosOt`, `validarProductoCargado`). Cancela el refresco anterior
    * si sigue pendiente; `limpiarCampos` también lo cancela para que una respuesta tardía no vuelva a llenar
    * ArrayProducto con el producto de una OT ya guardada o descartada.
    * Si la consulta falla (API caída, 500), el error queda en consola y el aviso se muestra una sola vez
-   * hasta que un refresco vuelva a responder, para no repetir el aviso en cada pulsación de tecla.
+   * hasta que un refresco vuelva a responder, para no repetir el aviso en cada recálculo.
    * @returns No retorna un valor.
    */
   buscarInformacionProducto() {
@@ -1565,21 +1566,54 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Programa (500 ms) el refresco del producto y el recálculo de pesos y costos de la OT.
+   * Programa (500 ms) el recálculo de pesos y costos de la OT. Solo consulta de nuevo el producto si ArrayProducto
+   * está vacío o es de otro item/presentación (p. ej. un item nuevo sin ficha en BagPro ni OT previa); el cálculo
+   * ya no modifica ArrayProducto, así que no hace falta refrescarlo en cada tecla.
    * No se ejecuta si al vencer el tiempo hay un guardado en curso, y los pendientes se cancelan al guardar.
    * @returns No retorna un valor.
    */
   calcularDatosOt() {
     this.programarCalculo(() => {
-      this.buscarInformacionProducto();
+      if (this.productoPendienteDeCargar()) this.buscarInformacionProducto();
       this.calcularDatosOtInmediato();
     }, 500);
   }
 
   /**
+   * Indica si la información del producto (ArrayProducto) falta o no corresponde al item y la presentación
+   * actuales (`producto` y `presentacionProducto`), que son los que consulta `buscarInformacionProducto`.
+   * @returns true si hay un item y una presentación seleccionados y ArrayProducto no les corresponde.
+   */
+  private productoPendienteDeCargar(): boolean {
+    if (!this.producto || !this.presentacionProducto) return false;
+    const cargado = this.ArrayProducto[0];
+    return !cargado || `${cargado.Id}`.trim() != `${this.producto}`.trim() || `${cargado.Und}`.trim() != `${this.presentacionProducto}`.trim();
+  }
+
+  /**
+   * Comprueba que el item y la presentación del formulario sean los mismos que los del producto cargado
+   * (`producto`, `presentacionProducto` y ArrayProducto), para no guardar costos calculados con otro item.
+   * Si ArrayProducto falta o es de otro item, pide de nuevo la información del producto.
+   * @returns true si todo corresponde; false si no (ya se mostró el aviso).
+   */
+  private validarProductoCargado(): boolean {
+    const formulario = this.FormOrdenTrabajo.value;
+    if (`${formulario.Id_Producto ?? ''}`.trim() != `${this.producto ?? ''}`.trim() || `${formulario.Presentacion ?? ''}`.trim() != `${this.presentacionProducto ?? ''}`.trim()) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El item o la presentación del formulario no coinciden con el item cargado. Vuelva a buscar el item ${formulario.Id_Producto ?? ''} e intente de nuevo.`, 6000);
+      return false;
+    }
+    if (!this.ArrayProducto.length || this.productoPendienteDeCargar()) {
+      this.buscarInformacionProducto();
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `La información del item ${this.producto} con la presentación ${this.presentacionProducto} aún no se ha cargado. Espere unos segundos e intente de nuevo.`, 6000);
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Programa una acción de cálculo diferida y guarda su temporizador para poder cancelarla.
    * Si al vencer el tiempo hay un guardado en curso, la acción no se ejecuta (no debe cambiar los valores
-   * que se están enviando, ni apagar la pantalla de carga, ni volver a dividir el PesoMillar).
+   * que se están enviando ni apagar la pantalla de carga).
    * @param accion Acción que se ejecutará.
    * @param milisegundos Tiempo de espera.
    * @returns No retorna un valor.
@@ -2354,11 +2388,13 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Prepara y valida los formularios de procesos antes de crear o editar una OT, sin esperas:
    * limpia los procesos que no aplican, recalcula pesos y costos con lo que hay en pantalla y valida
-   * los subformularios en el orden habitual. Antes cancela los cálculos diferidos pendientes. Conserva el refresco de la información del producto que hacía
-   * `calcularDatosOt`: el cálculo usa los datos ya cargados y la respuesta del refresco llega después.
-   * @returns true si todos los subformularios son válidos; false si alguno no lo es (ya se mostró el aviso).
+   * los subformularios en el orden habitual. Antes cancela los cálculos diferidos pendientes. No guarda si la
+   * información del producto falta o es de otro item/presentación (`validarProductoCargado`), ni si algún valor
+   * calculado no es finito (`validarValoresCalculados`). El cálculo es idempotente: se puede repetir sin cambiar el resultado.
+   * @param avisarSinPeso false omite el aviso (no bloqueante) de Valor Kg 0 por falta de peso, cuando ya se mostró.
+   * @returns true si todo es válido; false si algo no lo es (ya se mostró el aviso).
    */
-  private prepararFormulariosParaGuardar(): boolean {
+  private prepararFormulariosParaGuardar(avisarSinPeso: boolean = true): boolean {
     // Un cálculo diferido pendiente (al teclear o al cargar) no debe ejecutarse durante el guardado
     this.cancelarCalculosPendientes();
     if (!this.extrusion) this.limpiarFormExtrusion();
@@ -2368,7 +2404,7 @@ export class Orden_TrabajoComponent implements OnInit {
     if (!this.sellado) this.limpiarFormSellado();
     if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
 
-    this.buscarInformacionProducto();
+    if (!this.validarProductoCargado()) return false;
     this.calcularDatosOtInmediato();
 
     const validaciones: [FormGroup, string][] = [
@@ -2384,16 +2420,17 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, invalido[1]);
       return false;
     }
-    return this.validarValoresCalculados();
+    return this.validarValoresCalculados(avisarSinPeso);
   }
 
   /**
    * Comprueba, justo antes de armar el payload, que los valores calculados y numéricos que se envían sean números
    * finitos (sin null, NaN ni Infinity). Si alguno no lo es, avisa con sus nombres y no deja guardar.
    * Si el Valor Kg quedó en 0 por falta de Peso Millar (o de cantidad por paquete), muestra un aviso que no bloquea.
+   * @param avisarSinPeso false omite el aviso de Valor Kg 0 por falta de peso.
    * @returns true si todos los valores son válidos; false si alguno no lo es (ya se mostró el aviso).
    */
-  private validarValoresCalculados(): boolean {
+  private validarValoresCalculados(avisarSinPeso: boolean = true): boolean {
     const noValidos = this.calculoCostos.valoresNoFinitos({
       'Cantidad': this.cantidadProducto,
       'Valor Unidad': this.valorProducto,
@@ -2408,7 +2445,7 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `Los siguientes valores no son válidos: ${noValidos.join(', ')}. Revise la cantidad, el precio, el margen y la información del item.`);
       return false;
     }
-    if (this.sinPesoParaValorKg && ['Paquete', 'Und'].includes(this.presentacionProducto)) {
+    if (avisarSinPeso && this.sinPesoParaValorKg && ['Paquete', 'Und'].includes(this.presentacionProducto)) {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `El Valor Kg quedó en 0 porque el item ${this.producto} no tiene Peso Millar${this.presentacionProducto == 'Paquete' ? ' o cantidad por paquete' : ''}.`, 6000);
     }
     return true;
@@ -2924,8 +2961,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Valida la información de la OT en edición y, si es correcta, pide confirmación antes de actualizarla.
-   * No hace nada si ya hay un guardado en curso o si la confirmación ya está abierta (evita confirmaciones
-   * duplicadas y un segundo recálculo que en LAMINADO/HOJA volvería a dividir el PesoMillar).
+   * No hace nada si ya hay un guardado en curso o si la confirmación ya está abierta (una sola confirmación).
    * @returns No retorna un valor.
    */
   validarActualizacionOT() {
@@ -2953,18 +2989,19 @@ export class Orden_TrabajoComponent implements OnInit {
    * Actualiza la orden de trabajo en un único flujo: datos actuales de la OT → datos de procesos → edición.
    * Solo actúa en modo edición y si no hay un guardado en curso (evita doble envío). Cualquier error o validación
    * fallida muestra un mensaje y libera la pantalla; si la OT se actualiza, limpia los campos y abre su PDF.
-   * Si hay un recálculo pendiente (el usuario cambió datos con la confirmación abierta), no guarda: vuelve a
-   * validar y recalcular con `validarActualizacionOT` y pide confirmar de nuevo, para no enviar costos viejos.
+   * Antes de enviar vuelve a validar y recalcular de forma síncrona (`prepararFormulariosParaGuardar`), por si el usuario
+   * cambió datos con la confirmación abierta: así se envían los costos actuales con una sola confirmación.
    * @returns No retorna un valor.
    */
   editarOrdenTrabajo() {
     if (!this.edicionOrdenTrabajo || this.guardando) return;
     this.cerrarMensaje();
-    if (this.calculosPendientes.size > 0) {
-      this.msj.mensajeAdvertencia(`¡Los datos de la OT cambiaron!`, `Se recalcularon los costos; confirme de nuevo la edición.`);
-      this.validarActualizacionOT(); // cancela los cálculos pendientes, recalcula una sola vez y vuelve a mostrar la confirmación
+    if (!this.FormOrdenTrabajo.valid) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
       return;
     }
+    // El aviso de Valor Kg 0 ya se mostró al pedir la confirmación
+    if (!this.prepararFormulariosParaGuardar(false)) return;
     this.guardando = true;
     this.cargando = true;
     let ot: number = this.FormOrdenTrabajo.value.OT_Id;
