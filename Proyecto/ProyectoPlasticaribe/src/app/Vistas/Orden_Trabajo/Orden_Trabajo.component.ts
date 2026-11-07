@@ -99,6 +99,7 @@ export class Orden_TrabajoComponent implements OnInit {
   otCargada: number | null = null; //Número de la OT cargada en pantalla; base para navegar con ◀ ▶ y para restaurar el campo si una búsqueda no encuentra la OT
   private busquedaOT?: Subscription; //Búsqueda de OT en curso; se cancela al iniciar otra para no mezclar datos de dos OTs
   private refrescoProducto?: Subscription; //Refresco en segundo plano de ArrayProducto (buscarInformacionProducto); se cancela en limpiarCampos
+  private calculosPendientes = new Set<ReturnType<typeof setTimeout>>(); //Temporizadores de cálculo diferido (calcularDatosOt); se cancelan al guardar
   produccionProcesos: any[] = []; //Fila de Estados Procesos OT con los kg (y und) producidos por proceso de la OT consultada
   otProduccion: number | null = null; //Número de la OT a la que pertenece la tabla de producción por proceso
   cargandoProduccion: boolean = false; //Indica si se está consultando la producción por proceso
@@ -624,13 +625,15 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Limpia los datos de la orden y restablece los valores iniciales de sus formularios.
-   * Cancela el refresco pendiente del producto para que su respuesta no vuelva a llenar ArrayProducto.
+   * Cancela el refresco pendiente del producto y los cálculos diferidos para que no vuelvan a llenar
+   * ArrayProducto ni los costos con datos de la OT anterior.
    *
    * @returns No retorna un valor.
    */
   limpiarCampos() {
     console.log('Limpiando campos de la orden de trabajo');
     this.refrescoProducto?.unsubscribe();
+    this.cancelarCalculosPendientes();
     this.limpiarFormOrdenTrabajo();
     this.limpiarFormExtrusion();
     this.limpiarFormImpresion();
@@ -1526,12 +1529,42 @@ export class Orden_TrabajoComponent implements OnInit {
     }));
   }
 
-  // Funcion que va a calcular los costos de la orden de trabajo
+  /**
+   * Programa (500 ms) el refresco del producto y el recálculo de pesos y costos de la OT.
+   * No se ejecuta si al vencer el tiempo hay un guardado en curso, y los pendientes se cancelan al guardar.
+   * @returns No retorna un valor.
+   */
   calcularDatosOt() {
-    setTimeout(() => {
+    this.programarCalculo(() => {
       this.buscarInformacionProducto();
       this.calcularDatosOtInmediato();
     }, 500);
+  }
+
+  /**
+   * Programa una acción de cálculo diferida y guarda su temporizador para poder cancelarla.
+   * Si al vencer el tiempo hay un guardado en curso, la acción no se ejecuta (no debe cambiar los valores
+   * que se están enviando, ni apagar la pantalla de carga, ni volver a dividir el PesoMillar).
+   * @param accion Acción que se ejecutará.
+   * @param milisegundos Tiempo de espera.
+   * @returns No retorna un valor.
+   */
+  private programarCalculo(accion: () => void, milisegundos: number): void {
+    const temporizador = setTimeout(() => {
+      this.calculosPendientes.delete(temporizador);
+      if (this.guardando) return;
+      accion();
+    }, milisegundos);
+    this.calculosPendientes.add(temporizador);
+  }
+
+  /**
+   * Cancela todos los cálculos diferidos pendientes (de calcularDatosOt y de la carga de una OT).
+   * @returns No retorna un valor.
+   */
+  private cancelarCalculosPendientes(): void {
+    this.calculosPendientes.forEach(temporizador => clearTimeout(temporizador));
+    this.calculosPendientes.clear();
   }
 
   /**
@@ -2293,11 +2326,13 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Prepara y valida los formularios de procesos antes de crear o editar una OT, sin esperas:
    * limpia los procesos que no aplican, recalcula pesos y costos con lo que hay en pantalla y valida
-   * los subformularios en el orden habitual. Conserva el refresco de la información del producto que hacía
+   * los subformularios en el orden habitual. Antes cancela los cálculos diferidos pendientes. Conserva el refresco de la información del producto que hacía
    * `calcularDatosOt`: el cálculo usa los datos ya cargados y la respuesta del refresco llega después.
    * @returns true si todos los subformularios son válidos; false si alguno no lo es (ya se mostró el aviso).
    */
   private prepararFormulariosParaGuardar(): boolean {
+    // Un cálculo diferido pendiente (al teclear o al cargar) no debe ejecutarse durante el guardado
+    this.cancelarCalculosPendientes();
     if (!this.extrusion) this.limpiarFormExtrusion();
     if (!this.impresion) this.limpiarFormImpresion();
     if (!this.laminado) this.limpiarFormLaminado();
@@ -2799,7 +2834,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.llenarFormularioSellado(datos_orden);
     this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden.mezcla_Nombre });
     this.cargarCombinacionMezclas();
-    setTimeout(() => this.calcularDatosOt(), 1000);
+    this.programarCalculo(() => this.calcularDatosOt(), 1000);
     this.cargando = false;
   }
 
