@@ -2640,8 +2640,20 @@ export class Orden_TrabajoComponent implements OnInit {
       this.consultarProduccionProcesos(numeroOT);
     }, error => {
       this.msj.mensajeError(`¡No fue posible consultar la Orden de Trabajo N° ${numeroOT}!`, error.error);
+      this.restaurarNumeroOTSinCarga(numeroOT);
       this.cargando = false;
     });
+  }
+
+  /**
+   * Tras un error al consultar una OT, vuelve a poner en el campo el número consultado si la pantalla quedó
+   * sin OT cargada (prepararCargaOrdenTrabajo$ ya la limpió), para que ◀ ▶ tengan una base para navegar.
+   * Si la OT anterior sigue cargada no se toca el campo.
+   * @param numeroOT Número de la OT consultada.
+   * @returns No retorna un valor.
+   */
+  private restaurarNumeroOTSinCarga(numeroOT: number): void {
+    if (this.otCargada == null) this.FormOrdenTrabajo.patchValue({ OT_Id: numeroOT });
   }
 
   /**
@@ -2739,6 +2751,7 @@ export class Orden_TrabajoComponent implements OnInit {
       alCargar?.();
     }, error => {
       this.msj.mensajeError(`¡No fue posible consultar la Orden de Trabajo N° ${numeroOT} en BagPro!`, error.error);
+      this.restaurarNumeroOTSinCarga(numeroOT);
       this.cargando = false;
     });
   }
