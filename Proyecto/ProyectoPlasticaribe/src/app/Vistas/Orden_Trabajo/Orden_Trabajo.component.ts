@@ -2882,11 +2882,18 @@ export class Orden_TrabajoComponent implements OnInit {
    * Actualiza la orden de trabajo en un único flujo: datos actuales de la OT → datos de procesos → edición.
    * Solo actúa en modo edición y si no hay un guardado en curso (evita doble envío). Cualquier error o validación
    * fallida muestra un mensaje y libera la pantalla; si la OT se actualiza, limpia los campos y abre su PDF.
+   * Si hay un recálculo pendiente (el usuario cambió datos con la confirmación abierta), no guarda: vuelve a
+   * validar y recalcular con `validarActualizacionOT` y pide confirmar de nuevo, para no enviar costos viejos.
    * @returns No retorna un valor.
    */
   editarOrdenTrabajo() {
     if (!this.edicionOrdenTrabajo || this.guardando) return;
     this.cerrarMensaje();
+    if (this.calculosPendientes.size > 0) {
+      this.msj.mensajeAdvertencia(`¡Los datos de la OT cambiaron!`, `Se recalcularon los costos; confirme de nuevo la edición.`);
+      this.validarActualizacionOT(); // cancela los cálculos pendientes, recalcula una sola vez y vuelve a mostrar la confirmación
+      return;
+    }
     this.guardando = true;
     this.cargando = true;
     let ot: number = this.FormOrdenTrabajo.value.OT_Id;
