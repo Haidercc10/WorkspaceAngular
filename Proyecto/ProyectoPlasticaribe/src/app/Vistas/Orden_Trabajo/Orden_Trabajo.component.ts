@@ -98,6 +98,7 @@ export class Orden_TrabajoComponent implements OnInit {
   edicionOrdenTrabajo: boolean = false; //Variable para validar que se está editando o no una orden de trabajo
   otCargada: number | null = null; //Número de la OT cargada en pantalla; base para navegar con ◀ ▶ y para restaurar el campo si una búsqueda no encuentra la OT
   private busquedaOT?: Subscription; //Búsqueda de OT en curso; se cancela al iniciar otra para no mezclar datos de dos OTs
+  private refrescoProducto?: Subscription; //Refresco en segundo plano de ArrayProducto (buscarInformacionProducto); se cancela en limpiarCampos
   produccionProcesos: any[] = []; //Fila de Estados Procesos OT con los kg (y und) producidos por proceso de la OT consultada
   otProduccion: number | null = null; //Número de la OT a la que pertenece la tabla de producción por proceso
   cargandoProduccion: boolean = false; //Indica si se está consultando la producción por proceso
@@ -623,11 +624,13 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Limpia los datos de la orden y restablece los valores iniciales de sus formularios.
+   * Cancela el refresco pendiente del producto para que su respuesta no vuelva a llenar ArrayProducto.
    *
    * @returns No retorna un valor.
    */
   limpiarCampos() {
     console.log('Limpiando campos de la orden de trabajo');
+    this.refrescoProducto?.unsubscribe();
     this.limpiarFormOrdenTrabajo();
     this.limpiarFormExtrusion();
     this.limpiarFormImpresion();
@@ -968,15 +971,28 @@ export class Orden_TrabajoComponent implements OnInit {
     }, () => this.msj.mensajeAdvertencia(`¡No se encontró información del Item buscado!`));
   }
 
-  // Funcion que va a buscar la información de un producto
+  /**
+   * Refresca en segundo plano la información del producto actual (ArrayProducto). Cancela el refresco anterior
+   * si sigue pendiente; `limpiarCampos` también lo cancela para que una respuesta tardía no vuelva a llenar
+   * ArrayProducto con el producto de una OT ya guardada o descartada.
+   * @returns No retorna un valor.
+   */
   buscarInformacionProducto() {
-    this.obtenerInformacionProducto$().subscribe();
+    this.refrescoProducto?.unsubscribe();
+    this.refrescoProducto = this.obtenerInformacionProducto$().subscribe({
+      error: error => {
+        console.error(error);
+        this.msj.mensajeError(`¡No fue posible consultar la información del item ${this.producto}!`, error?.error);
+      }
+    });
   }
 
   /**
    * Consulta el producto y presentación actuales y llena ArrayProducto; avisa si no se encuentra.
+   * Solo una respuesta vacía o un 400/404 significan "no existe"; los demás errores (500, red) se propagan
+   * para que los muestre el manejador de error de quien llama.
    * @param avisar false omite el aviso cuando no se encuentra, para que quien llama muestre uno propio.
-   * @returns Observable que emite true si se cargó el producto y false si no se encontró o falló la consulta.
+   * @returns Observable que emite true si se cargó el producto y false si no existe; falla con los demás errores.
    */
   obtenerInformacionProducto$(avisar: boolean = true): Observable<boolean> {
     return this.productoService.GetInfoProducto_Prod_Presentacion(this.producto, this.presentacionProducto).pipe(
@@ -988,7 +1004,8 @@ export class Orden_TrabajoComponent implements OnInit {
         datos_producto.forEach(data => this.llenarProducto(data));
         return true;
       }),
-      catchError(() => {
+      catchError((error: HttpErrorResponse) => {
+        if (!this.esOrdenNoEncontrada(error)) return throwError(() => error);
         if (avisar) this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
         return of(false);
       })
