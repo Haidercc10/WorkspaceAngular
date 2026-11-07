@@ -2431,11 +2431,16 @@ export class Orden_TrabajoComponent implements OnInit {
    * Comprueba que la presentación de la OT nueva esté entre las permitidas (`PRESENTACIONES_OT_PERMITIDAS`).
    * Una presentación como "Rollo" puede llegar desde BagPro (presentación del item o plantilla de una OT de BagPro);
    * en ese caso avisa y no deja crear la OT. Solo aplica a la creación: las OT existentes se siguen editando.
+   * Si todavía no hay un item cargado (sin presentación), pide buscarlo o cargarlo.
    * @returns true si la presentación está permitida; false si no (ya se mostró el aviso).
    */
   private presentacionPermitidaParaCrear(): boolean {
     const presentacion = `${this.presentacionProducto ?? ''}`.trim();
     if (PRESENTACIONES_OT_PERMITIDAS.includes(presentacion)) return true;
+    if (!presentacion) {
+      this.msj.mensajeAdvertencia(`¡No se puede crear la OT!`, `No hay un item cargado. Busque el item (Enter en el código) o selecciónelo con su presentación y espere a que cargue.`, 6000);
+      return false;
+    }
     this.msj.mensajeAdvertencia(`¡No se puede crear la OT!`, `La presentación "${presentacion}" no está habilitada para crear OT. Seleccione una de estas: ${PRESENTACIONES_OT_PERMITIDAS.join(', ')}.`, 6000);
     return false;
   }
