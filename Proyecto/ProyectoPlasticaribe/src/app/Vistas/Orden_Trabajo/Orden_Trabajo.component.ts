@@ -2395,7 +2395,7 @@ export class Orden_TrabajoComponent implements OnInit {
    * Crea la orden de trabajo en un único flujo: sede del cliente → último número de BagPro y datos de procesos → creación.
    * Ignora la llamada si ya hay un guardado en curso (evita doble envío). Cualquier error o validación fallida
    * muestra un mensaje y libera la pantalla; si la OT se crea, limpia los campos y abre su PDF.
-   * La usa también `Busqueda_OrdenesTrabajo` para copiar una OT.
+   * Solo se invoca desde `validarDatos` (Búsqueda ya no guarda OTs); la firma se conserva hasta la reestructuración (F3).
    * @param otCreadaBagPro Parámetro conservado por compatibilidad; no se usa.
    * @returns No retorna un valor.
    */
