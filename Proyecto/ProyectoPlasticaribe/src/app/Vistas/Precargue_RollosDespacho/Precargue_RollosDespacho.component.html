@@ -166,6 +166,21 @@
                 <td class="text-center">{{'Kg'}}</td>
               </tr>
             </ng-template>
+            <!--* Totalizador: la cantidad neta se muestra por presentación porque no se pueden sumar unidades distintas -->
+            <ng-template pTemplate="footer">
+              <tr *ngIf="tab.consolidated.length > 0">
+                <td class="text-end" colspan="3"><b>Totales</b></td>
+                <td class="text-center textBlue">
+                  <div *ngFor="let total of qtyTotalsByUnit(tab)"><b>{{total.qty | number : '1.2-2'}}</b></div>
+                </td>
+                <td class="text-center">
+                  <div *ngFor="let total of qtyTotalsByUnit(tab)"><b>{{total.unit}}</b></div>
+                </td>
+                <td class="text-center"><b>{{tab.rolls.length}}</b></td>
+                <td class="text-center textOrange"><b>{{weightTotal(tab) | number : '1.2-2'}}</b></td>
+                <td class="text-center"><b>Kg</b></td>
+              </tr>
+            </ng-template>
           </p-table>
         </div>
       </div>

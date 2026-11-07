@@ -374,6 +374,18 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
 
   weightTotalItem = (tab: PreloadTab, data: any) => tab.rolls.filter(x => x.item == data.item).reduce((a, b) => a += b.weight, 0);
 
+  // Totales del consolidado. La cantidad neta se agrupa por presentación porque sumar Kg con Und no tiene sentido.
+  qtyTotalsByUnit(tab: PreloadTab): { unit: string, qty: number }[] {
+    return tab.rolls.reduce((acc, value) => {
+      let find = acc.find(x => x.unit == value.unit);
+      if (find) find.qty += value.qty;
+      else acc.push({ unit: value.unit, qty: value.qty });
+      return acc;
+    }, []);
+  }
+
+  weightTotal = (tab: PreloadTab) => tab.rolls.reduce((a, b) => a += b.weight, 0);
+
   // Quita el rollo del precargue en base de datos y lo devuelve a disponible.
   quitRoll(tab: PreloadTab, data: any) {
     if (!tab.pcdId) return;
