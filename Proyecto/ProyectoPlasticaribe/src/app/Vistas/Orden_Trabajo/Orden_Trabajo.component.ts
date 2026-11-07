@@ -999,19 +999,36 @@ export class Orden_TrabajoComponent implements OnInit {
    * falta o es de otro item/presentación (`calcularDatosOt`, `validarProductoCargado`). Cancela el refresco anterior
    * si sigue pendiente; `limpiarCampos` también lo cancela para que una respuesta tardía no vuelva a llenar
    * ArrayProducto con el producto de una OT ya guardada o descartada.
+   * Cuando el producto llega, programa un recálculo (con `programarCalculo`: no corre durante un guardado y se cancela
+   * con `cancelarCalculosPendientes`) para que los costos no queden calculados con datos vacíos o de otro item.
    * Si la consulta falla (API caída, 500), el error queda en consola y el aviso se muestra una sola vez
    * hasta que un refresco vuelva a responder, para no repetir el aviso en cada recálculo.
+   * @param alGuardar true cuando lo pide un intento de guardado que se bloqueó: muestra la pantalla de carga y un único
+   * aviso con el resultado (el item no existe, o ya se cargó y hay que revisar los costos y volver a guardar).
    * @returns No retorna un valor.
    */
-  buscarInformacionProducto() {
+  buscarInformacionProducto(alGuardar: boolean = false) {
     this.refrescoProducto?.unsubscribe();
-    this.refrescoProducto = this.obtenerInformacionProducto$().subscribe({
-      next: () => this.errorRefrescoAvisado = false,
+    const producto = this.producto;
+    const presentacion = this.presentacionProducto;
+    if (alGuardar) this.cargando = true;
+    this.refrescoProducto = this.obtenerInformacionProducto$(!alGuardar).pipe(
+      finalize(() => { if (alGuardar) this.cargando = false; })
+    ).subscribe({
+      next: cargado => {
+        this.errorRefrescoAvisado = false;
+        if (!cargado) {
+          if (alGuardar) this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El item ${producto} con la presentación ${presentacion} no existe en Plasticaribe.`, 6000);
+          return;
+        }
+        this.programarCalculo(() => this.calcularDatosOtInmediato(), 0);
+        if (alGuardar) this.msj.mensajeAdvertencia(`¡La OT no se guardó!`, `Se acaba de cargar la información del item ${producto}. Revise los costos y vuelva a guardar.`, 6000);
+      },
       error: error => {
         console.error(error);
-        if (this.errorRefrescoAvisado) return;
+        if (this.errorRefrescoAvisado && !alGuardar) return;
         this.errorRefrescoAvisado = true;
-        this.msj.mensajeError(`¡No fue posible consultar la información del item ${this.producto}!`, error?.error);
+        this.msj.mensajeError(`¡No fue posible consultar la información del item ${producto}!`, error?.error);
       }
     });
   }
@@ -1603,8 +1620,9 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Comprueba que el item y la presentación del formulario sean los mismos que los del producto cargado
    * (`producto`, `presentacionProducto` y ArrayProducto), para no guardar costos calculados con otro item.
-   * Si ArrayProducto falta o es de otro item, pide de nuevo la información del producto.
-   * @returns true si todo corresponde; false si no (ya se mostró el aviso).
+   * Si ArrayProducto falta o es de otro item, no guarda y pide la información del producto con
+   * `buscarInformacionProducto(true)`, que muestra un único aviso con el resultado (no existe, o ya se cargó).
+   * @returns true si todo corresponde; false si no (el aviso ya se mostró o lo mostrará la consulta).
    */
   private validarProductoCargado(): boolean {
     const formulario = this.FormOrdenTrabajo.value;
@@ -1613,8 +1631,7 @@ export class Orden_TrabajoComponent implements OnInit {
       return false;
     }
     if (!this.ArrayProducto.length || this.productoPendienteDeCargar()) {
-      this.buscarInformacionProducto();
-      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `La información del item ${this.producto} con la presentación ${this.presentacionProducto} aún no se ha cargado. Espere unos segundos e intente de nuevo.`, 6000);
+      this.buscarInformacionProducto(true);
       return false;
     }
     return true;
