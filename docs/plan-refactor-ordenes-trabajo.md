@@ -59,7 +59,20 @@
 | F0-04 | Comprobar si hay solapamiento entre `SedeCli_CodBagPro` y `SedeCli_Id`. | F2-07 |
 | F0-05 | **Fuera de alcance, urgente:** `BagPro_WebAPI/Data/plasticaribeContext.cs` (línea ~120) tiene en un comentario una cadena de conexión con usuario `sa` y su contraseña, y está en el historial de git. Rotar la credencial y dejar de usar `sa` en las APIs. | Seguridad |
 
-### F0-06 · CRÍTICO · Producción escribe en bases de PRUEBAS (pendiente de verificar con datos)
+### F0-06 · Producción escribe en bases de PRUEBAS: **intencional para OT (confirmado 2026-11-07)**
+
+**Respuesta del responsable (2026-11-07):** la creación de OT de `PlasticaribeBDD` apunta a `plasticaribe2` **a propósito**. Las OT reales se siguen creando en BagPro (`plasticaribe`), y el módulo de OT de Plasticaribe en producción funciona como piloto contra el BagPro de pruebas. Por eso, para OT, **no es un defecto y no se corrige ahora**. Consecuencias para el plan:
+
+1. **Los scripts de producción de PR3 y PR4 siguen apuntando a `plasticaribe2`** hasta el corte. F2 ya no está bloqueada para OT.
+2. **F2-01 (numeración):** el MAX de BagPro debe leerse de **la misma base a la que escribe el trigger**. Hoy, en producción, el número que calcula el cliente sale de `BagPro_WebAPI` (cadena de conexión → `plasticaribe` real), pero el trigger inserta en `plasticaribe2`. Esa mezcla es otra fuente de T1.
+3. **Los sinónimos (antes en F4) pasan a PR3.** `TR_CrearOTs`, los SPs de BagPro que invoca y el cálculo del número de F2-01 usan sinónimos (`bp_ClientesOT`, `bp_ClientesOT_Item`, …). Así, el corte a BagPro real consiste en recrear los sinónimos y no en reescribir triggers.
+4. **Nueva tarea F4-CORTE (cuando Plasticaribe pase a ser el origen de las OT):**
+   - repuntar los sinónimos a `plasticaribe` y al Zeus real;
+   - revisar `CrearOrden_TrabajoDesdeBagPro`, que también lee de `plasticaribe2`;
+   - **decidir qué hacer con las OT piloto que ya existen en `PlasticaribeBDD`**. Sus `Numero_OT` pueden coincidir con números que BagPro real asignó a otras OT, y chocarían con el índice único de F2-01. Revisarlo junto con F0-02.
+5. **Sigue abierto:** confirmar si también son intencionales `CrearPedidos_Zeus` (→ `Inventario_Prea21`), `Crear_Material`, `Crear_Mezclas_Materiales` y `CrearTintas_DesdePBDD` (→ `plasticaribe2`). No forman parte del módulo de OT.
+
+Hallazgo original (2026-11-06):
 
 Extracción de Producción (2026-11-06, `PlasticaribeDB/Produccion`). Las APIs definen como producción `plasticaribe` (BagPro), `PlasticaribeBDD` e `Inventario` (Zeus), según las cadenas de conexión de BagPro_WebAPI, PlasticaribeWebAPI y ApiZeusInventario. Sin embargo, **9 triggers habilitados de `PlasticaribeBDD` (producción) escriben en `plasticaribe2` (BagPro de pruebas) y/o en `[192.168.0.85].Inventario_Prea21` (Zeus de pruebas)**:
 
@@ -72,7 +85,7 @@ Extracción de Producción (2026-11-06, `PlasticaribeDB/Produccion`). Las APIs d
 
 Además, varios SPs de producción (`SPInsertarCabeceraDoc_Zeus`, `SpInsertar_PedidoZeus`, `SPInsertarDetalle_PedidoZeus`, `SPInsertarDoc_DatosAdicionales`, `CrearOrden_TrabajoDesdeBagPro`, `SP_InsertarRollosEliminadosSinParametros`) y del BagPro de producción (`ActualizarArticulos_Zeus`, `CrearItem_Zeus`, `InsertarArticulo_Zeus`) apuntan a `plasticaribe2` o a `Inventario_Prea21`. El resto del código de producción apunta a `plasticaribe` (137 referencias frente a 75 a `plasticaribe2`).
 
-**Si se confirma:** cada OT creada o editada en Plasticaribe producción se replica al BagPro **de pruebas** y no al real, y los pedidos se envían al Zeus de pruebas. **No tocar nada hasta verificarlo con datos**: puede que esas funciones aún no se usen en producción, o que `Inventario_Prea21` no sea solo de pruebas. Se verifica con las consultas de solo lectura de la sección "Verificación F0-06". Esto **bloquea F2** (los scripts de trigger de Producción dependen de saber cuál es el destino correcto).
+**Si se confirma:** cada OT creada o editada en Plasticaribe producción se replica al BagPro **de pruebas** y no al real, y los pedidos se envían al Zeus de pruebas. **No tocar nada hasta verificarlo con datos**: puede que esas funciones aún no se usen en producción, o que `Inventario_Prea21` no sea solo de pruebas. Se verifica con las consultas de solo lectura de la sección "Verificación F0-06". ~~Esto bloquea F2~~ (resuelto para OT, ver arriba).
 
 ### Resultados F0 (2026-11-06, extracción de Pruebas en `PlasticaribeDB/Pruebas`)
 
@@ -220,7 +233,7 @@ Se aborda después de F1, sobre un código ya estabilizado.
 | PR0 | `docs/plan-refactor-ot` | WorkspaceAngular | Este documento | — |
 | PR1 | `refactor/ot-f1-frontend` | WorkspaceAngular | F1-01, 02, 03, 05, 06, 07, 08 | PR0 |
 | PR2 | `refactor/ot-f1-calculos` | WorkspaceAngular | F1-04 + F3-01 (servicio de costos puro con `.spec.ts`), D1 aplicada y D2 como constante | PR1 |
-| PR3 | `refactor/ot-f2-creacion` | PlasticaribeWebAPI + WorkspaceAngular | F2-01, F2-02, F2-03, F2-12, **F2-13, F2-14**, regla F2-15 y migración EF (índice único, `RowVersion`, columnas de último editor). Incluye el script de `TR_CrearOTs` (Pruebas y Producción) en el repo `PlasticaribeDB`, que aplica el responsable | F0 completa, PR1 |
+| PR3 | `refactor/ot-f2-creacion` | PlasticaribeWebAPI + WorkspaceAngular | F2-01, F2-02, F2-03, F2-12, **F2-13, F2-14**, regla F2-15 y migración EF (índice único, `RowVersion`, columnas de último editor). Incluye los **sinónimos de BagPro** (en Pruebas y en Producción apuntan a `plasticaribe2`, ver F0-06) y el script de `TR_CrearOTs` (Pruebas y Producción) en el repo `PlasticaribeDB`, que aplica el responsable | F0 completa, PR1 |
 | PR4 | `refactor/ot-f2-autorizacion` | PlasticaribeWebAPI + WorkspaceAngular + BagPro_WebAPI (F2-06) + PlasticaribeDB (scripts F2-16, F2-17) | F2-04, F2-05, F2-06, F2-16, F2-17 | PR3 |
 | PR5 | `refactor/ot-f2-endpoints` | PlasticaribeWebAPI + WorkspaceAngular | F2-07 a F2-11 | PR3 |
 | PR6 | `refactor/ot-f3-estructura` | WorkspaceAngular | F3-02 a F3-08 | PR2 |
