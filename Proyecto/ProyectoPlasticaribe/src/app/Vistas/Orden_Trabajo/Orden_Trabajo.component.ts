@@ -2076,15 +2076,23 @@ export class Orden_TrabajoComponent implements OnInit {
     }, error => this.msj.mensajeError(`¡Error!`, `¡${error.error}!`));
   }
 
-  /** Función para crear mater desde el modal de crear mezclas */
+  /**
+   * Crea un material de mezclas desde el modal de crear mezclas. El nombre es obligatorio (se guarda sin espacios
+   * sobrantes y en mayúsculas); la descripción es opcional y, si no se diligencia, se genera a partir del nombre.
+   * @returns No retorna un valor.
+   */
   crearMaterial() {
-    let nombreMaterial: string = this.formCrearMateriales.value.matNombre;
-    let descripcionMaterial: string = this.formCrearMateriales.value.matDescripcion;
-    this.mezclaMaterialService.getMezclasMateriales(nombreMaterial.toUpperCase()).subscribe(dataMzMaterial => {
+    const nombreMaterial: string = (this.formCrearMateriales.value.matNombre ?? '').toString().trim().toUpperCase();
+    const descripcionMaterial: string = (this.formCrearMateriales.value.matDescripcion ?? '').toString().trim();
+    if (nombreMaterial == '') {
+      this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el nombre del material.`);
+      return;
+    }
+    this.mezclaMaterialService.getMezclasMateriales(nombreMaterial).subscribe(dataMzMaterial => {
       if (dataMzMaterial.length == 0) {
         const material: modelMezMaterial = {
-          MezMaterial_Nombre: nombreMaterial.toUpperCase(),
-          MezMaterial_Descripcion: descripcionMaterial == null ? `Mezcla de Material ${nombreMaterial.toUpperCase()}` : descripcionMaterial.toUpperCase(),
+          MezMaterial_Nombre: nombreMaterial,
+          MezMaterial_Descripcion: descripcionMaterial == '' ? `Mezcla de Material ${nombreMaterial}` : descripcionMaterial.toUpperCase(),
         }
         this.mezclaMaterialService.srvGuardar(material).subscribe(() => {
           this.msj.mensajeConfirmacion('Registro creado con éxito!', '');
@@ -2093,31 +2101,40 @@ export class Orden_TrabajoComponent implements OnInit {
             this.cargarMezclaMateria();
             this.cargarMezclaMateria2();
           }, 300);
-        });
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe una material de mezclas llamado ${nombreMaterial.toUpperCase()}`);
-    });
+        }, error => this.msj.mensajeError(`¡No fue posible crear el material ${nombreMaterial}!`, error.error));
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe una material de mezclas llamado ${nombreMaterial}`);
+    }, error => this.msj.mensajeError(`¡No fue posible validar si el material ${nombreMaterial} ya existe!`, error.error));
   }
 
-  /** Función para crear pigmentos desde el modal de crear mezclas */
+  /**
+   * Crea un pigmento de mezclas desde el modal de crear mezclas y refresca las listas de pigmentos.
+   * El nombre es obligatorio (se guarda sin espacios sobrantes y en mayúsculas); la descripción es opcional
+   * y, si no se diligencia, se genera a partir del nombre.
+   * @returns No retorna un valor.
+   */
   crearPigmento() {
-    let nombrePigmento: string = this.formCrearPigmentos.value.pigNombre;
-    let descripcionPigmento: string = this.formCrearPigmentos.value.pigDescripcion;
-    this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento.toUpperCase()).subscribe(dataMzPigmento => {
+    const nombrePigmento: string = (this.formCrearPigmentos.value.pigNombre ?? '').toString().trim().toUpperCase();
+    const descripcionPigmento: string = (this.formCrearPigmentos.value.pigDescripcion ?? '').toString().trim();
+    if (nombrePigmento == '') {
+      this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el nombre del pigmento.`);
+      return;
+    }
+    this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento).subscribe(dataMzPigmento => {
       if (dataMzPigmento.length == 0) {
         const pigmento: modelMezPigmento = {
-          MezPigmto_Nombre: nombrePigmento.toUpperCase(),
-          MezPigmto_Descripcion: descripcionPigmento == null ? `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}` : descripcionPigmento.toUpperCase(),
+          MezPigmto_Nombre: nombrePigmento,
+          MezPigmto_Descripcion: descripcionPigmento == '' ? `Mezcla de Pigmento ${nombrePigmento}` : descripcionPigmento.toUpperCase(),
         }
         this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(() => {
           this.msj.mensajeConfirmacion('Registro creado con éxito!', '');
           setTimeout(() => {
             this.formCrearPigmentos.reset();
-            this.mezclasPigmentos();
-            this.mezclasPigmentos2();
+            this.cargarMezclaPigmento();
+            this.cargarMezclaPigmento2();
           }, 300);
-        });
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe un pigmento de mezclas llamado ${nombrePigmento.toUpperCase()}`)
-    });
+        }, error => this.msj.mensajeError(`¡No fue posible crear el pigmento ${nombrePigmento}!`, error.error));
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe un pigmento de mezclas llamado ${nombrePigmento}`)
+    }, error => this.msj.mensajeError(`¡No fue posible validar si el pigmento ${nombrePigmento} ya existe!`, error.error));
   }
 
   // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1
