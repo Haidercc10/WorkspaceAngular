@@ -1666,9 +1666,13 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Calcula pesos y costos de la OT con los datos que ya están en pantalla, sin esperas ni nuevas consultas.
-   * @returns No retorna un valor.
+   * Si la unidad de extrusión no es Cms ni Plgs no calcula y avisa (salvo `avisar` en false).
+   * @param avisar false omite el aviso de unidad de extrusión, para que quien llama muestre uno propio (guardado).
+   * @returns true si se calcularon los costos; false si no hay producto, la unidad de extrusión no es Cms ni Plgs
+   * o la presentación no tiene regla de cálculo.
    */
-  calcularDatosOtInmediato() {
+  calcularDatosOtInmediato(avisar: boolean = true): boolean {
+    let calculado: boolean = false;
     if (this.ArrayProducto.length > 0) {
       this.cargando = true;
       this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
@@ -1682,12 +1686,13 @@ export class Orden_TrabajoComponent implements OnInit {
         for (let i = 0; i < this.ArrayProducto.length; i++) {
           if (this.ArrayProducto[i].Id == this.ArrayProducto[0].Id && this.ArrayProducto[i].UndCant == this.ArrayProducto[0].UndCant) {
             this.calcularPesoProducto(material, fact);
-            this.calcularCostosOT(margen_Adicional);
+            calculado = this.calcularCostosOT(margen_Adicional);
           }
         }
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe elegir una unidad de medida para extrusión!`);
+      } else if (avisar) this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe elegir una unidad de medida para extrusión!`);
       this.cargando = false;
     }
+    return calculado;
   }
 
   calcularMargenAdicional(): number {
@@ -1754,9 +1759,9 @@ export class Orden_TrabajoComponent implements OnInit {
    * conserva los valores actuales, como hasta ahora. Si el servicio no calcula el Valor Kg (MTS, pendiente de definir),
    * usa 0 en una OT nueva y, al editar, conserva el Valor Kg con el que se cargó la OT.
    * @param margen_Adicional Margen adicional en porcentaje.
-   * @returns No retorna un valor.
+   * @returns true si se calcularon los costos; false si la presentación no tiene regla de cálculo.
    */
-  calcularCostosOT(margen_Adicional: number) {
+  calcularCostosOT(margen_Adicional: number): boolean {
     const data = this.ArrayProducto[0];
     const resultado = this.calculoCostos.calcularCostos({
       presentacion: data.UndCant,
@@ -1768,7 +1773,7 @@ export class Orden_TrabajoComponent implements OnInit {
       cantidadPaquete: data.CantPaquete,
       cantidadBulto: data.CantBulto,
     });
-    if (!resultado) return;
+    if (!resultado) return false;
     this.cantidadProducto = resultado.cantidadProducto;
     this.valorProducto = resultado.valorProducto;
     this.margenKg = resultado.margenKg;
@@ -1779,6 +1784,7 @@ export class Orden_TrabajoComponent implements OnInit {
     if (resultado.pesoPaquete != null) this.pesoPaquete = resultado.pesoPaquete;
     if (resultado.pesoBulto != null) this.pesoBulto = resultado.pesoBulto;
     this.sinPesoParaValorKg = resultado.sinPesoParaValorKg;
+    return true;
   }
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
@@ -2434,7 +2440,9 @@ export class Orden_TrabajoComponent implements OnInit {
    * limpia los procesos que no aplican, recalcula pesos y costos con lo que hay en pantalla y valida
    * los subformularios en el orden habitual. Antes cancela los cálculos diferidos pendientes. No guarda si la
    * información del producto falta o es de otro item/presentación (`validarProductoCargado`), ni si algún valor
-   * calculado no es finito (`validarValoresCalculados`). El cálculo es idempotente: se puede repetir sin cambiar el resultado.
+   * calculado no es finito (`validarValoresCalculados`), ni si no se pudieron calcular los costos (unidad de extrusión
+   * distinta de Cms/Plgs o presentación sin regla), para no enviar costos en 0 ni sobrescribir los guardados al editar.
+   * El cálculo es idempotente: se puede repetir sin cambiar el resultado.
    * @param repetirAvisoSinPeso false no repite el aviso (no bloqueante) de Valor Kg 0 si ya se mostró en la validación anterior;
    * si la condición aparece recién ahora, el aviso sí se muestra.
    * @returns true si todo es válido; false si algo no lo es (ya se mostró el aviso).
@@ -2450,7 +2458,15 @@ export class Orden_TrabajoComponent implements OnInit {
     if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
 
     if (!this.validarProductoCargado()) return false;
-    this.calcularDatosOtInmediato();
+    if (!this.calcularDatosOtInmediato(false)) {
+      // Sin cálculo la OT se enviaría con costos en 0 (o, al editar, sobrescribiría los guardados)
+      const unidad = this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion;
+      const detalle = !['Cms', 'Plgs'].includes(unidad)
+        ? `Seleccione la unidad de medida de extrusión (Cms o Plgs) para calcular los costos.`
+        : `No hay regla de cálculo de costos para la presentación "${this.presentacionProducto}".`;
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT: no se calcularon los costos!`, detalle, 6000);
+      return false;
+    }
 
     const validaciones: [FormGroup, string][] = [
       [this.FormOrdenTrabajoExtrusion, `¡EL formulario de Extrusion tiene campos vacios!`],
