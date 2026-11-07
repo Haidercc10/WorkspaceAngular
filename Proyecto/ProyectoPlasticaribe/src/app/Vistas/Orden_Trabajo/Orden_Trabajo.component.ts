@@ -609,10 +609,15 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Restaura los formularios de proceso y los datos derivados del producto.
+   * Cancela el refresco pendiente del producto anterior y los cálculos diferidos, para que una respuesta tardía no
+   * vuelva a llenar ArrayProducto ni programe un recálculo con el item anterior. Si ese refresco venía de un guardado,
+   * su `finalize` libera la pantalla de carga; quien llama (`consultarInfoProducto`) la vuelve a activar para su consulta.
    *
    * @returns No retorna un valor.
    */
   limpiarProducto() {
+    this.refrescoProducto?.unsubscribe();
+    this.cancelarCalculosPendientes();
     this.limpiarFormExtrusion();
     this.limpiarFormImpresion();
     this.limpiarFormLaminado();
