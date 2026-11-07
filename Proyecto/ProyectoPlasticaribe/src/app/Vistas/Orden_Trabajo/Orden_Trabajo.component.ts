@@ -2496,12 +2496,24 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Comprueba, justo antes de armar el payload, que los valores calculados y numéricos que se envían sean números
-   * finitos (sin null, NaN ni Infinity). Si alguno no lo es, avisa con sus nombres y no deja guardar.
+   * finitos (sin null, NaN ni Infinity) y que las entradas de costos que teclea el usuario (cantidad, precio, margen,
+   * cantidad por paquete y por bulto) no sean negativas. Si algo no es válido, avisa con los nombres y no deja guardar.
    * Si el Valor Kg quedó en 0 por falta de Peso Millar (o de cantidad por paquete), muestra un aviso que no bloquea.
    * @param repetirAvisoSinPeso false no repite el aviso de Valor Kg 0 si la validación anterior ya lo mostró.
    * @returns true si todos los valores son válidos; false si alguno no lo es (ya se mostró el aviso).
    */
   private validarValoresCalculados(repetirAvisoSinPeso: boolean = true): boolean {
+    const negativos = this.calculoCostos.valoresNegativos({
+      'Cantidad': this.FormOrdenTrabajo.value.Cantidad,
+      'Precio': this.FormOrdenTrabajo.value.Precio,
+      'Margen': this.FormOrdenTrabajo.value.Margen,
+      'Cantidad Paquete': this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+      'Cantidad Bulto': this.FormOrdenTrabajoSellado.value.CantidadBulto,
+    });
+    if (negativos.length > 0) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `No se permiten valores negativos en: ${negativos.join(', ')}.`, 6000);
+      return false;
+    }
     const noValidos = this.calculoCostos.valoresNoFinitos({
       'Cantidad': this.cantidadProducto,
       'Valor Unidad': this.valorProducto,

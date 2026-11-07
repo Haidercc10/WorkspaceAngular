@@ -221,6 +221,15 @@ describe('OtCalculoCostosService', () => {
     expect(servicio.valoresNoFinitos({ a: 'abc', b: ' ', c: undefined, d: -Infinity, e: 0, f: '-3.5' })).toEqual(['a', 'b', 'c', 'd']);
   });
 
+  it('valoresNegativos detecta números y textos negativos; ignora 0, positivos, vacíos y no numéricos', () => {
+    expect(servicio.valoresNegativos({ a: -1, b: '-0.5', c: 0, d: 10, e: null, f: '', g: ' ', h: 'abc', i: -Infinity, j: '3' }))
+      .toEqual(['a', 'b', 'i']);
+  });
+
+  it('valoresNegativos sin negativos devuelve vacío', () => {
+    expect(servicio.valoresNegativos({ cantidad: 1000, precio: 50.5, margen: 0, cantidadPaquete: 100, cantidadBulto: 10 })).toEqual([]);
+  });
+
   it('una cantidad no numérica produce valores que valoresNoFinitos detecta (el guardado se bloquea)', () => {
     const r = servicio.calcularCostos(paquete({ cantidad: 'abc' }))!;
     expect(servicio.valoresNoFinitos({ neto: r.netoKg, valorOt: r.valorOt, cantidad: r.cantidadProducto })).toEqual(['neto', 'valorOt', 'cantidad']);
@@ -302,7 +311,8 @@ describe('OtCalculoCostosService', () => {
       }
     }));
 
-    // Valores negativos: no hay regla de negocio; se documenta el comportamiento actual frente al anterior.
+    // Valores negativos: el componente bloquea el guardado con entradas negativas (valoresNegativos); aquí se documenta
+    // qué calcula el servicio con ellas frente a las fórmulas anteriores.
     it('negativos en Kg: mismas fórmulas que antes (valores negativos, sin bloqueo en el cálculo)', () => {
       const c: CasoLegado = { presentacion: 'Kg', cant: -100, precio: 5000, margen: 10, pm: 0, tipo: 'BOLSA', cp: 0, cb: 0, pesoProducto: 1 };
       const actual = servicio.calcularCostos(aEntrada(c))!;

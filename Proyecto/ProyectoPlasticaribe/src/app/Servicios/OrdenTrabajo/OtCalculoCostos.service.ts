@@ -241,6 +241,20 @@ export class OtCalculoCostosService {
   }
 
   /**
+   * Revisa que las entradas de costos no sean negativas (no se permiten cantidades, precios ni márgenes negativos).
+   * Los valores vacíos o no numéricos no se consideran negativos: los detecta `valoresNoFinitos`.
+   * @param valores Valores a revisar, por nombre.
+   * @returns Los nombres de los valores menores que 0; vacío si ninguno lo es.
+   */
+  valoresNegativos(valores: Record<string, unknown>): string[] {
+    return Object.keys(valores).filter(nombre => {
+      const valor = valores[nombre];
+      if (valor == null || (typeof valor === 'string' && valor.trim() === '')) return false;
+      return Number(valor) < 0;
+    });
+  }
+
+  /**
    * Revisa que los valores que se van a enviar sean números finitos (acepta texto numérico, como lo acepta la API).
    * @param valores Valores a revisar, por nombre.
    * @returns Los nombres de los valores nulos, vacíos (o solo espacios), no numéricos o infinitos; vacío si todos son válidos.
