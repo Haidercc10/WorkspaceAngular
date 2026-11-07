@@ -78,7 +78,7 @@ Abrir el sitio con **Ctrl + F5** para limpiar la caché.
 | Login: verificación de conexión | Sin errores | Sin errores |
 | Login: distintivo BETA bajo el logo | Sí | No |
 | Login: versión al pie | `vX.Y.Z` | `vX.Y.Z` |
-| Header: BETA junto al logo | Sí | No |
+| Header: junto al logo | `BETA vX.Y.Z` | `vX.Y.Z` |
 | Menú lateral bajo el logo | `BETA vX.Y.Z` | `vX.Y.Z` |
 | F12 → Red: las peticiones van a | `192.168.0.250:90xx` | `192.168.0.85:90xx` |
 

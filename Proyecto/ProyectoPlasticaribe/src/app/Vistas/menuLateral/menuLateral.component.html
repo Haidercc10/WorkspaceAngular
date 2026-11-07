@@ -5,6 +5,7 @@
       <div class="d-flex align-items-center">
         <img class="logo2 cursor" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="" (click)="mostrarMenuLateral()">
         <span class="badgeBeta ms-3" *ngIf="esBeta" pTooltip="Entorno de pruebas" tooltipPosition="bottom">BETA</span>
+        <span class="versionApp" [ngClass]="{'versionAppDark' : modoSeleccionado, 'ms-2' : esBeta, 'ms-3' : !esBeta}" pTooltip="Versión de la aplicación" tooltipPosition="bottom">v{{ versionApp }}</span>
       </div>
       <!--<p>
         <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button >
