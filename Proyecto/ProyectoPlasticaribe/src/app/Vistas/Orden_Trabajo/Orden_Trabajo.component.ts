@@ -42,6 +42,13 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { OtCalculoCostosService } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
 
+/**
+ * Presentaciones con las que se puede crear una OT; también son las opciones del dropdown de presentación.
+ * "Rollo" no se usa (decisión del responsable): una OT existente con Rollo se puede consultar, editar y generar su PDF,
+ * pero no se crean OT nuevas con esa presentación (puede llegar desde BagPro como presentación del item).
+ */
+const PRESENTACIONES_OT_PERMITIDAS: readonly string[] = ['Kg', 'Paquete', 'Und', 'MTS'];
+
 /** OT encontrada al consultar por número: en Plasticaribe (editable) o solo en BagPro (plantilla). */
 interface ResultadoBusquedaOT {
   origen: 'plasticaribe' | 'bagpro';
@@ -1070,8 +1077,8 @@ export class Orden_TrabajoComponent implements OnInit {
     }];
   }
 
-  // Funcion que va a consultar las presentaciones de los productos
-  consultarPresentaciones = () => this.undService.srvObtenerLista().subscribe(data => this.presentaciones = data.filter(x => ['Kg', 'Paquete', 'Und', 'MTS'].includes(x.undMed_Id)));
+  /** Consulta las unidades de medida y deja como opciones de presentación solo las permitidas (`PRESENTACIONES_OT_PERMITIDAS`). */
+  consultarPresentaciones = () => this.undService.srvObtenerLista().subscribe(data => this.presentaciones = data.filter(x => PRESENTACIONES_OT_PERMITIDAS.includes(x.undMed_Id)));
 
   // Funcion que va a consultar los estados que puede tener la orden de trabajo
   consultarEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(data => this.estados = data.filter(x => [3, 4].includes(x.tpEstado_Id)));
@@ -2382,7 +2389,21 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
       return;
     }
+    if (!this.presentacionPermitidaParaCrear()) return;
     if (this.prepararFormulariosParaGuardar()) this.guardarOt();
+  }
+
+  /**
+   * Comprueba que la presentación de la OT nueva esté entre las permitidas (`PRESENTACIONES_OT_PERMITIDAS`).
+   * Una presentación como "Rollo" puede llegar desde BagPro (presentación del item o plantilla de una OT de BagPro);
+   * en ese caso avisa y no deja crear la OT. Solo aplica a la creación: las OT existentes se siguen editando.
+   * @returns true si la presentación está permitida; false si no (ya se mostró el aviso).
+   */
+  private presentacionPermitidaParaCrear(): boolean {
+    const presentacion = `${this.presentacionProducto ?? ''}`.trim();
+    if (PRESENTACIONES_OT_PERMITIDAS.includes(presentacion)) return true;
+    this.msj.mensajeAdvertencia(`¡No se puede crear la OT!`, `La presentación "${presentacion}" no está habilitada para crear OT. Seleccione una de estas: ${PRESENTACIONES_OT_PERMITIDAS.join(', ')}.`, 6000);
+    return false;
   }
 
   /**
