@@ -70,7 +70,7 @@
    - repuntar los sinónimos a `plasticaribe` y al Zeus real;
    - revisar `CrearOrden_TrabajoDesdeBagPro`, que también lee de `plasticaribe2`;
    - **decidir qué hacer con las OT piloto que ya existen en `PlasticaribeBDD`**. Sus `Numero_OT` pueden coincidir con números que BagPro real asignó a otras OT, y chocarían con el índice único de F2-01. Revisarlo junto con F0-02.
-5. **Sigue abierto:** confirmar si también son intencionales `CrearPedidos_Zeus` (→ `Inventario_Prea21`), `Crear_Material`, `Crear_Mezclas_Materiales` y `CrearTintas_DesdePBDD` (→ `plasticaribe2`). No forman parte del módulo de OT.
+5. `CrearPedidos_Zeus` (→ `Inventario_Prea21`): **los pedidos no se usan actualmente** (confirmado 2026-11-07), así que no tiene impacto hoy. Hay que repuntarlo antes de activar pedidos. `Crear_Material`, `Crear_Mezclas_Materiales` y `CrearTintas_DesdePBDD` (→ `plasticaribe2`) quedan en la tarea de corte. Ninguno forma parte del módulo de OT.
 
 Hallazgo original (2026-11-06):
 
