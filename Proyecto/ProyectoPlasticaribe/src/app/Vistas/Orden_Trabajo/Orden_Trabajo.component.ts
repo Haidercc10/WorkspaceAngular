@@ -2384,6 +2384,33 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, invalido[1]);
       return false;
     }
+    return this.validarValoresCalculados();
+  }
+
+  /**
+   * Comprueba, justo antes de armar el payload, que los valores calculados y numéricos que se envían sean números
+   * finitos (sin null, NaN ni Infinity). Si alguno no lo es, avisa con sus nombres y no deja guardar.
+   * Si el Valor Kg quedó en 0 por falta de Peso Millar (o de cantidad por paquete), muestra un aviso que no bloquea.
+   * @returns true si todos los valores son válidos; false si alguno no lo es (ya se mostró el aviso).
+   */
+  private validarValoresCalculados(): boolean {
+    const noValidos = this.calculoCostos.valoresNoFinitos({
+      'Cantidad': this.cantidadProducto,
+      'Valor Unidad': this.valorProducto,
+      'Margen': this.FormOrdenTrabajo.value.Margen,
+      'Neto Kg': this.netoKg,
+      'Valor Kg': this.valorKg,
+      'Valor OT': this.valorOt,
+      'Peso Millar': this.FormOrdenTrabajoSellado.value.PesoMillar,
+      'Peso Producto': this.pesoProducto,
+    });
+    if (noValidos.length > 0) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `Los siguientes valores no son válidos: ${noValidos.join(', ')}. Revise la cantidad, el precio, el margen y la información del item.`);
+      return false;
+    }
+    if (this.sinPesoParaValorKg && ['Paquete', 'Und'].includes(this.presentacionProducto)) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `El Valor Kg quedó en 0 porque el item ${this.producto} no tiene Peso Millar${this.presentacionProducto == 'Paquete' ? ' o cantidad por paquete' : ''}.`, 6000);
+    }
     return true;
   }
 
