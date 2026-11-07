@@ -264,6 +264,51 @@ a {
   animation: aparecer 0.4s ease-out both;
 }
 
+/* Distintivo del entorno de pruebas (solo visible con environment.esBeta) */
+.badgeBeta {
+  display: inline-block;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background-color: #f59e0b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  line-height: 1.4;
+  user-select: none;
+}
+
+/* Versión de la app (package.json), discreta al pie de la tarjeta */
+.versionApp {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin: 0.5rem 0 0 0;
+  user-select: none;
+}
+
+.versionAppDark {
+  color: #adb5bd;
+}
+
+.betaLogin {
+  text-align: center;
+  margin-top: 0.75rem;
+}
+
+/* En la verificación de conexión late al mismo ritmo que el logo */
+.badgeBetaCarga {
+  margin-top: 1rem;
+  animation: latido-logo 1.6s ease-in-out infinite;
+}
+
+/* Con error deja de latir y se atenúa, igual que .logoCargaError */
+.badgeBetaError {
+  animation: none;
+  opacity: 0.45;
+  filter: grayscale(60%);
+}
+
 @keyframes aparecer {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }

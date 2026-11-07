@@ -1,10 +1,16 @@
 {
   "name": "proyecto-plasticaribe",
-  "version": "0.0.0",
+  "version": "7.3.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "version": "node scripts/generar-version.js",
+    "start": "node scripts/generar-version.js && ng serve",
+    "build": "node scripts/generar-version.js && ng build",
+    "build:prod": "node scripts/generar-version.js && ng build --configuration production",
+    "build:beta": "node scripts/generar-version.js && ng build --configuration production,beta",
+    "version:parche": "npm version patch --no-git-tag-version",
+    "version:menor": "npm version minor --no-git-tag-version",
+    "version:mayor": "npm version major --no-git-tag-version",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "aot": "node --max-old-space-size=8192 ./node_modules/@angular/cli/bin/ng serve -o"

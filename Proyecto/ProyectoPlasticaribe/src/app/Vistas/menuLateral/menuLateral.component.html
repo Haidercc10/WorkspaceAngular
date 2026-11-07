@@ -2,7 +2,10 @@
   <!-- Navegador Principal -->
   <nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
     <div class="container-fluid">
-      <img class="logo2 cursor" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="" (click)="mostrarMenuLateral()">
+      <div class="d-flex align-items-center">
+        <img class="logo2 cursor" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="" (click)="mostrarMenuLateral()">
+        <span class="badgeBeta ms-3" *ngIf="esBeta" pTooltip="Entorno de pruebas" tooltipPosition="bottom">BETA</span>
+      </div>
       <!--<p>
         <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button >
           <b>
@@ -33,6 +36,10 @@
   <p-sidebar [(visible)]="display" [style]="{width : '30rem'}">
     <div class="imagen">
       <img [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="Plasticaribe S.A.S">
+      <div class="betaSidebar">
+        <span class="badgeBeta" *ngIf="esBeta">BETA</span>
+        <span class="versionApp" [ngClass]="{'versionAppDark' : modoSeleccionado}">v{{ versionApp }}</span>
+      </div>
     </div>
     <br>
     <p-panelMenu *ngIf="!cargando" [model]="categorias" [multiple]="true" [style]="{color : modoSeleccionado ?  'white' : 'black'}"></p-panelMenu>

@@ -20,6 +20,7 @@ import { authentication_ContaZeus } from 'src/app/_Services/authentication_Conta
 import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
 import { AppComponent } from 'src/app/app.component';
 import { environment } from 'src/environments/environment';
+import { VERSION_APP } from 'src/environments/version';
 
 /**
  * The `LoginComponentComponent` class handles the login functionality of the application.
@@ -53,6 +54,8 @@ export class LoginComponentComponent implements OnInit {
   estadoConexion: 'verificando' | 'error' | 'listo' = 'verificando';
   mensajeConexion: string = 'Iniciando...';
   erroresConexion: string[] = []; // Un mensaje por API con problemas; la tarjeta muestra uno por renglón
+  esBeta: boolean = environment.esBeta; //Indica si la app se compiló para el entorno de pruebas (npm run build:beta)
+  versionApp: string = VERSION_APP; //Versión de la app (package.json), se sube con npm run version:parche | version:menor | version:mayor
 
   constructor(private empresaServices: EmpresaService,
     private frmBuilderUsuario: FormBuilder,

@@ -13,6 +13,8 @@
         <div *ngIf="estadoConexion != 'listo'" class="verificacionConexion">
           <img class="logoCarga" [class.logoCargaError]="estadoConexion == 'error'"
                [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="Plasticaribe">
+          <!--Distintivo BETA: late junto al logo mientras verifica y se atenúa igual que él si hay error-->
+          <span *ngIf="esBeta" class="badgeBeta badgeBetaCarga" [class.badgeBetaError]="estadoConexion == 'error'" title="Entorno de pruebas">BETA</span>
           <p *ngIf="estadoConexion == 'verificando'" class="mensajeConexion">{{ mensajeConexion }}</p>
           <ul *ngIf="estadoConexion == 'error'" class="erroresConexion">
             <li *ngFor="let error of erroresConexion" [title]="error">
@@ -29,6 +31,10 @@
         <div class="mb-3">
           <h4 class="tituloRojo"><i class="pi pi-sign-in"></i> Accede a tu cuenta de</h4>
           <img class="logo2" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="">
+          <!--Distintivo BETA: aparece con el formulario (animación .aparecer del contenedor)-->
+          <div *ngIf="esBeta" class="betaLogin">
+            <span class="badgeBeta" title="Entorno de pruebas">BETA</span>
+          </div>
         </div>
 
         <div class="col-md mb">
@@ -64,6 +70,9 @@
           <button pButton pRipple type="button" icon="pi pi-users" label="Entrar como invitado" class="p-button-danger p-button-text" (click)="redireccionarArchivos()"></button>
         </div>
         </div>
+
+        <!--Versión de la app (package.json): visible tanto en la verificación de conexión como en el formulario-->
+        <p class="versionApp" [ngClass]="{'versionAppDark' : modoSeleccionado}">v{{ versionApp }}</p>
       </div>
     </div>
   </form>

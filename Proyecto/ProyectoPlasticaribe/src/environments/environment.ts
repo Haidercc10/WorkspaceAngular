@@ -5,6 +5,7 @@ const host = window.location.hostname;
 
 export const environment = {
   production: false,
+  esBeta: false, // true solo en environment.beta.ts (npm run build:beta)
 
   // SERVIDOR
   //rutaPlasticaribeAPI: "http://192.168.0.85:9085/api",
@@ -13,17 +14,17 @@ export const environment = {
   //rutaZeusContabilidad: "http://192.168.0.85:9065/api",
 
   // SERVIDOR 250
-  //rutaPlasticaribeAPI: "http://192.168.0.250:9085/api",
-  //rutaBagPro: "http://192.168.0.250:9095/api",
-  //rutaZeus: "http://192.168.0.250:9055/api",
-  //rutaZeusContabilidad: "http://192.168.0.250:9065/api"
+  rutaPlasticaribeAPI: "http://192.168.0.250:9085/api",
+  rutaBagPro: "http://192.168.0.250:9095/api",
+  rutaZeus: "http://192.168.0.250:9055/api",
+  rutaZeusContabilidad: "http://192.168.0.250:9065/api"
 
   // LOCALES
   // rutaPlasticaribeAPI : `https://${host}:7137/api`,
-  rutaPlasticaribeAPI : `http://${host}:9085/api`,
-  rutaBagPro : `http://${host}:9095/api`,
-  rutaZeus : `http://${host}:9055/api`,
-  rutaZeusContabilidad : `http://${host}:9065/api`,
+  // rutaPlasticaribeAPI : `http://${host}:9085/api`,
+  // rutaBagPro : `http://${host}:9095/api`,
+  // rutaZeus : `http://${host}:9055/api`,
+  // rutaZeusContabilidad : `http://${host}:9065/api`,
 };
 
 /*
