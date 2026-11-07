@@ -40,6 +40,7 @@ import { modelProducto } from 'src/app/Modelo/modelProducto';
 import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { OtCalculoCostosService } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
 
 /** OT encontrada al consultar por número: en Plasticaribe (editable) o solo en BagPro (plantilla). */
 interface ResultadoBusquedaOT {
@@ -141,6 +142,7 @@ export class Orden_TrabajoComponent implements OnInit {
   pesoBulto: number = 0; //Variable que almacenará cuantos kg pesa un bulto
   pesoProducto: number = 0; //Variable que almacenará el peso del producto
   pesoMillar: number = 0; //Variable que almacenará el peso de un millar
+  private sinPesoParaValorKg: boolean = false; //true si el último cálculo dejó Valor Kg en 0 por falta de Peso Millar (o de cantidad por paquete)
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
 
@@ -193,7 +195,8 @@ export class Orden_TrabajoComponent implements OnInit {
     private shepherdService: ShepherdService,
     private svcSedes: SedeClienteService,
     private svcExistencias: ExistenciasProductosService,
-    private estadosProcesosService: EstadosProcesos_OTService,) {
+    private estadosProcesosService: EstadosProcesos_OTService,
+    private calculoCostos: OtCalculoCostosService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -1656,20 +1659,23 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
+  /**
+   * Calcula el peso del producto con sus dimensiones y el factor del material, y toma el Peso Millar base del producto
+   * (el que se muestra en sellado y se guarda). No modifica el Peso Millar de ArrayProducto: la regla de LAMINADO/HOJA
+   * (D2) se aplica en `OtCalculoCostosService` sobre una variable local, así que repetir el cálculo no acumula divisiones.
+   * @param material Id del material de extrusión.
+   * @param fact Parámetro conservado por compatibilidad; el factor lo calcula el servicio.
+   * @returns No retorna un valor.
+   */
   calcularPesoProducto(material: number, fact: number) {
-    let i: number = 0;
-    this.ArrayProducto[i].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado || this.FormOrdenTrabajoCorte.value.Formato_Corte;
-    if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
-      material == 3 ? fact = 0.0048 : fact = 0.00468;
-      this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-    } else {
-      material == 3 ? fact = 0.0317 : fact = 0.0302;
-      this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-    }
-    this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
-    //Peso Millar
-    this.pesoMillar = this.ArrayProducto[i].PesoMillar;
-    if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
+    const producto = this.ArrayProducto[0];
+    producto.Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado || this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    // Solo se llama con Cms o Plgs (lo valida calcularDatosOtInmediato); cualquier unidad distinta de Cms usa el factor de Plgs, como antes
+    const unidad: string = this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' ? 'Cms' : 'Plgs';
+    producto.Peso_Producto = this.calculoCostos.calcularPesoProducto(
+      { ancho: producto.Ancho, largo: producto.Largo, fuelle: producto.Fuelle, calibre: producto.Cal }, unidad, material);
+    this.pesoProducto = producto.Peso_Producto;
+    this.pesoMillar = producto.PesoMillar;
   }
 
   /**
@@ -1680,45 +1686,35 @@ export class Orden_TrabajoComponent implements OnInit {
     return this.netoKg || 0;
   }
 
+  /**
+   * Calcula los costos de la OT (cantidad, valor unidad, margen kg, neto kg, valor kg, valor OT y pesos de paquete/bulto)
+   * con `OtCalculoCostosService` a partir del producto cargado. Si la presentación no tiene regla de cálculo (p. ej. MTS),
+   * conserva los valores actuales, como hasta ahora.
+   * @param margen_Adicional Margen adicional en porcentaje.
+   * @returns No retorna un valor.
+   */
   calcularCostosOT(margen_Adicional: number) {
-    let data = this.ArrayProducto[0];
-    if (data.UndCant == 'Kg') this.calcularCostosOT_Kg(data, margen_Adicional);
-    else if (data.UndCant == 'Paquete') this.calcularCostosOT_Paquete(data, margen_Adicional);
-    else if (data.UndCant == 'Und') this.calcularCostosOT_Und(data, margen_Adicional);
-  }
-
-  calcularCostosOT_Kg(data: any, margen_Adicional: number) {
-    this.cantidadProducto = data.Cant;
-    this.margenKg = margen_Adicional * (data.Cant / 100);
-    this.netoKg = data.Cant + ((data.Cant * margen_Adicional) / 100);
-    this.valorKg = data.PrecioUnd;
-    this.valorProducto = data.PrecioUnd;
-    this.valorOt = data.Cant * this.valorProducto;
-  }
-
-  calcularCostosOT_Paquete(data: any, margen_Adicional: number) {
-    this.cantidadProducto = data.Cant;
-    this.valorProducto = data.PrecioUnd;
-    this.margenKg = margen_Adicional * (((data.Cant * data.CantPaquete * this.ArrayProducto[0].PesoMillar) / 1000) / 100);
-    this.netoKg = ((1 + (margen_Adicional / 100)) * ((data.PesoMillar / 1000) * (data.Cant * data.CantPaquete)));
-    this.valorOt = data.Cant * data.PrecioUnd;
-    if (data.PesoMillar > 0 && data.CantPaquete > 0) this.pesoPaquete = data.PesoMillar * (data.CantPaquete / 1000);
-    if (data.CantPaquete > 0) this.pesoBulto = this.pesoPaquete * data.CantBulto;
-    if (data.CantPaquete == 0) this.valorKg = 0;
-    else data.CantPaquete > 0 ? this.valorKg = data.PrecioUnd / this.pesoPaquete : this.valorKg = 0;
-  }
-
-  calcularCostosOT_Und(data: any, margen_Adicional: number) {
-    this.cantidadProducto = data.Cant;
-    this.valorProducto = data.PrecioUnd;
-    this.valorOt = this.cantidadProducto * this.valorProducto;
-    this.margenKg = (margen_Adicional * ((data.Cant * this.pesoMillar) / 1000)) / 100;
-    this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((this.pesoMillar / 1000) * data.Cant));
-    if (data.Peso_Producto > 0) {
-      if (this.valorOt == 0) this.valorOt = 1;
-      if ((data.Cant * data.PesoMillar) / 1000 == 0) this.valorKg = 0;
-      else this.valorKg = this.valorOt / ((data.Cant * this.pesoMillar) / 1000);
-    } else this.valorOt = 0;
+    const data = this.ArrayProducto[0];
+    const resultado = this.calculoCostos.calcularCostos({
+      presentacion: data.UndCant,
+      cantidad: data.Cant,
+      precio: data.PrecioUnd,
+      margenAdicional: margen_Adicional,
+      pesoMillar: data.PesoMillar,
+      tipoProducto: data.Tipo,
+      cantidadPaquete: data.CantPaquete,
+      cantidadBulto: data.CantBulto,
+    });
+    if (!resultado) return;
+    this.cantidadProducto = resultado.cantidadProducto;
+    this.valorProducto = resultado.valorProducto;
+    this.margenKg = resultado.margenKg;
+    this.netoKg = resultado.netoKg;
+    this.valorKg = resultado.valorKg;
+    this.valorOt = resultado.valorOt;
+    if (resultado.pesoPaquete != null) this.pesoPaquete = resultado.pesoPaquete;
+    if (resultado.pesoBulto != null) this.pesoBulto = resultado.pesoBulto;
+    this.sinPesoParaValorKg = resultado.sinPesoParaValorKg;
   }
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
