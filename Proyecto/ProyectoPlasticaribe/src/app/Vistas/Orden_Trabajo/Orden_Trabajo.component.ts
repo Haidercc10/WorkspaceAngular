@@ -99,6 +99,7 @@ export class Orden_TrabajoComponent implements OnInit {
   otCargada: number | null = null; //Número de la OT cargada en pantalla; base para navegar con ◀ ▶ y para restaurar el campo si una búsqueda no encuentra la OT
   private busquedaOT?: Subscription; //Búsqueda de OT en curso; se cancela al iniciar otra para no mezclar datos de dos OTs
   private refrescoProducto?: Subscription; //Refresco en segundo plano de ArrayProducto (buscarInformacionProducto); se cancela en limpiarCampos
+  private errorRefrescoAvisado: boolean = false; //Evita repetir el aviso de error del refresco de producto hasta que vuelva a responder
   private calculosPendientes = new Set<ReturnType<typeof setTimeout>>(); //Temporizadores de cálculo diferido (calcularDatosOt); se cancelan al guardar
   produccionProcesos: any[] = []; //Fila de Estados Procesos OT con los kg (y und) producidos por proceso de la OT consultada
   otProduccion: number | null = null; //Número de la OT a la que pertenece la tabla de producción por proceso
@@ -978,13 +979,18 @@ export class Orden_TrabajoComponent implements OnInit {
    * Refresca en segundo plano la información del producto actual (ArrayProducto). Cancela el refresco anterior
    * si sigue pendiente; `limpiarCampos` también lo cancela para que una respuesta tardía no vuelva a llenar
    * ArrayProducto con el producto de una OT ya guardada o descartada.
+   * Si la consulta falla (API caída, 500), el error queda en consola y el aviso se muestra una sola vez
+   * hasta que un refresco vuelva a responder, para no repetir el aviso en cada pulsación de tecla.
    * @returns No retorna un valor.
    */
   buscarInformacionProducto() {
     this.refrescoProducto?.unsubscribe();
     this.refrescoProducto = this.obtenerInformacionProducto$().subscribe({
+      next: () => this.errorRefrescoAvisado = false,
       error: error => {
         console.error(error);
+        if (this.errorRefrescoAvisado) return;
+        this.errorRefrescoAvisado = true;
         this.msj.mensajeError(`¡No fue posible consultar la información del item ${this.producto}!`, error?.error);
       }
     });
