@@ -216,4 +216,118 @@ describe('OtCalculoCostosService', () => {
   it('valoresNoFinitos detecta null, vacío, NaN e Infinity y acepta texto numérico', () => {
     expect(servicio.valoresNoFinitos({ a: 1, b: Infinity, c: NaN, d: null, e: '5', f: '' })).toEqual(['b', 'c', 'd', 'f']);
   });
+
+  it('valoresNoFinitos detecta texto no numérico, solo espacios, undefined y -Infinity', () => {
+    expect(servicio.valoresNoFinitos({ a: 'abc', b: ' ', c: undefined, d: -Infinity, e: 0, f: '-3.5' })).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('una cantidad no numérica produce valores que valoresNoFinitos detecta (el guardado se bloquea)', () => {
+    const r = servicio.calcularCostos(paquete({ cantidad: 'abc' }))!;
+    expect(servicio.valoresNoFinitos({ neto: r.netoKg, valorOt: r.valorOt, cantidad: r.cantidadProducto })).toEqual(['neto', 'valorOt', 'cantidad']);
+  });
+
+  /**
+   * Caracterización: reproduce las fórmulas del componente en 338f7233 (antes de PR2) para el primer cálculo con
+   * ArrayProducto recién cargado: `pesoMillarComponente` es el Peso Millar base (this.pesoMillar) y `pesoMillarArreglo`
+   * el de ArrayProducto ya dividido entre 2 si el tipo es LAMINADO/HOJA (la división se hacía en todas las presentaciones).
+   */
+  describe('caracterización frente a las fórmulas anteriores (338f7233)', () => {
+    interface CasoLegado { presentacion: string; cant: number; precio: number; margen: number; pm: number; tipo: string; cp: number; cb: number; pesoProducto: number; }
+
+    /**
+     * Fórmulas anteriores de calcularCostosOT_Kg, _Paquete y _Und (primer cálculo, pesoPaquete/pesoBulto/valorKg previos en 0).
+     * @param c Datos del caso.
+     * @returns Valores que calculaba el componente.
+     */
+    const legado = (c: CasoLegado) => {
+      const pesoMillarComponente = c.pm;
+      const pesoMillarArreglo = (c.tipo == 'LAMINADO' || c.tipo == 'HOJA') ? c.pm / 2 : c.pm;
+      const r: any = { pesoPaquete: 0, pesoBulto: 0, valorKg: 0 };
+      if (c.presentacion == 'Kg') {
+        r.cantidadProducto = c.cant;
+        r.margenKg = c.margen * (c.cant / 100);
+        r.netoKg = c.cant + ((c.cant * c.margen) / 100);
+        r.valorKg = c.precio;
+        r.valorProducto = c.precio;
+        r.valorOt = c.cant * r.valorProducto;
+      } else if (c.presentacion == 'Paquete') {
+        r.cantidadProducto = c.cant;
+        r.valorProducto = c.precio;
+        r.margenKg = c.margen * (((c.cant * c.cp * pesoMillarArreglo) / 1000) / 100);
+        r.netoKg = ((1 + (c.margen / 100)) * ((pesoMillarArreglo / 1000) * (c.cant * c.cp)));
+        r.valorOt = c.cant * c.precio;
+        if (pesoMillarArreglo > 0 && c.cp > 0) r.pesoPaquete = pesoMillarArreglo * (c.cp / 1000);
+        if (c.cp > 0) r.pesoBulto = r.pesoPaquete * c.cb;
+        if (c.cp == 0) r.valorKg = 0;
+        else r.valorKg = c.cp > 0 ? c.precio / r.pesoPaquete : 0;
+      } else if (c.presentacion == 'Und') {
+        r.cantidadProducto = c.cant;
+        r.valorProducto = c.precio;
+        r.valorOt = r.cantidadProducto * r.valorProducto;
+        r.margenKg = (c.margen * ((c.cant * pesoMillarComponente) / 1000)) / 100;
+        r.netoKg = ((1 + ((c.margen) / 100)) * ((pesoMillarComponente / 1000) * c.cant));
+        if (c.pesoProducto > 0) {
+          if (r.valorOt == 0) r.valorOt = 1;
+          if ((c.cant * pesoMillarArreglo) / 1000 == 0) r.valorKg = 0;
+          else r.valorKg = r.valorOt / ((c.cant * pesoMillarComponente) / 1000);
+        } else r.valorOt = 0;
+      }
+      return r;
+    };
+
+    const aEntrada = (c: CasoLegado): EntradaCostosOT => ({
+      presentacion: c.presentacion, cantidad: c.cant, precio: c.precio, margenAdicional: c.margen,
+      pesoMillar: c.pm, tipoProducto: c.tipo, cantidadPaquete: c.cp, cantidadBulto: c.cb,
+    });
+
+    const casosNormales: CasoLegado[] = [
+      { presentacion: 'Kg', cant: 1000, precio: 5000, margen: 10, pm: 20, tipo: 'BOLSA', cp: 0, cb: 0, pesoProducto: 1 },
+      { presentacion: 'Kg', cant: 250.5, precio: 7300, margen: 0, pm: 0, tipo: 'LAMINADO', cp: 0, cb: 0, pesoProducto: 1 },
+      { presentacion: 'Paquete', cant: 50, precio: 3000, margen: 10, pm: 20, tipo: 'BOLSA', cp: 100, cb: 10, pesoProducto: 1 },
+      { presentacion: 'Paquete', cant: 12, precio: 4500, margen: 5, pm: 13.75, tipo: 'BOLSA', cp: 50, cb: 20, pesoProducto: 1 },
+      { presentacion: 'Paquete', cant: 50, precio: 3000, margen: 10, pm: 20, tipo: 'LAMINADO', cp: 100, cb: 10, pesoProducto: 1 },
+      { presentacion: 'Paquete', cant: 8, precio: 2100, margen: 3, pm: 9.5, tipo: 'HOJA', cp: 25, cb: 4, pesoProducto: 1 },
+      { presentacion: 'Und', cant: 10000, precio: 50, margen: 5, pm: 8, tipo: 'BOLSA', cp: 0, cb: 0, pesoProducto: 0.5 },
+      { presentacion: 'Und', cant: 3500, precio: 120.5, margen: 0, pm: 4.2, tipo: 'LAMINADO', cp: 0, cb: 0, pesoProducto: 0.5 },
+    ];
+
+    casosNormales.forEach(c => it(`${c.presentacion} ${c.tipo} (cant ${c.cant}, precio ${c.precio}, PM ${c.pm}) da lo mismo que antes`, () => {
+      const anterior = legado(c);
+      const actual = servicio.calcularCostos(aEntrada(c))!;
+      ['cantidadProducto', 'valorProducto', 'margenKg', 'netoKg', 'valorKg', 'valorOt'].forEach(campo =>
+        expect((actual as any)[campo]).withContext(campo).toBeCloseTo(anterior[campo], 8));
+      if (c.presentacion == 'Paquete') {
+        expect(actual.pesoPaquete!).toBeCloseTo(anterior.pesoPaquete, 8);
+        expect(actual.pesoBulto!).toBeCloseTo(anterior.pesoBulto, 8);
+      }
+    }));
+
+    // Valores negativos: no hay regla de negocio; se documenta el comportamiento actual frente al anterior.
+    it('negativos en Kg: mismas fórmulas que antes (valores negativos, sin bloqueo en el cálculo)', () => {
+      const c: CasoLegado = { presentacion: 'Kg', cant: -100, precio: 5000, margen: 10, pm: 0, tipo: 'BOLSA', cp: 0, cb: 0, pesoProducto: 1 };
+      const actual = servicio.calcularCostos(aEntrada(c))!;
+      expect(actual.valorOt).toBe(legado(c).valorOt);
+      expect(actual.netoKg).toBeCloseTo(legado(c).netoKg, 8);
+      expect(actual.valorOt).toBe(-500000);
+    });
+
+    it('negativos en Und: Valor OT igual que antes; con cantidad negativa el Valor Kg ahora es 0 (antes era positivo)', () => {
+      const c: CasoLegado = { presentacion: 'Und', cant: -10000, precio: 50, margen: 5, pm: 8, tipo: 'BOLSA', cp: 0, cb: 0, pesoProducto: 0.5 };
+      const actual = servicio.calcularCostos(aEntrada(c))!;
+      expect(actual.valorOt).toBe(legado(c).valorOt);
+      expect(legado(c).valorKg).toBeCloseTo(6250, 8);
+      expect(actual.valorKg).toBe(0);
+      const precioNegativo = servicio.calcularCostos(aEntrada({ ...c, cant: 10000, precio: -50 }))!;
+      expect(precioNegativo.valorKg).toBeCloseTo(-6250, 8);
+    });
+
+    it('negativos en Paquete: con Peso Millar negativo el Valor Kg ahora es 0 (antes era Infinity)', () => {
+      const c: CasoLegado = { presentacion: 'Paquete', cant: 50, precio: 3000, margen: 10, pm: -20, tipo: 'BOLSA', cp: 100, cb: 10, pesoProducto: 1 };
+      expect(legado(c).valorKg).toBe(Infinity);
+      const actual = servicio.calcularCostos(aEntrada(c))!;
+      expect(actual.valorKg).toBe(0);
+      expect(actual.sinPesoParaValorKg).toBeTrue();
+      expect(actual.netoKg).toBeCloseTo(legado(c).netoKg, 8);
+    });
+  });
 });

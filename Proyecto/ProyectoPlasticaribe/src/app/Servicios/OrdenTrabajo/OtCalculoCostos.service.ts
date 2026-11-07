@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 
 /**
- * Regla D2 (pendiente de confirmar por el responsable): para los tipos de producto indicados, el Peso Millar
- * se divide entre `divisor` antes de calcular los costos, solo en las presentaciones indicadas.
- * Hoy se conserva el comportamiento vigente: LAMINADO y HOJA ÷ 2 únicamente en Paquete (Und y Kg no lo aplican).
- * Cuando se confirme D2, basta con ajustar esta constante.
+ * Regla D2 (aprobada por el responsable, opción B): para los tipos de producto LAMINADO y HOJA, el Peso Millar
+ * se divide entre 2 antes de calcular los costos, solo en la presentación Paquete (Und, Kg y MTS no lo aplican).
+ * La división se hace sobre una variable local; el Peso Millar del producto no se modifica.
  */
 export const REGLA_PESO_MILLAR_D2: Readonly<{ tipos: readonly string[]; divisor: number; presentaciones: readonly string[] }> = {
   tipos: ['LAMINADO', 'HOJA'],
@@ -244,12 +243,12 @@ export class OtCalculoCostosService {
   /**
    * Revisa que los valores que se van a enviar sean números finitos (acepta texto numérico, como lo acepta la API).
    * @param valores Valores a revisar, por nombre.
-   * @returns Los nombres de los valores nulos, vacíos, no numéricos o infinitos; vacío si todos son válidos.
+   * @returns Los nombres de los valores nulos, vacíos (o solo espacios), no numéricos o infinitos; vacío si todos son válidos.
    */
   valoresNoFinitos(valores: Record<string, unknown>): string[] {
     return Object.keys(valores).filter(nombre => {
       const valor = valores[nombre];
-      return valor == null || valor === '' || !Number.isFinite(Number(valor));
+      return valor == null || (typeof valor === 'string' && valor.trim() === '') || !Number.isFinite(Number(valor));
     });
   }
 }
