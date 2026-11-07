@@ -151,6 +151,7 @@ export class Orden_TrabajoComponent implements OnInit {
   pesoMillar: number = 0; //Variable que almacenará el peso de un millar
   private sinPesoParaValorKg: boolean = false; //true si el último cálculo dejó Valor Kg en 0 por falta de Peso Millar (o de cantidad por paquete)
   private valorKgCargado: number | null = null; //Valor Kg guardado de la OT abierta en edición; se conserva cuando la presentación no lo calcula (MTS)
+  private avisoSinPesoMostrado: boolean = false; //Indica si la última validación de guardado ya mostró el aviso de Valor Kg 0 (evita repetirlo al confirmar la edición)
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
 
@@ -2434,10 +2435,11 @@ export class Orden_TrabajoComponent implements OnInit {
    * los subformularios en el orden habitual. Antes cancela los cálculos diferidos pendientes. No guarda si la
    * información del producto falta o es de otro item/presentación (`validarProductoCargado`), ni si algún valor
    * calculado no es finito (`validarValoresCalculados`). El cálculo es idempotente: se puede repetir sin cambiar el resultado.
-   * @param avisarSinPeso false omite el aviso (no bloqueante) de Valor Kg 0 por falta de peso, cuando ya se mostró.
+   * @param repetirAvisoSinPeso false no repite el aviso (no bloqueante) de Valor Kg 0 si ya se mostró en la validación anterior;
+   * si la condición aparece recién ahora, el aviso sí se muestra.
    * @returns true si todo es válido; false si algo no lo es (ya se mostró el aviso).
    */
-  private prepararFormulariosParaGuardar(avisarSinPeso: boolean = true): boolean {
+  private prepararFormulariosParaGuardar(repetirAvisoSinPeso: boolean = true): boolean {
     // Un cálculo diferido pendiente (al teclear o al cargar) no debe ejecutarse durante el guardado
     this.cancelarCalculosPendientes();
     if (!this.extrusion) this.limpiarFormExtrusion();
@@ -2463,17 +2465,17 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, invalido[1]);
       return false;
     }
-    return this.validarValoresCalculados(avisarSinPeso);
+    return this.validarValoresCalculados(repetirAvisoSinPeso);
   }
 
   /**
    * Comprueba, justo antes de armar el payload, que los valores calculados y numéricos que se envían sean números
    * finitos (sin null, NaN ni Infinity). Si alguno no lo es, avisa con sus nombres y no deja guardar.
    * Si el Valor Kg quedó en 0 por falta de Peso Millar (o de cantidad por paquete), muestra un aviso que no bloquea.
-   * @param avisarSinPeso false omite el aviso de Valor Kg 0 por falta de peso.
+   * @param repetirAvisoSinPeso false no repite el aviso de Valor Kg 0 si la validación anterior ya lo mostró.
    * @returns true si todos los valores son válidos; false si alguno no lo es (ya se mostró el aviso).
    */
-  private validarValoresCalculados(avisarSinPeso: boolean = true): boolean {
+  private validarValoresCalculados(repetirAvisoSinPeso: boolean = true): boolean {
     const noValidos = this.calculoCostos.valoresNoFinitos({
       'Cantidad': this.cantidadProducto,
       'Valor Unidad': this.valorProducto,
@@ -2488,9 +2490,11 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `Los siguientes valores no son válidos: ${noValidos.join(', ')}. Revise la cantidad, el precio, el margen y la información del item.`);
       return false;
     }
-    if (avisarSinPeso && this.sinPesoParaValorKg && ['Paquete', 'Und'].includes(this.presentacionProducto)) {
+    const sinPeso = this.sinPesoParaValorKg && ['Paquete', 'Und'].includes(this.presentacionProducto);
+    if (sinPeso && (repetirAvisoSinPeso || !this.avisoSinPesoMostrado)) {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `El Valor Kg quedó en 0 porque el item ${this.producto} no tiene Peso Millar${this.presentacionProducto == 'Paquete' ? ' o cantidad por paquete' : ''}.`, 6000);
     }
+    this.avisoSinPesoMostrado = sinPeso;
     return true;
   }
 
@@ -3046,7 +3050,7 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
       return;
     }
-    // El aviso de Valor Kg 0 ya se mostró al pedir la confirmación
+    // No repite el aviso de Valor Kg 0 si ya se mostró al pedir la confirmación (sí lo muestra si la condición es nueva)
     if (!this.prepararFormulariosParaGuardar(false)) return;
     this.guardando = true;
     this.cargando = true;
