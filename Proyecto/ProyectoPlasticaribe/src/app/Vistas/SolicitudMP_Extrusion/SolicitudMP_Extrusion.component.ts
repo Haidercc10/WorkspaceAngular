@@ -13,6 +13,7 @@ import {
   AdvertenciaDisponibilidad,
   DetalleSolicitudRequest,
   EstadoSolicitudMaterial,
+  MaterialAsignadoOT,
   ADICIONAL_KG_OT,
   ROLES_EXCEDER_LIMITE_OT,
 } from 'src/app/Modelo/modelFlujoMaterialProduccion';
@@ -75,6 +76,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   @ViewChild('dtMaterials') dtMaterials: Table | undefined;
   minDate: Date = new Date();
   maquinas: any[] = [];
+  viewMaterialesAsignados: boolean = false; //Muestra el popup con los materiales asignados a la OT
+  cargandoMaterialesAsignados: boolean = false; //Indica que se están consultando los materiales asignados
+  materialesAsignados: MaterialAsignadoOT[] = [];
 
   /** Total solicitado al cargar la solicitud en edición; sirve para validar solo el aumento contra el límite de la OT. */
   private totalOriginalSolicitud: number = 0;
@@ -219,6 +223,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     this.load = false;
     this.subcategoriasSeleccionadas = [];
     this.infoOrdenTrabajo = [];
+    this.materialesAsignados = [];
     this.esSolicitud = false;
     this.totalOriginalSolicitud = 0;
     this.accionPendiente = null;
@@ -291,6 +296,27 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       kgRestante: this.cantRestante,
       kgPorSolicitar: this.cantRestante - datos_asignacion.cantidad_Solicitada,
     }];
+  }
+
+  /**
+   * Abre el popup y consulta el detalle de los materiales asignados (y devueltos) a la OT consultada.
+   * @param ot Número de la orden de trabajo.
+   */
+  verMaterialesAsignados(ot: number) {
+    this.materialesAsignados = [];
+    this.viewMaterialesAsignados = true;
+    this.cargandoMaterialesAsignados = true;
+    this.detallesAsignacionService.getMaterialesAsignadosOT(ot)
+      .pipe(takeUntil(this.destroy$), finalize(() => this.cargandoMaterialesAsignados = false))
+      .subscribe({
+        next: datos => this.materialesAsignados = datos,
+        error: () => this.mensajeService.mensajeError(`Error`, `No se pudieron consultar los materiales asignados a la OT N° ${ot}!`),
+      });
+  }
+
+  /** Cantidad neta de los materiales del popup: lo asignado menos lo devuelto. */
+  get totalCantidadMaterialesAsignados(): number {
+    return this.materialesAsignados.reduce((total, m) => total + (m.esDevolucion ? -m.cantidad : m.cantidad), 0);
   }
 
   getAllSubcategories() {

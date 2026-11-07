@@ -123,7 +123,8 @@
               tooltipPosition="top">Kg solicitados</th>
             <th class="text-center" scope="col" pTooltip="Kilos pendientes por solicitar de materia prima de la OT"
               tooltipPosition="top">Kg por solicitar</th>
-            <th class="text-center" scope="col" pTooltip="Kilos asignados/entregados de materia prima de la OT"
+            <th class="text-center" scope="col"
+              pTooltip="Kilos asignados/entregados de materia prima de la OT."
               tooltipPosition="top">Kg asignados</th>
             <th class="text-center" scope="col" pTooltip="Kilos restantes de materia prima por asignar de la OT"
               tooltipPosition="top">Kg restantes por asignar</th>
@@ -139,7 +140,13 @@
             <td>{{ot.kgSolicitados | number}}</td>
             <td [ngClass]="{'colorRojo' : ot.kgPorSolicitar <= 0, 'colorVerde' : ot.kgPorSolicitar > 0 }">
               <b>{{ot.kgPorSolicitar | number}}</b> </td>
-            <td>{{ot.kgAsignado | number}}</td>
+            <td>
+              <div class="d-flex align-items-center justify-content-center gap-2">
+                <span>{{ot.kgAsignado | number}}</span>
+                <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="danger" pTooltip="Ver materiales asignados"
+                  tooltipPosition="top" (onClick)="verMaterialesAsignados(ot.ot)"></p-button>
+              </div>
+            </td>
             <td [ngClass]="{'colorRojo' : ot.kgRestante <= 0, 'colorVerde' : ot.kgRestante > 0 }"><b>{{ot.kgRestante |
                 number}}</b></td>
           </tr>
@@ -150,22 +157,23 @@
 
   <p-divider></p-divider>
 
-  <!--Inicio titulo -->
-  <div class="mb-5">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
-      Seleccionar subcategorias</h4>
+  <!-- Subtitulo con el boton para ver las subcategorias -->
+  <div class="header-actions mb-5">
+    <div class="header-actions__title">
+      <h4 class="mb-0" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
+        Seleccionar subcategorias</h4>
+    </div>
+
+    <div class="header-actions__buttons">
+      <button pButton type="button" label="Ver Subcategorías y Materiales" icon="pi pi-eye"
+        class="p-button-rounded p-button-danger p-button-outlined" (click)="loadSubcategories()"></button>
+    </div>
   </div>
 
   <!-- Formulario de seleccion de materia prima  -->
   <form [formGroup]="formMP">
     <div class="mb-5" id="materiaPrima">
       <div class="row g-4">
-
-        <!-- Boton de informacion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-1 col-xl-1 col-xxl-1">
-          <p-button label="Ver" icon="pi pi-eye" styleClass="p-button-rounded p-button-danger"
-            pTooltip="Ver subcategorias" tooltipPosition="top" (click)="loadSubcategories()"></p-button>
-        </div>
 
         <!-- Id subcategoria -->
         <div class="col-xs-12 col-sm-12 col-md-2 col-lg-1 col-xl-1 col-xxl-1" id="idMp">
@@ -428,6 +436,58 @@
           <td class="text-center">{{data.item}}</td>
           <td>{{data.referencia}}</td>
           <td class="text-center">{{data.stock | number : '1.2-2'}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
+
+<!-- Modal de materiales asignados a la OT -->
+<p-dialog header="Materiales asignados a la OT N° {{infoOrdenTrabajo[0]?.ot}}" [(visible)]="viewMaterialesAsignados"
+  [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '95vw' }" [draggable]="true" [resizable]="false">
+
+  <div class="d-flex justify-content-center py-5" *ngIf="cargandoMaterialesAsignados">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+
+  <div class="font-size-14" *ngIf="!cargandoMaterialesAsignados">
+    <p-table styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [scrollable]="true"
+      scrollHeight="25rem" [rowHover]="true" [value]="materialesAsignados">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center" scope="col">Id</th>
+          <th class="text-center" scope="col">Mat. Prima</th>
+          <th class="text-center" scope="col">Cantidad</th>
+          <th class="text-center" scope="col">Und. Medida</th>
+          <th class="text-center" scope="col">Proceso</th>
+          <th class="text-center" scope="col" *ngIf="ValidarRol == 1">Precio Und</th>
+          <th class="text-center" scope="col" *ngIf="ValidarRol == 1">Subtotal</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-mat>
+        <tr>
+          <td class="text-center">{{mat.id}}</td>
+          <td>{{mat.nombre}}</td>
+          <td class="text-center" [ngClass]="{ 'colorRojo' : mat.esDevolucion }"
+            [pTooltip]="mat.esDevolucion ? 'Cantidad devuelta: resta de lo asignado' : ''" tooltipPosition="top">
+            <b>{{mat.esDevolucion ? '-' : ''}}{{mat.cantidad | number : '1.2-2'}}</b>
+          </td>
+          <td class="text-center">{{mat.undMedida}}</td>
+          <td class="text-center"><b>{{mat.proceso}}</b></td>
+          <td class="text-center" *ngIf="ValidarRol == 1">${{mat.precio | number : '1.2-2'}}</td>
+          <td class="text-center" *ngIf="ValidarRol == 1"><b>${{mat.subTotal | number : '1.0-0'}}</b></td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td class="text-center" [attr.colspan]="ValidarRol == 1 ? 7 : 5">La OT no tiene materiales asignados.</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td class="text-right" colspan="2">Total</td>
+          <td class="text-center">{{totalCantidadMaterialesAsignados | number : '1.2-2'}}</td>
+          <td [attr.colspan]="ValidarRol == 1 ? 4 : 2"></td>
         </tr>
       </ng-template>
     </p-table>

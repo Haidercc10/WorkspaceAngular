@@ -109,3 +109,18 @@ export interface AutorizacionExcesoPendiente {
   usuarioSolicita: string;
   autEx_FechaSolicitudUtc: string;
 }
+
+/** Material asignado o devuelto en una OT (materia prima, tinta o BOPP). */
+export interface MaterialAsignadoOT {
+  tipo: 'MP' | 'TINTA' | 'BOPP';
+  id: number;
+  nombre: string;
+  /** Siempre positiva; si es devolución resta de lo asignado. */
+  cantidad: number;
+  undMedida: string;
+  precio: number;
+  subTotal: number;
+  procesoId: string;
+  proceso: string;
+  esDevolucion: boolean;
+}
