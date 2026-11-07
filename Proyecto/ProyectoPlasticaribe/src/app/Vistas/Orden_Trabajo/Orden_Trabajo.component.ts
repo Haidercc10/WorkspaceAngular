@@ -2308,8 +2308,6 @@ export class Orden_TrabajoComponent implements OnInit {
           }
           this.ordenTrabajoService.crearOrdenCompleta({ OrdenTrabajo: infoOT, ...procesos }).subscribe(datos_ot => {
             this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
-            //this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-            //this.cambiarEstadoProducto(this.producto);
             this.limpiarCampos();
             this.pdfOrdenTrabajo(datos_ot.numero_OT);
           }, error => {
@@ -2466,45 +2464,6 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  //Funcion que va a cambiar el estado de un producto a "Activo"
-  cambiarEstadoProducto(producto: number) {
-    this.productoService.srvObtenerListaPorId(producto).subscribe(datos => {
-      for (let i = 0; i < datos.length; i++) {
-        let info: any = {
-          Prod_Id: producto,
-          Prod_Nombre: datos[i].prod_Nombre,
-          Prod_Descripcion: datos[i].prod_Descripcion,
-          TpProd_Id: datos[i].tpProd_Id,
-          Prod_Peso: this.pesoProducto,
-          Prod_Peso_Millar: this.FormOrdenTrabajoSellado.value.PesoMillar,
-          UndMedPeso: datos[i].undMedPeso,
-          Prod_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-          Prod_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-          Prod_Calibre: this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-          UndMedACF: this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
-          Estado_Id: 10,
-          Prod_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-          Pigmt_Id: this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
-          Material_Id: this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
-          Prod_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
-          Prod_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-          TpSellado_Id: datos[i].tpSellado_Id,
-          Prod_Fecha: datos[i].prod_Fecha,
-          Prod_Hora: datos[i].prod_Hora,
-          Prod_PrecioDia_Sellado: this.FormOrdenTrabajoSellado.value.PrecioDia,
-          Prod_PrecioNoche_Sellado: this.FormOrdenTrabajoSellado.value.PrecioNoche,
-          Prod_Peso_Paquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
-          Prod_Peso_Bulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
-        }
-        this.productoService.srvActualizar(producto, info).subscribe(null, error => this.msj.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error));
-      }
-    }, error => this.msj.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
-  }
-
-  // Funcion que va a cambiar el estado de un cliente a "Activo". El numero '1' corresponde a "Activo"
-  cambiarEstadoCliente(id: number) {
-    this.clienteServise.PutEstadoCliente(id, 1).subscribe(null, err => this.msj.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${id}`, err.error));
-  }
 
   /**
    * Consulta una orden de trabajo y carga sus datos en los formularios. Solo limpia la pantalla si la OT existe:
@@ -2785,8 +2744,6 @@ export class Orden_TrabajoComponent implements OnInit {
           let info = this.informacionOrdenTrabajo(datos_Orden);
           this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).subscribe(datos_ot => {
             this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
-            this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-            this.cambiarEstadoProducto(this.producto);
             this.pdfOrdenTrabajo(datos_ot.numero_OT);
             this.limpiarCampos();
           }, error => {
