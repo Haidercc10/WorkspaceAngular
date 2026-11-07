@@ -159,8 +159,33 @@ describe('OtCalculoCostosService', () => {
     });
   });
 
-  it('presentaciones sin regla de cálculo (MTS, Rollo) devuelven null', () => {
-    expect(servicio.calcularCostos(entrada({ presentacion: 'MTS' }))).toBeNull();
+  describe('MTS', () => {
+    const mts = (cambios: Partial<EntradaCostosOT> = {}) =>
+      entrada({ presentacion: 'MTS', cantidad: 2500, precio: 120, margenAdicional: 10, ...cambios });
+
+    it('Valor Unidad = precio, Cantidad = cantidad y Valor OT = cantidad × precio', () => {
+      const r = servicio.calcularCostos(mts())!;
+      expect(r.cantidadProducto).toBe(2500);
+      expect(r.valorProducto).toBe(120);
+      expect(r.valorOt).toBe(300000);
+    });
+
+    it('no calcula Valor Kg (por definir): devuelve null; Neto Kg y Margen Kg en 0', () => {
+      const r = servicio.calcularCostos(mts({ tipoProducto: 'LAMINADO', pesoMillar: 0 }))!;
+      expect(r.valorKg).toBeNull();
+      expect(r.netoKg).toBe(0);
+      expect(r.margenKg).toBe(0);
+      expect(r.sinPesoParaValorKg).toBeFalse();
+      expect(r.pesoPaquete).toBeNull();
+    });
+
+    it('con precio o cantidad en 0 el Valor OT es 0', () => {
+      expect(servicio.calcularCostos(mts({ precio: 0 }))!.valorOt).toBe(0);
+      expect(servicio.calcularCostos(mts({ cantidad: 0 }))!.valorOt).toBe(0);
+    });
+  });
+
+  it('presentaciones sin regla de cálculo (Rollo) devuelven null', () => {
     expect(servicio.calcularCostos(entrada({ presentacion: 'Rollo' }))).toBeNull();
   });
 

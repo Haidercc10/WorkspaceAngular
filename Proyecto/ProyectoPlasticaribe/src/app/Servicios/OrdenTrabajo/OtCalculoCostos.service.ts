@@ -38,7 +38,8 @@ export interface ResultadoCostosOT {
   valorProducto: number;
   margenKg: number;
   netoKg: number;
-  valorKg: number;
+  /** Valor del kilo; null cuando la presentación no lo calcula (MTS: pendiente de definir) y quien llama decide qué valor usar. */
+  valorKg: number | null;
   valorOt: number;
   /** Peso Millar usado en el cálculo (con la regla D2 aplicada si corresponde). */
   pesoMillarEfectivo: number;
@@ -80,7 +81,7 @@ export class OtCalculoCostosService {
   /**
    * Calcula los costos de la OT según su presentación.
    * @param entrada Datos de la OT y del producto.
-   * @returns Los costos calculados, o null si la presentación no tiene regla de cálculo (p. ej. MTS),
+   * @returns Los costos calculados, o null si la presentación no tiene regla de cálculo (p. ej. Rollo),
    * en cuyo caso quien llama conserva los valores que ya tenía.
    */
   calcularCostos(entrada: EntradaCostosOT): ResultadoCostosOT | null {
@@ -88,6 +89,7 @@ export class OtCalculoCostosService {
       case 'Kg': return this.calcularCostosKg(entrada);
       case 'Paquete': return this.calcularCostosPaquete(entrada);
       case 'Und': return this.calcularCostosUnd(entrada);
+      case 'MTS': return this.calcularCostosMts(entrada);
       default: return null;
     }
   }
@@ -168,6 +170,31 @@ export class OtCalculoCostosService {
       pesoPaquete: null,
       pesoBulto: null,
       sinPesoParaValorKg: !(pesoMillar > 0),
+    };
+  }
+
+  /**
+   * Costos de una OT en metros (decisión del responsable): Valor Unidad = precio ingresado, Cantidad = cantidad
+   * ingresada y Valor OT = cantidad × precio. Neto Kg y Margen Kg no tienen regla para metros y quedan en 0, como antes.
+   * TODO: Valor Kg MTS por definir (responsable). Mientras tanto no se calcula: se devuelve null y el componente
+   * usa 0 en una OT nueva y conserva el Valor Kg guardado al editar.
+   * @param entrada Datos de la OT y del producto.
+   * @returns Costos calculados, con `valorKg` en null; no calcula peso de paquete ni de bulto.
+   */
+  calcularCostosMts(entrada: EntradaCostosOT): ResultadoCostosOT {
+    const cantidad = this.aNumero(entrada.cantidad);
+    const precio = this.aNumero(entrada.precio);
+    return {
+      cantidadProducto: cantidad,
+      valorProducto: precio,
+      margenKg: 0,
+      netoKg: 0,
+      valorKg: null,
+      valorOt: cantidad * precio,
+      pesoMillarEfectivo: this.pesoMillarEfectivo(entrada.pesoMillar, entrada.tipoProducto, entrada.presentacion),
+      pesoPaquete: null,
+      pesoBulto: null,
+      sinPesoParaValorKg: false,
     };
   }
 

@@ -150,6 +150,7 @@ export class Orden_TrabajoComponent implements OnInit {
   pesoProducto: number = 0; //Variable que almacenará el peso del producto
   pesoMillar: number = 0; //Variable que almacenará el peso de un millar
   private sinPesoParaValorKg: boolean = false; //true si el último cálculo dejó Valor Kg en 0 por falta de Peso Millar (o de cantidad por paquete)
+  private valorKgCargado: number | null = null; //Valor Kg guardado de la OT abierta en edición; se conserva cuando la presentación no lo calcula (MTS)
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
 
@@ -685,6 +686,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.pesoPaquete = 0;
     this.pesoBulto = 0;
     this.informacionSeleccionada = 0;
+    this.valorKgCargado = null;
   }
 
   //Cargar modal de crear producto
@@ -1141,6 +1143,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.otCargada = null;
     this.FormOrdenTrabajo.patchValue({ OT_Id: null });
     this.limpiarProduccionProcesos();
+    this.valorKgCargado = null;
   }
 
   /**
@@ -1729,8 +1732,9 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Calcula los costos de la OT (cantidad, valor unidad, margen kg, neto kg, valor kg, valor OT y pesos de paquete/bulto)
-   * con `OtCalculoCostosService` a partir del producto cargado. Si la presentación no tiene regla de cálculo (p. ej. MTS),
-   * conserva los valores actuales, como hasta ahora.
+   * con `OtCalculoCostosService` a partir del producto cargado. Si la presentación no tiene regla de cálculo (p. ej. Rollo),
+   * conserva los valores actuales, como hasta ahora. Si el servicio no calcula el Valor Kg (MTS, pendiente de definir),
+   * usa 0 en una OT nueva y, al editar, conserva el Valor Kg con el que se cargó la OT.
    * @param margen_Adicional Margen adicional en porcentaje.
    * @returns No retorna un valor.
    */
@@ -1751,7 +1755,8 @@ export class Orden_TrabajoComponent implements OnInit {
     this.valorProducto = resultado.valorProducto;
     this.margenKg = resultado.margenKg;
     this.netoKg = resultado.netoKg;
-    this.valorKg = resultado.valorKg;
+    // TODO: Valor Kg MTS por definir (responsable)
+    this.valorKg = resultado.valorKg ?? (this.edicionOrdenTrabajo ? this.valorKgCargado ?? 0 : 0);
     this.valorOt = resultado.valorOt;
     if (resultado.pesoPaquete != null) this.pesoPaquete = resultado.pesoPaquete;
     if (resultado.pesoBulto != null) this.pesoBulto = resultado.pesoBulto;
@@ -2925,10 +2930,13 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Carga en los formularios una OT existente en Plasticaribe y habilita el modo edición.
+   * Guarda su Valor Kg para conservarlo al editar cuando la presentación no lo calcula (MTS).
    * @param datos Fila de la OT devuelta por getOrdenTrabajo.
    * @returns No retorna un valor.
    */
   cargarOrdenTrabajoPlasticaribe(datos: any) {
+    const valorKg = Number(datos.valorKg);
+    this.valorKgCargado = datos.valorKg != null && Number.isFinite(valorKg) ? valorKg : null;
     this.FormOrdenTrabajo.patchValue({
       'OT_Id': datos.numero_Orden,
       'Id_Vendedor': datos.id_Vendedor,
