@@ -46,6 +46,8 @@ interface ResultadoBusquedaOT {
   origen: 'plasticaribe' | 'bagpro';
   datos: any;
   sede?: any;
+  /** true si el item/presentación de la OT no existe en Plasticaribe; en ese caso la OT no se carga. */
+  productoNoEncontrado?: boolean;
 }
 
 /** Información encontrada al consultar por item: ficha de BagPro (ClientesOtItem) o, como respaldo, la última OT de Plasticaribe. */
@@ -53,6 +55,8 @@ interface ResultadoBusquedaItem {
   origen: 'item' | 'ultimaOT';
   datos: any;
   sede?: any;
+  /** true si el item/presentación no existe en Plasticaribe; en ese caso el item no se carga. */
+  productoNoEncontrado?: boolean;
 }
 
 @Injectable({
@@ -971,23 +975,33 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Consulta el producto y presentación actuales y llena ArrayProducto; avisa si no se encuentra.
+   * @param avisar false omite el aviso cuando no se encuentra, para que quien llama muestre uno propio.
    * @returns Observable que emite true si se cargó el producto y false si no se encontró o falló la consulta.
    */
-  obtenerInformacionProducto$(): Observable<boolean> {
+  obtenerInformacionProducto$(avisar: boolean = true): Observable<boolean> {
     return this.productoService.GetInfoProducto_Prod_Presentacion(this.producto, this.presentacionProducto).pipe(
       map(datos_producto => {
-        if (datos_producto.length == 0) {
-          this.msj.mensajeAdvertencia(`Debe ingresar un producto válido y su presentación correspondiente.`);
+        if (!datos_producto?.length) {
+          if (avisar) this.msj.mensajeAdvertencia(`Debe ingresar un producto válido y su presentación correspondiente.`);
           return false;
         }
         datos_producto.forEach(data => this.llenarProducto(data));
         return true;
       }),
       catchError(() => {
-        this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
+        if (avisar) this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
         return of(false);
       })
     );
+  }
+
+  /**
+   * Muestra el aviso de que una OT o un item no se pudo cargar porque su producto no existe en Plasticaribe.
+   * @param origen Texto que identifica lo que se intentó cargar (p. ej. "la OT N° 123" o "el item").
+   * @returns No retorna un valor.
+   */
+  private avisarProductoNoEncontrado(origen: string): void {
+    this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No se pudo cargar ${origen}: el item ${this.producto} con la presentación ${this.presentacionProducto} no existe en Plasticaribe!`);
   }
 
   /**
@@ -1029,6 +1043,7 @@ export class Orden_TrabajoComponent implements OnInit {
    * Carga toda la información del item seleccionado tal como está guardado en BagPro (ClientesOtItem):
    * cliente, vendedor, procesos, extrusión, impresión, laminado, sellado y mezclas.
    * Si el item no está en BagPro usa la última OT de Plasticaribe; si tampoco existe, avisa sin borrar el producto.
+   * Si el item/presentación no existe en Plasticaribe, avisa y no carga nada ni ejecuta `alCargar`.
    * Cancela cualquier consulta anterior para que cambios rápidos de item no mezclen datos.
    * @param alCargar Función opcional que se ejecuta cuando la información quedó cargada (p. ej. copiar OT).
    * @returns No retorna un valor.
@@ -1048,6 +1063,12 @@ export class Orden_TrabajoComponent implements OnInit {
     ).subscribe(resultado => {
       if (!resultado) {
         this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No hay información del item ${producto} con la presentación ${presentacion}!`);
+        this.cargando = false;
+        return;
+      }
+      if (resultado.productoNoEncontrado) {
+        // Sin producto no se llenan los formularios ni se ejecuta alCargar (p. ej. la copia de OT no guarda)
+        this.avisarProductoNoEncontrado(`el item`);
         this.cargando = false;
         return;
       }
@@ -1087,12 +1108,15 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Consulta lo necesario para cargar el item encontrado: el producto y, para la ficha de BagPro, la sede del cliente.
    * @param resultado Información del item encontrada y su origen.
-   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro.
+   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro, y marcado con
+   * `productoNoEncontrado` si el item/presentación no existe en Plasticaribe.
    */
   prepararCargaItem$(resultado: ResultadoBusquedaItem): Observable<ResultadoBusquedaItem> {
-    if (resultado.origen == 'ultimaOT') return this.obtenerInformacionProducto$().pipe(map(() => resultado));
-    return forkJoin({ producto: this.obtenerInformacionProducto$(), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
-      map(({ sede }) => ({ ...resultado, sede }))
+    if (resultado.origen == 'ultimaOT') return this.obtenerInformacionProducto$(false).pipe(
+      map(producto => ({ ...resultado, productoNoEncontrado: !producto }))
+    );
+    return forkJoin({ producto: this.obtenerInformacionProducto$(false), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
+      map(({ producto, sede }) => ({ ...resultado, sede, productoNoEncontrado: !producto }))
     );
   }
 
@@ -1208,7 +1232,7 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   llenarDatosCliente(data: any) {
-    let vendedor: string = data ? data.id_Vendedor : '';
+    let vendedor: string = data ? (data.id_Vendedor ?? '') : ''; // BagPro puede traer el vendedor en null
     this.FormOrdenTrabajo.patchValue({
       Id_Cliente: data == undefined ? '' : data.id_Cliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
@@ -1302,7 +1326,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Ancho_Extrusion2: data.ancho2_Extrusion || this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
       Ancho_Extrusion3: data.ancho3_Extrusion || this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
       Calibre_Extrusion: data.calibre_Extrusion || this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-      UnidadMedida_Extrusion: data.und_Extrusion.trim() || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
+      UnidadMedida_Extrusion: data.und_Extrusion?.toString().trim() || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
       Tratado_Extrusion: data.id_Tratado || this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Grafilado_Extrusion: data.extrusion_Grafilado ?? null,
       Peso_Extrusion: data.peso_Extrusion,
@@ -1359,10 +1383,10 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   llenarFormularioCorte(data: any) {
     this.FormOrdenTrabajoCorte.patchValue({
-      Formato_Corte: this.ArrayProducto[0].Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
-      Ancho_Corte: this.ArrayProducto[0].Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-      Largo_Corte: this.ArrayProducto[0].Largo || this.FormOrdenTrabajoCorte.value.Largo_Corte,
-      Fuelle_Corte: this.ArrayProducto[0].Fuelle || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+      Formato_Corte: this.ArrayProducto[0]?.Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
+      Ancho_Corte: this.ArrayProducto[0]?.Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+      Largo_Corte: this.ArrayProducto[0]?.Largo || this.FormOrdenTrabajoCorte.value.Largo_Corte,
+      Fuelle_Corte: this.ArrayProducto[0]?.Fuelle || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
       Margen_Corte: data.margen || this.FormOrdenTrabajoCorte.value.Margen_Corte,
       Etiqueta_Ancho_Corte: data.selladoCorte_Etiqueta_Ancho || this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte,
       Etiqueta_Largo_Corte: data.selladoCorte_Etiqueta_Largo || this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte,
@@ -1382,11 +1406,11 @@ export class Orden_TrabajoComponent implements OnInit {
     const observacionSelladoCorte = data.selladoCorte_Observacion || null;
     this.FormOrdenTrabajoCorte.patchValue({ SelladoCorte_Observacion: observacionSelladoCorte });
     this.FormOrdenTrabajoSellado.patchValue({
-      Formato_Sellado: this.ArrayProducto[0].Tipo,
-      Ancho_Sellado: this.ArrayProducto[0].Ancho,
-      Largo_Sellado: this.ArrayProducto[0].Largo,
-      Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
-      Solapa_Sellado: data.selladoCorte_Solapa ?? this.ArrayProducto[0].Solapa ?? 0,
+      Formato_Sellado: this.ArrayProducto[0]?.Tipo,
+      Ancho_Sellado: this.ArrayProducto[0]?.Ancho,
+      Largo_Sellado: this.ArrayProducto[0]?.Largo,
+      Fuelle_Sellado: this.ArrayProducto[0]?.Fuelle,
+      Solapa_Sellado: data.selladoCorte_Solapa ?? this.ArrayProducto[0]?.Solapa ?? 0,
       Ancho_Sellado1: data.selladoCorte_Ancho1 ?? 0,
       Ancho_Sellado2: data.selladoCorte_Ancho2 ?? 0,
       Ancho_Sellado3: data.selladoCorte_Ancho3 ?? 0,
@@ -1395,11 +1419,11 @@ export class Orden_TrabajoComponent implements OnInit {
       Etiqueta_Fuelle_Sellado: data.selladoCorte_Etiqueta_Fuelle || '0',
       Calibre_Sellado: Number(data.selladoCorte_Calibre) > 0 ? Number(data.selladoCorte_Calibre) : (Number(this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion) || 0),
       Margen_Sellado: data.margen,
-      PesoMillar: this.ArrayProducto[0].PesoMillar,
-      TipoSellado: this.ArrayProducto[0].TipoSellado,
-      CantidadPaquete: this.ArrayProducto[0].CantPaquete || 0.0,
+      PesoMillar: this.ArrayProducto[0]?.PesoMillar,
+      TipoSellado: this.ArrayProducto[0]?.TipoSellado,
+      CantidadPaquete: this.ArrayProducto[0]?.CantPaquete || 0.0,
       PesoPaquete: [null, ''].includes(data.selladoCorte_PesoPaquete) ? 0.0 : parseFloat(data.selladoCorte_PesoPaquete) || 0.0,
-      CantidadBulto: this.ArrayProducto[0].CantBulto || 0.0,
+      CantidadBulto: this.ArrayProducto[0]?.CantBulto || 0.0,
       PesoBulto: [null, ''].includes(data.selladoCorte_PesoBulto) ? 0.0 : parseFloat(data.selladoCorte_PesoBulto) || 0.0,
       PrecioDia: parseFloat(data.selladoCorte_PrecioSelladoDia) || 0.0,
       PrecioNoche: parseFloat(data.selladoCorte_PrecioSelladoNoche) || 0.0,
@@ -2541,6 +2565,7 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = false;
         return;
       }
+      if (resultado.productoNoEncontrado) return this.cancelarCargaOTSinProducto(numeroOT);
       if (resultado.origen == 'plasticaribe') this.cargarOrdenTrabajoPlasticaribe(resultado.datos);
       else this.cargarOrdenTrabajoBagPro(resultado, numeroOT);
       this.otCargada = numeroOT;
@@ -2549,6 +2574,18 @@ export class Orden_TrabajoComponent implements OnInit {
       this.msj.mensajeError(`¡No fue posible consultar la Orden de Trabajo N° ${numeroOT}!`, error.error);
       this.cargando = false;
     });
+  }
+
+  /**
+   * Termina la carga de una OT cuyo item/presentación no existe en Plasticaribe: avisa, deja la pantalla limpia
+   * (ya la limpió prepararCargaOrdenTrabajo$), sin modo edición, y conserva el número consultado para poder navegar.
+   * @param numeroOT Número de la OT que se intentó cargar.
+   * @returns No retorna un valor.
+   */
+  private cancelarCargaOTSinProducto(numeroOT: number): void {
+    this.avisarProductoNoEncontrado(`la OT N° ${numeroOT}`);
+    this.FormOrdenTrabajo.patchValue({ OT_Id: numeroOT });
+    this.cargando = false;
   }
 
   /**
@@ -2603,7 +2640,8 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Carga una OT de BagPro como plantilla para crear una nueva. Lo usa la búsqueda de OTs (crear / copiar OT).
-   * Si la OT no existe en BagPro se avisa y no se modifica la pantalla.
+   * Si la OT no existe en BagPro se avisa y no se modifica la pantalla; si su item/presentación no existe en
+   * Plasticaribe se avisa, la pantalla queda limpia y no se ejecuta `alCargar`.
    * @param ot Número de la OT o fila de la búsqueda con la propiedad ordenTrabajo.
    * @param alCargar Función opcional que se ejecuta cuando la OT quedó cargada (p. ej. copiar OT).
    * @returns No retorna un valor.
@@ -2625,6 +2663,8 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = false;
         return;
       }
+      // Sin producto no se carga la OT ni se ejecuta alCargar (la copia de OT no guarda)
+      if (resultado.productoNoEncontrado) return this.cancelarCargaOTSinProducto(numeroOT);
       this.cargarOrdenTrabajoBagPro(resultado, numeroOT, false);
       this.otCargada = numeroOT;
       this.consultarProduccionProcesos(numeroOT);
@@ -2668,7 +2708,8 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Limpia la pantalla y consulta lo necesario para cargar la OT encontrada: el producto y, para BagPro, la sede del cliente.
    * @param resultado OT encontrada y su origen.
-   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro.
+   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro, y marcado con
+   * `productoNoEncontrado` si el item/presentación de la OT no existe en Plasticaribe.
    */
   prepararCargaOrdenTrabajo$(resultado: ResultadoBusquedaOT): Observable<ResultadoBusquedaOT> {
     this.limpiarCampos();
@@ -2676,13 +2717,15 @@ export class Orden_TrabajoComponent implements OnInit {
     if (resultado.origen == 'plasticaribe') {
       this.producto = resultado.datos.id_Producto;
       this.presentacionProducto = resultado.datos.id_Presentacion;
-      return this.obtenerInformacionProducto$().pipe(map(() => resultado));
+      return this.obtenerInformacionProducto$(false).pipe(
+        map(producto => ({ ...resultado, productoNoEncontrado: !producto }))
+      );
     }
 
     this.producto = resultado.datos.id_Producto;
     this.presentacionProducto = resultado.datos.presentacion == 'Kilo' ? 'Kg' : resultado.datos.presentacion == 'Unidad' ? 'Und' : resultado.datos.presentacion;
-    return forkJoin({ producto: this.obtenerInformacionProducto$(), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
-      map(({ sede }) => ({ ...resultado, sede }))
+    return forkJoin({ producto: this.obtenerInformacionProducto$(false), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
+      map(({ producto, sede }) => ({ ...resultado, sede, productoNoEncontrado: !producto }))
     );
   }
 
@@ -2696,7 +2739,7 @@ export class Orden_TrabajoComponent implements OnInit {
       'OT_Id': datos.numero_Orden,
       'Id_Vendedor': datos.id_Vendedor,
       'Nombre_Vendedor': this.idVendedorParaDropdown(datos.id_Vendedor),
-      'OT_FechaCreacion': datos.fecha_Creacion.replace('T00:00:00', ''),
+      'OT_FechaCreacion': datos.fecha_Creacion?.replace('T00:00:00', '') ?? null,
       'OT_FechaEntrega': datos.fecha_Entrega ? moment(datos.fecha_Entrega.replace('T00:00:00', '')).toDate() : null,
       'Id_Cliente': datos.id_Cliente,
       'Nombre_Cliente': datos.cliente,
