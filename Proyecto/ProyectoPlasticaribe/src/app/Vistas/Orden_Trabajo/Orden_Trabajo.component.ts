@@ -2236,32 +2236,51 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Función que va a validar que la información este correcta
+  /**
+   * Valida la información de la OT y, si es correcta, la crea. No hace nada si ya hay un guardado en curso.
+   * @returns No retorna un valor.
+   */
   validarDatos() {
-    this.calcularDatosOt();
-    if (this.FormOrdenTrabajo.valid) {
-      if (!this.extrusion) this.limpiarFormExtrusion();
-      if (!this.impresion) this.limpiarFormImpresion();
-      if (!this.laminado) this.limpiarFormLaminado();
-      if (!this.corte) this.limpiarFormCorte();
-      if (!this.sellado) this.limpiarFormSellado();
-      if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
+    if (this.guardando) return;
+    if (!this.FormOrdenTrabajo.valid) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+      return;
+    }
+    if (this.prepararFormulariosParaGuardar()) this.guardarOt();
+  }
 
-      setTimeout(() => {
-        if (this.FormOrdenTrabajoExtrusion.valid) {
-          if (this.FormOrdenTrabajoImpresion.valid) {
-            if (this.FormOrdenTrabajoLaminado.valid) {
-              if (this.FormOrdenTrabajoCorte.valid) {
-                if (this.FormOrdenTrabajoSellado.valid) {
-                  if (this.FormOrdenTrabajoMezclas.valid) this.guardarOt();
-                  else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
-              } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
-            } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
-        } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
-      }, 700);
-    } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+  /**
+   * Prepara y valida los formularios de procesos antes de crear o editar una OT, sin esperas:
+   * limpia los procesos que no aplican, recalcula pesos y costos con lo que hay en pantalla y valida
+   * los subformularios en el orden habitual. Conserva el refresco de la información del producto que hacía
+   * `calcularDatosOt`: el cálculo usa los datos ya cargados y la respuesta del refresco llega después.
+   * @returns true si todos los subformularios son válidos; false si alguno no lo es (ya se mostró el aviso).
+   */
+  private prepararFormulariosParaGuardar(): boolean {
+    if (!this.extrusion) this.limpiarFormExtrusion();
+    if (!this.impresion) this.limpiarFormImpresion();
+    if (!this.laminado) this.limpiarFormLaminado();
+    if (!this.corte) this.limpiarFormCorte();
+    if (!this.sellado) this.limpiarFormSellado();
+    if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
+
+    this.buscarInformacionProducto();
+    this.calcularDatosOtInmediato();
+
+    const validaciones: [FormGroup, string][] = [
+      [this.FormOrdenTrabajoExtrusion, `¡EL formulario de Extrusion tiene campos vacios!`],
+      [this.FormOrdenTrabajoImpresion, `¡El formulario de Impresion tiene campos vacios!`],
+      [this.FormOrdenTrabajoLaminado, `¡EL formulario de Laminado tiene campos vacios!`],
+      [this.FormOrdenTrabajoCorte, `¡El formulario de Corte tiene campos vacios!`],
+      [this.FormOrdenTrabajoSellado, `¡El formulario de Sellado tiene campos vacios!`],
+      [this.FormOrdenTrabajoMezclas, `¡El formulario de Mezclas tiene campos vacios!`],
+    ];
+    const invalido = validaciones.find(([formulario]) => !formulario.valid);
+    if (invalido) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, invalido[1]);
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -2724,42 +2743,28 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargando = false;
   }
 
-  // Funcion que va a validar que si se desee actualizar la orden de trabajo
+  /**
+   * Valida la información de la OT en edición y, si es correcta, pide confirmación antes de actualizarla.
+   * No hace nada si ya hay un guardado en curso.
+   * @returns No retorna un valor.
+   */
   validarActualizacionOT() {
-    this.calcularDatosOt();
-    if (this.FormOrdenTrabajo.valid) {
-      let ot: number = this.FormOrdenTrabajo.value.OT_Id;
-      if (!this.extrusion) this.limpiarFormExtrusion();
-      if (!this.impresion) this.limpiarFormImpresion();
-      if (!this.laminado) this.limpiarFormLaminado();
-      if (!this.corte) this.limpiarFormCorte();
-      if (!this.sellado) this.limpiarFormSellado();
-      if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
-
-      setTimeout(() => {
-        if (this.FormOrdenTrabajoExtrusion.valid) {
-          if (this.FormOrdenTrabajoImpresion.valid) {
-            if (this.FormOrdenTrabajoLaminado.valid) {
-              if (this.FormOrdenTrabajoCorte.valid) {
-                if (this.FormOrdenTrabajoSellado.valid) {
-                  if (this.FormOrdenTrabajoMezclas.valid) {
-                    this.messageService.add({
-                      severity: 'warn',
-                      key: 'editarOrden',
-                      summary: 'Confirmación de Edición de OT',
-                      detail:
-                        `<h6><b>Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</b></h6><br>` +
-                        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>`,
-                      sticky: true
-                    });
-                  } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
-              } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
-            } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
-        } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
-      }, 700);
-    } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
+    if (this.guardando) return;
+    if (!this.FormOrdenTrabajo.valid) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
+      return;
+    }
+    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
+    if (!this.prepararFormulariosParaGuardar()) return;
+    this.messageService.add({
+      severity: 'warn',
+      key: 'editarOrden',
+      summary: 'Confirmación de Edición de OT',
+      detail:
+        `<h6><b>Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</b></h6><br>` +
+        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>`,
+      sticky: true
+    });
   }
 
   /**
