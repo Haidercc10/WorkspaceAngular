@@ -1077,14 +1077,19 @@ export class Orden_TrabajoComponent implements OnInit {
    * cliente, vendedor, procesos, extrusión, impresión, laminado, sellado y mezclas.
    * Si el item no está en BagPro usa la última OT de Plasticaribe; si tampoco existe, avisa sin borrar el producto.
    * Si el item/presentación no existe en Plasticaribe, avisa y no carga nada ni ejecuta `alCargar`.
+   * Si había una OT abierta en modo edición, sale de ese modo antes de cargar (la OT abierta no se modifica)
+   * y el item queda como plantilla para crear una OT nueva.
    * Cancela cualquier consulta anterior para que cambios rápidos de item no mezclen datos.
-   * @param alCargar Función opcional que se ejecuta cuando la información quedó cargada (p. ej. copiar OT).
+   * @param alCargar Función opcional que se ejecuta cuando la información quedó cargada.
    * @returns No retorna un valor.
    */
   consultarInfoProducto(alCargar?: () => void) {
     const producto = this.FormOrdenTrabajo.value.Id_Producto;
     const presentacion = this.FormOrdenTrabajo.value.Presentacion;
     if (producto == null || presentacion == null) return;
+
+    const otEnEdicion: number | null = this.edicionOrdenTrabajo ? this.FormOrdenTrabajo.value.OT_Id : null;
+    if (this.edicionOrdenTrabajo) this.salirModoEdicion();
 
     this.busquedaOT?.unsubscribe();
     this.limpiarProducto();
@@ -1106,11 +1111,25 @@ export class Orden_TrabajoComponent implements OnInit {
         return;
       }
       this.cargarItem(resultado);
+      if (otEnEdicion != null) this.msj.mensajeAdvertencia(`¡Advertencia!`, `Se cargó el item ${producto} como plantilla para una OT nueva; la OT N° ${otEnEdicion} no se modificó.`, 6000);
       alCargar?.();
     }, error => {
       this.msj.mensajeError(`¡No fue posible consultar la información del item ${producto}!`, error.error);
       this.cargando = false;
     });
+  }
+
+  /**
+   * Sale del modo edición sin modificar la OT que estaba abierta: quita su número, la confirmación de edición
+   * y la tabla de producción, para que lo que se cargue después quede como plantilla de una OT nueva ("Crear OT").
+   * @returns No retorna un valor.
+   */
+  private salirModoEdicion(): void {
+    this.cerrarMensaje();
+    this.edicionOrdenTrabajo = false;
+    this.otCargada = null;
+    this.FormOrdenTrabajo.patchValue({ OT_Id: null });
+    this.limpiarProduccionProcesos();
   }
 
   /**
