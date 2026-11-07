@@ -84,6 +84,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   cargando: boolean = false; //Variable para validar que salga o no la imagen de carga
+  confirmandoEdicion: boolean = false; //Indica que el mensaje de confirmación de edición está abierto; deshabilita los botones "Editar OT"
   guardando: boolean = false; //Indica que hay una creación o edición de OT en curso; bloquea un segundo envío (doble clic)
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -682,8 +683,14 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion para llamar el modal que crea clientes
   LlamarModalCrearCliente = () => this.ModalCrearCliente = true;
 
-  // Funcion que va a cerrar el mensaje de confirmación de edicion de una orden de trabajo
-  cerrarMensaje = () => this.messageService.clear('editarOrden');
+  /**
+   * Cierra el mensaje de confirmación de edición de la OT y vuelve a habilitar los botones "Editar OT".
+   * @returns No retorna un valor.
+   */
+  cerrarMensaje() {
+    this.messageService.clear('editarOrden');
+    this.confirmandoEdicion = false;
+  }
 
   /** Carga las tintas para impresión y ajusta las selecciones actuales al nombre de cada opción. */
   cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => {
@@ -2875,17 +2882,20 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Valida la información de la OT en edición y, si es correcta, pide confirmación antes de actualizarla.
-   * No hace nada si ya hay un guardado en curso.
+   * No hace nada si ya hay un guardado en curso o si la confirmación ya está abierta (evita confirmaciones
+   * duplicadas y un segundo recálculo que en LAMINADO/HOJA volvería a dividir el PesoMillar).
    * @returns No retorna un valor.
    */
   validarActualizacionOT() {
-    if (this.guardando) return;
+    if (this.guardando || this.confirmandoEdicion) return;
     if (!this.FormOrdenTrabajo.valid) {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
       return;
     }
     let ot: number = this.FormOrdenTrabajo.value.OT_Id;
     if (!this.prepararFormulariosParaGuardar()) return;
+    this.cerrarMensaje();
+    this.confirmandoEdicion = true;
     this.messageService.add({
       severity: 'warn',
       key: 'editarOrden',
