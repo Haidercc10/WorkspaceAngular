@@ -2427,12 +2427,28 @@ export class Orden_TrabajoComponent implements OnInit {
         // Si la OT se creó, el overlay lo controla la generación del PDF
         if (!creada) this.cargando = false;
       })
-    ).subscribe(datos_ot => {
-      creada = true;
-      this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
-      this.limpiarCampos();
-      this.pdfOrdenTrabajo(datos_ot.numero_OT);
+    ).subscribe({
+      next: datos_ot => {
+        creada = true;
+        this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
+        this.limpiarCampos();
+        this.pdfOrdenTrabajo(datos_ot.numero_OT);
+      },
+      // Errores no previstos dentro del flujo (p. ej. datos nulos al armar la OT); los HTTP ya se informaron en cada paso
+      error: error => this.informarErrorInesperadoGuardado(`¡No fue posible crear la Orden de Trabajo por un error inesperado!`, error),
     });
+  }
+
+  /**
+   * Informa un error no previsto del flujo de crear o editar una OT (no HTTP, ya que esos se informan en cada paso)
+   * y lo deja en consola para su diagnóstico.
+   * @param mensaje Mensaje para el usuario.
+   * @param error Error capturado.
+   * @returns No retorna un valor.
+   */
+  private informarErrorInesperadoGuardado(mensaje: string, error: any): void {
+    console.error(error);
+    this.msj.mensajeError(mensaje, `Revise la información de la OT e intente de nuevo. Detalle: ${error?.message ?? error}`);
   }
 
   /**
@@ -2898,11 +2914,15 @@ export class Orden_TrabajoComponent implements OnInit {
         // Si la OT se actualizó, el overlay lo controla la generación del PDF
         if (!editada) this.cargando = false;
       })
-    ).subscribe(datos_ot => {
-      editada = true;
-      this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
-      this.limpiarCampos();
-      this.pdfOrdenTrabajo(datos_ot.numero_OT);
+    ).subscribe({
+      next: datos_ot => {
+        editada = true;
+        this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
+        this.limpiarCampos();
+        this.pdfOrdenTrabajo(datos_ot.numero_OT);
+      },
+      // Errores no previstos dentro del flujo (p. ej. datos nulos al armar la OT); los HTTP ya se informaron en cada paso
+      error: error => this.informarErrorInesperadoGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot} por un error inesperado!`, error),
     });
   }
 
