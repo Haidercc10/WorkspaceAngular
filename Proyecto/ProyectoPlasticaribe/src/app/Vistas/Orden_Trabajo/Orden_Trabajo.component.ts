@@ -5,7 +5,7 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Observable, Subscription, catchError, finalize, forkJoin, map, of, switchMap, throwError } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, finalize, forkJoin, map, of, switchMap, throwError } from 'rxjs';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
@@ -80,6 +80,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   cargando: boolean = false; //Variable para validar que salga o no la imagen de carga
+  guardando: boolean = false; //Indica que hay una creación o edición de OT en curso; bloquea un segundo envío (doble clic)
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -2263,69 +2264,94 @@ export class Orden_TrabajoComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
   }
 
-  //Funcion que va a guardar la información de la orden de trabajo
+  /**
+   * Crea la orden de trabajo en un único flujo: sede del cliente → último número de BagPro y datos de procesos → creación.
+   * Ignora la llamada si ya hay un guardado en curso (evita doble envío). Cualquier error o validación fallida
+   * muestra un mensaje y libera la pantalla; si la OT se crea, limpia los campos y abre su PDF.
+   * La usa también `Busqueda_OrdenesTrabajo` para copiar una OT.
+   * @param otCreadaBagPro Parámetro conservado por compatibilidad; no se usa.
+   * @returns No retorna un valor.
+   */
   guardarOt(otCreadaBagPro: boolean = false) {
+    if (this.guardando) return;
+    this.guardando = true;
     this.cargando = true;
-    this.svcSedes.GetSedeClientexNitBagPro(this.FormOrdenTrabajo.value.Id_Cliente).subscribe(sede => {
-      if (sede.length > 0) {
+    let creada: boolean = false;
+    (this.svcSedes.GetSedeClientexNitBagPro(this.FormOrdenTrabajo.value.Id_Cliente) as Observable<any[]>).pipe(
+      catchError(error => this.cortarGuardado(`¡No fue posible consultar la sede del cliente!`, error)),
+      switchMap(sede => {
+        if (!sede?.length) return this.cortarGuardado(`¡No se encontró ninguna sede para el cliente!`, null, true);
         this.FormOrdenTrabajo.patchValue({ Id_Cliente: sede[0].idSede });
-        forkJoin({
+        return forkJoin({
           numOT: this.bagProService.srvObtenerListaClienteOT_UltimaOT(),
           datosProcesos: this.consultarDatosProcesos(),
-        }).subscribe(({ numOT, datosProcesos }) => {
-          let procesos = this.construirProcesosOt(datosProcesos);
-          if (!procesos) return;
-          let numeroOrden: number = numOT.item + 1;
+        }).pipe(
+          catchError(error => this.cortarGuardado(`¡No fue posible consultar la información necesaria para crear la Orden de Trabajo!`, error))
+        );
+      }),
+      switchMap(({ numOT, datosProcesos }) => {
+        let procesos = this.construirProcesosOt(datosProcesos);
+        if (!procesos) return EMPTY;
+        let numeroOrden: number = numOT.item + 1;
 
-          let infoOT: modelOrden_Trabajo = {
-            'Numero_OT': numeroOrden,
-            'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
-            'Prod_Id': this.producto,
-            'UndMed_Id': this.presentacionProducto,
-            'Ot_FechaCreacion': this.today,
-            'Ot_FechaEntrega': this.fechaEntregaParaApi(),
-            'Ot_Hora': moment().format('H:mm:ss'),
-            'Estado_Id': 15,
-            'Usua_Id': this.storage_Id,
-            'PedExt_Id': 517,
-            'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
-            'Ot_Cyrel': this.cyrel,
-            'Ot_Corte': this.corte,
-            'Mezcla_Id': this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
-            'Extrusion': this.extrusion,
-            'Impresion': this.impresion,
-            'Rotograbado': false, // Proceso descontinuado; se conserva la columna.
-            'Laminado': this.laminado,
-            'Sellado': this.sellado,
-            'Ot_MargenAdicional': this.FormOrdenTrabajo.value.Margen,
-            'Ot_CantidadPedida': this.cantidadProducto,
-            'Ot_ValorUnidad': this.valorProducto,
-            'Ot_PesoNetoKg': this.netoKg,
-            'Ot_ValorKg': this.valorKg,
-            'Ot_ValorOT': this.valorOt,
-            'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
-            'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
-          }
-          this.ordenTrabajoService.crearOrdenCompleta({ OrdenTrabajo: infoOT, ...procesos }).subscribe(datos_ot => {
-            this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
-            this.limpiarCampos();
-            this.pdfOrdenTrabajo(datos_ot.numero_OT);
-          }, error => {
-            this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
-            this.cargando = false;
-          });
-
-        }, error => {
-          this.msj.mensajeError(`¡No fue posible consultar la información necesaria para crear la Orden de Trabajo!`, error.error);
-          this.cargando = false;
-        });
-        console.log(sede);
-      } else {
-        this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró ninguna sede para el cliente!`);
-        this.cargando = false;
-        return;
-      }
+        let infoOT: modelOrden_Trabajo = {
+          'Numero_OT': numeroOrden,
+          'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
+          'Prod_Id': this.producto,
+          'UndMed_Id': this.presentacionProducto,
+          'Ot_FechaCreacion': this.today,
+          'Ot_FechaEntrega': this.fechaEntregaParaApi(),
+          'Ot_Hora': moment().format('H:mm:ss'),
+          'Estado_Id': 15,
+          'Usua_Id': this.storage_Id,
+          'PedExt_Id': 517,
+          'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
+          'Ot_Cyrel': this.cyrel,
+          'Ot_Corte': this.corte,
+          'Mezcla_Id': this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+          'Extrusion': this.extrusion,
+          'Impresion': this.impresion,
+          'Rotograbado': false, // Proceso descontinuado; se conserva la columna.
+          'Laminado': this.laminado,
+          'Sellado': this.sellado,
+          'Ot_MargenAdicional': this.FormOrdenTrabajo.value.Margen,
+          'Ot_CantidadPedida': this.cantidadProducto,
+          'Ot_ValorUnidad': this.valorProducto,
+          'Ot_PesoNetoKg': this.netoKg,
+          'Ot_ValorKg': this.valorKg,
+          'Ot_ValorOT': this.valorOt,
+          'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
+          'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
+        }
+        return this.ordenTrabajoService.crearOrdenCompleta({ OrdenTrabajo: infoOT, ...procesos }).pipe(
+          catchError(error => this.cortarGuardado(`¡No fue posible crear la Orden de Trabajo!`, error))
+        );
+      }),
+      finalize(() => {
+        this.guardando = false;
+        // Si la OT se creó, el overlay lo controla la generación del PDF
+        if (!creada) this.cargando = false;
+      })
+    ).subscribe(datos_ot => {
+      creada = true;
+      this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
+      this.limpiarCampos();
+      this.pdfOrdenTrabajo(datos_ot.numero_OT);
     });
+  }
+
+  /**
+   * Muestra el mensaje de un paso fallido del guardado (crear o editar OT) y termina el flujo sin emitir valores,
+   * para que su `finalize` libere la pantalla.
+   * @param mensaje Mensaje para el usuario.
+   * @param error Error HTTP recibido, si lo hay; su detalle se muestra junto al mensaje.
+   * @param advertencia true muestra una advertencia en lugar de un error.
+   * @returns Observable vacío que completa de inmediato.
+   */
+  private cortarGuardado(mensaje: string, error: any = null, advertencia: boolean = false): Observable<never> {
+    if (advertencia) this.msj.mensajeAdvertencia(`¡Advertencia!`, mensaje);
+    else this.msj.mensajeError(mensaje, error?.error);
+    return EMPTY;
   }
 
   /**
@@ -2343,13 +2369,19 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Arma la información de los cuatro procesos de la OT. Si no se encontraron las tintas, muestra el error y apaga la carga.
+   * Arma la información de los cuatro procesos de la OT. Si no se encontraron las tintas o no existe la combinación
+   * de tipo de sellado y formato (la API responde 204 sin cuerpo), muestra el error y apaga la carga.
    * @param datos Tintas y formato/tipo de sellado consultados con consultarDatosProcesos.
-   * @returns Procesos de la OT para la API, o null si faltan las tintas.
+   * @returns Procesos de la OT para la API, o null si faltan las tintas o la combinación de sellado/formato.
    */
   construirProcesosOt(datos: { datosImpresion: any[], datosSellado: any }): any {
     if (datos.datosImpresion.length == 0) {
       this.msj.mensajeError(`¡No se encontraron las tintas seleccionadas para el área de 'Impresión'!`);
+      this.cargando = false;
+      return null;
+    }
+    if (!datos.datosSellado) {
+      this.msj.mensajeError(`¡No existe la combinación de tipo de sellado y formato seleccionada!`, `Verifique el tipo de sellado y el formato del producto terminado.`);
       this.cargando = false;
       return null;
     }
@@ -2730,35 +2762,48 @@ export class Orden_TrabajoComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
   }
 
-  // Funcion que va actualizar con nueva información la orden de trabajo
+  /**
+   * Actualiza la orden de trabajo en un único flujo: datos actuales de la OT → datos de procesos → edición.
+   * Solo actúa en modo edición y si no hay un guardado en curso (evita doble envío). Cualquier error o validación
+   * fallida muestra un mensaje y libera la pantalla; si la OT se actualiza, limpia los campos y abre su PDF.
+   * @returns No retorna un valor.
+   */
   editarOrdenTrabajo() {
-    if (this.edicionOrdenTrabajo) {
-      this.cerrarMensaje();
-      this.cargando = true;
-      let ot: number = this.FormOrdenTrabajo.value.OT_Id;
+    if (!this.edicionOrdenTrabajo || this.guardando) return;
+    this.cerrarMensaje();
+    this.guardando = true;
+    this.cargando = true;
+    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
+    let editada: boolean = false;
 
-      this.ordenTrabajoService.GetDatosOrden(ot).subscribe(datos_Orden => {
-        this.consultarDatosProcesos().subscribe(datosProcesos => {
-          let procesos = this.construirProcesosOt(datosProcesos);
-          if (!procesos) return;
-          let info = this.informacionOrdenTrabajo(datos_Orden);
-          this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).subscribe(datos_ot => {
-            this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
-            this.pdfOrdenTrabajo(datos_ot.numero_OT);
-            this.limpiarCampos();
-          }, error => {
-            this.msj.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error.error);
-            this.cargando = false;
-          });
-        }, error => {
-          this.msj.mensajeError(`¡No fue posible consultar la información necesaria para actualizar la Orden de Trabajo!`, error.error);
-          this.cargando = false;
-        });
-      }, () => {
+    this.ordenTrabajoService.GetDatosOrden(ot).pipe(
+      catchError(() => {
         this.msj.mensajeError(`¡Error!`, `¡La Orden de Trabajo N° ${ot} ya no existe en Plasticaribe!`);
-        this.cargando = false;
-      });
-    }
+        return EMPTY;
+      }),
+      switchMap(datos_Orden => this.consultarDatosProcesos().pipe(
+        catchError(error => this.cortarGuardado(`¡No fue posible consultar la información necesaria para actualizar la Orden de Trabajo!`, error)),
+        map(datosProcesos => ({ datos_Orden, datosProcesos }))
+      )),
+      switchMap(({ datos_Orden, datosProcesos }) => {
+        let procesos = this.construirProcesosOt(datosProcesos);
+        if (!procesos) return EMPTY;
+        let info = this.informacionOrdenTrabajo(datos_Orden);
+        return this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).pipe(
+          catchError(error => this.cortarGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error))
+        );
+      }),
+      finalize(() => {
+        this.guardando = false;
+        // Si la OT se actualizó, el overlay lo controla la generación del PDF
+        if (!editada) this.cargando = false;
+      })
+    ).subscribe(datos_ot => {
+      editada = true;
+      this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
+      this.limpiarCampos();
+      this.pdfOrdenTrabajo(datos_ot.numero_OT);
+    });
   }
 
   // Funcion que va a construir la informacion de los procesos de la orden de trabajo
