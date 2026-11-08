@@ -136,7 +136,7 @@
             <div class="col-md-6 col-lg-2 col-xl-2" id="cantidadFabricar">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-hashtag"></i>
-                <p-inputNumber formControlName="Cantidad" inputId="Cant" (onKeyDown)="calcularDatosOt()"
+                <p-inputNumber formControlName="Cantidad" [min]="0" inputId="Cant" (onKeyDown)="calcularDatosOt()"
                   [required]="true"></p-inputNumber>
                 <label for="Cant">Cant. Pedida</label>
               </span>
@@ -168,7 +168,7 @@
             <div class="col-md-6 col-lg-3 col-xl-2" id="precioUnitario">
               <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                 <i class="pi pi-dollar"></i>
-                <p-inputNumber formControlName="Precio" mode="decimal" inputId="Cant"
+                <p-inputNumber formControlName="Precio" [min]="0" mode="decimal" inputId="Cant"
                   [minFractionDigits]="2" (onKeyDown)="calcularDatosOt()" [required]="true"></p-inputNumber>
                 <label for="Cant">Precio Unitario</label>
               </span>
@@ -975,7 +975,7 @@
                           <!-- Margen -->
                           <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-1">
                             <span class="p-float-label">
-                              <p-inputNumber formControlName="Margen_Corte" inputId="Margen" mode="decimal" prefix="% "
+                              <p-inputNumber formControlName="Margen_Corte" [min]="0" inputId="Margen" mode="decimal" prefix="% "
                                 [minFractionDigits]="2" [required]="true"
                                 (onKeyDown)="calcularDatosOt()"></p-inputNumber>
                               <label for="Margen">Margen</label>
@@ -1101,7 +1101,7 @@
                           <!-- Margen -->
                           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                             <span class="p-float-label">
-                              <p-inputNumber formControlName="Margen_Sellado" inputId="Margen" mode="decimal"
+                              <p-inputNumber formControlName="Margen_Sellado" [min]="0" inputId="Margen" mode="decimal"
                                 prefix="% " [minFractionDigits]="2" [required]="true"
                                 (onKeyDown)="calcularDatosOt()"></p-inputNumber>
                               <label for="Margen">Margen</label>
@@ -1143,7 +1143,7 @@
                           <!-- Cantidad Paquete -->
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
-                              <p-inputNumber formControlName="CantidadPaquete" inputId="CantidadPaquete" mode="decimal"
+                              <p-inputNumber formControlName="CantidadPaquete" [min]="0" inputId="CantidadPaquete" mode="decimal"
                                 [minFractionDigits]="0" [required]="true" (onInput)="calcularPesosPaqueteBulto()"></p-inputNumber>
                               <label for="CantidadPaquete">Cantidad Paquete</label>
                             </span>
@@ -1161,7 +1161,7 @@
                           <!-- Cantidad Bulto -->
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
-                              <p-inputNumber formControlName="CantidadBulto" inputId="CantidadBulto" mode="decimal"
+                              <p-inputNumber formControlName="CantidadBulto" [min]="0" inputId="CantidadBulto" mode="decimal"
                                 [minFractionDigits]="0" [required]="true" (onInput)="calcularPesosPaqueteBulto(false)"></p-inputNumber>
                               <label for="CantidadBulto">Cantidad Bulto</label>
                             </span>
