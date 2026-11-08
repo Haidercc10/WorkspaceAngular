@@ -1145,7 +1145,7 @@
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="CantidadPaquete" [min]="0" inputId="CantidadPaquete" mode="decimal"
-                                [minFractionDigits]="0" [required]="true" (onInput)="calcularPesosPaqueteBulto()"></p-inputNumber>
+                                [minFractionDigits]="0" [required]="true" (onInput)="calcularPesosPaqueteBulto(); calcularDatosOt()"></p-inputNumber>
                               <label for="CantidadPaquete">Cantidad Paquete</label>
                             </span>
                           </div>

@@ -1741,13 +1741,14 @@ export class Orden_TrabajoComponent implements OnInit {
    * Calcula el peso del producto con sus dimensiones y el factor del material, y toma el Peso Millar base del producto
    * (el que se muestra en sellado y se guarda). No modifica el Peso Millar de ArrayProducto: la regla de LAMINADO/HOJA
    * (D2) se aplica en `OtCalculoCostosService` sobre una variable local, así que repetir el cálculo no acumula divisiones.
+   * El tipo para la regla D2 es el mismo formato que se envía en SelladoCorte.Formato_Id (`formatoProductoTerminado`).
    * @param material Id del material de extrusión.
    * @param fact Parámetro conservado por compatibilidad; el factor lo calcula el servicio.
    * @returns No retorna un valor.
    */
   calcularPesoProducto(material: number, fact: number) {
     const producto = this.ArrayProducto[0];
-    producto.Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado || this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    producto.Tipo = this.formatoProductoTerminado();
     // Solo se llama con Cms o Plgs (lo valida calcularDatosOtInmediato); cualquier unidad distinta de Cms usa el factor de Plgs, como antes
     const unidad: string = this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' ? 'Cms' : 'Plgs';
     producto.Peso_Producto = this.calculoCostos.calcularPesoProducto(
@@ -1769,6 +1770,9 @@ export class Orden_TrabajoComponent implements OnInit {
    * con `OtCalculoCostosService` a partir del producto cargado. Si la presentación no tiene regla de cálculo (p. ej. Rollo),
    * conserva los valores actuales, como hasta ahora. Si el servicio no calcula el Valor Kg (MTS, pendiente de definir),
    * usa 0 en una OT nueva y, al editar, conserva el Valor Kg con el que se cargó la OT.
+   * H-C/I2: usa las mismas entradas que se envían y con las que el servidor valida: la cantidad por paquete editada en
+   * sellado (CantidadPaquete → SelladoCorte_CantBolsasPaquete), el Peso Millar de SelladoCorte_PesoMillar y el formato
+   * de SelladoCorte.Formato_Id.
    * @param margen_Adicional Margen adicional en porcentaje.
    * @returns true si se calcularon los costos; false si la presentación no tiene regla de cálculo.
    */
@@ -1781,7 +1785,7 @@ export class Orden_TrabajoComponent implements OnInit {
       margenAdicional: margen_Adicional,
       pesoMillar: data.PesoMillar,
       tipoProducto: data.Tipo,
-      cantidadPaquete: data.CantPaquete,
+      cantidadPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
       cantidadBulto: data.CantBulto,
     });
     if (!resultado) return false;
@@ -2673,12 +2677,21 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
+   * Formato (nombre del tipo de producto) del producto terminado: el de sellado si la OT es de sellado; si no, el de corte.
+   * Es el formato que se envía en SelladoCorte.Formato_Id y, por eso, el que se usa como tipo para la regla D2 (I2).
+   * @returns Nombre del formato seleccionado.
+   */
+  private formatoProductoTerminado(): any {
+    return this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
+  }
+
+  /**
    * Consulta los Ids de las tintas seleccionadas y el formato/tipo de sellado, necesarios para armar los procesos de la OT.
    * @returns Observable con las tintas encontradas y el formato/tipo de sellado.
    */
   consultarDatosProcesos(): Observable<{ datosImpresion: any[], datosSellado: any }> {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
-    let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    let formato: any = this.formatoProductoTerminado();
     let tintas = this.FormOrdenTrabajoImpresion.value;
     return forkJoin({
       datosImpresion: this.servicioTintas.srvObtenerListaConsultaImpresion(tintas.Tinta_Impresion1, tintas.Tinta_Impresion2, tintas.Tinta_Impresion3, tintas.Tinta_Impresion4, tintas.Tinta_Impresion5, tintas.Tinta_Impresion6, tintas.Tinta_Impresion7, tintas.Tinta_Impresion8),
@@ -2794,7 +2807,8 @@ export class Orden_TrabajoComponent implements OnInit {
       'SelladoCorte_Observacion': this.sellado
         ? this.FormOrdenTrabajoSellado.value.SelladoCorte_Observacion
         : this.FormOrdenTrabajoCorte.value.SelladoCorte_Observacion,
-      'SelladoCorte_PesoMillar': this.FormOrdenTrabajoSellado.value.PesoMillar,
+      // I2: el mismo Peso Millar con el que se calcularon los costos (el de sellado se pone en 0 si la OT no es de sellado)
+      'SelladoCorte_PesoMillar': this.ArrayProducto[0]?.PesoMillar ?? this.FormOrdenTrabajoSellado.value.PesoMillar,
       'TpSellado_Id': datos.tpSellado_Id,
       'SelladoCorte_PrecioSelladoDia': this.FormOrdenTrabajoSellado.value.PrecioDia,
       'SelladoCorte_PrecioSelladoNoche': this.FormOrdenTrabajoSellado.value.PrecioNoche,

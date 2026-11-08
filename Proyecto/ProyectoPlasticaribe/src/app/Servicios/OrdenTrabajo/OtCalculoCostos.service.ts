@@ -25,7 +25,7 @@ export interface EntradaCostosOT {
   pesoMillar: number | string | null;
   /** Tipo o formato del producto (p. ej. LAMINADO, HOJA). */
   tipoProducto: string | null;
-  /** Cantidad de bolsas por paquete. */
+  /** Bolsas por paquete editadas en sellado (las que se guardan como SelladoCorte_CantBolsasPaquete y usa el servidor, H-C), no las del producto. */
   cantidadPaquete: number | string | null;
   /** Cantidad de paquetes por bulto. */
   cantidadBulto: number | string | null;
