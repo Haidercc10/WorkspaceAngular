@@ -99,7 +99,8 @@
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-user"></i>
                 <input formControlName="Nombre_Cliente" id="cliente" list="clientes" type="text" pInputText
-                  (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off" [required]="true" />
+                  (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off" [required]="true"
+                  [readonly]="edicionOrdenTrabajo" />
                 <datalist id="clientes">
                   <option value={{item.sedeCli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
                 </datalist>

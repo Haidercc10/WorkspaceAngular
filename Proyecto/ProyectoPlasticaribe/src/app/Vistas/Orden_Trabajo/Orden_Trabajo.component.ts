@@ -9,8 +9,7 @@ import { EMPTY, Observable, Subscription, catchError, finalize, forkJoin, map, o
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
-import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
-import { CrearOrdenTrabajoDatos, OtExtrusionDatos, OtImpresionDatos, OtLaminadoDatos, OtSelladoCorteDatos } from 'src/app/Modelo/modelOrdenTrabajoCompleta';
+import { CrearOrdenTrabajoDatos, EditarOrdenTrabajoCompleta, EditarOrdenTrabajoDatos, OtExtrusionDatos, OtImpresionDatos, OtLaminadoDatos, OtSelladoCorteDatos, ProcesosOrdenTrabajo } from 'src/app/Modelo/modelOrdenTrabajoCompleta';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -151,6 +150,7 @@ export class Orden_TrabajoComponent implements OnInit {
   pesoMillar: number = 0; //Variable que almacenará el peso de un millar
   private sinPesoParaValorKg: boolean = false; //true si el último cálculo dejó Valor Kg en 0 por falta de Peso Millar (o de cantidad por paquete)
   private valorKgCargado: number | null = null; //Valor Kg guardado de la OT abierta en edición; se conserva cuando la presentación no lo calcula (MTS)
+  private rowVersionCargada: string | null = null; //Versión de la fila (rowVersion de getOrdenTrabajo, base64) de la OT abierta en edición; se envía como Ot_RowVersion para detectar ediciones concurrentes (409)
   private avisoSinPesoMostrado: boolean = false; //Indica si la última validación de guardado ya mostró el aviso de Valor Kg 0 (evita repetirlo al confirmar la edición)
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
@@ -693,6 +693,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.pesoBulto = 0;
     this.informacionSeleccionada = 0;
     this.valorKgCargado = null;
+    this.rowVersionCargada = null;
   }
 
   //Cargar modal de crear producto
@@ -889,9 +890,12 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Coloca la información del cliente seleccionado y su vendedor en el formulario.
+   * En modo edición no hace nada: la sede (cliente) de una OT no se puede cambiar al editar (la API responde 422)
+   * y el campo es de solo lectura.
    * @returns No retorna un valor.
    */
   clienteSeleccionado() {
+    if (this.edicionOrdenTrabajo) return;
     let id_cliente: any = this.FormOrdenTrabajo.value.Nombre_Cliente;
     console.log(this.clientes, id_cliente);
 
@@ -1156,8 +1160,9 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Sale del modo edición sin modificar la OT que estaba abierta: quita su número, la confirmación de edición
-   * y la tabla de producción, para que lo que se cargue después quede como plantilla de una OT nueva ("Crear OT").
+   * Sale del modo edición sin modificar la OT que estaba abierta: quita su número, su versión (rowVersion),
+   * la confirmación de edición y la tabla de producción, para que lo que se cargue después quede como plantilla
+   * de una OT nueva ("Crear OT").
    * @returns No retorna un valor.
    */
   private salirModoEdicion(): void {
@@ -1167,6 +1172,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.FormOrdenTrabajo.patchValue({ OT_Id: null });
     this.limpiarProduccionProcesos();
     this.valorKgCargado = null;
+    this.rowVersionCargada = null;
   }
 
   /**
@@ -2655,7 +2661,7 @@ export class Orden_TrabajoComponent implements OnInit {
    * @param datos Tintas y formato/tipo de sellado consultados con consultarDatosProcesos.
    * @returns Procesos de la OT para la API, o null si faltan las tintas o la combinación de sellado/formato.
    */
-  construirProcesosOt(datos: { datosImpresion: any[], datosSellado: any }): any {
+  construirProcesosOt(datos: { datosImpresion: any[], datosSellado: any }): ProcesosOrdenTrabajo | null {
     if (datos.datosImpresion.length == 0) {
       this.msj.mensajeError(`¡No se encontraron las tintas seleccionadas para el área de 'Impresión'!`);
       this.cargando = false;
@@ -2981,13 +2987,16 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Carga en los formularios una OT existente en Plasticaribe y habilita el modo edición.
-   * Guarda su Valor Kg para conservarlo al editar cuando la presentación no lo calcula (MTS).
+   * Guarda su Valor Kg para conservarlo al editar cuando la presentación no lo calcula (MTS) y su versión
+   * (`rowVersion` del GET), que se envía como `Ot_RowVersion` al editar.
    * @param datos Fila de la OT devuelta por getOrdenTrabajo.
    * @returns No retorna un valor.
    */
   cargarOrdenTrabajoPlasticaribe(datos: any) {
     const valorKg = Number(datos.valorKg);
     this.valorKgCargado = datos.valorKg != null && Number.isFinite(valorKg) ? valorKg : null;
+    // M6: el GET devuelve `rowVersion`; el PUT lo espera como `Ot_RowVersion` (ver editarOrdenTrabajo)
+    this.rowVersionCargada = typeof datos.rowVersion === 'string' && datos.rowVersion.trim() !== '' ? datos.rowVersion : null;
     this.FormOrdenTrabajo.patchValue({
       'OT_Id': datos.numero_Orden,
       'Id_Vendedor': datos.id_Vendedor,
@@ -3071,6 +3080,8 @@ export class Orden_TrabajoComponent implements OnInit {
    * fallida muestra un mensaje y libera la pantalla; si la OT se actualiza, limpia los campos y abre su PDF.
    * Antes de enviar vuelve a validar y recalcular de forma síncrona (`prepararFormulariosParaGuardar`), por si el usuario
    * cambió datos con la confirmación abierta: así se envían los costos actuales con una sola confirmación.
+   * Envía la versión con la que se cargó la OT (`Ot_RowVersion`); si no la tiene, no envía y pide volver a cargarla.
+   * Si la API responde 409 (otro usuario la modificó), avisa que hay que volver a cargarla.
    * @returns No retorna un valor.
    */
   editarOrdenTrabajo() {
@@ -3082,9 +3093,14 @@ export class Orden_TrabajoComponent implements OnInit {
     }
     // No repite el aviso de Valor Kg 0 si ya se mostró al pedir la confirmación (sí lo muestra si la condición es nueva)
     if (!this.prepararFormulariosParaGuardar(false)) return;
+    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
+    const rowVersion = this.rowVersionCargada;
+    if (!rowVersion) {
+      this.msj.mensajeAdvertencia(`¡No se puede editar la OT N° ${ot}!`, `No se recibió la versión de la OT. Vuelva a cargarla e intente de nuevo.`, 6000);
+      return;
+    }
     this.guardando = true;
     this.cargando = true;
-    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
     let editada: boolean = false;
 
     this.ordenTrabajoService.GetDatosOrden(ot).pipe(
@@ -3099,9 +3115,13 @@ export class Orden_TrabajoComponent implements OnInit {
       switchMap(({ datos_Orden, datosProcesos }) => {
         let procesos = this.construirProcesosOt(datosProcesos);
         if (!procesos) return EMPTY;
-        let info = this.informacionOrdenTrabajo(datos_Orden);
-        return this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).pipe(
-          catchError(error => this.cortarGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error))
+        let info = this.informacionOrdenTrabajo();
+        // M6: mapeo explícito de la versión recibida en el GET (`rowVersion`) al campo del PUT (`Ot_RowVersion`)
+        const solicitud: EditarOrdenTrabajoCompleta = { Ot_RowVersion: rowVersion, OrdenTrabajo: info, ...procesos };
+        return this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, solicitud).pipe(
+          catchError((error: HttpErrorResponse) => error?.status === 409
+            ? this.cortarGuardado(`La OT fue modificada por otro usuario; vuelva a cargarla`, error)
+            : this.cortarGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error))
         );
       }),
       finalize(() => {
@@ -3121,20 +3141,19 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a construir la informacion de los procesos de la orden de trabajo
-  informacionOrdenTrabajo(datos_Orden) {
-    let info: modelOrden_Trabajo = {
-      'Ot_Id': datos_Orden.ot_Id,
-      'Numero_OT': datos_Orden.numero_OT,
+  /**
+   * Arma los datos generales editables de la OT (lista blanca de editarCompleta). No envía Ot_Id, número, fecha ni hora
+   * de creación, creador ni estado: los conserva la API y el último editor lo toma del token. Producto, presentación y
+   * sede se envían solo para que la API compruebe que no cambiaron (si difieren responde 422); en pantalla no se
+   * pueden cambiar en modo edición (cambiar el item o la presentación sale del modo edición y el cliente es de solo lectura).
+   * @returns Datos generales de la OT para editarla.
+   */
+  informacionOrdenTrabajo(): EditarOrdenTrabajoDatos {
+    let info: EditarOrdenTrabajoDatos = {
       'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
       'Prod_Id': this.producto,
       'UndMed_Id': this.presentacionProducto,
-      'Ot_FechaCreacion': datos_Orden.ot_FechaCreacion,
       'Ot_FechaEntrega': this.fechaEntregaParaApi(),
-      'Ot_Hora': datos_Orden.ot_Hora,
-      'Estado_Id': this.FormOrdenTrabajo.value.OT_Estado,
-      'Usua_Id': this.storage_Id,
-      'PedExt_Id': 517,
       'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
       'Ot_Cyrel': this.cyrel,
       'Ot_Corte': this.corte,
