@@ -263,7 +263,15 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     ];
   }
 
+  /**
+   * Carga la fila seleccionada (item u OT de BagPro) como plantilla en la pestaña de creación de OT y cambia a
+   * esa pestaña. No guarda: el usuario revisa los datos y pulsa "Crear OT". Si la pantalla de OT está cargando,
+   * no hace nada.
+   * @param data Fila de la búsqueda (item u OT de BagPro).
+   * @returns No retorna un valor.
+   */
   crearOrdenTrabajo(data: any) {
+    if (this.orden_TrabajoComponent.cargando) return;
     let tipoBusqueda: 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
     let tabCrearOrden2 = document.getElementById(tabCrearOrden[1].id) as HTMLDivElement;
@@ -281,30 +289,13 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   }
 
   /**
-   * Crea una OT nueva copiando la fila seleccionada: carga el item u OT, aplica la cantidad y el precio
-   * de la fila y guarda solo cuando la carga terminó.
+   * Carga la fila seleccionada como plantilla en la pestaña de creación de OT, igual que el doble clic en la fila.
+   * Búsqueda no guarda OTs: el usuario revisa los datos y pulsa "Crear OT".
    * @param data Fila de la búsqueda (item u OT de BagPro).
    * @returns No retorna un valor.
    */
   crearCopiaOrdenTrabajo(data: any) {
-    let tipoBusqueda: 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
-    const ordenTrabajo = this.orden_TrabajoComponent;
-    const guardarCopia = () => {
-      ordenTrabajo.FormOrdenTrabajo.patchValue({
-        Cantidad: data.cantidad,
-        Precio: data.precio,
-      });
-      ordenTrabajo.calcularDatosOtInmediato();
-      ordenTrabajo.guardarOt();
-    };
-    ordenTrabajo.consultarClientes();
-    ordenTrabajo.FormOrdenTrabajo.patchValue({
-      Id_Producto: data.item,
-      Nombre_Producto: data.referencia,
-      Presentacion: data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' : data.presentacion,
-    });
-    if (tipoBusqueda == 'Item') ordenTrabajo.consultarInfoProducto(guardarCopia);
-    else if (tipoBusqueda == 'OT') ordenTrabajo.busquedaOTBagPro(data, guardarCopia);
+    this.crearOrdenTrabajo(data);
   }
 
   exportExcel() {

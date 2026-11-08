@@ -5,7 +5,7 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Observable, Subscription, catchError, finalize, forkJoin, map, of, switchMap, throwError } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, finalize, forkJoin, map, of, switchMap, throwError } from 'rxjs';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
@@ -46,6 +46,8 @@ interface ResultadoBusquedaOT {
   origen: 'plasticaribe' | 'bagpro';
   datos: any;
   sede?: any;
+  /** true si el item/presentación de la OT no existe en Plasticaribe; en ese caso la OT no se carga. */
+  productoNoEncontrado?: boolean;
 }
 
 /** Información encontrada al consultar por item: ficha de BagPro (ClientesOtItem) o, como respaldo, la última OT de Plasticaribe. */
@@ -53,6 +55,8 @@ interface ResultadoBusquedaItem {
   origen: 'item' | 'ultimaOT';
   datos: any;
   sede?: any;
+  /** true si el item/presentación no existe en Plasticaribe; en ese caso el item no se carga. */
+  productoNoEncontrado?: boolean;
 }
 
 @Injectable({
@@ -80,6 +84,8 @@ export class Orden_TrabajoComponent implements OnInit {
 
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   cargando: boolean = false; //Variable para validar que salga o no la imagen de carga
+  confirmandoEdicion: boolean = false; //Indica que el mensaje de confirmación de edición está abierto; deshabilita los botones "Editar OT"
+  guardando: boolean = false; //Indica que hay una creación o edición de OT en curso; bloquea un segundo envío (doble clic)
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -93,6 +99,9 @@ export class Orden_TrabajoComponent implements OnInit {
   edicionOrdenTrabajo: boolean = false; //Variable para validar que se está editando o no una orden de trabajo
   otCargada: number | null = null; //Número de la OT cargada en pantalla; base para navegar con ◀ ▶ y para restaurar el campo si una búsqueda no encuentra la OT
   private busquedaOT?: Subscription; //Búsqueda de OT en curso; se cancela al iniciar otra para no mezclar datos de dos OTs
+  private refrescoProducto?: Subscription; //Refresco en segundo plano de ArrayProducto (buscarInformacionProducto); se cancela en limpiarCampos
+  private errorRefrescoAvisado: boolean = false; //Evita repetir el aviso de error del refresco de producto hasta que vuelva a responder
+  private calculosPendientes = new Set<ReturnType<typeof setTimeout>>(); //Temporizadores de cálculo diferido (calcularDatosOt); se cancelan al guardar
   produccionProcesos: any[] = []; //Fila de Estados Procesos OT con los kg (y und) producidos por proceso de la OT consultada
   otProduccion: number | null = null; //Número de la OT a la que pertenece la tabla de producción por proceso
   cargandoProduccion: boolean = false; //Indica si se está consultando la producción por proceso
@@ -618,11 +627,15 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Limpia los datos de la orden y restablece los valores iniciales de sus formularios.
+   * Cancela el refresco pendiente del producto y los cálculos diferidos para que no vuelvan a llenar
+   * ArrayProducto ni los costos con datos de la OT anterior.
    *
    * @returns No retorna un valor.
    */
   limpiarCampos() {
     console.log('Limpiando campos de la orden de trabajo');
+    this.refrescoProducto?.unsubscribe();
+    this.cancelarCalculosPendientes();
     this.limpiarFormOrdenTrabajo();
     this.limpiarFormExtrusion();
     this.limpiarFormImpresion();
@@ -670,8 +683,14 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion para llamar el modal que crea clientes
   LlamarModalCrearCliente = () => this.ModalCrearCliente = true;
 
-  // Funcion que va a cerrar el mensaje de confirmación de edicion de una orden de trabajo
-  cerrarMensaje = () => this.messageService.clear('editarOrden');
+  /**
+   * Cierra el mensaje de confirmación de edición de la OT y vuelve a habilitar los botones "Editar OT".
+   * @returns No retorna un valor.
+   */
+  cerrarMensaje() {
+    this.messageService.clear('editarOrden');
+    this.confirmandoEdicion = false;
+  }
 
   /** Carga las tintas para impresión y ajusta las selecciones actuales al nombre de cada opción. */
   cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => {
@@ -963,30 +982,59 @@ export class Orden_TrabajoComponent implements OnInit {
     }, () => this.msj.mensajeAdvertencia(`¡No se encontró información del Item buscado!`));
   }
 
-  // Funcion que va a buscar la información de un producto
+  /**
+   * Refresca en segundo plano la información del producto actual (ArrayProducto). Cancela el refresco anterior
+   * si sigue pendiente; `limpiarCampos` también lo cancela para que una respuesta tardía no vuelva a llenar
+   * ArrayProducto con el producto de una OT ya guardada o descartada.
+   * Si la consulta falla (API caída, 500), el error queda en consola y el aviso se muestra una sola vez
+   * hasta que un refresco vuelva a responder, para no repetir el aviso en cada pulsación de tecla.
+   * @returns No retorna un valor.
+   */
   buscarInformacionProducto() {
-    this.obtenerInformacionProducto$().subscribe();
+    this.refrescoProducto?.unsubscribe();
+    this.refrescoProducto = this.obtenerInformacionProducto$().subscribe({
+      next: () => this.errorRefrescoAvisado = false,
+      error: error => {
+        console.error(error);
+        if (this.errorRefrescoAvisado) return;
+        this.errorRefrescoAvisado = true;
+        this.msj.mensajeError(`¡No fue posible consultar la información del item ${this.producto}!`, error?.error);
+      }
+    });
   }
 
   /**
    * Consulta el producto y presentación actuales y llena ArrayProducto; avisa si no se encuentra.
-   * @returns Observable que emite true si se cargó el producto y false si no se encontró o falló la consulta.
+   * Solo una respuesta vacía o un 400/404 significan "no existe"; los demás errores (500, red) se propagan
+   * para que los muestre el manejador de error de quien llama.
+   * @param avisar false omite el aviso cuando no se encuentra, para que quien llama muestre uno propio.
+   * @returns Observable que emite true si se cargó el producto y false si no existe; falla con los demás errores.
    */
-  obtenerInformacionProducto$(): Observable<boolean> {
+  obtenerInformacionProducto$(avisar: boolean = true): Observable<boolean> {
     return this.productoService.GetInfoProducto_Prod_Presentacion(this.producto, this.presentacionProducto).pipe(
       map(datos_producto => {
-        if (datos_producto.length == 0) {
-          this.msj.mensajeAdvertencia(`Debe ingresar un producto válido y su presentación correspondiente.`);
+        if (!datos_producto?.length) {
+          if (avisar) this.msj.mensajeAdvertencia(`Debe ingresar un producto válido y su presentación correspondiente.`);
           return false;
         }
         datos_producto.forEach(data => this.llenarProducto(data));
         return true;
       }),
-      catchError(() => {
-        this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
+      catchError((error: HttpErrorResponse) => {
+        if (!this.esOrdenNoEncontrada(error)) return throwError(() => error);
+        if (avisar) this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
         return of(false);
       })
     );
+  }
+
+  /**
+   * Muestra el aviso de que una OT o un item no se pudo cargar porque su producto no existe en Plasticaribe.
+   * @param origen Texto que identifica lo que se intentó cargar (p. ej. "la OT N° 123" o "el item").
+   * @returns No retorna un valor.
+   */
+  private avisarProductoNoEncontrado(origen: string): void {
+    this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No se pudo cargar ${origen}: el item ${this.producto} con la presentación ${this.presentacionProducto} no existe en Plasticaribe!`);
   }
 
   /**
@@ -1028,14 +1076,20 @@ export class Orden_TrabajoComponent implements OnInit {
    * Carga toda la información del item seleccionado tal como está guardado en BagPro (ClientesOtItem):
    * cliente, vendedor, procesos, extrusión, impresión, laminado, sellado y mezclas.
    * Si el item no está en BagPro usa la última OT de Plasticaribe; si tampoco existe, avisa sin borrar el producto.
+   * Si el item/presentación no existe en Plasticaribe, avisa y no carga nada ni ejecuta `alCargar`.
+   * Si había una OT abierta en modo edición, sale de ese modo antes de cargar (la OT abierta no se modifica)
+   * y el item queda como plantilla para crear una OT nueva.
    * Cancela cualquier consulta anterior para que cambios rápidos de item no mezclen datos.
-   * @param alCargar Función opcional que se ejecuta cuando la información quedó cargada (p. ej. copiar OT).
+   * @param alCargar Función opcional que se ejecuta cuando la información quedó cargada.
    * @returns No retorna un valor.
    */
   consultarInfoProducto(alCargar?: () => void) {
     const producto = this.FormOrdenTrabajo.value.Id_Producto;
     const presentacion = this.FormOrdenTrabajo.value.Presentacion;
     if (producto == null || presentacion == null) return;
+
+    const otEnEdicion: number | null = this.edicionOrdenTrabajo ? this.FormOrdenTrabajo.value.OT_Id : null;
+    if (this.edicionOrdenTrabajo) this.salirModoEdicion();
 
     this.busquedaOT?.unsubscribe();
     this.limpiarProducto();
@@ -1050,12 +1104,32 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = false;
         return;
       }
+      if (resultado.productoNoEncontrado) {
+        // Sin producto no se llenan los formularios ni se ejecuta alCargar (p. ej. la copia de OT no guarda)
+        this.avisarProductoNoEncontrado(`el item`);
+        this.cargando = false;
+        return;
+      }
       this.cargarItem(resultado);
+      if (otEnEdicion != null) this.msj.mensajeAdvertencia(`¡Advertencia!`, `Se cargó el item ${producto} como plantilla para una OT nueva; la OT N° ${otEnEdicion} no se modificó.`, 6000);
       alCargar?.();
     }, error => {
       this.msj.mensajeError(`¡No fue posible consultar la información del item ${producto}!`, error.error);
       this.cargando = false;
     });
+  }
+
+  /**
+   * Sale del modo edición sin modificar la OT que estaba abierta: quita su número, la confirmación de edición
+   * y la tabla de producción, para que lo que se cargue después quede como plantilla de una OT nueva ("Crear OT").
+   * @returns No retorna un valor.
+   */
+  private salirModoEdicion(): void {
+    this.cerrarMensaje();
+    this.edicionOrdenTrabajo = false;
+    this.otCargada = null;
+    this.FormOrdenTrabajo.patchValue({ OT_Id: null });
+    this.limpiarProduccionProcesos();
   }
 
   /**
@@ -1086,12 +1160,15 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Consulta lo necesario para cargar el item encontrado: el producto y, para la ficha de BagPro, la sede del cliente.
    * @param resultado Información del item encontrada y su origen.
-   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro.
+   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro, y marcado con
+   * `productoNoEncontrado` si el item/presentación no existe en Plasticaribe.
    */
   prepararCargaItem$(resultado: ResultadoBusquedaItem): Observable<ResultadoBusquedaItem> {
-    if (resultado.origen == 'ultimaOT') return this.obtenerInformacionProducto$().pipe(map(() => resultado));
-    return forkJoin({ producto: this.obtenerInformacionProducto$(), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
-      map(({ sede }) => ({ ...resultado, sede }))
+    if (resultado.origen == 'ultimaOT') return this.obtenerInformacionProducto$(false).pipe(
+      map(producto => ({ ...resultado, productoNoEncontrado: !producto }))
+    );
+    return forkJoin({ producto: this.obtenerInformacionProducto$(false), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
+      map(({ producto, sede }) => ({ ...resultado, sede, productoNoEncontrado: !producto }))
     );
   }
 
@@ -1207,7 +1284,7 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   llenarDatosCliente(data: any) {
-    let vendedor: string = data ? data.id_Vendedor : '';
+    let vendedor: string = data ? (data.id_Vendedor ?? '') : ''; // BagPro puede traer el vendedor en null
     this.FormOrdenTrabajo.patchValue({
       Id_Cliente: data == undefined ? '' : data.id_Cliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
@@ -1301,7 +1378,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Ancho_Extrusion2: data.ancho2_Extrusion || this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
       Ancho_Extrusion3: data.ancho3_Extrusion || this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
       Calibre_Extrusion: data.calibre_Extrusion || this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-      UnidadMedida_Extrusion: data.und_Extrusion.trim() || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
+      UnidadMedida_Extrusion: data.und_Extrusion?.toString().trim() || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
       Tratado_Extrusion: data.id_Tratado || this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Grafilado_Extrusion: data.extrusion_Grafilado ?? null,
       Peso_Extrusion: data.peso_Extrusion,
@@ -1358,10 +1435,10 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   llenarFormularioCorte(data: any) {
     this.FormOrdenTrabajoCorte.patchValue({
-      Formato_Corte: this.ArrayProducto[0].Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
-      Ancho_Corte: this.ArrayProducto[0].Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-      Largo_Corte: this.ArrayProducto[0].Largo || this.FormOrdenTrabajoCorte.value.Largo_Corte,
-      Fuelle_Corte: this.ArrayProducto[0].Fuelle || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+      Formato_Corte: this.ArrayProducto[0]?.Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
+      Ancho_Corte: this.ArrayProducto[0]?.Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+      Largo_Corte: this.ArrayProducto[0]?.Largo || this.FormOrdenTrabajoCorte.value.Largo_Corte,
+      Fuelle_Corte: this.ArrayProducto[0]?.Fuelle || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
       Margen_Corte: data.margen || this.FormOrdenTrabajoCorte.value.Margen_Corte,
       Etiqueta_Ancho_Corte: data.selladoCorte_Etiqueta_Ancho || this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte,
       Etiqueta_Largo_Corte: data.selladoCorte_Etiqueta_Largo || this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte,
@@ -1381,11 +1458,11 @@ export class Orden_TrabajoComponent implements OnInit {
     const observacionSelladoCorte = data.selladoCorte_Observacion || null;
     this.FormOrdenTrabajoCorte.patchValue({ SelladoCorte_Observacion: observacionSelladoCorte });
     this.FormOrdenTrabajoSellado.patchValue({
-      Formato_Sellado: this.ArrayProducto[0].Tipo,
-      Ancho_Sellado: this.ArrayProducto[0].Ancho,
-      Largo_Sellado: this.ArrayProducto[0].Largo,
-      Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
-      Solapa_Sellado: data.selladoCorte_Solapa ?? this.ArrayProducto[0].Solapa ?? 0,
+      Formato_Sellado: this.ArrayProducto[0]?.Tipo,
+      Ancho_Sellado: this.ArrayProducto[0]?.Ancho,
+      Largo_Sellado: this.ArrayProducto[0]?.Largo,
+      Fuelle_Sellado: this.ArrayProducto[0]?.Fuelle,
+      Solapa_Sellado: data.selladoCorte_Solapa ?? this.ArrayProducto[0]?.Solapa ?? 0,
       Ancho_Sellado1: data.selladoCorte_Ancho1 ?? 0,
       Ancho_Sellado2: data.selladoCorte_Ancho2 ?? 0,
       Ancho_Sellado3: data.selladoCorte_Ancho3 ?? 0,
@@ -1394,11 +1471,11 @@ export class Orden_TrabajoComponent implements OnInit {
       Etiqueta_Fuelle_Sellado: data.selladoCorte_Etiqueta_Fuelle || '0',
       Calibre_Sellado: Number(data.selladoCorte_Calibre) > 0 ? Number(data.selladoCorte_Calibre) : (Number(this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion) || 0),
       Margen_Sellado: data.margen,
-      PesoMillar: this.ArrayProducto[0].PesoMillar,
-      TipoSellado: this.ArrayProducto[0].TipoSellado,
-      CantidadPaquete: this.ArrayProducto[0].CantPaquete || 0.0,
+      PesoMillar: this.ArrayProducto[0]?.PesoMillar,
+      TipoSellado: this.ArrayProducto[0]?.TipoSellado,
+      CantidadPaquete: this.ArrayProducto[0]?.CantPaquete || 0.0,
       PesoPaquete: [null, ''].includes(data.selladoCorte_PesoPaquete) ? 0.0 : parseFloat(data.selladoCorte_PesoPaquete) || 0.0,
-      CantidadBulto: this.ArrayProducto[0].CantBulto || 0.0,
+      CantidadBulto: this.ArrayProducto[0]?.CantBulto || 0.0,
       PesoBulto: [null, ''].includes(data.selladoCorte_PesoBulto) ? 0.0 : parseFloat(data.selladoCorte_PesoBulto) || 0.0,
       PrecioDia: parseFloat(data.selladoCorte_PrecioSelladoDia) || 0.0,
       PrecioNoche: parseFloat(data.selladoCorte_PrecioSelladoNoche) || 0.0,
@@ -1484,12 +1561,42 @@ export class Orden_TrabajoComponent implements OnInit {
     }));
   }
 
-  // Funcion que va a calcular los costos de la orden de trabajo
+  /**
+   * Programa (500 ms) el refresco del producto y el recálculo de pesos y costos de la OT.
+   * No se ejecuta si al vencer el tiempo hay un guardado en curso, y los pendientes se cancelan al guardar.
+   * @returns No retorna un valor.
+   */
   calcularDatosOt() {
-    setTimeout(() => {
+    this.programarCalculo(() => {
       this.buscarInformacionProducto();
       this.calcularDatosOtInmediato();
     }, 500);
+  }
+
+  /**
+   * Programa una acción de cálculo diferida y guarda su temporizador para poder cancelarla.
+   * Si al vencer el tiempo hay un guardado en curso, la acción no se ejecuta (no debe cambiar los valores
+   * que se están enviando, ni apagar la pantalla de carga, ni volver a dividir el PesoMillar).
+   * @param accion Acción que se ejecutará.
+   * @param milisegundos Tiempo de espera.
+   * @returns No retorna un valor.
+   */
+  private programarCalculo(accion: () => void, milisegundos: number): void {
+    const temporizador = setTimeout(() => {
+      this.calculosPendientes.delete(temporizador);
+      if (this.guardando) return;
+      accion();
+    }, milisegundos);
+    this.calculosPendientes.add(temporizador);
+  }
+
+  /**
+   * Cancela todos los cálculos diferidos pendientes (de calcularDatosOt y de la carga de una OT).
+   * @returns No retorna un valor.
+   */
+  private cancelarCalculosPendientes(): void {
+    this.calculosPendientes.forEach(temporizador => clearTimeout(temporizador));
+    this.calculosPendientes.clear();
   }
 
   /**
@@ -2008,9 +2115,15 @@ export class Orden_TrabajoComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "Nombre de Mezcla"`);
   }
 
-  // Función que va a crear la mezcla en la base de datos
+  /**
+   * Crea la mezcla predefinida con los valores del modal de mezclas.
+   * Las capas que no están activas tienen sus controles deshabilitados (no vienen en `value`):
+   * en ese caso se envía 0 en los porcentajes y 1 ("no aplica") en materiales y pigmentos.
+   * @returns No retorna un valor.
+   */
   infoMezclaCrear() {
-    let mezcla: any = this.formCrearMezclas.value.Nombre_Mezclas;
+    const v = this.formCrearMezclas.value;
+    let mezcla: any = v.Nombre_Mezclas;
     let modelo: modelMezclas = {
       Mezcla_Nombre: mezcla.replace('%25', '%'),
       Mezcla_NroCapas: this.nroCapas,
@@ -2029,34 +2142,34 @@ export class Orden_TrabajoComponent implements OnInit {
       Mezcla_PorcentajePigmto1_Capa1: this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa1,
       MezPigmto_Id2xCapa1: this.formCrearMezclas.value.MezclaPigmentoP2_Capa1,
       Mezcla_PorcentajePigmto2_Capa1: this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa1,
-      /** Mezcla porcentaje capa 2 */
-      Mezcla_PorcentajeCapa2: this.formCrearMezclas.value.Mezcla_PorcentajeCapa2 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa2,
-      MezMaterial_Id1xCapa2: this.formCrearMezclas.value.MezMaterial_Id1xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP1_Capa2,
-      Mezcla_PorcentajeMaterial1_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial1_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa2,
-      MezMaterial_Id2xCapa2: this.formCrearMezclas.value.MezMaterial_Id2xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP2_Capa2,
-      Mezcla_PorcentajeMaterial2_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial2_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa2,
-      MezMaterial_Id3xCapa2: this.formCrearMezclas.value.MezMaterial_Id3xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP3_Capa2,
-      Mezcla_PorcentajeMaterial3_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial3_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa2,
-      MezMaterial_Id4xCapa2: this.formCrearMezclas.value.MezMaterial_Id4xCapa2 == undefined ? 1 : this.formCrearMezclas.value.materialP4_Capa2,
-      Mezcla_PorcentajeMaterial4_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial4_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa2,
-      MezPigmto_Id1xCapa2: this.formCrearMezclas.value.MezPigmto_Id1xCapa2 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmentoP1_Capa2,
-      Mezcla_PorcentajePigmto1_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajePigmto1_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa2,
-      MezPigmto_Id2xCapa2: this.formCrearMezclas.value.MezPigmto_Id2xCapa2 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmentoP2_Capa2,
-      Mezcla_PorcentajePigmto2_Capa2: this.formCrearMezclas.value.Mezcla_PorcentajePigmto2_Capa2 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa2,
+      /** Mezcla porcentaje capa 2 (si la capa no está activa sus controles están deshabilitados y no vienen en value) */
+      Mezcla_PorcentajeCapa2: v.Proc_Capa2 ?? 0,
+      MezMaterial_Id1xCapa2: v.materialP1_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial1_Capa2: v.PorcentajeMaterialP1_Capa2 ?? 0,
+      MezMaterial_Id2xCapa2: v.materialP2_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial2_Capa2: v.PorcentajeMaterialP2_Capa2 ?? 0,
+      MezMaterial_Id3xCapa2: v.materialP3_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial3_Capa2: v.PorcentajeMaterialP3_Capa2 ?? 0,
+      MezMaterial_Id4xCapa2: v.materialP4_Capa2 ?? 1,
+      Mezcla_PorcentajeMaterial4_Capa2: v.PorcentajeMaterialP4_Capa2 ?? 0,
+      MezPigmto_Id1xCapa2: v.MezclaPigmentoP1_Capa2 ?? 1,
+      Mezcla_PorcentajePigmto1_Capa2: v.PorcentajeMezclaPigmentoP1_Capa2 ?? 0,
+      MezPigmto_Id2xCapa2: v.MezclaPigmentoP2_Capa2 ?? 1,
+      Mezcla_PorcentajePigmto2_Capa2: v.PorcentajeMezclaPigmentoP2_Capa2 ?? 0,
       /** Mezcla porcentaje capa 3 */
-      Mezcla_PorcentajeCapa3: this.formCrearMezclas.value.Mezcla_PorcentajeCapa3 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa3,
-      MezMaterial_Id1xCapa3: this.formCrearMezclas.value.MezMaterial_Id1xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP1_Capa3,
-      Mezcla_PorcentajeMaterial1_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial1_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa3,
-      MezMaterial_Id2xCapa3: this.formCrearMezclas.value.MezMaterial_Id2xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP2_Capa3,
-      Mezcla_PorcentajeMaterial2_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial2_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa3,
-      MezMaterial_Id3xCapa3: this.formCrearMezclas.value.MezMaterial_Id3xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP3_Capa3,
-      Mezcla_PorcentajeMaterial3_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial3_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa3,
-      MezMaterial_Id4xCapa3: this.formCrearMezclas.value.MezMaterial_Id4xCapa3 == undefined ? 1 : this.formCrearMezclas.value.materialP4_Capa3,
-      Mezcla_PorcentajeMaterial4_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajeMaterial4_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa3,
-      MezPigmto_Id1xCapa3: this.formCrearMezclas.value.MezPigmto_Id1xCapa3 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmento1_Capa3,
-      Mezcla_PorcentajePigmto1_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajePigmto1_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa3,
-      MezPigmto_Id2xCapa3: this.formCrearMezclas.value.MezPigmto_Id2xCapa3 == undefined ? 1 : this.formCrearMezclas.value.MezclaPigmento2_Capa3,
-      Mezcla_PorcentajePigmto2_Capa3: this.formCrearMezclas.value.Mezcla_PorcentajePigmto2_Capa3 == undefined ? 0 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa3,
+      Mezcla_PorcentajeCapa3: v.Proc_Capa3 ?? 0,
+      MezMaterial_Id1xCapa3: v.materialP1_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial1_Capa3: v.PorcentajeMaterialP1_Capa3 ?? 0,
+      MezMaterial_Id2xCapa3: v.materialP2_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial2_Capa3: v.PorcentajeMaterialP2_Capa3 ?? 0,
+      MezMaterial_Id3xCapa3: v.materialP3_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial3_Capa3: v.PorcentajeMaterialP3_Capa3 ?? 0,
+      MezMaterial_Id4xCapa3: v.materialP4_Capa3 ?? 1,
+      Mezcla_PorcentajeMaterial4_Capa3: v.PorcentajeMaterialP4_Capa3 ?? 0,
+      MezPigmto_Id1xCapa3: v.MezclaPigmento1_Capa3 ?? 1,
+      Mezcla_PorcentajePigmto1_Capa3: v.PorcentajeMezclaPigmentoP1_Capa3 ?? 0,
+      MezPigmto_Id2xCapa3: v.MezclaPigmento2_Capa3 ?? 1,
+      Mezcla_PorcentajePigmto2_Capa3: v.PorcentajeMezclaPigmentoP2_Capa3 ?? 0,
       Usua_Id: this.storage_Id,
       Mezcla_FechaIngreso: this.today
     }
@@ -2070,15 +2183,23 @@ export class Orden_TrabajoComponent implements OnInit {
     }, error => this.msj.mensajeError(`¡Error!`, `¡${error.error}!`));
   }
 
-  /** Función para crear mater desde el modal de crear mezclas */
+  /**
+   * Crea un material de mezclas desde el modal de crear mezclas. El nombre es obligatorio (se guarda sin espacios
+   * sobrantes y en mayúsculas); la descripción es opcional y, si no se diligencia, se genera a partir del nombre.
+   * @returns No retorna un valor.
+   */
   crearMaterial() {
-    let nombreMaterial: string = this.formCrearMateriales.value.matNombre;
-    let descripcionMaterial: string = this.formCrearMateriales.value.matDescripcion;
-    this.mezclaMaterialService.getMezclasMateriales(nombreMaterial.toUpperCase()).subscribe(dataMzMaterial => {
+    const nombreMaterial: string = (this.formCrearMateriales.value.matNombre ?? '').toString().trim().toUpperCase();
+    const descripcionMaterial: string = (this.formCrearMateriales.value.matDescripcion ?? '').toString().trim();
+    if (nombreMaterial == '') {
+      this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el nombre del material.`);
+      return;
+    }
+    this.mezclaMaterialService.getMezclasMateriales(nombreMaterial).subscribe(dataMzMaterial => {
       if (dataMzMaterial.length == 0) {
         const material: modelMezMaterial = {
-          MezMaterial_Nombre: nombreMaterial.toUpperCase(),
-          MezMaterial_Descripcion: descripcionMaterial == null ? `Mezcla de Material ${nombreMaterial.toUpperCase()}` : descripcionMaterial.toUpperCase(),
+          MezMaterial_Nombre: nombreMaterial,
+          MezMaterial_Descripcion: descripcionMaterial == '' ? `Mezcla de Material ${nombreMaterial}` : descripcionMaterial.toUpperCase(),
         }
         this.mezclaMaterialService.srvGuardar(material).subscribe(() => {
           this.msj.mensajeConfirmacion('Registro creado con éxito!', '');
@@ -2087,31 +2208,40 @@ export class Orden_TrabajoComponent implements OnInit {
             this.cargarMezclaMateria();
             this.cargarMezclaMateria2();
           }, 300);
-        });
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe una material de mezclas llamado ${nombreMaterial.toUpperCase()}`);
-    });
+        }, error => this.msj.mensajeError(`¡No fue posible crear el material ${nombreMaterial}!`, error.error));
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe una material de mezclas llamado ${nombreMaterial}`);
+    }, error => this.msj.mensajeError(`¡No fue posible validar si el material ${nombreMaterial} ya existe!`, error.error));
   }
 
-  /** Función para crear pigmentos desde el modal de crear mezclas */
+  /**
+   * Crea un pigmento de mezclas desde el modal de crear mezclas y refresca las listas de pigmentos.
+   * El nombre es obligatorio (se guarda sin espacios sobrantes y en mayúsculas); la descripción es opcional
+   * y, si no se diligencia, se genera a partir del nombre.
+   * @returns No retorna un valor.
+   */
   crearPigmento() {
-    let nombrePigmento: string = this.formCrearPigmentos.value.pigNombre;
-    let descripcionPigmento: string = this.formCrearPigmentos.value.pigDescripcion;
-    this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento.toUpperCase()).subscribe(dataMzPigmento => {
+    const nombrePigmento: string = (this.formCrearPigmentos.value.pigNombre ?? '').toString().trim().toUpperCase();
+    const descripcionPigmento: string = (this.formCrearPigmentos.value.pigDescripcion ?? '').toString().trim();
+    if (nombrePigmento == '') {
+      this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el nombre del pigmento.`);
+      return;
+    }
+    this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento).subscribe(dataMzPigmento => {
       if (dataMzPigmento.length == 0) {
         const pigmento: modelMezPigmento = {
-          MezPigmto_Nombre: nombrePigmento.toUpperCase(),
-          MezPigmto_Descripcion: descripcionPigmento == null ? `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}` : descripcionPigmento.toUpperCase(),
+          MezPigmto_Nombre: nombrePigmento,
+          MezPigmto_Descripcion: descripcionPigmento == '' ? `Mezcla de Pigmento ${nombrePigmento}` : descripcionPigmento.toUpperCase(),
         }
         this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(() => {
           this.msj.mensajeConfirmacion('Registro creado con éxito!', '');
           setTimeout(() => {
             this.formCrearPigmentos.reset();
-            this.mezclasPigmentos();
-            this.mezclasPigmentos2();
+            this.cargarMezclaPigmento();
+            this.cargarMezclaPigmento2();
           }, 300);
-        });
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe un pigmento de mezclas llamado ${nombrePigmento.toUpperCase()}`)
-    });
+        }, error => this.msj.mensajeError(`¡No fue posible crear el pigmento ${nombrePigmento}!`, error.error));
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `Ya existe un pigmento de mezclas llamado ${nombrePigmento}`)
+    }, error => this.msj.mensajeError(`¡No fue posible validar si el pigmento ${nombrePigmento} ya existe!`, error.error));
   }
 
   // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1
@@ -2212,99 +2342,159 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Función que va a validar que la información este correcta
+  /**
+   * Valida la información de la OT y, si es correcta, la crea. No hace nada si ya hay un guardado en curso.
+   * @returns No retorna un valor.
+   */
   validarDatos() {
-    this.calcularDatosOt();
-    if (this.FormOrdenTrabajo.valid) {
-      if (!this.extrusion) this.limpiarFormExtrusion();
-      if (!this.impresion) this.limpiarFormImpresion();
-      if (!this.laminado) this.limpiarFormLaminado();
-      if (!this.corte) this.limpiarFormCorte();
-      if (!this.sellado) this.limpiarFormSellado();
-      if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
-
-      setTimeout(() => {
-        if (this.FormOrdenTrabajoExtrusion.valid) {
-          if (this.FormOrdenTrabajoImpresion.valid) {
-            if (this.FormOrdenTrabajoLaminado.valid) {
-              if (this.FormOrdenTrabajoCorte.valid) {
-                if (this.FormOrdenTrabajoSellado.valid) {
-                  if (this.FormOrdenTrabajoMezclas.valid) this.guardarOt();
-                  else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
-              } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
-            } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
-        } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
-      }, 700);
-    } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+    if (this.guardando) return;
+    if (!this.FormOrdenTrabajo.valid) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+      return;
+    }
+    if (this.prepararFormulariosParaGuardar()) this.guardarOt();
   }
 
-  //Funcion que va a guardar la información de la orden de trabajo
+  /**
+   * Prepara y valida los formularios de procesos antes de crear o editar una OT, sin esperas:
+   * limpia los procesos que no aplican, recalcula pesos y costos con lo que hay en pantalla y valida
+   * los subformularios en el orden habitual. Antes cancela los cálculos diferidos pendientes. Conserva el refresco de la información del producto que hacía
+   * `calcularDatosOt`: el cálculo usa los datos ya cargados y la respuesta del refresco llega después.
+   * @returns true si todos los subformularios son válidos; false si alguno no lo es (ya se mostró el aviso).
+   */
+  private prepararFormulariosParaGuardar(): boolean {
+    // Un cálculo diferido pendiente (al teclear o al cargar) no debe ejecutarse durante el guardado
+    this.cancelarCalculosPendientes();
+    if (!this.extrusion) this.limpiarFormExtrusion();
+    if (!this.impresion) this.limpiarFormImpresion();
+    if (!this.laminado) this.limpiarFormLaminado();
+    if (!this.corte) this.limpiarFormCorte();
+    if (!this.sellado) this.limpiarFormSellado();
+    if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
+
+    this.buscarInformacionProducto();
+    this.calcularDatosOtInmediato();
+
+    const validaciones: [FormGroup, string][] = [
+      [this.FormOrdenTrabajoExtrusion, `¡EL formulario de Extrusion tiene campos vacios!`],
+      [this.FormOrdenTrabajoImpresion, `¡El formulario de Impresion tiene campos vacios!`],
+      [this.FormOrdenTrabajoLaminado, `¡EL formulario de Laminado tiene campos vacios!`],
+      [this.FormOrdenTrabajoCorte, `¡El formulario de Corte tiene campos vacios!`],
+      [this.FormOrdenTrabajoSellado, `¡El formulario de Sellado tiene campos vacios!`],
+      [this.FormOrdenTrabajoMezclas, `¡El formulario de Mezclas tiene campos vacios!`],
+    ];
+    const invalido = validaciones.find(([formulario]) => !formulario.valid);
+    if (invalido) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, invalido[1]);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Crea la orden de trabajo en un único flujo: sede del cliente → último número de BagPro y datos de procesos → creación.
+   * Ignora la llamada si ya hay un guardado en curso (evita doble envío). Cualquier error o validación fallida
+   * muestra un mensaje y libera la pantalla; si la OT se crea, limpia los campos y abre su PDF.
+   * Solo se invoca desde `validarDatos` (Búsqueda ya no guarda OTs); la firma se conserva hasta la reestructuración (F3).
+   * @param otCreadaBagPro Parámetro conservado por compatibilidad; no se usa.
+   * @returns No retorna un valor.
+   */
   guardarOt(otCreadaBagPro: boolean = false) {
+    if (this.guardando) return;
+    this.guardando = true;
     this.cargando = true;
-    this.svcSedes.GetSedeClientexNitBagPro(this.FormOrdenTrabajo.value.Id_Cliente).subscribe(sede => {
-      if (sede.length > 0) {
+    let creada: boolean = false;
+    (this.svcSedes.GetSedeClientexNitBagPro(this.FormOrdenTrabajo.value.Id_Cliente) as Observable<any[]>).pipe(
+      catchError(error => this.cortarGuardado(`¡No fue posible consultar la sede del cliente!`, error)),
+      switchMap(sede => {
+        if (!sede?.length) return this.cortarGuardado(`¡No se encontró ninguna sede para el cliente!`, null, true);
         this.FormOrdenTrabajo.patchValue({ Id_Cliente: sede[0].idSede });
-        forkJoin({
+        return forkJoin({
           numOT: this.bagProService.srvObtenerListaClienteOT_UltimaOT(),
           datosProcesos: this.consultarDatosProcesos(),
-        }).subscribe(({ numOT, datosProcesos }) => {
-          let procesos = this.construirProcesosOt(datosProcesos);
-          if (!procesos) return;
-          let numeroOrden: number = numOT.item + 1;
+        }).pipe(
+          catchError(error => this.cortarGuardado(`¡No fue posible consultar la información necesaria para crear la Orden de Trabajo!`, error))
+        );
+      }),
+      switchMap(({ numOT, datosProcesos }) => {
+        let procesos = this.construirProcesosOt(datosProcesos);
+        if (!procesos) return EMPTY;
+        let numeroOrden: number = numOT.item + 1;
 
-          let infoOT: modelOrden_Trabajo = {
-            'Numero_OT': numeroOrden,
-            'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
-            'Prod_Id': this.producto,
-            'UndMed_Id': this.presentacionProducto,
-            'Ot_FechaCreacion': this.today,
-            'Ot_FechaEntrega': this.fechaEntregaParaApi(),
-            'Ot_Hora': moment().format('H:mm:ss'),
-            'Estado_Id': 15,
-            'Usua_Id': this.storage_Id,
-            'PedExt_Id': 517,
-            'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
-            'Ot_Cyrel': this.cyrel,
-            'Ot_Corte': this.corte,
-            'Mezcla_Id': this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
-            'Extrusion': this.extrusion,
-            'Impresion': this.impresion,
-            'Rotograbado': false, // Proceso descontinuado; se conserva la columna.
-            'Laminado': this.laminado,
-            'Sellado': this.sellado,
-            'Ot_MargenAdicional': this.FormOrdenTrabajo.value.Margen,
-            'Ot_CantidadPedida': this.cantidadProducto,
-            'Ot_ValorUnidad': this.valorProducto,
-            'Ot_PesoNetoKg': this.netoKg,
-            'Ot_ValorKg': this.valorKg,
-            'Ot_ValorOT': this.valorOt,
-            'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
-            'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
-          }
-          this.ordenTrabajoService.crearOrdenCompleta({ OrdenTrabajo: infoOT, ...procesos }).subscribe(datos_ot => {
-            this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
-            //this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-            //this.cambiarEstadoProducto(this.producto);
-            this.limpiarCampos();
-            this.pdfOrdenTrabajo(datos_ot.numero_OT);
-          }, error => {
-            this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
-            this.cargando = false;
-          });
-
-        }, error => {
-          this.msj.mensajeError(`¡No fue posible consultar la información necesaria para crear la Orden de Trabajo!`, error.error);
-          this.cargando = false;
-        });
-        console.log(sede);
-      } else {
-        this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró ninguna sede para el cliente!`);
-        this.cargando = false;
-        return;
-      }
+        let infoOT: modelOrden_Trabajo = {
+          'Numero_OT': numeroOrden,
+          'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
+          'Prod_Id': this.producto,
+          'UndMed_Id': this.presentacionProducto,
+          'Ot_FechaCreacion': this.today,
+          'Ot_FechaEntrega': this.fechaEntregaParaApi(),
+          'Ot_Hora': moment().format('H:mm:ss'),
+          'Estado_Id': 15,
+          'Usua_Id': this.storage_Id,
+          'PedExt_Id': 517,
+          'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
+          'Ot_Cyrel': this.cyrel,
+          'Ot_Corte': this.corte,
+          'Mezcla_Id': this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+          'Extrusion': this.extrusion,
+          'Impresion': this.impresion,
+          'Rotograbado': false, // Proceso descontinuado; se conserva la columna.
+          'Laminado': this.laminado,
+          'Sellado': this.sellado,
+          'Ot_MargenAdicional': this.FormOrdenTrabajo.value.Margen,
+          'Ot_CantidadPedida': this.cantidadProducto,
+          'Ot_ValorUnidad': this.valorProducto,
+          'Ot_PesoNetoKg': this.netoKg,
+          'Ot_ValorKg': this.valorKg,
+          'Ot_ValorOT': this.valorOt,
+          'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
+          'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
+        }
+        return this.ordenTrabajoService.crearOrdenCompleta({ OrdenTrabajo: infoOT, ...procesos }).pipe(
+          catchError(error => this.cortarGuardado(`¡No fue posible crear la Orden de Trabajo!`, error))
+        );
+      }),
+      finalize(() => {
+        this.guardando = false;
+        // Si la OT se creó, el overlay lo controla la generación del PDF
+        if (!creada) this.cargando = false;
+      })
+    ).subscribe({
+      next: datos_ot => {
+        creada = true;
+        this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
+        this.limpiarCampos();
+        this.pdfOrdenTrabajo(datos_ot.numero_OT);
+      },
+      // Errores no previstos dentro del flujo (p. ej. datos nulos al armar la OT); los HTTP ya se informaron en cada paso
+      error: error => this.informarErrorInesperadoGuardado(`¡No fue posible crear la Orden de Trabajo por un error inesperado!`, error),
     });
+  }
+
+  /**
+   * Informa un error no previsto del flujo de crear o editar una OT (no HTTP, ya que esos se informan en cada paso)
+   * y lo deja en consola para su diagnóstico.
+   * @param mensaje Mensaje para el usuario.
+   * @param error Error capturado.
+   * @returns No retorna un valor.
+   */
+  private informarErrorInesperadoGuardado(mensaje: string, error: any): void {
+    console.error(error);
+    this.msj.mensajeError(mensaje, `Revise la información de la OT e intente de nuevo. Detalle: ${error?.message ?? error}`);
+  }
+
+  /**
+   * Muestra el mensaje de un paso fallido del guardado (crear o editar OT) y termina el flujo sin emitir valores,
+   * para que su `finalize` libere la pantalla.
+   * @param mensaje Mensaje para el usuario.
+   * @param error Error HTTP recibido, si lo hay; su detalle se muestra junto al mensaje.
+   * @param advertencia true muestra una advertencia en lugar de un error.
+   * @returns Observable vacío que completa de inmediato.
+   */
+  private cortarGuardado(mensaje: string, error: any = null, advertencia: boolean = false): Observable<never> {
+    if (advertencia) this.msj.mensajeAdvertencia(`¡Advertencia!`, mensaje);
+    else this.msj.mensajeError(mensaje, error?.error);
+    return EMPTY;
   }
 
   /**
@@ -2322,13 +2512,19 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Arma la información de los cuatro procesos de la OT. Si no se encontraron las tintas, muestra el error y apaga la carga.
+   * Arma la información de los cuatro procesos de la OT. Si no se encontraron las tintas o no existe la combinación
+   * de tipo de sellado y formato (la API responde 204 sin cuerpo), muestra el error y apaga la carga.
    * @param datos Tintas y formato/tipo de sellado consultados con consultarDatosProcesos.
-   * @returns Procesos de la OT para la API, o null si faltan las tintas.
+   * @returns Procesos de la OT para la API, o null si faltan las tintas o la combinación de sellado/formato.
    */
   construirProcesosOt(datos: { datosImpresion: any[], datosSellado: any }): any {
     if (datos.datosImpresion.length == 0) {
       this.msj.mensajeError(`¡No se encontraron las tintas seleccionadas para el área de 'Impresión'!`);
+      this.cargando = false;
+      return null;
+    }
+    if (!datos.datosSellado) {
+      this.msj.mensajeError(`¡No existe la combinación de tipo de sellado y formato seleccionada!`, `Verifique el tipo de sellado y el formato del producto terminado.`);
       this.cargando = false;
       return null;
     }
@@ -2443,45 +2639,6 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  //Funcion que va a cambiar el estado de un producto a "Activo"
-  cambiarEstadoProducto(producto: number) {
-    this.productoService.srvObtenerListaPorId(producto).subscribe(datos => {
-      for (let i = 0; i < datos.length; i++) {
-        let info: any = {
-          Prod_Id: producto,
-          Prod_Nombre: datos[i].prod_Nombre,
-          Prod_Descripcion: datos[i].prod_Descripcion,
-          TpProd_Id: datos[i].tpProd_Id,
-          Prod_Peso: this.pesoProducto,
-          Prod_Peso_Millar: this.FormOrdenTrabajoSellado.value.PesoMillar,
-          UndMedPeso: datos[i].undMedPeso,
-          Prod_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-          Prod_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-          Prod_Calibre: this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-          UndMedACF: this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
-          Estado_Id: 10,
-          Prod_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-          Pigmt_Id: this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
-          Material_Id: this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
-          Prod_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
-          Prod_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-          TpSellado_Id: datos[i].tpSellado_Id,
-          Prod_Fecha: datos[i].prod_Fecha,
-          Prod_Hora: datos[i].prod_Hora,
-          Prod_PrecioDia_Sellado: this.FormOrdenTrabajoSellado.value.PrecioDia,
-          Prod_PrecioNoche_Sellado: this.FormOrdenTrabajoSellado.value.PrecioNoche,
-          Prod_Peso_Paquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
-          Prod_Peso_Bulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
-        }
-        this.productoService.srvActualizar(producto, info).subscribe(null, error => this.msj.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error));
-      }
-    }, error => this.msj.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
-  }
-
-  // Funcion que va a cambiar el estado de un cliente a "Activo". El numero '1' corresponde a "Activo"
-  cambiarEstadoCliente(id: number) {
-    this.clienteServise.PutEstadoCliente(id, 1).subscribe(null, err => this.msj.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${id}`, err.error));
-  }
 
   /**
    * Consulta una orden de trabajo y carga sus datos en los formularios. Solo limpia la pantalla si la OT existe:
@@ -2508,14 +2665,39 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = false;
         return;
       }
+      if (resultado.productoNoEncontrado) return this.cancelarCargaOTSinProducto(numeroOT);
       if (resultado.origen == 'plasticaribe') this.cargarOrdenTrabajoPlasticaribe(resultado.datos);
       else this.cargarOrdenTrabajoBagPro(resultado, numeroOT);
       this.otCargada = numeroOT;
       this.consultarProduccionProcesos(numeroOT);
     }, error => {
       this.msj.mensajeError(`¡No fue posible consultar la Orden de Trabajo N° ${numeroOT}!`, error.error);
+      this.restaurarNumeroOTSinCarga(numeroOT);
       this.cargando = false;
     });
+  }
+
+  /**
+   * Tras un error al consultar una OT, vuelve a poner en el campo el número consultado si la pantalla quedó
+   * sin OT cargada (prepararCargaOrdenTrabajo$ ya la limpió), para que ◀ ▶ tengan una base para navegar.
+   * Si la OT anterior sigue cargada no se toca el campo.
+   * @param numeroOT Número de la OT consultada.
+   * @returns No retorna un valor.
+   */
+  private restaurarNumeroOTSinCarga(numeroOT: number): void {
+    if (this.otCargada == null) this.FormOrdenTrabajo.patchValue({ OT_Id: numeroOT });
+  }
+
+  /**
+   * Termina la carga de una OT cuyo item/presentación no existe en Plasticaribe: avisa, deja la pantalla limpia
+   * (ya la limpió prepararCargaOrdenTrabajo$), sin modo edición, y conserva el número consultado para poder navegar.
+   * @param numeroOT Número de la OT que se intentó cargar.
+   * @returns No retorna un valor.
+   */
+  private cancelarCargaOTSinProducto(numeroOT: number): void {
+    this.avisarProductoNoEncontrado(`la OT N° ${numeroOT}`);
+    this.FormOrdenTrabajo.patchValue({ OT_Id: numeroOT });
+    this.cargando = false;
   }
 
   /**
@@ -2570,7 +2752,8 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Carga una OT de BagPro como plantilla para crear una nueva. Lo usa la búsqueda de OTs (crear / copiar OT).
-   * Si la OT no existe en BagPro se avisa y no se modifica la pantalla.
+   * Si la OT no existe en BagPro se avisa y no se modifica la pantalla; si su item/presentación no existe en
+   * Plasticaribe se avisa, la pantalla queda limpia y no se ejecuta `alCargar`.
    * @param ot Número de la OT o fila de la búsqueda con la propiedad ordenTrabajo.
    * @param alCargar Función opcional que se ejecuta cuando la OT quedó cargada (p. ej. copiar OT).
    * @returns No retorna un valor.
@@ -2592,12 +2775,15 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = false;
         return;
       }
+      // Sin producto no se carga la OT ni se ejecuta alCargar (la copia de OT no guarda)
+      if (resultado.productoNoEncontrado) return this.cancelarCargaOTSinProducto(numeroOT);
       this.cargarOrdenTrabajoBagPro(resultado, numeroOT, false);
       this.otCargada = numeroOT;
       this.consultarProduccionProcesos(numeroOT);
       alCargar?.();
     }, error => {
       this.msj.mensajeError(`¡No fue posible consultar la Orden de Trabajo N° ${numeroOT} en BagPro!`, error.error);
+      this.restaurarNumeroOTSinCarga(numeroOT);
       this.cargando = false;
     });
   }
@@ -2635,7 +2821,8 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Limpia la pantalla y consulta lo necesario para cargar la OT encontrada: el producto y, para BagPro, la sede del cliente.
    * @param resultado OT encontrada y su origen.
-   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro.
+   * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro, y marcado con
+   * `productoNoEncontrado` si el item/presentación de la OT no existe en Plasticaribe.
    */
   prepararCargaOrdenTrabajo$(resultado: ResultadoBusquedaOT): Observable<ResultadoBusquedaOT> {
     this.limpiarCampos();
@@ -2643,13 +2830,15 @@ export class Orden_TrabajoComponent implements OnInit {
     if (resultado.origen == 'plasticaribe') {
       this.producto = resultado.datos.id_Producto;
       this.presentacionProducto = resultado.datos.id_Presentacion;
-      return this.obtenerInformacionProducto$().pipe(map(() => resultado));
+      return this.obtenerInformacionProducto$(false).pipe(
+        map(producto => ({ ...resultado, productoNoEncontrado: !producto }))
+      );
     }
 
     this.producto = resultado.datos.id_Producto;
     this.presentacionProducto = resultado.datos.presentacion == 'Kilo' ? 'Kg' : resultado.datos.presentacion == 'Unidad' ? 'Und' : resultado.datos.presentacion;
-    return forkJoin({ producto: this.obtenerInformacionProducto$(), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
-      map(({ sede }) => ({ ...resultado, sede }))
+    return forkJoin({ producto: this.obtenerInformacionProducto$(false), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
+      map(({ producto, sede }) => ({ ...resultado, sede, productoNoEncontrado: !producto }))
     );
   }
 
@@ -2663,7 +2852,7 @@ export class Orden_TrabajoComponent implements OnInit {
       'OT_Id': datos.numero_Orden,
       'Id_Vendedor': datos.id_Vendedor,
       'Nombre_Vendedor': this.idVendedorParaDropdown(datos.id_Vendedor),
-      'OT_FechaCreacion': datos.fecha_Creacion.replace('T00:00:00', ''),
+      'OT_FechaCreacion': datos.fecha_Creacion?.replace('T00:00:00', '') ?? null,
       'OT_FechaEntrega': datos.fecha_Entrega ? moment(datos.fecha_Entrega.replace('T00:00:00', '')).toDate() : null,
       'Id_Cliente': datos.id_Cliente,
       'Nombre_Cliente': datos.cliente,
@@ -2706,79 +2895,90 @@ export class Orden_TrabajoComponent implements OnInit {
     this.llenarFormularioSellado(datos_orden);
     this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden.mezcla_Nombre });
     this.cargarCombinacionMezclas();
-    setTimeout(() => this.calcularDatosOt(), 1000);
+    this.programarCalculo(() => this.calcularDatosOt(), 1000);
     this.cargando = false;
   }
 
-  // Funcion que va a validar que si se desee actualizar la orden de trabajo
+  /**
+   * Valida la información de la OT en edición y, si es correcta, pide confirmación antes de actualizarla.
+   * No hace nada si ya hay un guardado en curso o si la confirmación ya está abierta (evita confirmaciones
+   * duplicadas y un segundo recálculo que en LAMINADO/HOJA volvería a dividir el PesoMillar).
+   * @returns No retorna un valor.
+   */
   validarActualizacionOT() {
-    this.calcularDatosOt();
-    if (this.FormOrdenTrabajo.valid) {
-      let ot: number = this.FormOrdenTrabajo.value.OT_Id;
-      if (!this.extrusion) this.limpiarFormExtrusion();
-      if (!this.impresion) this.limpiarFormImpresion();
-      if (!this.laminado) this.limpiarFormLaminado();
-      if (!this.corte) this.limpiarFormCorte();
-      if (!this.sellado) this.limpiarFormSellado();
-      if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
-
-      setTimeout(() => {
-        if (this.FormOrdenTrabajoExtrusion.valid) {
-          if (this.FormOrdenTrabajoImpresion.valid) {
-            if (this.FormOrdenTrabajoLaminado.valid) {
-              if (this.FormOrdenTrabajoCorte.valid) {
-                if (this.FormOrdenTrabajoSellado.valid) {
-                  if (this.FormOrdenTrabajoMezclas.valid) {
-                    this.messageService.add({
-                      severity: 'warn',
-                      key: 'editarOrden',
-                      summary: 'Confirmación de Edición de OT',
-                      detail:
-                        `<h6><b>Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</b></h6><br>` +
-                        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>`,
-                      sticky: true
-                    });
-                  } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
-              } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
-            } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
-        } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
-      }, 700);
-    } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
+    if (this.guardando || this.confirmandoEdicion) return;
+    if (!this.FormOrdenTrabajo.valid) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
+      return;
+    }
+    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
+    if (!this.prepararFormulariosParaGuardar()) return;
+    this.cerrarMensaje();
+    this.confirmandoEdicion = true;
+    this.messageService.add({
+      severity: 'warn',
+      key: 'editarOrden',
+      summary: 'Confirmación de Edición de OT',
+      detail:
+        `<h6><b>Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</b></h6><br>` +
+        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>`,
+      sticky: true
+    });
   }
 
-  // Funcion que va actualizar con nueva información la orden de trabajo
+  /**
+   * Actualiza la orden de trabajo en un único flujo: datos actuales de la OT → datos de procesos → edición.
+   * Solo actúa en modo edición y si no hay un guardado en curso (evita doble envío). Cualquier error o validación
+   * fallida muestra un mensaje y libera la pantalla; si la OT se actualiza, limpia los campos y abre su PDF.
+   * Si hay un recálculo pendiente (el usuario cambió datos con la confirmación abierta), no guarda: vuelve a
+   * validar y recalcular con `validarActualizacionOT` y pide confirmar de nuevo, para no enviar costos viejos.
+   * @returns No retorna un valor.
+   */
   editarOrdenTrabajo() {
-    if (this.edicionOrdenTrabajo) {
-      this.cerrarMensaje();
-      this.cargando = true;
-      let ot: number = this.FormOrdenTrabajo.value.OT_Id;
-
-      this.ordenTrabajoService.GetDatosOrden(ot).subscribe(datos_Orden => {
-        this.consultarDatosProcesos().subscribe(datosProcesos => {
-          let procesos = this.construirProcesosOt(datosProcesos);
-          if (!procesos) return;
-          let info = this.informacionOrdenTrabajo(datos_Orden);
-          this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).subscribe(datos_ot => {
-            this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
-            this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-            this.cambiarEstadoProducto(this.producto);
-            this.pdfOrdenTrabajo(datos_ot.numero_OT);
-            this.limpiarCampos();
-          }, error => {
-            this.msj.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error.error);
-            this.cargando = false;
-          });
-        }, error => {
-          this.msj.mensajeError(`¡No fue posible consultar la información necesaria para actualizar la Orden de Trabajo!`, error.error);
-          this.cargando = false;
-        });
-      }, () => {
-        this.msj.mensajeError(`¡Error!`, `¡La Orden de Trabajo N° ${ot} ya no existe en Plasticaribe!`);
-        this.cargando = false;
-      });
+    if (!this.edicionOrdenTrabajo || this.guardando) return;
+    this.cerrarMensaje();
+    if (this.calculosPendientes.size > 0) {
+      this.msj.mensajeAdvertencia(`¡Los datos de la OT cambiaron!`, `Se recalcularon los costos; confirme de nuevo la edición.`);
+      this.validarActualizacionOT(); // cancela los cálculos pendientes, recalcula una sola vez y vuelve a mostrar la confirmación
+      return;
     }
+    this.guardando = true;
+    this.cargando = true;
+    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
+    let editada: boolean = false;
+
+    this.ordenTrabajoService.GetDatosOrden(ot).pipe(
+      catchError(() => {
+        this.msj.mensajeError(`¡Error!`, `¡La Orden de Trabajo N° ${ot} ya no existe en Plasticaribe!`);
+        return EMPTY;
+      }),
+      switchMap(datos_Orden => this.consultarDatosProcesos().pipe(
+        catchError(error => this.cortarGuardado(`¡No fue posible consultar la información necesaria para actualizar la Orden de Trabajo!`, error)),
+        map(datosProcesos => ({ datos_Orden, datosProcesos }))
+      )),
+      switchMap(({ datos_Orden, datosProcesos }) => {
+        let procesos = this.construirProcesosOt(datosProcesos);
+        if (!procesos) return EMPTY;
+        let info = this.informacionOrdenTrabajo(datos_Orden);
+        return this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).pipe(
+          catchError(error => this.cortarGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error))
+        );
+      }),
+      finalize(() => {
+        this.guardando = false;
+        // Si la OT se actualizó, el overlay lo controla la generación del PDF
+        if (!editada) this.cargando = false;
+      })
+    ).subscribe({
+      next: datos_ot => {
+        editada = true;
+        this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${datos_ot.numero_OT}`);
+        this.limpiarCampos();
+        this.pdfOrdenTrabajo(datos_ot.numero_OT);
+      },
+      // Errores no previstos dentro del flujo (p. ej. datos nulos al armar la OT); los HTTP ya se informaron en cada paso
+      error: error => this.informarErrorInesperadoGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot} por un error inesperado!`, error),
+    });
   }
 
   // Funcion que va a construir la informacion de los procesos de la orden de trabajo
@@ -2832,23 +3032,58 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Funcion que le va a dar el formato al arcivo PDF
+  /**
+   * Genera y abre el PDF de una sola OT (la primera fila recibida). Siempre libera la pantalla de carga,
+   * aunque no lleguen filas o falle el armado del documento.
+   * @param datos_ot Filas de la OT devueltas por Plasticaribe o BagPro (se acepta también un objeto único).
+   * @returns No retorna un valor.
+   */
   formatoPDF(datos_ot) {
-    for (let i = 0; i < datos_ot.length; i++) {
-      let titulo: string = `${datos_ot[i].numero_Orden}`;
+    try {
+      const ot = Array.isArray(datos_ot) ? datos_ot[0] : datos_ot;
+      if (!ot) {
+        this.msj.mensajeAdvertencia(`¡No se encontró información para generar el PDF de la Orden de Trabajo!`);
+        return;
+      }
+      let titulo: string = `${ot.numero_Orden}`;
       const pdfDefinicion: any = {
         info: { title: titulo },
         pageSize: { width: 630, height: 760 },
         watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.03, bold: true, italics: false },
         pageMargins: [25, 190, 25, 35],
-        header: this.headerPDF(datos_ot[i]),
+        header: this.headerPDF(ot),
         footer: this.footerPDF(),
-        content: this.contentPDF(datos_ot[i]),
+        content: this.contentPDF(ot),
         styles: this.stylesPDF()
       };
       pdfMake.createPdf(pdfDefinicion).open();
+    } catch (error) {
+      this.msj.mensajeError(`¡No fue posible generar el PDF de la Orden de Trabajo!`);
+    } finally {
       this.cargando = false;
-    };
+    }
+  }
+
+  /**
+   * Convierte un valor posiblemente nulo en texto sin espacios sobrantes para el PDF.
+   * @param valor Valor recibido de la API (las OT de BagPro o antiguas pueden traer nulos).
+   * @param porDefecto Texto que se usa cuando el valor es nulo o indefinido.
+   * @returns Texto limpio o el valor por defecto.
+   */
+  private txt(valor: any, porDefecto: string = ''): string {
+    return valor == null ? porDefecto : valor.toString().trim();
+  }
+
+  /**
+   * Formatea un número para el PDF con separador de miles y los decimales indicados.
+   * Los valores nulos o no numéricos se muestran como 0.
+   * @param valor Valor recibido de la API.
+   * @param decimales Cantidad de decimales a mostrar.
+   * @returns Número formateado como texto.
+   */
+  private num(valor: any, decimales: number = 2): string {
+    const numero = Number(valor);
+    return this.formatonumeros((Number.isFinite(numero) ? numero : 0).toFixed(decimales));
   }
 
   // Funcion que va a crear el header del PDF
@@ -2896,15 +3131,15 @@ export class Orden_TrabajoComponent implements OnInit {
       body: [
         [
           { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
-          { border: [false, true, false, false], text: `${datos_ot.id_SedeCliente}` },
+          { border: [false, true, false, false], text: `${this.txt(datos_ot.id_SedeCliente)}` },
           { border: [true, true, false, false], text: `Item`, style: 'titulo', },
-          { border: [false, true, true, false], text: `${datos_ot.id_Producto}` },
+          { border: [false, true, true, false], text: `${this.txt(datos_ot.id_Producto)}` },
         ],
         [
           { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
-          { border: [false, false, true, true], text: `${datos_ot.cliente.toString().trim()}` },
+          { border: [false, false, true, true], text: `${this.txt(datos_ot.cliente)}` },
           { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
-          { border: [false, false, true, true], text: `${datos_ot.producto.toString().trim()}` },
+          { border: [false, false, true, true], text: `${this.txt(datos_ot.producto)}` },
         ],
       ]
     }
@@ -2923,10 +3158,10 @@ export class Orden_TrabajoComponent implements OnInit {
           { text: `Despachar`, style: 'titulosTablas', border: [false, true, true, true] },
         ],
         [
-          { text: `${datos_ot.material}`, style: 'datosTablaExtrusion' },
-          { text: `${this.formatonumeros((datos_ot.cantidad_Pedida).toFixed(2))}`, style: 'datosTablaExtrusion' },
-          { text: `${this.formatonumeros((datos_ot.peso_Neto).toFixed(2))}`, style: 'datosTablaExtrusion' },
-          { text: `${datos_ot.presentacion}`, style: 'datosTablaExtrusion' },
+          { text: `${this.txt(datos_ot.material)}`, style: 'datosTablaExtrusion' },
+          { text: `${this.num(datos_ot.cantidad_Pedida)}`, style: 'datosTablaExtrusion' },
+          { text: `${this.num(datos_ot.peso_Neto)}`, style: 'datosTablaExtrusion' },
+          { text: `${this.txt(datos_ot.presentacion)}`, style: 'datosTablaExtrusion' },
           { text: `${datos_ot.fecha_Entrega ? datos_ot.fecha_Entrega.replace('T00:00:00', '') : ''}`, style: 'datosTablaExtrusion' },
         ]
       ]
@@ -2965,7 +3200,7 @@ export class Orden_TrabajoComponent implements OnInit {
       table: {
         widths: ['*'],
         body: [
-          [{ text: (datos_ot.mezcla_Nombre).trim() == '' ? 'MATERIA PRIMA' : (datos_ot.mezcla_Nombre).trim(), style: 'titulosTablas' }]
+          [{ text: this.txt(datos_ot.mezcla_Nombre) == '' ? 'MATERIA PRIMA' : this.txt(datos_ot.mezcla_Nombre), style: 'titulosTablas' }]
         ]
       },
       fontSize: 9,
@@ -2975,12 +3210,12 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a colocar la información de la mezcla
   datosMezclas(datos_ot) {
     let validacion: boolean = Math.max(...[
-      datos_ot.m1C1_nombre.toString().trim().length,
-      datos_ot.m2C1_nombre.toString().trim().length,
-      datos_ot.m3C1_nombre.toString().trim().length,
-      datos_ot.m4C1_nombre.toString().trim().length,
-      datos_ot.p1C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length,
-      datos_ot.p2C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length
+      this.txt(datos_ot.m1C1_nombre).length,
+      this.txt(datos_ot.m2C1_nombre).length,
+      this.txt(datos_ot.m3C1_nombre).length,
+      this.txt(datos_ot.m4C1_nombre).length,
+      this.txt(datos_ot.p1C1_Nombre).replace('PIGMENTO', 'PIG.').length,
+      this.txt(datos_ot.p2C1_Nombre).replace('PIGMENTO', 'PIG.').length
     ]) > 20;
 
     return {
@@ -3009,38 +3244,38 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [
             { border: [true, false, false, false], text: `(%) Capa:` },
-            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa1}%` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa1 ?? 0}%` },
             { border: [false, false, true, false], text: `` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 1:` },
-            { border: [], text: `${datos_ot.m1C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m1C1_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa1}%` }
+            { border: [], text: `${datos_ot.m1C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m1C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa1 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 2:` },
-            { border: [], text: `${datos_ot.m2C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m2C1_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa1}%` }
+            { border: [], text: `${datos_ot.m2C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m2C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa1 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 3:` },
-            { border: [], text: `${datos_ot.m3C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m3C1_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa1}%` }
+            { border: [], text: `${datos_ot.m3C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m3C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa1 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 4:` },
-            { border: [], text: `${datos_ot.m4C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m4C1_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa1}%` }
+            { border: [], text: `${datos_ot.m4C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m4C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa1 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Pig. 1:` },
-            { border: [], text: `${datos_ot.p1C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p1C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa1}%` }
+            { border: [], text: `${datos_ot.p1C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txt(datos_ot.p1C1_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa1 ?? 0}%` }
           ],
           [
             { border: [true, false, false, true], text: `Pig. 2:` },
-            { border: [false, false, false, true], text: `${datos_ot.p2C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p2C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa1}%` }
+            { border: [false, false, false, true], text: `${datos_ot.p2C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txt(datos_ot.p2C1_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa1 ?? 0}%` }
           ],
         ]
       }
@@ -3062,38 +3297,38 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [
             { border: [true, false, false, false], text: `(%) Capa:` },
-            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa2}%` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa2 ?? 0}%` },
             { border: [false, false, true, false], text: `` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 1:` },
-            { border: [], text: `${datos_ot.m1C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m1C2_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa2}%` }
+            { border: [], text: `${datos_ot.m1C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m1C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa2 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 2:` },
-            { border: [], text: `${datos_ot.m2C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m2C2_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa2}%` }
+            { border: [], text: `${datos_ot.m2C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m2C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa2 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 3:` },
-            { border: [], text: `${datos_ot.m3C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m3C2_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa2}%` }
+            { border: [], text: `${datos_ot.m3C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m3C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa2 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 4:` },
-            { border: [], text: `${datos_ot.m4C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m4C2_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa2}%` }
+            { border: [], text: `${datos_ot.m4C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m4C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa2 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Pig. 1:` },
-            { border: [], text: `${datos_ot.p1C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p1C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa2}%` }
+            { border: [], text: `${datos_ot.p1C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txt(datos_ot.p1C2_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa2 ?? 0}%` }
           ],
           [
             { border: [true, false, false, true], text: `Pig. 2:` },
-            { border: [false, false, false, true], text: `${datos_ot.p2C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p2C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa2}%` }
+            { border: [false, false, false, true], text: `${datos_ot.p2C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txt(datos_ot.p2C2_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa2 ?? 0}%` }
           ],
         ]
       }
@@ -3115,38 +3350,38 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [
             { border: [true, false, false, false], text: `(%) Capa: ` },
-            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa3}%` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa3 ?? 0}%` },
             { border: [false, false, true, false], text: `` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 1:` },
-            { border: [], text: `${datos_ot.m1C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m1C3_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa3}%` }
+            { border: [], text: `${datos_ot.m1C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m1C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa3 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 2:` },
-            { border: [], text: `${datos_ot.m2C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m2C3_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa3}%` }
+            { border: [], text: `${datos_ot.m2C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m2C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa3 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 3:` },
-            { border: [], text: `${datos_ot.m3C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m3C3_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa3}%` }
+            { border: [], text: `${datos_ot.m3C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m3C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa3 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Mat. 4:` },
-            { border: [], text: `${datos_ot.m4C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m4C3_nombre.toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa3}%` }
+            { border: [], text: `${datos_ot.m4C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txt(datos_ot.m4C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa3 ?? 0}%` }
           ],
           [
             { border: [true, false, false, false], text: `Pig. 1:` },
-            { border: [], text: `${datos_ot.p1C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p1C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa3}%` }
+            { border: [], text: `${datos_ot.p1C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txt(datos_ot.p1C3_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa3 ?? 0}%` }
           ],
           [
             { border: [true, false, false, true], text: `Pig. 2:` },
-            { border: [false, false, false, true], text: `${datos_ot.p2C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p2C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa3}%` }
+            { border: [false, false, false, true], text: `${datos_ot.p2C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txt(datos_ot.p2C3_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa3 ?? 0}%` }
           ],
         ]
       }
@@ -3198,13 +3433,13 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [{}, {}, {}, {}, {}, {}, {}, {}],
           [
-            { border: [false, false, false, false], text: `${datos_ot.pigmento_Extrusion.toString().trim()}`, alignment: 'center', },
-            { border: [false, false, false, false], text: `${datos_ot.formato_Extrusin.toString().trim()}`, alignment: 'center', },
-            { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho2_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho3_Extrusion).toFixed(2))}`, alignment: 'center', },
-            { border: [false, false, false, false], text: `${datos_ot.und_Extrusion}`, alignment: 'center', },
-            { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.calibre_Extrusion).toFixed(2))}`, alignment: 'center', },
-            { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.peso_Extrusion).toFixed(2))}`, alignment: 'center', },
-            { border: [false, false, false, false], text: `${datos_ot.tratado}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.txt(datos_ot.pigmento_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.txt(datos_ot.formato_Extrusin)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.num(datos_ot.ancho1_Extrusion)}   +   ${this.num(datos_ot.ancho2_Extrusion)}   +   ${this.num(datos_ot.ancho3_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.txt(datos_ot.und_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.num(datos_ot.calibre_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.num(datos_ot.peso_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.txt(datos_ot.tratado)}`, alignment: 'center', },
             { border: [false, false, false, false], text: `${this.textoGrafiladoPDF(datos_ot.extrusion_Grafilado)}`, alignment: 'center', }
           ]
         ]
@@ -3288,37 +3523,37 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [
             { text: `Pigmento: `, style: 'subtitulo' },
-            { text: `${datos_ot.pigmento_Extrusion.toString().trim()}` },
+            { text: `${this.txt(datos_ot.pigmento_Extrusion)}` },
             {}
           ],
           [
             { text: `Formato: `, style: 'subtitulo' },
-            { text: `${datos_ot.formato_Extrusin.toString().trim()}` },
+            { text: `${this.txt(datos_ot.formato_Extrusin)}` },
             {}
           ],
           [
             { text: `Calibre: `, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.calibre_Extrusion).toFixed(2))}` },
+            { text: `${this.num(datos_ot.calibre_Extrusion)}` },
             {}
           ],
           [
             { text: `Unidad Medida: `, style: 'subtitulo' },
-            { text: `${datos_ot.und_Extrusion.toString().trim()}` },
+            { text: `${this.txt(datos_ot.und_Extrusion)}` },
             {}
           ],
           [
             { text: `ANCHO`, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho2_Extrusion).toFixed(2))}   +` },
-            { text: `   ${this.formatonumeros((datos_ot.ancho3_Extrusion).toFixed(2))}` }
+            { text: `${this.num(datos_ot.ancho1_Extrusion)}   +   ${this.num(datos_ot.ancho2_Extrusion)}   +` },
+            { text: `   ${this.num(datos_ot.ancho3_Extrusion)}` }
           ],
           [
             { text: `Peso MT (Min/Max): `, style: 'subtitulo' },
-            { text: `${this.formatonumeros((datos_ot.peso_Extrusion).toFixed(2))}` },
+            { text: `${this.num(datos_ot.peso_Extrusion)}` },
             {}
           ],
           [
             { text: `Tratado Caras: `, style: 'subtitulo' },
-            { text: `${datos_ot.tratado.toString().trim()}` },
+            { text: `${this.txt(datos_ot.tratado)}` },
             {}
           ],
           [
@@ -3349,19 +3584,19 @@ export class Orden_TrabajoComponent implements OnInit {
             { text: `CANTIDAD`, style: 'subtitulo' }
           ],
           [
-            { text: `${datos_ot.laminado_Capa1.toString().trim()}`, },
-            { text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa1).toFixed(2))}`, },
-            { text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa1).toFixed(2))}`, }
+            { text: `${this.txt(datos_ot.laminado_Capa1)}`, },
+            { text: `${this.num(datos_ot.calibre_Laminado_Capa1)}`, },
+            { text: `${this.num(datos_ot.cantidad_Laminado_Capa1)}`, }
           ],
           [
-            { text: `${datos_ot.laminado_Capa2.toString().trim()}`, },
-            { text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa2).toFixed(2))}`, },
-            { text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa2).toFixed(2))}`, }
+            { text: `${this.txt(datos_ot.laminado_Capa2)}`, },
+            { text: `${this.num(datos_ot.calibre_Laminado_Capa2)}`, },
+            { text: `${this.num(datos_ot.cantidad_Laminado_Capa2)}`, }
           ],
           [
-            { text: `${datos_ot.laminado_Capa3.toString().trim()}`, },
-            { text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa3).toFixed(2))}`, },
-            { text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa3).toFixed(2))}`, }
+            { text: `${this.txt(datos_ot.laminado_Capa3)}`, },
+            { text: `${this.num(datos_ot.calibre_Laminado_Capa3)}`, },
+            { text: `${this.num(datos_ot.cantidad_Laminado_Capa3)}`, }
           ]
         ]
       },
@@ -3381,47 +3616,47 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [
             { text: `Tipo Impresión: `, style: 'subtitulo' },
-            { text: `${datos_ot.tipo_Impresion.toString().trim() == 'NO APLICA' ? 'FLEXOGRAFIA' : datos_ot.tipo_Impresion.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tipo_Impresion) == 'NO APLICA' ? 'FLEXOGRAFIA' : this.txt(datos_ot.tipo_Impresion)}` }
           ],
           [
             { text: `Rodillo N°: `, style: 'subtitulo' },
-            { text: `${datos_ot.rodillo.toString().trim()}` }
+            { text: `${this.txt(datos_ot.rodillo)}` }
           ],
           [
             { text: `N° de Pista: `, style: 'subtitulo' },
-            { text: `${datos_ot.pista.toString().trim()}` }
+            { text: `${this.txt(datos_ot.pista)}` }
           ],
           [
             { text: `Tinta 1: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta1.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta1)}` }
           ],
           [
             { text: `Tinta 2: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta2.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta2)}` }
           ],
           [
             { text: `Tinta 3: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta3.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta3)}` }
           ],
           [
             { text: `Tinta 4: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta4.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta4)}` }
           ],
           [
             { text: `Tinta 5: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta5.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta5)}` }
           ],
           [
             { text: `Tinta 6: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta6.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta6)}` }
           ],
           [
             { text: `Tinta 7: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta7.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta7)}` }
           ],
           [
             { text: `Tinta 8: `, style: 'subtitulo' },
-            { text: `${datos_ot.tinta8.toString().trim()}` }
+            { text: `${this.txt(datos_ot.tinta8)}` }
           ],
         ]
       },
@@ -3449,7 +3684,7 @@ export class Orden_TrabajoComponent implements OnInit {
           ],
           [
             { text: `Formato Bolsa: `, style: 'subtitulo' },
-            { colSpan: 2, text: `${datos_ot.formato_Producto.toString().trim()}`, alignment: 'center', },
+            { colSpan: 2, text: `${this.txt(datos_ot.formato_Producto)}`, alignment: 'center', },
             {},
             { text: ``, },
           ],
@@ -3460,40 +3695,40 @@ export class Orden_TrabajoComponent implements OnInit {
             { text: `Solapa`, alignment: 'center', style: 'subtitulo' },
           ],
           [
-            { text: `${this.formatonumeros((datos_ot.selladoCorte_Ancho).toFixed(2))}   x`, alignment: 'center', },
-            { text: `${this.formatonumeros((datos_ot.selladoCorte_Largo).toFixed(2))}   x`, alignment: 'center', },
-            { text: `${this.formatonumeros((datos_ot.selladoCorte_Fuelle).toFixed(2))}`, alignment: 'center', },
-            { text: `${this.formatonumeros(solapa.toFixed(2))}   ${datos_ot.und_Extrusion.toString().trim()}`, alignment: 'center', },
+            { text: `${this.num(datos_ot.selladoCorte_Ancho)}   x`, alignment: 'center', },
+            { text: `${this.num(datos_ot.selladoCorte_Largo)}   x`, alignment: 'center', },
+            { text: `${this.num(datos_ot.selladoCorte_Fuelle)}`, alignment: 'center', },
+            { text: `${this.num(solapa)}   ${this.txt(datos_ot.und_Extrusion)}`, alignment: 'center', },
           ],
           [{}, {}, {}, {}],
           [{}, {}, {}, {}],
           [
             { text: `Sellado: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${datos_ot.tpSellados_Nombre.toString().trim()}` },
+            { colSpan: 3, text: `${this.txt(datos_ot.tpSellados_Nombre)}` },
             {},
             {},
           ],
           [
             { text: `Margen: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.formatonumeros((datos_ot.margen).toFixed(2))}` },
+            { colSpan: 3, text: `${this.num(datos_ot.margen)}` },
             {},
             {},
           ],
           [
             { text: `Peso Millar: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_PesoMillar).toFixed(2))}` },
+            { colSpan: 3, text: `${this.num(datos_ot.selladoCorte_PesoMillar)}` },
             {},
             {},
           ],
           [
             { text: `Cant. x Paquete: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasPaquete).toFixed(2))}` },
+            { colSpan: 3, text: `${this.num(datos_ot.selladoCorte_CantBolsasPaquete)}` },
             {},
             {},
           ],
           [
             { text: `Cant. x Bulto: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasBulto).toFixed(2))}` },
+            { colSpan: 3, text: `${this.num(datos_ot.selladoCorte_CantBolsasBulto)}` },
             {},
             {},
           ]

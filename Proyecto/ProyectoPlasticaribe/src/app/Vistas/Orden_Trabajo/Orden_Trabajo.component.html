@@ -47,8 +47,8 @@
         <!-- Botones -->
         <div class="ot-header-actions__buttons">
           <!-- <button pButton class="p-button-danger p-button-outlined" id="crearItem" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"></button> -->
-          <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check" *ngIf="!edicionOrdenTrabajo" (click)="validarDatos()"></button>
-          <button pButton class="p-button-danger" id="editar" type="button" label="Editar OT" icon="pi pi-check" *ngIf="edicionOrdenTrabajo" (click)="validarActualizacionOT()"></button>
+          <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check" *ngIf="!edicionOrdenTrabajo" [disabled]="guardando || cargando" (click)="validarDatos()"></button>
+          <button pButton class="p-button-danger" id="editar" type="button" label="Editar OT" icon="pi pi-check" *ngIf="edicionOrdenTrabajo" [disabled]="guardando || cargando || confirmandoEdicion" (click)="validarActualizacionOT()"></button>
           <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         </div>
       </div>
@@ -2604,9 +2604,9 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <!--<button pButton class="p-button-danger p-button-outlined" id="crearItem" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"></button>-->
               <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check"
-                *ngIf="!edicionOrdenTrabajo" (click)="validarDatos()"></button>
+                *ngIf="!edicionOrdenTrabajo" [disabled]="guardando || cargando" (click)="validarDatos()"></button>
               <button pButton class="p-button-danger" id="editar" type="button" label="Editar OT" icon="pi pi-check"
-                *ngIf="edicionOrdenTrabajo" (click)="validarActualizacionOT()"></button>
+                *ngIf="edicionOrdenTrabajo" [disabled]="guardando || cargando || confirmandoEdicion" (click)="validarActualizacionOT()"></button>
               <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos"
                 icon="pi pi-eraser" (click)="limpiarCampos()"></button>
             </div>
@@ -2640,7 +2640,7 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="editarOrdenTrabajo()" icon="pi pi-check" label="Editar OT"
+          <button type="button" pButton [disabled]="guardando || cargando" (click)="editarOrdenTrabajo()" icon="pi pi-check" label="Editar OT"
             class="p-button-warning"></button>
         </div>
         <div class="col-6">
