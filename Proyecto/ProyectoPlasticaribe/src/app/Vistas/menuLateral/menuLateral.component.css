@@ -49,6 +49,46 @@ p-panelmenu ::ng-deep div[style*="black"] a {
   width: 90%;
 }
 
+/* Distintivo del entorno de pruebas (solo visible con environment.esBeta) */
+.imagen {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.betaSidebar {
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+/* Versión de la app (package.json) */
+.versionApp {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+  user-select: none;
+}
+
+.versionAppDark {
+  color: #adb5bd;
+}
+
+.badgeBeta {
+  display: inline-block;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background-color: #f59e0b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  line-height: 1.4;
+  user-select: none;
+}
+
 .imagen p{
   padding-left: 5%;
   padding-top: 10%;

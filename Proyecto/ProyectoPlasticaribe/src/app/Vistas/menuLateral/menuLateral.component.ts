@@ -15,6 +15,8 @@ import { AuthenticationService } from 'src/app/_Services/authentication.service'
 import { AppComponent } from 'src/app/app.component';
 import { collection, getDocs, doc, setDoc } from "firebase/firestore";
 import { db } from 'src/app/conexionFirebase';
+import { environment } from 'src/environments/environment';
+import { VERSION_APP } from 'src/environments/version';
 
 Injectable({
   providedIn: 'root'
@@ -53,6 +55,8 @@ export class MenuLateralComponent implements OnInit {
   cantidadCorreosNuevos: number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
   position: string = '';
   modoSeleccionado: boolean;
+  esBeta: boolean = environment.esBeta; //Indica si la app se compiló para el entorno de pruebas (npm run build:beta)
+  versionApp: string = VERSION_APP; //Versión de la app (package.json), se sube con npm run version:parche | version:menor | version:mayor
   roles: any[] = [];
   cargando: boolean = false;
 
