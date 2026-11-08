@@ -9,8 +9,8 @@ import { EMPTY, Observable, Subscription, catchError, finalize, forkJoin, map, o
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
-import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
 import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
+import { CrearOrdenTrabajoDatos, OtExtrusionDatos, OtImpresionDatos, OtLaminadoDatos, OtSelladoCorteDatos } from 'src/app/Modelo/modelOrdenTrabajoCompleta';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -2537,7 +2537,9 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Crea la orden de trabajo en un único flujo: sede del cliente → último número de BagPro y datos de procesos → creación.
+   * Crea la orden de trabajo en un único flujo: sede del cliente → datos de procesos → creación.
+   * El número de OT, el creador (usuario del token), la fecha, la hora y el estado inicial los asigna la API;
+   * el número creado se lee de la respuesta (`numero_OT`) para el mensaje y el PDF.
    * Ignora la llamada si ya hay un guardado en curso (evita doble envío). Cualquier error o validación fallida
    * muestra un mensaje y libera la pantalla; si la OT se crea, limpia los campos y abre su PDF.
    * Solo se invoca desde `validarDatos` (Búsqueda ya no guarda OTs); la firma se conserva hasta la reestructuración (F3).
@@ -2554,28 +2556,19 @@ export class Orden_TrabajoComponent implements OnInit {
       switchMap(sede => {
         if (!sede?.length) return this.cortarGuardado(`¡No se encontró ninguna sede para el cliente!`, null, true);
         this.FormOrdenTrabajo.patchValue({ Id_Cliente: sede[0].idSede });
-        return forkJoin({
-          numOT: this.bagProService.srvObtenerListaClienteOT_UltimaOT(),
-          datosProcesos: this.consultarDatosProcesos(),
-        }).pipe(
+        return this.consultarDatosProcesos().pipe(
           catchError(error => this.cortarGuardado(`¡No fue posible consultar la información necesaria para crear la Orden de Trabajo!`, error))
         );
       }),
-      switchMap(({ numOT, datosProcesos }) => {
+      switchMap(datosProcesos => {
         let procesos = this.construirProcesosOt(datosProcesos);
         if (!procesos) return EMPTY;
-        let numeroOrden: number = numOT.item + 1;
 
-        let infoOT: modelOrden_Trabajo = {
-          'Numero_OT': numeroOrden,
+        let infoOT: CrearOrdenTrabajoDatos = {
           'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
           'Prod_Id': this.producto,
           'UndMed_Id': this.presentacionProducto,
-          'Ot_FechaCreacion': this.today,
           'Ot_FechaEntrega': this.fechaEntregaParaApi(),
-          'Ot_Hora': moment().format('H:mm:ss'),
-          'Estado_Id': 15,
-          'Usua_Id': this.storage_Id,
           'PedExt_Id': 517,
           'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
           'Ot_Cyrel': this.cyrel,
@@ -2683,9 +2676,9 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Construye la configuración y observación del proceso de extrusión. El Ot_Id lo asigna la API.
-   * @returns Información de extrusión para la creación de la OT.
+   * @returns Información de extrusión para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Extrusion(): any {
+  construirInfoOt_Extrusion(): OtExtrusionDatos {
     return {
       'Material_Id': this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
       'Formato_Id': this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
@@ -2705,9 +2698,9 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Construye la configuración y observación del proceso de impresión. El Ot_Id lo asigna la API.
    * @param datosImpresion Ids de las tintas seleccionadas, consultados por nombre.
-   * @returns Información de impresión para la creación de la OT.
+   * @returns Información de impresión para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Impresion(datosImpresion: any): any {
+  construirInfoOt_Impresion(datosImpresion: any): OtImpresionDatos {
     return {
       'TpImpresion_Id': this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
       'Rodillo_Id': this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
@@ -2726,9 +2719,9 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Construye la configuración y observación del proceso de laminado. El OT_Id lo asigna la API.
-   * @returns Información de laminado para la creación de la OT.
+   * @returns Información de laminado para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Laminado(): any {
+  construirInfoOt_Laminado(): OtLaminadoDatos {
     return {
       'Capa_Id1': this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
       'Capa_Id2': this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
@@ -2746,11 +2739,10 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Construye la configuración, solapa y observación de sellado o corte. El Ot_Id lo asigna la API.
    * @param datos Formato y tipo de sellado seleccionados.
-   * @returns Información de sellado/corte para la creación de la OT.
+   * @returns Información de sellado/corte para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Sellado_Corte(datos: any): modelOrdenTrabajo_SelladoCorte {
+  construirInfoOt_Sellado_Corte(datos: any): OtSelladoCorteDatos {
     return {
-      'Ot_Id': 0,
       'Corte': this.corte,
       'Sellado': this.sellado,
       'Formato_Id': datos.tpProd_Id,
