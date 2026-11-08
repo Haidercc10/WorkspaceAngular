@@ -2629,7 +2629,8 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Muestra el mensaje de un paso fallido del guardado (crear o editar OT) y termina el flujo sin emitir valores,
-   * para que su `finalize` libere la pantalla.
+   * para que su `finalize` libere la pantalla. Si hay error HTTP, muestra su detalle con `detalleErrorApi`
+   * (ProblemDetails, ValidationProblemDetails o texto) durante más tiempo para que se pueda leer.
    * @param mensaje Mensaje para el usuario.
    * @param error Error HTTP recibido, si lo hay; su detalle se muestra junto al mensaje.
    * @param advertencia true muestra una advertencia en lugar de un error.
@@ -2637,8 +2638,38 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   private cortarGuardado(mensaje: string, error: any = null, advertencia: boolean = false): Observable<never> {
     if (advertencia) this.msj.mensajeAdvertencia(`¡Advertencia!`, mensaje);
-    else this.msj.mensajeError(mensaje, error?.error);
+    else {
+      const detalle = this.detalleErrorApi(error);
+      this.msj.mensajeError(mensaje, detalle, detalle ? 10000 : 3000);
+    }
     return EMPTY;
+  }
+
+  /**
+   * Obtiene un texto legible del error devuelto por la API. Con ProblemDetails usa `detail` (o `title` si no hay detail);
+   * con ValidationProblemDetails agrega cada mensaje de `errors` ("Campo: mensaje"). Si el cuerpo es texto lo devuelve
+   * tal cual; si no hay cuerpo usa el código y el texto del estado HTTP.
+   * @param error Error HTTP (HttpErrorResponse) o cualquier valor recibido en el catchError.
+   * @returns El detalle para mostrar; vacío si no hay error.
+   */
+  private detalleErrorApi(error: any): string {
+    if (!error) return '';
+    const cuerpo = error.error;
+    if (typeof cuerpo === 'string' && cuerpo.trim() !== '') return cuerpo;
+    if (cuerpo && typeof cuerpo === 'object') {
+      const partes: string[] = [];
+      const principal = cuerpo.detail || cuerpo.title;
+      if (principal) partes.push(`${principal}`);
+      if (cuerpo.errors && typeof cuerpo.errors === 'object') {
+        Object.keys(cuerpo.errors).forEach(campo => {
+          const mensajes = Array.isArray(cuerpo.errors[campo]) ? cuerpo.errors[campo] : [cuerpo.errors[campo]];
+          mensajes.forEach((m: unknown) => partes.push(campo ? `${campo}: ${m}` : `${m}`));
+        });
+      }
+      if (partes.length > 0) return partes.join(' | ');
+    }
+    if (error.status) return `Error ${error.status}${error.statusText ? ` (${error.statusText})` : ''}`;
+    return `${error?.message ?? ''}`;
   }
 
   /**
