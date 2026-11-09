@@ -1070,13 +1070,13 @@ export class CreacionPdfService {
       margin: [0, 0, 0, 10],
       fontSize: 8,
       table: {
-        widths: [45, 140, '*', 65, 65],
+        widths: [45, 140, 40, '*', 65, 65],
         body: [
-          [{ text: 'Información de la OT', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}],
-          ['OT', 'Cliente', 'Referencia', 'Kg OT', 'Kg Límite'],
+          [{ text: 'Información de la OT', colSpan: 6, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}, {}],
+          ['OT', 'Cliente', 'Item', 'Referencia', 'Kg OT', 'Kg Límite'],
           ot
-            ? [solicitud.ot, ot.cliente || '', ot.referencia || '', this.cantidadPDF(ot.kgOT), this.cantidadPDF(ot.kgLimite)]
-            : [solicitud.ot, { text: 'No se encontró la OT en BagPro', colSpan: 4, italics: true }, {}, {}, {}],
+            ? [solicitud.ot, ot.cliente || '', ot.item ?? '', ot.referencia || '', this.cantidadPDF(ot.kgOT), this.cantidadPDF(ot.kgLimite)]
+            : [solicitud.ot, { text: 'No se encontró la OT en BagPro', colSpan: 5, italics: true }, {}, {}, {}, {}],
         ]
       },
       layout: this.layoutEncabezadoGris,
@@ -2082,6 +2082,8 @@ export const MOVIMIENTOS_ASIGNACION: string[] = ['ASIGMP', 'ASIGTINTAS', 'ASIGBO
 /** Datos de la OT (consultados en BagPro) que se imprimen en el PDF de la solicitud de material. */
 export interface DatosOTSolicitudPDF {
   cliente: string;
+  /** Número del item (producto) de la OT. */
+  item: number | string | null;
   referencia: string;
   /** Kg de la OT. */
   kgOT: number;

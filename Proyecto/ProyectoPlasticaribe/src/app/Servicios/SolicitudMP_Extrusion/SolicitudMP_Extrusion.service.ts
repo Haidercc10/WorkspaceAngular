@@ -24,7 +24,10 @@ export class SolicitudMP_ExtrusionService {
 
   Delete = (id : number) => this.http.delete(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`);
 
-  getEstadosSolicitudes = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getEstadosSolicitudes`);
+  /** Marca como verificada (estado 55) una solicitud finalizada. Responde 409 si no está finalizada y 403 si el rol no tiene permiso. */
+  verificarSolicitud = (id : number) => this.http.put(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/verificar/${id}`, null);
+
+  getEstadosSolicitudes = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getEstadosSolicitudes`);
 
   /** Crea la solicitud y sus detalles en una sola transacción. Responde 409 si falta confirmar la disponibilidad. */
   crearSolicitud = (data : CrearSolicitudRequest) : Observable<{ solMpExt_Id : number; estado_Id : number }> =>

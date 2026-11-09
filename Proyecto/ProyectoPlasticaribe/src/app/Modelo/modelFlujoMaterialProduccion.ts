@@ -18,7 +18,12 @@ export enum EstadoSolicitudMaterial {
   Finalizada = 5,
   Pendiente = 11,
   Parcial = 12,
+  /** Finalizada y revisada por un administrador o superior de extrusión. */
+  Verificada = 55,
 }
+
+/** Roles que pueden marcar una solicitud finalizada como verificada: ADMINISTRADOR (1) y SUPERIOR EXTRUSION 2 (85). Policy VerificarSolicitudMaterial del API. */
+export const ROLES_VERIFICAR_SOLICITUD: number[] = [1, 85];
 
 /** Subcategoría y cantidad de una solicitud. */
 export interface DetalleSolicitudRequest {

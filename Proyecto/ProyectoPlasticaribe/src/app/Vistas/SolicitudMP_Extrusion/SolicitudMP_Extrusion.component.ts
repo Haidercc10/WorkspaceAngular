@@ -665,7 +665,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   private generarPdfSolicitud(solicitud: number) {
     const datosOT = this.infoOrdenTrabajo[0];
     const ot: DatosOTSolicitudPDF | null = datosOT
-      ? { cliente: datosOT.cliente, referencia: datosOT.ref, kgOT: datosOT.kgReal, kgLimite: datosOT.kg }
+      ? { cliente: datosOT.cliente, item: datosOT.item, referencia: datosOT.ref, kgOT: datosOT.kgReal, kgLimite: datosOT.kg }
       : null;
 
     this.load = true;
