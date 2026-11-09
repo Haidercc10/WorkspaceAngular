@@ -77,11 +77,11 @@
     <div class="mb-4" id="formulario1">
       <div class="row g-3 justify-content-md-center">
 
-        <!-- Documento -->
+        <!-- Id Solicitud -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="documento" id="documento" type="text" pInputText required />
+            <input formControlName="documento" id="documento" type="text" pInputText required (keyup.enter)="consultarFiltros()"/>
             <label for="documento">Id Solicitud</label>
           </span>
         </div>

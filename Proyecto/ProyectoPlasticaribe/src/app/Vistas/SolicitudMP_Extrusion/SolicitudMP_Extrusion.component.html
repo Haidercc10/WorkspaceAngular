@@ -8,7 +8,9 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" id="titulo">Solicitud de Material de Producción</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" id="titulo">Solicitud de Material de Producción
+        <p-button class="boton-tutorial-titulo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+      </h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -17,11 +19,6 @@
 </div>
 
 <p-card>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}"
-      (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-
   <div class="mb-5">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i>
       Consultar OT</h4>
@@ -33,7 +30,7 @@
       <div class="row g-4">
 
         <!-- Solicitud -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl" data-tutorial="solicitud">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-hashtag"></i>
             <input formControlName="Solicitud" id="solicitud" type="text" pInputText
@@ -44,7 +41,7 @@
         </div>
         
         <!-- Proceso -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="proceso">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="proceso" data-tutorial="proceso">
           <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
             <i class="pi pi-sitemap"></i>
             <p-dropdown formControlName="proceso" inputId="Proceso" [readonly]="![1,104].includes(ValidarRol)"
@@ -56,17 +53,25 @@
           </span>
         </div>
 
-        <!-- Orden de Trabajo -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input formControlName="ot" id="ordenTrabajo" type="text" autocomplete="off" pInputText pTooltip="Ingrese el número de OT y presione Enter" tooltipPosition="top" (keyup.enter)="infoOT()" required />
-            <label for="ordenTrabajo">OT</label>
-          </span>
+        <!-- Orden de Trabajo, con el botón para exportar su PDF pegado a la derecha (como el botón de los campos de fecha) -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl" data-tutorial="ot">
+          <div class="campo-con-boton">
+            <span class="p-input-icon-left p-float-label">
+              <i class="pi pi-search"></i>
+              <input formControlName="ot" id="ordenTrabajo" type="text" autocomplete="off" pInputText pTooltip="Ingrese el número de OT y presione Enter" tooltipPosition="top" (keyup.enter)="infoOT()" required />
+              <label for="ordenTrabajo">OT</label>
+            </span>
+            <!-- El tooltip va en el contenedor porque un botón deshabilitado no recibe el mouse -->
+            <span class="campo-con-boton__accion" tooltipPosition="top"
+              [pTooltip]="puedeExportarPdfOT ? 'Exportar OT en PDF' : 'Exportar OT en PDF (primero consulte la OT con Enter)'">
+              <button pButton type="button" icon="pi pi-file-pdf" class="p-button-danger" aria-label="Exportar OT en PDF"
+                [disabled]="!puedeExportarPdfOT" (click)="exportarPdfOT()"></button>
+            </span>
+          </div>
         </div>
 
         <!-- Maquina -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl" data-tutorial="maquina">
           <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
             <i class="pi pi-cog"></i>
             <p-dropdown formControlName="maq" inputId="Maquina"
@@ -77,7 +82,7 @@
         </div>
 
         <!-- Fecha estimada de Entrega -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="fechaEntrega">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="fechaEntrega" data-tutorial="fechaEntrega">
           <span class="p-float-label">
             <p-calendar formControlName="fechaEntrega" inputId="fechaEntrega" [showIcon]="true"
               [minDate]="minDate"></p-calendar>
@@ -86,7 +91,7 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-4" data-tutorial="observacion">
           <span class="p-float-label">
             <textarea formControlName="observacion" id="observacion" [rows]="1" 
               pInputTextarea appContadorCaracteres maxLength="2000"></textarea>
@@ -104,7 +109,7 @@
   </div>
 
   <!-- Tabla de OT -->
-  <div class="row g-3" id="tabla1" *ngIf="!load">
+  <div class="row g-3" id="tabla1" data-tutorial="tablaOT" *ngIf="!load">
     <div class="table-responsive">
       <p-table #dt [resizableColumns]="true" columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll" [rows]="20" [rowHover]="true" [value]="infoOrdenTrabajo">
@@ -166,7 +171,7 @@
         Seleccionar subcategorias</h4>
     </div>
 
-    <div class="header-actions__buttons">
+    <div class="header-actions__buttons" data-tutorial="verSubcategorias">
       <button pButton type="button" label="Ver Subcategorías y Materiales" icon="pi pi-eye"
         class="p-button-rounded p-button-danger p-button-outlined" (click)="loadSubcategories()"></button>
     </div>
@@ -187,13 +192,13 @@
         </div>
 
         <!-- Nombre subcategoria -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4" id="nombreMp">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4" id="nombreMp" data-tutorial="subcategoria">
           <span class="p-input-icon-left p-float-label input-limpiable">
             <i class="pi pi-box"></i>
-            <app-selector-material formControlName="subcat_Nombre" inputId="MP" [opciones]="subcategories"
+            <app-selector-material #selectorSubcategoria formControlName="subcat_Nombre" inputId="MP" [opciones]="subcategories"
               campoId="id_Subcategoria" campoNombre="subcategoria" campoStock="stock" [busquedaRemota]="true" [minLength]="1"
               [readonly]="!formEncabezado.valid" (keydown)="validarEncabezadoAlDigitar($event)" (buscar)="getAllSubcategories()" (seleccionar)="loadMaterialInField()"></app-selector-material>
-            <button *ngIf="formMP.get('subcat_Nombre')?.value || formMP.get('subcat_Id')?.value"
+            <button *ngIf="(formMP.get('subcat_Nombre')?.value || formMP.get('subcat_Id')?.value) && !selectorSubcategoria.cargando"
               pButton type="button" class="p-button-text p-button-rounded p-button-sm boton-limpiar-input"
               icon="pi pi-times" aria-label="Limpiar subcategoría" pTooltip="Limpiar subcategoría" tooltipPosition="top"
               (click)="limpiarCamposMP()"></button>
@@ -202,16 +207,16 @@
         </div>
 
         <!-- Cantidad pedida -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="cantidad">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="cantidad" data-tutorial="cantidad">
           <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
             <i class="pi pi-calculator"></i>
-            <p-inputNumber formControlName="cantidad" mode="decimal" [showClear]="true" inputId="Cantidad" pTooltip="Ingrese la cantidad a solicitar y presione Enter" tooltipPosition="top" [minFractionDigits]="2" (keyup.enter)="validarCamposVaciosMPRetirada()"></p-inputNumber>
+            <p-inputNumber formControlName="cantidad" (click)="seleccionarContenido($event)" mode="decimal" [showClear]="true" inputId="Cantidad" pTooltip="Ingrese la cantidad a solicitar y presione Enter" tooltipPosition="top" [minFractionDigits]="2" (keyup.enter)="validarCamposVaciosMPRetirada()"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
           </span>
         </div>
 
         <!-- Disponible subcategoria (stock menos lo reservado por solicitudes activas) -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" id="disponibleMp">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" id="disponibleMp" data-tutorial="disponible">
           <span class="p-input-icon-left p-inputnumber-icon-left p-float-label" pTooltip="Stock menos lo solicitado y aún no asignado en otras solicitudes" tooltipPosition="top">
             <i class="pi pi-check-circle"></i>
             <p-inputNumber formControlName="disponible" mode="decimal" inputId="Disponible" [minFractionDigits]="2"
@@ -242,7 +247,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-4" id="botones1">
+    <div class="mb-4" id="botones1" data-tutorial="botonesSubcategoria">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton pRipple id="agregarMp" label="Agregar" type="button" icon="pi pi-send" class="p-button-danger"
           [disabled]="infoOrdenTrabajo.length == 0 && !this.formMP.valid"
@@ -265,7 +270,7 @@
   </div>
 
   <!-- TABLA DE RETIRO -->
-  <div class="row g-3" id="tabla2" *ngIf="!load">
+  <div class="row g-3" id="tabla2" data-tutorial="tablaSolicitadas" *ngIf="!load">
     <div class="table-responsive">
       <p-table #dt [resizableColumns]="true" columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll" [rows]="20" [rowHover]="true" [value]="subcategoriasSeleccionadas">
@@ -273,11 +278,11 @@
           <tr>
             <th class="text-center" scope="col">ID</th>
             <th class="text-center" scope="col">Nombre subcategoria</th>
-            <th class="text-center" scope="col" id="cantidad2">Cantidad</th>
+            <th class="text-center" scope="col" id="cantidad2" data-tutorial="editarCantidad">Cantidad</th>
             <th class="text-center" scope="col">Cantidad Entregada</th>
             <th class="text-center" scope="col">Cantidad Faltante</th>
             <th class="text-center" scope="col">Und. Medida</th>
-            <th class="text-center" scope="col" id="quitarMP">Quitar</th>
+            <th class="text-center" scope="col" id="quitarMP" data-tutorial="quitar">Quitar</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-subcat>
@@ -322,15 +327,15 @@
   <br>
   <div *ngIf="!load">
     <div class="mb-3">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones2">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones2" data-tutorial="botonesSolicitud">
         <button pButton pRipple id="asignar" label="Crear Solicitud" type="button" icon="pi pi-check"
           class="p-button-danger" *ngIf="!esSolicitud" [disabled]="subcategoriasSeleccionadas.length == 0"
-          (click)="validarCamposVaciosRetirada()"></button>
+          (click)="validarCamposVaciosRetirada()" pTooltip="Al presionar este botón, se procede a crear la solicitud de material de producción." ></button>
         <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check"
           class="p-button-danger" *ngIf="esSolicitud" [disabled]="subcategoriasSeleccionadas.length == 0"
-          (click)="validarCamposVaciosRetirada()"></button>
+          (click)="validarCamposVaciosRetirada()" pTooltip="Al presionar este botón, se procede a editar la solicitud de material de producción." ></button>
         <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary"
-          icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
+          icon="pi pi-eraser" (click)="LimpiarCampos()" pTooltip="Al presionar este botón, se limpiarán todos los campos del formulario." ></button>
       </div>
     </div>
   </div>

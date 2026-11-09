@@ -9,6 +9,9 @@ import { EncriptacionService } from '../Encriptacion/Encriptacion.service';
 import { ReImpresionEtiquetasService, ReImpresionEtiquetas } from '../ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { referenceWike } from './referenciaWiketiado';
 import { UtileriaService } from '../Utileria/utileria.service';
+import { catchError, map, Observable } from 'rxjs';
+import { BagproService } from '../BagPro/Bagpro.service';
+import { Orden_TrabajoService } from '../OrdenTrabajo/Orden_Trabajo.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +24,9 @@ export class CreacionPdfService {
   constructor(private rePrintService: ReImpresionEtiquetasService,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
     private encriptacion: EncriptacionService,
-    private util: UtileriaService
+    private util: UtileriaService,
+    private ordenTrabajoService: Orden_TrabajoService,
+    private bagProService: BagproService,
   ) { }
 
   formatoPDF(titulo: string, content: any, headerAdicional: any = {}) {
@@ -1226,6 +1231,848 @@ export class CreacionPdfService {
         ]
       },
     };
+  }
+
+  // ===================================================================== ORDEN DE TRABAJO
+  // Formato PDF de la Orden de Trabajo, compartido por la página Orden de Trabajo y Solicitud de Material de Producción.
+
+  /**
+   * Consulta los datos de la OT para el PDF: primero en Plasticaribe y, si no está, en BagPro.
+   * @param ot Número de la orden de trabajo.
+   * @returns La primera fila de la OT, o null si la consulta no trae filas. Falla si no existe en ninguno.
+   */
+  obtenerDatosOrdenTrabajo(ot: number): Observable<any | null> {
+    return this.ordenTrabajoService.GetOrdenTrabajo(ot, '').pipe(
+      catchError(() => this.bagProService.GetOrdenTrabajo(ot)),
+      map((datos: any) => (Array.isArray(datos) ? datos[0] : datos) ?? null),
+    );
+  }
+
+  /**
+   * Arma el documento PDF de la OT (sin abrirlo ni descargarlo).
+   * @param datos_ot Fila de la OT devuelta por Plasticaribe o BagPro.
+   * @param usuario Nombre que se muestra en el pie como quien generó el documento.
+   */
+  crearPdfOrdenTrabajo(datos_ot: any, usuario: string) {
+    const pdfDefinicion: any = {
+      info: { title: `OT ${datos_ot.numero_Orden}` }, // Título que muestra la pestaña del navegador al abrir el PDF
+      pageSize: { width: 630, height: 760 },
+      watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.03, bold: true, italics: false },
+      pageMargins: [25, 190, 25, 35],
+      header: this.headerPDFOT(datos_ot),
+      footer: this.footerPDFOT(usuario),
+      content: this.contentPDFOT(datos_ot),
+      styles: this.stylesPDFOT()
+    };
+    return pdfMake.createPdf(pdfDefinicion);
+  }
+
+  /**
+   * Genera el PDF de la OT como archivo en memoria, para abrirlo o descargarlo cuando convenga
+   * (p. ej. después de mostrar un aviso).
+   * @param datos_ot Fila de la OT devuelta por Plasticaribe o BagPro.
+   * @param usuario Nombre que se muestra en el pie como quien generó el documento.
+   */
+  generarBlobOrdenTrabajo(datos_ot: any, usuario: string): Observable<Blob> {
+    return new Observable<Blob>(suscriptor => {
+      try {
+        this.crearPdfOrdenTrabajo(datos_ot, usuario).getBlob((blob: Blob) => {
+          suscriptor.next(blob);
+          suscriptor.complete();
+        });
+      } catch (error) {
+        suscriptor.error(error);
+      }
+    });
+  }
+
+  private formatonumerosOT =(number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  /**
+   * Convierte un valor posiblemente nulo en texto sin espacios sobrantes para el PDF.
+   * @param valor Valor recibido de la API (las OT de BagPro o antiguas pueden traer nulos).
+   * @param porDefecto Texto que se usa cuando el valor es nulo o indefinido.
+   * @returns Texto limpio o el valor por defecto.
+   */
+  private txtOT(valor: any, porDefecto: string = ''): string {
+    return valor == null ? porDefecto : valor.toString().trim();
+  }
+
+  /**
+   * Formatea un número para el PDF con separador de miles y los decimales indicados.
+   * Los valores nulos o no numéricos se muestran como 0.
+   * @param valor Valor recibido de la API.
+   * @param decimales Cantidad de decimales a mostrar.
+   * @returns Número formateado como texto.
+   */
+  private numOT(valor: any, decimales: number = 2): string {
+    const numero = Number(valor);
+    return this.formatonumerosOT((Number.isFinite(numero) ? numero : 0).toFixed(decimales));
+  }
+
+  // Funcion que va a crear el header del PDF
+  private headerPDFOT(datos_ot) {
+    return [
+      {
+        margin: [25, 5],
+        columns: this.informacionEmpresaHeaderOT(datos_ot)
+      },
+      {
+        margin: [25, 5],
+        style: 'tablaEmpresa',
+        table: this.informacionClienteItemHeaderOT(datos_ot),
+        layout: { defaultBorder: false, },
+        fontSize: 9,
+      },
+      '\n',
+      {
+        margin: [25, 5],
+        table: this.informacaionExtrusionHeaderOT(datos_ot),
+        layout: { defaultBorder: false, },
+        fontSize: 9,
+      },
+    ];
+  }
+
+  // Funcion que va a colocar la información de la empresa en el header
+  private informacionEmpresaHeaderOT(datos_ot) {
+    return [
+      { image: logoParaPdf, width: 220, height: 50, margin: [5, 5] },
+      {
+        text: `OT ${datos_ot.numero_Orden}`,
+        style: 'orden_trabajo',
+        alignment: 'right',
+        margin: [0, 10, 10, 0],
+      },
+    ]
+  }
+
+  // Funaion que va a colocar la informacion del cliente y del item en el header
+  private informacionClienteItemHeaderOT(datos_ot) {
+    return {
+      widths: ['10%', '40%', '12%', '38%'],
+      style: 'header',
+      body: [
+        [
+          { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
+          { border: [false, true, false, false], text: `${this.txtOT(datos_ot.id_SedeCliente)}` },
+          { border: [true, true, false, false], text: `Item`, style: 'titulo', },
+          { border: [false, true, true, false], text: `${this.txtOT(datos_ot.id_Producto)}` },
+        ],
+        [
+          { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
+          { border: [false, false, true, true], text: `${this.txtOT(datos_ot.cliente)}` },
+          { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
+          { border: [false, false, true, true], text: `${this.txtOT(datos_ot.producto)}` },
+        ],
+      ]
+    }
+  }
+
+  // Funcion que va a colocar informacion general de la extrusion en el header
+  private informacaionExtrusionHeaderOT(datos_ot) {
+    return {
+      widths: ['*', '*', '*', '*', '*'],
+      body: [
+        [
+          { text: `Material`, style: 'titulosTablas', border: [true, true, false, true] },
+          { text: `Cant. Bolsas`, style: 'titulosTablas', border: [false, true, false, true] },
+          { text: `Cant. Kilos (Kg)`, style: 'titulosTablas', border: [false, true, false, true] },
+          { text: `Presentación`, style: 'titulosTablas', border: [false, true, false, true] },
+          { text: `Despachar`, style: 'titulosTablas', border: [false, true, true, true] },
+        ],
+        [
+          { text: `${this.txtOT(datos_ot.material)}`, style: 'datosTablaExtrusion' },
+          { text: `${this.numOT(datos_ot.cantidad_Pedida)}`, style: 'datosTablaExtrusion' },
+          { text: `${this.numOT(datos_ot.peso_Neto)}`, style: 'datosTablaExtrusion' },
+          { text: `${this.txtOT(datos_ot.presentacion)}`, style: 'datosTablaExtrusion' },
+          { text: `${datos_ot.fecha_Entrega ? datos_ot.fecha_Entrega.replace('T00:00:00', '') : ''}`, style: 'datosTablaExtrusion' },
+        ]
+      ]
+    };
+  }
+
+  // Funcion que va a crear el contenido del PDF
+  private contentPDFOT(datos_ot) {
+    let data: any = [];
+    data.push(this.hoja1ContentPDFOT(datos_ot));
+    data.push(this.hoja2ContentPDFOT(datos_ot));
+    // if (this.impresion) data.push(this.hoja2ContentPDFOT(datos_ot));
+    // if (this.sellado) data.push(this.hoja2ContentPDFOT(datos_ot));
+    return data;
+  }
+
+  // Funcion que va a crear la hoja 1 del PDF
+  private hoja1ContentPDFOT(datos_ot) {
+    let data: any[] = [];
+    data.push(
+      this.tituloMezclasOT(datos_ot),
+      '\n',
+      this.datosMezclasOT(datos_ot),
+      '\n\n',
+      this.tituloExtrusionOT(),
+      this.datosExtrusionOT(datos_ot),
+      '\n',
+      this.observacionOT(datos_ot),
+    )
+    return data;
+  }
+
+  // Funcion que va a colocar el nombre de la mezcla que tiene el item
+  private tituloMezclasOT(datos_ot) {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [{ text: this.txtOT(datos_ot.mezcla_Nombre) == '' ? 'MATERIA PRIMA' : this.txtOT(datos_ot.mezcla_Nombre), style: 'titulosTablas' }]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla
+  private datosMezclasOT(datos_ot) {
+    let validacion: boolean = Math.max(...[
+      this.txtOT(datos_ot.m1C1_nombre).length,
+      this.txtOT(datos_ot.m2C1_nombre).length,
+      this.txtOT(datos_ot.m3C1_nombre).length,
+      this.txtOT(datos_ot.m4C1_nombre).length,
+      this.txtOT(datos_ot.p1C1_Nombre).replace('PIGMENTO', 'PIG.').length,
+      this.txtOT(datos_ot.p2C1_Nombre).replace('PIGMENTO', 'PIG.').length
+    ]) > 20;
+
+    return {
+      columns: [
+        this.columna1MezclaOT(datos_ot, validacion),
+        this.columna2MezclaOT(datos_ot, validacion),
+        this.columna3MezclaOT(datos_ot, validacion),
+      ],
+      fontSize: 9,
+      columnGap: 10
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla en la capa 1
+  private columna1MezclaOT(datos_ot, validacion) {
+    return {
+      width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
+      table: {
+        widths: [40, '*', 'auto'],
+        heights: (row) => (row) * 3,
+        body: [
+          [
+            { colSpan: 3, text: `CAPA UNICA`, alignment: 'center', style: 'titulosTablas' },
+            {},
+            {}
+          ],
+          [
+            { border: [true, false, false, false], text: `(%) Capa:` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa1 ?? 0}%` },
+            { border: [false, false, true, false], text: `` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 1:` },
+            { border: [], text: `${datos_ot.m1C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m1C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa1 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 2:` },
+            { border: [], text: `${datos_ot.m2C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m2C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa1 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 3:` },
+            { border: [], text: `${datos_ot.m3C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m3C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa1 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 4:` },
+            { border: [], text: `${datos_ot.m4C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m4C1_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa1 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Pig. 1:` },
+            { border: [], text: `${datos_ot.p1C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txtOT(datos_ot.p1C1_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa1 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, true], text: `Pig. 2:` },
+            { border: [false, false, false, true], text: `${datos_ot.p2C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txtOT(datos_ot.p2C1_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa1 ?? 0}%` }
+          ],
+        ]
+      }
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla en la capa 2
+  private columna2MezclaOT(datos_ot, validacion) {
+    return {
+      width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
+      table: {
+        widths: [40, '*', 'auto'],
+        heights: (row) => (row) * 3,
+        body: [
+          [
+            { colSpan: 3, text: `CAPA INTERNA`, alignment: 'center', style: 'titulosTablas', },
+            {},
+            {}
+          ],
+          [
+            { border: [true, false, false, false], text: `(%) Capa:` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa2 ?? 0}%` },
+            { border: [false, false, true, false], text: `` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 1:` },
+            { border: [], text: `${datos_ot.m1C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m1C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa2 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 2:` },
+            { border: [], text: `${datos_ot.m2C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m2C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa2 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 3:` },
+            { border: [], text: `${datos_ot.m3C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m3C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa2 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 4:` },
+            { border: [], text: `${datos_ot.m4C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m4C2_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa2 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Pig. 1:` },
+            { border: [], text: `${datos_ot.p1C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txtOT(datos_ot.p1C2_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa2 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, true], text: `Pig. 2:` },
+            { border: [false, false, false, true], text: `${datos_ot.p2C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txtOT(datos_ot.p2C2_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa2 ?? 0}%` }
+          ],
+        ]
+      }
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla en la capa 3
+  private columna3MezclaOT(datos_ot, validacion) {
+    return {
+      width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
+      table: {
+        widths: [40, '*', 'auto'],
+        heights: (row) => (row) * 3,
+        body: [
+          [
+            { colSpan: 3, text: `CAPA EXTERNA`, alignment: 'center', style: 'titulosTablas', },
+            {},
+            {}
+          ],
+          [
+            { border: [true, false, false, false], text: `(%) Capa: ` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa3 ?? 0}%` },
+            { border: [false, false, true, false], text: `` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 1:` },
+            { border: [], text: `${datos_ot.m1C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m1C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa3 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 2:` },
+            { border: [], text: `${datos_ot.m2C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m2C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa3 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 3:` },
+            { border: [], text: `${datos_ot.m3C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m3C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa3 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 4:` },
+            { border: [], text: `${datos_ot.m4C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : this.txtOT(datos_ot.m4C3_nombre)}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa3 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Pig. 1:` },
+            { border: [], text: `${datos_ot.p1C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txtOT(datos_ot.p1C3_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa3 ?? 0}%` }
+          ],
+          [
+            { border: [true, false, false, true], text: `Pig. 2:` },
+            { border: [false, false, false, true], text: `${datos_ot.p2C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : this.txtOT(datos_ot.p2C3_Nombre).replace('PIGMENTO', 'PIG.')}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa3 ?? 0}%` }
+          ],
+        ]
+      }
+    }
+  }
+
+  // Funcion que va a colocar 'EXTRUSIÓN' en la hoja 1
+  private tituloExtrusionOT() {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [{ text: `EXTRUSIÓN`, style: 'titulosTablas' }]
+        ]
+      }
+    };
+  }
+
+  /**
+   * Devuelve el texto de grafilado a mostrar en el PDF de la OT.
+   * @param grafilado Valor de grafilado de extrusión (puede no venir si la OT se consultó desde BagPro).
+   * @returns 'SÍ' si es verdadero, 'NO' si es falso y 'NO APLICA' si no hay valor.
+   */
+  private textoGrafiladoPDFOT(grafilado: boolean | null | undefined): string {
+    if (grafilado === true) return 'SÍ';
+    if (grafilado === false) return 'NO';
+    return 'NO APLICA';
+  }
+
+  /**
+   * Coloca en la hoja 1 la tabla con la información de extrusión, incluido el grafilado a la derecha de tratado.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla de extrusión.
+   */
+  private datosExtrusionOT(datos_ot) {
+    return {
+      table: {
+        widths: [60, 60, '*', 40, 55, 55, 50, 55],
+        body: [
+          [
+            { text: `Pigmento`, style: 'subtituloTablas' },
+            { text: `Formato`, style: 'subtituloTablas' },
+            { text: `Ancho`, style: 'subtituloTablas' },
+            { text: `Und Medida`, style: 'subtituloTablas' },
+            { text: `Calibre`, style: 'subtituloTablas' },
+            { text: `Peso MT \n(Min/Max)`, style: 'subtituloTablas' },
+            { text: `Tratado`, style: 'subtituloTablas' },
+            { text: `Grafilado`, style: 'subtituloTablas' }
+          ],
+          [{}, {}, {}, {}, {}, {}, {}, {}],
+          [
+            { border: [false, false, false, false], text: `${this.txtOT(datos_ot.pigmento_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.txtOT(datos_ot.formato_Extrusin)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.numOT(datos_ot.ancho1_Extrusion)}   +   ${this.numOT(datos_ot.ancho2_Extrusion)}   +   ${this.numOT(datos_ot.ancho3_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.txtOT(datos_ot.und_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.numOT(datos_ot.calibre_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.numOT(datos_ot.peso_Extrusion)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.txtOT(datos_ot.tratado)}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.textoGrafiladoPDFOT(datos_ot.extrusion_Grafilado)}`, alignment: 'center', }
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+  }
+
+  /**
+   * Coloca en la hoja 1 la observación del proceso de extrusión (la observación general ya no se usa).
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la observación de extrusión.
+   */
+  private observacionOT(datos_ot) {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación Extrusión: `, style: 'subtitulo' }],
+          [{ border: [true, false, true, true], text: this.textoObservacionPDFOT(datos_ot.extrusion_Observacion) }]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  /**
+   * Arma el contenido de la hoja 2: procesos, cyrel y, al final, la tabla de observaciones por proceso.
+   * Si la OT no lleva cyrel se omite su separador para que la tabla de observaciones quede más arriba.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Arreglo de nodos pdfmake de la hoja 2.
+   */
+  private hoja2ContentPDFOT(datos_ot) {
+    let data: any[] = [];
+    const llevaCyrel: boolean = datos_ot.cyrel == true || datos_ot.cyrel == '1';
+    const observaciones = this.observacionesPorProcesoPDFOT(datos_ot);
+    data.push(this.procesosHoja2OT(datos_ot));
+    if (llevaCyrel) data.push('\n', this.cyrelPDFOT(datos_ot));
+    if (observaciones) data.push('\n', observaciones);
+    return data;
+  }
+
+  /**
+   * Coloca en la hoja 2 las tablas de cada proceso. El margen superior negativo acerca la primera fila
+   * a la tabla del encabezado para reducir el espacio que deja el margen superior de la página.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con las tablas de los procesos.
+   */
+  private procesosHoja2OT(datos_ot) {
+    return {
+      pageBreak: 'before',
+      margin: [0, -18, 0, 0],
+      table: {
+        widths: ['*', 20, '*'],
+        body: [
+          [this.procesoExtrusionOT(datos_ot), {}, this.procesoLaminadoOT(datos_ot)],
+          [{}, {}, {}],
+          [this.procesoImpresionOT(datos_ot), {}, this.productoTermiandoOT(datos_ot),]
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+  }
+
+  /**
+   * Coloca en la hoja 2 la información del proceso de extrusión, con el grafilado debajo de tratado caras.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla del proceso de extrusión.
+   */
+  private procesoExtrusionOT(datos_ot) {
+    return {
+      table: {
+        widths: ['*', '*', '*'],
+        body: [
+          [
+            { colSpan: 3, text: `EXTRUSIÓN`, style: 'titulosTablas', border: [true, true, true, true] },
+            {},
+            {}
+          ],
+          [
+            { text: `Pigmento: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.pigmento_Extrusion)}` },
+            {}
+          ],
+          [
+            { text: `Formato: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.formato_Extrusin)}` },
+            {}
+          ],
+          [
+            { text: `Calibre: `, style: 'subtitulo' },
+            { text: `${this.numOT(datos_ot.calibre_Extrusion)}` },
+            {}
+          ],
+          [
+            { text: `Unidad Medida: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.und_Extrusion)}` },
+            {}
+          ],
+          [
+            { text: `ANCHO`, style: 'subtitulo' },
+            { text: `${this.numOT(datos_ot.ancho1_Extrusion)}   +   ${this.numOT(datos_ot.ancho2_Extrusion)}   +` },
+            { text: `   ${this.numOT(datos_ot.ancho3_Extrusion)}` }
+          ],
+          [
+            { text: `Peso MT (Min/Max): `, style: 'subtitulo' },
+            { text: `${this.numOT(datos_ot.peso_Extrusion)}` },
+            {}
+          ],
+          [
+            { text: `Tratado Caras: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tratado)}` },
+            {}
+          ],
+          [
+            { text: `Grafilado: `, style: 'subtitulo' },
+            { text: `${this.textoGrafiladoPDFOT(datos_ot.extrusion_Grafilado)}` },
+            {}
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 la información del proceso de laminado
+  private procesoLaminadoOT(datos_ot) {
+    return {
+      table: {
+        widths: ['*', '*', '*'],
+        body: [
+          [
+            { colSpan: 3, text: `LAMINADO`, style: 'titulosTablas', border: [true, true, true, true] },
+            {},
+            {}
+          ],
+          [
+            { text: `CAPA`, style: 'subtitulo' },
+            { text: `CALIBRE`, style: 'subtitulo' },
+            { text: `CANTIDAD`, style: 'subtitulo' }
+          ],
+          [
+            { text: `${this.txtOT(datos_ot.laminado_Capa1)}`, },
+            { text: `${this.numOT(datos_ot.calibre_Laminado_Capa1)}`, },
+            { text: `${this.numOT(datos_ot.cantidad_Laminado_Capa1)}`, }
+          ],
+          [
+            { text: `${this.txtOT(datos_ot.laminado_Capa2)}`, },
+            { text: `${this.numOT(datos_ot.calibre_Laminado_Capa2)}`, },
+            { text: `${this.numOT(datos_ot.cantidad_Laminado_Capa2)}`, }
+          ],
+          [
+            { text: `${this.txtOT(datos_ot.laminado_Capa3)}`, },
+            { text: `${this.numOT(datos_ot.calibre_Laminado_Capa3)}`, },
+            { text: `${this.numOT(datos_ot.cantidad_Laminado_Capa3)}`, }
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 la información del proceso de impresión
+  private procesoImpresionOT(datos_ot) {
+    return {
+      table: {
+        widths: ['*', '*'],
+        body: [
+          [
+            { colSpan: 2, text: `IMPRESIÓN`, style: 'titulosTablas', border: [true, true, true, true] },
+            {},
+          ],
+          [
+            { text: `Tipo Impresión: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tipo_Impresion) == 'NO APLICA' ? 'FLEXOGRAFIA' : this.txtOT(datos_ot.tipo_Impresion)}` }
+          ],
+          [
+            { text: `Rodillo N°: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.rodillo)}` }
+          ],
+          [
+            { text: `N° de Pista: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.pista)}` }
+          ],
+          [
+            { text: `Tinta 1: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta1)}` }
+          ],
+          [
+            { text: `Tinta 2: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta2)}` }
+          ],
+          [
+            { text: `Tinta 3: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta3)}` }
+          ],
+          [
+            { text: `Tinta 4: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta4)}` }
+          ],
+          [
+            { text: `Tinta 5: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta5)}` }
+          ],
+          [
+            { text: `Tinta 6: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta6)}` }
+          ],
+          [
+            { text: `Tinta 7: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta7)}` }
+          ],
+          [
+            { text: `Tinta 8: `, style: 'subtitulo' },
+            { text: `${this.txtOT(datos_ot.tinta8)}` }
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  /**
+   * Coloca en la hoja 2 la información de producto terminado (sellado/corte), con la solapa al lado del fuelle.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla de producto terminado.
+   */
+  private productoTermiandoOT(datos_ot) {
+    // Las OT que vienen de BagPro no traen la solapa, por eso se toma 0 por defecto
+    const solapa: number = Number(datos_ot.selladoCorte_Solapa) || 0;
+    return {
+      table: {
+        widths: ['*', '*', '*', '*'],
+        body: [
+          [
+            { colSpan: 4, text: `PRODUCTO TERMINADO`, style: 'titulosTablas', border: [true, true, true, true] },
+            {},
+            {},
+            {},
+          ],
+          [
+            { text: `Formato Bolsa: `, style: 'subtitulo' },
+            { colSpan: 2, text: `${this.txtOT(datos_ot.formato_Producto)}`, alignment: 'center', },
+            {},
+            { text: ``, },
+          ],
+          [
+            { text: `Ancho`, alignment: 'center', style: 'subtitulo' },
+            { text: `Largo`, alignment: 'center', style: 'subtitulo' },
+            { text: `Fuelle`, alignment: 'center', style: 'subtitulo' },
+            { text: `Solapa`, alignment: 'center', style: 'subtitulo' },
+          ],
+          [
+            { text: `${this.numOT(datos_ot.selladoCorte_Ancho)}   x`, alignment: 'center', },
+            { text: `${this.numOT(datos_ot.selladoCorte_Largo)}   x`, alignment: 'center', },
+            { text: `${this.numOT(datos_ot.selladoCorte_Fuelle)}`, alignment: 'center', },
+            { text: `${this.numOT(solapa)}   ${this.txtOT(datos_ot.und_Extrusion)}`, alignment: 'center', },
+          ],
+          [{}, {}, {}, {}],
+          [{}, {}, {}, {}],
+          [
+            { text: `Sellado: `, style: 'subtitulo' },
+            { colSpan: 3, text: `${this.txtOT(datos_ot.tpSellados_Nombre)}` },
+            {},
+            {},
+          ],
+          [
+            { text: `Margen: `, style: 'subtitulo' },
+            { colSpan: 3, text: `${this.numOT(datos_ot.margen)}` },
+            {},
+            {},
+          ],
+          [
+            { text: `Peso Millar: `, style: 'subtitulo' },
+            { colSpan: 3, text: `${this.numOT(datos_ot.selladoCorte_PesoMillar)}` },
+            {},
+            {},
+          ],
+          [
+            { text: `Cant. x Paquete: `, style: 'subtitulo' },
+            { colSpan: 3, text: `${this.numOT(datos_ot.selladoCorte_CantBolsasPaquete)}` },
+            {},
+            {},
+          ],
+          [
+            { text: `Cant. x Bulto: `, style: 'subtitulo' },
+            { colSpan: 3, text: `${this.numOT(datos_ot.selladoCorte_CantBolsasBulto)}` },
+            {},
+            {},
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 si a la orden de trabajo se le debe crear un cyrel o no
+  private cyrelPDFOT(datos_ot) {
+    return datos_ot.cyrel == true || datos_ot.cyrel == '1' ? {
+      table: {
+        margin: [15, 5],
+        widths: [20, '*', 20],
+        body: [
+          [
+            {},
+            { text: `Hacer Cyrel`, style: 'titulosTablas', border: [true, true, true, true] },
+            {}
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+    } : {}
+  }
+
+  /**
+   * Arma la tabla de observaciones por proceso de la hoja 2. Solo incluye las filas que tienen observación,
+   * para no ocupar espacio con procesos vacíos ni desbordar el contenido a otra hoja.
+   * "Producto Terminado" muestra la observación compartida de corte y sellado.
+   * La observación general ya no se usa y la de extrusión se muestra solo en la hoja 1.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla, o null si ningún proceso tiene observación.
+   */
+  private observacionesPorProcesoPDFOT(datos_ot) {
+    const filas = [
+      { proceso: `Laminado`, texto: this.textoObservacionPDFOT(datos_ot.laminado_Observacion) },
+      { proceso: `Impresión`, texto: this.textoObservacionPDFOT(datos_ot.impresion_Observacion) },
+      { proceso: `Producto Terminado`, texto: this.textoObservacionPDFOT(datos_ot.selladoCorte_Observacion) },
+    ].filter(fila => fila.texto != '');
+
+    if (filas.length == 0) return null;
+
+    return {
+      table: {
+        widths: [120, '*'],
+        headerRows: 2,
+        dontBreakRows: true,
+        body: [
+          [
+            { colSpan: 2, text: `OBSERVACIONES POR PROCESO`, style: 'titulosTablas', border: [true, true, true, true] },
+            {}
+          ],
+          [
+            { text: `Proceso`, style: 'subtituloTablas' },
+            { text: `Observación`, style: 'subtituloTablas' }
+          ],
+          ...filas.map(fila => [
+            { text: fila.proceso, style: 'subtitulo' },
+            { text: fila.texto }
+          ]),
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  /**
+   * Normaliza el texto de una observación para el PDF. Las OT que vienen de BagPro no traen
+   * las observaciones por proceso, por eso se toleran valores nulos o indefinidos.
+   * @param valor Observación tal como llega de la API.
+   * @returns Observación sin espacios sobrantes, o cadena vacía si no existe.
+   */
+  private textoObservacionPDFOT(valor: any): string {
+    return valor == null ? '' : valor.toString().trim();
+  }
+
+  // Función que va a colocar el footer del PDF
+  private footerPDFOT(usuario: string) {
+    return function (currentPage: any, pageCount: any) {
+      return [
+        '\n',
+        {
+          columns: [
+            { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+            { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+            { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+          ]
+        }
+      ]
+    }
+  }
+
+  // Funcion que va a colocar los estilos en el PDF
+  private stylesPDFOT() {
+    return {
+      header: { fontSize: 7, bold: true },
+      titulo: { fontSize: 11, bold: true },
+      ot: { fontSize: 11, bold: true },
+      orden_trabajo: { fontSize: 30, bold: true },
+      subtitulo: { fontSize: 10, bold: true },
+      titulosTablas: {
+        border: [false, false, false, false],
+        fillColor: '#cccccc',
+        alignment: 'center',
+        bold: true,
+        fontSize: 11
+      },
+      subtituloTablas: {
+        border: [false, false, false, false],
+        fillColor: '#eeeeee',
+        alignment: 'center',
+        bold: true,
+        fontSize: 10
+      },
+      datosTablaExtrusion: {
+        alignment: 'center',
+        border: [false, false, false, false],
+      }
+    }
   }
 }
 
