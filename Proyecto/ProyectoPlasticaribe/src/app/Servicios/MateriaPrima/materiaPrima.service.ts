@@ -57,6 +57,10 @@ export class MateriaPrimaService {
 
   getAllSubcategoriesForName = (ref : string, proceso : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getAllSubcategoriesForName/${ref}/${proceso}`);
 
+  /** Busca subcategorías del proceso por Id o por parte del nombre (materias primas en EXT, tintas en los demás). */
+  buscarSubcategorias = (texto : string, proceso : string) : Observable<any[]> =>
+    this.http.get<any[]>(this.rutaPlasticaribeAPI + `/Materia_Prima/buscarSubcategorias/${proceso}`, { params: { texto } });
+
   srvAgregar = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
 
   srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);

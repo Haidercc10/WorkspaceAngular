@@ -12,6 +12,24 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   width: 100%;
 }
 
+/* Inputs con botón X para limpiar su contenido */
+.input-limpiable {
+  position: relative;
+}
+
+.input-limpiable input {
+  padding-right: 2.5rem;
+}
+
+.boton-limpiar-input {
+  position: absolute;
+  top: 50%;
+  right: 0.25rem;
+  z-index: 2;
+  transform: translateY(-50%);
+  color: #5d6d7e;
+}
+
 ::ng-deep .p-card {
   align-items: center;
   margin: auto;

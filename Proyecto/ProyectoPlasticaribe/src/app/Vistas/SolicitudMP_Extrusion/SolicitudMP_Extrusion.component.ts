@@ -80,6 +80,17 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   cargandoMaterialesAsignados: boolean = false; //Indica que se están consultando los materiales asignados
   materialesAsignados: MaterialAsignadoOT[] = [];
 
+  /** Subcategoría obtenida en la última selección; se usa para validar que el Id y nombre del formulario no se alteraron. */
+  private subcategoriaConsultada: { id: number; nombre: string } | null = null;
+
+  /** Indica si hay una subcategoría seleccionada; bloquea Und porque se toma de la subcategoría. */
+  get haySubcategoriaConsultada(): boolean {
+    return this.subcategoriaConsultada !== null;
+  }
+
+  /** Momento (ms) del último aviso de encabezado incompleto; evita repetir el mensaje en cada tecla. */
+  private ultimoAvisoProceso: number = 0;
+
   /** Total solicitado al cargar la solicitud en edición; sirve para validar solo el aumento contra el límite de la OT. */
   private totalOriginalSolicitud: number = 0;
   /** Acción que ejecuta el botón "Sí" del mensaje de confirmación de la solicitud. */
@@ -214,10 +225,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   /** Limpia los campos de la vista y restablece el estado inicial. */
   LimpiarCampos() {
     const proceso = this.formEncabezado.get('proceso')?.value;
-    this.formMP.reset();
+    this.limpiarCamposMP();
     this.formEncabezado.reset();
     this.formEncabezado.patchValue({ fecha: moment().format('YYYY-MM-DD'), proceso });
-    this.formMP.patchValue({ und: 'Kg' });
     this.cantRestante = 0;
     this.kgOT = 0;
     this.load = false;
@@ -229,9 +239,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     this.accionPendiente = null;
   }
 
+  /** Limpia el formulario de subcategoría (Id, nombre, cantidad, disponible, stock y und) y la subcategoría consultada. */
   limpiarCamposMP() {
     this.formMP.reset();
     this.formMP.patchValue({ und: 'Kg' });
+    this.subcategoriaConsultada = null;
   }
 
   obtenerProcesos() {
@@ -319,12 +331,51 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     return this.materialesAsignados.reduce((total, m) => total + (m.esDevolucion ? -m.cantidad : m.cantidad), 0);
   }
 
+  /**
+   * El campo Subcategoría está bloqueado mientras el encabezado no es válido; aun así recibe las teclas.
+   * Si el usuario intenta escribir o borrar, se le indica qué le falta del encabezado.
+   */
+  validarEncabezadoAlDigitar(event: KeyboardEvent) {
+    if (this.formEncabezado.valid) return;
+    const editaTexto = event.key?.length === 1 || ['Backspace', 'Delete'].includes(event.key);
+    if (!editaTexto || event.ctrlKey || event.metaKey || event.altKey) return;
+    this.avisarEncabezadoIncompleto();
+  }
+
+  /**
+   * Advierte qué falta del encabezado para consultar una subcategoría. Mientras el aviso sigue visible
+   * no se repite, para no apilar un mensaje por cada tecla.
+   */
+  private avisarEncabezadoIncompleto() {
+    const ahora = Date.now();
+    if (ahora - this.ultimoAvisoProceso < 3000) return;
+    this.ultimoAvisoProceso = ahora;
+    this.subcategories = [];
+
+    const encabezado = this.formEncabezado.value;
+    if (!encabezado.proceso) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un proceso para consultar una subcategoría!`);
+
+    const faltantes: string[] = [];
+    if (!encabezado.ot || encabezado.kgOt == null) faltantes.push('consultar la OT');
+    if (!encabezado.maq) faltantes.push('seleccionar la máquina');
+    const detalle = faltantes.length > 0 ? faltantes.join(' y ') : 'completar el encabezado';
+    this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe ${detalle} para consultar una subcategoría!`);
+  }
+
+  /**
+   * Busca subcategorías por Id (desde 1 dígito) o por nombre (desde 3 caracteres).
+   * Descarta respuestas que lleguen después de que el texto del campo haya cambiado.
+   */
   getAllSubcategories() {
-    const material: string = this.formMP.value.subcat_Nombre;
+    const texto: string = (this.formMP.value.subcat_Nombre ?? '').toString().trim();
     const proceso: string = this.formEncabezado.get('proceso')?.value;
-    if (material && material.trim().length > 2) {
-      this.materiaPrimaService.getAllSubcategoriesForName(material, proceso).pipe(takeUntil(this.destroy$)).subscribe(datos => this.subcategories = datos);
-    }
+    if (!proceso) return this.avisarEncabezadoIncompleto();
+    const esId = /^\d+$/.test(texto);
+    if (!esId && texto.length < 3) return;
+
+    this.materiaPrimaService.buscarSubcategorias(texto, proceso).pipe(takeUntil(this.destroy$)).subscribe(datos => {
+      if ((this.formMP.value.subcat_Nombre ?? '').toString().trim() === texto) this.subcategories = datos;
+    });
   }
 
   /** Carga la subcategoría elegida en el formulario junto con su disponible informativo. */
@@ -332,15 +383,18 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     const data: any = this.subcategories.find(x => x.id_Subcategoria == this.formMP.value.subcat_Nombre);
     if (!data) return;
 
+    this.subcategoriaConsultada = { id: data.id_Subcategoria, nombre: data.subcategoria };
     this.formMP.patchValue({
       'subcat_Id': data.id_Subcategoria,
       'subcat_Nombre': data.subcategoria,
       'cantidad': 0,
-      'und': data.und,
+      'und': data.und ?? 'Kg', // Las subcategorías de tintas (IMP, EMP, LAM) no traen unidad desde la API
       'stock': data.stock,
       'disponible': null,
     });
     this.servicioSolicitudMpExt.getReservas([data.id_Subcategoria]).pipe(takeUntil(this.destroy$)).subscribe(reservas => {
+      // Si mientras tanto se limpió o se eligió otra subcategoría, no se pisa el disponible con el de esta.
+      if (this.subcategoriaConsultada?.id != data.id_Subcategoria) return;
       this.formMP.patchValue({ disponible: reservas[0]?.disponible ?? data.stock });
     });
   }
@@ -349,6 +403,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   validarCamposVaciosMPRetirada() {
     const form = this.formMP.value;
     if (!this.formMP.valid) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `Hay campos vacíos en el formulario de subcategoría!`);
+    if (!this.subcategoriaConsultada || this.subcategoriaConsultada.id != form.subcat_Id || this.subcategoriaConsultada.nombre !== form.subcat_Nombre)
+      return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La subcategoría del formulario no corresponde a la seleccionada, selecciónela nuevamente!`);
     if (!(form.cantidad > 0)) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar debe ser mayor a cero (0)!`);
     if (this.subcategoriasSeleccionadas.some(x => x.Id == form.subcat_Id)) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La subcategoría ${form.subcat_Nombre} ya ha sido seleccionada!`);
 
@@ -562,6 +618,13 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   /** Función para cargar las máquinas disponibles */
+  /** Al cambiar el proceso limpia la subcategoría cargada (y sus resultados de búsqueda), que pertenecían al proceso anterior, y recarga las máquinas. */
+  cambiarProceso() {
+    this.limpiarCamposMP();
+    this.subcategories = [];
+    this.cargarMaquinas();
+  }
+
   cargarMaquinas() {
     const proceso: string = this.formEncabezado.value.proceso;
     this.maquinas = [];

@@ -50,7 +50,7 @@
             <p-dropdown formControlName="proceso" inputId="Proceso" [readonly]="![1,104].includes(ValidarRol)"
               [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre"
               optionValue="proceso_Id"
-              (onChange)="cargarMaquinas()"
+              (onChange)="cambiarProceso()"
               ></p-dropdown>
             <label for="Proceso">Proceso</label>
           </span>
@@ -180,19 +180,23 @@
         <!-- Id subcategoria -->
         <div class="col-xs-12 col-sm-12 col-md-2 col-lg-1 col-xl-1 col-xxl-1" id="idMp">
           <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input formControlName="subcat_Id" id="IdMP" type="number" pInputText min="0" required />
+            <i class="pi pi-hashtag"></i>
+            <input formControlName="subcat_Id" id="IdMP" type="number" pInputText [readonly]="true" required />
             <label for="IdMP">Id</label>
           </span>
         </div>
 
         <!-- Nombre subcategoria -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4" id="nombreMp">
-          <span class="p-input-icon-left p-float-label">
+          <span class="p-input-icon-left p-float-label input-limpiable">
             <i class="pi pi-box"></i>
             <app-selector-material formControlName="subcat_Nombre" inputId="MP" [opciones]="subcategories"
-              campoId="id_Subcategoria" campoNombre="subcategoria" campoStock="stock" [busquedaRemota]="true" [minLength]="3"
-              [readonly]="!formEncabezado.valid" (buscar)="getAllSubcategories()" (seleccionar)="loadMaterialInField()"></app-selector-material>
+              campoId="id_Subcategoria" campoNombre="subcategoria" campoStock="stock" [busquedaRemota]="true" [minLength]="1"
+              [readonly]="!formEncabezado.valid" (keydown)="validarEncabezadoAlDigitar($event)" (buscar)="getAllSubcategories()" (seleccionar)="loadMaterialInField()"></app-selector-material>
+            <button *ngIf="formMP.get('subcat_Nombre')?.value || formMP.get('subcat_Id')?.value"
+              pButton type="button" class="p-button-text p-button-rounded p-button-sm boton-limpiar-input"
+              icon="pi pi-times" aria-label="Limpiar subcategoría" pTooltip="Limpiar subcategoría" tooltipPosition="top"
+              (click)="limpiarCamposMP()"></button>
             <label for="MP"> Subcategoria</label>
           </span>
         </div>
@@ -229,7 +233,7 @@
         <!-- Unidad de Medida -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-1" id="und">
           <span class="p-float-label">
-            <p-dropdown formControlName="und" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida"
+            <p-dropdown formControlName="und" inputId="Und" [autoDisplayFirst]="false" [readonly]="haySubcategoriaConsultada" [options]="unidadMedida"
               optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
             <label for="Und">Und</label>
           </span>
