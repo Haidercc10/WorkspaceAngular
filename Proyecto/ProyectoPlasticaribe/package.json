@@ -1,6 +1,6 @@
 {
   "name": "proyecto-plasticaribe",
-  "version": "7.3.0",
+  "version": "7.3.1",
   "scripts": {
     "ng": "ng",
     "version": "node scripts/generar-version.js",
