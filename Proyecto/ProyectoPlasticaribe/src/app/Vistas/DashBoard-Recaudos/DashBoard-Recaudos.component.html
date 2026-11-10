@@ -6,51 +6,56 @@
 </div>
 
 <div class="fondo">
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-
-  <div class="row m-3">
-    <p-toolbar class="m-3">
-      <div class="row g-3" style="width: 100%;">
-        <div class="col-md-12 m-auto text-center">
-          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de Busqueda</h4>
+  <!-- Todas las secciones usan .seccion-recaudos: mismo margen a ambos lados, así comparten el mismo ancho -->
+  <div class="seccion-recaudos mt-4">
+    <p-toolbar>
+      <div class="row g-0" style="width: 100%;">
+        <div class="col-12 text-center pt-2">
+          <!-- Título de filtros con el botón del tutorial en el extremo derecho -->
+          <div class="titulo-filtros">
+            <h4 class="m-0" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de Búsqueda</h4>
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" class="btn-tutorial" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+          </div>
+          <p-divider styleClass="mt-3 mb-0"></p-divider>
         </div>
 
-        <div class="col-md-12">
+        <div class="col-12">
           <!-- FILTROS -->
-          <form [formGroup]="FormFiltros" (ngSubmit)="tiempoExcedido()">
-            <div class="row g-4 my-3">
+          <form [formGroup]="FormFiltros" (ngSubmit)="tiempoExcedido2()">
+            <div class="row g-4 pt-2 pb-3 align-items-center">
 
               <!-- CLIENTES -->
-              <div class="col-sm-12 col-md-12 col-lg-3">
-                <span class="p-float-label">
-                  <p-multiSelect formControlName="Cliente" inputId="Cliente" [options]="clientes" optionLabel="displayLabel" optionValue="idcliente"></p-multiSelect>
+              <div class="col-sm-12 col-md-12 col-lg-3" id="filtroCliente">
+                <span class="p-input-icon-left p-float-label">
+                  <i class="pi pi-users"></i>
+                  <p-multiSelect formControlName="Cliente" inputId="Cliente" [options]="clientes" optionLabel="displayLabel" optionValue="idcliente" [virtualScroll]="true" [virtualScrollItemSize]="40"></p-multiSelect>
                   <label for="Cliente">Cliente</label>
                 </span>
               </div>
         
               <!-- VENDEDORES -->
-              <div class="col-sm-12 col-md-12 col-lg-3" *ngIf="[1,69,103].includes(ValidarRol)">
-                <span class="p-float-label">
+              <div class="col-sm-12 col-md-12 col-lg-3" *ngIf="[1,69,103].includes(ValidarRol)" id="filtroVendedor">
+                <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+                  <i class="pi pi-user"></i>
                   <p-dropdown formControlName="Vendedor" id="Nombre" [autoDisplayFirst]="false" appendTo="body" [options]="vendedores" [showClear]="true" ></p-dropdown>
                   <label for="Nombre">Vendedor</label>
                 </span>
               </div>
 
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="iva">
-                <div class="field-checkbox">
-                  <p-checkbox formControlName="CarteraOriginal" [binary]="true" inputId="iva"></p-checkbox>
-                  <label for="iva"><p-chip label="Cartera Original" icon="pi pi-money-bill"></p-chip></label>
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="filtroCarteraOriginal">
+                <div class="field-checkbox mb-0 check-cartera-original">
+                  <p-checkbox formControlName="CarteraOriginal" [binary]="true" inputId="carteraOriginal"></p-checkbox>
+                  <!-- Al hacer clic en el chip se marca/desmarca el checkbox -->
+                  <label (click)="FormFiltros.patchValue({ CarteraOriginal: !FormFiltros.value.CarteraOriginal })"><p-chip label="Cartera Original" icon="pi pi-money-bill"></p-chip></label>
                 </div>
               </div>
         
               <!-- Botones -->
               <div class="col-sm-12 col-md-12 col-lg-4">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botonesFiltros">
                   <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
                   <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="FormFiltros.reset()"></button>
-                  <button pButton class="p-button-danger" type="button" label="PDF" icon="pi pi-file-pdf" (click)="generarPDF()"></button>
+                  <button pButton class="p-button-danger" type="button" label="PDF" icon="pi pi-file-pdf" (click)="generarPDF2()"></button>
                   <button pButton class="p-button-success" type="button" label="Excel" icon="pi pi-file-excel" (click)="exportExcel()"></button>
                 </div>
               </div>
@@ -62,25 +67,73 @@
   </div>
 
   <!-- Cards de Costos -->
-  <div class="row g-3 text-center fila-1">
+  <div class="row g-3 text-center fila-1 fila-total-cartera">
     <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 p-3"></div>
 
     <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
-      <p-card id="totalCartera">
-        <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-3">
+      <p-card id="totalCartera" class="card-total-cartera">
+        <!-- Botón que abre el panel con el detalle de la cartera -->
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-info" class="btn-detalle-cartera" id="btnDetalleCartera"
+          [style]="{width: '25px', height: '25px'}" (click)="detalleCartera.toggle($event)"
+          pTooltip="Ver detalle de la cartera" tooltipPosition="top"></p-button>
+
+        <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-2">
           <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wallet"></i> Total Cartera</h3>
         </div>
-        <div>
-          <h4><b>{{totalCartera() | currency : ' COP $'}}</b></h4>
+        <div class="total-cartera">
+          <span class="total-cartera-corto">{{totalCarteraCorto}}</span>
+          <small class="total-cartera-completo">{{totalCarteraValor | currency : ' COP $'}}</small>
         </div>
       </p-card>
+
+      <!-- Panel de detalle de la cartera (sin máscara de fondo) -->
+      <p-overlayPanel #detalleCartera styleClass="panel-detalle-cartera">
+        <div class="detalle-cartera">
+          <div *ngIf="cargandoResumen" class="detalle-mensaje">Cargando...</div>
+          <div *ngIf="!cargandoResumen && !resumenCartera" class="detalle-mensaje">Sin información de cartera</div>
+
+          <ng-container *ngIf="!cargandoResumen && resumenCartera as r">
+            <div class="detalle-titulo">Detalle de la cartera</div>
+            <div class="detalle-escala">{{r.facturas}} facturas · {{r.clientes}} clientes</div>
+            <div *ngIf="r.carteraOriginal" class="detalle-aviso"><i class="pi pi-info-circle"></i> Excluye facturas de más de 1.000 días</div>
+
+            <!-- Antigüedad de la cartera -->
+            <div class="detalle-subtitulo">Antigüedad</div>
+            <div class="barra-antiguedad">
+              <div *ngFor="let t of r.tramos" class="segmento" [style.width.%]="t.porcentaje" [style.background]="t.color"></div>
+            </div>
+            <ul class="leyenda-antiguedad">
+              <li *ngFor="let t of r.tramos">
+                <span class="punto" [style.background]="t.color"></span>
+                <span class="etiqueta">{{t.etiqueta}}</span>
+                <b class="valor">{{t.valorCorto}}</b>
+                <span class="porcentaje">{{t.porcentaje | number : '1.0-0'}}%</span>
+              </li>
+            </ul>
+
+            <!-- Indicadores -->
+            <div class="detalle-indicadores">
+              <div class="indicador">
+                <span class="indicador-titulo">Vencida</span>
+                <b class="indicador-valor vencida">{{r.vencidaCorto}}</b>
+                <span class="indicador-detalle">{{r.porcentajeVencida | number : '1.0-0'}}% del total</span>
+              </div>
+              <div class="indicador" *ngIf="r.mayorDeudor">
+                <span class="indicador-titulo">Mayor deudor</span>
+                <b class="indicador-valor">{{r.mayorDeudor.valorCorto}}</b>
+                <span class="indicador-detalle" [title]="r.mayorDeudor.nombre">{{r.mayorDeudor.nombre}}</span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </p-overlayPanel>
     </div>
 
     <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 p-3"></div>
   </div>
 
-  <div class="row g-3 text-center fila-2" id="facturas">
-    <div class="py-3 col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+  <div class="seccion-recaudos text-center" id="facturas">
+    <div>
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-dollar"></i> Cartera Detallada</h2>
         <p class="mb-4"><i class="pi pi-exclamation-triangle"></i> <b> Nota: </b> Ahora puedes ver los movimientos de facturas creadas desde Febrero de 2024, haciendo doble clic sobre la fila que tenga el N° de factura que desees revisar.</p>
@@ -144,8 +197,10 @@
     </div>
   </div>
 
-  <div class="row g-3 text-center fila-3">
-    <div class="py-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="carteraVendedores">
+  <!-- Cartera por vendedores y por clientes en la misma fila; juntas ocupan el ancho de la tarjeta de filtros -->
+  <div class="seccion-recaudos text-center">
+    <div class="grid-cartera">
+    <div id="carteraVendedores">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-user"></i> Cartera por Vendedores</h2>
         <p-table
@@ -178,7 +233,7 @@
       </p-card>
     </div>
 
-    <div class="py-3 px-2 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="carteraClientes">
+    <div id="carteraClientes">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-user"></i> Clientes en Cartera</h2>
         <p-table
@@ -221,6 +276,7 @@
           </ng-template>
         </p-table>
       </p-card>
+    </div>
     </div>
   </div>
 
