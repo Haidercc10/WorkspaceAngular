@@ -61,6 +61,15 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Existencias/getExistenciasProductos/${item}/${presentacion}`);
   }
 
+  /**
+   * Consulta en una sola petición los disponibles en bodega 003 de varios productos.
+   * @param productos Pares código de producto + presentación Zeus (UND, KLS, PAQ).
+   * @returns Disponibles sumados por producto y presentación; los productos sin existencia no se incluyen.
+   */
+  getExistenciasProductosLote(productos: { producto: string, presentacion: string }[]): Observable<{ producto: string, presentacion: string, disponibles: number }[]> {
+    return this.http.post<any[]>(this.rutaInventarioZeusAPI + `/Existencias/getExistenciasProductos`, productos);
+  }
+
   srvObtenerExistenciasZeusXId(Articulo: any): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/idArticulo/${Articulo}`);
   }

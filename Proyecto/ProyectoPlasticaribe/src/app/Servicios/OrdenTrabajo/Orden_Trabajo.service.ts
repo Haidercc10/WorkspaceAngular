@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { modelOrden_Trabajo } from '../../Modelo/modelOrden_Trabajo';
+import { CrearOrdenTrabajoCompleta, EditarOrdenTrabajoCompleta, RespuestaOrdenTrabajoCompleta } from '../../Modelo/modelOrdenTrabajoCompleta';
 
 @Injectable({
   providedIn: 'root'
@@ -37,9 +38,20 @@ export class Orden_TrabajoService {
 
   srvGuardar = (data : modelOrden_Trabajo): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Orden_Trabajo', data);
 
-  /** Crea la OT y sus procesos (extrusión, impresión, laminado y sellado/corte) en una sola transacción. */
-  crearOrdenCompleta = (data : any): Observable<{ ot_Id: number, numero_OT: number }> => this.http.post<{ ot_Id: number, numero_OT: number }>(this.rutaPlasticaribeAPI + '/Orden_Trabajo/crearCompleta', data);
+  /**
+   * Crea la OT y sus procesos (extrusión, impresión, laminado y sellado/corte) en una sola transacción.
+   * El número de OT, el creador, la fecha, la hora y el estado inicial los asigna la API.
+   * @param data Datos planos de la OT y de cada proceso.
+   * @returns Observable con el Ot_Id y el Numero_OT asignados; los errores llegan como ProblemDetails (400, 409, 422, 502).
+   */
+  crearOrdenCompleta = (data : CrearOrdenTrabajoCompleta): Observable<RespuestaOrdenTrabajoCompleta> => this.http.post<RespuestaOrdenTrabajoCompleta>(this.rutaPlasticaribeAPI + '/Orden_Trabajo/crearCompleta', data);
 
-  /** Actualiza la OT y sus procesos de forma atómica; la API crea los procesos que le falten a la OT. */
-  editarOrdenCompleta = (otId : number, data : any): Observable<{ ot_Id: number, numero_OT: number }> => this.http.put<{ ot_Id: number, numero_OT: number }>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/editarCompleta/${otId}`, data);
+  /**
+   * Actualiza la OT y sus procesos de forma atómica; la API crea los procesos que le falten a la OT.
+   * Producto, presentación, sede y estado no se pueden cambiar (422) y si la OT cambió desde que se cargó responde 409.
+   * @param otId Identificador interno (Ot_Id) de la OT.
+   * @param data Datos planos de la OT y de cada proceso, con la versión de la fila (Ot_RowVersion).
+   * @returns Observable con el Ot_Id y el Numero_OT; los errores llegan como ProblemDetails (400, 404, 409, 422, 502).
+   */
+  editarOrdenCompleta = (otId : number, data : EditarOrdenTrabajoCompleta): Observable<RespuestaOrdenTrabajoCompleta> => this.http.put<RespuestaOrdenTrabajoCompleta>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/editarCompleta/${otId}`, data);
 }

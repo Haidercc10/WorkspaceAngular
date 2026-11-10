@@ -26,3 +26,51 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
     -ms-user-select: none;
     user-select: none; 
 }
+/* Columna "Arte" (primera, fija): angosta y con un botón rojo de 30x30 px para no agrandar las filas */
+.columna-arte {
+  width: 46px;
+  min-width: 46px;
+  padding: 2px 4px !important;
+}
+
+.boton-arte {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px;
+  padding: 0 !important;
+  justify-content: center;
+}
+
+.boton-arte ::ng-deep .p-button-icon {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Columnas de procesos (Ext, Imp, Rot, Lam, Cor, Sel): angostas y centradas */
+.columna-proceso {
+  width: 56px;
+  min-width: 56px;
+  max-width: 70px;
+  text-align: center !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+/* Verde de cantidades del sistema (el mismo de Kardex de Materias Primas y del "success" de PrimeNG):
+   Existencia mayor que 0 y procesos por los que pasa la OT ("Sí") */
+.valor-verde {
+  color: #22C55E;
+  font-weight: bold;
+}
+
+/* Fila superior del encabezado con los grupos de columnas */
+.grupo-encabezado {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* Mensaje de la tabla vacía */
+.sin-datos {
+  color: #6c757d;
+  font-style: italic;
+}

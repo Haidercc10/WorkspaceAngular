@@ -118,3 +118,139 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
     justify-content: flex-end;
   }
 }
+/* ===== Campos de consulta: fondo azul claro, borde azul e ícono de lupa (ver la leyenda) ===== */
+.campo-consulta ::ng-deep input.p-inputtext,
+.campo-consulta ::ng-deep .p-dropdown,
+.campo-consulta ::ng-deep .p-inputnumber input {
+  background-color: #eef5ff;
+  border-color: #7aa7e0;
+}
+
+.campo-consulta ::ng-deep .pi-search {
+  color: #1d6fd1;
+}
+
+/* ===== Obligatorios vacíos: en rojo después de intentar crear o editar (resaltarObligatorios) ===== */
+/* Los modales (p-dialog, p. ej. crear mezclas) no se resaltan: tienen su propio guardado. */
+.ot-resaltar-obligatorios ::ng-deep input[formcontrolname].ng-invalid:not(p-dialog *),
+.ot-resaltar-obligatorios ::ng-deep textarea[formcontrolname].ng-invalid:not(p-dialog *),
+.ot-resaltar-obligatorios ::ng-deep p-dropdown.ng-invalid:not(p-dialog *) .p-dropdown,
+.ot-resaltar-obligatorios ::ng-deep p-inputnumber.ng-invalid:not(p-dialog *) input,
+.ot-resaltar-obligatorios ::ng-deep p-calendar.ng-invalid:not(p-dialog *) input {
+  border-color: #e24c4c !important;
+  background-color: #fff1f1 !important;
+  box-shadow: 0 0 0 1px #e24c4c;
+}
+
+.ot-resaltar-obligatorios ::ng-deep .p-float-label:has(> .ng-invalid[formcontrolname]):not(p-dialog *) > label {
+  color: #d32f2f;
+}
+
+/* ===== Leyenda ===== */
+.ot-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.ot-leyenda > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ot-leyenda__muestra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 16px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+}
+
+.ot-leyenda__muestra--consulta {
+  background-color: #eef5ff;
+  border: 1px solid #7aa7e0;
+  color: #1d6fd1;
+}
+
+.ot-leyenda__muestra--obligatorio {
+  background-color: #fff1f1;
+  border: 1px solid #e24c4c;
+}
+
+/*
+ * Botón de tutorial dentro del h2 del título (como en Gestión de Tickets y Precargue de Rollos): el título conserva
+ * la altura y separación de las demás páginas (márgenes globales de .Titulo .tituloRojo en styles.css).
+ */
+.boton-tutorial-titulo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.4rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ===== Referencia: los botones van dentro del campo, a la derecha; el texto no pasa por debajo de ellos ===== */
+.ot-referencia {
+  position: relative;
+}
+
+/* Espacio a la derecha del texto para los 3 botones (2 de 28px + "Ver arte" + separaciones) */
+.ot-referencia input {
+  padding-right: 170px;
+}
+
+/* Solo lectura (editando la OT, hasta pulsar el lápiz): fondo gris; habilitada con el lápiz para cambiar el nombre: borde rojo */
+/* Sin proceso de impresión no se muestra "Ver arte": solo quedan los 2 botones de 28px */
+.ot-referencia--sin-arte input {
+  padding-right: 75px;
+}
+
+.ot-referencia input[readonly] {
+  background-color: #f2f2f2;
+  color: #444;
+  cursor: default;
+}
+
+.ot-referencia--editando input {
+  border-color: #e24c4c;
+  box-shadow: 0 0 0 1px #e24c4c;
+}
+
+.ot-referencia__botones {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  z-index: 1;
+}
+
+.ot-referencia__boton {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+}
+
+.ot-referencia__boton ::ng-deep .p-button-icon {
+  font-size: 0.85rem;
+}
+
+.ot-referencia__arte {
+  height: 28px;
+  padding: 0 10px !important;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Estado OT es de solo lectura: sin la flecha del desplegable gana espacio en su columna angosta */
+#estadoOrden ::ng-deep .p-dropdown-trigger {
+  display: none;
+}

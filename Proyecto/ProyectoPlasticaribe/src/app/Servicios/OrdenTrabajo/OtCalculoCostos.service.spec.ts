@@ -148,6 +148,80 @@ describe('OtCalculoCostosService', () => {
     });
   });
 
+  describe('peso teórico (fórmula de producción)', () => {
+    const base = { pesoMillar: 20, cantidadPaquete: 100 };
+
+    it('Kg: el peso teórico es la cantidad', () => {
+      expect(servicio.calcularPesoTeorico({ ...base, presentacion: 'Kg', cantidad: 500 })).toBe(500);
+      expect(servicio.calcularPesoTeorico({ ...base, presentacion: 'Kilo', cantidad: 500 })).toBe(500);
+    });
+
+    it('Und: cantidad × Peso Millar / 1000', () => {
+      expect(servicio.calcularPesoTeorico({ ...base, presentacion: 'Und', cantidad: 10000 })).toBe(200);
+      expect(servicio.calcularPesoTeorico({ ...base, presentacion: 'Unidad', cantidad: 10000 })).toBe(200);
+    });
+
+    it('Paquete: cantidad × Peso Millar × bolsas por paquete / 1000, también con cantidad 1', () => {
+      expect(servicio.calcularPesoTeorico({ ...base, presentacion: 'Paquete', cantidad: 1 })).toBe(2);
+      expect(servicio.calcularPesoTeorico({ ...base, presentacion: 'Paquete', cantidad: 50 })).toBe(100);
+    });
+
+    it('presentación sin regla o datos vacíos dan 0 (nunca NaN)', () => {
+      expect(servicio.calcularPesoTeorico({ ...base, presentacion: 'Rollo', cantidad: 10 })).toBe(0);
+      expect(servicio.calcularPesoTeorico({ presentacion: 'Paquete', cantidad: null, pesoMillar: null, cantidadPaquete: null })).toBe(0);
+    });
+
+    it('rango de ± 7 %', () => {
+      const rango = servicio.rangoPesoTeorico(100);
+      expect(rango.pesoTeorico).toBe(100);
+      expect(rango.pesoMinimo).toBeCloseTo(93, 8);
+      expect(rango.pesoMaximo).toBeCloseTo(107, 8);
+      expect(servicio.rangoPesoTeorico(null)).toEqual({ pesoTeorico: 0, pesoMinimo: 0, pesoMaximo: 0 });
+    });
+
+    it('peso manual de CAMISILLA BIOD', () => {
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD SUPER ESPECIAL T0.5')).toBe(21);
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD SUPER ESPECIAL T1.0')).toBeNull();
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD ESPECIAL T2.0')).toBe(44);
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD ESPECIAL T3.2')).toBe(28);
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD T1.5')).toBe(28);
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD T3.0 X 70')).toBe(20);
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD T3.0')).toBe(23);
+    });
+
+    it('reconoce la talla escrita sin decimal, con punto final, con coma o con espacio', () => {
+      ['CAMISILLA BIOD T2 X 50', 'CAMISILLA BIOD T2. X 50', 'CAMISILLA BIOD T2,0', 'CAMISILLA BIOD T 2.0', 'camisilla biod t2'].forEach(ref =>
+        expect(servicio.pesoTeoricoManual('CAMISILLA', ref)).withContext(ref).toBe(35));
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD T3 X70')).toBe(20);
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD T25')).toBeNull();
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA BIOD')).toBeNull();
+    });
+
+    it('peso del paquete BIOD = peso fijo del bulto / paquetes por bulto', () => {
+      expect(servicio.pesoPaqueteManual('CAMISILLA', 'CAMISILLA BIODEGRADABLE T2.0', 10)).toBeCloseTo(3.5, 8);
+      expect(servicio.pesoPaqueteManual('CAMISILLA', 'CAMISILLA BIOD T3.0', 2)).toBeCloseTo(11.5, 8);
+      expect(servicio.pesoPaqueteManual('CAMISILLA', 'CAMISILLA BIOD ESPECIAL T2.0', '4')).toBeCloseTo(11, 8);
+      expect(servicio.pesoPaqueteManual('CAMISILLA', 'CAMISILLA T2.0', 10)).toBeNull();
+    });
+
+    it('sin paquetes por bulto el paquete pesa lo mismo que el bulto (1 paquete)', () => {
+      expect(servicio.pesoPaqueteManual('CAMISILLA', 'CAMISILLA BIOD T3.0', 0)).toBe(23);
+      expect(servicio.pesoPaqueteManual('CAMISILLA', 'CAMISILLA BIOD T3.0', null)).toBe(23);
+      expect(servicio.pesoPaqueteManual('CAMISILLA', 'CAMISILLA BIOD T3.0', 1)).toBe(23);
+    });
+
+    it('reconoce la CAMISILLA por el formato o por el nombre de la referencia', () => {
+      expect(servicio.pesoTeoricoManual('', 'CAMISILLA BIODEGRADABLE T2.0')).toBe(35);
+      expect(servicio.pesoTeoricoManual('BOLSA CAMISILLA', 'BIODEGRADABLE T2.0')).toBe(35);
+    });
+
+    it('sin peso manual fuera de CAMISILLA BIOD', () => {
+      expect(servicio.pesoTeoricoManual('CAMISILLA', 'CAMISILLA T1.0')).toBeNull();
+      expect(servicio.pesoTeoricoManual('BOLSA', 'BOLSA BIOD T1.0')).toBeNull();
+      expect(servicio.pesoTeoricoManual(null, null)).toBeNull();
+    });
+  });
+
   describe('pesoMillarEfectivo', () => {
     it('solo aplica la regla a los tipos y presentaciones configurados', () => {
       expect(REGLA_PESO_MILLAR_D2.presentaciones).toEqual(['Paquete']);
