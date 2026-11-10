@@ -77,11 +77,11 @@
     <div class="mb-4" id="formulario1">
       <div class="row g-3 justify-content-md-center">
 
-        <!-- Documento -->
+        <!-- Id Solicitud -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="documento" id="documento" type="text" pInputText required />
+            <input formControlName="documento" id="documento" type="text" pInputText required (keyup.enter)="consultarFiltros()"/>
             <label for="documento">Id Solicitud</label>
           </span>
         </div>
@@ -193,11 +193,19 @@
 
         <div class="table-responsive mb-4">
           <p-table [tableStyle]="{ 'min-width': '45%' }" #dt2 [resizableColumns]="true"
-            styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll"
+            styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines tabla-detalles" responsiveLayout="scroll"
             [rowHover]="true" [value]="arrayMatPrimas" [scrollable]="true" scrollHeight="500px">
             <ng-template pTemplate="caption">
-              <div class="flex align-items-center justify-content-between" style="margin: 2% 0 0 0" id="usuario">
-                <p><i class="pi pi-user"></i> Usuario Solicitante: {{usuarioSolicitante}}</p>
+              <div class="cabecera-detalles" id="usuario">
+                <!-- El tooltip con el nombre completo solo se activa si el texto quedó recortado con "...".
+                     Se mide al entrar el cursor al contenedor, antes de llegar al texto que tiene el tooltip. -->
+                <span class="cabecera-detalles__usuario" (mouseenter)="medirNombreSolicitante(textoSolicitante)">
+                  <i class="pi pi-user"></i>
+                  <span #textoSolicitante class="cabecera-detalles__texto" tooltipPosition="top"
+                    [pTooltip]="usuarioSolicitante" [tooltipDisabled]="!nombreSolicitanteRecortado">Usuario Solicitante: {{usuarioSolicitante}}</span>
+                </span>
+                <button *ngIf="[1,3,7,104].includes(ValidarRol)" pButton class="p-button-danger" type="button" label="Crear Asignación"
+                  icon="pi pi-check-square" id="crear-asig" [disabled]="!solicitudActiva" (click)="cargarModalCrearAsignacion()"></button>
               </div>
             </ng-template>
             <ng-template pTemplate="header">
@@ -238,15 +246,18 @@
         </div>
 
         <!-- Acciones: se habilitan según el estado de la solicitud seleccionada (Crear asignación, Finalizar y Cancelar solo para PENDIENTE o PARCIAL) -->
-        <div class="mb-3" *ngIf="[1,3,7,104].includes(ValidarRol)">
+        <!-- "Marcar como Verificado": solo ADMINISTRADOR (1) y SUPERIOR EXTRUSION 2 (85), habilitado con la solicitud FINALIZADA -->
+        <div class="mb-3" *ngIf="[1,3,7,104].includes(ValidarRol) || puedeVerificar">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton class="p-button-danger" type="button" label="Crear Asignación" icon="pi pi-check-square"
-              id="crear-asig" [disabled]="!solicitudActiva" (click)="cargarModalCrearAsignacion()"></button>
-            <button pButton class="p-button-success" type="button" label="Finalizar" icon="pi pi-check"
-              id="finalizar" [disabled]="!solicitudActiva" (click)="mostrarEleccion('finalizar')"></button>
-            <button pButton class="p-button-secondary" type="button" label="Cancelar" icon="pi pi-ban"
-              id="cancelar" [disabled]="!solicitudActiva" (click)="mostrarEleccion('cancelar')"></button>
-            <button pButton class="p-button-danger" type="button" label="Ver PDF" icon="pi pi-file-pdf"
+            <ng-container *ngIf="[1,3,7,104].includes(ValidarRol)">
+              <button pButton class="p-button-success" type="button" label="Finalizar" icon="pi pi-check"
+                id="finalizar" [disabled]="!solicitudActiva" (click)="mostrarEleccion('finalizar')"></button>
+              <button pButton class="p-button-secondary" type="button" label="Cancelar" icon="pi pi-ban"
+                id="cancelar" [disabled]="!solicitudActiva" (click)="mostrarEleccion('cancelar')"></button>
+            </ng-container>
+            <button *ngIf="puedeVerificar" pButton class="p-button-success" type="button" label="Marcar como Verificado"
+              icon="pi pi-check-circle" id="verificar" [disabled]="!solicitudFinalizada" (click)="mostrarVerificacion()"></button>
+            <button *ngIf="[1,3,7,104].includes(ValidarRol)" pButton class="p-button-danger" type="button" label="Ver PDF" icon="pi pi-file-pdf"
               id="ver-pdf" [disabled]="!haySolicitudSeleccionada" (click)="infoSolicitudPDF(solicitudSeleccionada)"></button>
           </div>
         </div>
@@ -271,7 +282,7 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="cancelarFinalizarSolicitud()"
+          <button type="button" pButton (click)="confirmarEleccion()"
             icon="pi pi-check" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">

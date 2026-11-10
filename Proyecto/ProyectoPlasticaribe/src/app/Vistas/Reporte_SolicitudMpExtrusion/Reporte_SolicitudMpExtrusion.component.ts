@@ -18,7 +18,7 @@ import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } fr
 import { catchError, finalize, map, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, DatosOTSolicitudPDF } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
-import { ADICIONAL_KG_OT, EstadoSolicitudMaterial } from 'src/app/Modelo/modelFlujoMaterialProduccion';
+import { ADICIONAL_KG_OT, EstadoSolicitudMaterial, ROLES_VERIFICAR_SOLICITUD } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 
 
 @Component({
@@ -110,7 +110,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   // Funcion que va a consultar y almacenar los estados que pueden tener los documentos
   obtenerEstados(){
     this.servicioEstados.srvObtenerListaEstados().subscribe(datos_estados => {
-      this.estados = datos_estados.filter(item => item.estado_Id == 11 || item.estado_Id == 5 || item.estado_Id == 4 || item.estado_Id == 12);
+      this.estados = datos_estados.filter(item => [11, 5, 4, 12, EstadoSolicitudMaterial.Verificada].includes(item.estado_Id));
     });
   }
 
@@ -245,6 +245,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     const kgOT = Number(datosOT.datosotKg) || 0;
     return {
       cliente: datosOT.clienteNom,
+      item: datosOT.clienteItems,
       referencia: datosOT.clienteItemsNom,
       kgOT,
       kgLimite: kgOT * (1 + ADICIONAL_KG_OT),
@@ -338,6 +339,77 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
       detail: `Está seguro que desea ${this.clave} la solicitud N° ${this.solicitudSeleccionada}?`,
       sticky: true
     });
+  }
+
+  /** True si el nombre del usuario solicitante quedó recortado con "..." (habilita su tooltip con el nombre completo). */
+  nombreSolicitanteRecortado : boolean = false;
+
+  /**
+   * Mide si el texto del usuario solicitante no cabe (está recortado con "..."). Se llama al entrar el cursor al
+   * contenedor y no al texto: PrimeNG cancela el tooltip que está por salir si `tooltipDisabled` cambia, así que el
+   * valor debe estar listo antes de que el cursor llegue al texto.
+   * @param texto Elemento con el nombre del usuario solicitante.
+   */
+  medirNombreSolicitante(texto : HTMLElement) {
+    this.nombreSolicitanteRecortado = texto.scrollWidth > texto.clientWidth;
+  }
+
+  /** Indica si el rol del usuario puede marcar solicitudes como verificadas (muestra el botón). */
+  get puedeVerificar() : boolean {
+    return ROLES_VERIFICAR_SOLICITUD.includes(Number(this.ValidarRol));
+  }
+
+  /** Indica si la solicitud seleccionada está finalizada (habilita "Marcar como Verificado"). */
+  get solicitudFinalizada() : boolean {
+    return this.estadoSolicitudId === EstadoSolicitudMaterial.Finalizada;
+  }
+
+  /** Pide confirmación para marcar como verificada la solicitud seleccionada. */
+  mostrarVerificacion() {
+    this.clave = 'verificar';
+    if (!this.solicitudFinalizada) {
+      this.msj.mensajeAdvertencia(`Advertencia`, `Solo se pueden verificar solicitudes finalizadas; la solicitud N° ${this.solicitudSeleccionada} está ${this.estadoSolicitud}!`);
+      return;
+    }
+    this.onReject();
+    this.messageService.add({
+      severity:'warn',
+      key: this.claveConfirmacion,
+      summary:'Verificar asignación',
+      detail: `¿Está seguro que la asignación de la solicitud N° ${this.solicitudSeleccionada} está completada? Se marcará como VERIFICADA.`,
+      sticky: true
+    });
+  }
+
+  /** Ejecuta la acción confirmada con "Sí" según la `clave`: verificar, finalizar o cancelar. */
+  confirmarEleccion() {
+    if (this.clave == 'verificar') this.verificarSolicitud();
+    else this.cancelarFinalizarSolicitud();
+  }
+
+  /** Cambia el estado de la solicitud seleccionada a VERIFICADA (55). */
+  verificarSolicitud() {
+    this.onReject();
+    const solicitud_Id : number = this.solicitudSeleccionada;
+    this.cargando = true;
+
+    this.servicioSolicitudesMPExt.verificarSolicitud(solicitud_Id)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: () => {
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡La solicitud N° ${solicitud_Id} se marcó como VERIFICADA!`);
+          this.getEstadoSolitudes();
+          this.consultarFiltros();
+        },
+        error: (error) => {
+          if (error?.status == 403) this.msj.mensajeAdvertencia(`Advertencia`, `¡Su rol no tiene permiso para verificar solicitudes!`);
+          else if (error?.status == 409 || error?.status == 404) this.msj.mensajeAdvertencia(`Advertencia`, typeof error.error == 'string' ? error.error : `No fue posible verificar la solicitud N° ${solicitud_Id}.`);
+          else this.msj.mensajeError(`Error`, `¡No fue posible verificar la solicitud N° ${solicitud_Id}!`);
+        }
+      });
   }
 
   /** Quitar el mensaje que sale luego de presionar si o no, en el mensaje de cancelar solicitud. */

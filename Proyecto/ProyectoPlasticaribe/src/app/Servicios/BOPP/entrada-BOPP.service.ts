@@ -44,6 +44,12 @@ export class EntradaBOPPService {
 
   GetInventarioBopps = (fecha1 : any, fecha2 : any, id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getInventarioBopps/${fecha1}/${fecha2}/${id}`);
 
+  /** Versión nueva: BOPP agrupado por genérico sin duplicar filas por precio. */
+  GetInventarioBoppsGenericosV2 = ():Observable<any[]> => this.http.get<any[]>(this.rutaPlasticaribeAPI + '/BOPP/getInventarioBoppsGenericosV2');
+
+  /** Versión nueva: rollos del genérico con entradas/salidas calculadas por rollo. */
+  GetInventarioBoppsV2 = (fecha1 : string, fecha2 : string, id : number):Observable<any[]> => this.http.get<any[]>(this.rutaPlasticaribeAPI + `/BOPP/getInventarioBoppsV2/${fecha1}/${fecha2}/${id}`);
+
   getEntryBOPP = (date1 : any, date2 : any, hour : string):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getEntryBOPP/${date1}/${date2}/${hour}`);
 
   getSerialesBopp = (data: any): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/BOPP/getSerialesBopp', data);

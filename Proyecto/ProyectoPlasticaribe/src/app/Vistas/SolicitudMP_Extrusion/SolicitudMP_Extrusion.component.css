@@ -12,6 +12,64 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   width: 100%;
 }
 
+/* Botón de tutorial dentro del h2 del título (igual que en Tickets y Precargue). */
+.boton-tutorial-titulo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.4rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Campo con un botón pegado a la derecha, con el mismo aspecto del botón de los campos de fecha (p-calendar). */
+.campo-con-boton {
+  display: flex;
+  align-items: stretch;
+}
+
+.campo-con-boton > .p-float-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.campo-con-boton input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.campo-con-boton__accion {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.campo-con-boton__accion .p-button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Deshabilitado, el clic y el mouse pasan al contenedor, que es el que muestra el tooltip. */
+.campo-con-boton__accion .p-button:disabled {
+  pointer-events: none;
+}
+
+/* Inputs con botón X para limpiar su contenido */
+.input-limpiable {
+  position: relative;
+}
+
+.input-limpiable input {
+  padding-right: 2.5rem;
+}
+
+.boton-limpiar-input {
+  position: absolute;
+  top: 50%;
+  right: 0.25rem;
+  z-index: 2;
+  transform: translateY(-50%);
+  color: #5d6d7e;
+}
+
 ::ng-deep .p-card {
   align-items: center;
   margin: auto;

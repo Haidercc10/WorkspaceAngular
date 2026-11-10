@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { finalize, tap, of, map, timeout, Observable } from 'rxjs';
+import { finalize, tap, of, map, timeout, Observable, retry, timer, throwError, TimeoutError, MonoTypeOperatorFunction } from 'rxjs';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { switchMap } from 'rxjs/internal/operators/switchMap';
@@ -49,6 +49,7 @@ export class LoginComponentComponent implements OnInit {
   static readonly CLAVE_USUARIO_RECORDADO = 'login:usuarioRecordado';
   private static readonly SIN_INTERNET = 'No hay conexión a internet. Verifica tu red.';
   private readonly tiempoMaximoConexionMs = 15000;
+  private readonly esperaAntesDeReintentarMs = 2000;
 
   /** Estado de la verificación inicial: mientras no esté 'listo' la tarjeta muestra el logo animado y un mensaje en lugar del formulario. */
   estadoConexion: 'verificando' | 'error' | 'listo' = 'verificando';
@@ -125,7 +126,7 @@ export class LoginComponentComponent implements OnInit {
 
     this.mensajeConexion = 'Cargando empresas...';
     this.empresaServices.getIdNombreEmpresas().pipe(
-      timeout(this.tiempoMaximoConexionMs),
+      this.esperarConUnReintento(),
       switchMap(empresas => {
         this.empresas = empresas ?? [];
         this.mensajeConexion = 'Conectando con los servicios...';
@@ -153,7 +154,7 @@ export class LoginComponentComponent implements OnInit {
       { nombre: 'BagPro', ruta: environment.rutaBagPro },
     ];
     return forkJoin(servicios.map(servicio => this.http.get(`${servicio.ruta}/Salud`).pipe(
-      timeout(this.tiempoMaximoConexionMs),
+      this.esperarConUnReintento(),
       map(() => null),
       catchError(error => of({ nombre: servicio.nombre, error })),
     ))).pipe(map(resultados => {
@@ -163,11 +164,29 @@ export class LoginComponentComponent implements OnInit {
     }));
   }
 
+  /**
+   * Tiempo máximo de espera + un reintento si la API no alcanzó a responder (timeout o status 0).
+   * Cubre el arranque en frío de las APIs en IIS (p. ej. Contabilidad de Zeus construyendo su modelo EF tras publicar o reciclar):
+   * la primera petición puede pasarse del tiempo, pero deja la API caliente y el reintento ya responde rápido.
+   */
+  private esperarConUnReintento<T>(): MonoTypeOperatorFunction<T> {
+    return (fuente: Observable<T>) => fuente.pipe(
+      timeout(this.tiempoMaximoConexionMs),
+      retry({
+        count: 1,
+        delay: (error) => this.esFallaTransitoria(error) ? timer(this.esperaAntesDeReintentarMs) : throwError(() => error),
+      }),
+    );
+  }
+
+  private esFallaTransitoria = (error: any): boolean => navigator.onLine && (error instanceof TimeoutError || (error instanceof HttpErrorResponse && error.status === 0));
+
   private apiRespondio = (error: any): boolean => error instanceof HttpErrorResponse && error.status !== 0;
 
   /** Mensaje corto para la tarjeta: nunca el error completo, que no cabe en la interfaz. */
   private mensajeErrorConexion(api: string, error: any): string {
     if (!navigator.onLine) return LoginComponentComponent.SIN_INTERNET;
+    if (error instanceof TimeoutError) return `${api} está tardando demasiado en responder.`;
     if (this.apiRespondio(error) && error.status == 503) return `${api} no pudo conectarse a su base de datos.`;
     if (this.apiRespondio(error)) return `${api} respondió con un error (${error.status}).`;
     return `No se pudo conectar con ${api}.`;

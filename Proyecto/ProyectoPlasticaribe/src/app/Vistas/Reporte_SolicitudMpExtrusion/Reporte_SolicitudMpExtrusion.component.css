@@ -93,3 +93,47 @@ p-chip ::ng-deep .p-chip-text {
 ::ng-deep .p-datatable.p-datatable-sm ::ng-deep .p-datatable-header {
     padding: 0 0 0 2% !important;
 }
+
+/* Cabecera de la tabla de detalles: padding parejo (gana sobre la regla anterior por ser más específica y venir después). */
+::ng-deep .p-datatable.p-datatable-sm.tabla-detalles .p-datatable-header {
+    padding: 0.5rem 0.75rem !important;
+}
+
+/* Usuario solicitante a la izquierda y "Crear Asignación" en el extremo derecho, centrados verticalmente y sin márgenes que separen la cabecera de la tabla. */
+.cabecera-detalles {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    margin: 0;
+    min-height: 2.5rem;
+}
+
+/* min-width: 0 deja que el usuario se encoja cuando choca con el botón, en vez de empujarlo. */
+.cabecera-detalles__usuario {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    gap: 0.4rem;
+    min-width: 0;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.cabecera-detalles__usuario > .pi {
+    flex: 0 0 auto;
+}
+
+/* El texto que no cabe se oculta y termina en "...". */
+.cabecera-detalles__texto {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.cabecera-detalles .p-button {
+    flex: 0 0 auto;
+    margin-left: auto;
+}

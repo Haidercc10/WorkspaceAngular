@@ -35,6 +35,9 @@ export class MateriaPrimaService {
 
   GetInventario = (fechaInicial : any, fechaFinal : any, id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventario/${fechaInicial}/${fechaFinal}/${id}`);
 
+  /** Inventario consolidado de materias primas, tintas y biorientados en una sola petición (la fecha final no puede ser mayor a hoy). */
+  GetInventarioConsolidado = (fechaInicial : string, fechaFinal : string) : Observable<any[]> => this.http.get<any[]>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventarioConsolidado/${fechaInicial}/${fechaFinal}`);
+
   GetCategoriasMateriaPrima = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
 
   GetMovimientos = (fechaInicial : any, fechaFinal : any, ruta : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMovimientos/${fechaInicial}/${fechaFinal}/${ruta}`);
@@ -56,6 +59,10 @@ export class MateriaPrimaService {
   getSubcategories = (proceso : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getSubcategories/${proceso}`);
 
   getAllSubcategoriesForName = (ref : string, proceso : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getAllSubcategoriesForName/${ref}/${proceso}`);
+
+  /** Busca subcategorías del proceso por Id o por parte del nombre (materias primas en EXT, tintas en los demás). */
+  buscarSubcategorias = (texto : string, proceso : string) : Observable<any[]> =>
+    this.http.get<any[]>(this.rutaPlasticaribeAPI + `/Materia_Prima/buscarSubcategorias/${proceso}`, { params: { texto } });
 
   srvAgregar = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
 

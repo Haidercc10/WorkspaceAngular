@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription, finalize, firstValueFrom } from 'rxjs';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -9,8 +10,8 @@ import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service'
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
-import { stepInventarioBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { ClaveTutorialInventarioMateriaPrima, pasosTutorialInventarioMateriaPrima } from 'src/app/Tutoriales/Tutoriales_InventarioMateriaPrima';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { modelMateriaPrima } from 'src/app/Modelo/modelMateriaPrima';
@@ -23,7 +24,16 @@ import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_En
 import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 import { SubcategoriasMatPrimaService } from 'src/app/Servicios/Subcategorias_MatPrima/subcategorias-mat-prima.service';
-import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+
+/** Tablas del reporte que muestran totales en el footer. */
+type TablaInventario = 'general' | 'polietilenos' | 'tintas' | 'biorientados';
+interface TotalTabla { stock: number, valor: number }
+
+/** Pestañas que se pueden exportar a Excel. */
+type PestanaExcel = 'materiasPrimas' | 'polietilenos' | 'tintas' | 'biorientados' | 'boppsAgrupados' | 'subcategorias';
+
+/** Columna de una hoja de Excel del reporte. */
+interface ColumnaExcel { titulo: string, campo: string, ancho: number, formato?: 'cantidad' | 'moneda' | 'entero', total?: boolean, resaltar?: boolean }
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -31,7 +41,7 @@ import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionEx
   styleUrls: ['./reporteMateriaPrima.component.css']
 })
 
-export class ReporteMateriaPrimaComponent implements OnInit {
+export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
 
   FormEdicionMateriaPrima !: FormGroup;
   @ViewChild('dt') dt: Table | undefined;
@@ -41,6 +51,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   @ViewChild('dt_BoppGenerico') dt_BoppGenerico: Table | undefined;
   @ViewChild('dt_Biorientados2') dt_Biorientados2: Table | undefined;
   @ViewChild('dt_Subcategories') dt_Subcategories: Table | undefined;
+  @ViewChild('dt_Materiales') dt_Materiales: Table | undefined;
+  readonly rolesInventarioGeneral: number[] = [1, 3, 12, 85, 98, 2, 104]; //Roles que ven materias primas, polietilenos y tintas
+  readonly rolesInventarioBopp: number[] = [1, 3, 4, 89, 63, 12, 85, 98, 2, 104]; //Roles que ven biorientados
+  fechaMaxima: Date = moment().endOf('day').toDate(); //Fecha máxima permitida para consultar (hoy)
+  pestanaActiva: number = 0; //Índice de la pestaña visible (el tutorial la cambia para mostrar las tablas)
+  private tutorialAutomaticoRevisado: boolean = false; //Evita revisar más de una vez si el tutorial debe salir solo
+  mostrarSinStock: boolean = false; //Si está marcado se muestran también los registros con stock en cero (por defecto solo stock mayor a cero)
+  private inventarioCompleto: Record<TablaInventario, any[]> = { general: [], polietilenos: [], tintas: [], biorientados: [] }; //Inventario consultado sin filtrar por stock
+  totales: Record<TablaInventario, TotalTabla> = this.totalesVacios(); //Totales de los footers de cada tabla (respetan los filtros)
+  private subInventario?: Subscription; //Suscripción de la consulta de inventario en curso (se cancela si se lanza otra)
+  private subBoppsAgrupados?: Subscription; //Suscripción de la consulta de bopps agrupados en curso
+  private subModalBopp?: Subscription; //Suscripción de la consulta de rollos del modal en curso
+  private consultasEnCurso: number = 0; //Cantidad de consultas activas, para saber cuándo ocultar la animación de carga
+  private rangoConsultado?: { inicio: string, fin: string }; //Último rango consultado con éxito (se muestra en el Excel)
+  private boppsAgrupadosCargados: boolean = false; //Indica si ya se consultaron los bopps agrupados
+  private intervaloTema?: any; //Intervalo que sincroniza el tema claro/oscuro
   columnas: any[] = []; //Variable que almacenará las columnas de la tabla que no se verá inicialmente pero que se podrá elegir
   _columnasSeleccionada: any[] = []; //variable que almacenará las columnas de la tabla que han sido seleccionadas
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -51,10 +77,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   categorias: any = []; //variable que almacenará las categorias existentes
   undMedidas: any[] = []; //Variable que almacenará las unidades de medidas
   bodegas: any = []; //variable que almacenará las bodegas
-  rongoFechas: any[] = []; //Variable que va a guardar el rango de fechas en el que se buscará informacion
-  categoriasMP: any[] = []; //Variable que almcanará las categorias de la tabla Materia_Prima
-  categoriasTintas: any[] = []; //Variable que almcanará las categorias de la tabla Tintas
-  categoriasBOPP: any[] = []; //Variable que almcanará las categorias de la tabla BOPP
+  rongoFechas: any[] = this.rangoPorDefecto(); //Variable que va a guardar el rango de fechas en el que se buscará informacion (por defecto, el último año)
   arryMateriaPrimaFiltrada: any[] = []; //Variable que tendrá la informacion filtrada en las tablas
   load: boolean = true; //Variable que validará cuando vaya a salir la animacion de carga
   ArrayMateriaPrima: any[] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
@@ -120,7 +143,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     private categoriMpService: CategoriaMateriaPrimaService,
     private AppComponent: AppComponent,
     private boppService: EntradaBOPPService,
-    private shepherdService: ShepherdService,
+    private tutoriales: TutorialesService,
     private frmBuilder: FormBuilder,
     private undMedidaService: UnidadMedidaService,
     private msj: MensajesAplicacionService,
@@ -128,7 +151,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     private srvMovEntradasMP: Movimientos_Entradas_MPService,
     private srvSalidasMP: Entradas_Salidas_MPService,
     private svSubcategories: SubcategoriasMatPrimaService,
-    private svExcel: CreacionExcelService,
   ) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -152,40 +174,127 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
+    this.cargarColumnas();
     this.obtenerCategorias();
     this.consultarInventario();
-    this.getCatMP();
-    this.getCatTintas();
-    this.getCatBOPP();
     this.obtenerUnidadesMedidas();
     this.getSubcategories();
 
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.intervaloTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.intervaloTema) clearInterval(this.intervaloTema);
+    this.subInventario?.unsubscribe();
+    this.subBoppsAgrupados?.unsubscribe();
+    this.subModalBopp?.unsubscribe();
+    this.tutoriales.cancelar();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
-  // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
-  getCatMP() {
-    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => {
-      this.categoriasMP = datos;
-    });
-
+  /** Marca el inicio de una consulta y muestra la animación de carga. */
+  private iniciarCarga() {
+    this.consultasEnCurso++;
+    this.load = false;
   }
 
-  // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
-  getCatTintas() {
-    this.tintasService.GetCategoriasTintas().subscribe(datos => {
-      this.categoriasTintas = datos;
-    });
+  /** Marca el fin de una consulta; oculta la animación solo cuando no quedan consultas activas. */
+  private terminarCarga() {
+    this.consultasEnCurso = Math.max(0, this.consultasEnCurso - 1);
+    if (this.consultasEnCurso == 0) this.load = true;
   }
 
-  // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
-  getCatBOPP() {
-    this.boppService.GetCategoriasBOPP().subscribe(datos => {
-      this.categoriasBOPP = datos;
-    });
+  /** Extrae el mensaje de error enviado por la API (BadRequest) o devuelve uno genérico. */
+  private mensajeErrorApi(error: any, porDefecto: string): string {
+    return typeof error?.error === 'string' && error.error.length > 0 ? error.error : porDefecto;
+  }
+
+  /** Rango de fechas por defecto: desde hace un año hasta hoy. */
+  private rangoPorDefecto(): Date[] {
+    return [moment().subtract(1, 'year').startOf('day').toDate(), moment().startOf('day').toDate()];
+  }
+
+  /** Devuelve el rango de fechas a consultar. Si el campo está vacío se usa el último año; la fecha final no puede ser mayor a hoy. */
+  private obtenerRangoFechas(): { inicio: string, fin: string } | null {
+    if (!this.rongoFechas?.[0]) this.rongoFechas = this.rangoPorDefecto();
+    let inicio = moment(this.rongoFechas[0]);
+    let fin = this.rongoFechas?.[1] ? moment(this.rongoFechas[1]) : inicio.clone();
+    if (inicio.isAfter(fin, 'day')) [inicio, fin] = [fin, inicio];
+    if (fin.isAfter(this.fechaMaxima, 'day')) {
+      this.msj.mensajeAdvertencia(`Advertencia`, `La fecha final no puede ser mayor que el día de hoy.`);
+      return null;
+    }
+    return { inicio: inicio.format('YYYY-MM-DD'), fin: fin.format('YYYY-MM-DD') };
+  }
+
+  /** Columnas disponibles y seleccionadas por defecto de las tablas de inventario. */
+  private cargarColumnas() {
+    this.columnas = [
+      { header: 'ID', field: 'Id', tipo: 'texto' },
+      { header: 'Nombre', field: 'Nombre', tipo: 'texto' },
+      { header: 'Descripción', field: 'Descripcion', tipo: 'texto' },
+      { header: 'Ancho', field: 'Ancho', tipo: 'numero' },
+      { header: 'Micras', field: 'Micras', tipo: 'numero' },
+      { header: 'Stock', field: 'Cant', tipo: 'numero' },
+      { header: 'Medida', field: 'UndCant', tipo: 'texto' },
+      { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero' },
+      { header: 'SubTotal', field: 'SubTotal', tipo: 'numero' },
+      { header: 'Categoria', field: 'Categoria', tipo: 'texto' },
+      { header: 'Subcategoria', field: 'Subcategoria', tipo: 'texto' },
+      { header: 'Inicial', field: 'Inicial', tipo: 'numero' },
+      { header: 'Entrada', field: 'Entrada', tipo: 'numero' },
+      { header: 'Salida', field: 'Salida', tipo: 'numero' },
+      { header: 'Diferencia', field: 'Diferencia', tipo: 'numero' },
+    ];
+    this._columnasSeleccionada = this.columnas.filter(c => !['Descripcion', 'Inicial', 'Entrada', 'Salida', 'Diferencia'].includes(c.field));
+  }
+
+  /** Totales vacíos de cada tabla. */
+  private totalesVacios(): Record<TablaInventario, TotalTabla> {
+    return {
+      general: { stock: 0, valor: 0 },
+      polietilenos: { stock: 0, valor: 0 },
+      tintas: { stock: 0, valor: 0 },
+      biorientados: { stock: 0, valor: 0 },
+    };
+  }
+
+  /** Calcula stock y valor de un conjunto de filas. */
+  private calcularTotales(filas: any[]) {
+    return {
+      stock: this.cantidadExistencias(filas),
+      valor: [1, 104].includes(this.ValidarRol) ? this.valorTotalExistencia(filas) : 0,
+    };
+  }
+
+  /** Recalcula los totales de todas las tablas con la información completa (sin filtros). */
+  private recalcularTotales() {
+    this.totales = {
+      general: this.calcularTotales(this.ArrayMateriaPrima),
+      polietilenos: this.calcularTotales(this.polietilenos),
+      tintas: this.calcularTotales(this.tintas),
+      biorientados: this.calcularTotales(this.biorientados),
+    };
+  }
+
+  /** Si la página actual de la tabla quedó fuera del total de registros (p. ej. tras una nueva consulta con menos datos), la regresa a la primera página. */
+  private ajustarPagina(tabla: Table | undefined, cantidad: number) {
+    if (tabla && tabla.first >= cantidad) tabla.first = 0;
+  }
+
+  /** Ajusta la página de las tablas de materias primas, polietilenos, tintas y biorientados. */
+  private ajustarPaginasInventario() {
+    this.ajustarPagina(this.dt, this.ArrayMateriaPrima.length);
+    this.ajustarPagina(this.dt_Polientileno, this.polietilenos.length);
+    this.ajustarPagina(this.dt_Tintas, this.tintas.length);
+    this.ajustarPagina(this.dt_Biorientados, this.biorientados.length);
+  }
+
+  /** Se ejecuta con el evento (onFilter) de cada tabla para que el footer muestre los totales de lo filtrado. */
+  actualizarTotalesFiltro(tabla: TablaInventario, event: any) {
+    this.totales[tabla] = this.calcularTotales(event?.filteredValue ?? []);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -197,481 +306,416 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion para obtener las diferentes categorias de materia prima existentes
   obtenerCategorias() {
-    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => this.categorias = datos_categorias);
-    this.categorias.sort((a, b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
+    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
+      this.categorias = datos_categorias;
+      this.categorias.sort((a, b) => (a.catMP_Nombre ?? '').localeCompare(b.catMP_Nombre ?? ''));
+    });
   }
 
   // Funcion para obtener las diferentes categorias de materia prima existentes
   getSubcategories() {
-    this.svSubcategories.GetAll().subscribe(data => {
-      this.subcategoriesInModal = data;
-      console.log(data);
-    });
+    this.svSubcategories.GetAll().subscribe(data => this.subcategoriesInModal = data);
   }
 
   // Funcion que va a obtener las diferentes materias primas
   obtenerUnidadesMedidas = () => this.undMedidaService.srvObtenerLista().subscribe(data => this.undMedidas = data);
 
-  // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
-  cargarTabla(data: any) {
-    if (![2001, 2072, 84, 88, 89].includes(data.id)) {
-      this.valorTotal = [1,104].includes(this.ValidarRol) ? this.valorTotal + data.precio * data.stock : 0;
-      this.cantInicial += data.inicial;
-      this.cantEntrante += data.entrada;
-      this.cantSaliente += data.salida;
-      this.cantExistencias += data.stock;
-      this.cantDiferencia += data.diferencia;
-
-      let info: any = {
-        Id: data.id,
-        Id2: data.id2,
-        Nombre: data.nombre,
-        Descripcion: data.descripcion,
-        Ancho: data.ancho,
-        Micras: data.micras,
-        Inicial: data.inicial,
-        Entrada: data.entrada,
-        Salida: data.salida,
-        Cant: data.stock,
-        Cant2: data.stock,
-        Diferencia: data.diferencia,
-        UndCant: data.presentacion,
-        PrecioUnd: [1,104].includes(this.ValidarRol) ? data.precio : 0,
-        PrecioEstandar: data.precioEstandar,
-        SubTotal: [1,104].includes(this.ValidarRol) ? data.subTotal : 0,
-        Categoria: data.categoria,
-        Categoria_Id: data.categoria_Id,
-        Subcategoria: data.subcategoria,
-        Subcategoria_Id: data.subcategoria_Id,
-      }
-      if ([1, 3, 12, 85, 98, 2, 104].includes(this.ValidarRol)) this.ArrayMateriaPrima.push(info);
-      this.ArrayMateriaPrima.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-
-      if (this.categoriasMP.includes(data.categoria_Id) && ([1, 3, 12, 85, 98, 2, 104].includes(this.ValidarRol))) {
-        this.polietilenos.push(info);
-        this.valorTotalPolietileno += data.precio * data.stock;
-        this.cantInicialPolietileno += data.inicial;
-        this.cantEntrantePolietileno += data.entrada;
-        this.cantSalientePolietileno += data.salida;
-        this.cantExistenciasPolientileno += data.stock;
-        this.cantDiferenciaPolietileno += data.diferencia;
-      }
-      if (this.categoriasTintas.includes(data.categoria_Id) && ([1, 3, 12, 85, 98, 2, 104].includes(this.ValidarRol))) {
-        this.tintas.push(info);
-        this.valorTotalTintas += data.precio * data.stock;
-        this.cantInicialTintas += data.inicial;
-        this.cantEntranteTintas += data.entrada;
-        this.cantSalienteTintas += data.salida;
-        this.cantExistenciasTintas += data.stock;
-        this.cantDiferenciaTintas += data.diferencia;
-      }
-      if (this.categoriasBOPP.includes(data.categoria_Id) && ([1, 3, 4, 89, 63, 12, 85, 98, 2, 104].includes(this.ValidarRol))) {
-        this.biorientados.push(info);
-        this.valorTotalBiorientado += [1,104].includes(this.ValidarRol) ? data.precio * data.stock : 0;
-        this.cantInicialBiorientado += data.inicial;
-        this.cantEntranteBiorientado += data.entrada;
-        this.cantSalienteBiorientado += data.salida;
-        this.cantExistenciasBiorientado += data.stock;
-        this.cantDiferenciaBiorientado += data.diferencia;
-      }
-      this.polietilenos.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-      this.tintas.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-      this.biorientados.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-    }
+  // Funcion que convierte un registro de la API en la fila que usan las tablas
+  private mapearFila(data: any) {
+    return {
+      Tipo: data.tipo, //MP | TINTA | BOPP (tabla de origen)
+      Clave: data.clave, //Clave única (Tipo + Id) para evitar choques entre ids de distintas tablas
+      Id: data.id,
+      Id2: data.id2,
+      Nombre: data.nombre,
+      Descripcion: data.descripcion,
+      Ancho: data.ancho,
+      Micras: data.micras,
+      Inicial: data.inicial,
+      Entrada: data.entrada,
+      Salida: data.salida,
+      Cant: data.stock,
+      Cant2: data.stock,
+      Diferencia: data.diferencia,
+      UndCant: data.presentacion,
+      PrecioUnd: [1, 104].includes(this.ValidarRol) ? data.precio : 0,
+      PrecioEstandar: data.precioEstandar,
+      SubTotal: [1, 104].includes(this.ValidarRol) ? data.subTotal : 0,
+      Categoria: data.categoria,
+      Categoria_Id: data.categoria_Id,
+      Subcategoria: data.subcategoria,
+      Subcategoria_Id: data.subcategoria_Id,
+    };
   }
 
-  // Funcion que va a consultar la informacion del inventario de las materias primas
+  // Funcion que reparte la información consultada en las tablas de cada pestaña
+  private cargarInventario(data: any[]) {
+    const filas = (data ?? []).map(d => this.mapearFila(d)).sort((a, b) => (a.Nombre ?? '').localeCompare(b.Nombre ?? ''));
+    const verGeneral = this.rolesInventarioGeneral.includes(this.ValidarRol);
+    const verBopp = this.rolesInventarioBopp.includes(this.ValidarRol);
+
+    this.inventarioCompleto = {
+      general: verGeneral ? filas : [],
+      polietilenos: verGeneral ? filas.filter(x => x.Tipo == 'MP') : [],
+      tintas: verGeneral ? filas.filter(x => x.Tipo == 'TINTA') : [],
+      biorientados: verBopp ? filas.filter(x => x.Tipo == 'BOPP') : [],
+    };
+    this.aplicarFiltroStock();
+  }
+
+  // Funcion que limpia la información de las tablas
+  private limpiarInventario() {
+    this.inventarioCompleto = { general: [], polietilenos: [], tintas: [], biorientados: [] };
+    this.aplicarFiltroStock();
+  }
+
+  /** Muestra en las tablas solo los registros con stock mayor a cero, o todos si el checkbox "Mostrar sin Stock" está marcado. */
+  aplicarFiltroStock() {
+    const filtrar = (filas: any[]) => this.mostrarSinStock ? filas : filas.filter(item => (item.Cant ?? 0) > 0);
+    this.ArrayMateriaPrima = filtrar(this.inventarioCompleto.general);
+    this.polietilenos = filtrar(this.inventarioCompleto.polietilenos);
+    this.tintas = filtrar(this.inventarioCompleto.tintas);
+    this.biorientados = filtrar(this.inventarioCompleto.biorientados);
+    this.recalcularTotales();
+    this.ajustarPaginasInventario();
+    if (this.isSubcategory) this.loadSubcategories();
+  }
+
+  // Funcion que va a consultar la informacion del inventario de las materias primas (una sola petición)
   consultarInventario() {
-    this.load = false;
-    this.ArrayMateriaPrima = [];
-    this.polietilenos = [];
-    this.tintas = [];
-    this.biorientados = [];
+    const rango = this.obtenerRangoFechas();
+    if (!rango) return;
 
-    this.valorTotal = 0;
-    this.cantInicial = 0;
-    this.cantEntrante = 0;
-    this.cantSaliente = 0;
-    this.cantExistencias = 0;
-    this.cantDiferencia = 0;
-    let fecha: any = this.rongoFechas.length > 0 ? moment(this.rongoFechas[0]).format('YYYY-MM-DD') : this.today;
-    let fechaFinal: any = this.rongoFechas.length > 0 ? moment(this.rongoFechas[1]).format('YYYY-MM-DD') : fecha;
-
-    this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        this.materiaPrimaService.GetInventario(fecha, fechaFinal, data[i].id_Materia_Prima).subscribe(datos => {
-          datos.forEach(data => this.cargarTabla(data));
-        });
-      }
-    });
-    setTimeout(() => {
-      this.columnas = [
-        { header: 'ID', field: 'Id', tipo: 'texto' },
-        { header: 'Nombre', field: 'Nombre', tipo: 'texto' },
-        { header: 'Descripción', field: 'Descripcion', tipo: 'texto' },
-        { header: 'Ancho', field: 'Ancho', tipo: 'numero' },
-        { header: 'Micras', field: 'Micras', tipo: 'numero' },
-        { header: 'Stock', field: 'Cant', tipo: 'numero' },
-        { header: 'Medida', field: 'UndCant', tipo: 'texto' },
-        { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero' },
-        { header: 'SubTotal', field: 'SubTotal', tipo: 'numero' },
-        { header: 'Categoria', field: 'Categoria', tipo: 'texto' },
-        { header: 'Subcategoria', field: 'Subcategoria', tipo: 'texto' },
-        { header: 'Inicial', field: 'Inicial', tipo: 'numero' },
-        { header: 'Entrada', field: 'Entrada', tipo: 'numero' },
-        { header: 'Salida', field: 'Salida', tipo: 'numero' },
-        { header: 'Diferencia', field: 'Diferencia', tipo: 'numero' },
-      ];
-      this._columnasSeleccionada = [
-        { header: 'ID', field: 'Id', tipo: 'texto' },
-        { header: 'Nombre', field: 'Nombre', tipo: 'texto' },
-        { header: 'Ancho', field: 'Ancho', tipo: 'numero' },
-        { header: 'Micras', field: 'Micras', tipo: 'numero' },
-        { header: 'Stock', field: 'Cant', tipo: 'numero' },
-        { header: 'Medida', field: 'UndCant', tipo: 'texto' },
-        { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero' },
-        { header: 'SubTotal', field: 'SubTotal', tipo: 'numero' },
-        { header: 'Categoria', field: 'Categoria', tipo: 'texto' },
-        { header: 'Subcategoria', field: 'Subcategoria', tipo: 'texto' },
-      ]
-      this.load = true;
-    }, 2500);
+    //Si había una consulta en curso se cancela para que sus datos no se mezclen con los de la nueva.
+    this.subInventario?.unsubscribe();
+    this.iniciarCarga();
+    this.subInventario = this.materiaPrimaService.GetInventarioConsolidado(rango.inicio, rango.fin)
+      .pipe(finalize(() => {
+        this.terminarCarga();
+        if (this.load) this.iniciarTutorialPrimeraVez();
+      }))
+      .subscribe({
+        next: data => {
+          this.rangoConsultado = rango;
+          this.cargarInventario(data);
+        },
+        error: error => {
+          this.limpiarInventario();
+          this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar el inventario de materias primas!`));
+        }
+      });
   }
+
+  // Filas que alimentan la pestaña de subcategorías según el rol (los roles de biorientados solo ven sus rollos)
+  private filasSubcategorias = (): any[] => this.ArrayMateriaPrima.length > 0 ? this.ArrayMateriaPrima : this.biorientados;
 
   //Función para cargar los materiales por subcategorias.
   loadSubcategories() {
-    this.totalSubcategories = 0;
-    this.subcategories = [];
-    this.load = false;
-    this.subcategories = this.ArrayMateriaPrima.filter(x => ![null, 21].includes(x.Subcategoria_Id)).reduce((a, b) => {
-      let find = a.find(x => x.id == b.Subcategoria_Id);
-      if (!find) {
-        let object: any = {
-          'id': b.Subcategoria_Id,
-          'reference': b.Subcategoria,
-          'stock': b.Cant,
-          'unit': 'Kg',
-          'subtotal': b.SubTotal ? b.SubTotal : 0,
-        }
-        a.push(object);
-      } else {
-        a[a.map(x => x.id).indexOf(b.Subcategoria_Id)].stock += b.Cant;
-        a[a.map(x => x.id).indexOf(b.Subcategoria_Id)].subtotal += b.SubTotal ? b.SubTotal : 0;
+    const mapa = new Map<number, any>();
+    for (const item of this.filasSubcategorias()) {
+      if ([null, undefined, 21].includes(item.Subcategoria_Id)) continue;
+      let sub = mapa.get(item.Subcategoria_Id);
+      if (!sub) {
+        sub = { id: item.Subcategoria_Id, reference: item.Subcategoria, stock: 0, unit: 'Kg', subtotal: 0 };
+        mapa.set(item.Subcategoria_Id, sub);
       }
-      this.load = true;
-      return a;
-    }, []);
-    setTimeout(() => {
-      this.subcategories.sort((a, b) => Number(a.id) - Number(b.id));
-      this.totalSubcategories = this.subcategories.reduce((a, b) => a += b.subtotal, 0);
-    }, 500);
+      sub.stock += item.Cant ?? 0;
+      sub.subtotal += item.SubTotal ?? 0;
+    }
+    this.subcategories = [...mapa.values()].sort((a, b) => Number(a.id) - Number(b.id));
+    this.totalSubcategories = this.subcategories.reduce((a, b) => a + b.subtotal, 0);
+    this.ajustarPagina(this.dt_Subcategories, this.subcategories.length);
   }
 
   //Modal para cargar las materias primas asociadas a la subcategoria seleccionada.
   loadModalSubcategories(mp: any) {
-    this.materials = [];
     this.modalSubcat = true;
     this.subcategory = mp.reference;
-    this.materials = this.ArrayMateriaPrima.filter(x => x.Subcategoria_Id == mp.id);
-    this.materials.sort((a, b) => Number(a.Id) - Number(b.Id));
+    this.materials = this.filasSubcategorias().filter(x => x.Subcategoria_Id == mp.id).sort((a, b) => Number(a.Id) - Number(b.Id));
+    this.ajustarPagina(this.dt_Materiales, 0); //Cada subcategoría abre su listado desde la primera página
   }
 
-  // Funcion que va a mostrar las materias primas con existencias mayor a cero
-  existenciasMayorCero() {
-    this.load = false;
-    this.ArrayMateriaPrima = this.ArrayMateriaPrima.filter((item) => item.Cant > 0);
-    this.polietilenos = this.polietilenos.filter((item) => item.Cant > 0);
-    this.tintas = this.tintas.filter((item) => item.Cant > 0);
-    this.biorientados = this.biorientados.filter((item) => item.Cant > 0);
-    this.load = true;
-  }
+  /** Filtros de las tablas. Los totales se recalculan con el evento (onFilter) de cada tabla. */
+  aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dt?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro($event, campo: any, valorCampo: string) {
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt?.filteredValue != null) {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt.filteredValue.length; i++) {
-          this.valorTotal += this.dt.filteredValue[i].PrecioUnd * this.dt.filteredValue[i].Cant;
-          this.cantInicial += this.dt.filteredValue[i].Inicial;
-          this.cantEntrante += this.dt.filteredValue[i].Entrada;
-          this.cantSaliente += this.dt.filteredValue[i].Salida;
-          this.cantExistencias += this.dt.filteredValue[i].Cant;
-          this.cantDiferencia += this.dt.filteredValue[i].Diferencia;
-        }
-      } else {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt!._value.length; i++) {
-          this.valorTotal += this.dt!._value[i].PrecioUnd * this.dt!._value[i].Cant;
-          this.cantInicial += this.dt!._value[i].Inicial;
-          this.cantEntrante += this.dt!._value[i].Entrada;
-          this.cantSaliente += this.dt!._value[i].Salida;
-          this.cantExistencias += this.dt!._value[i].Cant;
-          this.cantDiferencia += this.dt!._value[i].Diferencia;
-        }
-      }
-    }, 500);
-  }
+  // Filtro de la tabla de subcategorías
+  applyFilter = ($event, campo: any, valorCampo: string) => this.dt_Subcategories?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  applyFilter($event, campo: any, valorCampo: string) {
-    this.dt_Subcategories!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt_Subcategories?.filteredValue != null) {
-        this.totalSubcategories = 0;
-        for (let index = 0; index < this.dt_Subcategories.filteredValue.length; index++) {
-          this.totalSubcategories += this.dt_Subcategories.filteredValue[index].Stock;
-        }
-      } else {
-        this.totalSubcategories = 0;
-        for (let index = 0; index < this.dt_Subcategories!._value.length; index++) {
-          this.totalSubcategories += this.dt_Subcategories!._value[index].Stock;
-        }
-      }
-    }, 500)
-  }
+  // Total de la tabla de subcategorías según lo filtrado
+  actualizarTotalSubcategorias = (event: any) => this.totalSubcategories = (event?.filteredValue ?? []).reduce((a, b) => a + (b.subtotal ?? 0), 0);
 
-  cantidadExistencias(data: any) {
-    let total: number = 0;
-    total = data.reduce((a, b) => a + b.Cant, 0);
-    return total;
-  }
+  // Filtro de la tabla del modal de materiales por subcategoría
+  aplicarFiltroMateriales = ($event, campo: any, valorCampo: string) => this.dt_Materiales?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  valorTotalExistencia(data: any) {
-    let total: number = 0;
-    total = data.reduce((a, b) => a + (b.Cant * b.PrecioUnd), 0);
-    return total;
-  }
+  cantidadExistencias = (data: any[]): number => (data ?? []).reduce((a, b) => a + (b.Cant ?? 0), 0);
+
+  valorTotalExistencia = (data: any[]): number => (data ?? []).reduce((a, b) => a + ((b.Cant ?? 0) * (b.PrecioUnd ?? 0)), 0);
 
   // Funcion que va a filtrar la información de la tabla e polietilenos
-  aplicarFiltroPolietilenos($event, campo: any, valorCampo: string) {
-    this.dt_Polientileno!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt_Polientileno?.filteredValue != null) {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt_Polientileno.filteredValue.length; i++) {
-          this.valorTotal += this.dt_Polientileno.filteredValue[i].PrecioUnd * this.dt_Polientileno.filteredValue[i].Cant;
-          this.cantInicial += this.dt_Polientileno.filteredValue[i].Inicial;
-          this.cantEntrante += this.dt_Polientileno.filteredValue[i].Entrada;
-          this.cantSaliente += this.dt_Polientileno.filteredValue[i].Salida;
-          this.cantExistencias += this.dt_Polientileno.filteredValue[i].Cant;
-          this.cantDiferencia += this.dt_Polientileno.filteredValue[i].Diferencia;
-        }
-      } else {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt_Polientileno!._value.length; i++) {
-          this.valorTotal += this.dt_Polientileno!._value[i].PrecioUnd * this.dt_Polientileno!._value[i].Cant;
-          this.cantInicial += this.dt_Polientileno!._value[i].Inicial;
-          this.cantEntrante += this.dt_Polientileno!._value[i].Entrada;
-          this.cantSaliente += this.dt_Polientileno!._value[i].Salida;
-          this.cantExistencias += this.dt_Polientileno!._value[i].Cant;
-          this.cantDiferencia += this.dt_Polientileno!._value[i].Diferencia;
-        }
-      }
-    }, 500);
-  }
+  aplicarFiltroPolietilenos = ($event, campo: any, valorCampo: string) => this.dt_Polientileno?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a filtar la información de la tabla de tintas
-  aplicarFiltroTintas($event, campo: any, valorCampo: string) {
-    this.dt_Tintas!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt_Tintas?.filteredValue != null) {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt_Tintas.filteredValue.length; i++) {
-          this.valorTotal += this.dt_Tintas.filteredValue[i].PrecioUnd * this.dt_Tintas.filteredValue[i].Cant;
-          this.cantInicial += this.dt_Tintas.filteredValue[i].Inicial;
-          this.cantEntrante += this.dt_Tintas.filteredValue[i].Entrada;
-          this.cantSaliente += this.dt_Tintas.filteredValue[i].Salida;
-          this.cantExistencias += this.dt_Tintas.filteredValue[i].Cant;
-          this.cantDiferencia += this.dt_Tintas.filteredValue[i].Diferencia;
-        }
-      } else {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt_Tintas!._value.length; i++) {
-          this.valorTotal += this.dt_Tintas!._value[i].PrecioUnd * this.dt_Tintas!._value[i].Cant;
-          this.cantInicial += this.dt_Tintas!._value[i].Inicial;
-          this.cantEntrante += this.dt_Tintas!._value[i].Entrada;
-          this.cantSaliente += this.dt_Tintas!._value[i].Salida;
-          this.cantExistencias += this.dt_Tintas!._value[i].Cant;
-          this.cantDiferencia += this.dt_Tintas!._value[i].Diferencia;
-        }
-      }
-    }, 500);
+  aplicarFiltroTintas = ($event, campo: any, valorCampo: string) => this.dt_Tintas?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  // Funcion que va a filtrar la información en la tabla de biorientados
+  aplicarFiltrosBiorientados = ($event, campo: any, valorCampo: string) => this.dt_Biorientados?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  /* ===================================================================================================
+   * EXPORTACIÓN A EXCEL
+   * - Botón superior "Exportar todo": un solo libro con una hoja por cada pestaña visible para el rol (sin filtros).
+   * - Botón de cada pestaña: solo la información de esa pestaña, respetando los filtros aplicados.
+   * =================================================================================================== */
+
+  /** Información de cada pestaña exportable: nombre visible, roles que la ven y de dónde salen los datos. */
+  private definicionPestanaExcel(pestana: PestanaExcel): { nombre: string, visible: boolean, columnas: ColumnaExcel[], filas: (conFiltros: boolean) => any[], subtitulo: () => string } {
+    const rol = this.ValidarRol;
+    const verPrecios = [1, 104].includes(rol);
+    const rango = () => this.rangoConsultado ? `Movimientos del ${this.rangoConsultado.inicio} al ${this.rangoConsultado.fin}` : '';
+    const filtradas = (tabla: Table | undefined, datos: any[]) => (conFiltros: boolean) => (conFiltros && tabla?.filteredValue) ? tabla.filteredValue : datos;
+    const verPestanasGenerales = ![63, 89, 4].includes(rol) && this.rolesInventarioGeneral.includes(rol);
+    const verPestanasBopp = [1, 3, 4, 89, 63, 12, 98, 2, 104].includes(rol);
+
+    //Formato de cada columna posible de las tablas de inventario (por campo).
+    const formatoColumnas: { [campo: string]: Omit<ColumnaExcel, 'titulo' | 'campo'> } = {
+      Id: { ancho: 12 },
+      Nombre: { ancho: 55 },
+      Descripcion: { ancho: 45 },
+      Ancho: { ancho: 10, formato: 'cantidad' },
+      Micras: { ancho: 10, formato: 'cantidad' },
+      Inicial: { ancho: 18, formato: 'cantidad', total: true },
+      Entrada: { ancho: 14, formato: 'cantidad', total: true },
+      Salida: { ancho: 14, formato: 'cantidad', total: true },
+      Cant: { ancho: 18, formato: 'cantidad', total: true, resaltar: true },
+      Diferencia: { ancho: 14, formato: 'cantidad', total: true },
+      UndCant: { ancho: 10 },
+      PrecioUnd: { ancho: 16, formato: 'moneda' },
+      SubTotal: { ancho: 20, formato: 'moneda', total: true },
+      Categoria: { ancho: 22 },
+      Subcategoria: { ancho: 25 },
+    };
+    //Se exportan las columnas que el usuario eligió en el selector, en el mismo orden y con el mismo título que en la tabla.
+    //Si no eligió ninguna se exportan todas. Precio y subtotal solo para los roles que pueden verlos.
+    const seleccionadas = (this._columnasSeleccionada?.length ? this._columnasSeleccionada : this.columnas);
+    const columnasInventario: ColumnaExcel[] = seleccionadas
+      .filter(c => verPrecios || !['PrecioUnd', 'SubTotal'].includes(c.field))
+      .map(c => ({ titulo: c.header, campo: c.field, ...(formatoColumnas[c.field] ?? { ancho: 18 }) }));
+
+    switch (pestana) {
+      case 'materiasPrimas':
+        return { nombre: 'Materias Primas', visible: verPestanasGenerales, columnas: columnasInventario, filas: filtradas(this.dt, this.ArrayMateriaPrima), subtitulo: rango };
+      case 'polietilenos':
+        return { nombre: 'Polietilenos', visible: verPestanasGenerales, columnas: columnasInventario, filas: filtradas(this.dt_Polientileno, this.polietilenos), subtitulo: rango };
+      case 'tintas':
+        return { nombre: 'Tintas', visible: verPestanasGenerales, columnas: columnasInventario, filas: filtradas(this.dt_Tintas, this.tintas), subtitulo: rango };
+      case 'biorientados':
+        return { nombre: 'Biorientados', visible: this.rolesInventarioBopp.includes(rol), columnas: columnasInventario, filas: filtradas(this.dt_Biorientados, this.biorientados), subtitulo: rango };
+      case 'boppsAgrupados':
+        return {
+          nombre: 'Bopps agrupados', visible: verPestanasBopp, subtitulo: () => 'Stock actual de rollos con existencias',
+          filas: filtradas(this.dt_BoppGenerico, this.arrayBopps),
+          columnas: [
+            { titulo: 'Id', campo: 'Id', ancho: 12 },
+            { titulo: 'Nombre', campo: 'Nombre', ancho: 40 },
+            { titulo: 'Micras', campo: 'Micras', ancho: 10, formato: 'cantidad' },
+            { titulo: 'Ancho', campo: 'Ancho', ancho: 10, formato: 'cantidad' },
+            { titulo: 'Categoria', campo: 'NombreCateg', ancho: 22 },
+            { titulo: 'Rollos', campo: 'Rollos', ancho: 10, formato: 'entero', total: true },
+            { titulo: 'Stock', campo: 'Stock', ancho: 16, formato: 'cantidad', total: true, resaltar: true },
+            { titulo: 'Medida', campo: 'Medida', ancho: 10 },
+          ],
+        };
+      case 'subcategorias':
+        return {
+          nombre: 'Subcategorias', visible: verPestanasBopp, subtitulo: () => 'Stock actual agrupado por subcategoría',
+          filas: filtradas(this.dt_Subcategories, this.subcategories),
+          columnas: [
+            { titulo: 'Id', campo: 'id', ancho: 10 },
+            { titulo: 'Subcategoria', campo: 'reference', ancho: 45 },
+            { titulo: 'Stock', campo: 'stock', ancho: 18, formato: 'cantidad', total: true, resaltar: true },
+            { titulo: 'Presentación', campo: 'unit', ancho: 14 },
+            ...(verPrecios ? [{ titulo: 'Subtotal', campo: 'subtotal', ancho: 20, formato: 'moneda', total: true } as ColumnaExcel] : []),
+          ],
+        };
+    }
   }
 
-  // Funcion que va a filtrar la información en la tabla de la alcantarilla
-  aplicarFiltrosBiorientados($event, campo: any, valorCampo: string) {
-    this.dt_Biorientados!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt_Biorientados?.filteredValue != null) {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt_Biorientados!.filteredValue.length; i++) {
-          this.valorTotal += this.dt_Biorientados!.filteredValue[i].PrecioUnd * this.dt_Biorientados!.filteredValue[i].Cant;
-          this.cantInicial += this.dt_Biorientados!.filteredValue[i].Inicial;
-          this.cantEntrante += this.dt_Biorientados!.filteredValue[i].Entrada;
-          this.cantSaliente += this.dt_Biorientados!.filteredValue[i].Salida;
-          this.cantExistencias += this.dt_Biorientados!.filteredValue[i].Cant;
-          this.cantDiferencia += this.dt_Biorientados!.filteredValue[i].Diferencia;
-        }
-      } else {
-        this.valorTotal = 0;
-        this.cantInicial = 0;
-        this.cantEntrante = 0;
-        this.cantSaliente = 0;
-        this.cantExistencias = 0;
-        this.cantDiferencia = 0;
-        for (let i = 0; i < this.dt_Biorientados!._value.length; i++) {
-          this.valorTotal += this.dt_Biorientados!._value[i].PrecioUnd * this.dt_Biorientados!._value[i].Cant;
-          this.cantInicial += this.dt_Biorientados!._value[i].Inicial;
-          this.cantEntrante += this.dt_Biorientados!._value[i].Entrada;
-          this.cantSaliente += this.dt_Biorientados!._value[i].Salida;
-          this.cantExistencias += this.dt_Biorientados!._value[i].Cant;
-          this.cantDiferencia += this.dt_Biorientados!._value[i].Diferencia;
-        }
-      }
-    }, 500);
-  }
+  /** Agrega al libro una hoja con logo, título, subtítulo, encabezados, datos y fila de totales. */
+  private agregarHojaExcel(workbook: Workbook, idLogo: number, nombreHoja: string, titulo: string, subtitulo: string, columnas: ColumnaExcel[], filas: any[]) {
+    const formatos = { cantidad: '#,##0.00;[Red]-#,##0.00', moneda: '"$"#,##0.00;[Red]-"$"#,##0.00', entero: '#,##0;[Red]-#,##0' };
+    const borde: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    const total = columnas.length;
+    const filaEncabezado = 7;
+    const ws = workbook.addWorksheet(nombreHoja.substring(0, 31), { views: [{ state: 'frozen', ySplit: filaEncabezado }] });
 
-  // Funcion que va a exportar a excel la información de las materias primas. Recibirá un número para diferenciar con que informacion se llenará el archivo
-  exportarExcel(num: number) {
-    if ([4, 89].includes(this.ValidarRol)) num = 5;
+    columnas.forEach((c, i) => ws.getColumn(i + 1).width = c.ancho);
 
-    this.load = false;
-    let datos: any[] = [];
-    let infoDocumento: any[] = [];
-    let title: string = ``;
-    if (num == 1) {
-      datos = this.ArrayMateriaPrima; //Todas las materias primas
-      title = `Inventario Materia Prima - ${this.today}`;
-    }
-    else if (num == 2) {
-      this.dt?.filteredValue != null ? datos = this.dt.filteredValue : datos = this.ArrayMateriaPrima; //Materias primas filtradas y no filtradas
-      title = `Inventario Materia Prima - ${this.today}`;
-    }
-    else if (num == 3) {
-      this.dt_Polientileno?.filteredValue != null ? datos = this.dt_Polientileno.filteredValue : datos = this.polietilenos; //Polietilenos filtrados y no filtrados
-      title = `Inventario Polietilenos - ${this.today}`;
-    }
-    else if (num == 4) {
-      this.dt_Tintas?.filteredValue != null ? datos = this.dt_Tintas.filteredValue : datos = this.tintas; //Tintas Filtradas y no Filtradas
-      title = `Inventario Tintas - ${this.today}`;
-    }
-    else if (num == 5) {
-      this.dt_Biorientados?.filteredValue != null ? datos = this.dt_Biorientados.filteredValue : datos = this.biorientados; //Biorientado filtrada y no filtrado
-      title = `Inventario Biorientados - ${this.today}`;
-    }
-    //datos.filter(x => ![21, null].includes(x.Subcategoria)).sort((a,b) => a.Subcategoria.localeCompare(b.Subcategoria));
-    //if (this.boppsAgrupados) this.exportarExcel2();
-    //else {
-    setTimeout(() => {
-      const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria", "Subcategoria", "Micras"]
-      for (const item of datos) {
-        const datos1: any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria, item.Subcategoria, item.Micras];
-        infoDocumento.push(datos1);
-      }
-      let workbook = new Workbook();
-      const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(title);
-      worksheet.addImage(imageId1, 'A1:B3');
-      let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'eeeeee' }
-        }
-        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    //Logo en las filas 1-3 conservando su proporción original (no se deforma).
+    const altoLogo = 55;
+    ws.addImage(idLogo, { tl: { col: 0, row: 0 }, ext: { width: Math.round(altoLogo * this.proporcionLogo()), height: altoLogo } });
+
+    //Título (fila 4), subtítulo (fila 5) y fila 6 como separación.
+    if (total > 1) ws.mergeCells(4, 1, 4, total);
+    ws.getRow(4).height = 24;
+    ws.getCell(4, 1).value = titulo;
+    ws.getCell(4, 1).font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+    ws.getCell(4, 1).alignment = { vertical: 'middle', horizontal: 'left' };
+    if (total > 1) ws.mergeCells(5, 1, 5, total);
+    ws.getCell(5, 1).value = [subtitulo, `Generado: ${moment().format('YYYY-MM-DD H:mm')}`].filter(x => x).join('  ·  ');
+    ws.getCell(5, 1).font = { name: 'Calibri', size: 10, italic: true };
+    ws.getCell(5, 1).alignment = { horizontal: 'left' };
+
+    //Encabezados
+    const encabezado = ws.getRow(filaEncabezado);
+    columnas.forEach((c, i) => {
+      const celda = encabezado.getCell(i + 1);
+      celda.value = c.titulo;
+      celda.font = { bold: true };
+      celda.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      celda.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EEEEEE' } };
+      celda.border = borde;
+    });
+
+    //Datos
+    filas.forEach((fila, f) => {
+      const row = ws.getRow(filaEncabezado + 1 + f);
+      columnas.forEach((c, i) => {
+        const celda = row.getCell(i + 1);
+        celda.value = fila[c.campo] ?? (c.formato ? 0 : '');
+        if (c.formato) celda.numFmt = formatos[c.formato];
+        if (c.resaltar) celda.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ADD8E6' } };
+        celda.border = borde;
       });
-      worksheet.mergeCells('A1:M3');
-      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-      worksheet.getCell('A1').value = title;
-      infoDocumento.forEach(d => {
-        let row = worksheet.addRow(d);
-        row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-        row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-        let qty = row.getCell(7);
-        let color = 'ADD8E6';
-        qty.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: color }
+    });
+
+    //Totales
+    if (columnas.some(c => c.total) && filas.length > 0) {
+      const row = ws.getRow(filaEncabezado + 1 + filas.length);
+      const primeraConTotal = columnas.findIndex(c => c.total);
+      if (primeraConTotal > 0) row.getCell(primeraConTotal).value = 'TOTALES';
+      columnas.forEach((c, i) => {
+        const celda = row.getCell(i + 1);
+        if (c.total) {
+          celda.value = filas.reduce((a, b) => a + (Number(b[c.campo]) || 0), 0);
+          celda.numFmt = formatos[c.formato ?? 'cantidad'];
         }
+        celda.font = { bold: true };
+        celda.border = borde;
       });
-      worksheet.getColumn(1).width = 10;
-      worksheet.getColumn(2).width = 60;
-      worksheet.getColumn(3).width = 12;
-      worksheet.getColumn(4).width = 22;
-      worksheet.getColumn(5).width = 12;
-      worksheet.getColumn(6).width = 12;
-      worksheet.getColumn(7).width = 22;
-      worksheet.getColumn(8).width = 12;
-      worksheet.getColumn(9).width = 12;
-      worksheet.getColumn(10).width = 12;
-      worksheet.getColumn(11).width = 20;
-      worksheet.getColumn(12).width = 20;
-      worksheet.getColumn(13).width = 25;
-      setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, title + `.xlsx`);
-        });
-        this.load = true;
-        this.msj.mensajeConfirmacion(`Confirmación`, `Se ha exportado el ` + title + `!`);
-      }, 1000);
-    }, 1500);
-    //}
+    }
   }
 
-  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
-  verTutorial() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
+  /** Genera el archivo y lo descarga. */
+  private async descargarExcel(workbook: Workbook, nombreArchivo: string) {
+    const buffer = await workbook.xlsx.writeBuffer();
+    fs.saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${nombreArchivo}.xlsx`);
   }
+
+  /** Crea un libro nuevo y devuelve el id del logo para usarlo en sus hojas. */
+  /** Proporción ancho/alto del logo leída de la cabecera del PNG (si falla se usa la del logo actual, 1972x370). */
+  private proporcionLogo(): number {
+    try {
+      const base64 = String(logoParaPdf).split(',').pop()!.substring(0, 44);
+      const bytes = atob(base64);
+      const leer = (i: number) => ((bytes.charCodeAt(i) << 24) >>> 0) + (bytes.charCodeAt(i + 1) << 16) + (bytes.charCodeAt(i + 2) << 8) + bytes.charCodeAt(i + 3);
+      const ancho = leer(16), alto = leer(20);
+      if (ancho > 0 && alto > 0) return ancho / alto;
+    } catch { }
+    return 1972 / 370;
+  }
+
+  private nuevoLibroExcel() {
+    const workbook = new Workbook();
+    const idLogo = workbook.addImage({ base64: logoParaPdf, extension: 'png' });
+    return { workbook, idLogo };
+  }
+
+  /** Botón de cada pestaña: exporta solo esa pestaña respetando sus filtros. */
+  async exportarPestana(pestana: PestanaExcel) {
+    const def = this.definicionPestanaExcel(pestana);
+    const filas = def.filas(true);
+    if (filas.length == 0) {
+      this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos de ${def.nombre} para exportar.`);
+      return;
+    }
+    const titulo = `Inventario ${def.nombre} - ${this.today}`;
+    this.iniciarCarga();
+    try {
+      const { workbook, idLogo } = this.nuevoLibroExcel();
+      this.agregarHojaExcel(workbook, idLogo, def.nombre, titulo, def.subtitulo(), def.columnas, filas);
+      await this.descargarExcel(workbook, titulo);
+      this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha exportado el ${titulo}!`);
+    } catch {
+      this.msj.mensajeError(`¡Error!`, `¡Ocurrió un error al generar el Excel de ${def.nombre}!`);
+    } finally {
+      this.terminarCarga();
+    }
+  }
+
+  /** Botón superior: un solo libro con una hoja por cada pestaña visible para el rol (información completa, sin filtros). */
+  async exportarTodo() {
+    this.iniciarCarga();
+    try {
+      //Bopps agrupados y subcategorías se calculan solo al abrir su pestaña; si no se han cargado se cargan aquí.
+      if (this.definicionPestanaExcel('boppsAgrupados').visible && !this.boppsAgrupadosCargados) await this.cargarBoppsAgrupadosParaExcel();
+      if (this.definicionPestanaExcel('subcategorias').visible) this.loadSubcategories();
+
+      const { workbook, idLogo } = this.nuevoLibroExcel();
+      const pestanas: PestanaExcel[] = ['materiasPrimas', 'polietilenos', 'tintas', 'biorientados', 'boppsAgrupados', 'subcategorias'];
+      let hojas = 0;
+      for (const p of pestanas) {
+        const def = this.definicionPestanaExcel(p);
+        const filas = def.filas(false);
+        if (!def.visible || filas.length == 0) continue;
+        this.agregarHojaExcel(workbook, idLogo, def.nombre, `Inventario ${def.nombre} - ${this.today}`, def.subtitulo(), def.columnas, filas);
+        hojas++;
+      }
+      if (hojas == 0) {
+        this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+        return;
+      }
+      const titulo = `Inventario Materia Prima Completo - ${this.today}`;
+      await this.descargarExcel(workbook, titulo);
+      this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha exportado el ${titulo} con ${hojas} hoja(s)!`);
+    } catch {
+      this.msj.mensajeError(`¡Error!`, `¡Ocurrió un error al generar el Excel del inventario!`);
+    } finally {
+      this.terminarCarga();
+    }
+  }
+
+  /** Consulta los bopps agrupados para incluirlos en el Excel completo cuando aún no se ha abierto su pestaña. */
+  private async cargarBoppsAgrupadosParaExcel() {
+    const data = await firstValueFrom(this.boppService.GetInventarioBoppsGenericosV2());
+    this.arrayBopps = (data ?? []).map(d => this.cargarTablaBopps(d));
+    this.stockTotalBopps = this.arrayBopps.reduce((a, b) => a + (b.Stock ?? 0), 0);
+    this.boppsAgrupadosCargados = true;
+  }
+
+  //#region Tutorial
+  /** Muestra el tutorial (botón "i" del título). La primera vez que el usuario entra se muestra solo. */
+  tutorial = () => this.tutoriales.iniciar(this.pasosTutorial());
+
+  /** Pasos del tutorial según lo que el rol del usuario puede ver y hacer en la página. */
+  private pasosTutorial() {
+    const veInventarioGeneral = ![63, 89, 4].includes(this.ValidarRol);
+    return pasosTutorialInventarioMateriaPrima({
+      veInventarioGeneral,
+      veAgrupados: [1, 3, 4, 89, 63, 12, 98, 2, 104].includes(this.ValidarRol),
+      puedeCrear: [1, 104].includes(this.ValidarRol),
+      //La primera pestaña es Materias Primas (editan 1, 104 y 3) o, para los roles de BOPP, Biorientados (editan 1 y 104).
+      puedeEditarPrimeraPestana: veInventarioGeneral ? [1, 104, 3].includes(this.ValidarRol) : [1, 104].includes(this.ValidarRol),
+      vePrecios: [1, 104].includes(this.ValidarRol),
+      irPrimeraPestana: () => this.pestanaActiva = 0,
+    });
+  }
+
+  /** Inicia el tutorial automáticamente la primera vez, cuando termina la primera consulta y las tablas ya se ven. */
+  private iniciarTutorialPrimeraVez() {
+    if (this.tutorialAutomaticoRevisado) return;
+    this.tutorialAutomaticoRevisado = true;
+    this.tutoriales.iniciarPrimeraVez(ClaveTutorialInventarioMateriaPrima, this.storage_Id, () => this.pasosTutorial());
+  }
+  //#endregion
 
   // Funcion para llamar el modal que pregunta que materia prima se va a crear
   LlamarModalCrearMateriaPrima = () => this.modalCreacionMateriaPrima = true;
@@ -706,7 +750,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       PrecioEstandar: data.PrecioEstandar,
       subcategory: data.Subcategoria_Id,
     });
-    if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
+    if (data.Tipo == 'BOPP') {
       this.esBopp = true;
       this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
@@ -723,7 +767,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a editar una materia primas
   editarMateriaPrima() {
-    if (this.categoriasMP.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
+    //Se decide la tabla a actualizar por el origen del registro (Tipo) y no por la categoría elegida en el formulario,
+    //así cambiar la categoría no envía el registro a la tabla equivocada.
+    const tipo: string = this.materialSeleccionado?.Tipo;
+    if (tipo == 'MP') {
       const info: modelMateriaPrima = {
         MatPri_Id: this.FormEdicionMateriaPrima.value.Id,
         MatPri_Nombre: this.FormEdicionMateriaPrima.value.Nombre,
@@ -749,7 +796,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.esBopp = false;
         this.idBoppGenerico = 1;
       });
-    } else if (this.categoriasTintas.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
+    } else if (tipo == 'TINTA') {
       this.tintasService.srvObtenerListaPorId(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
         const info: modelTintas = {
           Tinta_Id: this.FormEdicionMateriaPrima.value.Id,
@@ -786,7 +833,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
 
       });
-    } else if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
+    } else if (tipo == 'BOPP') {
       this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           const info: modelBOPP = {
@@ -833,23 +880,28 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   /** Función que consultará la información del BOPP agrupado por genérico. */
   boppsAgrupados_Genericos() {
-    this.arrayBopps = [];
-    this.stockTotalBopps = 0;
-    let cantDatos: number = 0;
-    this.load = false;
-
-    this.boppService.GetInventarioBoppsGenericos().subscribe(data => {
-      for (let index = 0; index < data.length; index++) {
-        this.cargarTablaBopps(data[index]);
-        cantDatos += 1;
-        cantDatos == data.length ? this.load = true : this.load = false;
-      }
-    });
+    this.subBoppsAgrupados?.unsubscribe();
+    this.iniciarCarga();
+    this.subBoppsAgrupados = this.boppService.GetInventarioBoppsGenericosV2()
+      .pipe(finalize(() => this.terminarCarga()))
+      .subscribe({
+        next: data => {
+          this.arrayBopps = (data ?? []).map(d => this.cargarTablaBopps(d));
+          this.stockTotalBopps = this.arrayBopps.reduce((a, b) => a + (b.Stock ?? 0), 0);
+          this.boppsAgrupadosCargados = true;
+          this.ajustarPagina(this.dt_BoppGenerico, this.arrayBopps.length);
+        },
+        error: error => {
+          this.arrayBopps = [];
+          this.stockTotalBopps = 0;
+          this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar los bopps agrupados!`));
+        }
+      });
   }
 
-  /**  Función que cargará en la tabla la información del BOPP agrupado por genérico. */
+  /**  Función que convierte un registro del BOPP agrupado por genérico en la fila de la tabla. */
   cargarTablaBopps(datos: any) {
-    let info: any = {
+    return {
       Id: datos.id,
       Nombre: datos.nombre,
       Micras: datos.micras,
@@ -859,53 +911,41 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       Rollos: datos.rollos,
       Stock: datos.stock,
       Medida: datos.medida,
-    }
-    this.arrayBopps.push(info);
-    this.stockTotalBopps += info.Stock;
+    };
   }
 
-  /** Función que cargará el bopp agrupado por el génerico */
-  aplicarfiltroGenerico($event, campo: any, valorCampo: string) {
-    this.dt_BoppGenerico!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt_BoppGenerico?.filteredValue != null) {
-        this.stockTotalBopps = 0;
-        for (let index = 0; index < this.dt_BoppGenerico.filteredValue.length; index++) {
-          this.stockTotalBopps += this.dt_BoppGenerico.filteredValue[index].Stock;
-        }
-      } else {
-        this.stockTotalBopps = 0;
-        for (let index = 0; index < this.dt_BoppGenerico!._value.length; index++) {
-          this.stockTotalBopps += this.dt_BoppGenerico!._value[index].Stock;
-        }
-      }
-    }, 500)
-  }
+  /** Filtro de la tabla de bopp agrupado. El total se recalcula con el evento (onFilter). */
+  aplicarfiltroGenerico = ($event, campo: any, valorCampo: string) => this.dt_BoppGenerico?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  /** Total de stock de la tabla de bopp agrupado según lo filtrado. */
+  actualizarTotalBoppsAgrupados = (event: any) => this.stockTotalBopps = (event?.filteredValue ?? []).reduce((a, b) => a + (b.Stock ?? 0), 0);
 
   /** Función que llamará el modal y consultará la información de el(los) bopp(s) asociado(s) al bopp genérico que se seleccionó */
   llamarModalBopp(data: any) {
-    this.genericoSeleccionado = data.Nombre
+    const rango = this.obtenerRangoFechas();
+    if (!rango) return;
+    this.genericoSeleccionado = data.Nombre;
     this.modalVerBopps = true;
     this.arrayModalBopp = [];
-    this.valorTotalBopp = 0;
-    this.cantInicialBopp = 0;
-    this.cantEntranteBopp = 0;
-    this.cantSalienteBopp = 0;
-    this.cantExistenciasBopp = 0;
-    this.cantDiferenciaBopp = 0;
-    let fecha: any = this.rongoFechas.length > 0 ? moment(this.rongoFechas[0]).format('YYYY-MM-DD') : this.today;
-    let fechaFinal: any = this.rongoFechas.length > 0 ? moment(this.rongoFechas[1]).format('YYYY-MM-DD') : fecha;
+    this.ajustarPagina(this.dt_Biorientados2, 0); //Cada genérico abre su listado de rollos desde la primera página
+    this.calcularTotalesModalBopp([]);
 
-    this.boppService.GetInventarioBopps(fecha, fechaFinal, data.Id).subscribe(data => {
-      for (let index = 0; index < data.length; index++) {
-        this.cargarTablaModal(data[index]);
-      }
-    });
+    this.subModalBopp?.unsubscribe();
+    this.iniciarCarga();
+    this.subModalBopp = this.boppService.GetInventarioBoppsV2(rango.inicio, rango.fin, data.Id)
+      .pipe(finalize(() => this.terminarCarga()))
+      .subscribe({
+        next: rollos => {
+          this.arrayModalBopp = (rollos ?? []).map(r => this.cargarTablaModal(r));
+          this.calcularTotalesModalBopp(this.arrayModalBopp);
+        },
+        error: error => this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar los rollos del bopp genérico!`)),
+      });
   }
 
-  /** Función quellenará la información de el(los) bopp(s) asociado(s) al bopp genérico que se seleccionó */
+  /** Función que convierte un rollo asociado al bopp genérico en la fila de la tabla del modal */
   cargarTablaModal(datos: any) {
-    let info: any = {
+    return {
       Id: datos.id,
       Nombre: datos.nombre,
       Ancho: datos.ancho,
@@ -920,131 +960,39 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       SubTotal: datos.subtotal,
       Categoria: datos.categoria,
       Categoria_Id: datos.categoriaId,
-    }
-    this.arrayModalBopp.push(info);
-    this.valorTotalBopp += info.SubTotal,
-      this.cantInicialBopp += info.Inicial,
-      this.cantEntranteBopp += info.Entrada,
-      this.cantSalienteBopp += info.Salida,
-      this.cantExistenciasBopp += info.Cant,
-      this.cantDiferenciaBopp += info.Diferencia
+    };
   }
 
-  /** Función que cargará el inventario de bopp's agrupados si se encuentra en el tab 4 */
+  /** Calcula los totales del footer del modal de rollos. */
+  private calcularTotalesModalBopp(filas: any[]) {
+    const sumar = (campo: string) => (filas ?? []).reduce((a, b) => a + (b[campo] ?? 0), 0);
+    this.valorTotalBopp = sumar('SubTotal');
+    this.cantInicialBopp = sumar('Inicial');
+    this.cantEntranteBopp = sumar('Entrada');
+    this.cantSalienteBopp = sumar('Salida');
+    this.cantExistenciasBopp = sumar('Cant');
+    this.cantDiferenciaBopp = sumar('Diferencia');
+  }
+
+  /** Función que cargará el inventario de bopp's agrupados o las subcategorías según la pestaña seleccionada */
   cargarTabs(event) {
-    let tab: any = event.originalEvent.srcElement.innerText;
-    if (tab == 'Bopps agrupados') {
+    //Se busca el encabezado de la pestaña para que funcione aunque se haga clic sobre el icono.
+    const elemento = event?.originalEvent?.target as HTMLElement;
+    const tab: string = (elemento?.closest('[role="tab"]')?.textContent ?? elemento?.innerText ?? '').trim();
+    if (tab.includes('Bopps agrupados')) {
       this.boppsAgrupados = true;
       this.boppsAgrupados_Genericos();
-    } else if (tab == 'Subcategorias') {
+    } else if (tab.includes('Subcategorias')) {
       this.isSubcategory = true;
       this.loadSubcategories();
     }
   }
 
-  // Funcion que va a filtrar la información en la tabla de inventario
-  aplicarFiltrosBiorientados2($event, campo: any, valorCampo: string) {
-    this.dt_Biorientados2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt_Biorientados2?.filteredValue != null) {
-        this.valorTotalBopp = 0;
-        this.cantInicialBopp = 0;
-        this.cantEntranteBopp = 0;
-        this.cantSalienteBopp = 0;
-        this.cantExistenciasBopp = 0;
-        this.cantDiferenciaBopp = 0;
-        for (let i = 0; i < this.dt_Biorientados2.filteredValue.length; i++) {
-          this.valorTotalBopp += this.dt_Biorientados2.filteredValue[i].PrecioUnd * this.dt_Biorientados2.filteredValue[i].Cant;
-          this.cantInicialBopp += this.dt_Biorientados2.filteredValue[i].Inicial;
-          this.cantEntranteBopp += this.dt_Biorientados2.filteredValue[i].Entrada;
-          this.cantSalienteBopp += this.dt_Biorientados2.filteredValue[i].Salida;
-          this.cantExistenciasBopp += this.dt_Biorientados2.filteredValue[i].Cant;
-          this.cantDiferenciaBopp += this.dt_Biorientados2.filteredValue[i].Diferencia;
-        }
-      } else {
-        this.valorTotalBopp = 0;
-        this.cantInicialBopp = 0;
-        this.cantEntranteBopp = 0;
-        this.cantSalienteBopp = 0;
-        this.cantExistenciasBopp = 0;
-        this.cantDiferenciaBopp = 0;
-        for (let i = 0; i < this.dt_Biorientados2!._value.length; i++) {
-          this.valorTotalBopp += this.dt_Biorientados2!._value[i].PrecioUnd * this.dt_Biorientados2!._value[i].Cant;
-          this.cantInicialBopp += this.dt_Biorientados2!._value[i].Inicial;
-          this.cantEntranteBopp += this.dt_Biorientados2!._value[i].Entrada;
-          this.cantSalienteBopp += this.dt_Biorientados2!._value[i].Salida;
-          this.cantExistenciasBopp += this.dt_Biorientados2!._value[i].Cant;
-          this.cantDiferenciaBopp += this.dt_Biorientados2!._value[i].Diferencia;
-        }
-      }
-    }, 500);
-  }
+  // Funcion que va a filtrar la información en la tabla del modal de rollos. Los totales se recalculan con (onFilter).
+  aplicarFiltrosBiorientados2 = ($event, campo: any, valorCampo: string) => this.dt_Biorientados2?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  /** Exportar el formato de bopp's agrupados a excel */
-  exportarExcel2() {
-    this.load = false;
-    let datos: any[] = [];
-    let infoDocumento: any[] = [];
-    let title: string = `Inventario Bopp agrupado - ${this.today}`;
-
-    this.dt_BoppGenerico?.filteredValue != null ? datos = this.dt_BoppGenerico.filteredValue : datos = this.arrayBopps;
-
-    setTimeout(() => {
-      const header = ["Id", "Nombre", "Micras", "Ancho", "Categoria", "Rollos", "Stock", "Medida"]
-      for (const item of datos) {
-        const datos1: any = [item.Id, item.Nombre, item.Micras, item.Ancho, item.NombreCateg, item.Rollos, item.Stock, item.Medida];
-        infoDocumento.push(datos1);
-      }
-      let workbook = new Workbook();
-      const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(title);
-      worksheet.addImage(imageId1, 'A1:A2');
-      let titleRow = worksheet.addRow([title]);
-      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-      worksheet.addRow([]);
-      worksheet.addRow([]);
-      let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'eeeeee' }
-        }
-        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      });
-      worksheet.mergeCells('A1:H3');
-      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      infoDocumento.forEach(d => {
-        let row = worksheet.addRow(d);
-        row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        let qty = row.getCell(7);
-        let color = 'ADD8E6';
-        qty.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: color }
-        }
-      });
-      worksheet.getColumn(1).width = 20;
-      worksheet.getColumn(2).width = 35;
-      worksheet.getColumn(3).width = 12;
-      worksheet.getColumn(4).width = 12;
-      worksheet.getColumn(5).width = 12;
-      worksheet.getColumn(6).width = 12;
-      worksheet.getColumn(7).width = 12;
-      worksheet.getColumn(8).width = 12;
-      setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, title + `.xlsx`);
-        });
-        this.load = true;
-        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha generado el formato Excel del ${title}!`);
-      }, 1000);
-    }, 1500);
-  }
+  // Totales del modal de rollos según lo filtrado
+  actualizarTotalesModalBopp = (event: any) => this.calcularTotalesModalBopp(event?.filteredValue ?? []);
 
   /** Función para cargar los nombres de bopps genericos en el campo */
   cargarBoppsGenericos() {
@@ -1061,6 +1009,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let bopp: any = this.FormEdicionMateriaPrima.value.BoppGenerico;
     let nuevo: any = [];
     nuevo = this.boppsGenericos.filter((item) => item.boppGen_Id == bopp);
+    if (nuevo.length == 0) return;
     this.FormEdicionMateriaPrima.patchValue({ BoppGenerico: nuevo[0].boppGen_Nombre, IdBoppGenerico: nuevo[0].boppGen_Id });
   }
 
@@ -1168,129 +1117,5 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       UndMed_Id: 'N/E',
     }
     this.srvSalidasMP.Post(salida).subscribe(data => { }, error => console.log(error));
-  }
-
-  //Función que exportará un formato excel con los datos de los clientes
-  exportExcel() {
-    if (this.subcategories.length > 0) {
-      this.load = false;
-      setTimeout(() => { this.loadSheetAndStyles(this.subcategories); }, 1000);
-    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
-  }
-
-  //Función que cargará la hoja y los estilos. 
-  loadSheetAndStyles(data: any) {
-    let title: any = `Inventario por subcategoria `;
-    title += ` ${moment().format('DD-MM-YYYY')}`;
-    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
-    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
-    let font = { name: 'Calibri', family: 4, size: 11, bold: true };
-    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-    let workbook = this.svExcel.formatoExcel(title, true);
-    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
-    this.svExcel.creacionExcel(title, workbook);
-    this.load = true;
-  }
-
-  //Función para agregar una nueva hoja de calculo.
-  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
-    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-    let worksheet: any = wb.worksheets[0];
-    this.loadStyleTitle(worksheet, title, fontTitle);
-    this.loadHeader(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
-  }
-
-  //Cargar estilos del titulo de la hoja.
-  loadStyleTitle(ws: any, title: any, fontTitle: any) {
-    ws.getCell('A1').alignment = { vertical: 'middle', horizontal: 'right', wrapText: true };
-    ws.getCell('A1').font = fontTitle;
-    ws.getCell('A1').value = title;
-  }
-
-  //Función para cargar los titulos de el header y los estilos.
-  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
-    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5'];
-    ws.addRow(this.loadFieldsHeader());
-
-    //ws.addRow([]);
-    rowHeader.forEach(x => ws.getCell(x).fill = fill);
-    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
-    rowHeader.forEach(x => ws.getCell(x).border = border);
-    rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:F3');
-
-    this.loadSizeHeader(ws);
-  }
-
-  //Función para cargar el tamaño y el alto de las columnas del header.
-  loadSizeHeader(ws: any) {
-    [3].forEach(x => ws.getColumn(x).width = 50);
-    [1].forEach(x => ws.getColumn(x).width = 5);
-    [3, 4, 5, 6].forEach(x => ws.getColumn(x).width = 20);
-  }
-
-  //Función para cargar los nombres de las columnas del header
-  loadFieldsHeader() {
-    let headerRow = [
-      'N°',
-      'Id',
-      'Subcategoria',
-      'Stock',
-      'Presentación',
-      'Subtotal',
-    ];
-    return headerRow;
-  }
-
-  //Cargar información con los estilos al formato excel. 
-  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
-    let formatNumber: Array<number> = [4, 6];
-    let contador: any = 6;
-    let row: any = ['A', 'B', 'C', 'D', 'E', 'F'];
-
-    formatNumber.forEach(i => ws.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    data.forEach(x => {
-      ws.addRow(x);
-      row.forEach(r => {
-        ws.getCell(`${r}${contador}`).border = border;
-        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
-        ws.getCell(`${r}${contador}`).alignment = alignment;
-      });
-      contador++
-    });
-    row.forEach(r => ws.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold: true, });
-  }
-
-  //.Función que contendrá la info al documento excel. 
-  dataExcel(data: any) {
-    let info: any = [];
-    let count: number = 0;
-    data.forEach(x => {
-      info.push([
-        count += 1,
-        x.id,
-        x.reference,
-        x.stock,
-        x.unit,
-        x.subtotal,
-      ]);
-    });
-    this.addTotal(info);
-    return info;
-  }
-
-  totalSubcategoriesExcel = (data) => data.reduce((a, b) => a += b[5], 0);
-
-  //Agregar fila de totales al formato excel.
-  addTotal(info: any) {
-    info.push([
-      '',
-      '',
-      '',
-      '',
-      'TOTAL',
-      this.totalSubcategoriesExcel(info),
-    ]);
   }
 }

@@ -1,5 +1,6 @@
-import { Component, EventEmitter, forwardRef, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, forwardRef, HostBinding, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AutoComplete } from 'primeng/autocomplete';
 
 /**
  * Campo de búsqueda de materiales (materia prima, tintas, BOPP, etc.) por id o por nombre.
@@ -48,8 +49,18 @@ export class SelectorMaterialComponent implements ControlValueAccessor, OnChange
   @HostBinding('class.p-inputwrapper-focus') enfocado = false;
   @HostBinding('class.p-inputwrapper-filled') get lleno() { return this.texto != null && this.texto !== ''; }
 
+  /**
+   * Búsqueda remota en curso: se activa junto con el ícono de carga del autocompletado (al emitir `buscar`)
+   * y se apaga cuando el padre entrega las nuevas `opciones`. Permite al padre ocultar controles que se
+   * superponen al ícono, como un botón para limpiar.
+   */
+  cargando = false;
+
+  @ViewChild(AutoComplete) private autoComplete?: AutoComplete;
+
   texto: any = '';
-  sugerencias: any[] = [];
+  /** En búsqueda remota es null cuando no hay resultados, para que PrimeNG cierre el panel en vez de mostrarlo vacío. */
+  sugerencias: any[] | null = [];
   deshabilitado = false;
   private seleccionReciente = false;
 
@@ -59,7 +70,21 @@ export class SelectorMaterialComponent implements ControlValueAccessor, OnChange
   get campoMostrado() { return this.campoTexto || this.campoNombre; }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['opciones'] && this.busquedaRemota) this.sugerencias = (this.opciones ?? []).slice(0, this.maxResultados);
+    if (changes['opciones'] && this.busquedaRemota) {
+      this.cargando = false;
+      const lista = (this.opciones ?? []).slice(0, this.maxResultados);
+      if (lista.length > 0) {
+        this.sugerencias = lista;
+        return;
+      }
+      // Sin resultados: si las sugerencias ya eran null, Angular no vuelve a pasarlas al autocompletado y PrimeNG
+      // nunca apaga su ícono de carga (solo lo hace al recibir sugerencias). Por eso se apaga y se cierra el panel aquí.
+      this.sugerencias = null;
+      if (this.autoComplete) {
+        this.autoComplete.loading = false;
+        this.autoComplete.hide();
+      }
+    }
   }
 
   writeValue(valor: any) {
@@ -82,7 +107,10 @@ export class SelectorMaterialComponent implements ControlValueAccessor, OnChange
 
   filtrar(event: { query: string }) {
     const consulta = (event.query ?? '').toString().trim();
-    if (this.busquedaRemota) return this.buscar.emit(consulta);
+    if (this.busquedaRemota) {
+      this.cargando = true;
+      return this.buscar.emit(consulta);
+    }
     this.sugerencias = this.coincidencias(consulta).slice(0, this.maxResultados);
   }
 

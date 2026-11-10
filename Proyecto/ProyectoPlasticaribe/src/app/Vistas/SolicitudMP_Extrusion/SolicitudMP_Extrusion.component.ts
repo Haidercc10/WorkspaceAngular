@@ -1,14 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { finalize, Subject, takeUntil } from 'rxjs';
+import { finalize, of, Subject, Subscription, switchMap, takeUntil } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsSolicitudMaterialProduccion as defaultSteps } from 'src/app/data';
 import { ConfirmacionTeclado } from 'src/app/_helpers/confirmacion-teclado';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { ClaveTutorialSolicitudMaterial, pasosTutorialSolicitudMaterial } from 'src/app/Tutoriales/Tutoriales_SolicitudMaterial';
 import {
   AdvertenciaDisponibilidad,
   DetalleSolicitudRequest,
@@ -25,6 +25,9 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
 import { CreacionPdfService, DatosOTSolicitudPDF } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+
+/** Segundos que se muestra el aviso de PDF generado antes de abrirlo en una pestaña nueva. */
+const ESPERA_ABRIR_PDF_OT_SEG = 3;
 
 
 /** Estados de BagPro en los que la OT está cerrada. */
@@ -80,6 +83,20 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   cargandoMaterialesAsignados: boolean = false; //Indica que se están consultando los materiales asignados
   materialesAsignados: MaterialAsignadoOT[] = [];
 
+  /** Subcategoría obtenida en la última selección; se usa para validar que el Id y nombre del formulario no se alteraron. */
+  private subcategoriaConsultada: { id: number; nombre: string } | null = null;
+
+  /** Indica si hay una subcategoría seleccionada; bloquea Und porque se toma de la subcategoría. */
+  get haySubcategoriaConsultada(): boolean {
+    return this.subcategoriaConsultada !== null;
+  }
+
+  /** Búsqueda de subcategorías en curso; se cancela al iniciar otra o al limpiar el campo. */
+  private busquedaSubcategorias?: Subscription;
+
+  /** Momento (ms) del último aviso de encabezado incompleto; evita repetir el mensaje en cada tecla. */
+  private ultimoAvisoProceso: number = 0;
+
   /** Total solicitado al cargar la solicitud en edición; sirve para validar solo el aumento contra el límite de la OT. */
   private totalOriginalSolicitud: number = 0;
   /** Acción que ejecuta el botón "Sí" del mensaje de confirmación de la solicitud. */
@@ -94,7 +111,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     private detallesAsignacionService: DetallesAsignacionService,
     private bagProServices: BagproService,
     private messageService: MessageService,
-    private shepherdService: ShepherdService,
+    private tutoriales: TutorialesService,
     private mensajeService: MensajesAplicacionService,
     private servicioSolicitudMpExt: SolicitudMP_ExtrusionService,
     private servicioDetSolicitudMpExt: DetSolicitudMP_ExtrusionService,
@@ -111,7 +128,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       proceso: ['', Validators.required],
       observacion: [''],
       Solicitud: [null],
-      fechaEntrega: [null,],
+      fechaEntrega: [null, Validators.required],
     });
 
     this.formMP = this.frmBuilderMateriaPrima.group({
@@ -130,9 +147,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.formEncabezado.patchValue({ 'proceso': this.validateProcess(), });
     if (this.validateProcess() != '') this.cargarMaquinas();
+    this.tutoriales.iniciarPrimeraVez(ClaveTutorialSolicitudMaterial, this.storage_Id, () => this.pasosTutorial());
   }
 
   ngOnDestroy(): void {
+    this.tutoriales.cancelar();
     this.destroy$.next();
     this.destroy$.complete();
     this.confirmacion.destruir();
@@ -148,12 +167,16 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     return this.formEncabezado.get('proceso')?.value === 'EXT';
   }
 
-  tutorial() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
+  /** Muestra el tutorial (botón "i" del título). La primera vez que el usuario entra se muestra solo. */
+  tutorial = () => this.tutoriales.iniciar(this.pasosTutorial());
+
+  /** Pasos del tutorial según lo que el rol del usuario puede hacer en la página. */
+  private pasosTutorial() {
+    return pasosTutorialSolicitudMaterial({
+      esAdministrador: [1, 104].includes(Number(this.ValidarRol)),
+      puedeExcederLimite: this.puedeExcederLimite,
+      porcentajeAdicional: Math.round(ADICIONAL_KG_OT * 100),
+    });
   }
 
   lecturaStorage() {
@@ -214,10 +237,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   /** Limpia los campos de la vista y restablece el estado inicial. */
   LimpiarCampos() {
     const proceso = this.formEncabezado.get('proceso')?.value;
-    this.formMP.reset();
+    this.limpiarCamposMP();
     this.formEncabezado.reset();
     this.formEncabezado.patchValue({ fecha: moment().format('YYYY-MM-DD'), proceso });
-    this.formMP.patchValue({ und: 'Kg' });
     this.cantRestante = 0;
     this.kgOT = 0;
     this.load = false;
@@ -229,9 +251,20 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     this.accionPendiente = null;
   }
 
+  /** Selecciona todo el contenido del input clicado, para reemplazar el valor sin tener que borrarlo. */
+  seleccionarContenido(event: MouseEvent) {
+    const input = event.target;
+    if (input instanceof HTMLInputElement && !input.readOnly) input.select();
+  }
+
+  /** Limpia el formulario de subcategoría (Id, nombre, cantidad, disponible, stock y und) y la subcategoría consultada. */
   limpiarCamposMP() {
     this.formMP.reset();
     this.formMP.patchValue({ und: 'Kg' });
+    this.subcategoriaConsultada = null;
+    // Cancela la búsqueda pendiente y entrega una lista nueva para que el autocompletado apague su ícono de carga.
+    this.busquedaSubcategorias?.unsubscribe();
+    this.subcategories = [];
   }
 
   obtenerProcesos() {
@@ -314,17 +347,140 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** Número de la OT consultada (la que se ve en la tabla de información de la OT), o null si no hay. */
+  private get otConsultada(): number | null {
+    return this.infoOrdenTrabajo[0]?.ot ?? null;
+  }
+
+  /**
+   * El PDF solo se puede exportar si hay una OT consultada y el campo OT sigue teniendo ese mismo número
+   * (si el usuario lo cambió sin presionar Enter, la tabla muestra otra OT distinta a la del campo).
+   */
+  get puedeExportarPdfOT(): boolean {
+    const enCampo = (this.formEncabezado.value.ot ?? '').toString().trim();
+    return this.otConsultada != null && enCampo === String(this.otConsultada) && !this.load && !this.abriendoPdfOT;
+  }
+
+  /**
+   * Genera el PDF de la OT consultada (mismo formato de la página Orden de Trabajo). Muestra el aviso de éxito,
+   * espera unos segundos para que se pueda leer y luego lo abre en una pestaña nueva.
+   */
+  exportarPdfOT() {
+    const ot = this.otConsultada;
+    const enCampo = (this.formEncabezado.value.ot ?? '').toString().trim();
+    if (ot == null) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe consultar una OT para exportarla en PDF!`);
+    if (enCampo !== String(ot)) {
+      return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT del campo (${enCampo || 'vacío'}) no es la consultada (N° ${ot}). Presione Enter para consultarla antes de exportar.`);
+    }
+
+    // El cargando se mantiene desde la consulta de la OT hasta que el PDF termina de generarse.
+    let otEncontrada = false;
+    this.load = true;
+    this.servicioPDF.obtenerDatosOrdenTrabajo(ot).pipe(
+      switchMap(datos => {
+        otEncontrada = true;
+        return datos ? this.servicioPDF.generarBlobOrdenTrabajo(datos, this.storage_Nombre) : of(null);
+      }),
+      takeUntil(this.destroy$),
+      finalize(() => this.load = false),
+    ).subscribe({
+      next: pdf => pdf
+        ? this.abrirPdfOTConAviso(pdf, ot)
+        : this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontró información para generar el PDF de la OT N° ${ot}!`),
+      error: () => otEncontrada
+        ? this.mensajeService.mensajeError(`Error`, `No fue posible generar el PDF de la OT N° ${ot}!`)
+        : this.mensajeService.mensajeError(`Error`, `No se encontró la OT N° ${ot} para generar el PDF!`),
+    });
+  }
+
+  /** PDF de OT esperando a abrirse; evita generarlo dos veces mientras se muestra el aviso. */
+  abriendoPdfOT: boolean = false;
+
+  /**
+   * Muestra el aviso de éxito y, pasados unos segundos, abre el PDF en una pestaña nueva. Si el navegador
+   * bloquea la pestaña (ventanas emergentes), lo descarga para que el usuario no se quede sin el documento.
+   */
+  private abrirPdfOTConAviso(pdf: Blob, ot: number) {
+    this.abriendoPdfOT = true;
+    this.mensajeService.mensajeConfirmacion(`PDF generado`,
+      `El PDF de la orden de trabajo N° ${ot} se generó correctamente. En unos momentos se abrirá en una nueva pestaña.`,
+      ESPERA_ABRIR_PDF_OT_SEG * 1000 + 500);
+
+    const url = URL.createObjectURL(pdf);
+    setTimeout(() => {
+      this.abriendoPdfOT = false;
+      const pestana = window.open(url, '_blank');
+      if (!pestana) {
+        const enlace = document.createElement('a');
+        enlace.href = url;
+        enlace.download = `OT ${ot}.pdf`;
+        enlace.click();
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `El navegador bloqueó la pestaña nueva, por eso el PDF de la OT N° ${ot} se descargó. Puede permitir las ventanas emergentes para este sitio.`, 6000);
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }, ESPERA_ABRIR_PDF_OT_SEG * 1000);
+  }
+
   /** Cantidad neta de los materiales del popup: lo asignado menos lo devuelto. */
   get totalCantidadMaterialesAsignados(): number {
     return this.materialesAsignados.reduce((total, m) => total + (m.esDevolucion ? -m.cantidad : m.cantidad), 0);
   }
 
+  /**
+   * El campo Subcategoría está bloqueado mientras el encabezado no es válido; aun así recibe las teclas.
+   * Si el usuario intenta escribir o borrar, se le indica qué le falta del encabezado.
+   */
+  validarEncabezadoAlDigitar(event: KeyboardEvent) {
+    if (this.formEncabezado.valid) return;
+    const editaTexto = event.key?.length === 1 || ['Backspace', 'Delete'].includes(event.key);
+    if (!editaTexto || event.ctrlKey || event.metaKey || event.altKey) return;
+    this.avisarEncabezadoIncompleto();
+  }
+
+  /**
+   * Advierte qué falta del encabezado para consultar una subcategoría. Mientras el aviso sigue visible
+   * no se repite, para no apilar un mensaje por cada tecla.
+   */
+  private avisarEncabezadoIncompleto() {
+    const ahora = Date.now();
+    if (ahora - this.ultimoAvisoProceso < 3000) return;
+    this.ultimoAvisoProceso = ahora;
+    this.subcategories = [];
+
+    const encabezado = this.formEncabezado.value;
+    if (!encabezado.proceso) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un proceso para consultar una subcategoría!`);
+
+    const faltantes: string[] = [];
+    if (!encabezado.ot || encabezado.kgOt == null) faltantes.push('consultar la OT');
+    if (!encabezado.maq) faltantes.push('seleccionar la máquina');
+    if (!encabezado.fechaEntrega) faltantes.push('elegir la fecha de entrega');
+    const detalle = faltantes.length > 0
+      ? (faltantes.length > 1 ? `${faltantes.slice(0, -1).join(', ')} y ${faltantes[faltantes.length - 1]}` : faltantes[0])
+      : 'completar el encabezado';
+    this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe ${detalle} para consultar una subcategoría!`);
+  }
+
+  /**
+   * Busca subcategorías por Id (desde 1 dígito) o por nombre (desde 3 caracteres).
+   * Descarta respuestas que lleguen después de que el texto del campo haya cambiado.
+   */
   getAllSubcategories() {
-    const material: string = this.formMP.value.subcat_Nombre;
+    const texto: string = (this.formMP.value.subcat_Nombre ?? '').toString().trim();
     const proceso: string = this.formEncabezado.get('proceso')?.value;
-    if (material && material.trim().length > 2) {
-      this.materiaPrimaService.getAllSubcategoriesForName(material, proceso).pipe(takeUntil(this.destroy$)).subscribe(datos => this.subcategories = datos);
+    const esId = /^\d+$/.test(texto);
+    // El autocompletado mantiene su ícono de carga hasta que cambian las opciones, por eso siempre se asigna una lista nueva.
+    this.busquedaSubcategorias?.unsubscribe();
+    if (!proceso || (!esId && texto.length < 3)) {
+      this.subcategories = [];
+      if (!proceso) this.avisarEncabezadoIncompleto();
+      return;
     }
+
+    this.busquedaSubcategorias = this.materiaPrimaService.buscarSubcategorias(texto, proceso).pipe(takeUntil(this.destroy$)).subscribe({
+      // Si el texto cambió sin lanzar otra búsqueda (p. ej. se borró todo), se entrega una lista vacía para cerrar la carga.
+      next: datos => this.subcategories = (this.formMP.value.subcat_Nombre ?? '').toString().trim() === texto ? datos : [],
+      error: () => this.subcategories = [],
+    });
   }
 
   /** Carga la subcategoría elegida en el formulario junto con su disponible informativo. */
@@ -332,15 +488,18 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     const data: any = this.subcategories.find(x => x.id_Subcategoria == this.formMP.value.subcat_Nombre);
     if (!data) return;
 
+    this.subcategoriaConsultada = { id: data.id_Subcategoria, nombre: data.subcategoria };
     this.formMP.patchValue({
       'subcat_Id': data.id_Subcategoria,
       'subcat_Nombre': data.subcategoria,
       'cantidad': 0,
-      'und': data.und,
+      'und': data.und ?? 'Kg', // Las subcategorías de tintas (IMP, EMP, LAM) no traen unidad desde la API
       'stock': data.stock,
       'disponible': null,
     });
     this.servicioSolicitudMpExt.getReservas([data.id_Subcategoria]).pipe(takeUntil(this.destroy$)).subscribe(reservas => {
+      // Si mientras tanto se limpió o se eligió otra subcategoría, no se pisa el disponible con el de esta.
+      if (this.subcategoriaConsultada?.id != data.id_Subcategoria) return;
       this.formMP.patchValue({ disponible: reservas[0]?.disponible ?? data.stock });
     });
   }
@@ -349,6 +508,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   validarCamposVaciosMPRetirada() {
     const form = this.formMP.value;
     if (!this.formMP.valid) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `Hay campos vacíos en el formulario de subcategoría!`);
+    if (!this.subcategoriaConsultada || this.subcategoriaConsultada.id != form.subcat_Id || this.subcategoriaConsultada.nombre !== form.subcat_Nombre)
+      return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La subcategoría del formulario no corresponde a la seleccionada, selecciónela nuevamente!`);
     if (!(form.cantidad > 0)) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar debe ser mayor a cero (0)!`);
     if (this.subcategoriasSeleccionadas.some(x => x.Id == form.subcat_Id)) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La subcategoría ${form.subcat_Nombre} ya ha sido seleccionada!`);
 
@@ -387,6 +548,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   validarCamposVaciosRetirada() {
     const maq: number = this.formEncabezado.value.maq;
     const proceso: string = this.formEncabezado.value.proceso;
+    if (!this.formEncabezado.value.fechaEntrega) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe elegir la fecha de entrega del material!');
     if (!this.formEncabezado.valid) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe llenar los campos vacios!');
     if (this.subcategoriasSeleccionadas.length == 0) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe seleccionar minimo una materia prima para crear la solicitud!');
     if (!(maq >= 1) || !proceso) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe diligenciar los campos maquina y proceso, verifique!');
@@ -503,7 +665,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   private generarPdfSolicitud(solicitud: number) {
     const datosOT = this.infoOrdenTrabajo[0];
     const ot: DatosOTSolicitudPDF | null = datosOT
-      ? { cliente: datosOT.cliente, referencia: datosOT.ref, kgOT: datosOT.kgReal, kgLimite: datosOT.kg }
+      ? { cliente: datosOT.cliente, item: datosOT.item, referencia: datosOT.ref, kgOT: datosOT.kgReal, kgLimite: datosOT.kg }
       : null;
 
     this.load = true;
@@ -562,6 +724,13 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   /** Función para cargar las máquinas disponibles */
+  /** Al cambiar el proceso limpia la subcategoría cargada (y sus resultados de búsqueda), que pertenecían al proceso anterior, y recarga las máquinas. */
+  cambiarProceso() {
+    this.limpiarCamposMP();
+    this.subcategories = [];
+    this.cargarMaquinas();
+  }
+
   cargarMaquinas() {
     const proceso: string = this.formEncabezado.value.proceso;
     this.maquinas = [];
