@@ -25,7 +25,7 @@
             <div class="row g-4 pt-2 pb-3 align-items-center">
 
               <!-- CLIENTES -->
-              <div class="col-sm-12 col-md-12 col-lg-3" id="filtroCliente">
+              <div class="col-sm-12 filtro-campo filtro-cliente" [ngClass]="[1,69,103].includes(ValidarRol) ? 'col-md-6' : 'col-md-9'" id="filtroCliente">
                 <span class="p-input-icon-left p-float-label">
                   <i class="pi pi-users"></i>
                   <p-multiSelect formControlName="Cliente" inputId="Cliente" [options]="clientes" optionLabel="displayLabel" optionValue="idcliente" [virtualScroll]="true" [virtualScrollItemSize]="40"></p-multiSelect>
@@ -34,7 +34,7 @@
               </div>
         
               <!-- VENDEDORES -->
-              <div class="col-sm-12 col-md-12 col-lg-3" *ngIf="[1,69,103].includes(ValidarRol)" id="filtroVendedor">
+              <div class="col-sm-12 col-md-3 filtro-campo filtro-vendedor" *ngIf="[1,69,103].includes(ValidarRol)" id="filtroVendedor">
                 <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
                   <i class="pi pi-user"></i>
                   <p-dropdown formControlName="Vendedor" id="Nombre" [autoDisplayFirst]="false" appendTo="body" [options]="vendedores" [showClear]="true" ></p-dropdown>
@@ -42,7 +42,7 @@
                 </span>
               </div>
 
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="filtroCarteraOriginal">
+              <div class="col-sm-12 col-md-3 filtro-cartera" id="filtroCarteraOriginal">
                 <div class="field-checkbox mb-0 check-cartera-original">
                   <p-checkbox formControlName="CarteraOriginal" [binary]="true" inputId="carteraOriginal"></p-checkbox>
                   <!-- Al hacer clic en el chip se marca/desmarca el checkbox -->
@@ -50,9 +50,9 @@
                 </div>
               </div>
         
-              <!-- Botones -->
-              <div class="col-sm-12 col-md-12 col-lg-4">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botonesFiltros">
+              <!-- Botones: por debajo de 1600px van en una fila propia debajo de Cliente, Vendedor y Cartera Original; desde 1600px todo queda en una sola fila -->
+              <div class="col-12 filtro-botones">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center botones-filtros" id="botonesFiltros">
                   <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
                   <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="FormFiltros.reset()"></button>
                   <button pButton class="p-button-danger" type="button" label="PDF" icon="pi pi-file-pdf" (click)="generarPDF2()"></button>

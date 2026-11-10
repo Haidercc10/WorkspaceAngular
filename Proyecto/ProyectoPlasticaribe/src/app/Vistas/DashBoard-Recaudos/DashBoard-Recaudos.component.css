@@ -402,3 +402,45 @@ p-card.card-total-cartera .header2 .pi:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Evita que el texto de los botones de filtros se parta en dos líneas o se corte */
+.botones-filtros ::ng-deep .p-button {
+  white-space: nowrap;
+}
+
+/* Desde 1600px: Cliente, Vendedor, Cartera Original y botones en una sola fila.
+   Por debajo, los botones bajan a una fila propia centrada (en portátiles no caben sin cortarse) */
+@media (min-width: 1600px) {
+  .filtro-campo,
+  .filtro-cartera {
+    flex: 0 0 auto;
+  }
+
+  .filtro-cliente {
+    width: 30%;
+  }
+
+  /* Sin el filtro de Vendedor (según el rol), Cliente toma también su espacio */
+  .filtro-cliente.col-md-9 {
+    width: 48%;
+  }
+
+  .filtro-vendedor {
+    width: 18%;
+  }
+
+  .filtro-cartera {
+    width: auto;
+  }
+
+  .filtro-botones {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+}
+
+/* El checkbox y el chip "Cartera Original" siempre en una sola línea, aunque la columna sea angosta */
+.check-cartera-original ::ng-deep .p-chip-text {
+  white-space: nowrap;
+}
