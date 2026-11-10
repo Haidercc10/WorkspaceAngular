@@ -394,8 +394,11 @@ p-dropdown .p-dropdown {
   width: auto;
 }
 
+/* ".p-dropdown-panel .p-dropdown-items" cubre los dropdowns con appendTo="body", cuyo panel queda fuera de <p-dropdown>;
+   sin esto, el "ul { padding-left: 2rem }" de Bootstrap le gana a PrimeNG (que va en @layer primeng) y deja un espacio a la izquierda */
 p-dropdown ol,
-p-dropdown ul {
+p-dropdown ul,
+.p-dropdown-panel .p-dropdown-items {
   margin: 0;
   padding-left: 0;
 }
