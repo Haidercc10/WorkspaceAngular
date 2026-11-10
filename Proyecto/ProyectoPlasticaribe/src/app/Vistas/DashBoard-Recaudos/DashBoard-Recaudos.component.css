@@ -251,6 +251,15 @@ p-card.card-total-cartera .header2 .pi:hover {
   color: #6c757d;
 }
 
+/* Tema oscuro: valores claros para que se lean sobre el fondo oscuro de la tarjeta */
+.total-cartera-oscuro .total-cartera-corto {
+  color: #f8f9fa;
+}
+
+.total-cartera-oscuro .total-cartera-completo {
+  color: #adb5bd;
+}
+
 /* ==================== PANEL DE DETALLE ==================== */
 /* Contenedor del p-overlayPanel (lo crea PrimeNG): fondo blanco con borde superior de color */
 ::ng-deep .p-overlaypanel.panel-detalle-cartera {

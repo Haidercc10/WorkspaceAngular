@@ -80,7 +80,7 @@
         <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-2">
           <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wallet"></i> Total Cartera</h3>
         </div>
-        <div class="total-cartera">
+        <div class="total-cartera" [class.total-cartera-oscuro]="modoSeleccionado">
           <span class="total-cartera-corto">{{totalCarteraCorto}}</span>
           <small class="total-cartera-completo">{{totalCarteraValor | currency : ' COP $'}}</small>
         </div>
