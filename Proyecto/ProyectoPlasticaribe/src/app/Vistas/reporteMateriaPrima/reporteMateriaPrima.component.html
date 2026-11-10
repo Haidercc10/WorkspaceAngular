@@ -11,7 +11,9 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Reporte de Materia Prima / BOPP / Tintas</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" id="titulo">Reporte de Materia Prima / BOPP / Tintas
+        <p-button class="boton-tutorial-titulo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+      </h2>
     </div>
 
     <div class="mb-4">
@@ -22,10 +24,6 @@
 
 <p-card class="font-size-14">
 
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
-  </div>
-
   <div class="mb-5">
     <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
   </div>
@@ -33,25 +31,28 @@
   <p-toolbar>
       <ng-template pTemplate="left">
         <div class="mr-2">
-          <span class="p-float-label" id="rango-fechas">
+          <span class="p-float-label" id="rango-fechas" data-tutorial="rangoFechas">
             <!-- Rango de Fechas -->
-            <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
+            <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true" [maxDate]="fechaMaxima" [readonlyInput]="true" pTooltip="Por defecto se consulta el último año"></p-calendar>
             <label for="FechaInicial">Rango de Fechas</label>
           </span>
         </div>
-        <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger" id="consultar" (click)="consultarInventario()"></button>
+        <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger mr-3" id="consultar" data-tutorial="consultar" (click)="consultarInventario()"></button>
+        <!-- Mostrar registros sin stock -->
+        <div class="flex align-items-center" id="con-existencias" data-tutorial="mostrarSinStock" pTooltip="Al marcarlo se muestran también los registros con stock en cero">
+          <p-checkbox [(ngModel)]="mostrarSinStock" [binary]="true" inputId="mostrarSinStock" (onChange)="aplicarFiltroStock()"></p-checkbox>
+          <label for="mostrarSinStock" class="ml-2 cursor-pointer select-none">Mostrar sin Stock</label>
+        </div>
       </ng-template>
       <ng-template pTemplate="right">
-        <!-- Con existencias -->
-        <button pButton pRipple pTooltip="Materias primas con existencias" label="Stock" icon="pi pi-eject" class="p-button-warning mr-2" id="con-existencias" (click)="existenciasMayorCero()"></button>
         <!-- Nueva materias prima -->
-        <button *ngIf="[1,104].includes(ValidarRol)" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-danger mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
+        <button *ngIf="[1,104].includes(ValidarRol)" pButton pRipple label="Crear" id="nuevaMateriaPrima" data-tutorial="crear" icon="pi pi-plus" class="p-button-danger mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
         <!-- Exportar excel -->
-        <button pButton pRipple label="Exportar a excel inventario de todos los materiales" pTooltip="Exportar a excel" icon="pi pi-file-excel" class="p-button-success" id="exportar1" label="Exportar" (click)="exportarExcel(1)"></button>            
+        <button pButton pRipple label="Exportar todo" pTooltip="Exportar todas las pestañas en un solo Excel (una hoja por pestaña, sin filtros)" tooltipPosition="left" icon="pi pi-file-excel" class="p-button-success" id="exportar1" data-tutorial="exportarTodo" (click)="exportarTodo()"></button>            
       </ng-template>
   </p-toolbar>
 
-  <p-tabView id="materias-primas" (onChange)="cargarTabs($event)">
+  <p-tabView id="materias-primas" [(activeIndex)]="pestanaActiva" (onChange)="cargarTabs($event)">
     <!-- Materias Primas -->
     <p-tabPanel
       header="Materias Primas"
@@ -74,29 +75,33 @@
                 </p-multiSelect>
             </ng-template>
             <ng-template pTemplate="right">
-              <button pButton pRipple pTooltip="Exportar a excel inventario de todos los materiales" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" label="Exportar" (click)="exportarExcel(2)"></button>
+              <button pButton pRipple label="Exportar Materias Primas" pTooltip="Exportar a Excel materias primas (respeta los filtros aplicados)" icon="pi pi-file-excel" class="p-button-outlined p-button-success exportar-pestana" id="exportar-materiasPrimas" (click)="exportarPestana('materiasPrimas')"></button>
             </ng-template>
           </p-toolbar>
           <p-table
             #dt
+            [tableStyle]="{'width': '100%'}"
             [columns]="_columnasSeleccionada"
             [value]="ArrayMateriaPrima"
+            (onFilter)="actualizarTotalesFiltro('general', $event)"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="100"
+            [rowsPerPageOptions]="[25,50,100,200]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [rowHover]="true"
-            dataKey="Id"
+            dataKey="Clave"
             [scrollable]="true"
-            scrollHeight="50rem"
-            [virtualScroll]="true"
-            [virtualScrollItemSize]="46"
-            >
+            scrollHeight="50rem">
             <ng-template pTemplate="header" let-columns>
               <tr class="font-size-16" id="filtros">
                 <th></th>
                 <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
-                <th *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+                <th *ngIf="[1,104,3].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
@@ -104,7 +109,7 @@
                   {{col.header}} 
                   <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th id="editar" *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="[1,104,3].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns" style="height:46px">
@@ -114,14 +119,16 @@
                 <td *ngIf="[1,104,3].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
-            <ng-template pTemplate="footer">
+            <ng-template pTemplate="footer" let-columns>
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(ArrayMateriaPrima) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(ArrayMateriaPrima) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
-                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
+                <td class="text-right"><b>Totales</b></td>
+                <td *ngFor="let col of columns">
+                  <ng-container *ngIf="[1,104].includes(ValidarRol)">
+                    <b *ngIf="col.field == 'Cant'">{{totales.general.stock | number : '1.2-2'}} Kg</b>
+                    <b *ngIf="col.field == 'SubTotal'">{{totales.general.valor | number : '1.2-2'}} COP</b>
+                  </ng-container>
+                </td>
+                <td *ngIf="[1,104,3].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -151,19 +158,26 @@
                 </p-multiSelect>
             </ng-template>
             <ng-template pTemplate="right">
-              <button pButton pRipple pTooltip="Exportar a excel inventario de polietilenos" icon="pi pi-file-excel" class="p-button-outlined p-button-success" label="Exportar" id="exportar3" (click)="exportarExcel(3)"></button>
+              <button pButton pRipple label="Exportar Polietilenos" pTooltip="Exportar a Excel polietilenos (respeta los filtros aplicados)" icon="pi pi-file-excel" class="p-button-outlined p-button-success exportar-pestana" id="exportar-polietilenos" (click)="exportarPestana('polietilenos')"></button>
             </ng-template>
           </p-toolbar>
           <p-table
             #dt_Polientileno
+            [tableStyle]="{'width': '100%'}"
             [columns]="_columnasSeleccionada"
             [value]="polietilenos"
+            (onFilter)="actualizarTotalesFiltro('polietilenos', $event)"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="100"
+            [rowsPerPageOptions]="[25,50,100,200]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [rowHover]="true"
-            dataKey="Id"
+            dataKey="Clave"
             [scrollable]="true"
             scrollHeight="50rem">
             <ng-template pTemplate="header" let-columns>
@@ -188,14 +202,16 @@
                 <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
-            <ng-template pTemplate="footer">
+            <ng-template pTemplate="footer" let-columns>
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(polietilenos) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(polietilenos) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
-                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
+                <td class="text-right"><b>Totales</b></td>
+                <td *ngFor="let col of columns">
+                  <ng-container *ngIf="[1,104].includes(ValidarRol)">
+                    <b *ngIf="col.field == 'Cant'">{{totales.polietilenos.stock | number : '1.2-2'}} Kg</b>
+                    <b *ngIf="col.field == 'SubTotal'">{{totales.polietilenos.valor | number : '1.2-2'}} COP</b>
+                  </ng-container>
+                </td>
+                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -225,19 +241,26 @@
                 </p-multiSelect>
             </ng-template>
             <ng-template pTemplate="right">
-              <button pButton pRipple pTooltip="Exportar a excel inventario de tintas" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportarExcel(4)"></button>
+              <button pButton pRipple label="Exportar Tintas" pTooltip="Exportar a Excel tintas (respeta los filtros aplicados)" icon="pi pi-file-excel" class="p-button-outlined p-button-success exportar-pestana" id="exportar-tintas" (click)="exportarPestana('tintas')"></button>
             </ng-template>
           </p-toolbar>
           <p-table
             #dt_Tintas
+            [tableStyle]="{'width': '100%'}"
             [columns]="_columnasSeleccionada"
             [value]="tintas"
+            (onFilter)="actualizarTotalesFiltro('tintas', $event)"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="100"
+            [rowsPerPageOptions]="[25,50,100,200]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [rowHover]="true"
-            dataKey="Id"
+            dataKey="Clave"
             [scrollable]="true"
             scrollHeight="50rem">
             <ng-template pTemplate="header" let-columns>
@@ -262,14 +285,16 @@
                 <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
-            <ng-template pTemplate="footer">
+            <ng-template pTemplate="footer" let-columns>
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(tintas) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(tintas) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
-                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
+                <td class="text-right"><b>Totales</b></td>
+                <td *ngFor="let col of columns">
+                  <ng-container *ngIf="[1,104].includes(ValidarRol)">
+                    <b *ngIf="col.field == 'Cant'">{{totales.tintas.stock | number : '1.2-2'}} Kg</b>
+                    <b *ngIf="col.field == 'SubTotal'">{{totales.tintas.valor | number : '1.2-2'}} COP</b>
+                  </ng-container>
+                </td>
+                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -298,19 +323,26 @@
                 </p-multiSelect>
             </ng-template>
             <ng-template pTemplate="right">
-              <button pButton pRipple pTooltip="Exportar a excel inventario de biorientados detallados" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportarExcel(5)"></button>
+              <button pButton pRipple label="Exportar Biorientados" pTooltip="Exportar a Excel biorientados (respeta los filtros aplicados)" icon="pi pi-file-excel" class="p-button-outlined p-button-success exportar-pestana" id="exportar-biorientados" (click)="exportarPestana('biorientados')"></button>
             </ng-template>
           </p-toolbar>
           <p-table
             #dt_Biorientados
+            [tableStyle]="{'width': '100%'}"
             [columns]="_columnasSeleccionada"
             [value]="biorientados"
+            (onFilter)="actualizarTotalesFiltro('biorientados', $event)"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="100"
+            [rowsPerPageOptions]="[25,50,100,200]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [rowHover]="true"
-            dataKey="Id"
+            dataKey="Clave"
             [scrollable]="true"
             scrollHeight="50rem">
             <ng-template pTemplate="header" let-columns>
@@ -335,14 +367,16 @@
                 <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
-            <ng-template pTemplate="footer">
+            <ng-template pTemplate="footer" let-columns>
               <tr id="totales">
-                <td colspan="5" class="text-right" *ngIf="[1,104].includes(ValidarRol)">Totales</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{cantidadExistencias(biorientados) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">{{valorTotalExistencia(biorientados) | number}}</td>
-                <td *ngIf="[1,104].includes(ValidarRol)">COP</td>
-                <td [colSpan]="[1,104].includes(ValidarRol) ? 1 : 14" class="text-center"></td>
+                <td class="text-right"><b>Totales</b></td>
+                <td *ngFor="let col of columns">
+                  <ng-container *ngIf="[1,104].includes(ValidarRol)">
+                    <b *ngIf="col.field == 'Cant'">{{totales.biorientados.stock | number : '1.2-2'}} Kg</b>
+                    <b *ngIf="col.field == 'SubTotal'">{{totales.biorientados.valor | number : '1.2-2'}} COP</b>
+                  </ng-container>
+                </td>
+                <td *ngIf="[1,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"></td>
               </tr>
             </ng-template>
           </p-table>
@@ -353,6 +387,7 @@
     <!--Bopp's genéricos -->
     <p-tabPanel
       header="Bopps agrupados"
+      headerStyleClass="tab-bopps-agrupados"
       leftIcon="pi pi-table"
       tooltip="Información del Inventario de los Bopps genéricos"
       *ngIf="[1,3,4,89,63,12,98,2,104].includes(this.ValidarRol)">
@@ -362,19 +397,22 @@
             <ng-template pTemplate="left">
             </ng-template>
             <ng-template pTemplate="right">
-              <button pButton pRipple pTooltip="Exportar a excel inventario de biorientados genéricos agrupados" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportarExcel2()"></button>
+              <button pButton pRipple label="Exportar Bopps agrupados" pTooltip="Exportar a Excel bopps agrupados (respeta los filtros aplicados)" icon="pi pi-file-excel" class="p-button-outlined p-button-success exportar-pestana" id="exportar-boppsAgrupados" (click)="exportarPestana('boppsAgrupados')"></button>
             </ng-template>
           </p-toolbar>
           <p-table
             #dt_BoppGenerico
             [value]="arrayBopps"
+            (onFilter)="actualizarTotalBoppsAgrupados($event)"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
             [paginator]="true"
-            [rows]="arrayBopps.length"
-            [rowsPerPageOptions]="[10,25,50,100,arrayBopps.length]"
+            [rows]="100"
+            [rowsPerPageOptions]="[25,50,100,200]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [rowHover]="true"
             dataKey="Id"
             [scrollable]="true"
@@ -450,6 +488,7 @@
     <!--Subcategorias-->
     <p-tabPanel
       header="Subcategorias"
+      headerStyleClass="tab-subcategorias"
       leftIcon="pi pi-list"
       tooltip="Información del Inventario por Subcategorias"
       *ngIf="[1,3,4,89,63,12,98,2,104].includes(this.ValidarRol)">
@@ -459,31 +498,34 @@
             <ng-template pTemplate="left">
             </ng-template>
             <ng-template pTemplate="right">
-              <button pButton pRipple pTooltip="Exportar a excel inventario por subcategorias" label="Exportar" icon="pi pi-file-excel" class="p-button-outlined p-button-success" id="exportar3" (click)="exportExcel()"></button>
+              <button pButton pRipple label="Exportar Subcategorías" pTooltip="Exportar a Excel subcategorías (respeta los filtros aplicados)" icon="pi pi-file-excel" class="p-button-outlined p-button-success exportar-pestana" id="exportar-subcategorias" (click)="exportarPestana('subcategorias')"></button>
             </ng-template>
           </p-toolbar>
           <p-table
             #dt_Subcategories
             [value]="subcategories"
+            (onFilter)="actualizarTotalSubcategorias($event)"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
             [paginator]="true"
-            [rows]="subcategories.length"
-            [rowsPerPageOptions]="[10,25,50,100,subcategories.length]"
+            [rows]="100"
+            [rowsPerPageOptions]="[25,50,100,200]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [rowHover]="true"
-            dataKey="Id"
+            dataKey="id"
             [scrollable]="true"
             scrollHeight="50rem">
             <ng-template pTemplate="header">
               <tr class="font-size-16" id="filtros">
                 <th></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'id', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Nombre', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Micras', 'contains')"></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Ancho', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'NombreCateg', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'stock', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'subtotal', 'contains')"></th>
                 <th></th>
               </tr>
               <tr>
@@ -677,13 +719,16 @@
       <p-table
         #dt_Biorientados2
         [value]="arrayModalBopp"
+        (onFilter)="actualizarTotalesModalBopp($event)"
         [resizableColumns]="true"
         columnResizeMode="expand"
         styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll"
         [paginator]="true"
-        [rows]="arrayModalBopp.length"
-        [rowsPerPageOptions]="[10,25,50,100,arrayModalBopp.length]"
+        [rows]="100"
+        [rowsPerPageOptions]="[25,50,100,200]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
         [rowHover]="true"
         dataKey="Id"
         [scrollable]="true"
@@ -792,29 +837,31 @@
 
     <div class="row g-3 font-size-14" id="table">
       <p-table
-        #dt_Biorientados2
+        #dt_Materiales
         [value]="materials"
         [resizableColumns]="true"
         columnResizeMode="expand"
         styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll"
         [paginator]="true"
-        [rows]="materials.length"
-        [rowsPerPageOptions]="[10,25,50,100,materials.length]"
+        [rows]="100"
+        [rowsPerPageOptions]="[25,50,100,200]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
         [rowHover]="true"
-        dataKey="Id"
+        dataKey="Clave"
         [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr class="font-size-16">
             <th></th>
-            <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Id', 'contains')"></th>
-            <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Nombre', 'contains')"></th>
-            <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Cant', 'contains')"></th>
-            <th ><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'UndCant', 'contains')"></th>
-            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'PrecioUnd', 'contains')"></th>
-            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'SubTotal', 'contains')"></th>
-            <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'Categoria', 'contains')"></th>
+            <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroMateriales($event, 'Id', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroMateriales($event, 'Nombre', 'contains')"></th>
+            <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroMateriales($event, 'Cant', 'contains')"></th>
+            <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroMateriales($event, 'UndCant', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroMateriales($event, 'PrecioUnd', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroMateriales($event, 'SubTotal', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroMateriales($event, 'Categoria', 'contains')"></th>
           </tr>
           <tr>
             <th class="text-center">#</th>

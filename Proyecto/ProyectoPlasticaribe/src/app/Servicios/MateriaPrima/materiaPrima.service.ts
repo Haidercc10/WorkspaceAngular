@@ -35,6 +35,9 @@ export class MateriaPrimaService {
 
   GetInventario = (fechaInicial : any, fechaFinal : any, id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventario/${fechaInicial}/${fechaFinal}/${id}`);
 
+  /** Inventario consolidado de materias primas, tintas y biorientados en una sola petición (la fecha final no puede ser mayor a hoy). */
+  GetInventarioConsolidado = (fechaInicial : string, fechaFinal : string) : Observable<any[]> => this.http.get<any[]>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventarioConsolidado/${fechaInicial}/${fechaFinal}`);
+
   GetCategoriasMateriaPrima = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
 
   GetMovimientos = (fechaInicial : any, fechaFinal : any, ruta : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMovimientos/${fechaInicial}/${fechaFinal}/${ruta}`);
