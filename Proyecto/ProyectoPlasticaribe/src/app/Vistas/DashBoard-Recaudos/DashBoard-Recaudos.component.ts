@@ -1,13 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/app/data';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { pasosTutorialRecaudos } from 'src/app/Tutoriales/Tutoriales_Recaudos';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes-Consolidados.component';
@@ -15,7 +15,7 @@ import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/Orde
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize, forkJoin, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -23,7 +23,7 @@ import { finalize, forkJoin } from 'rxjs';
   styleUrls: ['./DashBoard-Recaudos.component.css']
 })
 
-export class DashBoardRecaudosComponent implements OnInit {
+export class DashBoardRecaudosComponent implements OnInit, OnDestroy {
 
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
@@ -46,10 +46,26 @@ export class DashBoardRecaudosComponent implements OnInit {
   cols: any = [];
   movements: any = [];
   invoiceSelected: any = null;
+  totalCarteraValor: number = 0; //Total de la cartera, se calcula una sola vez cuando llegan los datos (en lugar de recalcularlo en cada ciclo de la vista)
+  totalCarteraCorto: string = '$ 0'; //Total de la cartera abreviado en millones (ej: $ 12.812 M)
+  resumenCartera: any = null; //Detalle de la cartera para el panel de información (antigüedad, vencida, mayor deudor)
+  cargandoResumen: boolean = false; //Indica si la cartera se está consultando, para mostrar "Cargando..." en el panel de detalle
+  private readonly formatoCO = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }); //Formato colombiano: punto como separador de miles
+  //Tramos de antigüedad de la cartera (campos que ya calcula el backend por factura), con colores en escala de urgencia
+  readonly tramosCartera = [
+    { campo: 'saldoPlazo1', etiqueta: '1-30 días', color: '#22c55e' },
+    { campo: 'saldoPlazo2', etiqueta: '31-60 días', color: '#eab308' },
+    { campo: 'saldoPlazo3', etiqueta: '61-90 días', color: '#f97316' },
+    { campo: 'saldoPlazo4', etiqueta: '91-120 días', color: '#ef4444' },
+    { campo: 'saldoPlazo5', etiqueta: '+120 días', color: '#991b1b' },
+  ];
+  private intervaloTema: any; //Intervalo que sincroniza el modo oscuro/claro, se limpia al destruir el componente
+  private subCartera: Subscription | undefined; //Consulta de cartera en curso, se cancela si se lanza una nueva
+  private subClientesVacios: Subscription | undefined; //Escucha el filtro de clientes para dejarlo en null cuando queda vacío
 
   constructor(private AppComponent: AppComponent,
     private zeusService: ZeusContabilidadService,
-    private shepherdService: ShepherdService,
+    private tutoriales: TutorialesService,
     private paginaPrincial: PaginaPrincipalComponent,
     private reportesConsolidadosComponent: ReportesConsolidadosComponent,
     private frmBuilder: FormBuilder,
@@ -73,18 +89,22 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerVendedor();
     this.obtenerClientes();
-    this.tiempoExcedido();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.tiempoExcedido2();
+    this.limpiarClientesVacios();
+    this.intervaloTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
-  // Funcion que iniciará el tutorial
-  tutorial() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
+  ngOnDestroy(): void {
+    clearInterval(this.intervaloTema);
+    this.subCartera?.unsubscribe();
+    this.subClientesVacios?.unsubscribe();
+    this.tutoriales.cancelar(); //Si se cambia de pestaña con el tutorial abierto, no queda encima de otra
   }
+
+  // Función que iniciará el tutorial (pasos en src/app/Tutoriales/Tutoriales_Recaudos.ts)
+  tutorial = () => this.tutoriales.iniciar(pasosTutorialRecaudos({
+    veFiltroVendedor: [1, 69, 103].includes(this.ValidarRol),
+  }));
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
@@ -100,6 +120,126 @@ export class DashBoardRecaudosComponent implements OnInit {
     if (this.paginaPrincial.recaudos || this.reportesConsolidadosComponent.cartera) {
       this.consultarCartera();
     }
+  }
+
+  // PrimeNG 16 marca el p-multiSelect como "lleno" aunque su valor sea un arreglo vacío ([] != null), dejando la etiqueta flotante arriba.
+  // Al deseleccionar todos los clientes (uno a uno o con "seleccionar todos") se deja el valor en null para que la etiqueta vuelva a su posición.
+  // Se usa valueChanges porque "seleccionar todos" no emite el evento onChange del componente.
+  // El cambio a null se difiere (setTimeout) porque PrimeNG, en updateModel, vuelve a asignar [] a su modelo interno
+  // justo después de notificar al formulario; si se hiciera de inmediato, PrimeNG lo sobrescribiría.
+  limpiarClientesVacios() {
+    this.subClientesVacios = this.FormFiltros.get('Cliente')?.valueChanges.subscribe(valor => {
+      if (Array.isArray(valor) && valor.length === 0) {
+        setTimeout(() => {
+          const control = this.FormFiltros.get('Cliente');
+          if (Array.isArray(control?.value) && control.value.length === 0) control.setValue(null);
+        });
+      }
+    });
+  }
+
+  //Copia de tiempoExcedido que usa la consulta optimizada de la cartera.
+  //No valida paginaPrincial.recaudos / reportesConsolidadosComponent.cartera porque este componente solo se crea cuando su pestaña
+  //está activa (*ngIf="recaudos" en Inicio y *ngIf="cartera" en Reportes Consolidados), y esas referencias inyectadas
+  //son instancias distintas a las que están en pantalla.
+  tiempoExcedido2() {
+    this.consultarCarteraOptimizada();
+  }
+
+  // Copia de consultarCartera que usa los endpoints optimizados (getCarteraTotal2, getCarteraAgrupadaClientes2 y getCarteraAgrupadaVendedores2),
+  // lanza las 3 peticiones en paralelo, calcula el total una sola vez y cancela una consulta anterior que siga en curso.
+  consultarCarteraOptimizada() {
+    this.cargando = true;
+    let ruta: string = "";
+    let cliente: any = this.FormFiltros.value.Cliente == null ? [] : this.FormFiltros.value.Cliente;
+    let vendedor: string = this.FormFiltros.value.Vendedor;
+    let carteraOriginal: boolean = this.FormFiltros.value.CarteraOriginal;
+
+    if (this.ValidarRol == 2) vendedor = `${this.storage_Nombre}`;
+    this.carteraAgrupadaClientes = [];
+    this.carteraAgrupadaVendedores = [];
+    this.cartera = [];
+    this.totalCarteraValor = 0;
+    this.totalCarteraCorto = '$ 0';
+    this.resumenCartera = null;
+    this.cargandoResumen = true;
+
+    if (vendedor != null) ruta += `vendedor=${encodeURIComponent(vendedor)}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
+
+    this.subCartera?.unsubscribe();
+    this.subCartera = forkJoin({
+      clientes: this.zeusService.GetCarteraAgrupadaClientes2(cliente, ruta),
+      vendedores: this.zeusService.GetCarteraAgrupadaVendedores2(ruta),
+      total: this.zeusService.GetCarteraTotal2(cliente, ruta),
+    }).pipe(finalize(() => {
+      this.cargando = false;
+      this.cargandoResumen = false;
+    })).subscribe({
+      next: (resp) => {
+        this.carteraAgrupadaClientes = resp.clientes;
+        this.carteraAgrupadaVendedores = resp.vendedores;
+        this.cartera = resp.total.filter(x => x.saldo_Cartera > 0 && (!carteraOriginal || x.cantidad_Dias < 1000));
+        this.totalCarteraValor = this.cartera.reduce((acc, item) => acc + item.saldo_Cartera, 0);
+        this.calcularResumenCartera(carteraOriginal);
+      },
+      error: (error) => this.msj.mensajeError("Error al intentar consultar la cartera total", error?.error?.title ?? ''),
+    });
+  }
+
+  // Función que abrevia un valor en millones con formato colombiano (ej: 12812174110.99 -> "$ 12.812 M")
+  formatoMillones(valor: number): string {
+    return Math.abs(valor) >= 1_000_000 ? `$ ${this.formatoCO.format(valor / 1_000_000)} M` : `$ ${this.formatoCO.format(valor)}`;
+  }
+
+  // Función que indica si una factura está vencida: usa la fecha de vencimiento y, si no se puede interpretar,
+  // compara los días transcurridos contra el plazo de pago del cliente
+  private facturaVencida(factura: any, hoy: moment.Moment): boolean {
+    const formatos = ['YYYY-MM-DD', 'YYYY/MM/DD', 'YYYYMMDD', 'DD/MM/YYYY', 'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DDTHH:mm:ss'];
+    const vencimiento = moment(factura.fecha_Vencimiento, formatos, true);
+    if (vencimiento.isValid()) return vencimiento.isBefore(hoy);
+    return factura.cantidad_Dias > (factura.plazo_De_Pago ?? 0);
+  }
+
+  // Función que calcula, en una sola pasada, el resumen que se muestra en el panel de detalle de la cartera
+  calcularResumenCartera(carteraOriginal: boolean) {
+    const total = this.totalCarteraValor;
+    const hoy = moment().startOf('day');
+    const porcentaje = (valor: number) => total > 0 ? valor / total * 100 : 0;
+
+    const valoresTramos = this.tramosCartera.map(() => 0);
+    const saldoPorCliente = new Map<string, { nombre: string, valor: number }>();
+    let vencida = 0;
+
+    this.cartera.forEach(factura => {
+      this.tramosCartera.forEach((tramo, i) => {
+        if (factura[tramo.campo] > 0) valoresTramos[i] += factura[tramo.campo];
+      });
+      if (this.facturaVencida(factura, hoy)) vencida += factura.saldo_Cartera;
+      const cliente = saldoPorCliente.get(factura.id_Cliente) ?? { nombre: factura.nombre_CLiente, valor: 0 };
+      cliente.valor += factura.saldo_Cartera;
+      saldoPorCliente.set(factura.id_Cliente, cliente);
+    });
+
+    let mayorDeudor: { nombre: string, valor: number } | null = null;
+    for (const cliente of saldoPorCliente.values()) {
+      if (!mayorDeudor || cliente.valor > mayorDeudor.valor) mayorDeudor = cliente;
+    }
+
+    this.totalCarteraCorto = this.formatoMillones(total);
+    this.resumenCartera = {
+      facturas: this.formatoCO.format(this.cartera.length),
+      clientes: this.formatoCO.format(saldoPorCliente.size),
+      carteraOriginal,
+      tramos: this.tramosCartera.map((tramo, i) => ({
+        ...tramo,
+        valorCorto: this.formatoMillones(valoresTramos[i]),
+        porcentaje: porcentaje(valoresTramos[i]),
+      })),
+      vencidaCorto: this.formatoMillones(vencida),
+      porcentajeVencida: porcentaje(vencida),
+      mayorDeudor: mayorDeudor ? { nombre: mayorDeudor.nombre, valorCorto: this.formatoMillones(mayorDeudor.valor) } : null,
+    };
   }
 
   // Funcion que consultará los clientes
@@ -413,6 +553,164 @@ export class DashBoardRecaudosComponent implements OnInit {
     if (this.FormFiltros.value.Cliente) informacion = informacion.filter(x => this.FormFiltros.value.Cliente.includes(x.id_Cliente));
     console.log(informacion);
     return informacion;
+  }
+
+  //* ==================== PDF OPTIMIZADO ====================
+  // Copias de generarPDF, seleccionarInformacionPDf, contenidoPDF, obtenerVendedoresCartera, clientesVendedorPdf,
+  // facturasClientes y datosFacturasPdf. Generan el mismo PDF, pero agrupan las facturas una sola vez (Map)
+  // en lugar de filtrar el arreglo completo por cada vendedor / cliente, y calculan cada total una sola vez.
+
+  // Copia de generarPDF que usa la generación optimizada
+  generarPDF2() {
+    if (this.cartera.length > 0) {
+      this.cargando = true;
+      let informacionPDF = this.seleccionarInformacionPDf2();
+      let titulo: string = "Cartera Plasticaribe";
+      let content: any[] = this.contenidoPDF2(informacionPDF);
+      this.creacionPDFService.formatoPDF(titulo, content);
+      setTimeout(() => this.cargando = false, 3000);
+    } else {
+      this.msj.mensajeAdvertencia("No hay datos para generar el PDF");
+      this.cargando = false;
+    }
+  }
+
+  // Copia de seleccionarInformacionPDf sin console.log y con búsqueda de clientes por Set
+  seleccionarInformacionPDf2(): any[] {
+    const { CarteraOriginal, Vendedor, Cliente } = this.FormFiltros.value;
+    let informacion: any[] = this.cartera;
+    if (CarteraOriginal) informacion = informacion.filter(x => x.cantidad_Dias < 1000);
+    if (Vendedor) informacion = informacion.filter(x => x.nombre_Vendedor == Vendedor);
+    if (Cliente) {
+      const clientes = new Set(Cliente);
+      informacion = informacion.filter(x => clientes.has(x.id_Cliente));
+    }
+    return informacion;
+  }
+
+  // Función que agrupa un arreglo por la llave indicada, en una sola pasada
+  private agruparPor(datos: any[], llave: (x: any) => any): Map<any, any[]> {
+    const grupos = new Map<any, any[]>();
+    datos.forEach(x => {
+      const k = llave(x);
+      const grupo = grupos.get(k);
+      if (grupo) grupo.push(x);
+      else grupos.set(k, [x]);
+    });
+    return grupos;
+  }
+
+  // Copia de contenidoPDF: agrupa por vendedor y por cliente una sola vez
+  contenidoPDF2(informacionPDF: any[]) {
+    let data: any[] = [];
+    const facturasPorVendedor = this.agruparPor(informacionPDF, x => x.id_Vendedor);
+    const facturasPorCliente = this.agruparPor(informacionPDF, x => x.id_Cliente);
+    let vendedores: any[] = this.obtenerVendedoresCartera2(informacionPDF);
+    vendedores.forEach(vendedor => {
+      data.push([
+        {
+          margin: [5, 0, 5, 5],
+          text: `${vendedor.id} - ${vendedor.nombre}`,
+          bold: true,
+          fontSize: 11,
+          alignment: 'left'
+        },
+        this.clientesVendedorPdf2(facturasPorVendedor.get(vendedor.id) ?? [], facturasPorCliente),
+      ]);
+    });
+    data.push(this.totalCarteraPdf(informacionPDF));
+    return data;
+  }
+
+  // Copia de obtenerVendedoresCartera: usa un Map por nombre en vez de map + includes por cada factura
+  obtenerVendedoresCartera2(informacionPDF: any[]) {
+    const vendedores = new Map<string, any>();
+    informacionPDF.forEach(factura => {
+      if (!vendedores.has(factura.nombre_Vendedor)) vendedores.set(factura.nombre_Vendedor, { id: factura.id_Vendedor, nombre: factura.nombre_Vendedor });
+    });
+    return [...vendedores.values()].sort((a, b) => a.id - b.id);
+  }
+
+  // Copia de clientesVendedorPdf: recibe las facturas del vendedor y las facturas agrupadas por cliente
+  clientesVendedorPdf2(facturasVendedor: any[], facturasPorCliente: Map<any, any[]>) {
+    let clientes: any[] = [...facturasVendedor].sort((a, b) => (a.nombre_CLiente ?? '').localeCompare(b.nombre_CLiente ?? ''));
+    const clientesIncluidos = new Set<any>();
+    let data: any[] = [];
+    clientes.forEach(cliente => {
+      if (clientesIncluidos.has(cliente.id_Cliente)) return;
+      clientesIncluidos.add(cliente.id_Cliente);
+      data.push({
+        margin: [5, 0, 5, 5],
+        table: {
+          headerRows: 1,
+          widths: ['10%', '35%', '12%', '20%', '11%', '12%'],
+          body: this.facturasClientes2(cliente, facturasPorCliente.get(cliente.id_Cliente) ?? [])
+        }
+      });
+    });
+    return data;
+  }
+
+  // Copia de facturasClientes: recibe directamente las facturas del cliente
+  facturasClientes2(cliente: any, facturasCliente: any[]) {
+    let facturas: any[] = [...facturasCliente].sort((a, b) => (a.id_Fecha ?? '').localeCompare(b.id_Fecha ?? ''));
+    let data: any[] = [];
+    data.push(this.informacionClientePDF(cliente));
+    data.push([
+      {
+        colSpan: 6,
+        border: [true, false, true, true],
+        table: {
+          fontSize: 7,
+          headerRows: 1,
+          dontBreakRows: true,
+          widths: ['11%', '11%', '11%', '5%', '12%', '12%', '12%', '14%', '12%',],
+          body: this.datosFacturasPdf2(facturas)
+        }
+      },
+      {},
+      {},
+      {},
+      {},
+      {},
+    ]);
+    data.push(this.totalClientePdf(facturas));
+    return data;
+  }
+
+  // Copia de datosFacturasPdf: calcula los 5 totales una sola vez (antes se recalculaba cada total 2 o 3 veces)
+  datosFacturasPdf2(facturas: any[]) {
+    const plazos = ['saldoPlazo1', 'saldoPlazo2', 'saldoPlazo3', 'saldoPlazo4', 'saldoPlazo5'];
+    const valorPlazo = (valor: number) => valor == -1 ? '' : this.formatonumeros(valor.toFixed(2));
+    const celda = (text: string, alignment: string) => ({ border: [false, false, false, false], fontSize: 7, alignment, text });
+
+    let data: any[] = [];
+    data.push(this.titulosFacturasPdf());
+    facturas.forEach(f => {
+      data.push([
+        celda(`${f.num_Factura}`, 'center'),
+        celda(`${f.id_Fecha}`, 'center'),
+        celda(`${f.fecha_Vencimiento}`, 'center'),
+        celda(`${f.cantidad_Dias}`, 'center'),
+        ...plazos.map(p => celda(`${valorPlazo(f[p])}`, 'right')),
+      ]);
+    });
+
+    const totales = plazos.map(p => facturas.reduce((a, b) => a + b[p], 0));
+    data.push([
+      celda(``, 'center'),
+      celda(``, 'center'),
+      celda(``, 'center'),
+      celda(``, 'center'),
+      ...totales.map(total => ({
+        border: [false, false, false, total > 0],
+        bold: true,
+        fontSize: 8,
+        alignment: 'right',
+        text: `${total <= 0 ? '' : this.formatonumeros(total.toFixed(2))}`
+      })),
+    ]);
+    return data;
   }
 
   //* FUNCIONES PARA MOVIMIENTOS DE FACTURA (OF, DESPACHO, DV)

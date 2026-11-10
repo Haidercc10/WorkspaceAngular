@@ -202,7 +202,7 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.calcularKilosFacturadosMes();
     this.consultarFacturasNoHabilitadas();
     //this.BuscarDatosGraficaFacturacion();
-    this.BuscarDatosGraficaCuentas_Cobrar();
+    this.BuscarDatosGraficaCuentas_Cobrar2();
     this.BuscarDatosGraficaCuentas_Pagar();
     this.BuscarDatosGrafica_Compras('0');
     this.BuscarDatosGrafica_Compras('900362200');
@@ -351,6 +351,28 @@ export class Dashboard_GeneralComponent implements OnInit {
             let index2 : number = this.cuentas_Cobrar_Anios.findIndex(item => item.anio == this.anioSeleccionado);
             if (index2 != -1) this.cuentas_Cobrar_Anios[index2].costo += dato[i].valor;
             else this.cuentas_Cobrar_Anios.push(info);
+          } else {
+            this.llenarGraficaCuentas_Cobrar(costoMeses);
+            break;
+          }
+        }
+      });
+    }
+  }
+
+  // Copia de BuscarDatosGraficaCuentas_Cobrar que usa el endpoint optimizado getCartera_Mes_Anio2 (una sola consulta por año en vez de 12)
+  BuscarDatosGraficaCuentas_Cobrar2(){
+    let index : number = this.cuentas_Cobrar_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+      this.zeusContabilidad.GetCartera_Mes_Anio2(`${this.anioSeleccionado}`).subscribe(dato => {
+        for (let i = 0; i < dato.length; i++) {
+          if (dato[i] != null){
+            costoMeses[parseInt(dato[i].mes) - 1] = dato[i].valor;
+            if (dato[i].mes == '12') this.llenarGraficaCuentas_Cobrar(costoMeses);
+            let index2 : number = this.cuentas_Cobrar_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+            if (index2 != -1) this.cuentas_Cobrar_Anios[index2].costo += dato[i].valor;
+            else this.cuentas_Cobrar_Anios.push({ anio: this.anioSeleccionado, costo : dato[i].valor });
           } else {
             this.llenarGraficaCuentas_Cobrar(costoMeses);
             break;

@@ -279,6 +279,23 @@ th {
   padding-right: 2.5rem;
 }
 
+/* Íconos en p-multiSelect: igual que en p-dropdown, se eleva el ícono y se deja espacio en la etiqueta del campo */
+.p-input-icon-left:has(> p-multiselect) > i {
+  z-index: 1;
+}
+
+.p-input-icon-left > p-multiselect .p-multiselect-label {
+  padding-left: 2.5rem;
+}
+
+/*
+ * Etiqueta flotante con ícono: el tema Lara la deja en left: 2.5rem (alineada con el texto del campo).
+ * Al subir (campo enfocado o con valor) se alinea con el ícono, en left: 0.75rem.
+ */
+.p-input-icon-left.p-float-label > :is(input:focus, input.p-filled, textarea:focus, textarea.p-filled, .p-inputwrapper-focus, .p-inputwrapper-filled) ~ label {
+  left: 0.75rem;
+}
+
 .p-inputtext:enabled:focus {
   box-shadow: 0 0 0 0.2rem #febfbf;
   border-color: #f63b3b;
@@ -731,4 +748,12 @@ input.con-contador-caracteres + .contador-caracteres {
   top: 50%;
   bottom: auto;
   transform: translateY(-50%);
+}
+
+/* p-multiSelect: el ícono del check (<CheckIcon> y su <svg>) se elimina del DOM al desmarcar (*ngIf="selected").
+   Si el clic cae sobre el ícono, onContainerClick de PrimeNG ya no lo encuentra dentro del panel, lo interpreta
+   como clic externo y cierra la lista. Con pointer-events: none en todo el contenido del recuadro, el clic cae en
+   .p-checkbox-box (que siempre existe) y la lista sigue abierta. Aplica también al check de "seleccionar todos". */
+.p-multiselect-panel .p-checkbox-box * {
+  pointer-events: none;
 }

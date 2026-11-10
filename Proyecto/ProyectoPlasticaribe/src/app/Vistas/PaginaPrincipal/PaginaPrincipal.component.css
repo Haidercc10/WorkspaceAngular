@@ -3,6 +3,9 @@
   isolation: isolate; /* las capas de fondo (z-index: -1) quedan detrás del contenido sin salirse del componente */
   height: 100%;
   min-height: 100vh;
+  /* Espacio reservado para la barra de favoritos (p-dock fijo abajo): al llegar al final de la página,
+     las tablas de los dashboards quedan por encima de los íconos y no tapados por ellos */
+  padding-bottom: 6.5rem;
 }
 
 /* ===== Capas de fondo por sección (cambio con desvanecido) ===== */
