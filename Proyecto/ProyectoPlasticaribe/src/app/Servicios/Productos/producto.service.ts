@@ -34,4 +34,21 @@ export class ProductoService {
   PutEstadoProducto = (id: number, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Producto/putEstadoProducto/${id}`, datos_Productos);
 
   srvGuardar = (data : modelProducto): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Producto', data);
+
+  /** PDF del arte del item (carpeta de artes de Aseguramiento de la Calidad, `{prodId}.pdf`); 404 si no tiene. */
+  GetArteItem = (prodId : number) : Observable<Blob> => this.http.get(`${this.rutaPlasticaribeAPI}/Producto/arte/${prodId}`, { responseType: 'blob' });
+
+  /** Historial de nombres (referencia) del producto, cambiados al crear o editar OT; del más reciente al más antiguo. */
+  GetHistorialNombres = (prodId : number) : Observable<HistorialNombreProducto[]> => this.http.get<HistorialNombreProducto[]>(`${this.rutaPlasticaribeAPI}/Producto/historialNombres/${prodId}`);
+}
+
+/** Un cambio de nombre de un producto (GET Producto/historialNombres/{prodId}). */
+export interface HistorialNombreProducto {
+  fecha: string;
+  nombreAnterior: string;
+  nombreNuevo: string;
+  numero_OT: number;
+  /** "Creación" o "Edición" de la OT. */
+  origen: string;
+  usuario: string;
 }

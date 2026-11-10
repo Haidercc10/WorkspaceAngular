@@ -1,0 +1,24 @@
+<!-- Visor del arte del item (PDF de Aseguramiento de la Calidad) -->
+<p-dialog [header]="item ? 'Arte del item N° ' + item : 'Arte del item'" [(visible)]="visible" [modal]="true"
+  [draggable]="false" [maximizable]="true" [style]="{width: '80vw'}" [breakpoints]="{'960px': '95vw'}"
+  appendTo="body" (onHide)="cerrar()">
+
+  <div *ngIf="cargando" class="d-flex justify-content-center p-4">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+
+  <div *ngIf="!cargando && error" class="d-flex align-items-center gap-2 p-3" style="color: #b23b3b;">
+    <i class="pi pi-exclamation-triangle" style="font-size: 1.4rem;"></i>
+    <span>{{error}}</span>
+  </div>
+
+  <iframe *ngIf="!cargando && urlSegura" [src]="urlSegura" title="Arte del item"
+    style="width: 100%; height: 75vh; border: 0;"></iframe>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" icon="pi pi-external-link" label="Abrir en otra pestaña"
+      class="p-button-outlined p-button-secondary" [disabled]="!urlSegura" (click)="abrirEnPestana()"></button>
+    <button pButton type="button" icon="pi pi-download" label="Descargar" class="p-button-danger"
+      [disabled]="!urlSegura" (click)="descargar()"></button>
+  </ng-template>
+</p-dialog>

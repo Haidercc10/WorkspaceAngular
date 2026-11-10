@@ -8,8 +8,7 @@ import { EMPTY, Observable, Subscription, catchError, finalize, forkJoin, map, o
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
-import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
-import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
+import { CrearOrdenTrabajoDatos, EditarOrdenTrabajoCompleta, EditarOrdenTrabajoDatos, OtExtrusionDatos, OtImpresionDatos, OtLaminadoDatos, OtSelladoCorteDatos, ProcesosOrdenTrabajo } from 'src/app/Modelo/modelOrdenTrabajoCompleta';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -23,7 +22,7 @@ import { Mezclas_PigmentosService } from 'src/app/Servicios/MezclasPigmentos/Mez
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import { OrdenTrabajo_Sellado_CorteService } from 'src/app/Servicios/OrdenTrabajo_Sellado_Corte/OrdenTrabajo_Sellado_Corte.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { HistorialNombreProducto, ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { Tipos_ImpresionService } from 'src/app/Servicios/TipoImpresion/Tipos_Impresion.service';
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
@@ -32,13 +31,13 @@ import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsOrdenesTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2 } from 'src/app/data';
+import { defaultStepOptions, stepsOrdenesTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsBusquedaOrdenesTrabajo } from 'src/app/data';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { modelProducto } from 'src/app/Modelo/modelProducto';
 import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { OtCalculoCostosService } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
+import { OtCalculoCostosService, RangoPesoTeorico } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 /**
@@ -47,6 +46,13 @@ import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.s
  * pero no se crean OT nuevas con esa presentación (puede llegar desde BagPro como presentación del item).
  */
 const PRESENTACIONES_OT_PERMITIDAS: readonly string[] = ['Kg', 'Paquete', 'Und', 'MTS'];
+
+/**
+ * Roles que pueden crear y editar OT desde esta vista (decisión del responsable, medida temporal mientras se define
+ * quién puede renombrar el maestro de productos). Los demás roles solo consultan y generan el PDF.
+ * La API todavía no aplica esta restricción.
+ */
+const ROLES_GUARDAR_OT: readonly number[] = [1, 98];
 
 /** OT encontrada al consultar por número: en Plasticaribe (editable) o solo en BagPro (plantilla). */
 interface ResultadoBusquedaOT {
@@ -150,6 +156,17 @@ export class Orden_TrabajoComponent implements OnInit {
   pesoMillar: number = 0; //Variable que almacenará el peso de un millar
   private sinPesoParaValorKg: boolean = false; //true si el último cálculo dejó Valor Kg en 0 por falta de Peso Millar (o de cantidad por paquete)
   private valorKgCargado: number | null = null; //Valor Kg guardado de la OT abierta en edición; se conserva cuando la presentación no lo calcula (MTS)
+  private rowVersionCargada: string | null = null; //Versión de la fila (rowVersion de getOrdenTrabajo, base64) de la OT abierta en edición; se envía como Ot_RowVersion para detectar ediciones concurrentes (409)
+  private nombresCargados: { sede: any, cliente: string, producto: string } | null = null; //Nombres de cliente y producto con los que se cargó la OT en edición; si cambian, la confirmación lo indica
+  /** Pestaña abierta (0 = Buscar Orden Trabajo, 1 = Crear Orden Trabajo); el botón de tutorial del título muestra el de esa pestaña. */
+  tabActivo: number = 0;
+  /** true después de intentar crear o editar: la vista resalta en rojo los campos obligatorios vacíos (clase ot-resaltar-obligatorios). */
+  resaltarObligatorios: boolean = false;
+  editandoReferencia: boolean = false; //true si se habilitó (lápiz) el campo Referencia para cambiar el nombre del item; si no, es de solo lectura
+  private referenciaOriginal: string | null = null; //Nombre del item al habilitar el cambio de referencia; se restaura si se cancela
+  modalHistorialNombres: boolean = false; //Muestra el historial de nombres del item
+  historialNombres: HistorialNombreProducto[] = []; //Cambios de nombre del item (más reciente primero)
+  cargandoHistorialNombres: boolean = false; //Indica si se está consultando el historial de nombres
   private avisoSinPesoMostrado: boolean = false; //Indica si la última validación de guardado ya mostró el aviso de Valor Kg 0 (evita repetirlo al confirmar la edición)
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
@@ -214,7 +231,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Id_Vendedor: [null, Validators.required],
       Nombre_Vendedor: [null, Validators.required],
       OT_FechaCreacion: [this.today, Validators.required],
-      OT_FechaEntrega: [null],
+      OT_FechaEntrega: [null, Validators.required], // Obligatoria (la API también la exige)
       Id_Cliente: [null, Validators.required],
       Nombre_Cliente: [null, Validators.required],
       Id_Producto: [null, Validators.required],
@@ -279,9 +296,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Largo_Corte: [null, Validators.required],
       Fuelle_Corte: [null, Validators.required],
       Margen_Corte: [null, Validators.required],
-      Etiqueta_Ancho_Corte: [null, Validators.required],
-      Etiqueta_Largo_Corte: [null, Validators.required],
-      Etiqueta_Fuelle_Corte: [null, Validators.required],
+      Etiqueta_Ancho_Corte: ['0'], // Ya no se muestra en la vista; se conserva el valor cargado para no romper el contrato de la API
+      Calibre_Cliente_Corte: ['0'], // Se guarda y se carga en SelladoCorte_Etiqueta_Largo (EtiquetaLargo en BagPro)
+      Etiqueta_Fuelle_Corte: ['0'], // Ya no se muestra en la vista; se conserva el valor cargado para no romper el contrato de la API
       SelladoCorte_Observacion: [null],
     });
 
@@ -447,12 +464,16 @@ export class Orden_TrabajoComponent implements OnInit {
     this.ultimoIdProducto();
   }
 
-  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  /**
+   * Muestra el tutorial de la pestaña abierta: Buscar OT (tabActivo 0) o Crear OT (tabActivo 1).
+   * Cada tutorial solo apunta a elementos de su pestaña, porque los de la otra pestaña están ocultos.
+   * @returns No retorna un valor.
+   */
   verTutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.addSteps(this.tabActivo == 0 ? stepsBusquedaOrdenesTrabajo : defaultSteps);
     this.shepherdService.start();
   }
 
@@ -561,9 +582,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Largo_Corte: 0,
       Fuelle_Corte: 0,
       Margen_Corte: 0,
-      Etiqueta_Ancho_Corte: 0,
-      Etiqueta_Largo_Corte: 0,
-      Etiqueta_Fuelle_Corte: 0,
+      Etiqueta_Ancho_Corte: '0',
+      Calibre_Cliente_Corte: '0',
+      Etiqueta_Fuelle_Corte: '0',
     });
   }
 
@@ -693,6 +714,53 @@ export class Orden_TrabajoComponent implements OnInit {
     this.pesoBulto = 0;
     this.informacionSeleccionada = 0;
     this.valorKgCargado = null;
+    this.rowVersionCargada = null;
+    this.nombresCargados = null;
+    this.editandoReferencia = false;
+    this.referenciaOriginal = null;
+    this.resaltarObligatorios = false;
+  }
+
+  /**
+   * Al crear o editar una OT, habilita o cancela el cambio del nombre (referencia) del item. El campo Referencia es de solo
+   * lectura hasta habilitarlo; habilitado, su texto se envía como nuevo nombre: queda en el maestro, en ClientesOT_Item de
+   * BagPro y en Zeus, y el nombre anterior en el historial. Al cancelar, se restaura el nombre que tenía.
+   * @returns No retorna un valor.
+   */
+  alternarEdicionReferencia() {
+    if (this.editandoReferencia) {
+      this.FormOrdenTrabajo.patchValue({ Nombre_Producto: this.referenciaOriginal });
+      this.editandoReferencia = false;
+      this.referenciaOriginal = null;
+      return;
+    }
+    if (!this.producto) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `Primero cargue el item al que le quiere cambiar la referencia.`);
+      return;
+    }
+    this.referenciaOriginal = this.FormOrdenTrabajo.value.Nombre_Producto;
+    this.editandoReferencia = true;
+  }
+
+  /**
+   * Abre el historial de nombres (referencias) del item cargado.
+   * @returns No retorna un valor.
+   */
+  verHistorialNombres() {
+    if (!this.producto) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `Primero cargue un item.`);
+      return;
+    }
+    this.historialNombres = [];
+    this.modalHistorialNombres = true;
+    this.cargandoHistorialNombres = true;
+    this.productoService.GetHistorialNombres(this.producto).subscribe({
+      next: data => { this.historialNombres = data ?? []; this.cargandoHistorialNombres = false; },
+      error: error => {
+        this.cargandoHistorialNombres = false;
+        this.msj.mensajeError(`¡No fue posible consultar el historial de nombres del item ${this.producto}!`, error?.message ?? '');
+      },
+    });
   }
 
   //Cargar modal de crear producto
@@ -874,7 +942,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar los clientes de la empresa
+  // Funcion que va a consultar los clientes de la empresa (al crear y al editar, para elegir otro cliente).
   consultarClientes = () => {
     let nombre = this.FormOrdenTrabajo.value.Nombre_Cliente;
     if (!nombre || nombre.trim() === '' || nombre.trim().length < 3) return;
@@ -889,6 +957,8 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Coloca la información del cliente seleccionado y su vendedor en el formulario.
+   * En modo edición cambia el cliente (sede) de la OT; si no se elige de la lista, el texto escrito queda como
+   * nombre del cliente solo para esa OT.
    * @returns No retorna un valor.
    */
   clienteSeleccionado() {
@@ -917,19 +987,24 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar los productos de la empresa
+  // Funcion que va a consultar los productos de la empresa. En modo edición no busca: el campo es el nombre del producto
+  // (se actualiza en el maestro al editar la OT); el item se cambia desde el campo "Item".
   consultarProductos() {
+    if (this.edicionOrdenTrabajo || this.editandoReferencia) return;
     let nombreProducto: any = this.FormOrdenTrabajo.get('Nombre_Producto')?.value;
     this.productoService.obtenerItemsLike(nombreProducto).subscribe(data => this.productos = data);
   }
 
   /**
    * Coloca el producto elegido en el formulario y, cuando BagPro responde su presentación, carga la información del item.
+   * En modo edición, o si el texto no corresponde a un producto de la lista, no hace nada (el texto queda como nombre).
    * @returns No retorna un valor.
    */
   productoSeleccionado() {
+    if (this.edicionOrdenTrabajo || this.editandoReferencia) return;
     let id_producto = this.FormOrdenTrabajo.value.Nombre_Producto;
     let producto = this.productos.find(x => x.prod_Id == id_producto);
+    if (!producto) return;
     this.FormOrdenTrabajo.patchValue({
       Id_Producto: producto.prod_Id,
       Nombre_Producto: producto.prod_Nombre,
@@ -1156,8 +1231,9 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Sale del modo edición sin modificar la OT que estaba abierta: quita su número, la confirmación de edición
-   * y la tabla de producción, para que lo que se cargue después quede como plantilla de una OT nueva ("Crear OT").
+   * Sale del modo edición sin modificar la OT que estaba abierta: quita su número, su versión (rowVersion),
+   * la confirmación de edición y la tabla de producción, para que lo que se cargue después quede como plantilla
+   * de una OT nueva ("Crear OT").
    * @returns No retorna un valor.
    */
   private salirModoEdicion(): void {
@@ -1167,6 +1243,8 @@ export class Orden_TrabajoComponent implements OnInit {
     this.FormOrdenTrabajo.patchValue({ OT_Id: null });
     this.limpiarProduccionProcesos();
     this.valorKgCargado = null;
+    this.rowVersionCargada = null;
+    this.nombresCargados = null;
   }
 
   /**
@@ -1242,6 +1320,9 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   cargarFormularios(dataSedes: any, dataOt: any, ot: number | null) {
+    // Otro item u otra OT: se cancela el cambio de referencia que estuviera habilitado
+    this.editandoReferencia = false;
+    this.referenciaOriginal = null;
     this.llenarDatosCliente(dataSedes ? dataSedes : dataOt)
     this.llenarFormularioOrdenTrabajo(dataOt);
     this.llenarFormularioExtrusion(dataOt);
@@ -1478,7 +1559,11 @@ export class Orden_TrabajoComponent implements OnInit {
       Fuelle_Corte: this.ArrayProducto[0]?.Fuelle || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
       Margen_Corte: data.margen || this.FormOrdenTrabajoCorte.value.Margen_Corte,
       Etiqueta_Ancho_Corte: data.selladoCorte_Etiqueta_Ancho || this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte,
-      Etiqueta_Largo_Corte: data.selladoCorte_Etiqueta_Largo || this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte,
+      // BagPro envía selladoCorte_CalibreCliente (EtiquetaLargo sin respaldo); su selladoCorte_Etiqueta_Largo cae al Largo si está vacío.
+      // Plasticaribe no lo envía y su SelladoCorte_Etiqueta_Largo ya es el valor guardado.
+      Calibre_Cliente_Corte: data.selladoCorte_CalibreCliente !== undefined
+        ? this.textoEtiqueta(data.selladoCorte_CalibreCliente)
+        : (data.selladoCorte_Etiqueta_Largo || this.FormOrdenTrabajoCorte.value.Calibre_Cliente_Corte),
       Etiqueta_Fuelle_Corte: data.selladoCorte_Etiqueta_Fuelle || this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte,
     });
   }
@@ -1550,25 +1635,81 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Calcula el peso del paquete (Peso Millar × Cantidad Paquete / 1000) y el del bulto (Peso Paquete × Cantidad Bulto)
-   * en el formulario de sellado. Los campos siguen siendo editables: si falta algún dato no se toca el valor actual.
+   * Peso teórico de un paquete y su rango de tolerancia. Para las referencias CAMISILLA BIOD con peso manual de
+   * producción es el peso del bulto repartido entre la Cantidad Bulto digitada (T3.0: 23 kg / 2 = 11,5 kg;
+   * T2.0: 35 kg / 10 = 3,5 kg); para el resto, la fórmula de producción
+   * (1 paquete × Peso Millar × Cantidad Paquete / 1000). Se muestra debajo de Peso Paquete mientras se escribe.
+   * @returns Peso teórico, mínimo y máximo del paquete (0 si faltan datos).
+   */
+  get pesoTeoricoPaquete(): RangoPesoTeorico {
+    const sellado = this.FormOrdenTrabajoSellado.value;
+    return this.calculoCostos.rangoPesoTeorico(this.pesoPaqueteManual() ?? this.calculoCostos.calcularPesoTeorico({
+      presentacion: 'Paquete', cantidad: 1, pesoMillar: sellado.PesoMillar, cantidadPaquete: sellado.CantidadPaquete,
+    }));
+  }
+
+  /**
+   * Peso teórico de un bulto y su rango de tolerancia: peso teórico del paquete × Cantidad Bulto. En las referencias
+   * CAMISILLA BIOD con peso manual es el peso fijo de la tabla (23 kg aunque el bulto traiga 1 o 2 paquetes).
+   * Se muestra debajo de Peso Bulto mientras se escribe.
+   * @returns Peso teórico, mínimo y máximo del bulto.
+   */
+  get pesoTeoricoBulto(): RangoPesoTeorico {
+    return this.calculoCostos.rangoPesoTeorico(this.pesoTeoricoBultoKg());
+  }
+
+  /**
+   * Peso teórico del bulto en kg (ver `pesoTeoricoBulto`), sin redondear.
+   * @returns Peso teórico del bulto.
+   */
+  private pesoTeoricoBultoKg(): number {
+    const cantidadBulto = Number(this.FormOrdenTrabajoSellado.value.CantidadBulto) || 0;
+    // BIOD: el paquete es el bulto repartido entre la cantidad (1 si no se ha digitado), así que el bulto da el peso de la tabla
+    const paquetes = this.pesoPaqueteManual() != null && cantidadBulto <= 0 ? 1 : cantidadBulto;
+    return this.pesoTeoricoPaquete.pesoTeorico * paquetes;
+  }
+
+  /**
+   * Peso del paquete según la tabla manual de producción (solo referencias CAMISILLA BIOD). Toma el formato de sellado
+   * y el de corte, porque al cargar una OT todavía no se sabe cuál de los dos procesos aplica, y el nombre del item
+   * del formulario (refleja un cambio de referencia) o, si no hay, el del item cargado.
+   * @returns El peso del paquete en kg, o null si la referencia no tiene peso manual.
+   */
+  pesoPaqueteManual(): number | null {
+    const nombreFormulario = this.FormOrdenTrabajo.value.Nombre_Producto;
+    const referencia = typeof nombreFormulario == 'string' && isNaN(Number(nombreFormulario)) ? nombreFormulario : this.ArrayProducto[0]?.Nombre;
+    const formatos = `${this.FormOrdenTrabajoSellado.value.Formato_Sellado ?? ''} ${this.FormOrdenTrabajoCorte.value.Formato_Corte ?? ''}`;
+    // Paquetes por bulto digitados en la OT: el peso de la tabla es el del bulto completo y se reparte entre ellos
+    return this.calculoCostos.pesoPaqueteManual(formatos, referencia, this.FormOrdenTrabajoSellado.value.CantidadBulto);
+  }
+
+  /**
+   * Llena Peso Paquete y Peso Bulto del formulario de sellado con el peso teórico (ver `pesoTeoricoPaquete` y
+   * `pesoTeoricoBulto`). En las referencias CAMISILLA BIOD con peso manual el bulto queda en el peso de la tabla y el
+   * paquete se reparte entre la Cantidad Bulto (23 kg con 2 paquetes: paquete 11,5 y bulto 23). Si solo cambió el
+   * Peso Paquete (editado a mano), el bulto se calcula como Peso Paquete × Cantidad Bulto.
+   * Al cargar una OT o un item (soloVacios) se conservan los pesos guardados, salvo en las referencias CAMISILLA BIOD
+   * con peso manual: en esas siempre se cargan los pesos de la tabla. Si falta algún dato no se toca el valor actual.
    * @param recalcularPaquete true recalcula el peso del paquete; false solo recalcula el bulto con el peso de paquete actual.
    * @param soloVacios true solo llena los pesos que estén en 0 o vacíos (carga de OT o item), para no reemplazar valores guardados.
    * @returns No retorna un valor.
    */
   calcularPesosPaqueteBulto(recalcularPaquete: boolean = true, soloVacios: boolean = false) {
+    if (soloVacios && this.pesoPaqueteManual() != null) soloVacios = false;
     const sellado = this.FormOrdenTrabajoSellado.value;
-    const pesoMillar: number = Number(sellado.PesoMillar) || 0;
-    const cantidadPaquete: number = Number(sellado.CantidadPaquete) || 0;
     const cantidadBulto: number = Number(sellado.CantidadBulto) || 0;
+    const pesoTeoricoPaquete: number = this.pesoTeoricoPaquete.pesoTeorico;
     let pesoPaquete: number = Number(sellado.PesoPaquete) || 0;
+    let pesoBulto: number = cantidadBulto > 0 ? pesoPaquete * cantidadBulto : 0;
 
-    if (recalcularPaquete && pesoMillar > 0 && cantidadPaquete > 0 && (!soloVacios || pesoPaquete <= 0)) {
-      pesoPaquete = Math.round(pesoMillar * (cantidadPaquete / 1000) * 100) / 100;
+    if (recalcularPaquete && pesoTeoricoPaquete > 0 && (!soloVacios || pesoPaquete <= 0)) {
+      pesoPaquete = Math.round(pesoTeoricoPaquete * 100) / 100;
+      // Con el teórico sin redondear: 35 kg en 3 paquetes da paquete 11,67 y bulto 35 (no 35,01)
+      pesoBulto = this.pesoTeoricoBultoKg();
       this.FormOrdenTrabajoSellado.patchValue({ PesoPaquete: pesoPaquete });
     }
-    if (pesoPaquete > 0 && cantidadBulto > 0 && (!soloVacios || (Number(sellado.PesoBulto) || 0) <= 0)) {
-      this.FormOrdenTrabajoSellado.patchValue({ PesoBulto: Math.round(pesoPaquete * cantidadBulto * 100) / 100 });
+    if (pesoBulto > 0 && (!soloVacios || (Number(sellado.PesoBulto) || 0) <= 0)) {
+      this.FormOrdenTrabajoSellado.patchValue({ PesoBulto: Math.round(pesoBulto * 100) / 100 });
     }
   }
 
@@ -1735,13 +1876,14 @@ export class Orden_TrabajoComponent implements OnInit {
    * Calcula el peso del producto con sus dimensiones y el factor del material, y toma el Peso Millar base del producto
    * (el que se muestra en sellado y se guarda). No modifica el Peso Millar de ArrayProducto: la regla de LAMINADO/HOJA
    * (D2) se aplica en `OtCalculoCostosService` sobre una variable local, así que repetir el cálculo no acumula divisiones.
+   * El tipo para la regla D2 es el mismo formato que se envía en SelladoCorte.Formato_Id (`formatoProductoTerminado`).
    * @param material Id del material de extrusión.
    * @param fact Parámetro conservado por compatibilidad; el factor lo calcula el servicio.
    * @returns No retorna un valor.
    */
   calcularPesoProducto(material: number, fact: number) {
     const producto = this.ArrayProducto[0];
-    producto.Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado || this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    producto.Tipo = this.formatoProductoTerminado();
     // Solo se llama con Cms o Plgs (lo valida calcularDatosOtInmediato); cualquier unidad distinta de Cms usa el factor de Plgs, como antes
     const unidad: string = this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' ? 'Cms' : 'Plgs';
     producto.Peso_Producto = this.calculoCostos.calcularPesoProducto(
@@ -1759,10 +1901,23 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
+   * Precio total de la OT: Cant. Pedida × Precio Unitario, con los valores del formulario para que se vea
+   * mientras se escribe (no espera el recálculo de costos).
+   * @returns Precio total; 0 si falta la cantidad o el precio.
+   */
+  get precioTotal(): number {
+    const { Cantidad, Precio } = this.FormOrdenTrabajo.value;
+    return (Number(Cantidad) || 0) * (Number(Precio) || 0);
+  }
+
+  /**
    * Calcula los costos de la OT (cantidad, valor unidad, margen kg, neto kg, valor kg, valor OT y pesos de paquete/bulto)
    * con `OtCalculoCostosService` a partir del producto cargado. Si la presentación no tiene regla de cálculo (p. ej. Rollo),
    * conserva los valores actuales, como hasta ahora. Si el servicio no calcula el Valor Kg (MTS, pendiente de definir),
    * usa 0 en una OT nueva y, al editar, conserva el Valor Kg con el que se cargó la OT.
+   * H-C/I2: usa las mismas entradas que se envían y con las que el servidor valida: la cantidad por paquete editada en
+   * sellado (CantidadPaquete → SelladoCorte_CantBolsasPaquete), el Peso Millar de SelladoCorte_PesoMillar y el formato
+   * de SelladoCorte.Formato_Id.
    * @param margen_Adicional Margen adicional en porcentaje.
    * @returns true si se calcularon los costos; false si la presentación no tiene regla de cálculo.
    */
@@ -1775,7 +1930,7 @@ export class Orden_TrabajoComponent implements OnInit {
       margenAdicional: margen_Adicional,
       pesoMillar: data.PesoMillar,
       tipoProducto: data.Tipo,
-      cantidadPaquete: data.CantPaquete,
+      cantidadPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
       cantidadBulto: data.CantBulto,
     });
     if (!resultado) return false;
@@ -2418,13 +2573,65 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   validarDatos() {
-    if (this.guardando) return;
+    if (this.guardando || !this.validarRolGuardar()) return;
+    this.resaltarObligatorios = true;
     if (!this.FormOrdenTrabajo.valid) {
-      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+      this.avisarCamposVacios();
       return;
     }
     if (!this.presentacionPermitidaParaCrear()) return;
+    if (!this.validarReferenciaCreacion()) return;
     if (this.prepararFormulariosParaGuardar()) this.guardarOt();
+  }
+
+  /**
+   * Al crear con el cambio de referencia habilitado, comprueba que el nombre nuevo no esté vacío ni supere 100 caracteres
+   * (Productos.Prod_Nombre).
+   * @returns true si es válido o no se está cambiando la referencia; false si no (ya se mostró el aviso).
+   */
+  private validarReferenciaCreacion(): boolean {
+    if (!this.editandoReferencia) return true;
+    const nombre = this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto);
+    if (nombre == null) {
+      this.msj.mensajeAdvertencia(`¡No se puede crear la OT!`, `La referencia (nombre del item) no puede estar vacía.`, 6000);
+      return false;
+    }
+    if (nombre.length > 100) {
+      this.msj.mensajeAdvertencia(`¡No se puede crear la OT!`, `La referencia (nombre del item) no puede tener más de 100 caracteres.`, 6000);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Avisa qué campos obligatorios del formulario principal están vacíos (por su etiqueta en pantalla) y lleva el
+   * cursor al primero. Los campos ya se ven en rojo porque `resaltarObligatorios` está activo.
+   * @returns No retorna un valor.
+   */
+  private avisarCamposVacios() {
+    const vacios = Array.from(document.querySelectorAll<HTMLElement>('#formOrdenTrabajo [formcontrolname].ng-invalid'));
+    const nombres = vacios
+      .map(el => el.closest('.p-float-label')?.querySelector('label')?.textContent?.trim() || el.getAttribute('formcontrolname') || '')
+      .filter((nombre, i, lista) => nombre !== '' && lista.indexOf(nombre) === i);
+    this.msj.mensajeAdvertencia(`¡Hay campos obligatorios vacíos!`,
+      nombres.length ? `Complete los campos resaltados en rojo: ${nombres.join(', ')}.` : `Complete los campos resaltados en rojo.`, 6000);
+    const primero = vacios[0];
+    (primero?.matches('input, textarea') ? primero : primero?.querySelector<HTMLElement>('input, textarea'))?.focus();
+  }
+
+  /** Indica si el rol del usuario puede crear y editar OT (`ROLES_GUARDAR_OT`); la vista oculta los botones si no puede. */
+  get puedeGuardarOT(): boolean {
+    return ROLES_GUARDAR_OT.includes(Number(this.ValidarRol));
+  }
+
+  /**
+   * Bloquea crear o editar si el rol no está autorizado (por si se llama sin pasar por los botones ocultos).
+   * @returns true si el rol puede guardar; false si no (ya se mostró el aviso).
+   */
+  private validarRolGuardar(): boolean {
+    if (this.puedeGuardarOT) return true;
+    this.msj.mensajeAdvertencia(`¡Advertencia!`, `Su rol no tiene permiso para crear ni editar órdenes de trabajo.`);
+    return false;
   }
 
   /**
@@ -2468,6 +2675,7 @@ export class Orden_TrabajoComponent implements OnInit {
     if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
 
     if (!this.validarProductoCargado()) return false;
+    if (!this.validarNombresEdicion()) return false;
     if (!this.calcularDatosOtInmediato(false)) {
       // Sin cálculo la OT se enviaría con costos en 0 (o, al editar, sobrescribiría los guardados)
       const unidad = this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion;
@@ -2497,7 +2705,8 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Comprueba, justo antes de armar el payload, que los valores calculados y numéricos que se envían sean números
    * finitos (sin null, NaN ni Infinity) y que las entradas de costos que teclea el usuario (cantidad, precio, margen,
-   * cantidad por paquete y por bulto) no sean negativas. Si algo no es válido, avisa con los nombres y no deja guardar.
+   * cantidad por paquete y por bulto) no sean negativas, y que el precio unitario sea mayor que 0. Si algo no es válido,
+   * avisa con los nombres y no deja guardar.
    * Si el Valor Kg quedó en 0 por falta de Peso Millar (o de cantidad por paquete), muestra un aviso que no bloquea.
    * @param repetirAvisoSinPeso false no repite el aviso de Valor Kg 0 si la validación anterior ya lo mostró.
    * @returns true si todos los valores son válidos; false si alguno no lo es (ya se mostró el aviso).
@@ -2512,6 +2721,12 @@ export class Orden_TrabajoComponent implements OnInit {
     });
     if (negativos.length > 0) {
       this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `No se permiten valores negativos en: ${negativos.join(', ')}.`, 6000);
+      return false;
+    }
+    // El precio unitario es obligatorio y debe ser mayor que 0 (al crear y al editar); la API aplica la misma regla.
+    const precio = Number(this.FormOrdenTrabajo.value.Precio);
+    if (!Number.isFinite(precio) || precio <= 0) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El precio unitario debe ser mayor que 0.`, 6000);
       return false;
     }
     const noValidos = this.calculoCostos.valoresNoFinitos({
@@ -2537,7 +2752,9 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Crea la orden de trabajo en un único flujo: sede del cliente → último número de BagPro y datos de procesos → creación.
+   * Crea la orden de trabajo en un único flujo: sede del cliente → datos de procesos → creación.
+   * El número de OT, el creador (usuario del token), la fecha, la hora y el estado inicial los asigna la API;
+   * el número creado se lee de la respuesta (`numero_OT`) para el mensaje y el PDF.
    * Ignora la llamada si ya hay un guardado en curso (evita doble envío). Cualquier error o validación fallida
    * muestra un mensaje y libera la pantalla; si la OT se crea, limpia los campos y abre su PDF.
    * Solo se invoca desde `validarDatos` (Búsqueda ya no guarda OTs); la firma se conserva hasta la reestructuración (F3).
@@ -2554,29 +2771,22 @@ export class Orden_TrabajoComponent implements OnInit {
       switchMap(sede => {
         if (!sede?.length) return this.cortarGuardado(`¡No se encontró ninguna sede para el cliente!`, null, true);
         this.FormOrdenTrabajo.patchValue({ Id_Cliente: sede[0].idSede });
-        return forkJoin({
-          numOT: this.bagProService.srvObtenerListaClienteOT_UltimaOT(),
-          datosProcesos: this.consultarDatosProcesos(),
-        }).pipe(
+        return this.consultarDatosProcesos().pipe(
           catchError(error => this.cortarGuardado(`¡No fue posible consultar la información necesaria para crear la Orden de Trabajo!`, error))
         );
       }),
-      switchMap(({ numOT, datosProcesos }) => {
+      switchMap(datosProcesos => {
         let procesos = this.construirProcesosOt(datosProcesos);
         if (!procesos) return EMPTY;
-        let numeroOrden: number = numOT.item + 1;
 
-        let infoOT: modelOrden_Trabajo = {
-          'Numero_OT': numeroOrden,
+        let infoOT: CrearOrdenTrabajoDatos = {
           'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
           'Prod_Id': this.producto,
           'UndMed_Id': this.presentacionProducto,
-          'Ot_FechaCreacion': this.today,
           'Ot_FechaEntrega': this.fechaEntregaParaApi(),
-          'Ot_Hora': moment().format('H:mm:ss'),
-          'Estado_Id': 15,
-          'Usua_Id': this.storage_Id,
           'PedExt_Id': 517,
+          // Solo si se habilitó el cambio de referencia; la API lo cambia en el maestro si difiere y guarda el historial
+          'Prod_Nombre': this.editandoReferencia ? this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto) : null,
           'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
           'Ot_Cyrel': this.cyrel,
           'Ot_Corte': this.corte,
@@ -2630,7 +2840,8 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Muestra el mensaje de un paso fallido del guardado (crear o editar OT) y termina el flujo sin emitir valores,
-   * para que su `finalize` libere la pantalla.
+   * para que su `finalize` libere la pantalla. Si hay error HTTP, muestra su detalle con `detalleErrorApi`
+   * (ProblemDetails, ValidationProblemDetails o texto) durante más tiempo para que se pueda leer.
    * @param mensaje Mensaje para el usuario.
    * @param error Error HTTP recibido, si lo hay; su detalle se muestra junto al mensaje.
    * @param advertencia true muestra una advertencia en lugar de un error.
@@ -2638,31 +2849,74 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   private cortarGuardado(mensaje: string, error: any = null, advertencia: boolean = false): Observable<never> {
     if (advertencia) this.msj.mensajeAdvertencia(`¡Advertencia!`, mensaje);
-    else this.msj.mensajeError(mensaje, error?.error);
+    else {
+      const detalle = this.detalleErrorApi(error);
+      this.msj.mensajeError(mensaje, detalle, detalle ? 10000 : 3000);
+    }
     return EMPTY;
   }
 
   /**
+   * Obtiene un texto legible del error devuelto por la API. Con ProblemDetails usa `detail` (o `title` si no hay detail);
+   * con ValidationProblemDetails agrega cada mensaje de `errors` ("Campo: mensaje"). Si el cuerpo es texto lo devuelve
+   * tal cual; si no hay cuerpo usa el código y el texto del estado HTTP.
+   * @param error Error HTTP (HttpErrorResponse) o cualquier valor recibido en el catchError.
+   * @returns El detalle para mostrar; vacío si no hay error.
+   */
+  private detalleErrorApi(error: any): string {
+    if (!error) return '';
+    const cuerpo = error.error;
+    if (typeof cuerpo === 'string' && cuerpo.trim() !== '') return cuerpo;
+    if (cuerpo && typeof cuerpo === 'object') {
+      const partes: string[] = [];
+      const principal = cuerpo.detail || cuerpo.title;
+      if (principal) partes.push(`${principal}`);
+      if (cuerpo.errors && typeof cuerpo.errors === 'object') {
+        Object.keys(cuerpo.errors).forEach(campo => {
+          const mensajes = Array.isArray(cuerpo.errors[campo]) ? cuerpo.errors[campo] : [cuerpo.errors[campo]];
+          mensajes.forEach((m: unknown) => partes.push(campo ? `${campo}: ${m}` : `${m}`));
+        });
+      }
+      if (partes.length > 0) return partes.join(' | ');
+    }
+    if (error.status) return `Error ${error.status}${error.statusText ? ` (${error.statusText})` : ''}`;
+    return `${error?.message ?? ''}`;
+  }
+
+  /**
+   * Formato (nombre del tipo de producto) del producto terminado: el de sellado si la OT es de sellado; si no, el de corte.
+   * Es el formato que se envía en SelladoCorte.Formato_Id y, por eso, el que se usa como tipo para la regla D2 (I2).
+   * @returns Nombre del formato seleccionado.
+   */
+  private formatoProductoTerminado(): any {
+    return this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
+  }
+
+  /**
    * Consulta los Ids de las tintas seleccionadas y el formato/tipo de sellado, necesarios para armar los procesos de la OT.
-   * @returns Observable con las tintas encontradas y el formato/tipo de sellado.
+   * Si la combinación de tipo de sellado y formato no existe (404), `datosSellado` llega en null para que
+   * `construirProcesosOt` muestre el aviso; cualquier otro error se propaga.
+   * @returns Observable con las tintas encontradas y el formato/tipo de sellado (null si no existe).
    */
   consultarDatosProcesos(): Observable<{ datosImpresion: any[], datosSellado: any }> {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
-    let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    let formato: any = this.formatoProductoTerminado();
     let tintas = this.FormOrdenTrabajoImpresion.value;
     return forkJoin({
       datosImpresion: this.servicioTintas.srvObtenerListaConsultaImpresion(tintas.Tinta_Impresion1, tintas.Tinta_Impresion2, tintas.Tinta_Impresion3, tintas.Tinta_Impresion4, tintas.Tinta_Impresion5, tintas.Tinta_Impresion6, tintas.Tinta_Impresion7, tintas.Tinta_Impresion8),
-      datosSellado: this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato),
+      datosSellado: this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).pipe(
+        catchError((error: HttpErrorResponse) => error?.status === 404 ? of(null) : throwError(() => error))
+      ),
     });
   }
 
   /**
    * Arma la información de los cuatro procesos de la OT. Si no se encontraron las tintas o no existe la combinación
-   * de tipo de sellado y formato (la API responde 204 sin cuerpo), muestra el error y apaga la carga.
+   * de tipo de sellado y formato (la API responde 404), muestra el error y apaga la carga.
    * @param datos Tintas y formato/tipo de sellado consultados con consultarDatosProcesos.
    * @returns Procesos de la OT para la API, o null si faltan las tintas o la combinación de sellado/formato.
    */
-  construirProcesosOt(datos: { datosImpresion: any[], datosSellado: any }): any {
+  construirProcesosOt(datos: { datosImpresion: any[], datosSellado: any }): ProcesosOrdenTrabajo | null {
     if (datos.datosImpresion.length == 0) {
       this.msj.mensajeError(`¡No se encontraron las tintas seleccionadas para el área de 'Impresión'!`);
       this.cargando = false;
@@ -2683,9 +2937,9 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Construye la configuración y observación del proceso de extrusión. El Ot_Id lo asigna la API.
-   * @returns Información de extrusión para la creación de la OT.
+   * @returns Información de extrusión para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Extrusion(): any {
+  construirInfoOt_Extrusion(): OtExtrusionDatos {
     return {
       'Material_Id': this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
       'Formato_Id': this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
@@ -2705,9 +2959,9 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Construye la configuración y observación del proceso de impresión. El Ot_Id lo asigna la API.
    * @param datosImpresion Ids de las tintas seleccionadas, consultados por nombre.
-   * @returns Información de impresión para la creación de la OT.
+   * @returns Información de impresión para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Impresion(datosImpresion: any): any {
+  construirInfoOt_Impresion(datosImpresion: any): OtImpresionDatos {
     return {
       'TpImpresion_Id': this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
       'Rodillo_Id': this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
@@ -2726,9 +2980,9 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Construye la configuración y observación del proceso de laminado. El OT_Id lo asigna la API.
-   * @returns Información de laminado para la creación de la OT.
+   * @returns Información de laminado para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Laminado(): any {
+  construirInfoOt_Laminado(): OtLaminadoDatos {
     return {
       'Capa_Id1': this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
       'Capa_Id2': this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
@@ -2746,11 +3000,10 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Construye la configuración, solapa y observación de sellado o corte. El Ot_Id lo asigna la API.
    * @param datos Formato y tipo de sellado seleccionados.
-   * @returns Información de sellado/corte para la creación de la OT.
+   * @returns Información de sellado/corte para crear o editar la OT (sin Ids).
    */
-  construirInfoOt_Sellado_Corte(datos: any): modelOrdenTrabajo_SelladoCorte {
+  construirInfoOt_Sellado_Corte(datos: any): OtSelladoCorteDatos {
     return {
-      'Ot_Id': 0,
       'Corte': this.corte,
       'Sellado': this.sellado,
       'Formato_Id': datos.tpProd_Id,
@@ -2765,7 +3018,8 @@ export class Orden_TrabajoComponent implements OnInit {
       'SelladoCorte_Observacion': this.sellado
         ? this.FormOrdenTrabajoSellado.value.SelladoCorte_Observacion
         : this.FormOrdenTrabajoCorte.value.SelladoCorte_Observacion,
-      'SelladoCorte_PesoMillar': this.FormOrdenTrabajoSellado.value.PesoMillar,
+      // I2: el mismo Peso Millar con el que se calcularon los costos (el de sellado se pone en 0 si la OT no es de sellado)
+      'SelladoCorte_PesoMillar': this.ArrayProducto[0]?.PesoMillar ?? this.FormOrdenTrabajoSellado.value.PesoMillar,
       'TpSellado_Id': datos.tpSellado_Id,
       'SelladoCorte_PrecioSelladoDia': this.FormOrdenTrabajoSellado.value.PrecioDia,
       'SelladoCorte_PrecioSelladoNoche': this.FormOrdenTrabajoSellado.value.PrecioNoche,
@@ -2774,14 +3028,26 @@ export class Orden_TrabajoComponent implements OnInit {
       'SelladoCorte_PesoPaquete': this.FormOrdenTrabajoSellado.value.PesoPaquete,
       'SelladoCorte_PesoBulto': this.FormOrdenTrabajoSellado.value.PesoBulto,
       'SelladoCorte_PesoProducto': this.pesoProducto,
-      'SelladoCorte_Etiqueta_Ancho': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
-      'SelladoCorte_Etiqueta_Largo': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
-      'SelladoCorte_Etiqueta_Fuelle': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+      'SelladoCorte_Etiqueta_Ancho': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : this.textoEtiqueta(this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte),
+      // En corte, Calibre Cliente se guarda en SelladoCorte_Etiqueta_Largo (EtiquetaLargo en BagPro)
+      'SelladoCorte_Etiqueta_Largo': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : this.textoEtiqueta(this.FormOrdenTrabajoCorte.value.Calibre_Cliente_Corte),
+      'SelladoCorte_Etiqueta_Fuelle': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : this.textoEtiqueta(this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte),
       'SelladoCorte_PrecioDia_Wik_Mq50': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
       'SelladoCorte_PrecioNoche_Wik_Mq50': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
       'SelladoCorte_PrecioDia_Wik_Mq9': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
       'SelladoCorte_PrecioNoche_Wik_Mq9': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
     }
+  }
+
+  /**
+   * Convierte un campo de etiqueta de corte en el texto que se guarda: en mayúsculas y sin espacios al inicio o al final.
+   * Vacío o null se guarda como '0' (BagPro trata '' y '0' de EtiquetaLargo como "sin calibre cliente" y usa el de extrusión).
+   * @param valor Valor del formulario.
+   * @returns Texto para SelladoCorte_Etiqueta_*.
+   */
+  private textoEtiqueta(valor: unknown): string {
+    const texto = valor == null ? '' : `${valor}`.trim();
+    return texto === '' ? '0' : texto.toUpperCase();
   }
 
 
@@ -2947,9 +3213,22 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargandoProduccion = true;
     this.consultaProduccion = this.estadosProcesosService.consultaPorOT(ot).pipe(
       finalize(() => this.cargandoProduccion = false)
-    ).subscribe(datos => this.produccionProcesos = datos ?? [], () => {
+    ).subscribe(datos => this.produccionProcesos = this.unaFilaProduccion(datos), () => {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No fue posible consultar la producción por proceso de la OT N° ${ot}!`);
     });
+  }
+
+  /**
+   * Deja una sola fila de Estados Procesos OT por OT. Si la tabla tiene registros duplicados de la misma OT (pasa
+   * cuando el trigger de ClientesOT la crea más de una vez), los triggers de producción actualizan todos por número
+   * de OT, así que tienen los mismos kilos: se muestra el registro original (el de menor EstProcOT_Id).
+   * @param datos Filas devueltas por la consulta de Estados Procesos OT.
+   * @returns Lista con una fila, o vacía si no hay datos.
+   */
+  private unaFilaProduccion(datos: any[] | null): any[] {
+    if (!Array.isArray(datos) || datos.length == 0) return [];
+    const original = datos.reduce((menor, fila) => Number(fila?.estProcOT_Id) < Number(menor?.estProcOT_Id) ? fila : menor);
+    return [original];
   }
 
   /**
@@ -2989,13 +3268,16 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Carga en los formularios una OT existente en Plasticaribe y habilita el modo edición.
-   * Guarda su Valor Kg para conservarlo al editar cuando la presentación no lo calcula (MTS).
+   * Guarda su Valor Kg para conservarlo al editar cuando la presentación no lo calcula (MTS) y su versión
+   * (`rowVersion` del GET), que se envía como `Ot_RowVersion` al editar.
    * @param datos Fila de la OT devuelta por getOrdenTrabajo.
    * @returns No retorna un valor.
    */
   cargarOrdenTrabajoPlasticaribe(datos: any) {
     const valorKg = Number(datos.valorKg);
     this.valorKgCargado = datos.valorKg != null && Number.isFinite(valorKg) ? valorKg : null;
+    // M6: el GET devuelve `rowVersion`; el PUT lo espera como `Ot_RowVersion` (ver editarOrdenTrabajo)
+    this.rowVersionCargada = typeof datos.rowVersion === 'string' && datos.rowVersion.trim() !== '' ? datos.rowVersion : null;
     this.FormOrdenTrabajo.patchValue({
       'OT_Id': datos.numero_Orden,
       'Id_Vendedor': datos.id_Vendedor,
@@ -3015,6 +3297,8 @@ export class Orden_TrabajoComponent implements OnInit {
     });
     this.llenarFormularios(datos);
     this.edicionOrdenTrabajo = true;
+    // `cliente` ya es el nombre propio de la OT si se cambió en una edición anterior (Ot_NombreCliente)
+    this.nombresCargados = { sede: datos.id_Cliente, cliente: `${datos.cliente ?? ''}`.trim(), producto: `${datos.producto ?? ''}`.trim() };
   }
 
   /**
@@ -3053,9 +3337,10 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   validarActualizacionOT() {
-    if (this.guardando || this.confirmandoEdicion) return;
+    if (this.guardando || this.confirmandoEdicion || !this.validarRolGuardar()) return;
+    this.resaltarObligatorios = true;
     if (!this.FormOrdenTrabajo.valid) {
-      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
+      this.avisarCamposVacios();
       return;
     }
     let ot: number = this.FormOrdenTrabajo.value.OT_Id;
@@ -3068,7 +3353,8 @@ export class Orden_TrabajoComponent implements OnInit {
       summary: 'Confirmación de Edición de OT',
       detail:
         `<h6><b>Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</b></h6><br>` +
-        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>`,
+        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>` +
+        this.avisoCambioNombres(),
       sticky: true
     });
   }
@@ -3079,10 +3365,12 @@ export class Orden_TrabajoComponent implements OnInit {
    * fallida muestra un mensaje y libera la pantalla; si la OT se actualiza, limpia los campos y abre su PDF.
    * Antes de enviar vuelve a validar y recalcular de forma síncrona (`prepararFormulariosParaGuardar`), por si el usuario
    * cambió datos con la confirmación abierta: así se envían los costos actuales con una sola confirmación.
+   * Envía la versión con la que se cargó la OT (`Ot_RowVersion`); si no la tiene, no envía y pide volver a cargarla.
+   * Si la API responde 409 (otro usuario la modificó), avisa que hay que volver a cargarla.
    * @returns No retorna un valor.
    */
   editarOrdenTrabajo() {
-    if (!this.edicionOrdenTrabajo || this.guardando) return;
+    if (!this.edicionOrdenTrabajo || this.guardando || !this.validarRolGuardar()) return;
     this.cerrarMensaje();
     if (!this.FormOrdenTrabajo.valid) {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
@@ -3090,9 +3378,14 @@ export class Orden_TrabajoComponent implements OnInit {
     }
     // No repite el aviso de Valor Kg 0 si ya se mostró al pedir la confirmación (sí lo muestra si la condición es nueva)
     if (!this.prepararFormulariosParaGuardar(false)) return;
+    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
+    const rowVersion = this.rowVersionCargada;
+    if (!rowVersion) {
+      this.msj.mensajeAdvertencia(`¡No se puede editar la OT N° ${ot}!`, `No se recibió la versión de la OT. Vuelva a cargarla e intente de nuevo.`, 6000);
+      return;
+    }
     this.guardando = true;
     this.cargando = true;
-    let ot: number = this.FormOrdenTrabajo.value.OT_Id;
     let editada: boolean = false;
 
     this.ordenTrabajoService.GetDatosOrden(ot).pipe(
@@ -3107,9 +3400,13 @@ export class Orden_TrabajoComponent implements OnInit {
       switchMap(({ datos_Orden, datosProcesos }) => {
         let procesos = this.construirProcesosOt(datosProcesos);
         if (!procesos) return EMPTY;
-        let info = this.informacionOrdenTrabajo(datos_Orden);
-        return this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, { OrdenTrabajo: info, ...procesos }).pipe(
-          catchError(error => this.cortarGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error))
+        let info = this.informacionOrdenTrabajo();
+        // M6: mapeo explícito de la versión recibida en el GET (`rowVersion`) al campo del PUT (`Ot_RowVersion`)
+        const solicitud: EditarOrdenTrabajoCompleta = { Ot_RowVersion: rowVersion, OrdenTrabajo: info, ...procesos };
+        return this.ordenTrabajoService.editarOrdenCompleta(datos_Orden.ot_Id, solicitud).pipe(
+          catchError((error: HttpErrorResponse) => error?.status === 409
+            ? this.cortarGuardado(`La OT fue modificada por otro usuario; vuelva a cargarla`, error)
+            : this.cortarGuardado(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, error))
         );
       }),
       finalize(() => {
@@ -3129,20 +3426,20 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a construir la informacion de los procesos de la orden de trabajo
-  informacionOrdenTrabajo(datos_Orden) {
-    let info: modelOrden_Trabajo = {
-      'Ot_Id': datos_Orden.ot_Id,
-      'Numero_OT': datos_Orden.numero_OT,
+  /**
+   * Arma los datos generales editables de la OT (lista blanca de editarCompleta). No envía Ot_Id, número, fecha ni hora
+   * de creación, creador ni estado: los conserva la API y el último editor lo toma del token. Producto y presentación
+   * se envían solo para que la API compruebe que no cambiaron (si difieren responde 422; cambiar el item o la presentación
+   * sale del modo edición). La sede sí se puede cambiar (cliente elegido de la lista).
+   * Sí se envían los nombres: el del producto se actualiza en el maestro y el del cliente se guarda solo en esta OT.
+   * @returns Datos generales de la OT para editarla.
+   */
+  informacionOrdenTrabajo(): EditarOrdenTrabajoDatos {
+    let info: EditarOrdenTrabajoDatos = {
       'SedeCli_Id': this.FormOrdenTrabajo.value.Id_Cliente,
       'Prod_Id': this.producto,
       'UndMed_Id': this.presentacionProducto,
-      'Ot_FechaCreacion': datos_Orden.ot_FechaCreacion,
       'Ot_FechaEntrega': this.fechaEntregaParaApi(),
-      'Ot_Hora': datos_Orden.ot_Hora,
-      'Estado_Id': this.FormOrdenTrabajo.value.OT_Estado,
-      'Usua_Id': this.storage_Id,
-      'PedExt_Id': 517,
       'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
       'Ot_Cyrel': this.cyrel,
       'Ot_Corte': this.corte,
@@ -3160,8 +3457,70 @@ export class Orden_TrabajoComponent implements OnInit {
       'Ot_ValorOT': this.valorOt,
       'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
       'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
+      // Nombres: el del producto se actualiza en el maestro; el del cliente solo en esta OT (la API decide si cambiaron)
+      'Prod_Nombre': this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto),
+      'Ot_NombreCliente': this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Cliente),
     }
     return info;
+  }
+
+  /**
+   * Quita los espacios al inicio y al final de un nombre del formulario.
+   * @param valor Valor del campo.
+   * @returns El texto sin espacios extremos; null si está vacío.
+   */
+  private textoNombre(valor: unknown): string | null {
+    const texto = valor == null ? '' : `${valor}`.trim();
+    return texto === '' ? null : texto;
+  }
+
+  /**
+   * Arma el aviso de la confirmación de edición con los nombres que van a cambiar respecto a los cargados.
+   * @returns HTML con los cambios de nombre (escapado), o cadena vacía si no hay cambios.
+   */
+  private avisoCambioNombres(): string {
+    if (!this.nombresCargados) return '';
+    const escapar = (texto: string) => texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const cliente = this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Cliente) ?? '';
+    const producto = this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto) ?? '';
+    let aviso = '';
+    if (producto !== this.nombresCargados.producto) {
+      aviso += `<br><span>El nombre del item ${this.producto} cambiará en el maestro de productos, BagPro y Zeus: ` +
+        `<b>${escapar(this.nombresCargados.producto)}</b> → <b>${escapar(producto)}</b>.</span><br>`;
+    }
+    if (`${this.FormOrdenTrabajo.value.Id_Cliente ?? ''}` !== `${this.nombresCargados.sede ?? ''}`) {
+      aviso += `<br><span>El cliente de la OT cambiará (en Plasticaribe y BagPro): ` +
+        `<b>${escapar(this.nombresCargados.cliente)}</b> → <b>${escapar(cliente)}</b>.</span><br>`;
+    } else if (cliente !== this.nombresCargados.cliente) {
+      aviso += `<br><span>El nombre del cliente cambiará solo en esta OT y en su item de BagPro: ` +
+        `<b>${escapar(this.nombresCargados.cliente)}</b> → <b>${escapar(cliente)}</b>.</span><br>`;
+    }
+    return aviso;
+  }
+
+  /**
+   * En modo edición, comprueba que los nombres de producto y cliente no estén vacíos (o solo con espacios) y no superen
+   * el largo que se guarda (Productos.Prod_Nombre: 100; Orden_Trabajo.Ot_NombreCliente: 150, igual a
+   * Existencias_Productos.ExProd_Cliente).
+   * @returns true si son válidos o no se está editando; false si alguno no lo es (ya se mostró el aviso).
+   */
+  private validarNombresEdicion(): boolean {
+    if (!this.edicionOrdenTrabajo) return true;
+    const largos: [string | null, number, string][] = [
+      [this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto), 100, 'del producto'],
+      [this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Cliente), 150, 'del cliente'],
+    ];
+    const vacio = largos.find(([texto]) => texto == null);
+    if (vacio) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El nombre ${vacio[2]} no puede estar vacío.`, 6000);
+      return false;
+    }
+    const largo = largos.find(([texto, maximo]) => (texto?.length ?? 0) > maximo);
+    if (largo) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El nombre ${largo[2]} no puede tener más de ${largo[1]} caracteres.`, 6000);
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -3233,7 +3592,11 @@ export class Orden_TrabajoComponent implements OnInit {
     }, () => this.crearNuevoProducto());
   }
 
-  //Función que se encargará de la creación de un nuevo producto
+  /**
+   * Arma el nuevo producto con los Ids de tipo de sellado y formato (el guardado sigue deshabilitado).
+   * Si la combinación no existe (404) o la consulta falla, avisa y libera la pantalla de carga.
+   * @returns No retorna un valor.
+   */
   crearNuevoProducto() {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
@@ -3266,6 +3629,10 @@ export class Orden_TrabajoComponent implements OnInit {
       }
       console.log(item);
       //this.productoService.srvGuardar(item).subscribe(data => this.crearExistenciaProducto(data), () => this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`));
+    }, (error: HttpErrorResponse) => {
+      this.cargando = false;
+      if (error?.status === 404) this.msj.mensajeError(`¡No existe la combinación de tipo de sellado y formato seleccionada!`, `Verifique el tipo de sellado y el formato del producto terminado.`);
+      else this.msj.mensajeError(`¡No fue posible consultar el tipo de sellado y el formato!`, error?.error);
     });
   }
 
