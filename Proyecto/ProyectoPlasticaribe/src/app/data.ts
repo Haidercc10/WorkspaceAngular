@@ -7600,332 +7600,151 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
 ];
 
 /******************************************************** ORDENES DE TRABAJO ***************************************************************/
-export const stepsOrdenesTrabajo: Step.StepOptions[] = [
-  {
-    attachTo: {
-      element: '#none',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-    ],
+/**
+ * Arma un paso de los tutoriales de Órdenes de Trabajo (Crear OT y Buscar OT).
+ * @param element Selector del elemento al que apunta el paso; si no existe en la pantalla, el paso se muestra centrado.
+ * @param titulo Título del paso.
+ * @param texto Contenido (HTML) del paso.
+ * @param primero true en el primer paso: muestra "Cerrar" en lugar de "Atrás".
+ * @param idPaso Id del paso; por defecto, el selector sin símbolos. Se indica cuando dos pasos apuntan al mismo elemento.
+ * @returns El paso para Shepherd.
+ */
+function pasoTutorialOT(element: string, titulo: string, texto: string, primero: boolean = false, idPaso?: string): Step.StepOptions {
+  return {
+    attachTo: { element, on: 'bottom' },
+    buttons: [primero ? builtInButtons.cancel : builtInButtons.back, builtInButtons.next],
     classes: '',
     scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'none',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Ordne de Trabajo</h5>`,
-    text: `<p>¡Las <b style="color: var(--rojo)">OT</b> o <b style="color: var(--rojo)">Ordenes de Trabajo</b> son documentos que se crean para la producción de un producto.
-    Este documento tendrá todas las especificaciones necesarias sobre como debe ser la producción, los áreas por las que deberá pasar, etc..!</p>
+    id: idPaso ?? element.replace(/[^A-Za-z0-9_-]/g, ''),
+    title: `<h5 class="tituloRojo" style="margin: auto;">${titulo}</h5>`,
+    text: texto,
+  };
+}
 
-    <p>Desde aquí podremos crear, consultar y editar las ordenes de trabajo de manera sencilla y eficiente.</p>`
-  },
-  {
-    attachTo: {
-      element: '#formOrdenTrabajo',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'formOrdenTrabajo',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Información General</h5>`,
-    text: `<p>Para empezar a crear una <b style="color: var(--rojo)">Orden de Trabajo</b> necesitamos diligenciar los datos que se explicarán acontinuación.</p>`
-  },
-  {
-    attachTo: {
-      element: '#idCliente',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'idCliente',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Id del Cliente</h5>`,
-    text: `<p>Este campo <b style="color: var(--rojo)">se llenará</b> con la información del cliente que se seleccionó.</p>
-    <p>Este campo <b style="color: var(--rojo)">no es editable</b>. 
-    Una vez hayamos seleccionado un cliente en el campo que sigue acontinuación se llenará este mismo de manera automatica.</p>`
-  },
-  {
-    attachTo: {
-      element: '#cliente',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'cliente',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Cliente</h5>`,
-    text: `<p>Para seleccionar un cliente <b style="color: var(--rojo)">tenemos que escribir el nombre</b> del mismo, y a medida que escribimos, 
-    se muestran los clientes que tengan en su nombre el texto que hemos escrito.</p>
-    <p>Si encontramos el cliente que queremos <b style="color: var(--rojo)">presionamos click o lo seleccionamos y listo</b>. 
-    El campo anterior (Id Cliente) se llenará automaticamente una vez hayamos elegido uno.</p>
-    <p>De igual manera se llenarán de forma automatica los campos de vendedor que estaremos viendo más adelante.</p>
-    <br>
-    <p>Si el cliente no existe, <b>presionaremos el botón de crear cliente</b> que se encuentra en la parte superior de la pantalla. 
-    Acontinuación se explicará como se creará el cliente.</p>`
-  },
-  {
-    attachTo: {
-      element: '#idProducto',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'idProducto',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Item (Id Producto)</h5>`,
-    text: `<p>Tenemos 2 opciones al momento de seleccionar el producto al que se le hará la orden de trabajo, a continuación se explicará la primera opción.</p>
-    <p>En este se podrá escribir el código del producto que queremos y presionar <b>Enter</b>, una vez hagamos esto se llenará el campo <b>Referencia</b> automaticamente
-    lo cual indica que el producto existe y se le puede crear una OT de lo contrario aparecerá un mensaje diciendo que le producto seleccionado no existe.</p>
-    <p>Otra de las cosas que se harán un vez se busque el producto es llenar la mayoria de campos de toda la orden de trabajo. Esto lo hace porque busca la ultima OT
-    que se haya creado a este mismo Item y llena los campos con esa misma información.</p>
-    <p>Para ver la segunda opción debes seguir el tutorial.</p>`
-  },
-  {
-    attachTo: {
-      element: '#producto',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'producto',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Referencia (Producto)</h5>`,
-    text: `<p>La segunda opción que tenemos para buscar un produto es mediante este campo, tenemos que escribir el nombre del producto que queremos y nos saldrán
-    en una lista los productos que tienen en su nombre el texto que hemos escrito.</p>
-    <p>Si encontramos el producto deseado procedemos a presionar click sobre este y listo, lo habremos seleccionado.</p>
-    <p> Al igual que en el campo Item, cuando se seleccione el producto se buscará y se llenarán la mayoria de campos de toda la orden de trabajo.
-    Esto lo hace porque busca la ultima OT que se haya creado a este mismo Item y llena los campos con esa misma información.</p>`
-  },
-  {
-    attachTo: {
-      element: '#cantidadFabricar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'cantidadFabricar',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad a Fabricar</h5>`,
-    text: `<p>En este campo podemos colocar la cantidad que queremos fabricar del producto, este campo es editable pero tambien puede llenarse de manera automatica.</p>`
-  },
-  {
-    attachTo: {
-      element: '#presentacion',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'presentacion',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Presentación</h5>`,
-    text: `<p>Debemos elegir una de las opciones de presentación que tenemos, esto nos permitirá buscar las especificaciones que tuvo la última orden de trabajo creada al producto seleccionado.</p>
-    <p>Se buscará la información de la última orden de trabajo creada al producto seleccionado, cuando se encuentre información en los campos Item (Id Producto) y Presentación.
-    Si se encuentra una orden de trabajo creada al producto seleccionado, se cargará en los campos la información de la orden encontrada.</p>`
-  },
-  {
-    attachTo: {
-      element: '#precioUnitario',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'precioUnitario',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Precio Unitario</h5>`,
-    text: `<p>En este campo debemos colocar el precio unitario del producto, al igual que campos anteriores, 
-    este se podrá llenar automaticamente cuando se busque un producto y al producto se le haya hecho minimos 1 OT.</p>`
-  },
-  {
-    attachTo: {
-      element: '#margenAdicional',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'margenAdicional',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Margen Adicional</h5>`,
-    text: `<p>En este campo estará saliendo un número entre el 0 y el 100, 
-    este número <b>representará el porcentaje adicional que se debe fabricar</b>. 
-    <br>
-    Este porcentaje adicional se mide respecto a la cantidad pedida, es decir, si piden <b style="color: var(--rojo)">100</b> unidades de un producto 
-    y en este campo se encuentra el número <b style="color: var(--rojo)">10</b> significa que se deberá sumar un 
-    <b style="color: var(--rojo)">10%</b> a las 100 unidades que se pidieron en principio.</p>    
-    <p>Este campo <b>no es editable</b>, pero la cantidad de margen <b>se puede modificar desde los apartados</b> de <b style="color: var(--rojo)">Corte</b> y
-    <b style="color: var(--rojo)">Sellado</b>.</p>`
-  },
-  {
-    attachTo: {
-      element: '#idVendedor',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'idVendedor',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Código Vendedor</h5>`,
-    text: `<p>Cada uno de los vendedores es identificado por un código, este código es el que estará apareciendo en este campo.
-    Una vez se haya seleccionado un cliente o un vendedor (en el campo que sigue) se colocará el código correspondiente aquí.</p>`
-  },
-  {
-    attachTo: {
-      element: '#vendedor',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'vendedor',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Nombre Vendedor</h5>`,
-    text: `<p>En este campo podemos seleccionar el nombre del vendedor. Tambien se llenará automaticamente una vez se seleccione un cliente.</p>`
-  },
-  {
-    attachTo: {
-      element: '#estadoOrden',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'estadoOrden',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Estado de la Orden</h5>`,
-    text: `<p>En este campo estará apareciendo el estado de la orden de trabajo, tambien podemos seleccionar un estado para editar la orden de trabajo.</p>`
-  },
-  {
-    attachTo: {
-      element: '#fechaCreacion',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'fechaCreacion',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Fecha Creación</h5>`,
-    text: `<p>Este campo siempre estará lleno con la fecha actual, 
-    o se llenará con la información de la fecha en que se creó la orden de trabajo en caso de que se consulte una.</p>`
-  },
-  {
-    attachTo: {
-      element: '#observacion',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'observacion',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Observación</h5>`,
-    text: `<p>En este campo se podrá colocar una observación a la orden de trabajo</p>`
-  },
-  {
-    attachTo: {
-      element: '#check',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'check',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Seleccionables</h5>`,
-    text: `<p>Desde aquí se pueden seleccionar los puntos o procesos por los que pasará el producto en el proceso de producción.</p>`
-  },
-  {
-    attachTo: {
-      element: '#datos-ot',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'datos-ot',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Datos de Orden</h5>`,
-    text: `<p>En este apartado podemos seleccionar o llenar los datos del proceso del producción del producto</p>`
-  },
-  {
-    attachTo: {
-      element: '#datosOrdenTrabajo',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'datosOrdenTrabajo',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Datos Generales de la OT</h5>`,
-    text: `<p>En este tab estaremos viendo los siguiente datos de la Orden de trabajo:</p>
+/** Tutorial de la pestaña "Crear Orden Trabajo" (botón de tutorial del título con esa pestaña abierta). */
+export const stepsOrdenesTrabajo: Step.StepOptions[] = [
+  pasoTutorialOT('#none', 'Orden de Trabajo',
+    `<p>Las <b style="color: var(--rojo)">OT</b> u <b style="color: var(--rojo)">Órdenes de Trabajo</b> son los documentos con los que se fabrica un producto:
+    tienen sus especificaciones, los procesos por los que pasa y sus costos.</p>
+    <p>Desde esta pestaña puedes <b>crear</b> una OT nueva o <b>consultar y editar</b> una existente. En la pestaña
+    <b>Buscar Orden Trabajo</b> puedes buscar items u OT anteriores y traerlas aquí con doble clic.</p>`, true, 'introCrearOT'),
+  pasoTutorialOT('#leyendaOT', 'Colores de los campos',
+    `<p><b style="color: #1d6fd1">Fondo azul con lupa:</b> campo de <b>consulta</b>. Al escribir o elegir un valor trae información
+    (por ejemplo, el cliente o la última OT del item). Pasa el mouse sobre el campo para ver cómo usarlo.</p>
+    <p><b style="color: var(--rojo)">Rojo:</b> campo <b>obligatorio vacío</b>. Se marca cuando intentas crear o editar la OT sin llenarlo.</p>`),
+  pasoTutorialOT('#botonesOT', 'Crear, editar y limpiar',
+    `<p><b>Crear OT</b> guarda una orden nueva. Cuando consultas una OT existente, este botón cambia a <b>Editar OT</b>.</p>
+    <p><b>Limpiar Campos</b> borra el formulario para empezar de nuevo.</p>
+    <p>Los botones de crear y editar solo aparecen para los usuarios con permiso. Al final de la página están los mismos botones.</p>`),
+  pasoTutorialOT('#consultaOT', 'N° OT',
+    `<p>Escribe el número de una OT y presiona <b>Enter</b> para cargarla y verla o editarla.</p>
+    <p>Las flechas cargan la OT <b>anterior</b> o la <b>siguiente</b>, el reloj carga la <b>última</b> OT creada
+    y el botón rojo descarga el <b>PDF</b> de la OT.</p>`),
+  pasoTutorialOT('#idProducto', 'Item',
+    `<p>Escribe el código del item y presiona <b>Enter</b>. Se llena la <b>Referencia</b> y la mayoría de los campos
+    con la información de la <b>última OT</b> del item, para que solo ajustes lo que cambie.</p>
+    <p>Si el item no existe, aparecerá un aviso.</p>`),
+  pasoTutorialOT('#producto', 'Referencia',
+    `<p>Otra forma de elegir el item: escribe parte del nombre y <b>selecciónalo de la lista</b>. Igual que con el campo Item,
+    se carga la información de su última OT.</p>
+    <p>Al editar una OT la referencia queda bloqueada (fondo gris). Los botones dentro del campo se explican a continuación.</p>`),
+  pasoTutorialOT('#botonCambiarReferencia', 'Cambiar referencia',
+    `<p>El <b>lápiz</b> habilita el campo para escribir un <b>nuevo nombre</b> del item (máximo 100 caracteres). El campo queda con borde rojo mientras lo cambias.</p>
+    <p>Al guardar la OT, el nombre nuevo queda en el maestro de productos y pasa a BagPro y Zeus. El nombre anterior se guarda en el historial.</p>
+    <p>Para deshacer el cambio, pulsa la <b>X</b> y vuelve el nombre original.</p>`),
+  pasoTutorialOT('#botonHistorialReferencia', 'Historial de referencias',
+    `<p>Muestra los <b>nombres anteriores</b> del item: en qué OT cambió, si fue al crear o al editar, quién lo cambió y cuándo.</p>`),
+  pasoTutorialOT('#botonVerArte', 'Ver arte',
+    `<p>Abre el <b>arte del item</b> (PDF de Aseguramiento de la Calidad) en una ventana. Desde ahí puedes ampliarlo,
+    abrirlo en otra pestaña o descargarlo.</p>
+    <p>Si el item no tiene arte cargado, aparecerá un aviso.</p>`),
+  pasoTutorialOT('#estadoOrden', 'Estado OT',
+    `<p>Muestra el estado de la OT consultada. Es de <b>solo lectura</b>: el estado cambia con la producción.</p>`),
+  pasoTutorialOT('#idCliente', 'Id Cliente',
+    `<p>Se llena solo al elegir el cliente en el campo siguiente. <b>No es editable</b>.</p>`),
+  pasoTutorialOT('#cliente', 'Cliente',
+    `<p>Escribe al menos 3 letras del cliente y <b>elígelo de la lista</b>. Se llenan el Id Cliente y el asesor.</p>
+    <p>Al <b>editar</b> una OT también puedes elegir otro cliente de la lista para cambiar el cliente de la OT.
+    Si solo cambias el texto sin elegir de la lista, se cambia el nombre del cliente <b>solo en esta OT</b> (en Plasticaribe y BagPro).</p>`),
+  pasoTutorialOT('#vendedor', 'Asesor',
+    `<p>El asesor (vendedor) se llena al elegir el cliente, junto con su código en <b>Asesor ID</b>. También puedes elegir otro de la lista.</p>
+    <p>Si tu usuario es vendedor, siempre quedarás tú como asesor.</p>`),
+  pasoTutorialOT('#fechaEntrega', 'Fecha Entrega',
+    `<p>Elige la fecha en que se debe entregar el pedido. Es <b>obligatoria</b>.</p>`),
+  pasoTutorialOT('#cantidadFabricar', 'Cant. Pedida',
+    `<p>Cantidad que pidió el cliente, en la presentación elegida (unidades, paquetes, kilos, etc.).</p>`),
+  pasoTutorialOT('#presentacion', 'Presentación',
+    `<p>Unidad en la que se vende el item. Al cambiarla se busca la última OT del item <b>en esa presentación</b> y se cargan sus datos.</p>`),
+  pasoTutorialOT('#precioUnitario', 'Precio Unitario',
+    `<p>Precio por unidad de la presentación. Debe ser <b>mayor que 0</b>.</p>`),
+  pasoTutorialOT('#cantidadPedidaKg', 'Cant. Kg',
+    `<p>Kilos que se van a fabricar, incluido el margen adicional. Se <b>calcula solo</b>.</p>`),
+  pasoTutorialOT('#precioKilo', 'Precio Kg',
+    `<p>Precio por kilo, calculado con el precio unitario y el peso del producto. Se <b>calcula solo</b>.</p>`),
+  pasoTutorialOT('#margenAdicional', 'Margen',
+    `<p>Porcentaje adicional que se fabrica sobre la cantidad pedida. Por ejemplo, si piden <b>100</b> y el margen es <b>10</b>,
+    se fabrican <b>110</b>.</p>
+    <p>Aquí no se edita: se cambia en los apartados de <b style="color: var(--rojo)">Corte</b> o <b style="color: var(--rojo)">Sellado</b>.</p>`),
+  pasoTutorialOT('#check', 'Procesos de Producción',
+    `<p>Marca los procesos por los que pasará el producto: Cyrel, Extrusión, Impresión, Laminado, Corte y Sellado.</p>
+    <p>Extrusión, Impresión, Laminado, Corte y Sellado agregan su apartado abajo cuando se marcan, con sus datos y su observación.</p>
+    <p><b>Mostrar Empresa en Etiquetas</b> indica si el nombre de la empresa sale en las etiquetas.</p>`),
+  pasoTutorialOT('#datos-ot', 'Datos de la Orden',
+    `<p>En la pestaña <b>Datos Orden Trabajo</b> llenas las especificaciones de cada proceso marcado. Por ejemplo, en Corte va el
+    <b>Calibre Cliente</b> y en Sellado los datos del paquete y el margen.</p>
+    <p>En la pestaña <b>Mezclas</b> eliges la mezcla de materiales y pigmentos de la extrusión. Esa pestaña tiene su propio tutorial.</p>`),
+  pasoTutorialOT('#costosOT', 'Datos y Costos OT',
+    `<p>Resumen calculado de la OT:</p>
     <ol>
-      <li>Cantidad a Producir.</li>
-      <li>Valor Unitario.</li>
-      <li>Peso Neto o Peso Total de la Orden de Trabajo.</li>
-      <li>Valor del Kilogramo. Si la presentación del producto es Kg este precio debe ser al precio unitario.</li>
-      <li>Valor total de la Orden de Trabajo.</li>
-    </ol>`
-  },
-  {
-    attachTo: {
-      element: '#datosExtrusion',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'datosExtrusion',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Datos Extrusión</h5>`,
-    text: `<p>Una vez hayamos seleccionado o habilitado la casilla de extrusión se añadirá un nuevo tab desde el cual podremos </p>`
-  },
+      <li>Cantidad a producir.</li>
+      <li>Valor unitario.</li>
+      <li>Peso neto en kilos.</li>
+      <li>Valor del kilo.</li>
+      <li>Valor total de la OT.</li>
+    </ol>`),
+  pasoTutorialOT('#botonesOT', 'Guardar la OT',
+    `<p>Al pulsar <b>Crear OT</b> o <b>Editar OT</b>, los campos obligatorios vacíos se marcan en <b style="color: var(--rojo)">rojo</b>,
+    un aviso dice cuáles faltan y el cursor va al primero.</p>
+    <p>Al editar, antes de guardar se muestra una confirmación con los cambios, incluido el cambio de cliente o de referencia.</p>
+    <p>¡Listo! Ya sabes crear y editar órdenes de trabajo.</p>`, false, 'guardarOT'),
+];
+
+/** Tutorial de la pestaña "Buscar Orden Trabajo" (botón de tutorial del título con esa pestaña abierta). */
+export const stepsBusquedaOrdenesTrabajo: Step.StepOptions[] = [
+  pasoTutorialOT('#none', 'Buscar Órdenes de Trabajo',
+    `<p>Desde aquí buscas <b>items</b> u <b>OT</b> ya creadas para revisarlas, exportarlas o usarlas como base de una OT nueva.</p>
+    <p>Llena uno o varios filtros y pulsa <b>Consultar</b>.</p>`, true, 'introBusquedaOT'),
+  pasoTutorialOT('#busqBuscarPor', 'Buscar por',
+    `<p><b>Item:</b> muestra cada item con su última información (existencia, cantidad, precio, medidas).</p>
+    <p><b>OT:</b> muestra las OT creadas en el rango de fechas, con su número.</p>`),
+  pasoTutorialOT('#busqFiltroCliente', 'Cliente',
+    `<p>Escribe el nombre (o parte del nombre) del cliente para ver solo sus OT o items. La <b>X</b> limpia el campo.</p>`),
+  pasoTutorialOT('#busqFechas', 'Fechas',
+    `<p>Elige la <b>Fecha Inicial</b> y la <b>Fecha Final</b> del rango en que se crearon las OT.</p>`),
+  pasoTutorialOT('#busqFiltroItem', 'Item',
+    `<p>Escribe el número del item y presiona <b>Enter</b> para consultar.</p>`),
+  pasoTutorialOT('#busqFiltroReferencia', 'Referencia',
+    `<p>Escribe parte del nombre de la referencia y presiona <b>Enter</b>. La <b>X</b> limpia el campo.</p>`),
+  pasoTutorialOT('#busqFiltroMaterial', 'Material y Pigmento',
+    `<p>Filtra por el material y el pigmento del producto.</p>`),
+  pasoTutorialOT('#busqFiltroMedidas', 'Medidas',
+    `<p>Filtra por <b>Ancho</b>, <b>Largo</b>, <b>Fuelle</b> y <b>Calibre</b>. Úsalos para encontrar items con las mismas medidas.</p>`),
+  pasoTutorialOT('#busqFiltroVendedor', 'Vendedores',
+    `<p>Muestra solo las OT del vendedor elegido.</p>
+    <p>Si tu usuario es vendedor, solo verás tus propias OT.</p>`),
+  pasoTutorialOT('#busqBotones', 'Consultar, limpiar y exportar',
+    `<p><b>Consultar</b> busca con los filtros llenos. <b>Limpiar Campos</b> borra los filtros.
+    <b>Exportar Excel</b> descarga la tabla de resultados.</p>`),
+  pasoTutorialOT('#busqColumnas', 'Columnas',
+    `<p>Elige qué columnas quieres ver en la tabla.</p>`),
+  pasoTutorialOT('#busqFiltrosColumnas', 'Filtrar y ordenar',
+    `<p>Escribe en la caja de cada columna para filtrar los resultados. Haz clic en el nombre de la columna para ordenarla.</p>`),
+  pasoTutorialOT('th.columna-arte', 'Arte del item',
+    `<p>El botón rojo de cada fila abre el <b>arte del item</b> (PDF de Aseguramiento de la Calidad) para verlo o descargarlo.</p>`),
+  pasoTutorialOT('#busqTabla', 'Crear una OT a partir de un resultado',
+    `<p>Haz <b>doble clic</b> en una fila para llevar sus datos a la pestaña <b>Crear Orden Trabajo</b>.
+    Revisa la información y pulsa <b>Crear OT</b> para guardarla.</p>
+    <p>Las columnas Cantidad y Precio se pueden ajustar con clic en la celda. El ajuste solo cambia la tabla (por ejemplo, para exportarla), no la OT.</p>`),
 ];
 
 export const stepsOrdenTrabajo: Step.StepOptions[] = [
@@ -8408,7 +8227,7 @@ export const stepsMezclasOT: Step.StepOptions[] = [
   },
   {
     attachTo: {
-      element: '#Mezcla',
+      element: '#nombreMezcla, #Mezcla', // #nombreMezcla en Orden_Trabajo; #Mezcla en el módulo anterior (ordenes-trabajo), que comparte este tutorial
       on: 'bottom'
     },
     buttons: [

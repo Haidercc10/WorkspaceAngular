@@ -21,7 +21,8 @@
 </div>
 
 <p-card>
-  <p-tabView>
+  <!-- tabActivo: el botón de tutorial del título muestra el de la pestaña abierta (0 = Buscar, 1 = Crear) -->
+  <p-tabView [(activeIndex)]="tabActivo">
     <p-tabPanel header="Buscar Orden Trabajo" leftIcon="pi pi-search"
       tooltip="Desde aquí podrás buscar las ordenes de trabajo que se han creado">
       <app-Busqueda_OrdenesTrabajo></app-Busqueda_OrdenesTrabajo>
@@ -39,7 +40,7 @@
 
         <!-- Leyenda: campos de consulta (fondo azul e ícono de lupa) y obligatorios vacíos (en rojo al intentar guardar).
              Va arriba del título para que no choque con las etiquetas flotantes de los campos cuando tienen datos. -->
-        <div class="ot-leyenda mb-3">
+        <div class="ot-leyenda mb-3" id="leyendaOT">
           <span><span class="ot-leyenda__muestra ot-leyenda__muestra--consulta"><i class="pi pi-search"></i></span>
             Campo de consulta: al escribir o seleccionar trae información (pase el mouse para ver cómo usarlo)</span>
           <span><span class="ot-leyenda__muestra ot-leyenda__muestra--obligatorio"></span>
@@ -54,7 +55,7 @@
           </div>
 
           <!-- Botones -->
-          <div class="ot-header-actions__buttons">
+          <div class="ot-header-actions__buttons" id="botonesOT">
             <!-- <button pButton class="p-button-danger p-button-outlined" id="crearItem" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"></button> -->
             <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check"
               *ngIf="!edicionOrdenTrabajo && puedeGuardarOT" [disabled]="guardando || cargando"
@@ -75,7 +76,7 @@
               <!-- N° OT -->
               <!-- No usar "col-12" aquí: PrimeFlex (cargado después de Bootstrap) lo redefine y anula col-md/lg/xl.
                  Sin breakpoint, Bootstrap 5 ya deja cada campo al 100% en pantallas pequeñas (.row > *). -->
-              <div class="col-md-4 col-lg-3 col-xl-2 campo-consulta">
+              <div class="col-md-4 col-lg-3 col-xl-2 campo-consulta" id="consultaOT">
                 <div class="p-inputgroup">
                   <span class="p-inputgroup-addon cursor" pTooltip="Anterior" tooltipPosition="top"
                     (click)="ConsultarOrdenTrabajo(-1)">
@@ -135,16 +136,16 @@
                   </span>
                   <!-- Botones dentro del campo: cambiar (contorno rojo), historial (contorno gris) y "Ver arte" (rojo relleno) -->
                   <div class="ot-referencia__botones">
-                    <button pButton type="button"
+                    <button pButton type="button" id="botonCambiarReferencia"
                       [icon]="editandoReferencia ? 'pi pi-times' : 'pi pi-pencil'"
                       class="p-button-rounded p-button-outlined p-button-danger ot-referencia__boton"
                       [pTooltip]="editandoReferencia ? 'Cancelar el cambio de referencia' : 'Cambiar la referencia (nombre) del item'"
                       tooltipPosition="top" (click)="alternarEdicionReferencia()"></button>
-                    <button pButton type="button" icon="pi pi-history"
+                    <button pButton type="button" icon="pi pi-history" id="botonHistorialReferencia"
                       class="p-button-rounded p-button-outlined p-button-secondary ot-referencia__boton"
                       pTooltip="Historial de referencias del item" tooltipPosition="top"
                       (click)="verHistorialNombres()"></button>
-                    <button pButton type="button" icon="pi pi-image" label="Ver arte"
+                    <button pButton type="button" icon="pi pi-image" label="Ver arte" id="botonVerArte"
                       class="p-button-danger ot-referencia__arte"
                       [pTooltip]="'Ver el arte (PDF) del item' + (producto ? ' N° ' + producto : '')" tooltipPosition="top"
                       (click)="arteItem.abrir(producto || FormOrdenTrabajo.value.Id_Producto)"></button>
@@ -1308,7 +1309,7 @@
                       </div>
                     </ng-template>
                     <ng-template pTemplate="content">
-                      <div class="d-grid gap-2 d-md-flex justify-content-md-center text-center">
+                      <div class="d-grid gap-2 d-md-flex justify-content-md-center text-center" id="costosOT">
                         <div class="mb-3 costosFinales">
                           <div class="row g-3">
                             <p-chip id="cantidad" label="Cantidad {{presentacionProducto}}"
@@ -2083,7 +2084,7 @@
                       <div class="row g-4 justify-content-md-center">
 
                         <!-- Nombre Mezcla -->
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 campo-consulta">
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 campo-consulta" id="nombreMezcla">
                           <span class="p-float-label">
                             <p-dropdown formControlName="Nombre_Mezclas" inputId="Mezcla" [options]="mezclas"
                               optionLabel="mezcla_Nombre" optionValue="mezcla_Nombre" [filter]="true"

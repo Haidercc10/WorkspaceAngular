@@ -32,7 +32,7 @@ import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsOrdenesTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2 } from 'src/app/data';
+import { defaultStepOptions, stepsOrdenesTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsBusquedaOrdenesTrabajo } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { modelProducto } from 'src/app/Modelo/modelProducto';
@@ -159,6 +159,8 @@ export class Orden_TrabajoComponent implements OnInit {
   private valorKgCargado: number | null = null; //Valor Kg guardado de la OT abierta en edición; se conserva cuando la presentación no lo calcula (MTS)
   private rowVersionCargada: string | null = null; //Versión de la fila (rowVersion de getOrdenTrabajo, base64) de la OT abierta en edición; se envía como Ot_RowVersion para detectar ediciones concurrentes (409)
   private nombresCargados: { sede: any, cliente: string, producto: string } | null = null; //Nombres de cliente y producto con los que se cargó la OT en edición; si cambian, la confirmación lo indica
+  /** Pestaña abierta (0 = Buscar Orden Trabajo, 1 = Crear Orden Trabajo); el botón de tutorial del título muestra el de esa pestaña. */
+  tabActivo: number = 0;
   /** true después de intentar crear o editar: la vista resalta en rojo los campos obligatorios vacíos (clase ot-resaltar-obligatorios). */
   resaltarObligatorios: boolean = false;
   editandoReferencia: boolean = false; //true si se habilitó (lápiz) el campo Referencia para cambiar el nombre del item; si no, es de solo lectura
@@ -462,12 +464,16 @@ export class Orden_TrabajoComponent implements OnInit {
     this.ultimoIdProducto();
   }
 
-  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  /**
+   * Muestra el tutorial de la pestaña abierta: Buscar OT (tabActivo 0) o Crear OT (tabActivo 1).
+   * Cada tutorial solo apunta a elementos de su pestaña, porque los de la otra pestaña están ocultos.
+   * @returns No retorna un valor.
+   */
   verTutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.addSteps(this.tabActivo == 0 ? stepsBusquedaOrdenesTrabajo : defaultSteps);
     this.shepherdService.start();
   }
 
