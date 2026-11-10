@@ -37,7 +37,7 @@ import { modelProducto } from 'src/app/Modelo/modelProducto';
 import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { OtCalculoCostosService } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
+import { OtCalculoCostosService, RangoPesoTeorico } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 /**
@@ -1635,25 +1635,81 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   /**
-   * Calcula el peso del paquete (Peso Millar × Cantidad Paquete / 1000) y el del bulto (Peso Paquete × Cantidad Bulto)
-   * en el formulario de sellado. Los campos siguen siendo editables: si falta algún dato no se toca el valor actual.
+   * Peso teórico de un paquete y su rango de tolerancia. Para las referencias CAMISILLA BIOD con peso manual de
+   * producción es el peso del bulto repartido entre la Cantidad Bulto digitada (T3.0: 23 kg / 2 = 11,5 kg;
+   * T2.0: 35 kg / 10 = 3,5 kg); para el resto, la fórmula de producción
+   * (1 paquete × Peso Millar × Cantidad Paquete / 1000). Se muestra debajo de Peso Paquete mientras se escribe.
+   * @returns Peso teórico, mínimo y máximo del paquete (0 si faltan datos).
+   */
+  get pesoTeoricoPaquete(): RangoPesoTeorico {
+    const sellado = this.FormOrdenTrabajoSellado.value;
+    return this.calculoCostos.rangoPesoTeorico(this.pesoPaqueteManual() ?? this.calculoCostos.calcularPesoTeorico({
+      presentacion: 'Paquete', cantidad: 1, pesoMillar: sellado.PesoMillar, cantidadPaquete: sellado.CantidadPaquete,
+    }));
+  }
+
+  /**
+   * Peso teórico de un bulto y su rango de tolerancia: peso teórico del paquete × Cantidad Bulto. En las referencias
+   * CAMISILLA BIOD con peso manual es el peso fijo de la tabla (23 kg aunque el bulto traiga 1 o 2 paquetes).
+   * Se muestra debajo de Peso Bulto mientras se escribe.
+   * @returns Peso teórico, mínimo y máximo del bulto.
+   */
+  get pesoTeoricoBulto(): RangoPesoTeorico {
+    return this.calculoCostos.rangoPesoTeorico(this.pesoTeoricoBultoKg());
+  }
+
+  /**
+   * Peso teórico del bulto en kg (ver `pesoTeoricoBulto`), sin redondear.
+   * @returns Peso teórico del bulto.
+   */
+  private pesoTeoricoBultoKg(): number {
+    const cantidadBulto = Number(this.FormOrdenTrabajoSellado.value.CantidadBulto) || 0;
+    // BIOD: el paquete es el bulto repartido entre la cantidad (1 si no se ha digitado), así que el bulto da el peso de la tabla
+    const paquetes = this.pesoPaqueteManual() != null && cantidadBulto <= 0 ? 1 : cantidadBulto;
+    return this.pesoTeoricoPaquete.pesoTeorico * paquetes;
+  }
+
+  /**
+   * Peso del paquete según la tabla manual de producción (solo referencias CAMISILLA BIOD). Toma el formato de sellado
+   * y el de corte, porque al cargar una OT todavía no se sabe cuál de los dos procesos aplica, y el nombre del item
+   * del formulario (refleja un cambio de referencia) o, si no hay, el del item cargado.
+   * @returns El peso del paquete en kg, o null si la referencia no tiene peso manual.
+   */
+  pesoPaqueteManual(): number | null {
+    const nombreFormulario = this.FormOrdenTrabajo.value.Nombre_Producto;
+    const referencia = typeof nombreFormulario == 'string' && isNaN(Number(nombreFormulario)) ? nombreFormulario : this.ArrayProducto[0]?.Nombre;
+    const formatos = `${this.FormOrdenTrabajoSellado.value.Formato_Sellado ?? ''} ${this.FormOrdenTrabajoCorte.value.Formato_Corte ?? ''}`;
+    // Paquetes por bulto digitados en la OT: el peso de la tabla es el del bulto completo y se reparte entre ellos
+    return this.calculoCostos.pesoPaqueteManual(formatos, referencia, this.FormOrdenTrabajoSellado.value.CantidadBulto);
+  }
+
+  /**
+   * Llena Peso Paquete y Peso Bulto del formulario de sellado con el peso teórico (ver `pesoTeoricoPaquete` y
+   * `pesoTeoricoBulto`). En las referencias CAMISILLA BIOD con peso manual el bulto queda en el peso de la tabla y el
+   * paquete se reparte entre la Cantidad Bulto (23 kg con 2 paquetes: paquete 11,5 y bulto 23). Si solo cambió el
+   * Peso Paquete (editado a mano), el bulto se calcula como Peso Paquete × Cantidad Bulto.
+   * Al cargar una OT o un item (soloVacios) se conservan los pesos guardados, salvo en las referencias CAMISILLA BIOD
+   * con peso manual: en esas siempre se cargan los pesos de la tabla. Si falta algún dato no se toca el valor actual.
    * @param recalcularPaquete true recalcula el peso del paquete; false solo recalcula el bulto con el peso de paquete actual.
    * @param soloVacios true solo llena los pesos que estén en 0 o vacíos (carga de OT o item), para no reemplazar valores guardados.
    * @returns No retorna un valor.
    */
   calcularPesosPaqueteBulto(recalcularPaquete: boolean = true, soloVacios: boolean = false) {
+    if (soloVacios && this.pesoPaqueteManual() != null) soloVacios = false;
     const sellado = this.FormOrdenTrabajoSellado.value;
-    const pesoMillar: number = Number(sellado.PesoMillar) || 0;
-    const cantidadPaquete: number = Number(sellado.CantidadPaquete) || 0;
     const cantidadBulto: number = Number(sellado.CantidadBulto) || 0;
+    const pesoTeoricoPaquete: number = this.pesoTeoricoPaquete.pesoTeorico;
     let pesoPaquete: number = Number(sellado.PesoPaquete) || 0;
+    let pesoBulto: number = cantidadBulto > 0 ? pesoPaquete * cantidadBulto : 0;
 
-    if (recalcularPaquete && pesoMillar > 0 && cantidadPaquete > 0 && (!soloVacios || pesoPaquete <= 0)) {
-      pesoPaquete = Math.round(pesoMillar * (cantidadPaquete / 1000) * 100) / 100;
+    if (recalcularPaquete && pesoTeoricoPaquete > 0 && (!soloVacios || pesoPaquete <= 0)) {
+      pesoPaquete = Math.round(pesoTeoricoPaquete * 100) / 100;
+      // Con el teórico sin redondear: 35 kg en 3 paquetes da paquete 11,67 y bulto 35 (no 35,01)
+      pesoBulto = this.pesoTeoricoBultoKg();
       this.FormOrdenTrabajoSellado.patchValue({ PesoPaquete: pesoPaquete });
     }
-    if (pesoPaquete > 0 && cantidadBulto > 0 && (!soloVacios || (Number(sellado.PesoBulto) || 0) <= 0)) {
-      this.FormOrdenTrabajoSellado.patchValue({ PesoBulto: Math.round(pesoPaquete * cantidadBulto * 100) / 100 });
+    if (pesoBulto > 0 && (!soloVacios || (Number(sellado.PesoBulto) || 0) <= 0)) {
+      this.FormOrdenTrabajoSellado.patchValue({ PesoBulto: Math.round(pesoBulto * 100) / 100 });
     }
   }
 
@@ -1842,6 +1898,16 @@ export class Orden_TrabajoComponent implements OnInit {
    */
   get cantidadPedidaKg(): number {
     return this.netoKg || 0;
+  }
+
+  /**
+   * Precio total de la OT: Cant. Pedida × Precio Unitario, con los valores del formulario para que se vea
+   * mientras se escribe (no espera el recálculo de costos).
+   * @returns Precio total; 0 si falta la cantidad o el precio.
+   */
+  get precioTotal(): number {
+    const { Cantidad, Precio } = this.FormOrdenTrabajo.value;
+    return (Number(Cantidad) || 0) * (Number(Precio) || 0);
   }
 
   /**
@@ -3143,9 +3209,22 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargandoProduccion = true;
     this.consultaProduccion = this.estadosProcesosService.consultaPorOT(ot).pipe(
       finalize(() => this.cargandoProduccion = false)
-    ).subscribe(datos => this.produccionProcesos = datos ?? [], () => {
+    ).subscribe(datos => this.produccionProcesos = this.unaFilaProduccion(datos), () => {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No fue posible consultar la producción por proceso de la OT N° ${ot}!`);
     });
+  }
+
+  /**
+   * Deja una sola fila de Estados Procesos OT por OT. Si la tabla tiene registros duplicados de la misma OT (pasa
+   * cuando el trigger de ClientesOT la crea más de una vez), los triggers de producción actualizan todos por número
+   * de OT, así que tienen los mismos kilos: se muestra el registro original (el de menor EstProcOT_Id).
+   * @param datos Filas devueltas por la consulta de Estados Procesos OT.
+   * @returns Lista con una fila, o vacía si no hay datos.
+   */
+  private unaFilaProduccion(datos: any[] | null): any[] {
+    if (!Array.isArray(datos) || datos.length == 0) return [];
+    const original = datos.reduce((menor, fila) => Number(fila?.estProcOT_Id) < Number(menor?.estProcOT_Id) ? fila : menor);
+    return [original];
   }
 
   /**

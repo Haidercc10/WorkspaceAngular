@@ -118,7 +118,8 @@
                  Los botones (cambiar, historial y ver arte) van dentro del campo, a la derecha, siempre visibles. -->
               <div class="col-md-12 col-lg-7 col-xl-7" id="producto"
                 [class.campo-consulta]="!edicionOrdenTrabajo && !editandoReferencia">
-                <div class="ot-referencia" [class.ot-referencia--editando]="editandoReferencia">
+                <div class="ot-referencia" [class.ot-referencia--editando]="editandoReferencia"
+                  [class.ot-referencia--sin-arte]="!impresion">
                   <span class="p-input-icon-left p-float-label">
                     <i [class]="editandoReferencia ? 'pi pi-pencil' : edicionOrdenTrabajo ? 'pi pi-box' : 'pi pi-search'"></i>
                     <input formControlName="Nombre_Producto" id="Nombre_Producto" type="text" pInputText
@@ -145,7 +146,8 @@
                       class="p-button-rounded p-button-outlined p-button-secondary ot-referencia__boton"
                       pTooltip="Historial de referencias del item" tooltipPosition="top"
                       (click)="verHistorialNombres()"></button>
-                    <button pButton type="button" icon="pi pi-image" label="Ver arte" id="botonVerArte"
+                    <!-- "Ver arte" solo si la OT/item pasa por el proceso de impresión -->
+                    <button *ngIf="impresion" pButton type="button" icon="pi pi-image" label="Ver arte" id="botonVerArte"
                       class="p-button-danger ot-referencia__arte"
                       [pTooltip]="'Ver el arte (PDF) del item' + (producto ? ' N° ' + producto : '')" tooltipPosition="top"
                       (click)="arteItem.abrir(producto || FormOrdenTrabajo.value.Id_Producto)"></button>
@@ -153,18 +155,17 @@
                 </div>
               </div>
 
-              <!-- ESTADO DE LA ORDEN -->
-              <div class="col-md-4 col-lg-2 col-xl-2" id="estadoOrden">
-                <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
-                  <i class="pi pi-table"></i>
-                  <p-dropdown formControlName="OT_Estado" inputId="Estado" [options]="estados"
-                    optionLabel="estado_Nombre" optionValue="estado_Id" [autoDisplayFirst]="false" [required]="true"
-                    [readonly]="true"></p-dropdown>
-                  <label for="Estado">Estado OT</label>
+              <!-- Estado OT no se muestra: el control OT_Estado sigue en el formulario (15 al crear o el de la OT cargada) -->
+              <!-- Fecha entrega -->
+              <div class="col-md-4 col-lg-3 col-xl-2" id="fechaEntrega">
+                <span class="p-float-label">
+                  <p-calendar formControlName="OT_FechaEntrega" inputId="FechaEntrega" dateFormat="yy-mm-dd"
+                    [showIcon]="true" [showButtonBar]="true" appendTo="body" [minDate]="minDate" [required]="true"></p-calendar>
+                  <label for="FechaEntrega">Fecha Entrega</label>
                 </span>
               </div>
 
-              <!-- Fila 2 (xl): Id Cliente · Cliente · Asesor ID · Asesor · Fecha Entrega -->
+              <!-- Fila 2 (xl): Id Cliente · Cliente · Asesor ID · Asesor · Margen -->
               <!-- ID CLIENTE -->
               <div class="col-md-3 col-lg-2 col-xl-2" id="idCliente">
                 <span class="p-input-icon-left p-float-label">
@@ -213,16 +214,17 @@
                 </span>
               </div>
 
-              <!-- Fecha entrega -->
-              <div class="col-md-3 col-lg-3 col-xl-2" id="fechaEntrega">
-                <span class="p-float-label">
-                  <p-calendar formControlName="OT_FechaEntrega" inputId="FechaEntrega" dateFormat="yy-mm-dd"
-                    [showIcon]="true" [showButtonBar]="true" appendTo="body" [minDate]="minDate" [required]="true"></p-calendar>
-                  <label for="FechaEntrega">Fecha Entrega</label>
+              <!-- MARGEN ADICIONAL -->
+              <div class="col-md-3 col-lg-3 col-xl-2" id="margenAdicional">
+                <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+                  <i class="pi pi-percentage"></i>
+                  <p-inputNumber formControlName="Margen" mode="decimal" inputId="MargenOT" [minFractionDigits]="2"
+                    [readonly]="true" [required]="true"></p-inputNumber>
+                  <label for="MargenOT">Margen</label>
                 </span>
               </div>
 
-              <!-- Fila 3 (xl): Cant. Pedida · Presentación · Precio Unitario · Cant. Kg · Precio Kg · Margen (2 columnas cada uno) -->
+              <!-- Fila 3 (xl): Cant. Pedida · Presentación · Precio Unitario · Precio Total · Cant. Kg · Precio Kg (2 columnas cada uno) -->
               <!-- Fecha Creación no se muestra: el control OT_FechaCreacion sigue en el formulario (hoy o la de la OT cargada) -->
               <!-- CANTIDAD PEDIDA -->
               <div class="col-md-4 col-lg-3 col-xl-2" id="cantidadFabricar">
@@ -257,6 +259,17 @@
                 </span>
               </div>
 
+              <!-- PRECIO TOTAL (Cant. Pedida × Precio Unitario, solo lectura; se actualiza mientras se escribe) -->
+              <div class="col-md-4 col-lg-2 col-xl-2" id="precioTotal">
+                <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+                  <i class="pi pi-wallet"></i>
+                  <p-inputNumber [ngModel]="precioTotal" [ngModelOptions]="{ standalone: true }" mode="decimal"
+                    inputId="PrecioTotal" [minFractionDigits]="2" [maxFractionDigits]="2" [readonly]="true"
+                    pTooltip="Cant. Pedida × Precio Unitario" tooltipPosition="top"></p-inputNumber>
+                  <label for="PrecioTotal">Precio Total</label>
+                </span>
+              </div>
+
               <!-- CANTIDAD PEDIDA EN KG (calculada en calcularCostosOT, solo lectura) -->
               <div class="col-md-4 col-lg-2 col-xl-2" id="cantidadPedidaKg">
                 <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
@@ -278,16 +291,6 @@
                     pTooltip="Calculado a partir del precio unitario y el peso del producto"
                     tooltipPosition="top"></p-inputNumber>
                   <label for="PrecioKg">Precio Kg</label>
-                </span>
-              </div>
-
-              <!-- MARGEN ADICIONAL -->
-              <div class="col-md-4 col-lg-2 col-xl-2" id="margenAdicional">
-                <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
-                  <i class="pi pi-percentage"></i>
-                  <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant" [minFractionDigits]="2"
-                    [readonly]="true" [required]="true"></p-inputNumber>
-                  <label for="Cant">Margen</label>
                 </span>
               </div>
 
@@ -545,7 +548,7 @@
                             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="Peso_Extrusion" inputId="PesoExtrusion" mode="decimal"
-                                  [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
+                                  [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
                                 <label for="PesoExtrusion">Peso Extrusión</label>
                               </span>
                             </div>
@@ -1023,12 +1026,12 @@
                             <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-1">
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="Margen_Corte" [min]="0" inputId="Margen" mode="decimal"
-                                  prefix="% " [minFractionDigits]="2" [required]="true"
+                                  prefix="% " [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true" 
                                   (onKeyDown)="calcularDatosOt()"></p-inputNumber>
                                 <label for="Margen">Margen</label>
                               </span>
                               <div>
-                                <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                                <label><b>Margen Kg: </b>{{margenKg | number: '1.2-2'}}</label>
                               </div>
                             </div>
                           </div>
@@ -1069,7 +1072,7 @@
                                 <p-dropdown formControlName="Formato_Sellado" inputId="Formato"
                                   [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre"
                                   [autoDisplayFirst]="false" [required]="true"
-                                  (onChange)="calcularDatosOt()"></p-dropdown>
+                                  (onChange)="calcularPesosPaqueteBulto(pesoPaqueteManual() != null); calcularDatosOt()"></p-dropdown>
                                 <label for="Formato">Formato</label>
                               </span>
                             </div>
@@ -1188,33 +1191,15 @@
                               </span>
                             </div>
 
-                            <!-- Cantidad Paquete -->
-                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                              <span class="p-float-label">
-                                <p-inputNumber formControlName="CantidadPaquete" [min]="0" inputId="CantidadPaquete"
-                                  mode="decimal" [minFractionDigits]="0" [required]="true"
-                                  (onInput)="calcularPesosPaqueteBulto(); calcularDatosOt()"></p-inputNumber>
-                                <label for="CantidadPaquete">Cantidad Paquete</label>
-                              </span>
-                            </div>
-
-                            <!-- Peso Paquete -->
-                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                              <span class="p-float-label">
-                                <p-inputNumber formControlName="PesoPaquete" inputId="PesoPaquete" mode="decimal"
-                                  [minFractionDigits]="2" [required]="true"
-                                  (onInput)="calcularPesosPaqueteBulto(false)"></p-inputNumber>
-                                <label for="PesoPaquete">Peso Paquete</label>
-                              </span>
-                            </div>
+                            
 
                             <!-- Cantidad Bulto -->
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="CantidadBulto" [min]="0" inputId="CantidadBulto"
                                   mode="decimal" [minFractionDigits]="0" [required]="true"
-                                  (onInput)="calcularPesosPaqueteBulto(false)"></p-inputNumber>
-                                <label for="CantidadBulto">Cantidad Bulto</label>
+                                  (onInput)="calcularPesosPaqueteBulto(pesoPaqueteManual() != null)"></p-inputNumber>
+                                <label for="CantidadBulto">Cantidad de {{presentacionProducto}}(s) x Bulto</label>
                               </span>
                             </div>
 
@@ -1222,10 +1207,49 @@
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="PesoBulto" inputId="PesoBulto" mode="decimal"
-                                  [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                                  [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true"></p-inputNumber>
                                 <label for="PesoBulto">Peso Bulto</label>
                               </span>
+                              <!-- Peso teórico de producción (± 7 %); peso fijo para las referencias CAMISILLA BIOD con peso manual -->
+                              <div *ngIf="pesoTeoricoBulto as teorico">
+                                <label *ngIf="teorico.pesoTeorico > 0"
+                                  [pTooltip]="pesoPaqueteManual() != null ? 'Peso fijo de bulto de la tabla de producción para esta referencia CAMISILLA BIOD (± 7 %)' : 'Peso teórico: Peso Paquete teórico × Cantidad Bulto (± 7 %)'"
+                                  tooltipPosition="bottom">
+                                  <b>Teórico: </b>{{teorico.pesoTeorico | number: '1.2-2'}} Kg
+                                  <small>({{teorico.pesoMinimo | number: '1.2-2'}} – {{teorico.pesoMaximo | number: '1.2-2'}})</small>
+                                </label>
+                              </div>
                             </div>
+
+                            <!-- Cantidad Paquete -->
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                              <span class="p-float-label">
+                                <p-inputNumber formControlName="CantidadPaquete" [min]="0" inputId="CantidadPaquete"
+                                  mode="decimal" [minFractionDigits]="0" [required]="true"
+                                  (onInput)="calcularPesosPaqueteBulto(); calcularDatosOt()"></p-inputNumber>
+                                <label for="CantidadPaquete">Cantidad bolsas x {{presentacionProducto}}</label>
+                              </span>
+                            </div>
+
+                            <!-- Peso Paquete -->
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                              <span class="p-float-label">
+                                <p-inputNumber formControlName="PesoPaquete" inputId="PesoPaquete" mode="decimal"
+                                  [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true"
+                                  (onInput)="calcularPesosPaqueteBulto(false)"></p-inputNumber>
+                                <label for="PesoPaquete">Peso {{presentacionProducto}}</label>
+                              </span>
+                              <!-- Peso teórico de producción (± 7 %), se actualiza mientras se escribe -->
+                              <div *ngIf="pesoTeoricoPaquete as teorico">
+                                <label *ngIf="teorico.pesoTeorico > 0"
+                                  [pTooltip]="pesoPaqueteManual() != null ? 'Peso de tabla de producción para esta referencia CAMISILLA BIOD: peso del bulto / Cantidad de paquetes x Bulto (± 7 %)' : 'Peso teórico de producción: 1 paquete × Peso Millar × Cantidad Paquete / 1000 (± 7 %)'"
+                                  tooltipPosition="bottom">
+                                  <b>Teórico: </b>{{teorico.pesoTeorico | number: '1.2-2'}} Kg
+                                  <small>({{teorico.pesoMinimo | number: '1.2-2'}} – {{teorico.pesoMaximo | number: '1.2-2'}})</small>
+                                </label>
+                              </div>
+                            </div>
+                            
                           </div>
                           <hr>
 

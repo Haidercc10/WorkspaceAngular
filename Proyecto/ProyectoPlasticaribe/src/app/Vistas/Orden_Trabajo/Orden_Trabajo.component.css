@@ -205,6 +205,11 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
 }
 
 /* Solo lectura (editando la OT, hasta pulsar el lápiz): fondo gris; habilitada con el lápiz para cambiar el nombre: borde rojo */
+/* Sin proceso de impresión no se muestra "Ver arte": solo quedan los 2 botones de 28px */
+.ot-referencia--sin-arte input {
+  padding-right: 75px;
+}
+
 .ot-referencia input[readonly] {
   background-color: #f2f2f2;
   color: #444;

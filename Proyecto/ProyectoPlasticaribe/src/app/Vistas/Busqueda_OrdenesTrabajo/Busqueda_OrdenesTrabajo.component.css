@@ -45,3 +45,32 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
   font-size: 0.9rem;
   margin: 0;
 }
+
+/* Columnas de procesos (Ext, Imp, Rot, Lam, Cor, Sel): angostas y centradas */
+.columna-proceso {
+  width: 56px;
+  min-width: 56px;
+  max-width: 70px;
+  text-align: center !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+/* Verde de cantidades del sistema (el mismo de Kardex de Materias Primas y del "success" de PrimeNG):
+   Existencia mayor que 0 y procesos por los que pasa la OT ("Sí") */
+.valor-verde {
+  color: #22C55E;
+  font-weight: bold;
+}
+
+/* Fila superior del encabezado con los grupos de columnas */
+.grupo-encabezado {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* Mensaje de la tabla vacía */
+.sin-datos {
+  color: #6c757d;
+  font-style: italic;
+}

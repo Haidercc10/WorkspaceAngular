@@ -15,6 +15,52 @@ import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/E
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { finalize } from 'rxjs';
 
+/**
+ * Procesos por los que pasa la OT (banderas booleanas de BagPro), con encabezado corto. La tabla muestra la columna
+ * `field` ("Sí" / "No"), que se llena en `enmascararProcesos`, para que el filtro de la columna funcione con ese texto.
+ */
+const PROCESOS_OT: readonly { header: string; bandera: string; nombre: string }[] = [
+  { header: 'Ext', bandera: 'extrusion', nombre: 'Extrusión' },
+  { header: 'Imp', bandera: 'impresion', nombre: 'Impresión' },
+  { header: 'Rot', bandera: 'rotograbado', nombre: 'Rotograbado' },
+  { header: 'Lam', bandera: 'laminado', nombre: 'Laminado' },
+  { header: 'Cor', bandera: 'corte', nombre: 'Corte' },
+  { header: 'Sel', bandera: 'sellado', nombre: 'Sellado' },
+];
+
+/** Columnas de procesos de la tabla de búsqueda (van antes de "Ult. Fecha"). */
+const COLUMNAS_PROCESOS_OT = PROCESOS_OT.map(p => ({ header: p.header, field: `proceso_${p.bandera}`, tipo: 'proceso', titulo: p.nombre }));
+
+/** Grupo del encabezado de la tabla según el campo de la columna (la fila superior que agrupa columnas). */
+const GRUPO_POR_CAMPO: Readonly<Record<string, string>> = {
+  ordenTrabajo: 'Orden de Trabajo', fechaCreacion: 'Orden de Trabajo',
+  existencia: 'Inventario',
+  cliente: 'Información del Producto', item: 'Información del Producto', referencia: 'Información del Producto',
+  cantidad: 'Cantidades y Costos', cantidad_Kilos: 'Cantidades y Costos', precio: 'Cantidades y Costos',
+  precio_Kilo: 'Cantidades y Costos', presentacion: 'Cantidades y Costos',
+  material: 'Especificaciones Técnicas', pigmento: 'Especificaciones Técnicas', undExtrusion: 'Especificaciones Técnicas',
+  calibre: 'Especificaciones Técnicas', formato: 'Especificaciones Técnicas', ancho: 'Especificaciones Técnicas',
+  largo: 'Especificaciones Técnicas', fuelle: 'Especificaciones Técnicas',
+  ...Object.fromEntries(COLUMNAS_PROCESOS_OT.map(c => [c.field, 'Procesos de Producción'])),
+};
+
+/** Grupo de la columna fija "Ult. Fecha". */
+const GRUPO_FECHA_FIJA: string = 'Fecha';
+
+/** Ícono (PrimeIcons) de cada grupo del encabezado. */
+const ICONO_POR_GRUPO: Readonly<Record<string, string>> = {
+  'Orden de Trabajo': 'pi pi-file',
+  'Inventario': 'pi pi-box',
+  'Información del Producto': 'pi pi-tag',
+  'Cantidades y Costos': 'pi pi-dollar',
+  'Especificaciones Técnicas': 'pi pi-sliders-h',
+  'Procesos de Producción': 'pi pi-cog',
+  [GRUPO_FECHA_FIJA]: 'pi pi-calendar',
+};
+
+/** Campos que se muestran en negrita en la tabla. */
+const CAMPOS_NEGRITA: readonly string[] = ['referencia', 'presentacion', 'calibre'];
+
 @Component({
   selector: 'app-Busqueda_OrdenesTrabajo',
   templateUrl: './Busqueda_OrdenesTrabajo.component.html',
@@ -72,6 +118,26 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     this.obtenerPigmentos();
     this.lecturaStorage();
     this.loadRankDates();
+    this.llenarColumnas(); // La tabla se ve vacía, con sus encabezados, antes de consultar
+  }
+
+  /**
+   * Al cambiar entre búsqueda por Item y por OT, si la tabla está vacía muestra los encabezados del nuevo tipo.
+   * Si ya hay resultados se conservan hasta la próxima consulta, como antes.
+   * @returns No retorna un valor.
+   */
+  cambiarTipoBusqueda() {
+    if (this.ordenesConsultadas.length == 0) this.llenarColumnas();
+  }
+
+  /**
+   * Opciones de filas por página; la última muestra todos los registros (solo si hay más de 100, para no repetir
+   * ni ofrecer 0 cuando la tabla está vacía).
+   * @returns Opciones sin repetidos y mayores que 0.
+   */
+  get opcionesFilasPorPagina(): number[] {
+    const total = this.ordenesConsultadas.length;
+    return total > 100 ? [10, 15, 20, 50, 100, total] : [10, 15, 20, 50, 100];
   }
 
   // Carga las fechas de rango por defecto (últimos 12 meses) en el formulario de filtros.
@@ -87,6 +153,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     this.ordenesConsultadas = [];
     this.formFiltros.patchValue({ buscarPorItem_Ot: 'Item' });
     this.loadRankDates();
+    this.llenarColumnas();
   }
 
   //Crea la función de lectura storage que tengo en otros modulos
@@ -150,7 +217,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
         this.cargando = false;
         return;
       }
-      this.ordenesConsultadas = data;
+      this.ordenesConsultadas = data.map(orden => this.enmascararProcesos(orden));
       this.llenarColumnas();
     }, () => {
       this.msj.mensajeError(`¡Ocurrió un error al realizar la consulta!`);
@@ -196,11 +263,47 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     return ruta;
   }
 
+  /**
+   * Agrega a la fila el texto de cada proceso ("Sí" si la OT pasa por él, "No" si no) en `proceso_<bandera>`.
+   * Las banderas originales (extrusion, impresion, ...) no se modifican: las usan el botón de arte y la creación de OT.
+   * @param orden Fila devuelta por BagPro.
+   * @returns La misma fila con los textos de los procesos.
+   */
+  private enmascararProcesos(orden: any): any {
+    PROCESOS_OT.forEach(p => {
+      const valor = orden?.[p.bandera];
+      orden[`proceso_${p.bandera}`] = valor === true || `${valor ?? ''}`.trim() == '1' ? 'Sí' : 'No';
+    });
+    return orden;
+  }
+
   llenarColumnas() {
     let tipoBusqueda: 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
     if (tipoBusqueda == 'Item') this.llenarColumnas_BusquedaPorItem();
     else if (tipoBusqueda == 'OT') this.llenarColumnas_BusquedaPorOT();
+    this.columnas = this.columnas.map(col => ({
+      ...col,
+      grupo: col.frozen ? GRUPO_FECHA_FIJA : GRUPO_POR_CAMPO[col.field] ?? '',
+      negrita: CAMPOS_NEGRITA.includes(col.field),
+    }));
     this.columnasSeleccionadas = this.columnas;
+  }
+
+  /**
+   * Fila superior del encabezado: une las columnas visibles consecutivas del mismo grupo (Información del Producto,
+   * Cantidades y Costos, ...). Se calcula con las columnas seleccionadas y en su orden actual, así que se ajusta
+   * cuando el usuario oculta o reordena columnas.
+   * @returns Grupos con su nombre, ícono, cuántas columnas ocupan y si son la columna fija de la derecha.
+   */
+  get gruposEncabezado(): { nombre: string; icono: string; colspan: number; frozen: boolean }[] {
+    return (this.columnasSeleccionadas ?? []).reduce((grupos, col) => {
+      const ultimo = grupos[grupos.length - 1];
+      const frozen = !!col.frozen;
+      const nombre = col.grupo ?? '';
+      if (ultimo && ultimo.nombre == nombre && ultimo.frozen == frozen) ultimo.colspan++;
+      else grupos.push({ nombre, icono: ICONO_POR_GRUPO[nombre] ?? '', colspan: 1, frozen });
+      return grupos;
+    }, [] as { nombre: string; icono: string; colspan: number; frozen: boolean }[]);
   }
 
   llenarColumnas_BusquedaPorItem() {
@@ -228,7 +331,8 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       { header: 'Ancho', field: 'ancho', tipo: 'number' },
       { header: 'Largo', field: 'largo', tipo: 'number' },
       { header: 'Fuelle', field: 'fuelle', tipo: 'number' },
-      { header: 'Ult. Fecha', field: 'fechaCreacion', tipo: 'date' },
+      ...COLUMNAS_PROCESOS_OT,
+      { header: 'Ult. Fecha', field: 'fechaCreacion', tipo: 'date', frozen: true },
     ];
   }
 
@@ -244,6 +348,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       ot.existencia = 0;
       return { producto: String(ot.item).trim(), presentacion: presentacionesZeus[ot.presentacion] ?? ot.presentacion };
     });
+    if (productos.length == 0) return; // Tabla vacía (columnas iniciales o sin resultados): no se consulta Zeus
     if (productos.length == 0) return;
 
     this.zeusService.getExistenciasProductosLote(productos).subscribe({
@@ -275,7 +380,8 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       { header: 'Ancho', field: 'ancho', tipo: 'number' },
       { header: 'Largo', field: 'largo', tipo: 'number' },
       { header: 'Fuelle', field: 'fuelle', tipo: 'number' },
-      { header: 'Ult. Fecha', field: 'fechaCreacion', tipo: 'date' },
+      ...COLUMNAS_PROCESOS_OT,
+      { header: 'Ult. Fecha', field: 'fechaCreacion', tipo: 'date', frozen: true },
     ];
   }
 

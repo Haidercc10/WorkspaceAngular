@@ -7183,9 +7183,9 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
   pasoTutorialOT('#botonVerArte', 'Ver arte',
     `<p>Abre el <b>arte del item</b> (PDF de Aseguramiento de la Calidad) en una ventana. Desde ahí puedes ampliarlo,
     abrirlo en otra pestaña o descargarlo.</p>
-    <p>Si el item no tiene arte cargado, aparecerá un aviso.</p>`),
-  pasoTutorialOT('#estadoOrden', 'Estado OT',
-    `<p>Muestra el estado de la OT consultada. Es de <b>solo lectura</b>: el estado cambia con la producción.</p>`),
+    <p>Solo aparece si la OT pasa por el proceso de <b>Impresión</b>. Si el item no tiene arte cargado, aparecerá un aviso.</p>`),
+  pasoTutorialOT('#fechaEntrega', 'Fecha Entrega',
+    `<p>Elige la fecha en que se debe entregar el pedido. Es <b>obligatoria</b>.</p>`),
   pasoTutorialOT('#idCliente', 'Id Cliente',
     `<p>Se llena solo al elegir el cliente en el campo siguiente. <b>No es editable</b>.</p>`),
   pasoTutorialOT('#cliente', 'Cliente',
@@ -7195,22 +7195,22 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
   pasoTutorialOT('#vendedor', 'Asesor',
     `<p>El asesor (vendedor) se llena al elegir el cliente, junto con su código en <b>Asesor ID</b>. También puedes elegir otro de la lista.</p>
     <p>Si tu usuario es vendedor, siempre quedarás tú como asesor.</p>`),
-  pasoTutorialOT('#fechaEntrega', 'Fecha Entrega',
-    `<p>Elige la fecha en que se debe entregar el pedido. Es <b>obligatoria</b>.</p>`),
+  pasoTutorialOT('#margenAdicional', 'Margen',
+    `<p>Porcentaje adicional que se fabrica sobre la cantidad pedida. Por ejemplo, si piden <b>100</b> y el margen es <b>10</b>,
+    se fabrican <b>110</b>.</p>
+    <p>Aquí no se edita: se cambia en los apartados de <b style="color: var(--rojo)">Corte</b> o <b style="color: var(--rojo)">Sellado</b>.</p>`),
   pasoTutorialOT('#cantidadFabricar', 'Cant. Pedida',
     `<p>Cantidad que pidió el cliente, en la presentación elegida (unidades, paquetes, kilos, etc.).</p>`),
   pasoTutorialOT('#presentacion', 'Presentación',
     `<p>Unidad en la que se vende el item. Al cambiarla se busca la última OT del item <b>en esa presentación</b> y se cargan sus datos.</p>`),
   pasoTutorialOT('#precioUnitario', 'Precio Unitario',
     `<p>Precio por unidad de la presentación. Debe ser <b>mayor que 0</b>.</p>`),
+  pasoTutorialOT('#precioTotal', 'Precio Total',
+    `<p>Cantidad pedida × precio unitario. Se <b>calcula solo</b> mientras escribes.</p>`),
   pasoTutorialOT('#cantidadPedidaKg', 'Cant. Kg',
     `<p>Kilos que se van a fabricar, incluido el margen adicional. Se <b>calcula solo</b>.</p>`),
   pasoTutorialOT('#precioKilo', 'Precio Kg',
     `<p>Precio por kilo, calculado con el precio unitario y el peso del producto. Se <b>calcula solo</b>.</p>`),
-  pasoTutorialOT('#margenAdicional', 'Margen',
-    `<p>Porcentaje adicional que se fabrica sobre la cantidad pedida. Por ejemplo, si piden <b>100</b> y el margen es <b>10</b>,
-    se fabrican <b>110</b>.</p>
-    <p>Aquí no se edita: se cambia en los apartados de <b style="color: var(--rojo)">Corte</b> o <b style="color: var(--rojo)">Sellado</b>.</p>`),
   pasoTutorialOT('#check', 'Procesos de Producción',
     `<p>Marca los procesos por los que pasará el producto: Cyrel, Extrusión, Impresión, Laminado, Corte y Sellado.</p>
     <p>Extrusión, Impresión, Laminado, Corte y Sellado agregan su apartado abajo cuando se marcan, con sus datos y su observación.</p>
