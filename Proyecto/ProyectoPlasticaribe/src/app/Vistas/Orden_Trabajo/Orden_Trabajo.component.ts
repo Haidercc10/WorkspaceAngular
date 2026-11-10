@@ -2894,7 +2894,9 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Consulta los Ids de las tintas seleccionadas y el formato/tipo de sellado, necesarios para armar los procesos de la OT.
-   * @returns Observable con las tintas encontradas y el formato/tipo de sellado.
+   * Si la combinación de tipo de sellado y formato no existe (404), `datosSellado` llega en null para que
+   * `construirProcesosOt` muestre el aviso; cualquier otro error se propaga.
+   * @returns Observable con las tintas encontradas y el formato/tipo de sellado (null si no existe).
    */
   consultarDatosProcesos(): Observable<{ datosImpresion: any[], datosSellado: any }> {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
@@ -2902,13 +2904,15 @@ export class Orden_TrabajoComponent implements OnInit {
     let tintas = this.FormOrdenTrabajoImpresion.value;
     return forkJoin({
       datosImpresion: this.servicioTintas.srvObtenerListaConsultaImpresion(tintas.Tinta_Impresion1, tintas.Tinta_Impresion2, tintas.Tinta_Impresion3, tintas.Tinta_Impresion4, tintas.Tinta_Impresion5, tintas.Tinta_Impresion6, tintas.Tinta_Impresion7, tintas.Tinta_Impresion8),
-      datosSellado: this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato),
+      datosSellado: this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).pipe(
+        catchError((error: HttpErrorResponse) => error?.status === 404 ? of(null) : throwError(() => error))
+      ),
     });
   }
 
   /**
    * Arma la información de los cuatro procesos de la OT. Si no se encontraron las tintas o no existe la combinación
-   * de tipo de sellado y formato (la API responde 204 sin cuerpo), muestra el error y apaga la carga.
+   * de tipo de sellado y formato (la API responde 404), muestra el error y apaga la carga.
    * @param datos Tintas y formato/tipo de sellado consultados con consultarDatosProcesos.
    * @returns Procesos de la OT para la API, o null si faltan las tintas o la combinación de sellado/formato.
    */
@@ -3588,7 +3592,11 @@ export class Orden_TrabajoComponent implements OnInit {
     }, () => this.crearNuevoProducto());
   }
 
-  //Función que se encargará de la creación de un nuevo producto
+  /**
+   * Arma el nuevo producto con los Ids de tipo de sellado y formato (el guardado sigue deshabilitado).
+   * Si la combinación no existe (404) o la consulta falla, avisa y libera la pantalla de carga.
+   * @returns No retorna un valor.
+   */
   crearNuevoProducto() {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
@@ -3621,6 +3629,10 @@ export class Orden_TrabajoComponent implements OnInit {
       }
       console.log(item);
       //this.productoService.srvGuardar(item).subscribe(data => this.crearExistenciaProducto(data), () => this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`));
+    }, (error: HttpErrorResponse) => {
+      this.cargando = false;
+      if (error?.status === 404) this.msj.mensajeError(`¡No existe la combinación de tipo de sellado y formato seleccionada!`, `Verifique el tipo de sellado y el formato del producto terminado.`);
+      else this.msj.mensajeError(`¡No fue posible consultar el tipo de sellado y el formato!`, error?.error);
     });
   }
 
