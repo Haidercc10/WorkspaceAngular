@@ -8,7 +8,7 @@
 export interface OrdenTrabajoDatosBase {
   /** Cantidad pedida en la presentación de la OT; debe ser mayor que 0. */
   Ot_CantidadPedida: number;
-  /** Precio por unidad de la presentación; no puede ser negativo. */
+  /** Precio por unidad de la presentación; debe ser mayor que 0. */
   Ot_ValorUnidad: number;
   /** Margen adicional en porcentaje; no puede ser negativo. */
   Ot_MargenAdicional: number;
@@ -45,17 +45,27 @@ export interface CrearOrdenTrabajoDatos extends OrdenTrabajoDatosBase {
   UndMed_Id: string;
   /** Pedido externo asociado (517: sin pedido). */
   PedExt_Id: number;
+  /**
+   * Nombre (referencia) del producto (máx. 100), solo si se habilitó el cambio de referencia: si difiere del guardado,
+   * la API lo cambia en el maestro antes de crear la OT (y TR_CrearOTs en BagPro y Zeus) y deja el anterior en el historial.
+   */
+  Prod_Nombre?: string | null;
 }
 
 /**
- * Datos generales para editar una OT. Producto, presentación, sede y estado no se pueden cambiar: si se envían y
+ * Datos generales para editar una OT. Producto, presentación y estado no se pueden cambiar: si se envían y
  * difieren de los guardados, la API responde 422. Se envían solo para que la API compruebe que no cambiaron.
  */
 export interface EditarOrdenTrabajoDatos extends OrdenTrabajoDatosBase {
+  /** Sede del cliente: si difiere de la guardada, la OT pasa a ese cliente (Plasticaribe y BagPro). */
   SedeCli_Id?: number | null;
   Prod_Id?: number | null;
   UndMed_Id?: string | null;
   Estado_Id?: number | null;
+  /** Nombre del producto (máx. 100): si difiere del guardado, la API lo actualiza en el maestro (y TR_CrearOTs en BagPro y Zeus). */
+  Prod_Nombre?: string | null;
+  /** Nombre del cliente solo para esta OT (máx. 150); el maestro de clientes no cambia. Igual al del maestro: la OT vuelve a usar ese. */
+  Ot_NombreCliente?: string | null;
 }
 
 /** Datos del proceso de extrusión (sin Ids ni navegaciones). */

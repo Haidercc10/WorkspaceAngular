@@ -23,7 +23,7 @@ import { Mezclas_PigmentosService } from 'src/app/Servicios/MezclasPigmentos/Mez
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import { OrdenTrabajo_Sellado_CorteService } from 'src/app/Servicios/OrdenTrabajo_Sellado_Corte/OrdenTrabajo_Sellado_Corte.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { HistorialNombreProducto, ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { Tipos_ImpresionService } from 'src/app/Servicios/TipoImpresion/Tipos_Impresion.service';
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
@@ -47,6 +47,13 @@ import { OtCalculoCostosService } from 'src/app/Servicios/OrdenTrabajo/OtCalculo
  * pero no se crean OT nuevas con esa presentación (puede llegar desde BagPro como presentación del item).
  */
 const PRESENTACIONES_OT_PERMITIDAS: readonly string[] = ['Kg', 'Paquete', 'Und', 'MTS'];
+
+/**
+ * Roles que pueden crear y editar OT desde esta vista (decisión del responsable, medida temporal mientras se define
+ * quién puede renombrar el maestro de productos). Los demás roles solo consultan y generan el PDF.
+ * La API todavía no aplica esta restricción.
+ */
+const ROLES_GUARDAR_OT: readonly number[] = [1, 98];
 
 /** OT encontrada al consultar por número: en Plasticaribe (editable) o solo en BagPro (plantilla). */
 interface ResultadoBusquedaOT {
@@ -151,6 +158,14 @@ export class Orden_TrabajoComponent implements OnInit {
   private sinPesoParaValorKg: boolean = false; //true si el último cálculo dejó Valor Kg en 0 por falta de Peso Millar (o de cantidad por paquete)
   private valorKgCargado: number | null = null; //Valor Kg guardado de la OT abierta en edición; se conserva cuando la presentación no lo calcula (MTS)
   private rowVersionCargada: string | null = null; //Versión de la fila (rowVersion de getOrdenTrabajo, base64) de la OT abierta en edición; se envía como Ot_RowVersion para detectar ediciones concurrentes (409)
+  private nombresCargados: { sede: any, cliente: string, producto: string } | null = null; //Nombres de cliente y producto con los que se cargó la OT en edición; si cambian, la confirmación lo indica
+  /** true después de intentar crear o editar: la vista resalta en rojo los campos obligatorios vacíos (clase ot-resaltar-obligatorios). */
+  resaltarObligatorios: boolean = false;
+  editandoReferencia: boolean = false; //true si se habilitó (lápiz) el campo Referencia para cambiar el nombre del item; si no, es de solo lectura
+  private referenciaOriginal: string | null = null; //Nombre del item al habilitar el cambio de referencia; se restaura si se cancela
+  modalHistorialNombres: boolean = false; //Muestra el historial de nombres del item
+  historialNombres: HistorialNombreProducto[] = []; //Cambios de nombre del item (más reciente primero)
+  cargandoHistorialNombres: boolean = false; //Indica si se está consultando el historial de nombres
   private avisoSinPesoMostrado: boolean = false; //Indica si la última validación de guardado ya mostró el aviso de Valor Kg 0 (evita repetirlo al confirmar la edición)
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
@@ -214,7 +229,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Id_Vendedor: [null, Validators.required],
       Nombre_Vendedor: [null, Validators.required],
       OT_FechaCreacion: [this.today, Validators.required],
-      OT_FechaEntrega: [null],
+      OT_FechaEntrega: [null, Validators.required], // Obligatoria (la API también la exige)
       Id_Cliente: [null, Validators.required],
       Nombre_Cliente: [null, Validators.required],
       Id_Producto: [null, Validators.required],
@@ -279,9 +294,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Largo_Corte: [null, Validators.required],
       Fuelle_Corte: [null, Validators.required],
       Margen_Corte: [null, Validators.required],
-      Etiqueta_Ancho_Corte: [null, Validators.required],
-      Etiqueta_Largo_Corte: [null, Validators.required],
-      Etiqueta_Fuelle_Corte: [null, Validators.required],
+      Etiqueta_Ancho_Corte: ['0'], // Ya no se muestra en la vista; se conserva el valor cargado para no romper el contrato de la API
+      Calibre_Cliente_Corte: ['0'], // Se guarda y se carga en SelladoCorte_Etiqueta_Largo (EtiquetaLargo en BagPro)
+      Etiqueta_Fuelle_Corte: ['0'], // Ya no se muestra en la vista; se conserva el valor cargado para no romper el contrato de la API
       SelladoCorte_Observacion: [null],
     });
 
@@ -561,9 +576,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Largo_Corte: 0,
       Fuelle_Corte: 0,
       Margen_Corte: 0,
-      Etiqueta_Ancho_Corte: 0,
-      Etiqueta_Largo_Corte: 0,
-      Etiqueta_Fuelle_Corte: 0,
+      Etiqueta_Ancho_Corte: '0',
+      Calibre_Cliente_Corte: '0',
+      Etiqueta_Fuelle_Corte: '0',
     });
   }
 
@@ -694,6 +709,52 @@ export class Orden_TrabajoComponent implements OnInit {
     this.informacionSeleccionada = 0;
     this.valorKgCargado = null;
     this.rowVersionCargada = null;
+    this.nombresCargados = null;
+    this.editandoReferencia = false;
+    this.referenciaOriginal = null;
+    this.resaltarObligatorios = false;
+  }
+
+  /**
+   * Al crear o editar una OT, habilita o cancela el cambio del nombre (referencia) del item. El campo Referencia es de solo
+   * lectura hasta habilitarlo; habilitado, su texto se envía como nuevo nombre: queda en el maestro, en ClientesOT_Item de
+   * BagPro y en Zeus, y el nombre anterior en el historial. Al cancelar, se restaura el nombre que tenía.
+   * @returns No retorna un valor.
+   */
+  alternarEdicionReferencia() {
+    if (this.editandoReferencia) {
+      this.FormOrdenTrabajo.patchValue({ Nombre_Producto: this.referenciaOriginal });
+      this.editandoReferencia = false;
+      this.referenciaOriginal = null;
+      return;
+    }
+    if (!this.producto) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `Primero cargue el item al que le quiere cambiar la referencia.`);
+      return;
+    }
+    this.referenciaOriginal = this.FormOrdenTrabajo.value.Nombre_Producto;
+    this.editandoReferencia = true;
+  }
+
+  /**
+   * Abre el historial de nombres (referencias) del item cargado.
+   * @returns No retorna un valor.
+   */
+  verHistorialNombres() {
+    if (!this.producto) {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `Primero cargue un item.`);
+      return;
+    }
+    this.historialNombres = [];
+    this.modalHistorialNombres = true;
+    this.cargandoHistorialNombres = true;
+    this.productoService.GetHistorialNombres(this.producto).subscribe({
+      next: data => { this.historialNombres = data ?? []; this.cargandoHistorialNombres = false; },
+      error: error => {
+        this.cargandoHistorialNombres = false;
+        this.msj.mensajeError(`¡No fue posible consultar el historial de nombres del item ${this.producto}!`, error?.message ?? '');
+      },
+    });
   }
 
   //Cargar modal de crear producto
@@ -875,7 +936,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar los clientes de la empresa
+  // Funcion que va a consultar los clientes de la empresa (al crear y al editar, para elegir otro cliente).
   consultarClientes = () => {
     let nombre = this.FormOrdenTrabajo.value.Nombre_Cliente;
     if (!nombre || nombre.trim() === '' || nombre.trim().length < 3) return;
@@ -890,12 +951,11 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Coloca la información del cliente seleccionado y su vendedor en el formulario.
-   * En modo edición no hace nada: la sede (cliente) de una OT no se puede cambiar al editar (la API responde 422)
-   * y el campo es de solo lectura.
+   * En modo edición cambia el cliente (sede) de la OT; si no se elige de la lista, el texto escrito queda como
+   * nombre del cliente solo para esa OT.
    * @returns No retorna un valor.
    */
   clienteSeleccionado() {
-    if (this.edicionOrdenTrabajo) return;
     let id_cliente: any = this.FormOrdenTrabajo.value.Nombre_Cliente;
     console.log(this.clientes, id_cliente);
 
@@ -921,19 +981,24 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar los productos de la empresa
+  // Funcion que va a consultar los productos de la empresa. En modo edición no busca: el campo es el nombre del producto
+  // (se actualiza en el maestro al editar la OT); el item se cambia desde el campo "Item".
   consultarProductos() {
+    if (this.edicionOrdenTrabajo || this.editandoReferencia) return;
     let nombreProducto: any = this.FormOrdenTrabajo.get('Nombre_Producto')?.value;
     this.productoService.obtenerItemsLike(nombreProducto).subscribe(data => this.productos = data);
   }
 
   /**
    * Coloca el producto elegido en el formulario y, cuando BagPro responde su presentación, carga la información del item.
+   * En modo edición, o si el texto no corresponde a un producto de la lista, no hace nada (el texto queda como nombre).
    * @returns No retorna un valor.
    */
   productoSeleccionado() {
+    if (this.edicionOrdenTrabajo || this.editandoReferencia) return;
     let id_producto = this.FormOrdenTrabajo.value.Nombre_Producto;
     let producto = this.productos.find(x => x.prod_Id == id_producto);
+    if (!producto) return;
     this.FormOrdenTrabajo.patchValue({
       Id_Producto: producto.prod_Id,
       Nombre_Producto: producto.prod_Nombre,
@@ -1173,6 +1238,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.limpiarProduccionProcesos();
     this.valorKgCargado = null;
     this.rowVersionCargada = null;
+    this.nombresCargados = null;
   }
 
   /**
@@ -1248,6 +1314,9 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   cargarFormularios(dataSedes: any, dataOt: any, ot: number | null) {
+    // Otro item u otra OT: se cancela el cambio de referencia que estuviera habilitado
+    this.editandoReferencia = false;
+    this.referenciaOriginal = null;
     this.llenarDatosCliente(dataSedes ? dataSedes : dataOt)
     this.llenarFormularioOrdenTrabajo(dataOt);
     this.llenarFormularioExtrusion(dataOt);
@@ -1484,7 +1553,11 @@ export class Orden_TrabajoComponent implements OnInit {
       Fuelle_Corte: this.ArrayProducto[0]?.Fuelle || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
       Margen_Corte: data.margen || this.FormOrdenTrabajoCorte.value.Margen_Corte,
       Etiqueta_Ancho_Corte: data.selladoCorte_Etiqueta_Ancho || this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte,
-      Etiqueta_Largo_Corte: data.selladoCorte_Etiqueta_Largo || this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte,
+      // BagPro envía selladoCorte_CalibreCliente (EtiquetaLargo sin respaldo); su selladoCorte_Etiqueta_Largo cae al Largo si está vacío.
+      // Plasticaribe no lo envía y su SelladoCorte_Etiqueta_Largo ya es el valor guardado.
+      Calibre_Cliente_Corte: data.selladoCorte_CalibreCliente !== undefined
+        ? this.textoEtiqueta(data.selladoCorte_CalibreCliente)
+        : (data.selladoCorte_Etiqueta_Largo || this.FormOrdenTrabajoCorte.value.Calibre_Cliente_Corte),
       Etiqueta_Fuelle_Corte: data.selladoCorte_Etiqueta_Fuelle || this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte,
     });
   }
@@ -2428,13 +2501,65 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   validarDatos() {
-    if (this.guardando) return;
+    if (this.guardando || !this.validarRolGuardar()) return;
+    this.resaltarObligatorios = true;
     if (!this.FormOrdenTrabajo.valid) {
-      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+      this.avisarCamposVacios();
       return;
     }
     if (!this.presentacionPermitidaParaCrear()) return;
+    if (!this.validarReferenciaCreacion()) return;
     if (this.prepararFormulariosParaGuardar()) this.guardarOt();
+  }
+
+  /**
+   * Al crear con el cambio de referencia habilitado, comprueba que el nombre nuevo no esté vacío ni supere 100 caracteres
+   * (Productos.Prod_Nombre).
+   * @returns true si es válido o no se está cambiando la referencia; false si no (ya se mostró el aviso).
+   */
+  private validarReferenciaCreacion(): boolean {
+    if (!this.editandoReferencia) return true;
+    const nombre = this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto);
+    if (nombre == null) {
+      this.msj.mensajeAdvertencia(`¡No se puede crear la OT!`, `La referencia (nombre del item) no puede estar vacía.`, 6000);
+      return false;
+    }
+    if (nombre.length > 100) {
+      this.msj.mensajeAdvertencia(`¡No se puede crear la OT!`, `La referencia (nombre del item) no puede tener más de 100 caracteres.`, 6000);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Avisa qué campos obligatorios del formulario principal están vacíos (por su etiqueta en pantalla) y lleva el
+   * cursor al primero. Los campos ya se ven en rojo porque `resaltarObligatorios` está activo.
+   * @returns No retorna un valor.
+   */
+  private avisarCamposVacios() {
+    const vacios = Array.from(document.querySelectorAll<HTMLElement>('#formOrdenTrabajo [formcontrolname].ng-invalid'));
+    const nombres = vacios
+      .map(el => el.closest('.p-float-label')?.querySelector('label')?.textContent?.trim() || el.getAttribute('formcontrolname') || '')
+      .filter((nombre, i, lista) => nombre !== '' && lista.indexOf(nombre) === i);
+    this.msj.mensajeAdvertencia(`¡Hay campos obligatorios vacíos!`,
+      nombres.length ? `Complete los campos resaltados en rojo: ${nombres.join(', ')}.` : `Complete los campos resaltados en rojo.`, 6000);
+    const primero = vacios[0];
+    (primero?.matches('input, textarea') ? primero : primero?.querySelector<HTMLElement>('input, textarea'))?.focus();
+  }
+
+  /** Indica si el rol del usuario puede crear y editar OT (`ROLES_GUARDAR_OT`); la vista oculta los botones si no puede. */
+  get puedeGuardarOT(): boolean {
+    return ROLES_GUARDAR_OT.includes(Number(this.ValidarRol));
+  }
+
+  /**
+   * Bloquea crear o editar si el rol no está autorizado (por si se llama sin pasar por los botones ocultos).
+   * @returns true si el rol puede guardar; false si no (ya se mostró el aviso).
+   */
+  private validarRolGuardar(): boolean {
+    if (this.puedeGuardarOT) return true;
+    this.msj.mensajeAdvertencia(`¡Advertencia!`, `Su rol no tiene permiso para crear ni editar órdenes de trabajo.`);
+    return false;
   }
 
   /**
@@ -2478,6 +2603,7 @@ export class Orden_TrabajoComponent implements OnInit {
     if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
 
     if (!this.validarProductoCargado()) return false;
+    if (!this.validarNombresEdicion()) return false;
     if (!this.calcularDatosOtInmediato(false)) {
       // Sin cálculo la OT se enviaría con costos en 0 (o, al editar, sobrescribiría los guardados)
       const unidad = this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion;
@@ -2507,7 +2633,8 @@ export class Orden_TrabajoComponent implements OnInit {
   /**
    * Comprueba, justo antes de armar el payload, que los valores calculados y numéricos que se envían sean números
    * finitos (sin null, NaN ni Infinity) y que las entradas de costos que teclea el usuario (cantidad, precio, margen,
-   * cantidad por paquete y por bulto) no sean negativas. Si algo no es válido, avisa con los nombres y no deja guardar.
+   * cantidad por paquete y por bulto) no sean negativas, y que el precio unitario sea mayor que 0. Si algo no es válido,
+   * avisa con los nombres y no deja guardar.
    * Si el Valor Kg quedó en 0 por falta de Peso Millar (o de cantidad por paquete), muestra un aviso que no bloquea.
    * @param repetirAvisoSinPeso false no repite el aviso de Valor Kg 0 si la validación anterior ya lo mostró.
    * @returns true si todos los valores son válidos; false si alguno no lo es (ya se mostró el aviso).
@@ -2522,6 +2649,12 @@ export class Orden_TrabajoComponent implements OnInit {
     });
     if (negativos.length > 0) {
       this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `No se permiten valores negativos en: ${negativos.join(', ')}.`, 6000);
+      return false;
+    }
+    // El precio unitario es obligatorio y debe ser mayor que 0 (al crear y al editar); la API aplica la misma regla.
+    const precio = Number(this.FormOrdenTrabajo.value.Precio);
+    if (!Number.isFinite(precio) || precio <= 0) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El precio unitario debe ser mayor que 0.`, 6000);
       return false;
     }
     const noValidos = this.calculoCostos.valoresNoFinitos({
@@ -2580,6 +2713,8 @@ export class Orden_TrabajoComponent implements OnInit {
           'UndMed_Id': this.presentacionProducto,
           'Ot_FechaEntrega': this.fechaEntregaParaApi(),
           'PedExt_Id': 517,
+          // Solo si se habilitó el cambio de referencia; la API lo cambia en el maestro si difiere y guarda el historial
+          'Prod_Nombre': this.editandoReferencia ? this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto) : null,
           'Ot_Observacion': this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
           'Ot_Cyrel': this.cyrel,
           'Ot_Corte': this.corte,
@@ -2817,14 +2952,26 @@ export class Orden_TrabajoComponent implements OnInit {
       'SelladoCorte_PesoPaquete': this.FormOrdenTrabajoSellado.value.PesoPaquete,
       'SelladoCorte_PesoBulto': this.FormOrdenTrabajoSellado.value.PesoBulto,
       'SelladoCorte_PesoProducto': this.pesoProducto,
-      'SelladoCorte_Etiqueta_Ancho': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
-      'SelladoCorte_Etiqueta_Largo': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
-      'SelladoCorte_Etiqueta_Fuelle': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+      'SelladoCorte_Etiqueta_Ancho': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : this.textoEtiqueta(this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte),
+      // En corte, Calibre Cliente se guarda en SelladoCorte_Etiqueta_Largo (EtiquetaLargo en BagPro)
+      'SelladoCorte_Etiqueta_Largo': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : this.textoEtiqueta(this.FormOrdenTrabajoCorte.value.Calibre_Cliente_Corte),
+      'SelladoCorte_Etiqueta_Fuelle': this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : this.textoEtiqueta(this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte),
       'SelladoCorte_PrecioDia_Wik_Mq50': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
       'SelladoCorte_PrecioNoche_Wik_Mq50': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
       'SelladoCorte_PrecioDia_Wik_Mq9': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
       'SelladoCorte_PrecioNoche_Wik_Mq9': this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
     }
+  }
+
+  /**
+   * Convierte un campo de etiqueta de corte en el texto que se guarda: en mayúsculas y sin espacios al inicio o al final.
+   * Vacío o null se guarda como '0' (BagPro trata '' y '0' de EtiquetaLargo como "sin calibre cliente" y usa el de extrusión).
+   * @param valor Valor del formulario.
+   * @returns Texto para SelladoCorte_Etiqueta_*.
+   */
+  private textoEtiqueta(valor: unknown): string {
+    const texto = valor == null ? '' : `${valor}`.trim();
+    return texto === '' ? '0' : texto.toUpperCase();
   }
 
 
@@ -3061,6 +3208,8 @@ export class Orden_TrabajoComponent implements OnInit {
     });
     this.llenarFormularios(datos);
     this.edicionOrdenTrabajo = true;
+    // `cliente` ya es el nombre propio de la OT si se cambió en una edición anterior (Ot_NombreCliente)
+    this.nombresCargados = { sede: datos.id_Cliente, cliente: `${datos.cliente ?? ''}`.trim(), producto: `${datos.producto ?? ''}`.trim() };
   }
 
   /**
@@ -3099,9 +3248,10 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   validarActualizacionOT() {
-    if (this.guardando || this.confirmandoEdicion) return;
+    if (this.guardando || this.confirmandoEdicion || !this.validarRolGuardar()) return;
+    this.resaltarObligatorios = true;
     if (!this.FormOrdenTrabajo.valid) {
-      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
+      this.avisarCamposVacios();
       return;
     }
     let ot: number = this.FormOrdenTrabajo.value.OT_Id;
@@ -3114,7 +3264,8 @@ export class Orden_TrabajoComponent implements OnInit {
       summary: 'Confirmación de Edición de OT',
       detail:
         `<h6><b>Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</b></h6><br>` +
-        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>`,
+        `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>` +
+        this.avisoCambioNombres(),
       sticky: true
     });
   }
@@ -3130,7 +3281,7 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   editarOrdenTrabajo() {
-    if (!this.edicionOrdenTrabajo || this.guardando) return;
+    if (!this.edicionOrdenTrabajo || this.guardando || !this.validarRolGuardar()) return;
     this.cerrarMensaje();
     if (!this.FormOrdenTrabajo.valid) {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
@@ -3188,9 +3339,10 @@ export class Orden_TrabajoComponent implements OnInit {
 
   /**
    * Arma los datos generales editables de la OT (lista blanca de editarCompleta). No envía Ot_Id, número, fecha ni hora
-   * de creación, creador ni estado: los conserva la API y el último editor lo toma del token. Producto, presentación y
-   * sede se envían solo para que la API compruebe que no cambiaron (si difieren responde 422); en pantalla no se
-   * pueden cambiar en modo edición (cambiar el item o la presentación sale del modo edición y el cliente es de solo lectura).
+   * de creación, creador ni estado: los conserva la API y el último editor lo toma del token. Producto y presentación
+   * se envían solo para que la API compruebe que no cambiaron (si difieren responde 422; cambiar el item o la presentación
+   * sale del modo edición). La sede sí se puede cambiar (cliente elegido de la lista).
+   * Sí se envían los nombres: el del producto se actualiza en el maestro y el del cliente se guarda solo en esta OT.
    * @returns Datos generales de la OT para editarla.
    */
   informacionOrdenTrabajo(): EditarOrdenTrabajoDatos {
@@ -3216,8 +3368,70 @@ export class Orden_TrabajoComponent implements OnInit {
       'Ot_ValorOT': this.valorOt,
       'Id_Vendedor': parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
       'MotrarEmpresaEtiquetas': this.motrarEmpresaEtiquetas,
+      // Nombres: el del producto se actualiza en el maestro; el del cliente solo en esta OT (la API decide si cambiaron)
+      'Prod_Nombre': this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto),
+      'Ot_NombreCliente': this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Cliente),
     }
     return info;
+  }
+
+  /**
+   * Quita los espacios al inicio y al final de un nombre del formulario.
+   * @param valor Valor del campo.
+   * @returns El texto sin espacios extremos; null si está vacío.
+   */
+  private textoNombre(valor: unknown): string | null {
+    const texto = valor == null ? '' : `${valor}`.trim();
+    return texto === '' ? null : texto;
+  }
+
+  /**
+   * Arma el aviso de la confirmación de edición con los nombres que van a cambiar respecto a los cargados.
+   * @returns HTML con los cambios de nombre (escapado), o cadena vacía si no hay cambios.
+   */
+  private avisoCambioNombres(): string {
+    if (!this.nombresCargados) return '';
+    const escapar = (texto: string) => texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const cliente = this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Cliente) ?? '';
+    const producto = this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto) ?? '';
+    let aviso = '';
+    if (producto !== this.nombresCargados.producto) {
+      aviso += `<br><span>El nombre del item ${this.producto} cambiará en el maestro de productos, BagPro y Zeus: ` +
+        `<b>${escapar(this.nombresCargados.producto)}</b> → <b>${escapar(producto)}</b>.</span><br>`;
+    }
+    if (`${this.FormOrdenTrabajo.value.Id_Cliente ?? ''}` !== `${this.nombresCargados.sede ?? ''}`) {
+      aviso += `<br><span>El cliente de la OT cambiará (en Plasticaribe y BagPro): ` +
+        `<b>${escapar(this.nombresCargados.cliente)}</b> → <b>${escapar(cliente)}</b>.</span><br>`;
+    } else if (cliente !== this.nombresCargados.cliente) {
+      aviso += `<br><span>El nombre del cliente cambiará solo en esta OT y en su item de BagPro: ` +
+        `<b>${escapar(this.nombresCargados.cliente)}</b> → <b>${escapar(cliente)}</b>.</span><br>`;
+    }
+    return aviso;
+  }
+
+  /**
+   * En modo edición, comprueba que los nombres de producto y cliente no estén vacíos (o solo con espacios) y no superen
+   * el largo que se guarda (Productos.Prod_Nombre: 100; Orden_Trabajo.Ot_NombreCliente: 150, igual a
+   * Existencias_Productos.ExProd_Cliente).
+   * @returns true si son válidos o no se está editando; false si alguno no lo es (ya se mostró el aviso).
+   */
+  private validarNombresEdicion(): boolean {
+    if (!this.edicionOrdenTrabajo) return true;
+    const largos: [string | null, number, string][] = [
+      [this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Producto), 100, 'del producto'],
+      [this.textoNombre(this.FormOrdenTrabajo.value.Nombre_Cliente), 150, 'del cliente'],
+    ];
+    const vacio = largos.find(([texto]) => texto == null);
+    if (vacio) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El nombre ${vacio[2]} no puede estar vacío.`, 6000);
+      return false;
+    }
+    const largo = largos.find(([texto, maximo]) => (texto?.length ?? 0) > maximo);
+    if (largo) {
+      this.msj.mensajeAdvertencia(`¡No se puede guardar la OT!`, `El nombre ${largo[2]} no puede tener más de ${largo[1]} caracteres.`, 6000);
+      return false;
+    }
+    return true;
   }
 
   // Funcion que creará el PDF de la Orden de trabajo

@@ -144,7 +144,7 @@
         <i class="pi pi-users"></i>
         <p-dropdown formControlName="sales" inputId="sales" [autoDisplayFirst]="ValidarRol == 2"
           [readonly]="ValidarRol == 2" [options]="sales" optionValue="usua_Id" optionLabel="usua_Nombre"
-          [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+          [filter]="true" filterBy="usua_Nombre" [showClear]="ValidarRol != 2"></p-dropdown>
         <label for="sales">Vendedores</label>
       </span>
     </div>
@@ -174,6 +174,8 @@
   </ng-template>
   <ng-template pTemplate="header" let-columns>
     <tr>
+      <!-- Primera columna, fija a la izquierda: arte del item -->
+      <th rowspan="2" class="text-center columna-arte" pFrozenColumn [frozen]="true">Arte</th>
       <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field)">
       </th>
       <!--<th rowspan="2" pFrozenColumn alignFrozen="right" [frozen]="true">Crear Orden</th>-->
@@ -187,6 +189,12 @@
   </ng-template>
   <ng-template pTemplate="body" let-data let-columns="columns">
     <tr (dblclick)="crearOrdenTrabajo(data)" class="no-seleccionable cursor" pTooltip="Al hacer doble click en la fila, se moverá los datos al formulario de crear OT." tooltipPosition="top">
+      <!-- Arte del item de la fila (PDF de Aseguramiento de la Calidad): botón rojo de 30x30 px -->
+      <td pFrozenColumn [frozen]="true" class="text-center columna-arte">
+        <button pButton type="button" icon="pi pi-image" class="p-button-danger boton-arte"
+          [pTooltip]="'Ver arte del item N° ' + data.item" tooltipPosition="right"
+          (click)="$event.stopPropagation(); arteItem.abrir(data.item)" (dblclick)="$event.stopPropagation()"></button>
+      </td>
       <td [pEditableColumn]="data" class="cursor" *ngFor="let col of columns">
         <p-cellEditor *ngIf="['Cantidad', 'Precio'].includes(col.header)"> <!---->
           <ng-template pTemplate="input">
@@ -211,3 +219,6 @@
     </tr>
   </ng-template>
 </p-table>
+
+<!-- Visor del arte del item -->
+<app-arte-item #arteItem></app-arte-item>

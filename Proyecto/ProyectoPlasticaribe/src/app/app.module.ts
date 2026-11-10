@@ -132,6 +132,7 @@ import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 import { Orden_FacturacionComponent } from './Vistas/Orden_Facturacion/Orden_Facturacion.component';
 import { Orden_MaquilaComponent } from './Vistas/Orden_Maquila/Orden_Maquila.component';
 import { Orden_TrabajoComponent } from './Vistas/Orden_Trabajo/Orden_Trabajo.component';
+import { ArteItemComponent } from './Vistas/ArteItem/ArteItem.component';
 import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincipal.component';
 import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
@@ -374,6 +375,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     ReporteProduccionComponent,
     ReportesConsolidadosComponent,
     Busqueda_OrdenesTrabajoComponent,
+    ArteItemComponent,
     Produccion_SelladoComponent,
     Produccion_ExtrusionComponent,
     Correos_PaginaWebComponent,

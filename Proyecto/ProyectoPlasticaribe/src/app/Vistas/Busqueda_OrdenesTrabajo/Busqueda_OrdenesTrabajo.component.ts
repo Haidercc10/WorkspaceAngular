@@ -172,8 +172,11 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     let largo: any = this.formFiltros.value.largo;
     let fuelle: any = this.formFiltros.value.fuelle;
     let calibre: any = this.formFiltros.value.calibre;
-    let sales: any = this.ValidarRol == 2
-      ? `${String(this.storage_Id).padStart(3, '0')}`
+    // El rol vendedor (2) solo ve sus OTs; los demás filtran por el vendedor elegido. BagPro guarda el vendedor
+    // (ClientesOT.UsrModifica) con 3 dígitos, por eso se completa con ceros a la izquierda.
+    let idVendedor: any = this.ValidarRol == 2 ? this.storage_Id : this.formFiltros.value.sales;
+    let sales: string | null = idVendedor != null && String(idVendedor).trim() !== ''
+      ? String(idVendedor).trim().padStart(3, '0')
       : null;
     let ruta: string = '';
 
