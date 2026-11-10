@@ -232,14 +232,27 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     ];
   }
 
+  /**
+   * Consulta en una sola petición a Zeus los disponibles (bodega 003) de los ítems listados y los asigna en
+   * `existencia`. Los ítems sin existencia quedan en 0.
+   * @returns No retorna un valor.
+   */
   consultarExistenciasItems() {
-    for (const ot of this.ordenesConsultadas) {
-      let presentacion: string = ot.presentacion;
-      if (presentacion == 'Unidad') presentacion = 'UND';
-      else if (presentacion == 'Kilo') presentacion = 'KLS';
-      else if (presentacion == 'Paquete') presentacion = 'PAQ';
-      this.zeusService.getExistenciasProductos(ot.item, presentacion).subscribe(data => ot.existencia = data.length > 0 ? data[0].disponibles : 0);
-    }
+    const presentacionesZeus: { [key: string]: string } = { 'Unidad': 'UND', 'Kilo': 'KLS', 'Paquete': 'PAQ' };
+    const clave = (item: any, presentacion: string) => `${String(item).trim()}|${presentacion}`;
+    const productos = this.ordenesConsultadas.map(ot => {
+      ot.existencia = 0;
+      return { producto: String(ot.item).trim(), presentacion: presentacionesZeus[ot.presentacion] ?? ot.presentacion };
+    });
+    if (productos.length == 0) return;
+
+    this.zeusService.getExistenciasProductosLote(productos).subscribe({
+      next: data => {
+        const disponibles = new Map<string, number>(data.map(x => [clave(x.producto, x.presentacion), x.disponibles]));
+        this.ordenesConsultadas.forEach((ot, i) => ot.existencia = disponibles.get(clave(productos[i].producto, productos[i].presentacion)) ?? 0);
+      },
+      error: () => this.msj.mensajeError(`¡Ocurrió un error al consultar las existencias de los ítems!`),
+    });
   }
 
   llenarColumnas_BusquedaPorOT() {
