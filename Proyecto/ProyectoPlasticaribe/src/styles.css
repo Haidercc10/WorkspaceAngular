@@ -23,6 +23,12 @@ body {
   font-size: calc(var(--font-size) * 16px);
 }
 
+/* Fondo de la página (index.html: <body class="surface-ground">): gris neutro en lugar del gris azulado del tema.
+   Solo con el tema claro; el oscuro conserva su --surface-ground. PrimeFlex aplica la clase con !important */
+:root:has(#app-theme[href*="light"]) body.surface-ground {
+  background-color: #dee2e6 !important;
+}
+
 .TitulosTabla {
   font-family: "Inter var", sans-serif;
   font-weight: 200;
