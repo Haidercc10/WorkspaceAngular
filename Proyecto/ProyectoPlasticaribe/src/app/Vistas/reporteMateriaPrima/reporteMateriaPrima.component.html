@@ -39,14 +39,14 @@
         </div>
         <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger mr-3" id="consultar" data-tutorial="consultar" (click)="consultarInventario()"></button>
         <!-- Mostrar registros sin stock -->
-        <div class="flex align-items-center" id="con-existencias" data-tutorial="mostrarSinStock" pTooltip="Al marcarlo se muestran también los registros con stock en cero">
-          <p-checkbox [(ngModel)]="mostrarSinStock" [binary]="true" inputId="mostrarSinStock" (onChange)="aplicarFiltroStock()"></p-checkbox>
-          <label for="mostrarSinStock" class="ml-2 cursor-pointer select-none">Mostrar sin Stock</label>
+        <div class="switch-stock" id="con-existencias" data-tutorial="mostrarSinStock" pTooltip="Al activarlo se muestran también los registros con stock en cero">
+          <p-inputSwitch inputId="mostrarSinStock" [(ngModel)]="mostrarSinStock" (onChange)="aplicarFiltroStock()"></p-inputSwitch>
+          <label for="mostrarSinStock" class="cursor-pointer select-none">Mostrar sin Stock</label>
         </div>
       </ng-template>
       <ng-template pTemplate="right">
         <!-- Nueva materias prima -->
-        <button *ngIf="[1,104].includes(ValidarRol)" pButton pRipple label="Crear" id="nuevaMateriaPrima" data-tutorial="crear" icon="pi pi-plus" class="p-button-danger mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
+        <button *ngIf="[1,104].includes(ValidarRol)" pButton pRipple label="Crear" id="nuevaMateriaPrima" data-tutorial="crear" icon="pi pi-plus" class="p-button-danger mr-2" pTooltip="Crear un material nuevo" tooltipPosition="bottom" (click)="LlamarModalCrearMateriaPrima()"></button>
         <!-- Exportar excel -->
         <button pButton pRipple label="Exportar todo" pTooltip="Exportar todas las pestañas en un solo Excel (una hoja por pestaña, sin filtros)" tooltipPosition="left" icon="pi pi-file-excel" class="p-button-success" id="exportar1" data-tutorial="exportarTodo" (click)="exportarTodo()"></button>            
       </ng-template>
@@ -524,6 +524,8 @@
                 <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'id', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'stock', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'reservada', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'disponible', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'unit', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'subtotal', 'contains')"></th>
                 <th></th>
@@ -539,6 +541,12 @@
                 <th class="text-center" id="stock" pSortableColumn="stock" pReorderableColumn scope="col">Stock
                   <p-sortIcon field="stock"></p-sortIcon>
                 </th>
+                <th class="text-center" id="reservada" pSortableColumn="reservada" pReorderableColumn scope="col" pTooltip="Cantidad solicitada y aún no asignada en las solicitudes de material de producción pendientes o parciales" tooltipPosition="top">Cant. Reservada
+                  <p-sortIcon field="reservada"></p-sortIcon>
+                </th>
+                <th class="text-center" id="disponible" pSortableColumn="disponible" pReorderableColumn scope="col" pTooltip="Stock menos la cantidad reservada" tooltipPosition="top">Cant. Disponible
+                  <p-sortIcon field="disponible"></p-sortIcon>
+                </th>
                 <th class="text-center" id="unit" pSortableColumn="unit" pReorderableColumn scope="col">Presentación
                   <p-sortIcon field="unit"></p-sortIcon>
                 </th>
@@ -553,6 +561,8 @@
                 <td class="text-center"><b>{{mp.id}}</b></td>
                 <td>{{mp.reference}}</td>
                 <td class="text-center"><b>{{mp.stock | number : '1.2-2'}}</b></td>
+                <td class="text-center">{{mp.reservada | number : '1.2-2'}}</td>
+                <td class="text-center" [ngClass]="{'disponible-negativo': mp.disponible < 0}"><b>{{mp.disponible | number : '1.2-2'}}</b></td>
                 <td class="text-center">{{mp.unit }}</td>
                 <td class="text-center"><b>${{mp.subtotal | number : '1.2-2'}}</b></td>
                 <td class="text-center" *ngIf="[1,3,4,89,63,98,2,104].includes(ValidarRol)" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" pTooltip="Ver rollos asociados" (click)="loadModalSubcategories(mp)"></p-button></td>
@@ -560,7 +570,11 @@
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="5" class="text-right">Totales</td>
+                <td colspan="3" class="text-right">Totales</td>
+                <td class="text-center">{{totalesSubcategorias.stock | number : '1.2-2'}}</td>
+                <td class="text-center">{{totalesSubcategorias.reservada | number : '1.2-2'}}</td>
+                <td class="text-center" [ngClass]="{'disponible-negativo': totalesSubcategorias.disponible < 0}">{{totalesSubcategorias.disponible | number : '1.2-2'}}</td>
+                <td></td>
                 <td class="text-center">{{totalSubcategories | number : '1.2-2'}}</td>
                 <td></td>
               </tr>
@@ -573,139 +587,198 @@
   </p-tabView>
 </p-card>
 
-<!-- Modal Para Crear Materias Primas -->
-<p-dialog [(visible)]="modalCreacionMateriaPrima" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="¿Qué desea crear?" [modal]="true" styleClass="p-fluid">
+<!-- Modal para elegir qué tipo de material se va a crear -->
+<p-dialog [(visible)]="modalCreacionMateriaPrima" [style]="{width: '560px'}" [breakpoints]="{'640px': '95vw'}" header="¿Qué material desea crear?" [modal]="true" [draggable]="false" [dismissableMask]="true" (onHide)="cerrarModalCreacion()">
   <ng-template pTemplate="content">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <h5>¡Presione el botón de la materia prima que quiere crear!</h5>
+    <div class="opciones-crear">
+      <button type="button" class="opcion-crear" (click)="crearPolientileno()">
+        <i class="pi pi-box"></i>
+        <span class="opcion-titulo">Materia prima</span>
+        <span class="opcion-detalle">Polietilenos y demás materias primas de extrusión</span>
+      </button>
+      <button type="button" class="opcion-crear" (click)="creartinta()">
+        <i class="pi pi-palette"></i>
+        <span class="opcion-titulo">Tinta</span>
+        <span class="opcion-detalle">Tintas, chips y solventes</span>
+      </button>
     </div>
-    <br>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <button pButton pRipple class="p-button-warning" label="Polietilenos" (click)="crearPolientileno()"></button>
-      <br>
-      <button pButton pRipple class="p-button-danger" label="Tintas / Chips / Solventes" (click)="creartinta()"></button>
-    </div>
+    <p class="nota-crear"><i class="pi pi-info-circle"></i> Los rollos de BOPP se registran desde la entrada de BOPP.</p>
   </ng-template>
 </p-dialog>
 
-<!-- Modal Para Crear Materias Primas -->
-<p-dialog [(visible)]="ModalCrearMateriaPrima" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Crear Materia Primas" [modal]="true" >
+<!-- Modal para crear materias primas -->
+<p-dialog [(visible)]="ModalCrearMateriaPrima" [style]="{width: '900px'}" [breakpoints]="{'960px': '95vw'}" [modal]="true" [draggable]="false" (onHide)="cerrarModalCreacion()">
+  <ng-template pTemplate="header">
+    <div class="encabezado-crear">
+      <button pButton pRipple type="button" icon="pi pi-arrow-left" class="p-button-rounded p-button-text p-button-danger boton-volver" pTooltip="Volver a elegir el tipo de material" tooltipPosition="bottom" (click)="volverAOpcionesCrear()"></button>
+      <span class="p-dialog-title">Crear Materia Prima</span>
+    </div>
+  </ng-template>
   <ng-template pTemplate="content">
-    <app-crear-materiaprima></app-crear-materiaprima>
+    <app-crear-materiaprima (creada)="materialCreado($event.matPri_Id, $event.matPri_Nombre)"></app-crear-materiaprima>
   </ng-template>
 </p-dialog>
 
-<!-- Modal Para Crear Tintas -->
-<p-dialog [(visible)]="ModalCrearTintas" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Crear Tintas / Solventes / Chips" [modal]="true" >
+<!-- Modal para crear tintas -->
+<p-dialog [(visible)]="ModalCrearTintas" [style]="{width: '900px'}" [breakpoints]="{'960px': '95vw'}" [modal]="true" [draggable]="false" (onHide)="cerrarModalCreacion()">
+  <ng-template pTemplate="header">
+    <div class="encabezado-crear">
+      <button pButton pRipple type="button" icon="pi pi-arrow-left" class="p-button-rounded p-button-text p-button-danger boton-volver" pTooltip="Volver a elegir el tipo de material" tooltipPosition="bottom" (click)="volverAOpcionesCrear()"></button>
+      <span class="p-dialog-title">Crear Tinta / Chip / Solvente</span>
+    </div>
+  </ng-template>
   <ng-template pTemplate="content">
-    <app-crear-tintas></app-crear-tintas>
+    <app-crear-tintas (creada)="materialCreado($event.tinta_Id, $event.tinta_Nombre)"></app-crear-tintas>
   </ng-template>
 </p-dialog>
 
 <!-- Modal Para Editar Materias Primas -->
-<p-dialog [(visible)]="modalEditarMateriasPrimas" [style]="{width: '400px'}" [resizable]="true" header="Editar Materias Primas" [modal]="true">
+<p-dialog [(visible)]="modalEditarMateriasPrimas" [style]="{width: '760px'}" [breakpoints]="{'800px': '95vw'}" [header]="tituloEdicion" [modal]="true" [draggable]="false">
   <ng-template pTemplate="content">
-    <br>
-    <form [formGroup]="FormEdicionMateriaPrima" (ngSubmit)="editarMateriaPrima()">
-      <div class="mb-3">
-        <div class="row g-4">
+    <form [formGroup]="FormEdicionMateriaPrima" (ngSubmit)="editarMateriaPrima()" class="formulario-editar">
+      <p class="nota-obligatorios">Los campos con <span class="obligatorio">*</span> son obligatorios.</p>
 
-          <!-- ID -->
-          <div class="col-md-12">
-            <span class="p-float-label">
-              <input formControlName="Id" id="Id" type="number" pInputText [readOnly]="true" required/>
-              <label for="Id">ID</label>
-            </span>
-          </div>
-
-          <!-- Nombre -->
-          <div class="col-md-12">
-            <span class="p-float-label">
-              <input formControlName="Nombre" id="Nombre" type="text" pInputText required/>
-              <label for="Nombre">Nombre</label>
-            </span>
-          </div>
-
-          <!-- Categoria -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-dropdown formControlName="Categoria" inputId="Categoria" [options]="categorias" optionValue="catMP_Id" optionLabel="catMP_Nombre" [autoDisplayFirst]="false"></p-dropdown>
-              <label for="Categoria">Categoria</label>
-            </span>
-          </div>
-
-          <!-- SubCategoria -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-dropdown formControlName="subcategory" inputId="subcategory" [options]="subcategoriesInModal" optionValue="subCatMP_Id" optionLabel="subCatMP_Nombre" [autoDisplayFirst]="false"></p-dropdown>
-              <label for="subcategory">Subcategoria</label>
-            </span>
-          </div>
-
-          <!-- Ancho -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="Ancho" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-              <label for="Ancho">Ancho</label>
-            </span>
-          </div>
-
-          <!-- Micras -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="Micras" inputId="Micras" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-              <label for="Micras">Micras</label>
-            </span>
-          </div>
-
-          <!-- Cantidad -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="Stock" inputId="Stock" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-              <label for="Stock">Cantidad</label>
-            </span>
-          </div>
-
-          <!-- Unidad de Medida -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-dropdown formControlName="UndMed" inputId="UndMed" [options]="undMedidas" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false"></p-dropdown>
-              <label for="UndMed">Und. Medida</label>
-            </span>
-          </div>
-
-          <!-- Precio -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="Precio" inputId="Precio" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-              <label for="Precio">Precio</label>
-            </span>
-          </div>
-
-          <!-- Precio Estandar -->
-          <div class="col-md-6">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="PrecioEstandar" inputId="Precio" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-              <label for="Precio">Precio Estandar</label>
-            </span>
-          </div>
-
-          <!-- Nombre BOPP Generico -->
-          <div class="col-md-6" *ngIf="esBopp">
-            <span class="p-float-label">
-              <input formControlName="BoppGenerico" id="BoppGenerico" list="BoppGen" (change)="seleccionarBoppsGenericos()" autocomplete="off" type="text" pInputText pTooltip="Elige el nombre de bopp genérico por ancho y micras asociado al rollo que deseas editar!" [required]="esBopp"/>
-              <datalist id="BoppGen">
-                <option value={{item.boppGen_Id}} *ngFor="let item of boppsGenericos">{{item.boppGen_Nombre}}</option>
-              </datalist>
-              <label for="Nombre">Bopp Genérico</label>
-            </span>
-          </div>
-
-          <!--Boton Ingresar al sistema-->
-          <div class="mb-3 d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple label="Editar" [disabled]="FormEdicionMateriaPrima.invalid" type="submit" class="p-button-success"></button>
-          </div>
+      <div class="row g-4 mb-4">
+        <!-- ID -->
+        <div class="col-12 col-md-4">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-hashtag"></i>
+            <input formControlName="Id" id="editarId" type="number" pInputText [readOnly]="true" class="campo-solo-lectura"/>
+            <label for="editarId">{{ tipoEdicion == 'BOPP' ? 'Serial' : 'Id' }}</label>
+          </span>
         </div>
+
+        <!-- Nombre -->
+        <div class="col-12 col-md-8">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-tag"></i>
+            <input formControlName="Nombre" id="editarNombre" type="text" pInputText autocomplete="off" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('Nombre')}"/>
+            <label for="editarNombre">Nombre <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('Nombre')">Escriba el nombre.</small>
+        </div>
+
+        <!-- Descripción -->
+        <div class="col-12">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-align-left"></i>
+            <input formControlName="Descripcion" id="editarDescripcion" type="text" pInputText autocomplete="off"/>
+            <label for="editarDescripcion">Descripción</label>
+          </span>
+          <small class="ayuda">Si la deja vacía, se usa el nombre.</small>
+        </div>
+
+        <!-- Categoría -->
+        <div class="col-12 col-md-6">
+          <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+            <i class="pi pi-sitemap"></i>
+            <p-dropdown formControlName="Categoria" inputId="editarCategoria" [options]="categoriasEdicion" optionValue="catMP_Id" optionLabel="catMP_Nombre" [autoDisplayFirst]="false" [filter]="true" filterBy="catMP_Nombre" appendTo="body" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('Categoria')}"></p-dropdown>
+            <label for="editarCategoria">Categoría <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('Categoria')">Elija la categoría.</small>
+        </div>
+
+        <!-- Subcategoría (opcional: hay materiales antiguos sin subcategoría) -->
+        <div class="col-12 col-md-6">
+          <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+            <i class="pi pi-list"></i>
+            <p-dropdown formControlName="subcategory" inputId="editarSubcategoria" [options]="subcategoriasEdicion" optionValue="subCatMP_Id" optionLabel="subCatMP_Nombre" [autoDisplayFirst]="false" [filter]="true" filterBy="subCatMP_Nombre" [showClear]="true" appendTo="body" emptyMessage="La categoría no tiene subcategorías"></p-dropdown>
+            <label for="editarSubcategoria">Subcategoría</label>
+          </span>
+          <small class="ayuda aviso" *ngIf="FormEdicionMateriaPrima.value.subcategory == null"><i class="pi pi-exclamation-triangle"></i> Sin subcategoría no aparece en Subcategorías ni en las solicitudes de material.</small>
+        </div>
+
+        <!-- Ancho (BOPP) -->
+        <div class="col-12 col-md-4" *ngIf="esBopp">
+          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+            <i class="pi pi-arrows-h"></i>
+            <p-inputNumber formControlName="Ancho" inputId="editarAncho" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" [min]="0" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('Ancho')}"></p-inputNumber>
+            <label for="editarAncho">Ancho <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('Ancho')">Escriba el ancho.</small>
+        </div>
+
+        <!-- Micras (BOPP) -->
+        <div class="col-12 col-md-4" *ngIf="esBopp">
+          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+            <i class="pi pi-arrows-v"></i>
+            <p-inputNumber formControlName="Micras" inputId="editarMicras" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" [min]="0" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('Micras')}"></p-inputNumber>
+            <label for="editarMicras">Micras <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('Micras')">Escriba las micras.</small>
+        </div>
+
+        <!-- BOPP genérico (BOPP) -->
+        <div class="col-12 col-md-4" *ngIf="esBopp">
+          <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+            <i class="pi pi-th-large"></i>
+            <p-dropdown formControlName="IdBoppGenerico" inputId="editarBoppGenerico" [options]="boppsGenericos" optionValue="boppGen_Id" optionLabel="boppGen_Nombre" [autoDisplayFirst]="false" [filter]="true" filterBy="boppGen_Nombre" appendTo="body" pTooltip="BOPP genérico (por ancho y micras) al que pertenece el rollo" tooltipPosition="top" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('IdBoppGenerico')}"></p-dropdown>
+            <label for="editarBoppGenerico">BOPP genérico <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('IdBoppGenerico')">Elija el BOPP genérico.</small>
+        </div>
+
+        <!-- Stock -->
+        <div class="col-12 col-md-6">
+          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+            <i class="pi pi-chart-bar"></i>
+            <p-inputNumber formControlName="Stock" inputId="editarStock" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('Stock')}"></p-inputNumber>
+            <label for="editarStock">Stock <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('Stock')">Escriba el stock.</small>
+          <small class="ayuda" *ngIf="!campoEdicionInvalido('Stock')">Si cambia el stock se registra un ajuste de entrada o salida.</small>
+        </div>
+
+        <!-- Unidad de medida -->
+        <div class="col-12 col-md-6">
+          <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+            <i class="pi pi-calculator"></i>
+            <p-dropdown formControlName="UndMed" inputId="editarUndMed" [options]="undMedidas" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" appendTo="body" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('UndMed')}"></p-dropdown>
+            <label for="editarUndMed">Unidad <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('UndMed')">Elija la unidad.</small>
+        </div>
+
+        <!-- Precio (solo roles que ven precios) -->
+        <div class="col-12 col-md-6" *ngIf="puedeEditarPrecios">
+          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+            <i class="pi pi-dollar"></i>
+            <p-inputNumber formControlName="Precio" inputId="editarPrecio" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" [min]="0" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('Precio')}"></p-inputNumber>
+            <label for="editarPrecio">Precio unitario <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('Precio')">Escriba el precio (0 o más).</small>
+        </div>
+
+        <!-- Precio estándar (solo roles que ven precios) -->
+        <div class="col-12 col-md-6" *ngIf="puedeEditarPrecios">
+          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+            <i class="pi pi-money-bill"></i>
+            <p-inputNumber formControlName="PrecioEstandar" inputId="editarPrecioEstandar" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" [min]="0" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('PrecioEstandar')}"></p-inputNumber>
+            <label for="editarPrecioEstandar">Precio estándar <span class="obligatorio">*</span></label>
+          </span>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('PrecioEstandar')">Escriba el precio estándar (0 o más).</small>
+          <small class="ayuda" *ngIf="esBopp && !campoEdicionInvalido('PrecioEstandar')">En biorientados se guarda en el BOPP genérico.</small>
+        </div>
+
+        <!-- Código de color (tintas) -->
+        <div class="col-12" *ngIf="tipoEdicion == 'TINTA'">
+          <div class="campo-color">
+            <span class="p-input-icon-left p-float-label">
+              <i class="pi pi-palette"></i>
+              <input formControlName="CodigoHexa" id="editarCodigoHexa" type="text" pInputText autocomplete="off" maxlength="9" [ngClass]="{'ng-invalid ng-dirty': campoEdicionInvalido('CodigoHexa')}"/>
+              <label for="editarCodigoHexa">Código de color (hexadecimal)</label>
+            </span>
+            <p-colorPicker [ngModel]="colorEdicion ?? '#FFFFFF'" [ngModelOptions]="{standalone: true}" format="hex" appendTo="body" (onChange)="elegirColorEdicion($event.value)" pTooltip="Elegir el color" tooltipPosition="top"></p-colorPicker>
+          </div>
+          <small class="mensaje-error" *ngIf="campoEdicionInvalido('CodigoHexa')">Use 3, 6 u 8 dígitos entre 0-9 y A-F (por ejemplo FF0000).</small>
+          <small class="ayuda" *ngIf="!campoEdicionInvalido('CodigoHexa')">Opcional. Elíjalo en el cuadro de color o escríbalo.</small>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-secondary p-button-outlined" [disabled]="guardandoEdicion" (click)="modalEditarMateriasPrimas = false"></button>
+        <button pButton pRipple type="submit" label="Guardar cambios" icon="pi pi-save" class="p-button-danger" [loading]="guardandoEdicion" [disabled]="FormEdicionMateriaPrima.invalid || guardandoEdicion"></button>
       </div>
     </form>
   </ng-template>

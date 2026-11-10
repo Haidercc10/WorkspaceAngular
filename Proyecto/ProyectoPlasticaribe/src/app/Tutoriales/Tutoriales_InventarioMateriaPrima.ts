@@ -62,13 +62,21 @@ export function pasosTutorialInventarioMateriaPrima(ctx : ContextoTutorialInvent
     paso(el('mostrarSinStock'), '¡Mostrar sin Stock!',
       `<p>Por defecto las tablas muestran <b>solo los materiales con stock mayor a cero</b>.</p>
        <ul>
-         <li><b>Marcada:</b> se muestran también los que tienen stock en cero.</li>
-         <li><b>Desmarcada:</b> se vuelven a ocultar.</li>
+         <li><b>Activado:</b> se muestran también los que tienen stock en cero.</li>
+         <li><b>Desactivado:</b> se vuelven a ocultar.</li>
        </ul>
        <p>El cambio es inmediato, no hace falta volver a consultar. Los totales y el Excel tienen en cuenta lo que se está mostrando.</p>`),
 
     puedeCrear && paso(el('crear'), '¡Crear material!',
-      `<p>Con <b>Crear</b> elegimos qué vamos a crear (<b>Polietilenos</b> o <b>Tintas / Chips / Solventes</b>), llenamos los campos y guardamos.</p>`),
+      `<p>Con <b>Crear</b> elegimos qué vamos a crear: una <b>materia prima</b> (polietilenos) o una <b>tinta</b> (tintas, chips y solventes).
+       Los rollos de BOPP no se crean aquí, se registran desde la entrada de BOPP.</p>
+       <ul>
+         <li>Si nos equivocamos de opción, con la flecha <i class="pi pi-arrow-left"></i> junto al título del formulario volvemos a elegir.</li>
+         <li>Los campos con <b>*</b> son obligatorios, entre ellos la <b>subcategoría</b>, que es la que usan las solicitudes de material. El botón de crear se habilita cuando están completos.</li>
+         <li>En las tintas, el <b>color</b> se puede elegir en el cuadro de colores o escribir en hexadecimal (por ejemplo FF0000).</li>
+         <li>No se puede repetir el nombre de un material que ya existe.</li>
+         <li>Podemos crear varios seguidos. El material se crea con stock en cero; al cerrar la ventana el reporte se actualiza y se activa <b>Mostrar sin Stock</b> para verlo.</li>
+       </ul>`),
 
     paso(el('exportarTodo'), '¡Exportar todo!',
       `<p>Descarga <b>un solo Excel</b> con <b>una hoja por cada pestaña</b>.</p>
@@ -105,8 +113,12 @@ export function pasosTutorialInventarioMateriaPrima(ctx : ContextoTutorialInvent
       enPrimeraPestana('#filtros')),
 
     puedeEditarPrimeraPestana && paso(enPestana('th#editar'), '¡Editar!',
-      `<p>Con el botón <i class="pi pi-pencil"></i> de cada fila abrimos una ventana para editar el material: nombre, categoría, ancho, micras, stock, unidad${vePrecios ? ', precios' : ''} y subcategoría.</p>
-       <p>Si es un rollo de BOPP, también se le puede asignar su <b>BOPP genérico</b>.</p>`,
+      `<p>Con el botón <i class="pi pi-pencil"></i> de cada fila abrimos una ventana para editar el material: nombre, descripción, categoría, subcategoría, stock, unidad${vePrecios ? ' y precios' : ''}.</p>
+       <ul>
+         <li>Los campos con <b>*</b> son obligatorios. La subcategoría no lo es, pero sin ella el material no aparece en Subcategorías ni en las solicitudes de material.</li>
+         <li>Si cambiamos el <b>stock</b>, se registra un ajuste de entrada o salida.</li>
+         <li>En los rollos de BOPP también se editan el ancho, las micras y su <b>BOPP genérico</b>; en las tintas, el <b>color</b>.</li>
+       </ul>`,
       enPrimeraPestana('th#editar')),
 
     vePrecios && paso(enPestana('#totales'), '¡Totales!',
@@ -127,7 +139,12 @@ export function pasosTutorialInventarioMateriaPrima(ctx : ContextoTutorialInvent
        <p>Con el botón <i class="pi pi-eye"></i> de cada genérico vemos sus <b>rollos</b>, con las entradas y salidas del <b>rango de fechas</b> consultado.</p>`),
 
     veAgrupados && paso('.tab-subcategorias', '¡Subcategorías!',
-      `<p>Aquí vemos el stock${vePrecios ? ' y el valor' : ''} de los materiales <b>sumados por subcategoría</b>.</p>
+      `<p>Aquí vemos el stock${vePrecios ? ' y el valor' : ''} de los materiales <b>sumados por subcategoría</b>, y además:</p>
+       <ul>
+         <li><b>Cant. Reservada:</b> lo que ya se pidió en las <b>solicitudes de material de producción</b> pendientes o parciales y todavía no se ha asignado.</li>
+         <li><b>Cant. Disponible:</b> el stock menos lo reservado. Sale en <b>rojo</b> si lo reservado supera el stock.</li>
+       </ul>
+       ${veInventarioGeneral ? `<p>Si una subcategoría tiene material reservado pero sus materiales no aparecen en las tablas (por ejemplo, todos con stock en cero), igual sale en la lista para que se vea lo que falta.</p>` : ''}
        <p>Con el botón <i class="pi pi-eye"></i> vemos los materiales que componen cada subcategoría.</p>`),
 
     paso(null, '¡Listo!',

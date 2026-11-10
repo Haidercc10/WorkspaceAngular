@@ -24,6 +24,8 @@ import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_En
 import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 import { SubcategoriasMatPrimaService } from 'src/app/Servicios/Subcategorias_MatPrima/subcategorias-mat-prima.service';
+import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
+import { ReservaInventario } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 
 /** Tablas del reporte que muestran totales en el footer. */
 type TablaInventario = 'general' | 'polietilenos' | 'tintas' | 'biorientados';
@@ -57,12 +59,16 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
   fechaMaxima: Date = moment().endOf('day').toDate(); //Fecha máxima permitida para consultar (hoy)
   pestanaActiva: number = 0; //Índice de la pestaña visible (el tutorial la cambia para mostrar las tablas)
   private tutorialAutomaticoRevisado: boolean = false; //Evita revisar más de una vez si el tutorial debe salir solo
-  mostrarSinStock: boolean = false; //Si está marcado se muestran también los registros con stock en cero (por defecto solo stock mayor a cero)
+  mostrarSinStock: boolean = false; //Si el interruptor está activado se muestran también los registros con stock en cero (por defecto solo stock mayor a cero)
   private inventarioCompleto: Record<TablaInventario, any[]> = { general: [], polietilenos: [], tintas: [], biorientados: [] }; //Inventario consultado sin filtrar por stock
   totales: Record<TablaInventario, TotalTabla> = this.totalesVacios(); //Totales de los footers de cada tabla (respetan los filtros)
   private subInventario?: Subscription; //Suscripción de la consulta de inventario en curso (se cancela si se lanza otra)
   private subBoppsAgrupados?: Subscription; //Suscripción de la consulta de bopps agrupados en curso
   private subModalBopp?: Subscription; //Suscripción de la consulta de rollos del modal en curso
+  private subReservas?: Subscription; //Suscripción de la consulta de cantidades reservadas por subcategoría
+  private reservasSubcategoria = new Map<number, ReservaInventario>(); //Cantidad reservada por subcategoría (solicitudes de material pendientes o parciales)
+  private reservasCargadas: boolean = false; //Indica si ya se consultaron las cantidades reservadas
+  totalesSubcategorias = { stock: 0, reservada: 0, disponible: 0 }; //Totales del pie de la tabla de subcategorías (respetan los filtros)
   private consultasEnCurso: number = 0; //Cantidad de consultas activas, para saber cuándo ocultar la animación de carga
   private rangoConsultado?: { inicio: string, fin: string }; //Último rango consultado con éxito (se muestra en el Excel)
   private boppsAgrupadosCargados: boolean = false; //Indica si ya se consultaron los bopps agrupados
@@ -151,25 +157,30 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
     private srvMovEntradasMP: Movimientos_Entradas_MPService,
     private srvSalidasMP: Entradas_Salidas_MPService,
     private svSubcategories: SubcategoriasMatPrimaService,
+    private srvSolicitudMaterial: SolicitudMP_ExtrusionService,
   ) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
+    //Ancho, micras y BOPP genérico solo son obligatorios en biorientados; los precios solo para quien los puede ver
+    //(los validadores se ajustan al abrir el modal en llamarModalEdicionMateriaPrima).
     this.FormEdicionMateriaPrima = this.frmBuilder.group({
       Id: [null, Validators.required],
-      Nombre: [null, Validators.required],
+      Nombre: [null, [Validators.required, Validators.pattern(/\S/)]],
+      Descripcion: [null],
       Categoria: [null, Validators.required],
-      Ancho: [null, Validators.required],
-      Stock: [null, Validators.required],
+      Ancho: [null],
+      Stock: [null, Validators.required], //Sin mínimo: hay materiales con stock negativo que también se deben poder editar
       Stock2: [null],
       UndMed: [null, Validators.required],
-      Precio: [null, Validators.required],
-      PrecioEstandar: [null, Validators.required],
-      Micras: [null, Validators.required],
-      BoppGenerico: [null],
+      Precio: [null],
+      PrecioEstandar: [null],
+      Micras: [null],
+      CodigoHexa: [null, Validators.pattern(/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/)],
       IdBoppGenerico: [null],
-      subcategory: [null],
+      subcategory: [null], //Opcional: hay registros antiguos sin subcategoría y no se debe obligar a ponerla para editar otra cosa
     });
+    this.FormEdicionMateriaPrima.get('Categoria')!.valueChanges.subscribe(() => this.actualizarSubcategoriasEdicion());
   }
 
   ngOnInit(): void {
@@ -188,6 +199,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
     this.subInventario?.unsubscribe();
     this.subBoppsAgrupados?.unsubscribe();
     this.subModalBopp?.unsubscribe();
+    this.subReservas?.unsubscribe();
     this.tutoriales.cancelar();
   }
 
@@ -369,7 +381,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
     this.aplicarFiltroStock();
   }
 
-  /** Muestra en las tablas solo los registros con stock mayor a cero, o todos si el checkbox "Mostrar sin Stock" está marcado. */
+  /** Muestra en las tablas solo los registros con stock mayor a cero, o todos si el interruptor "Mostrar sin Stock" está activado. */
   aplicarFiltroStock() {
     const filtrar = (filas: any[]) => this.mostrarSinStock ? filas : filas.filter(item => (item.Cant ?? 0) > 0);
     this.ArrayMateriaPrima = filtrar(this.inventarioCompleto.general);
@@ -398,6 +410,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
         next: data => {
           this.rangoConsultado = rango;
           this.cargarInventario(data);
+          if (this.isSubcategory) this.consultarReservas();
         },
         error: error => {
           this.limpiarInventario();
@@ -409,22 +422,62 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
   // Filas que alimentan la pestaña de subcategorías según el rol (los roles de biorientados solo ven sus rollos)
   private filasSubcategorias = (): any[] => this.ArrayMateriaPrima.length > 0 ? this.ArrayMateriaPrima : this.biorientados;
 
-  //Función para cargar los materiales por subcategorias.
+  //Función para cargar los materiales por subcategorias, con su cantidad reservada y disponible.
   loadSubcategories() {
     const mapa = new Map<number, any>();
+    const nuevaFila = (id: number, nombre: string) => ({ id, reference: nombre, stock: 0, reservada: 0, disponible: 0, unit: 'Kg', subtotal: 0 });
     for (const item of this.filasSubcategorias()) {
       if ([null, undefined, 21].includes(item.Subcategoria_Id)) continue;
       let sub = mapa.get(item.Subcategoria_Id);
       if (!sub) {
-        sub = { id: item.Subcategoria_Id, reference: item.Subcategoria, stock: 0, unit: 'Kg', subtotal: 0 };
+        sub = nuevaFila(item.Subcategoria_Id, item.Subcategoria);
         mapa.set(item.Subcategoria_Id, sub);
       }
       sub.stock += item.Cant ?? 0;
       sub.subtotal += item.SubTotal ?? 0;
     }
+    //Subcategorías de materias primas y tintas con material reservado aunque sus materiales no salgan en la tabla
+    //(p. ej. todos con stock en cero): se agregan para que se vea que lo reservado supera lo que hay.
+    if (this.ArrayMateriaPrima.length > 0) {
+      for (const reserva of this.reservasSubcategoria.values()) {
+        if (reserva.subCatMP_Id == 21 || mapa.has(reserva.subCatMP_Id) || (reserva.reservaPendiente ?? 0) <= 0) continue;
+        mapa.set(reserva.subCatMP_Id, nuevaFila(reserva.subCatMP_Id, reserva.subCatMP_Nombre));
+      }
+    }
+    for (const sub of mapa.values()) {
+      sub.reservada = this.reservasSubcategoria.get(sub.id)?.reservaPendiente ?? 0;
+      sub.disponible = sub.stock - sub.reservada;
+    }
     this.subcategories = [...mapa.values()].sort((a, b) => Number(a.id) - Number(b.id));
-    this.totalSubcategories = this.subcategories.reduce((a, b) => a + b.subtotal, 0);
+    this.calcularTotalesSubcategorias(this.subcategories);
     this.ajustarPagina(this.dt_Subcategories, this.subcategories.length);
+  }
+
+  /** Consulta la cantidad reservada por subcategoría (lo solicitado y aún no asignado en las solicitudes de material pendientes o parciales). */
+  consultarReservas() {
+    this.subReservas?.unsubscribe();
+    this.iniciarCarga();
+    this.subReservas = this.srvSolicitudMaterial.getReservas([])
+      .pipe(finalize(() => this.terminarCarga()))
+      .subscribe({
+        next: data => {
+          this.guardarReservas(data);
+          this.loadSubcategories();
+        },
+        error: error => this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar las cantidades reservadas por las solicitudes de material!`)),
+      });
+  }
+
+  private guardarReservas(data: ReservaInventario[]) {
+    this.reservasSubcategoria = new Map((data ?? []).map(r => [r.subCatMP_Id, r] as [number, ReservaInventario]));
+    this.reservasCargadas = true;
+  }
+
+  /** Totales del pie de la tabla de subcategorías. */
+  private calcularTotalesSubcategorias(filas: any[]) {
+    const sumar = (campo: string) => (filas ?? []).reduce((a, b) => a + (b[campo] ?? 0), 0);
+    this.totalSubcategories = sumar('subtotal');
+    this.totalesSubcategorias = { stock: sumar('stock'), reservada: sumar('reservada'), disponible: sumar('disponible') };
   }
 
   //Modal para cargar las materias primas asociadas a la subcategoria seleccionada.
@@ -442,7 +495,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
   applyFilter = ($event, campo: any, valorCampo: string) => this.dt_Subcategories?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Total de la tabla de subcategorías según lo filtrado
-  actualizarTotalSubcategorias = (event: any) => this.totalSubcategories = (event?.filteredValue ?? []).reduce((a, b) => a + (b.subtotal ?? 0), 0);
+  actualizarTotalSubcategorias = (event: any) => this.calcularTotalesSubcategorias(event?.filteredValue ?? []);
 
   // Filtro de la tabla del modal de materiales por subcategoría
   aplicarFiltroMateriales = ($event, campo: any, valorCampo: string) => this.dt_Materiales?.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -526,12 +579,14 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
         };
       case 'subcategorias':
         return {
-          nombre: 'Subcategorias', visible: verPestanasBopp, subtitulo: () => 'Stock actual agrupado por subcategoría',
+          nombre: 'Subcategorias', visible: verPestanasBopp, subtitulo: () => 'Stock actual agrupado por subcategoría. Cant. Reservada: lo solicitado y aún no asignado en las solicitudes de material de producción',
           filas: filtradas(this.dt_Subcategories, this.subcategories),
           columnas: [
             { titulo: 'Id', campo: 'id', ancho: 10 },
             { titulo: 'Subcategoria', campo: 'reference', ancho: 45 },
             { titulo: 'Stock', campo: 'stock', ancho: 18, formato: 'cantidad', total: true, resaltar: true },
+            { titulo: 'Cant. Reservada', campo: 'reservada', ancho: 18, formato: 'cantidad', total: true },
+            { titulo: 'Cant. Disponible', campo: 'disponible', ancho: 18, formato: 'cantidad', total: true },
             { titulo: 'Presentación', campo: 'unit', ancho: 14 },
             ...(verPrecios ? [{ titulo: 'Subtotal', campo: 'subtotal', ancho: 20, formato: 'moneda', total: true } as ColumnaExcel] : []),
           ],
@@ -657,7 +712,10 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
     try {
       //Bopps agrupados y subcategorías se calculan solo al abrir su pestaña; si no se han cargado se cargan aquí.
       if (this.definicionPestanaExcel('boppsAgrupados').visible && !this.boppsAgrupadosCargados) await this.cargarBoppsAgrupadosParaExcel();
-      if (this.definicionPestanaExcel('subcategorias').visible) this.loadSubcategories();
+      if (this.definicionPestanaExcel('subcategorias').visible) {
+        if (!this.reservasCargadas) this.guardarReservas(await firstValueFrom(this.srvSolicitudMaterial.getReservas([])));
+        this.loadSubcategories();
+      }
 
       const { workbook, idLogo } = this.nuevoLibroExcel();
       const pestanas: PestanaExcel[] = ['materiasPrimas', 'polietilenos', 'tintas', 'biorientados', 'boppsAgrupados', 'subcategorias'];
@@ -732,151 +790,291 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
     this.ModalCrearTintas = true;
   }
 
+  /** Botón "volver" de los formularios: cierra el formulario y vuelve a mostrar las opciones de qué crear. */
+  volverAOpcionesCrear() {
+    this.modalCreacionMateriaPrima = true;
+    this.ModalCrearMateriaPrima = false;
+    this.ModalCrearTintas = false;
+  }
+
+  /** Materiales creados mientras el modal estaba abierto (se muestran al cerrarlo). */
+  private materialesCreados: { id: number, nombre: string }[] = [];
+
+  /** Se ejecuta cada vez que el formulario crea un material: se guarda para refrescar el reporte al cerrar el modal. */
+  materialCreado(id: number, nombre: string) {
+    this.materialesCreados.push({ id, nombre });
+  }
+
+  /**
+   * Al cerrar el modal de creación se vuelve a consultar el inventario para que aparezca lo creado.
+   * Como los materiales nuevos tienen stock en cero, se activa "Mostrar sin Stock" para que no queden ocultos.
+   */
+  cerrarModalCreacion() {
+    //Si se pasó de un modal a otro (elegir tipo <-> formulario) todavía no se ha terminado de crear.
+    if (this.modalCreacionMateriaPrima || this.ModalCrearMateriaPrima || this.ModalCrearTintas) return;
+    if (this.materialesCreados.length == 0) return;
+    const creados = this.materialesCreados.map(m => `${m.nombre} (Id ${m.id})`).join(', ');
+    this.materialesCreados = [];
+    this.mostrarSinStock = true;
+    this.consultarInventario();
+    this.msj.mensajeInformacion(`Inventario actualizado`, `Se activó "Mostrar sin Stock" para ver lo creado: ${creados}.`, 6000);
+  }
+
+  //#region Edición de materiales
+  readonly categoriasTintas: number[] = [7, 8, 13]; //Tintas, chips y solventes
+  categoriasEdicion: any[] = []; //Categorías que se pueden elegir según el tipo de material que se edita
+  subcategoriasEdicion: any[] = []; //Subcategorías de la categoría elegida
+  guardandoEdicion: boolean = false; //Evita enviar dos veces la misma edición
+
+  /** Tipo del material que se está editando (tabla de origen). */
+  get tipoEdicion(): 'MP' | 'TINTA' | 'BOPP' | undefined { return this.materialSeleccionado?.Tipo; }
+
+  /** Si el usuario puede ver y cambiar precios (los demás roles ven el precio en cero y no se debe guardar ese cero). */
+  get puedeEditarPrecios(): boolean { return [1, 104].includes(this.ValidarRol); }
+
+  /** Título del modal de edición según el tipo de material. */
+  get tituloEdicion(): string {
+    return this.tipoEdicion == 'TINTA' ? 'Editar Tinta / Chip / Solvente' : this.tipoEdicion == 'BOPP' ? 'Editar Biorientado' : 'Editar Materia Prima';
+  }
+
+  /** Si el campo quedó vacío/inválido después de tocarlo (para resaltarlo en rojo). */
+  campoEdicionInvalido = (campo: string): boolean => {
+    const control = this.FormEdicionMateriaPrima.get(campo);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  /** Color de 6 dígitos para la vista previa del selector de color de tintas (null si no es válido). */
+  get colorEdicion(): string | null {
+    const codigo: string = (this.FormEdicionMateriaPrima.value.CodigoHexa ?? '').trim().replace(/^#/, '');
+    if (!codigo || this.FormEdicionMateriaPrima.get('CodigoHexa')?.invalid) return null;
+    if (codigo.length == 3) return '#' + codigo.split('').map(c => c + c).join('');
+    return '#' + codigo.substring(0, 6);
+  }
+
+  /** El selector de color entrega el código sin #; se guarda en mayúsculas. */
+  elegirColorEdicion(color: string | object) {
+    if (typeof color !== 'string') return;
+    this.FormEdicionMateriaPrima.patchValue({ CodigoHexa: color.replace(/^#/, '').toUpperCase() });
+    this.FormEdicionMateriaPrima.get('CodigoHexa')?.markAsDirty();
+  }
+
+  /** Subcategorías de la categoría elegida. Si el material tenía una de otra categoría se conserva en la lista para no perderla. */
+  private actualizarSubcategoriasEdicion() {
+    const categoria = this.FormEdicionMateriaPrima.get('Categoria')?.value;
+    const actual = this.FormEdicionMateriaPrima.get('subcategory')?.value;
+    const lista = (this.subcategoriesInModal ?? []).filter(s => s.catMP_Id == categoria);
+    const original = this.materialSeleccionado?.Subcategoria_Id;
+    if (original != null && !lista.some(s => s.subCatMP_Id == original) && categoria == this.materialSeleccionado?.Categoria_Id) {
+      const sub = (this.subcategoriesInModal ?? []).find(s => s.subCatMP_Id == original);
+      if (sub) lista.unshift(sub);
+    }
+    this.subcategoriasEdicion = lista;
+    if (actual != null && !lista.some(s => s.subCatMP_Id == actual)) this.FormEdicionMateriaPrima.patchValue({ subcategory: null }, { emitEvent: false });
+  }
+
+  /** Ajusta qué campos son obligatorios según el tipo de material y el rol. */
+  private configurarValidacionesEdicion(esBopp: boolean) {
+    const reglas: { [campo: string]: any[] | null } = {
+      Ancho: esBopp ? [Validators.required, Validators.min(0)] : null,
+      Micras: esBopp ? [Validators.required, Validators.min(0)] : null,
+      IdBoppGenerico: esBopp ? [Validators.required] : null,
+      Precio: this.puedeEditarPrecios ? [Validators.required, Validators.min(0)] : null,
+      PrecioEstandar: this.puedeEditarPrecios ? [Validators.required, Validators.min(0)] : null,
+    };
+    for (const [campo, validadores] of Object.entries(reglas)) {
+      const control = this.FormEdicionMateriaPrima.get(campo);
+      control?.setValidators(validadores);
+      control?.updateValueAndValidity({ emitEvent: false });
+    }
+  }
+
   // Funcion que va a llamar el modal donde se editará la información de la materia prima
   llamarModalEdicionMateriaPrima(data: any) {
     this.materialSeleccionado = data;
-    this.cargarBoppsGenericos();
-    this.modalEditarMateriasPrimas = true;
-    this.FormEdicionMateriaPrima.patchValue({
+    this.esBopp = data.Tipo == 'BOPP';
+    this.idBoppGenerico = 1;
+    this.guardandoEdicion = false;
+    if (this.esBopp && this.boppsGenericos.length == 0) this.cargarBoppsGenericos();
+
+    //Categorías según el tipo: las tintas solo entre las de tintas y los demás materiales sin las de tintas.
+    this.categoriasEdicion = (this.categorias ?? []).filter(c => (data.Tipo == 'TINTA') == this.categoriasTintas.includes(c.catMP_Id));
+    if (!this.categoriasEdicion.some(c => c.catMP_Id == data.Categoria_Id)) {
+      const actual = (this.categorias ?? []).find(c => c.catMP_Id == data.Categoria_Id);
+      if (actual) this.categoriasEdicion = [actual, ...this.categoriasEdicion];
+    }
+
+    this.FormEdicionMateriaPrima.reset({
       Id: data.Id,
       Nombre: data.Nombre,
+      Descripcion: data.Descripcion ?? data.Nombre,
       Categoria: data.Categoria_Id,
-      Ancho: data.Ancho,
+      Ancho: this.esBopp ? data.Ancho : 0,
+      Micras: this.esBopp ? data.Micras : 0,
       Stock: data.Cant,
       Stock2: data.Cant2,
       UndMed: data.UndCant,
       Precio: data.PrecioUnd,
-      Micras: 0,
       PrecioEstandar: data.PrecioEstandar,
+      CodigoHexa: null,
+      IdBoppGenerico: null,
       subcategory: data.Subcategoria_Id,
-    });
+    }, { emitEvent: false });
+    this.actualizarSubcategoriasEdicion();
+    this.configurarValidacionesEdicion(this.esBopp);
+    this.modalEditarMateriasPrimas = true;
+
+    //Datos que no vienen en la tabla del reporte
     if (data.Tipo == 'BOPP') {
-      this.esBopp = true;
-      this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          this.FormEdicionMateriaPrima.patchValue({ Micras: data[i].bopP_CantidadMicras, IdBoppGenerico: data[i].boppGen_Id, BoppGenerico: data[i].boppGen_Id, });
-          this.idBoppGenerico = data[i].boppGen_Id;
-        }
-        setTimeout(() => { this.seleccionarBoppsGenericos(); }, 3000);
+      this.boppService.srvObtenerListaPorSerial(data.Id).subscribe(rollos => {
+        const rollo = (rollos ?? [])[0];
+        if (!rollo) return;
+        this.idBoppGenerico = rollo.boppGen_Id ?? 1;
+        this.FormEdicionMateriaPrima.patchValue({ Micras: rollo.bopP_CantidadMicras, Ancho: rollo.bopP_Ancho ?? data.Ancho, IdBoppGenerico: rollo.boppGen_Id });
       });
-    } else {
-      this.FormEdicionMateriaPrima.patchValue({ Micras: 0, Ancho: 0, IdBoppGenerico: null, BoppGenerico: null, });
-      this.esBopp = false;
+    } else if (data.Tipo == 'TINTA') {
+      this.tintasService.srvObtenerListaPorId(data.Id).subscribe(tinta => this.FormEdicionMateriaPrima.patchValue({ CodigoHexa: tinta?.tinta_CodigoHexadecimal || null }));
     }
+  }
+
+  /** Termina la edición con éxito: recarga el inventario y cierra el modal. */
+  private edicionGuardada(titulo: string, detalle: string) {
+    this.consultarInventario();
+    this.msj.mensajeConfirmacion(titulo, detalle);
+    this.modalEditarMateriasPrimas = false;
+    this.esBopp = false;
+    this.idBoppGenerico = 1;
+  }
+
+  /** Error al editar: se deja el modal abierto para que el usuario pueda corregir o reintentar. */
+  private edicionFallida(mensaje: string, error?: any) {
+    this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, mensaje), 5000);
   }
 
   // Funcion que va a editar una materia primas
   editarMateriaPrima() {
+    if (this.FormEdicionMateriaPrima.invalid) {
+      this.FormEdicionMateriaPrima.markAllAsTouched();
+      this.msj.mensajeAdvertencia('Advertencia', '¡Debe llenar los campos obligatorios (*)!');
+      return;
+    }
+    if (this.guardandoEdicion) return;
+    const valores = this.FormEdicionMateriaPrima.value;
+    const nombre: string = (valores.Nombre ?? '').trim().toUpperCase();
+    const descripcion: string = (valores.Descripcion ?? '').trim().toUpperCase() || nombre;
+    const subcategoria = valores.subcategory ?? null;
+    const terminar = () => this.guardandoEdicion = false;
+    this.guardandoEdicion = true;
+
     //Se decide la tabla a actualizar por el origen del registro (Tipo) y no por la categoría elegida en el formulario,
     //así cambiar la categoría no envía el registro a la tabla equivocada.
-    const tipo: string = this.materialSeleccionado?.Tipo;
+    //Se consulta el registro completo antes de guardar porque el PUT reemplaza todos los campos (fecha, hora, color...).
+    const tipo = this.tipoEdicion;
     if (tipo == 'MP') {
-      const info: modelMateriaPrima = {
-        MatPri_Id: this.FormEdicionMateriaPrima.value.Id,
-        MatPri_Nombre: this.FormEdicionMateriaPrima.value.Nombre,
-        MatPri_Descripcion: this.FormEdicionMateriaPrima.value.Nombre,
-        MatPri_Stock: this.FormEdicionMateriaPrima.value.Stock,
-        UndMed_Id: this.FormEdicionMateriaPrima.value.UndMed,
-        CatMP_Id: this.FormEdicionMateriaPrima.value.Categoria,
-        MatPri_Precio: this.FormEdicionMateriaPrima.value.Precio,
-        TpBod_Id: 4,
-        MatPri_PrecioEstandar: this.FormEdicionMateriaPrima.value.PrecioEstandar,
-        SubCatMP_Id: this.FormEdicionMateriaPrima.value.subcategory,
-      }
-      this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {
-        this.crearAjustesMP(info.MatPri_Id, 2001, 1);
-        this.consultarInventario();
-        this.msj.mensajeConfirmacion(`¡Polietileno Actualizado!`, `¡La materia prima con el nombre '${info.MatPri_Nombre}' ha sido actualizada con exito!`);
-        this.modalEditarMateriasPrimas = false;
-        this.esBopp = false;
-        this.idBoppGenerico = 1;
-      }, () => {
-        this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la materia prima!`);
-        this.modalEditarMateriasPrimas = false;
-        this.esBopp = false;
-        this.idBoppGenerico = 1;
+      this.materiaPrimaService.srvObtenerListaPorId(valores.Id).subscribe({
+        next: original => {
+          const info: any = {
+            MatPri_Id: valores.Id,
+            MatPri_Nombre: nombre,
+            MatPri_Descripcion: descripcion,
+            MatPri_Stock: valores.Stock,
+            UndMed_Id: valores.UndMed,
+            CatMP_Id: valores.Categoria,
+            MatPri_Precio: this.puedeEditarPrecios ? valores.Precio : original.matPri_Precio,
+            TpBod_Id: original.tpBod_Id ?? 4,
+            MatPri_Fecha: original.matPri_Fecha,
+            MatPri_Hora: original.matPri_Hora,
+            MatPri_PrecioEstandar: this.puedeEditarPrecios ? valores.PrecioEstandar : original.matPri_PrecioEstandar,
+            SubCatMP_Id: subcategoria,
+          };
+          this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).pipe(finalize(terminar)).subscribe({
+            next: () => {
+              this.crearAjustesMP(info.MatPri_Id, 2001, 1);
+              this.edicionGuardada(`¡Materia prima actualizada!`, `¡La materia prima '${info.MatPri_Nombre}' se actualizó con éxito!`);
+            },
+            error: error => this.edicionFallida(`¡Ocurrió un error al actualizar la materia prima!`, error),
+          });
+        },
+        error: error => { terminar(); this.edicionFallida(`¡No se pudo consultar la materia prima a editar!`, error); },
       });
     } else if (tipo == 'TINTA') {
-      this.tintasService.srvObtenerListaPorId(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
-        const info: modelTintas = {
-          Tinta_Id: this.FormEdicionMateriaPrima.value.Id,
-          Tinta_Nombre: this.FormEdicionMateriaPrima.value.Nombre,
-          Tinta_Descripcion: this.FormEdicionMateriaPrima.value.Nombre,
-          Tinta_CodigoHexadecimal: this.FormEdicionMateriaPrima.value.Nombre,
-          Tinta_Stock: this.FormEdicionMateriaPrima.value.Stock,
-          UndMed_Id: this.FormEdicionMateriaPrima.value.UndMed,
-          Tinta_Precio: this.FormEdicionMateriaPrima.value.Precio,
-          CatMP_Id: this.FormEdicionMateriaPrima.value.Categoria,
-          TpBod_Id: data.tpBod_Id,
-          Tinta_InvInicial: data.tinta_InvInicial,
-          Tinta_FechaIngreso: data.tinta_FechaIngreso,
-          Tinta_Hora: data.tinta_Hora,
-          Tinta_PrecioEstandar: this.FormEdicionMateriaPrima.value.PrecioEstandar,
-          SubCatMP_Id: this.FormEdicionMateriaPrima.value.subcategory,
-        }
-        if (info.Tinta_Id != null) {
-          this.tintasService.srvActualizar(info.Tinta_Id, info).subscribe(() => {
-            if (info.Tinta_Id != null) {
-              this.crearAjustesMP(84, info.Tinta_Id, 1);
-              this.consultarInventario();
-              this.msj.mensajeConfirmacion(`¡Tinta Actualizada!`, `¡La tinta con el nombre '${info.Tinta_Nombre}' ha sido actualizada con exito!`);
-              this.modalEditarMateriasPrimas = false;
-              this.esBopp = false;
-              this.idBoppGenerico = 1;
-            }
-          }, () => {
-            this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la tinta!`);
-            this.modalEditarMateriasPrimas = false;
-            this.esBopp = false;
-            this.idBoppGenerico = 1;
-          })
-        }
-
+      this.tintasService.srvObtenerListaPorId(valores.Id).subscribe({
+        next: data => {
+          const info: modelTintas = {
+            Tinta_Id: valores.Id,
+            Tinta_Nombre: nombre,
+            Tinta_Descripcion: descripcion,
+            Tinta_CodigoHexadecimal: (valores.CodigoHexa ?? '').trim().replace(/^#/, '').toUpperCase(),
+            Tinta_Stock: valores.Stock,
+            UndMed_Id: valores.UndMed,
+            Tinta_Precio: this.puedeEditarPrecios ? valores.Precio : data.tinta_Precio,
+            CatMP_Id: valores.Categoria,
+            TpBod_Id: data.tpBod_Id,
+            Tinta_InvInicial: data.tinta_InvInicial,
+            Tinta_FechaIngreso: data.tinta_FechaIngreso,
+            Tinta_Hora: data.tinta_Hora,
+            Tinta_PrecioEstandar: this.puedeEditarPrecios ? valores.PrecioEstandar : data.tinta_PrecioEstandar,
+            SubCatMP_Id: subcategoria,
+          };
+          this.tintasService.srvActualizar(valores.Id, info).pipe(finalize(terminar)).subscribe({
+            next: () => {
+              this.crearAjustesMP(84, valores.Id, 1);
+              this.edicionGuardada(`¡Tinta actualizada!`, `¡La tinta '${info.Tinta_Nombre}' se actualizó con éxito!`);
+            },
+            error: error => this.edicionFallida(`¡Ocurrió un error al actualizar la tinta!`, error),
+          });
+        },
+        error: error => { terminar(); this.edicionFallida(`¡No se pudo consultar la tinta a editar!`, error); },
       });
     } else if (tipo == 'BOPP') {
-      this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          const info: modelBOPP = {
-            BOPP_Id: data[i].bopP_Id,
-            BOPP_Nombre: `${this.FormEdicionMateriaPrima.value.Nombre}`,
-            BOPP_Descripcion: this.FormEdicionMateriaPrima.value.Nombre,
-            BOPP_Serial: data[i].bopP_Serial,
-            BOPP_CantidadMicras: this.FormEdicionMateriaPrima.value.Micras,
-            UndMed_Id: data[i].undMed_Id,
-            CatMP_Id: this.FormEdicionMateriaPrima.value.Categoria,
-            BOPP_Precio: this.FormEdicionMateriaPrima.value.Precio,
-            TpBod_Id: data[i].tpBod_Id,
-            BOPP_FechaIngreso: data[i].bopP_FechaIngreso,
-            BOPP_Ancho: this.FormEdicionMateriaPrima.value.Ancho,
-            BOPP_Stock: this.FormEdicionMateriaPrima.value.Stock,
-            UndMed_Kg: this.FormEdicionMateriaPrima.value.UndMed,
-            BOPP_CantidadInicialKg: data[i].bopP_CantidadInicialKg,
-            Usua_Id: data[i].usua_Id,
-            BOPP_Hora: data[i].bopP_Hora,
-            BoppGen_Id: this.FormEdicionMateriaPrima.value.IdBoppGenerico == null ? this.idBoppGenerico : this.FormEdicionMateriaPrima.value.IdBoppGenerico,
-            BOPP_CodigoDoc: data[i].bopP_CodigoDoc,
-            BOPP_TipoDoc: data[i].bopP_TipoDoc,
-            Prov_Id: data[i].prov_Id,
-            SubCatMP_Id: this.FormEdicionMateriaPrima.value.subcategory,
+      this.boppService.srvObtenerListaPorSerial(valores.Id).subscribe({
+        next: rollos => {
+          const rollo = (rollos ?? [])[0];
+          if (!rollo) {
+            terminar();
+            this.edicionFallida(`¡No se encontró el rollo a editar!`);
+            return;
           }
-          this.servicioBoppGen.PutPrecioEstandar(this.idBoppGenerico, this.FormEdicionMateriaPrima.value.PrecioEstandar).subscribe();
-          this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
-            this.crearAjustesMP(84, 2001, info.BoppGen_Id);
-            this.consultarInventario();
-            this.msj.mensajeConfirmacion(`¡Biorientado Actualizado!`, `El biorientado con el nombre '${info.BOPP_Nombre}' ha sido actualizado con exito!`);
-            this.modalEditarMateriasPrimas = false;
-            this.esBopp = false;
-            this.idBoppGenerico = 1;
-          }, () => {
-            this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar el biorientado!`);
-            this.modalEditarMateriasPrimas = false;
-            this.esBopp = false;
-            this.idBoppGenerico = 1;
-          })
-        }
+          const boppGenerico = valores.IdBoppGenerico ?? this.idBoppGenerico;
+          const info: modelBOPP = {
+            BOPP_Id: rollo.bopP_Id,
+            BOPP_Nombre: nombre,
+            BOPP_Descripcion: descripcion,
+            BOPP_Serial: rollo.bopP_Serial,
+            BOPP_CantidadMicras: valores.Micras,
+            UndMed_Id: rollo.undMed_Id,
+            CatMP_Id: valores.Categoria,
+            BOPP_Precio: this.puedeEditarPrecios ? valores.Precio : rollo.bopP_Precio,
+            TpBod_Id: rollo.tpBod_Id,
+            BOPP_FechaIngreso: rollo.bopP_FechaIngreso,
+            BOPP_Ancho: valores.Ancho,
+            BOPP_Stock: valores.Stock,
+            UndMed_Kg: valores.UndMed,
+            BOPP_CantidadInicialKg: rollo.bopP_CantidadInicialKg,
+            Usua_Id: rollo.usua_Id,
+            BOPP_Hora: rollo.bopP_Hora,
+            BoppGen_Id: boppGenerico,
+            BOPP_CodigoDoc: rollo.bopP_CodigoDoc,
+            BOPP_TipoDoc: rollo.bopP_TipoDoc,
+            Prov_Id: rollo.prov_Id,
+            SubCatMP_Id: subcategoria,
+          };
+          //El precio estándar es del BOPP genérico: se actualiza el genérico que quedó asignado al rollo.
+          if (this.puedeEditarPrecios) this.servicioBoppGen.PutPrecioEstandar(boppGenerico, valores.PrecioEstandar).subscribe();
+          this.boppService.srvActualizar(info.BOPP_Id, info).pipe(finalize(terminar)).subscribe({
+            next: () => {
+              this.crearAjustesMP(84, 2001, info.BoppGen_Id);
+              this.edicionGuardada(`¡Biorientado actualizado!`, `¡El biorientado '${info.BOPP_Nombre}' se actualizó con éxito!`);
+            },
+            error: error => this.edicionFallida(`¡Ocurrió un error al actualizar el biorientado!`, error),
+          });
+        },
+        error: error => { terminar(); this.edicionFallida(`¡No se pudo consultar el rollo a editar!`, error); },
       });
+    } else {
+      this.guardandoEdicion = false;
     }
   }
+  //#endregion
 
   /** Función que consultará la información del BOPP agrupado por genérico. */
   boppsAgrupados_Genericos() {
@@ -985,6 +1183,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
     } else if (tab.includes('Subcategorias')) {
       this.isSubcategory = true;
       this.loadSubcategories();
+      this.consultarReservas();
     }
   }
 
@@ -1002,15 +1201,6 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
         this.boppsGenericos.push(data[index])
       }
     });
-  }
-
-  /** Función para seleccionar el nombre del bopp en el campo, pero su valor será el Id. */
-  seleccionarBoppsGenericos() {
-    let bopp: any = this.FormEdicionMateriaPrima.value.BoppGenerico;
-    let nuevo: any = [];
-    nuevo = this.boppsGenericos.filter((item) => item.boppGen_Id == bopp);
-    if (nuevo.length == 0) return;
-    this.FormEdicionMateriaPrima.patchValue({ BoppGenerico: nuevo[0].boppGen_Nombre, IdBoppGenerico: nuevo[0].boppGen_Id });
   }
 
   //Función que creará ajustes de entradas/salidas de materia prima

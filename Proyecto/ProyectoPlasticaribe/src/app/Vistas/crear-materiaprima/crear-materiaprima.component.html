@@ -1,73 +1,81 @@
-<br>
+<form [formGroup]="materiPrima" (ngSubmit)="registrarMateriPrima()" class="formulario-crear">
+  <p class="nota-obligatorios">Los campos con <span class="obligatorio">*</span> son obligatorios. El material se crea con stock en cero.</p>
 
-<form [formGroup]="materiPrima">
-  <div class="mb-3">
-    <div class="row g-4">
+  <div class="row g-4 mb-4">
+    <!-- Nombre -->
+    <div class="col-12 col-md-6">
+      <span class="p-input-icon-left p-float-label">
+        <i class="pi pi-tag"></i>
+        <input formControlName="mpNombre" id="mpNombre" type="text" pInputText autocomplete="off" (input)="cargarDescripcion()" [ngClass]="{'ng-invalid ng-dirty': invalido('mpNombre')}"/>
+        <label for="mpNombre">Nombre <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('mpNombre')">Escriba el nombre.</small>
+    </div>
 
-      <!-- Nombre Materia Prima -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <input formControlName="mpNombre" id="mpNombre" type="text" pInputText (keyup)="cargarDescripcion()" required/>
-          <label for="mpNombre">Nombre</label>
-        </span>
-      </div>
+    <!-- Descripción -->
+    <div class="col-12 col-md-6">
+      <span class="p-input-icon-left p-float-label">
+        <i class="pi pi-align-left"></i>
+        <input formControlName="mpDescripcion" id="mpDescripcion" type="text" pInputText autocomplete="off" (input)="editarDescripcion()"/>
+        <label for="mpDescripcion">Descripción</label>
+      </span>
+      <small class="ayuda">Si la deja igual, se usa el nombre.</small>
+    </div>
 
-      <!-- Descripción -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <input formControlName="mpDescripcion" id="mpDescripcion" type="text" pInputText required/>
-          <label for="mpDescripcion">Descripción</label>
-        </span>
-      </div>
+    <!-- Categoría -->
+    <div class="col-12 col-md-4">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-sitemap"></i>
+        <p-dropdown formControlName="mpCategoria" inputId="mpCategoria" optionValue="catMP_Id" optionLabel="catMP_Nombre" [options]="nombreCategoriasMP" [autoDisplayFirst]="false" [filter]="true" filterBy="catMP_Nombre" appendTo="body" [ngClass]="{'ng-invalid ng-dirty': invalido('mpCategoria')}"></p-dropdown>
+        <label for="mpCategoria">Categoría <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('mpCategoria')">Elija la categoría.</small>
+    </div>
 
-      <!-- CATEGORIA  -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <p-dropdown formControlName="mpCategoria" inputId="mpCategoria" optionValue="catMP_Id" [autoDisplayFirst]="false" [options]="nombreCategoriasMP" optionLabel="catMP_Nombre" (onChange)="getSubcategoriesForId()"></p-dropdown>
-          <label for="mpCategoria">Categoria</label>
-        </span>
-      </div>
+    <!-- Subcategoría -->
+    <div class="col-12 col-md-4">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-list"></i>
+        <p-dropdown formControlName="mpSubcategory" inputId="mpSubcategory" optionValue="subCatMP_Id" optionLabel="subCatMP_Nombre" [options]="subcategories" [autoDisplayFirst]="false" [filter]="true" filterBy="subCatMP_Nombre" appendTo="body" emptyMessage="Elija primero la categoría" [ngClass]="{'ng-invalid ng-dirty': invalido('mpSubcategory')}"></p-dropdown>
+        <label for="mpSubcategory">Subcategoría <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('mpSubcategory')">Elija la subcategoría.</small>
+    </div>
 
-       <!-- Subcategories  -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <p-dropdown formControlName="mpSubcategory" inputId="mpSubcategory" optionValue="subCatMP_Id" [autoDisplayFirst]="false" [options]="subcategories" optionLabel="subCatMP_Nombre"></p-dropdown>
-          <label for="mpSubcategory">Subcategoria</label>
-        </span>
-      </div>
+    <!-- Precio -->
+    <div class="col-12 col-md-4">
+      <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+        <i class="pi pi-dollar"></i>
+        <p-inputNumber formControlName="mpValor" inputId="mpValor" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" [min]="0" [ngClass]="{'ng-invalid ng-dirty': invalido('mpValor')}"></p-inputNumber>
+        <label for="mpValor">Precio por Kg <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('mpValor')">Escriba el precio (0 o más).</small>
+    </div>
 
-      <!-- Precio -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="mpValor" inputId="mpValor" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="mpValor">Precio Unitario</label>
-        </span>
-      </div>
+    <!-- Material (recuperados) -->
+    <div class="col-12 col-md-6" *ngIf="recovery">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-box"></i>
+        <p-dropdown formControlName="mpMaterial" inputId="mpMaterial" optionValue="material_Id" optionLabel="material_Nombre" [options]="materials" [autoDisplayFirst]="false" appendTo="body" [ngClass]="{'ng-invalid ng-dirty': invalido('mpMaterial')}"></p-dropdown>
+        <label for="mpMaterial">Material <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('mpMaterial')">Elija el material.</small>
+    </div>
 
-      <!-- Material  -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" *ngIf="recovery">
-        <span class="p-float-label">
-          <p-dropdown formControlName="mpMaterial" inputId="mpMaterial" optionValue="material_Id" [autoDisplayFirst]="false" [options]="materials" optionLabel="material_Nombre"></p-dropdown>
-          <label for="mpMaterial">Material</label>
-        </span>
-      </div>
-
-      <!-- Pigmento  -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" *ngIf="recovery">
-        <span class="p-float-label">
-          <p-dropdown formControlName="mpPigment" inputId="mpPigment" optionValue="pigmt_Id" [autoDisplayFirst]="false" [options]="pigments" optionLabel="pigmt_Nombre"></p-dropdown>
-          <label for="mpPigment">Pigmento</label>
-        </span>
-      </div>
-
+    <!-- Pigmento (recuperados) -->
+    <div class="col-12 col-md-6" *ngIf="recovery">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-palette"></i>
+        <p-dropdown formControlName="mpPigment" inputId="mpPigment" optionValue="pigmt_Id" optionLabel="pigmt_Nombre" [options]="pigments" [autoDisplayFirst]="false" appendTo="body" [ngClass]="{'ng-invalid ng-dirty': invalido('mpPigment')}"></p-dropdown>
+        <label for="mpPigment">Pigmento <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('mpPigment')">Elija el pigmento.</small>
     </div>
   </div>
 
-  <!--Inicio Fila 3 Botones y Limpiar Campos-->
-  <div class="mb-1">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Crear Materia Prima" icon="pi pi-pencil" (click)="registrarMateriPrima()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-    </div>
+  <!-- Botones -->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button pButton pRipple class="p-button-secondary p-button-outlined" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()" [disabled]="guardando"></button>
+    <button pButton pRipple class="p-button-danger" type="submit" [label]="recovery ? 'Crear Recuperado' : 'Crear Materia Prima'" icon="pi pi-plus" [loading]="guardando" [disabled]="materiPrima.invalid || guardando"></button>
   </div>
 </form>

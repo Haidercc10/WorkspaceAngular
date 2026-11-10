@@ -88,3 +88,157 @@ p-dialog ::ng-deep .p-dialog-header span {
   font-size: 1rem;
   line-height: 1;
 }
+
+/* Interruptor "Mostrar sin Stock": centrado verticalmente con el botón Consultar y el campo de fechas. */
+.switch-stock {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.switch-stock p-inputswitch,
+.switch-stock ::ng-deep .p-inputswitch {
+  display: flex; /* sin esto el switch queda como elemento de línea y se sube unos píxeles */
+}
+
+.switch-stock label {
+  margin: 0; /* bootstrap-select agrega margin-bottom a todos los label */
+  line-height: 1;
+}
+
+/* Cantidad disponible negativa en Subcategorías: lo reservado supera el stock. */
+.disponible-negativo {
+  color: #db4149;
+}
+
+/* Modal "¿Qué material desea crear?": dos tarjetas grandes. */
+.opciones-crear {
+  display: grid;
+  padding-top: 0.5rem; /* espacio para que la tarjeta no se corte bajo la cabecera al subir con el cursor */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.opcion-crear {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.opcion-crear:hover, .opcion-crear:focus-visible {
+  border-color: var(--rojo);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.opcion-crear .pi {
+  font-size: 2rem;
+  color: var(--rojo);
+}
+
+.opcion-titulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.opcion-detalle {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.nota-crear {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* Cabecera de los formularios de creación: botón para volver a las opciones + título. */
+.encabezado-crear {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.boton-volver {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* Modal de edición de materiales (mismo estilo que los formularios de creación). */
+.formulario-editar {
+  padding-top: 0.75rem;
+}
+
+.formulario-editar p-dropdown ::ng-deep .p-dropdown,
+.formulario-editar p-inputnumber,
+.formulario-editar p-inputnumber ::ng-deep span,
+.formulario-editar p-inputnumber ::ng-deep input {
+  display: flex;
+  width: 100%;
+}
+
+.formulario-editar .p-inputtext {
+  width: 100%;
+}
+
+.formulario-editar .nota-obligatorios {
+  margin: 0 0 1.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.formulario-editar .obligatorio {
+  color: #db4149;
+}
+
+.formulario-editar .mensaje-error,
+.formulario-editar .ayuda {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.formulario-editar .mensaje-error {
+  color: #db4149;
+}
+
+.formulario-editar .ayuda {
+  color: #6c757d;
+}
+
+.formulario-editar .ayuda.aviso {
+  color: #b7791f;
+}
+
+.formulario-editar .campo-solo-lectura {
+  background: #f1f3f5;
+}
+
+.formulario-editar .campo-color {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.formulario-editar .campo-color > .p-float-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.formulario-editar .campo-color p-colorpicker ::ng-deep .p-colorpicker-preview {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+}

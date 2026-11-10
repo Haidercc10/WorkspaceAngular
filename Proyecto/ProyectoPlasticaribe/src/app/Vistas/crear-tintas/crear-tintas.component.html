@@ -1,64 +1,84 @@
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
- <br>
-<form [formGroup]="formularioTintas" (ngSubmit)="agregarTintas()">
-  <!-- Inicio Fila 1 Agregar Unidad Medida -->
-  <div class="mb-3">
-    <div class="row g-4">
-      <!-- Nombre -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-4">
-        <span class="p-float-label">
-          <input formControlName="TintaNombre" id="TintaNombre" type="text" (keyup)="cargarDescripcion()" pInputText required/>
-          <label for="TintaNombre">Nombre</label>
-        </span>
-      </div>
+<form [formGroup]="formularioTintas" (ngSubmit)="agregarTintas()" class="formulario-crear">
+  <p class="nota-obligatorios">Los campos con <span class="obligatorio">*</span> son obligatorios. La tinta se crea con stock en cero.</p>
 
-      <!-- Descripcion -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <input formControlName="TintaDescripcion" id="TintaDescripcion" type="text" pInputText required/>
-          <label for="TintaDescripcion">Descripción</label>
-        </span>
-      </div>
+  <div class="row g-4 mb-4">
+    <!-- Nombre -->
+    <div class="col-12 col-md-6">
+      <span class="p-input-icon-left p-float-label">
+        <i class="pi pi-tag"></i>
+        <input formControlName="TintaNombre" id="TintaNombre" type="text" pInputText autocomplete="off" (input)="cargarDescripcion()" [ngClass]="{'ng-invalid ng-dirty': invalido('TintaNombre')}"/>
+        <label for="TintaNombre">Nombre <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('TintaNombre')">Escriba el nombre.</small>
+    </div>
 
-      <!-- Codigo Hexadecimal -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <input formControlName="TintaCodigoHexa" id="TintaCodigoHexa" type="text" pInputText required/>
-          <label for="TintaCodigoHexa">Código Hexa</label>
-        </span>
-      </div>
+    <!-- Descripción -->
+    <div class="col-12 col-md-6">
+      <span class="p-input-icon-left p-float-label">
+        <i class="pi pi-align-left"></i>
+        <input formControlName="TintaDescripcion" id="TintaDescripcion" type="text" pInputText autocomplete="off" (input)="editarDescripcion()"/>
+        <label for="TintaDescripcion">Descripción</label>
+      </span>
+      <small class="ayuda">Si la deja igual, se usa el nombre.</small>
+    </div>
 
-      <!-- Unidad de Medida -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="TintaUndMedida" inputId="Und" [autoDisplayFirst]="false" optionValue="undMed_Id" [options]="unidadMedida" optionLabel="undMed_Id" [required]="true"></p-dropdown>
-          <label for="Und">Und</label>
-        </span>
-      </div>
+    <!-- Categoría -->
+    <div class="col-12 col-md-4">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-sitemap"></i>
+        <p-dropdown formControlName="TintaCategoria" inputId="TintaCategoria" optionValue="catMP_Id" optionLabel="catMP_Nombre" [options]="categorias" [autoDisplayFirst]="false" appendTo="body" [ngClass]="{'ng-invalid ng-dirty': invalido('TintaCategoria')}"></p-dropdown>
+        <label for="TintaCategoria">Categoría <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('TintaCategoria')">Elija la categoría.</small>
+    </div>
 
-      <!-- Categorias -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="TintaCategoria" inputId="TintaCategoria" optionValue="catMP_Id" [autoDisplayFirst]="false" [options]="categorias" optionLabel="catMP_Nombre" [required]="true"></p-dropdown>
-          <label for="TintaCategoria">Categorias</label>
-        </span>
-      </div>
+    <!-- Subcategoría -->
+    <div class="col-12 col-md-4">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-list"></i>
+        <p-dropdown formControlName="TintaSubcategoria" inputId="TintaSubcategoria" optionValue="subCatMP_Id" optionLabel="subCatMP_Nombre" [options]="subcategorias" [autoDisplayFirst]="false" [filter]="true" filterBy="subCatMP_Nombre" appendTo="body" emptyMessage="Elija primero la categoría" [ngClass]="{'ng-invalid ng-dirty': invalido('TintaSubcategoria')}"></p-dropdown>
+        <label for="TintaSubcategoria">Subcategoría <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('TintaSubcategoria')">Elija la subcategoría.</small>
+    </div>
 
-      <!-- Precio -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="TintaPrecio" mode="decimal" inputId="TintaPrecio" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="TintaPrecio">Precio</label>
+    <!-- Unidad de Medida -->
+    <div class="col-12 col-md-4">
+      <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+        <i class="pi pi-calculator"></i>
+        <p-dropdown formControlName="TintaUndMedida" inputId="Und" optionValue="undMed_Id" optionLabel="undMed_Id" [options]="unidadMedida" [autoDisplayFirst]="false" appendTo="body" [ngClass]="{'ng-invalid ng-dirty': invalido('TintaUndMedida')}"></p-dropdown>
+        <label for="Und">Unidad <span class="obligatorio">*</span></label>
+      </span>
+    </div>
+
+    <!-- Código hexadecimal con selector de color -->
+    <div class="col-12 col-md-6">
+      <div class="campo-color">
+        <span class="p-input-icon-left p-float-label">
+          <i class="pi pi-palette"></i>
+          <input formControlName="TintaCodigoHexa" id="TintaCodigoHexa" type="text" pInputText autocomplete="off" maxlength="9" [ngClass]="{'ng-invalid ng-dirty': invalido('TintaCodigoHexa')}"/>
+          <label for="TintaCodigoHexa">Código de color (hexadecimal)</label>
         </span>
+        <p-colorPicker [ngModel]="colorVistaPrevia ?? '#FFFFFF'" [ngModelOptions]="{standalone: true}" format="hex" appendTo="body" (onChange)="elegirColor($event.value)" pTooltip="Elegir el color" tooltipPosition="top"></p-colorPicker>
       </div>
+      <small class="mensaje-error" *ngIf="invalido('TintaCodigoHexa')">Use 3, 6 u 8 dígitos entre 0-9 y A-F (por ejemplo FF0000).</small>
+      <small class="ayuda" *ngIf="!invalido('TintaCodigoHexa')">Opcional. Elíjalo en el cuadro de color o escríbalo.</small>
+    </div>
+
+    <!-- Precio -->
+    <div class="col-12 col-md-6">
+      <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+        <i class="pi pi-dollar"></i>
+        <p-inputNumber formControlName="TintaPrecio" inputId="TintaPrecio" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" [min]="0" [ngClass]="{'ng-invalid ng-dirty': invalido('TintaPrecio')}"></p-inputNumber>
+        <label for="TintaPrecio">Precio unitario <span class="obligatorio">*</span></label>
+      </span>
+      <small class="mensaje-error" *ngIf="invalido('TintaPrecio')">Escriba el precio (0 o más).</small>
     </div>
   </div>
 
-  <!--Inicio Fila 2 Botones Agregar tintas y Limpiar Campos-->
-  <div class="mb-1">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton pRipple label="Crear Tinta" type="submit" icon="pi pi-check" class="p-button-danger"></button>
-      <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-    </div>
+  <!-- Botones -->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary p-button-outlined" icon="pi pi-eraser" (click)="limpiarCampos()" [disabled]="guardando"></button>
+    <button pButton pRipple label="Crear Tinta" type="submit" icon="pi pi-plus" class="p-button-danger" [loading]="guardando" [disabled]="formularioTintas.invalid || guardando"></button>
   </div>
 </form>

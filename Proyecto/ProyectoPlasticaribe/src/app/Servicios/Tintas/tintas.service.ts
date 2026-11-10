@@ -27,4 +27,8 @@ export class TintasService {
   srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Tinta/${id}`, data);
 
   srvGuardar = (data : modelTintas): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Tinta', data);
+
+  /** Crea una tinta, chip o solvente validando los datos en la API. Responde 400 si falta algo y 409 si el nombre ya existe. */
+  crearTinta = (data : { Nombre : string, Descripcion : string, CodigoHexadecimal : string, UndMed_Id : string, CatMP_Id : number, SubCatMP_Id : number, Precio : number }): Observable<any> =>
+    this.http.post(this.rutaPlasticaribeAPI + '/Tinta/crear', data);
 }

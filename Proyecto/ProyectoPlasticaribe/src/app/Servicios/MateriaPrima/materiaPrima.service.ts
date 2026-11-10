@@ -69,4 +69,8 @@ export class MateriaPrimaService {
   srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);
 
   srvGuardar = (data : modelMateriaPrima): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
+
+  /** Crea una materia prima validando los datos en la API. Responde 400 si falta algo y 409 si el nombre ya existe. */
+  crearMateriaPrima = (data : { Nombre : string, Descripcion : string, CatMP_Id : number, SubCatMP_Id : number, Precio : number }): Observable<any> =>
+    this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima/crear', data);
 }

@@ -1,32 +1,38 @@
-.p-input-icon-left {
-  width: 100%;
+.formulario-crear {
+  padding-top: 0.75rem;
 }
 
-p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   display: flex;
   width: 100%;
 }
 
-p-calendar ::ng-deep span button {
-  background-color: var(--rojo);
-  border: 0;
-  transition: all 1s;
+.p-inputtext {
+  width: 100%;
 }
 
-p-calendar ::ng-deep span .p-datepicker-trigger:hover {
-  background: var(--rojoHover);
+.nota-obligatorios {
+  margin: 0 0 1.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
 }
 
-p-calendar ::ng-deep .p-datepicker-header button {
-  background: #fff0;
+.obligatorio {
+  color: #db4149;
 }
 
-p-calendar ::ng-deep .p-datepicker-header button:hover {
-  background: #fff0;
-}
-
-p-calendar ::ng-deep span button span {
+.mensaje-error, .ayuda {
   display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.mensaje-error {
+  color: #db4149;
+}
+
+.ayuda {
+  color: #6c757d;
 }
 
 ::ng-deep .p-card {
@@ -38,10 +44,5 @@ p-calendar ::ng-deep span button span {
   border-radius: 10px;
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
-}
-
-::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
-  display: flex;
-  width: 100%;
 }
 
