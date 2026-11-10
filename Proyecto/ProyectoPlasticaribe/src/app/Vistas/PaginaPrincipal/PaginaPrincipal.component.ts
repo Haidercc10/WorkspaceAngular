@@ -1,4 +1,4 @@
-import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Injectable, OnDestroy, OnInit } from '@angular/core';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
 import { modelUsabilidad_Modulos } from 'src/app/Modelo/modelUsabilidad_Modulos';
@@ -12,7 +12,9 @@ import { UsabilidadModulosService } from 'src/app/Servicios/Usabilidad_Modulos/u
   styleUrls: ['./PaginaPrincipal.component.css']
 })
 
-export class PaginaPrincipalComponent implements OnInit, OnDestroy {
+export class PaginaPrincipalComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  private limpiarArrastreTabs : () => void; //Función que elimina los eventos de arrastre de la barra de pestañas
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -34,6 +36,7 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   constructor(private AppComponent : AppComponent,
     private svUseModules : UsabilidadModulosService,
+    private elementRef : ElementRef,
   ) { }
 
   ngOnInit() {
@@ -42,7 +45,79 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     this.ordenTrabajo = true;
   }
 
+  ngAfterViewInit(): void {
+    this.habilitarArrastreTabs();
+  }
+
+  //Función que permite desplazar la barra de pestañas presionando y arrastrando con el mouse (en táctil el deslizamiento es nativo)
+  habilitarArrastreTabs() {
+    const nav : HTMLElement = this.elementRef.nativeElement.querySelector('.p-tabview-nav-content');
+    if (!nav) return;
+
+    let presionado = false;
+    let arrastro = false;
+    let inicioX = 0;
+    let scrollInicial = 0;
+
+    const onMouseDown = (e : MouseEvent) => {
+      if (e.button !== 0) return;
+      presionado = true;
+      arrastro = false;
+      inicioX = e.pageX;
+      scrollInicial = nav.scrollLeft;
+    };
+
+    const onMouseMove = (e : MouseEvent) => {
+      if (!presionado) return;
+      const desplazamiento = e.pageX - inicioX;
+      if (!arrastro && Math.abs(desplazamiento) > 5) {
+        arrastro = true;
+        nav.classList.add('arrastrando');
+      }
+      if (arrastro) {
+        e.preventDefault();
+        nav.scrollLeft = scrollInicial - desplazamiento;
+      }
+    };
+
+    const onMouseUp = () => {
+      presionado = false;
+      nav.classList.remove('arrastrando');
+    };
+
+    //Si hubo arrastre, se cancela el click para que no cambie de pestaña al soltar
+    const onClick = (e : MouseEvent) => {
+      if (arrastro) {
+        e.preventDefault();
+        e.stopPropagation();
+        arrastro = false;
+      }
+    };
+
+    //Rueda vertical del mouse desplaza la barra horizontalmente
+    const onWheel = (e : WheelEvent) => {
+      if (nav.scrollWidth <= nav.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      nav.scrollLeft += e.deltaY;
+    };
+
+    nav.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    nav.addEventListener('click', onClick, true);
+    nav.addEventListener('wheel', onWheel, { passive: false });
+
+    this.limpiarArrastreTabs = () => {
+      nav.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      nav.removeEventListener('click', onClick, true);
+      nav.removeEventListener('wheel', onWheel);
+    };
+  }
+
   ngOnDestroy(): void {
+    this.limpiarArrastreTabs?.();
     this.production = false;
     this.ordenTrabajo = false;
     this.facturacion = false;

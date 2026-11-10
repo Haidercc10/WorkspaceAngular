@@ -5,3 +5,59 @@
   background-size: cover;
   background-attachment: fixed;
 }
+
+/* Barra de pestañas desplazable: arrastre con mouse y deslizamiento táctil */
+:host ::ng-deep .p-tabview-nav-content {
+  cursor: grab;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+:host ::ng-deep .p-tabview-nav-content.arrastrando {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+:host ::ng-deep .p-tabview-nav-content .p-tabview-nav-link {
+  -webkit-user-drag: none;
+}
+
+/* Bootstrap agrega margin-bottom a los <ul>, lo que hacía el contenedor más alto que las pestañas */
+:host ::ng-deep .p-tabview .p-tabview-nav {
+  margin-bottom: 0;
+}
+
+/* Botones laterales de navegación alineados con la altura de las pestañas */
+:host ::ng-deep .p-tabview .p-tabview-nav-btn.p-link {
+  top: 0;
+  height: calc(100% - 2px); /* deja visible el borde inferior de la barra */
+  width: 2rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav-btn.p-tabview-nav-prev {
+  left: 0;
+  box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.25);
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav-btn.p-tabview-nav-next {
+  right: 0;
+  box-shadow: -4px 0 6px -4px rgba(0, 0, 0, 0.25);
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav-btn.p-link:hover {
+  background: #fff1f1;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav-btn .p-icon,
+:host ::ng-deep .p-tabview .p-tabview-nav-btn .pi {
+  width: 0.875rem;
+  height: 0.875rem;
+  font-size: 0.875rem;
+}
