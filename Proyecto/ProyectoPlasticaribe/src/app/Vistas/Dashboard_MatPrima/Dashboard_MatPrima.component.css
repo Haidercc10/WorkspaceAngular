@@ -47,9 +47,8 @@ p-knob ::ng-deep .p-knob-text {
   padding: 0 0.5rem 0.5rem 0.5rem;
 }
 
-.fondo {
-  background-color: #a5d2ff;
-  background-image: linear-gradient(62deg, #a5d2ff 0%, #c7f7ff 100%);
+.fondo, .fondo2 {
+  background: transparent; /* Se deja ver el fondo principal de la página de inicio */
   border-radius: 20px;
 }
 
@@ -102,20 +101,4 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
     filter: blur(0);
     opacity: 1;
   }
-}
-
-.fondo, .fondo2 {
-  --s: 105px; /* control the size */
-  --c1: #6778bb;
-  --c2: #8dccff;
-  --c3: #7790d7;
-
-  background:
-    conic-gradient(from 75deg,var(--c1)   15deg ,var(--c2) 0 30deg ,#0000 0 180deg,
-                              var(--c2) 0 195deg,var(--c1) 0 210deg,#0000 0) 
-       calc(0.5*var(--s)) calc(0.5*var(--s)/0.577),
-    conic-gradient(var(--c1)   30deg ,var(--c3) 0 75deg ,var(--c1) 0 90deg, var(--c2) 0 105deg,
-                   var(--c3) 0 150deg,var(--c2) 0 180deg,var(--c3) 0 210deg,var(--c1) 0 256deg,
-                   var(--c2) 0 270deg,var(--c1) 0 286deg,var(--c2) 0 331deg,var(--c3) 0);
-  background-size: var(--s) calc(var(--s)/0.577);
 }

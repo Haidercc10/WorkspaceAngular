@@ -1,10 +1,14 @@
 <div class="tutorial" id="tutorial"></div>
 <div class="fondo">
+  <!-- Capas de fondo por sección: solo la activa es visible y el cambio se hace con desvanecido -->
+  <div class="capas-fondo" aria-hidden="true">
+    <div *ngFor="let capa of capasFondo" class="capa" [ngClass]="capa" [class.activa]="capa === fondoActivo"></div>
+  </div>
 <br>
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
   <div class="container-fluid" id="card">
-    <p-tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="[1,2,3,4,6,10,59,60,61,69,12,94,96,85,97,2,98,10,5,63,64,65,74,75,76,77,78,79,80,81,85,86,87,88,89,97,98,102,101,95,83,103,104].includes(ValidarRol)">
+    <p-tabView #tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="[1,2,3,4,6,10,59,60,61,69,12,94,96,85,97,2,98,10,5,63,64,65,74,75,76,77,78,79,80,81,85,86,87,88,89,97,98,102,101,95,83,103,104].includes(ValidarRol)">
       <!-- Producción por Áreas -->
       <p-tabPanel
         header="Producción"

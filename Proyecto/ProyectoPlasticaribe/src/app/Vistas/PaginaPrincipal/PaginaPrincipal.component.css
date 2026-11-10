@@ -1,9 +1,235 @@
 .fondo {
-  background: url('/assets/Imagenes_Cards/bolsasPlastico.jpg') no-repeat center;
+  position: relative;
+  isolation: isolate; /* las capas de fondo (z-index: -1) quedan detrás del contenido sin salirse del componente */
   height: 100%;
   min-height: 100vh;
+}
+
+/* ===== Capas de fondo por sección (cambio con desvanecido) ===== */
+.capas-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.capa {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden; /* las capas ocultas no se pintan */
+  transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+
+.capa.activa {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s ease, visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .capa, .capa.activa { transition: none; }
+}
+
+/* Producción: foto principal */
+.fondo-produccion {
+  background: url('/assets/Imagenes_Cards/bolsasPlastico.jpg') no-repeat center;
   background-size: cover;
   background-attachment: fixed;
+}
+
+/* Ordenes de Trabajo */
+.fondo-ot {
+  --s: 222px;
+  --c1: #2c2c2c;
+  --c2: #a7a7a7;
+  --c3: #787576;
+  --_g: var(--c1) 10%,var(--c2) 10.5% 19%,#0000 19.5% 80.5%,var(--c2) 81% 89.5%,var(--c3) 90%;
+  --_c: from -90deg at 37.5% 50%,#0000 75%;
+  --_l1: linear-gradient(145deg,var(--_g));
+  --_l2: linear-gradient( 35deg,var(--_g));
+  background:
+    var(--_l1), var(--_l1) calc(var(--s)/2) var(--s),
+    var(--_l2), var(--_l2) calc(var(--s)/2) var(--s),
+    conic-gradient(var(--_c),var(--c1) 0) calc(var(--s)/8) 0,
+    conic-gradient(var(--_c),var(--c3) 0) calc(var(--s)/2) 0,
+    linear-gradient(90deg,var(--c3) 38%,var(--c1) 0 50%,var(--c3) 0 62%,var(--c1) 0);
+  background-size: var(--s) calc(2*var(--s)/3);
+}
+
+/* Facturación */
+.fondo-facturacion {
+  --s: 65px;
+  --c1: #dadee1;
+  --c2: #4a99b4;
+  --c3: #9cceb5;
+  --_c: 75%, var(--c3) 52.72deg, #0000 0;
+  --_g1: conic-gradient(from -116.36deg at 25% var(--_c));
+  --_g2: conic-gradient(from 63.43deg at 75% var(--_c));
+  background:
+    var(--_g1), var(--_g1) calc(3*var(--s)) calc(var(--s)/2),
+    var(--_g2), var(--_g2) calc(3*var(--s)) calc(var(--s)/2),
+    conic-gradient(var(--c2) 63.43deg, var(--c1) 0 116.36deg,
+      var(--c2) 0 180deg, var(--c1) 0 243.43deg,
+      var(--c2) 0 296.15deg, var(--c1) 0);
+  background-size: calc(2*var(--s)) var(--s);
+}
+
+/* Materia Prima */
+.fondo-materia-prima {
+  --s: 105px;
+  --c1: #6778bb;
+  --c2: #8dccff;
+  --c3: #7790d7;
+  background:
+    conic-gradient(from 75deg,var(--c1) 15deg,var(--c2) 0 30deg,#0000 0 180deg,
+                   var(--c2) 0 195deg,var(--c1) 0 210deg,#0000 0)
+       calc(0.5*var(--s)) calc(0.5*var(--s)/0.577),
+    conic-gradient(var(--c1) 30deg,var(--c3) 0 75deg,var(--c1) 0 90deg,var(--c2) 0 105deg,
+                   var(--c3) 0 150deg,var(--c2) 0 180deg,var(--c3) 0 210deg,var(--c1) 0 256deg,
+                   var(--c2) 0 270deg,var(--c1) 0 286deg,var(--c2) 0 331deg,var(--c3) 0);
+  background-size: var(--s) calc(var(--s)/0.577);
+}
+
+/* Pedidos */
+.fondo-pedidos {
+  --s: 200px;
+  --c1: #e1e1e1;
+  --c2: #858c9d;
+  --c3: #bbbbbb;
+  background:
+    repeating-conic-gradient(from 30deg,#0000 0 120deg,var(--c3) 0 180deg)
+     calc(.5*var(--s)) calc(.5*var(--s)*0.577),
+    repeating-conic-gradient(from 30deg,var(--c1) 0 60deg,var(--c2) 0 120deg,var(--c3) 0 180deg);
+  background-size: var(--s) calc(var(--s)*0.577);
+}
+
+/* Facturación Vendedores */
+.fondo-facturacion-vendedores {
+  --s: 82px;
+  --c1: #b2b2b2;
+  --c2: #ffffff;
+  --c3: #d9d9d9;
+  --_g: var(--c3) 0 120deg,#0000 0;
+  background:
+    conic-gradient(from -60deg at 50% calc(100%/3),var(--_g)),
+    conic-gradient(from 120deg at 50% calc(200%/3),var(--_g)),
+    conic-gradient(from  60deg at calc(200%/3),var(--c3) 60deg,var(--c2) 0 120deg,#0000 0),
+    conic-gradient(from 180deg at calc(100%/3),var(--c1) 60deg,var(--_g)),
+    linear-gradient(90deg,var(--c1) calc(100%/6),var(--c2) 0 50%,
+                          var(--c1) 0 calc(500%/6),var(--c2) 0);
+  background-size: calc(1.732*var(--s)) var(--s);
+}
+
+/* Recaudos */
+.fondo-recaudos {
+  --s: 194px;
+  --c1: #cdc79f;
+  --c2: #acc4a3;
+  --_l: #0000 calc(25%/3),var(--c1) 0 25%,#0000 0;
+  --_g: conic-gradient(from 120deg at 50% 87.5%,var(--c1) 120deg,#0000 0);
+  background:
+    var(--_g),var(--_g) 0 calc(var(--s)/2),
+    conic-gradient(from 180deg at 75%,var(--c2) 60deg,#0000 0),
+    conic-gradient(from 60deg at 75% 75%,var(--c1) 0 60deg,#0000 0),
+    linear-gradient(150deg,var(--_l)) 0 calc(var(--s)/2),
+    conic-gradient(at 25% 25%,#0000 50%,var(--c2) 0 240deg,var(--c1) 0 300deg,var(--c2) 0),
+    linear-gradient(-150deg,var(--_l)) #839d96;
+  background-size: calc(0.866*var(--s)) var(--s);
+}
+
+/* Cuentas Por Pagar */
+.fondo-cuentas-pagar {
+  --s: 84px;
+  --c1: #838383;
+  --c2: #545454;
+  --c3: #bbbbbb;
+  --_g: 0 120deg,#0000 0;
+  background:
+    conic-gradient(from    0deg at calc(500%/6) calc(100%/3),var(--c3) var(--_g)),
+    conic-gradient(from -120deg at calc(100%/6) calc(100%/3),var(--c2) var(--_g)),
+    conic-gradient(from  120deg at calc(100%/3) calc(500%/6),var(--c1) var(--_g)),
+    conic-gradient(from  120deg at calc(200%/3) calc(500%/6),var(--c1) var(--_g)),
+    conic-gradient(from -180deg at calc(100%/3) 50%,var(--c2)  60deg,var(--c1) var(--_g)),
+    conic-gradient(from   60deg at calc(200%/3) 50%,var(--c1)  60deg,var(--c3) var(--_g)),
+    conic-gradient(from  -60deg at 50% calc(100%/3),var(--c1) 120deg,var(--c2) 0 240deg,var(--c3) 0);
+  background-size: calc(var(--s)*1.732) var(--s);
+}
+
+/* Gerencia */
+.fondo-gerencia {
+  --s: 50px;
+  --_g: conic-gradient(at 50% 25%,#0000 75%,#838383 0);
+  background:
+    var(--_g),var(--_g) var(--s) var(--s),
+    var(--_g) calc(2*var(--s)) calc(2*var(--s)),
+    var(--_g) calc(3*var(--s)) calc(3*var(--s)),
+    repeating-linear-gradient(135deg,#464545 0 12.5%,#a19e9e 0 25%);
+  background-size: calc(4*var(--s)) calc(4*var(--s));
+}
+
+/* Costos */
+.fondo-costos {
+  --s: 36px;
+  --c1: #8d8d8d;
+  --c2: #d2d3d5;
+  --c3: #727c7e;
+  --g1: conic-gradient(at calc(250%/3) calc(50%/3),var(--c2) 60deg,#0000 0 300deg,var(--c1) 0);
+  --g2: conic-gradient(at calc(50%/3) 50%,#0000 75%,var(--c1) 0);
+  --g3: conic-gradient(at calc(100%/3) 50%,#0000 75%,var(--c2) 0);
+  --g4: conic-gradient(from 59deg at calc(200%/3) calc(249%/9),var(--c3) 61deg,#0000 62deg);
+  --g5: conic-gradient(from 60deg at 50% calc(250%/3),#f1f1f1 60deg,var(--c1) 0 120deg,#0000 0);
+  --_p: calc(9*0.577*var(--s));
+  background:
+    var(--g1) calc(-1*var(--s)) 0,var(--g1) calc(2*var(--s)) var(--_p),
+    var(--g2),var(--g2) calc(3*var(--s)) var(--_p),
+    var(--g3),var(--g3) calc(3*var(--s)) var(--_p),
+    var(--g4),var(--g4) calc(3*var(--s)) var(--_p),
+    var(--g5) calc(3*var(--s)) 0,var(--g5) 0 var(--_p) var(--c3);
+  background-size: calc(6*var(--s)) calc(2*var(--_p));
+}
+
+/* Compras */
+.fondo-compras {
+  --s: 150px;
+  --c1: #FF847C;
+  --c2: #E84A5F;
+  --c3: #FECEA8;
+  --c4: #99B898;
+  background:
+    conic-gradient(from  45deg at 75% 75%, var(--c3) 90deg,var(--c1) 0 180deg,#0000 0),
+    conic-gradient(from -45deg at 25% 25%, var(--c3) 90deg,#0000 0),
+    conic-gradient(from -45deg at 50% 100%,#0000 180deg,var(--c3) 0),
+    conic-gradient(from -45deg,var(--c1) 90deg, var(--c2) 0 225deg,var(--c4) 0);
+  background-size: var(--s) var(--s);
+}
+
+/* Producción Áreas */
+.fondo-produccion-areas {
+  --s: 84px;
+  --c: #fff;
+  --a: from -30deg at;
+  background:
+    linear-gradient(#0000 50%,#0004 0),
+    conic-gradient(var(--a) 90%,var(--c) 240deg,#0000 0),
+    conic-gradient(var(--a) 75%,#71e9a0 240deg,#0000 0),
+    conic-gradient(var(--a) 25%,#0000 240deg,var(--c) 0),
+    conic-gradient(var(--a) 40%,var(--c) 240deg,#2a6a9b 0);
+  background-size: calc(1.5*var(--s)) var(--s);
+}
+
+/* Calidad (zigzag) */
+.fondo-calidad {
+  --s: 60px;
+  --c1: #a8d5b3;
+  --c2: #6fa77e;
+  --_g: #0000 90deg, var(--c1) 0;
+  background:
+    conic-gradient(from 135deg, var(--_g)) var(--s) calc(var(--s)/2),
+    conic-gradient(from 135deg, var(--_g)),
+    conic-gradient(from 135deg at 50% 0, var(--_g)) var(--c2);
+  background-size: calc(2*var(--s)) var(--s);
 }
 
 /* Barra de pestañas desplazable: arrastre con mouse y deslizamiento táctil */
@@ -22,6 +248,20 @@
 
 :host ::ng-deep .p-tabview-nav-content .p-tabview-nav-link {
   -webkit-user-drag: none;
+}
+
+/* Panel de pestañas sin fondo blanco: solo se ven las cards sobre la foto principal */
+:host ::ng-deep .p-tabview .p-tabview-panels {
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Dashboards compartidos con Reportes Consolidados (Facturación Vendedores, Recaudos, Producción Áreas):
+   su fondo de mosaico se conserva allá, pero dentro de Inicio se oculta */
+:host ::ng-deep .p-tabview-panels .fondo,
+:host ::ng-deep .p-tabview-panels .fondo2 {
+  background: transparent !important;
 }
 
 /* Bootstrap agrega margin-bottom a los <ul>, lo que hacía el contenedor más alto que las pestañas */
