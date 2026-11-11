@@ -326,6 +326,11 @@ a {
   margin: 0;
 }
 
+/* En modo oscuro la etiqueta heredaba un color oscuro y no se veía sobre el fondo del contenedor */
+.contenedorLoginDark .recordarme label {
+  color: #e2e8f0;
+}
+
 @keyframes puff-in-center {
   0% {
     transform: scale(2);
