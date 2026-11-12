@@ -9,6 +9,7 @@ import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produccion.component';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { plugins } from 'chart.js/dist/core';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -85,6 +86,8 @@ export class DashboardProduccionComponent implements OnInit {
   totalPercentageMonth: number = 0;
 
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  private readonly suscripcionTemaGraficas = alCambiarTema(() => this.actualizarColoresGraficas(), { omitirActual: true }); // recolorea las gráficas al cambiar de tema
 
   //Valores maximos por area;
   maxExtrusion: number = 100;
@@ -109,45 +112,46 @@ export class DashboardProduccionComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
+  // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
+  private actualizarColoresGraficas() {
+    //EXTRUSIÓN
+    this.ComparativoOptionsExtrusion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsExtrusion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsExtrusion.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    //IMPRESIÓN
+    this.ComparativoOptionsImpresion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsImpresion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsImpresion.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    //PERFORADO
+    this.ComparativoOptionsPerforado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsPerforado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsPerforado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    //CAMISILLA
+    this.ComparativoOptionsCamisilla.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsCamisilla.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsCamisilla.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    //EMPAQUE
+    this.ComparativoOptionsEmpaque.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsEmpaque.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsEmpaque.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    //SELLADO
+    this.ComparativoOptionsSellado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsSellado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsSellado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    //LAMINADO
+    this.ComparativoOptionsLaminado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsLaminado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsLaminado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    //DOBLADO
+    this.ComparativoOptionsDoblado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsDoblado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsDoblado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+  }
+
   ngOnInit() {
     this.dateSelected = new Date(moment().format('YYYY-MM-DD'));
     this.tiempoExcedido();
     this.lecturaStorage();
-    setInterval(() => {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      //EXTRUSIÓN
-      this.ComparativoOptionsExtrusion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsExtrusion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsExtrusion.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      //IMPRESIÓN
-      this.ComparativoOptionsImpresion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsImpresion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsImpresion.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      //PERFORADO
-      this.ComparativoOptionsPerforado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsPerforado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsPerforado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      //CAMISILLA
-      this.ComparativoOptionsCamisilla.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsCamisilla.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsCamisilla.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      //EMPAQUE
-      this.ComparativoOptionsEmpaque.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsEmpaque.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsEmpaque.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      //SELLADO
-      this.ComparativoOptionsSellado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsSellado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsSellado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      //LAMINADO
-      this.ComparativoOptionsLaminado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsLaminado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsLaminado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      //DOBLADO
-      this.ComparativoOptionsDoblado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsDoblado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptionsDoblado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    }, 500);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -529,8 +533,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }
@@ -552,8 +556,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }
@@ -575,8 +579,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }
@@ -598,8 +602,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }
@@ -621,8 +625,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }
@@ -644,8 +648,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }
@@ -667,8 +671,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }
@@ -690,8 +694,8 @@ export class DashboardProduccionComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: '#ebedef' } }
+        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
+        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
       }
     };
   }

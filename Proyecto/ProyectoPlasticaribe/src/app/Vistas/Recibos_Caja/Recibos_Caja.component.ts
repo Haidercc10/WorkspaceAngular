@@ -10,6 +10,7 @@ import * as fs from 'file-saver';
 import { ShepherdService } from 'angular-shepherd';
 import { defaultStepOptions, stepsReporteRecibosCaja as defaultSteps } from 'src/app/data';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Recibos_Caja',
@@ -18,6 +19,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 })
 export class Recibos_CajaComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -46,7 +48,6 @@ export class Recibos_CajaComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerVendedores();
     this.loadRankDates();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //*Función para cargar fechas en el rango.

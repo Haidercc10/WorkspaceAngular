@@ -17,6 +17,7 @@ import { defaultStepOptions, stepAsignacionBopp as defaultSteps } from 'src/app/
 import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { EMPTY, forkJoin, Subject } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-asignacionBOPP_TEMPORAL',
@@ -42,6 +43,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   arrayOT: any = [];
   itemSeleccionado: any;
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   kgOT: number = 0; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
   hora: any = moment().format('H:mm:ss'); //Variable que va a almacenar la hora actual
   entradas: any = [];
@@ -87,7 +89,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerBOPP();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   ngOnDestroy(): void {

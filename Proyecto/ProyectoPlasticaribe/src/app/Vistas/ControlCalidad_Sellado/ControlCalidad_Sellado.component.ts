@@ -12,6 +12,7 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import * as fs from 'file-saver';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   @ViewChild('dtSellado') dtSellado: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de sellado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
 
   constructor(private srvCcSellado : ControlCalidad_SelladoService, 
@@ -55,7 +57,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.mostrarRegistrosHoy();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     //this.exportarExcel();
   }
 

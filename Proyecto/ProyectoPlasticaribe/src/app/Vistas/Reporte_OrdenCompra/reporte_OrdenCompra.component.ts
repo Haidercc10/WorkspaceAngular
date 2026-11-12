@@ -12,6 +12,7 @@ import { OcompraComponent } from '../ocompra/ocompra.component';
 import { Table } from 'primeng/table';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-reporte_OrdenCompra',
@@ -36,6 +37,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   mostrarModal: boolean = false; //Variable que va a mostrar o no, el modal para editar ordenes de compra
   numeroOrdenCompra: number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   //* Nuevos filtros.
   proveedor: any = [];
@@ -71,7 +73,6 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     this.obtenerEstados();
     this.obtenerMateriasPrimas();
     this.obtenerProveeedor();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

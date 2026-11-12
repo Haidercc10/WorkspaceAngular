@@ -12,6 +12,7 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +28,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   form !: FormGroup; //Variable que se usará para validar el formulario
   selectedMode : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   process : any = []; //Variable que almacenará la informacion de los procesos de producción
   rolls : any = []; //Variable que almacenará la informacion de los rollos de producción
   rollsInsert : any = []; //Variable que almacenará la informacion de los rollos a insertar en la base de datos

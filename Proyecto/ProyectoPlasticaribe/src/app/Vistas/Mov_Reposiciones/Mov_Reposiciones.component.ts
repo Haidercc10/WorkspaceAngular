@@ -15,6 +15,7 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Mov_Reposiciones',
@@ -27,6 +28,7 @@ export class Mov_ReposicionesComponent implements OnInit {
   form !: FormGroup;
   load: boolean = false;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   ValidarRol : number;
   storage_Id : number;
   storage_Nombre : any;

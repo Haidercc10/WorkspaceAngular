@@ -16,6 +16,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 Injectable({
   providedIn: 'root'
@@ -37,6 +38,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
   hora : any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual 
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   procesos : any[] = []; //Variable que va almacenar la información de todas las unidades de medida
   formulario !: FormGroup; //Formulario de la vista
   ordenes_trabajos : any[] = []; //Array que guardará las diferentes OT
@@ -92,7 +94,6 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
     this.cargarProcesos();
     this.url = this.router.url;
     this.cargarLabels(this.url);
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.getCategoriesMP();
     this.getCategoriesTintas();
     this.getCategoriesBopp();

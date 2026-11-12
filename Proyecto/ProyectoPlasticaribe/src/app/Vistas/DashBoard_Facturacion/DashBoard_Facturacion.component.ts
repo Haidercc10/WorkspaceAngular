@@ -11,6 +11,7 @@ import { CumplimientoFacturacionService } from 'src/app/Servicios/Cumplimiento_F
 import { ColoresBarraProgresoService } from 'src/app/Servicios/Colores_BarraProgreso/colores-barra-progreso.service';
 import { forkJoin, map, Observable } from 'rxjs';
 import { setTimeout } from 'node:timers';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -38,6 +39,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
   totalFacturadoAnio: number = 0; //Variable que almacenará lo facturado en todo el año
   facturadoAnios: any[] = []; //variable que almacenará la información de lo facturado por los años
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  private readonly suscripcionTemaGraficas = alCambiarTema(() => this.actualizarColoresGraficas(), { omitirActual: true }); // recolorea las gráficas al cambiar de tema
   GoalType = GoalType;
   complianceBilling: any = {}; //Variable que mostrará los diferentes datos del cumplimiento de facturación. 
   modalGoal: boolean = false; //
@@ -55,18 +58,19 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
+  // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
+  private actualizarColoresGraficas() {
+    this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+  }
+
   ngOnInit() {
     this.lecturaStorage();
     this.llenarArrayAnos();
     this.tiempoExcedido();
     //this.graficarDatos();
 
-    setInterval(() => {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    }, 1000);
   }
 
   tutorial() {
@@ -267,14 +271,14 @@ export class DashBoard_FacturacionComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' },
+          grid: { color: 'rgba(128, 128, 128, 0.2)' },
           min: 0
         },
       },

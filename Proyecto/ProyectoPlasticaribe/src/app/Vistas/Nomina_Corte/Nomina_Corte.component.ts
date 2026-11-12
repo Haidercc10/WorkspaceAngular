@@ -9,6 +9,7 @@ import { FestivosService } from 'src/app/Servicios/Festivos/Festivos.service';
 import { Maquilas_InternasService } from 'src/app/Servicios/Maquilas_Internas/Maquilas_Internas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Nomina_Corte',
@@ -24,6 +25,7 @@ export class Nomina_CorteComponent implements OnInit {
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load: boolean = false; //Variable que validará cuando vaya a salir la animacion de carga
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   rankDates: any[] = []; /** Array que almacenará el rango de fechas */
   productionCourt : any [] = [];
   hiddenProduction : any = [];

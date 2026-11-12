@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import moment from 'moment';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTe
 export class Ubicaciones_RollosComponent implements OnInit {
   load: boolean = false;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   storage_Id: number;
   storage_Name: number;
   validateRole: number;

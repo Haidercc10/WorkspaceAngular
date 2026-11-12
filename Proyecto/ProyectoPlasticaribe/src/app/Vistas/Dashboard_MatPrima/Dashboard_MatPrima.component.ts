@@ -10,6 +10,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardMateriaPrima as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Dashboard_MatPrima',
@@ -47,6 +48,8 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   cargando : boolean = false;
   nroCard : string = ''; /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  private readonly suscripcionTemaGraficas = alCambiarTema(() => this.actualizarColoresGraficas(), { omitirActual: true }); // recolorea las gráficas al cambiar de tema
 
   /* GRAFICA */
   ComparativoData: any;
@@ -63,15 +66,16 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
+  // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
+  private actualizarColoresGraficas() {
+    this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+  }
+
   ngOnInit() {
     this.tiempoExcedido();
     this.lecturaStorage();
-    setInterval(() => {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    }, 1000);
   }
 
   tutorial(){
@@ -261,8 +265,8 @@ export class Dashboard_MatPrimaComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: '#ebedef'}},
-        y: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: '#ebedef'}}
+        x: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}},
+        y: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}}
       }
     };
   }

@@ -5,6 +5,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { PrimeNGConfig } from 'primeng/api';
 import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
+import { TemaService } from './Servicios/Tema/Tema.service';
 import { User } from './_Models/user';
 import { User_BagPro } from './_Models/user_BagPro';
 import { user_Conta_Zeus } from './_Models/user_Conta_Zeus';
@@ -46,7 +47,6 @@ export class AppComponent implements OnInit {
   ValidarRol !: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   rutaCarpetaArchivos: string = 'D:\\Calidad'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
   tamanoLetra: number = 1;
-  temaSeleccionado: boolean = false;
   private destroy$ = new Subject<void>(); // Crear un Subject para controlar el ciclo de vida
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -57,7 +57,8 @@ export class AppComponent implements OnInit {
     private cookieService: CookieService,
     private config: PrimeNGConfig,
     private encriptacion: EncriptacionService,
-    @Inject(DOCUMENT) private document: Document,) {
+    @Inject(DOCUMENT) private document: Document,
+    private temaService: TemaService,) {
 
     this.authenticationService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user_InvZeus = x);
@@ -67,18 +68,23 @@ export class AppComponent implements OnInit {
     this.mostrar();
   }
 
-  mostrar() {
-    window.localStorage.setItem('theme', this.cookieService.get('theme'));
-    let modo = window.localStorage.getItem("theme");
-    if (modo) this.temaSeleccionado = modo == 'dark' ? true : false;
-    this.cambiar(this.temaSeleccionado);
+  /**
+   * Tema actual (true = oscuro). Se mantiene por compatibilidad con las vistas que lo leen; la fuente de verdad es
+   * TemaService. Para reaccionar a los cambios de tema usar alCambiarTema (Servicios/Tema/Tema.service.ts).
+   */
+  get temaSeleccionado(): boolean {
+    return this.temaService.oscuro;
   }
 
+  set temaSeleccionado(oscuro: boolean) {
+    this.temaService.cambiar(oscuro);
+  }
+
+  /** Se mantiene por compatibilidad: el tema ya lo aplica TemaService al crearse. */
+  mostrar() { }
+
   cambiar(estado: boolean) {
-    let tema = estado ? 'dark' : 'light';
-    window.localStorage.setItem("theme", tema);
-    let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
-    linkTema.href = 'lara-' + tema + '-blue' + '.css'
+    this.temaService.cambiar(estado);
   }
 
   ngOnInit(): void {

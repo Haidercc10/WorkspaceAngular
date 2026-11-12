@@ -15,6 +15,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudMateriaPrima as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   materiaPrima : any [] = []; //Variable que almacenará las materias primas
   unidadesMedida : any [] = []; //Variable que va a almacenar las unidades de medida
   materiasPrimasSeleccionadas : any [] = []; //Variable que almacenará las materias primas que son escogidas para la solicitud
@@ -82,7 +84,6 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.consultarCategorias();
     this.cargarConsecutivo();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a iniciar el tutorial in-app del componente actual

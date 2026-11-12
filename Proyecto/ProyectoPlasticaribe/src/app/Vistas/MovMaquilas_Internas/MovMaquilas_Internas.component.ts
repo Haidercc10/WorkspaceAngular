@@ -9,6 +9,7 @@ import { Servicios_ProduccionService } from 'src/app/Servicios/Servicios_Producc
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Maquilas_InternasComponent } from '../Maquilas_Internas/Maquilas_Internas.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-MovMaquilas_Internas',
@@ -27,6 +28,7 @@ export class MovMaquilas_InternasComponent implements OnInit {
   load: boolean = false;
   validateRole: number | undefined;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   operators: any[] = [];
   services: any[] = [];
   dataSearched: Array<any> = [];

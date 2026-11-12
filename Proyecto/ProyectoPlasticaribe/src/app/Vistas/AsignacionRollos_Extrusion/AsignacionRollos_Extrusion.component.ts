@@ -11,6 +11,7 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSalidaRollosExtrusion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-AsignacionRollos_Extrusion',
@@ -35,6 +36,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos escogidos
   rollosPDF : any [] = []; //Variable que almacenará la informacion de los rollos salientes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -59,7 +61,6 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerProcesos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

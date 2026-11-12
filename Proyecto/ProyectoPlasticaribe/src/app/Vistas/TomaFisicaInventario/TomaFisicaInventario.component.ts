@@ -21,6 +21,7 @@ import { TomaFisicaService } from 'src/app/Servicios/Toma_Fisica/toma-fisica.ser
 import { modelToma_Fisica } from 'src/app/Modelo/modelToma_Fisica';
 import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
 import { InventarioSnapshotService } from 'src/app/Servicios/Inventario_Snapshot/inventario-snapshot.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 
 @Component({
@@ -33,6 +34,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
 
   load: boolean = false;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   storage_Id: number;
   storage_Name: number;
   validateRole: number;

@@ -8,6 +8,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { NominaDetallada_PlasticaribeService } from 'src/app/Servicios/Nomina_Detallada/NominaDetallada_Plasticaribe.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_Nomina',
@@ -17,6 +18,7 @@ import { AppComponent } from 'src/app/app.component';
 export class Reporte_NominaComponent implements OnInit {
   form !: FormGroup;
   modeSelected : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modeSelected = oscuro); // mantiene modeSelected al día con el tema
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador

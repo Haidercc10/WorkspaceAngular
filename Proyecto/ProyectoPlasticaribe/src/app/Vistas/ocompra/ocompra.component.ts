@@ -20,6 +20,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenesCompra as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +61,7 @@ export class OcompraComponent implements OnInit {
   llave: string = 'pdf';
   ordenCreada: number = 0;
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   solicitud: boolean = false;
   iva: number = 19;
   modalConcepts = false;
@@ -113,7 +115,6 @@ export class OcompraComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.generarConsecutivo();
     this.consultarCategorias();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial() {

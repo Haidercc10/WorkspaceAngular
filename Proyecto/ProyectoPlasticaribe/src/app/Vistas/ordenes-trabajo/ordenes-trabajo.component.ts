@@ -36,6 +36,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsCrearMezclasOT as defaultSteps3 } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -110,6 +111,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   pesoProducto : number = 0; //Variable que almacenará el peso del producto
   informacionSeleccionada : any; //Variable que almacenará la información del producto seleccionado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   formCrearMezclas !: FormGroup;
   arrayMateriales2 : any = [];
@@ -344,7 +346,6 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.cargarEstados();
     this.lecturaStorage();
     this.ultimaOT();

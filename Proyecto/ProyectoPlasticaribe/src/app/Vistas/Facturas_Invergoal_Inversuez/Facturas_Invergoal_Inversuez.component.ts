@@ -10,6 +10,7 @@ import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service'
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsInvergoalInversuez as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Facturas_Invergoal_Inversuez',
@@ -25,6 +26,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   FormFacturas !: FormGroup;
   proveedores : any [] = [];
@@ -56,7 +58,6 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
     this.lecturaStorage();
     this.cargarProveedores();
     this.cargarEmpresas();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

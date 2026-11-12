@@ -11,6 +11,7 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { defaultStepOptions, stepsMovimientosDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte-Despacho',
@@ -31,6 +32,7 @@ export class ReporteDespachoComponent implements OnInit {
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados
   consolidadoRollo : any [] = []; //Variable que va a almacenar el consolidado de la cantidad de rollos ingresados o facturados
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private AppComponent : AppComponent,
                   private frmBuilder : FormBuilder,
@@ -57,7 +59,6 @@ export class ReporteDespachoComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerTipoDocumento();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

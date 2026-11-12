@@ -7,6 +7,7 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Dashboard_CuentasPagar',
@@ -24,6 +25,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   carteraAgrupadaProveedores : any [] = []; //Variable que almacenará la información de la cartera agrupada por los proveedores
   carteraInvergoal : any [] = []; //Variable que almacenará la información de la cartera de INVERGOAL
   carteraInversuez : any [] = []; //Variable que almacenará la información de la cartera de INVERSUEZ
@@ -41,7 +43,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.tiempoExcedido();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que iniciará el tutorial

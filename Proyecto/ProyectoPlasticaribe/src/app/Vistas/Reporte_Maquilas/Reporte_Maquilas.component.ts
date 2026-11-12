@@ -14,6 +14,7 @@ import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovMaquilas as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_Maquilas',
@@ -41,6 +42,7 @@ export class Reporte_MaquilasComponent implements OnInit {
   valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
   pesoTotal : number = 0; /** Peso total de la orden de maquila */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -66,7 +68,6 @@ export class Reporte_MaquilasComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerEstados();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

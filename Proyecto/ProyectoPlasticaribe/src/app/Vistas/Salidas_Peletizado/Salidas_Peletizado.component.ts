@@ -12,6 +12,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Salidas_PeletizadoService } from 'src/app/Servicios/Salidas_Peletizado/Salidas_Peletizado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn : 'root'
@@ -26,6 +27,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 export class Salidas_PeletizadoComponent implements OnInit, OnDestroy {
 
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   load : boolean = false;
   presentations : any = []; 
   form !: FormGroup;

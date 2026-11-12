@@ -13,6 +13,7 @@ import { Tipos_NominaService } from 'src/app/Servicios/Tipos_Nomina/Tipos_Nomina
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsNomina as defaultSteps } from 'src/app/data';
 import { Nomina_CorteComponent } from '../Nomina_Corte/Nomina_Corte.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn : 'root'
@@ -38,6 +39,7 @@ export class NominaComponent implements OnInit {
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load: boolean = true; //Variable que validará cuando vaya a salir la animacion de carga
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   rangoFechas: any[] = []; /** Array que almacenará el rango de fechas */
   arraySellado: any = []; /** Array que cargará la información de la nomina de los operarios de sellado */
   nominaDespacho: any[] = []; /** Array que cargará la información de la nomina de los operarios de despacho */
@@ -65,7 +67,6 @@ export class NominaComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerTiposNominas();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.validateActiveTab();
   }
 

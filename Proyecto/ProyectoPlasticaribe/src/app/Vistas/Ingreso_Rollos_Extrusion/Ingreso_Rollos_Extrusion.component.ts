@@ -15,6 +15,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsBodegas as defaultSteps } from 'src/app/data';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 import { finalize, pipe } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
   rollosConsultados : any [] = []; //Variable que almacenará la información de los rollos que hayan sido consultados
@@ -82,7 +84,6 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.getProcesos();
     //this.loadCurrentWareHouse();
   }

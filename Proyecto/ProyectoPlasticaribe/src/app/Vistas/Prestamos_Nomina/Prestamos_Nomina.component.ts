@@ -8,6 +8,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { FormEditarPrestamosComponent } from '../FormEditarPrestamos/FormEditarPrestamos.component';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,7 @@ export class Prestamos_NominaComponent implements OnInit {
   @ViewChild(FormEditarPrestamosComponent) cmFormEditLoans: FormEditarPrestamosComponent;
   load: boolean = false;
   modeSelected: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modeSelected = oscuro); // mantiene modeSelected al día con el tema
   employees: any = [];
   form !: FormGroup;
   loans: any = [];

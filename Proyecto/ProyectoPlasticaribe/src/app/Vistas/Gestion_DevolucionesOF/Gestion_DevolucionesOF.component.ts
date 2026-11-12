@@ -15,6 +15,7 @@ import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFactura
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { OverlayPanel } from 'primeng/overlaypanel';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Gestion_DevolucionesOF',
@@ -34,6 +35,7 @@ export class Gestion_DevolucionesOFComponent implements OnInit, OnChanges {
   ValidarRol: number | undefined;
   form !: FormGroup;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   production: Array<production> = [];
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];

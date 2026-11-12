@@ -9,6 +9,7 @@ import { InventariosService } from 'src/app/Servicios/Inventarios/inventarios.se
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TomaFisicaInventarioService } from 'src/app/Servicios/Toma_Fisica_Inventario/toma-fisica-inventario.service';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_R
 })
 export class InventarioVsTomaFisicaComponent implements OnInit {
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   @ViewChild('table') table: Table | undefined;
   @ViewChild('tableSystem') tableSystem: Table | undefined;
   @ViewChild('tableCount') tableCount: Table | undefined;

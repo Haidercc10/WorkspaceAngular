@@ -8,6 +8,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCompras as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Dashboard_Compras',
@@ -21,6 +22,8 @@ export class Dashboard_ComprasComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  private readonly suscripcionTemaGraficas = alCambiarTema(() => this.actualizarColoresGraficas(), { omitirActual: true }); // recolorea las gráficas al cambiar de tema
 
   @ViewChild('dt_comprasAgrupadas') dt_comprasAgrupadas: Table | undefined;
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
@@ -53,17 +56,18 @@ export class Dashboard_ComprasComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
+  // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
+  private actualizarColoresGraficas() {
+    this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+  }
+
   ngOnInit() {
     this.llenarArrayAnos();
     this.inicializarGraficas();
     this.lecturaStorage();
     this.validarConsulta();
-    setInterval(() => {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    }, 1000);
   }
 
   // Funcion que iniciará el tutorial
@@ -141,14 +145,14 @@ export class Dashboard_ComprasComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' },
+          grid: { color: 'rgba(128, 128, 128, 0.2)' },
           min : 0
         },
       },

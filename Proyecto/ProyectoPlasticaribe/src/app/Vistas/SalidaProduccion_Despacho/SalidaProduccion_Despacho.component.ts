@@ -22,6 +22,7 @@ import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacio
 import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Productos/facturacion-productos.service';
 import { MovimientosOrdenFacturacionComponent } from '../Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
 import { finalize, Subject, take, takeUntil } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -35,6 +36,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   storage_Id: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   sendProductionZeus: any[] = [];
   productionSearched: any;
   production: Array<production> = [];

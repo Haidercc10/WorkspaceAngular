@@ -10,6 +10,7 @@ import { AppComponent } from 'src/app/app.component';
 import { stepsMovRecuperado as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_RecuperadoMP',
@@ -32,6 +33,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   consultaTurno : string = '';
   modalInfoRecuperado : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilder : FormBuilder,
                 private materiaPrimaService : MateriaPrimaService,
@@ -56,7 +58,6 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.obtenerTurnos();
     this.obtenerOperarios();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
 
     this.columnas = [
       { header: 'Id Materia Prima', field: 'idMatPrima'},

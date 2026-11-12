@@ -22,6 +22,7 @@ import { DepartamentosMunicipiosColombiaService } from 'src/app/Servicios/Depart
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -60,6 +61,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   arrayPedidosIndividuales: any = [];
   datosExcel: any[] = []; //VAriable que almcanerá la informacion que se verá en el archivo de excel
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   modalExportarPDF: boolean = false;
   informacionPDF: any[] = [];
   vendedores: any[] = [];
@@ -103,7 +105,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.consultarPedidosZeus();
     this.getBillingSales();
     //this.consultarPedidos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial() {

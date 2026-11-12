@@ -26,6 +26,7 @@ import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_M
 import { SubcategoriasMatPrimaService } from 'src/app/Servicios/Subcategorias_MatPrima/subcategorias-mat-prima.service';
 import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
 import { ReservaInventario } from 'src/app/Modelo/modelFlujoMaterialProduccion';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 /** Tablas del reporte que muestran totales en el footer. */
 type TablaInventario = 'general' | 'polietilenos' | 'tintas' | 'biorientados';
@@ -72,7 +73,6 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
   private consultasEnCurso: number = 0; //Cantidad de consultas activas, para saber cuándo ocultar la animación de carga
   private rangoConsultado?: { inicio: string, fin: string }; //Último rango consultado con éxito (se muestra en el Excel)
   private boppsAgrupadosCargados: boolean = false; //Indica si ya se consultaron los bopps agrupados
-  private intervaloTema?: any; //Intervalo que sincroniza el tema claro/oscuro
   columnas: any[] = []; //Variable que almacenará las columnas de la tabla que no se verá inicialmente pero que se podrá elegir
   _columnasSeleccionada: any[] = []; //variable que almacenará las columnas de la tabla que han sido seleccionadas
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -115,6 +115,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
   cantExistenciasBiorientado: number = 0; //Variable que guardará la cantidad total en existencias de los biorientados
   cantDiferenciaBiorientado: number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual de los biorientados
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   modalCreacionMateriaPrima: boolean = false; //Variable para validar que se abra el modal en que se pregusntará que se creará
   ModalCrearMateriaPrima: boolean = false; //Variable para validar que se abra el modal de creacion de polietileno
   ModalCrearTintas: boolean = false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenetes
@@ -191,11 +192,9 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
     this.obtenerUnidadesMedidas();
     this.getSubcategories();
 
-    this.intervaloTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   ngOnDestroy(): void {
-    if (this.intervaloTema) clearInterval(this.intervaloTema);
     this.subInventario?.unsubscribe();
     this.subBoppsAgrupados?.unsubscribe();
     this.subModalBopp?.unsubscribe();

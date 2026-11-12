@@ -11,6 +11,7 @@ import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespa
 import { defaultStepOptions, stepsPreIngresoRolloDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-PreIngresoRollosExtrusion',
@@ -35,6 +36,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -61,7 +63,6 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     this.minDate.setDate(25);
     this.minDate.setMonth(8);
     this.minDate.setFullYear(2022);
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

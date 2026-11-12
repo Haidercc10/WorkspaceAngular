@@ -18,6 +18,7 @@ import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTe
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produccion.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   arrayDesperdicios: any = []; //Array que guardará la información total de los desperdicios consultados.
   date: any | undefined = [new Date(), new Date()] //Variable que guardará la fecha seleccionada en el campo de rango de fechas
   turnos: string[] = []; //Variable que guardará los turnos obtenidos de la consulta al API
@@ -90,7 +92,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.getTurnos();
     this.obtenerFallas();
     this.obtenerProcesos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función para validar el area del rol del usuario logueado.

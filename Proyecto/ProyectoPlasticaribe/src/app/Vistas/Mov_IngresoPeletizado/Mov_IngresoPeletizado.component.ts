@@ -12,6 +12,7 @@ import { Ingreso_PeletizadoComponent } from '../Ingreso_Peletizado/Ingreso_Pelet
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Salidas_PeletizadoComponent } from '../Salidas_Peletizado/Salidas_Peletizado.component';
 import { MateriaPrimaRecuperadaComponent } from '../MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,7 @@ export class Mov_IngresoPeletizadoComponent implements OnInit {
   storage_Id: number;
   validateRole: number | undefined;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   products: any[] = [];
   @ViewChild('tableData1') tableData1: Table | undefined;
   @ViewChild('tableData2') tableData2: Table | undefined;

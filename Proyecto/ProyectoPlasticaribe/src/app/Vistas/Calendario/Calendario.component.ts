@@ -12,6 +12,7 @@ import { EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/Ev
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Calendario',
@@ -28,6 +29,7 @@ export class CalendarioComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   modalEvento : boolean = false; //Variable que validará si se ve el modal de creación, edición y eliminación de eventos
   accion : string = 'Crear'; //Variable que tendrá la información del titulo que tendrá el modal
   visibilidadSeleccionable: any[] = [{ key: `A`, label: `Solo Yo`, data: `Solo Yo`, icon: 'pi pi-fw pi-user', children: [] }]; //Variable que almacenará las opciones de usuarios a ver el evento
@@ -56,7 +58,6 @@ export class CalendarioComponent implements OnInit {
     this.obtenerRoles();
     this.opcionesCalendario();
     this.obtenerEventos('');
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

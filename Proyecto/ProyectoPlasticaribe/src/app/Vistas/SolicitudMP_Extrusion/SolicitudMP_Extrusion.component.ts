@@ -25,6 +25,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
 import { CreacionPdfService, DatosOTSolicitudPDF } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 /** Segundos que se muestra el aviso de PDF generado antes de abrirlo en una pestaña nueva. */
 const ESPERA_ABRIR_PDF_OT_SEG = 3;
@@ -68,6 +69,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   infoOrdenTrabajo: any[] = [];
   mpSeleccionada: SubcategoriaSolicitada | null = null;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   esSolicitud: boolean = false; //Indica que se está editando una solicitud existente
   viewSubcategories: boolean = false;
   subcategoriesInModal: any[] = [];
@@ -144,7 +146,6 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerProcesos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.formEncabezado.patchValue({ 'proceso': this.validateProcess(), });
     if (this.validateProcess() != '') this.cargarMaquinas();
     this.tutoriales.iniciarPrimeraVez(ClaveTutorialSolicitudMaterial, this.storage_Id, () => this.pasosTutorial());

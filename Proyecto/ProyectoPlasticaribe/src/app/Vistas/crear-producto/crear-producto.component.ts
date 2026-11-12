@@ -11,6 +11,7 @@ import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-product
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,7 @@ export class CrearProductoComponent implements OnInit {
   tiposSellado : any [] = [];  //Variable que almacenará los tipos de sellados
   cliente : any [] = []; //Variable que almacenará los clientes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilderCrearProducto : FormBuilder,
                 private unidadMedidaService : UnidadMedidaService,

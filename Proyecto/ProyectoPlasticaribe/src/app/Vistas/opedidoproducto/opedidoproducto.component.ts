@@ -26,6 +26,7 @@ import { OrdenesTrabajoComponent } from '../ordenes-trabajo/ordenes-trabajo.comp
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 const pdfMake = require('pdfmake/build/pdfmake');
 const pdfFonts = require('pdfmake/build/vfs_fonts');
@@ -132,6 +133,7 @@ export class OpedidoproductoComponent implements OnInit {
   public historyHeading: string = 'Seleccionado Recientemente';
   public historyHeading2: string = 'Seleccionado Recientemente';
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
 
   constructor(private pedidoproductoService: OpedidoproductoService,

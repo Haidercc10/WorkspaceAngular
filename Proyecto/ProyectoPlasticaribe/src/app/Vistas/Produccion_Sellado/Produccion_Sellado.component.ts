@@ -14,6 +14,7 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Produccion_Sellado',
@@ -25,6 +26,7 @@ export class Produccion_SelladoComponent implements OnInit {
 
   cargando: boolean = false; //Variable de carga
   modoSeleccionado: boolean = false; //Variable de modo de seleccion
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formSellado !: FormGroup; //Formulario de sellado
   turnos: any[] = []; //array que contiene los diferentes turnos
   operarios: any[] = []; //array que contiene los diferentes operarios

@@ -15,6 +15,7 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -31,6 +32,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
   cargando: boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -73,7 +75,6 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     this.cargarAnios();
     this.consultarVendedores();
     this.consultarClientes();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial() {

@@ -14,6 +14,7 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 import { ClaveTutorialPrecargue, pasosTutorialPrecargue } from 'src/app/Tutoriales/Tutoriales_Precargue';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 // Cada pestaña gestiona un precargue independiente. pcdId es null hasta que se escanea el primer rollo.
 interface PreloadTab {
@@ -49,6 +50,7 @@ export class Precargue_RollosDespachoComponent implements OnInit, OnDestroy {
 
   load: boolean = false;
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   tabs: PreloadTab[] = [];
   activeIndex: number = 0;
   @ViewChild('tabView') tabView: TabView;

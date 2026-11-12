@@ -17,6 +17,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteCostos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -79,6 +80,7 @@ export class ReporteCostosOTComponent implements OnInit {
   estado : any = null;
   arrayEstados : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
@@ -117,7 +119,6 @@ export class ReporteCostosOTComponent implements OnInit {
     this.lecturaStorage();
     this.cargarEstados();
     this.inhabilitarCampos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

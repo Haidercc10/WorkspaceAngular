@@ -11,6 +11,7 @@ import { AppComponent } from 'src/app/app.component';
 import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn : 'root'
@@ -29,6 +30,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   storage_Id: number;
   validateRole: any;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   products: any[] = [];
   dataSearched: Array<dataDesp> = [];
   dataSearchedFiltered: Array<dataDesp> = [];

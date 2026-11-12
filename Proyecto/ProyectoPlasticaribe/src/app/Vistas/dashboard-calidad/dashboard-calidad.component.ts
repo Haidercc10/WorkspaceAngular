@@ -6,6 +6,7 @@ import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { DevolucionesCalidadService } from 'src/app/Servicios/Devoluciones_Calidad/devoluciones-calidad.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MovDevolucionesCalidadComponent } from '../mov-devoluciones-calidad/mov-devoluciones-calidad.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-dashboard-calidad',
@@ -24,6 +25,8 @@ export class DashboardCalidadComponent implements OnInit {
   cargando : boolean = false; //Variable que va a validar si se esta cargando algo o no
 
   modoSeleccionado : boolean; //Variable que almacenará el modo seleccionado, claro u oscuro, esta información se obtiene del componente principal para que se pueda cambiar de forma dinámica
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  private readonly suscripcionTemaGraficas = alCambiarTema(() => this.actualizarColoresGraficas(), { omitirActual: true }); // recolorea las gráficas al cambiar de tema
   monthNames: any = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', '']; //Variable que almacenará el nombre de los meses para mostrar en las opciones de filtrado y en las graficas
   monthSelected : any = null; //Variable que almacenará el mes seleccionado para filtrar la información, por defecto no se selecciona ningún mes para mostrar toda la información del año
   typeRejected : any = ['', 'INTERNO', 'EXTERNO', '']; //Variable que almacenará los tipos de rechazo para filtrar la información, por defecto no se selecciona ningún tipo de rechazo para mostrar toda la información
@@ -88,6 +91,13 @@ export class DashboardCalidadComponent implements OnInit {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
+  // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
+  private actualizarColoresGraficas() {
+    this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+  }
+
   ngOnInit() {
     this.lecturaStorage();
     this.llenarArrayAnos();
@@ -95,12 +105,6 @@ export class DashboardCalidadComponent implements OnInit {
     this.getInfoDevolutionsQuality();
     this.inicializarGraficas(); //TODO: (1) 
     this.tiempoExcedido();
-    setInterval(() => {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    }, 1000);
   } 
 
   selectMonthAuto(){
@@ -280,8 +284,8 @@ export class DashboardCalidadComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: '#ebedef'}},
-        y: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: '#ebedef'}}
+        x: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}},
+        y: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}}
       }
     };
   }
@@ -330,21 +334,21 @@ export class DashboardCalidadComponent implements OnInit {
               //else return this.getLabelForValue(value);
             }
           },
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: '#ebedef'}
+          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
         },
       },
     };
@@ -393,21 +397,21 @@ export class DashboardCalidadComponent implements OnInit {
               else return label;
             }
           },
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: '#ebedef'}
+          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
         },
       },
     };
@@ -461,21 +465,21 @@ export class DashboardCalidadComponent implements OnInit {
               //else return this.getLabelForValue(value);   
             }
           },
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: '#ebedef'}
+          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
         },
       },
     };
@@ -528,21 +532,21 @@ export class DashboardCalidadComponent implements OnInit {
               //else return this.getLabelForValue(value);   
             }
           },
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: '#ebedef'}
+          grid: {color: 'rgba(128, 128, 128, 0.2)'}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
           ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: '#ebedef'}
+          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
         },
       },
     };
@@ -619,14 +623,14 @@ export class DashboardCalidadComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' },
+          grid: { color: 'rgba(128, 128, 128, 0.2)' },
           min : 0
         },
       },

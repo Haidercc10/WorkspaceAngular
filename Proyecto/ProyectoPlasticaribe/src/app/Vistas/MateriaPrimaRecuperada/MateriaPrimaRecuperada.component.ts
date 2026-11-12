@@ -15,6 +15,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsRecuperado as defaultSteps } from 'src/app/data';
 import { Mov_IngresoPeletizadoComponent } from '../Mov_IngresoPeletizado/Mov_IngresoPeletizado.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +52,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
   mpSeleccionada : any = []; //Variable que almacenará la información de la materia prima seleccionada para quitar de la tabla
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   modalMode : boolean = false; //Variable que se usará para cambiar el titulo del modal de agregar materia prima dependiendo de si se está editando o agregando una nueva materia prima
   fieldFocus : boolean = false; //Variable que se usará para validar el foco en el campo de cantidad de la materia prima en la tabla, para mostrar un mensaje de advertencia si la cantidad ingresada es mayor a la cantidad inicial
   title : boolean = true; //Variable que se usará para mostrar el titulo de la vista dependiendo del rol del usuario, si es tipo 2 se mostrará "Registrar materia prima recuperada" y si es otro tipo de rol se mostrará "Registrar materia prima retirada"
@@ -97,7 +99,6 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerUsuarios();
     this.obtenerTurnos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

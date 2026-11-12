@@ -8,6 +8,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-ReporteFacturacionClientes',
@@ -23,6 +24,7 @@ export class ReporteFacturacionClientesComponent implements OnInit {
   validateRole: number | undefined;
   formClientFilters: FormGroup;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   clients: Array<any> = [];
   items: Array<any> = [];
   billsPerClient: Array<BillsClient> = [];

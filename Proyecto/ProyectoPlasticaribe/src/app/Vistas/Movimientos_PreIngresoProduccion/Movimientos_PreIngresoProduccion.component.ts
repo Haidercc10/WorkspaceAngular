@@ -10,6 +10,7 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
 import { PreIngresoProduccion_DespachoComponent } from '../PreIngresoProduccion_Despacho/PreIngresoProduccion_Despacho.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Movimientos_PreIngresoProduccion',
@@ -20,6 +21,7 @@ import { PreIngresoProduccion_DespachoComponent } from '../PreIngresoProduccion_
 export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   load : boolean = false;
   modeSelected: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modeSelected = oscuro); // mantiene modeSelected al día con el tema
   movements : any[] = [];
   form !: FormGroup;
   process : any = [];

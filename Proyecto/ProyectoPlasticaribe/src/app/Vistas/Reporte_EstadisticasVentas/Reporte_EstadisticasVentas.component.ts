@@ -7,6 +7,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_EstadisticasVentas',
@@ -21,6 +22,7 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
   vendors : any = [];
   clients : any = [];
   modoSeleccionado : boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   load : boolean = false;
   years : any = [];
   infoTable : any = [];

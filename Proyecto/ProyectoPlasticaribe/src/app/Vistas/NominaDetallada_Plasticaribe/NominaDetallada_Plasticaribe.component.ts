@@ -11,6 +11,7 @@ import { PaymentLoan, Prestamos_NominaService } from 'src/app/Servicios/Prestamo
 import { DataMoneySave, SalarioTrabajadoresService } from 'src/app/Servicios/Salario_Trabajadores/Salario-Trabajadores.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-NominaDetallada_Plasticaribe',
@@ -25,6 +26,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   storage_Id: any;
   storage_Name: string | undefined;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   rangeDates: Array<any> = [];
   @ViewChild('tableWorkers') tableWorkers: Table;
   formPayrollWorker: FormGroup;

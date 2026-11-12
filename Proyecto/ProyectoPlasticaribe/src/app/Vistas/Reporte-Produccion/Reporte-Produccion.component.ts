@@ -12,6 +12,7 @@ import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_R
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte-Produccion',
@@ -24,6 +25,7 @@ export class ReporteProduccionComponent implements OnInit {
   @ViewChild('dt') dt !: Table;
   cargando: boolean = false;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   formFiltros !: FormGroup;

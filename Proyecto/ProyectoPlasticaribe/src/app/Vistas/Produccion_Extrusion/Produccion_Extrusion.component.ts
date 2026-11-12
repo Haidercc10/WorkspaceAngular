@@ -20,6 +20,7 @@ import { AppComponent } from 'src/app/app.component';
 import { RePrint } from '../Produccion_Sellado/Produccion_Sellado.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Produccion_Extrusion',
@@ -33,6 +34,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   storage_Id: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formDatosProduccion !: FormGroup;
   turnos: Array<any> = [];
   unidadesMedida: Array<any> = [];

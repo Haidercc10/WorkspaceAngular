@@ -10,6 +10,7 @@ import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoR
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsInventarioExtrusion as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Inventario_Extrusion',
@@ -33,6 +34,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
   pesoTotalOrden : number = 0; //Variable que va a tener el peso total de la orden consultada
   aperturaModal : number = 0;
   modoSeleccionado : boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -54,7 +56,6 @@ export class Inventario_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.consultar();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

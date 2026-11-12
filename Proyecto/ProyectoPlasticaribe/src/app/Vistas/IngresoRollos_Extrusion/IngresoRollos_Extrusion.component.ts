@@ -10,6 +10,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsIngresoRollosExtrusion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-IngresoRollos_Extrusion',
@@ -34,6 +35,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   totalCantidad : number = 0;
   rollosPDF : any [] = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -57,7 +59,6 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

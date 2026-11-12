@@ -21,6 +21,7 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
 import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_BodegaRollos/Ubicaciones_BodegaRollos.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-solicitud-rollos-areas',
@@ -35,6 +36,7 @@ export class SolicitudRollosAreasComponent {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
   bodegasSolicitadas : any [] = []; //Variable que va a tener las bodegas a los cuales se les pedirán rollos.
@@ -93,7 +95,6 @@ export class SolicitudRollosAreasComponent {
     this.getUbications();
     this.url = this.router.url;
     this.validateProcess();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

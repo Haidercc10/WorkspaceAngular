@@ -16,6 +16,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { stepsFacturacionMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Facturacion_OrdenMaquila',
@@ -38,6 +39,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   informacionPDF : any [] = []; //Variable que almcenará la informacion de la factura consultada para crear el pdf
   documento : number = 0;
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -62,7 +64,6 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

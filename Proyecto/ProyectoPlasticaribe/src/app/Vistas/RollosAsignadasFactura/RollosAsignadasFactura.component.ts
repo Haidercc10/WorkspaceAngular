@@ -12,6 +12,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDespacharRollosDespacho as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-RollosAsignadasFactura',
@@ -37,6 +38,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   Productos : any [] = [];
   rollosAsignados : any [] = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -60,7 +62,6 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerCondutores();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

@@ -8,6 +8,7 @@ import { AppComponent } from 'src/app/app.component';
 import { CertificadoCalidadComponent } from '../Certificado-Calidad/Certificado-Calidad.component';
 import { ShepherdService } from 'angular-shepherd';
 import { defaultStepOptions, stepsMov_CertificadosCalidad as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_CertificadosCalidad',
@@ -18,6 +19,7 @@ import { defaultStepOptions, stepsMov_CertificadosCalidad as defaultSteps } from
 export class Reporte_CertificadosCalidadComponent implements OnInit {
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   certificados : any = []; /** Array que contendrá la información de los certificados */
   @ViewChild('dt') dt: Table | undefined; /** Tabla que contendrá la información de los certificados */
   FormFiltros !: FormGroup; /** Formulario que contendrá los filtros de búsqueda */
@@ -52,7 +54,6 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
   
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

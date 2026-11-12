@@ -18,6 +18,7 @@ import { AppComponent } from 'src/app/app.component';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { finalize, of } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +36,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit, OnChanges {
   ValidarRol: number = 0;
   load: boolean = false;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formDataOrder: FormGroup;
   production: Array<production> = [];
   productionSelected: Array<production> = [];

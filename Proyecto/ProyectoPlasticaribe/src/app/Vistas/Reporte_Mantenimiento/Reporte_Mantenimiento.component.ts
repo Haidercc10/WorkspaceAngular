@@ -12,6 +12,7 @@ import { AppComponent } from 'src/app/app.component';
 import { stepsReporteActivos as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
   modalMovimientos : boolean = false; //Variable que hará que se muestre o no el modal de movimientos de activos
   @ViewChild(Movimientos_MantenimientoComponent) movimientosActivos : Movimientos_MantenimientoComponent;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private AppComponent : AppComponent,
@@ -61,7 +63,6 @@ export class Reporte_MantenimientoComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.consultarActivos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

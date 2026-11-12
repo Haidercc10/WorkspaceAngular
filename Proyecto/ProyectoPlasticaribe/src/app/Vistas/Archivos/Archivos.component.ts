@@ -11,6 +11,7 @@ import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Archivos',
@@ -39,6 +40,7 @@ export class ArchivosComponent implements OnInit {
   validarArchivo_Carpeta: boolean = false; //Variable que va a validar si lo que se quiere mover o copiar es un archivo o una carpeta
   descargandoArchivo: boolean = false; //Variable que va a validar si el si se está descargando un archivo o carpeta
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   modal: boolean = false; /** Variable que servirá para abrir el modal de crear categorias */
   clave: string = ''; /** Palabra clave para mostrar mensajes de elección de eliminación de archivos y carpetas */
   fileSeleccionado: any; /** Archivo/Carpeta seleccionado para ser eliminado */
@@ -81,7 +83,6 @@ export class ArchivosComponent implements OnInit {
     this.mostrarCarpetas();
     this.obtenerCategorias();
     this.cargarArchivos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

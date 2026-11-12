@@ -5,6 +5,7 @@ import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/Bodega
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-inventarioBodegaDespacho',
@@ -18,6 +19,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   storage_Id: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formStorehouse: FormGroup;
   storehouse: Array<any> = [];
   ubicationsStorehouse: Array<any> = [];

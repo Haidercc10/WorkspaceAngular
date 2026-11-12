@@ -16,6 +16,7 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-OrdenFacturacion_Pallets',
@@ -33,6 +34,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   ValidarRol: number;
   load: boolean = false;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   form : FormGroup;
   pallets : Array<any> = [];
   copyPallets : Array<any> = [];

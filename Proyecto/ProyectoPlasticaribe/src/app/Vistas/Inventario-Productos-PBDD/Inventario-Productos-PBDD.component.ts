@@ -10,6 +10,7 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MessageService } from 'primeng/api';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   storage_Nombre: string;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   columns: Array<Columns> = [];
   selectedColumns: Array<Columns> = [];
   selectedColumnsComparative: Array<Columns> = [];

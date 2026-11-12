@@ -13,6 +13,7 @@ import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 import { finalize } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +49,7 @@ export class MovimientoMPComponent implements OnInit {
   movimientosBiorientados: any[] = []; //Variable que va a contener la informacion de los movimientos de los biorientados
   datosPdf: any[] = []; //Variable en la que se almacenará la información que se verá en el pdf
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   cantRestante: number = 0;
   cantAsignada: number = 0;
   movements: any = [];
@@ -88,7 +90,6 @@ export class MovimientoMPComponent implements OnInit {
     this.obtenerTipoDocumento();
     this.obtenerMateriasPrimas();
     this.loadRankDates();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función para cargar fechas en el rango.

@@ -11,6 +11,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteRollosEliminados as defaultSteps } from 'src/app/data';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',
@@ -36,6 +37,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   public Item : any = null; /** variable ngModel que servirá para la consulta de tipo LIKE para traer nombres de productos */
   public arrayProcesos : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private formbuilder : FormBuilder,
                 private servicioProducto : ProductoService,
@@ -61,7 +63,6 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     this.obtenerProcesos();
     this.lecturaStorage();
     this.loadRankDates();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función para cargar fechas en el rango. 

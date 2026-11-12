@@ -10,6 +10,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDevolverRolloDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Devoluciones_Productos_Rollos',
@@ -30,6 +31,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   observacionFactura : string = ''; //Variable que almacenará la observcación añadida de la devolución de factura
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -46,7 +48,6 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

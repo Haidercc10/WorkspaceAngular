@@ -220,10 +220,12 @@ a {
   filter: grayscale(60%);
 }
 
+/* "Cargando empresas...", "Consultando servicios...": color del tema cargado (gris en claro, claro en oscuro) */
 .mensajeConexion {
   margin-top: 1.5rem;
   max-width: 100%;
   font-size: 1rem;
+  color: var(--text-color);
 }
 
 /* Un error por renglón: ícono a la izquierda y texto alineado, cada uno en su propia línea */
@@ -321,14 +323,11 @@ a {
   margin: -4% 0 6% 0;
 }
 
+/* Color del tema cargado: antes heredaba un color oscuro fijo y en modo oscuro no se veía */
 .recordarme label {
   cursor: pointer;
   margin: 0;
-}
-
-/* En modo oscuro la etiqueta heredaba un color oscuro y no se veía sobre el fondo del contenedor */
-.contenedorLoginDark .recordarme label {
-  color: #e2e8f0;
+  color: var(--text-color);
 }
 
 @keyframes puff-in-center {

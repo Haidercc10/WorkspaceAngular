@@ -29,12 +29,10 @@ p-panelmenu ::ng-deep chevrondownicon, p-panelmenu ::ng-deep chevronrighticon, p
   color: var(--rojo);
 }
 
-p-panelmenu ::ng-deep div[style*="white"] a {
-  color: white;
-}
-
-p-panelmenu ::ng-deep div[style*="black"] a {
-  color: #495057;
+/* Texto de las opciones del menú: sale de la variable del tema que esté cargado, no de un estilo inline que
+   dependía de la detección de cambios (quedaba blanco en modo claro o gris en modo oscuro hasta el siguiente clic) */
+p-panelmenu ::ng-deep div a {
+  color: var(--text-color);
 }
 
 .imagen{

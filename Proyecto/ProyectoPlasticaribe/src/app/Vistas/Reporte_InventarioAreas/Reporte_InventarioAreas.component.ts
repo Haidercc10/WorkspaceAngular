@@ -13,6 +13,7 @@ import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service'
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte_InventarioAreas',
@@ -29,6 +30,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   hora : any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual 
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   rangoFechas : any = []; //Variable que guardará el rango de fechas seleccionado por el usuario
   invMatPrimas : any = []; //Variable que guardará el inventario de las areas.
   invReciclados : any = []; //Variable que guardará el inventario de las areas
@@ -74,7 +76,6 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.consultarCategorias();
   }
 

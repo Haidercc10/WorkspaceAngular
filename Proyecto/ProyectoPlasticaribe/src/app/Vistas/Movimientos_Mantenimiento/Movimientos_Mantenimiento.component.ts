@@ -14,6 +14,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { stepsMovimientosMtto as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   modeModal : boolean = false; //Variable que hará que se muestre el menú lateral o no
   infoPdf : any [] = []; //Variable que tendrá la información los activos de un pedido un mantenimiento consultados
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -72,7 +74,6 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     this.obtenerActivos();
     this.obtenerTiposMantenimiento();
     this.obtenerEstados();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

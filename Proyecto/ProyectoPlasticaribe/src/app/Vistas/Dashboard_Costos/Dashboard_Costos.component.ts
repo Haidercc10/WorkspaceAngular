@@ -10,6 +10,7 @@ import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticarib
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCostos as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Dashboard_Costos',
@@ -21,6 +22,8 @@ export class Dashboard_CostosComponent implements OnInit {
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : any; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  private readonly suscripcionTemaGraficas = alCambiarTema(() => this.actualizarColoresGraficas(), { omitirActual: true }); // recolorea las gráficas al cambiar de tema
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
   rangoFechas : any [] = []; //Variable que almacenará la información de la fecha de inicio y la fecha de fin
@@ -71,17 +74,18 @@ export class Dashboard_CostosComponent implements OnInit {
                           private invMatPrimasService : InventInicialDiaService,
                             private excelService : CreacionExcelService,){}
 
+  // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
+  private actualizarColoresGraficas() {
+    this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+  }
+
   ngOnInit(): void {
     this.lecturaStorage();
     this.llenarArrayAnos();
     this.inicializarGraficas();
     this.llenarGraficas();
-    setInterval(() => {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    }, 1000);
   }
 
   tutorial(){
@@ -145,14 +149,14 @@ export class Dashboard_CostosComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' },
+          grid: { color: 'rgba(128, 128, 128, 0.2)' },
           min : 0
         },
       },

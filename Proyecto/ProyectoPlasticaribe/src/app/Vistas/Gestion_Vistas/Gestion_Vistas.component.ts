@@ -11,6 +11,7 @@ import { imagenes } from 'src/app/Vistas/Gestion_Vistas/Iconos';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { AppComponent } from 'src/app/app.component';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Gestion_Vistas',
@@ -38,6 +39,7 @@ export class Gestion_VistasComponent implements OnInit {
   arrayRutas : any = []; //.Array que guardará las rutas de las vistas para evitar que se cree una igual
   nombreVistas : any = []; //.Array que gurardará los nombres de las vistas para evitar que se cree una igual
   modoSeleccionado : boolean; //.Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   imagenes : any = []; //.Imagenes que se cargarán en la tabla y en los dropdown.
   estados : any = []; //.Estados que se mostrarán en el dropdow
   nuevaCategoria : string = "";
@@ -71,7 +73,6 @@ export class Gestion_VistasComponent implements OnInit {
     this.cargarRoles();
     this.iconos2 = iconos;
     this.imagenes = imagenes;
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   obtenerEstados = () => this.estadoService.srvObtenerListaEstados().subscribe(resp => this.estados = resp.filter(x => [1,8].includes(x.estado_Id)));

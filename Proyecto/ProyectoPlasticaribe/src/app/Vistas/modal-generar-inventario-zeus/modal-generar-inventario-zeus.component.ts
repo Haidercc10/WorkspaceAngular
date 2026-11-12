@@ -15,6 +15,7 @@ import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Product
 import { InventarioProductosPBDDComponent } from '../Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
 import { Observable, Subject } from 'rxjs';
 import { map, switchMap, takeUntil, } from 'rxjs/operators';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   cantidadDias: number;
   numeroIdProd: number = 0;
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   recetaProducto: boolean = false;
   @ViewChild(InventarioProductosPBDDComponent) invPlasticaribe: InventarioProductosPBDDComponent | undefined;
   private destroy$ = new Subject<void>();

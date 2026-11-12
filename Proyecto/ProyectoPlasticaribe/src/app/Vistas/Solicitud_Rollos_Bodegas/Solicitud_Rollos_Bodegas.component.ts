@@ -26,6 +26,7 @@ import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_B
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudRollos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
   bodegasSolicitadas : any [] = []; //Variable que va a tener las bodegas a los cuales se les pedirán rollos.
@@ -104,7 +106,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.getUbications();
     this.url = this.router.url;
     this.validateProcess();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

@@ -5,6 +5,7 @@ import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_M
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ import { AppComponent } from 'src/app/app.component';
 export class Informe_ConsumosComponent implements OnInit {
   load : boolean = false; //Variable para controlar la carga de la pagina
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   rangoFechas : any = []; //Variable que se usará para almacenar el rango de fechas que se seleccionarán en el filtro
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora : any = moment().format('HH:mm:ss'); //Variable que se usará para llenar la hora actual
@@ -44,7 +46,6 @@ export class Informe_ConsumosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerMateriales();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que se usará para mostrar el tutorial

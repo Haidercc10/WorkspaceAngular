@@ -14,6 +14,7 @@ import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateria
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovSolicitudesMP as defaultSteps } from 'src/app/data';
 import { OcompraComponent } from '../ocompra/ocompra.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ import { OcompraComponent } from '../ocompra/ocompra.component';
 })
 export class Reporte_SolicitudesMPComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   cargando : boolean = false;
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -71,7 +73,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     this.obtenerEstados();
     this.lecturaStorage();
     this.getEstadoSolitudes();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

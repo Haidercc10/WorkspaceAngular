@@ -8,6 +8,7 @@ import { Prestamos_NominaService } from 'src/app/Servicios/Prestamos_Nomina/Pres
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { MessageService } from 'primeng/api';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.s
 export class FormEditarPrestamosComponent implements OnInit {
   
   modeSelected : boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modeSelected = oscuro); // mantiene modeSelected al día con el tema
   form !: FormGroup;
   moments : any = ["SEMANAL", "QUINCENAL", "MENSUAL"];
   statusLoan : any[] = [];

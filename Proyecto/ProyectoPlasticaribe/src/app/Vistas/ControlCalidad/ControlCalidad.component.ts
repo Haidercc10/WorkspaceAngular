@@ -10,6 +10,7 @@ import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionEx
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, ControlCalidad as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-ControlCalidad',
@@ -24,6 +25,7 @@ export class ControlCalidadComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   @ViewChild ('dt_Doblado') dt_Doblado : Table | undefined; //Variable que se usará para almacenar la tabla de la vista'
   @ViewChild ('dt_Impresion') dt_Impresion : Table | undefined; //Variable que se usará para almacenar la tabla de la vista)
@@ -52,7 +54,6 @@ export class ControlCalidadComponent implements OnInit {
     this.lecturaStorage();
     //this.consultarDatos();
     //this.exportExcel();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial() {

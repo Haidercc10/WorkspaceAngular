@@ -19,6 +19,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsUsuarios as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-registro-component',
@@ -54,6 +55,7 @@ export class RegistroComponentComponent implements OnInit {
   public arrayNombresRoles : any = []; /** Array que cargará los nombres de los roles en el modal para crear roles. */
   public arrayNombresAreas : any = []; /** Array que cargará los nombres de las areas en el modal para crear areas. */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   arrayRoles_Vistas : any [] = []; //Array que cargará los roles con cada una de las vistas que tienen
   vistasAplicacion : any [] = []; //Array que cargará las vistas de la aplicación
   vistasSeleccionadas : any [] = []; //Array que cargará las vistas seleccionadas en el modal de roles
@@ -96,7 +98,6 @@ export class RegistroComponentComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.cargarRoles_Vistas();
     this.cargarVistas();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que crgará las areas

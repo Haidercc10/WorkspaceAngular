@@ -15,6 +15,7 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-PreIngresoProduccion_Despacho',
@@ -32,6 +33,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   ValidarRol: number;
   load: boolean = false;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formData: FormGroup;
   process: Array<any> = [];
   turns: Array<any> = [];

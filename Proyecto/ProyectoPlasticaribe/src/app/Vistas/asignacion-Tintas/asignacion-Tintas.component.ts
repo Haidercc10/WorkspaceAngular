@@ -16,6 +16,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepAsignacionTintas as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-asignacion-Tintas',
@@ -40,6 +41,7 @@ export class AsignacionTintasComponent implements OnInit {
   componenteCrearMateriasPrimas: boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
   mpSeleccionada: any = [];
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   hora: any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual
   esError: boolean = false; //Variable que se usará para validar si se ha presentado un error en alguna consulta o acción y mostrar un mensaje de error en la vista
 
@@ -89,7 +91,6 @@ export class AsignacionTintasComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.obtenerUnidadesMedida();
     this.obtenerTintas();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

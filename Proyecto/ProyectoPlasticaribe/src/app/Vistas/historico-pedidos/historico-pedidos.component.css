@@ -70,14 +70,15 @@ table {
 
 th,
 td {
-	border: 1px solid #e1e4e8;
+	border: 1px solid var(--borde-sutil);
 	padding: 0.5rem;
 	text-align: left;
 	white-space: nowrap;
 }
 
 th {
-	background: #f1f5f9;
+	background: var(--fondo-sutil);
+	color: var(--texto-fuerte);
 }
 
 .font-weight-bold {

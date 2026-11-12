@@ -16,6 +16,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { PlanillasDespachoService } from 'src/app/Servicios/Planillas_Despacho/planillas-despacho.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Movimientos_Despacho',
@@ -30,6 +31,7 @@ export class Movimientos_DespachoComponent implements OnInit {
   storage_Nombre: string;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formSearchDespacho: FormGroup;
   form: FormGroup;
   drivers: any[] = [];

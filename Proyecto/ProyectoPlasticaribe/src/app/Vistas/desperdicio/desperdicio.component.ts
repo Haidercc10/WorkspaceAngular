@@ -16,6 +16,7 @@ import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Table } from 'primeng/table';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app.desperdicio.component',
@@ -41,6 +42,7 @@ export class DesperdicioComponent implements OnInit {
   materiales : any [] = []; //Variable que va a tener la información de los materiales
   registroSeleccionado : any =[]; /** Variable que contendrá el registro a quitar de la tabla. */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   desperdicios : any = []; //
   area : any = {};
   areas : any [] = [];
@@ -101,7 +103,6 @@ export class DesperdicioComponent implements OnInit {
       this.filtrarArea();
       this.obtenerOperarios();
     }, 1000);
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función que cargará el area del usuario logueado

@@ -21,6 +21,7 @@ import { CrearBoppComponent } from '../crear-bopp/crear-bopp.component';
 import { modelBOPP } from 'src/app/Modelo/modelBOPP';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -58,6 +59,7 @@ export class EntradaBOPPComponent implements OnInit {
   tipoDoc : any = null;
   boppSeleccionado : any = [];
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   boppsGenericos : any = [];  /** Variable que contendrá los bopp genericos. */
   modalCrearBopp : boolean = false; /** Variable para abrir el modal que creará nuevos bopp's genericos para sociarlos al que se desea ingresar */
   createSuppliers : boolean = false;
@@ -117,7 +119,6 @@ export class EntradaBOPPComponent implements OnInit {
     this.getSerialesBOPP();
     this.obtenerProveeedor();
     this.cargarBoppsGenericos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

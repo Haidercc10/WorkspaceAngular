@@ -6,6 +6,7 @@ import { Ingreso_PeletizadoService } from 'src/app/Servicios/Ingreso_Peletizado/
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Inventario_Peletizado',
@@ -18,6 +19,7 @@ export class Inventario_PeletizadoComponent implements OnInit {
   peletizados : any = [];
   detailsPele : any = [];
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   @ViewChild('tableRecoveries') tableRecoveries: Table | undefined;
   @ViewChild('tablePeletizados') tablePeletizados: Table | undefined;
   @ViewChild('tableDetails') tableDetails: Table | undefined;

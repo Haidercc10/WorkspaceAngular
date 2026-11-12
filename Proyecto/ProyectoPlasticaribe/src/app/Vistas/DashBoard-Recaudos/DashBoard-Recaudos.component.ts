@@ -16,6 +16,7 @@ import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturaci
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { finalize, forkJoin, Subscription } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -35,6 +36,7 @@ export class DashBoardRecaudosComponent implements OnInit, OnDestroy {
   today: any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes: any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   carteraAgrupadaClientes: any = []; //Variable que almacenará la información de la cartera agrupada por los clientes
   carteraAgrupadaVendedores: any = []; //Variable que almacenará la información de la cartera agrupada por vendedores
   cartera: any = []; //Variable que almacenará la información de la cartera, información detalla de cada una de las facturas en cartera
@@ -59,7 +61,6 @@ export class DashBoardRecaudosComponent implements OnInit, OnDestroy {
     { campo: 'saldoPlazo4', etiqueta: '91-120 días', color: '#ef4444' },
     { campo: 'saldoPlazo5', etiqueta: '+120 días', color: '#991b1b' },
   ];
-  private intervaloTema: any; //Intervalo que sincroniza el modo oscuro/claro, se limpia al destruir el componente
   private subCartera: Subscription | undefined; //Consulta de cartera en curso, se cancela si se lanza una nueva
   private subClientesVacios: Subscription | undefined; //Escucha el filtro de clientes para dejarlo en null cuando queda vacío
 
@@ -91,11 +92,9 @@ export class DashBoardRecaudosComponent implements OnInit, OnDestroy {
     this.obtenerClientes();
     this.tiempoExcedido2();
     this.limpiarClientesVacios();
-    this.intervaloTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.intervaloTema);
     this.subCartera?.unsubscribe();
     this.subClientesVacios?.unsubscribe();
     this.tutoriales.cancelar(); //Si se cambia de pestaña con el tutorial abierto, no queda encima de otra

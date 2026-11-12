@@ -8,6 +8,7 @@ import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/En
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-IngresoDespacho_EntregaMercancia',
@@ -22,6 +23,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
   storage_Name: number = 0;
   validateRole: number = 0;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   dataSearched: Array<any> = [];
   barCode: string | null = null;
   storehouse: Array<any> = [];

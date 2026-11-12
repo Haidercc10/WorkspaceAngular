@@ -9,6 +9,7 @@ import moment from 'moment';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-mov-trazabilidad-produccion',
@@ -22,6 +23,7 @@ export class MovTrazabilidadProduccionComponent {
     storage_Id: number;
     validateRole: number | undefined;
     selectedMode: boolean = false;
+    private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
     products: any[] = [];
     traceability: Array<any> = [];
     @ViewChild('dt') dt: Table | undefined;

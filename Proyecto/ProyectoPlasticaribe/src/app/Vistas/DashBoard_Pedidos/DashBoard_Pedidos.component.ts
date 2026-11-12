@@ -8,6 +8,7 @@ import { defaultStepOptions, stepsDashboardPedidos as defaultSteps } from 'src/a
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-DashBoard_Pedidos',
@@ -54,6 +55,8 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   infoTablaModal: any[] = []; //Variable que se llenará con la información para mostrar en la tabla modal dependiendo del ranking que se seleccione
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  private readonly suscripcionTemaGraficas = alCambiarTema(() => this.actualizarColoresGraficas(), { omitirActual: true }); // recolorea las gráficas al cambiar de tema
 
   constructor(private AppComponent: AppComponent,
     private zeusService: InventarioZeusService,
@@ -69,18 +72,19 @@ export class DashBoard_PedidosComponent implements OnInit {
    * Inicializa la carga del tablero y actualiza periódicamente el tema de las gráficas.
    * @returns No retorna un valor.
    */
+  // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
+  private actualizarColoresGraficas() {
+    const color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    if (this.multiAxisOptions?.plugins?.legend?.labels) this.multiAxisOptions.plugins.legend.labels.color = color;
+    if (this.opcionesGraficas1?.plugins?.legend?.labels) this.opcionesGraficas1.plugins.legend.labels.color = color;
+    if (this.opcionesGraficas1?.scales?.x?.ticks) this.opcionesGraficas1.scales.x.ticks.color = color;
+    if (this.opcionesGraficas1?.scales?.y?.ticks) this.opcionesGraficas1.scales.y.ticks.color = color;
+    if (this.opcionesGraficas1?.scales?.y1?.ticks) this.opcionesGraficas1.scales.y1.ticks.color = color;
+  }
+
   ngOnInit() {
     this.lecturaStorage();
     if ([1, 60, 61, 6, 12, 96, 85, 97, 2, 98, 10, 103, 104].includes(this.ValidarRol)) this.tiempoExcedido();
-    setInterval(() => {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      const color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      if (this.multiAxisOptions?.plugins?.legend?.labels) this.multiAxisOptions.plugins.legend.labels.color = color;
-      if (this.opcionesGraficas1?.plugins?.legend?.labels) this.opcionesGraficas1.plugins.legend.labels.color = color;
-      if (this.opcionesGraficas1?.scales?.x?.ticks) this.opcionesGraficas1.scales.x.ticks.color = color;
-      if (this.opcionesGraficas1?.scales?.y?.ticks) this.opcionesGraficas1.scales.y.ticks.color = color;
-      if (this.opcionesGraficas1?.scales?.y1?.ticks) this.opcionesGraficas1.scales.y1.ticks.color = color;
-    }, 2000);
   }
 
   tutorial() {
@@ -356,21 +360,21 @@ export class DashBoard_PedidosComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { drawOnChartArea: false, color: '#ebedef' }
+          grid: { drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)' }
         },
       },
     };
@@ -397,21 +401,21 @@ export class DashBoard_PedidosComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { drawOnChartArea: false, color: '#ebedef' }
+          grid: { drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)' }
         },
       },
     };
@@ -437,21 +441,21 @@ export class DashBoard_PedidosComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { color: '#ebedef' }
+          grid: { color: 'rgba(128, 128, 128, 0.2)' }
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
           ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { drawOnChartArea: false, color: '#ebedef' }
+          grid: { drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)' }
         },
       },
     };

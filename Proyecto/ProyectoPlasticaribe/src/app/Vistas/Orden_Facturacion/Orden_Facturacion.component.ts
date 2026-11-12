@@ -24,6 +24,7 @@ import { FacturacionProductosService } from 'src/app/Servicios/Facturacion_Produ
 import { modelFacturacion_Productos } from 'src/app/Modelo/Facturacion_Productos';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,7 @@ export class Orden_FacturacionComponent implements OnInit {
   ValidarRol: number;
   load: boolean = false;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formDataOrder: FormGroup;
   formItems: FormGroup;
   clients: Array<any> = [];

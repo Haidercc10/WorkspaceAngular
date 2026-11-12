@@ -11,7 +11,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <!-- <link rel="icon" href="assets/Plascaribe_Icono.png"> -->
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-  <link id="app-theme" href="lara-light-blue.css" rel="stylesheet">
+  <!-- Tema de PrimeNG (claro u oscuro). Se elige aquí, antes del primer pintado, según la preferencia guardada
+       (cookie "theme", la misma que lee AppComponent.mostrar()): así la página no se muestra primero en claro y luego cambia a
+       oscuro cuando arranca Angular. Se escribe con document.write para que el navegador espere este CSS antes de pintar. -->
+  <script>
+    (function () {
+      var tema = 'light';
+      try {
+        var cookie = document.cookie.match(/(?:^|;\s*)theme=([^;]*)/);
+        if (cookie && decodeURIComponent(cookie[1]) === 'dark') tema = 'dark';
+      } catch (e) { }
+      document.write('<link id="app-theme" href="lara-' + tema + '-blue.css" rel="stylesheet">');
+    })();
+  </script>
   <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css">-->
 </head>
 <body class="surface-ground">

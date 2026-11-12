@@ -10,6 +10,7 @@ import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFactura
 import { IngresoProduccion_DespachoComponent } from '../IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
 import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
 import { DevolucionesCalidadComponent } from '../devoluciones-calidad/devoluciones-calidad.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ export class Crear_FallasComponent implements OnInit {
   load : boolean = false;
   typeFails : any = [];
   selectedMode : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
 
   constructor(private frmBuild : FormBuilder, 
     private AppComponent : AppComponent, 

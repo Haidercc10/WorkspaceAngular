@@ -8,6 +8,7 @@ import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionEx
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-reporte-clientes',
@@ -21,6 +22,7 @@ export class ReporteClientesComponent {
   validateRole: number | undefined; //  Variable para almacenar el rol del usuario que se encuentra en el storage y así validar la información que se le mostrará al usuario dependiendo de su rol.
   form: FormGroup; //Variable para almacenar el formulario reactivo que se utiliza para realizar las consultas de los clientes.
   selectedMode: boolean = false; //Variable para almacenar el estado del tema seleccionado por el usuario y así mostrar el tema oscuro o claro en el formato excel dependiendo de su selección.
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   clients: Array<any> = []; //Variable para almacenar la información de los clientes que se muestra en la tabla después de realizar la consulta por nombre del cliente.
   dataClients : any = []; //Variable para almacenar la información de los clientes que se muestra en la tabla después de realizar la consulta por el rango de fechas y el cliente seleccionado.
   @ViewChild('tableClients') tableClients : Table | undefined; //Variable para almacenar la referencia de la tabla de clientes y así poder aplicar los filtros a la tabla después de realizar la consulta por nombre del cliente.

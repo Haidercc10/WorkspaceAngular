@@ -12,6 +12,7 @@ import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRol
 import { Detalles_AsignacionRollosOTService } from 'src/app/Servicios/Detalles_AsignacionRollosOT/Detalles_AsignacionRollosOT.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Asignacion_RollosOT',
@@ -27,6 +28,7 @@ export class Asignacion_RollosOTComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   form !: FormGroup;
   process : any [] = [];

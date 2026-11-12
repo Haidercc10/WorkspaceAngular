@@ -17,6 +17,7 @@ import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produc
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   load: boolean = false;
   modoSeleccionado: boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   FormFiltros !: FormGroup; /** Formulario que contendrá los filtros de búsqueda */
   today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual

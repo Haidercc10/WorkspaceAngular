@@ -15,6 +15,7 @@ import { RequerimientosCalidadService } from 'src/app/Servicios/Requerimientos_C
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -82,6 +83,7 @@ export class DevolucionesCalidadComponent {
   estado : any;
   arrayEstados : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   //Nuevos
   fails : any = [];
@@ -130,7 +132,6 @@ export class DevolucionesCalidadComponent {
     this.getProcess();
     this.getRequirements();
     this.loadDate();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

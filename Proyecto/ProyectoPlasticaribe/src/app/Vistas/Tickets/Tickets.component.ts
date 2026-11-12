@@ -8,6 +8,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { claseEstadoTicket, rangoFechasTicketsPorDefecto, ReportanteTicket, TicketListado, TicketsService, TipoTicket } from 'src/app/Servicios/Tickets/Tickets.service';
 import { AppComponent } from 'src/app/app.component';
 import { ClavesTutorialTickets, pasosTutorialTickets } from 'src/app/Tutoriales/Tutoriales_Tickets';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 interface ImagenSeleccionada { archivo: File; vistaPrevia: string; }
 
@@ -27,7 +28,7 @@ export class TicketsComponent implements OnInit, OnDestroy {
   FormTickets !: FormGroup;
   cargando : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  private intervaloTema : any;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   tabActiva : number = 0; // 0 = Nuevo ticket, 1 = Mis tickets
   tiposTicket : TipoTicket[] = [];
@@ -66,7 +67,6 @@ export class TicketsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    this.intervaloTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.ticketService.getTipos().subscribe(tipos => {
       this.tiposTicket = tipos;
       this.limpiarTodo();
@@ -81,7 +81,6 @@ export class TicketsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    clearInterval(this.intervaloTema);
     this.messageService.clear('ticketCreado');
   }
 

@@ -19,6 +19,7 @@ import { DetallesDevolucionesProductosService } from 'src/app/Servicios/Detalles
 import { TomaFisicaInventario, TomaFisicaInventarioComponent } from '../TomaFisicaInventario/TomaFisicaInventario.component';
 import { InventarioVsTomaFisicaComponent } from '../inventario-vs-toma-fisica/inventario-vs-toma-fisica.component';
 import { catchError, finalize, map, Observable, switchMap, tap, throwError } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 type SearchSource = 'EMP' | 'SELLA' | 'EXT';
 
 @Component({
@@ -34,6 +35,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   storage_Name: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   sendProductionZeus: any[] = [];
   productionSearched: any;
   storehouse: Array<any> = [];

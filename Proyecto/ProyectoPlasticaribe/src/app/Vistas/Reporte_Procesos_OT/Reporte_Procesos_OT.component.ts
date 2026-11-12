@@ -17,6 +17,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReportesProcesosOT as defaultSteps } from 'src/app/data';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -63,6 +64,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   mostrarModalCostos : boolean = false; //Variable que validará cuando se muetra el modal de costos
   estadoModal : any; //Variablke que se utilizará para validar el estado en el que se encuentra la orden de trabajo y actualziar el estado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   infoColor : string = ''; /** Variable que servirá para mostrar la descripción de cada color */
   @ViewChild('op') op: OverlayPanel | undefined;
   ordenesSeleccionadas : any [] = []; //Variable que se utilizará para almacenar las ordenes de trabajo que hayan sido elegidas
@@ -108,7 +110,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.loadRankDates();
     this.construirColumnas(this.formularioOT.value.vistaGerencial);
     this.formularioOT.get('vistaGerencial')?.valueChanges.subscribe(valor => this.construirColumnas(valor));
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     
     //setTimeout(() => this.validarVendedor(), 500);
   }

@@ -22,6 +22,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsEntradasMp as defaultSteps } from 'src/app/data';
 import { MovimientoMPComponent } from '../movimientoMP/movimientoMP.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app_pedidomateriaprima_component',
@@ -36,7 +37,6 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
 
   public consultaRemisiones !: FormGroup; //Variable que se usará para consultar las remisiones por su id
 
-  private _intervalTema: any; //Variable que se usará para guardar el intervalo del tema seleccionado y limpiarlo al cerrar la vista
   private destroy$ = new Subject<void>(); //Variable que se usará para limpiar los intervalos de la vista al cerrarla
 
   /* Vaiables*/
@@ -69,6 +69,7 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
 
   modalMode : boolean = false; //Variable que se usará para mostrar u ocultar el modal de consulta de remisiones dependiendo de si se ha consultado una factura o remisión y esta tiene remisiones relacionadas
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private frmBuilderMateriaPrima : FormBuilder,
@@ -110,12 +111,10 @@ export class PedidomateriaprimaComponent implements OnInit, OnDestroy {
     this.ColumnasTabla();
     this.ColumnasTablaRemisiones();
     this.obtenerProveeedor();
-    this._intervalTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que se ejecutará al cerrar la vista para limpiar el intervalo del tema seleccionado
   ngOnDestroy(): void {
-    clearInterval(this._intervalTema);
     this.destroy$.next();
     this.destroy$.complete();
   }

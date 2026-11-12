@@ -12,6 +12,7 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reporte-Facturacion-Detallada',
@@ -22,6 +23,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   cargando: boolean = false;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   ValidarRol: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   formFiltros !: FormGroup;

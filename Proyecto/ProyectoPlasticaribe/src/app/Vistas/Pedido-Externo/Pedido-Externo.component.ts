@@ -31,6 +31,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { modelPedidoExterno } from 'src/app/Modelo/modelPedidoExterno';
 import { modelPedidoExterno_Productos } from 'src/app/Modelo/modelPedidosExternos_Productos';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -80,8 +81,8 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
   pedidoEditar: number = 0; //Variable que alamcenará el numero el pedido que se está editando
   fechaUltFacuracion: any; //Variable que mostrará la fecha de la ultima facturacion de un producto seleccionado
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   private destroy$ = new Subject<void>(); //Variable que se usará para eliminar las subscripciones y evitar fugas de memoria
-  private _intervalTema: any; //Variable que se usará para almacenar el intervalo que actualiza el tema cada segundo
   materials: any = []; //Variable que almacenará la lista de materiales para el producto terminado
   pigments: any = []; //Variable que almacenará la lista de pigmentos para el producto terminado
   printingTypes: any = []; //Variable que almacenará la lista de tipos de impresión para el producto terminado
@@ -185,14 +186,12 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
     this.getPresentations();
     //this.getTreatys();
     this.buscarClientes();
-    this._intervalTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   getLastSale = () => this.pedidoproductoService.srvObtenerUltimoPedido().pipe(takeUntil(this.destroy$)).subscribe(data => this.form1.patchValue({ 'PedId': data.pedExt_Id + 1 }));
 
   //Funcion que se ejecuta al destruir el componente
   ngOnDestroy() {
-    clearInterval(this._intervalTema);
     this.destroy$.next();
     this.destroy$.complete();
   }

@@ -14,6 +14,7 @@ import { ConfirmationService } from 'primeng/api';
 import { Precargue_DespachoService } from 'src/app/Servicios/Precargue_Despacho/Precargue_Despacho.service';
 import { ESTADOS_PRECARGUE, OF_GENERICA_PRECARGUE } from './precargue-despacho.constants';
 import { Router } from '@angular/router';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Mov_PrecargueDespacho',
@@ -29,6 +30,7 @@ export class Mov_PrecargueDespachoComponent implements OnInit, OnDestroy {
   processing: boolean = false;
   dialogLoad: boolean = false;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   ValidarRol: number;
   storage_Id: number;
   storage_Nombre: any;

@@ -8,6 +8,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { Movimientos_RollosComponent } from '../Movimientos_Rollos/Movimientos_Rollos.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-rollos-pesados',
@@ -21,6 +22,7 @@ export class RollosPesadosComponent {
   validateRole: number | undefined;
   form: FormGroup;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   process: Array<any> = [];
   rolls : any = [];
   rollsConsolidate : any = [];

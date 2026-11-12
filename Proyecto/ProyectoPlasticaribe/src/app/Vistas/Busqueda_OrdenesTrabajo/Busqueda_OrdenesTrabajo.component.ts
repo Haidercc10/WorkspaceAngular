@@ -14,6 +14,7 @@ import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionEx
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { finalize } from 'rxjs';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 /**
  * Procesos por los que pasa la OT (banderas booleanas de BagPro), con encabezado corto. La tabla muestra la columna
@@ -72,6 +73,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   cargando: boolean = false;
   ValidarRol : any;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   formFiltros: FormGroup;
   materiales: any[] = [];
   pigmentos: any[] = [];

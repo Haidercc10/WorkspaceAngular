@@ -6,6 +6,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-VistasFavoritas',
@@ -28,6 +29,7 @@ export class VistasFavoritasComponent implements OnInit {
   vistasFavoritas : any [] = []; // Variable que almacenará las vistas favoritas del usuario
   disponiblesMostrar: any[] = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private AppComponent : AppComponent,
                 private vistasFavService : VistasFavoritasService,
@@ -42,7 +44,6 @@ export class VistasFavoritasComponent implements OnInit {
     this.llenarVistasDisponibles();
     this.mostrarVistasFav();
     this.buscarFavoritos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

@@ -9,6 +9,7 @@ import { CajaMenor_PlasticaribeService } from 'src/app/Servicios/CajaMenor_Plast
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TipoSalidas_CajaMenorService } from 'src/app/Servicios/TipoSalidas_CajaMenor/TipoSalidas_CajaMenor.service';
 import { AppComponent } from 'src/app/app.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Costos_CajaMenor',
@@ -19,6 +20,7 @@ import { AppComponent } from 'src/app/app.component';
 export class Costos_CajaMenorComponent implements OnInit {
 
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -66,7 +68,6 @@ export class Costos_CajaMenorComponent implements OnInit {
     this.lecturaStorage();
     this.cargarTiposCostos();
     this.obtenerAreas();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función que se encarga de leer la información que se almacena en el storage del navegador

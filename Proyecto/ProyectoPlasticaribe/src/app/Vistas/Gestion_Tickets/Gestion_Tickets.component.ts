@@ -6,6 +6,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { CantidadesTickets, claseEstadoTicket, rangoFechasTicketsPorDefecto, TicketListado, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { AppComponent } from 'src/app/app.component';
 import { ClavesTutorialTickets, pasosTutorialGestionTickets } from 'src/app/Tutoriales/Tutoriales_Tickets';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Gestion_Tickets',
@@ -18,7 +19,7 @@ export class Gestion_TicketsComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt: Table | undefined; //Variable identificadora en la que se verán los tickets
   cargando : boolean = false;
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  private intervaloTema : any;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   cantidades : CantidadesTickets = { abiertos: 0, enRevision: 0, resueltosMes: 0 };
   incluirFinalizados : boolean = false; // muestra también resueltos y cancelados
@@ -39,12 +40,10 @@ export class Gestion_TicketsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    this.intervaloTema = setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.consultar();
   }
 
   ngOnDestroy() {
-    clearInterval(this.intervaloTema);
   }
 
   tutorial = () => this.tutoriales.iniciar(pasosTutorialGestionTickets());

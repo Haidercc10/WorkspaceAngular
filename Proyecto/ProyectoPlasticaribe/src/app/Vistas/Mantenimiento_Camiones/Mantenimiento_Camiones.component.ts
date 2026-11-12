@@ -13,6 +13,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMttoActivos as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Mantenimiento_Camiones',
@@ -46,6 +47,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   public PedMtto : string = '';
   tipoMovimientos : any [] = [{Id : 1, Nombre: 'Pedido de Mantenimiento'}, {Id : 2, Nombre: 'Mantenimiento'}];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -66,7 +68,6 @@ export class Mantenimiento_CamionesComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

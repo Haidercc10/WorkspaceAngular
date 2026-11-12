@@ -21,6 +21,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenMaquila as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -55,6 +56,7 @@ export class Orden_MaquilaComponent implements OnInit {
   llave: string = 'pdf'; /** Variable que se utilizará como palabra clave para cargar el mensaje de Ver Pdf/Quitar MP/Eliminar MP de la tabla*/
   itemSeleccionado: any; /** Variable que tomará diferentes valores, generalmente id para mostrar el pdf o id del item a quitar o eliminar de la tabla. */
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   hora: any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual
 
   constructor(private frmBuilder: FormBuilder,
@@ -97,7 +99,6 @@ export class Orden_MaquilaComponent implements OnInit {
     this.consultarCategorias();
     this.obtenerUnidadesMedida();
     this.generarConsecutivo();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.llave = 'pdf';
   }
 

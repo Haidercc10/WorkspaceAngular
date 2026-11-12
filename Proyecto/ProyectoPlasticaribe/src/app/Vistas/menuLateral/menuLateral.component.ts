@@ -17,6 +17,7 @@ import { collection, getDocs, doc, setDoc } from "firebase/firestore";
 import { db } from 'src/app/conexionFirebase';
 import { environment } from 'src/environments/environment';
 import { VERSION_APP } from 'src/environments/version';
+import { TemaService, alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 Injectable({
   providedIn: 'root'
@@ -55,6 +56,7 @@ export class MenuLateralComponent implements OnInit {
   cantidadCorreosNuevos: number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
   position: string = '';
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene el interruptor y los logos al día con el tema
   esBeta: boolean = environment.esBeta; //Indica si la app se compiló para el entorno de pruebas (npm run build:beta)
   versionApp: string = VERSION_APP; //Versión de la app (package.json), se sube con npm run version:parche | version:menor | version:mayor
   roles: any[] = [];
@@ -72,10 +74,9 @@ export class MenuLateralComponent implements OnInit {
     private mensajeService: MensajesAplicacionService,
     private eventosCalService: EventosCalendarioService,
     private vistasPermisosService: Vistas_PermisosService,
-    private router: Router,) {
+    private router: Router,
+    private temaService: TemaService,) {
 
-    this.AppComponent.mostrar();
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormUsuarios = this.formBuilder.group({
       usuNombre: [null, Validators.required],
       usuPassword: [null, Validators.required],
@@ -348,20 +349,9 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  // Funcion que cambiará el tema de la aplicación
+  // Interruptor de tema: TemaService guarda la preferencia, cambia el CSS y avisa a todas las vistas abiertas
   mostrar() {
-    let modo = window.localStorage.getItem("theme");
-    if (modo) this.AppComponent.temaSeleccionado = this.modoSeleccionado;
-    this.cambiar(this.modoSeleccionado);
-  }
-
-  // Funcion que cambiará el tema de la aplicación
-  cambiar(estado: any) {
-    let tema = estado ? 'dark' : 'light';
-    window.localStorage.setItem("theme", tema);
-    this.cookieService.set('theme', tema, { expires: 365, sameSite: 'Lax' });
-    let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
-    linkTema.href = 'lara-' + tema + '-blue' + '.css';
+    this.temaService.cambiar(!!this.modoSeleccionado);
   }
 
   async getMails() {

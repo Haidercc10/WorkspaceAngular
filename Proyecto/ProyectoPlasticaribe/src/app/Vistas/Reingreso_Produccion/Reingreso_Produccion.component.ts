@@ -16,6 +16,7 @@ import { Gestion_DevolucionesOFComponent } from '../Gestion_DevolucionesOF/Gesti
 import { HttpErrorResponse } from '@angular/common/http';
 import moment from 'moment';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Reingreso_Produccion',
@@ -28,6 +29,7 @@ export class Reingreso_ProduccionComponent implements OnInit {
   storage_Name: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   sendProductionZeus: any[] = [];
   productionSearched: any;
   storehouse: Array<any> = [];

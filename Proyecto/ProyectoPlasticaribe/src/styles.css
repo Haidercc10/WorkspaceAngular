@@ -7,6 +7,46 @@
   --shadow-color: 286deg 36% 56%;
 }
 
+/* ==================== COLORES SEGÚN EL TEMA (CLARO / OSCURO) ====================
+   En los CSS de las vistas no se deben escribir colores fijos de fondo o de texto (#fff, #000, #495057...):
+   en modo oscuro quedan cajas blancas o textos que no se leen. Usar en su lugar:
+
+   1) Las variables del tema de PrimeNG, que ya cambian solas al cambiar de tema:
+        --surface-card / --surface-overlay   fondo de tarjetas, paneles y popups
+        --surface-ground                     fondo de la página
+        --surface-border                     bordes y separadores
+        --surface-hover                      fondo al pasar el mouse
+        --text-color                         texto normal
+        --text-color-secondary               texto secundario (ayudas, subtítulos)
+
+   2) Las variables propias de abajo, para lo que el tema de PrimeNG no trae.
+      Si se necesita un color nuevo, agregarlo aquí con su valor para cada tema. */
+:root {
+  --texto-fuerte: #343a40;                      /* títulos y valores destacados */
+  --fondo-sutil: #f1f3f5;                       /* campos de solo lectura, encabezados de tabla, pistas de barras */
+  --borde-sutil: #e1e4e8;                       /* bordes de tablas HTML simples */
+  --fondo-info: #e0f2fe;                        /* avisos informativos */
+  --texto-info: #0369a1;
+  --texto-peligro: #dc2626;                     /* valores negativos o vencidos */
+  --fondo-obligatorio: #fff1f1;                 /* campos obligatorios pendientes */
+  --borde-obligatorio: #e24c4c;
+  --fondo-acento: #fff9f9;                      /* resaltado suave con el rojo de la marca */
+  --rejilla-graficas: rgba(128, 128, 128, 0.2); /* líneas de la cuadrícula de las gráficas (sirve en ambos temas) */
+}
+
+/* Tema oscuro: se activa cuando el <link id="app-theme"> carga lara-dark-blue.css */
+:root:has(#app-theme[href*="dark"]) {
+  --texto-fuerte: rgba(255, 255, 255, 0.95);
+  --fondo-sutil: rgba(255, 255, 255, 0.06);
+  --borde-sutil: var(--surface-border);
+  --fondo-info: rgba(14, 165, 233, 0.16);
+  --texto-info: #7dd3fc;
+  --texto-peligro: #f87171;
+  --fondo-obligatorio: rgba(226, 76, 76, 0.16);
+  --borde-obligatorio: #f87171;
+  --fondo-acento: rgba(219, 65, 73, 0.14);
+}
+
 * {
   text-decoration: none;
 }

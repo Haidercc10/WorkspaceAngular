@@ -10,6 +10,7 @@ import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosExtrusion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos
   tipoDocumento : string [] = ['Ingreso de Rollos', 'Salida de Rollos'];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -61,7 +63,6 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerEstados();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

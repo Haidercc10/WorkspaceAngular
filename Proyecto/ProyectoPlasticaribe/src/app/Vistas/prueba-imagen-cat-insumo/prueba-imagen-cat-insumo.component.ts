@@ -23,6 +23,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { OverlayPanel } from 'primeng/overlaypanel';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -42,6 +43,7 @@ load: boolean = false;
   ValidarRol: number | undefined;
   form !: FormGroup;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   production: Array<production> = [];
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];

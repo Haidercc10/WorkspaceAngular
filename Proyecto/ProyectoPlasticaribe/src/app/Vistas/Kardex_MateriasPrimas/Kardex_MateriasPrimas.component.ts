@@ -12,6 +12,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { Informe_ConsumosComponent } from '../Informe_Consumos/Informe_Consumos.component';
 import { defaultStepOptions, stepsKardex as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Kardex_MateriasPrimas',
@@ -29,6 +30,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   FormFiltros : FormGroup;
   materiales : any [] = [];
   comprasRealizadas : any [] = [];
@@ -54,7 +56,6 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerMateriales();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

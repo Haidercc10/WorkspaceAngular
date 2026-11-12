@@ -13,6 +13,7 @@ import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_En
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDevolucionesMp as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-devolucionesMP',
@@ -34,6 +35,7 @@ export class DevolucionesMPComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load : boolean = true;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private AppComponent : AppComponent,
@@ -56,7 +58,6 @@ export class DevolucionesMPComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

@@ -16,6 +16,7 @@ import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollo
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosSolicitudesRollos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Movimientos_SolicitudRollos',
@@ -31,6 +32,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   @ViewChild('tblSol') tblSol: Table | undefined;
   FormFiltros !: FormGroup; //Variable que será el formulario donde estarán los filtros de busqueda de las solicitudes
@@ -75,7 +77,6 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
     this.lecturaStorage();
     this.obternerBodegas();
     this.obtenerEstados();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

@@ -10,6 +10,7 @@ import { Pedido_MantenimientoService } from 'src/app/Servicios/Pedido_Mantenimie
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsPedidoMtto as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,7 @@ export class PedidoMantenimientoComponent implements OnInit {
   activoSeleccionado : any = [];
   llave : string = '';
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -65,7 +67,6 @@ export class PedidoMantenimientoComponent implements OnInit {
     this.obtenerActivos();
     this.obtenerUlimoId();
     this.obtenerTiposMantenimiento();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

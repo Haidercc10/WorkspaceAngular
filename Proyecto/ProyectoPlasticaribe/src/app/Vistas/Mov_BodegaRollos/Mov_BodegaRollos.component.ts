@@ -9,6 +9,7 @@ import { AppComponent } from 'src/app/app.component';
 import { Ingreso_Rollos_ExtrusionComponent } from '../Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
 import { Solicitud_Rollos_BodegasComponent } from '../Solicitud_Rollos_Bodegas/Solicitud_Rollos_Bodegas.component';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Mov_BodegaRollos',
@@ -26,6 +27,7 @@ export class Mov_BodegaRollosComponent implements OnInit {
   load: boolean = false;
   validateRole: number | undefined;
   selectedMode: boolean = false;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
   products: any[] = [];
   dataSearched: Array<any> = [];
   @ViewChild('tableMovIn') tableMovIn: Table | undefined;

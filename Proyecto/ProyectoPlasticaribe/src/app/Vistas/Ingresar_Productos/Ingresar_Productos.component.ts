@@ -13,6 +13,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { defaultStepOptions, stepsIngresoRolloDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Ingresar_Productos',
@@ -45,6 +46,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   procesos : any [] = [{Id : 'EMP', Nombre: 'Empaque'}, {Id : 'EXT', Nombre: 'Extrusión'}, {Id : 'SELLA', Nombre: 'Sellado'}]; //Variable que va a guardar los diferentes procesos de donde vienen los rollos
   minDate: Date = new Date(); //Variable que validará la fecha minima para los campos Date en el HTML
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -71,7 +73,6 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.lecturaStorage();
     this.minDate.setMonth(8);
     this.minDate.setFullYear(2022);
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

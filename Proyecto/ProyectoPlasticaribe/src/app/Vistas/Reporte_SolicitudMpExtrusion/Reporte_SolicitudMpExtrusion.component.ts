@@ -19,6 +19,7 @@ import { catchError, finalize, map, of, Subject, switchMap, takeUntil } from 'rx
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, DatosOTSolicitudPDF } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { ADICIONAL_KG_OT, EstadoSolicitudMaterial, ROLES_VERIFICAR_SOLICITUD } from 'src/app/Modelo/modelFlujoMaterialProduccion';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 
 @Component({
@@ -28,6 +29,7 @@ import { ADICIONAL_KG_OT, EstadoSolicitudMaterial, ROLES_VERIFICAR_SOLICITUD } f
 })
 export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   cargando : boolean = false;
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -84,7 +86,6 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.obtenerEstados();
     this.lecturaStorage();
     this.getEstadoSolitudes();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   /** Función que se ejecutará al cerrar el componente para limpiar las subscripciones y evitar fugas de memoria */

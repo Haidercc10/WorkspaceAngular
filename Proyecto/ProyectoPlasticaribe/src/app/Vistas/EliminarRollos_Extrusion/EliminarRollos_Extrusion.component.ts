@@ -9,6 +9,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsEliminarRollos as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-EliminarRollos_Extrusion',
@@ -36,6 +37,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   scrolly : number = 0;
   scrollx : number = 0;
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   unMesAtras : any = moment().subtract(30, 'days').format('YYYY-MM-DD'); /** Variable que contendrá la fecha de hace un mes atrás para consultar desde esa fecha hasta hoy. */
   nroRollo : any = []; /** Variable que contendrá el id de los rollos consultados en el formulario de filtros. */
   bodegaElegida : string = '';
@@ -64,7 +66,6 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerProcesos();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     window.onscroll = () => {
       this.scrolly = window.scrollY;
       this.scrollx = window.scrollX;

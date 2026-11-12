@@ -9,6 +9,7 @@ import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticarib
 import { Tipos_NominaService } from 'src/app/Servicios/Tipos_Nomina/Tipos_Nomina.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsIngresoNomina as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Ingreso_Nomina',
@@ -17,6 +18,7 @@ import { defaultStepOptions, stepsIngresoNomina as defaultSteps } from 'src/app/
 })
 export class Ingreso_NominaComponent implements OnInit {
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   storage_Id: any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -50,7 +52,6 @@ export class Ingreso_NominaComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.cargarTiposNomina();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función que se encarga de leer la información que se almacena en el storage del navegador

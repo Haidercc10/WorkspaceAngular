@@ -22,6 +22,7 @@ import { finalize } from 'rxjs';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
@@ -39,6 +40,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   formEndDevolutions !: FormGroup;
   load: boolean = false;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   validateRole: number = 0;
   storage_Id: number = 0;
   storage_Nombre: any;

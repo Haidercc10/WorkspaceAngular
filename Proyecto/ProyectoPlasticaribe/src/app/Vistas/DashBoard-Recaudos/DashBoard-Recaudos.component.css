@@ -261,9 +261,9 @@ p-card.card-total-cartera .header2 .pi:hover {
 }
 
 /* ==================== PANEL DE DETALLE ==================== */
-/* Contenedor del p-overlayPanel (lo crea PrimeNG): fondo blanco con borde superior de color */
+/* Contenedor del p-overlayPanel (lo crea PrimeNG): fondo según el tema con borde superior de color */
 ::ng-deep .p-overlaypanel.panel-detalle-cartera {
-  background: #ffffff;
+  background: var(--surface-overlay);
   border-top: 4px solid #0ea5e9;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
@@ -283,7 +283,7 @@ p-card.card-total-cartera .header2 .pi:hover {
   width: 340px;
   max-width: calc(100vw - 3rem);
   min-height: 4rem;
-  color: #495057;
+  color: var(--text-color);
   text-align: left;
 }
 
@@ -293,26 +293,26 @@ p-card.card-total-cartera .header2 .pi:hover {
   justify-content: center;
   min-height: 4rem;
   font-weight: 600;
-  color: #6c757d;
+  color: var(--text-color-secondary);
 }
 
 .detalle-titulo {
   font-weight: 700;
   font-size: 1rem;
-  color: #343a40;
+  color: var(--texto-fuerte);
 }
 
 .detalle-escala {
   font-size: 0.85rem;
-  color: #6c757d;
+  color: var(--text-color-secondary);
 }
 
 .detalle-aviso {
   margin-top: 0.5rem;
   padding: 0.35rem 0.5rem;
   border-radius: 6px;
-  background: #e0f2fe;
-  color: #0369a1;
+  background: var(--fondo-info);
+  color: var(--texto-info);
   font-size: 0.8rem;
 }
 
@@ -323,7 +323,7 @@ p-card.card-total-cartera .header2 .pi:hover {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #6c757d;
+  color: var(--text-color-secondary);
 }
 
 .barra-antiguedad {
@@ -331,7 +331,7 @@ p-card.card-total-cartera .header2 .pi:hover {
   height: 12px;
   border-radius: 6px;
   overflow: hidden;
-  background: #e9ecef;
+  background: var(--fondo-sutil);
 }
 
 .barra-antiguedad .segmento {
@@ -339,7 +339,7 @@ p-card.card-total-cartera .header2 .pi:hover {
 }
 
 .barra-antiguedad .segmento + .segmento {
-  border-left: 2px solid #ffffff; /* separa visualmente los tramos */
+  border-left: 2px solid var(--surface-overlay); /* separa visualmente los tramos */
 }
 
 .leyenda-antiguedad {
@@ -364,12 +364,12 @@ p-card.card-total-cartera .header2 .pi:hover {
 }
 
 .leyenda-antiguedad .valor {
-  color: #343a40;
+  color: var(--texto-fuerte);
 }
 
 .leyenda-antiguedad .porcentaje {
   text-align: right;
-  color: #6c757d;
+  color: var(--text-color-secondary);
 }
 
 .detalle-indicadores {
@@ -378,7 +378,7 @@ p-card.card-total-cartera .header2 .pi:hover {
   gap: 0.75rem;
   margin-top: 0.85rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--surface-border);
 }
 
 .indicador {
@@ -392,21 +392,21 @@ p-card.card-total-cartera .header2 .pi:hover {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #6c757d;
+  color: var(--text-color-secondary);
 }
 
 .indicador-valor {
   font-size: 1.15rem;
-  color: #343a40;
+  color: var(--texto-fuerte);
 }
 
 .indicador-valor.vencida {
-  color: #dc2626;
+  color: var(--texto-peligro);
 }
 
 .indicador-detalle {
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--text-color-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

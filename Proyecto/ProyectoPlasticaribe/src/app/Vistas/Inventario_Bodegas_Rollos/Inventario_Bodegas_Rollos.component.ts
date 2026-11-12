@@ -13,6 +13,7 @@ import { Ubicaciones_BodegaRollosService } from 'src/app/Servicios/Ubicaciones_B
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsInvenatarioBodegas as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-Inventario_Bodegas_Rollos',
@@ -29,6 +30,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   inventarioTotal: any[] = []; //Variable que almacenará la información del inventario total de todas las bodegas
   inventarioExtrusion: any[] = []; //Variable que almacenará la información del inventario de la bodega de extrusion
@@ -74,7 +76,6 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.getAllUbicationsStore();
   }
 

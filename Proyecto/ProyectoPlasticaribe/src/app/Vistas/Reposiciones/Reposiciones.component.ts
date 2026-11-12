@@ -21,6 +21,7 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { ReposicionesService } from 'src/app/Servicios/Reposiciones/Reposiciones.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,7 @@ export class ReposicionesComponent implements OnInit, OnChanges {
 
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   form !: FormGroup;
   rollsToDispatch : any = [];
   rollsConsolidate : any = [];

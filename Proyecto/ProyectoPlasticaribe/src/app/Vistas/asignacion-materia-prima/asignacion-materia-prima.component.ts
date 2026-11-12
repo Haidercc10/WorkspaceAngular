@@ -28,6 +28,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { ConfirmacionTeclado } from 'src/app/_helpers/confirmacion-teclado';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 
 /** Estados de BagPro en los que la OT está cerrada y no admite asignaciones. */
@@ -98,6 +99,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   categoriasTintas: any[] = [];
   mpSeleccionada: MaterialSeleccionado | null = null;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   esSolicitud: boolean = false;
   esSolicitudDesdeReporte: boolean = false;
   expandedRows: any = {};
@@ -166,7 +168,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.obtenerProcesos();
     this.obtenerMateriaPrima();
     this.consultarCategorias();
-    interval(1000).pipe(takeUntil(this.destroy$)).subscribe(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado);
   }
 
   /** Cancela las suscripciones activas al destruir el componente. */

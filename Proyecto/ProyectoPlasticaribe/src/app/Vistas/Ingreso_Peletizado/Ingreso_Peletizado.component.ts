@@ -23,6 +23,7 @@ import { CrearMateriaprimaComponent } from '../crear-materiaprima/crear-materiap
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { Crear_FallasComponent } from '../Crear_Fallas/Crear_Fallas.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +39,7 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
 
   load : boolean = false; //Variable que servirá para mostrar el spinner de carga
   modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   form !: FormGroup; //Variable que contiene el formulario
   materials : any = [];
   typesRecovery : any = [];

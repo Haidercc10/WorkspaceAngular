@@ -12,6 +12,7 @@ import { AsignacionProductosFacturaService } from 'src/app/Servicios/Facturacion
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsFacturarRolloDespacho as defaultSteps } from 'src/app/data';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
   selector: 'app-AsignarProductosFacturas',
@@ -39,6 +40,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada para mostrarlos en el pdf
   Productos : any[] = []; //Variable que va a almcanenar el consolidado de los productos para mostrarlos en el pdf
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
 
   scrollToTop: any = () => window.scroll(0, 999999999999);
 
@@ -68,7 +70,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     //this.obtenerClientes();
   }
 

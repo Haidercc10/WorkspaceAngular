@@ -7,6 +7,7 @@ import { AppComponent } from 'src/app/app.component';
 import { RequerimientosCalidadService } from 'src/app/Servicios/Requerimientos_Calidad/requerimientos-calidad.service';
 import { modelRequerimientos_Calidad } from 'src/app/Modelo/modelRequerimientos_Calidad';
 import { DevolucionesCalidadComponent } from '../devoluciones-calidad/devoluciones-calidad.component';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class RequerimientosCalidadComponent {
   load : boolean = false; //Variable para mostrar el cargando mientras se crea el requerimiento
   typeReqs : any = []; //Variable para almacenar los tipos de requerimientos y mostrarlos en el select
   selectedMode : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
 
   constructor(private frmBuild : FormBuilder, 
     private AppComponent : AppComponent, 

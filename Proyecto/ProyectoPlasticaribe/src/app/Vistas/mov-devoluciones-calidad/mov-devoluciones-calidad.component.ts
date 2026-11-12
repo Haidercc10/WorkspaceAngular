@@ -11,6 +11,7 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,7 @@ export class MovDevolucionesCalidadComponent implements OnInit {
   formFilters !: FormGroup;
   load: boolean = false;
   modoSeleccionado: boolean;
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   validateRole: number;
   storage_Id : number;
   storage_Nombre : any;
