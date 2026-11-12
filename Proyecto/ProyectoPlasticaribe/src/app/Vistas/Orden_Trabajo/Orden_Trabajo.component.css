@@ -254,3 +254,64 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
 #estadoOrden ::ng-deep .p-dropdown-trigger {
   display: none;
 }
+
+/* ===== Tema oscuro (modoSeleccionado): mismos resaltados con tonos oscuros para que el texto claro se lea ===== */
+.ot-oscuro .campo-consulta ::ng-deep input.p-inputtext,
+.ot-oscuro .campo-consulta ::ng-deep .p-dropdown,
+.ot-oscuro .campo-consulta ::ng-deep .p-inputnumber input {
+  background-color: #12243d;
+  border-color: #3f6fae;
+}
+
+.ot-oscuro .campo-consulta ::ng-deep .pi-search,
+.ot-oscuro .ot-leyenda__muestra--consulta {
+  color: #7fb2ff;
+}
+
+.ot-oscuro .ot-leyenda {
+  color: #b8c2cc;
+}
+
+.ot-oscuro .ot-leyenda__muestra--consulta {
+  background-color: #12243d;
+  border-color: #3f6fae;
+}
+
+.ot-oscuro .ot-leyenda__muestra--obligatorio {
+  background-color: #3a1619;
+}
+
+.ot-oscuro.ot-resaltar-obligatorios ::ng-deep input[formcontrolname].ng-invalid:not(p-dialog *),
+.ot-oscuro.ot-resaltar-obligatorios ::ng-deep textarea[formcontrolname].ng-invalid:not(p-dialog *),
+.ot-oscuro.ot-resaltar-obligatorios ::ng-deep p-dropdown.ng-invalid:not(p-dialog *) .p-dropdown,
+.ot-oscuro.ot-resaltar-obligatorios ::ng-deep p-inputnumber.ng-invalid:not(p-dialog *) input,
+.ot-oscuro.ot-resaltar-obligatorios ::ng-deep p-calendar.ng-invalid:not(p-dialog *) input {
+  background-color: #3a1619 !important;
+}
+
+.ot-oscuro.ot-resaltar-obligatorios ::ng-deep .p-float-label:has(> .ng-invalid[formcontrolname]):not(p-dialog *) > label {
+  color: #ff8a8a;
+}
+
+.ot-oscuro .ot-referencia input[readonly] {
+  background-color: #1f2937;
+  color: #cbd5e1;
+}
+
+.ot-oscuro ::ng-deep .p-accordion .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
+  background: #2a1517;
+}
+
+/* Fórmula del cálculo debajo de cada campo calculado */
+.ot-formula {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.ot-oscuro .ot-formula {
+  color: #9aa7b4;
+}

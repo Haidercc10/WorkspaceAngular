@@ -178,7 +178,7 @@
     <tr>
       <!-- Primera columna, fija a la izquierda: arte del item -->
       <th rowspan="3" class="text-center columna-arte" pFrozenColumn [frozen]="true">Arte</th>
-      <th *ngFor="let grupo of gruposEncabezado" [attr.colspan]="grupo.colspan" class="text-center grupo-encabezado"
+      <th *ngFor="let grupo of gruposEncabezado; trackBy: trackGrupoEncabezado" [attr.colspan]="grupo.colspan" class="text-center grupo-encabezado"
         pFrozenColumn [frozen]="grupo.frozen" alignFrozen="right">
         <i *ngIf="grupo.icono" [class]="grupo.icono + ' me-1'"></i>{{grupo.nombre}}
       </th>

@@ -31,7 +31,7 @@
     <p-tabPanel header="Crear Orden Trabajo" leftIcon="pi pi-plus-circle"
       tooltip="Desde aquí podrás crear las ordenes de trabajo">
       <!-- Contenedor de Crear OT: tras intentar guardar resalta en rojo los obligatorios vacíos (sin afectar Buscar OT) -->
-      <div [class.ot-resaltar-obligatorios]="resaltarObligatorios">
+      <div [class.ot-resaltar-obligatorios]="resaltarObligatorios" [class.ot-oscuro]="modoSeleccionado">
         <!--<div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button pButton class="p-button-danger" id="crearCliente" type="button" label="Crear Clientes" icon="pi pi-check-circle" (click)="LlamarModalCrearCliente()"> </button>
         <button pButton class="p-button-danger p-button-outlined" id="crearProducto" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"> </button> 
@@ -91,7 +91,7 @@
                     <i class="pi pi-chevron-right"></i>
                   </span>
                   <span class="p-inputgroup-addon cursor" style="border-left: 1px solid rgb(201, 201, 201);"
-                    pTooltip="Última" tooltipPosition="top" (click)="ConsultarOrdenTrabajo(ultimaOT)">
+                    pTooltip="Última" tooltipPosition="top" (click)="consultarUltimaOT()">
                     <i class="pi pi-history"></i>
                   </span>
                   <button pButton class="p-button-danger" id="pdf" type="button" icon="pi pi-file-pdf"
@@ -218,10 +218,12 @@
               <div class="col-md-3 col-lg-3 col-xl-2" id="margenAdicional">
                 <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
                   <i class="pi pi-percentage"></i>
-                  <p-inputNumber formControlName="Margen" mode="decimal" inputId="MargenOT" [minFractionDigits]="2"
-                    [readonly]="true" [required]="true"></p-inputNumber>
-                  <label for="MargenOT">Margen</label>
+                  <p-inputNumber formControlName="Margen" [min]="0" mode="decimal" inputId="MargenOT"
+                    [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true"
+                    (onInput)="sincronizarMargen($event.value, 'ot')"></p-inputNumber>
+                  <label for="MargenOT">Margen Prod. Terminado</label>
                 </span>
+                <small class="ot-formula">Mismo valor que el Margen de Sellado / Corte</small>
               </div>
 
               <!-- Fila 3 (xl): Cant. Pedida · Presentación · Precio Unitario · Precio Total · Cant. Kg · Precio Kg (2 columnas cada uno) -->
@@ -268,6 +270,7 @@
                     pTooltip="Cant. Pedida × Precio Unitario" tooltipPosition="top"></p-inputNumber>
                   <label for="PrecioTotal">Precio Total</label>
                 </span>
+                <small class="ot-formula">= Cant. Pedida × Precio Unitario</small>
               </div>
 
               <!-- CANTIDAD PEDIDA EN KG (calculada en calcularCostosOT, solo lectura) -->
@@ -280,6 +283,7 @@
                     tooltipPosition="top"></p-inputNumber>
                   <label for="CantKg">Cant. Kg</label>
                 </span>
+                <small class="ot-formula" *ngIf="formulaCalculo('netoKg') as formula">= {{formula}}</small>
               </div>
 
               <!-- PRECIO KILO (calculado en calcularCostosOT, se guarda como Ot_ValorKg) -->
@@ -291,6 +295,17 @@
                     pTooltip="Calculado a partir del precio unitario y el peso del producto"
                     tooltipPosition="top"></p-inputNumber>
                   <label for="PrecioKg">Precio Kg</label>
+                </span>
+                <small class="ot-formula" *ngIf="formulaCalculo('valorKg') as formula">= {{formula}}</small>
+              </div>
+
+              <!-- OBSERVACIÓN GENERAL (Ot_Observacion): se mantiene mientras se termina de salir de BagPro;
+                 en el PDF solo aparece si tiene texto -->
+              <div class="col-12" id="observacion">
+                <span class="p-float-label">
+                  <textarea formControlName="OT_Observacion" id="otObservacion" class="w-100" [rows]="2"
+                    pInputTextarea></textarea>
+                  <label for="otObservacion">Observación general</label>
                 </span>
               </div>
 
@@ -551,6 +566,7 @@
                                   [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
                                 <label for="PesoExtrusion">Peso Extrusión</label>
                               </span>
+                              <small class="ot-formula">= {{formulaCalculo('pesoExtrusion')}}</small>
                             </div>
                           </div>
                         </div>
@@ -1026,12 +1042,13 @@
                             <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-1">
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="Margen_Corte" [min]="0" inputId="Margen" mode="decimal"
-                                  prefix="% " [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true" 
-                                  (onKeyDown)="calcularDatosOt()"></p-inputNumber>
+                                  prefix="% " [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true"
+                                  (onInput)="sincronizarMargen($event.value, 'corte')"></p-inputNumber>
                                 <label for="Margen">Margen</label>
                               </span>
                               <div>
                                 <label><b>Margen Kg: </b>{{margenKg | number: '1.2-2'}}</label>
+                                <small class="ot-formula" *ngIf="formulaCalculo('margenKg') as formula">= {{formula}}</small>
                               </div>
                             </div>
                           </div>
@@ -1111,6 +1128,7 @@
                                   [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
                                 <label for="Ancho">Ancho Total</label>
                               </span>
+                              <small class="ot-formula">= Ancho + Fuelle Izq. + Fuelle Der.</small>
                             </div>
 
                             <!-- Largo-->
@@ -1154,11 +1172,12 @@
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="Margen_Sellado" [min]="0" inputId="Margen"
                                   mode="decimal" prefix="% " [minFractionDigits]="2" [required]="true"
-                                  (onKeyDown)="calcularDatosOt()"></p-inputNumber>
+                                  (onInput)="sincronizarMargen($event.value, 'sellado')"></p-inputNumber>
                                 <label for="Margen">Margen</label>
                               </span>
                               <div>
                                 <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                                <small class="ot-formula" *ngIf="formulaCalculo('margenKg') as formula">= {{formula}}</small>
                               </div>
                             </div>
                           </div>
@@ -1210,6 +1229,7 @@
                                   [minFractionDigits]="2" [maxFractionDigits]="2" [required]="true"></p-inputNumber>
                                 <label for="PesoBulto">Peso Bulto</label>
                               </span>
+                              <small class="ot-formula">= {{formulaCalculo('pesoBulto')}}</small>
                               <!-- Peso teórico de producción (± 7 %); peso fijo para las referencias CAMISILLA BIOD con peso manual -->
                               <div *ngIf="pesoTeoricoBulto as teorico">
                                 <label *ngIf="teorico.pesoTeorico > 0"
@@ -1239,6 +1259,7 @@
                                   (onInput)="calcularPesosPaqueteBulto(false)"></p-inputNumber>
                                 <label for="PesoPaquete">Peso {{presentacionProducto}}</label>
                               </span>
+                              <small class="ot-formula">= {{formulaCalculo('pesoPaquete')}}</small>
                               <!-- Peso teórico de producción (± 7 %), se actualiza mientras se escribe -->
                               <div *ngIf="pesoTeoricoPaquete as teorico">
                                 <label *ngIf="teorico.pesoTeorico > 0"
@@ -1339,30 +1360,35 @@
                             <p-chip id="cantidad" label="Cantidad {{presentacionProducto}}"
                               icon="pi pi-shopping-cart"></p-chip>
                             <label for="">{{cantidadProducto | number}}</label>
+                            <small class="ot-formula">= Cant. Pedida</small>
                           </div>
                         </div>
                         <div class="mb-3 costosFinales">
                           <div class="row g-3">
                             <p-chip id="valor1" label="Valor {{presentacionProducto}}" icon="pi pi-dollar"></p-chip>
                             <label for="">${{valorProducto | number : '1.2-2'}}</label>
+                            <small class="ot-formula">= Precio Unitario</small>
                           </div>
                         </div>
                         <div class="mb-3 costosFinales">
                           <div class="row g-3">
                             <p-chip id="neto1" label="Neto Kg" icon="pi pi-th-large"></p-chip>
                             <label for="">{{netoKg | number : '1.2-2'}}</label>
+                            <small class="ot-formula" *ngIf="formulaCalculo('netoKg') as formula">= {{formula}}</small>
                           </div>
                         </div>
                         <div class="mb-3 costosFinales">
                           <div class="row g-3">
                             <p-chip id="valor-kg" label="Valor Kg" icon="pi pi-money-bill"></p-chip>
                             <label for="">${{valorKg | number : '1.2-2'}}</label>
+                            <small class="ot-formula" *ngIf="formulaCalculo('valorKg') as formula">= {{formula}}</small>
                           </div>
                         </div>
                         <div class="mb-3 costosFinales">
                           <div class="row g-3">
                             <p-chip id="valor-ot" label="Valor OT" icon="pi pi-wallet"></p-chip>
                             <label for="">${{valorOt | number : '1.2-2'}}</label>
+                            <small class="ot-formula">= Cantidad × Valor {{presentacionProducto}}</small>
                           </div>
                         </div>
                       </div>

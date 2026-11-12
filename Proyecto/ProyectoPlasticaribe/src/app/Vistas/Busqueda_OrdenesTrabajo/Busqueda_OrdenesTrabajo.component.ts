@@ -144,7 +144,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
 
   // Carga las fechas de rango por defecto (últimos 12 meses) en el formulario de filtros.
   loadRankDates() {
-    let fechaInicio: any = new Date(moment().subtract(12, 'M').format('YYYY-MM-DD'));
+    let fechaInicio: any = new Date(moment().subtract(6, 'M').format('YYYY-MM-DD'));
     let fechaFin: any = new Date();
     this.formFiltros.patchValue({ 'fechaInicio': fechaInicio, 'fechaFin': fechaFin });
   }
@@ -308,6 +308,19 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     }, [] as { nombre: string; icono: string; colspan: number; frozen: boolean }[]);
   }
 
+  /**
+   * Identidad estable de cada grupo del encabezado para el *ngFor. `gruposEncabezado` es un getter que crea objetos
+   * nuevos en cada detección de cambios; sin trackBy, Angular vuelve a crear los <th> y cada `pFrozenColumn` nuevo
+   * programa un setTimeout de 1 s (ngAfterViewInit de PrimeNG) que dispara otra detección: los temporizadores se
+   * acumulan sin fin y bloquean los demás (p. ej. el cálculo de costos de la pantalla de OT).
+   * @param indice Posición del grupo en el encabezado.
+   * @param grupo Grupo del encabezado.
+   * @returns Clave del grupo (posición, nombre y si es la columna fija).
+   */
+  trackGrupoEncabezado(indice: number, grupo: { nombre: string; frozen: boolean }): string {
+    return `${indice}|${grupo.nombre}|${grupo.frozen}`;
+  }
+
   llenarColumnas_BusquedaPorItem() {
     //this.ordenesConsultadas.sort((a,b) => Number(b.ordenTrabajo) - Number(a.ordenTrabajo));
     this.ordenesConsultadas = this.ordenesConsultadas.reduce((a, b) => {
@@ -450,12 +463,25 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   //.Información de la producción.
   infoProduction2() {
     let info: any = [];
-    //this.ordenesConsultadas.sort((a,b) => a.id_Vendedor - b.id_Vendedor);
-    this.ordenesConsultadas.forEach(d => {
-      info.push([d.ordenTrabajo, d.item, d.fechaCreacion.replace('T00:00:00', ''), d.fecha_Despacho.replace('T00:00:00', ''), d.cliente, d.formato_Extrusion + d.ancho_Extrusion + d.calibre_Extrusion + d.pigmento_Extrusion, d.kilos, d.referencia, d.ancho, d.peso_Metro, d.rodillo, d.material, d.maquinas.toString(), d.color_1, d.color_2, d.color_3, d.color_4, d.color_5, d.color_6, d.color_7, d.color_8, d.anchoReal, d.fuelle_Izquierdo, d.fuelle_Derecho, d.largo, d.fuelle_Fondo, d.tipo_Sellado, d.cant_Unidades, d.peso_Millar, d.cantBolsasxPaquete]);
+    // Solo en el Excel las OT van de menor a mayor; se ordena una copia para no cambiar el orden de la tabla (mayor a menor)
+    const ordenes = [...this.ordenesConsultadas].sort((a, b) => Number(a.ordenTrabajo) - Number(b.ordenTrabajo));
+    ordenes.forEach(d => {
+      info.push([d.ordenTrabajo, d.item, this.soloFecha(d.fechaCreacion), this.soloFecha(d.fecha_Despacho), d.cliente, d.formato_Extrusion + d.ancho_Extrusion + d.calibre_Extrusion + d.pigmento_Extrusion, d.kilos, d.referencia, d.ancho, d.peso_Metro, d.rodillo, d.material, d.maquinas.toString(), d.color_1, d.color_2, d.color_3, d.color_4, d.color_5, d.color_6, d.color_7, d.color_8, d.anchoReal, d.fuelle_Izquierdo, d.fuelle_Derecho, d.largo, d.fuelle_Fondo, d.tipo_Sellado, d.cant_Unidades, d.peso_Millar, d.cantBolsasxPaquete]);
     });
     //this.addTotalSheet1(info);
     return info;
+  }
+
+  /**
+   * Deja solo la fecha (YYYY-MM-DD) de un valor fecha-hora. Las OT de Plasticaribe traen la hora de despacho
+   * (p. ej. 2026-11-11T17:24:00) y antes solo se quitaba "T00:00:00", así que esa hora salía en el Excel.
+   * @param fecha Fecha en texto ISO o fecha.
+   * @returns La fecha sin hora, o '' si no hay fecha.
+   */
+  private soloFecha(fecha: any): string {
+    if (fecha == null || fecha === '') return '';
+    if (fecha instanceof Date) return moment(fecha).format('YYYY-MM-DD');
+    return `${fecha}`.split('T')[0].trim();
   }
 
   //.Agregar información a la hoja del excel.
