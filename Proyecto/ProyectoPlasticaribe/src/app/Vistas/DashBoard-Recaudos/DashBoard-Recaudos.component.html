@@ -216,16 +216,16 @@
           <ng-template pTemplate="header">
             <tr>
               <th>#</th>
-              <th pSortableColumn="nombvende"><p-sortIcon field="nombvende"></p-sortIcon> Venedor</th>
               <th pSortableColumn="idvende"><p-sortIcon field="idvende"></p-sortIcon> Id Vendedor</th>
+              <th pSortableColumn="nombvende"><p-sortIcon field="nombvende"></p-sortIcon> Vendedor</th>
               <th pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
             <tr>
               <td>{{rowIndex + 1}}</td>
-              <td>{{item.nombvende}}</td>
               <td>{{item.idvende}}</td>
+              <td>{{item.nombvende}}</td>
               <td>{{item.subTotal | number : '1.2-2'}}</td>
             </tr>
           </ng-template>
@@ -260,8 +260,8 @@
               <th pSortableColumn="idcliente"><p-sortIcon field="idcliente"></p-sortIcon> Id Cliente</th>
               <th pSortableColumn="razoncial"><p-sortIcon field="razoncial"></p-sortIcon> Cliente</th>
               <th pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
-              <th pSortableColumn="nombvende"><p-sortIcon field="nombvende"></p-sortIcon> Venedor</th>
               <th pSortableColumn="idvende"><p-sortIcon field="idvende"></p-sortIcon> Id Vendedor</th>
+              <th pSortableColumn="nombvende"><p-sortIcon field="nombvende"></p-sortIcon> Vendedor</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
@@ -270,8 +270,8 @@
               <td>{{item.idcliente}}</td>
               <td>{{item.razoncial}}</td>
               <td>{{item.subTotal | number : '1.2-2'}}</td>
-              <td>{{item.nombvende}}</td>
               <td>{{item.idvende}}</td>
+              <td>{{item.nombvende}}</td>
             </tr>
           </ng-template>
         </p-table>
