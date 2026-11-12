@@ -1,10 +1,10 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
-import { EMPTY, Observable, Subscription, catchError, finalize, forkJoin, map, of, switchMap, throwError } from 'rxjs';
+import { EMPTY, Observable, Subject, Subscription, catchError, debounceTime, distinctUntilChanged, filter, finalize, forkJoin, map, of, switchMap, throwError } from 'rxjs';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
@@ -37,7 +37,7 @@ import { modelProducto } from 'src/app/Modelo/modelProducto';
 import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { OtCalculoCostosService, RangoPesoTeorico } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
+import { OtCalculoCostosService, RangoPesoTeorico, REGLA_PESO_MILLAR_D2 } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 /**
@@ -82,7 +82,7 @@ interface ResultadoBusquedaItem {
   styleUrls: ['./Orden_Trabajo.component.css']
 })
 
-export class Orden_TrabajoComponent implements OnInit {
+export class Orden_TrabajoComponent implements OnInit, OnDestroy {
 
   FormOrdenTrabajo !: FormGroup;
   FormOrdenTrabajoExtrusion !: FormGroup;
@@ -95,7 +95,9 @@ export class Orden_TrabajoComponent implements OnInit {
   formCrearMateriales !: FormGroup;
   formCrearPigmentos !: FormGroup;
 
-  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  /** Tema oscuro/claro de la aplicación. Se lee directo de AppComponent (antes un setInterval de 1 s forzaba la
+   * detección de cambios de todo el formulario cada segundo y no se detenía al salir de la pantalla). */
+  get modoSeleccionado(): boolean { return this.AppComponent.temaSeleccionado; }
   cargando: boolean = false; //Variable para validar que salga o no la imagen de carga
   confirmandoEdicion: boolean = false; //Indica que el mensaje de confirmación de edición está abierto; deshabilita los botones "Editar OT"
   guardando: boolean = false; //Indica que hay una creación o edición de OT en curso; bloquea un segundo envío (doble clic)
@@ -115,6 +117,9 @@ export class Orden_TrabajoComponent implements OnInit {
   private refrescoProducto?: Subscription; //Refresco en segundo plano de ArrayProducto (buscarInformacionProducto); se cancela en limpiarCampos
   private errorRefrescoAvisado: boolean = false; //Evita repetir el aviso de error del refresco de producto hasta que vuelva a responder
   private calculosPendientes = new Set<ReturnType<typeof setTimeout>>(); //Temporizadores de cálculo diferido (calcularDatosOt); se cancelan al guardar
+  private calculoOtProgramado?: ReturnType<typeof setTimeout>; //Último recálculo de calcularDatosOt; cada tecla reemplaza al anterior (debounce)
+  private textoBusquedaProducto = new Subject<string>(); //Texto digitado en Referencia; se consulta con debounce (iniciarBusquedaProductos)
+  private suscripcionBusquedaProductos?: Subscription; //Búsqueda de productos por nombre; se cierra en ngOnDestroy
   produccionProcesos: any[] = []; //Fila de Estados Procesos OT con los kg (y und) producidos por proceso de la OT consultada
   otProduccion: number | null = null; //Número de la OT a la que pertenece la tabla de producción por proceso
   cargandoProduccion: boolean = false; //Indica si se está consultando la producción por proceso
@@ -224,14 +229,12 @@ export class Orden_TrabajoComponent implements OnInit {
     private calculoCostos: OtCalculoCostosService,
     private creacionPdf: CreacionPdfService,) {
 
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [null],
       Id_Vendedor: [null, Validators.required],
       Nombre_Vendedor: [null, Validators.required],
       OT_FechaCreacion: [this.today, Validators.required],
-      OT_FechaEntrega: [null, Validators.required], // Obligatoria (la API también la exige)
+      OT_FechaEntrega: [new Date(), Validators.required], // Obligatoria (la API también la exige)
       Id_Cliente: [null, Validators.required],
       Nombre_Cliente: [null, Validators.required],
       Id_Producto: [null, Validators.required],
@@ -440,7 +443,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   ngOnInit() {
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.iniciarBusquedaProductos();
     this.lecturaStorage();
     this.consultarVendedores();
     this.consultarPresentaciones();
@@ -501,7 +504,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.FormOrdenTrabajo.reset();
     this.FormOrdenTrabajo.patchValue({
       OT_FechaCreacion: this.today,
-      OT_FechaEntrega: null,
+      OT_FechaEntrega: new Date(), // Por defecto la fecha de hoy
       OT_Estado: 15
     });
   }
@@ -989,10 +992,33 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a consultar los productos de la empresa. En modo edición no busca: el campo es el nombre del producto
   // (se actualiza en el maestro al editar la OT); el item se cambia desde el campo "Item".
+  // Solo envía el texto: la consulta la hace `iniciarBusquedaProductos` con debounce.
   consultarProductos() {
     if (this.edicionOrdenTrabajo || this.editandoReferencia) return;
-    let nombreProducto: any = this.FormOrdenTrabajo.get('Nombre_Producto')?.value;
-    this.productoService.obtenerItemsLike(nombreProducto).subscribe(data => this.productos = data);
+    this.textoBusquedaProducto.next(`${this.FormOrdenTrabajo.get('Nombre_Producto')?.value ?? ''}`.trim());
+  }
+
+  /**
+   * Consulta los productos por nombre mientras se escribe en Referencia sin saturar el API: espera 300 ms sin teclear,
+   * ignora textos repetidos (flechas, Shift, etc.), exige al menos 2 caracteres y cancela la consulta anterior si
+   * sigue pendiente, para que una respuesta tardía no reemplace la lista de un texto más reciente.
+   * Un texto solo numérico (el código que pone el datalist al elegir un item) no se consulta.
+   * @returns No retorna un valor.
+   */
+  private iniciarBusquedaProductos(): void {
+    this.suscripcionBusquedaProductos = this.textoBusquedaProducto.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(texto => texto.length >= 2 && isNaN(Number(texto))),
+      switchMap(texto => this.productoService.obtenerItemsLike(encodeURIComponent(texto)).pipe(catchError(() => of([])))),
+    ).subscribe(data => this.productos = data ?? []);
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcionBusquedaProductos?.unsubscribe();
+    this.busquedaOT?.unsubscribe();
+    this.refrescoProducto?.unsubscribe();
+    this.cancelarCalculosPendientes();
   }
 
   /**
@@ -1019,13 +1045,36 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   cargarPresentacionYConsultarItem(idProducto: number) {
-    this.bagProService.GetPresentacionItem(idProducto).subscribe(data => {
-      let presentacion: string = `${data.ptPresentacionNom}`;
-      if (presentacion == 'Kilo') presentacion = 'Kg';
-      else if (presentacion == 'Unidad') presentacion = 'Und';
-      this.FormOrdenTrabajo.patchValue({ Presentacion: presentacion, });
-      this.consultarInfoProducto();
-    }, () => this.consultarInfoProducto());
+    this.cargando = true;
+    this.presentacionItem$(idProducto).subscribe(presentacion => this.aplicarPresentacionYConsultarItem(presentacion));
+  }
+
+  /**
+   * Consulta en BagPro la última presentación del item, convertida a la de Plasticaribe (Kilo → Kg, Unidad → Und).
+   * @param idProducto Código del item.
+   * @returns Observable con la presentación, o null si el item no tiene ficha en BagPro o la consulta falla.
+   */
+  private presentacionItem$(idProducto: number): Observable<string | null> {
+    return this.bagProService.GetPresentacionItem(idProducto).pipe(
+      map(data => {
+        const presentacion = `${data?.ptPresentacionNom ?? ''}`.trim();
+        if (!presentacion) return null;
+        return presentacion == 'Kilo' ? 'Kg' : presentacion == 'Unidad' ? 'Und' : presentacion;
+      }),
+      catchError(() => of(null))
+    );
+  }
+
+  /**
+   * Coloca la presentación encontrada (si hay) y carga la información del item. Sin presentación se usa la que tenga
+   * el formulario (antes se colocaba el texto "undefined" cuando BagPro no tenía el item).
+   * @param presentacion Presentación del item, o null para conservar la del formulario.
+   * @returns No retorna un valor.
+   */
+  private aplicarPresentacionYConsultarItem(presentacion: string | null): void {
+    if (presentacion) this.FormOrdenTrabajo.patchValue({ Presentacion: presentacion });
+    this.cargando = false;
+    this.consultarInfoProducto();
   }
 
   /**
@@ -1065,14 +1114,20 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   buscarProductoPorId() {
-    let id: any = this.FormOrdenTrabajo.value.Id_Producto;
-    this.productoService.srvObtenerListaPorId(id).subscribe(data => {
+    let id: any = `${this.FormOrdenTrabajo.value.Id_Producto ?? ''}`.trim();
+    if (!id) return;
+    this.cargando = true;
+    // El producto (Plasticaribe) y su presentación (BagPro) se consultan a la vez en lugar de uno tras otro
+    forkJoin({ data: this.productoService.srvObtenerListaPorId(id), presentacion: this.presentacionItem$(id) }).subscribe(({ data, presentacion }) => {
       this.FormOrdenTrabajo.patchValue({
         'Id_Producto': data.prod_Id,
         'Nombre_Producto': data.prod_Nombre,
       });
-      this.cargarPresentacionYConsultarItem(data.prod_Id);
-    }, () => this.msj.mensajeAdvertencia(`¡No se encontró información del Item buscado!`));
+      this.aplicarPresentacionYConsultarItem(presentacion);
+    }, () => {
+      this.cargando = false;
+      this.msj.mensajeAdvertencia(`¡No se encontró información del Item buscado!`);
+    });
   }
 
   /**
@@ -1207,8 +1262,13 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargando = true;
     this.producto = producto;
     this.presentacionProducto = presentacion;
-    this.busquedaOT = this.buscarItem$(producto, presentacion).pipe(
-      switchMap(resultado => resultado ? this.prepararCargaItem$(resultado) : of(null))
+    // La ficha del item (BagPro / última OT) y la información del producto (Plasticaribe) no dependen entre sí:
+    // se consultan a la vez; después solo falta la sede del cliente cuando la ficha viene de BagPro.
+    this.busquedaOT = forkJoin({
+      resultado: this.buscarItem$(producto, presentacion),
+      productoEncontrado: this.obtenerInformacionProducto$(false),
+    }).pipe(
+      switchMap(({ resultado, productoEncontrado }) => resultado ? this.prepararCargaItem$(resultado, productoEncontrado) : of(null))
     ).subscribe(resultado => {
       if (!resultado) {
         this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No hay información del item ${producto} con la presentación ${presentacion}!`);
@@ -1278,12 +1338,11 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns Observable con el mismo resultado, incluida la sede cuando el origen es BagPro, y marcado con
    * `productoNoEncontrado` si el item/presentación no existe en Plasticaribe.
    */
-  prepararCargaItem$(resultado: ResultadoBusquedaItem): Observable<ResultadoBusquedaItem> {
-    if (resultado.origen == 'ultimaOT') return this.obtenerInformacionProducto$(false).pipe(
-      map(producto => ({ ...resultado, productoNoEncontrado: !producto }))
-    );
-    return forkJoin({ producto: this.obtenerInformacionProducto$(false), sede: this.consultarSedeCliente$(resultado.datos.nitCliente) }).pipe(
-      map(({ producto, sede }) => ({ ...resultado, sede, productoNoEncontrado: !producto }))
+  prepararCargaItem$(resultado: ResultadoBusquedaItem, productoEncontrado: boolean): Observable<ResultadoBusquedaItem> {
+    // Sin producto no se cargará nada: no hace falta consultar la sede
+    if (resultado.origen == 'ultimaOT' || !productoEncontrado) return of({ ...resultado, productoNoEncontrado: !productoEncontrado });
+    return this.consultarSedeCliente$(resultado.datos.nitCliente).pipe(
+      map(sede => ({ ...resultado, sede, productoNoEncontrado: false }))
     );
   }
 
@@ -1747,7 +1806,12 @@ export class Orden_TrabajoComponent implements OnInit {
    * @returns No retorna un valor.
    */
   calcularDatosOt() {
-    this.programarCalculo(() => {
+    // Debounce: cada tecla reemplaza el recálculo pendiente (antes cada tecla dejaba su propio recálculo en cola)
+    if (this.calculoOtProgramado != null) {
+      clearTimeout(this.calculoOtProgramado);
+      this.calculosPendientes.delete(this.calculoOtProgramado);
+    }
+    this.calculoOtProgramado = this.programarCalculo(() => {
       if (this.productoPendienteDeCargar()) this.buscarInformacionProducto();
       this.calcularDatosOtInmediato();
     }, 500);
@@ -1792,13 +1856,14 @@ export class Orden_TrabajoComponent implements OnInit {
    * @param milisegundos Tiempo de espera.
    * @returns No retorna un valor.
    */
-  private programarCalculo(accion: () => void, milisegundos: number): void {
+  private programarCalculo(accion: () => void, milisegundos: number): ReturnType<typeof setTimeout> {
     const temporizador = setTimeout(() => {
       this.calculosPendientes.delete(temporizador);
       if (this.guardando) return;
       accion();
     }, milisegundos);
     this.calculosPendientes.add(temporizador);
+    return temporizador;
   }
 
   /**
@@ -1842,7 +1907,8 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   calcularMargenAdicional(): number {
-    let margen_Adicional: number = 0;
+    // Sin sellado ni corte se usa el Margen Prod. Terminado digitado (antes quedaba en 0)
+    let margen_Adicional: number = this.FormOrdenTrabajo.value.Margen ?? 0;
     if (this.sellado) {
       margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
       this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
@@ -1850,8 +1916,25 @@ export class Orden_TrabajoComponent implements OnInit {
       margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
       this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoCorte.value.Formato_Corte;
     }
-    this.FormOrdenTrabajo.patchValue({ Margen: margen_Adicional });
+    // Solo si cambió: no reescribir el campo mientras el usuario lo digita
+    if (this.FormOrdenTrabajo.value.Margen !== margen_Adicional) this.FormOrdenTrabajo.patchValue({ Margen: margen_Adicional });
     return margen_Adicional;
+  }
+
+  /**
+   * Mantiene iguales el Margen Prod. Terminado y los márgenes de Sellado y Corte: al escribir en cualquiera de
+   * ellos se copia el valor a los otros dos y se recalculan pesos y costos (Margen Kg, Neto Kg, Cant. Kg).
+   * El campo de origen no se reescribe para no mover el cursor mientras se digita.
+   * @param margen Margen digitado en porcentaje.
+   * @param origen Campo en el que se digitó.
+   * @returns No retorna un valor.
+   */
+  sincronizarMargen(margen: number | string | null, origen: 'ot' | 'sellado' | 'corte'): void {
+    const valor = margen == null || margen === '' ? null : Number(margen);
+    if (origen != 'ot') this.FormOrdenTrabajo.patchValue({ Margen: valor }, { emitEvent: false });
+    if (origen != 'sellado') this.FormOrdenTrabajoSellado.patchValue({ Margen_Sellado: valor }, { emitEvent: false });
+    if (origen != 'corte') this.FormOrdenTrabajoCorte.patchValue({ Margen_Corte: valor }, { emitEvent: false });
+    this.calcularDatosOt();
   }
 
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
@@ -1908,6 +1991,53 @@ export class Orden_TrabajoComponent implements OnInit {
   get precioTotal(): number {
     const { Cantidad, Precio } = this.FormOrdenTrabajo.value;
     return (Number(Cantidad) || 0) * (Number(Precio) || 0);
+  }
+
+  /**
+   * Texto con la fórmula que se usa para obtener un campo calculado de la OT; se muestra debajo del campo.
+   * Las fórmulas que dependen de la presentación siguen las reglas de `OtCalculoCostosService.calcularCostos`.
+   * @param campo Campo calculado.
+   * @returns La fórmula en texto, o '' si el campo no tiene cálculo para la presentación actual.
+   */
+  formulaCalculo(campo: 'netoKg' | 'margenKg' | 'valorKg' | 'pesoExtrusion' | 'pesoPaquete' | 'pesoBulto'): string {
+    const presentacion = `${this.presentacionProducto ?? ''}`.trim();
+    const formato = this.ArrayProducto[0]?.Tipo ?? this.formatoProductoTerminado();
+    // Regla D2: en LAMINADO/HOJA por paquete el Peso Millar se divide entre 2
+    const pm = REGLA_PESO_MILLAR_D2.tipos.includes(formato ?? '') && REGLA_PESO_MILLAR_D2.presentaciones.includes(presentacion)
+      ? `(Peso Millar ÷ ${REGLA_PESO_MILLAR_D2.divisor})` : 'Peso Millar';
+    const kilos: { [presentacion: string]: string } = {
+      'Kg': 'Cant. Pedida',
+      'Paquete': `Cant. Pedida × Bolsas x Paquete × ${pm} / 1000`,
+      'Und': `Cant. Pedida × ${pm} / 1000`,
+    };
+    switch (campo) {
+      case 'netoKg':
+        if (presentacion == 'MTS') return 'Sin regla para metros (0)';
+        return kilos[presentacion] ? `${kilos[presentacion]} × (1 + Margen / 100)` : '';
+      case 'margenKg':
+        if (presentacion == 'MTS') return 'Sin regla para metros (0)';
+        return kilos[presentacion] ? `${kilos[presentacion]} × Margen / 100` : '';
+      case 'valorKg':
+        switch (presentacion) {
+          case 'Kg': return 'Igual al Precio Unitario';
+          case 'Paquete': return `Precio Unitario ÷ (${pm} × Bolsas x Paquete / 1000)`;
+          case 'Und': return `Valor OT ÷ (Cant. Pedida × ${pm} / 1000)`;
+          case 'MTS': return 'Pendiente de definir para metros';
+          default: return '';
+        }
+      case 'pesoExtrusion': {
+        const cms = this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms';
+        const material3 = Number(this.FormOrdenTrabajoExtrusion.value.Material_Extrusion) === 3;
+        const factor = cms ? (material3 ? 0.0048 : 0.00468) : (material3 ? 0.0317 : 0.0302);
+        return `(Ancho 1 + Fuelle Izq. + Fuelle Der.) × Calibre × ${factor} × ${cms ? 100 : 39.3701}`;
+      }
+      case 'pesoPaquete':
+        return this.pesoPaqueteManual() != null
+          ? 'Peso de tabla CAMISILLA BIOD ÷ Cantidad x Bulto'
+          : `${pm} × Cantidad bolsas x ${presentacion || 'Paquete'} / 1000`;
+      case 'pesoBulto':
+        return this.pesoPaqueteManual() != null ? 'Peso fijo de tabla CAMISILLA BIOD' : `Peso ${presentacion || 'Paquete'} × Cantidad x Bulto`;
+    }
   }
 
   /**
@@ -2817,8 +2947,12 @@ export class Orden_TrabajoComponent implements OnInit {
     ).subscribe({
       next: datos_ot => {
         creada = true;
+        // La OT recién creada pasa a ser la última conocida (botón "Última")
+        this.ultimaOT = Math.max(this.ultimaOT || 0, Number(datos_ot.numero_OT) || 0);
         this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
-        this.limpiarCampos();
+        // Los datos no se borran: se carga la OT recién creada (queda en pantalla con su número, en modo edición),
+        // así un segundo clic en "Crear" no duplica la OT
+        this.ConsultarOrdenTrabajo(Number(datos_ot.numero_OT));
         this.pdfOrdenTrabajo(datos_ot.numero_OT);
       },
       // Errores no previstos dentro del flujo (p. ej. datos nulos al armar la OT); los HTTP ya se informaron en cada paso
@@ -3058,6 +3192,26 @@ export class Orden_TrabajoComponent implements OnInit {
    * @param numero Desplazamiento relativo (-1, 0, 1) sobre la OT actual o número absoluto de OT.
    * @returns No retorna un valor.
    */
+  /**
+   * Botón "Última": consulta en ese momento el último número de OT y la carga. Antes usaba `ultimaOT`, que solo se
+   * consultaba al abrir la pantalla, así que una OT creada después (p. ej. 142648) no aparecía y cargaba la anterior.
+   * Toma el mayor entre BagPro y Plasticaribe; si ambas consultas fallan usa el último número conocido.
+   * @returns No retorna un valor.
+   */
+  consultarUltimaOT(): void {
+    this.cargando = true;
+    forkJoin({
+      bagPro: this.bagProService.srvObtenerListaClienteOT_UltimaOT().pipe(map(data => Number(data?.item) || 0), catchError(() => of(0))),
+      plasticaribe: this.ordenTrabajoService.GetUlt_Numero_OT().pipe(map(data => Number(data) || 0), catchError(() => of(0))),
+    }).subscribe(({ bagPro, plasticaribe }) => {
+      this.ultimaOT = Math.max(this.ultimaOT || 0, bagPro, plasticaribe);
+      this.cargando = false;
+      // 0, 1 y -1 son desplazamientos en ConsultarOrdenTrabajo; un número real de OT siempre es mayor
+      if (this.ultimaOT > 1) this.ConsultarOrdenTrabajo(this.ultimaOT);
+      else this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``);
+    });
+  }
+
   ConsultarOrdenTrabajo(numero: number) {
     const numeroOT = this.resolverNumeroOT(numero);
     if (numeroOT == null) {

@@ -1417,6 +1417,17 @@ export class CreacionPdfService {
     return data;
   }
 
+  /**
+   * Fila de la observación general de la OT (Ot_Observacion) para las tablas de observaciones por proceso.
+   * Se mantiene en la hoja 1 y en la hoja 2 mientras se termina de salir de BagPro, y solo si tiene texto.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Arreglo con la fila de la observación general, o vacío si no tiene texto.
+   */
+  private filaObservacionGeneralPDFOT(datos_ot): { proceso: string, texto: string }[] {
+    const texto = this.textoObservacionPDFOT(datos_ot?.observacion);
+    return texto == '' ? [] : [{ proceso: `General`, texto }];
+  }
+
   // Funcion que va a colocar el nombre de la mezcla que tiene el item
   private tituloMezclasOT(datos_ot) {
     return {
@@ -1673,21 +1684,16 @@ export class CreacionPdfService {
   }
 
   /**
-   * Coloca en la hoja 1 la observación del proceso de extrusión (la observación general ya no se usa).
+   * Tabla de observaciones por proceso de la hoja 1: la observación general (si tiene texto) y luego la de extrusión.
+   * La fila de extrusión se muestra siempre, como antes.
    * @param datos_ot Datos de la orden de trabajo consultada.
-   * @returns Nodo pdfmake con la observación de extrusión.
+   * @returns Nodo pdfmake con la tabla de observaciones de la hoja 1.
    */
   private observacionOT(datos_ot) {
-    return {
-      table: {
-        widths: ['*'],
-        body: [
-          [{ border: [true, true, true, false], text: `Observación Extrusión: `, style: 'subtitulo' }],
-          [{ border: [true, false, true, true], text: this.textoObservacionPDFOT(datos_ot.extrusion_Observacion) }]
-        ]
-      },
-      fontSize: 9,
-    }
+    return this.tablaObservacionesPDFOT([
+      ...this.filaObservacionGeneralPDFOT(datos_ot),
+      { proceso: `Extrusión`, texto: this.textoObservacionPDFOT(datos_ot.extrusion_Observacion) },
+    ]);
   }
 
   /**
@@ -1983,19 +1989,28 @@ export class CreacionPdfService {
    * Arma la tabla de observaciones por proceso de la hoja 2. Solo incluye las filas que tienen observación,
    * para no ocupar espacio con procesos vacíos ni desbordar el contenido a otra hoja.
    * "Producto Terminado" muestra la observación compartida de corte y sellado.
-   * La observación general ya no se usa y la de extrusión se muestra solo en la hoja 1.
+   * La observación general va en la primera fila (si tiene texto) y la de extrusión se muestra solo en la hoja 1.
    * @param datos_ot Datos de la orden de trabajo consultada.
    * @returns Nodo pdfmake con la tabla, o null si ningún proceso tiene observación.
    */
   private observacionesPorProcesoPDFOT(datos_ot) {
     const filas = [
+      ...this.filaObservacionGeneralPDFOT(datos_ot),
       { proceso: `Laminado`, texto: this.textoObservacionPDFOT(datos_ot.laminado_Observacion) },
       { proceso: `Impresión`, texto: this.textoObservacionPDFOT(datos_ot.impresion_Observacion) },
       { proceso: `Producto Terminado`, texto: this.textoObservacionPDFOT(datos_ot.selladoCorte_Observacion) },
     ].filter(fila => fila.texto != '');
 
     if (filas.length == 0) return null;
+    return this.tablaObservacionesPDFOT(filas);
+  }
 
+  /**
+   * Arma la tabla "OBSERVACIONES POR PROCESO" (encabezado Proceso / Observación) que comparten la hoja 1 y la hoja 2.
+   * @param filas Filas a mostrar, cada una con el nombre del proceso y su observación.
+   * @returns Nodo pdfmake con la tabla.
+   */
+  private tablaObservacionesPDFOT(filas: { proceso: string, texto: string }[]) {
     return {
       table: {
         widths: [120, '*'],
