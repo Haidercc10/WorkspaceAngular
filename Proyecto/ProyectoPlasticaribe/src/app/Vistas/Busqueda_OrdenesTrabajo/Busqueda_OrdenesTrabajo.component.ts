@@ -119,7 +119,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     this.obtenerMateriales();
     this.obtenerPigmentos();
     this.lecturaStorage();
-    this.loadRankDates();
     this.llenarColumnas(); // La tabla se ve vacía, con sus encabezados, antes de consultar
   }
 
@@ -142,11 +141,15 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     return total > 100 ? [10, 15, 20, 50, 100, total] : [10, 15, 20, 50, 100];
   }
 
-  // Carga las fechas de rango por defecto (últimos 12 meses) en el formulario de filtros.
-  loadRankDates() {
-    let fechaInicio: any = new Date(moment().subtract(6, 'M').format('YYYY-MM-DD'));
-    let fechaFin: any = new Date();
-    this.formFiltros.patchValue({ 'fechaInicio': fechaInicio, 'fechaFin': fechaFin });
+  /**
+   * Rango de fechas de la consulta. Los campos de fecha se dejan vacíos en pantalla; si no se llenan,
+   * se consultan los últimos 6 meses (fecha final = hoy, fecha inicial = 6 meses antes de la final).
+   * @returns Fechas inicial y final en formato YYYY-MM-DD.
+   */
+  private rangoFechasConsulta(): { fechaInicio: string, fechaFin: string } {
+    const fin = this.formFiltros.value.fechaFin ? moment(this.formFiltros.value.fechaFin) : moment();
+    const inicio = this.formFiltros.value.fechaInicio ? moment(this.formFiltros.value.fechaInicio) : fin.clone().subtract(6, 'M');
+    return { fechaInicio: inicio.format('YYYY-MM-DD'), fechaFin: fin.format('YYYY-MM-DD') };
   }
 
   limpiarCampos() {
@@ -154,7 +157,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     this.formFiltros.reset();
     this.ordenesConsultadas = [];
     this.formFiltros.patchValue({ buscarPorItem_Ot: 'Item' });
-    this.loadRankDates();
     this.llenarColumnas();
   }
 
@@ -206,11 +208,10 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
    */
   consultarOrdenes() {
     this.cargando = true;
-    let fechaIncio: any = moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD');
-    let fechaFin: any = moment(this.formFiltros.value.fechaFin).format('YYYY-MM-DD');
+    const { fechaInicio, fechaFin } = this.rangoFechasConsulta();
     let ruta: string = this.validarRutaConsulta();
 
-    this.bagProService.GetOrdenesTrabajo(fechaIncio, fechaFin, ruta)
+    this.bagProService.GetOrdenesTrabajo(fechaInicio, fechaFin, ruta)
     .pipe(
       finalize(() => this.cargando = false)
     ).subscribe(data => {

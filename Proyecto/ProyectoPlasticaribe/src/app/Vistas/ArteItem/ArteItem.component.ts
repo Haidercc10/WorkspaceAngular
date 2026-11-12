@@ -7,7 +7,7 @@ import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 /**
  * Ventana emergente con el PDF del arte de un item (carpeta de artes de Aseguramiento de la Calidad, `{item}.pdf`).
  * Se usa desde Crear OT y desde Buscar OT: `<app-arte-item #arte></app-arte-item>` y `arte.abrir(item)`.
- * Permite verlo en la ventana, abrirlo en otra pestaña o descargarlo.
+ * Permite verlo en la ventana o abrirlo en otra pestaña.
  */
 @Component({
   selector: 'app-arte-item',
@@ -60,15 +60,6 @@ export class ArteItemComponent implements OnDestroy {
   /** Abre el PDF en otra pestaña del navegador. */
   abrirEnPestana() {
     if (this.url) window.open(this.url, '_blank');
-  }
-
-  /** Descarga el PDF como `{item}.pdf`. */
-  descargar() {
-    if (!this.url) return;
-    const enlace = document.createElement('a');
-    enlace.href = this.url;
-    enlace.download = `${this.item}.pdf`;
-    enlace.click();
   }
 
   /** Al cerrar la ventana libera el PDF de memoria. */

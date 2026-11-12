@@ -781,6 +781,34 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     this.confirmandoEdicion = false;
   }
 
+  /**
+   * Muestra el aviso de OT creada con el botón "Ver PDF". El PDF solo se abre (en otra pestaña) si el usuario
+   * lo pide, para que la aplicación no salte a la pestaña del PDF al crear la OT.
+   * @param numeroOT Número de la OT recién creada.
+   * @returns No retorna un valor.
+   */
+  avisarOtCreada(numeroOT: number) {
+    this.messageService.clear('otCreada');
+    this.messageService.add({
+      severity: 'success',
+      key: 'otCreada',
+      summary: '¡Orden de Trabajo Creada!',
+      detail: `Se ha creado la orden de trabajo N° ${numeroOT}`,
+      data: { numeroOT },
+      life: 15000,
+    });
+  }
+
+  /**
+   * Abre el PDF de la OT creada desde el aviso y lo cierra.
+   * @param numeroOT Número de la OT recién creada.
+   * @returns No retorna un valor.
+   */
+  verPdfOtCreada(numeroOT: number) {
+    this.messageService.clear('otCreada');
+    this.pdfOrdenTrabajo(numeroOT);
+  }
+
   /** Carga las tintas para impresión y ajusta las selecciones actuales al nombre de cada opción. */
   cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => {
     this.arrayTintas = tintas.filter((item) => item.catMP_Id == 7);
@@ -2941,7 +2969,7 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
       }),
       finalize(() => {
         this.guardando = false;
-        // Si la OT se creó, el overlay lo controla la generación del PDF
+        // Si la OT se creó, el overlay lo controla la carga de la OT recién creada
         if (!creada) this.cargando = false;
       })
     ).subscribe({
@@ -2949,11 +2977,11 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
         creada = true;
         // La OT recién creada pasa a ser la última conocida (botón "Última")
         this.ultimaOT = Math.max(this.ultimaOT || 0, Number(datos_ot.numero_OT) || 0);
-        this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.numero_OT}`);
+        // El PDF no se abre solo (el navegador pasaría a esa pestaña): el aviso trae el botón "Ver PDF"
+        this.avisarOtCreada(Number(datos_ot.numero_OT));
         // Los datos no se borran: se carga la OT recién creada (queda en pantalla con su número, en modo edición),
         // así un segundo clic en "Crear" no duplica la OT
         this.ConsultarOrdenTrabajo(Number(datos_ot.numero_OT));
-        this.pdfOrdenTrabajo(datos_ot.numero_OT);
       },
       // Errores no previstos dentro del flujo (p. ej. datos nulos al armar la OT); los HTTP ya se informaron en cada paso
       error: error => this.informarErrorInesperadoGuardado(`¡No fue posible crear la Orden de Trabajo por un error inesperado!`, error),

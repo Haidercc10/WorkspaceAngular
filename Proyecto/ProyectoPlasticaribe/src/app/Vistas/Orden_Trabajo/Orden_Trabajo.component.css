@@ -315,3 +315,21 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
 .ot-oscuro .ot-formula {
   color: #9aa7b4;
 }
+
+/* Aviso de OT creada (centrado, mismo estilo que el de ticket creado) */
+.toast-ot-creada {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.toast-ot-creada-icono {
+  font-size: 2rem;
+}
+
+.toast-ot-creada-titulo {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}

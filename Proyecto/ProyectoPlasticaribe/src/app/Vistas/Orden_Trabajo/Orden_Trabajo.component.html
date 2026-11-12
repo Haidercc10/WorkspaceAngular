@@ -2779,6 +2779,22 @@
   <!--<app-crear-clientes></app-crear-clientes>-->
 </p-dialog>
 
+<!-- Aviso de OT creada: el PDF se abre solo si el usuario pulsa "Ver PDF" (así la aplicación no salta a otra pestaña) -->
+<p-toast position="center" key="otCreada" [baseZIndex]="5000"
+  [breakpoints]="{'920px': {width: '100%', right: '0', left: '0'}}">
+  <ng-template let-message pTemplate="message">
+    <div class="toast-ot-creada">
+      <i class="pi pi-check-circle toast-ot-creada-icono"></i>
+      <div>
+        <div class="toast-ot-creada-titulo">{{message.summary}}</div>
+        <div>{{message.detail}}</div>
+        <button type="button" pButton icon="pi pi-file-pdf" label="VER PDF" class="p-button-success p-button-sm mt-2"
+          [disabled]="cargando" (click)="verPdfOtCreada(message.data?.numeroOT)"></button>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
 <p-toast position="center" key="editarOrden" (onClose)="cerrarMensaje()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">
     <div class="flex flex-column" style="flex: 1">
