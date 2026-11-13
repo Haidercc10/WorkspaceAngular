@@ -1,5 +1,4 @@
 import { Component, DestroyRef, Injectable, Input, OnInit, ViewChild } from '@angular/core';
-import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -10,7 +9,8 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsProductos as defaultSteps } from 'src/app/data';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { ClaveTutorialInventarioProductos, pasosTutorialInventarioProductos } from 'src/app/Tutoriales/Tutoriales_InventarioProductos';
 import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
 import { InventarioProductosPBDDComponent } from '../Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
 import { Observable, Subject } from 'rxjs';
@@ -54,13 +54,15 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   recetaProducto: boolean = false;
   @ViewChild(InventarioProductosPBDDComponent) invPlasticaribe: InventarioProductosPBDDComponent | undefined;
   private destroy$ = new Subject<void>();
+  pestanaActiva: number = 0; //Índice de la pestaña principal visible (el tutorial la cambia para mostrar cada parte)
+  private tutorialAutomaticoRevisado: boolean = false; //Evita revisar más de una vez si el tutorial debe salir solo
 
   constructor(private existenciasZeus: InventarioZeusService,
     private clienteOtItems: BagproService,
     private existencias_ProductosService: ExistenciasProductosService,
     private invMesProductoService: Inventario_Mes_ProductosService,
     private AppComponent: AppComponent,
-    private shepherdService: ShepherdService,
+    private tutoriales: TutorialesService,
     private mensajeService: MensajesAplicacionService,
     private destroyRef: DestroyRef,
   ) {
@@ -75,17 +77,33 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
 
   ngOnDestroy(): void {
+    this.tutoriales.cancelar();
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  tutorial() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
+  //#region Tutorial
+  /** Muestra el tutorial (botón "i" del título). La primera vez que el usuario entra se muestra solo. */
+  tutorial = () => this.tutoriales.iniciar(this.pasosTutorial());
+
+  /** Pasos del tutorial según lo que el rol del usuario puede ver en la página. */
+  private pasosTutorial() {
+    // Los roles 86 y 4 no ven la pestaña de Zeus, así que "Por Bodegas" es su primera pestaña.
+    const indiceBodegas = [86, 4].includes(this.ValidarRol) ? 0 : 1;
+    return pasosTutorialInventarioProductos({
+      rol: this.ValidarRol,
+      irPestanaProductos: () => this.pestanaActiva = 0,
+      irPestanaBodegas: () => this.pestanaActiva = indiceBodegas,
+    });
   }
+
+  /** Inicia el tutorial automáticamente la primera vez, cuando termina la carga y la tabla ya se ve. */
+  private iniciarTutorialPrimeraVez() {
+    if (this.tutorialAutomaticoRevisado || this.reporteConsolidado) return;
+    this.tutorialAutomaticoRevisado = true;
+    this.tutoriales.iniciarPrimeraVez(ClaveTutorialInventarioProductos, this.storage_Id, () => this.pasosTutorial());
+  }
+  //#endregion
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
@@ -260,10 +278,12 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
         this.load = true;
         this.invPlasticaribe?.getStockInformation();
+        this.iniciarTutorialPrimeraVez();
       },
       error: (err) => {
         console.error('Error al cargar inventario de productos', err);
         this.load = true;
+        this.iniciarTutorialPrimeraVez();
       }
     });
   }
