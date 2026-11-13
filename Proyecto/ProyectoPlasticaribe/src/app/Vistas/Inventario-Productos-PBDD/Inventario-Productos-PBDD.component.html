@@ -9,7 +9,7 @@
         Información del Inventario</h4>
 </div>
 
-<p-tabView (onChange)="changeTab($event)" [scrollable]="true">
+<p-tabView (onChange)="changeTab($event)" [scrollable]="true" data-tutorial="pestanasBodegas">
     <p-tabPanel header="Inventario de Despacho" leftIcon="pi pi-sliders-h" *ngIf="![86,4].includes(ValidarRol)">
         <p-table #tableStock *ngIf="!load" [columns]="selectedColumns" [value]="stockInformation" dataKey="item"
             styleClass="p-datatable-gridlines p-datatable-sm" [resizableColumns]="true" [reorderableColumns]="true"
