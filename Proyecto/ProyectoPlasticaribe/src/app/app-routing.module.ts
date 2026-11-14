@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { VistasPermisosGuard } from './Guards/vistas-permisos.guard';
 import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
+import { CrearProductoComponent } from './Vistas/crear-producto/crear-producto.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
 
 export const routes: Routes = [
@@ -100,6 +101,7 @@ export const routes: Routes = [
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   // {path: 'opedidoproducto', component: OpedidoproductoComponent},
+  { path: 'crear-item', canActivate: [VistasPermisosGuard], data: { nombre: 'Crear Item' }, component: CrearProductoComponent },
   { path: 'pedido-externo', loadChildren: () => import('./Modules/pedido-externo/pedido-externo.module').then(m => m.PedidoExternoModule) },
 
   /***************************************************************** USUARIOS **********************************************************************************/

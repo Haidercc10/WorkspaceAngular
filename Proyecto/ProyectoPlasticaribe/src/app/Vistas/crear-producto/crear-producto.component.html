@@ -1,181 +1,487 @@
-<br>
-<form [formGroup]="FormCrearProducto" (ngSubmit)="validarCamposVacios()">
-  <div class="mb-4">
-    <div class="row g-4">
-
-      <!-- ID Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <input formControlName="ProduId" id="Id" type="text" pInputText required readonly/>
-          <label for="Id">Item</label>
-        </span>
-      </div>
-
-      <!-- Nombre Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
-        <span class="p-float-label">
-          <input formControlName="ProduNombre" id="Nombre"  type="text" pInputText required/>
-          <label for="Nombre">Referencia</label>
-        </span>
-      </div>
-
-      <!-- Material -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduMaterial" inputId="Material" [options]="materialProducto" appendTo="body" optionValue="material_Id" optionLabel="material_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Material">Material Extrusión</label>
-        </span>
-      </div>
-
-      <!-- Pigmento -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduPigmento" inputId="Pigmento" [options]="pigmentoProducto" appendTo="body" optionValue="pigmt_Id" optionLabel="pigmt_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Pigmento">Pigmento Extrusión</label>
-        </span>
-      </div>
-
-      <!-- Calibre Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduCalibre" mode="decimal" inputId="Calibre" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Calibre">Calibre Extrusión</label>
-        </span>
-      </div>
-
-      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduUnidadMedidaACF" inputId="Und" [options]="unidadMedida" appendTo="body" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Und">Und Extrusión</label>
-        </span>
-      </div>
-
-      <!-- Tipo Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduTipo" inputId="TipoProducto" [options]="tipoProducto" appendTo="body" optionValue="tpProd_Id" optionLabel="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="TipoProducto">Formato</label>
-        </span>
-      </div>
-
-      <!-- Tipo Sellado -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduSellado" inputId="TipoSellado" [options]="tiposSellado" appendTo="body" optionValue="tpSellado_Id" optionLabel="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="TipoSellado">Tipo Sellado</label>
-        </span>
-      </div>
-
-      <!-- Ancho Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduAncho" mode="decimal" inputId="Ancho" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Ancho">Ancho</label>
-        </span>
-      </div>
-
-      <!-- Largo Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduLargo" mode="decimal" inputId="Largo" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Largo">Largo</label>
-        </span>
-      </div>
-
-      <!-- Fuelle Producto - -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduFuelle" mode="decimal" inputId="Fuelle" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Fuelle">Fuelle</label>
-        </span>
-      </div>
-
-      <!-- Bolsas Por Bulto -- -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduBolsasBulto" mode="decimal" inputId="BolsasBulto" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="BolsasBulto">Bolsas Por Bulto</label>
-        </span>
-      </div>
-
-      <!-- Bolsas Por Paquete -- -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduBolsasPaquete" mode="decimal" inputId="BolsasPaquete" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="BolsasPaquete">Bolsas Por Paquete</label>
-        </span>
-      </div>
+<!-- Creación de items: BagPro asigna el código, su trigger crea el producto en Plasticaribe y luego se crea el artículo en Zeus.
+     Solo roles 1 y 98. Embebida (modal de Pedido Externo) se oculta el título de página y el card. -->
+<div class="contain" *ngIf="!embebido">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Crear Item</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
     </div>
   </div>
-
-  <div class="mb-3">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton pRipple label="Crear Producto" type="submit" icon="pi pi-check" class="p-button-danger" [disabled]="!FormCrearProducto.valid"></button>
-      <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
-    </div>
-  </div>
-</form>
-
-<div class="mb-4">
-  <hr>
 </div>
 
-<div class="mb-4">
-  <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-plus-circle"></i> Crear Presentación de productos</h5>
-</div>
-<br>
+<p-card *ngIf="!embebido">
+  <ng-container *ngTemplateOutlet="contenido"></ng-container>
+</p-card>
+<ng-container *ngIf="embebido">
+  <ng-container *ngTemplateOutlet="contenido"></ng-container>
+</ng-container>
 
-<form [formGroup]="FormCrearPresentacionProducto" (ngSubmit)="validarCamposVaciosPresentacion()">
-  <div class="mb-4">
-    <div class="row g-4">
-
-      <!-- Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
-        <span class="p-float-label">
-          <input formControlName="ProdId" id="Id" type="text" pInputText required/>
-          <label for="Id">Id Producto</label>
-        </span>
-      </div>
-
-      <!-- Cantidad Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduCantidad" mode="decimal" inputId="Cantidad" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Cantidad">Cantidad</label>
-        </span>
-      </div>
-
-      <!-- Presentacion Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduUnidadMedidaCant" inputId="Und" [options]="presentacionesProductos" appendTo="body" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Und">Und</label>
-        </span>
-      </div>
-
-      <!-- Precio Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduPrecioUnd" mode="decimal" inputId="Precio" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Precio">Precio</label>
-        </span>
-      </div>
-
-      <!-- Tipo Moneda -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduTipoMoneda" inputId="Moneda" [options]="tipoMoneda" appendTo="body" optionValue="tpMoneda_Id" optionLabel="tpMoneda_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Moneda">Tipo de Moneda</label>
-        </span>
-      </div>
-    </div>
+<ng-template #contenido>
+  <div *ngIf="!puedeCrearItems" class="mb-3 paso-advertencia">
+    <i class="pi pi-lock"></i> No tiene permisos para crear items.
   </div>
 
-  <div class="mb-3">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton pRipple label="Crear Presentación de Producto" type="submit" icon="pi pi-check" class="p-button-danger" [disabled]="!FormCrearPresentacionProducto.valid"></button>
-      <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCamposPresentacion()"></button>
-    </div>
-  </div>
-</form>
+  <p-tabView *ngIf="puedeCrearItems">
+    <!-- ======================================== CREAR ITEM ======================================== -->
+    <p-tabPanel header="Crear Item" leftIcon="pi pi-plus-circle" tooltip="Crear un item nuevo en BagPro, Plasticaribe y Zeus">
+
+      <!-- Copiar desde item -->
+      <div class="mb-4 mt-2">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-copy"></i> Copiar desde Item</h4>
+      </div>
+      <div class="row g-3 mb-3 align-items-center">
+        <div class="col-sm-12 col-md-8 col-xl-6">
+          <span class="p-float-label">
+            <p-autoComplete [formControl]="busquedaCopia" inputId="busquedaCopia" [suggestions]="itemsSugeridos"
+              (completeMethod)="buscarItems($event)" field="etiqueta" [minLength]="3" [delay]="400" appendTo="body"
+              [style]="{width: '100%'}" [inputStyle]="{width: '100%'}" (keyup.enter)="copiarDesdeItem()"></p-autoComplete>
+            <label for="busquedaCopia">Item (código o nombre)</label>
+          </span>
+        </div>
+        <div class="col-auto">
+          <button pButton type="button" label="Copiar Ficha" icon="pi pi-copy" class="p-button-secondary p-button-outlined"
+            [disabled]="copiando || guardando" (click)="copiarDesdeItem()"
+            pTooltip="Carga la ficha técnica del item buscado en el formulario; nombre, presentación y precio quedan vacíos" tooltipPosition="top"></button>
+        </div>
+        <div class="col-12" *ngIf="itemCopiado">
+          <small>Ficha copiada del item {{itemCopiado}}. Nombre, presentación y precio quedan vacíos.</small>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <hr class="Linea">
+      </div>
+
+      <form [formGroup]="formItem" (ngSubmit)="guardar()">
+        <!-- General -->
+        <div class="mb-4">
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> General</h4>
+        </div>
+        <div class="row g-4 mb-4">
+          <div class="col-sm-12 col-md-6 col-xl-4">
+            <span class="p-float-label">
+              <p-autoComplete formControlName="cliente" inputId="cliente" [suggestions]="clientesSugeridos"
+                (completeMethod)="buscarClientes($event)" field="nombreComercial" [minLength]="3" [forceSelection]="true"
+                appendTo="body" [style]="{width: '100%'}" [inputStyle]="{width: '100%'}">
+                <ng-template let-cliente pTemplate="item">{{cliente.nombreComercial}} ({{cliente.codBagpro}})</ng-template>
+              </p-autoComplete>
+              <label for="cliente">Cliente*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-3">
+            <span class="p-float-label">
+              <p-dropdown formControlName="vendedor" inputId="vendedor" [options]="vendedores" optionValue="usua_Id"
+                optionLabel="usua_Nombre" [filter]="true" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="vendedor">Vendedor</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="formato" inputId="formato" [options]="formatos" optionValue="codigo"
+                optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="formato">Formato*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-3">
+            <span class="p-float-label">
+              <p-dropdown formControlName="material" inputId="material" [options]="materiales" optionValue="material_Id"
+                optionLabel="material_Nombre" [filter]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="material">Material*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="pigmento" inputId="pigmento" [options]="pigmentos" optionValue="pigmt_Id"
+                optionLabel="pigmt_Nombre" [filter]="true" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="pigmento">Pigmento</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="presentacion" inputId="presentacion" [options]="presentaciones" optionValue="valor"
+                optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="presentacion">Presentación*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="precio" inputId="precio" mode="decimal" [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="precio">Precio Unitario*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-2" *ngIf="esPaquete">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="cantidadPaquete" inputId="cantidadPaquete" [min]="0" [useGrouping]="false"></p-inputNumber>
+              <label for="cantidadPaquete">Unidades por Paquete*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="unidad" inputId="unidad" [options]="unidades" optionValue="codigo"
+                optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="unidad">Unidad Medidas*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="ancho" inputId="ancho" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="ancho">Ancho*</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="largo" inputId="largo" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="largo">Largo{{requiereLargo ? '*' : ''}}</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="fuelle" inputId="fuelle" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="fuelle">Fuelle</label>
+            </span>
+          </div>
+        </div>
+
+        <div class="mb-3"><hr class="Linea"></div>
+
+        <!-- Extrusión: se contrae y deshabilita si el proceso no está marcado -->
+        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('extrusion')" styleClass="seccion-proceso">
+          <ng-template pTemplate="header">
+            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
+              <p-checkbox formControlName="extrusion" [binary]="true" inputId="extrusion"></p-checkbox>
+              <label for="extrusion" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-sliders-h"></i> Extrusión</label>
+            </span>
+          </ng-template>
+          <div class="row g-4 align-items-center pt-3">
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="calibre" inputId="calibre" mode="decimal" [min]="0" [minFractionDigits]="1" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="calibre">Calibre{{formItem.get('extrusion')?.value ? '*' : ''}}</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="formatoExtrusion" inputId="formatoExtrusion" [options]="formatosExtrusion" optionValue="formato_Id"
+                optionLabel="formato_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="formatoExtrusion">Formato Extrusión</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="tratado" inputId="tratado" [options]="tratados" optionValue="tratado_Id"
+                optionLabel="tratado_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="tratado">Tratado</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2" *ngFor="let n of [1, 2, 3]">
+            <span class="p-float-label">
+              <p-inputNumber [formControlName]="'anchoExtrusion' + n" [inputId]="'anchoExtrusion' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+              <label [for]="'anchoExtrusion' + n">Ancho Extrusión {{n}}</label>
+            </span>
+          </div>
+          </div>
+        </p-fieldset>
+
+        <!-- Impresión: se contrae y deshabilita si el proceso no está marcado -->
+        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('impresion')" styleClass="seccion-proceso">
+          <ng-template pTemplate="header">
+            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
+              <p-checkbox formControlName="impresion" [binary]="true" inputId="impresion"></p-checkbox>
+              <label for="impresion" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-print"></i> Impresión</label>
+            </span>
+          </ng-template>
+          <div class="row g-4 align-items-center pt-3">
+          <div class="col-auto">
+            <p-checkbox formControlName="cyrel" [binary]="true" inputId="cyrel" label="Cyrel"></p-checkbox>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="tipoImpresion" inputId="tipoImpresion" [options]="tiposImpresion" optionValue="tpImpresion_Id"
+                optionLabel="tpImpresion_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="tipoImpresion">Tipo Impresión</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="rodillo" inputId="rodillo" [min]="0" [useGrouping]="false"></p-inputNumber>
+              <label for="rodillo">Rodillo</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="pista" inputId="pista" [min]="0" [useGrouping]="false"></p-inputNumber>
+              <label for="pista">Pistas</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-8 col-xl-4">
+            <span class="p-float-label">
+              <input formControlName="descripcionComercial" id="descripcionComercial" type="text" pInputText class="mayusculas"/>
+              <label for="descripcionComercial">Descripción Comercial (nombre)</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <input formControlName="gramaje" id="gramaje" type="text" pInputText class="mayusculas"/>
+              <label for="gramaje">Gramaje (ej. 500GR)</label>
+            </span>
+          </div>
+          <div class="col-12" *ngIf="formItem.get('impresion')?.value">
+            <small *ngIf="tintasCopiadas.length > 0">
+              Tintas copiadas del item {{itemCopiado}} (códigos BagPro): {{tintasCopiadas.join(', ')}}
+              <button pButton type="button" class="p-button-text p-button-sm p-button-secondary" icon="pi pi-times" label="Quitar"
+                (click)="quitarTintas()" pTooltip="Quita las tintas copiadas; el item se creará sin tintas" tooltipPosition="top"></button>
+            </small>
+            <small *ngIf="tintasCopiadas.length == 0">Las tintas solo se pueden tomar copiando la ficha de otro item.</small>
+          </div>
+          </div>
+        </p-fieldset>
+
+        <!-- Laminado: se contrae y deshabilita si el proceso no está marcado -->
+        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('laminado')" styleClass="seccion-proceso">
+          <ng-template pTemplate="header">
+            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
+              <p-checkbox formControlName="laminado" [binary]="true" inputId="laminado"></p-checkbox>
+              <label for="laminado" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-clone"></i> Laminado</label>
+            </span>
+          </ng-template>
+          <div class="row g-4 align-items-center pt-3">          <ng-container *ngFor="let n of [1, 2, 3]">
+            <div class="col-sm-12 col-md-4 col-xl-2">
+              <span class="p-float-label">
+                <p-dropdown [formControlName]="'capa' + n" [inputId]="'capa' + n" [options]="capasLaminado" optionValue="lamCapa_Id"
+                  optionLabel="lamCapa_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                <label [for]="'capa' + n">Capa {{n}}</label>
+              </span>
+            </div>
+            <div class="col-sm-12 col-md-4 col-xl-1">
+              <span class="p-float-label">
+                <p-inputNumber [formControlName]="'calibreCapa' + n" [inputId]="'calibreCapa' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                <label [for]="'calibreCapa' + n">Calibre</label>
+              </span>
+            </div>
+            <div class="col-sm-12 col-md-4 col-xl-1">
+              <span class="p-float-label">
+                <p-inputNumber [formControlName]="'cantidadCapa' + n" [inputId]="'cantidadCapa' + n" [min]="0" [useGrouping]="false"></p-inputNumber>
+                <label [for]="'cantidadCapa' + n">Cantidad</label>
+              </span>
+            </div>
+          </ng-container>
+          </div>
+        </p-fieldset>
+
+        <!-- Sellado / Corte: se contrae y deshabilita si el proceso no está marcado -->
+        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('selladoCorte')" styleClass="seccion-proceso">
+          <ng-template pTemplate="header">
+            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
+              <p-checkbox formControlName="sellado" [binary]="true" inputId="sellado" label="Sellado"></p-checkbox>
+              <p-checkbox formControlName="corte" [binary]="true" inputId="corte" label="Corte"></p-checkbox>
+            </span>
+          </ng-template>
+          <div class="row g-4 align-items-center pt-3">
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-dropdown formControlName="tipoSellado" inputId="tipoSellado" [options]="tiposSellado" optionValue="tpSellado_Id"
+                optionLabel="tpSellados_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+              <label for="tipoSellado">Tipo Sellado</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="cantidadBulto" inputId="cantidadBulto" [min]="0" [useGrouping]="false"></p-inputNumber>
+              <label for="cantidadBulto">Cantidad por Bulto</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="pesoMillar" inputId="pesoMillar" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="pesoMillar">Peso Millar</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="peso" inputId="peso" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="peso">Peso</label>
+            </span>
+          </div>
+          <div class="col-sm-12 col-md-4 col-xl-2">
+            <span class="p-float-label">
+              <input formControlName="perforacion" id="perforacion" type="text" pInputText class="mayusculas"/>
+              <label for="perforacion">Perforación (ej. 2 PERF 1/2)</label>
+            </span>
+          </div>
+          </div>
+        </p-fieldset>
+
+        <div class="mb-3"><hr class="Linea"></div>
+
+        <!-- Nombre y observación -->
+        <div class="mb-4">
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-tag"></i> Nombre del Item</h4>
+        </div>
+        <div class="row g-4 mb-4 align-items-center">
+          <div class="col-sm-12 col-xl-8">
+            <span class="p-float-label">
+              <input formControlName="nombre" id="nombre" type="text" pInputText class="mayusculas"/>
+              <label for="nombre">Nombre*</label>
+            </span>
+            <small>{{nombreManual ? 'Editado a mano: pulse "Sugerir Nombre" para volver a la sugerencia.' : 'Se sugiere automáticamente mientras no lo edite.'}}</small>
+          </div>
+          <div class="col-auto">
+            <button pButton type="button" label="Sugerir Nombre" icon="pi pi-sync" class="p-button-secondary p-button-outlined" (click)="sugerirNombre()"
+              pTooltip="Arma el nombre con formato, material, medidas, calibre, densidad y pigmento (o descripción comercial si lleva impresión) y lo vuelve a recalcular al cambiar la ficha" tooltipPosition="top"></button>
+          </div>
+          <div class="col-12">
+            <span class="p-float-label">
+              <textarea formControlName="observacion" id="observacion" [rows]="1" pInputTextarea></textarea>
+              <label for="observacion">Observación</label>
+            </span>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton type="submit" label="Crear Item" icon="pi pi-check" class="p-button-danger" [disabled]="guardando"
+            pTooltip="Valida duplicados, crea el item en BagPro (asigna el código), verifica el producto en Plasticaribe y crea el artículo en Zeus con el precio" tooltipPosition="top"></button>
+          <button pButton type="button" label="Limpiar Campos" icon="pi pi-eraser" class="p-button-secondary" [disabled]="guardando" (click)="limpiarFormulario()"
+            pTooltip="Limpia todos los campos de la ficha" tooltipPosition="top"></button>
+        </div>
+      </form>
+
+      <!-- Resultado por paso -->
+      <ng-container *ngIf="pasos.length > 0">
+        <div class="mb-3"><hr class="Linea"></div>
+        <div class="mb-3">
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Resultado</h4>
+        </div>
+        <ul class="lista-pasos">
+          <li *ngFor="let paso of pasos"><i [class]="iconoPaso(paso.estado)"></i> <b>{{paso.titulo}}</b><span *ngIf="paso.detalle">: {{paso.detalle}}</span></li>
+        </ul>
+      </ng-container>
+    </p-tabPanel>
+
+    <!-- ================================== ESTADO DE SINCRONIZACIÓN ================================== -->
+    <p-tabPanel header="Estado de Sincronización" leftIcon="pi pi-sync" tooltip="Ver y completar el item en BagPro, Plasticaribe y Zeus">
+      <div class="mb-4 mt-2">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Item</h4>
+      </div>
+      <div class="row g-3 mb-3 align-items-center">
+        <div class="col-sm-12 col-md-8 col-xl-6">
+          <span class="p-float-label">
+            <p-autoComplete [formControl]="busquedaSync" inputId="busquedaSync" [suggestions]="itemsSugeridos"
+              (completeMethod)="buscarItems($event)" field="etiqueta" [minLength]="3" [delay]="400" appendTo="body"
+              [style]="{width: '100%'}" [inputStyle]="{width: '100%'}"
+              (keyup.enter)="consultarEstado()"></p-autoComplete>
+            <label for="busquedaSync">Item (código o nombre)</label>
+          </span>
+        </div>
+      </div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton type="button" label="Consultar Estado" icon="pi pi-search" class="p-button-danger"
+          [disabled]="consultandoSync" (click)="consultarEstado()"
+          pTooltip="Consulta el item en BagPro (presentaciones), Plasticaribe (producto) y Zeus (artículos)" tooltipPosition="top"></button>
+        <button pButton type="button" label="Completar" icon="pi pi-cloud-upload" class="p-button-secondary"
+          [disabled]="!estadoSync || completando || agregandoPresentacion || faltantesZeus.length == 0 || !estadoSync.existePlasticaribe"
+          (click)="completarSincronizacion()"
+          pTooltip="Crea en Zeus las presentaciones de BagPro que faltan, con su precio (repetirlo es seguro)" tooltipPosition="top"></button>
+      </div>
+
+      <ng-container *ngIf="estadoSync as estado">
+        <div class="mb-3"><hr class="Linea"></div>
+        <div class="mb-3">
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Item {{estado.codigo}} por Sistema</h4>
+        </div>
+        <div class="mb-2 avisos-sync">
+          <small *ngIf="estado.errorBagPro" class="paso-error d-block"><i class="pi pi-times-circle"></i> BagPro: {{estado.errorBagPro}}</small>
+          <small *ngIf="estado.errorPlasticaribe" class="paso-error d-block"><i class="pi pi-times-circle"></i> Plasticaribe: {{estado.errorPlasticaribe}}</small>
+          <small *ngIf="estado.errorZeus" class="paso-error d-block"><i class="pi pi-times-circle"></i> Zeus: {{estado.errorZeus}}</small>
+          <small *ngIf="faltantesZeus.length > 0" class="paso-advertencia d-block"><i class="pi pi-exclamation-triangle"></i> Faltan en Zeus: {{faltantesZeusTexto}}</small>
+        </div>
+
+        <div class="mb-3 font-size-14">
+          <p-table #dtSync [value]="filasSync" styleClass="p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll"
+            [rowHover]="true" [scrollable]="true" scrollHeight="25rem" [resizableColumns]="true" columnResizeMode="expand">
+            <ng-template pTemplate="header">
+              <tr>
+                <th><input pInputText (input)="filtrarSync($event, 'sistema')"></th>
+                <th></th>
+                <th><input pInputText (input)="filtrarSync($event, 'codigo')"></th>
+                <th><input pInputText (input)="filtrarSync($event, 'nombre')"></th>
+                <th><input pInputText (input)="filtrarSync($event, 'descripcion')"></th>
+                <th><input pInputText (input)="filtrarSync($event, 'presentacion')"></th>
+                <th></th>
+              </tr>
+              <tr>
+                <th class="text-center">Sistema</th>
+                <th class="text-center">Estado</th>
+                <th class="text-center">Item</th>
+                <th class="text-center">Referencia</th>
+                <th class="text-center">Descripción</th>
+                <th class="text-center">Presentación</th>
+                <th class="text-center" style="min-width: 8rem;">Precio</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-fila>
+              <tr [class.fila-falta]="!fila.existe">
+                <td class="text-center"><b>{{fila.sistema}}</b></td>
+                <td class="text-center">
+                  <p-tag [severity]="fila.existe ? 'success' : 'danger'" [value]="fila.existe ? 'Existe' : 'Falta'"></p-tag>
+                </td>
+                <td class="text-center">{{fila.codigo}}</td>
+                <td [class.nombre-difiere]="fila.nombreDifiere">
+                  <i *ngIf="fila.nombreDifiere" class="pi pi-exclamation-triangle" pTooltip="El nombre difiere del de BagPro" tooltipPosition="top"></i>
+                  {{fila.nombre}}
+                </td>
+                <td>{{fila.descripcion}}</td>
+                <td class="text-center">{{fila.presentacion}}</td>
+                <td class="text-end pe-3" style="min-width: 8rem;">{{fila.precio != null ? (fila.precio | number:'1.0-2') : ''}}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr><td colspan="7">Sin información del item.</td></tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <div class="mb-3"><hr class="Linea"></div>
+
+        <!-- Agregar presentación -->
+        <div class="mb-4">
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-plus-circle"></i> Agregar Presentación al Item {{estado.codigo}}</h4>
+        </div>
+        <form [formGroup]="formPresentacion" (ngSubmit)="agregarPresentacion()">
+          <div class="row g-4 mb-3 align-items-center">
+            <div class="col-sm-12 col-md-4 col-xl-2">
+              <span class="p-float-label">
+                <p-dropdown formControlName="presentacion" inputId="presentacionNueva" [options]="presentaciones" optionValue="valor"
+                  optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                <label for="presentacionNueva">Presentación*</label>
+              </span>
+            </div>
+            <div class="col-sm-12 col-md-4 col-xl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="precio" inputId="precioNuevo" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                <label for="precioNuevo">Precio Unitario*</label>
+              </span>
+            </div>
+          </div>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton type="submit" label="Agregar Presentación" icon="pi pi-plus" class="p-button-danger p-button-outlined"
+              [disabled]="agregandoPresentacion || completando || !formPresentacion.valid"
+              pTooltip="Agrega la presentación al item en BagPro (su trigger la crea en Plasticaribe) y crea el artículo en Zeus con el precio" tooltipPosition="top"></button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-container *ngIf="resultadosSync.length > 0">
+        <div class="mb-3"><hr class="Linea"></div>
+        <div class="mb-3">
+          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Resultado</h4>
+        </div>
+        <ul class="lista-pasos">
+          <li *ngFor="let paso of resultadosSync"><i [class]="iconoPaso(paso.estado)"></i> <b>{{paso.titulo}}</b><span *ngIf="paso.detalle">: {{paso.detalle}}</span></li>
+        </ul>
+      </ng-container>
+    </p-tabPanel>
+  </p-tabView>
+</ng-template>

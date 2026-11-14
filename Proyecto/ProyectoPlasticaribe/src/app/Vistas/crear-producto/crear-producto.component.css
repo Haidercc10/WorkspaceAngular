@@ -44,3 +44,91 @@ p-calendar ::ng-deep span button span {
   display: flex;
   width: 100%;
 }
+
+.mayusculas {
+  text-transform: uppercase;
+}
+
+p-autocomplete ::ng-deep .p-autocomplete {
+  display: flex;
+  width: 100%;
+}
+
+.d-grid {
+  padding-bottom: 2%;
+}
+
+.lista-pasos {
+  list-style: none;
+  padding-left: 0;
+}
+
+.lista-pasos li {
+  margin-bottom: 0.25rem;
+}
+
+/* Colores del tema PrimeNG y de la app (sin paleta propia) */
+.paso-ok {
+  color: var(--green-500);
+}
+
+.paso-error {
+  color: var(--rojo);
+}
+
+.paso-advertencia {
+  color: var(--yellow-600);
+}
+
+.fila-falta td {
+  color: var(--text-color-secondary);
+  font-style: italic;
+}
+
+.nombre-difiere {
+  color: var(--rojo);
+  font-weight: 600;
+}
+
+/* Secciones de proceso colapsables: título y checks del proceso en la cabecera */
+:host ::ng-deep .seccion-proceso {
+  margin-bottom: 1rem;
+}
+
+.cabecera-seccion {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.checks-seccion {
+  display: inline-flex;
+  gap: 1rem;
+  font-size: 1rem;
+  font-weight: normal;
+  color: var(--text-color);
+}
+
+/* Título de cada sección de proceso alineado a la izquierda: solo el check y el nombre del proceso. */
+:host ::ng-deep .seccion-proceso .p-fieldset-legend {
+  margin-left: 0;
+  margin-right: auto;
+  text-align: left;
+}
+
+:host ::ng-deep .seccion-proceso .p-fieldset-legend > a,
+:host ::ng-deep .seccion-proceso .p-fieldset-legend > span {
+  justify-content: flex-start;
+}
+
+.cabecera-seccion label {
+  cursor: pointer;
+  margin: 0;
+}
+
+:host ::ng-deep .cabecera-seccion .p-checkbox-label {
+  font-size: 1.1rem;
+}

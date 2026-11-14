@@ -32,11 +32,6 @@
       tooltip="Desde aquí podrás crear las ordenes de trabajo">
       <!-- Contenedor de Crear OT: tras intentar guardar resalta en rojo los obligatorios vacíos (sin afectar Buscar OT) -->
       <div [class.ot-resaltar-obligatorios]="resaltarObligatorios" [class.ot-oscuro]="modoSeleccionado">
-        <!--<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button pButton class="p-button-danger" id="crearCliente" type="button" label="Crear Clientes" icon="pi pi-check-circle" (click)="LlamarModalCrearCliente()"> </button>
-        <button pButton class="p-button-danger p-button-outlined" id="crearProducto" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"> </button> 
-      </div>-->
-        <!--(click)="LlamarModalCrearProducto()"-->
 
         <!-- Leyenda: campos de consulta (fondo azul e ícono de lupa) y obligatorios vacíos (en rojo al intentar guardar).
              Va arriba del título para que no choque con las etiquetas flotantes de los campos cuando tienen datos. -->
@@ -56,7 +51,6 @@
 
           <!-- Botones -->
           <div class="ot-header-actions__buttons" id="botonesOT">
-            <!-- <button pButton class="p-button-danger p-button-outlined" id="crearItem" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"></button> -->
             <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check"
               *ngIf="!edicionOrdenTrabajo && puedeGuardarOT" [disabled]="guardando || cargando"
               (click)="validarDatos()"></button>
@@ -2712,7 +2706,6 @@
             <!-- Botones -->
             <div class="bajarPagina">
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <!--<button pButton class="p-button-danger p-button-outlined" id="crearItem" type="button" label="Crear Item" icon="pi pi-plus" (click)="validarFormularios()"></button>-->
                 <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check"
                   *ngIf="!edicionOrdenTrabajo && puedeGuardarOT" [disabled]="guardando || cargando"
                   (click)="validarDatos()"></button>
@@ -2765,12 +2758,6 @@
       </tr>
     </ng-template>
   </p-table>
-</p-dialog>
-
-<!-- Modal de crear producto -->
-<p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80vw'}" [modal]="true"
-  [draggable]="false" (onHide)="ngOnInit()">
-  <app-crear-producto></app-crear-producto>
 </p-dialog>
 
 <!-- Modal de crear clientes -->
