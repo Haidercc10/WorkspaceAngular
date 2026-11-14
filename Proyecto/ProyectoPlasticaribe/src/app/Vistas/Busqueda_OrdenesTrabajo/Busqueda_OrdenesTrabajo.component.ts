@@ -402,13 +402,16 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   }
 
   /**
-   * Carga la fila seleccionada (item u OT de BagPro) como plantilla en la pestaña de creación de OT y cambia a
-   * esa pestaña. No guarda: el usuario revisa los datos y pulsa "Crear OT". Si la pantalla de OT está cargando,
-   * no hace nada.
-   * @param data Fila de la búsqueda (item u OT de BagPro).
+   * Carga la fila seleccionada en la pestaña de OT y cambia a esa pestaña. No guarda.
+   * - Búsqueda por item: carga la ficha del item como plantilla para crear ("Crear OT").
+   * - Búsqueda por OT: abre la OT; si existe en Plasticaribe queda en modo edición ("Editar OT"), si solo existe
+   *   en BagPro se carga como plantilla. Con `comoCopia` siempre se carga como plantilla para crear una nueva.
+   * Si la pantalla de OT está cargando, no hace nada.
+   * @param data Fila de la búsqueda (item u OT).
+   * @param comoCopia true para cargar la OT como plantilla de una nueva aunque exista en Plasticaribe.
    * @returns No retorna un valor.
    */
-  crearOrdenTrabajo(data: any) {
+  crearOrdenTrabajo(data: any, comoCopia: boolean = false) {
     if (this.orden_TrabajoComponent.cargando) return;
     let tipoBusqueda: 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
@@ -423,17 +426,20 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
         Presentacion: data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' : data.presentacion,
       });
       this.orden_TrabajoComponent.consultarInfoProducto();
-    } else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
+    } else if (tipoBusqueda == 'OT') {
+      if (comoCopia) this.orden_TrabajoComponent.busquedaOTBagPro(data);
+      else this.orden_TrabajoComponent.ConsultarOrdenTrabajo(Number(data.ordenTrabajo));
+    }
   }
 
   /**
-   * Carga la fila seleccionada como plantilla en la pestaña de creación de OT, igual que el doble clic en la fila.
+   * Botón "+": carga la fila como plantilla en la pestaña de creación de OT para crear una nueva (copia).
    * Búsqueda no guarda OTs: el usuario revisa los datos y pulsa "Crear OT".
-   * @param data Fila de la búsqueda (item u OT de BagPro).
+   * @param data Fila de la búsqueda (item u OT).
    * @returns No retorna un valor.
    */
   crearCopiaOrdenTrabajo(data: any) {
-    this.crearOrdenTrabajo(data);
+    this.crearOrdenTrabajo(data, true);
   }
 
   exportExcel() {

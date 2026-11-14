@@ -200,7 +200,7 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-data let-columns="columns">
-    <tr (dblclick)="crearOrdenTrabajo(data)" class="no-seleccionable cursor" pTooltip="Al hacer doble click en la fila, se moverá los datos al formulario de crear OT." tooltipPosition="top">
+    <tr (dblclick)="crearOrdenTrabajo(data)" class="no-seleccionable cursor" pTooltip="Doble click: por item carga los datos para crear una OT; por OT abre la orden para editarla. El botón + la carga como copia para crear una nueva." tooltipPosition="top">
       <!-- Arte del item de la fila (PDF de Aseguramiento de la Calidad): botón rojo de 30x30 px.
            Solo se muestra si la OT pasa por el proceso de impresión -->
       <td pFrozenColumn [frozen]="true" class="text-center columna-arte">
