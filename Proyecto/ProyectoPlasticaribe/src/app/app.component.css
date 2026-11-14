@@ -1,2 +1,98 @@
+/* Toast de error con "Ver detalles" (MensajesAplicacionService.mensajeErrorDetallado) */
+.toast-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+}
 
+.toast-error-icono {
+  font-size: 2rem;
+}
 
+.toast-error-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.toast-error-enlace {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  font-weight: 600;
+  text-decoration: underline;
+  color: inherit;
+  cursor: pointer;
+}
+
+.toast-error-enlace:hover,
+.toast-error-enlace:focus {
+  opacity: 0.8;
+}
+
+/* Ventana "Detalles del error" */
+.detalle-error {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.detalle-error dt {
+  font-weight: 600;
+  color: var(--texto-fuerte);
+}
+
+.detalle-error dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.detalle-error-mono {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background-color: var(--fondo-sutil);
+}
+
+.detalle-error-codigo {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: var(--rojo);
+}
+
+.detalle-error-botones {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* El footer del diálogo de PrimeNG agrega margen a la derecha de cada botón; aquí el espacio lo da el gap. */
+.detalle-error-botones .p-button {
+  margin: 0;
+}
+
+/* Botón "Copiar" después de copiar: verde claro con borde y texto verde oscuro. */
+.p-button.p-button-outlined.boton-copiado,
+.p-button.p-button-outlined.boton-copiado:enabled:hover {
+  background-color: var(--fondo-exito);
+  border-color: var(--texto-exito);
+  color: var(--texto-exito);
+}
+
+@media (max-width: 576px) {
+  .detalle-error {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .detalle-error dd {
+    margin-bottom: 0.5rem;
+  }
+}

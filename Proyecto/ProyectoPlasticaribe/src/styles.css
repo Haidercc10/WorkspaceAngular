@@ -31,6 +31,8 @@
   --fondo-obligatorio: #fff1f1;                 /* campos obligatorios pendientes */
   --borde-obligatorio: #e24c4c;
   --fondo-acento: #fff9f9;                      /* resaltado suave con el rojo de la marca */
+  --fondo-exito: #dcfce7;                       /* confirmaciones (p. ej. botón "Copiado!") */
+  --texto-exito: #166534;                       /* texto y borde de las confirmaciones */
   --rejilla-graficas: rgba(128, 128, 128, 0.2); /* líneas de la cuadrícula de las gráficas (sirve en ambos temas) */
 }
 
@@ -45,6 +47,8 @@
   --fondo-obligatorio: rgba(226, 76, 76, 0.16);
   --borde-obligatorio: #f87171;
   --fondo-acento: rgba(219, 65, 73, 0.14);
+  --fondo-exito: rgba(34, 197, 94, 0.16);
+  --texto-exito: #86efac;
 }
 
 * {
@@ -431,8 +435,27 @@ p-multiselect div[class*="p-multiselect p-component"] {
   border-color: #f63b3b;
 }
 
-p-multiselect div searchicon[class*="p-element p-icon-wrapper"] {
+/* Buscador de los paneles de multiselect y treeSelect (también con appendTo="body", donde el panel queda fuera del componente):
+   el envoltorio <searchicon> es inline y agrega una línea vacía bajo el input; eso agranda el contenedor y deja
+   la lupa y la X desalineadas hacia abajo. Como bloque (su ícono es absoluto) no ocupa alto y ambos quedan centrados. */
+p-multiselect div searchicon[class*="p-element p-icon-wrapper"],
+.p-multiselect-filter-container > searchicon,
+.p-treeselect-filter-container > searchicon,
+.p-dropdown-filter-container > searchicon {
   display: block;
+}
+
+/* Lista de vistas del modal de roles (Gestión de Usuarios, panelStyleClass="panel-vistas-rol").
+   Quita el "ul { padding-left: 2rem }" de Bootstrap (le gana a PrimeNG, que va en @layer primeng) y el espacio
+   reservado para la flecha de expandir, que estas vistas no usan porque no tienen sub-vistas. */
+.panel-vistas-rol .p-tree-container,
+.panel-vistas-rol .p-treenode-children {
+  margin: 0;
+  padding-left: 0;
+}
+
+.panel-vistas-rol .p-tree-toggler {
+  display: none;
 }
 
 p-dropdown .p-dropdown {

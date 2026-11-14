@@ -1,11 +1,163 @@
-.bg-danger1 {
-  color: white;
-  background-color: palevioletred;
+/* Botón de tutorial dentro del h2 del título (igual que en Tickets, Precargue e Inventarios). */
+.boton-tutorial-titulo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.4rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Estado del usuario: colores del tema (claro/oscuro) */
+.estado-activo {
+  color: var(--texto-exito);
+  background-color: var(--fondo-exito);
   font-size: calc(var(--font-size) * 15px);
 }
 
-.bg-success1 {
-  color: rgb(11, 82, 0);
-  background-color: palegreen;
+.estado-inactivo {
+  color: var(--texto-peligro);
+  background-color: var(--fondo-obligatorio);
   font-size: calc(var(--font-size) * 15px);
+}
+
+/* El nombre se guarda en mayúsculas; así se ve en mayúsculas desde la primera tecla. */
+.texto-mayusculas {
+  text-transform: uppercase;
+}
+
+/* Ojo para mostrar/ocultar la contraseña dentro del campo */
+.boton-ver-password {
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Barra de acciones con totalizador (mismo estilo que el "Total Stock" de Inventario de Productos Terminados, en verde).
+   El fondo usa --fondo-exito, que ya tiene su versión para modo oscuro. */
+:host {
+  --verde-total: #16a34a;
+}
+
+.barraAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--borde-sutil);
+  border-radius: 10px;
+  background-color: var(--fondo-sutil);
+}
+
+.resumenTotal {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  border-left: 4px solid var(--verde-total);
+  border-radius: 8px;
+  background-color: var(--fondo-exito);
+}
+
+.resumenTotal.conDetalle {
+  cursor: help;
+}
+
+.empujarDerecha {
+  margin-left: auto;
+}
+
+.iconoTotal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--verde-total);
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+
+.datosTotal {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.etiquetaTotal {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  color: var(--texto-fuerte);
+}
+
+.valorTotal {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--texto-fuerte);
+}
+
+@media (max-width: 576px) {
+  .barraAcciones > * {
+    width: 100%;
+  }
+
+  .empujarDerecha {
+    margin-left: 0;
+  }
+}
+
+/* Tooltip del total de usuarios (se dibuja en el body, por eso ::ng-deep; solo aplica a esta clase) */
+::ng-deep .tooltip-total-usuarios .p-tooltip-text {
+  min-width: 13rem;
+  padding: 0.6rem 0.8rem;
+}
+
+::ng-deep .tooltip-total-usuarios .titulo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 0.4rem;
+}
+
+::ng-deep .tooltip-total-usuarios .fila {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+}
+
+::ng-deep .tooltip-total-usuarios .fila .texto {
+  flex: 1;
+}
+
+::ng-deep .tooltip-total-usuarios .punto {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+}
+
+::ng-deep .tooltip-total-usuarios .punto.activo {
+  background-color: #22c55e;
+}
+
+::ng-deep .tooltip-total-usuarios .punto.inactivo {
+  background-color: #ef4444;
+}
+
+/* Botones redondos de editar / inactivar en las filas */
+:host ::ng-deep .boton-fila {
+  width: 30px;
+  height: 30px;
+}
+
+/* Columnas del checkbox y del estado centradas en ambos sentidos (PrimeNG alinea las celdas a la izquierda) */
+th.celda-centrada,
+td.celda-centrada {
+  text-align: center !important;
+  vertical-align: middle !important;
 }

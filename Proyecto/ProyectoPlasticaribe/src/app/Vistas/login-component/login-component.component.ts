@@ -228,151 +228,110 @@ export class LoginComponentComponent implements OnInit {
   //Funcion que va a validar si hay campos vacios
   validarCamposVacios = () => this.formularioUsuario.valid ? this.consultaLogin() : this.mensajeService.mensajeAdvertencia('Advertencia', '¡Por favor llenar los campos vacios!');
 
-  // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
+  /**
+   * Inicia sesión en Plasticaribe y, si las credenciales son válidas, en Inventario de Zeus, Contabilidad de Zeus y BagPro (en paralelo).
+   * Cada paso etiqueta su error con la API que falló, para mostrar un mensaje preciso con "Ver detalles".
+   * Si algo falla después del login principal, se borran los tokens ya guardados para no dejar la sesión a medias.
+   */
   consultaLogin() {
     this.cargando = true;
-    let empresa: number = this.formularioUsuario.value.Empresa;
-    let idUsuario: number = this.formularioUsuario.value.Identificacion;
-    let contrasena: string = this.formularioUsuario.value.Contrasena;
-    let data: any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa };
+    const { Empresa, Identificacion, Contrasena } = this.formularioUsuario.value;
+    const data = { id_Usuario: Identificacion, contrasena: Contrasena, empresa: Empresa };
 
-    this.authenticationService.login(data).subscribe(datos => {
-      this.authenticationInvZeusService.login().subscribe(() => {
-        this.authenticationContaZeusService.login().subscribe(() => {
-          this.authenticationBagPro.login().subscribe(() => {
-            let idUsuario: number = datos.usua_Id;
-            let nombre: string = datos.usuario;
-            let rol: number = datos.rolUsu_Id;
-            let infoMovimientoAplicacion: any = {
-              "Usua_Id": idUsuario,
-              "MovApp_Nombre": `Inicio de sesión`,
-              "MovApp_Descripcion": `El usuario "${nombre}" con el ID ${idUsuario} inició sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
-              "MovApp_Fecha": moment().format('YYYY-MM-DD'),
-              "MovApp_Hora": moment().format('H:mm:ss'),
-            }
-            this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(() => {
-              this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
-              this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre.toString()));
-              this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
-              this.guardarPreferenciaRecordarme();
-              window.location.pathname = '/home';
-            }, () => {
-              this.mensajeService.mensajeError(`¡Error!`, `¡Error al registrar el inicio de sesión!`);
-              this.cargando = false;
-            });
-          }, (error: HttpErrorResponse) => {
-            this.mensajeService.mensajeError(`¡Error al conectarse con BagPro!`, `Error: ${error.statusText} | Status: ${error.status}`);
-            this.cargando = false;
-          });
-        }, (error: HttpErrorResponse) => {
-          this.mensajeService.mensajeError(`¡Error al conectarse con Contabilidad de Zeus!`, `Error: ${error.statusText} | Status: ${error.status}`);
-          this.cargando = false;
-        });
-      }, (error: HttpErrorResponse) => {
-        this.mensajeService.mensajeError(`¡Error al conectarse con Inventario de Zeus!`, `Error: ${error.statusText} | Status: ${error.status}`);
+    this.authenticationService.login(data).pipe(
+      this.esperarConUnReintento(),
+      this.etiquetarFallo(LoginComponentComponent.API_PRINCIPAL, `${environment.rutaPlasticaribeAPI}/Authentication/login`),
+      switchMap(datos => forkJoin([
+        this.authenticationInvZeusService.login().pipe(this.esperarConUnReintento(), this.etiquetarFallo('Inventario de Zeus', `${environment.rutaZeus}/Authentication/login`)),
+        this.authenticationContaZeusService.login().pipe(this.esperarConUnReintento(), this.etiquetarFallo('Contabilidad de Zeus', `${environment.rutaZeusContabilidad}/Authentication/login`)),
+        this.authenticationBagPro.login().pipe(this.esperarConUnReintento(), this.etiquetarFallo('BagPro', `${environment.rutaBagPro}/Authentication/login`)),
+      ]).pipe(map(() => datos))),
+      // El registro del movimiento no se reintenta: si el servidor alcanzó a guardarlo, quedaría duplicado.
+      switchMap(datos => this.movAplicacionService.insert(this.movimientoInicioSesion(datos)).pipe(
+        timeout(this.tiempoMaximoConexionMs),
+        this.etiquetarFallo(LoginComponentComponent.API_PRINCIPAL, undefined, 'Registro del inicio de sesión'),
+        map(() => datos),
+      )),
+    ).subscribe({
+      next: (datos) => {
+        this.saveInLocal('Id', this.encriptacion.encrypt(datos.usua_Id.toString()));
+        this.saveInLocal('Nombre', this.encriptacion.encrypt(datos.usuario.toString()));
+        this.saveInLocal('Rol', this.encriptacion.encrypt(datos.rolUsu_Id.toString()));
+        this.guardarPreferenciaRecordarme();
+        window.location.pathname = '/home';
+      },
+      error: (fallo: FalloLogin) => {
+        this.limpiarSesionParcial();
+        this.notificarFalloLogin(fallo);
         this.cargando = false;
-      });
-    }, (error: HttpErrorResponse) => {
-      this.mensajeService.mensajeError(`¡No fue posible iniciar sesión!`, `Error: ${error.statusText} | Status: ${error.status}`);
-      this.cargando = false;
+      },
     });
   }
 
-  consultaLogin2() {
-    this.cargando = true;
+  private static readonly API_PRINCIPAL = 'Plasticaribe';
 
-    const { Empresa, Identificacion, Contrasena } = this.formularioUsuario.value;
-
-    const data = {
-      id_Usuario: Identificacion,
-      contrasena: Contrasena,
-      empresa: Empresa
-    };
-
-    this.authenticationService.login(data).pipe(
-
-      // Ejecutar logins secundarios en paralelo
-      switchMap((datos) => {
-
-        return forkJoin({
-          inv: this.authenticationInvZeusService.login().pipe(
-            catchError((error: HttpErrorResponse) => {
-              this.mensajeService.mensajeError(
-                `¡Error al conectarse con Inventario de Zeus!`,
-                `Error: ${error.statusText} | Status: ${error.status}`
-              );
-              return of(null); // evita que se caiga todo
-            })
-          ),
-          conta: this.authenticationContaZeusService.login().pipe(
-            catchError((error: HttpErrorResponse) => {
-              this.mensajeService.mensajeError(
-                `¡Error al conectarse con Contabilidad de Zeus!`,
-                `Error: ${error.statusText} | Status: ${error.status}`
-              );
-              return of(null);
-            })
-          ),
-          bag: this.authenticationBagPro.login().pipe(
-            catchError((error: HttpErrorResponse) => {
-              this.mensajeService.mensajeError(
-                `¡Error al conectarse con BagPro!`,
-                `Error: ${error.statusText} | Status: ${error.status}`
-              );
-              return of(null);
-            })
-          )
-        }).pipe(
-          map(() => datos) // mantenemos datos del login principal
-        );
-      }),
-
-      // 🔹 Registrar movimiento
-      switchMap((datos) => {
-
-        const idUsuario = datos.usua_Id;
-        const nombre = datos.usuario;
-        const rol = datos.rolUsu_Id;
-
-        const fecha = moment();
-        const infoMovimientoAplicacion = {
-          Usua_Id: idUsuario,
-          MovApp_Nombre: `Inicio de sesión`,
-          MovApp_Descripcion: `El usuario "${nombre}" con el ID ${idUsuario} inició sesión el día ${fecha.format('YYYY-MM-DD')} a las ${fecha.format('H:mm:ss')} horas.`,
-          MovApp_Fecha: fecha.format('YYYY-MM-DD'),
-          MovApp_Hora: fecha.format('H:mm:ss')
-        };
-
-        return this.movAplicacionService.insert(infoMovimientoAplicacion).pipe(
-          map(() => ({ idUsuario, nombre, rol }))
-        );
-      }),
-
-      // 🔹 Guardar en storage + navegación
-      tap(({ idUsuario, nombre, rol }) => {
-        this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
-        this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre));
-        this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
-        this.guardarPreferenciaRecordarme();
-
-        this.router.navigate(['/home']); // ✅ sin recargar página
-      }),
-
-      // 🔴 Manejo global de errores (login principal)
-      catchError((error: HttpErrorResponse) => {
-        this.mensajeService.mensajeError(
-          `¡No fue posible iniciar sesión!`,
-          `Error: ${error.statusText} | Status: ${error.status}`
-        );
-        return of(null);
-      }),
-
-      finalize(() => {
-        this.cargando = false;
-      })
-
-    ).subscribe();
+  /** Convierte cualquier error del paso en un FalloLogin con la API, la URL y la operación. */
+  private etiquetarFallo<T>(api: string, url?: string, operacion: string = 'Inicio de sesión'): MonoTypeOperatorFunction<T> {
+    return catchError((error: any) => throwError(() => (error?.esFalloLogin ? error : { esFalloLogin: true, api, url, operacion, error } as FalloLogin)));
   }
+
+  private movimientoInicioSesion(datos: any) {
+    const fecha = moment();
+    return {
+      "Usua_Id": datos.usua_Id,
+      "MovApp_Nombre": `Inicio de sesión`,
+      "MovApp_Descripcion": `El usuario "${datos.usuario}" con el ID ${datos.usua_Id} inició sesión el día ${fecha.format('YYYY-MM-DD')} a las ${fecha.format('H:mm:ss')} horas.`,
+      "MovApp_Fecha": fecha.format('YYYY-MM-DD'),
+      "MovApp_Hora": fecha.format('H:mm:ss'),
+    };
+  }
+
+  /** Muestra el error con título "Error", un mensaje breve y "Ver detalles" (sin el cuerpo de la petición, que lleva la contraseña). */
+  private notificarFalloLogin(fallo: FalloLogin) {
+    const error = fallo?.esFalloLogin ? fallo.error : fallo;
+    const api = fallo?.esFalloLogin ? fallo.api : LoginComponentComponent.API_PRINCIPAL;
+    const status = error instanceof HttpErrorResponse ? error.status : undefined;
+    if (api == LoginComponentComponent.API_PRINCIPAL && status == 401) this.formularioUsuario.patchValue({ Contrasena: '' });
+
+    const detalle = MensajesAplicacionService.detalleDeError(error, { api, operacion: fallo?.operacion ?? 'Inicio de sesión', metodo: 'POST', url: fallo?.url });
+    this.mensajeService.mensajeErrorDetallado(this.mensajeFalloLogin(api, error, fallo?.operacion), detalle);
+  }
+
+  /** Mensaje breve y entendible según la causa del error. */
+  private mensajeFalloLogin(api: string, error: any, operacion?: string): string {
+    const esLoginPrincipal = api == LoginComponentComponent.API_PRINCIPAL && (operacion ?? 'Inicio de sesión') == 'Inicio de sesión';
+    if (!navigator.onLine) return 'No hay conexión a internet. Verifica tu red e inténtalo de nuevo.';
+    if (error instanceof TimeoutError) return `${api} tardó demasiado en responder. Inténtalo de nuevo.`;
+    if (!(error instanceof HttpErrorResponse)) return 'Ocurrió un error inesperado al iniciar sesión.';
+
+    switch (true) {
+      case error.status == 0: return `No se pudo conectar con ${api}. Verifica que estés en la red de la empresa o que el servidor esté encendido.`;
+      case esLoginPrincipal && error.status == 400: return 'Faltan datos para iniciar sesión. Completa la identificación y la contraseña.';
+      case esLoginPrincipal && error.status == 401: return 'Usuario, contraseña o empresa incorrectos.';
+      case esLoginPrincipal && error.status == 403: return 'El usuario está inactivo. Comunícate con el administrador del sistema.';
+      case !esLoginPrincipal && api == LoginComponentComponent.API_PRINCIPAL: return 'No se pudo registrar el inicio de sesión. Inténtalo de nuevo.';
+      case [401, 403].includes(error.status): return `${api} rechazó el acceso del sistema. Informa a soporte.`;
+      case error.status == 404: return `No se encontró el servicio de inicio de sesión en ${api}. Informa a soporte.`;
+      case error.status == 503: return `${api} no pudo conectarse a su base de datos. Inténtalo en unos minutos.`;
+      case error.status >= 500: return `${api} tuvo un error interno. Inténtalo de nuevo; si continúa, informa a soporte.`;
+      default: return `${api} respondió con un error inesperado (${error.status}).`;
+    }
+  }
+
+  /** Borra los tokens que alcanzaron a guardarse si el inicio de sesión no se completó. */
+  private limpiarSesionParcial() {
+    ['Token', 'Token_Inv_Zeus', 'Token_Conta_Zeus', 'Token_BagPro', ''].forEach(clave => { try { this.storage.remove(clave); } catch { } });
+    ['user', 'user_Inv_Zeus', 'user_Conta_Zeus', 'user_BagPro', ''].forEach(clave => { try { localStorage.removeItem(clave); } catch { } });
+  }
+}
+
+/** Error de un paso del inicio de sesión, con la API que falló. */
+interface FalloLogin {
+  esFalloLogin: true;
+  api: string;
+  url?: string;
+  operacion: string;
+  error: any;
 }
 
 

@@ -17,4 +17,6 @@ export class SrvTipos_UsuariosService {
   srvObtenerListaPorId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Usuario/${id}`);
 
   Insert = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Usuario/', data);
+
+  Update = (id : number, data : any) => this.http.put(this.rutaPlasticaribeAPI + `/Tipo_Usuario/${id}`, data);
 }

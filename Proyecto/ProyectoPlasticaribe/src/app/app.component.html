@@ -13,3 +13,50 @@
 
 <p-toast position="center" [preventOpenDuplicates]="true"
     [breakpoints]="{'920px': {width: '100%', right: '0', left: '0'}}"></p-toast>
+
+<!-- Errores con "Ver detalles" (MensajesAplicacionService.mensajeErrorDetallado) -->
+<p-toast position="center" [key]="claveToastErrorDetallado" [preventOpenDuplicates]="true"
+    [breakpoints]="{'920px': {width: '100%', right: '0', left: '0'}}">
+    <ng-template let-message pTemplate="message">
+        <div class="toast-error">
+            <i class="pi pi-times-circle toast-error-icono"></i>
+            <div class="toast-error-texto">
+                <span class="p-toast-summary">{{message.summary}}</span>
+                <div class="p-toast-detail">{{message.detail}}</div>
+                <a *ngIf="message.data" class="toast-error-enlace" role="button" tabindex="0"
+                    (click)="mensajes.verDetalles(message.data)" (keydown.enter)="mensajes.verDetalles(message.data)">Ver detalles</a>
+            </div>
+        </div>
+    </ng-template>
+</p-toast>
+
+<p-dialog header="Detalles del error" [visible]="!!mensajes.detalleVisible" (visibleChange)="!$event && cerrarDetalleError()"
+    [modal]="true" [draggable]="false" [resizable]="false" [dismissableMask]="true" [baseZIndex]="10000"
+    [style]="{width: '560px'}" [breakpoints]="{'640px': '95vw'}">
+    <ng-container *ngIf="mensajes.detalleVisible as detalle">
+        <dl class="detalle-error">
+            <ng-container *ngIf="detalle.operacion"><dt>Operación</dt><dd>{{detalle.operacion}}</dd></ng-container>
+            <ng-container *ngIf="detalle.api"><dt>API</dt><dd>{{detalle.api}}</dd></ng-container>
+            <ng-container *ngIf="detalle.status !== undefined || detalle.statusText">
+                <dt>Código</dt>
+                <dd><span class="detalle-error-codigo" *ngIf="detalle.status !== undefined">{{detalle.status}}</span> {{detalle.statusText}}</dd>
+            </ng-container>
+            <ng-container *ngIf="detalle.tituloServidor"><dt>Error del servidor</dt><dd>{{detalle.tituloServidor}}</dd></ng-container>
+            <ng-container *ngIf="detalle.detalleServidor"><dt>Detalle del servidor</dt><dd>{{detalle.detalleServidor}}</dd></ng-container>
+            <ng-container *ngIf="detalle.metodo || detalle.url"><dt>Petición</dt><dd class="detalle-error-mono">{{detalle.metodo}} {{detalle.url}}</dd></ng-container>
+            <ng-container *ngIf="detalle.traceId"><dt>TraceId</dt><dd class="detalle-error-mono">{{detalle.traceId}}</dd></ng-container>
+            <ng-container *ngIf="detalle.mensajeTecnico"><dt>Mensaje técnico</dt><dd class="detalle-error-mono">{{detalle.mensajeTecnico}}</dd></ng-container>
+            <dt>Conexión a internet</dt><dd>{{detalle.conInternet ? 'Sí' : 'No'}}</dd>
+            <dt>Fecha</dt><dd>{{detalle.fecha}}</dd>
+        </dl>
+    </ng-container>
+    <ng-template pTemplate="footer">
+        <div class="detalle-error-botones">
+            <button pButton type="button" [label]="detalleCopiado ? 'Copiado!' : 'Copiar'" [icon]="detalleCopiado ? 'pi pi-check' : 'pi pi-copy'"
+                class="p-button-outlined" [ngClass]="detalleCopiado ? 'boton-copiado' : 'p-button-secondary'"
+                (click)="copiarDetalleError(mensajes.detalleVisible!)"></button>
+            <button pButton type="button" label="Cerrar" icon="pi pi-times" class="p-button-danger"
+                (click)="cerrarDetalleError()"></button>
+        </div>
+    </ng-template>
+</p-dialog>

@@ -16,6 +16,7 @@ import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.s
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
 import { Subject } from 'rxjs/internal/Subject';
 import { takeUntil } from 'rxjs/internal/operators/takeUntil';
+import { CLAVE_TOAST_ERROR_DETALLADO, DetalleError, MensajesAplicacionService } from './Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 const pdfMake = require('pdfmake/build/pdfmake');
 const pdfFonts = require('pdfmake/build/vfs_fonts');
@@ -58,7 +59,8 @@ export class AppComponent implements OnInit {
     private config: PrimeNGConfig,
     private encriptacion: EncriptacionService,
     @Inject(DOCUMENT) private document: Document,
-    private temaService: TemaService,) {
+    private temaService: TemaService,
+    public mensajes: MensajesAplicacionService,) {
 
     this.authenticationService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user_InvZeus = x);
@@ -79,6 +81,48 @@ export class AppComponent implements OnInit {
   set temaSeleccionado(oscuro: boolean) {
     this.temaService.cambiar(oscuro);
   }
+
+  //#region Errores con "Ver detalles"
+  readonly claveToastErrorDetallado = CLAVE_TOAST_ERROR_DETALLADO;
+
+  /** Si el botón "Copiar" debe mostrarse como "Copiado!" (vuelve a "Copiar" a los 2 segundos). */
+  detalleCopiado: boolean = false;
+  private temporizadorCopiado?: ReturnType<typeof setTimeout>;
+
+  /** Copia el detalle técnico del error al portapapeles (para enviarlo a soporte). */
+  copiarDetalleError(detalle: DetalleError) {
+    const texto = MensajesAplicacionService.detalleComoTexto(detalle);
+    const copiado = () => {
+      this.detalleCopiado = true;
+      clearTimeout(this.temporizadorCopiado);
+      this.temporizadorCopiado = setTimeout(() => this.detalleCopiado = false, 2000);
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(texto).then(copiado, () => this.copiarConRespaldo(texto) && copiado());
+    } else if (this.copiarConRespaldo(texto)) copiado();
+  }
+
+  /** Cierra la ventana de detalles y deja el botón de nuevo en "Copiar". */
+  cerrarDetalleError() {
+    clearTimeout(this.temporizadorCopiado);
+    this.detalleCopiado = false;
+    this.mensajes.cerrarDetalles();
+  }
+
+  /** Copia sin la API de portapapeles (no disponible en http de la red interna, que no es contexto seguro). */
+  private copiarConRespaldo(texto: string): boolean {
+    const area = this.document.createElement('textarea');
+    area.value = texto;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    this.document.body.appendChild(area);
+    area.select();
+    let ok = false;
+    try { ok = this.document.execCommand('copy'); } catch { ok = false; }
+    this.document.body.removeChild(area);
+    return ok;
+  }
+  //#endregion
 
   /** Se mantiene por compatibilidad: el tema ya lo aplica TemaService al crearse. */
   mostrar() { }
