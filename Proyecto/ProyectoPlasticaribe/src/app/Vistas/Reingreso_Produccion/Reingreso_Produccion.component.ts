@@ -295,7 +295,7 @@ export class Reingreso_ProduccionComponent implements OnInit {
 
   //Mensaje de confirmación de cuando los rollos se suben correctamente
   messageConfirmationUpdateStore() {
-    this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+    this.msj.mensajeConfirmacion('OK!', '¡Los rollos se subieron al inventario de manera satisfactoria!');
     this.load = false;
   }
 

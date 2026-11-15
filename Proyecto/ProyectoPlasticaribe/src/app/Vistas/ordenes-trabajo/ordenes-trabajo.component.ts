@@ -1193,7 +1193,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
       setTimeout(() => {
         if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
-          this.mensajeService.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de trabajo N°${datos_ot.ot_Id}`);
+          this.mensajeService.mensajeConfirmacion('OK!', `Se ha creado la orden de trabajo N° ${datos_ot.ot_Id}`);
           this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
           this.cambiarEstadoProducto(this.producto);
           this.pdfOrdenTrabajo(datos_ot.ot_Id);
@@ -2147,7 +2147,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           errorSelCor = this.actualizarOT_Sellado_Corte(ot);
           setTimeout(() => {
             if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
-              this.mensajeService.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);
+              this.mensajeService.mensajeConfirmacion('OK!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);
               this.limpiarCampos();
             }
           }, 1500);
@@ -2686,7 +2686,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     }
 
     this.mezclasService.srvGuardar(modelo).subscribe(() => {
-      this.mensajeService.mensajeConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`, '');
+      this.mensajeService.mensajeConfirmacion('OK!', `Registro de Mezcla Predefinida creado con éxito!`);
       setTimeout(() => {
         this.initFormCrearMezclas();
         this.cargarMezclas();
@@ -2705,7 +2705,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezMaterial_Descripcion: descripcionMaterial == null ? `Mezcla de Material ${nombreMaterial.toUpperCase()}` : descripcionMaterial,
         }
         this.mezclaMaterialService.srvGuardar(material).subscribe(() => {
-          this.mensajeService.mensajeConfirmacion('Registro creado con éxito!', '');
+          this.mensajeService.mensajeConfirmacion('OK!', 'Registro creado con éxito!');
           setTimeout(() => {
             this.formCrearMateriales.reset();
             this.cargarMezclaMateria();
@@ -2727,7 +2727,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezPigmto_Descripcion: descripcionPigmento == null ? `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}` : descripcionPigmento,
         }
         this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(() => {
-          this.mensajeService.mensajeConfirmacion('Registro creado con éxito!', '');
+          this.mensajeService.mensajeConfirmacion('OK!', 'Registro creado con éxito!');
           setTimeout(() => {
           this.formCrearPigmentos.reset();
           this.mezclasPigmentos();

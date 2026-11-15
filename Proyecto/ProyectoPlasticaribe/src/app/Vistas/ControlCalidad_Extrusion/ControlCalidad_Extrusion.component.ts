@@ -594,7 +594,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
           fs.saveAs(blob, title + ` - ` + this.today + `.xlsx`);
         });
         this.load = false;
-        this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información!`);
+        this.msjs.mensajeConfirmacion('OK!', `¡Se ha creado un archivo de Excel con la información!`);
       }, 500);
       //} else this.msjs.mensajeAdvertencia(`Advertencia`, `No hay registros para exportar!`);
     }, 1500);

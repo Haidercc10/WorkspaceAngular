@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Injectable, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
@@ -18,6 +18,10 @@ import { db } from 'src/app/conexionFirebase';
 import { environment } from 'src/environments/environment';
 import { VERSION_APP } from 'src/environments/version';
 import { TemaService, alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { VistaFavorita, VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd } from '@angular/router';
+import { combineLatest, filter, startWith } from 'rxjs';
 
 Injectable({
   providedIn: 'root'
@@ -62,6 +66,20 @@ export class MenuLateralComponent implements OnInit {
   roles: any[] = [];
   cargando: boolean = false;
 
+  // Estrella de la barra superior: agrega o quita la página actual de los accesos rápidos (barra inferior)
+  private readonly vistasFavService = inject(VistasFavoritasService);
+  vistaActual: VistaFavorita | null = null; // vista de la página actual, si el rol puede tenerla como acceso rápido
+  esFavorita: boolean = false;
+  guardandoFavorito: boolean = false;
+  private readonly suscripcionFavorito = combineLatest([
+    inject(Router).events.pipe(filter(e => e instanceof NavigationEnd), startWith(null)),
+    this.vistasFavService.misFavoritos$,
+    this.vistasFavService.disponiblesSinError(),
+  ]).pipe(takeUntilDestroyed()).subscribe(([, { favoritos }, disponibles]) => {
+    this.vistaActual = VistasFavoritasService.vistaDeUrl(this.router?.url ?? location.pathname, disponibles);
+    this.esFavorita = !!this.vistaActual && favoritos.some(f => f.id === this.vistaActual!.id);
+  });
+
   constructor(private AppComponent: AppComponent,
     private formBuilder: FormBuilder,
     private rolService: RolesService,
@@ -90,6 +108,32 @@ export class MenuLateralComponent implements OnInit {
     //this.consultarEventosMes();
     this.CargarCategorias();
     this.abrirModalUsuario();
+  }
+
+  /** Agrega la página actual a los accesos rápidos, o la quita si ya estaba (respeta el límite de la API). */
+  alternarFavoritoActual() {
+    const vista = this.vistaActual;
+    if (!vista || this.guardandoFavorito) return;
+
+    const { limite, favoritos } = this.vistasFavService.actual;
+    const ids = favoritos.map(f => f.id);
+    const quitar = ids.includes(vista.id);
+    if (!quitar && ids.length >= limite) {
+      this.mensajeService.mensajeAdvertencia('Límite alcanzado', `Ya tiene ${limite} accesos rápidos. Quite uno desde el botón + de la barra inferior.`);
+      return;
+    }
+
+    this.guardandoFavorito = true;
+    this.vistasFavService.guardar(quitar ? ids.filter(id => id !== vista.id) : [...ids, vista.id]).subscribe({
+      next: () => {
+        this.guardandoFavorito = false;
+        this.mensajeService.mensajeConfirmacion('OK!', `"${vista.nombre}" se ${quitar ? 'quitó de' : 'agregó a'} sus accesos rápidos.`);
+      },
+      error: err => {
+        this.guardandoFavorito = false;
+        this.mensajeService.mensajeError('¡No se pudieron guardar sus accesos rápidos!', typeof err?.error === 'string' ? err.error : '');
+      },
+    });
   }
 
   /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria
@@ -270,7 +314,7 @@ export class MenuLateralComponent implements OnInit {
         }
         this.usuarioService.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(() => {
           this.modalUsuario = false;
-          this.mensajeService.mensajeConfirmacion(`¡Usuario Actualizado!`, `¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
+          this.mensajeService.mensajeConfirmacion('OK!', `¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
         }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`));
       }
     });

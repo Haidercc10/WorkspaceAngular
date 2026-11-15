@@ -263,7 +263,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
             } else {
               this.reposition = true;
               this.formProduction.patchValue({ 'fact': dataProduction.order.factura, 'saleOrder': dataProduction.dtOrder.consecutivo_Pedido, });
-              this.msj.mensajeConfirmacion(`Reposición consultada`, `¡Ingrese los rollos que van a ser enviados por reposición!`);
+              this.msj.mensajeConfirmacion('OK!', `Reposición consultada. ¡Ingrese los rollos que van a ser enviados por reposición!`);
               this.load = false;
             }
           }
@@ -277,7 +277,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       finalize(() => { this.load = false; })
     ).subscribe(factura => {
       this.factZeus = factura;
-      this.msj.mensajeConfirmacion(`OF consultada`, `¡Ingrese los rollos/bultos a despachar!`);
+      this.msj.mensajeConfirmacion('OK!', `Orden de facturación consultada. ¡Ingrese los rollos/bultos a despachar!`);
       this.load = false;
       this.sendProductionZeus = this.preSendProductionZeus;
       this.consolidateItems();
@@ -628,7 +628,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   //*Función para colocar en estado NO DISPONIBLE los bultos despachados. 
   putStateReels(orderFact: number, ofDirect: boolean, preload: number) {
     this.productionProcessSerivce.putStateNotAvaible2(orderFact).subscribe(() => {
-      this.msj.mensajeConfirmacion(`¡Orden despachada correctamente!`);
+      this.msj.mensajeConfirmacion('OK!', `¡Orden despachada correctamente!`);
       let fact = this.formProduction.value.fact;
       if (this.reposition) this.updateDevolution();
       if (this.preload) this.updatePreload(preload, orderFact);
@@ -898,7 +898,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           /*this.zeusService.GetFactura(saleOrders[saleOrders.length - 1]).subscribe(factura => {
             this.orderFactService.PutFactOrder(orderFact, factura.documento).subscribe(() => {
               this.formProduction.patchValue({ fact: factura.documento });
-              this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
+              this.msj.mensajeConfirmacion('OK!', `Orden de facturación consultada. ¡Continúe ingresando los rollos que van a ser despachados!`);
             }, error => this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error));
           }, error => this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${orderFact}!`, error));*/
           console.log(this.production)
@@ -995,7 +995,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           this.sendProductionZeus[i].position = this.sendProductionZeus.length;
           this.sendProductionZeus.sort((a, b) => Number(b.position) - Number(a.position));
         });
-        this.msj.mensajeConfirmacion(`${barcodeRead} leído exitosamente!`, ``);
+        this.msj.mensajeConfirmacion('OK!', `${barcodeRead} leído exitosamente!`);
         this.load = false;
       }
     }, error => {

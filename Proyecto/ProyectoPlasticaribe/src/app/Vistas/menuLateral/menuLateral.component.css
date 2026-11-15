@@ -366,3 +366,30 @@ p-accordion span[class = 'vertical-align-middle'] {
   height: auto;
   flex-shrink: 0;
 }
+/* Estrella: agrega o quita la página actual de los accesos rápidos (barra inferior) */
+.botonFavorito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--rojo);
+  cursor: pointer;
+  transition: transform .15s;
+}
+
+.botonFavorito:hover:not(:disabled) {
+  transform: scale(1.15);
+}
+
+.botonFavorito:disabled {
+  cursor: default;
+  opacity: .7;
+}
+
+.botonFavorito:focus-visible {
+  outline: 2px solid var(--rojo);
+  outline-offset: 3px;
+  border-radius: 4px;
+}

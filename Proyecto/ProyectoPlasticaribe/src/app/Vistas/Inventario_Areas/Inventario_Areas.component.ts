@@ -322,7 +322,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
     });
     setTimeout(() => {
       this.load = false;
-      (esError) ? this.svcMsjs.mensajeError(`Error`, `No se pudo crear la entrada de inventario!`) : this.svcMsjs.mensajeConfirmacion(`¡Sí!`, `Entrada de inventario exitosa!`);
+      (esError) ? this.svcMsjs.mensajeError(`Error`, `No se pudo crear la entrada de inventario!`) : this.svcMsjs.mensajeConfirmacion('OK!', `Entrada de inventario exitosa!`);
       this.limpiarTodo();
     }, 1000);
   }

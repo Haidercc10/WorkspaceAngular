@@ -269,7 +269,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         preEntRollo_Id : idEntrada,
       }
       this.dtPreEntRollosService.srvGuardar(info).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`¡PreEntrega Realizada!`, `¡Se ha registrado la PreEntrega de rollos!`);
+        this.mensajeService.mensajeConfirmacion('OK!', `¡Se ha registrado la PreEntrega de rollos!`);
         this.cargando = false;
       }, () => {
         this.mensajeService.mensajeError(`¡Ha Ocurrido Un Error!`,`¡No fue posible guardar los detalles de cada rollos PreEntregado!`);

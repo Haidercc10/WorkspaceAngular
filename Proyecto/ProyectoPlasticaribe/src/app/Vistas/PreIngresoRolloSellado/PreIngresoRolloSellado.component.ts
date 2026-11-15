@@ -270,7 +270,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
       if (info.UndMed_Rollo == 'UND') info.UndMed_Rollo = 'Und';
 
       this.dtPreEntRollosService.srvGuardar(info).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`¡PreEntrega Realizada!`, `¡Se ha registrado la PreEntrega de rollos!`);
+        this.mensajeService.mensajeConfirmacion('OK!', `¡Se ha registrado la PreEntrega de rollos!`);
         this.cargando = false;
       }, () => {
         this.mensajeService.mensajeError(`¡Ha Ocurrido Un Error!`,`¡No fue posible guardar los detalles de cada rollos PreEntregado!`);

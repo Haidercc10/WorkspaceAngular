@@ -236,7 +236,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.dtSolicitudService.GetMateriaPrimaSolicitud(this.formSolicitud.value.Id_Solicitud, this.mpSeleccionada.Id).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.dtSolicitudService.Delete(data[i].dtSolicitud_Id).subscribe(datos => {
-          this.msj.mensajeConfirmacion(`¡Materia Prima Eliminada!`, `¡Se ha eliminado la materia prima con el ID ${this.mpSeleccionada.Id} de la solicitud!`);
+          this.msj.mensajeConfirmacion('OK!', `¡Se ha eliminado la materia prima con el ID ${this.mpSeleccionada.Id} de la solicitud!`);
         });
       }
     });
@@ -279,7 +279,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
         Estado_Id: 11
       }
-      this.dtSolicitudService.Post(info).subscribe(data => this.msj.mensajeConfirmacion(`¡Se ha creado la solicitud de materia prima!`, `¡Se creó correctamente la solicitud de materia prima!`),
+      this.dtSolicitudService.Post(info).subscribe(data => this.msj.mensajeConfirmacion('OK!', `¡Se creó correctamente la solicitud de materia prima!`),
       error => err = true);
     }
     setTimeout(() => {
@@ -365,7 +365,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
           Estado_Id: 11
         }
-        this.dtSolicitudService.Post(info).subscribe(datos => this.msj.mensajeConfirmacion(`¡Se ha editado la solicitud de materia prima!`, `¡Se editó correctamente la solicitud de materia prima!`),
+        this.dtSolicitudService.Post(info).subscribe(datos => this.msj.mensajeConfirmacion('OK!', `¡Se editó correctamente la solicitud de materia prima!`),
         error => err = true);
       });
     }

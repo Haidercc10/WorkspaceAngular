@@ -98,7 +98,7 @@ export class CrearProveedorComponent implements OnInit {
     }
 
     this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(() => {
-      this.mensajeService.mensajeConfirmacion(`Proveedor Creado`, 'Proveedor creado con éxito!');
+      this.mensajeService.mensajeConfirmacion('OK!', 'Proveedor creado con éxito!');
       setTimeout(() => { this.LimpiarCampos(); }, 500);
     }, () => this.mensajeService.mensajeError(`Error`, 'No fue posible crear el registro, por favor, verifique!'));
   }

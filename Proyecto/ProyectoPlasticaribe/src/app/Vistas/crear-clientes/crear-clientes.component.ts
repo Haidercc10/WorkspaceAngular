@@ -117,7 +117,7 @@ export class ClientesComponent implements OnInit {
     if (this.ValidarRol == 2) datosClientes.Estado_Id = 8;
     else if (this.ValidarRol == 1) datosClientes.Estado_Id = 1;
     this.clientesService.srvGuardar(datosClientes).subscribe(() => {
-      this.mensajeService.mensajeConfirmacion(`¡Cliente Creado!`, `¡Se ha creado un cliente con el nombre ${datosClientes.Cli_Nombre}!`);
+      this.mensajeService.mensajeConfirmacion('OK!', `¡Se ha creado un cliente con el nombre ${datosClientes.Cli_Nombre}!`);
       this.LimpiarCampos();
     }, error => this.mensajeService.mensajeError('¡No fue posible crear el cliente!', error.message));
   }
@@ -137,7 +137,7 @@ export class ClientesComponent implements OnInit {
       if (datos_sedePorID > 0) datosSedes.sedeCli_Id = datos_sedePorID + 1;
       else if (datos_sedePorID == 0) datosSedes.sedeCli_Id = this.FormCrearSedeClientes.value.CliId2 +""+ 1;
       this.sedesClientesService.srvGuardar(datosSedes).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion('Guardado Exitoso', 'Sede de Cliente guardada con éxito!');
+        this.mensajeService.mensajeConfirmacion('OK!', 'Sede de Cliente guardada con éxito!');
         this.LimpiarCamposSede();
       }, error => this.mensajeService.mensajeError('¡No fue posible crear la sede del cliente!', error.message));
     }, error => this.mensajeService.mensajeError('¡Ocurrió un error al momento de consultar si el cliente tiene sedes previamente creadas!', error.message));

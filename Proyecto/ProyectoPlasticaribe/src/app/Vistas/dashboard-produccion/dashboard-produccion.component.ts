@@ -255,7 +255,7 @@ export class DashboardProduccionComponent implements OnInit {
     let goal = this.productionMachineProcess(process).find(x => x.machine == data.machine).goal;
 
     this.svDailyProd.putGoalForMachine(data.machine, process, moment(this.dateSelected).format('YYYY-MM-DD'), goal).subscribe(dataa => {
-      if ($event.key == 'Enter') this.svMsj.mensajeConfirmacion(`¡Meta establecida con éxito!`);
+      if ($event.key == 'Enter') this.svMsj.mensajeConfirmacion('OK!', `¡Meta establecida con éxito!`);
     }, error => {
       this.svMsj.mensajeError('Error', ``)
     })

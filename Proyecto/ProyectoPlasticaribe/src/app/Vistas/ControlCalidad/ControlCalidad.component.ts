@@ -360,7 +360,7 @@ export class ControlCalidadComponent implements OnInit {
       Observacion: (this.datosControlCal_Impresion[i].Observacion).toString().toUpperCase()
     }
     this.controlImp.Post(control).subscribe(() => {
-      this.msj.mensajeConfirmacion(`¡Registro guardado exitosamente!`);
+      this.msj.mensajeConfirmacion('OK!', `¡Registro guardado exitosamente!`);
       this.ConsultarDatosControlCal_Impresion();
     }, () => {
       this.msj.mensajeError(`¡No se pudo guardar el registro!`);
@@ -408,7 +408,7 @@ export class ControlCalidadComponent implements OnInit {
       Observacion: (this.datosControlCal_Impresion[i].Observacion).toString().toUpperCase()
     }
     this.controlImp.Put(id, control).subscribe(() => {
-      this.msj.mensajeConfirmacion(`¡Registro actualizado exitosamente!`);
+      this.msj.mensajeConfirmacion('OK!', `¡Registro actualizado exitosamente!`);
       this.ConsultarDatosControlCal_Impresion();
     }, () => {
       this.msj.mensajeError(`¡No se pudo actualizar el registro!`);
@@ -447,7 +447,7 @@ export class ControlCalidadComponent implements OnInit {
       Observacion: (this.datosControlCal_Doblado[i].observacion).toString().toUpperCase(),
     };
     this.controlDbl.Post(control).subscribe(() => {
-      this.msj.mensajeConfirmacion(`¡Registro guardado exitosamente!`);
+      this.msj.mensajeConfirmacion('OK!', `¡Registro guardado exitosamente!`);
       this.ConsultarDatosControlCal_DobladoCorte();
     }, () => {
       this.msj.mensajeError(`¡No se pudo guardar el registro!`);
@@ -480,7 +480,7 @@ export class ControlCalidadComponent implements OnInit {
       Observacion: (this.datosControlCal_Doblado[i].observacion).toString().toUpperCase(),
     };
     this.controlDbl.Put(id, control).subscribe(() => {
-      this.msj.mensajeConfirmacion(`¡Registro actualizado exitosamente!`);
+      this.msj.mensajeConfirmacion('OK!', `¡Registro actualizado exitosamente!`);
       this.ConsultarDatosControlCal_DobladoCorte();
     }, () => {
       this.msj.mensajeError(`¡No se pudo actualizar el registro!`);

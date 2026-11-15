@@ -223,7 +223,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
 
   PutDelivered_NoAvaible(idPreIn: number) {
     this.productionProcessService.PutDelivered_NoAvaible(idPreIn).subscribe(() => {
-      this.msg.mensajeConfirmacion(`¡Pre Ingreso creado correctamente!`);
+      this.msg.mensajeConfirmacion('OK!', `¡Pre Ingreso creado correctamente!`);
       this.createPDF(idPreIn);
     }, error => this.errorMessage(`¡Ocurrió un error al cambiar el estado de los rollos/bultos!`, error));
   }

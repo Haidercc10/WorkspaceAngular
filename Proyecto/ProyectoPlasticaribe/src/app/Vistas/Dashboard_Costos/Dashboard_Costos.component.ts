@@ -702,7 +702,7 @@ export class Dashboard_CostosComponent implements OnInit {
     this.agregarHojaDosExcel(workbook, fill, font, border, datosHojaDos);
     this.excelService.creacionExcel(nombreArchivo, workbook);
     this.cargando = false;
-    this.msj.mensajeConfirmacion(`¡Información Exportada!`, titulo);
+    this.msj.mensajeConfirmacion('OK!', `¡Se exportó la información de "${titulo}" a Excel!`);
   }
 
   // Funcion que agregará la primera hoja al archivo de excel, a su vez esta funcion llamará a otras funciones que añadirán información a la hoja creada aquí

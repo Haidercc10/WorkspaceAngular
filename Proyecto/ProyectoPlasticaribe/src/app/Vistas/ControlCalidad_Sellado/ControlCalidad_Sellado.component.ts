@@ -304,7 +304,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
         fs.saveAs(blob, nombreDoc + ` - ` + this.today + `.xlsx`);
       });
       this.load = false;
-      this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información!`);
+      this.msjs.mensajeConfirmacion('OK!', `¡Se ha creado un archivo de Excel con la información!`);
     }, 400);
   }
 }

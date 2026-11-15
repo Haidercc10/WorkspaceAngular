@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
@@ -79,6 +79,17 @@ export class Produccion_ProcesosService {
   getRollsForRepack = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getRollsForRepack`);
 
   putStateDeletedRolls = (data : Array<rollsToDelete>) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateDeletedRolls`, data);
+
+  /** Rollos disponibles para eliminar. Los filtros vacíos no se envían. */
+  getInfoProductionToDelete = (date1: string, date2: string, filters: { ot?: number | null, process?: string | null, roll?: number | null }): Observable<any[]> => {
+    let params = new HttpParams();
+    Object.entries(filters).forEach(([key, value]) => { if (value != null && value !== '') params = params.set(key, String(value)); });
+    return this.http.get<any[]>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionToDelete/${date1}/${date2}`, { params });
+  }
+
+  /** Elimina los rollos y crea sus registros de desecho en una sola transacción. Devuelve los rollos eliminados. */
+  putDeleteRolls = (data: { rolls: Array<rollsToDelete>, fail: number, observation: string, userAuthorize: number, userDelete: number }): Observable<{ deleted: Array<rollsToDelete> }> =>
+    this.http.put<{ deleted: Array<rollsToDelete> }>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putDeleteRolls`, data);
 
   getInfoItemsAvailablesInPallet = (item : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoItemsAvailablesInPallet/${item}`);
 

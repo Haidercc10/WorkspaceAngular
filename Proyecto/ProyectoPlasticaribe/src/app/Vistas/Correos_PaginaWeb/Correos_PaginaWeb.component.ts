@@ -133,7 +133,7 @@ export class Correos_PaginaWebComponent implements OnInit {
       Hora_Envio: moment().format('HH:mm:ss'),
     };
     this.sendMailsService.SendMail(data).subscribe(() => {
-      this.msg.mensajeConfirmacion('Respuesta enviada');
+      this.msg.mensajeConfirmacion('OK!', 'Respuesta enviada');
       this.loading = false;
     });
   }

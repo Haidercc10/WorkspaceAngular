@@ -357,7 +357,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
       next: () => {
         this.modalGoal = false;
         this.mensajeAplicacion.mensajeConfirmacion(
-          `¡Meta de facturación ${this.typeGoal} actualizada exitosamente!`
+          'OK!', `¡Meta de facturación ${this.typeGoal} actualizada exitosamente!`
         );
         this.getComplianceBilling();
       },
@@ -376,7 +376,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.svCompBilling.putCurrentBilling(payload).subscribe({
       next: () => {
         this.mensajeAplicacion.mensajeConfirmacion(
-          `¡Facturación actualizada exitosamente!`
+          'OK!', `¡Facturación actualizada exitosamente!`
         );
         this.getComplianceBilling();
       },

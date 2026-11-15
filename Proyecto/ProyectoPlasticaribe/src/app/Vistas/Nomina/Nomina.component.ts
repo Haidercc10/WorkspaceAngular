@@ -130,7 +130,7 @@ export class NominaComponent implements OnInit {
       }
       this.nominaService.Put(data.id, modelo).subscribe(() => {
         this.consultarNominaIngresada();
-        this.msj.mensajeConfirmacion(`¡Se actualizó la nomina con éxito!`);
+        this.msj.mensajeConfirmacion('OK!', `¡Se actualizó la nomina con éxito!`);
         this.load = true;
       }, () => this.msj.mensajeError(`¡No se pudo actualizar la nomina!`));
     }, () => this.msj.mensajeError(`¡No se encontró el registro de la nomina a actualizar!`));

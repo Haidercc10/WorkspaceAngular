@@ -569,7 +569,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
         cono: res.cono_Id,
       });
       this.buscraOrdenTrabajo();
-      this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
+      this.msj.mensajeConfirmacion('OK!', `¡Rollo almacenado!`);
     }, () => {
       this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
       this.cargando = false;

@@ -403,7 +403,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
    */
   private abrirPdfOTConAviso(pdf: Blob, ot: number) {
     this.abriendoPdfOT = true;
-    this.mensajeService.mensajeConfirmacion(`PDF generado`,
+    this.mensajeService.mensajeConfirmacion('OK!',
       `El PDF de la orden de trabajo N° ${ot} se generó correctamente. En unos momentos se abrirá en una nueva pestaña.`,
       ESPERA_ABRIR_PDF_OT_SEG * 1000 + 500);
 

@@ -1,199 +1,269 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import moment from 'moment';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DOCUMENT } from '@angular/common';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { filter } from 'rxjs';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
-import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
-import { AppComponent } from 'src/app/app.component';
-import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { VistaFavorita, VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 
+/** Grupo de vistas que se muestra en el panel izquierdo del editor. */
+interface GrupoVistas {
+  modulo: string;
+  vistas: VistaFavorita[];
+}
+
+/**
+ * Barra inferior de accesos rápidos (vistas favoritas).
+ *
+ * - El dock muestra "Inicio", los favoritos del usuario en el orden elegido y el botón "Añadir"; resalta el de la
+ *   página actual. Se puede ocultar (la preferencia se recuerda en este navegador).
+ * - Mientras está visible, <body> lleva la clase `con-accesos-rapidos`, que reserva espacio abajo para que la barra
+ *   no tape el contenido de las páginas (ver styles.css).
+ * - El editor (botón +) tiene dos paneles: a la izquierda las vistas disponibles (buscador, filtro por módulo y
+ *   agrupadas por módulo) y a la derecha los favoritos elegidos, que se reordenan arrastrando. Trabaja sobre una
+ *   copia: no guarda nada hasta presionar "Guardar".
+ * - Los favoritos viven en VistasFavoritasService, que comparte el estado con la estrella de la barra superior.
+ */
 @Component({
   selector: 'app-VistasFavoritas',
   templateUrl: './VistasFavoritas.component.html',
   styleUrls: ['./VistasFavoritas.component.css']
 })
+export class VistasFavoritasComponent implements OnInit, OnDestroy {
 
-export class VistasFavoritasComponent implements OnInit {
-  
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  displayTerminal: boolean; //Variable que permitirá mostrar o no el apartado donde se pueden escoger las vistas favoritas
-  dockItems: MenuItem[] = []; //Variable que mostrará las vistas favoritas que feuron escogidas por el usuario logeado
-  responsiveOptions: any[]; //Variable que hará que el docker, donde estan las vistas favoritas, sea responsive
-  targetProducts: any[] = []; //Variable que tendrá las vistas seleccionadas por el usuario como favoritas
-  disponibles: any[] = []; //Variable que tendrá la información de todas las vistas disponibles
-  seleccionados: number[] = []; //Variable que almacenará los id de las vistas seleccionadas por el usuario como favoritas
-  vistasFavoritas : any [] = []; // Variable que almacenará las vistas favoritas del usuario
-  disponiblesMostrar: any[] = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
+  /** Módulos que el menú lateral tampoco muestra como categoría. */
+  private static readonly MODULOS_OCULTOS = ['Inicio', 'Pruebas', 'Vistas'];
+  private static readonly SIN_MODULO = 'Otros';
+  private static readonly CLAVE_OCULTO = 'accesosRapidos_oculto';
+  private static readonly CLASE_BODY = 'con-accesos-rapidos';
+  private static readonly RUTA_INICIO = '/home';
 
-  constructor(private AppComponent : AppComponent,
-                private vistasFavService : VistasFavoritasService,
-                  private msj : MensajesAplicacionService,
-                    private vistasPermisos : Vistas_PermisosService,
-                      private router : Router) {
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  limite = 7; // máximo de favoritos; lo define la API
+  favoritos: VistaFavorita[] = []; // favoritos guardados, en orden
+  dockItems: MenuItem[] = [];
+  rutaActiva = ''; // ruta (normalizada) del acceso que corresponde a la página actual
+  oculto = this.leerOculto();
+
+  // Estado del editor
+  editorVisible = false;
+  cargandoEditor = false;
+  guardando = false;
+  seleccion: VistaFavorita[] = []; // copia editable de `favoritos`
+  busqueda = '';
+  moduloFiltro: string | null = null; // null = todos los módulos
+  modulos: string[] = [];
+  grupos: GrupoVistas[] = [];
+  private seleccionIds = new Set<number>();
+  private disponibles: VistaFavorita[] | null = null;
+
+  constructor(private vistasFavService : VistasFavoritasService,
+                private msj : MensajesAplicacionService,
+                  private router : Router,
+                    @Inject(DOCUMENT) private document : Document) {
+    this.vistasFavService.misFavoritos$.pipe(takeUntilDestroyed()).subscribe(({ limite, favoritos }) => {
+      this.limite = limite;
+      this.favoritos = favoritos;
+      this.construirDock();
+    });
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
+      .subscribe(() => this.actualizarRutaActiva());
   }
 
   ngOnInit() {
-    this.lecturaStorage();
-    this.llenarVistasDisponibles();
-    this.mostrarVistasFav();
-    this.buscarFavoritos();
-  }
-
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.AppComponent.storage_Id;
-    this.storage_Nombre = this.AppComponent.storage_Nombre;
-    this.ValidarRol = this.AppComponent.storage_Rol;
-  }
-
-  // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
-  llenarVistasDisponibles = () => this.vistasPermisos.Get_By_Rol(this.ValidarRol).subscribe(data => this.disponibles = data);
-
-  // Funcion que va a colocar en la vista las vistas escogidas por un usuario como favoritas, las ociones favoritas siempre tendrán predeterminadas, 1: Inicio y 2: Añadir
-  mostrarVistasFav(){
-    this.dockItems = [];
-    this.dockItems.push(
-      {
-        label: 'Inicio',
-        tooltipOptions: {
-          tooltipLabel: "Inicio",
-          tooltipPosition: 'top',
-          positionTop: -15,
-          positionLeft: 15
-        },
-        icon: "assets/Iconos_Menu/home.png",
-        command: () => this.router.navigateByUrl('/home')
-      }
-    );    
-    this.disponibles.forEach(disponible => {
-      if (this.vistasFavoritas.includes(disponible.id)) {
-        let { nombre, icono, ruta } = disponible;
-        let info: any = {
-          label: nombre,
-          tooltipOptions: {
-            tooltipLabel: nombre,
-            tooltipPosition: 'top',
-            positionTop: -15,
-            positionLeft: 15
-          },
-          icon: icono,
-          command: () => this.router.navigateByUrl(ruta)
-        };
-        this.dockItems.push(info);
-        this.seleccionados.push(disponible.id);
-      }
+    this.aplicarClaseBody();
+    this.vistasFavService.cargar().subscribe({
+      error: () => this.msj.mensajeError('¡No se pudieron cargar sus accesos rápidos!'),
     });
-    this.dockItems.push(
-      {
-        label: 'Añadir',
-        tooltipOptions: {
-          tooltipLabel: "Añadir Favoritos",
-          tooltipPosition: 'top',
-          positionTop: -15,
-          positionLeft: 15
-        },
-        icon: "assets/Iconos_Menu/crear.png",
-        command: () => this.llenarDatosRol()
-      }
-    );
-    this.responsiveOptions = [
-      { breakpoint: '1024px', numVisible: 3 },
-      { breakpoint: '768px', numVisible: 2 },
-      { breakpoint: '560px', numVisible: 1 }
+  }
+
+  ngOnDestroy() {
+    this.document.body.classList.remove(VistasFavoritasComponent.CLASE_BODY);
+  }
+
+  // ---------- Dock ----------
+
+  private construirDock() {
+    const item = (label: string, tooltip: string, icon: string, ruta: string, command: () => void): MenuItem => ({
+      label,
+      icon,
+      command,
+      state: { ruta: VistasFavoritasService.normalizarRuta(ruta) },
+      tooltipOptions: { tooltipLabel: tooltip, tooltipPosition: 'top', positionTop: -15, positionLeft: 15 },
+    });
+
+    this.dockItems = [
+      item('Inicio', 'Inicio', 'assets/Iconos_Menu/home.png', VistasFavoritasComponent.RUTA_INICIO,
+        () => this.router.navigateByUrl(VistasFavoritasComponent.RUTA_INICIO)),
+      ...this.favoritos.map(v => item(v.nombre, v.nombre, v.icono, v.ruta, () => this.router.navigateByUrl(v.ruta))),
+      item('Añadir', 'Editar accesos rápidos', 'assets/Iconos_Menu/crear.png', '', () => this.abrirEditor()),
     ];
+    this.actualizarRutaActiva();
   }
 
-  // Funcion que llenará los datos segun el rol del usuario logeado, si no encuentra ninguna vista como favorita no pondrá ninguno en la vista
-  llenarDatosRol(){
-    this.targetProducts = [];
-    this.disponiblesMostrar = [];
-    for (let i = 0; i < this.disponibles.length; i++) {
-      if (!this.seleccionados.includes(this.disponibles[i].id)) this.disponiblesMostrar.push(this.disponibles[i]);
-      else this.targetProducts.push(this.disponibles[i]);
-      if ((i + 1) == this.disponibles.length) this.displayTerminal = true;
+  /** Marca el acceso de la página actual (también en subrutas, p. ej. /inventario-areas/materiales). */
+  private actualizarRutaActiva() {
+    const inicio = { id: 0, nombre: 'Inicio', icono: '', categoria: '', ruta: VistasFavoritasComponent.RUTA_INICIO };
+    const vista = VistasFavoritasService.vistaDeUrl(this.router.url, [inicio, ...this.favoritos]);
+    this.rutaActiva = vista ? VistasFavoritasService.normalizarRuta(vista.ruta) : '';
+  }
+
+  esActivo = (item: MenuItem) => !!this.rutaActiva && item.state?.['ruta'] === this.rutaActiva;
+
+  alternarOculto() {
+    this.oculto = !this.oculto;
+    try { localStorage.setItem(VistasFavoritasComponent.CLAVE_OCULTO, this.oculto ? '1' : '0'); } catch { /* sin localStorage: no se recuerda */ }
+    this.aplicarClaseBody();
+  }
+
+  private leerOculto(): boolean {
+    try { return localStorage.getItem(VistasFavoritasComponent.CLAVE_OCULTO) === '1'; } catch { return false; }
+  }
+
+  private aplicarClaseBody() {
+    this.document.body.classList.toggle(VistasFavoritasComponent.CLASE_BODY, !this.oculto);
+  }
+
+  // ---------- Editor: apertura y cierre ----------
+
+  abrirEditor() {
+    this.busqueda = '';
+    this.moduloFiltro = null;
+    this.establecerSeleccion(this.favoritos);
+    this.editorVisible = true;
+
+    if (this.disponibles) return this.actualizarGrupos();
+
+    this.cargandoEditor = true;
+    this.vistasFavService.disponibles().subscribe({
+      next: data => {
+        this.disponibles = data ?? [];
+        this.modulos = [...new Set(this.disponibles.flatMap(v => this.modulosDe(v)))].sort((a, b) => a.localeCompare(b));
+        this.cargandoEditor = false;
+        this.actualizarGrupos();
+      },
+      error: () => {
+        this.cargandoEditor = false;
+        this.editorVisible = false;
+        this.msj.mensajeError('¡No se pudieron cargar las vistas disponibles!');
+      },
+    });
+  }
+
+  cancelar = () => this.editorVisible = false;
+
+  /** Vuelve a los favoritos guardados, descartando lo editado. */
+  restablecer = () => this.establecerSeleccion(this.favoritos);
+
+  guardar() {
+    if (!this.hayCambios || this.guardando) return;
+
+    this.guardando = true;
+    this.vistasFavService.guardar(this.seleccion.map(v => v.id)).subscribe({
+      next: () => {
+        this.guardando = false;
+        this.editorVisible = false;
+        this.msj.mensajeConfirmacion('OK!', '¡Sus accesos rápidos se guardaron correctamente!');
+      },
+      error: err => {
+        this.guardando = false;
+        const detalle = typeof err?.error === 'string' ? err.error : '';
+        this.msj.mensajeError('¡No se pudieron guardar sus accesos rápidos!', detalle);
+      },
+    });
+  }
+
+  // ---------- Editor: selección ----------
+
+  get hayCambios(): boolean {
+    return this.seleccion.map(v => v.id).join(',') !== this.favoritos.map(v => v.id).join(',');
+  }
+
+  get limiteAlcanzado(): boolean {
+    return this.seleccion.length >= this.limite;
+  }
+
+  /** Posiciones vacías que se dibujan debajo de los favoritos para que el límite sea visible. */
+  get espaciosLibres(): number[] {
+    return Array.from({ length: Math.max(this.limite - this.seleccion.length, 0) }, (_, i) => this.seleccion.length + i + 1);
+  }
+
+  estaSeleccionada = (vista: VistaFavorita) => this.seleccionIds.has(vista.id);
+
+  /** Agrega la vista a los favoritos, o la quita si ya estaba. */
+  alternar(vista: VistaFavorita) {
+    if (this.estaSeleccionada(vista)) return this.quitar(vista);
+    if (this.limiteAlcanzado) {
+      this.msj.mensajeAdvertencia('Límite alcanzado', `Solo puede tener ${this.limite} accesos rápidos. Quite uno para agregar otro.`);
+      return;
     }
+    this.establecerSeleccion([...this.seleccion, vista]);
   }
 
-  // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusada o actualiza las vistas escogidas
-  elegirFavoritos(){
-    if (this.targetProducts.length > 5) {
-      this.msj.mensajeAdvertencia('Advertencia', 'Solo puede elegir 5 favoritos');
-      for (let i = 0; i < this.targetProducts.length; i++) {
-        this.disponiblesMostrar.push(this.targetProducts[i]);
-        this.targetProducts.splice(i, 1);
-        this.disponiblesMostrar.sort((a,b) => Number(a.id) - Number(b.id));
-        this.añadirVistasFavoritas();
-        break;
-      }
-    } else if (this.targetProducts.length <= 5) this.añadirVistasFavoritas();
+  quitar = (vista: VistaFavorita) => this.establecerSeleccion(this.seleccion.filter(v => v.id !== vista.id));
+
+  soltar(evento: CdkDragDrop<VistaFavorita[]>) {
+    const nueva = [...this.seleccion];
+    moveItemInArray(nueva, evento.previousIndex, evento.currentIndex);
+    this.establecerSeleccion(nueva);
   }
 
-  // Funcion que tomará el usuario logeado y lo consultará en la base de datos, en tabla "VistasFavoritas", y buscará las vistas escogidas por el usuario anteriormente
-  buscarFavoritos(){
-    this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(data => {
-      data.forEach(element => this.vistasFavoritas = [element.vistaFav_Num1, element.vistaFav_Num2, element.vistaFav_Num3, element.vistaFav_Num4, element.vistaFav_Num5]);
-      setTimeout(() => this.mostrarVistasFav(), 500);
-    }, () => this.msj.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
+  /** Mueve un favorito una posición arriba (-1) o abajo (+1); alternativa al arrastre para teclado. */
+  mover(indice: number, direccion: -1 | 1) {
+    const destino = indice + direccion;
+    if (destino < 0 || destino >= this.seleccion.length) return;
+    const nueva = [...this.seleccion];
+    moveItemInArray(nueva, indice, destino);
+    this.establecerSeleccion(nueva);
   }
 
-  // Funcion que añadirá o actualizará la base de datos con las vistas favoritas que ha elegido un usuario
-  añadirVistasFavoritas(){
-    if (this.vistasFavoritas.length == 0) {
-      for (let i = 0; i < this.targetProducts.length; i++) {
-        let info : any = {
-          Usua_Id : this.storage_Id,
-          VistaFav_Num1 : this.targetProducts[i] == undefined ? 0 : this.targetProducts[i].id,
-          VistaFav_Num2 : this.targetProducts[i + 1] == undefined ? 0 : this.targetProducts[i + 1].id,
-          VistaFav_Num3 : this.targetProducts[i + 2] == undefined ? 0 : this.targetProducts[i + 2].id,
-          VistaFav_Num4 : this.targetProducts[i + 3] == undefined ? 0 : this.targetProducts[i + 3].id,
-          VistaFav_Num5 : this.targetProducts[i + 4] == undefined ? 0 : this.targetProducts[i + 4].id,
-          VistaFav_Fecha : moment().format('YYYY-MM-DD'),
-          VistaFav_Hora : moment().format('H:mm:ss'),
-        }
-        this.vistasFavService.insertVistasFavoritas(info).subscribe(() => this.buscarFavoritos(), () => this.msj.mensajeError(`¡Ocurrió un error al guardar las vistas elegidas!`, '¡No se pudieron guardar las vistas elegidas!'));
-      }
-    } else {
-      this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
-        for (let i = 0; i < datos_vistasFav.length; i++) {
-          if (this.targetProducts.length == 0) {
-            let info : any = {
-              VistasFav_Id: datos_vistasFav[i].vistasFav_Id ,
-              Usua_Id : this.storage_Id,
-              VistaFav_Num1 : 0,
-              VistaFav_Num2 : 0,
-              VistaFav_Num3 : 0,
-              VistaFav_Num4 : 0,
-              VistaFav_Num5 : 0,
-              VistaFav_Fecha : moment().format('YYYY-MM-DD'),
-              VistaFav_Hora : moment().format('H:mm:ss'),
-            }
-            this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => this.buscarFavoritos(), () => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
-          } else {
-            for (let j = 0; j < this.targetProducts.length; j++) {
-              let info : any = {
-                VistasFav_Id: datos_vistasFav[i].vistasFav_Id ,
-                Usua_Id : this.storage_Id,
-                VistaFav_Num1 : this.targetProducts[i] == undefined ? 0 : this.targetProducts[i].id,
-                VistaFav_Num2 : this.targetProducts[i + 1] == undefined ? 0 : this.targetProducts[i + 1].id,
-                VistaFav_Num3 : this.targetProducts[i + 2] == undefined ? 0 : this.targetProducts[i + 2].id,
-                VistaFav_Num4 : this.targetProducts[i + 3] == undefined ? 0 : this.targetProducts[i + 3].id,
-                VistaFav_Num5 : this.targetProducts[i + 4] == undefined ? 0 : this.targetProducts[i + 4].id,
-                VistaFav_Fecha : moment().format('YYYY-MM-DD'),
-                VistaFav_Hora : moment().format('H:mm:ss'),
-              }
-              this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => this.buscarFavoritos(), () => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
-              break;
-            }
-          }
-        }
-      });
+  private establecerSeleccion(vistas: VistaFavorita[]) {
+    this.seleccion = vistas;
+    this.seleccionIds = new Set(vistas.map(v => v.id));
+  }
+
+  // ---------- Editor: búsqueda y filtro ----------
+
+  filtrarPorModulo(modulo: string | null) {
+    this.moduloFiltro = modulo;
+    this.actualizarGrupos();
+  }
+
+  /**
+   * Arma los grupos del panel izquierdo. Sin búsqueda, las vistas se agrupan por módulo (una vista con varios
+   * módulos aparece en cada uno, igual que en el menú lateral). Con búsqueda se muestra una sola lista de
+   * resultados, sin repetidos.
+   */
+  actualizarGrupos() {
+    if (!this.disponibles) return;
+
+    const texto = this.normalizar(this.busqueda.trim());
+    const enModulo = (v: VistaFavorita) => !this.moduloFiltro || this.modulosDe(v).includes(this.moduloFiltro);
+    const coincide = (v: VistaFavorita) => !texto || this.normalizar(`${v.nombre} ${this.modulosDe(v).join(' ')}`).includes(texto);
+    const porNombre = (a: VistaFavorita, b: VistaFavorita) => a.nombre.localeCompare(b.nombre);
+
+    const visibles = this.disponibles.filter(v => enModulo(v) && coincide(v));
+
+    if (texto) {
+      this.grupos = visibles.length ? [{ modulo: `Resultados (${visibles.length})`, vistas: [...visibles].sort(porNombre) }] : [];
+      return;
     }
+
+    const modulos = this.moduloFiltro ? [this.moduloFiltro] : this.modulos;
+    this.grupos = modulos
+      .map(modulo => ({ modulo, vistas: visibles.filter(v => this.modulosDe(v).includes(modulo)).sort(porNombre) }))
+      .filter(g => g.vistas.length > 0);
   }
+
+  /** Módulos de una vista a partir de "|Módulo A|Módulo B|". */
+  modulosDe(vista: VistaFavorita): string[] {
+    const modulos = (vista.categoria ?? '').split('|').map(m => m.trim())
+      .filter(m => m && !VistasFavoritasComponent.MODULOS_OCULTOS.includes(m));
+    return modulos.length ? modulos : [VistasFavoritasComponent.SIN_MODULO];
+  }
+
+  trackPorId = (_: number, vista: VistaFavorita) => vista.id;
+
+  private normalizar = (texto: string) => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }

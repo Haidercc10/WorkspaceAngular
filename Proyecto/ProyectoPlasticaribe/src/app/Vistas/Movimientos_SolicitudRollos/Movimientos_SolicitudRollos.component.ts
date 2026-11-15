@@ -252,7 +252,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
           if (estado == 5) this.cambiarBodegaActualRollo();
           else {
             this.limpiarCampos();
-            this.msj.mensajeConfirmacion(`¡Se ha cambiado el estado de la solicitud satisfactoriamente!`, ``);
+            this.msj.mensajeConfirmacion('OK!', `¡Se ha cambiado el estado de la solicitud satisfactoriamente!`);
           }
         }, err => {
           this.msj.mensajeError(`No se ha podido cambiado a ${estadoNombre} solicitud!`, `¡${err.error}!`);
@@ -293,7 +293,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
             numDatos += 1;
             if (numDatos == this.detallesSolicitud.length) {
               this.limpiarCampos();
-              this.msj.mensajeConfirmacion(`¡Se ha cambiado el estado de la solicitud satisfactoriamente!`, ``);
+              this.msj.mensajeConfirmacion('OK!', `¡Se ha cambiado el estado de la solicitud satisfactoriamente!`);
             } else this.cargando = true;
           })
         }

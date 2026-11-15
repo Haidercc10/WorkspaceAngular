@@ -336,7 +336,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
           }
           this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
-            this.msj.mensajeConfirmacion(`¡Registro Exitoso!`, '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!');
+            this.msj.mensajeConfirmacion('OK!', '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!');
             this.cargando = false;
           }, error => { this.msj.mensajeError(`¡Ha ocurrido un error!`, `¡No se pudo actualizar el estado de los rollos seleccionados!`); this.cargando = false; });
         }

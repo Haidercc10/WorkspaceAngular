@@ -192,7 +192,7 @@ export class CrearProductoComponent implements OnInit {
     else if (this.ValidarRol == 1) datosProductos.Estado_Id = 10;
 
     this.productoService.srvGuardar(datosProductos).subscribe(() => {
-      this.mensajeService.mensajeConfirmacion(`¡Producto creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
+      this.mensajeService.mensajeConfirmacion('OK!', 'Se creó el producto de manera satisfactoria y se asoció al cliente');
       this.LimpiarCampos();
     }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear el producto!', error.message));
   }
@@ -214,7 +214,7 @@ export class CrearProductoComponent implements OnInit {
       ExProd_Hora : moment().format('H:mm:ss'),
     };
     this.existenciasService.srvGuardar(datosExistencias).subscribe(() => {
-      this.mensajeService.mensajeConfirmacion(`Existencia Creada`, `La existencia del producto con el ID ${this.FormCrearPresentacionProducto.value.ProdId} ha sido creada correctamente`);
+      this.mensajeService.mensajeConfirmacion('OK!', `La existencia del producto con el ID ${this.FormCrearPresentacionProducto.value.ProdId} ha sido creada correctamente`);
       this.LimpiarCamposPresentacion();
     }, error => this.mensajeService.mensajeError('¡Ocurrió un error, no fue posible guardar la presentación!', error.message));
   }

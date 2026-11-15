@@ -14,6 +14,9 @@ export class FallasTecnicasService {
 
   srvObtenerLista = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Falla_Tecnica');
 
+  /** Fallas de un tipo (solo id y nombre), ordenadas por nombre. */
+  getFallasPorTipo = (tipo: number) => this.http.get<{ falla_Id: number, falla_Nombre: string }[]>(`${this.rutaPlasticaribeAPI}/Falla_Tecnica/getFallasPorTipo/${tipo}`);
+
   Post = (data: fails) => this.http.post(`${this.rutaPlasticaribeAPI}/Falla_Tecnica`, data);
 
 }

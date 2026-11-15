@@ -392,7 +392,7 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
         this.servicioUsuarios.srvGuardarUsuario(data).subscribe({
           next: () => {
             this.dialogUsuarios = false;
-            this.msj.mensajeConfirmacion(`¡Usuario creado!`, `¡Se creó el usuario ${data.Usua_Nombre}!`);
+            this.msj.mensajeConfirmacion('OK!', `¡Se creó el usuario ${data.Usua_Nombre}!`);
             this.cargarUsuarios();
           },
           error: () => {
@@ -428,7 +428,7 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: () => {
         this.dialogUsuarios = false;
-        this.msj.mensajeConfirmacion(`¡Usuario actualizado!`, `¡Se actualizaron los datos del usuario ${form.usuNombre}!`);
+        this.msj.mensajeConfirmacion('OK!', `¡Se actualizaron los datos del usuario ${form.usuNombre}!`);
         this.cargarUsuarios();
       },
       error: () => {
@@ -465,7 +465,7 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
     forkJoin(peticiones).subscribe(resultados => {
       const fallidos = resultados.filter(ok => !ok).length;
       const exitosos = resultados.length - fallidos;
-      if (exitosos) this.msj.mensajeConfirmacion(`¡Usuarios inactivados!`, `¡Se inactivaron ${exitosos} usuario(s)!`);
+      if (exitosos) this.msj.mensajeConfirmacion('OK!', `¡Se inactivaron ${exitosos} usuario(s)!`);
       if (fallidos) this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible inactivar ${fallidos} usuario(s)!`);
       this.cargarUsuarios();
     });
@@ -527,7 +527,7 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
     this.load = false;
     workbook.xlsx.writeBuffer().then(data => {
       fs.saveAs(new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `Listado de usuarios.xlsx`);
-      this.msj.mensajeConfirmacion(`¡Exportación a Excel!`, `¡Se exportaron ${usuarios.length} usuarios!`);
+      this.msj.mensajeConfirmacion('OK!', `¡Se exportaron ${usuarios.length} usuarios!`);
     }).catch(() => this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible generar el archivo de Excel!`))
       .finally(() => this.load = true);
   }
@@ -585,7 +585,7 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
           this.actualizarPermisos(rolCreado.rolUsu_Id, vistas, []),
         ]).pipe(finalize(() => this.load = true)).subscribe(([tipoOk, vistasFallidas]) => {
           this.modalRol = false;
-          if (tipoOk && !vistasFallidas) this.msj.mensajeConfirmacion(`¡Rol creado!`, `¡Se creó el rol ${nombre} con su tipo de usuario y ${vistas.length} vista(s)!`);
+          if (tipoOk && !vistasFallidas) this.msj.mensajeConfirmacion('OK!', `¡Se creó el rol ${nombre} con su tipo de usuario y ${vistas.length} vista(s)!`);
           else {
             if (!tipoOk) this.msj.mensajeError(`¡Atención!`, `¡El rol ${nombre} se creó, pero no fue posible crear su tipo de usuario!`, 6000);
             if (vistasFallidas) this.msj.mensajeError(`¡Atención!`, `¡El rol ${nombre} se creó, pero no se pudieron asignar ${vistasFallidas} vista(s)! Edítelo para corregirlo.`, 6000);
@@ -623,7 +623,7 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: ([tipoOk, vistasFallidas]) => {
         this.modalRol = false;
-        if (tipoOk && !vistasFallidas) this.msj.mensajeConfirmacion(`¡Rol actualizado!`, `¡Se actualizó el rol ${nombre}!`);
+        if (tipoOk && !vistasFallidas) this.msj.mensajeConfirmacion('OK!', `¡Se actualizó el rol ${nombre}!`);
         if (!tipoOk) this.msj.mensajeError(`¡Atención!`, `¡El rol se actualizó, pero no fue posible actualizar su tipo de usuario!`, 6000);
         if (vistasFallidas) this.msj.mensajeError(`¡Atención!`, `¡No se pudieron actualizar ${vistasFallidas} vista(s) del rol!`, 6000);
         this.cargarRoles();

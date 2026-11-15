@@ -17,7 +17,13 @@
           </b>
         </button>
       </p>-->
-      <div class="p-2">
+      <div class="p-2 d-flex align-items-center">
+        <button type="button" class="botonFavorito m-2" *ngIf="vistaActual" (click)="alternarFavoritoActual()" [disabled]="guardandoFavorito"
+                [pTooltip]="esFavorita ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'" tooltipPosition="bottom"
+                [attr.aria-label]="(esFavorita ? 'Quitar de accesos rápidos: ' : 'Agregar a accesos rápidos: ') + vistaActual.nombre"
+                [attr.aria-pressed]="esFavorita">
+          <i class="pi font-size-25" [ngClass]="guardandoFavorito ? 'pi-spin pi-spinner' : (esFavorita ? 'pi-star-fill' : 'pi-star')"></i>
+        </button>
         <i class="pi pi-envelope font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadCorreosNuevos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="modalCorreos = true" *ngIf="[1,6,2].includes(ValidarRol)"></i>
         <i class="pi pi-calendar font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadEventos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="mostrarModalCalendario()"></i>
         <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>

@@ -145,7 +145,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
       this.facturasService.Post(datos).subscribe(() => {
         ingresos += 1;
         if (ingresos == this.facturas_Ingresar.length) {
-          this.msj.mensajeConfirmacion("Guardado exitoso", ``);
+          this.msj.mensajeConfirmacion('OK!', "Guardado exitoso");
           this.crearPdf();
           this.limpiarTodo();
         }

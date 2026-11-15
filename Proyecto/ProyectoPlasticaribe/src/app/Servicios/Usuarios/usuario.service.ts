@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -14,6 +14,13 @@ export class UsuarioService {
   constructor(private http : HttpClient,) { }
 
   srvObtenerListaUsuario = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Usuarios');
+
+  /** Solo id y nombre de los usuarios indicados, ordenados por nombre. */
+  getUsuariosPorIds = (ids: number[]) => {
+    let params = new HttpParams();
+    ids.forEach(id => params = params.append('ids', String(id)));
+    return this.http.get<{ usua_Id: number, usua_Nombre: string }[]>(`${this.rutaPlasticaribeAPI}/Usuarios/getUsuariosPorIds`, { params });
+  }
 
   srvObtenerListaPorId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/${id}`);
 

@@ -547,7 +547,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     if (this.materiasPrimasSeleccionadas.some(m => m.TipoMaterial === TipoMaterialInventario.Tinta))
       this.generarPdfAsignacion(resultado.asignacionId!, 'ASIGTINTAS');
 
-    const summary = '¡Asignación Creada!';
+    const summary = 'OK!';
     let detail = `Asignación N° ${resultado.asignacionId} creada satisfactoriamente. A continuación se mostrará un PDF en una nueva pestaña.`;
     if (resultado.estadoSolicitud === EstadoSolicitudMaterial.Finalizada) detail += ' La solicitud quedó finalizada.';
     else if (resultado.estadoSolicitud === EstadoSolicitudMaterial.Parcial) detail += ' La solicitud quedó con entrega parcial.';
@@ -586,7 +586,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.dialogoSolicitarAutorizacion = false;
-          this.mensajeService.mensajeConfirmacion('Solicitud enviada', 'Cuando la autorización sea aprobada, vuelva a realizar la asignación.');
+          this.mensajeService.mensajeConfirmacion('OK!', 'Solicitud de autorización enviada. Cuando sea aprobada, vuelva a realizar la asignación.');
         },
         error: (error: HttpErrorResponse) => this.mensajeService.mensajeError('¡Error!', typeof error.error === 'string' ? error.error : 'No fue posible enviar la solicitud de autorización.')
       });

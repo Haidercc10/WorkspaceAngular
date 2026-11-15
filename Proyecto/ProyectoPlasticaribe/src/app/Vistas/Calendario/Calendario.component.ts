@@ -218,7 +218,7 @@ export class CalendarioComponent implements OnInit {
         EventoCal_Visibilidad: visibilidad += '|',
       }
       this.eventosCalService.Post(datos).subscribe(() => {
-        this.mensajesService.mensajeConfirmacion(`¡Evento Creado!`, `¡Se ha creado un nuevo evento!`);
+        this.mensajesService.mensajeConfirmacion('OK!', `¡Se ha creado un nuevo evento!`);
         this.obtenerEventos('');
         setTimeout(() => this.limpiarModal(), 500);
       }, () =>  this.mensajesService.mensajeError(`¡Error!`, `¡No se pudo crear el evento!`));
@@ -256,7 +256,7 @@ export class CalendarioComponent implements OnInit {
       }
 
       this.eventosCalService.Put(this.eventoSeleccionado, datos).subscribe(() => {
-        this.mensajesService.mensajeConfirmacion(`¡Evento Editado!`, `¡Se ha editado un evento!`);
+        this.mensajesService.mensajeConfirmacion('OK!', `¡Se ha editado un evento!`);
         this.obtenerEventos('');
         setTimeout(() => this.limpiarModal(), 500);
       }, () => this.mensajesService.mensajeError(`¡Error!`, `¡No se pudo editar el evento!`));
@@ -281,7 +281,7 @@ export class CalendarioComponent implements OnInit {
   eliminarEvento(){
     this.cerrarMensaje('eliminar');
     this.eventosCalService.Delete(this.eventoSeleccionado).subscribe(() => {
-      this.mensajesService.mensajeConfirmacion(`¡Evento Eliminado!`, `¡Se ha eliminado el evento seleccionado!`);
+      this.mensajesService.mensajeConfirmacion('OK!', `¡Se ha eliminado el evento seleccionado!`);
       this.obtenerEventos('');
       setTimeout(() => this.limpiarModal(), 500);
     }, () => this.mensajesService.mensajeError(`¡Ocurrió un error!`, `¡Ocurrió un error al intentar eliminar el evento, por favor intente nuevamente!`));

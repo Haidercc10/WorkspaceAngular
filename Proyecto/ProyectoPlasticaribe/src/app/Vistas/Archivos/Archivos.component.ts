@@ -180,7 +180,7 @@ export class ArchivosComponent implements OnInit {
       try {
         this.cargarArchivos(filePath);
         this.mostrarCarpetas(filePath);
-        this.mensajeService.mensajeConfirmacion(`¡Se subió el archivo seleccionado!`, `¡Se ha subido un archivo correcatamente!`);
+        this.mensajeService.mensajeConfirmacion('OK!', `¡Se ha subido un archivo correcatamente!`);
       } catch (error) {
         this.mensajeService.mensajeError(`Error`, `¡Ha ocurrido un error al intentar subir el archivo!`);
       }
@@ -226,7 +226,7 @@ export class ArchivosComponent implements OnInit {
           if (descargaCarpeta == true) this.archivosService.eliminarArchivos(`${carpeta}\\${nombre}`).subscribe();
           this.descargandoArchivo = false;
           this.nombreArchivo = '';
-          this.mensajeService.mensajeConfirmacion(`¡Descarga Completada!`);
+          this.mensajeService.mensajeConfirmacion('OK!', `¡Descarga Completada!`);
         }, 2000);
       }
     });

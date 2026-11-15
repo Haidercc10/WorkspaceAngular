@@ -1,47 +1,128 @@
-<!-- DOCKER PARA ELEGIR LAS VISTAS FAVORITAS -->
+<!-- BARRA INFERIOR DE ACCESOS RÁPIDOS -->
 <div class="dock-window dock-advanced">
-  <!-- Docker -->
-  <div class="fixed-bottom">
+  <div class="fixed-bottom" *ngIf="!oculto">
     <p-dock [model]="dockItems" position="bottom">
       <ng-template pTemplate="item" let-item>
-        <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
+        <span class="dock-icono" [class.activo]="esActivo(item)" [attr.aria-current]="esActivo(item) ? 'page' : null">
+          <img [src]="item.icon" [alt]="item.label" width="100%">
+        </span>
       </ng-template>
     </p-dock>
   </div>
 
-  <p-dialog [(visible)]="displayTerminal" [contentStyle]="{'overflow':'visible'}" [draggable]="false" [style]="{width: '90%'}" header="Reporte de costos" [modal]="true">
-    <p-pickList
-      [source]="disponiblesMostrar"
-      [target]="targetProducts"
-      [showTargetControls]="false"
-      [showSourceControls]="false"
-      sourceHeader="Disponible"
-      targetHeader="Seleccionado"
-      [dragdrop]="true"
-      [metaKeySelection]="false"
-      [responsive]="true"
-      [sourceStyle]="{'height':'30rem'}"
-      [targetStyle]="{'height':'30rem'}"
-      filterBy="nombre"
-      sourceFilterPlaceholder="Buscar por nombre"
-      targetFilterPlaceholder="Buscar por nombre"
-      (onMoveToTarget)="elegirFavoritos()"
-      (onMoveAllToTarget)="llenarDatosRol()"
-      (onMoveToSource)="elegirFavoritos()"
-      (onMoveAllToSource)="elegirFavoritos()"
-      [stripedRows]="true">
-      <ng-template let-product pTemplate="item">
-        <div class="product-item">
-          <div class="product-list-detail">
-            <span>
-              <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
-              <p style="padding-left: 5%;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>{{product.nombre}}</b></p>
+  <!-- Ocultar / mostrar la barra (la preferencia se recuerda en este navegador) -->
+  <button type="button" class="alternar-dock" [class.dock-oculto]="oculto" (click)="alternarOculto()"
+          [title]="oculto ? 'Mostrar accesos rápidos' : 'Ocultar accesos rápidos'"
+          [attr.aria-label]="oculto ? 'Mostrar accesos rápidos' : 'Ocultar accesos rápidos'" [attr.aria-expanded]="!oculto">
+    <i class="pi" [ngClass]="oculto ? 'pi-star-fill' : 'pi-chevron-down'"></i>
+    <span *ngIf="oculto">Accesos rápidos</span>
+  </button>
+
+  <!-- EDITOR DE ACCESOS RÁPIDOS -->
+  <p-dialog [(visible)]="editorVisible" header="Mis accesos rápidos" [modal]="true" [draggable]="false" [resizable]="false"
+            [dismissableMask]="!guardando" [style]="{width: '95vw', maxWidth: '1100px'}" [breakpoints]="{'768px': '100vw'}">
+    <p class="subtitulo-editor">Elija hasta {{limite}} páginas para tenerlas a mano en la barra inferior.</p>
+
+    <div class="paneles">
+      <!-- PANEL IZQUIERDO: vistas disponibles -->
+      <section class="panel panel-disponibles" aria-label="Páginas disponibles">
+        <span class="p-input-icon-left buscador">
+          <i class="pi pi-search"></i>
+          <input pInputText type="search" [(ngModel)]="busqueda" (ngModelChange)="actualizarGrupos()"
+                 placeholder="Buscar página o módulo..." aria-label="Buscar página o módulo">
+        </span>
+
+        <div class="filtros" role="group" aria-label="Filtrar por módulo" *ngIf="modulos.length > 1">
+          <button type="button" class="filtro" [class.activo]="moduloFiltro === null" [attr.aria-pressed]="moduloFiltro === null"
+                  (click)="filtrarPorModulo(null)">Todos</button>
+          <button type="button" class="filtro" *ngFor="let modulo of modulos" [class.activo]="moduloFiltro === modulo"
+                  [attr.aria-pressed]="moduloFiltro === modulo" (click)="filtrarPorModulo(modulo)">{{modulo}}</button>
+        </div>
+
+        <div class="lista-disponibles">
+          <ng-container *ngIf="cargandoEditor">
+            <p-skeleton *ngFor="let _ of [1,2,3,4,5,6]" height="3.25rem" styleClass="mb-2"></p-skeleton>
+          </ng-container>
+
+          <ng-container *ngIf="!cargandoEditor">
+            <div class="grupo" *ngFor="let grupo of grupos">
+              <h4 class="grupo-titulo">{{grupo.modulo}}</h4>
+              <button type="button" class="vista" *ngFor="let vista of grupo.vistas; trackBy: trackPorId"
+                      [class.elegida]="estaSeleccionada(vista)"
+                      [class.bloqueada]="!estaSeleccionada(vista) && limiteAlcanzado"
+                      [attr.aria-pressed]="estaSeleccionada(vista)"
+                      [title]="estaSeleccionada(vista) ? 'Quitar de accesos rápidos' : (limiteAlcanzado ? 'Límite alcanzado' : 'Agregar a accesos rápidos')"
+                      (click)="alternar(vista)">
+                <img [src]="vista.icono" alt="">
+                <span class="vista-texto">
+                  <span class="vista-nombre">{{vista.nombre}}</span>
+                  <small *ngIf="modulosDe(vista).length > 1">{{modulosDe(vista).join(' · ')}}</small>
+                </span>
+                <i class="pi accion" [ngClass]="estaSeleccionada(vista) ? 'pi-check' : (limiteAlcanzado ? 'pi-lock' : 'pi-plus')"></i>
+              </button>
+            </div>
+
+            <div class="vacio" *ngIf="grupos.length === 0">
+              <i class="pi pi-search"></i>
+              <span>No se encontraron páginas{{busqueda ? ' para "' + busqueda + '"' : ''}}.</span>
+            </div>
+          </ng-container>
+        </div>
+      </section>
+
+      <!-- PANEL DERECHO: favoritos elegidos -->
+      <section class="panel panel-seleccion" aria-label="Sus accesos rápidos">
+        <div class="seleccion-encabezado">
+          <h4>Sus accesos rápidos</h4>
+          <span class="contador" [class.lleno]="limiteAlcanzado">{{seleccion.length}} / {{limite}}</span>
+        </div>
+        <small class="pista" *ngIf="seleccion.length > 1">Arrastre para cambiar el orden.</small>
+
+        <ol class="lista-seleccion" cdkDropList [cdkDropListData]="seleccion" (cdkDropListDropped)="soltar($event)">
+          <li class="favorito" *ngFor="let vista of seleccion; let i = index; trackBy: trackPorId" cdkDrag cdkDragLockAxis="y">
+            <i class="pi pi-bars asa" cdkDragHandle aria-hidden="true"></i>
+            <span class="posicion">{{i + 1}}</span>
+            <img [src]="vista.icono" alt="">
+            <span class="vista-nombre">{{vista.nombre}}</span>
+            <span class="acciones">
+              <button type="button" class="icono" (click)="mover(i, -1)" [disabled]="i === 0" title="Subir" [attr.aria-label]="'Subir ' + vista.nombre">
+                <i class="pi pi-angle-up"></i>
+              </button>
+              <button type="button" class="icono" (click)="mover(i, 1)" [disabled]="i === seleccion.length - 1" title="Bajar" [attr.aria-label]="'Bajar ' + vista.nombre">
+                <i class="pi pi-angle-down"></i>
+              </button>
+              <button type="button" class="icono quitar" (click)="quitar(vista)" title="Quitar" [attr.aria-label]="'Quitar ' + vista.nombre">
+                <i class="pi pi-times"></i>
+              </button>
             </span>
-            <p style="padding-left: 20%;">Módulo(s) {{product.categoria.replaceAll('|', ' - ')}}</p>
+            <div class="favorito-placeholder" *cdkDragPlaceholder></div>
+          </li>
+          <li class="espacio-libre" *ngFor="let n of espaciosLibres">
+            <span class="posicion">{{n}}</span>
+            <span>Espacio libre</span>
+          </li>
+        </ol>
+
+        <div class="vista-previa">
+          <small>Vista previa de la barra</small>
+          <div class="previa-iconos">
+            <img src="assets/Iconos_Menu/home.png" alt="Inicio" title="Inicio">
+            <img *ngFor="let vista of seleccion; trackBy: trackPorId" [src]="vista.icono" [alt]="vista.nombre" [title]="vista.nombre">
+            <img src="assets/Iconos_Menu/crear.png" alt="Añadir" title="Añadir">
           </div>
         </div>
-      </ng-template>
-      <button pButton pRipple type="button" label="Secondary" class="p-button-secondary"></button>
-    </p-pickList>
+      </section>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="pie-editor">
+        <button pButton type="button" label="Restablecer" icon="pi pi-undo" class="p-button-text p-button-secondary"
+                (click)="restablecer()" [disabled]="!hayCambios || guardando"></button>
+        <span class="espaciador"></span>
+        <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-danger" (click)="cancelar()" [disabled]="guardando"></button>
+        <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-success" (click)="guardar()"
+                [disabled]="!hayCambios" [loading]="guardando"></button>
+      </div>
+    </ng-template>
   </p-dialog>
 </div>

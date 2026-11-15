@@ -173,8 +173,8 @@ export class TicketsComponent implements OnInit, OnDestroy {
         this.messageService.add({
           key : 'ticketCreado',
           severity : 'success',
-          summary : reportante ? `¡Ticket #${codigo} creado a nombre de ${reportante}!` : `¡Ticket #${codigo} creado correctamente!`,
-          detail : 'Soporte lo revisará pronto. Puede seguir su estado en "Mis tickets".',
+          summary : 'OK!',
+          detail : `${reportante ? `¡Ticket #${codigo} creado a nombre de ${reportante}!` : `¡Ticket #${codigo} creado correctamente!`} Soporte lo revisará pronto. Puede seguir su estado en "Mis tickets".`,
           life : 8000,
         });
       },

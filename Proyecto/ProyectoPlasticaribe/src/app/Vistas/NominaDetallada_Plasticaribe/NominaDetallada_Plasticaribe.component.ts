@@ -950,7 +950,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   successPayroll() {
     this.clearAll();
-    this.msj.mensajeConfirmacion('¡Nómina procesada correctamente!');
+    this.msj.mensajeConfirmacion('OK!', '¡Nómina procesada correctamente!');
   }
 
   createMovementsPayroll() {

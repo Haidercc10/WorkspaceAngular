@@ -582,7 +582,7 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
         if (count == this.ArrayProducto.length) {
           this.productosPedido(id_pedido);
           this.limpiarTodosCampos();
-          this.msj.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
+          this.msj.mensajeConfirmacion('OK!', `¡El pedido fue creado de manera satisfactoria!`);
         }
       }, () => {
         this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!');
@@ -652,7 +652,7 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
             if (count == this.ArrayProducto.length) {
               this.limpiarTodosCampos();
               this.productosPedido(this.pedidoEditar);
-              this.msj.mensajeConfirmacion(`¡Pedido Editado exitosamente!`, `¡El pedido fue editado de manera satisfactoria!`);
+              this.msj.mensajeConfirmacion('OK!', `¡El pedido fue editado de manera satisfactoria!`);
             }
           }, () => {
             this.msj.mensajeError(`Error`, '¡No se pudo Editar el pedido, por favor intente de nuevo!');

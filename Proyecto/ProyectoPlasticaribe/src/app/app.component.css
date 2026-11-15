@@ -66,6 +66,46 @@
   background-color: var(--rojo);
 }
 
+/* Tabla de registros afectados (DetalleError.listado) */
+.detalle-error-listado {
+  margin-top: 1rem;
+}
+
+.detalle-error-listado h6 {
+  font-weight: 600;
+  color: var(--texto-fuerte);
+  margin-bottom: 0.5rem;
+}
+
+.detalle-error-tabla {
+  max-height: 16rem;
+  overflow: auto;
+  border: 1px solid var(--borde-sutil);
+  border-radius: 4px;
+}
+
+.detalle-error-tabla table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.detalle-error-tabla th {
+  position: sticky;
+  top: 0;
+  font-weight: 600;
+  color: var(--texto-fuerte);
+  /* --fondo-sutil es translúcido en modo oscuro: se apoya sobre el fondo del diálogo para que las filas no se vean debajo. */
+  background: linear-gradient(var(--fondo-sutil), var(--fondo-sutil)), var(--surface-overlay);
+}
+
+.detalle-error-tabla th,
+.detalle-error-tabla td {
+  padding: 0.3rem 0.6rem;
+  text-align: center;
+  border-bottom: 1px solid var(--borde-sutil);
+}
+
 .detalle-error-botones {
   display: flex;
   justify-content: flex-end;

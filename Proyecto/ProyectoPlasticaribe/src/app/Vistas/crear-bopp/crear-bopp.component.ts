@@ -59,7 +59,7 @@ export class CrearBoppComponent implements OnInit {
         BoppGen_Hora : moment().format('H:mm:ss'),
       }
       this.boppGenericoService.srvGuardar(info).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`¡Creación Exitosa!`, '¡El rollo ha sido creado con éxito!');
+        this.mensajeService.mensajeConfirmacion('OK!', '¡El rollo ha sido creado con éxito!');
         setTimeout(() => { this.EntradaBOPP.cargarBoppsGenericos(); }, 500);
         setTimeout(() => { this.limpiarCampos(); }, 500);
       }, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear el rollo, verifique!`));

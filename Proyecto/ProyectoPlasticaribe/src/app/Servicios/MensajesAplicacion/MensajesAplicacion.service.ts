@@ -28,6 +28,15 @@ export interface DetalleError {
   /** Si el navegador tenía conexión a internet al momento del error. */
   conInternet: boolean;
   fecha: string;
+  /** Registros afectados por el error (p. ej. rollos que no se pudieron eliminar), se muestran como tabla. */
+  listado?: ListadoDetalleError;
+}
+
+/** Tabla opcional de la ventana "Ver detalles". */
+export interface ListadoDetalleError {
+  titulo: string;
+  columnas: string[];
+  filas: (string | number | null | undefined)[][];
 }
 
 /** Clave del toast de errores con "Ver detalles" (vive solo en app.component.html). */
@@ -113,6 +122,11 @@ export class MensajesAplicacionService {
       ['Mensaje técnico', detalle.mensajeTecnico],
       ['Conexión a internet', detalle.conInternet ? 'Sí' : 'No'],
     ];
-    return filas.filter(([, valor]) => valor !== undefined && valor !== null && `${valor}` !== '').map(([nombre, valor]) => `${nombre}: ${valor}`).join('\n');
+    const texto = filas.filter(([, valor]) => valor !== undefined && valor !== null && `${valor}` !== '').map(([nombre, valor]) => `${nombre}: ${valor}`).join('\n');
+    if (!detalle.listado?.filas.length) return texto;
+
+    const { titulo, columnas, filas: registros } = detalle.listado;
+    const tabla = [columnas.join('\t'), ...registros.map(fila => fila.map(valor => valor ?? '').join('\t'))].join('\n');
+    return `${texto}\n\n${titulo} (${registros.length}):\n${tabla}`;
   }
 }

@@ -603,7 +603,7 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit, OnChanges {
       let title: string = `Devolución N° ${devolution}`;
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
-      this.msg.mensajeConfirmacion(`Devolución N° ${devolution} ${action} exitosamente!`);
+      this.msg.mensajeConfirmacion('OK!', `Devolución N° ${devolution} ${action} exitosamente!`);
       setTimeout(() => this.clearFields(), 3000);
     }, error => this.errorMessage(`¡Ocurrió un error al buscar información de la devolución #${devolution}!`, error));
   }

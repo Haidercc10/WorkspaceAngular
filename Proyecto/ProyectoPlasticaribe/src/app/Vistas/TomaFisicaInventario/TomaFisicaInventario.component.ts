@@ -193,7 +193,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
   saveHeaderPhysicalCount() {
     this.onReject('confirm');
     this.svCount.Post(this.headerPhysicalCount()).subscribe(data => {
-      this.msj.mensajeConfirmacion(`Toma ${data.toma_Descripcion} creada exitosamente`);
+      this.msj.mensajeConfirmacion('OK!', `Toma ${data.toma_Descripcion} creada exitosamente`);
       this.clearFields();
       this.getPhysicalCountActive();
     }, error => {
@@ -431,7 +431,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
         Toma_Id: this.form.value.id,
       }
       this.svPhysicalCount.Post(inventory).subscribe((data) => {
-        this.msj.mensajeConfirmacion(`Rollo/bulto N° ${data.tfi_Etiqueta} registrado correctamente`, '');
+        this.msj.mensajeConfirmacion('OK!', `Rollo/bulto N° ${data.tfi_Etiqueta} registrado correctamente`);
         this.load = false;
       }, error => {
         this.msj.mensajeError(`Error al registrar el rollo/bulto ${inventory.Tfi_Etiqueta} en la toma fisica`, `| ${error.status, error.statusText}`);
@@ -578,7 +578,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
   }
 
   messageConfirmationUpdateStore() {
-    this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+    this.msj.mensajeConfirmacion('OK!', '¡Los rollos se subieron al inventario de manera satisfactoria!');
     this.load = false;
     this.fillDataProductionIncome();
     this.clearFields();

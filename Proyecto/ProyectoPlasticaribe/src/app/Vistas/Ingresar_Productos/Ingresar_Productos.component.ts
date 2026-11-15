@@ -367,7 +367,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           }
           this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
             this.cargando = false;
-            this.mensajeService.mensajeConfirmacion('¡Rollos Ingresados!', `¡Entrada de Rollos registrada con exito!`);
+            this.mensajeService.mensajeConfirmacion('OK!', `¡Entrada de Rollos registrada con exito!`);
           }, () => {
             this.mensajeService.mensajeError('¡Rollos Ingresados con Error!', `¡Error al mover el inventario del Producto ${datos_productos[j].prod_Id}, mover el inventario manualmente!`);
             this.limpiarCampos();

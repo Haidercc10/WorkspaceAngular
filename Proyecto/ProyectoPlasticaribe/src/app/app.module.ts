@@ -56,6 +56,7 @@ import { RippleModule } from 'primeng/ripple';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { SidebarModule } from 'primeng/sidebar';
 import { SkeletonModule } from 'primeng/skeleton';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import { SliderModule } from 'primeng/slider';
 import { SpeedDialModule } from 'primeng/speeddial';
@@ -507,6 +508,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     FieldsetModule,
     DividerModule,
     ChipModule,
+    DragDropModule,
     TagModule,
     VirtualScrollerModule,
     KnobModule,

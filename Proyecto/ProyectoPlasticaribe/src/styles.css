@@ -829,3 +829,15 @@ input.con-contador-caracteres + .contador-caracteres {
 .p-multiselect-panel .p-checkbox-box * {
   pointer-events: none;
 }
+
+/* ===== Barra de accesos rápidos (VistasFavoritasComponent) =====
+   Mientras la barra está visible, <body> lleva la clase "con-accesos-rapidos": se reserva espacio abajo para que la
+   barra fija no tape el final de las páginas (tablas, botones). La página principal reserva su propio espacio dentro
+   de su fondo de 100vh (PaginaPrincipal.component.css), por eso se excluye aquí. */
+:root {
+  --alto-accesos-rapidos: 6.5rem;
+}
+
+body.con-accesos-rapidos:not(:has(app-PaginaPrincipal)) {
+  padding-bottom: var(--alto-accesos-rapidos);
+}

@@ -578,7 +578,7 @@ export class OrdenFacturacion_PalletsComponent implements OnInit {
   //Función para colocar el estado de los rollos en facturado
   putStatusRollsInvoice(order: number, fact: string) {
     this.svProductionProcess.putStateForSend(order).subscribe(() => {
-      this.msj.mensajeConfirmacion('Orden de facturación creada exitosamente!');
+      this.msj.mensajeConfirmacion('OK!', 'Orden de facturación creada exitosamente!');
       this.createPDF(order, fact);
       this.clearFields();
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));

@@ -49,6 +49,15 @@
             <dt>Conexión a internet</dt><dd>{{detalle.conInternet ? 'Sí' : 'No'}}</dd>
             <dt>Fecha</dt><dd>{{detalle.fecha}}</dd>
         </dl>
+        <div class="detalle-error-listado" *ngIf="detalle.listado?.filas?.length">
+            <h6>{{detalle.listado!.titulo}} ({{detalle.listado!.filas.length}})</h6>
+            <div class="detalle-error-tabla">
+                <table>
+                    <thead><tr><th *ngFor="let columna of detalle.listado!.columnas">{{columna}}</th></tr></thead>
+                    <tbody><tr *ngFor="let fila of detalle.listado!.filas"><td *ngFor="let valor of fila">{{valor}}</td></tr></tbody>
+                </table>
+            </div>
+        </div>
     </ng-container>
     <ng-template pTemplate="footer">
         <div class="detalle-error-botones">
