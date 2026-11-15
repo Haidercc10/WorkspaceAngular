@@ -835,7 +835,18 @@ input.con-contador-caracteres + .contador-caracteres {
    barra fija no tape el final de las páginas (tablas, botones). La página principal reserva su propio espacio dentro
    de su fondo de 100vh (PaginaPrincipal.component.css), por eso se excluye aquí. */
 :root {
-  --alto-accesos-rapidos: 6.5rem;
+  --alto-accesos-rapidos: 8rem; /* barra (6rem) + separación inferior (.5rem) + colina (24px) */
+  /* Modo claro: vidrio que desenfoca lo de atrás; borde gris suave porque el blanco no se distingue sobre fondo claro */
+  --desenfoque-accesos: blur(10px) saturate(1.4);
+  --fondo-accesos: rgba(255, 255, 255, .35);
+  --borde-accesos: rgba(0, 0, 0, .1);
+}
+
+:root:has(#app-theme[href*="dark"]) {
+  /* Modo oscuro: la transparencia del dock del tema ya se lee bien */
+  --desenfoque-accesos: none;
+  --fondo-accesos: rgba(255, 255, 255, .1);
+  --borde-accesos: rgba(255, 255, 255, .2);
 }
 
 body.con-accesos-rapidos:not(:has(app-PaginaPrincipal)) {

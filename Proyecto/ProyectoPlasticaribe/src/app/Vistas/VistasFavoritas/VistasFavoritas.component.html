@@ -1,22 +1,32 @@
 <!-- BARRA INFERIOR DE ACCESOS RÁPIDOS -->
 <div class="dock-window dock-advanced">
-  <div class="fixed-bottom" *ngIf="!oculto">
-    <p-dock [model]="dockItems" position="bottom">
-      <ng-template pTemplate="item" let-item>
-        <span class="dock-icono" [class.activo]="esActivo(item)" [attr.aria-current]="esActivo(item) ? 'page' : null">
-          <img [src]="item.icon" [alt]="item.label" width="100%">
-        </span>
-      </ng-template>
-    </p-dock>
-  </div>
+  <!-- Barra + colina: al ocultarse, la barra baja fuera de la pantalla y solo queda la colina asomada en el borde inferior -->
+  <div class="accesos-rapidos" [class.oculto]="oculto">
+    <!-- Colina pegada al borde superior de la barra: muestra / oculta (la preferencia se recuerda en este navegador).
+         La curva (72x24 px) se repite en .gota-vidrio (clip-path del CSS): si se cambia aquí, cambiarla allá también. -->
+    <button type="button" class="gota" (click)="alternarOculto()"
+            [title]="oculto ? 'Mostrar accesos rápidos' : 'Ocultar accesos rápidos'"
+            [attr.aria-label]="oculto ? 'Mostrar accesos rápidos' : 'Ocultar accesos rápidos'" [attr.aria-expanded]="!oculto">
+      <span class="gota-vidrio" aria-hidden="true"></span> <!-- fondo semitransparente (y desenfoque en modo claro) -->
+      <svg class="gota-forma" viewBox="0 0 72 24" preserveAspectRatio="none" aria-hidden="true">
+        <!-- zona de clic: la silueta completa -->
+        <path class="gota-relleno" d="M0 24 C18 24 22 2 36 2 C50 2 54 24 72 24 Z" />
+        <!-- borde: sin tramo inferior, para que se una al borde de la barra -->
+        <path class="gota-borde" d="M0 24 C18 24 22 2 36 2 C50 2 54 24 72 24" />
+      </svg>
+      <i class="pi pi-chevron-down gota-flecha"></i> <!-- gira 180° (hacia arriba) cuando la barra está oculta -->
+    </button>
 
-  <!-- Ocultar / mostrar la barra (la preferencia se recuerda en este navegador) -->
-  <button type="button" class="alternar-dock" [class.dock-oculto]="oculto" (click)="alternarOculto()"
-          [title]="oculto ? 'Mostrar accesos rápidos' : 'Ocultar accesos rápidos'"
-          [attr.aria-label]="oculto ? 'Mostrar accesos rápidos' : 'Ocultar accesos rápidos'" [attr.aria-expanded]="!oculto">
-    <i class="pi" [ngClass]="oculto ? 'pi-star-fill' : 'pi-chevron-down'"></i>
-    <span *ngIf="oculto">Accesos rápidos</span>
-  </button>
+    <div class="contenedor-barra" [attr.inert]="oculto ? '' : null">
+      <p-dock [model]="dockItems" position="bottom">
+        <ng-template pTemplate="item" let-item>
+          <span class="dock-icono" [class.activo]="esActivo(item)" [attr.aria-current]="esActivo(item) ? 'page' : null">
+            <img [src]="item.icon" [alt]="item.label" width="100%">
+          </span>
+        </ng-template>
+      </p-dock>
+    </div>
+  </div>
 
   <!-- EDITOR DE ACCESOS RÁPIDOS -->
   <p-dialog [(visible)]="editorVisible" header="Mis accesos rápidos" [modal]="true" [draggable]="false" [resizable]="false"

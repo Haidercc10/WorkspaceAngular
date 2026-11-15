@@ -20,44 +20,189 @@
   transform: translateX(-50%);
 }
 
-.alternar-dock {
+/*
+ * Barra + colina como una sola pieza semitransparente (mismos colores que el contenedor del p-dock del tema):
+ *  - .contenedor-barra es el rectángulo; su borde (::after) tiene un corte arriba al centro, justo bajo la colina.
+ *  - .gota es una colina baja: .gota-vidrio pone el fondo (recortado con la curva) y el SVG dibuja el contorno,
+ *    sin tramo inferior, de modo que continúa el borde de la barra.
+ *  - En modo claro ambas piezas desenfocan lo que hay detrás (--desenfoque-accesos, definida en styles.css).
+ *  - Al ocultar, la pieza baja hasta que la barra sale de la pantalla y solo queda la colina asomada en el borde.
+ */
+.accesos-rapidos {
+  --barra-fondo: var(--fondo-accesos, rgba(255, 255, 255, .1)); /* por tema, en styles.css */
+  --barra-borde: var(--borde-accesos, rgba(255, 255, 255, .2));
+  --gota-ancho: 72px; /* = viewBox 72x24 del SVG y coordenadas del clip-path de .gota-vidrio (en px para que coincidan) */
+  --gota-alto: 24px;
   position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 1031; /* sobre .fixed-bottom de Bootstrap (1030) */
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  height: 2.25rem;
-  min-width: 2.25rem;
-  justify-content: center;
-  padding: 0 .6rem;
-  border: 1px solid var(--surface-border);
-  border-radius: 999px;
-  background: var(--surface-card);
-  color: var(--text-color-secondary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+  left: 50%;
+  bottom: .5rem;
+  z-index: 1030;
+  width: max-content;
+  max-width: calc(100vw - 1rem);
+  transform: translateX(-50%);
+  /* Al mostrar: sube y rebota un poco por encima de su lugar antes de asentarse */
+  transition: transform .5s cubic-bezier(.34, 1.45, .64, 1);
+}
+
+.accesos-rapidos.oculto {
+  transform: translate(-50%, calc(100% + .5rem));
+  /* Al ocultar: cae acelerando, como una gota */
+  transition: transform .38s cubic-bezier(.55, 0, .85, .4);
+}
+
+.contenedor-barra {
+  position: relative;
+  padding: .5rem;
+  border-radius: .75rem;
+  background: var(--barra-fondo);
+  -webkit-backdrop-filter: var(--desenfoque-accesos, none);
+  backdrop-filter: var(--desenfoque-accesos, none);
+}
+
+.contenedor-barra::after {
+  --corte-ini: calc(50% - var(--gota-ancho) / 2);
+  --corte-fin: calc(50% + var(--gota-ancho) / 2);
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--barra-borde);
+  border-radius: inherit;
+  pointer-events: none;
+  /* franja superior de 2px sin el tramo bajo la gota + resto del borde completo */
+  -webkit-mask:
+    linear-gradient(to right, #000 var(--corte-ini), transparent var(--corte-ini), transparent var(--corte-fin), #000 var(--corte-fin)) top / 100% 2px no-repeat,
+    linear-gradient(#000, #000) bottom / 100% calc(100% - 2px) no-repeat;
+  mask:
+    linear-gradient(to right, #000 var(--corte-ini), transparent var(--corte-ini), transparent var(--corte-fin), #000 var(--corte-fin)) top / 100% 2px no-repeat,
+    linear-gradient(#000, #000) bottom / 100% calc(100% - 2px) no-repeat;
+}
+
+.gota {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  z-index: 1;
+  width: var(--gota-ancho);
+  height: var(--gota-alto);
+  padding: 0;
+  border: none;
+  background: transparent;
+  transform: translateX(-50%);
+  pointer-events: none; /* solo la silueta de la gota recibe clics (ver .gota-relleno) */
+  transition: opacity .2s;
+}
+
+.gota-vidrio,
+.gota-forma {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gota-vidrio {
+  background: var(--barra-fondo);
+  -webkit-backdrop-filter: var(--desenfoque-accesos, none);
+  backdrop-filter: var(--desenfoque-accesos, none);
+  clip-path: path('M0 24 C18 24 22 2 36 2 C50 2 54 24 72 24 Z'); /* misma curva que el SVG */
+  pointer-events: none;
+}
+
+.gota-forma {
+  overflow: visible;
+}
+
+.gota-relleno {
+  fill: transparent; /* el fondo lo pone .gota-vidrio; este trazo solo define la zona de clic */
+  pointer-events: all;
   cursor: pointer;
-  font-size: .85rem;
-  opacity: .75;
-  transition: opacity .15s, color .15s;
 }
 
-.alternar-dock:hover,
-.alternar-dock:focus-visible {
-  opacity: 1;
+.gota-borde {
+  fill: none;
+  stroke: var(--barra-borde);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.gota-flecha {
+  position: absolute;
+  left: 50%;
+  top: 14px; /* centro visual de la colina (cima en y=2, base en y=24) */
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--text-color-secondary);
+  transform: translate(-50%, -50%) rotate(0deg);
+  pointer-events: none;
+  transition: color .15s, transform .4s cubic-bezier(.34, 1.45, .64, 1);
+}
+
+/* Barra oculta: la flecha gira hacia arriba (mostrar) */
+.accesos-rapidos.oculto .gota-flecha {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.gota:hover .gota-flecha {
   color: var(--rojo);
 }
 
-.alternar-dock.dock-oculto {
-  opacity: 1;
-  color: var(--rojo);
-  font-weight: 600;
+/* Al pasar el mouse, la flecha se asoma en la dirección en que se moverá la barra */
+.accesos-rapidos:not(.oculto) .gota:hover .gota-flecha {
+  transform: translate(-50%, -35%) rotate(0deg);
 }
 
-.alternar-dock:focus-visible {
-  outline: 2px solid var(--rojo);
-  outline-offset: 2px;
+.accesos-rapidos.oculto .gota:hover .gota-flecha {
+  transform: translate(-50%, -65%) rotate(180deg);
+}
+
+.gota:focus-visible {
+  outline: none;
+}
+
+.gota:focus-visible .gota-borde {
+  stroke: var(--rojo);
+  stroke-width: 2px;
+}
+
+.gota:focus-visible .gota-flecha {
+  color: var(--rojo);
+}
+
+/* Al agrandarse un ícono (efecto del dock) sube por encima de la barra: la gota se aparta y el borde se cierra */
+.accesos-rapidos:not(.oculto):has(.p-dock-item:hover) .gota {
+  opacity: 0;
+}
+
+.accesos-rapidos:not(.oculto):has(.p-dock-item:hover) .gota-relleno {
+  pointer-events: none;
+}
+
+.accesos-rapidos:not(.oculto):has(.p-dock-item:hover) .contenedor-barra::after {
+  -webkit-mask: none;
+  mask: none;
+}
+
+/* El fondo y el borde los pone .contenedor-barra: el p-dock queda en el flujo y sin su propio contenedor */
+:host ::ng-deep .accesos-rapidos .p-dock {
+  position: static;
+  width: auto;
+}
+
+:host ::ng-deep .accesos-rapidos .p-dock .p-dock-list-container {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accesos-rapidos,
+  .accesos-rapidos.oculto,
+  .gota,
+  .gota-flecha {
+    transition: none;
+  }
 }
 
 /* ---------- Encabezado y pie ---------- */
