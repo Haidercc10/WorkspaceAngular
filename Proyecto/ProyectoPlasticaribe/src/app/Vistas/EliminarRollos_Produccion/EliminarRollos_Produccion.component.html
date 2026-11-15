@@ -22,16 +22,21 @@
   
   <p-card>
 
-    <!--Crear Falla-->
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-      <!-- TEMPORAL: reenvía a BagPro la observación de los rollos eliminados en el rango de fechas (solo administradores) -->
-      <button *ngIf="isAdmin" pButton pRipple data-tutorial="reenviarBagPro" class="p-button-warning p-button-outlined" icon="pi pi-refresh" label="Reenviar observación BagPro" [disabled]="load" (click)="resendBagProObservation()"
-              pTooltip="Temporal: registra en BagPro la observación de los rollos eliminados en el rango de fechas seleccionado." tooltipPosition="top"></button>
-      <button pButton pRipple data-tutorial="crearFalla" class="p-button-success" icon="pi pi-plus" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
-    </div>
-  
-    <div class="mb-5">
-      <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-search"></i> Consultar Rollos</h4>
+    <!-- Subtítulo y botones en la misma fila (igual que en Orden de Trabajo) -->
+    <div class="header-actions mb-4">
+      <!-- subtitulo -->
+      <div class="header-actions__title">
+        <h4 class="mb-0" [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-search"></i> Consultar Rollos</h4>
+      </div>
+
+      <!-- Botones -->
+      <div class="header-actions__buttons">
+        <!-- TEMPORAL: reenvía a BagPro la observación de los rollos eliminados en el rango de fechas (solo administradores) -->
+        <button *ngIf="isAdmin" pButton pRipple data-tutorial="reenviarBagPro" class="p-button-warning p-button-outlined" icon="pi pi-refresh" label="Reenviar observación BagPro" [disabled]="load" (click)="resendBagProObservation()"
+                pTooltip="Temporal: registra en BagPro la observación de los rollos eliminados en el rango de fechas seleccionado." tooltipPosition="top"></button>
+        <!--Crear Falla-->
+        <button pButton pRipple data-tutorial="crearFalla" class="p-button-success" icon="pi pi-plus" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+      </div>
     </div>
   
     <!-- Formulario -->
@@ -50,7 +55,8 @@
 
           <!--* Usuario -->
           <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="usuario">
-            <span class="p-float-label">
+            <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+              <i class="pi pi-user"></i>
               <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre" optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
               <label for="user">Usuario Autoriza*</label>
             </span>
@@ -58,7 +64,8 @@
 
           <!-- Bodega -->
           <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="bodega">
-            <span class="p-float-label">
+            <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+              <i class="pi pi-building"></i>
               <p-dropdown formControlName="Bodega" inputId="Bodega" [autoDisplayFirst]="false" [options]="process" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
               <label for="Bodega">Bodega</label>
             </span>
@@ -66,7 +73,8 @@
 
           <!-- Motivo -->
           <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="motivo">
-            <span class="p-float-label">
+            <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+              <i class="pi pi-exclamation-triangle"></i>
               <p-dropdown formControlName="Falla" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
               <label for="Falla">Motivo*</label>
             </span>
@@ -74,7 +82,8 @@
   
           <!-- OT -->
           <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="ot">
-            <span class="p-float-label">
+            <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+              <i class="pi pi-file"></i>
               <p-inputNumber formControlName="OT" id="ot" (keyup.enter)="searchRolls()" [useGrouping]="false"></p-inputNumber>
               <label for="ot">OT</label>
             </span>
@@ -82,7 +91,8 @@
   
           <!--Rollo -->
           <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="rollo">
-            <span class="p-float-label">
+            <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+              <i class="pi pi-hashtag"></i>
               <p-inputNumber formControlName="Rollo" id="Rollo" (keyup.enter)="searchRolls()" [useGrouping]="false"></p-inputNumber>
               <label for="Rollo">N° Rollo</label>
             </span>

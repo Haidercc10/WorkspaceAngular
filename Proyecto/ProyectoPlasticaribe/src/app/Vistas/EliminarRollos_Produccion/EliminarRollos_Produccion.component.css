@@ -71,3 +71,27 @@ span{
     padding-bottom: 0.5%;
   }
   
+  /* Subtítulo y botones en la misma fila (mismo patrón que .ot-header-actions en Orden de Trabajo). */
+  .header-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-actions__buttons {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 992px) {
+    .header-actions {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .header-actions__buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+  }
