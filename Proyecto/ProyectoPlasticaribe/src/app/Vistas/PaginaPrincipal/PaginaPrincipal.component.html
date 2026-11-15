@@ -7,6 +7,25 @@
 <br>
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
+
+  <!-- Aviso de tickets abiertos sin revisar (una vez por sesión) -->
+  <p-dialog [(visible)]="avisoTicketsVisible" [modal]="true" [closable]="true" [draggable]="false" [resizable]="false"
+            [dismissableMask]="true" styleClass="avisoTickets" [style]="{width: '30rem'}" [breakpoints]="{'576px': '92vw'}">
+    <ng-template pTemplate="header">
+      <span class="avisoTickets-titulo"><i class="pi pi-info-circle"></i> Tickets pendientes</span>
+    </ng-template>
+    <div class="avisoTickets-cuerpo">
+      <i class="pi pi-ticket avisoTickets-icono" aria-hidden="true"></i>
+      <p>
+        Tiene <b>{{ ticketsAbiertos }}</b> {{ ticketsAbiertos == 1 ? 'ticket abierto' : 'tickets abiertos' }} sin revisar.
+        ¿Desea verlos?
+      </p>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary" (click)="avisoTicketsVisible = false"></button>
+      <button pButton type="button" label="Ver tickets" icon="pi pi-check" class="p-button-info" (click)="verTicketsAbiertos()"></button>
+    </ng-template>
+  </p-dialog>
   <div class="container-fluid" id="card">
     <p-tabView #tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="[1,2,3,4,6,10,59,60,61,69,12,94,96,85,97,2,98,10,5,63,64,65,74,75,76,77,78,79,80,81,85,86,87,88,89,97,98,102,101,95,83,103,104].includes(ValidarRol)">
       <!-- Producción por Áreas -->

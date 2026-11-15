@@ -13,15 +13,21 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
-import { collection, getDocs, doc, setDoc } from "firebase/firestore";
-import { db } from 'src/app/conexionFirebase';
+import { CorreosWebService } from 'src/app/Servicios/CorreosWeb/CorreosWeb.service';
 import { environment } from 'src/environments/environment';
 import { VERSION_APP } from 'src/environments/version';
 import { TemaService, alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 import { VistaFavorita, VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd } from '@angular/router';
-import { combineLatest, filter, startWith } from 'rxjs';
+import { combineLatest, filter, fromEvent, interval, merge, startWith, throttleTime } from 'rxjs';
+import { DestroyRef } from '@angular/core';
+
+/** Cada cuánto se refrescan los contadores de la barra superior mientras la pestaña está visible. */
+const REFRESCO_CONTADORES_MS = 5 * 60 * 1000;
+/** Llave de sessionStorage: el aviso de eventos del día ya se mostró en esta sesión (el logout limpia sessionStorage). */
+const LLAVE_AVISO_EVENTOS_DIA = 'avisoEventosDiaMostrado';
+import { CantidadesTickets, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 
 Injectable({
   providedIn: 'root'
@@ -71,6 +77,21 @@ export class MenuLateralComponent implements OnInit {
   vistaActual: VistaFavorita | null = null; // vista de la página actual, si el rol puede tenerla como acceso rápido
   esFavorita: boolean = false;
   guardandoFavorito: boolean = false;
+  // Botón de tickets (rol 1): abiertos + en revisión. cantidadesTickets queda en null si el rol no tiene permiso a Gestionar Tickets
+  private readonly ticketsService = inject(TicketsService);
+  cantidadesTickets: CantidadesTickets | null = null;
+  totalTicketsPendientes: number = 0;
+  tooltipTickets: string = 'Gestionar tickets';
+  private readonly suscripcionTickets = this.ticketsService.cantidadesSoporte$.pipe(takeUntilDestroyed()).subscribe(c => {
+    this.cantidadesTickets = c;
+    this.totalTicketsPendientes = c ? c.abiertos + c.enRevision : 0;
+    this.tooltipTickets = c ? `Tickets: ${c.abiertos} abierto(s), ${c.enRevision} en revisión` : 'Gestionar tickets';
+  });
+
+  tooltipCalendario: string = 'Calendario de eventos';
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly correosWebService = inject(CorreosWebService);
+
   private readonly suscripcionFavorito = combineLatest([
     inject(Router).events.pipe(filter(e => e instanceof NavigationEnd), startWith(null)),
     this.vistasFavService.misFavoritos$,
@@ -103,12 +124,33 @@ export class MenuLateralComponent implements OnInit {
 
   async ngOnInit() {
     this.lecturaStorage();
-    //this.cantidadEventosMes();
-    //this.consultarEventosHoy();
-    //this.consultarEventosMes();
+    this.cantidadEventosMes();
+    this.consultarEventosHoy();
     this.CargarCategorias();
     this.abrirModalUsuario();
+    if (this.ValidarRol == 1) this.ticketsService.cargarCantidadesSoporte().subscribe();
+    this.programarRefrescoContadores();
   }
+
+  /**
+   * Refresca los contadores de la barra superior (calendario y tickets): al crear, editar o eliminar un evento,
+   * cada REFRESCO_CONTADORES_MS mientras la pestaña está visible y al volver a la pestaña.
+   * Los correos no lo necesitan: se escuchan en tiempo real desde Firebase.
+   */
+  private programarRefrescoContadores() {
+    this.eventosCalService.cambios$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.cantidadEventosMes());
+
+    merge(interval(REFRESCO_CONTADORES_MS), fromEvent(this.document, 'visibilitychange')).pipe(
+      filter(() => this.document.visibilityState === 'visible'),
+      throttleTime(30 * 1000), // al alternar pestañas seguido no se repiten consultas
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(() => {
+      this.cantidadEventosMes();
+      if (this.ValidarRol == 1) this.ticketsService.cargarCantidadesSoporte().subscribe();
+    });
+  }
+
+  irAGestionTickets = () => this.router.navigateByUrl('/Gestion-Tickets');
 
   /** Agrega la página actual a los accesos rápidos, o la quita si ya estaba (respeta el límite de la API). */
   alternarFavoritoActual() {
@@ -156,7 +198,7 @@ export class MenuLateralComponent implements OnInit {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
     this.rolService.srvObtenerListaPorId(this.ValidarRol).subscribe(datos => this.storage_Rol = datos.rolUsu_Nombre);
-    if (['100', '121'].includes(this.storage_Id.toString())) this.getMails();
+    if ([1, 6, 2].includes(this.ValidarRol)) this.escucharCorreosNuevos(); // mismos roles que ven el botón de correos
   }
 
   aumentarLetra() {
@@ -324,11 +366,26 @@ export class MenuLateralComponent implements OnInit {
   cantidadEventosMes() {
     let inicio: any = moment().format('YYYY-MM-DD');
     let fin: any = moment().endOf('month').format('YYYY-MM-DD');
-    this.eventosCalService.GetCantidadEventos(this.storage_Id, this.ValidarRol, inicio, fin).subscribe(data => this.cantidadEventos = data);
+    this.eventosCalService.GetCantidadEventos(this.storage_Id, this.ValidarRol, inicio, fin).subscribe({
+      next: data => {
+        this.cantidadEventos = Number(data) || 0;
+        this.tooltipCalendario = this.cantidadEventos > 0
+          ? `Calendario: ${this.cantidadEventos} evento(s) de hoy a fin de mes`
+          : 'Calendario de eventos';
+      },
+      error: () => { /* el contador es informativo: si falla, se conserva el último valor */ },
+    });
   }
 
-  // Funcion que consultará los eventos de hoy
+  /**
+   * Consulta los eventos de hoy y, si hay, los muestra una sola vez por sesión
+   * (salvo que el usuario haya elegido "No volver a mostrar"; el login borra esa preferencia).
+   */
   consultarEventosHoy() {
+    let avisoMostrado = false;
+    try { avisoMostrado = sessionStorage.getItem(LLAVE_AVISO_EVENTOS_DIA) === '1'; } catch { }
+    if (avisoMostrado || this.cookieService.get('MostrarEventosDia') == 'no') return;
+
     this.eventosHoy = [];
     this.eventosCalService.GetEventosDia(this.storage_Id, this.ValidarRol).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
@@ -340,11 +397,11 @@ export class MenuLateralComponent implements OnInit {
           Dia: moment().format('DD'),
           Mes: moment().format('MMM').toUpperCase(),
         });
-        if (this.cookieService.get('MostrarEventosDia') == 'no' || this.cookieService.get('MostrarEventosDia') == undefined) this.eventosDia = false;
-        else this.eventosDia = true;
       }
+      if (this.eventosHoy.length == 0) return;
+      this.eventosDia = true;
+      try { sessionStorage.setItem(LLAVE_AVISO_EVENTOS_DIA, '1'); } catch { }
     });
-
   }
 
   consultarEventosMes() {
@@ -398,12 +455,14 @@ export class MenuLateralComponent implements OnInit {
     this.temaService.cambiar(!!this.modoSeleccionado);
   }
 
-  async getMails() {
-    let count: number = 0;
-    const querySnapshot = await getDocs(collection(db, "Correos"));
-    querySnapshot.forEach((doc) => {
-      count++;
-      if (!doc.data()['Estado']) this.cantidadCorreosNuevos++;
+  /**
+   * Contador de correos nuevos en tiempo real: baja al abrir un correo y sube cuando llega uno, sin recargar.
+   * Comparte la escucha a Firebase con la bandeja de correos (CorreosWebService).
+   */
+  private escucharCorreosNuevos() {
+    this.correosWebService.cantidadNuevos$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: cantidad => this.cantidadCorreosNuevos = cantidad,
+      error: () => { /* sin conexión a Firebase: se conserva el último valor */ },
     });
   }
 }

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { modelEventosCalendario } from 'src/app/Modelo/modelEventosCalendario';
 import { environment } from 'src/environments/environment';
 
@@ -11,7 +11,11 @@ export class EventosCalendarioService {
 
   readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
-constructor(private http : HttpClient) { }
+  /** Emite cada vez que se crea, edita o elimina un evento (la barra superior refresca su contador). */
+  private readonly cambios = new Subject<void>();
+  readonly cambios$ = this.cambios.asObservable();
+
+  constructor(private http : HttpClient) { }
 
   Get = () : Observable<any[]> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/EventosCalendarios`);
 
@@ -25,9 +29,9 @@ constructor(private http : HttpClient) { }
 
   GEtEventosMes = (id : number, rol : number) : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/EventosCalendarios/getEventosMes/${id}/${rol}`);
 
-  Post = (data : modelEventosCalendario) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/EventosCalendarios`, data);
+  Post = (data : modelEventosCalendario) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/EventosCalendarios`, data).pipe(tap(() => this.cambios.next()));
 
-  Put = (id : number, data : modelEventosCalendario) => this.http.put(`${this.rutaPlasticaribeAPI}/EventosCalendarios/${id}`, data);
+  Put = (id : number, data : modelEventosCalendario) => this.http.put(`${this.rutaPlasticaribeAPI}/EventosCalendarios/${id}`, data).pipe(tap(() => this.cambios.next()));
 
-  Delete = (id : number) => this.http.delete(`${this.rutaPlasticaribeAPI}/EventosCalendarios/${id}`);
+  Delete = (id : number) => this.http.delete(`${this.rutaPlasticaribeAPI}/EventosCalendarios/${id}`).pipe(tap(() => this.cambios.next()));
 }

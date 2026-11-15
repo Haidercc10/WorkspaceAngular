@@ -24,8 +24,23 @@
                 [attr.aria-pressed]="esFavorita">
           <i class="pi font-size-25" [ngClass]="guardandoFavorito ? 'pi-spin pi-spinner' : (esFavorita ? 'pi-star-fill' : 'pi-star')"></i>
         </button>
-        <i class="pi pi-envelope font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadCorreosNuevos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="modalCorreos = true" *ngIf="[1,6,2].includes(ValidarRol)"></i>
-        <i class="pi pi-calendar font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadEventos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="mostrarModalCalendario()"></i>
+        <!-- Tickets abiertos y en revisión (solo administradores con permiso a Gestionar Tickets) -->
+        <button type="button" class="botonBadge m-2" *ngIf="ValidarRol == 1 && cantidadesTickets" (click)="irAGestionTickets()"
+                [pTooltip]="tooltipTickets" tooltipPosition="bottom" [attr.aria-label]="tooltipTickets">
+          <i class="pi pi-ticket font-size-25"></i>
+          <p-badge *ngIf="totalTicketsPendientes > 0" [value]="totalTicketsPendientes > 99 ? '99+' : totalTicketsPendientes.toString()"></p-badge>
+        </button>
+        <!-- El badge solo aparece cuando hay algo nuevo (con 0 se oculta) -->
+        <button type="button" class="botonBadge m-2" *ngIf="[1,6,2].includes(ValidarRol)" (click)="modalCorreos = true"
+                [pTooltip]="cantidadCorreosNuevos > 0 ? cantidadCorreosNuevos + ' correo(s) sin leer' : 'Correos recibidos'" tooltipPosition="bottom" aria-label="Correos recibidos">
+          <i class="pi pi-envelope font-size-25"></i>
+          <p-badge *ngIf="cantidadCorreosNuevos > 0" [value]="cantidadCorreosNuevos.toString()"></p-badge>
+        </button>
+        <button type="button" class="botonBadge m-2" (click)="mostrarModalCalendario()"
+                [pTooltip]="tooltipCalendario" tooltipPosition="bottom" [attr.aria-label]="tooltipCalendario">
+          <i class="pi pi-calendar font-size-25"></i>
+          <p-badge *ngIf="cantidadEventos > 0" [value]="cantidadEventos.toString()"></p-badge>
+        </button>
         <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>
         <p-avatar class="cursor" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
       </div>
@@ -206,8 +221,9 @@
     </ng-template>
   </p-dialog>
 
-  <!-- Correos de Ventas -->
-  <p-dialog [(visible)]="modalCorreos" [style]="{width: '90%', margin: 'auto', height: '80%'}" [modal]="true" header="Correos Recibidos">
+  <!-- Correos de la página web -->
+  <p-dialog [(visible)]="modalCorreos" [style]="{width: '90vw', maxWidth: '1400px'}" [breakpoints]="{'900px': '100vw'}"
+            [modal]="true" [draggable]="false" [resizable]="false" header="Correos de la página web">
     <ng-template pTemplate="content">
       <app-Correos_PaginaWeb></app-Correos_PaginaWeb>
     </ng-template>
