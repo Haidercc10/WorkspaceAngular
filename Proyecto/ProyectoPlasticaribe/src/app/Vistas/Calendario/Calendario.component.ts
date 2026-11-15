@@ -1,292 +1,348 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CalendarOptions } from '@fullcalendar/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, NgZone, OnInit, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
+import { FullCalendarComponent } from '@fullcalendar/angular';
+import { CalendarOptions, DateSelectArg, EventClickArg, EventInput, EventSourceFuncArg } from '@fullcalendar/core';
 import esLocale from '@fullcalendar/core/locales/es';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
-import { modelEventosCalendario } from 'src/app/Modelo/modelEventosCalendario';
-import { EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
+import { ConfirmationService } from 'primeng/api';
+import {
+  EventoCalendario, EventoCalendarioGuardar, EventosCalendarioService, RolCalendario, TipoVisibilidad, claseVisibilidad, nombreVisibilidad
+} from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AppComponent } from 'src/app/app.component';
-import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
+const ROL_ADMINISTRADOR = 1;
+const DIAS_PROXIMOS = 30;
+export const MAX_CARACTERES_NOMBRE_EVENTO = 200;
+export const MAX_CARACTERES_DESCRIPCION_EVENTO = 1000;
+
+type ModoEvento = 'crear' | 'editar' | 'ver';
+
+/** La fecha final no puede ser anterior a la inicial (en eventos de todo el día se comparan solo los días). */
+function finDespuesDeInicio(grupo: AbstractControl): ValidationErrors | null {
+  const { inicio, fin, todoElDia } = grupo.value;
+  if (!inicio || !fin) return null;
+  const unidad = todoElDia ? 'day' : 'minute';
+  return moment(fin).isBefore(moment(inicio), unidad) ? { finAntesDeInicio: true } : null;
+}
+
+/** Con "Roles específicos" hay que elegir al menos un rol. */
+function rolesRequeridos(grupo: AbstractControl): ValidationErrors | null {
+  const { visibilidad, roles } = grupo.value;
+  return visibilidad == 'roles' && (!roles || roles.length == 0) ? { sinRoles: true } : null;
+}
+
+/**
+ * Calendario de eventos (modal de la barra superior).
+ * Los eventos se consultan por el rango visible cada vez que se cambia de mes, semana o día;
+ * solo el creador o un administrador puede editarlos o eliminarlos (la API lo valida).
+ */
 @Component({
   selector: 'app-Calendario',
   templateUrl: './Calendario.component.html',
   styleUrls: ['./Calendario.component.css']
 })
+export class CalendarioComponent implements OnInit, AfterViewInit {
 
-export class CalendarioComponent implements OnInit {
+  @ViewChild(FullCalendarComponent) calendario?: FullCalendarComponent;
+  @ViewChild('contenedorCalendario') contenedorCalendario?: ElementRef<HTMLElement>;
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly zone = inject(NgZone);
+  readonly maxNombre = MAX_CARACTERES_NOMBRE_EVENTO;
+  readonly maxDescripcion = MAX_CARACTERES_DESCRIPCION_EVENTO;
+  readonly diasProximos = DIAS_PROXIMOS;
 
-  FormEvento !: FormGroup; //Formulario que tendrá la informacion del evento a crear o el evento a editar
-  cargando : boolean = false;
-  storage_Id : any; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
-  modalEvento : boolean = false; //Variable que validará si se ve el modal de creación, edición y eliminación de eventos
-  accion : string = 'Crear'; //Variable que tendrá la información del titulo que tendrá el modal
-  visibilidadSeleccionable: any[] = [{ key: `A`, label: `Solo Yo`, data: `Solo Yo`, icon: 'pi pi-fw pi-user', children: [] }]; //Variable que almacenará las opciones de usuarios a ver el evento
-  visibilidadSeleccionada: any; //VAriable que almacenará los usuarios que podrán ver el evento
-  eventoSeleccionado : number = 0; //VAriable que almacenará el id del evento a editar o eliminar
-  events : any [] = []; //Variable que almacenará la información de los eventos
-  options : CalendarOptions | undefined; //Variable que almacenará la configuración del calendario
+  miRol: number = 0;
+  esAdministrador: boolean = false;
+  cargando: boolean = false;
+  guardando: boolean = false;
 
-  constructor(private eventosCalService : EventosCalendarioService,
-                private AppComponent : AppComponent,
-                  private frmBuilder : FormBuilder,
-                    private rolesService : RolesService,
-                      private mensajesService : MensajesAplicacionService,
-                        private messageService: MessageService,) {
-    this.FormEvento = this.frmBuilder.group({
-      Nombre : [null, Validators.required],
-      Descripcion : [null, Validators.required],
-      FechaInicio : [null, Validators.required],
-      FechaFin : [null, Validators.required],
-      Visibilidad : [null, Validators.required],
-    });
-  }
+  proximos: EventoCalendario[] = [];
+  cargandoProximos: boolean = false;
+  roles: RolCalendario[] = [];
+  opcionesVisibilidad: { label: string, value: TipoVisibilidad, icon: string }[] = [];
+
+  modalEvento: boolean = false;
+  modo: ModoEvento = 'crear';
+  eventoActual: EventoCalendario | null = null;
+
+  readonly form = inject(FormBuilder).group({
+    nombre: ['', [Validators.required, Validators.maxLength(MAX_CARACTERES_NOMBRE_EVENTO)]],
+    descripcion: ['', [Validators.maxLength(MAX_CARACTERES_DESCRIPCION_EVENTO)]],
+    todoElDia: [true],
+    inicio: [null as Date | null, Validators.required],
+    fin: [null as Date | null, Validators.required],
+    visibilidad: ['yo' as TipoVisibilidad, Validators.required],
+    roles: [[] as number[]],
+  }, { validators: [finDespuesDeInicio, rolesRequeridos] });
+
+  options: CalendarOptions = {
+    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+    locale: esLocale,
+    initialView: 'dayGridMonth',
+    headerToolbar: { start: 'prev,next today', center: 'title', end: 'dayGridMonth,timeGridWeek,timeGridDay' },
+    height: 'auto',
+    dayMaxEvents: 3,
+    eventDisplay: 'block',
+    nowIndicator: true,
+    selectable: true,
+    selectMirror: true,
+    eventTimeFormat: { hour: 'numeric', minute: '2-digit', meridiem: 'short' },
+    events: (info, exito, fallo) => this.cargarEventos(info, exito, fallo),
+    loading: cargando => this.cargando = cargando,
+    select: info => this.nuevoDesdeSeleccion(info),
+    eventClick: info => this.abrirEvento(info),
+  };
+
+  constructor(
+    private eventosService: EventosCalendarioService,
+    private mensajes: MensajesAplicacionService,
+    private confirmationService: ConfirmationService,
+    private AppComponent: AppComponent) { }
 
   ngOnInit() {
-    this.lecturaStorage();
-    this.obtenerRoles();
-    this.opcionesCalendario();
-    this.obtenerEventos('');
+    this.miRol = Number(this.AppComponent.storage_Rol);
+    this.esAdministrador = this.miRol == ROL_ADMINISTRADOR;
+    // Quien no es administrador solo puede compartir con su rol (la API también lo valida)
+    this.opcionesVisibilidad = [
+      { label: nombreVisibilidad.yo, value: 'yo', icon: 'pi pi-user' },
+      { label: nombreVisibilidad.rol, value: 'rol', icon: 'pi pi-id-card' },
+      ...(this.esAdministrador ? [
+        { label: nombreVisibilidad.todos, value: 'todos' as TipoVisibilidad, icon: 'pi pi-users' },
+        { label: nombreVisibilidad.roles, value: 'roles' as TipoVisibilidad, icon: 'pi pi-list' },
+      ] : []),
+    ];
+    if (this.esAdministrador) this.eventosService.roles$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(r => this.roles = r);
+    this.cargarProximos();
   }
 
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.AppComponent.storage_Id;
-    this.storage_Nombre = this.AppComponent.storage_Nombre;
-    this.ValidarRol = this.AppComponent.storage_Rol;
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-  }
+  /**
+   * FullCalendar mide su contenedor con getBoundingClientRect(), que incluye las transformaciones CSS.
+   * El p-dialog se abre con una animación que parte de scale(0.7): si el calendario se mide en ese momento
+   * queda al 70 % del ancho. La animación no cambia el tamaño de diseño (offsetWidth), por eso un
+   * ResizeObserver no basta: se espera, cuadro a cuadro, a que el ancho visible coincida con el de diseño
+   * (animación terminada) y solo entonces se reajusta. También se reajusta cuando el contenedor cambia
+   * de tamaño (ventana, panel lateral que pasa abajo en pantallas angostas).
+   */
+  ngAfterViewInit() {
+    const contenedor = this.contenedorCalendario?.nativeElement;
+    if (!contenedor) return;
 
-  // Funcion que va a limpiar los datos del modal
-  limpiarModal(){
-    this.cargando = false;
-    this.FormEvento.reset();
-    this.visibilidadSeleccionada = [];
-    this.modalEvento = false;
-    this.eventoSeleccionado = 0;
-  }
+    let cuadro = 0;
+    const ajustarCuandoNoEsteEscalado = (intentos: number = 0) => {
+      cancelAnimationFrame(cuadro);
+      cuadro = requestAnimationFrame(() => {
+        const escalado = Math.abs(contenedor.getBoundingClientRect().width - contenedor.offsetWidth) > 1;
+        if (escalado && intentos < 120) ajustarCuandoNoEsteEscalado(intentos + 1); // máximo ~2 s esperando
+        else this.calendario?.getApi().updateSize();
+      });
+    };
 
-  // Funcion que va a cargar los roles que se podrán elegir en la visibilidad del evento
-  obtenerRoles() {
-    this.visibilidadSeleccionable.push(
-      { key: `B`, label: `Todos`, data: `Todos`, icon: 'pi pi-fw pi-users', children: [] },
-      { key: `C`, label: `Solo...`, data: `Solo...`, icon: 'pi pi-fw pi-user', children: [] }
-    );
-    this.rolesService.srvObtenerLista().subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        this.visibilidadSeleccionable[2].children.push({
-          key: data[i].rolUsu_Id,
-          label: data[i].rolUsu_Nombre,
-          data: data[i].rolUsu_Nombre,
-          icon: 'pi pi-fw pi-user',
-          children: []
-        });
-      }
+    // Fuera de Angular: no dispara detección de cambios en cada cuadro de la animación
+    this.zone.runOutsideAngular(() => {
+      ajustarCuandoNoEsteEscalado();
+      const observador = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => ajustarCuandoNoEsteEscalado()) : null;
+      observador?.observe(contenedor);
+      this.destroyRef.onDestroy(() => {
+        cancelAnimationFrame(cuadro);
+        observador?.disconnect();
+      });
     });
-    setTimeout(() => {
-      if (this.ValidarRol != 1) {
-        this.visibilidadSeleccionable[2].children = this.visibilidadSeleccionable[2].children.filter(item => item.key == this.ValidarRol);
-        this.visibilidadSeleccionable.splice(1, 1);
-      }
-    }, 500);
   }
 
-  // Funcion que llenará la información de la configuración del calendario
-  opcionesCalendario() {
-    this.options = {
-      plugins: [dayGridPlugin,timeGridPlugin,interactionPlugin],
-      dateClick: this.fechaClick.bind(this),
-      eventClick : this.eventoClick.bind(this),
-      locale: esLocale,
-      headerToolbar: {
-        start: 'dayGridMonth,timeGridWeek,timeGridDay',
-        center: 'title',
-        end: 'prevYear,prev,next,nextYear'
+  /** Fuente de eventos de FullCalendar: se llama con el rango visible cada vez que se navega. */
+  private cargarEventos(info: EventSourceFuncArg, exito: (eventos: EventInput[]) => void, fallo: (error: Error) => void) {
+    const finInclusivo = moment(info.end).subtract(1, 'day').toDate(); // FullCalendar da el fin exclusivo
+    this.eventosService.getRango(info.start, finInclusivo, this.miRol).subscribe({
+      next: eventos => exito(eventos.map(e => this.aEventoCalendario(e))),
+      error: () => {
+        this.mensajes.mensajeError('¡Ocurrió un error!', '¡No se pudieron consultar los eventos!');
+        fallo(new Error('Error al consultar eventos'));
       },
-      editable: false,
-      selectable: true
-    }
-  }
-
-  // Funcion que buscará en la base de datos los eventos
-  obtenerEventos(data : any){
-    this.cargando = true;
-    this.events = [];
-    let inicio : any = data == '' ? moment().startOf('month').format('YYYY-MM-DD') : moment(data.start).format('YYYY-MM-DD');
-    let fin : any = data == '' ? moment().endOf('month').format('YYYY-MM-DD') : moment(data.end).format('YYYY-MM-DD');
-    this.eventosCalService.GetEventosUsuario(this.storage_Id, this.ValidarRol, inicio, fin).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        this.events.push({
-          Id: data[i].eventoCal_Id,
-          title: data[i].eventoCal_Nombre,
-          start: `${data[i].eventoCal_FechaInicial.replace('T00:00:00', '')} ${(data[i].eventoCal_HoraInicial).length < 8 ? `0${data[i].eventoCal_HoraInicial}` : data[i].eventoCal_HoraInicial}`,
-          end: `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${(data[i].eventoCal_HoraFinal).length < 8 ? `0${data[i].eventoCal_HoraFinal}` : data[i].eventoCal_HoraFinal}`,
-          descripcion: data[i].eventoCal_Descripcion,
-          Visibilidad: data[i].eventoCal_Visibilidad,
-        });
-      }
-    }, error => this.mensajesService.mensajeError(`¡Ocurrió un error!`, `¡${error.error}!`));
-    setTimeout(() => this.cargando = false, 500);
-  }
-
-  // Funcion que va a abrir el modal de creacion, edicion y eliminacion de eventos cada vez que presionene click sobre una fecha
-  fechaClick(data : any) {
-    this.limpiarModal();
-    this.accion = 'Crear';
-    this.FormEvento.patchValue({
-      FechaInicio : `${data.dateStr} 00:00:00`,
-      FechaFin : `${data.dateStr} 00:00:00`,
     });
+  }
+
+  private aEventoCalendario(e: EventoCalendario): EventInput {
+    return {
+      id: String(e.id),
+      title: e.nombre,
+      start: e.todoElDia ? moment(e.inicio).format('YYYY-MM-DD') : e.inicio,
+      // En eventos de todo el día FullCalendar espera el fin exclusivo (el día siguiente)
+      end: e.todoElDia ? moment(e.fin).add(1, 'day').format('YYYY-MM-DD') : e.fin,
+      allDay: e.todoElDia,
+      classNames: [claseVisibilidad(e), ...(e.esPropio ? [] : ['evento-ajeno'])],
+      extendedProps: { evento: e },
+    };
+  }
+
+  cargarProximos() {
+    this.cargandoProximos = true;
+    const hoy = moment().startOf('day');
+    this.eventosService.getRango(hoy.toDate(), hoy.clone().add(DIAS_PROXIMOS, 'days').toDate(), this.miRol).subscribe({
+      next: eventos => {
+        const ahora = new Date();
+        this.proximos = eventos.filter(e => e.fin >= ahora).sort((a, b) => a.inicio.getTime() - b.inicio.getTime()).slice(0, 10);
+        this.cargandoProximos = false;
+      },
+      error: () => this.cargandoProximos = false,
+    });
+  }
+
+  private refrescar() {
+    this.calendario?.getApi().refetchEvents();
+    this.cargarProximos();
+  }
+
+  // ---------------------------------------------------------------- Abrir el formulario
+
+  /** Botón "+ Nuevo": hoy, todo el día. */
+  nuevo() {
+    const hoy = moment().startOf('day').toDate();
+    this.abrirFormulario('crear', null, { inicio: hoy, fin: hoy, todoElDia: true });
+  }
+
+  /** Clic en un día o arrastre sobre varios días / horas. */
+  private nuevoDesdeSeleccion(info: DateSelectArg) {
+    this.calendario?.getApi().unselect();
+    const fin = info.allDay ? moment(info.end).subtract(1, 'day').toDate() : info.end; // fin exclusivo → inclusivo
+    this.abrirFormulario('crear', null, { inicio: info.start, fin, todoElDia: info.allDay });
+  }
+
+  private abrirEvento(info: EventClickArg) {
+    this.verEvento(info.event.extendedProps['evento'] as EventoCalendario);
+  }
+
+  /** Desde el calendario o el panel "Próximos eventos". */
+  verEvento(evento: EventoCalendario) {
+    this.abrirFormulario(evento.puedeEditar ? 'editar' : 'ver', evento, {
+      inicio: evento.inicio, fin: evento.fin, todoElDia: evento.todoElDia,
+    });
+  }
+
+  private abrirFormulario(modo: ModoEvento, evento: EventoCalendario | null, fechas: { inicio: Date, fin: Date, todoElDia: boolean }) {
+    this.modo = modo;
+    this.eventoActual = evento;
+    let visibilidad: TipoVisibilidad = evento?.tipoVisibilidad ?? 'yo';
+    // Quien no es administrador no tiene "Todos" ni "Roles específicos"
+    if (!this.esAdministrador && (visibilidad == 'todos' || visibilidad == 'roles')) visibilidad = 'rol';
+    this.form.reset({
+      nombre: evento?.nombre ?? '',
+      descripcion: evento?.descripcion ?? '',
+      todoElDia: fechas.todoElDia,
+      inicio: fechas.inicio,
+      fin: fechas.todoElDia ? moment(fechas.fin).startOf('day').toDate() : fechas.fin,
+      visibilidad,
+      roles: evento?.tipoVisibilidad == 'roles' ? evento.roles : [],
+    });
+    modo == 'ver' ? this.form.disable() : this.form.enable();
     this.modalEvento = true;
   }
 
-  // Funcion que va a abrir el modal con la información del evento sobre el que se ha hecho click para que pueda ser editado
-  eventoClick(data : any){
-    this.accion = 'Editar';
-    this.eventoSeleccionado = data.event._def.extendedProps.Id;
-    this.visibilidadSeleccionada = [];
-    let visibilidad : any [] = data.event._def.extendedProps.Visibilidad.trim().split('|').filter((item: string) => item != '');
-    let c : number = this.visibilidadSeleccionable.findIndex(item => item.key == 'C');
-    if (visibilidad[0] == 'Solo Yo') {
-      visibilidad[0] = 'A';
-      this.visibilidadSeleccionada = this.visibilidadSeleccionable.filter(item => item.key == visibilidad[0]);
-    } else {
-      if (visibilidad.length == this.visibilidadSeleccionable[c].children.length) {
-        visibilidad = ['B'];
-        this.visibilidadSeleccionada = this.visibilidadSeleccionable.filter(item => item.key == visibilidad[0]);
-      } else {
-        for (let i = 0; i < this.visibilidadSeleccionable[c].children.length; i++) {
-          if (visibilidad.includes((this.visibilidadSeleccionable[c].children[i].key).toString())) this.visibilidadSeleccionada.push(this.visibilidadSeleccionable[c].children[i]);
-        }
-      }
+  /** Al pasar a "con hora" se propone 8:00 – 9:00 si las horas estaban en 0. */
+  alCambiarTodoElDia() {
+    const { todoElDia, inicio, fin } = this.form.value;
+    if (todoElDia || !inicio || !fin) return;
+    if (moment(inicio).format('HH:mm') == '00:00') {
+      const nuevoInicio = moment(inicio).hour(8).minute(0).toDate();
+      const nuevoFin = moment(fin).isSame(inicio, 'day') ? moment(nuevoInicio).add(1, 'hour').toDate() : moment(fin).hour(9).minute(0).toDate();
+      this.form.patchValue({ inicio: nuevoInicio, fin: nuevoFin });
     }
-
-    this.FormEvento.patchValue({
-      Nombre : data.event.title,
-      Descripcion : data.event._def.extendedProps.descripcion,
-      FechaInicio : moment(data.event.start).format('YYYY-MM-DD H:mm:ss'),
-      FechaFin : moment(data.event.end).format('YYYY-MM-DD H:mm:ss'),
-    });
-    this.modalEvento = true;
   }
 
-  // Funcion que va a validar si el formulario de creacion, edicion y eliminacion de eventos es valido y que función se está ejecutando
-  validarFormularioEvento(){
-    if (this.FormEvento.valid) {
-      if (this.accion == 'Crear') this.crearEvento();
-      else if (this.accion == 'Editar') this.editarEvento();
-    } else this.mensajesService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe llenar todos los campos para poder crear o editar el evento!`);
+  /** Si la fecha inicial pasa a ser posterior a la final, la final se mueve con ella. */
+  alCambiarInicio() {
+    const { inicio, fin, todoElDia } = this.form.value;
+    if (inicio && fin && moment(fin).isBefore(inicio, todoElDia ? 'day' : 'minute'))
+      this.form.patchValue({ fin: todoElDia ? inicio : moment(inicio).add(1, 'hour').toDate() });
   }
 
-  // Funcion que va a crear un evento
-  crearEvento(){
-    let visibilidad : string = '', todos : string = '';
-    this.rolesService.srvObtenerLista().subscribe(data => data.forEach(datos => todos += `|${datos.rolUsu_Id}`));
-    setTimeout(() => {
-      for (const item of this.visibilidadSeleccionada) {
-        if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {
-          visibilidad = `|Solo Yo`;
-          break;
-        }
-        if (this.visibilidadSeleccionada.some(item => item.key == 'B')) {
-          visibilidad = todos;
-          break;
-        }
-        visibilidad += `|${item.key}`;
-      }
-      let datos : modelEventosCalendario = {
-        Usua_Id: this.storage_Id,
-        EventoCal_FechaCreacion: moment().format('YYYY-MM-DD'),
-        EventoCal_HoraCreacion: moment().format('H:mm:ss'),
-        EventoCal_Nombre: this.FormEvento.value.Nombre,
-        EventoCal_Descripcion: this.FormEvento.value.Descripcion,
-        EventoCal_FechaInicial: moment(this.FormEvento.value.FechaInicio).format('YYYY-MM-DD'),
-        EventoCal_HoraInicial: moment(this.FormEvento.value.FechaInicio).format('H:mm:ss'),
-        EventoCal_FechaFinal:  moment(this.FormEvento.value.FechaFin).format('YYYY-MM-DD'),
-        EventoCal_HoraFinal: moment(this.FormEvento.value.FechaFin).format('H:mm:ss'),
-        EventoCal_Visibilidad: visibilidad += '|',
-      }
-      this.eventosCalService.Post(datos).subscribe(() => {
-        this.mensajesService.mensajeConfirmacion('OK!', `¡Se ha creado un nuevo evento!`);
-        this.obtenerEventos('');
-        setTimeout(() => this.limpiarModal(), 500);
-      }, () =>  this.mensajesService.mensajeError(`¡Error!`, `¡No se pudo crear el evento!`));
-    }, 200);
+  get titulo(): string {
+    return this.modo == 'crear' ? 'Nuevo evento' : this.modo == 'editar' ? 'Editar evento' : 'Detalle del evento';
   }
 
-  // Funcion que va a editar un evento
-  editarEvento() {
-    let visibilidad : string = '', todos : string = '';
-    this.rolesService.srvObtenerLista().subscribe(data => data.forEach(rol => todos += `|${rol.rolUsu_Id}`));
-    setTimeout(() => {
-      for (const item of this.visibilidadSeleccionada) {
-        if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {
-          visibilidad = `|Solo Yo`;
-          break;
-        }
-        if (this.visibilidadSeleccionada.some(item => item.key == 'B')) {
-          visibilidad = todos;
-          break;
-        }
-        visibilidad += `|${item.key}`;
-      }
-      let datos : modelEventosCalendario = {
-        EventoCal_Id : this.eventoSeleccionado,
-        Usua_Id: this.storage_Id,
-        EventoCal_FechaCreacion: moment().format('YYYY-MM-DD'),
-        EventoCal_HoraCreacion: moment().format('H:mm:ss'),
-        EventoCal_Nombre: this.FormEvento.value.Nombre,
-        EventoCal_Descripcion: this.FormEvento.value.Descripcion,
-        EventoCal_FechaInicial: moment(this.FormEvento.value.FechaInicio).format('YYYY-MM-DD'),
-        EventoCal_HoraInicial: moment(this.FormEvento.value.FechaInicio).format('H:mm:ss'),
-        EventoCal_FechaFinal:  moment(this.FormEvento.value.FechaFin).format('YYYY-MM-DD'),
-        EventoCal_HoraFinal: moment(this.FormEvento.value.FechaFin).format('H:mm:ss'),
-        EventoCal_Visibilidad: visibilidad += '|',
-      }
-
-      this.eventosCalService.Put(this.eventoSeleccionado, datos).subscribe(() => {
-        this.mensajesService.mensajeConfirmacion('OK!', `¡Se ha editado un evento!`);
-        this.obtenerEventos('');
-        setTimeout(() => this.limpiarModal(), 500);
-      }, () => this.mensajesService.mensajeError(`¡Error!`, `¡No se pudo editar el evento!`));
-    }, 200);
+  get nombreVisibilidadActual(): string {
+    return this.eventoActual ? nombreVisibilidad[this.eventoActual.tipoVisibilidad] : '';
   }
 
-  // Funcion que va a confirmar que si se desea eliminar un evento
-  confirmarEliminacion(){
-    this.messageService.add({
-      severity:'warn',
-      key: 'eliminar',
-      summary:'¿Estás seguro de eliminar el evento?',
-      detail:
-      `<b>Evento:</b> ${this.FormEvento.value.Nombre} <br> ` +
-      `<b>Fecha Inicio:</b> ${this.FormEvento.value.FechaInicio} <br>` +
-      `<b>Fecha Fin:</b> ${this.FormEvento.value.FechaFin} <br>`,
-      sticky: true
+  get nombresRolesActuales(): string {
+    if (!this.eventoActual || this.eventoActual.tipoVisibilidad != 'roles') return '';
+    return this.eventoActual.roles.map(id => this.roles.find(r => r.id == id)?.nombre ?? `Rol ${id}`).join(', ');
+  }
+
+  // ---------------------------------------------------------------- Guardar / eliminar
+
+  guardar() {
+    if (this.form.invalid || this.guardando || this.modo == 'ver') {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const v = this.form.getRawValue();
+    const datos: EventoCalendarioGuardar = {
+      nombre: v.nombre ?? '',
+      descripcion: v.descripcion ?? '',
+      inicio: v.inicio!,
+      fin: v.fin!,
+      todoElDia: !!v.todoElDia,
+      tipoVisibilidad: v.visibilidad!,
+      roles: v.roles ?? [],
+    };
+    const peticion = this.modo == 'editar' && this.eventoActual
+      ? this.eventosService.editar(this.eventoActual.id, datos, this.miRol)
+      : this.eventosService.crear(datos, this.miRol);
+
+    this.guardando = true;
+    peticion.subscribe({
+      next: () => {
+        this.guardando = false;
+        this.modalEvento = false;
+        this.mensajes.mensajeConfirmacion('OK!', this.modo == 'editar' ? '¡Evento actualizado!' : '¡Evento creado!');
+        this.refrescar();
+      },
+      error: err => {
+        this.guardando = false;
+        this.mensajes.mensajeError('¡No se pudo guardar el evento!', typeof err?.error === 'string' ? err.error : 'Intente nuevamente.');
+      },
     });
   }
 
-  // Funcion que va a eliminar un evento
-  eliminarEvento(){
-    this.cerrarMensaje('eliminar');
-    this.eventosCalService.Delete(this.eventoSeleccionado).subscribe(() => {
-      this.mensajesService.mensajeConfirmacion('OK!', `¡Se ha eliminado el evento seleccionado!`);
-      this.obtenerEventos('');
-      setTimeout(() => this.limpiarModal(), 500);
-    }, () => this.mensajesService.mensajeError(`¡Ocurrió un error!`, `¡Ocurrió un error al intentar eliminar el evento, por favor intente nuevamente!`));
+  confirmarEliminacion() {
+    const evento = this.eventoActual;
+    if (!evento) return;
+    this.confirmationService.confirm({
+      key: 'eliminarEvento',
+      header: 'Eliminar evento',
+      message: `¿Seguro que desea eliminar el evento "${evento.nombre}"? Esta acción no se puede deshacer.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      accept: () => this.eliminar(evento),
+    });
   }
 
-  // Funcion que va a cerrar un mensaje
-  cerrarMensaje = (key : string) => this.messageService.clear(key);
+  private eliminar(evento: EventoCalendario) {
+    this.guardando = true;
+    this.eventosService.eliminar(evento.id).subscribe({
+      next: () => {
+        this.guardando = false;
+        this.modalEvento = false;
+        this.mensajes.mensajeConfirmacion('OK!', '¡Evento eliminado!');
+        this.refrescar();
+      },
+      error: () => {
+        this.guardando = false;
+        this.mensajes.mensajeError('¡No se pudo eliminar el evento!', 'Es posible que ya no exista o que no tenga permiso para eliminarlo.');
+      },
+    });
+  }
+
+  campoInvalido = (campo: string) => {
+    const control = this.form.get(campo);
+    return !!control && control.invalid && (control.touched || control.dirty);
+  };
 }

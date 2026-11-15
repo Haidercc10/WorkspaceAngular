@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
+import { EventoCalendario, EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -60,8 +60,8 @@ export class MenuLateralComponent implements OnInit {
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   mostrarMenu: boolean = false; //Variable que se utilizará para mostrar el menú
   cantidadEventos: number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
-  eventosHoy: any[] = []; //VAriable que almacenará los eventos que hay para el día actual
-  eventosMes: any[] = []; //Variable que almacenará los eventos que hay para el mes actual
+  eventosHoy: EventoCalendario[] = []; //Eventos que ocurren hoy (aviso "Eventos de hoy")
+  eventosMes: EventoCalendario[] = []; //Eventos de hoy a fin de mes (badge y sección "Eventos" del menú de usuario)
   eventosDia: boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
   cantidadCorreosNuevos: number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
   position: string = '';
@@ -362,13 +362,14 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  // Funcion que consultará la cantidad de eventos que hay en el mes
+  /** Eventos de hoy a fin de mes: alimentan el badge del calendario y la sección "Eventos" del menú de usuario. */
   cantidadEventosMes() {
-    let inicio: any = moment().format('YYYY-MM-DD');
-    let fin: any = moment().endOf('month').format('YYYY-MM-DD');
-    this.eventosCalService.GetCantidadEventos(this.storage_Id, this.ValidarRol, inicio, fin).subscribe({
-      next: data => {
-        this.cantidadEventos = Number(data) || 0;
+    const hoy = moment().startOf('day');
+    this.eventosCalService.getRango(hoy.toDate(), hoy.clone().endOf('month').toDate(), Number(this.ValidarRol)).subscribe({
+      next: eventos => {
+        const ahora = new Date();
+        this.eventosMes = eventos.filter(e => e.fin >= ahora);
+        this.cantidadEventos = this.eventosMes.length;
         this.tooltipCalendario = this.cantidadEventos > 0
           ? `Calendario: ${this.cantidadEventos} evento(s) de hoy a fin de mes`
           : 'Calendario de eventos';
@@ -386,41 +387,22 @@ export class MenuLateralComponent implements OnInit {
     try { avisoMostrado = sessionStorage.getItem(LLAVE_AVISO_EVENTOS_DIA) === '1'; } catch { }
     if (avisoMostrado || this.cookieService.get('MostrarEventosDia') == 'no') return;
 
-    this.eventosHoy = [];
-    this.eventosCalService.GetEventosDia(this.storage_Id, this.ValidarRol).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        this.eventosHoy.push({
-          Fecha_Hora_Inicio: `${data[i].eventoCal_HoraInicial}`,
-          Fecha_Hora_Fin: `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
-          Nombre: data[i].eventoCal_Nombre,
-          Descripcion: data[i].eventoCal_Descripcion,
-          Dia: moment().format('DD'),
-          Mes: moment().format('MMM').toUpperCase(),
-        });
-      }
-      if (this.eventosHoy.length == 0) return;
-      this.eventosDia = true;
-      try { sessionStorage.setItem(LLAVE_AVISO_EVENTOS_DIA, '1'); } catch { }
+    this.eventosCalService.getHoy(Number(this.ValidarRol)).subscribe({
+      next: eventos => {
+        this.eventosHoy = eventos;
+        if (this.eventosHoy.length == 0) return;
+        this.eventosDia = true;
+        try { sessionStorage.setItem(LLAVE_AVISO_EVENTOS_DIA, '1'); } catch { }
+      },
+      error: () => { /* el aviso es informativo: si falla, simplemente no se muestra */ },
     });
   }
 
-  consultarEventosMes() {
-    this.eventosMes = [];
-    this.eventosCalService.GEtEventosMes(this.storage_Id, this.ValidarRol).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        this.eventosMes.push({
-          Fecha_Hora_Inicio: `${data[i].eventoCal_HoraInicial}`,
-          Fecha_Hora_Fin: `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
-          Nombre: data[i].eventoCal_Nombre,
-          Descripcion: data[i].eventoCal_Descripcion,
-          Dia: moment(data[i].eventoCal_FechaInicial).format('DD'),
-          Mes: moment().format('MMM').toUpperCase(),
-        });
-      }
-    });
-  }
-
-  mostrarModalCalendario = () => this.modalCalendario = true;
+  mostrarModalCalendario = () => {
+    this.eventosDia = false;
+    this.menuUsuario = false;
+    this.modalCalendario = true;
+  };
 
   noMostrarMasDialogoEventosDia(mostrar: string) {
     this.cookieService.set('MostrarEventosDia', mostrar, { expires: 365, sameSite: 'Lax' });

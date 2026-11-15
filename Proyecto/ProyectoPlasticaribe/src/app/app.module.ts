@@ -79,6 +79,7 @@ import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_E
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { Busqueda_OrdenesTrabajoComponent } from './Vistas/Busqueda_OrdenesTrabajo/Busqueda_OrdenesTrabajo.component';
 import { CalendarioComponent } from './Vistas/Calendario/Calendario.component';
+import { ListaEventosComponent } from './Vistas/Calendario/ListaEventos/ListaEventos.component';
 import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
 import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
@@ -340,6 +341,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     Reporte_SolicitudesMPComponent,
     SolicitudMateriaPrimaComponent,
     CalendarioComponent,
+    ListaEventosComponent,
     NominaComponent,
     DashBoardRecaudosComponent,
     SolicitudMP_ExtrusionComponent,

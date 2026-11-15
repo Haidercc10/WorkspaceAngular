@@ -429,3 +429,15 @@ p-accordion span[class = 'vertical-align-middle'] {
   padding: 0 .35rem;
   font-size: .75rem;
 }
+
+/* Botón principal del aviso "Eventos de hoy" con el rojo de la marca */
+:host ::ng-deep .botonVerCalendario.p-button {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: #fff;
+}
+
+:host ::ng-deep .botonVerCalendario.p-button:enabled:hover {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
+}

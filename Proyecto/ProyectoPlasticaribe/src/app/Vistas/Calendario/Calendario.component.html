@@ -1,86 +1,116 @@
-<full-calendar [events]="events" [options]="options" *ngIf="!cargando"></full-calendar>
+<div class="calendario">
 
-<p-dialog [(visible)]="modalEvento" [style]="{width: '500px', margin: 'auto', height: '830px'}" [contentStyle]="{'overflow':'visible'}" [breakpoints]="{ '960px': '360px' }" header="{{accion}} Evento" [modal]="true">
-  <ng-template pTemplate="content">
-    <form [formGroup]="FormEvento">
-      <div class="row g-4 my-2">
+  <!-- Acciones y leyenda -->
+  <div class="barra">
+    <div class="leyenda" aria-label="Colores de los eventos">
+      <span><i class="punto evento-yo"></i> Solo yo</span>
+      <span><i class="punto evento-rol"></i> Mi rol / roles</span>
+      <span><i class="punto evento-todos"></i> Todos</span>
+      <span class="ajeno-muestra"><i class="punto evento-rol"></i> Creado por otro usuario</span>
+    </div>
+    <div class="acciones-barra">
+      <i class="pi pi-spin pi-spinner" *ngIf="cargando" aria-label="Cargando eventos"></i>
+      <button pButton type="button" class="boton-principal" icon="pi pi-plus" label="Nuevo evento" (click)="nuevo()"></button>
+    </div>
+  </div>
 
-        <!-- Nombre Evento -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-          <span class="p-float-label p-input-icon-left">
-            <i class="pi pi-pencil"></i>
-            <input formControlName="Nombre" type="text" id="Nombre" pInputText/>
-            <label htmlFor="Nombre">Nombre Evento</label>
-          </span>
-        </div>
+  <div class="contenido">
+    <section class="vista-calendario" #contenedorCalendario>
+      <full-calendar [options]="options"></full-calendar>
+      <p class="ayuda"><i class="pi pi-info-circle"></i> Haga clic en un día o arrastre sobre varios días u horas para crear un evento.</p>
+    </section>
 
-        <!-- Visibilidad Evento -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-          <span class="p-float-label">
-            <p-treeSelect formControlName="Visibilidad"
-                          class="w-full md:w-20rem"
-                          containerStyleClass="w-full"
-                          [(ngModel)]="visibilidadSeleccionada"
-                          [options]="visibilidadSeleccionable"
-                          [metaKeySelection]="false"
-                          selectionMode="multiple"
-                          placeholder="Seleccionar Roles"
-                          id="Visibilidad"></p-treeSelect>
-            <label htmlFor="Visibilidad">Visibilidad</label>
-          </span>
-        </div>
+    <aside class="proximos" aria-label="Próximos eventos">
+      <h4>Próximos {{ diasProximos }} días</h4>
+      <ng-container *ngIf="cargandoProximos && proximos.length == 0">
+        <p-skeleton height="3rem" styleClass="mb-2" *ngFor="let _ of [1,2,3]"></p-skeleton>
+      </ng-container>
+      <app-ListaEventos *ngIf="!cargandoProximos || proximos.length > 0" [eventos]="proximos"
+                        mensajeVacio="No hay eventos próximos." (seleccionar)="verEvento($event)"></app-ListaEventos>
+    </aside>
+  </div>
+</div>
 
-        <!-- Descripción del Evento -->
-        <div class="col-12">
-          <span class="p-float-label">
-            <textarea formControlName="Descripcion" [rows]="13" maxlength="200" pInputTextarea></textarea>
-            <label for="textarea">Descripción Evento</label>
-          </span>
-        </div>
+<!-- Crear / editar / ver evento -->
+<p-dialog [(visible)]="modalEvento" [modal]="true" [draggable]="false" [resizable]="false" [header]="titulo"
+          [style]="{width: '46rem', maxWidth: '96vw'}" [breakpoints]="{'768px': '96vw'}" styleClass="dialogo-evento">
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="form-evento" id="formEvento">
 
-        <!-- Fecha Inicio -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-          <span class="p-float-label">
-            <p-calendar formControlName="FechaInicio" [showTime]="true" [showSeconds]="true" dateFormat="yy-mm-dd"></p-calendar>
-            <label for="FechaInicio">Fecha Inicio</label>
-          </span>
-        </div>
+    <!-- Solo lectura: evento de otro usuario -->
+    <div class="aviso-lectura" *ngIf="modo == 'ver' && eventoActual">
+      <i class="pi pi-lock"></i>
+      <span>Creado por <b>{{ eventoActual.creador || 'otro usuario' }}</b>. Solo su creador o un administrador puede modificarlo.</span>
+    </div>
 
-        <!-- Fecha Fin -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-          <span class="p-float-label">
-            <p-calendar formControlName="FechaFin" [showTime]="true" [showSeconds]="true" dateFormat="yy-mm-dd"></p-calendar>
-            <label for="FechaFin">Fecha Fin</label>
-          </span>
-        </div>
+    <div class="campo">
+      <label for="nombreEvento">Nombre <span class="obligatorio" *ngIf="modo != 'ver'">*</span></label>
+      <input id="nombreEvento" type="text" pInputText formControlName="nombre" [maxlength]="maxNombre"
+             placeholder="Ej.: Reunión de producción" [class.ng-dirty]="campoInvalido('nombre')"/>
+      <small class="error" *ngIf="campoInvalido('nombre')">El nombre es obligatorio.</small>
+    </div>
+
+    <div class="campo fila-switch">
+      <p-inputSwitch inputId="todoElDia" formControlName="todoElDia" (onChange)="alCambiarTodoElDia()"></p-inputSwitch>
+      <label for="todoElDia">Todo el día</label>
+    </div>
+
+    <div class="fechas">
+      <div class="campo">
+        <label for="inicioEvento">Inicio <span class="obligatorio" *ngIf="modo != 'ver'">*</span></label>
+        <p-calendar inputId="inicioEvento" formControlName="inicio" [showTime]="!form.value.todoElDia" hourFormat="12"
+                    dateFormat="dd/mm/yy" [showIcon]="true" appendTo="body" (onSelect)="alCambiarInicio()"
+                    styleClass="w-100"></p-calendar>
       </div>
-
-      <div class="my-3 d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-success" id="crear" type="button" label="{{accion}} Evento" icon="pi pi-send" (click)="validarFormularioEvento()"></button>
-        <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarModal()"></button>
-        <button pButton class="p-button-danger" id="eliminar" type="button" label="Eliminar Evento" icon="pi pi-trash" (click)="confirmarEliminacion()"></button>
+      <div class="campo">
+        <label for="finEvento">Fin <span class="obligatorio" *ngIf="modo != 'ver'">*</span></label>
+        <p-calendar inputId="finEvento" formControlName="fin" [showTime]="!form.value.todoElDia" hourFormat="12"
+                    dateFormat="dd/mm/yy" [showIcon]="true" appendTo="body" [minDate]="form.value.inicio ?? undefined"
+                    styleClass="w-100"></p-calendar>
       </div>
-    </form>
+    </div>
+    <small class="error" *ngIf="form.errors?.['finAntesDeInicio']">La fecha de fin no puede ser anterior a la de inicio.</small>
+
+    <div class="campo">
+      <label>¿Quién puede verlo?</label>
+      <p-selectButton *ngIf="modo != 'ver'" [options]="opcionesVisibilidad" formControlName="visibilidad"
+                      optionLabel="label" optionValue="value" [allowEmpty]="false" styleClass="selector-visibilidad">
+        <ng-template let-opcion pTemplate="item">
+          <i [class]="opcion.icon"></i><span class="ms-2">{{ opcion.label }}</span>
+        </ng-template>
+      </p-selectButton>
+      <span class="valor-lectura" *ngIf="modo == 'ver'">
+        {{ nombreVisibilidadActual }}<ng-container *ngIf="nombresRolesActuales">: {{ nombresRolesActuales }}</ng-container>
+      </span>
+    </div>
+
+    <div class="campo" *ngIf="modo != 'ver' && form.value.visibilidad == 'roles'">
+      <label for="rolesEvento">Roles <span class="obligatorio">*</span></label>
+      <p-multiSelect inputId="rolesEvento" [options]="roles" formControlName="roles" optionLabel="nombre" optionValue="id"
+                     display="chip" [filter]="true" filterPlaceholder="Buscar rol" placeholder="Seleccione los roles"
+                     appendTo="body" styleClass="w-100"></p-multiSelect>
+      <small class="error" *ngIf="form.errors?.['sinRoles'] && form.get('roles')?.touched">Seleccione al menos un rol.</small>
+    </div>
+
+    <div class="campo">
+      <label for="descripcionEvento">Descripción</label>
+      <textarea id="descripcionEvento" pInputTextarea formControlName="descripcion" [rows]="4" [autoResize]="true"
+                [maxlength]="maxDescripcion" placeholder="Detalles, lugar, participantes…"></textarea>
+      <small class="contador" *ngIf="modo != 'ver'">{{ (form.value.descripcion || '').length }}/{{ maxDescripcion }}</small>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="pie">
+      <button pButton type="button" class="p-button-text p-button-danger" icon="pi pi-trash" label="Eliminar"
+              *ngIf="modo == 'editar'" [disabled]="guardando" (click)="confirmarEliminacion()"></button>
+      <span class="espacio"></span>
+      <button pButton type="button" class="p-button-text p-button-secondary" [label]="modo == 'ver' ? 'Cerrar' : 'Cancelar'"
+              icon="pi pi-times" (click)="modalEvento = false"></button>
+      <button pButton type="submit" form="formEvento" class="boton-principal" *ngIf="modo != 'ver'"
+              [icon]="guardando ? 'pi pi-spin pi-spinner' : 'pi pi-check'" [label]="modo == 'editar' ? 'Guardar cambios' : 'Crear evento'"
+              [disabled]="form.invalid || guardando"></button>
+    </div>
   </ng-template>
 </p-dialog>
 
-<!-- Mensaje  para validar que si se desea eliminar un evento -->
-<p-toast position="center" key="eliminar" (onClose)="cerrarMensaje('eliminar')" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p innerHtml="{{message.detail}}"></p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6">
-          <button type="button" pButton (click)="eliminarEvento()" icon="pi pi-check" label="ELiminar" class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="cerrarMensaje('eliminar')" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>
+<p-confirmDialog key="eliminarEvento" [style]="{width: '28rem'}" [breakpoints]="{'640px': '92vw'}"></p-confirmDialog>
