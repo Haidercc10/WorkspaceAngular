@@ -1,10 +1,23 @@
 /* Barra y editor de accesos rápidos. Solo variables de tema (PrimeNG + styles.css) para que funcione en claro y oscuro. */
 
 /* ---------- Barra (dock) ---------- */
+/* Ocupa todo el .p-dock-link (4rem x 4rem del tema) y centra la imagen en ambos ejes */
 .dock-icono {
   position: relative;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
+}
+
+/* En bloque: un <img> en línea deja debajo el espacio de la línea de texto y se ve corrido hacia arriba */
+.dock-icono img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Página actual: punto rojo debajo del ícono */
@@ -194,6 +207,13 @@
   padding: 0;
   border: none;
   background: transparent;
+}
+
+/* Bootstrap le da a todo <ul> margin-bottom: 1rem y padding-left: 2rem, y gana a la regla de PrimeNG (que está
+   dentro de @layer primeng): sin esto los íconos quedan corridos hacia arriba y a la derecha dentro de la barra */
+:host ::ng-deep .accesos-rapidos .p-dock .p-dock-list {
+  margin: 0;
+  padding: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

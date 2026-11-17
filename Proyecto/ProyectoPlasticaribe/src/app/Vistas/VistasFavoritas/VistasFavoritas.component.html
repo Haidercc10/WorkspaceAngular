@@ -21,7 +21,7 @@
       <p-dock [model]="dockItems" position="bottom">
         <ng-template pTemplate="item" let-item>
           <span class="dock-icono" [class.activo]="esActivo(item)" [attr.aria-current]="esActivo(item) ? 'page' : null">
-            <img [src]="item.icon" [alt]="item.label" width="100%">
+            <img [src]="item.icon" [alt]="item.label">
           </span>
         </ng-template>
       </p-dock>
