@@ -7,8 +7,8 @@
   --shadow-color: 286deg 36% 56%;
 
   /* Marca */
-  --rojo: #c42a35;               /* botones y acentos (antes #db4149; contraste con blanco 5,6:1) */
-  --rojoHover: #b11d28;          /* rojo exacto del logo */
+  --rojo: #b11d28;               /* rojo exacto del logo: botones y acentos (contraste con blanco 6,8:1) */
+  --rojoHover: #c42a35;          /* hover: un poco más claro que el del logo */
   --rojoClaro: #e4636e;          /* detalles suaves; acento sobre fondo oscuro */
   --azul-marca: #131f4c;         /* azul marino del logo: encabezados, menú, títulos */
   --azul-marca-medio: #283a75;   /* hover, bordes y botones secundarios */
@@ -52,7 +52,10 @@
   --fondo-obligatorio: #fff1f1;                 /* campos obligatorios pendientes */
   --borde-obligatorio: #e24c4c;
   --fondo-acento: #fdf2f3;                      /* resaltado suave con el rojo de la marca */
-  --azul-marca-claro: #eef1f8;                  /* fondos de secciones con el azul de la marca */
+  --rojo-texto: #b11d28;                        /* rojo para texto y bordes (botones de texto o con borde) */
+  --azul-marca-claro: #eef1f8;                 /* fondos de secciones con el azul de la marca */
+  --fondo-contador: #131f4c;                    /* contadores (badges) de la barra superior: azul marino del logo */
+  --texto-contador: #ffffff;
   --fondo-exito: #dcfce7;                       /* confirmaciones (p. ej. botón "Copiado!") */
   --texto-exito: #166534;                       /* texto y borde de las confirmaciones */
   --rejilla-graficas: rgba(128, 128, 128, 0.2); /* líneas de la cuadrícula de las gráficas (sirve en ambos temas) */
@@ -66,6 +69,9 @@
   --grafica-6: #7b5ea7;
   --grafica-7: #8c6d46;
   --grafica-8: #6c757d;
+  /* Texto legible encima de cada color (etiquetas, chips) */
+  --grafica-1-texto: #ffffff; --grafica-2-texto: #ffffff; --grafica-3-texto: #0b1020; --grafica-4-texto: #1f1300;
+  --grafica-5-texto: #0b1020; --grafica-6-texto: #ffffff; --grafica-7-texto: #ffffff; --grafica-8-texto: #ffffff;
 }
 
 /* Tema oscuro: se activa cuando el <link id="app-theme"> carga lara-dark-blue.css */
@@ -82,8 +88,11 @@
   --fondo-obligatorio: rgba(226, 76, 76, 0.16);
   --borde-obligatorio: #f87171;
   --fondo-acento: rgba(196, 42, 53, 0.16);
+  --rojo-texto: #e4636e;                        /* el rojo del logo no se lee sobre fondo oscuro */
   --azul-marca-medio: #8597c9;
   --azul-marca-claro: rgba(133, 151, 201, 0.12);
+  --fondo-contador: #f1f3f5;                    /* contadores en oscuro: blanco con número azul marino */
+  --texto-contador: #131f4c;
   --fondo-exito: rgba(34, 197, 94, 0.16);
   --texto-exito: #86efac;
 
@@ -95,6 +104,9 @@
   --grafica-6: #a68bd1;
   --grafica-7: #b89466;
   --grafica-8: #adb5bd;
+  /* En oscuro todas las series son claras: texto oscuro encima */
+  --grafica-1-texto: #0b1020; --grafica-2-texto: #0b1020; --grafica-3-texto: #0b1020; --grafica-4-texto: #0b1020;
+  --grafica-5-texto: #0b1020; --grafica-6-texto: #0b1020; --grafica-7-texto: #0b1020; --grafica-8-texto: #0b1020;
 }
 
 * {
@@ -415,42 +427,56 @@ th {
   background: #ffefef;
 }
 
-.p-checkbox .p-checkbox-box.p-highlight {
-  border-color: #f63b3b;
-  background: #f63b3b;
+/* Checkbox (p-checkbox, checks de tablas y triestado) y radio buttons con el rojo de la marca:
+   rojo del logo marcado y --rojoHover al pasar el mouse, igual que los botones. La palomita y el punto
+   van en blanco también en oscuro (el tema oscuro los pinta oscuros y no se verían sobre el rojo). */
+.p-checkbox .p-checkbox-box.p-highlight,
+.p-input-filled .p-checkbox .p-checkbox-box.p-highlight {
+  border-color: var(--rojo);
+  background: var(--rojo);
+}
+
+.p-checkbox .p-checkbox-box.p-highlight .p-checkbox-icon,
+.p-checkbox .p-checkbox-box.p-highlight .p-icon {
+  color: #ffffff;
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-  border-color: #f63b3b;
+  border-color: var(--rojo);
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
-  box-shadow: 0 0 0 0.2rem #febfbf;
-  border-color: #f63b3b;
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+  border-color: var(--rojo);
 }
 
-.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-  border-color: #d81d1d;
-  background: #d81d1d;
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover,
+.p-input-filled .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+  border-color: var(--rojoHover);
+  background: var(--rojoHover);
 }
 
 .p-radiobutton .p-radiobutton-box.p-highlight {
-  border-color: #f63b3b;
-  background: #f63b3b;
+  border-color: var(--rojo);
+  background: var(--rojo);
+}
+
+.p-radiobutton .p-radiobutton-box.p-highlight .p-radiobutton-icon {
+  background-color: #ffffff;
 }
 
 .p-radiobutton .p-radiobutton-box.p-highlight:not(.p-disabled):hover {
-  border-color: #d81d1d;
-  background: #d81d1d;
+  border-color: var(--rojoHover);
+  background: var(--rojoHover);
 }
 
 .p-radiobutton .p-radiobutton-box:not(.p-disabled).p-focus {
-  box-shadow: 0 0 0 0.2rem #febfbf;
-  border-color: #f63b3b;
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+  border-color: var(--rojo);
 }
 
 .p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
-  border-color: #f63b3b;
+  border-color: var(--rojo);
 }
 
 .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
@@ -897,4 +923,65 @@ input.con-contador-caracteres + .contador-caracteres {
 
 body.con-accesos-rapidos:not(:has(app-PaginaPrincipal)) {
   padding-bottom: var(--alto-accesos-rapidos);
+}
+
+/* ==================== BOTONES ROJOS (p-button-danger) ====================
+   PrimeNG trae su propio rojo (#EF4444 en claro, rosado pastel en oscuro). Aquí se usa el de la marca:
+   rojo del logo de base y --rojoHover al pasar el mouse, en ambos temas.
+   El prefijo "html" asegura que gane aunque el <link> del tema se vuelva a insertar al cambiar de modo. */
+html .p-button.p-button-danger,
+html .p-buttonset.p-button-danger > .p-button,
+html .p-splitbutton.p-button-danger > .p-button {
+  background: var(--rojo);
+  border: 1px solid var(--rojo);
+  color: #ffffff;
+}
+
+html .p-button.p-button-danger:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button:enabled:hover,
+html .p-button.p-button-danger:enabled:active,
+html .p-buttonset.p-button-danger > .p-button:enabled:active,
+html .p-splitbutton.p-button-danger > .p-button:enabled:active {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
+  color: #ffffff;
+}
+
+html .p-button.p-button-danger:enabled:focus,
+html .p-buttonset.p-button-danger > .p-button:enabled:focus,
+html .p-splitbutton.p-button-danger > .p-button:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+}
+
+/* Variantes con borde y de solo texto: el rojo como texto (en oscuro, uno más claro para que se lea) */
+html .p-button.p-button-danger.p-button-outlined,
+html .p-buttonset.p-button-danger > .p-button.p-button-outlined,
+html .p-splitbutton.p-button-danger > .p-button.p-button-outlined,
+html .p-button.p-button-danger.p-button-outlined:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-outlined:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-outlined:enabled:hover {
+  background-color: transparent;
+  color: var(--rojo-texto);
+  border: 1px solid;
+}
+
+html .p-button.p-button-danger.p-button-text,
+html .p-buttonset.p-button-danger > .p-button.p-button-text,
+html .p-splitbutton.p-button-danger > .p-button.p-button-text,
+html .p-button.p-button-danger.p-button-text:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-text:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-text:enabled:hover {
+  background-color: transparent;
+  color: var(--rojo-texto);
+  border-color: transparent;
+}
+
+html .p-button.p-button-danger.p-button-outlined:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-outlined:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-outlined:enabled:hover,
+html .p-button.p-button-danger.p-button-text:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-text:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-text:enabled:hover {
+  background: var(--fondo-acento);
 }

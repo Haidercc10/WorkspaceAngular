@@ -29,3 +29,17 @@ export const PALETA_GRAFICAS = {
 export function coloresSeriesGrafica(oscuro: boolean): string[] {
   return oscuro ? PALETA_GRAFICAS.oscuro : PALETA_GRAFICAS.claro;
 }
+
+/**
+ * Color de la serie número `indice` (0, 1, 2...). Pasado el octavo vuelve a empezar.
+ * Para series que se agregan una a una: colorSerieGrafica(grafica.datasets.length, this.modoSeleccionado).
+ */
+export function colorSerieGrafica(indice: number, oscuro: boolean): string {
+  const paleta = coloresSeriesGrafica(oscuro);
+  return paleta[indice % paleta.length];
+}
+
+/** Relleno semitransparente (13 %) de un color de la paleta, para áreas bajo líneas. */
+export function rellenoSerieGrafica(color: string): string {
+  return color + '22';
+}

@@ -13,7 +13,7 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardGerencia as defaultSteps } from 'src/app/data';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_General',
@@ -314,13 +314,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de facturacion
   llenarGraficaFacturacion(data, title? : any){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaFacturacion.datasets.length, this.modoSeleccionado);
     this.graficaFacturacion.datasets.push({
       label: title += `${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -389,13 +389,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de facturacion
   llenarGraficaCuentas_Cobrar(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCuentas_Cobrar.datasets.length, this.modoSeleccionado);
     this.graficaCuentas_Cobrar.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -508,13 +508,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de cuentas por pagar
   llenarGraficaCuentas_Pagar_Plasticaribe(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCuentas_Pagar_Plasticaribe.datasets.length, this.modoSeleccionado);
     this.graficaCuentas_Pagar_Plasticaribe.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -525,13 +525,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de cuentas por pagar
   llenarGraficaCuentas_Pagar_Invergoal(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCuentas_Pagar_Invergoal.datasets.length, this.modoSeleccionado);
     this.graficaCuentas_Pagar_Invergoal.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -542,13 +542,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de cuentas por pagar
   llenarGraficaCuentas_Pagar_Inversuez(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCuentas_Pagar_Inversuez.datasets.length, this.modoSeleccionado);
     this.graficaCuentas_Pagar_Inversuez.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -558,13 +558,13 @@ export class Dashboard_GeneralComponent implements OnInit {
   }
 
   llenarGraficaCuentas_Pagar_Totales(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCuentas_Pagar_Totales.datasets.length, this.modoSeleccionado);
     this.graficaCuentas_Pagar_Totales.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -644,13 +644,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de compras de plasticaribe
   llenarGrafica_Compras_Plasticaribe(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCompras_Plasticaribe.datasets.length, this.modoSeleccionado);
     this.graficaCompras_Plasticaribe.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -661,13 +661,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de compras de invergoal
   llenarGrafica_Compras_Invergoal(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCompras_Invergoal.datasets.length, this.modoSeleccionado);
     this.graficaCompras_Invergoal.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -678,13 +678,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de compras de inversuez
   llenarGrafica_Compras_Inversuez(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCompras_Inversuez.datasets.length, this.modoSeleccionado);
     this.graficaCompras_Inversuez.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -695,13 +695,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // 
   llenarGrafica_Compras_Totales(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCompras_Totales.datasets.length, this.modoSeleccionado);
     this.graficaCompras_Totales.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -741,13 +741,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de inventario de materias primas
   llenarGraficaInventario_MatPrima(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaInventario_MatPrima.datasets.length, this.modoSeleccionado);
     this.graficaInventario_MatPrima.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -787,13 +787,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de inventario de productos
   llenarGraficaInventario_Producto(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaInventario_Productos.datasets.length, this.modoSeleccionado);
     this.graficaInventario_Productos.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -820,13 +820,13 @@ export class Dashboard_GeneralComponent implements OnInit {
 
   //Función que va a llenar la gráfica
   llenarGraficaSalidasDespacho(data){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaSalidasDespacho.datasets.length, this.modoSeleccionado);
     this.graficaSalidasDespacho.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,

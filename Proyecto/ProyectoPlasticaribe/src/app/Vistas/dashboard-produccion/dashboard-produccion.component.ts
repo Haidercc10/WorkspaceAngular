@@ -10,7 +10,7 @@ import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produc
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { plugins } from 'chart.js/dist/core';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Injectable({
   providedIn: 'root'
@@ -112,6 +112,20 @@ export class DashboardProduccionComponent implements OnInit {
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
+
+  /** Posición en la paleta de gráficas de cada proceso (en el orden en que aparecen en pantalla).
+   *  Debe coincidir con las clases prd-/meta-/title- del CSS (--grafica-N, con N = índice + 1). */
+  private static readonly INDICE_PROCESO: { [proceso: string]: number } = {
+    EXTRUSION: 0, IMPRESION: 1, PERFORADO: 2, CORTE: 3, SELLADO: 4, CAMISILLA: 5, LAMINADO: 6, DOBLADO: 7,
+  };
+
+  /** Color del proceso: anillo de cumplimiento, barras de producción y meta. */
+  colorProceso(proceso: string): string {
+    return colorSerieGrafica(DashboardProduccionComponent.INDICE_PROCESO[proceso] ?? 0, this.modoSeleccionado);
+  }
+
+  /** Anillo de desperdicio: gris de la paleta (igual que sus etiquetas de la papelera). */
+  get colorDesperdicio(): string { return colorSerieGrafica(7, this.modoSeleccionado); }
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
@@ -522,8 +536,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataExtrusion = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#f0d800ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('EXTRUSION')] },
-        { label: 'Meta', backgroundColor: '#ff9900ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('EXTRUSION')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('EXTRUSION'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('EXTRUSION')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('EXTRUSION') + '55', borderColor: this.colorProceso('EXTRUSION'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('EXTRUSION')] }
       ]
     };
 
@@ -545,8 +559,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataImpresion = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#60f000ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('IMPRESION')] },
-        { label: 'Meta', backgroundColor: '#009632ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('IMPRESION')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('IMPRESION'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('IMPRESION')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('IMPRESION') + '55', borderColor: this.colorProceso('IMPRESION'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('IMPRESION')] }
       ]
     };
 
@@ -568,8 +582,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataEmpaque = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#2e8fffff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('CORTE')] },
-        { label: 'Meta', backgroundColor: '#003cffff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('CORTE')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('CORTE'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('CORTE')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('CORTE') + '55', borderColor: this.colorProceso('CORTE'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('CORTE')] }
       ]
     };
 
@@ -591,8 +605,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataSellado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#ff5353ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('SELLADO')] },
-        { label: 'Meta', backgroundColor: '#ff1111ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('SELLADO')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('SELLADO'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('SELLADO')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('SELLADO') + '55', borderColor: this.colorProceso('SELLADO'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('SELLADO')] }
       ]
     };
 
@@ -614,8 +628,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataCamisilla = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#00d9ffff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('CAMISILLA')] },
-        { label: 'Meta', backgroundColor: '#008c91ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('CAMISILLA')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('CAMISILLA'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('CAMISILLA')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('CAMISILLA') + '55', borderColor: this.colorProceso('CAMISILLA'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('CAMISILLA')] }
       ]
     };
 
@@ -637,8 +651,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataPerforado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#8255ffff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('PERFORADO')] },
-        { label: 'Meta', backgroundColor: '#2000b1ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('PERFORADO')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('PERFORADO'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('PERFORADO')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('PERFORADO') + '55', borderColor: this.colorProceso('PERFORADO'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('PERFORADO')] }
       ]
     };
 
@@ -660,8 +674,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataLaminado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: 'rgb(255, 71, 215)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('LAMINADO')] },
-        { label: 'Meta', backgroundColor: 'rgb(201, 0, 191)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('LAMINADO')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('LAMINADO'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('LAMINADO')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('LAMINADO') + '55', borderColor: this.colorProceso('LAMINADO'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('LAMINADO')] }
       ]
     };
 
@@ -683,8 +697,8 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataDoblado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: 'rgb(114, 114, 114)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('DOBLADO')] },
-        { label: 'Meta', backgroundColor: 'rgb(41, 41, 41)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('DOBLADO')] }
+        { label: 'Producción', backgroundColor: this.colorProceso('DOBLADO'), color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('DOBLADO')] },
+        { label: 'Meta', backgroundColor: this.colorProceso('DOBLADO') + '55', borderColor: this.colorProceso('DOBLADO'), borderWidth: 2, color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('DOBLADO')] }
       ]
     };
 

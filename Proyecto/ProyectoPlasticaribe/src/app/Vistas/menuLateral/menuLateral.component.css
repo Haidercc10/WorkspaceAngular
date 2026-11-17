@@ -537,6 +537,9 @@ p-dialog ::ng-deep div .p-dialog-title {
   line-height: 1.5rem;
   padding: 0 .35rem;
   font-size: .75rem;
+  /* Azul marino del logo en vez del azul de PrimeNG (en oscuro, un azul claro que se lee sobre la barra) */
+  background: var(--fondo-contador);
+  color: var(--texto-contador);
 }
 
 /* Botón principal del aviso "Eventos de hoy" con el rojo de la marca */

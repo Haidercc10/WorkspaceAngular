@@ -9,7 +9,7 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-DashBoard_Pedidos',
@@ -251,8 +251,8 @@ export class DashBoard_PedidosComponent implements OnInit {
       datasets: [
         {
           data: [this.cantidadPedidosPendientes, this.cantidadPedidosParciales],
-          backgroundColor: ['#87B6FF', '#FF87B6'],
-          hoverBackgroundColor: ['#BDD7FF', '#FFBDD7']
+          backgroundColor: [colorSerieGrafica(0, this.modoSeleccionado), colorSerieGrafica(1, this.modoSeleccionado)],
+          hoverBackgroundColor: [colorSerieGrafica(0, this.modoSeleccionado), colorSerieGrafica(1, this.modoSeleccionado)]
         }
       ]
     };
@@ -281,8 +281,8 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.graficaPedidosClientes = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Pedidos por Clientes', backgroundColor: ['#FFFF64'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#6475FF'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: costo }
+        { label: 'Cantidad de Pedidos por Clientes', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: costo }
       ]
     };
     this.estilosGrafica1();
@@ -304,8 +304,8 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.graficaPedidosProductos = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Pedidos vigentes ', backgroundColor: ['#FF646E'], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#A453FD',], yAxisID: 'y1', data: costo },
+        { label: 'Cantidad de Pedidos vigentes ', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), yAxisID: 'y1', data: costo },
       ]
     };
     this.estilosGrafica2();
@@ -330,11 +330,11 @@ export class DashBoard_PedidosComponent implements OnInit {
       labels: vendedores,
       datasets: [{
         label: `Cantidad de pedidos`,
-        backgroundColor: ['#42A5F5'],
+        backgroundColor: colorSerieGrafica(0, this.modoSeleccionado),
         yAxisID: 'y',
         data: cantidad_Pedidos
       },
-      { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#FFCA28'], yAxisID: 'y1', data: costo }
+      { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), yAxisID: 'y1', data: costo }
       ]
     };
     this.estilosGrafica3();

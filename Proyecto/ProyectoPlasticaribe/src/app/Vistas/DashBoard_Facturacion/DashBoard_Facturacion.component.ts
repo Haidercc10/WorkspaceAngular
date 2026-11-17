@@ -12,7 +12,7 @@ import { ColoresBarraProgresoService } from 'src/app/Servicios/Colores_BarraProg
 import { forkJoin, map, Observable } from 'rxjs';
 import { setTimeout } from 'node:timers';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -289,13 +289,13 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de las cantidades facturadas en cada mes
   llenarGraficaFacturacion(datos) {
-    let color: string = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+    const color: string = colorSerieGrafica(this.facturasData.datasets.length, this.modoSeleccionado);
     let info: any = {
       label: `Año ${this.anoSeleccionado}`,
       data: datos,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,

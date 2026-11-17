@@ -9,7 +9,7 @@ import { defaultStepOptions, stepsDashboardCompras as defaultSteps } from 'src/a
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_Compras',
@@ -261,13 +261,10 @@ export class Dashboard_ComprasComponent implements OnInit {
 
   // Funcion que va a cargar los datos de la grafica
   llenarGraficaPlasticaribe(data : any [], id : string){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info = {
       label: `Año - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -276,13 +273,13 @@ export class Dashboard_ComprasComponent implements OnInit {
     };
     if (id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado)) {
       this.anioGraficadoPlasticaribe.push(this.anioSeleccionado);
-      this.graficaComprasPlasticaribe.datasets.push(info);
+      this.agregarSerie(this.graficaComprasPlasticaribe, info);
     } else if (id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado)) {
       this.anioGraficadoInvergoal.push(this.anioSeleccionado);
-      this.graficaComprasInvergoal.datasets.push(info);
+      this.agregarSerie(this.graficaComprasInvergoal, info);
     } else if (id == '900458314' && !this.anioGraficadoInversuez.includes(this.anioSeleccionado)) {
       this.anioGraficadoInversuez.push(this.anioSeleccionado);
-      this.graficaComprasInversuez.datasets.push(info);
+      this.agregarSerie(this.graficaComprasInversuez, info);
     }
   }
 
@@ -302,5 +299,11 @@ export class Dashboard_ComprasComponent implements OnInit {
         if(registros == data.length) this.cargando = false;
       }
     });
+  }
+
+  // Agrega una serie a la gráfica con el siguiente color de la paleta de la marca
+  private agregarSerie(grafica: any, info: any) {
+    const color: string = colorSerieGrafica(grafica.datasets.length, this.modoSeleccionado);
+    grafica.datasets.push({ ...info, borderColor: color, backgroundColor: rellenoSerieGrafica(color) });
   }
 }

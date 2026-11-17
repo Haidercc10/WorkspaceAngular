@@ -7,7 +7,7 @@ import { DevolucionesCalidadService } from 'src/app/Servicios/Devoluciones_Calid
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MovDevolucionesCalidadComponent } from '../mov-devoluciones-calidad/mov-devoluciones-calidad.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-dashboard-calidad',
@@ -273,8 +273,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.ComparativoData = {
       labels: [''],
       datasets: [
-        { label: 'Interno', backgroundColor: '#008cffff',  color: colorTextoGrafica(this.modoSeleccionado), data:  [this.totalRejectedInt] },
-        { label: 'Externo', backgroundColor: '#ffd000',  color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalRejectedExt] }
+        { label: 'Interno', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado),  color: colorTextoGrafica(this.modoSeleccionado), data:  [this.totalRejectedInt] },
+        { label: 'Externo', backgroundColor: colorSerieGrafica(1, this.modoSeleccionado),  color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalRejectedExt] }
       ]
     };
 
@@ -306,8 +306,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graficaPedidosClientes = {
       labels: areas,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#FFFF64'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
-        {label: "Valor total",  backgroundColor: ['#00a130ff'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: total}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Valor total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: total}
       ]
     };
     this.estilosGrafica();
@@ -371,8 +371,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicForKg = {
       labels: areas,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#0081a1ff'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
-        {label: "Peso total",  backgroundColor: ['#89f7ffff'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: weight}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Peso total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: weight}
       ]
     };
     this.estilosGraficaPorKg();
@@ -433,8 +433,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicForClientMoney = {
       labels: clients,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#9684ffff'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
-        {label: "Valor total",  backgroundColor: ['#4557ffff'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: total}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Valor total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: total}
       ]
     };
     this.estilosGraficaClientes();
@@ -501,8 +501,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicForClientKg = {
       labels: clients,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#eeff90ff'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
-        {label: "Peso total",  backgroundColor: ['#45aa45ff'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: weight}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Peso total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: weight}
       ]
     };
     this.estilosGraficaClientesPorKg();
@@ -649,13 +649,13 @@ export class DashboardCalidadComponent implements OnInit {
 
   // Funcion que se encargará de llenar las graficas de areas
   llenarGraficas(data : any []){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graphicForMonth.datasets.length, this.modoSeleccionado);
     let info = {
       label: `${this.selectedYear}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,

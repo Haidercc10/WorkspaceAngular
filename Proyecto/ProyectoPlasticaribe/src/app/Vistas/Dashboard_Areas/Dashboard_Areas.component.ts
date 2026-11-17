@@ -8,7 +8,7 @@ import { defaultStepOptions, stepsDashboarsAreas as defaultSteps } from 'src/app
 import { AppComponent } from 'src/app/app.component';
 import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes-Consolidados.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_Areas',
@@ -196,30 +196,27 @@ export class Dashboard_AreasComponent implements OnInit {
 
   // Funcion que se encargará de llenar las graficas
   llenarGraficas(data : any [], area : string){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info = {
       label: `${area != null ? area.replace('_', '. ') : area} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
       fill : true,
       tension: 0.3
     };
-    if (['EXTRUSION', 'DESP_EXTRUSION'].includes(area)) this.graficaExtrusionProducido.datasets.push(info);
-    else if (['IMPRESION', 'DESP_IMPRESION'].includes(area)) this.graficaImpresionProducido.datasets.push(info);
-    else if (['ROTOGRABADO', 'DESP_ROTOGRABADO'].includes(area)) this.graficaRotograbadoProducido.datasets.push(info);
-    else if (['DOBLADO', 'DESP_DOBLADO'].includes(area)) this.graficaDobladoProducido.datasets.push(info);
-    else if (['LAMINADO', 'DESP_LAMINADO'].includes(area)) this.graficaLaminadoProducido.datasets.push(info);
-    else if (['CORTE', 'DESP_CORTADORES'].includes(area)) this.graficaCorteProducido.datasets.push(info);
-    else if (['EMPAQUE', 'DESP_EMPAQUE'].includes(area)) this.graficaEmpaqueProducido.datasets.push(info);
-    else if (['SELLADO', 'DESP_SELLADO'].includes(area)) this.graficaSelladoProducido.datasets.push(info);
-    else if (['CAMISILLA'].includes(area)) this.graficaCamisillasProducido.datasets.push(info);
-    else if (['Wiketiado'].includes(area)) this.graficaWiketiadoProducido.datasets.push(info);
-    else if (['PERFORADO', 'DESP_PERFORADO'].includes(area)) this.graficaPerforadoProducido.datasets.push(info);
+    if (['EXTRUSION', 'DESP_EXTRUSION'].includes(area)) this.agregarSerie(this.graficaExtrusionProducido, info);
+    else if (['IMPRESION', 'DESP_IMPRESION'].includes(area)) this.agregarSerie(this.graficaImpresionProducido, info);
+    else if (['ROTOGRABADO', 'DESP_ROTOGRABADO'].includes(area)) this.agregarSerie(this.graficaRotograbadoProducido, info);
+    else if (['DOBLADO', 'DESP_DOBLADO'].includes(area)) this.agregarSerie(this.graficaDobladoProducido, info);
+    else if (['LAMINADO', 'DESP_LAMINADO'].includes(area)) this.agregarSerie(this.graficaLaminadoProducido, info);
+    else if (['CORTE', 'DESP_CORTADORES'].includes(area)) this.agregarSerie(this.graficaCorteProducido, info);
+    else if (['EMPAQUE', 'DESP_EMPAQUE'].includes(area)) this.agregarSerie(this.graficaEmpaqueProducido, info);
+    else if (['SELLADO', 'DESP_SELLADO'].includes(area)) this.agregarSerie(this.graficaSelladoProducido, info);
+    else if (['CAMISILLA'].includes(area)) this.agregarSerie(this.graficaCamisillasProducido, info);
+    else if (['Wiketiado'].includes(area)) this.agregarSerie(this.graficaWiketiadoProducido, info);
+    else if (['PERFORADO', 'DESP_PERFORADO'].includes(area)) this.agregarSerie(this.graficaPerforadoProducido, info);
   }
 
   // Funcion que va a colocar los totales de producción de cada area en cada año
@@ -267,5 +264,11 @@ export class Dashboard_AreasComponent implements OnInit {
       }
     });
     return total;
+  }
+
+  // Agrega una serie a la gráfica con el siguiente color de la paleta de la marca
+  private agregarSerie(grafica: any, info: any) {
+    const color: string = colorSerieGrafica(grafica.datasets.length, this.modoSeleccionado);
+    grafica.datasets.push({ ...info, borderColor: color, backgroundColor: rellenoSerieGrafica(color) });
   }
 }

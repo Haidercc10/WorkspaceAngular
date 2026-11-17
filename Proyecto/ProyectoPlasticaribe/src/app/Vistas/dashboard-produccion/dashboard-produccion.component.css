@@ -6,119 +6,138 @@
     margin-top: 2%;
 }
 
-/* Clases para meta y producción */
-
-::ng-deep .meta-extrusion .p-chip {
-    background-color: #ff9900ff;
-    color: white;
+/* Cada proceso tiene un color de la paleta (--grafica-N), el mismo de sus barras en las gráficas
+   (ver colorProceso en el .ts). Producción: chip relleno. Meta: chip con borde del mismo color. */
+::ng-deep .prd-extrusion .p-chip {
+    background-color: var(--grafica-1);
+    color: var(--grafica-1-texto);
 }
 
-::ng-deep .prd-extrusion .p-chip {
-    background-color: #f0d800ff;
-    color: rgb(29, 22, 0);
+::ng-deep .meta-extrusion .p-chip {
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-1);
+}
+
+::ng-deep i.title-extrusion {
+    color: var(--grafica-1);
 }
 
 ::ng-deep .prd-impresion .p-chip {
-    background-color: #60f000ff;
-    color: rgb(0, 56, 12);
+    background-color: var(--grafica-2);
+    color: var(--grafica-2-texto);
 }
 
 ::ng-deep .meta-impresion .p-chip {
-    background-color: #009632ff;
-    color: white;
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-2);
 }
 
-::ng-deep .prd-corte .p-chip {
-    background-color: #2e8fffff;
-    color: white;
-}
-
-::ng-deep .meta-corte .p-chip {
-    background-color: #003cffff;
-    color: white
-}
-
-::ng-deep .prd-sellado .p-chip {
-    background-color: #ff5353ff;
-    color: white;
-}
-
-::ng-deep .meta-sellado .p-chip {
-    background-color: #ff1111ff;
-    color: white
+::ng-deep i.title-impresion {
+    color: var(--grafica-2);
 }
 
 ::ng-deep .prd-perforado .p-chip {
-    background-color: #8255ffff;
-    color: white;
+    background-color: var(--grafica-3);
+    color: var(--grafica-3-texto);
 }
 
 ::ng-deep .meta-perforado .p-chip {
-    background-color: #2000b1ff;
-    color: white
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-3);
+}
+
+::ng-deep i.title-perforado {
+    color: var(--grafica-3);
+}
+
+::ng-deep .prd-corte .p-chip {
+    background-color: var(--grafica-4);
+    color: var(--grafica-4-texto);
+}
+
+::ng-deep .meta-corte .p-chip {
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-4);
+}
+
+::ng-deep i.title-corte {
+    color: var(--grafica-4);
+}
+
+::ng-deep .prd-sellado .p-chip {
+    background-color: var(--grafica-5);
+    color: var(--grafica-5-texto);
+}
+
+::ng-deep .meta-sellado .p-chip {
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-5);
+}
+
+::ng-deep i.title-sellado {
+    color: var(--grafica-5);
 }
 
 ::ng-deep .prd-camisilla .p-chip {
-    background-color: #00d9ffff;
-    color: white;
+    background-color: var(--grafica-6);
+    color: var(--grafica-6-texto);
 }
 
 ::ng-deep .meta-camisilla .p-chip {
-    background-color: #008c91ff;
-    color: white
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-6);
+}
+
+::ng-deep i.title-camisilla {
+    color: var(--grafica-6);
 }
 
 ::ng-deep .prd-laminado .p-chip {
-    background-color: rgb(255, 71, 215);
-    color: white;
+    background-color: var(--grafica-7);
+    color: var(--grafica-7-texto);
 }
 
 ::ng-deep .meta-laminado .p-chip {
-    background-color: rgb(201, 0, 191);
-    color: white
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-7);
+}
+
+::ng-deep i.title-laminado {
+    color: var(--grafica-7);
 }
 
 ::ng-deep .prd-doblado .p-chip {
-    background-color: rgb(114, 114, 114);
-    color: white;
+    background-color: var(--grafica-8);
+    color: var(--grafica-8-texto);
 }
 
 ::ng-deep .meta-doblado .p-chip {
-    background-color:rgb(41, 41, 41);
-    color: white
+    background-color: var(--surface-card);
+    color: var(--text-color);
+    box-shadow: inset 0 0 0 2px var(--grafica-8);
 }
 
-/* Clases titulos tablas */
-::ng-deep .title-extrusion {
-    color: #ff9900ff;
+::ng-deep i.title-doblado {
+    color: var(--grafica-8);
 }
 
-::ng-deep .title-impresion {
-    color: #60f000ff;
-}
-
-::ng-deep .title-corte  {
-    color: #2e8fffff;
-}
-
-::ng-deep .title-sellado {
-    color: #ff5353ff;
-}
-
-::ng-deep .title-perforado {
-    color: #8255ffff;
-}
-
-::ng-deep .title-camisilla {
-    color: #00d9ffff;
-}
-
-::ng-deep .title-laminado {
-    color: rgb(201, 0, 191);
-}
-
+/* Títulos de las tablas por proceso: texto del tema; el ícono lleva el color del proceso */
+::ng-deep .title-extrusion,
+::ng-deep .title-impresion,
+::ng-deep .title-perforado,
+::ng-deep .title-corte,
+::ng-deep .title-sellado,
+::ng-deep .title-camisilla,
+::ng-deep .title-laminado,
 ::ng-deep .title-doblado {
-    color: rgb(41, 41, 41);
+    color: var(--texto-fuerte);
 }
 
 ::ng-deep .p-card {

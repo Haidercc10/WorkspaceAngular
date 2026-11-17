@@ -11,7 +11,7 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCostos as defaultSteps } from 'src/app/data';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_Costos',
@@ -306,13 +306,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de fabricacion
   llenarGraficaCostos_Fabricacion(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosFabricacion.datasets.length, this.modoSeleccionado);
     this.graficaCostosFabricacion.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -349,13 +349,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de costos administrativos
   llenarGraficaCostos_Administrativos(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosAdministrativos.datasets.length, this.modoSeleccionado);
     this.graficaCostosAdministrativos.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -392,13 +392,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de costos de ventas
   llenarGraficaCostos_Ventas(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosVentas.datasets.length, this.modoSeleccionado);
     this.graficaCostosVentas.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -435,13 +435,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de costos no operacionesles
   llenarGraficaCostos_NoOperacionesles(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosNoOperacionesles.datasets.length, this.modoSeleccionado);
     this.graficaCostosNoOperacionesles.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,

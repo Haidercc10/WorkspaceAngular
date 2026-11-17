@@ -10,7 +10,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardVentasVendedor as defaultSteps } from 'src/app/data';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 
 @Component({
@@ -131,13 +131,13 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
         });
       }
       setTimeout(() => {
-        let color: string = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+        const color: string = colorSerieGrafica(this.facturasData.datasets.length, this.modoSeleccionado);
         let info: any = {
           label: `Año ${this.anioSeleccionado} - Vendedor ${vendedor}`,
           data: [ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dic],
           yAxisID: 'y',
-          borderColor: color.substring(0, 4),
-          backgroundColor: color.substring(0, 4) + "2",
+          borderColor: color,
+          backgroundColor: rellenoSerieGrafica(color),
           pointStyle: 'circle',
           pointRadius: 10,
           pointHoverRadius: 15,
@@ -190,14 +190,14 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     forkJoin(consultas).subscribe({
       next: (resultados) => {
 
-        const color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+        const color: string = colorSerieGrafica(this.facturasData.datasets.length, this.modoSeleccionado);
 
         const info = {
           label: `Año ${this.anioSeleccionado} - Vendedor ${vendedor}`,
           data: resultados, // Enero a Diciembre
           yAxisID: 'y',
-          borderColor: color.substring(0, 4),
-          backgroundColor: color.substring(0, 4) + "2",
+          borderColor: color,
+          backgroundColor: rellenoSerieGrafica(color),
           pointStyle: 'circle',
           pointRadius: 10,
           pointHoverRadius: 15,
