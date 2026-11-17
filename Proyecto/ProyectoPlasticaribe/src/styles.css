@@ -287,6 +287,19 @@ th {
   font-weight: 500;
 }
 
+/* Mensajes informativos en azul (el tema Lara los trae en índigo/morado). */
+.p-toast .p-toast-message.p-toast-message-info {
+  background: #e3effe;
+  border: solid #3b82f6;
+  border-width: 0 0 0 6px;
+  color: #1d4ed8;
+}
+
+.p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon,
+.p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close {
+  color: #1d4ed8;
+}
+
 /* ESTILO DE PRIMENG */
 .p-input-icon-left {
   width: 100%;
