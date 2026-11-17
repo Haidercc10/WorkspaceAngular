@@ -1,5 +1,5 @@
 span{
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .columnaCantidad {
@@ -120,7 +120,7 @@ p-dialog ::ng-deep .p-dialog-header span {
 
 /* Cantidad disponible negativa en Subcategorías: lo reservado supera el stock. */
 .disponible-negativo {
-  color: #db4149;
+  color: var(--rojo);
 }
 
 /* Modal "¿Qué material desea crear?": dos tarjetas grandes. */
@@ -211,7 +211,7 @@ p-dialog ::ng-deep .p-dialog-header span {
 }
 
 .formulario-editar .obligatorio {
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .formulario-editar .mensaje-error,
@@ -222,7 +222,7 @@ p-dialog ::ng-deep .p-dialog-header span {
 }
 
 .formulario-editar .mensaje-error {
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .formulario-editar .ayuda {

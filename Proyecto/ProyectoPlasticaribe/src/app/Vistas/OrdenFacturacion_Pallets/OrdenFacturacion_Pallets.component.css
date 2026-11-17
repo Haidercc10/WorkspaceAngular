@@ -16,7 +16,7 @@ p-table ::ng-deep div {
 }
 
 ::ng-deep .p-inputgroup-addon {
-    background: rgb(214, 100, 106);
+    background: var(--rojoClaro);
     color: white;
 }    
 

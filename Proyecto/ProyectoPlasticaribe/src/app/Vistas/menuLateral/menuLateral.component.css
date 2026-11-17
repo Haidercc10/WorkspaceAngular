@@ -98,11 +98,11 @@ p-panelmenu ::ng-deep div a {
 }
 
 .botonMenu .user:hover{
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .pi:hover{
-  color: #a23;
+  color: var(--rojoHover);
 }
 
 .navbar {
@@ -451,7 +451,7 @@ p-dialog ::ng-deep div .p-dialog-title {
   height: 100%;
   font-weight: 600;
   padding: 10px;
-  background: #db4149;
+  background: var(--rojo);
   color: white;
   font-size: 1rem;
   width: 50%;

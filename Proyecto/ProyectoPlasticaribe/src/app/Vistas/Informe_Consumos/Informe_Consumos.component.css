@@ -1,5 +1,5 @@
 span{
-    color: #db4149;
+    color: var(--rojo);
   }
   p-calendar ::ng-deep span button {
     background-color: var(--rojo);

@@ -8,6 +8,7 @@ import { AppComponent } from 'src/app/app.component';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Facturacion_Vs_IngresosDespacho',
@@ -54,9 +55,9 @@ export class Facturacion_Vs_IngresosDespachoComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.facturasOptions.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.facturasOptions.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.facturasOptions.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -167,13 +168,13 @@ export class Facturacion_Vs_IngresosDespachoComponent implements OnInit {
     this.facturasOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 20 },
             callback: function(value) {
               if (value.length > 4) return `${value.substring(0, 4)}...`;
@@ -182,14 +183,14 @@ export class Facturacion_Vs_IngresosDespachoComponent implements OnInit {
               //else return this.getLabelForValue(value);
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' },
+          ticks: {  color: colorTextoGrafica(this.modoSeleccionado), font: { size: 20 } },
+          grid: { color: COLOR_REJILLA_GRAFICA },
           min : 0
         },
       },

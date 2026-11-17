@@ -145,7 +145,7 @@
                 <td (click)="mostrarModalCrearEditar(ArrayProductoZeus)">{{ArrayProductoZeus.Nombre}}</td>
                 <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
                 <ng-template #rojo>
-                  <td class="text-center" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+                  <td class="text-center" style="background-color: var(--fondo-peligro);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
                 </ng-template>
                 <ng-template #azul>
                   <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
@@ -314,7 +314,7 @@
             <td (click)="mostrarModalCrearEditar(ArrayProductoZeus)" >{{ArrayProductoZeus.Nombre}}</td>
             <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
             <ng-template #rojo>
-              <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+              <td style="text-align: center;" style="background-color: var(--fondo-peligro);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
             </ng-template>
             <ng-template #azul>
               <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>

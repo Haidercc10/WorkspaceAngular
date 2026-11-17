@@ -12,6 +12,7 @@ import { ColoresBarraProgresoService } from 'src/app/Servicios/Colores_BarraProg
 import { forkJoin, map, Observable } from 'rxjs';
 import { setTimeout } from 'node:timers';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -60,9 +61,9 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.facturasOptions.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.facturasOptions.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.facturasOptions.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -257,13 +258,13 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.facturasOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 20 },
             callback: (value : any) => {
               const label = this.facturasData.labels[value];
@@ -271,14 +272,14 @@ export class DashBoard_FacturacionComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' },
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 20 } },
+          grid: { color: COLOR_REJILLA_GRAFICA },
           min: 0
         },
       },

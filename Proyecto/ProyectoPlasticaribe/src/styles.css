@@ -1,10 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
+/* ==================== PALETA PLASTICARIBE ====================
+   Tomada del logo (rojo #b11d28 y azul marino #131f4c). Usar siempre estas variables
+   en lugar de escribir el color: así un cambio de marca se hace en un solo lugar. */
 :root {
   --font-size: 1;
-  --rojo: #db4149;
-  --rojoHover: #a8262c;
-  --rojoClaro: rgb(214, 100, 106);
   --shadow-color: 286deg 36% 56%;
+
+  /* Marca */
+  --rojo: #c42a35;               /* botones y acentos (antes #db4149; contraste con blanco 5,6:1) */
+  --rojoHover: #b11d28;          /* rojo exacto del logo */
+  --rojoClaro: #e4636e;          /* detalles suaves; acento sobre fondo oscuro */
+  --azul-marca: #131f4c;         /* azul marino del logo: encabezados, menú, títulos */
+  --azul-marca-medio: #283a75;   /* hover, bordes y botones secundarios */
+
+  /* Neutros (reemplazan los #ccc, #ddd, #eee... sueltos; son iguales en ambos temas,
+     para fondos y textos que deban cambiar con el tema usar las variables de abajo) */
+  --gris-100: #f1f3f5;
+  --gris-200: #e9ecef;
+  --gris-300: #dee2e6;
+  --gris-400: #ced4da;
+  --gris-500: #adb5bd;
+  --gris-600: #6c757d;
+  --gris-700: #495057;
+  --gris-800: #343a40;
 }
 
 /* ==================== COLORES SEGÚN EL TEMA (CLARO / OSCURO) ====================
@@ -27,13 +45,27 @@
   --borde-sutil: #e1e4e8;                       /* bordes de tablas HTML simples */
   --fondo-info: #e0f2fe;                        /* avisos informativos */
   --texto-info: #0369a1;
-  --texto-peligro: #dc2626;                     /* valores negativos o vencidos */
+  --texto-peligro: #b91c1c;                     /* valores negativos o vencidos */
+  --fondo-peligro: #fee2e2;                     /* filas o celdas con error (p. ej. rollos ya registrados) */
+  --texto-advertencia: #92400e;                 /* avisos que requieren atención */
+  --fondo-advertencia: #fef3c7;
   --fondo-obligatorio: #fff1f1;                 /* campos obligatorios pendientes */
   --borde-obligatorio: #e24c4c;
-  --fondo-acento: #fff9f9;                      /* resaltado suave con el rojo de la marca */
+  --fondo-acento: #fdf2f3;                      /* resaltado suave con el rojo de la marca */
+  --azul-marca-claro: #eef1f8;                  /* fondos de secciones con el azul de la marca */
   --fondo-exito: #dcfce7;                       /* confirmaciones (p. ej. botón "Copiado!") */
   --texto-exito: #166534;                       /* texto y borde de las confirmaciones */
   --rejilla-graficas: rgba(128, 128, 128, 0.2); /* líneas de la cuadrícula de las gráficas (sirve en ambos temas) */
+
+  /* Series de las gráficas, en este orden (en TS: PALETA_GRAFICAS de Servicios/Tema/Paleta.ts) */
+  --grafica-1: #283a75;
+  --grafica-2: #c42a35;
+  --grafica-3: #2a9d8f;
+  --grafica-4: #e9a23b;
+  --grafica-5: #4a99b4;
+  --grafica-6: #7b5ea7;
+  --grafica-7: #8c6d46;
+  --grafica-8: #6c757d;
 }
 
 /* Tema oscuro: se activa cuando el <link id="app-theme"> carga lara-dark-blue.css */
@@ -44,11 +76,25 @@
   --fondo-info: rgba(14, 165, 233, 0.16);
   --texto-info: #7dd3fc;
   --texto-peligro: #f87171;
+  --fondo-peligro: rgba(239, 68, 68, 0.16);
+  --texto-advertencia: #fcd34d;
+  --fondo-advertencia: rgba(245, 158, 11, 0.16);
   --fondo-obligatorio: rgba(226, 76, 76, 0.16);
   --borde-obligatorio: #f87171;
-  --fondo-acento: rgba(219, 65, 73, 0.14);
+  --fondo-acento: rgba(196, 42, 53, 0.16);
+  --azul-marca-medio: #8597c9;
+  --azul-marca-claro: rgba(133, 151, 201, 0.12);
   --fondo-exito: rgba(34, 197, 94, 0.16);
   --texto-exito: #86efac;
+
+  --grafica-1: #8597c9;
+  --grafica-2: #e4636e;
+  --grafica-3: #3dbfae;
+  --grafica-4: #e9a23b;
+  --grafica-5: #6bb6d0;
+  --grafica-6: #a68bd1;
+  --grafica-7: #b89466;
+  --grafica-8: #adb5bd;
 }
 
 * {

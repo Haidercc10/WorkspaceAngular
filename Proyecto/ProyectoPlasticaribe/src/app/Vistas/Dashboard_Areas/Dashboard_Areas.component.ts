@@ -8,6 +8,7 @@ import { defaultStepOptions, stepsDashboarsAreas as defaultSteps } from 'src/app
 import { AppComponent } from 'src/app/app.component';
 import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes-Consolidados.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_Areas',
@@ -60,9 +61,9 @@ export class Dashboard_AreasComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.opcionesGrafica.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.opcionesGrafica.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.opcionesGrafica.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -93,13 +94,13 @@ export class Dashboard_AreasComponent implements OnInit {
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 20 },
             callback: function(value : any, index : any, values : any) {
               const label = labels[index];
@@ -107,14 +108,14 @@ export class Dashboard_AreasComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' },
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 20 } },
+          grid: { color: COLOR_REJILLA_GRAFICA },
           min : 0
         },
       },

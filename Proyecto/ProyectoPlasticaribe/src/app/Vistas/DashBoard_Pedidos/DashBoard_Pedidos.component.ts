@@ -9,6 +9,7 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 import { UtileriaService } from 'src/app/Servicios/Utileria/utileria.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-DashBoard_Pedidos',
@@ -74,7 +75,7 @@ export class DashBoard_PedidosComponent implements OnInit {
    */
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    const color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    const color = colorTextoGrafica(this.modoSeleccionado);
     if (this.multiAxisOptions?.plugins?.legend?.labels) this.multiAxisOptions.plugins.legend.labels.color = color;
     if (this.opcionesGraficas1?.plugins?.legend?.labels) this.opcionesGraficas1.plugins.legend.labels.color = color;
     if (this.opcionesGraficas1?.scales?.x?.ticks) this.opcionesGraficas1.scales.x.ticks.color = color;
@@ -258,7 +259,7 @@ export class DashBoard_PedidosComponent implements OnInit {
 
     this.multiAxisOptions = {
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 18 } } },
         tooltip: { titleFont: { size: 25 }, bodyFont: { size: 20 } },
       },
     };
@@ -280,8 +281,8 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.graficaPedidosClientes = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Pedidos por Clientes', backgroundColor: ['#FFFF64'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#6475FF'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
+        { label: 'Cantidad de Pedidos por Clientes', backgroundColor: ['#FFFF64'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Pedidos ', backgroundColor: ['#6475FF'], color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: costo }
       ]
     };
     this.estilosGrafica1();
@@ -345,14 +346,14 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.opcionesGraficas1 = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       tooltip: { usePointStyle: true, },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 18 },
             callback: function (value, index, values) {
               const label = labels[index];
@@ -360,21 +361,21 @@ export class DashBoard_PedidosComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 18 } },
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)' }
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 18 } },
+          grid: { drawOnChartArea: false, color: COLOR_REJILLA_GRAFICA }
         },
       },
     };
@@ -386,14 +387,14 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.opcionesGraficas2 = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       tooltip: { usePointStyle: true, },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 18 },
             callback: function (value, index, values) {
               const label = labels[index];
@@ -401,21 +402,21 @@ export class DashBoard_PedidosComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 18 } },
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)' }
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 18 } },
+          grid: { drawOnChartArea: false, color: COLOR_REJILLA_GRAFICA }
         },
       },
     };
@@ -426,14 +427,14 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.opcionesGraficas3 = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       tooltip: { usePointStyle: true, },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 18 },
             callback: function (value, index, values) {
               const label = labels[index];
@@ -441,21 +442,21 @@ export class DashBoard_PedidosComponent implements OnInit {
               return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 18 } },
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-          grid: { drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)' }
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 18 } },
+          grid: { drawOnChartArea: false, color: COLOR_REJILLA_GRAFICA }
         },
       },
     };

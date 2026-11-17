@@ -88,7 +88,7 @@
   }
   
   .existente{
-    background-color: rgb(255, 146, 146);
+    background-color: var(--fondo-peligro);
   }
   
   .deshabilitado{

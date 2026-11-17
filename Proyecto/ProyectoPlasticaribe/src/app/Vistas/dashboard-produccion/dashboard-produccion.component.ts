@@ -10,6 +10,7 @@ import { ReporteProduccionComponent } from '../Reporte-Produccion/Reporte-Produc
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { plugins } from 'chart.js/dist/core';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA } from 'src/app/Servicios/Tema/Paleta';
 
 @Injectable({
   providedIn: 'root'
@@ -115,37 +116,37 @@ export class DashboardProduccionComponent implements OnInit {
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
     //EXTRUSIÓN
-    this.ComparativoOptionsExtrusion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsExtrusion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsExtrusion.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsExtrusion.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsExtrusion.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsExtrusion.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
     //IMPRESIÓN
-    this.ComparativoOptionsImpresion.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsImpresion.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsImpresion.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsImpresion.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsImpresion.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsImpresion.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
     //PERFORADO
-    this.ComparativoOptionsPerforado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsPerforado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsPerforado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsPerforado.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsPerforado.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsPerforado.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
     //CAMISILLA
-    this.ComparativoOptionsCamisilla.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsCamisilla.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsCamisilla.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsCamisilla.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsCamisilla.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsCamisilla.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
     //EMPAQUE
-    this.ComparativoOptionsEmpaque.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsEmpaque.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsEmpaque.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsEmpaque.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsEmpaque.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsEmpaque.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
     //SELLADO
-    this.ComparativoOptionsSellado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsSellado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsSellado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsSellado.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsSellado.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsSellado.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
     //LAMINADO
-    this.ComparativoOptionsLaminado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsLaminado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsLaminado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsLaminado.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsLaminado.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsLaminado.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
     //DOBLADO
-    this.ComparativoOptionsDoblado.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsDoblado.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptionsDoblado.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptionsDoblado.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsDoblado.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptionsDoblado.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -521,20 +522,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataExtrusion = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#f0d800ff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('EXTRUSION')] },
-        { label: 'Meta', backgroundColor: '#ff9900ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('EXTRUSION')] }
+        { label: 'Producción', backgroundColor: '#f0d800ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('EXTRUSION')] },
+        { label: 'Meta', backgroundColor: '#ff9900ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('EXTRUSION')] }
       ]
     };
 
     this.ComparativoOptionsExtrusion = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }
@@ -544,20 +545,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataImpresion = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#60f000ff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('IMPRESION')] },
-        { label: 'Meta', backgroundColor: '#009632ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('IMPRESION')] }
+        { label: 'Producción', backgroundColor: '#60f000ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('IMPRESION')] },
+        { label: 'Meta', backgroundColor: '#009632ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('IMPRESION')] }
       ]
     };
 
     this.ComparativoOptionsImpresion = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }
@@ -567,20 +568,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataEmpaque = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#2e8fffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('CORTE')] },
-        { label: 'Meta', backgroundColor: '#003cffff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('CORTE')] }
+        { label: 'Producción', backgroundColor: '#2e8fffff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('CORTE')] },
+        { label: 'Meta', backgroundColor: '#003cffff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('CORTE')] }
       ]
     };
 
     this.ComparativoOptionsEmpaque = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }
@@ -590,20 +591,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataSellado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#ff5353ff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('SELLADO')] },
-        { label: 'Meta', backgroundColor: '#ff1111ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('SELLADO')] }
+        { label: 'Producción', backgroundColor: '#ff5353ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('SELLADO')] },
+        { label: 'Meta', backgroundColor: '#ff1111ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('SELLADO')] }
       ]
     };
 
     this.ComparativoOptionsSellado = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }
@@ -613,20 +614,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataCamisilla = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#00d9ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('CAMISILLA')] },
-        { label: 'Meta', backgroundColor: '#008c91ff ', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('CAMISILLA')] }
+        { label: 'Producción', backgroundColor: '#00d9ffff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('CAMISILLA')] },
+        { label: 'Meta', backgroundColor: '#008c91ff ', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('CAMISILLA')] }
       ]
     };
 
     this.ComparativoOptionsCamisilla = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }
@@ -636,20 +637,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataPerforado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: '#8255ffff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('PERFORADO')] },
-        { label: 'Meta', backgroundColor: '#2000b1ff', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('PERFORADO')] }
+        { label: 'Producción', backgroundColor: '#8255ffff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('PERFORADO')] },
+        { label: 'Meta', backgroundColor: '#2000b1ff', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('PERFORADO')] }
       ]
     };
 
     this.ComparativoOptionsPerforado = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }
@@ -659,20 +660,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataLaminado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: 'rgb(255, 71, 215)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('LAMINADO')] },
-        { label: 'Meta', backgroundColor: 'rgb(201, 0, 191)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('LAMINADO')] }
+        { label: 'Producción', backgroundColor: 'rgb(255, 71, 215)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('LAMINADO')] },
+        { label: 'Meta', backgroundColor: 'rgb(201, 0, 191)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('LAMINADO')] }
       ]
     };
 
     this.ComparativoOptionsLaminado = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }
@@ -682,20 +683,20 @@ export class DashboardProduccionComponent implements OnInit {
     this.ComparativoDataDoblado = {
       labels: [''],
       datasets: [
-        { label: 'Producción', backgroundColor: 'rgb(114, 114, 114)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalKgMonth('DOBLADO')] },
-        { label: 'Meta', backgroundColor: 'rgb(41, 41, 41)', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalGoalMonth('DOBLADO')] }
+        { label: 'Producción', backgroundColor: 'rgb(114, 114, 114)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalKgMonth('DOBLADO')] },
+        { label: 'Meta', backgroundColor: 'rgb(41, 41, 41)', color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalGoalMonth('DOBLADO')] }
       ]
     };
 
     this.ComparativoOptionsDoblado = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } },
-        y: { ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'] }, grid: { color: 'rgba(128, 128, 128, 0.2)' } }
+        x: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: colorTextoGrafica(this.modoSeleccionado) }, grid: { color: COLOR_REJILLA_GRAFICA } }
       }
     };
   }

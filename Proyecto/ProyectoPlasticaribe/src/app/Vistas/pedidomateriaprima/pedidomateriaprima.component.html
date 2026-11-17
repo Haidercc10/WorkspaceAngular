@@ -116,12 +116,12 @@
             *ngIf="arrayOrdenCompra.Exits && arrayOrdenCompra.Cantidad_Ingresada == arrayOrdenCompra.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <tr>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Id}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Nombre}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Medida}}</td>
+              <td style="background-color: var(--fondo-peligro);">{{arrayOrdenCompra.Id}}</td>
+              <td style="background-color: var(--fondo-peligro);">{{arrayOrdenCompra.Nombre}}</td>
+              <td style="background-color: var(--fondo-peligro);">{{arrayOrdenCompra.Cantidad | number}}</td>
+              <td style="background-color: var(--fondo-peligro);">{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
+              <td style="background-color: var(--fondo-peligro);">{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
+              <td style="background-color: var(--fondo-peligro);">{{arrayOrdenCompra.Medida}}</td>
             </tr>
           </ng-template>
           <ng-template #elseTemplate>

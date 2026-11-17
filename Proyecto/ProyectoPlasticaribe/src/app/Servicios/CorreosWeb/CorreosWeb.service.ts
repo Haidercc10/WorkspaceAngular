@@ -139,7 +139,7 @@ export class CorreosWebService {
     const firmaHtml = `Atentamente,<br><b>${aHtml(usuario)}</b><br>Plasticaribe S.A.S`;
     const cuerpoHtml = `${aHtml(respuesta.trim())}<br><br>${firmaHtml}<br><br><hr>`
       + `<i>${aHtml(original)}</i><br>`
-      + `<blockquote style="margin: 8px 0; padding-left: 12px; border-left: 3px solid #db4149; color: #555;">${aHtml(correo.mensaje)}</blockquote>`;
+      + `<blockquote style="margin: 8px 0; padding-left: 12px; border-left: 3px solid #c42a35; color: #555;">${aHtml(correo.mensaje)}</blockquote>`;
 
     const firma = `${usuario} - Plasticaribe S.A.S`;
     const textoPlano = `${respuesta.trim()}\n\nAtentamente,\n${usuario}\nPlasticaribe S.A.S\n\n`
