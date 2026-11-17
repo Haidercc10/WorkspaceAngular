@@ -111,3 +111,25 @@ Si algo falla, restaurar la copia de la carpeta hecha en el paso 2.3 y recargar 
 | `src/environments/environment.beta.ts` | Rutas de las APIs del .250, `esBeta: true` |
 | `src/index.beta.html` | `index.html` con el título "PLASTICARIBE (BETA)" |
 | `angular.json` → configuración `beta` | Usa `environment.beta.ts` e `index.beta.html` |
+| `src/manifest.json` / `src/manifest.beta.json` | Datos de la app instalable (nombre, ícono, colores) de producción y BETA |
+| `src/assets/PWA/` | Íconos de la app instalable (192, 512 y 180 px) |
+
+## 8. Aplicación de escritorio (instalar Plasticaribe)
+
+El sitio se puede instalar como una aplicación con ventana propia, ícono en el escritorio y en la barra de tareas.
+Producción se instala como **Plasticaribe** y pruebas como **Plasticaribe (BETA)**; ambas pueden convivir en el mismo equipo.
+No hay que hacer nada extra al publicar: los manifiestos y los íconos salen en `dist/` con cada build.
+
+**Requisito del navegador:** Chrome y Edge solo muestran el botón *Instalar* de la barra de direcciones en sitios
+**HTTPS** (o `localhost`). Como el .85 y el .250 están en HTTP, hay tres opciones:
+
+1. **Acceso directo en ventana (sin configurar nada):**
+   - Chrome: menú ⋮ → *Transmitir, guardar y compartir* → *Crear acceso directo…* → marcar **Abrir como ventana**.
+   - Edge: menú ⋯ → *Aplicaciones* → *Instalar este sitio como una aplicación*.
+2. **Tratar las IPs como seguras (por equipo):** en `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
+   (o `edge://flags/...`) agregar `http://192.168.0.85,http://192.168.0.250`, activar y reiniciar el navegador.
+   Desde ahí aparece el botón *Instalar* en la barra de direcciones.
+3. **Para todos los equipos (TI):** la directiva de grupo `OverrideSecurityRestrictionsOnInsecureOrigin`
+   de Chrome/Edge con las mismas dos direcciones. Hace lo mismo que la opción 2 sin tocar cada equipo.
+
+A largo plazo, publicar el sitio con HTTPS en IIS hace que el botón aparezca solo, sin ninguna de estas opciones.

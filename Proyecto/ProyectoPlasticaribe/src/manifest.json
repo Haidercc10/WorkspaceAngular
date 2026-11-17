@@ -1,0 +1,18 @@
+{
+  "id": "/?app=plasticaribe",
+  "name": "Plasticaribe",
+  "short_name": "Plasticaribe",
+  "description": "Sistema de gestión de empaques plásticos flexibles.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#131f4c",
+  "icons": [
+    { "src": "assets/PWA/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/PWA/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/PWA/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/PWA/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

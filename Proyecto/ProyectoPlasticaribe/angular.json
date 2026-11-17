@@ -26,6 +26,8 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
+              "src/manifest.json",
+              "src/manifest.beta.json",
               "src/assets"
             ],
             "styles": [
