@@ -25,6 +25,16 @@ export enum EstadoSolicitudMaterial {
 /** Roles que pueden marcar una solicitud finalizada como verificada: ADMINISTRADOR (1) y SUPERIOR EXTRUSION 2 (85). Policy VerificarSolicitudMaterial del API. */
 export const ROLES_VERIFICAR_SOLICITUD: number[] = [1, 85];
 
+/** Roles que pueden editar solicitudes ya creadas y elegir el proceso. Policy EditarSolicitudMaterial del API. */
+export const ROLES_EDITAR_SOLICITUD: number[] = [1, 104];
+
+/** Indica si la solicitud ya no admite ediciones ni asignaciones (cancelada, finalizada o verificada). */
+export const solicitudCerrada = (estado: number): boolean =>
+  [EstadoSolicitudMaterial.Cancelada, EstadoSolicitudMaterial.Finalizada, EstadoSolicitudMaterial.Verificada].includes(Number(estado));
+
+/** Estados de la OT en BagPro en los que está cerrada y no admite solicitudes ni asignaciones. */
+export const ESTADOS_OT_CERRADA: number[] = [1, 4];
+
 /** Subcategoría y cantidad de una solicitud. */
 export interface DetalleSolicitudRequest {
   SubCatMP_Id: number;
@@ -38,8 +48,12 @@ export interface CrearSolicitudRequest {
   Maquina: number;
   ProcesoId: string;
   Observacion?: string;
-  FechaEstimadaEntrega?: string | null;
+  FechaEstimadaEntrega: string;
   ConfirmarSaldoNegativo: boolean;
+  /** Kg máximos de la OT (kg de la OT más el adicional). Obligatorio en Extrusión. */
+  LimiteKgOT?: number | null;
+  /** El usuario con permiso confirmó superar el límite de kg de la OT. */
+  ConfirmarExcesoLimite: boolean;
   Detalles: DetalleSolicitudRequest[];
 }
 
@@ -47,8 +61,12 @@ export interface CrearSolicitudRequest {
 export interface EditarSolicitudRequest {
   Maquina: number;
   Observacion?: string;
-  FechaEstimadaEntrega?: string | null;
+  FechaEstimadaEntrega: string;
   ConfirmarSaldoNegativo: boolean;
+  /** Kg máximos de la OT (kg de la OT más el adicional). Obligatorio en Extrusión. */
+  LimiteKgOT?: number | null;
+  /** El usuario con permiso confirmó superar el límite de kg de la OT. */
+  ConfirmarExcesoLimite: boolean;
   Detalles: DetalleSolicitudRequest[];
 }
 

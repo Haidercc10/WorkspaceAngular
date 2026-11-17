@@ -36,7 +36,9 @@ export function pasosTutorialSolicitudMaterial({ esAdministrador, puedeExcederLi
     esAdministrador && paso(el('solicitud'), '¡Editar una solicitud!',
       `<p>Para <b>modificar</b> una solicitud ya creada, escribimos su número y presionamos <b>Enter</b>.</p>
        <p>Se cargan su OT, máquina, fecha, observación y los materiales pedidos, y el botón cambia a <b>Editar Solicitud</b>.</p>
-       <p>Solo se pueden editar solicitudes <b>pendientes o parciales</b>; las finalizadas o canceladas no.</p>`),
+       <p>Arriba sale un aviso <b>"Editando la solicitud N°…"</b> con el botón <b>Cancelar edición</b>. Mientras se edita, la <b>OT</b> y el <b>proceso</b> no se pueden cambiar.</p>
+       <p>Solo se pueden editar solicitudes <b>pendientes o parciales</b>; las finalizadas, verificadas o canceladas no.</p>
+       <p>Si hay cambios sin guardar y consultamos otra solicitud o limpiamos la pantalla, nos pide <b>confirmar</b> antes de perderlos.</p>`),
 
     paso(el('proceso'), '¡Proceso!',
       esAdministrador
@@ -45,13 +47,15 @@ export function pasosTutorialSolicitudMaterial({ esAdministrador, puedeExcederLi
              <li><b>Extrusión:</b> se solicitan <b>materias primas</b>.</li>
              <li><b>Impresión, Empaque o Laminado:</b> se solicitan <b>tintas</b>.</li>
            </ul>
-           <p>Al cambiarlo se recargan las máquinas y se limpia la subcategoría que estuviera cargada.</p>`
+           <p>Al cambiarlo se recargan las máquinas y se quitan la máquina, la subcategoría cargada y las subcategorías agregadas, porque eran del proceso anterior.</p>`
         : `<p>El proceso <b>se carga solo según su rol</b> y no se puede cambiar.</p>
            <p>En <b>Extrusión</b> se solicitan materias primas; en Impresión, Empaque y Laminado se solicitan tintas.</p>`),
 
     paso(el('ot'), '¡Orden de Trabajo!',
       `<p>Escribimos el número de la OT y presionamos <b>Enter</b>.</p>
-       <p>Si existe, se carga su información en la tabla de abajo y sale un mensaje con los <b>kg que aún se pueden solicitar</b>.</p>
+       <p>Si existe, se carga su información en la tabla de abajo y, en Extrusión, sale un mensaje con los <b>kg que aún se pueden solicitar</b>.
+       Si la OT está <b>cerrada</b> nos avisa de una vez y no deja pedirle materiales.</p>
+       <p>Si cambiamos el número sin presionar <b>Enter</b>, no se puede agregar ni guardar hasta volver a consultarla.</p>
        <p>Con el botón <i class="pi pi-file-pdf"></i> de la derecha vemos el <b>PDF de la OT consultada</b>: se genera y, a los pocos segundos, se abre en una pestaña nueva.
        Se habilita solo después de consultar la OT, y si cambiamos el número hay que volver a presionar <b>Enter</b>.</p>`),
 
@@ -79,7 +83,8 @@ export function pasosTutorialSolicitudMaterial({ esAdministrador, puedeExcederLi
 
     paso(el('verSubcategorias'), '¡Ver Subcategorías y Materiales!',
       `<p>Muestra todas las subcategorías del proceso elegido con su <b>stock</b> y su <b>disponible</b>.</p>
-       <p>Con el botón <i class="pi pi-eye"></i> de cada subcategoría vemos los materiales que la componen. Sirve para consultar antes de pedir.</p>`),
+       <p>Con el botón <i class="pi pi-eye"></i> de cada subcategoría vemos los materiales que la componen, y con <i class="pi pi-check"></i>
+       la <b>cargamos en el formulario</b> para pedirla (con el encabezado completo).</p>`),
 
     paso(el('subcategoria'), '¡Subcategoría!',
       `<p>Aquí buscamos el material que vamos a pedir, <b>por su Id o por su nombre</b>:</p>
@@ -92,7 +97,8 @@ export function pasosTutorialSolicitudMaterial({ esAdministrador, puedeExcederLi
        <p>La <b>X</b> borra la subcategoría y sus datos para elegir otra.</p>`),
 
     paso(el('cantidad'), '¡Cantidad!',
-      `<p>Escribimos cuánto necesitamos y presionamos <b>Enter</b> para agregarla a la tabla.</p>
+      `<p>Al elegir la subcategoría el cursor pasa solo a este campo. Escribimos cuánto necesitamos (hasta <b>2 decimales</b>) y presionamos <b>Enter</b> para agregarla a la tabla;
+       el cursor vuelve a <b>Subcategoría</b> para seguir con la siguiente.</p>
        <p>Con <b>un clic</b> se selecciona todo el valor, así lo reemplazamos sin borrar.</p>`),
 
     paso(el('disponible'), '¡Disponible y Stock!',
@@ -110,7 +116,9 @@ export function pasosTutorialSolicitudMaterial({ esAdministrador, puedeExcederLi
 
     paso(el('tablaSolicitadas'), '¡Subcategorías solicitadas!',
       `<p>Aquí quedan los materiales que vamos a pedir, con lo <b>entregado</b> y lo <b>faltante</b> de cada uno (al editar una solicitud).</p>
-       <p>Abajo está el <b>total</b> pedido.</p>`),
+       <p>La columna <b>Disponible</b> se pone en <b>rojo</b> si lo pedido lo supera.</p>
+       <p>Abajo está el <b>total</b> pedido y, en <b>Extrusión</b>, un resumen en vivo con los kg por solicitar de la OT y cuántos quedarían después de guardar
+       (en <b>rojo</b> si se supera el límite).</p>`),
 
     paso(el('editarCantidad'), '¡Editar cantidad!',
       `<p>Haciendo <b>clic sobre la cantidad</b> de una fila podemos corregirla.</p>
@@ -130,7 +138,7 @@ export function pasosTutorialSolicitudMaterial({ esAdministrador, puedeExcederLi
          <li>Si algo supera el <b>disponible</b>, pide confirmar.</li>
        </ul>
        <p>En las confirmaciones, <b>Enter</b> es <b>Sí</b> y <b>Esc</b> es <b>No</b>.</p>
-       <p>Al guardar se descarga el <b>PDF</b> de la solicitud y la pantalla queda limpia. <b>Limpiar Todo</b> borra todo sin guardar.</p>
+       <p>Al guardar se descarga el <b>PDF</b> de la solicitud y la pantalla queda limpia. <b>Limpiar Todo</b> borra todo sin guardar (si hay cambios, pide confirmar).</p>
        <p>Puede volver a ver este tutorial cuando quiera con el botón <b>i</b> junto al título.</p>`),
   ]);
 }

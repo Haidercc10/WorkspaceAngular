@@ -67,10 +67,11 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   right: 0.25rem;
   z-index: 2;
   transform: translateY(-50%);
-  color: #5d6d7e;
+  color: var(--text-color-secondary);
 }
 
-::ng-deep .p-card {
+/* Estilos de PrimeNG limitados a esta página (:host) para que no se filtren a las demás vistas. */
+:host ::ng-deep .p-card {
   align-items: center;
   margin: auto;
   width: 90%;
@@ -81,33 +82,72 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   margin-bottom: 5%;
 }
 
-::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-inputtextarea {
   display: flex;
   width: 100%;
 }
 
-.colorRojo {
-  color: palevioletred;
-}
-
-.colorVerde {
-  color: rgb(0, 207, 0);
-}
-
-.colorNegro {
-  color: #000;
-}
-
-::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+:host ::ng-deep .p-button.p-button-icon-only.p-button-rounded {
   height: 2rem;
 }
 
-::ng-deep .p-button.p-button-icon-only {
+:host ::ng-deep .p-button.p-button-icon-only {
   width: 2rem;
 }
 
-::ng-deep p-table .p-datatable-gridlines .p-datatable-tbody>tr>td, p-table .p-datatable-gridlines .p-datatable-thead>tr>th, p-table .p-datatable-gridlines .p-datatable-tfoot>tr>td {
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tbody > tr > td,
+:host ::ng-deep .p-datatable-gridlines .p-datatable-thead > tr > th,
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tfoot > tr > td {
   text-align: center;
+}
+
+.colorRojo {
+  color: var(--texto-peligro);
+}
+
+.colorVerde {
+  color: var(--texto-exito);
+}
+
+/* Celda de disponible cuando lo solicitado lo supera. */
+.celda-excedida {
+  background-color: var(--fondo-peligro);
+  font-weight: 600;
+}
+
+/* Aviso de que se está editando una solicitud existente. */
+.aviso-edicion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+}
+
+/* Resumen en vivo del límite de kg de la OT (Extrusión). */
+.resumen-limite {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.resumen-limite--ok {
+  background-color: var(--fondo-exito);
+  color: var(--texto-exito);
+}
+
+.resumen-limite--excede {
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
 }
 
 /* Subtitulo con botones a la derecha (mismo patron de orden-trabajo) */

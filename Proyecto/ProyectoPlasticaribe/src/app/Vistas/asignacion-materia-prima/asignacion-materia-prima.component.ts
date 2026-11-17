@@ -13,6 +13,7 @@ import {
   RegistrarAsignacionRequest,
   RegistrarAsignacionResult,
   ADICIONAL_KG_OT,
+  ESTADOS_OT_CERRADA,
   ROLES_EXCEDER_LIMITE_OT,
   TipoMaterialInventario,
 } from 'src/app/Modelo/modelFlujoMaterialProduccion';
@@ -29,10 +30,6 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { ConfirmacionTeclado } from 'src/app/_helpers/confirmacion-teclado';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
-
-
-/** Estados de BagPro en los que la OT está cerrada y no admite asignaciones. */
-const ESTADOS_OT_CERRADA = [1, 4];
 
 /** Materiales comodín que no se pueden asignar. */
 const MATERIALES_NO_ASIGNABLES = [84, 2001, 88, 89, 2072];
