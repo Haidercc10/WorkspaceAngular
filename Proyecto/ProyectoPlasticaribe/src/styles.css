@@ -54,7 +54,7 @@
   --fondo-acento: #fdf2f3;                      /* resaltado suave con el rojo de la marca */
   --rojo-texto: #b11d28;                        /* rojo para texto y bordes (botones de texto o con borde) */
   --azul-marca-claro: #eef1f8;                 /* fondos de secciones con el azul de la marca */
-  --fondo-contador: #131f4c;                    /* contadores (badges) de la barra superior: azul marino del logo */
+  --fondo-contador: var(--azul-marca-medio);   /* contadores (badges) de la barra superior: azul medio de la marca */
   --texto-contador: #ffffff;
   --fondo-exito: #dcfce7;                       /* confirmaciones (p. ej. botón "Copiado!") */
   --texto-exito: #166534;                       /* texto y borde de las confirmaciones */
