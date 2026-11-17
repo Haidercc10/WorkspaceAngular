@@ -422,6 +422,16 @@ input:checked + .colorMode svg.moon {
   flex-direction: column;
 }
 
+/* El p-sidebar crea su contenido con *ngIf y lo anima al entrar; mientras esa animación corre, Angular bloquea la
+   animación 'void => hidden' de cada p-accordionTab y a veces nunca aplica su estilo (height: 0), dejando la caja vacía
+   de .p-accordion-content visible bajo cada encabezado. Se fija el estado cerrado por CSS: al abrir/cerrar, los estilos
+   inline de la animación tienen prioridad, así que la transición sigue funcionando igual. */
+:host ::ng-deep .sidebarUsuario .p-accordion-tab:not(.p-accordion-tab-active) > .p-toggleable-content {
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
 p-dialog input, p-accordion input {
 	width: 100%;
 	height: 100%;
