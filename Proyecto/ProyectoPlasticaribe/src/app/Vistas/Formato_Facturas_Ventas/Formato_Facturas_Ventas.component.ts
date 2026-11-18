@@ -3,7 +3,7 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 
 @Injectable({
   providedIn: 'root'
@@ -307,9 +307,9 @@ export class Formato_Facturas_VentasComponent implements OnInit {
           margin: [5, 0, 5, 0],
           columns: [
             { 
-              image: logoParaPdf, 
+              image: logoNuevoParaPdf, 
               width: 175, 
-              height: 43, 
+              fit: [175, 43], 
               margin: [25, 35, 0, 0],
             },
             {

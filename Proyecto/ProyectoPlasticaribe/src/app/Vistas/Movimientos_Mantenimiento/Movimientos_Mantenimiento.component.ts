@@ -10,7 +10,7 @@ import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenim
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { stepsMovimientosMtto as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -316,7 +316,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
+                { image : logoNuevoParaPdf, width : 220, fit : [220, 50] },
                 {
                   text: `Mantenimiento de Activos N° ${datos_mantenimiento[i].mtto_Id}`,
                   alignment: 'right',

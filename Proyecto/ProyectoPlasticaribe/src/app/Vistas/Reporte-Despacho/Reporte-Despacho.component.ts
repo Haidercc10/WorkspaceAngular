@@ -8,7 +8,7 @@ import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/Det
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { defaultStepOptions, stepsMovimientosDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
@@ -247,9 +247,9 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Rollos de la Factura ${factura.toUpperCase()}`,
@@ -447,9 +447,9 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Rollos devueltos de la factura ${factura.toUpperCase()}`,
@@ -620,9 +620,9 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Rollos Ingresados N° ${ot}`,
@@ -787,9 +787,9 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Rollos Pre Ingresados N° ${ot}`,

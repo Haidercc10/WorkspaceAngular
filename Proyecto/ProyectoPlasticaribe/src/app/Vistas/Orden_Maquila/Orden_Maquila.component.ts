@@ -20,7 +20,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenMaquila as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
@@ -616,7 +616,7 @@ export class Orden_MaquilaComponent implements OnInit {
               {
                 margin: [20, 8, 20, 0],
                 columns: [
-                  { image: logoParaPdf, width: 150, height: 30, margin: [20, 25] },
+                  { image: logoNuevoParaPdf, width: 150, fit: [150, 30], margin: [20, 25] },
                   {
                     width: 300,
                     alignment: 'center',

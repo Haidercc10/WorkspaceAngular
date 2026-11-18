@@ -13,6 +13,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { defaultStepOptions, stepsVerPedidos as defaultSteps } from 'src/app/data';
@@ -1008,7 +1009,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           content: [
             {
               columns: [
-                { image: logoParaPdf, width: 220, height: 50 },
+                { image: logoNuevoParaPdf, width: 220, fit: [220, 50] },
                 { text: `Pedido Zeus ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
@@ -1124,7 +1125,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               {
                 margin: [20, 8, 20, 0],
                 columns: [
-                  { image: logoParaPdf, width: 150, height: 30, margin: [20, 25] },
+                  { image: logoNuevoParaPdf, width: 150, fit: [150, 30], margin: [20, 25] },
                   {
                     width: 300,
                     alignment: 'center',
@@ -1343,7 +1344,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         {
           margin: [20, 5, 20, 0],
           columns: [
-            { image: logoParaPdf, width: 150, height: 30, margin: [20, 25, 80, 10] },
+            { image: logoNuevoParaPdf, width: 150, fit: [150, 30], margin: [20, 25, 80, 10] },
             this.empresaFechaHoraTituloPDF(),
             this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
           ]

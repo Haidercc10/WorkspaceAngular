@@ -14,7 +14,7 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
@@ -335,7 +335,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
       alignment: 'center',
       table: {
         body: [
-          [{ image: logoParaPdf, width: 150, height: 25 }],
+          [{ image: logoNuevoParaPdf, width: 150, fit: [150, 25] }],
         ]
       },
       layout: 'noBorders',

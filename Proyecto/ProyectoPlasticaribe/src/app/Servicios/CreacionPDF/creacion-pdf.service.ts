@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import JsBarcode from 'jsbarcode';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -47,7 +47,8 @@ export class CreacionPdfService {
 
   /**
    * Cabecera común: logo (ancho fijo), título (ocupa todo el espacio restante) y paginado/fecha/hora (ancho fijo).
-   * En carta (612 pt) quedan ~572 pt: 135 para el logo, 95 para el paginado y ~340 para el título,
+   * El logo necesita `width` además de `fit`: en pdfmake una columna sin width es '*' y se repartiría el espacio con el título.
+   * En carta (612 pt) quedan ~572 pt: 130 para el logo, 95 para el paginado y ~340 para el título,
    * suficiente para que cada línea del título (p. ej. "Asignación de Materia Prima N° 91510") quepa en un solo renglón.
    */
   private headerPDF(today: any, hour: any, titulo: string, headerAdicional: any): {} {
@@ -56,7 +57,8 @@ export class CreacionPdfService {
         {
           margin: [20, 8, 20, 0],
           columns: [
-            { image: logoParaPdf, width: 125, height: 25, margin: [10, 24, 0, 8] },
+            // Margen izquierdo 5: el logo empieza donde empieza la línea del encabezado (x = 25); arriba 20 lo centra con el título
+            { image: logoNuevoParaPdf, width: 130, fit: [130, 26], margin: [5, 20, 0, 8] },
             this.title == null ? null : this.empresaFechaHoraTituloPDF(titulo, today, hour),
             this.title == null ? null : this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
           ]
@@ -80,7 +82,8 @@ export class CreacionPdfService {
         { text: 'NIT. 800188732' },
         { text: titulo },
       ],
-      margin: [10, 18, 10, 8],
+      // Derecha 45 = 10 + (130 del logo − 95 del paginado): iguala los lados para que el título quede centrado en la página
+      margin: [10, 18, 45, 8],
     }
   }
 
@@ -1336,7 +1339,8 @@ export class CreacionPdfService {
   // Funcion que va a colocar la información de la empresa en el header
   private informacionEmpresaHeaderOT(datos_ot) {
     return [
-      { image: logoParaPdf, width: 220, height: 50, margin: [5, 5] },
+      // El logo empieza en el borde izquierdo de las tablas del encabezado
+      { image: logoNuevoParaPdf, width: 170, fit: [170, 30], margin: [0, 10, 0, 5] },
       {
         text: `OT ${datos_ot.numero_Orden}`,
         style: 'orden_trabajo',
@@ -1371,16 +1375,19 @@ export class CreacionPdfService {
   // Funcion que va a colocar informacion general de la extrusion en el header
   private informacaionExtrusionHeaderOT(datos_ot) {
     return {
-      widths: ['*', '*', '*', '*', '*'],
+      widths: ['*', '*', '*', '*', '*', '*'],
       body: [
         [
-          { text: `Material`, style: 'titulosTablas', border: [true, true, false, true] },
+          { text: `Fecha Creación`, style: 'titulosTablas', border: [true, true, false, true] },
+          { text: `Material`, style: 'titulosTablas', border: [false, true, false, true] },
           { text: `Cant. Bolsas`, style: 'titulosTablas', border: [false, true, false, true] },
           { text: `Cant. Kilos (Kg)`, style: 'titulosTablas', border: [false, true, false, true] },
           { text: `Presentación`, style: 'titulosTablas', border: [false, true, false, true] },
-          { text: `Despachar`, style: 'titulosTablas', border: [false, true, true, true] },
+          { text: `Fecha Entrega`, style: 'titulosTablas', border: [false, true, true, true] },
         ],
         [
+          // Solo la fecha (yyyy-MM-dd): Plasticaribe y BagPro la envían con hora
+          { text: `${datos_ot.fecha_Creacion ? `${datos_ot.fecha_Creacion}`.substring(0, 10) : ''}`, style: 'datosTablaExtrusion' },
           { text: `${this.txtOT(datos_ot.material)}`, style: 'datosTablaExtrusion' },
           { text: `${this.numOT(datos_ot.cantidad_Pedida)}`, style: 'datosTablaExtrusion' },
           { text: `${this.numOT(datos_ot.peso_Neto)}`, style: 'datosTablaExtrusion' },
@@ -1715,13 +1722,14 @@ export class CreacionPdfService {
   /**
    * Coloca en la hoja 2 las tablas de cada proceso. El margen superior negativo acerca la primera fila
    * a la tabla del encabezado para reducir el espacio que deja el margen superior de la página.
+   * El margen inferior separa estas tablas de los encabezados de lo que sigue (Cyrel / observaciones).
    * @param datos_ot Datos de la orden de trabajo consultada.
    * @returns Nodo pdfmake con las tablas de los procesos.
    */
   private procesosHoja2OT(datos_ot) {
     return {
       pageBreak: 'before',
-      margin: [0, -18, 0, 0],
+      margin: [0, -18, 0, 10],
       table: {
         widths: ['*', 20, '*'],
         body: [
@@ -1929,11 +1937,10 @@ export class CreacionPdfService {
             { text: `${this.numOT(datos_ot.selladoCorte_Fuelle)}`, alignment: 'center', },
             { text: `${this.numOT(solapa)}   ${this.txtOT(datos_ot.und_Extrusion)}`, alignment: 'center', },
           ],
-          [{}, {}, {}, {}],
-          [{}, {}, {}, {}],
           [
-            { text: `Sellado: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.txtOT(datos_ot.tpSellados_Nombre)}` },
+            // Margen superior: separa "Sellado" de la fila de medidas (Ancho / Largo / Fuelle / Solapa)
+            { text: `Sellado: `, style: 'subtitulo', margin: [0, 6, 0, 0] },
+            { colSpan: 3, text: `${this.txtOT(datos_ot.tpSellados_Nombre)}`, margin: [0, 6, 0, 0] },
             {},
             {},
           ],

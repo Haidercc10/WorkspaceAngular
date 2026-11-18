@@ -11,7 +11,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDespacharRollosDespacho as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
@@ -363,9 +363,9 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Rollos de la Factura ${factura.toUpperCase()}`,

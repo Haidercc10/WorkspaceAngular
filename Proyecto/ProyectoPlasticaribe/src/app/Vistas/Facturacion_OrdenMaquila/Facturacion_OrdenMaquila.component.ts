@@ -12,7 +12,7 @@ import { Facturacion_OrdenMaquilasService } from 'src/app/Servicios/Facturacion_
 import { OrdenMaquila_FacturacionService } from 'src/app/Servicios/OrdenMaquila_Facturacion/OrdenMaquila_Facturacion.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { stepsFacturacionMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -406,7 +406,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
+                { image : logoNuevoParaPdf, width : 220, fit : [220, 50] },
                 {
                   text: `${datos_facturacion[i].tipo_Documento} N° ${datos_facturacion[i].codigo_Documento}`,
                   alignment: 'right',

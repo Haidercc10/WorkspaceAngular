@@ -349,6 +349,25 @@ th {
   font-weight: 500;
 }
 
+/* Mensajes informativos (severity 'info') en azul de la paleta: el tema lara los pinta en morado (#696cff).
+   El prefijo "html body" gana al tema, que se carga con <link id="app-theme"> (claro u oscuro). */
+html body .p-toast .p-toast-message.p-toast-message-info,
+html body .p-message.p-message-info,
+html body .p-inline-message.p-inline-message-info {
+  /* --fondo-info es translúcido en modo oscuro: se apoya sobre --surface-overlay para que no se vea lo de abajo */
+  background: linear-gradient(var(--fondo-info), var(--fondo-info)), var(--surface-overlay);
+  border-color: var(--texto-info);
+  color: var(--texto-info);
+}
+
+html body .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon,
+html body .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close,
+html body .p-message.p-message-info .p-message-icon,
+html body .p-message.p-message-info .p-message-close,
+html body .p-inline-message.p-inline-message-info .p-inline-message-icon {
+  color: var(--texto-info);
+}
+
 /* ESTILO DE PRIMENG */
 .p-input-icon-left {
   width: 100%;
