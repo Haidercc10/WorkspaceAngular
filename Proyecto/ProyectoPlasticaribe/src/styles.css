@@ -513,6 +513,24 @@ html body .p-inline-message.p-inline-message-info .p-inline-message-icon {
   border-color: var(--rojo);
 }
 
+/* Interruptor (p-inputSwitch) encendido con el rojo de la marca, igual que checkbox y radio (el tema lo pinta azul).
+   Apagado se deja el gris del tema. La bolita va blanca también en oscuro para que se vea sobre el rojo. */
+html body .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  background: var(--rojo);
+}
+
+html body .p-inputswitch.p-inputswitch-checked:not(.p-disabled):hover .p-inputswitch-slider {
+  background: var(--rojoHover);
+}
+
+html body .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
+  background: #ffffff;
+}
+
+html body .p-inputswitch.p-focus .p-inputswitch-slider {
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+}
+
 .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
   border-color: #fd9393;
   color: var(--rojo);
@@ -812,10 +830,17 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
-/* Badges de estado de tickets */
+/* Badges de estado de tickets (paleta oficial; cambian solos con el tema). Clase según claseEstadoTicket(). */
 .badge-estado-ticket {
   text-transform: uppercase;
+  font-size: calc(var(--font-size) * 14px);
 }
+
+.estado-ticket--abierto { background-color: var(--fondo-advertencia); color: var(--texto-advertencia); }
+.estado-ticket--revision { background-color: var(--fondo-info); color: var(--texto-info); }
+.estado-ticket--resuelto { background-color: var(--fondo-exito); color: var(--texto-exito); }
+.estado-ticket--cancelado { background-color: var(--fondo-peligro); color: var(--texto-peligro); }
+.estado-ticket--otro { background-color: var(--fondo-sutil); color: var(--text-color-secondary); }
 
 #texto-centrado {
   text-align: center;
