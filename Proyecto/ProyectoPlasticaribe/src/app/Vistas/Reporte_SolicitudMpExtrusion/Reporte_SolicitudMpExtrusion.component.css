@@ -1,139 +1,363 @@
+/* Botón de tutorial dentro del h2 del título (igual que en las demás páginas con tutorial). */
+.boton-tutorial-titulo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.4rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Estilos de PrimeNG limitados a esta página (:host) para que no se filtren a las demás vistas. */
 .p-input-icon-left {
   width: 100%;
 }
 
-p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+:host ::ng-deep p-dropdown .p-dropdown,
+:host ::ng-deep p-multiselect .p-multiselect,
+:host ::ng-deep p-calendar,
+:host ::ng-deep p-calendar > span,
+:host ::ng-deep .p-inputtext {
   display: flex;
   width: 100%;
 }
 
-p-calendar ::ng-deep span button {
+:host ::ng-deep p-calendar span button {
   background-color: var(--rojo);
   border: 0;
-  transition: all 1s;
 }
 
-p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+:host ::ng-deep p-calendar span .p-datepicker-trigger:hover {
   background: var(--rojoHover);
 }
 
-p-calendar ::ng-deep .p-datepicker-header button {
-  background: #fff0;
-}
-
-p-calendar ::ng-deep .p-datepicker-header button:hover {
-  background: #fff0;
-}
-
-p-calendar ::ng-deep span button span {
-  display: block;
-}
-
-::ng-deep .p-inputtext {
-  display: flex;
-  width: 100%;
-}
-
-::ng-deep .p-card {
-  align-items: center;
+:host ::ng-deep .p-card {
   margin: auto;
   width: 95%;
-  height: 100%;
-  padding: 2%;
+  /* Relleno vertical fijo (antes 2% del ancho, que en pantallas grandes dejaba mucho espacio arriba y abajo). */
+  padding: 1rem 2%;
   border-radius: 10px;
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
 }
 
-::ng-deep .p-chip {
-  width: 90%;
-  justify-content: center;
+/* Sin el margen global de 3rem bajo el contenido de las tarjetas: el final de la tarjeta queda con el mismo espacio que arriba. */
+:host ::ng-deep .p-card .p-card-body .p-card-content {
+  margin-bottom: 0 !important;
 }
 
-p-chip ::ng-deep .p-chip-text {
-  font-weight: 700;
-}
-
-#fila {
+:host ::ng-deep .p-datatable-gridlines .p-datatable-thead > tr > th,
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tbody > tr > td,
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tfoot > tr > td {
   text-align: center;
 }
 
-#botonPdf ::ng-deep .p-button {
-  width: 30px;
-  height: 30px;
-  text-decoration: none;
+.texto-secundario {
+  color: var(--text-color-secondary);
 }
 
-#rojo ::ng-deep .p-chip {
-  background-color: palevioletred;
-  color : white;
+.texto-pendiente {
+  color: var(--texto-peligro);
 }
 
-#amarillo ::ng-deep .p-chip {
-  background-color: rgb(255, 246, 152);
-  color : #495057;
+.encabezado-seccion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-#azul ::ng-deep .p-chip {
-  background-color: paleturquoise;
-  color : #495057;
+/* Colores por estado (chips y etiquetas), con la paleta oficial. */
+.estado--pendiente { background-color: var(--fondo-advertencia); color: var(--texto-advertencia); }
+.estado--parcial { background-color: var(--fondo-info); color: var(--texto-info); }
+.estado--finalizada { background-color: var(--fondo-exito); color: var(--texto-exito); }
+.estado--verificada { background-color: var(--azul-marca-claro); color: var(--azul-marca-medio); }
+.estado--cancelada { background-color: var(--fondo-peligro); color: var(--texto-peligro); }
 
+.chips-estado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem;
 }
 
-#verde ::ng-deep .p-chip {
-  background-color: palegreen;
-  color : #495057;
+.chip-estado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
-#naranja ::ng-deep .p-chip {
-  background-color: rgb(255, 211, 101);
-  color : #495057;
+.chip-estado:hover,
+.chip-estado:focus-visible {
+  border-color: currentColor;
 }
 
-::ng-deep .p-datatable.p-datatable-sm ::ng-deep .p-datatable-header {
-    padding: 0 0 0 2% !important;
+.chip-estado b {
+  font-size: 1.1em;
 }
 
-/* Cabecera de la tabla de detalles: padding parejo (gana sobre la regla anterior por ser más específica y venir después). */
-::ng-deep .p-datatable.p-datatable-sm.tabla-detalles .p-datatable-header {
-    padding: 0.5rem 0.75rem !important;
+.chip-estado--activo {
+  border-color: currentColor;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Usuario solicitante a la izquierda y "Crear Asignación" en el extremo derecho, centrados verticalmente y sin márgenes que separen la cabecera de la tabla. */
-.cabecera-detalles {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
-    margin: 0;
-    min-height: 2.5rem;
+.etiqueta-estado {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-/* min-width: 0 deja que el usuario se encoja cuando choca con el botón, en vez de empujarlo. */
-.cabecera-detalles__usuario {
-    display: flex;
-    align-items: center;
-    flex: 1 1 auto;
-    gap: 0.4rem;
-    min-width: 0;
-    margin: 0;
-    line-height: 1.2;
+/* Fila seleccionada de la lista: acento con borde rojo, igual que en la solicitud. */
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr.p-highlight > td {
+  background-color: var(--fondo-acento);
+  color: var(--text-color);
 }
 
-.cabecera-detalles__usuario > .pi {
-    flex: 0 0 auto;
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr.p-highlight > td:first-child {
+  box-shadow: inset 4px 0 0 var(--rojo);
 }
 
-/* El texto que no cabe se oculta y termina en "...". */
-.cabecera-detalles__texto {
-    min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+/* Detalle */
+.detalle-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 14rem;
+  border: 2px dashed var(--surface-border);
+  border-radius: 10px;
+  color: var(--text-color-secondary);
+  text-align: center;
+  padding: 1rem;
 }
 
-.cabecera-detalles .p-button {
-    flex: 0 0 auto;
-    margin-left: auto;
+.resumen-solicitud {
+  padding: 0.75rem 1rem;
+  text-align: left; /* siempre a la izquierda (no hereda el centrado de otros contenedores) */
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  background-color: var(--fondo-sutil);
+  transition: opacity 0.2s;
+}
+
+.resumen-solicitud--cargando {
+  opacity: 0.6;
+}
+
+.resumen-solicitud__titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.resumen-solicitud__datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.4rem 1rem;
+  margin: 0;
+  text-align: left;
+}
+
+.resumen-solicitud__datos dt,
+.resumen-solicitud__datos dd {
+  text-align: left;
+}
+
+.resumen-solicitud__datos dt {
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.resumen-solicitud__datos dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.resumen-solicitud__maquinas {
+  grid-column: 1 / -1;
+}
+
+.etiqueta-maquina {
+  display: inline-block;
+  margin: 0 0.4rem 0.25rem 0;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  background-color: var(--surface-card);
+  font-weight: 600;
+}
+
+.etiqueta-sustituto {
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.75em;
+  font-weight: 600;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+}
+
+.observacion {
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--azul-marca-medio);
+  border-radius: 6px;
+  background-color: var(--azul-marca-claro);
+  white-space: pre-line;
+}
+
+.observacion__titulo {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Pie único con los totales de la solicitud. */
+.pie-total {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem 1.5rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background-color: var(--fondo-sutil);
+}
+
+.pie-total__principal {
+  margin-right: auto;
+}
+
+/* Filtros compactos: una fila que se acomoda (wrap) con anchos según el contenido de cada campo. */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.5rem 0.75rem; /* el espacio vertical deja lugar al label flotante */
+  padding-top: 0.75rem;
+}
+
+.filtros__campo--numero { flex: 0 1 10rem; }
+.filtros__campo--fecha { flex: 0 1 12rem; }
+.filtros__campo--estados { flex: 0 1 auto; }
+
+.filtros__etiqueta {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+/* Botones de estado (selección múltiple), con el mismo estilo que los botones de máquina de la solicitud. */
+.filtros-estado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filtro-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  background-color: var(--surface-card);
+  color: var(--text-color);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.filtro-estado .pi {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+.filtro-estado:hover {
+  border-color: var(--rojo-texto);
+}
+
+.filtro-estado:focus-visible {
+  outline: 2px solid var(--rojo-texto);
+  outline-offset: 2px;
+}
+
+.filtro-estado--activo,
+.filtro-estado--activo:hover {
+  border-color: var(--rojo-texto);
+  background-color: var(--fondo-acento);
+  color: var(--rojo-texto);
+  box-shadow: inset 0 0 0 1px var(--rojo-texto);
+}
+
+.filtro-estado--activo .pi {
+  color: inherit;
+}
+
+.filtros__botones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* En el celular cada campo ocupa la fila completa. */
+@media (max-width: 576px) {
+  .filtros__campo,
+  .filtros__botones {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .filtros__botones > .p-button {
+    flex: 1 1 0;
+  }
+}
+
+/* El selector de filas del paginador queda de su tamaño, junto a los botones de página
+   (la regla de arriba estira todos los p-dropdown al 100%). */
+:host ::ng-deep .p-paginator p-dropdown .p-dropdown {
+  display: inline-flex;
+  width: auto;
+}
+
+/* Máquina que ya recibió su parte de la solicitud. */
+.etiqueta-maquina--completa {
+  border-color: var(--texto-exito);
+  background-color: var(--fondo-exito);
+  color: var(--texto-exito);
+}
+
+/* Título del detalle con el botón "Ver asignaciones PDF" a la derecha. */
+.encabezado-detalle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }

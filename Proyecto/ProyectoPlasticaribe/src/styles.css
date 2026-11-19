@@ -985,3 +985,150 @@ html .p-buttonset.p-button-danger > .p-button.p-button-text:enabled:hover,
 html .p-splitbutton.p-button-danger > .p-button.p-button-text:enabled:hover {
   background: var(--fondo-acento);
 }
+
+/* ===== Tabla agrupada de materiales (solicitud, reporte y asignación de material) =====
+   Una sola cabecera; cada subcategoría es una fila-título y sus materiales van debajo. */
+.tabla-agrupada.p-datatable .p-datatable-thead > tr > th {
+  background-color: var(--fondo-sutil);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-color-secondary);
+}
+
+.tabla-agrupada.p-datatable .p-datatable-tbody > tr > td {
+  vertical-align: middle;
+}
+
+.tabla-agrupada .tabla-agrupada__numero {
+  width: 9rem;
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.tabla-agrupada .tabla-agrupada__accion {
+  width: 3.5rem;
+  text-align: center !important;
+}
+
+.tabla-agrupada.p-datatable .p-datatable-tbody > tr.tabla-agrupada__grupo > td {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-top: 2px solid var(--surface-border);
+  background-color: var(--azul-marca-claro);
+}
+
+.tabla-agrupada.p-datatable .p-datatable-tbody > tr.tabla-agrupada__material > td:first-child {
+  padding-left: 2rem;
+}
+
+.tabla-agrupada__titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+}
+
+.tabla-agrupada__nombre {
+  font-weight: 700;
+  color: var(--texto-fuerte);
+}
+
+.tabla-agrupada__meta {
+  font-size: 0.85em;
+  color: var(--text-color-secondary);
+}
+
+.tabla-agrupada__meta--excede {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
+}
+
+/* Chip con el total de la subcategoría. */
+.chip-total {
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 700;
+  white-space: nowrap;
+  background-color: var(--fondo-contador);
+  color: var(--texto-contador);
+}
+
+.chip-total--ok {
+  background-color: var(--fondo-exito);
+  color: var(--texto-exito);
+}
+
+.chip-total--excede {
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
+}
+
+/* Campo de cantidad angosto, alineado a la derecha como número. */
+.tabla-agrupada .campo-cantidad,
+.tabla-agrupada .campo-cantidad .p-inputnumber,
+.tabla-agrupada .campo-cantidad input {
+  width: 100%;
+}
+
+.tabla-agrupada .campo-cantidad input {
+  padding: 0.35rem 0.5rem;
+  text-align: right;
+}
+
+/* Campos de cantidad con "0.00" de ejemplo: al enfocarlos el ejemplo desaparece para que el cursor no quede encima del cero. */
+input.campo-sin-cero::placeholder {
+  color: var(--text-color-secondary);
+  opacity: 0.6;
+}
+
+input.campo-sin-cero:focus::placeholder {
+  color: transparent;
+}
+
+/* Confirmación cuyo mensaje trae saltos de línea (p. ej. el resumen de la asignación de material). */
+.confirmacion-multilinea .p-confirm-dialog-message {
+  white-space: pre-line;
+}
+
+/* Todas las confirmaciones (p-confirmDialog) del sistema: botones separados
+   (el de texto se pegaba al principal y se notaba al pasar el mouse). */
+.p-confirm-dialog .p-dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.p-confirm-dialog .p-dialog-footer .p-button {
+  margin: 0;
+}
+
+/* Fila con desplazamiento horizontal por arrastre (directiva appArrastreHorizontal), como las pestañas de la página principal. */
+.arrastre-horizontal {
+  display: flex;
+  overflow-x: auto;
+  cursor: grab;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.arrastre-horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+.arrastre-horizontal.arrastrando {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+.arrastre-horizontal * {
+  -webkit-user-drag: none;
+}

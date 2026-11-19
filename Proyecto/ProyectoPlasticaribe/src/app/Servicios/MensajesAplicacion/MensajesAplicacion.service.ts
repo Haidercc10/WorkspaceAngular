@@ -3,6 +3,7 @@ import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TimeoutError } from 'rxjs';
 import moment from 'moment';
+import { environment } from 'src/environments/environment';
 
 /**
  * Información técnica de un error para la ventana "Ver detalles".
@@ -42,6 +43,19 @@ export interface ListadoDetalleError {
 /** Clave del toast de errores con "Ver detalles" (vive solo en app.component.html). */
 export const CLAVE_TOAST_ERROR_DETALLADO = 'errorDetallado';
 
+/** Qué se estaba haciendo cuando ocurrió el error (para el mensaje y la ventana "Ver detalles"). */
+export interface ContextoError {
+  /** Qué se estaba haciendo (p. ej. "Consultar OT"). */
+  operacion: string;
+  /** Método HTTP, si aplica. */
+  metodo?: string;
+  /** API que falló; si no se indica, se deduce de la URL del error. */
+  api?: string;
+}
+
+/** Duración por defecto de los errores con "Ver detalles" (da tiempo de abrirlos). */
+const DURACION_ERROR_DETALLADO_MS = 10000;
+
 @Injectable({ providedIn: 'root'})
 
 export class MensajesAplicacionService {
@@ -68,6 +82,66 @@ export class MensajesAplicacionService {
    */
   mensajeErrorDetallado(mensaje : string, detalle : DetalleError, tiempo : number = 8000) {
     this.messageService.add({ key: CLAVE_TOAST_ERROR_DETALLADO, severity: 'error', summary: 'Error', detail: mensaje, life: tiempo, data: detalle });
+  }
+
+  /**
+   * Control de errores común: muestra un mensaje entendible según la causa y el enlace "Ver detalles" con la información técnica.
+   * @param error Error recibido (HttpErrorResponse, TimeoutError u otro).
+   * @param mensajePorDefecto Mensaje si el servidor no explicó la causa (p. ej. "No se pudo consultar la OT 1234.").
+   * @param contexto Operación que se estaba haciendo.
+   */
+  errorDetallado(error : any, mensajePorDefecto : string, contexto : ContextoError, tiempo : number = DURACION_ERROR_DETALLADO_MS) {
+    const api = contexto.api ?? MensajesAplicacionService.apiDeUrl(error?.url);
+    const detalle = MensajesAplicacionService.detalleDeError(error, { ...contexto, api });
+    this.mensajeErrorDetallado(MensajesAplicacionService.mensajeAmigable(error, mensajePorDefecto, api), detalle, tiempo);
+  }
+
+  /**
+   * Mensaje breve y entendible según la causa del error:
+   * sin internet, servidor apagado, tiempo agotado, sesión vencida, sin permiso, regla de negocio (mensaje del servidor) o error interno.
+   */
+  static mensajeAmigable(error : any, porDefecto : string, api? : string) : string {
+    const servidor = api ?? 'el servidor';
+    if (!navigator.onLine) return 'No hay conexión a internet. Verifique su red e inténtelo de nuevo.';
+    if (error instanceof TimeoutError) return `${servidor} tardó demasiado en responder. Inténtelo de nuevo.`;
+    if (!(error instanceof HttpErrorResponse)) return porDefecto;
+
+    const delServidor = MensajesAplicacionService.mensajeDelServidor(error);
+    if (error.status === 0) return `No se pudo conectar con ${servidor}. Verifique que esté en la red de la empresa o que el servidor esté encendido.`;
+    if (error.status === 401) return 'Su sesión venció. Inicie sesión de nuevo.';
+    if (error.status === 403) return delServidor ?? 'No tiene permiso para realizar esta acción.';
+    if (error.status >= 500) return `${porDefecto} ${servidor} tuvo un problema interno; si continúa, envíe los detalles a soporte.`;
+    return delServidor ?? porDefecto;
+  }
+
+  /** Mensaje de negocio que devolvió el API (texto corto o campo mensaje/detail), si lo hay. */
+  static mensajeDelServidor(error : HttpErrorResponse) : string | undefined {
+    const cuerpo = error.error;
+    let texto : any;
+    if (typeof cuerpo === 'string') texto = cuerpo;
+    else if (cuerpo && typeof cuerpo === 'object' && !(cuerpo instanceof ProgressEvent)) {
+      texto = cuerpo.mensaje ?? cuerpo.message ?? cuerpo.detail ?? cuerpo.detalle;
+      // Errores de validación de ASP.NET (ProblemDetails.errors): { campo: ["mensaje", ...] }
+      if (texto == null && cuerpo.errors && typeof cuerpo.errors === 'object') {
+        texto = Object.values(cuerpo.errors).flatMap(v => Array.isArray(v) ? v : [v]).filter(v => typeof v === 'string').join(' ');
+      }
+    }
+    if (typeof texto !== 'string') return undefined;
+    texto = texto.trim();
+    // Un HTML o una traza larga no sirven como mensaje para el usuario (quedan en "Ver detalles").
+    return texto && texto.length <= 300 && !texto.startsWith('<') ? texto : undefined;
+  }
+
+  /** Nombre de la API según la URL de la petición. */
+  static apiDeUrl(url? : string | null) : string | undefined {
+    if (!url) return undefined;
+    const apis : [string, string][] = [
+      [environment.rutaPlasticaribeAPI, 'Plasticaribe'],
+      [environment.rutaBagPro, 'BagPro'],
+      [environment.rutaZeusContabilidad, 'Zeus Contabilidad'],
+      [environment.rutaZeus, 'Zeus'],
+    ];
+    return apis.find(([ruta]) => ruta && url.startsWith(ruta))?.[1];
   }
 
   /** Abre la ventana con el detalle técnico (y cierra el toast). */

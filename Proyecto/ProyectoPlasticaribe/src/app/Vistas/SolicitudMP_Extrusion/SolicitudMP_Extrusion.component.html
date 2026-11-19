@@ -23,12 +23,20 @@
   <div class="aviso-edicion mb-4" *ngIf="esSolicitud" data-tutorial="avisoEdicion">
     <span><i class="pi pi-pencil"></i> Editando la solicitud N° <b>{{solicitudEnEdicion}}</b><ng-container *ngIf="infoOT"> de la OT N° <b>{{infoOT.ot}}</b></ng-container>. La OT y el proceso no se pueden cambiar.</span>
     <button pButton type="button" label="Cancelar edición" icon="pi pi-times" class="p-button-secondary p-button-sm"
+      pTooltip="Solo limpia todos los campos y sale de la edición. La solicitud NO se cancela ni se modifica." tooltipPosition="bottom"
       (click)="cancelarEdicion()"></button>
   </div>
 
-  <div class="mb-5">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i>
-      Consultar OT</h4>
+  <div class="header-actions mb-5">
+    <div class="header-actions__title">
+      <h4 class="mb-0" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i>
+        Consultar OT</h4>
+    </div>
+    <div class="header-actions__buttons" data-tutorial="misSolicitudes">
+      <button pButton type="button" label="Mis solicitudes pendientes" icon="pi pi-inbox"
+        class="p-button-rounded p-button-secondary p-button-outlined" (click)="verMisSolicitudes()"
+        pTooltip="Sus solicitudes que aún no tienen material entregado; desde ahí puede cancelarlas" tooltipPosition="top"></button>
+    </div>
   </div>
 
   <!-- Formulario Orden de Trabajo -->
@@ -36,22 +44,23 @@
     <div class="mb-3">
       <div class="row g-4">
 
-        <!-- Solicitud -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl" data-tutorial="solicitud">
+        <!-- Solicitud (solo administrador: consultar para editar) -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" data-tutorial="solicitud" *ngIf="puedeEditar">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-hashtag"></i>
-            <input formControlName="Solicitud" id="solicitud" type="text" autocomplete="off" pInputText
-              (keyup.enter)="consultarSolicitudMaterial()" [readonly]="!esAdministrador"
-              [pTooltip]="esAdministrador ? 'Digite el N° de una solicitud activa y presione Enter para editarla' : 'Solo los administradores pueden editar solicitudes'" tooltipPosition="top" />
+            <input formControlName="Solicitud" id="solicitud" type="text" autocomplete="off" pInputText inputmode="numeric"
+              (input)="soloDigitos($event, 'Solicitud')"
+              (keyup.enter)="consultarSolicitudMaterial()"
+              pTooltip="Digite el N° de una solicitud activa y presione Enter para editarla" tooltipPosition="top" />
             <label for="solicitud">Solicitud</label>
           </span>
         </div>
 
         <!-- Proceso -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" data-tutorial="proceso">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" data-tutorial="proceso">
           <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
             <i class="pi pi-sitemap"></i>
-            <p-dropdown formControlName="proceso" inputId="Proceso" [readonly]="!esAdministrador || esSolicitud"
+            <p-dropdown formControlName="proceso" inputId="Proceso" [readonly]="!puedeElegirProceso || esSolicitud"
               [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre"
               optionValue="proceso_Id" (onChange)="cambiarProceso()"></p-dropdown>
             <label for="Proceso">Proceso</label>
@@ -59,11 +68,12 @@
         </div>
 
         <!-- Orden de Trabajo, con el botón para exportar su PDF pegado a la derecha (como el botón de los campos de fecha) -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl" data-tutorial="ot">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" data-tutorial="ot">
           <div class="campo-con-boton">
             <span class="p-input-icon-left p-float-label">
               <i class="pi pi-search"></i>
-              <input formControlName="ot" id="ordenTrabajo" type="text" autocomplete="off" pInputText [readonly]="esSolicitud"
+              <input formControlName="ot" id="ordenTrabajo" type="text" autocomplete="off" pInputText [readonly]="esSolicitud" inputmode="numeric"
+                (input)="soloDigitos($event, 'ot')"
                 [pTooltip]="esSolicitud ? 'La OT de una solicitud existente no se puede cambiar' : 'Ingrese el número de OT y presione Enter'"
                 tooltipPosition="top" (keyup.enter)="consultarOT()" required />
               <label for="ordenTrabajo">OT</label>
@@ -77,32 +87,12 @@
           </div>
         </div>
 
-        <!-- Maquina -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl" data-tutorial="maquina">
-          <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
-            <i class="pi pi-cog"></i>
-            <p-dropdown formControlName="maq" inputId="Maquina"
-              [autoDisplayFirst]="false" [options]="maquinas" optionLabel="maq_Numero"
-              optionValue="maq_Numero" [filter]="true" filterBy="maq_Numero"></p-dropdown>
-            <label for="Maquina">Máquina</label>
-          </span>
-        </div>
-
         <!-- Fecha estimada de Entrega -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" data-tutorial="fechaEntrega">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" data-tutorial="fechaEntrega">
           <span class="p-float-label">
             <p-calendar formControlName="fechaEntrega" inputId="fechaEntrega" [showIcon]="true"
               [minDate]="minDate"></p-calendar>
             <label for="fechaEntrega">Fecha entrega*</label>
-          </span>
-        </div>
-
-        <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-4" data-tutorial="observacion">
-          <span class="p-float-label">
-            <textarea formControlName="observacion" id="observacion" [rows]="1"
-              pInputTextarea appContadorCaracteres maxLength="2000"></textarea>
-            <label for="observacion">Observación</label>
           </span>
         </div>
 
@@ -115,254 +105,278 @@
       Información de la OT </h4>
   </div>
 
-  <!-- Tabla de OT -->
-  <div class="row g-3" data-tutorial="tablaOT">
-    <div class="table-responsive">
-      <p-table [resizableColumns]="true" columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll" [rows]="20" [rowHover]="true" [value]="infoOrdenTrabajo">
-        <ng-template pTemplate="header">
-          <tr>
-            <th class="text-center textRed" colspan="5">Información de la OT</th>
-            <th class="text-center textBlue" colspan="2">Información de la solicitud</th>
-            <th class="text-center textOrange" colspan="2">Información de la asignación</th>
-          </tr>
-          <tr>
-            <th class="text-center" scope="col">N°</th>
-            <th class="text-center" scope="col">Cliente</th>
-            <th class="text-center" scope="col">Item</th>
-            <th class="text-center" scope="col">Referencia</th>
-            <th class="text-center" scope="col" pTooltip="Kilos totales permitidos para solicitar de la OT"
-              tooltipPosition="top">Kg total OT</th>
-            <th class="text-center" scope="col" pTooltip="Kilos de materia prima solicitados que aún no se han asignado"
-              tooltipPosition="top">Kg solicitados</th>
-            <th class="text-center" scope="col" pTooltip="Kilos pendientes por solicitar de materia prima de la OT"
-              tooltipPosition="top">Kg por solicitar</th>
-            <th class="text-center" scope="col"
-              pTooltip="Kilos asignados/entregados de materia prima de la OT."
-              tooltipPosition="top">Kg asignados</th>
-            <th class="text-center" scope="col" pTooltip="Kilos restantes de materia prima por asignar de la OT"
-              tooltipPosition="top">Kg restantes por asignar</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-ot>
-          <tr>
-            <td>
-              {{ot.ot}}
-              <p-tag *ngIf="ot.cerrada" severity="danger" value="Cerrada" styleClass="ms-1"></p-tag>
-            </td>
-            <td>{{ot.cliente}}</td>
-            <td>{{ot.item}}</td>
-            <td>{{ot.ref}}</td>
-            <td><b>{{ot.kg | number : '1.2-2'}}</b></td>
-            <td>{{ot.kgSolicitados | number : '1.2-2'}}</td>
-            <td [ngClass]="{'colorRojo' : ot.kgPorSolicitar <= 0, 'colorVerde' : ot.kgPorSolicitar > 0 }">
-              <b>{{ot.kgPorSolicitar | number : '1.2-2'}}</b> </td>
-            <td>
-              <div class="d-flex align-items-center justify-content-center gap-2">
-                <span>{{ot.kgAsignado | number : '1.2-2'}}</span>
-                <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="danger" pTooltip="Ver materiales asignados"
-                  tooltipPosition="top" (onClick)="verMaterialesAsignados(ot.ot)"></p-button>
-              </div>
-            </td>
-            <td [ngClass]="{'colorRojo' : ot.kgRestante <= 0, 'colorVerde' : ot.kgRestante > 0 }"><b>{{ot.kgRestante |
-                number : '1.2-2'}}</b></td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="9">Digite el número de la OT y presione Enter para consultarla.</td>
-          </tr>
-        </ng-template>
-      </p-table>
+  <!-- Ficha de la OT consultada: identidad arriba; solicitud y asignación abajo; barra de avance de los kg -->
+  <div data-tutorial="tablaOT">
+    <div *ngIf="infoOT as ot; else sinOT" class="ficha-ot">
+      <div class="ficha-ot__encabezado">
+        <div class="ficha-ot__identidad">
+          <div class="ficha-ot__titulo">
+            OT {{ot.ot}} · <span class="ficha-ot__rotulo">Cliente:</span> {{ot.cliente}}
+            <p-tag *ngIf="ot.cerrada" severity="danger" value="Cerrada" styleClass="ms-1"></p-tag>
+          </div>
+          <div class="texto-secundario">Ítem: {{ot.item}} · Referencia: {{ot.ref}}</div>
+        </div>
+        <div class="ficha-ot__total" [pTooltip]="'Kg que se pueden solicitar para la OT (incluye el ' + porcentajeAdicional + '% adicional)'" tooltipPosition="top">
+          <span class="ficha-ot__etiqueta">Kg total OT</span>
+          <b>{{ot.kg | number : '1.2-2'}} kg</b>
+        </div>
+      </div>
+
+      <div class="ficha-ot__bloques">
+        <div class="ficha-ot__bloque">
+          <span class="ficha-ot__bloque-titulo">Solicitud</span>
+          <div class="ficha-ot__fila" pTooltip="Kg pedidos en solicitudes que aún no se han asignado" tooltipPosition="top">
+            <span>Solicitados</span><span>{{ot.kgSolicitados | number : '1.2-2'}} kg</span>
+          </div>
+          <div class="ficha-ot__fila ficha-ot__fila--principal" [ngClass]="ot.kgPorSolicitar > 0 ? 'colorVerde' : 'colorRojo'"
+            pTooltip="Kg que todavía se pueden solicitar" tooltipPosition="top">
+            <span>Por solicitar</span><b>{{ot.kgPorSolicitar | number : '1.2-2'}} kg</b>
+          </div>
+        </div>
+        <div class="ficha-ot__bloque">
+          <div class="ficha-ot__bloque-encabezado">
+            <span class="ficha-ot__bloque-titulo">Asignación</span>
+            <button type="button" class="enlace-ficha" data-tutorial="verAsignados" (click)="verMaterialesAsignados(ot.ot)">Ver materiales asignados</button>
+          </div>
+          <div class="ficha-ot__fila" pTooltip="Kg ya entregados a la OT" tooltipPosition="top">
+            <span>Asignados</span><span>{{ot.kgAsignado | number : '1.2-2'}} kg</span>
+          </div>
+          <div class="ficha-ot__fila ficha-ot__fila--principal" [ngClass]="ot.kgRestante > 0 ? 'colorVerde' : 'colorRojo'"
+            pTooltip="Kg que faltan por entregar a la OT" tooltipPosition="top">
+            <span>Por asignar</span><b>{{ot.kgRestante | number : '1.2-2'}} kg</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de avance: asignado | solicitado sin asignar | por solicitar -->
+      <div class="barra-ot" role="img"
+        [attr.aria-label]="'Asignado ' + (ot.kgAsignado | number : '1.2-2') + ', solicitado sin asignar ' + (ot.kgSolicitados | number : '1.2-2') + ', por solicitar ' + (ot.kgPorSolicitar | number : '1.2-2') + ' kg'">
+        <span class="barra-ot__tramo barra-ot__tramo--asignado" [style.width.%]="tramosBarraOT.asignado"
+          [pTooltip]="'Asignado: ' + (ot.kgAsignado | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
+        <span class="barra-ot__tramo barra-ot__tramo--solicitado" [style.width.%]="tramosBarraOT.solicitado"
+          [pTooltip]="'Solicitado sin asignar: ' + (ot.kgSolicitados | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
+        <span class="barra-ot__tramo barra-ot__tramo--libre" [style.width.%]="tramosBarraOT.porSolicitar"
+          [pTooltip]="'Por solicitar: ' + (ot.kgPorSolicitar | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
+      </div>
+      <div class="barra-ot__leyenda">
+        <span><i class="punto barra-ot__tramo--asignado"></i> Asignado</span>
+        <span><i class="punto barra-ot__tramo--solicitado"></i> Solicitado sin asignar</span>
+        <span><i class="punto barra-ot__tramo--libre"></i> Por solicitar</span>
+      </div>
     </div>
+
+    <ng-template #sinOT>
+      <div class="ficha-ot ficha-ot--vacia texto-secundario">
+        <i class="pi pi-search"></i> Digite el número de la OT y presione Enter para consultarla.
+      </div>
+    </ng-template>
   </div>
 
   <p-divider></p-divider>
 
-  <!-- Subtitulo con el boton para ver las subcategorias -->
-  <div class="header-actions mb-5">
+  <!-- Distribución por máquinas: sección fija con el selector de máquinas y el reparto (justo después de la OT, antes de los materiales) -->
+  <div data-tutorial="distribucion">
+    <div class="header-actions mb-3">
+      <div class="header-actions__title">
+        <h4 class="mb-0" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cog"></i>
+          Distribución por máquinas</h4>
+      </div>
+      <div class="header-actions__buttons" *ngIf="distribucion.length > 1">
+        <button pButton type="button" label="Repartir en partes iguales" icon="pi pi-th-large"
+          class="p-button-text p-button-sm p-button-secondary" (click)="repartirIguales()"></button>
+      </div>
+    </div>
+
+    <!-- Máquinas (una o varias): un botón por máquina del proceso; un clic la elige o la quita.
+         Si no caben en el ancho, la fila se desplaza arrastrando, con la rueda o con las flechas (como las pestañas de la página principal). -->
+    <div class="selector-maquinas" data-tutorial="maquinas">
+      <span class="selector-maquinas__etiqueta" id="etiquetaMaquinas"
+        [ngClass]="{ 'colorRojo': maquinasPendientes }">Máquinas*</span>
+      <div class="selector-maquinas__fila">
+        <button *ngIf="filaMaquinas.puedeIzquierda" type="button" class="selector-maquinas__flecha selector-maquinas__flecha--izq"
+          aria-label="Ver máquinas anteriores" (click)="filaMaquinas.mover(-1)"><i class="pi pi-chevron-left"></i></button>
+        <div appArrastreHorizontal #filaMaquinas="arrastreHorizontal" class="selector-maquinas__botones" role="group" aria-labelledby="etiquetaMaquinas">
+          <button *ngFor="let m of maquinas" type="button" class="boton-maquina"
+            [class.boton-maquina--elegida]="maquinaElegida(m.maq_Numero)" [attr.aria-pressed]="maquinaElegida(m.maq_Numero)"
+            (click)="alternarMaquina(m.maq_Numero)">
+            <i class="pi" [ngClass]="maquinaElegida(m.maq_Numero) ? 'pi-check' : 'pi-plus'"></i> {{m.maq_Numero}}
+          </button>
+          <span *ngIf="maquinas.length === 0" class="texto-secundario">
+            {{ formEncabezado.value.proceso ? 'El proceso no tiene máquinas.' : 'Elija un proceso para ver sus máquinas.' }}
+          </span>
+        </div>
+        <button *ngIf="filaMaquinas.puedeDerecha" type="button" class="selector-maquinas__flecha selector-maquinas__flecha--der"
+          aria-label="Ver más máquinas" (click)="filaMaquinas.mover(1)"><i class="pi pi-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <p *ngIf="distribucion.length === 0 && maquinas.length > 0" class="mt-3 mb-0" [ngClass]="maquinasPendientes ? 'colorRojo' : 'texto-secundario'">
+      Elija una o varias máquinas. Si elige varias, aquí podrá repartir el material entre ellas.
+    </p>
+
+    <p *ngIf="distribucion.length === 1" class="mt-3 mb-0">
+      Todo el material va a la máquina <b>{{distribucion[0].Maquina}}</b><ng-container *ngIf="totalSolicitado > 0"> ({{totalSolicitado | number : '1.2-2'}})</ng-container>.
+    </p>
+
+    <ng-container *ngIf="distribucion.length > 1">
+      <div class="tarjetas-maquina mt-3">
+        <div *ngFor="let d of distribucion" class="tarjeta-maquina">
+          <span class="tarjeta-maquina__titulo">Máquina {{d.Maquina}}</span>
+          <label class="tarjeta-maquina__campo">
+            <span class="texto-secundario">Porcentaje</span>
+            <p-inputNumber [locale]="localeNumeros" [ngModel]="d.Porcentaje" (ngModelChange)="cambiarPorcentaje(d, $event)" mode="decimal" suffix=" %"
+              [min]="0" [max]="100" [minFractionDigits]="0" [maxFractionDigits]="2" inputStyleClass="text-end campo-compacto"
+              (click)="seleccionarContenido($event)" [attr.aria-label]="'Porcentaje de la máquina ' + d.Maquina"></p-inputNumber>
+          </label>
+          <label class="tarjeta-maquina__campo">
+            <span class="texto-secundario">Cantidad</span>
+            <!-- Sin materiales todavía no hay kg que repartir: se muestra un guion en vez de 0.00 -->
+            <p-inputNumber *ngIf="totalSolicitado > 0; else sinKg" [locale]="localeNumeros" [ngModel]="d.Kg" (ngModelChange)="cambiarKg(d, $event)"
+              mode="decimal" [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" inputStyleClass="text-end campo-compacto"
+              (click)="seleccionarContenido($event)" [attr.aria-label]="'Cantidad de la máquina ' + d.Maquina"></p-inputNumber>
+            <ng-template #sinKg><span class="tarjeta-maquina__sin-kg" pTooltip="Se calcula al agregar materiales" tooltipPosition="top">—</span></ng-template>
+          </label>
+        </div>
+      </div>
+
+      <div class="distribucion__pie">
+        <span [ngClass]="{ 'colorRojo': sumaPorcentajes !== 100 }">
+          Total: <b>{{sumaPorcentajes | number : '1.0-2'}} %</b>
+          <ng-container *ngIf="totalSolicitado > 0"> · <b>{{totalSolicitado | number : '1.2-2'}}</b></ng-container>
+        </span>
+        <span *ngIf="sumaPorcentajes !== 100" class="colorRojo"><i class="pi pi-exclamation-triangle"></i> Los porcentajes deben sumar 100%.</span>
+        <span *ngIf="totalSolicitado <= 0" class="texto-secundario">Los kg se calculan con lo que agregue en las subcategorías.</span>
+        <span *ngIf="distribucion.length === 2" class="texto-secundario">Con dos máquinas, al cambiar una la otra se ajusta sola.</span>
+      </div>
+    </ng-container>
+  </div>
+
+  <p-divider></p-divider>
+
+  <!-- Subtítulo con el botón para agregar subcategorías -->
+  <div class="header-actions mb-4">
     <div class="header-actions__title">
-      <h4 class="mb-0" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i>
-        Seleccionar subcategorías</h4>
+      <h4 class="mb-0" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i>
+        Subcategorías solicitadas</h4>
     </div>
-
-    <div class="header-actions__buttons" data-tutorial="verSubcategorias">
-      <button pButton type="button" label="Ver Subcategorías y Materiales" icon="pi pi-eye"
-        class="p-button-rounded p-button-danger p-button-outlined" (click)="verSubcategorias()"></button>
+    <div class="header-actions__buttons" data-tutorial="agregarSubcategoria">
+      <!-- El tooltip va en el contenedor porque un botón deshabilitado no recibe el mouse -->
+      <span [pTooltip]="encabezadoCompleto ? '' : 'Complete el encabezado: OT consultada, fecha de entrega y máquinas'" tooltipPosition="top"
+        (click)="!encabezadoCompleto && abrirAgregarSubcategoria()">
+        <button pButton type="button" label="Agregar subcategoría" icon="pi pi-plus" class="p-button-rounded p-button-danger"
+          [disabled]="!encabezadoCompleto" (click)="abrirAgregarSubcategoria()"></button>
+      </span>
     </div>
   </div>
 
-  <!-- Formulario de seleccion de materia prima  -->
-  <form [formGroup]="formMP">
-    <div class="mb-5">
-      <div class="row g-4">
-
-        <!-- Id subcategoria -->
-        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-1 col-xl-1 col-xxl-1">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-hashtag"></i>
-            <input formControlName="subcat_Id" id="IdMP" type="number" pInputText [readonly]="true" />
-            <label for="IdMP">Id</label>
-          </span>
-        </div>
-
-        <!-- Nombre subcategoria -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4" data-tutorial="subcategoria">
-          <span class="p-input-icon-left p-float-label input-limpiable">
-            <i class="pi pi-box"></i>
-            <app-selector-material #selectorSubcategoria formControlName="subcat_Nombre" inputId="MP" [opciones]="resultadosBusqueda"
-              campoId="id_Subcategoria" campoNombre="subcategoria" campoStock="stock" [busquedaRemota]="true" [minLength]="1"
-              [readonly]="!encabezadoCompleto" (keydown)="validarEncabezadoAlDigitar($event)" (buscar)="buscarSubcategorias()"
-              (seleccionar)="cargarSubcategoria($event)"></app-selector-material>
-            <button *ngIf="(formMP.get('subcat_Nombre')?.value || formMP.get('subcat_Id')?.value) && !selectorSubcategoria.cargando"
-              pButton type="button" class="p-button-text p-button-rounded p-button-sm boton-limpiar-input"
-              icon="pi pi-times" aria-label="Limpiar subcategoría" pTooltip="Limpiar subcategoría" tooltipPosition="top"
-              (click)="limpiarCamposMP()"></button>
-            <label for="MP">Subcategoría</label>
-          </span>
-        </div>
-
-        <!-- Cantidad pedida -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" data-tutorial="cantidad">
-          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
-            <i class="pi pi-calculator"></i>
-            <p-inputNumber formControlName="cantidad" (click)="seleccionarContenido($event)" mode="decimal" [showClear]="true"
-              inputId="Cantidad" pTooltip="Ingrese la cantidad a solicitar y presione Enter" tooltipPosition="top"
-              [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" (keyup.enter)="agregarSubcategoria()"></p-inputNumber>
-            <label for="Cantidad">Cantidad</label>
-          </span>
-        </div>
-
-        <!-- Disponible subcategoria (stock menos lo reservado por solicitudes activas) -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" data-tutorial="disponible">
-          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label" pTooltip="Stock menos lo solicitado y aún no asignado en otras solicitudes" tooltipPosition="top">
-            <i class="pi pi-check-circle"></i>
-            <p-inputNumber formControlName="disponible" mode="decimal" inputId="Disponible" [minFractionDigits]="2" [maxFractionDigits]="2"
-              [readonly]="true"></p-inputNumber>
-            <label for="Disponible">Disponible</label>
-          </span>
-        </div>
-
-        <!-- Stock subcategoria -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
-          <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
-            <i class="pi pi-database"></i>
-            <p-inputNumber formControlName="stock" mode="decimal" inputId="Stock" [minFractionDigits]="2" [maxFractionDigits]="2"
-              [readonly]="true"></p-inputNumber>
-            <label for="Stock">Stock</label>
-          </span>
-        </div>
-
-        <!-- Unidad de Medida -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-1">
-          <span class="p-float-label">
-            <p-dropdown formControlName="und" inputId="Und" [autoDisplayFirst]="false" [readonly]="haySubcategoriaConsultada" [options]="unidadMedida"
-              optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
-            <label for="Und">Und</label>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOTONES -->
-    <div class="mb-4" data-tutorial="botonesSubcategoria">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton pRipple label="Agregar" type="button" icon="pi pi-send" class="p-button-danger"
-          [disabled]="!encabezadoCompleto || !haySubcategoriaConsultada"
-          (click)="agregarSubcategoria()"></button>
-        <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary"
-          icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
-      </div>
-    </div>
-  </form>
-
-  <!--Linea -->
-  <div class="mb-4">
-    <hr class="colorLinea">
-  </div>
-  <!--Fin Linea -->
-
-  <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i>
-      Tabla de subcategorías solicitadas</h4>
-  </div>
-
-  <!-- TABLA DE SUBCATEGORÍAS SOLICITADAS -->
+  <!-- TABLA DE SUBCATEGORÍAS SOLICITADAS: una sola cabecera; cada subcategoría es una fila-título con sus materiales debajo -->
   <div class="row g-3" data-tutorial="tablaSolicitadas">
     <div class="table-responsive">
-      <p-table [resizableColumns]="true" columnResizeMode="expand" styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll" [rows]="20" [rowHover]="true" [value]="subcategoriasSeleccionadas" dataKey="Id">
+      <p-table styleClass="p-datatable-sm tabla-agrupada" responsiveLayout="scroll" [value]="subcategoriasSeleccionadas" dataKey="Id">
         <ng-template pTemplate="header">
           <tr>
-            <th class="text-center" scope="col">ID</th>
-            <th class="text-center" scope="col">Nombre subcategoría</th>
-            <th class="text-center" scope="col" data-tutorial="editarCantidad">Cantidad</th>
-            <th class="text-center" scope="col">Cantidad Entregada</th>
-            <th class="text-center" scope="col">Cantidad Faltante</th>
-            <th class="text-center" scope="col" data-tutorial="disponibleTabla"
-              pTooltip="Stock menos lo solicitado y aún no asignado en solicitudes activas" tooltipPosition="top">Disponible</th>
-            <th class="text-center" scope="col">Und. Medida</th>
-            <th class="text-center" scope="col" data-tutorial="quitar">Quitar</th>
+            <th scope="col" class="text-start">Material</th>
+            <th scope="col" class="tabla-agrupada__numero">Stock</th>
+            <th scope="col" class="tabla-agrupada__numero" *ngIf="esSolicitud">Entregado</th>
+            <th scope="col" class="tabla-agrupada__numero">Cantidad</th>
+            <th scope="col" class="tabla-agrupada__accion"><span class="visually-hidden">Quitar</span></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-subcat>
-          <tr>
-            <td class="text-center">{{subcat.Id}}</td>
-            <td class="text-center">{{subcat.Nombre}}</td>
-            <td class="text-center cursor" [pEditableColumn]="subcat" pEditableColumnField="Cantidad">
-              <p-cellEditor>
-                <ng-template pTemplate="input">
-                  <p-inputNumber [ngModel]="subcat.Cantidad" (ngModelChange)="cambiarCantidad(subcat, $event)" mode="decimal"
-                    [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" inputStyleClass="text-center"></p-inputNumber>
-                </ng-template>
-                <ng-template pTemplate="output">
-                  {{ subcat.Cantidad | number : '1.2-2' }}
-                </ng-template>
-              </p-cellEditor>
+          <!-- Fila-título de la subcategoría -->
+          <tr class="tabla-agrupada__grupo">
+            <td [attr.colspan]="esSolicitud ? 4 : 3">
+              <div class="tabla-agrupada__titulo">
+                <span class="tabla-agrupada__nombre">{{subcat.Nombre}}</span>
+                <span class="chip-total">{{subcat.Cantidad | number : '1.2-2'}} {{subcat.Und_Medida}}</span>
+                <span class="tabla-agrupada__meta" data-tutorial="disponibleTabla"
+                  [ngClass]="{ 'tabla-agrupada__meta--excede' : excedeDisponible(subcat) }"
+                  [pTooltip]="excedeDisponible(subcat) ? 'Lo solicitado supera el disponible; se pedirá confirmación al guardar' : 'Stock menos lo solicitado y aún no asignado en solicitudes activas'"
+                  tooltipPosition="top">
+                  <i *ngIf="excedeDisponible(subcat)" class="pi pi-exclamation-triangle"></i>
+                  Disponible
+                  <ng-container *ngIf="subcat.Disponible != null; else consultandoDisponible">{{subcat.Disponible | number : '1.2-2'}} {{subcat.Und_Medida}}</ng-container>
+                  <ng-template #consultandoDisponible><i class="pi pi-spin pi-spinner"></i></ng-template>
+                </span>
+                <span class="tabla-agrupada__meta" *ngIf="esSolicitud">
+                  Entregada {{subcat.Cantidad_Entregada | number : '1.2-2'}} · Faltante {{subcat.Cantidad_Faltante | number : '1.2-2'}}
+                </span>
+              </div>
             </td>
-            <td class="text-center">{{subcat.Cantidad_Entregada | number : '1.2-2'}}</td>
-            <td class="text-center">{{subcat.Cantidad_Faltante | number : '1.2-2'}}</td>
-            <td class="text-center" [ngClass]="{ 'colorRojo celda-excedida' : excedeDisponible(subcat) }"
-              [pTooltip]="excedeDisponible(subcat) ? 'Lo solicitado supera el disponible; se pedirá confirmación al guardar' : ''" tooltipPosition="top">
-              <ng-container *ngIf="subcat.Disponible != null; else consultandoDisponible">{{subcat.Disponible | number : '1.2-2'}}</ng-container>
-              <ng-template #consultandoDisponible><i class="pi pi-spin pi-spinner"></i></ng-template>
-            </td>
-            <td class="text-center">{{subcat.Und_Medida}}</td>
-            <td class="text-center">
-              <p-button icon="pi pi-trash" [rounded]="true" severity="danger" [disabled]="subcat.Cantidad_Entregada > 0"
-                [pTooltip]="subcat.Cantidad_Entregada > 0 ? 'No se puede quitar: ya tiene entregas' : 'Quitar material'"
-                (onClick)="mostrarEleccion(subcat)"></p-button>
+            <td class="tabla-agrupada__accion">
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" [disabled]="subcat.Cantidad_Entregada > 0"
+                [pTooltip]="subcat.Cantidad_Entregada > 0 ? 'No se puede quitar: ya tiene entregas' : 'Quitar la subcategoría y sus materiales'"
+                tooltipPosition="top" [attr.aria-label]="'Quitar ' + subcat.Nombre" (onClick)="pedirQuitarSubcategoria(subcat)"></p-button>
             </td>
           </tr>
+
+          <!-- Subcategoría de una solicitud anterior (sin materiales): su cantidad se corrige aquí -->
+          <tr *ngIf="subcat.SinMateriales" class="tabla-agrupada__material">
+            <td class="text-start texto-secundario" [attr.colspan]="esSolicitud ? 3 : 2">
+              Solicitud anterior, pedida sin materiales. Si le agrega materiales, su cantidad pasa a ser la suma de ellos.
+            </td>
+            <td class="tabla-agrupada__numero">
+              <p-inputNumber [locale]="localeNumeros" class="campo-cantidad" [ngModel]="subcat.Cantidad" (ngModelChange)="cambiarCantidad(subcat, $event)"
+                mode="decimal" [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" inputStyleClass="text-end"
+                (click)="seleccionarContenido($event)" [attr.aria-label]="'Cantidad de ' + subcat.Nombre"></p-inputNumber>
+            </td>
+            <td></td>
+          </tr>
+
+          <!-- Materiales de la subcategoría -->
+          <ng-container *ngIf="!subcat.SinMateriales">
+            <tr *ngFor="let mat of subcat.Materiales" class="tabla-agrupada__material">
+              <td class="text-start">{{mat.Nombre}}</td>
+              <td class="tabla-agrupada__numero texto-secundario">{{mat.Stock | number : '1.2-2'}} {{mat.Und_Medida}}</td>
+              <td class="tabla-agrupada__numero texto-secundario" *ngIf="esSolicitud">{{mat.Entregado | number : '1.2-2'}}</td>
+              <td class="tabla-agrupada__numero">
+                <p-inputNumber [locale]="localeNumeros" class="campo-cantidad" [ngModel]="mat.Cantidad" (ngModelChange)="cambiarCantidadMaterial(subcat, mat, $event)" mode="decimal"
+                  [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" inputStyleClass="text-end"
+                  (click)="seleccionarContenido($event)" [attr.aria-label]="'Cantidad de ' + mat.Nombre"></p-inputNumber>
+              </td>
+              <td class="tabla-agrupada__accion">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary" pTooltip="Quitar este material" tooltipPosition="top"
+                  [attr.aria-label]="'Quitar ' + mat.Nombre" (onClick)="pedirQuitarMaterial(subcat, mat)"></p-button>
+              </td>
+            </tr>
+          </ng-container>
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="8">Aún no hay subcategorías en la solicitud.</td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="footer">
-          <tr>
-            <td class="text-end" colspan="2">Total</td>
-            <td class="text-center">{{totalSolicitado | number : '1.2-2'}}</td>
-            <td colspan="5"></td>
+            <td [attr.colspan]="esSolicitud ? 5 : 4" class="text-center p-4 texto-secundario">
+              Aún no hay subcategorías en la solicitud. Use <b>Agregar subcategoría</b>.
+            </td>
           </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
 
-  <!-- Resumen en vivo del límite de kg de la OT (solo Extrusión: las tintas no cuentan) -->
-  <div class="resumen-limite mt-3" *ngIf="solicitaMateriaPrima && infoOT && otVigente" data-tutorial="resumenLimite"
-    [ngClass]="kgQuedarian < -0.005 ? 'resumen-limite--excede' : 'resumen-limite--ok'">
-    <span>Kg por solicitar de la OT: <b>{{infoOT.kgPorSolicitar | number : '1.2-2'}}</b></span>
-    <span>{{esSolicitud ? 'Aumento de esta solicitud' : 'Kg de esta solicitud'}}: <b>{{aumentoKg | number : '1.2-2'}}</b></span>
-    <span>Quedarían por solicitar: <b>{{kgQuedarian | number : '1.2-2'}}</b></span>
-    <span *ngIf="kgQuedarian < -0.005"><i class="pi pi-exclamation-triangle"></i>
-      {{puedeExcederLimite ? 'Supera el límite; se pedirá confirmación al guardar.' : 'Supera el límite; debe solicitar permisos al administrador.'}}</span>
+  <!-- Pie único: total solicitado y, en Extrusión, el límite de kg de la OT (las tintas no cuentan) -->
+  <div class="pie-total mt-2" *ngIf="subcategoriasSeleccionadas.length > 0 || (solicitaMateriaPrima && infoOT && otVigente)" data-tutorial="resumenLimite"
+    [ngClass]="{ 'pie-total--ok' : solicitaMateriaPrima && infoOT && otVigente && kgQuedarian >= -0.005,
+                 'pie-total--excede' : solicitaMateriaPrima && infoOT && otVigente && kgQuedarian < -0.005 }">
+    <!-- Izquierda: límite de kg de la OT; derecha: total solicitado (queda a la derecha también cuando va solo) -->
+    <div class="pie-total__limite" *ngIf="solicitaMateriaPrima && infoOT && otVigente">
+      <span>Por solicitar de la OT: <b>{{infoOT.kgPorSolicitar | number : '1.2-2'}}</b></span>
+      <span *ngIf="esSolicitud">Aumento de esta solicitud: <b>{{aumentoKg | number : '1.2-2'}}</b></span>
+      <span>Quedarían por solicitar: <b>{{kgQuedarian | number : '1.2-2'}}</b></span>
+      <span *ngIf="kgQuedarian < -0.005"><i class="pi pi-exclamation-triangle"></i>
+        {{puedeExcederLimite ? 'Supera el límite; se pedirá confirmación al guardar.' : 'Supera el límite; debe solicitar permisos al administrador.'}}</span>
+    </div>
+    <span class="pie-total__principal">Total solicitado: <b>{{totalSolicitado | number : '1.2-2'}}</b></span>
   </div>
 
-  <br>
-  <div class="mb-3">
+  <!-- Observación -->
+  <div class="mt-4" [formGroup]="formEncabezado" data-tutorial="observacion">
+    <span class="p-float-label">
+      <textarea formControlName="observacion" id="observacion" [rows]="5"
+        pInputTextarea appContadorCaracteres maxLength="2000"></textarea>
+      <label for="observacion">Observación</label>
+    </span>
+  </div>
+
+  <div class="mt-4">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center" data-tutorial="botonesSolicitud">
       <button pButton pRipple [label]="esSolicitud ? 'Editar Solicitud' : 'Crear Solicitud'" type="button" icon="pi pi-check"
         class="p-button-danger" [disabled]="subcategoriasSeleccionadas.length == 0 || load"
@@ -374,131 +388,241 @@
   </div>
 </p-card>
 
-<p-toast position="center" key="eleccion" (onClose)="onReject('eleccion')" [baseZIndex]="5000">
+<!-- Aviso de éxito al guardar: el PDF ya no se genera solo; el usuario elige ver la solicitud o generar su PDF -->
+<p-toast position="center" [key]="claveToastGuardada" [baseZIndex]="5000" styleClass="aviso-guardada">
   <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
+    <div class="aviso-guardada__cuerpo">
+      <div class="aviso-guardada__texto">
+        <i class="pi pi-check-circle"></i>
+        <div>
+          <b>{{message.summary}}</b>
+          <p class="mb-0">{{message.detail}}</p>
+        </div>
       </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="quitarMateriaPrima()" icon="pi pi-check"
-            label="Sí (Enter)" class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No (Esc)"
-            class="p-button-secondary"></button>
-        </div>
+      <div class="aviso-guardada__botones">
+        <button *ngIf="puedeVerMovimientos" pButton type="button" label="Ver en movimientos" icon="pi pi-list"
+          class="p-button-sm p-button-outlined p-button-secondary" (click)="verSolicitudEnMovimientos(message.data)"></button>
+        <button pButton type="button" [label]="generandoPdfSolicitud ? 'Generando PDF…' : 'Generar PDF'" icon="pi pi-file-pdf"
+          [loading]="generandoPdfSolicitud" [disabled]="generandoPdfSolicitud"
+          class="p-button-sm p-button-danger" (click)="generarPdfDesdeAviso(message.data)"></button>
       </div>
     </div>
   </ng-template>
 </p-toast>
 
-<p-toast position="center" key="solicitud" (onClose)="onReject('solicitud')" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="aceptarConfirmacion()" icon="pi pi-check" label="Sí (Enter)"
-            class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="onReject('solicitud')" icon="pi pi-times" label="No (Esc)"
-            class="p-button-secondary"></button>
-        </div>
-      </div>
+<!-- Confirmaciones de la página (mismo estilo que el de eliminar evento del calendario). Enter acepta y Esc cancela. -->
+<p-confirmDialog key="confirmarSolicitud" [style]="{width: '30rem'}" [breakpoints]="{'640px': '92vw'}" [baseZIndex]="6000" appendTo="body"></p-confirmDialog>
+
+<!-- Modal "Agregar subcategoría": la lista de subcategorías se desliza para dar paso a sus materiales -->
+<p-dialog [(visible)]="mostrarAgregar" [modal]="true" [style]="{ width: '60vw' }" [breakpoints]="{ '1200px': '80vw', '960px': '95vw' }"
+  [draggable]="false" [resizable]="false" [closeOnEscape]="false" (onHide)="alCerrarModalAgregar()" styleClass="dialogo-agregar">
+  <ng-template pTemplate="header">
+    <div class="encabezado-modal">
+      <button *ngIf="panelModal === 'materiales'" pButton type="button" icon="pi pi-arrow-left"
+        class="p-button-text p-button-secondary p-button-rounded boton-volver" pTooltip="Volver a las subcategorías" tooltipPosition="bottom"
+        aria-label="Volver a las subcategorías" (click)="volverASubcategorias()"></button>
+      <span class="p-dialog-title">
+        {{ panelModal === 'materiales' ? 'Materiales de ' + subcategoriaModal?.subcategoria : 'Subcategorías' }}
+      </span>
     </div>
   </ng-template>
-</p-toast>
 
-<!-- Modal para ver subcategorias -->
-<p-dialog header="Subcategorías" [(visible)]="mostrarSubcategorias" [modal]="true" [style]="{ width: '50vw' }"
-  [breakpoints]="{ '960px': '95vw' }" [draggable]="false" [resizable]="false">
+  <div class="carrusel">
+    <div class="carrusel__pista" [class.carrusel__pista--materiales]="panelModal === 'materiales'">
 
-  <div class="row g-3">
-    <p-table #dtSubcategories [resizableColumns]="true" columnResizeMode="expand"
-      styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rows]="20" [rowHover]="true"
-      [value]="subcategoriasModal">
-      <ng-template pTemplate="header">
-        <tr>
-          <th><input pInputText type="number" (input)="applyFilter($event, 'id_Subcategoria', dtSubcategories)"></th>
-          <th><input pInputText type="text" (input)="applyFilter($event, 'subcategoria', dtSubcategories)"></th>
-          <th><input pInputText type="number" (input)="applyFilter($event, 'stock', dtSubcategories)"></th>
-          <th><input pInputText type="number" (input)="applyFilter($event, 'disponible', dtSubcategories)"></th>
-          <th></th>
-        </tr>
-        <tr>
-          <th class="text-center" scope="col">Id</th>
-          <th class="text-center" scope="col">Subcategoría</th>
-          <th class="text-center" scope="col">Stock {{unidadStockModal}}</th>
-          <th class="text-center" scope="col" pTooltip="Stock menos lo solicitado y aún no asignado en solicitudes activas" tooltipPosition="top">Disponible {{unidadStockModal}}</th>
-          <th class="text-center" scope="col">Acciones</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-data>
-        <tr>
-          <td class="text-center">{{data.id_Subcategoria}}</td>
-          <td>{{data.subcategoria}}</td>
-          <td class="text-center">{{data.stock | number : '1.2-2'}}</td>
-          <td class="text-center" [ngClass]="{ 'colorRojo' : data.disponible != null && data.disponible <= 0 }">
-            <ng-container *ngIf="data.disponible != null; else cargandoDisponibleModal">{{data.disponible | number : '1.2-2'}}</ng-container>
-            <ng-template #cargandoDisponibleModal><i class="pi pi-spin pi-spinner"></i></ng-template>
-          </td>
-          <td class="text-center">
-            <div class="d-flex justify-content-center gap-2">
-              <p-button icon="pi pi-eye" [rounded]="true" severity="danger" [outlined]="true" pTooltip="Ver materiales" tooltipPosition="top"
-                (onClick)="verMaterialesSubcategoria(data)"></p-button>
-              <p-button icon="pi pi-check" [rounded]="true" severity="danger" pTooltip="Usar en la solicitud" tooltipPosition="top"
-                (onClick)="usarSubcategoria(data)"></p-button>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="5">El proceso no tiene subcategorías.</td>
-        </tr>
-      </ng-template>
-    </p-table>
+      <!-- Panel 1: subcategorías del proceso -->
+      <div class="carrusel__panel" [attr.inert]="panelModal !== 'subcategorias' ? '' : null" [attr.aria-hidden]="panelModal !== 'subcategorias'">
+        <p class="texto-secundario mb-2">Haga clic en una subcategoría para ver sus materiales.</p>
+        <p-table #dtSubcategorias styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true"
+          [value]="subcategoriasModal" [scrollable]="true" scrollHeight="50vh" [globalFilterFields]="['id_Subcategoria', 'subcategoria']">
+          <ng-template pTemplate="caption">
+            <span class="p-input-icon-left buscador-modal">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" placeholder="Buscar subcategoría por ID o nombre..." [(ngModel)]="busquedaSubcategoria"
+                (ngModelChange)="dtSubcategorias.filterGlobal($event, 'contains')" aria-label="Buscar subcategoría por ID o nombre"
+                [disabled]="cargandoCatalogoModal || !!errorCatalogoModal" />
+            </span>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">Subcategoría</th>
+              <th scope="col">Stock {{unidadStockModal}}</th>
+              <th scope="col" pTooltip="Stock menos lo solicitado y aún no asignado en solicitudes activas" tooltipPosition="top">Disponible {{unidadStockModal}}</th>
+              <th scope="col">En la solicitud</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-sub>
+            <tr class="cursor" (click)="verMaterialesDe(sub)" (keyup.enter)="verMaterialesDe(sub)" tabindex="0"
+              [ngClass]="{ 'fila-resaltada': sub.id_Subcategoria === subcategoriaModal?.id_Subcategoria,
+                           'fila-recien-agregada': sub.id_Subcategoria === ultimoAgregado?.subcategoriaId }">
+              <td class="text-start"><b>{{sub.subcategoria}}</b> <span class="id-secundario">ID {{sub.id_Subcategoria}}</span></td>
+              <td>{{sub.stock | number : '1.2-2'}}</td>
+              <td [ngClass]="{ 'colorRojo' : sub.disponible != null && sub.disponible <= 0 }">
+                <ng-container *ngIf="sub.disponible != null; else cargandoDisponibleModal">{{sub.disponible | number : '1.2-2'}}</ng-container>
+                <ng-template #cargandoDisponibleModal><i class="pi pi-spin pi-spinner"></i></ng-template>
+              </td>
+              <td>
+                <span *ngIf="cantidadEnSolicitud(sub.id_Subcategoria) > 0" class="etiqueta-agregado">
+                  <i class="pi pi-check"></i> {{cantidadEnSolicitud(sub.id_Subcategoria) | number : '1.2-2'}}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <!-- Primera carga: filas de relleno con la forma de la tabla y el texto de lo que se está cargando -->
+            <ng-container *ngIf="cargandoCatalogoModal">
+              <tr *ngFor="let fila of filasRelleno" aria-hidden="true">
+                <td class="text-start"><p-skeleton [width]="fila.nombre" height="1rem"></p-skeleton></td>
+                <td><p-skeleton width="5rem" height="1rem" styleClass="mx-auto"></p-skeleton></td>
+                <td><p-skeleton width="5rem" height="1rem" styleClass="mx-auto"></p-skeleton></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colspan="4" class="text-center texto-secundario" role="status">
+                  <i class="pi pi-spin pi-spinner me-2"></i>Cargando subcategorías y materiales…
+                </td>
+              </tr>
+            </ng-container>
+            <!-- Error de la primera carga: se muestra aquí con la opción de reintentar -->
+            <tr *ngIf="!cargandoCatalogoModal && errorCatalogoModal">
+              <td colspan="4" class="text-center p-4">
+                <div class="colorRojo mb-2"><i class="pi pi-exclamation-triangle me-1"></i>{{errorCatalogoModal}}</div>
+                <div class="d-flex justify-content-center flex-wrap gap-2">
+                  <button pButton type="button" label="Reintentar" icon="pi pi-refresh" class="p-button-outlined p-button-danger p-button-sm"
+                    (click)="reintentarCatalogoModal()"></button>
+                  <button *ngIf="detalleErrorCatalogoModal" pButton type="button" label="Ver detalles" icon="pi pi-info-circle"
+                    class="p-button-text p-button-secondary p-button-sm" (click)="verDetallesErrorCatalogo()"></button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="!cargandoCatalogoModal && !errorCatalogoModal">
+              <td colspan="4">{{ busquedaSubcategoria ? 'Ninguna subcategoría coincide con la búsqueda.' : 'El proceso no tiene subcategorías.' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- Panel 2: materiales de la subcategoría elegida -->
+      <div class="carrusel__panel" [attr.inert]="panelModal !== 'materiales' ? '' : null" [attr.aria-hidden]="panelModal !== 'materiales'">
+        <p class="texto-secundario mb-2">Haga clic en un material y escriba la cantidad. Puede escribir en varios materiales y agregarlos juntos.</p>
+        <p-table #dtMateriales styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true"
+          [value]="materialesModal" [scrollable]="true" scrollHeight="50vh" [globalFilterFields]="['item', 'referencia']">
+          <ng-template pTemplate="caption">
+            <span class="p-input-icon-left buscador-modal">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" placeholder="Buscar material por ID o nombre..." [(ngModel)]="busquedaMaterial"
+                (ngModelChange)="dtMateriales.filterGlobal($event, 'contains')" aria-label="Buscar material por ID o nombre" />
+            </span>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">Material</th>
+              <th scope="col">Stock</th>
+              <th scope="col">En la solicitud</th>
+              <th scope="col">Cantidad a solicitar</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-mat>
+            <tr class="cursor" (click)="marcarMaterial(mat)" [ngClass]="{ 'fila-resaltada': mat.item === materialMarcado }">
+              <td class="text-start">{{mat.referencia}} <span class="id-secundario">ID {{mat.item}}</span></td>
+              <td [ngClass]="{ 'colorRojo': mat.stock <= 0 }">{{mat.stock | number : '1.2-2'}} {{mat.undMed_Id}}</td>
+              <td>
+                <span *ngIf="cantidadMaterialEnSolicitud(mat.item) > 0" class="etiqueta-agregado">
+                  <i class="pi pi-check"></i> {{cantidadMaterialEnSolicitud(mat.item) | number : '1.2-2'}}
+                </span>
+              </td>
+              <td class="celda-cantidad" (click)="$event.stopPropagation(); materialMarcado = mat.item">
+                <p-inputNumber [locale]="localeNumeros" [(ngModel)]="borrador[mat.item]" [inputId]="'cantMat' + mat.item" mode="decimal" [min]="0"
+                  [minFractionDigits]="0" [maxFractionDigits]="2" inputStyleClass="text-end campo-sin-cero campo-compacto" placeholder="0.00"
+                  (keyup.enter)="agregarBorrador()" (onFocus)="materialMarcado = mat.item"
+                  [attr.aria-label]="'Cantidad de ' + mat.referencia"></p-inputNumber>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4">{{ busquedaMaterial ? 'Ningún material coincide con la búsqueda.' : 'La subcategoría no tiene materiales.' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
   </div>
+
+  <ng-template pTemplate="footer">
+    <div class="pie-modal">
+      <span class="pie-modal__resumen" *ngIf="panelModal === 'materiales'">
+        <ng-container *ngIf="resumenBorrador.cantidad > 0; else sinBorrador">
+          <b>{{resumenBorrador.cantidad}}</b> material(es) · <b>{{resumenBorrador.total | number : '1.2-2'}}</b>
+          <ng-container *ngIf="cantidadEnSolicitud(subcategoriaModal?.id_Subcategoria) > 0">
+            (ya hay {{cantidadEnSolicitud(subcategoriaModal?.id_Subcategoria) | number : '1.2-2'}} en la solicitud)
+          </ng-container>
+        </ng-container>
+        <ng-template #sinBorrador>Escriba la cantidad de uno o más materiales.</ng-template>
+      </span>
+      <ng-container *ngIf="panelModal === 'subcategorias'">
+        <!-- Confirmación de lo recién agregado (unos segundos); luego vuelve el resumen de la solicitud -->
+        <span *ngIf="ultimoAgregado; else resumenSolicitudModal" class="pie-modal__resumen pie-modal__agregado" role="status"
+          [pTooltip]="ultimoAgregado.detalle" tooltipPosition="top">
+          <i class="pi pi-check-circle"></i> {{ultimoAgregado.texto}}
+        </span>
+        <ng-template #resumenSolicitudModal>
+          <span class="pie-modal__resumen">
+            {{subcategoriasSeleccionadas.length}} subcategoría(s) en la solicitud · {{totalSolicitado | number : '1.2-2'}}
+          </span>
+        </ng-template>
+      </ng-container>
+      <div class="pie-modal__botones">
+        <button *ngIf="panelModal === 'materiales'" pButton type="button" icon="pi pi-plus" class="p-button-danger"
+          [label]="'Agregar a la solicitud' + (resumenBorrador.cantidad > 0 ? ' (' + resumenBorrador.cantidad + ')' : '')"
+          [disabled]="resumenBorrador.cantidad === 0" (click)="agregarBorrador()"></button>
+        <button pButton type="button" label="Listo" icon="pi pi-check" (click)="cerrarModalAgregar()"
+          [ngClass]="panelModal === 'materiales' ? 'p-button-outlined p-button-danger' : 'p-button-danger'"></button>
+      </div>
+    </div>
+  </ng-template>
 </p-dialog>
 
-<!--Modal para materiales-->
-<p-dialog header="Materiales" [(visible)]="mostrarMateriales" [modal]="true" [style]="{ width: '50vw' }"
+<!-- Mis solicitudes pendientes (el solicitante puede cancelarlas mientras no tengan entregas) -->
+<p-dialog header="Mis solicitudes pendientes" [(visible)]="mostrarMisSolicitudes" [modal]="true" [style]="{ width: '60vw' }"
   [breakpoints]="{ '960px': '95vw' }" [draggable]="false" [resizable]="false">
-
-  <div class="row g-3">
-    <p-table #dtMaterials [resizableColumns]="true" columnResizeMode="expand"
-      styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rows]="20" [rowHover]="true"
-      [value]="materialesSubcategoria">
-      <ng-template pTemplate="header">
-        <tr>
-          <th><input pInputText type="number" (input)="applyFilter($event, 'item', dtMaterials)"></th>
-          <th><input pInputText type="text" (input)="applyFilter($event, 'referencia', dtMaterials)"></th>
-          <th><input pInputText type="number" (input)="applyFilter($event, 'stock', dtMaterials)"></th>
-        </tr>
-        <tr>
-          <th class="text-center" scope="col">Id</th>
-          <th class="text-center" scope="col">Material</th>
-          <th class="text-center" scope="col">Stock {{unidadStockModal}}</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-data>
-        <tr>
-          <td class="text-center">{{data.item}}</td>
-          <td>{{data.referencia}}</td>
-          <td class="text-center">{{data.stock | number : '1.2-2'}}</td>
-        </tr>
-      </ng-template>
-    </p-table>
+  <p class="texto-secundario">Solo aparecen sus solicitudes <b>pendientes</b> (sin material entregado). Si se equivocó, cancélela y cree una nueva.</p>
+  <div class="d-flex justify-content-center py-4" *ngIf="cargandoMisSolicitudes">
+    <p-progressSpinner></p-progressSpinner>
   </div>
+  <p-table *ngIf="!cargandoMisSolicitudes" styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll"
+    [value]="misSolicitudes" [scrollable]="true" scrollHeight="50vh">
+    <ng-template pTemplate="header">
+      <tr>
+        <th scope="col">N°</th>
+        <th scope="col">OT</th>
+        <th scope="col">Proceso</th>
+        <th scope="col">Máquinas</th>
+        <th scope="col">Creada</th>
+        <th scope="col">Entrega</th>
+        <th scope="col">Cancelar</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-s>
+      <tr>
+        <td><b>{{s.id}}</b></td>
+        <td>{{s.ot}}</td>
+        <td>{{s.proceso}}</td>
+        <td>{{textoMaquinas(s)}}</td>
+        <td>{{s.fecha | date : 'yyyy-MM-dd'}}</td>
+        <td>{{s.fechaEntrega | date : 'yyyy-MM-dd'}}</td>
+        <td>
+          <p-button icon="pi pi-ban" [rounded]="true" severity="danger" [outlined]="true" pTooltip="Cancelar solicitud" tooltipPosition="left"
+            (onClick)="pedirCancelarSolicitud(s)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No tiene solicitudes pendientes.</td>
+      </tr>
+    </ng-template>
+  </p-table>
 </p-dialog>
 
 <!-- Modal de materiales asignados a la OT -->

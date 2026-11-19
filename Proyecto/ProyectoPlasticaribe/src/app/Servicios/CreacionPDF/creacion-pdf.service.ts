@@ -29,12 +29,15 @@ export class CreacionPdfService {
     private bagProService: BagproService,
   ) { }
 
-  formatoPDF(titulo: string, content: any, headerAdicional: any = {}) {
+  /**
+   * @param tituloPestana Título del documento (el que se ve en la pestaña del navegador); por defecto el mismo título.
+   */
+  formatoPDF(titulo: string, content: any, headerAdicional: any = {}, tituloPestana: string = titulo) {
     this.title = titulo; 
     let today: any = moment().format('YYYY-MM-DD');
     let hour: any = moment().format('HH:mm:ss');
     const pdfDefinicion: any = {
-      info: { title: titulo },
+      info: { title: tituloPestana },
       pageOrientation: 'portrait',
       pageSize: 'LETTER',
       watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
@@ -1013,6 +1016,80 @@ export class CreacionPdfService {
    * @param ot Datos de la OT en BagPro, o null si no se encontró.
    */
   solicitudMaterialProduccionPDF(detalles: any[], ot: DatosOTSolicitudPDF | null) {
+    const { titulo, tituloPestana, content } = this.contenidoSolicitudMaterialPDF(detalles, ot);
+    this.formatoPDF(titulo, content, {}, tituloPestana);
+  }
+
+  /**
+   * Genera el PDF de la solicitud de material como archivo en memoria (sin abrirlo), para mostrar un aviso
+   * y abrirlo después (como `generarBlobOrdenTrabajo`).
+   */
+  generarBlobSolicitudMaterialProduccion(detalles: any[], ot: DatosOTSolicitudPDF | null): Observable<Blob> {
+    return this.generarBlobPDF(() => this.contenidoSolicitudMaterialPDF(detalles, ot));
+  }
+
+  /**
+   * Genera el PDF de una asignación de materia prima como archivo en memoria (sin abrirlo), para mostrar un aviso
+   * y abrirlo después.
+   * @param datos Filas de `Materia_Prima/getInfoMovimientoAsignaciones/{id}/{tipo}`.
+   */
+  generarBlobAsignacionMateriaPrima(datos: any[]): Observable<Blob> {
+    return this.generarBlobPDF(() => this.contenidoAsignacionPDF(datos));
+  }
+
+  /**
+   * Arma un PDF con el formato común (cabecera, marca de agua, márgenes) y lo entrega como archivo en memoria.
+   * @param contenido Devuelve el título de la cabecera, el título de la pestaña y el contenido del documento.
+   */
+  private generarBlobPDF(contenido: () => {
+    titulo: string;
+    tituloPestana: string;
+    content: any[];
+    /** Título de la cabecera por hoja (si cambia de una hoja a otra); si no se envía, todas usan `titulo`. */
+    tituloPorPagina?: (pagina: number) => string;
+    /** Se ejecuta al maquetar cada nodo; sirve para saber en qué hoja empieza cada sección. */
+    pageBreakBefore?: (nodo: any) => boolean;
+  }): Observable<Blob> {
+    return new Observable<Blob>(suscriptor => {
+      try {
+        const hoy = moment().format('YYYY-MM-DD');
+        const hora = moment().format('HH:mm:ss');
+        // pdfmake modifica el contenido al maquetarlo: cada pasada arma el suyo con `contenido()`.
+        const definicion = () => {
+          const { titulo, tituloPestana, content, tituloPorPagina } = contenido();
+          this.title = titulo;
+          return {
+            info: { title: tituloPestana },
+            pageOrientation: 'portrait',
+            pageSize: 'LETTER',
+            watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
+            pageMargins: [25, 120, 25, 35],
+            header: tituloPorPagina
+              ? (pagina: number, total: number) => (this.headerPDF(hoy, hora, tituloPorPagina(pagina), {}) as any)(pagina, total)
+              : this.headerPDF(hoy, hora, titulo, {}),
+            content,
+          };
+        };
+        const entregar = (blob: Blob) => {
+          suscriptor.next(blob);
+          suscriptor.complete();
+        };
+        const { pageBreakBefore } = contenido();
+        if (pageBreakBefore) {
+          // pdfmake dibuja las cabeceras antes de llamar a pageBreakBefore: una primera pasada solo averigua
+          // en qué hoja empieza cada sección y la segunda dibuja las cabeceras ya con ese dato.
+          pdfMake.createPdf({ ...definicion(), pageBreakBefore } as any).getBuffer(() => pdfMake.createPdf(definicion() as any).getBlob(entregar));
+        } else {
+          pdfMake.createPdf(definicion() as any).getBlob(entregar);
+        }
+      } catch (error) {
+        suscriptor.error(error);
+      }
+    });
+  }
+
+  /** Título y contenido del PDF de una solicitud de material (comunes a abrirlo directo o como archivo). */
+  private contenidoSolicitudMaterialPDF(detalles: any[], ot: DatosOTSolicitudPDF | null): { titulo: string; tituloPestana: string; content: any[] } {
     const solicitud = detalles[0];
     const subcategorias = detalles
       .map(d => ({
@@ -1032,7 +1109,8 @@ export class CreacionPdfService {
       this.tablaSubcategoriasSolicitudPDF(subcategorias),
       this.observacionSolicitudMaterialPDF(solicitud.observacion),
     ];
-    this.formatoPDF(titulo, content);
+    // Título corto para la pestaña del navegador; el título completo va en la cabecera del documento.
+    return { titulo, tituloPestana: `Solicitud MP #${solicitud.id}`, content };
   }
 
   /** Formatea una cantidad con separador de miles y dos decimales. */
@@ -1140,6 +1218,12 @@ export class CreacionPdfService {
    * @param datos Filas de `Materia_Prima/getInfoMovimientoAsignaciones/{id}/{tipo}`: encabezado repetido en cada fila más el material.
    */
   asignacionMateriaPrimaPDF(datos: any[]) {
+    const { titulo, tituloPestana, content } = this.contenidoAsignacionPDF(datos);
+    this.formatoPDF(titulo, content, {}, tituloPestana);
+  }
+
+  /** Título y contenido del PDF de una asignación (comunes a abrirlo directo o como archivo). */
+  private contenidoAsignacionPDF(datos: any[]): { titulo: string; tituloPestana: string; content: any[] } {
     const asignacion = datos[0];
     const solicitud = Number(asignacion.solicitud_Id) || 0;
     const titulo = [
@@ -1155,7 +1239,46 @@ export class CreacionPdfService {
       this.tablaMaterialesAsignadosPDF(asignacion.movimiento, materiales),
       this.observacionAsignacionPDF(asignacion.observacion),
     ];
-    this.formatoPDF(titulo, content);
+    // Título corto para la pestaña del navegador; el título completo va en la cabecera del documento.
+    return { titulo, tituloPestana: `Asignación MP #${asignacion.id}`, content };
+  }
+
+  /**
+   * Genera en un solo PDF todas las asignaciones de una solicitud: una sección por asignación (y por tipo de movimiento),
+   * cada una empieza en hoja nueva. Cada hoja lleva la misma cabecera que el PDF individual de su asignación.
+   * @param lotes Filas de `Materia_Prima/getInfoMovimientoAsignaciones/{id}/{tipo}` de cada asignación (una lista por PDF individual).
+   * @param solicitud Número de la solicitud.
+   * @param ot Número de la OT.
+   */
+  generarBlobAsignacionesSolicitud(lotes: any[][], solicitud: number, ot: number): Observable<Blob> {
+    const ID_SECCION = 'seccion-asignacion-';
+    /** Hoja en la que empieza cada sección: la registra la primera pasada y la usa la segunda para las cabeceras. */
+    const conDatos = lotes.filter(datos => datos.length > 0);
+    const hojaInicio: number[] = conDatos.map((_, i) => i + 1);
+    return this.generarBlobPDF(() => {
+      // Cada sección es el mismo contenido (y la misma cabecera) que el PDF individual de la asignación.
+      const secciones = conDatos.map(datos => this.contenidoAsignacionPDF(datos));
+      // El id va en el primer bloque de la sección (no en el que lleva el salto de hoja: pdfmake no consulta esos nodos).
+      const content = secciones.map((seccion, i) => ({
+        stack: seccion.content.map((bloque, j) => j === 0 ? { ...bloque, id: `${ID_SECCION}${i}` } : bloque),
+        pageBreak: i > 0 ? 'before' : undefined,
+      }));
+      return {
+        titulo: secciones[0]?.titulo ?? `Asignaciones de la Solicitud N° ${solicitud}\nOrden de Trabajo N° ${ot}`,
+        tituloPestana: `Asignaciones Solicitud MP #${solicitud}`,
+        content,
+        pageBreakBefore: (nodo: any) => {
+          const id: string = nodo?.id ?? '';
+          if (id.startsWith(ID_SECCION) && nodo.startPosition?.pageNumber) hojaInicio[Number(id.slice(ID_SECCION.length))] = nodo.startPosition.pageNumber;
+          return false; // Solo se registra la hoja; los saltos ya los define cada sección.
+        },
+        tituloPorPagina: (pagina: number) => {
+          let indice = 0;
+          hojaInicio.forEach((inicio, i) => { if (inicio <= pagina) indice = i; });
+          return secciones[indice]?.titulo ?? '';
+        },
+      };
+    });
   }
 
   /** Id y nombre del material de la fila según el tipo de movimiento. */

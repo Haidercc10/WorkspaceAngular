@@ -76,10 +76,16 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   margin: auto;
   width: 90%;
   height: 100%;
-  padding: 2%;
+  /* Relleno vertical fijo (antes 2% del ancho, que en pantallas grandes dejaba mucho espacio arriba y abajo). */
+  padding: 1rem 2%;
   border-radius: 10px;
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
+}
+
+/* Sin el margen global de 3rem bajo el contenido de las tarjetas: los botones cierran la tarjeta con el mismo espacio que hay arriba. */
+:host ::ng-deep .p-card .p-card-body .p-card-content {
+  margin-bottom: 0 !important;
 }
 
 :host ::ng-deep .p-inputtext,
@@ -111,12 +117,6 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   color: var(--texto-exito);
 }
 
-/* Celda de disponible cuando lo solicitado lo supera. */
-.celda-excedida {
-  background-color: var(--fondo-peligro);
-  font-weight: 600;
-}
-
 /* Aviso de que se está editando una solicitud existente. */
 .aviso-edicion {
   display: flex;
@@ -130,24 +130,185 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   color: var(--texto-advertencia);
 }
 
-/* Resumen en vivo del límite de kg de la OT (Extrusión). */
-.resumen-limite {
+/* Selector de varias máquinas a lo ancho de su columna. */
+p-multiselect ::ng-deep .p-multiselect {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem 1.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
+  width: 100%;
 }
 
-.resumen-limite--ok {
+/* Botón deshabilitado dentro de un contenedor con tooltip: el clic pasa al contenedor, que avisa qué falta. */
+.header-actions__buttons > span .p-button:disabled {
+  pointer-events: none;
+}
+
+.texto-secundario {
+  color: var(--text-color-secondary);
+}
+
+/* Selector de máquinas: un botón por máquina del proceso, en una fila que se desplaza por arrastre si no caben. */
+.selector-maquinas__etiqueta {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+.selector-maquinas__fila {
+  position: relative;
+}
+
+.selector-maquinas__botones {
+  gap: 0.5rem;
+  padding: 0.15rem 0.1rem;
+}
+
+.boton-maquina {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 4.5rem;
+  justify-content: center;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  background-color: var(--surface-card);
+  color: var(--text-color);
+  font: inherit;
+  font-weight: 600;
+  cursor: inherit;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.boton-maquina .pi {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.boton-maquina:hover {
+  border-color: var(--rojo-texto);
+}
+
+.boton-maquina:focus-visible {
+  outline: 2px solid var(--rojo-texto);
+  outline-offset: 2px;
+}
+
+.boton-maquina--elegida,
+.boton-maquina--elegida:hover {
+  border-color: var(--rojo-texto);
+  background-color: var(--fondo-acento);
+  color: var(--rojo-texto);
+  box-shadow: inset 0 0 0 1px var(--rojo-texto);
+}
+
+.boton-maquina--elegida .pi {
+  color: inherit;
+}
+
+/* Flechas laterales, solo cuando hay máquinas ocultas hacia ese lado. */
+.selector-maquinas__flecha {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 50%;
+  background-color: var(--surface-card);
+  color: var(--text-color);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.selector-maquinas__flecha--izq {
+  left: -0.5rem;
+  box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.25);
+}
+
+.selector-maquinas__flecha--der {
+  right: -0.5rem;
+  box-shadow: -4px 0 6px -4px rgba(0, 0, 0, 0.25);
+}
+
+/* Modal "Agregar subcategoría": dos paneles en una pista que se desliza horizontalmente. */
+.encabezado-modal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.carrusel {
+  overflow: hidden;
+}
+
+.carrusel__pista {
+  display: flex;
+  width: 200%;
+  transition: transform 0.35s ease;
+}
+
+.carrusel__pista--materiales {
+  transform: translateX(-50%);
+}
+
+.carrusel__panel {
+  flex: 0 0 50%;
+  width: 50%;
+  min-width: 0;
+  padding: 0 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carrusel__pista {
+    transition: none;
+  }
+}
+
+/* Fila elegida: fondo de acento y borde rojo a la izquierda, para no perder el hilo al volver. */
+:host ::ng-deep .fila-resaltada > td {
+  background-color: var(--fondo-acento) !important;
+}
+
+:host ::ng-deep .fila-resaltada > td:first-child {
+  box-shadow: inset 4px 0 0 var(--rojo);
+}
+
+/* Cantidad que ya está en la solicitud. */
+.etiqueta-agregado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85em;
   background-color: var(--fondo-exito);
   color: var(--texto-exito);
 }
 
-.resumen-limite--excede {
-  background-color: var(--fondo-peligro);
-  color: var(--texto-peligro);
+.pie-modal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pie-modal__resumen {
+  color: var(--text-color-secondary);
+  text-align: left;
+}
+
+.pie-modal__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
 /* Subtitulo con botones a la derecha (mismo patron de orden-trabajo) */
@@ -172,5 +333,342 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
+  }
+}
+
+/* Pie único de la tabla: total solicitado y límite de kg de la OT. */
+.pie-total {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem 1.5rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background-color: var(--fondo-sutil);
+}
+
+/* Límite de la OT a la izquierda (ocupa el espacio libre); el total solicitado queda a la derecha. */
+.pie-total__limite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-right: auto;
+}
+
+.pie-total__principal {
+  font-size: 1.05em;
+}
+
+.pie-total--ok {
+  border-color: transparent;
+  background-color: var(--fondo-exito);
+  color: var(--texto-exito);
+}
+
+.pie-total--excede {
+  border-color: transparent;
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
+}
+
+/* Ficha de la OT consultada. */
+.ficha-ot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  background-color: var(--surface-card);
+}
+
+.ficha-ot--vacia {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-style: dashed;
+  background-color: transparent;
+}
+
+.ficha-ot__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+}
+
+.ficha-ot__titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--texto-fuerte);
+}
+
+.ficha-ot__total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 1.25rem;
+  color: var(--texto-fuerte);
+}
+
+.ficha-ot__etiqueta,
+.ficha-ot__bloque-titulo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-color-secondary);
+}
+
+.ficha-ot__bloques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.75rem;
+}
+
+.ficha-ot__bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  background-color: var(--fondo-sutil);
+}
+
+.ficha-ot__fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ficha-ot__fila--principal {
+  font-size: 1.1rem;
+}
+
+/* Barra de avance de los kg de la OT. */
+.barra-ot {
+  display: flex;
+  height: 0.6rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: var(--fondo-sutil);
+}
+
+.barra-ot__tramo {
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.barra-ot__tramo--asignado { background-color: var(--texto-exito); }
+.barra-ot__tramo--solicitado { background-color: var(--texto-info); }
+.barra-ot__tramo--libre { background-color: var(--surface-border); }
+
+.barra-ot__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-top: -0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+.barra-ot__leyenda .punto {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-right: 0.25rem;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.ficha-ot__rotulo {
+  font-weight: 400;
+  color: var(--text-color-secondary);
+}
+
+/* El botón va dentro de un span (por el tooltip) y la regla global "span button" le quitaba el redondeo izquierdo. */
+.header-actions__buttons > span .p-button.p-button-rounded {
+  border-radius: 2rem;
+}
+
+/* Buscador único (ID o nombre) a lo ancho de las tablas del modal. */
+.buscador-modal {
+  display: block;
+  width: 100%;
+}
+
+.buscador-modal input {
+  width: 100%;
+}
+
+:host ::ng-deep .dialogo-agregar .p-datatable .p-datatable-header {
+  padding: 0.5rem;
+  border-width: 0;
+  background: transparent;
+}
+
+/* ID junto al nombre, discreto. */
+.id-secundario {
+  margin-left: 0.35rem;
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--text-color-secondary);
+  white-space: nowrap;
+}
+
+/* Flecha para volver a las subcategorías (solo ícono, para no confundirse con el título). */
+.boton-volver.p-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+
+/* Cantidad dentro de la lista de materiales del modal: más baja para que la lista sea compacta. */
+:host ::ng-deep input.campo-compacto {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+/* Distribución por máquina: una tarjeta por máquina con su porcentaje y sus kg. */
+.tarjetas-maquina {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
+.tarjeta-maquina {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  background-color: var(--fondo-sutil);
+}
+
+.tarjeta-maquina__titulo {
+  font-weight: 700;
+  color: var(--texto-fuerte);
+}
+
+.tarjeta-maquina__campo {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.tarjeta-maquina__sin-kg {
+  text-align: right;
+  padding-right: 0.6rem;
+  color: var(--text-color-secondary);
+}
+
+.distribucion__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.25rem;
+  margin-top: 0.6rem;
+  font-size: 0.9em;
+}
+
+/* Encabezado de un bloque de la ficha de la OT, con un enlace a la derecha. */
+.ficha-ot__bloque-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+/* Botón con aspecto de enlace (texto subrayado al pasar el mouse). */
+.enlace-ficha {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--rojo-texto);
+  cursor: pointer;
+}
+
+.enlace-ficha:hover {
+  text-decoration: underline;
+}
+
+.enlace-ficha:focus-visible {
+  outline: 2px solid var(--rojo-texto);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Confirmación de lo recién agregado en el pie del popup. */
+.pie-modal__agregado {
+  color: var(--texto-exito);
+  font-weight: 600;
+}
+
+/* La fila de la subcategoría recién agregada se ilumina un momento. */
+:host ::ng-deep .fila-recien-agregada > td {
+  animation: destello-agregado 1.6s ease-out;
+}
+
+@keyframes destello-agregado {
+  0%, 35% { background-color: var(--fondo-exito); }
+  100% { background-color: transparent; }
+}
+
+/* Aviso de éxito al guardar, con sus dos opciones. */
+.aviso-guardada__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.aviso-guardada__texto {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.aviso-guardada__texto > .pi {
+  font-size: 1.6rem;
+}
+
+/* Aviso más ancho que el toast normal (25rem) para que los dos botones quepan lado a lado. */
+:host ::ng-deep .p-toast.aviso-guardada {
+  width: 34rem;
+  max-width: 92vw;
+}
+
+/* Botones lado a lado, del mismo ancho, alineados con el texto (debajo del título, no del ícono). */
+.aviso-guardada__botones {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 2.2rem; /* ancho del ícono (1.6rem) + separación (0.6rem) */
+}
+
+.aviso-guardada__botones > .p-button {
+  flex: 1 1 0;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap; /* el texto de cada botón en un solo renglón */
+}
+
+/* En pantallas angostas cada botón va en su propia fila. */
+@media (max-width: 480px) {
+  .aviso-guardada__botones {
+    flex-direction: column;
+    margin-left: 0;
   }
 }

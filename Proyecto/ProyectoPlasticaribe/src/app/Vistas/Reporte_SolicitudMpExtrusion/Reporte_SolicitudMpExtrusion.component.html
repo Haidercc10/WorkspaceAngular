@@ -5,11 +5,11 @@
 </div>
 
 <div class="contain">
-  <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo" id="movimientos">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de solicitudes de
-        material</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de solicitudes de material
+        <p-button class="boton-tutorial-titulo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+      </h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -18,278 +18,306 @@
 </div>
 
 <p-card>
-  <!--Ver tutorial-->
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <!--<p-button icon="pi pi-info" (onClick)="tutorial()" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>-->
+  <!-- Solicitudes por estado -->
+  <div class="encabezado-seccion mb-3">
+    <h4 class="mb-0 font-size-20" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">
+      <i class="pi pi-file font-size-16"></i> <b> Estados de solicitudes</b></h4>
+    <button *ngIf="puedeAutorizarExceso" data-tutorial="autorizaciones" pButton type="button" label="Autorizaciones de exceso" icon="pi pi-shield"
+      class="p-button-rounded p-button-secondary p-button-outlined p-button-sm" (click)="verAutorizacionesPendientes()"
+      pTooltip="Solicitudes para asignar más kg de los permitidos en una OT, pendientes de aprobar" tooltipPosition="left"></button>
   </div>
 
-  <!--Solicitudes-->
-  <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i
-        class="pi pi-file font-size-16"></i> <b> Solicitudes</b></h4>
+  <div class="chips-estado mb-4" data-tutorial="chipsEstado" role="group" aria-label="Solicitudes por estado">
+    <button *ngFor="let e of estadosSolicitud" type="button" class="chip-estado estado--{{e.clase}}"
+      [class.chip-estado--activo]="estadosConsultados.length === 1 && estadosConsultados[0] === e.id"
+      (click)="consultarPorEstado(e.id)" [pTooltip]="'Ver todas las solicitudes ' + e.nombre.toLowerCase()" tooltipPosition="top">
+      <i [class]="e.icono"></i>
+      <span>{{e.nombre}}</span>
+      <b>{{conteo[e.id] ?? 0}}</b>
+    </button>
   </div>
 
-  <div class="mb-3">
-    <div class="row g-3" id="fila">
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="rojo" class="cursor" (click)="consultarPorEstado(4)" icon="pi pi-ban"
-            label="Canceladas {{cantCanceladas}}"
-            pTooltip="Hay {{cantCanceladas}} solicitud(es) cancelada(s) de las últimas 100 creadas"></p-chip>
+  <!-- Filtros de búsqueda -->
+  <form [formGroup]="formFiltros" (ngSubmit)="consultarFiltros()" data-tutorial="filtros">
+    <!-- Filtros compactos: cada campo con el ancho que necesita su contenido; los botones en la misma fila -->
+    <div class="filtros mb-4">
+      <div class="filtros__campo filtros__campo--numero">
+        <span class="p-input-icon-left p-float-label">
+          <i class="pi pi-hashtag"></i>
+          <input formControlName="documento" id="documento" type="text" inputmode="numeric" autocomplete="off" pInputText
+            pTooltip="Por número de solicitud se ignoran los demás filtros" tooltipPosition="top" />
+          <label for="documento">N° Solicitud</label>
+        </span>
+      </div>
+      <div class="filtros__campo filtros__campo--numero">
+        <span class="p-input-icon-left p-float-label">
+          <i class="pi pi-search"></i>
+          <input formControlName="ot" id="otFiltro" type="text" inputmode="numeric" autocomplete="off" pInputText />
+          <label for="otFiltro">OT</label>
+        </span>
+      </div>
+      <div class="filtros__campo filtros__campo--fecha">
+        <span class="p-float-label">
+          <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true" dateFormat="yy-mm-dd"></p-calendar>
+          <label for="FechaInicial">Creada desde</label>
+        </span>
+      </div>
+      <div class="filtros__campo filtros__campo--fecha">
+        <span class="p-float-label">
+          <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true" dateFormat="yy-mm-dd"></p-calendar>
+          <label for="FechaFinal">Creada hasta</label>
+        </span>
+      </div>
+      <!-- Estados: botones de selección múltiple (son pocos); un clic marca o quita el estado -->
+      <div class="filtros__campo filtros__campo--estados">
+        <span class="filtros__etiqueta" id="etiquetaEstados">Estados</span>
+        <div class="filtros-estado" role="group" aria-labelledby="etiquetaEstados">
+          <button *ngFor="let estado of estadosSolicitud" type="button" class="filtro-estado"
+            [class.filtro-estado--activo]="estadoFiltrado(estado.id)" [attr.aria-pressed]="estadoFiltrado(estado.id)"
+            (click)="alternarEstadoFiltro(estado.id)">
+            <i [class]="estado.icono"></i> {{estado.nombre}}
+          </button>
         </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="naranja" class="cursor" (click)="consultarPorEstado(11)" icon="pi pi-hourglass"
-            label="Pendientes {{cantPendientes}}"
-            pTooltip="Hay {{cantPendientes}} solicitud(es) pendiente(s) de las últimas 100 creadas"></p-chip>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="amarillo" class="cursor" (click)="consultarPorEstado(12)" icon="pi pi-sliders-h"
-            label="Parciales {{cantParciales}}"
-            pTooltip="Hay {{cantParciales}} solicitud(es) parcial(es) de las últimas 100 creadas"></p-chip>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="verde" class="cursor" (click)="consultarPorEstado(5)" icon="pi pi-check-square"
-            label="Finalizadas {{cantFinalizadas}}"
-            pTooltip="Hay {{cantFinalizadas}} solicitud(es) finalizada(s) de las últimas 100 creadas"></p-chip>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Línea -->
-  <div class="mb-4">
-    <hr class="Linea">
-  </div>
-
-  <div class="mb-5">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i
-        class="pi pi-filter"></i> <b> Filtros de búsqueda</b></h4>
-  </div>
-
-  <!-- Formulario para consultar filtros -->
-  <form [formGroup]="formFiltros">
-    <div class="mb-4" id="formulario1">
-      <div class="row g-3 justify-content-md-center">
-
-        <!-- Id Solicitud -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input formControlName="documento" id="documento" type="text" pInputText required (keyup.enter)="consultarFiltros()"/>
-            <label for="documento">Id Solicitud</label>
-          </span>
-        </div>
-
-        <!-- Fecha Inicial -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Inicial</label>
-          </span>
-        </div>
-
-        <!-- Fecha Final -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
-          </span>
-        </div>
-
-        <!-- Estados -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-          <span class="p-float-label">
-            <p-dropdown formControlName="estadoDoc" inputId="Estado" [autoDisplayFirst]="false" [options]="estados"
-              optionValue="estado_Id" optionLabel="estado_Nombre"></p-dropdown>
-            <label for="Estado">Estados</label>
-          </span>
-        </div>
+      <div class="filtros__botones">
+        <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"
+          pTooltip="Sin filtros se muestran las solicitudes activas (pendientes y parciales)" tooltipPosition="top"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
       </div>
     </div>
   </form>
 
-  <!-- Botones -->
-  <div class="mb-3">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
-      <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search"
-        pTooltip="Si no llenas los filtros se consultará por la fecha de hoy." (click)="consultarFiltros()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"
-        (click)="limpiarCampos()"></button>
+  <p-divider></p-divider>
+
+  <div class="row g-4">
+    <!-- Lista de solicitudes -->
+    <!-- Sin "col-12": PrimeFlex (cargado después de Bootstrap) también la define y deja la columna siempre al 100%. -->
+    <div class="col-lg-6" data-tutorial="listaSolicitudes">
+      <h4 class="font-size-20 mb-1" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">
+        <i class="pi pi-list"></i> <b> Lista de solicitudes</b></h4>
+      <p class="texto-secundario mb-3">{{descripcionConsulta}} · {{solicitudes.length}} resultado(s)</p>
+
+      <p-table #dt1 [value]="solicitudes" dataKey="id" selectionMode="single" [(selection)]="solicitudSeleccionada"
+        (onRowSelect)="seleccionar($event.data)" (onRowUnselect)="solicitudSeleccionada = $event.data"
+        styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [rowHover]="true"
+        [paginator]="solicitudes.length > 20" [rows]="20" [rowsPerPageOptions]="[20, 50, 100]" [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} al {last} de {totalRecords}" [scrollable]="true" scrollHeight="60vh">
+        <ng-template pTemplate="header">
+          <!-- Clic en N°, OT o Entrega ordena de menor a mayor; otro clic, de mayor a menor -->
+          <tr>
+            <th scope="col" pSortableColumn="id">N° <p-sortIcon field="id"></p-sortIcon></th>
+            <th scope="col" pSortableColumn="ot">OT <p-sortIcon field="ot"></p-sortIcon></th>
+            <th scope="col">Máquinas</th>
+            <th scope="col" pSortableColumn="fechaEntrega">Entrega <p-sortIcon field="fechaEntrega"></p-sortIcon></th>
+            <th scope="col">Estado</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-s>
+          <tr [pSelectableRow]="s" class="cursor">
+            <td><b>{{s.id}}</b></td>
+            <td>{{s.ot}}</td>
+            <td>{{textoMaquinas(s)}}</td>
+            <td>{{s.fechaEntrega | date : 'yyyy-MM-dd'}}</td>
+            <td><span class="etiqueta-estado estado--{{claseEstado(s.estado_Id)}}">{{s.estado}}</span></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No hay solicitudes para mostrar.</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
-  </div>
 
-  <!-- Línea -->
-  <div class="mb-5">
-    <hr class="Linea">
-  </div>
+    <!-- Detalle de la solicitud seleccionada -->
+    <div class="col-lg-6" id="matprimas" data-tutorial="detalle">
+      <!-- Mismo encabezado (título + una línea) que la lista: así el contenido queda a la altura de la tabla -->
+      <div class="encabezado-detalle">
+        <h4 class="font-size-20 mb-1" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">
+          <i class="pi pi-file"></i> <b> Detalle de la solicitud</b></h4>
+        <!-- Todas las asignaciones de la solicitud en un solo PDF (una hoja por asignación) -->
+        <button *ngIf="puedeVerAsignacionesPdf" pButton type="button" icon="pi pi-file-pdf"
+          [label]="generandoPdfAsignaciones ? 'Generando PDF…' : (detalle!.asignaciones!.length > 1 ? 'Ver asignaciones PDF (' + detalle!.asignaciones!.length + ')' : 'Ver asignación PDF')"
+          [loading]="generandoPdfAsignaciones" [disabled]="generandoPdfAsignaciones"
+          class="p-button-sm p-button-outlined p-button-danger" pTooltip="Un solo PDF con una hoja por cada asignación de la solicitud" tooltipPosition="top"
+          (click)="verAsignacionesPdf()"></button>
+      </div>
+      <p class="texto-secundario mb-3">
+        {{ detalle ? 'Solicitud N° ' + detalle.id + ' · OT ' + detalle.ot : (cargandoDetalle ? 'Cargando…' : 'Ninguna seleccionada') }}
+      </p>
 
-  <!-- Tabla -->
-  <!-- Inicio tabla de registros consultados -->
-
-  <div class="mb-3" [style.visibility]="cargando ? 'hidden' : 'visible'" [attr.aria-hidden]="cargando">
-    <div class="row g-3" id="">
-      <!-- Encabezado -->
-      <div class="col-md-5 px-4">
-
-        <!--Titulo tabla-->
-        <div class="mb-5 text-center">
-          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i
-              class="pi pi-list"></i> <b> Registros consultados</b></h4>
-        </div>
-
-        <div class="table-responsive" id="tabla1" style="overflow-x: auto;">
-          <p-table [tableStyle]="{ 'min-width': '45%' }" #dt1 [resizableColumns]="true"
-            styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [paginator]="true" [rows]="20"
-            [showCurrentPageReport]="true" responsiveLayout="scroll"
-            currentPageReportTemplate="{first} al {last} de {totalRecords} registros"
-            [rowsPerPageOptions]="[10,20,30,50,70,100,arrayRegistros.length]" [rowHover]="true" [value]="arrayRegistros"
-            [scrollable]="true" scrollHeight="500px">
-            <ng-template pTemplate="header">
-              <tr class="font-size-16" id="">
-                <th><input pInputText type="text" style="width: 100%;"
-                    (input)="aplicarFiltro($event, 'id', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;"
-                    (input)="aplicarFiltro($event, 'ot', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;"
-                    (input)="aplicarFiltro($event, 'fecha', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;"
-                    (input)="aplicarFiltro($event, 'fechaEntrega', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;"
-                    (input)="aplicarFiltro($event, 'estado', 'contains')"></th>
-              </tr>
-              <tr>
-                <th>N° Solicitud</th>
-                <th>OT</th>
-                <th>F. Creación</th>
-                <th>F. Entrega</th>
-                <th>Estado</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-registros>
-              <tr (click)="cargarDetalleSolicitud(registros.id)" class="cursor" pTooltip="Haz click para ver el detalle de solicitudes" tooltipPosition="top">
-                <td><b>{{registros.id}}</b></td>
-                <td>{{registros.ot}}</td>
-                <td>{{registros.fecha}}</td>
-                <td>{{registros.fechaEntrega}}</td>
-                <td><b>{{registros.estado}}</b></td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
+      <div *ngIf="!detalle && !cargandoDetalle" class="detalle-vacio">
+        <i class="pi pi-arrow-left"></i>
+        <p class="mb-0">Seleccione una solicitud de la lista para ver sus materiales.</p>
       </div>
 
-      <!--Detalles-->
-      <div class="col-md-7 px-4" id="matprimas">
-        <div class="mb-5 text-center">
-          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i
-              class="pi pi-table"></i> <b> Detalles de la solicitud N° {{solicitudSeleccionada}}</b></h4>
-        </div>
+      <div *ngIf="cargandoDetalle && !detalle" class="detalle-vacio">
+        <p-progressSpinner [style]="{ width: '3rem', height: '3rem' }"></p-progressSpinner>
+      </div>
 
-        <div class="table-responsive mb-4">
-          <p-table [tableStyle]="{ 'min-width': '45%' }" #dt2 [resizableColumns]="true"
-            styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines tabla-detalles" responsiveLayout="scroll"
-            [rowHover]="true" [value]="arrayMatPrimas" [scrollable]="true" scrollHeight="500px">
-            <ng-template pTemplate="caption">
-              <div class="cabecera-detalles" id="usuario">
-                <!-- El tooltip con el nombre completo solo se activa si el texto quedó recortado con "...".
-                     Se mide al entrar el cursor al contenedor, antes de llegar al texto que tiene el tooltip. -->
-                <span class="cabecera-detalles__usuario" (mouseenter)="medirNombreSolicitante(textoSolicitante)">
-                  <i class="pi pi-user"></i>
-                  <span #textoSolicitante class="cabecera-detalles__texto" tooltipPosition="top"
-                    [pTooltip]="usuarioSolicitante" [tooltipDisabled]="!nombreSolicitanteRecortado">Usuario Solicitante: {{usuarioSolicitante}}</span>
-                </span>
-                <button *ngIf="[1,3,7,104].includes(ValidarRol)" pButton class="p-button-danger" type="button" label="Crear Asignación"
-                  icon="pi pi-check-square" id="crear-asig" [disabled]="!solicitudActiva" (click)="cargarModalCrearAsignacion()"></button>
-              </div>
-            </ng-template>
-            <ng-template pTemplate="header">
-              <tr>
-                <th colspan="2"></th>
-                <th colspan="3" class="text-center">Cantidad</th>
-                <th colspan="2"></th>
-              </tr>
-              <tr id="tabla2">
-                <th>Id</th>
-                <th>Subcategoria</th>
-                <th>Solicitada</th>
-                <th id="aprobada">Aprobada</th>
-                <th id="diferencia">Faltante</th>
-                <th>Unidad</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-mp>
-              <tr>
-                <td><b>{{mp.Id}}</b></td>
-                <td>{{mp.Nombre}}</td>
-                <td><b>{{mp.Cantidad | number : '1.2-2'}}</b></td>
-                <td><b>{{mp.CantAprobada | number : '1.2-2'}}</b></td>
-                <td>{{mp.CantFaltante | number : '1.2-2'}}</td>
-                <td>{{mp.Und_Medida}}</td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
-              <tr>
-                <td colspan="2">Total</td>
-                <td>{{calcularCantSolicitada() | number: '1.2-2'}}</td>
-                <td>{{calcularCantAprobada() | number: '1.2-2' }}</td>
-                <td>{{calcularCantFaltante() | number: '1.2-2'}}</td>
-                <td>{{'Kg'}}</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-
-        <!-- Acciones: se habilitan según el estado de la solicitud seleccionada (Crear asignación, Finalizar y Cancelar solo para PENDIENTE o PARCIAL) -->
-        <!-- "Marcar como Verificado": solo ADMINISTRADOR (1) y SUPERIOR EXTRUSION 2 (85), habilitado con la solicitud FINALIZADA -->
-        <div class="mb-3" *ngIf="[1,3,7,104].includes(ValidarRol) || puedeVerificar">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <ng-container *ngIf="[1,3,7,104].includes(ValidarRol)">
-              <button pButton class="p-button-success" type="button" label="Finalizar" icon="pi pi-check"
-                id="finalizar" [disabled]="!solicitudActiva" (click)="mostrarEleccion('finalizar')"></button>
-              <button pButton class="p-button-secondary" type="button" label="Cancelar" icon="pi pi-ban"
-                id="cancelar" [disabled]="!solicitudActiva" (click)="mostrarEleccion('cancelar')"></button>
-            </ng-container>
-            <button *ngIf="puedeVerificar" pButton class="p-button-success" type="button" label="Marcar como Verificado"
-              icon="pi pi-check-circle" id="verificar" [disabled]="!solicitudFinalizada" (click)="mostrarVerificacion()"></button>
-            <button *ngIf="[1,3,7,104].includes(ValidarRol)" pButton class="p-button-danger" type="button" label="Ver PDF" icon="pi pi-file-pdf"
-              id="ver-pdf" [disabled]="!haySolicitudSeleccionada" (click)="infoSolicitudPDF(solicitudSeleccionada)"></button>
+      <ng-container *ngIf="detalle as d">
+        <!-- Resumen -->
+        <div class="resumen-solicitud mb-3" [class.resumen-solicitud--cargando]="cargandoDetalle" data-tutorial="resumenSolicitud">
+          <div class="resumen-solicitud__titulo">
+            <h4 class="mb-0 font-size-20" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">
+              <b>Solicitud N° {{d.id}}</b></h4>
+            <span class="etiqueta-estado estado--{{claseEstado(d.estado_Id)}}">{{d.estado}}</span>
           </div>
+          <dl class="resumen-solicitud__datos">
+            <div><dt>OT</dt><dd><b>{{d.ot}}</b><ng-container *ngIf="datosOT"> · {{datosOT.cliente}}</ng-container></dd></div>
+            <div *ngIf="datosOT"><dt>Referencia</dt><dd>{{datosOT.item}} · {{datosOT.referencia}}</dd></div>
+            <div><dt>Proceso</dt><dd>{{d.proceso}}</dd></div>
+            <div><dt>Solicitante</dt><dd>{{d.usuario}}</dd></div>
+            <div><dt>Creada</dt><dd>{{d.fecha | date : 'yyyy-MM-dd'}} {{d.hora}}</dd></div>
+            <div><dt>Entrega</dt><dd>{{d.fechaEntrega ? (d.fechaEntrega | date : 'yyyy-MM-dd') : 'Sin fecha'}}</dd></div>
+            <div class="resumen-solicitud__maquinas">
+              <dt>Máquinas</dt>
+              <dd>
+                <!-- Con varias máquinas: su parte y lo ya entregado a cada una (avance por máquina) -->
+                <span *ngFor="let m of d.maquinas" class="etiqueta-maquina"
+                  [class.etiqueta-maquina--completa]="d.maquinas.length > 1 && m.objetivo > 0 && m.entregado >= m.objetivo - 0.005">
+                  {{m.maquina}}<ng-container *ngIf="d.maquinas.length > 1"> · {{m.porcentaje}}% · {{m.entregado | number : '1.2-2'}} de {{m.objetivo | number : '1.2-2'}}</ng-container>
+                </span>
+              </dd>
+            </div>
+          </dl>
         </div>
-      </div>
+
+        <!-- Subcategorías con sus materiales: una sola cabecera; cada subcategoría es una fila-título con sus materiales debajo -->
+        <p-table [value]="d.subcategorias" dataKey="subCatMP_Id"
+          styleClass="p-datatable-sm tabla-agrupada" responsiveLayout="scroll" data-tutorial="materialesSolicitud">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col" class="text-start">Material</th>
+              <th scope="col" class="tabla-agrupada__numero">Stock</th>
+              <th scope="col" class="tabla-agrupada__numero">Solicitado</th>
+              <th scope="col" class="tabla-agrupada__numero">Entregado</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-sub>
+            <!-- Fila-título de la subcategoría -->
+            <tr class="tabla-agrupada__grupo">
+              <td colspan="4">
+                <div class="tabla-agrupada__titulo">
+                  <span class="tabla-agrupada__nombre">{{sub.nombre}}</span>
+                  <span class="chip-total">{{sub.solicitado | number : '1.2-2'}} {{sub.undMed_Id}}</span>
+                  <span class="tabla-agrupada__meta">Entregado {{sub.entregado | number : '1.2-2'}}</span>
+                  <span *ngIf="sub.faltante > 0" class="chip-total chip-total--excede">Faltan {{sub.faltante | number : '1.2-2'}}</span>
+                  <span *ngIf="sub.faltante <= 0" class="chip-total chip-total--ok"><i class="pi pi-check"></i> Completa</span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Solicitudes anteriores, pedidas solo por subcategoría -->
+            <tr *ngIf="!sub.conMateriales" class="tabla-agrupada__material">
+              <td colspan="4" class="text-start texto-secundario">
+                {{sub.materiales.length > 0 ? 'Solicitud anterior, sin materiales pedidos. Materiales entregados:' : 'Solicitud anterior: se pidió solo por subcategoría, sin materiales.'}}
+              </td>
+            </tr>
+
+            <!-- Materiales -->
+            <tr *ngFor="let m of sub.materiales" class="tabla-agrupada__material">
+              <td class="text-start">
+                {{m.nombre}}
+                <span *ngIf="m.esSustituto" class="etiqueta-sustituto" pTooltip="Se entregó en lugar de los materiales solicitados de esta subcategoría" tooltipPosition="top">Sustituto</span>
+              </td>
+              <td class="tabla-agrupada__numero texto-secundario" [ngClass]="{ 'texto-pendiente': m.stock <= 0 }">{{m.stock | number : '1.2-2'}} {{m.undMed_Id}}</td>
+              <td class="tabla-agrupada__numero"><b>{{m.solicitado > 0 ? (m.solicitado | number : '1.2-2') : '—'}}</b></td>
+              <td class="tabla-agrupada__numero">{{m.entregado | number : '1.2-2'}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4" class="text-center texto-secundario">La solicitud no tiene subcategorías.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <!-- Pie único con los totales -->
+        <div class="pie-total mt-2" *ngIf="d.subcategorias.length > 0">
+          <ng-container *ngIf="unidadComun; else unidadesMixtas">
+            <span class="pie-total__principal">Total solicitado: <b>{{totalDe('solicitado') | number : '1.2-2'}} {{unidadComun}}</b></span>
+            <span>Entregado: <b>{{totalDe('entregado') | number : '1.2-2'}}</b></span>
+            <span [ngClass]="{ 'texto-pendiente': totalDe('faltante') > 0 }">Faltante: <b>{{totalDe('faltante') | number : '1.2-2'}}</b></span>
+          </ng-container>
+          <ng-template #unidadesMixtas>
+            <span class="pie-total__principal texto-secundario">Varias unidades: los totales no se suman</span>
+          </ng-template>
+        </div>
+
+        <!-- Observación del solicitante -->
+        <div class="observacion mt-3" data-tutorial="observacionSolicitud">
+          <span class="observacion__titulo"><i class="pi pi-comment"></i> Observación del solicitante</span>
+          <p class="mb-0" [class.texto-secundario]="!d.observacion">{{d.observacion || 'Sin observación.'}}</p>
+        </div>
+
+        <!-- Acciones según el rol y el estado de la solicitud -->
+        <div class="acciones mt-4" data-tutorial="accionesSolicitud">
+          <button *ngIf="puedeGestionar" pButton class="p-button-danger" type="button" label="Crear Asignación" icon="pi pi-check-square"
+            [disabled]="!solicitudActiva" (click)="cargarModalCrearAsignacion()"></button>
+          <button *ngIf="puedeGestionar" pButton class="p-button-success" type="button" label="Finalizar" icon="pi pi-check"
+            [disabled]="!solicitudActiva" (click)="pedirCambioEstado(5)"></button>
+          <button *ngIf="puedeGestionar" pButton class="p-button-secondary" type="button" label="Cancelar" icon="pi pi-ban"
+            [disabled]="!solicitudActiva" (click)="pedirCambioEstado(4)"></button>
+          <button *ngIf="puedeVerificar" pButton class="p-button-success p-button-outlined" type="button" label="Marcar como Verificado"
+            icon="pi pi-verified" [disabled]="!solicitudFinalizada" (click)="pedirVerificacion()"></button>
+          <button *ngIf="puedeVerPdf" pButton class="p-button-danger p-button-outlined" type="button" label="Ver PDF" icon="pi pi-file-pdf"
+            (click)="verPdf()"></button>
+        </div>
+        <p *ngIf="puedeGestionar && !solicitudActiva" class="texto-secundario text-center mt-2 mb-0">
+          La solicitud está {{d.estado | lowercase}}: ya no se puede asignar, finalizar ni cancelar.
+        </p>
+      </ng-container>
     </div>
   </div>
 </p-card>
 
-<p-dialog header="Solicitud N° {{solicitudSeleccionada}}" [(visible)]="modalAsignacion" [modal]="true"
-  [style]="{ width: '90%' }" [draggable]="false" [resizable]="false" (onHide)="alCerrarModalAsignacion()">
-  <app-asignacion-materia-prima
-    (asignacionCompletada)="finalizarModalAsignacion($event)"></app-asignacion-materia-prima>
+<p-dialog header="Asignar material · Solicitud N° {{detalle?.id}} · OT {{detalle?.ot}}" [(visible)]="modalAsignacion" [modal]="true"
+  [style]="{ width: '90vw' }" [breakpoints]="{ '960px': '98vw' }" [draggable]="false" [resizable]="false" [blockScroll]="true"
+  (onHide)="alCerrarModalAsignacion()">
+  <!-- Se crea al abrir el popup y se destruye al cerrarlo: cada apertura parte de la solicitud actualizada. -->
+  <app-asignacion-materia-prima *ngIf="modalAsignacion && detalle" [modoPopup]="true" [solicitudId]="detalle.id"
+    (asignacionRegistrada)="alRegistrarAsignacion()"></app-asignacion-materia-prima>
 </p-dialog>
 
-<p-toast position="center" [key]="claveConfirmacion" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="confirmarEleccion()"
-            icon="pi pi-check" label="Si" class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No"
-            class="p-button-secondary"></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>
+<!-- Autorizaciones de exceso pendientes -->
+<p-dialog header="Autorizaciones de exceso de OT pendientes" [(visible)]="dialogoAutorizaciones" [modal]="true"
+  [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '95vw' }" [draggable]="false" [resizable]="false">
+  <p-table styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll" [value]="autorizacionesPendientes">
+    <ng-template pTemplate="header">
+      <tr>
+        <th scope="col">OT</th>
+        <th scope="col">Kg</th>
+        <th scope="col">Motivo</th>
+        <th scope="col">Solicitado por</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Motivo de rechazo</th>
+        <th scope="col">Responder</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-autorizacion>
+      <tr>
+        <td>{{autorizacion.autEx_OrdenTrabajo}}</td>
+        <td><b>{{autorizacion.autEx_CantidadKg | number : '1.2-2'}}</b></td>
+        <td class="text-start">{{autorizacion.autEx_Motivo}}</td>
+        <td>{{autorizacion.usuarioSolicita}}</td>
+        <td>{{autorizacion.autEx_FechaSolicitudUtc | date : 'yyyy-MM-dd'}}</td>
+        <td><input pInputText type="text" maxlength="1000" [(ngModel)]="autorizacion.motivoRechazo" aria-label="Motivo de rechazo" /></td>
+        <td style="white-space: nowrap;">
+          <button pButton type="button" icon="pi pi-check" class="p-button-success p-button-sm me-2"
+            pTooltip="Aprobar" [disabled]="cargando" (click)="responderAutorizacion(autorizacion, true)"></button>
+          <button pButton type="button" icon="pi pi-times" class="p-button-danger p-button-sm"
+            pTooltip="Rechazar (requiere motivo)" [disabled]="cargando" (click)="responderAutorizacion(autorizacion, false)"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No hay autorizaciones pendientes.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-dialog>
+
+<!-- Confirmaciones de la página (mismo estilo que el de eliminar evento del calendario). Enter acepta y Esc cancela. -->
+<p-confirmDialog key="confirmarReporte" [style]="{width: '30rem'}" [breakpoints]="{'640px': '92vw'}" [baseZIndex]="6000" appendTo="body"></p-confirmDialog>
