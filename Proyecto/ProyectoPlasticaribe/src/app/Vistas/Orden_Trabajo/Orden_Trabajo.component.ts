@@ -33,9 +33,6 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenesTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsBusquedaOrdenesTrabajo } from 'src/app/data';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
-import { modelProducto } from 'src/app/Modelo/modelProducto';
-import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
-import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { OtCalculoCostosService, RangoPesoTeorico, REGLA_PESO_MILLAR_D2 } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
@@ -133,7 +130,6 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   otProduccion: number | null = null; //Número de la OT a la que pertenece la tabla de producción por proceso
   cargandoProduccion: boolean = false; //Indica si se está consultando la producción por proceso
   private consultaProduccion?: Subscription; //Consulta de producción en curso; se cancela al consultar otra OT para no mezclar datos
-  ModalCrearProductos: boolean = false; //Funcion que va a mostrar o no el modal de productos
   ModalCrearCliente: boolean = false; //Funcion que va a mostrar o no el modal de clientes
 
   arrayMateriales: any = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
@@ -203,7 +199,6 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   ultimaOT: number = 0;
   ultimaOTApp: number = 0;
   dataBusquedaxItem: any;
-  ultimoItem: number = 0;
   hora: any = moment().format('HH:mm:ss');
   minDate: Date = new Date();
 
@@ -233,7 +228,6 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private shepherdService: ShepherdService,
     private svcSedes: SedeClienteService,
-    private svcExistencias: ExistenciasProductosService,
     private estadosProcesosService: EstadosProcesos_OTService,
     private calculoCostos: OtCalculoCostosService,
     private creacionPdf: CreacionPdfService,) {
@@ -474,7 +468,6 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     this.sincronizarAnchoTotalSellado();
     this.limpiarCampos();
     this.ultimaOTBagPro();
-    this.ultimoIdProducto();
   }
 
   /**
@@ -775,9 +768,6 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
       },
     });
   }
-
-  //Cargar modal de crear producto
-  LlamarModalCrearProducto = () => this.ModalCrearProductos = true;
 
   // Funcion para llamar el modal que crea clientes
   LlamarModalCrearCliente = () => this.ModalCrearCliente = true;
@@ -3799,108 +3789,4 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   //Función que cargará la última OT de Plasticaribe. 
   ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => this.ultimaOT = data.item, () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
 
-  ultimoIdProducto = () => this.productoService.GetIdUltimoProducto().subscribe(data => { this.ultimoItem = data; }, () => this.msj.mensajeAdvertencia(`No fue posible consultar el último ID de Producto.`, ``));
-
-  // Función que va a validar los formularios
-  validarFormularios() {
-    this.cargando = true;
-    if (this.FormOrdenTrabajo.valid) {
-      setTimeout(() => {
-        if (this.FormOrdenTrabajoExtrusion.valid) {
-          if (this.FormOrdenTrabajoImpresion.valid) {
-            if (this.FormOrdenTrabajoLaminado.valid) {
-              if (this.FormOrdenTrabajoCorte.valid) {
-                if (this.FormOrdenTrabajoSellado.valid) {
-                  if (this.FormOrdenTrabajoMezclas.valid) this.validarNuevoProducto();
-                  else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
-              } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
-            } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
-        } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
-      }, 700);
-    } else {
-      this.cargando = false;
-      this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
-    }
-  }
-
-  // Función que va a crear un nuevo producto.
-  validarNuevoProducto() {
-    this.cargando = true;
-    this.productoService.GetProductsByName(this.FormOrdenTrabajo.value.Nombre_Producto).subscribe(data => {
-      if (data.length > 0) this.msj.mensajeAdvertencia(`El producto ${this.FormOrdenTrabajo.value.Nombre_Producto} ya existe!`); //this.validarDatos();
-    }, () => this.crearNuevoProducto());
-  }
-
-  /**
-   * Arma el nuevo producto con los Ids de tipo de sellado y formato (el guardado sigue deshabilitado).
-   * Si la combinación no existe (404) o la consulta falla, avisa y libera la pantalla de carga.
-   * @returns No retorna un valor.
-   */
-  crearNuevoProducto() {
-    let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
-    let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
-    this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(data => {
-      let item: modelProducto = {
-        'Prod_Id': this.ultimoItem + 1,
-        'Prod_Nombre': this.FormOrdenTrabajo.value.Nombre_Producto,
-        'Prod_Descripcion': this.FormOrdenTrabajo.value.Nombre_Producto,
-        'TpProd_Id': data.tpProd_Id,
-        'Prod_Peso': this.pesoProducto,
-        'Prod_Peso_Millar': this.FormOrdenTrabajoSellado.value.PesoMillar,
-        'UndMedPeso': 'Kg',
-        'Prod_Fuelle': this.FormOrdenTrabajoSellado.value.Fuelle_Sellado || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-        'Prod_Ancho': this.FormOrdenTrabajoSellado.value.Ancho_Sellado || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-        'Prod_Calibre': this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-        'UndMedACF': this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
-        'Estado_Id': 10,
-        'Prod_Largo': this.FormOrdenTrabajoSellado.value.Largo_Sellado || this.FormOrdenTrabajoCorte.value.Largo_Corte,
-        'Pigmt_Id': this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
-        'Material_Id': this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
-        'Prod_CantBolsasBulto': this.FormOrdenTrabajoSellado.value.CantidadBulto,
-        'Prod_CantBolsasPaquete': this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-        'TpSellado_Id': data.tpSellado_Id,
-        'Prod_Fecha': this.today,
-        'Prod_Hora': this.hora,
-        'Prod_PesoBulto': this.FormOrdenTrabajoSellado.value.PesoBulto,
-        'Prod_PesoPaquete': this.FormOrdenTrabajoSellado.value.PesoPaquete,
-        'Prod_PrecioDia_Sellado': this.FormOrdenTrabajoSellado.value.PrecioDia,
-        'Prod_PrecioNoche_Sellado': this.FormOrdenTrabajoSellado.value.PrecioNoche,
-      }
-      console.log(item);
-      //this.productoService.srvGuardar(item).subscribe(data => this.crearExistenciaProducto(data), () => this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`));
-    }, (error: HttpErrorResponse) => {
-      this.cargando = false;
-      if (error?.status === 404) this.msj.mensajeError(`¡No existe la combinación de tipo de sellado y formato seleccionada!`, `Verifique el tipo de sellado y el formato del producto terminado.`);
-      else this.msj.mensajeError(`¡No fue posible consultar el tipo de sellado y el formato!`, error?.error);
-    });
-  }
-
-  // Función que va a crear una nueva existencia de producto.
-  crearExistenciaProducto(data: any) {
-    let existencia: modelExistenciaProductos = {
-      'Prod_Id': data.prod_Id,
-      'exProd_Id': 0,
-      'ExProd_Cantidad': 0,
-      'UndMed_Id': this.FormOrdenTrabajo.value.Presentacion,
-      'TpBod_Id': 3,
-      'ExProd_Precio': 0,
-      'ExProd_PrecioExistencia': 0,
-      'ExProd_PrecioSinInflacion': 0,
-      'TpMoneda_Id': 'COP',
-      'ExProd_PrecioVenta': this.FormOrdenTrabajo.value.Precio,
-      'ExProd_CantMinima': 0,
-      'ExProd_Fecha': this.today,
-      'ExProd_Hora': this.hora,
-    }
-    this.svcExistencias.srvGuardar(existencia).subscribe(data => {
-      this.FormOrdenTrabajo.patchValue({ OT_Id: null, Id_Producto: data.prod_Id });
-      this.cargando = false;
-      this.msj.mensajeConfirmacion(`Confirmación`, `Producto ${data.prod_Nombre} creado con éxito!`);
-    }, () => {
-      this.cargando = false;
-      this.msj.mensajeError(`Error`, `No fue posible la existencia del producto, verifique!`)
-    });
-  }
 }

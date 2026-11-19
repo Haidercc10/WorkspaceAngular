@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
+import { CrearItemDto, FichaItem, ItemBusqueda, ItemCreado, MezclaPredefinida, PresentacionBagPro, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
 import { rollsToDelete } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
@@ -164,6 +165,62 @@ export class BagproService {
   LikeReferencia = (ref : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/likeReferencia/${ref}`);
 
   CalcularKilosItem = (items : any[]) => this.http.post<any>(this.rutaBagPro + `/ClientesOtItems/CalcularKilosItem`, items);
+
+  /**
+   * Indica si ya existe un item con el mismo nombre normalizado o la misma ficha técnica.
+   * @param ficha Ficha del item a crear.
+   * @returns Observable con `{ duplicado: false }`; si hay duplicado responde 409 con `{ tipo, codigo, nombre }`.
+   */
+  PostValidarDuplicadoItem = (ficha : CrearItemDto) => this.http.post<ValidacionItem>(`${this.rutaBagPro}/ClientesOtItems/validarDuplicado`, ficha);
+
+  /**
+   * Crea el item en ClientesOT_Item; BagPro asigna el código y su trigger crea el producto en Plasticaribe.
+   * @param ficha Ficha del item a crear.
+   * @returns Observable con `{ clienteItems, nombre, presentacion }`; 409 si hay duplicado o la numeración está ocupada.
+   */
+  PostCrearItem = (ficha : CrearItemDto) : Observable<ItemCreado> => this.http.post<ItemCreado>(`${this.rutaBagPro}/ClientesOtItems/crear`, ficha);
+
+  /**
+   * Agrega una presentación a un item existente de BagPro.
+   * @param codigo Código del item (ClienteItems).
+   * @param presentacion Presentación nueva: Kilo, Unidad, Paquete o MTS.
+   * @param precio Precio de venta de la presentación.
+   * @returns Observable con `{ clienteItems, nombre, presentacion }`; 404 si el item no existe, 409 si la presentación ya existe.
+   */
+  PostPresentacionItem = (codigo : number, presentacion : string, precio : number) : Observable<ItemCreado> => this.http.post<ItemCreado>(`${this.rutaBagPro}/ClientesOtItems/${codigo}/presentaciones`, { presentacion, precio });
+
+  /**
+   * Presentaciones que tiene un item en BagPro, con su precio.
+   * @param codigo Código del item (ClienteItems).
+   * @returns Observable con la lista de presentaciones; 404 si el item no existe.
+   */
+  GetPresentacionesItem = (codigo : number) : Observable<PresentacionBagPro[]> => this.http.get<PresentacionBagPro[]>(`${this.rutaBagPro}/ClientesOtItems/${codigo}/presentaciones`);
+
+  /**
+   * Busca items por nombre (contiene) o código (empieza por); máximo 20, del más reciente al más antiguo.
+   * @param texto Texto a buscar, mínimo 3 caracteres.
+   * @returns Observable con los items encontrados (código y nombre).
+   */
+  GetBuscarItems = (texto : string) : Observable<ItemBusqueda[]> => this.http.get<ItemBusqueda[]>(`${this.rutaBagPro}/ClientesOtItems/buscar`, { params: { texto } });
+
+  /**
+   * Mezclas predefinidas de BagPro (bpMezclasPreDef) para la creación de items.
+   * @returns Observable con las mezclas ordenadas por nombre.
+   */
+  GetMezclasPredefinidas = () : Observable<MezclaPredefinida[]> => this.http.get<MezclaPredefinida[]>(`${this.rutaBagPro}/ClientesOtItems/catalogos/mezclas`);
+
+  /**
+   * Tintas de impresión de BagPro para la creación de items (sin la tinta 1, que significa "sin tinta").
+   * @returns Observable con las tintas ordenadas por nombre.
+   */
+  GetTintasItem = () : Observable<TintaBagPro[]> => this.http.get<TintaBagPro[]>(`${this.rutaBagPro}/ClientesOtItems/catalogos/tintas`);
+
+  /**
+   * Ficha técnica de un item (primera fila en BagPro), para copiarla en un item nuevo.
+   * @param codigo Código del item (ClienteItems).
+   * @returns Observable con la ficha y los nombres de catálogo; 404 si el item no existe.
+   */
+  GetFichaItem = (codigo : number) : Observable<FichaItem> => this.http.get<FichaItem>(`${this.rutaBagPro}/ClientesOtItems/${codigo}/ficha`);
    
   /*********************************************************** DESPERDICIO **************************************************************/
 
