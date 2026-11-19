@@ -11,7 +11,8 @@ export class ErrorInterceptor_InvZeus implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(catchError(err => {
-      if ([401, 403].includes(err.status)) this.authenticationService.logout();
+      // En el login un 401/403 es "credenciales incorrectas" o "usuario inactivo": lo maneja la pantalla de login, no se cierra sesión.
+      if ([401, 403].includes(err.status) && !request.url.includes('/Authentication/login')) this.authenticationService.logout();
       return throwError(err);
     }));
   }

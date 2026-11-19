@@ -95,11 +95,63 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
   margin: auto;
 }
 
+/* Separación amplia con la primera fila: las etiquetas flotantes (p. ej. Fecha Entrega) suben sobre el campo
+   y no deben quedar tapadas por los botones Crear/Editar OT y Limpiar Campos. */
 .ot-header-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Barra de la OT cargada (estilo del aviso de edición de Solicitud de Material). Es sticky: queda fija arriba
+   al hacer scroll. El color de estado se apoya sobre --surface-card porque en modo oscuro es translúcido
+   y el formulario se vería por debajo. z-index bajo: los calendarios y diálogos (appendTo body) quedan encima.
+   top: debajo del menú superior (.navbar de menuLateral: fixed, z-index 5); el componente lo fija con el alto real
+   del menú (altoMenuSuperior), este valor es solo el respaldo. */
+.ot-barra-cargada {
+  position: sticky;
+  top: 86px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  /* Modo creación: verde; modo edición (--edicion): amarillo */
+  background: linear-gradient(var(--fondo-exito), var(--fondo-exito)), var(--surface-card);
+  color: var(--texto-exito);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.ot-barra-cargada--edicion {
+  background: linear-gradient(var(--fondo-advertencia), var(--fondo-advertencia)), var(--surface-card);
+  color: var(--texto-advertencia);
+}
+
+.ot-barra-cargada__datos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.25rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ot-barra-cargada__modo {
+  font-weight: 700;
+}
+
+/* Referencias largas: una sola línea con "…" (el nombre completo queda en el title) */
+.ot-barra-cargada__referencia {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ot-header-actions__buttons {

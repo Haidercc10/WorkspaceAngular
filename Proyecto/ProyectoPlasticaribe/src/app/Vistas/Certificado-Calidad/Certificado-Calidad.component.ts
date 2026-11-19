@@ -443,7 +443,7 @@ export class CertificadoCalidadComponent implements OnInit {
     this.certCalidadService.Post(datosCertificado).subscribe(res => {
       this.crearPdfCertificado(res.consecutivo);
       this.limpiarTodo();
-      this.msj.mensajeConfirmacion(`¡Los datos del certificado de calidad se han guardado correctamente!`, ``);
+      this.msj.mensajeConfirmacion('OK!', `¡Los datos del certificado de calidad se han guardado correctamente!`);
     }, () => {
       this.cargando = false;
       this.msj.mensajeError(`¡Ha ocurrido un error al guardar los datos del certificado de calidad!`, ``);

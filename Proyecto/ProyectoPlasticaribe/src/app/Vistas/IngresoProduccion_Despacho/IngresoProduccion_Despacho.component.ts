@@ -345,7 +345,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   }
 
   messageConfirmationUpdateStore() {
-    this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+    this.msj.mensajeConfirmacion('OK!', '¡Los rollos se subieron al inventario de manera satisfactoria!');
     this.load = false;
   }
 

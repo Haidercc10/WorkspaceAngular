@@ -98,11 +98,11 @@ p-panelmenu ::ng-deep div a {
 }
 
 .botonMenu .user:hover{
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .pi:hover{
-  color: #a23;
+  color: var(--rojoHover);
 }
 
 .navbar {
@@ -179,7 +179,8 @@ p-panelmenu ::ng-deep div a {
 	transition: 0.3s;
 }
 
-input {
+/* Solo el checkbox del interruptor de tema: antes afectaba a todos los inputs del componente */
+#darkmode-toggle {
 	width: 0;
 	height: 0;
 	visibility: hidden;
@@ -296,17 +297,139 @@ input:checked + .colorMode svg.moon {
 }
 
 /* Estilos para el sidebar de los usuarios */
-.cerrarSesion {
-  border: .5px solid #bbbb;
-  background-color: #ccc3 !important;
-  border-radius: 10px;
-  width: 100%;
-  cursor: pointer;
-  transition: all 300ms;
+.menuUsuario {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
 }
 
-.cerrarSesion:hover {
-  background-color: #CCC5 !important;
+.perfilUsuario {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: var(--fondo-acento);
+  border: 1px solid var(--surface-border);
+}
+
+.avatarIniciales {
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rojo);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: .05em;
+}
+
+.datosUsuario {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: .15rem;
+}
+
+.nombreUsuario {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rolUsuario {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  color: var(--rojo);
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+.idUsuario {
+  color: var(--text-color-secondary);
+  font-size: .8rem;
+}
+
+.encabezadoSeccion {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  width: 100%;
+  color: var(--text-color);
+}
+
+.encabezadoSeccion .pi {
+  color: var(--rojo);
+}
+
+.contadorSeccion {
+  margin-left: auto;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 .4rem;
+  border-radius: 999px;
+  background: var(--rojo);
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ayudaCampo {
+  display: block;
+  margin-top: .3rem;
+  text-align: right;
+  color: var(--text-color-secondary);
+}
+
+.ayudaCampo.errorCampo {
+  text-align: left;
+  color: var(--rojo);
+}
+
+.mayusculas {
+  text-transform: uppercase;
+}
+
+.accionesPerfil {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .5rem;
+  margin-top: 1.5rem;
+}
+
+/* "Cerrar sesión" queda al pie del sidebar */
+.pieMenuUsuario {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+:host ::ng-deep .sidebarUsuario .p-sidebar-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* El p-sidebar crea su contenido con *ngIf y lo anima al entrar; mientras esa animación corre, Angular bloquea la
+   animación 'void => hidden' de cada p-accordionTab y a veces nunca aplica su estilo (height: 0), dejando la caja vacía
+   de .p-accordion-content visible bajo cada encabezado. Se fija el estado cerrado por CSS: al abrir/cerrar, los estilos
+   inline de la animación tienen prioridad, así que la transición sigue funcionando igual. */
+:host ::ng-deep .sidebarUsuario .p-accordion-tab:not(.p-accordion-tab-active) > .p-toggleable-content {
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
 }
 
 p-dialog input, p-accordion input {
@@ -329,10 +452,6 @@ p-dialog ::ng-deep div .p-dialog-title {
   align-items: center;
 }
 
-/*  */
-p-accordion span[class = 'vertical-align-middle'] {
-  color: #777;
-}
 
 .eventos {
   height: 80px;
@@ -342,7 +461,7 @@ p-accordion span[class = 'vertical-align-middle'] {
   height: 100%;
   font-weight: 600;
   padding: 10px;
-  background: #db4149;
+  background: var(--rojo);
   color: white;
   font-size: 1rem;
   width: 50%;
@@ -365,4 +484,82 @@ p-accordion span[class = 'vertical-align-middle'] {
   min-width: 185px;
   height: auto;
   flex-shrink: 0;
+}
+/* Estrella: agrega o quita la página actual de los accesos rápidos (barra inferior) */
+.botonFavorito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--rojo);
+  cursor: pointer;
+  transition: transform .15s;
+}
+
+.botonFavorito:hover:not(:disabled) {
+  transform: scale(1.15);
+}
+
+.botonFavorito:disabled {
+  cursor: default;
+  opacity: .7;
+}
+
+.botonFavorito:focus-visible {
+  outline: 2px solid var(--rojo);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Iconos de la barra superior con contador (tickets, correos, calendario): el badge solo se pinta cuando hay algo pendiente */
+.botonBadge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--rojo);
+  cursor: pointer;
+  transition: transform .15s;
+}
+
+.botonBadge:hover {
+  transform: scale(1.15);
+}
+
+.botonBadge:focus-visible {
+  outline: 2px solid var(--rojo);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.botonBadge ::ng-deep .p-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  min-width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  padding: 0 .35rem;
+  font-size: .75rem;
+  /* Azul medio de la marca en vez del azul de PrimeNG (en oscuro, un azul claro que se lee sobre la barra) */
+  background: var(--fondo-contador);
+  color: var(--texto-contador);
+}
+
+/* Botón principal del aviso "Eventos de hoy" con el rojo de la marca */
+:host ::ng-deep .botonVerCalendario.p-button {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: #fff;
+}
+
+:host ::ng-deep .botonVerCalendario.p-button:enabled:hover {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
 }

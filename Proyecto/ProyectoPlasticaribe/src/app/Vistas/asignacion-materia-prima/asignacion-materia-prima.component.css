@@ -1,13 +1,20 @@
-/* ESTILOS PARA INPUT DE PRIMENG */
+/* Estilos de PrimeNG limitados a este componente (:host) para que no se filtren a las demás vistas ni al reporte. */
 .p-input-icon-left {
   width: 100%;
 }
 
-p-dropdown ::ng-deep .p-dropdown {
+:host ::ng-deep p-dropdown .p-dropdown,
+:host ::ng-deep p-calendar,
+:host ::ng-deep p-calendar > span {
   display: flex;
+  width: 100%;
 }
 
-p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
+:host ::ng-deep p-inputnumber,
+:host ::ng-deep p-inputnumber span,
+:host ::ng-deep p-inputnumber input,
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputtextarea {
   display: flex;
   width: 100%;
 }
@@ -27,29 +34,426 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   right: 0.25rem;
   z-index: 2;
   transform: translateY(-50%);
-  color: #5d6d7e;
+  color: var(--text-color-secondary);
 }
 
-::ng-deep .p-card {
-  align-items: center;
+/* Tarjeta de la página completa. */
+:host ::ng-deep .p-card.tarjeta-pagina {
   margin: auto;
   width: 90%;
-  height: 100%;
-  padding: 2%;
+  /* Relleno vertical fijo (antes 2% del ancho, que en pantallas grandes dejaba mucho espacio arriba y abajo). */
+  padding: 1rem 2%;
   border-radius: 10px;
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
 }
 
-::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
-  display: flex;
+/* Dentro del popup del reporte: sin sombra ni márgenes, el diálogo ya enmarca el contenido. */
+:host ::ng-deep .p-card.tarjeta-popup {
   width: 100%;
+  margin: 0;      /* sin el margen inferior global de las tarjetas (dejaba espacio vacío al final del popup) */
+  padding: 0;     /* sin el relleno global del 2% */
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Espacio arriba para que se vea el label flotante del primer campo (Fecha entrega). */
+:host ::ng-deep .p-card.tarjeta-popup .p-card-body {
+  padding: 1.5rem 0 0;
+}
+
+/* Sin el margen global de 3rem bajo el contenido de las tarjetas (página y popup): los botones cierran con el mismo espacio que arriba. */
+:host ::ng-deep .p-card .p-card-body .p-card-content {
+  margin-bottom: 0 !important;
+}
+
+:host ::ng-deep .p-datatable-gridlines .p-datatable-thead > tr > th,
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tbody > tr > td,
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tfoot > tr > td {
+  text-align: center;
 }
 
 .colorRojo {
-  color: var(--rojo);
+  color: var(--texto-peligro);
 }
 
-.colorNegro {
-  color: #000;
+.texto-secundario {
+  color: var(--text-color-secondary);
+}
+
+.texto-pendiente {
+  color: var(--texto-peligro);
+}
+
+/* Asignación por solicitud */
+.encabezado-materiales {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.encabezado-materiales__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.observacion-solicitante {
+  padding: 0.6rem 1rem;
+  border-left: 4px solid var(--azul-marca-medio);
+  border-radius: 6px;
+  background-color: var(--azul-marca-claro);
+  white-space: pre-line;
+}
+
+.observacion-solicitante__titulo {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.cabecera-subcategoria {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+  width: 100%;
+}
+
+.cabecera-subcategoria__nombre {
+  font-weight: 700;
+}
+
+.cabecera-subcategoria__cifras {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1rem;
+  font-weight: 400;
+  font-size: 0.9em;
+}
+
+.etiqueta-asignar {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 600;
+  background-color: var(--fondo-exito);
+  color: var(--texto-exito);
+}
+
+.etiqueta-asignar--excede {
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
+}
+
+.etiqueta-sustituto {
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.75em;
+  font-weight: 600;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+}
+
+/* Material con cantidad escrita. */
+:host ::ng-deep .tabla-agrupada .p-datatable-tbody > tr.fila-con-cantidad > td {
+  background-color: var(--fondo-acento);
+}
+
+.otro-material {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: min(100%, 22rem);
+}
+
+.otro-material p-dropdown {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pie-asignacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+}
+
+/* Cantidad en la tabla del modo manual. */
+.celda-cantidad {
+  min-width: 9rem;
+}
+
+.colorVerde {
+  color: var(--texto-exito);
+}
+
+/* Franja de la OT: identidad a la izquierda y kg a la derecha. */
+.franja-ot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background-color: var(--fondo-sutil);
+}
+
+.franja-ot__cifras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+}
+
+.franja-ot__cifras dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.franja-ot__cifras dd {
+  margin: 0;
+  text-align: right;
+}
+
+/* Máquina que recibe: un botón por máquina con su parte y lo entregado. */
+.maquinas-asignar {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.6rem;
+}
+
+.maquina-asignar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background-color: var(--surface-card);
+  color: var(--text-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.maquina-asignar:hover {
+  border-color: var(--rojo-texto);
+}
+
+.maquina-asignar:focus-visible {
+  outline: 2px solid var(--rojo-texto);
+  outline-offset: 2px;
+}
+
+.maquina-asignar--elegida,
+.maquina-asignar--elegida:hover {
+  border-color: var(--rojo-texto);
+  background-color: var(--fondo-acento);
+  box-shadow: inset 0 0 0 1px var(--rojo-texto);
+}
+
+.maquina-asignar__titulo {
+  font-weight: 700;
+}
+
+.maquina-asignar--elegida .maquina-asignar__titulo {
+  color: var(--rojo-texto);
+}
+
+.maquina-asignar__avance {
+  font-size: 0.85em;
+  color: var(--text-color-secondary);
+}
+
+.maquina-asignar--completa .maquina-asignar__avance {
+  color: var(--texto-exito);
+}
+
+/* Máquina que ya recibió su parte: verde y sin poder elegirse. */
+.maquina-asignar--completa,
+.maquina-asignar--completa:hover {
+  border-color: var(--texto-exito);
+  background-color: var(--fondo-exito);
+}
+
+.maquina-asignar--completa .maquina-asignar__titulo {
+  color: var(--texto-exito);
+}
+
+.maquina-asignar:disabled {
+  cursor: not-allowed;
+}
+
+.maquina-asignar__barra {
+  display: block;
+  width: 100%;
+  height: 0.35rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: var(--fondo-sutil);
+}
+
+.maquina-asignar__barra > span {
+  display: block;
+  height: 100%;
+  background-color: var(--texto-exito);
+  transition: width 0.3s;
+}
+
+/* Pie de la asignación por solicitud: observación a la izquierda; resumen y botón a la derecha. */
+.pie-asignacion__observacion {
+  flex: 1 1 18rem;
+}
+
+.pie-asignacion__accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem 1rem;
+  flex: 1 1 22rem;
+}
+
+.pie-asignacion__resumen {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  text-align: right;
+  font-size: 0.95em;
+}
+
+.pie-asignacion__aviso {
+  margin-top: 0.15rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+}
+
+/* Aviso de asignación creada: recuadro fijo arriba del formulario, con sus botones a la derecha. */
+.aviso-creada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--texto-exito);
+  border-radius: 8px;
+  background-color: var(--fondo-exito);
+  color: var(--texto-exito);
+}
+
+.aviso-creada__texto {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.aviso-creada__texto > .pi {
+  font-size: 1.6rem;
+}
+
+.aviso-creada__botones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.aviso-creada__botones > .p-button {
+  white-space: nowrap;
+}
+
+/* Resumen del diálogo "¿Crear la asignación?": el diálogo va en el body, pero el contenido de la plantilla lleva el atributo de este componente, así que basta con selectores normales. */
+.resumen-confirmacion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.resumen-confirmacion__encabezado {
+  margin: 0;
+  color: var(--text-color-secondary);
+}
+
+.resumen-confirmacion__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+
+.resumen-confirmacion__tabla th {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-color-secondary);
+  background-color: var(--fondo-sutil);
+  text-align: left;
+}
+
+.resumen-confirmacion__tabla td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.resumen-confirmacion__tabla .numero,
+.resumen-confirmacion__tabla th:not(:first-child) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.resumen-confirmacion__tabla tfoot td {
+  border-bottom: 0;
+  font-weight: 600;
+}
+
+.resumen-confirmacion__avisos {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  list-style: none;
+  border-radius: 6px;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+  font-size: 0.9em;
+}
+
+.resumen-confirmacion__avisos li + li {
+  margin-top: 0.25rem;
+}
+
+/* Filas de relleno mientras carga la solicitud en el popup. */
+.esqueleto-asignacion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.esqueleto-asignacion__fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.esqueleto-asignacion__tabla {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }

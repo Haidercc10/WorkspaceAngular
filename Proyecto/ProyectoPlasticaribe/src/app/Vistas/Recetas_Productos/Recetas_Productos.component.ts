@@ -261,7 +261,7 @@ export class Recetas_ProductosComponent implements OnInit {
     this.prodMaterialesService.Delete(data.Id_Registro).subscribe(() => {
       this.quitarMateriales(data.Material);
       this.closeMessage('eliminarMaterial');
-      this.msj.mensajeConfirmacion('¡Se ha eliminado la materia prima de la receta!');
+      this.msj.mensajeConfirmacion('OK!', '¡Se ha eliminado la materia prima de la receta!');
     }, () => this.msj.mensajeError('¡Ocurrió un error al eliminar el registro de la base de datos!'));
   }
 
@@ -287,7 +287,7 @@ export class Recetas_ProductosComponent implements OnInit {
           this.prodMaterialesService.Post(data).subscribe(() => {
             count++;
             if (count == this.materialesSeleccioados.length) {
-              this.msj.mensajeConfirmacion('¡Se ha registrado la receta con éxito!');
+              this.msj.mensajeConfirmacion('OK!', '¡Se ha registrado la receta con éxito!');
               this.limpiarTodo();
             }
           }, () => this.msj.mensajeError('¡No se ha podido registrar la receta!'), () => this.cargando = false);
@@ -334,7 +334,7 @@ export class Recetas_ProductosComponent implements OnInit {
         }
         count++;
         if (count == this.materialesSeleccioados.length) {
-          this.msj.mensajeConfirmacion('¡Se ha actualizado la receta con éxito!');
+          this.msj.mensajeConfirmacion('OK!', '¡Se ha actualizado la receta con éxito!');
           this.limpiarTodo();
         }
       });

@@ -11,6 +11,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardMateriaPrima as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_MatPrima',
@@ -68,9 +69,9 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptions.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptions.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptions.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -253,20 +254,20 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.ComparativoData = {
       labels: [''],
       datasets: [
-        { label: 'MP Asignada', backgroundColor: '#42A5F5',  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data:  [this.totalMpAsignada] },
-        { label: 'MP Extruida', backgroundColor: '#FFA726',  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalExtruidoMes] }
+        { label: 'MP Asignada', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado),  color: colorTextoGrafica(this.modoSeleccionado), data:  [this.totalMpAsignada] },
+        { label: 'MP Extruida', backgroundColor: colorSerieGrafica(2, this.modoSeleccionado),  color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalExtruidoMes] }
       ]
     };
 
     this.ComparativoOptions = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: {  color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}},
-        y: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}}
+        x: {ticks: {color: colorTextoGrafica(this.modoSeleccionado)}, grid: {color: COLOR_REJILLA_GRAFICA}},
+        y: {ticks: {color: colorTextoGrafica(this.modoSeleccionado)}, grid: {color: COLOR_REJILLA_GRAFICA}}
       }
     };
   }
@@ -278,8 +279,8 @@ export class Dashboard_MatPrimaComponent implements OnInit {
       datasets: [
         {
           data: [{id : 'BOPP', nested: {value: cantBopp}}, {id : 'BOPA', nested: {value: cantBopa}}, {id : 'POLIESTER',  nested: {value: cantPoliester}}],
-          backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726"],
-          hoverBackgroundColor: ["#64B5F6", "#81C784", "#FFB74D"]
+          backgroundColor: [colorSerieGrafica(0, this.modoSeleccionado), colorSerieGrafica(2, this.modoSeleccionado), colorSerieGrafica(3, this.modoSeleccionado)],
+          hoverBackgroundColor: [colorSerieGrafica(0, this.modoSeleccionado), colorSerieGrafica(2, this.modoSeleccionado), colorSerieGrafica(3, this.modoSeleccionado)]
         }
       ]
     };

@@ -136,7 +136,7 @@ export class CrearMateriaprimaComponent implements OnInit, OnDestroy {
       Precio: valores.mpValor,
     }).pipe(finalize(() => this.guardando = false)).subscribe({
       next: data => {
-        this.mensajeService.mensajeConfirmacion('¡Materia prima creada!', `${data.matPri_Nombre} quedó con el Id ${data.matPri_Id}.`);
+        this.mensajeService.mensajeConfirmacion('OK!', `Materia prima creada: ${data.matPri_Nombre} quedó con el Id ${data.matPri_Id}.`);
         if (this.recovery) this.createRecovery(data.matPri_Id, valores.mpMaterial, valores.mpPigment);
         this.creada.emit(data);
         this.limpiarCampos();

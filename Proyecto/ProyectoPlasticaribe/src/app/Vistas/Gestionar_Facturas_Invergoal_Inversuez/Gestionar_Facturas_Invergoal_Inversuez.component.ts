@@ -200,7 +200,7 @@ export class Gestionar_Facturas_Invergoal_InversuezComponent implements OnInit {
         this.facturasService.Put(factura.Id, facturas).subscribe((data : any) => {
           this.cargando = false;
           this.modalEstados = false;
-          this.msj.mensajeConfirmacion('Actualización exitosa', 'La actualización fue exitosa');
+          this.msj.mensajeConfirmacion('OK!', 'La actualización fue exitosa');
           this.consultarFacturas();  
         });
       }, () => this.msj.mensajeError("Error", "Ocurrió un error al actualizar la factura"));

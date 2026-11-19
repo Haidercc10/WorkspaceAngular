@@ -56,6 +56,7 @@ import { RippleModule } from 'primeng/ripple';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { SidebarModule } from 'primeng/sidebar';
 import { SkeletonModule } from 'primeng/skeleton';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import { SliderModule } from 'primeng/slider';
 import { SpeedDialModule } from 'primeng/speeddial';
@@ -78,6 +79,7 @@ import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_E
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { Busqueda_OrdenesTrabajoComponent } from './Vistas/Busqueda_OrdenesTrabajo/Busqueda_OrdenesTrabajo.component';
 import { CalendarioComponent } from './Vistas/Calendario/Calendario.component';
+import { ListaEventosComponent } from './Vistas/Calendario/ListaEventos/ListaEventos.component';
 import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
 import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
@@ -176,6 +178,7 @@ import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bop
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { SelectorMaterialComponent } from './Vistas/selector-material/selector-material.component';
 import { ContadorCaracteresDirective } from './Directivas/contador-caracteres.directive';
+import { ArrastreHorizontalDirective } from './Directivas/arrastre-horizontal.directive';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
@@ -282,6 +285,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     AsignacionMateriaPrimaComponent,
     SelectorMaterialComponent,
     ContadorCaracteresDirective,
+    ArrastreHorizontalDirective,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
     PruebaImagenCatInsumoComponent,
@@ -339,6 +343,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     Reporte_SolicitudesMPComponent,
     SolicitudMateriaPrimaComponent,
     CalendarioComponent,
+    ListaEventosComponent,
     NominaComponent,
     DashBoardRecaudosComponent,
     SolicitudMP_ExtrusionComponent,
@@ -507,6 +512,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     FieldsetModule,
     DividerModule,
     ChipModule,
+    DragDropModule,
     TagModule,
     VirtualScrollerModule,
     KnobModule,

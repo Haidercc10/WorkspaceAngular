@@ -7,6 +7,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, MOVIMIENTOS_ASIGNACION } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
 import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
@@ -70,7 +71,8 @@ export class MovimientoMPComponent implements OnInit {
     private creacionPDFService: CreacionPdfService,
     private cmpEntryBOPP: EntradaBOPPComponent,
     private svExcel: CreacionExcelService,
-    private util: UtileriaService
+    private util: UtileriaService,
+    private servicioAsignacion: AsignacionMPService,
   ) {
 
     this.formMovimientos = this.frmBuilder.group({
@@ -384,6 +386,15 @@ export class MovimientoMPComponent implements OnInit {
    * @param data Id de la asignación y tipo de movimiento (ASIGMP, ASIGTINTAS, ASIGBOPA, ASIGBOPP, ASIGPOLY).
    */
   asignacionesMateriaPrima(data: any) {
+    // Materias primas y tintas: un solo PDF por asignación, agrupado por subcategoría. BOPP sigue con el formato anterior.
+    if (data.Movimiento == 'ASIGMP' || data.Movimiento == 'ASIGTINTAS') {
+      this.servicioAsignacion.obtenerDatosPdf(Number(data.Id))
+        .pipe(finalize(() => { this.cargando = false; this.dialogCargando = false; }))
+        .subscribe(datos => {
+          if ((datos.subcategorias ?? []).length > 0) this.creacionPDFService.asignacionMaterialPDF(datos);
+        });
+      return;
+    }
     this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento)
       .pipe(finalize(() => { this.cargando = false; this.dialogCargando = false; }))
       .subscribe(datos => {

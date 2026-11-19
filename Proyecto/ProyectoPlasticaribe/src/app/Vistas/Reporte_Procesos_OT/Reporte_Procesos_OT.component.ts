@@ -343,7 +343,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
       const buffer = await workbook.xlsx.writeBuffer();
       fs.saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${title}.xlsx`);
-      this.msj.mensajeConfirmacion('¡Archivo Creado!', '¡Se ha exportado la información a un archivo de tipo Excel!');
+      this.msj.mensajeConfirmacion('OK!', '¡Se ha exportado la información a un archivo de tipo Excel!');
     } catch (error) {
       this.msj.mensajeError('¡Error!', 'No fue posible generar el archivo de Excel.');
       console.error(error);
@@ -614,7 +614,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         if (falla == null) this.msj.mensajeAdvertencia('¡Advertencia!',"Debe seleccionar un tipo de falla.");
         else {
           this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(() => {
-            this.msj.mensajeConfirmacion('¡Falla Agregada!', `¡Falla agregada a la OT ${this.otSeleccionada} con exito!`);
+            this.msj.mensajeConfirmacion('OK!', `¡Falla agregada a la OT ${this.otSeleccionada} con exito!`);
             this.limpiarCampos();
           });
         }
@@ -693,7 +693,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         this.servicioBagPro.srvActualizar(datos_ot[i].item, data, estadoFinal).subscribe(() => {
           //console.log(counter, this.ordenesSeleccionadas.length, datos_ot.length);
           if (counter == this.ordenesSeleccionadas.length) {
-            this.msj.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
+            this.msj.mensajeConfirmacion('OK!',`¡Se ha actualizado el estado de la Orden de Trabajo!`);
             setTimeout(() => { this.consultarInformacionOrdenesTrabajo(); }, 500);
           }
         });

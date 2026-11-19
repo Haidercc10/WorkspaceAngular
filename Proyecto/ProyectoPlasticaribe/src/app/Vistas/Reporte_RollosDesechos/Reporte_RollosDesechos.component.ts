@@ -228,7 +228,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     this.addNewSheet(workbook, title, fill, border, font, alignment);
     this.svExcel.creacionExcel(`Reporte rollos eliminados`, workbook)
     this.load = true;
-    this.msj.mensajeConfirmacion(`¡Información exportada a excel!`, 'Archivo generado con éxito!');
+    this.msj.mensajeConfirmacion('OK!', 'Archivo generado con éxito!');
   }
 
   //Función para agregar una nueva hoja de calculo.

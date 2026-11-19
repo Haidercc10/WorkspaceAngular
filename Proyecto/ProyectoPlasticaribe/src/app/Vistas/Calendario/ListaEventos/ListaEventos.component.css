@@ -1,0 +1,97 @@
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  gap: .75rem;
+  width: 100%;
+  padding: .7rem .5rem;
+  border: none;
+  border-bottom: 1px solid var(--surface-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-color);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--surface-hover);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--rojo);
+  outline-offset: -2px;
+}
+
+li:last-child .item {
+  border-bottom: none;
+}
+
+/* Barra de color según quién ve el evento (mismos colores que en el calendario) */
+.marca {
+  width: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.marca.evento-yo { background: var(--rojo); }
+.marca.evento-rol { background: #83D3FF; }      /* bg-blue1 */
+.marca.evento-todos { background: palegreen; }  /* bg-success1 */
+
+.contenido {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  min-width: 0;
+}
+
+.titulo {
+  font-weight: 600;
+  color: var(--texto-fuerte);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cuando,
+.meta {
+  font-size: .8rem;
+  color: var(--text-color-secondary);
+}
+
+.descripcion {
+  font-size: .85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item.detallado .titulo,
+.item.detallado .descripcion {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-color-secondary);
+}
+
+.vacio i {
+  font-size: 1.8rem;
+  opacity: .6;
+}
+
+.vacio p {
+  margin: 0;
+}

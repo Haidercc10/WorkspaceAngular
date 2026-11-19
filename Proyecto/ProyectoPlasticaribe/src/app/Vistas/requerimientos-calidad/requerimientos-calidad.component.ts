@@ -57,7 +57,7 @@ export class RequerimientosCalidadComponent {
         Req_HoraCreacion: moment().format('HH:mm:ss'),
       }
       this.svReqs.Post(info).subscribe(data => {
-        this.svMsjs.mensajeConfirmacion('Requerimiento creado correctamente!');
+        this.svMsjs.mensajeConfirmacion('OK!', 'Requerimiento creado correctamente!');
         this.load = false;
         this.cmpDevQuality.modalReqs = false;
         this.cmpDevQuality.getRequirements(); 

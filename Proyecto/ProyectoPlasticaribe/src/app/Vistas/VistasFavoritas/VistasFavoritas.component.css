@@ -1,21 +1,591 @@
+/* Barra y editor de accesos rápidos. Solo variables de tema (PrimeNG + styles.css) para que funcione en claro y oscuro. */
 
-p-pickList span{
+/* ---------- Barra (dock) ---------- */
+/* Ocupa todo el .p-dock-link (4rem x 4rem del tema) y centra la imagen en ambos ejes */
+.dock-icono {
+  position: relative;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
-@media screen and (max-width: 576px) {
+/* En bloque: un <img> en línea deja debajo el espacio de la línea de texto y se ve corrido hacia arriba */
+.dock-icono img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
-  .product-item {
+/* Página actual: punto rojo debajo del ícono */
+.dock-icono.activo::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -.55rem;
+  width: .45rem;
+  height: .45rem;
+  border-radius: 50%;
+  background: var(--rojo);
+  transform: translateX(-50%);
+}
+
+/*
+ * Barra + colina como una sola pieza semitransparente (mismos colores que el contenedor del p-dock del tema):
+ *  - .contenedor-barra es el rectángulo; su borde (::after) tiene un corte arriba al centro, justo bajo la colina.
+ *  - .gota es una colina baja: .gota-vidrio pone el fondo (recortado con la curva) y el SVG dibuja el contorno,
+ *    sin tramo inferior, de modo que continúa el borde de la barra.
+ *  - En modo claro ambas piezas desenfocan lo que hay detrás (--desenfoque-accesos, definida en styles.css).
+ *  - Al ocultar, la pieza baja hasta que la barra sale de la pantalla y solo queda la colina asomada en el borde.
+ */
+.accesos-rapidos {
+  --barra-fondo: var(--fondo-accesos, rgba(255, 255, 255, .1)); /* por tema, en styles.css */
+  --barra-borde: var(--borde-accesos, rgba(255, 255, 255, .2));
+  --gota-ancho: 72px; /* = viewBox 72x24 del SVG y coordenadas del clip-path de .gota-vidrio (en px para que coincidan) */
+  --gota-alto: 24px;
+  position: fixed;
+  left: 50%;
+  bottom: .5rem;
+  z-index: 1030;
+  width: max-content;
+  max-width: calc(100vw - 1rem);
+  transform: translateX(-50%);
+  /* Al mostrar: sube y rebota un poco por encima de su lugar antes de asentarse */
+  transition: transform .5s cubic-bezier(.34, 1.45, .64, 1);
+}
+
+.accesos-rapidos.oculto {
+  transform: translate(-50%, calc(100% + .5rem));
+  /* Al ocultar: cae acelerando, como una gota */
+  transition: transform .38s cubic-bezier(.55, 0, .85, .4);
+}
+
+.contenedor-barra {
+  position: relative;
+  padding: .5rem;
+  border-radius: .75rem;
+  background: var(--barra-fondo);
+  -webkit-backdrop-filter: var(--desenfoque-accesos, none);
+  backdrop-filter: var(--desenfoque-accesos, none);
+}
+
+.contenedor-barra::after {
+  --corte-ini: calc(50% - var(--gota-ancho) / 2);
+  --corte-fin: calc(50% + var(--gota-ancho) / 2);
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--barra-borde);
+  border-radius: inherit;
+  pointer-events: none;
+  /* franja superior de 2px sin el tramo bajo la gota + resto del borde completo */
+  -webkit-mask:
+    linear-gradient(to right, #000 var(--corte-ini), transparent var(--corte-ini), transparent var(--corte-fin), #000 var(--corte-fin)) top / 100% 2px no-repeat,
+    linear-gradient(#000, #000) bottom / 100% calc(100% - 2px) no-repeat;
+  mask:
+    linear-gradient(to right, #000 var(--corte-ini), transparent var(--corte-ini), transparent var(--corte-fin), #000 var(--corte-fin)) top / 100% 2px no-repeat,
+    linear-gradient(#000, #000) bottom / 100% calc(100% - 2px) no-repeat;
+}
+
+.gota {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  z-index: 1;
+  width: var(--gota-ancho);
+  height: var(--gota-alto);
+  padding: 0;
+  border: none;
+  background: transparent;
+  transform: translateX(-50%);
+  pointer-events: none; /* solo la silueta de la gota recibe clics (ver .gota-relleno) */
+  transition: opacity .2s;
+}
+
+.gota-vidrio,
+.gota-forma {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gota-vidrio {
+  background: var(--barra-fondo);
+  -webkit-backdrop-filter: var(--desenfoque-accesos, none);
+  backdrop-filter: var(--desenfoque-accesos, none);
+  clip-path: path('M0 24 C18 24 22 2 36 2 C50 2 54 24 72 24 Z'); /* misma curva que el SVG */
+  pointer-events: none;
+}
+
+.gota-forma {
+  overflow: visible;
+}
+
+.gota-relleno {
+  fill: transparent; /* el fondo lo pone .gota-vidrio; este trazo solo define la zona de clic */
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.gota-borde {
+  fill: none;
+  stroke: var(--barra-borde);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.gota-flecha {
+  position: absolute;
+  left: 50%;
+  top: 14px; /* centro visual de la colina (cima en y=2, base en y=24) */
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--text-color-secondary);
+  transform: translate(-50%, -50%) rotate(0deg);
+  pointer-events: none;
+  transition: color .15s, transform .4s cubic-bezier(.34, 1.45, .64, 1);
+}
+
+/* Barra oculta: la flecha gira hacia arriba (mostrar) */
+.accesos-rapidos.oculto .gota-flecha {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.gota:hover .gota-flecha {
+  color: var(--rojo);
+}
+
+/* Al pasar el mouse, la flecha se asoma en la dirección en que se moverá la barra */
+.accesos-rapidos:not(.oculto) .gota:hover .gota-flecha {
+  transform: translate(-50%, -35%) rotate(0deg);
+}
+
+.accesos-rapidos.oculto .gota:hover .gota-flecha {
+  transform: translate(-50%, -65%) rotate(180deg);
+}
+
+.gota:focus-visible {
+  outline: none;
+}
+
+.gota:focus-visible .gota-borde {
+  stroke: var(--rojo);
+  stroke-width: 2px;
+}
+
+.gota:focus-visible .gota-flecha {
+  color: var(--rojo);
+}
+
+/* Al agrandarse un ícono (efecto del dock) sube por encima de la barra: la gota se aparta y el borde se cierra */
+.accesos-rapidos:not(.oculto):has(.p-dock-item:hover) .gota {
+  opacity: 0;
+}
+
+.accesos-rapidos:not(.oculto):has(.p-dock-item:hover) .gota-relleno {
+  pointer-events: none;
+}
+
+.accesos-rapidos:not(.oculto):has(.p-dock-item:hover) .contenedor-barra::after {
+  -webkit-mask: none;
+  mask: none;
+}
+
+/* El fondo y el borde los pone .contenedor-barra: el p-dock queda en el flujo y sin su propio contenedor */
+:host ::ng-deep .accesos-rapidos .p-dock {
+  position: static;
+  width: auto;
+}
+
+:host ::ng-deep .accesos-rapidos .p-dock .p-dock-list-container {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* Bootstrap le da a todo <ul> margin-bottom: 1rem y padding-left: 2rem, y gana a la regla de PrimeNG (que está
+   dentro de @layer primeng): sin esto los íconos quedan corridos hacia arriba y a la derecha dentro de la barra */
+:host ::ng-deep .accesos-rapidos .p-dock .p-dock-list {
+  margin: 0;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accesos-rapidos,
+  .accesos-rapidos.oculto,
+  .gota,
+  .gota-flecha {
+    transition: none;
+  }
+}
+
+/* ---------- Encabezado y pie ---------- */
+.subtitulo-editor {
+  margin: 0 0 1rem;
+  color: var(--text-color-secondary);
+  font-size: .9rem;
+}
+
+.pie-editor {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.pie-editor .espaciador {
+  flex: 1;
+}
+
+/* ---------- Paneles ---------- */
+.paneles {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.25rem;
+  min-height: 28rem;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--surface-card);
+}
+
+/* ---------- Panel izquierdo ---------- */
+.buscador {
+  width: 100%;
+}
+
+.buscador input {
+  width: 100%;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: .75rem 0 .25rem;
+}
+
+.filtro {
+  border: 1px solid var(--surface-border);
+  background: var(--fondo-sutil);
+  color: var(--text-color);
+  border-radius: 999px;
+  padding: .3rem .8rem;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: background-color .15s, border-color .15s;
+}
+
+.filtro:hover {
+  border-color: var(--rojo);
+}
+
+.filtro.activo {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: #fff;
+}
+
+.lista-disponibles {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 26rem;
+  margin-top: .5rem;
+  padding-right: .25rem;
+}
+
+.grupo + .grupo {
+  margin-top: 1rem;
+}
+
+.grupo-titulo {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 0 .4rem;
+  padding: .3rem 0;
+  font-size: .75rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text-color-secondary);
+  background: var(--surface-card);
+}
+
+.vista {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  width: 100%;
+  margin-bottom: .35rem;
+  padding: .5rem .75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-color);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .15s, border-color .15s;
+}
+
+.vista:hover {
+  background: var(--fondo-sutil);
+}
+
+.vista:focus-visible,
+.filtro:focus-visible,
+.icono:focus-visible {
+  outline: 2px solid var(--rojo);
+  outline-offset: 2px;
+}
+
+.vista.elegida {
+  border-color: var(--texto-exito);
+  background: var(--fondo-exito);
+}
+
+.vista.bloqueada {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.vista img,
+.favorito img {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.vista-texto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.vista-nombre {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vista-texto small {
+  color: var(--text-color-secondary);
+}
+
+.accion {
+  font-size: .9rem;
+  color: var(--text-color-secondary);
+}
+
+.vista.elegida .accion {
+  color: var(--texto-exito);
+}
+
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  padding: 2rem 1rem;
+  color: var(--text-color-secondary);
+  text-align: center;
+}
+
+/* ---------- Panel derecho ---------- */
+.seleccion-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.seleccion-encabezado h4 {
+  margin: 0;
+  color: var(--texto-fuerte);
+}
+
+.contador {
+  font-weight: 700;
+  white-space: nowrap;
+  padding: .2rem .7rem;
+  border-radius: 999px;
+  background: var(--fondo-sutil);
+  color: var(--text-color);
+}
+
+.contador.lleno {
+  background: var(--fondo-acento);
+  color: var(--rojo);
+}
+
+.pista {
+  color: var(--text-color-secondary);
+  margin-top: .25rem;
+}
+
+.lista-seleccion {
+  list-style: none;
+  margin: .75rem 0 0;
+  padding: 0;
+  flex: 1;
+}
+
+.favorito,
+.espacio-libre {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 3rem;
+  margin-bottom: .35rem;
+  padding: .35rem .5rem;
+  border-radius: 8px;
+}
+
+.favorito {
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  color: var(--text-color);
+}
+
+.favorito .vista-nombre {
+  flex: 1;
+  min-width: 0;
+}
+
+.espacio-libre {
+  border: 1px dashed var(--surface-border);
+  color: var(--text-color-secondary);
+  font-size: .9rem;
+}
+
+.posicion {
+  width: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-color-secondary);
+}
+
+.asa {
+  cursor: grab;
+  color: var(--text-color-secondary);
+  padding: .25rem;
+}
+
+.acciones {
+  display: flex;
+  gap: .1rem;
+}
+
+.icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+}
+
+.icono:hover:not(:disabled) {
+  background: var(--fondo-sutil);
+  color: var(--text-color);
+}
+
+.icono.quitar:hover:not(:disabled) {
+  background: var(--fondo-obligatorio);
+  color: var(--texto-peligro);
+}
+
+.icono:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+/* Arrastre (CDK) */
+.favorito.cdk-drag-preview {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .25);
+}
+
+.favorito-placeholder {
+  min-height: 3rem;
+  margin-bottom: .35rem;
+  border: 2px dashed var(--rojo);
+  border-radius: 8px;
+  background: var(--fondo-acento);
+}
+
+.cdk-drag-animating,
+.lista-seleccion.cdk-drop-list-dragging .favorito:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, .2, 1);
+}
+
+/* Vista previa del dock */
+.vista-previa {
+  margin-top: .75rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+.vista-previa small {
+  color: var(--text-color-secondary);
+}
+
+.previa-iconos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .4rem;
+  margin-top: .5rem;
+  padding: .5rem;
+  border-radius: 10px;
+  background: var(--fondo-sutil);
+}
+
+.previa-iconos img {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+}
+
+/* El preview del arrastre se pinta en <body>, fuera del diálogo: se ajusta su tamaño aquí */
+::ng-deep .cdk-drag-preview.favorito {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  z-index: 5000 !important;
+}
+
+/* ---------- Pantallas pequeñas: paneles apilados, favoritos primero ---------- */
+@media screen and (max-width: 768px) {
+  .paneles {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .panel-seleccion {
+    order: -1;
+  }
+
+  .lista-disponibles {
+    max-height: 22rem;
+  }
+
+  .pie-editor {
     flex-wrap: wrap;
   }
-
-  p-pickList img {
-    margin: 0 0 1rem 0;
-    width: 50px;
-  }
-}
-
-::ng-deep .p-picklist-item:not(.cdk-drag-disabled) {
-  cursor: move;
-  z-index: 3130 !important;
 }

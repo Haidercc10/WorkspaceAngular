@@ -63,7 +63,7 @@ export class CrearTerceroComponent implements OnInit {
     }
 
     this.terceroService.insert(info).subscribe(datos => {
-      this.mensajeService.mensajeConfirmacion('¡Registro Exitoso!', 'El tercero ha sido creado');
+      this.mensajeService.mensajeConfirmacion('OK!', 'El tercero ha sido creado');
       this.LimpiarCampos();
     });
   }

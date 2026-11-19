@@ -236,7 +236,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.dtSolicitudService.GetMateriaPrimaSolicitud(this.formSolicitud.value.Id_Solicitud, this.mpSeleccionada.Id).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.dtSolicitudService.Delete(data[i].dtSolicitud_Id).subscribe(datos => {
-          this.msj.mensajeConfirmacion(`¡Materia Prima Eliminada!`, `¡Se ha eliminado la materia prima con el ID ${this.mpSeleccionada.Id} de la solicitud!`);
+          this.msj.mensajeConfirmacion('OK!', `¡Se ha eliminado la materia prima con el ID ${this.mpSeleccionada.Id} de la solicitud!`);
         });
       }
     });
@@ -249,7 +249,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar al menos una materia prima!`);
   }
 
-  // Función que va a crear una solicitud de materia prima
+  // Función que va a crear una requisición de materia prima
   crearSolicitud(){
     this.cargando = true;
     let info : modelSolicitudMateriaPrima = {
@@ -261,12 +261,12 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     }
     this.solicitudService.Post(info).subscribe(data => this.crearDetallesSolicitud(data.solicitud_Id),
     error => {
-      this.msj.mensajeError(`¡No fue posible crear la solicitud!`, `¡Ocurrió un error al intentar crear la solicitud de materia prima!`);
+      this.msj.mensajeError(`¡No fue posible crear la solicitud!`, `¡Ocurrió un error al intentar crear la requisición de materia prima!`);
       this.cargando = false;
     })
   }
 
-  // Función que va a crear los detalles de solicitud de materia prima
+  // Función que va a crear los detalles de requisición de materia prima
   crearDetallesSolicitud(solicitud_Id : number){
     let err : boolean = false;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
@@ -279,7 +279,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
         Estado_Id: 11
       }
-      this.dtSolicitudService.Post(info).subscribe(data => this.msj.mensajeConfirmacion(`¡Se ha creado la solicitud de materia prima!`, `¡Se creó correctamente la solicitud de materia prima!`),
+      this.dtSolicitudService.Post(info).subscribe(data => this.msj.mensajeConfirmacion('OK!', `¡Se creó correctamente la requisición de materia prima!`),
       error => err = true);
     }
     setTimeout(() => {
@@ -347,7 +347,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
 
     this.solicitudService.Put(this.formSolicitud.value.Id_Solicitud, info).subscribe(data => {
       if(info.Solicitud_Id != null) this.editarDtSolicitud(info.Solicitud_Id);
-    }, error => { this.msj.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la solicitud de materia prima!`); this.cargando = false; });
+    }, error => { this.msj.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la requisición de materia prima!`); this.cargando = false; });
   }
 
   // Funcion que agregará las materias primas a la solicitud que está siendo editada
@@ -365,7 +365,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
           Estado_Id: 11
         }
-        this.dtSolicitudService.Post(info).subscribe(datos => this.msj.mensajeConfirmacion(`¡Se ha editado la solicitud de materia prima!`, `¡Se editó correctamente la solicitud de materia prima!`),
+        this.dtSolicitudService.Post(info).subscribe(datos => this.msj.mensajeConfirmacion('OK!', `¡Se editó correctamente la requisición de materia prima!`),
         error => err = true);
       });
     }
@@ -417,7 +417,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
   crearPDF(solicitud_Id : number){
     this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
-        let titulo : string = `Solicitud de Materia Prima N° ${datos_orden[i].consecutivo}`;
+        let titulo : string = `Requisición de Materia Prima N° ${datos_orden[i].consecutivo}`;
         let content : any [] = this.contenidoPDF(datos_orden[i]);
         this.creacionPDFService.formatoPDF(titulo, content);
         setTimeout(() => this.cargando = false, 3000);

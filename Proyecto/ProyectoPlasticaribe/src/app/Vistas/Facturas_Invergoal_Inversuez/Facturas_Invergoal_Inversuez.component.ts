@@ -9,7 +9,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsInvergoalInversuez as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
@@ -145,7 +145,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
       this.facturasService.Post(datos).subscribe(() => {
         ingresos += 1;
         if (ingresos == this.facturas_Ingresar.length) {
-          this.msj.mensajeConfirmacion("Guardado exitoso", ``);
+          this.msj.mensajeConfirmacion('OK!', "Guardado exitoso");
           this.crearPdf();
           this.limpiarTodo();
         }
@@ -172,7 +172,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
           {
             margin: [20, 8, 20, 0],
             columns: [
-              { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+              { image : logoNuevoParaPdf, width : 150, fit : [150, 30], margin: [20, 25] },
               {
                 width: 300,
                 alignment: 'center',

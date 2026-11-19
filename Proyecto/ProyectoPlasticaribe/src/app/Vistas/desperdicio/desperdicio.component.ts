@@ -323,7 +323,7 @@ export class DesperdicioComponent implements OnInit {
         'Turno_Id' : this.FormDesperdicio.value.Turno,
       }
       this.deperdicioService.Insert(info).subscribe(data => {
-        this.mensajeService.mensajeConfirmacion(`Desperdicio guardado exitosamente!`);
+        this.mensajeService.mensajeConfirmacion('OK!', `Desperdicio guardado exitosamente!`);
         this.limpiarTodo();
       }), () => {
         this.mensajeService.mensajeError(`Error`, `No se pudo ingresar el desperdicio, verifique!`);

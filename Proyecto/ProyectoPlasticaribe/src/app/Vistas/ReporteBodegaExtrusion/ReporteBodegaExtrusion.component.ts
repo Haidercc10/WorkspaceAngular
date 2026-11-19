@@ -9,7 +9,7 @@ import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoR
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosExtrusion as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
@@ -323,9 +323,9 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Ingreso de Rollos a Bodega de Extrusión`,
@@ -461,9 +461,9 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Salida de Rollos a Bodega de Extrusión`,

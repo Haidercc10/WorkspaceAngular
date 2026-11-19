@@ -85,18 +85,18 @@
 }
 
 /*::ng-deep .p-column-filter-menu-button {
-  color: #db4149;
+  color: var(--rojo);
 }*/
 
 ::ng-deep .p-selectbutton .p-button.p-highlight:hover {
-  background: #db4149;
-  border-color: #db4149;
+  background: var(--rojo);
+  border-color: var(--rojo);
   color: #ffffff;
 }
 
 ::ng-deep .p-selectbutton .p-button.p-highlight {
-  background: #db4149;
-  border-color: #db4149;
+  background: var(--rojo);
+  border-color: var(--rojo);
   color: #ffffff;
 }
 

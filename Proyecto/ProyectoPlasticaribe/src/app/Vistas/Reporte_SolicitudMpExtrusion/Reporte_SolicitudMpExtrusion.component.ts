@@ -1,564 +1,607 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { ShepherdService } from 'angular-shepherd';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
-import { DetSolicitudMP_ExtrusionService } from 'src/app/Servicios/DetSolicitudMP_Extrusion/DetSolicitudMP_Extrusion.service';
-import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { ConfirmationService } from 'primeng/api';
+import { catchError, finalize, forkJoin, map, Observable, of, Subject, Subscription, switchMap, takeUntil } from 'rxjs';
+import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { AppComponent } from 'src/app/app.component';
-import { AsignacionMateriaPrimaComponent } from '../asignacion-materia-prima/asignacion-materia-prima.component';
-import { Table } from 'primeng/table';
-import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
-import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
-import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } from 'src/app/data';
-import { catchError, finalize, map, of, Subject, switchMap, takeUntil } from 'rxjs';
+import {
+  ADICIONAL_KG_OT,
+  AutorizacionExcesoPendiente,
+  DetalleSolicitudMaterial,
+  EstadoSolicitudMaterial,
+  FiltrosConsultaSolicitudes,
+  ROLES_EXCEDER_LIMITE_OT,
+  ROLES_GESTIONAR_SOLICITUD,
+  ROLES_VERIFICAR_SOLICITUD,
+  ROLES_VER_PDF_SOLICITUD,
+  SolicitudConsultada,
+} from 'src/app/Modelo/modelFlujoMaterialProduccion';
+import { AutorizacionesExcesoOTService } from 'src/app/Servicios/AutorizacionesExcesoOT/autorizacionesExcesoOT.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, DatosOTSolicitudPDF } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
-import { ADICIONAL_KG_OT, EstadoSolicitudMaterial, ROLES_VERIFICAR_SOLICITUD } from 'src/app/Modelo/modelFlujoMaterialProduccion';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { ClaveTutorialMovimientosSolicitud, pasosTutorialMovimientosSolicitud } from 'src/app/Tutoriales/Tutoriales_MovimientosSolicitudMaterial';
 
+
+/** Estados de la solicitud que se muestran como chips y en el filtro, en el orden del flujo. */
+const ESTADOS_SOLICITUD = [
+  { id: EstadoSolicitudMaterial.Pendiente, nombre: 'Pendientes', clase: 'pendiente', icono: 'pi pi-hourglass' },
+  { id: EstadoSolicitudMaterial.Parcial, nombre: 'Parciales', clase: 'parcial', icono: 'pi pi-sliders-h' },
+  { id: EstadoSolicitudMaterial.Finalizada, nombre: 'Finalizadas', clase: 'finalizada', icono: 'pi pi-check-square' },
+  { id: EstadoSolicitudMaterial.Verificada, nombre: 'Verificadas', clase: 'verificada', icono: 'pi pi-verified' },
+  { id: EstadoSolicitudMaterial.Cancelada, nombre: 'Canceladas', clase: 'cancelada', icono: 'pi pi-ban' },
+];
+
+/** Estados con los que abre el reporte: las solicitudes que quien asigna debe atender. */
+const ESTADOS_ACTIVOS = [EstadoSolicitudMaterial.Pendiente, EstadoSolicitudMaterial.Parcial];
+
+/** Datos de la OT (BagPro) que se muestran en el resumen de la solicitud. */
+interface DatosOTResumen {
+  cliente: string;
+  item: string;
+  referencia: string;
+  kgOT: number;
+}
 
 @Component({
   selector: 'app-Reporte_SolicitudMpExtrusion',
   templateUrl: './Reporte_SolicitudMpExtrusion.component.html',
   styleUrls: ['./Reporte_SolicitudMpExtrusion.component.css']
 })
-export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy {
+  modoSeleccionado : boolean;
   private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
-  cargando : boolean = false;
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
-  formFiltros !: FormGroup; /** Formulario de filtros de búsqueda */
-  estados : any = []; /** Array que contendrá los estados de las solicitudes */
-  arrayRegistros : any = []; /** Array que contendrá la tabla luego de realizar una consulta */
-  @ViewChild('dt1') dt1: Table | undefined;
-  cantPendientes : number = 0; /** Variable que mostrará el número de solicitudes pendientes */
-  cantFinalizadas : number = 0; /** Variable que mostrará el número de solicitudes finalizadas */
-  cantCanceladas : number = 0; /** Variable que mostrará el número de solicitudes canceladas */
-  @ViewChild(AsignacionMateriaPrimaComponent) AsignacionMatPrima : AsignacionMateriaPrimaComponent;
-  informacionPDF: any; /** Variable que contendrá la información del PDF */
-  arrayMatPrimas : any = []; /** Array que cargará las materias primas de la solicitud seleccionada */
-  solicitudSeleccionada : number = 0; /** Nro de la solicitud seleccionada */
-  usuarioSolicitante : string = '' /** Variable que contendrá el nombre del usuario que solicitó la materia prima. */
-  modalAsignacion : boolean = false; /** Variable que validará que se cargue o no, el componente del modal de ordenes de compras. */
-  private mensajeAsignacionPendiente: { summary: string; detail: string } | null = null;
-  cantParciales : number = 0; /** Variable que mostrará el número de solicitudes parciales */
-  estadoSolicitud : string = ''; /** Nombre del estado de la solicitud seleccionada, para los mensajes. */
-  estadoSolicitudId : number | null = null; /** Estado de la solicitud seleccionada; habilita o deshabilita las acciones. */
-  clave : string = ''; /** Variable que contendrá una palabra clave ya sea para finalizar o cancelar una solicitud.*/
-  /** Key fija del toast de confirmación. Debe ser constante: si dependiera de `clave`, el toast aún tendría la key anterior al llegar el mensaje y lo descartaría. */
-  readonly claveConfirmacion : string = 'confirmarEstadoSolicitud';
-  nroSolicitud : number = 0; /// Variable que se usará para almacenar el nro de solicitud al momento de generar el PDF y cargar la información de la solicitud seleccionada.
-  arrayId : any = []; /// Array que se usará para almacenar los id de las solicitudes que se muestran en la tabla, esto con el fin de no mostrar solicitudes repetidas en caso de que una solicitud tenga varias materias primas.
-  load : boolean = false; /** Variable que indicará si se está cargando información */
-  private destroy$ = new Subject<void>(); // Variable para manejar la destrucción de las subscripciones y evitar fugas de memoria
+  ValidarRol : number;
+  readonly estadosSolicitud = ESTADOS_SOLICITUD;
+  formFiltros !: FormGroup;
+
+  /** Cantidad de solicitudes por estado (chips). */
+  conteo : { [estado: number]: number } = {};
+  /** Estados de la última consulta (resalta el chip correspondiente). */
+  estadosConsultados : number[] = [];
+  /** Texto que explica qué se está mostrando en la tabla. */
+  descripcionConsulta : string = '';
+
+  solicitudes : SolicitudConsultada[] = [];
+  solicitudSeleccionada : SolicitudConsultada | null = null;
+
+  /** Detalle completo de la solicitud seleccionada. */
+  detalle : DetalleSolicitudMaterial | null = null;
+  datosOT : DatosOTResumen | null = null;
+  cargandoDetalle : boolean = false;
+
+  modalAsignacion : boolean = false;
+  /** El PDF de las asignaciones de la solicitud se está generando. */
+  generandoPdfAsignaciones = false;
+  /** Se creó al menos una asignación desde el popup (sigue abierto): al cerrarlo se refrescan la lista y el detalle. */
+  private huboAsignacion = false;
+
+  // Autorizaciones de exceso de la OT (antes solo en la página de asignación).
+  dialogoAutorizaciones : boolean = false;
+  autorizacionesPendientes : (AutorizacionExcesoPendiente & { motivoRechazo?: string })[] = [];
+
+  /** Operaciones que muestran el cargando; el overlay se quita cuando terminan todas. */
+  private cargasActivas : number = 0;
+  /** Últimos filtros consultados; se repiten al refrescar después de una acción. */
+  private ultimosFiltros : FiltrosConsultaSolicitudes = { estados: ESTADOS_ACTIVOS };
+  /** Solicitud que se selecciona al terminar la primera consulta (llega en la URL). */
+  private idPorSeleccionar : number | null = null;
+  private consultaLista? : Subscription;
+  private consultaDetalle? : Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(private frmBuilder : FormBuilder,
-                  private messageService: MessageService,
-                    private shepherdService: ShepherdService,
-                      private AppComponent : AppComponent,
-                        private servicioEstados : EstadosService,
-                          private servicioSolicitudesMPExt : SolicitudMP_ExtrusionService,
-                            private servicioDtSolicitudesMPExt : DetSolicitudMP_ExtrusionService,
-                              private msj : MensajesAplicacionService,
-                                private ServicioDetAsignacionesMp : DetallesAsignacionService,
-                                  private servicioBagPro : BagproService,
-                                    private servicioPDF : CreacionPdfService,
-                                ) {
+    private confirmationService : ConfirmationService,
+    private AppComponent : AppComponent,
+    private servicioSolicitudes : SolicitudMP_ExtrusionService,
+    private msj : MensajesAplicacionService,
+    private servicioBagPro : BagproService,
+    private servicioPDF : CreacionPdfService,
+    private servicioAsignacion : AsignacionMPService,
+    private servicioAutorizaciones : AutorizacionesExcesoOTService,
+    private tutoriales : TutorialesService,
+    private ruta : ActivatedRoute,
+  ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       documento : [null],
-      fechaDoc: [null],
-      fechaFinalDoc: [null],
-      estadoDoc : [null]
+      ot : [null],
+      fechaDoc : [null],
+      fechaFinalDoc : [null],
+      estados : [[]],
     });
   }
 
   ngOnInit() {
-    this.obtenerEstados();
-    this.lecturaStorage();
-    this.getEstadoSolitudes();
+    this.ValidarRol = Number(this.AppComponent.storage_Rol);
+    this.cargarConteo();
+    if (!this.aplicarFiltrosDeLaUrl()) this.consultar({ estados: ESTADOS_ACTIVOS }, 'Solicitudes activas (pendientes y parciales)');
   }
 
-  /** Función que se ejecutará al cerrar el componente para limpiar las subscripciones y evitar fugas de memoria */
+  /**
+   * Filtros que llegan en la URL desde otra página (p. ej. el aviso "Ver en movimientos" de la solicitud):
+   * - `solicitud=N`: consulta esa solicitud y la selecciona.
+   * - `fecha=YYYY-MM-DD` y `estado=E`: solicitudes creadas ese día en ese estado; con `seleccionar=N` deja esa seleccionada.
+   * @returns true si había filtros en la URL (ya se consultó).
+   */
+  private aplicarFiltrosDeLaUrl() : boolean {
+    const parametros = this.ruta.snapshot.queryParamMap;
+    const solicitud = parametros.get('solicitud');
+    const fecha = parametros.get('fecha');
+    if (solicitud && /^\d+$/.test(solicitud)) {
+      this.formFiltros.patchValue({ documento: solicitud });
+      this.consultarFiltros();
+      return true;
+    }
+    if (!fecha || !moment(fecha, 'YYYY-MM-DD', true).isValid()) return false;
+
+    const estado = Number(parametros.get('estado'));
+    const seleccionar = Number(parametros.get('seleccionar'));
+    this.idPorSeleccionar = Number.isInteger(seleccionar) && seleccionar > 0 ? seleccionar : null;
+    const dia = moment(fecha, 'YYYY-MM-DD').toDate();
+    this.formFiltros.patchValue({ fechaDoc: dia, fechaFinalDoc: dia, estados: ESTADOS_SOLICITUD.some(e => e.id === estado) ? [estado] : [] });
+    this.consultarFiltros();
+    return true;
+  }
+
   ngOnDestroy() {
+    this.tutoriales.cancelar();
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.AppComponent.storage_Id;
-    this.storage_Nombre = this.AppComponent.storage_Nombre;
-    this.ValidarRol = this.AppComponent.storage_Rol;
-  }
+  // ───────────────────────── Tutorial ─────────────────────────
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  /** Muestra el tutorial (botón "i" del título). La primera vez se muestra solo, al terminar la primera consulta. */
+  tutorial = () => this.tutoriales.iniciar(this.pasosTutorial());
 
-  // Funcion que va a consultar y almacenar los estados que pueden tener los documentos
-  obtenerEstados(){
-    this.servicioEstados.srvObtenerListaEstados().subscribe(datos_estados => {
-      this.estados = datos_estados.filter(item => [11, 5, 4, 12, EstadoSolicitudMaterial.Verificada].includes(item.estado_Id));
+  private pasosTutorial() {
+    return pasosTutorialMovimientosSolicitud({
+      puedeGestionar: this.puedeGestionar,
+      puedeVerificar: this.puedeVerificar,
+      puedeVerPdf: this.puedeVerPdf,
+      puedeAutorizarExceso: this.puedeAutorizarExceso,
+      seleccionarPrimera: () => { if (!this.detalle && this.solicitudes.length > 0) this.seleccionar(this.solicitudes[0]); },
     });
   }
 
-  /** Función que mostrará el numero de solicitudes por estado. */
-  getEstadoSolitudes(){
-    this.cargando = true;
-    this.cantPendientes = 0;
-    this.cantParciales = 0;
-    this.cantFinalizadas = 0;
-    this.cantCanceladas = 0;
+  // ───────────────────────── Permisos y estado de la vista ─────────────────────────
 
-    this.servicioSolicitudesMPExt.getEstadosSolicitudes()
-    .pipe(
-      finalize(() => this.cargando = false)
-    ).subscribe(data => {
-      data.forEach(x => {
-        if(x.estado_Id == 11) this.cantPendientes = x.suma;
-        if(x.estado_Id == 5) this.cantFinalizadas = x.suma;
-        if(x.estado_Id == 4) this.cantCanceladas = x.suma;
-        if(x.estado_Id == 12) this.cantParciales = x.suma;
-        
-      });
-    }, error => { 
-      this.msj.mensajeError(`Error`, `Error al consultar el estado de las solicitudes`) 
-    });
+  get cargando() : boolean {
+    return this.cargasActivas > 0;
   }
 
-  /** Consulta para cargar información de las solicitudes de materia prima.  */
-  consultarFiltros(){
-    this.cargando = true;
-    this.arrayRegistros = [];
-    this.arrayMatPrimas = [];
-    this.solicitudSeleccionada = 0;
-    this.usuarioSolicitante = '';
-    this.estadoSolicitud = '';
-    this.estadoSolicitudId = null;
-    let solicitud : number = this.formFiltros.value.documento;
-    let fechaInicial : any = moment(this.formFiltros.value.fechaDoc).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(this.formFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
-    let estado : any = this.formFiltros.value.estadoDoc;
-    this.arrayId = [];
-    let ruta : any = ``;
-
-    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
-    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
-    if(fechaInicial == null) fechaInicial = moment().subtract(30, 'days').format('YYYY-MM-DD'); 
-    if(fechaInicial != null && fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
-
-    if(solicitud != null) ruta = `id=${solicitud}`;
-    if(estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}` ;
-    ruta.length > 0 ? ruta = `?${ruta}` : ruta = ``;
-
-    this.servicioDtSolicitudesMPExt.GetQuerySolicitudesMp_Extrusion(fechaInicial, fechaFinal, ruta)
-    .pipe(
-      finalize(() => this.cargando = false)
-    ).subscribe(data => {
-      if(data.length > 0) {
-        for (let index = 0; index < data.length; index++) {
-          if(!this.arrayId.includes(data[index].id)) {
-            this.llenarTabla(data[index]);
-            this.arrayId.push(data[index].id);
-          }
-        }
-        /** Se reasigna la referencia para que p-table recalcule totalRecords y el paginador. */
-        this.arrayRegistros = [...this.arrayRegistros];
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
-    }, error => { this.msj.mensajeError(`Error`, `Error al consultar registros de solicitudes de material`)} );
-  }
-
-  /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
-  llenarTabla(datos : any){
-    let info : any = {
-      'id' : datos.id,
-      'ot' : datos.ot,
-      'fecha' : datos.fecha.replace('T00:00:00', ''),
-      'fechaEntrega' : datos.fecha_Entrega ? datos.fecha_Entrega.replace('T00:00:00', '') : '',
-      'estadoId' : datos.estado,
-      'estado' : datos.nombre_Estado,
-    }
-    this.arrayRegistros.push(info);
-  }
-
-  /** Función para limpiar los campos del formulario */
-  limpiarCampos() {
-    this.solicitudSeleccionada = 0;
-    this.formFiltros.reset();
-    this.arrayId = [];
-    this.arrayRegistros = [];
-    this.arrayMatPrimas = [];
-    this.usuarioSolicitante = '';
-    this.estadoSolicitud = '';
-    this.estadoSolicitudId = null;
-  }
-
-  /** Función para filtrar los registros de la tabla */
-  aplicarFiltro = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-
-  /**
-   * Genera el PDF de la solicitud de material seleccionada. Primero consulta la solicitud (API) y la OT (BagPro)
-   * y luego entrega esos datos al servicio de creación de PDFs. Si la OT no se encuentra en BagPro, el PDF se
-   * genera igual indicándolo.
-   * @param nroSolicitud Solicitud seleccionada.
-   */
-  infoSolicitudPDF(nroSolicitud : number){
-    if (!nroSolicitud) return this.msj.mensajeAdvertencia(`Advertencia`, `Debe seleccionar una solicitud.`);
-
-    this.cargando = true;
-    this.servicioDtSolicitudesMPExt.GetSolicitudMp_Extrusion(nroSolicitud)
-      .pipe(
-        switchMap((detalles : any[]) => detalles.length == 0
-          ? of({ detalles, ot: null })
-          : this.servicioBagPro.srvObtenerListaClienteOT_Item(detalles[0].ot).pipe(
-            map(datosOT => ({ detalles, ot: this.mapearOTParaPDF(datosOT[0]) })),
-            catchError(() => of({ detalles, ot: null }))
-          )),
-        takeUntil(this.destroy$),
-        finalize(() => this.cargando = false)
-      )
-      .subscribe({
-        next: ({ detalles, ot }) => {
-          if (detalles.length == 0) return this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron subcategorías para la solicitud N° ${nroSolicitud}.`);
-          this.servicioPDF.solicitudMaterialProduccionPDF(detalles, ot);
-          this.msj.mensajeConfirmacion(`Confirmación`, `Generando el PDF de la solicitud N° ${nroSolicitud}; se abrirá en una nueva pestaña.`);
-        },
-        error: () => this.msj.mensajeError(`Error`, `¡No se pudo obtener la información de la solicitud N° ${nroSolicitud}!`)
-      });
-  }
-
-  /** Convierte los datos de la OT de BagPro al formato del PDF; null si la OT no existe. */
-  private mapearOTParaPDF(datosOT : any) : DatosOTSolicitudPDF | null {
-    if (!datosOT) return null;
-    const kgOT = Number(datosOT.datosotKg) || 0;
-    return {
-      cliente: datosOT.clienteNom,
-      item: datosOT.clienteItems,
-      referencia: datosOT.clienteItemsNom,
-      kgOT,
-      kgLimite: kgOT * (1 + ADICIONAL_KG_OT),
+  /** Muestra el cargando mientras el observable está activo. */
+  private conCarga<T>() {
+    return (fuente : Observable<T>) => {
+      this.cargasActivas++;
+      return fuente.pipe(finalize(() => this.cargasActivas--));
     };
   }
 
-  /** Cargar detalles de la solicitud en la segunda tabla. */
-  cargarDetalleSolicitud(id : number) {
-    this.cargando = true;
-    this.solicitudSeleccionada = id;
-    this.arrayMatPrimas = [];
-    this.estadoSolicitud = '';
-    this.estadoSolicitudId = null;
+  /** Asigna material y finaliza o cancela solicitudes. */
+  get puedeGestionar() : boolean {
+    return ROLES_GESTIONAR_SOLICITUD.includes(this.ValidarRol);
+  }
 
-    this.servicioDtSolicitudesMPExt.GetSolicitudMp_Extrusion(this.solicitudSeleccionada)
-    .pipe(
-      finalize(() => { this.cargando = false; })
-    ).subscribe(data => {
-      data.forEach((item) =>  this.llenarTablaDetalles(item));
-    }, error => {
-      this.msj.mensajeError(`Error`, 
-        `¡No se pudo obtener la información de la solicitud N° ${this.solicitudSeleccionada}!`);
+  /** Marca como verificadas las solicitudes finalizadas. */
+  get puedeVerificar() : boolean {
+    return ROLES_VERIFICAR_SOLICITUD.includes(this.ValidarRol);
+  }
+
+  get puedeVerPdf() : boolean {
+    return ROLES_VER_PDF_SOLICITUD.includes(this.ValidarRol);
+  }
+
+  /** Aprueba o rechaza autorizaciones para superar el límite de kg de una OT. */
+  get puedeAutorizarExceso() : boolean {
+    return ROLES_EXCEDER_LIMITE_OT.includes(this.ValidarRol);
+  }
+
+  /** La solicitud seleccionada está pendiente o parcial: se puede asignar, finalizar o cancelar. */
+  get solicitudActiva() : boolean {
+    return this.detalle?.estado_Id === EstadoSolicitudMaterial.Pendiente || this.detalle?.estado_Id === EstadoSolicitudMaterial.Parcial;
+  }
+
+  get solicitudFinalizada() : boolean {
+    return this.detalle?.estado_Id === EstadoSolicitudMaterial.Finalizada;
+  }
+
+  /** "Ver asignaciones PDF": solo en solicitudes parciales, finalizadas o verificadas que tengan asignaciones. */
+  get puedeVerAsignacionesPdf() : boolean {
+    const estado = this.detalle?.estado_Id;
+    return (estado === EstadoSolicitudMaterial.Parcial || estado === EstadoSolicitudMaterial.Finalizada || estado === EstadoSolicitudMaterial.Verificada)
+      && (this.detalle?.asignaciones?.length ?? 0) > 0;
+  }
+
+  /**
+   * Genera en un solo PDF todas las asignaciones de la solicitud (una hoja por asignación y por tipo de material)
+   * y lo abre en una pestaña nueva después del aviso "PDF generado".
+   */
+  verAsignacionesPdf() {
+    const solicitud = this.detalle;
+    if (!solicitud || this.generandoPdfAsignaciones || !solicitud.asignaciones?.length) return;
+    // De la más antigua a la más reciente; cada asignación es una hoja con sus materias primas y tintas.
+    const consultas = [...solicitud.asignaciones]
+      .filter(a => a.conMateriasPrimas || a.conTintas)
+      .sort((a, b) => a.id - b.id)
+      .map(a => this.servicioAsignacion.obtenerDatosPdf(a.id));
+    if (consultas.length === 0) return this.msj.mensajeAdvertencia('Advertencia', 'Las asignaciones de esta solicitud no tienen materiales para imprimir.');
+
+    this.generandoPdfAsignaciones = true;
+    forkJoin(consultas).pipe(
+      switchMap(lotes => this.servicioPDF.generarBlobAsignacionesSolicitud(lotes, solicitud.id, solicitud.ot)),
+      finalize(() => this.generandoPdfAsignaciones = false),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: pdf => this.abrirPdfConAviso(pdf, solicitud.asignaciones!.length, solicitud.id),
+      error: error => this.notificarError(error, `No fue posible generar el PDF de las asignaciones de la solicitud N° ${solicitud.id}.`, 'Generar PDF de asignaciones'),
     });
   }
 
-  /** Llenar array con los registros de los detalles de las solicitudes de materia prima. */
-  llenarTablaDetalles(data : any) {
-    let arrayIds : any = [];
-
-    let info : any = {
-      'Codigo' : data.codigo,
-      'Solicitud' : data.id,
-      'Id' : data.id_Subcategoria,
-      'Nombre' : data.subcategoria,
-      'Cantidad' : data.cantidad_Pedida,
-      'CantAprobada' : data.cantidad_Entregada || 0,
-      'CantFaltante' : data.cantidad_Restante || 0,
-      'Und_Medida' : data.medida,
-      'Usuario' : data.nombre_Usuario,
-      'EstadoSolicitud' : data.nombre_Estado,
-    }
-
-    this.estadoSolicitud = info.EstadoSolicitud;
-    this.estadoSolicitudId = data.estado;
-    this.usuarioSolicitante = info.Usuario;
-    arrayIds.push(info.Id)
-
-    /*this.ServicioDetAsignacionesMp.GetAsignacionesConSolicitudes(this.solicitudSeleccionada).subscribe(data2 => {
-      for (let i = 0; i < data2.length; i++) {
-        let infoSolicitud : any = {
-          Ident : 0,
-          Id_Mp: data2[i].matPri_Id,
-          Id_Tinta: data2[i].tinta_Id,
-          CantSolicitud : data2[i].cantMP
-        }
-        if (infoSolicitud.Id_Mp != 84) infoSolicitud.Ident = infoSolicitud.Id_Mp;
-        else if (infoSolicitud.Id_Tinta != 2001) infoSolicitud.Ident = infoSolicitud.Id_Tinta;
-
-        if(arrayIds.includes(infoSolicitud.Ident)) info.CantAprobada = infoSolicitud.CantSolicitud;
+  /** Aviso "PDF generado" y, pasado un momento, lo abre en una pestaña nueva (si el navegador la bloquea, lo descarga). */
+  private abrirPdfConAviso(pdf : Blob, cantidad : number, solicitud : number) {
+    const archivo = `Asignaciones solicitud ${solicitud}.pdf`;
+    this.msj.mensajeConfirmacion('¡PDF generado!',
+      `El PDF con ${cantidad} asignación(es) de la solicitud N° ${solicitud} se generó correctamente. A continuación se abrirá en una nueva pestaña.`, 2000);
+    const url = URL.createObjectURL(pdf);
+    setTimeout(() => {
+      if (!window.open(url, '_blank')) {
+        const enlace = document.createElement('a');
+        enlace.href = url;
+        enlace.download = archivo;
+        enlace.click();
+        this.msj.mensajeAdvertencia('Advertencia', `El navegador bloqueó la pestaña nueva, por eso el PDF se descargó (${archivo}). Puede permitir las ventanas emergentes para este sitio.`);
       }
-    });*/
-
-    this.arrayMatPrimas.push(info);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }, 1500);
   }
 
-  /** Indica si hay una solicitud seleccionada (habilita "Ver PDF"). */
-  get haySolicitudSeleccionada() : boolean {
-    return this.solicitudSeleccionada > 0;
+  /** Clase de color de un estado (chips y etiquetas). */
+  claseEstado = (estado : number) : string => ESTADOS_SOLICITUD.find(e => e.id === estado)?.clase ?? 'pendiente';
+
+  // ───────────────────────── Conteo y consulta ─────────────────────────
+
+  /** Consulta cuántas solicitudes hay en cada estado (chips). */
+  cargarConteo() {
+    this.servicioSolicitudes.contarPorEstado().pipe(takeUntil(this.destroy$)).subscribe({
+      next: datos => this.conteo = Object.fromEntries(datos.map(d => [d.estado_Id, d.cantidad])),
+      error: error => this.notificarError(error, 'No se pudo consultar la cantidad de solicitudes por estado.', 'Contar solicitudes por estado'),
+    });
   }
 
-  /** Indica si la solicitud seleccionada está pendiente o parcial (habilita "Crear Asignación", "Finalizar" y "Cancelar"). */
-  get solicitudActiva() : boolean {
-    return this.estadoSolicitudId === EstadoSolicitudMaterial.Pendiente || this.estadoSolicitudId === EstadoSolicitudMaterial.Parcial;
+  /** Chip de estado: muestra todas las solicitudes de ese estado, sin límite de fechas (igual que su conteo). */
+  consultarPorEstado(estado : number) {
+    this.formFiltros.reset({ estados: [estado] });
+    const nombre = ESTADOS_SOLICITUD.find(e => e.id === estado)?.nombre ?? '';
+    this.consultar({ estados: [estado] }, `Todas las solicitudes ${nombre.toLowerCase()}`);
   }
+
+  /**
+   * Consulta con los filtros del formulario. Por N° de solicitud no se aplican las demás condiciones.
+   * Sin ningún filtro se muestran las solicitudes activas, sin límite de fechas.
+   */
+  consultarFiltros() {
+    const form = this.formFiltros.value;
+    const texto = (form.documento ?? '').toString().trim();
+    const textoOT = (form.ot ?? '').toString().trim();
+    if (texto && !/^\d+$/.test(texto)) return this.msj.mensajeAdvertencia('Advertencia', 'El N° de solicitud debe ser un número.');
+    if (textoOT && !/^\d+$/.test(textoOT)) return this.msj.mensajeAdvertencia('Advertencia', 'La OT debe ser un número.');
+    if (form.fechaDoc && form.fechaFinalDoc && moment(form.fechaFinalDoc).isBefore(form.fechaDoc, 'day'))
+      return this.msj.mensajeAdvertencia('Advertencia', 'La fecha final no puede ser anterior a la inicial.');
+
+    if (texto) return this.consultar({ id: Number(texto) }, `Solicitud N° ${texto}`);
+
+    const filtros : FiltrosConsultaSolicitudes = {
+      desde: form.fechaDoc ? moment(form.fechaDoc).format('YYYY-MM-DD') : undefined,
+      hasta: form.fechaFinalDoc ? moment(form.fechaFinalDoc).format('YYYY-MM-DD') : undefined,
+      ot: textoOT ? Number(textoOT) : undefined,
+      estados: form.estados?.length ? form.estados : undefined,
+    };
+    const sinFiltros = !filtros.desde && !filtros.hasta && filtros.ot == null && !filtros.estados;
+    if (sinFiltros) return this.consultar({ estados: ESTADOS_ACTIVOS }, 'Solicitudes activas (pendientes y parciales)');
+
+    const partes : string[] = [];
+    if (filtros.ot != null) partes.push(`OT ${filtros.ot}`);
+    if (filtros.desde || filtros.hasta) partes.push(`creadas ${filtros.desde ? 'desde ' + filtros.desde : ''} ${filtros.hasta ? 'hasta ' + filtros.hasta : ''}`.trim());
+    if (filtros.estados) partes.push(filtros.estados.map(e => ESTADOS_SOLICITUD.find(x => x.id === e)?.nombre.toLowerCase()).join(', '));
+    this.consultar(filtros, `Solicitudes: ${partes.join(' · ')}`);
+  }
+
+  /** Indica si el estado está marcado en los filtros. */
+  estadoFiltrado(estado : number) : boolean {
+    return (this.formFiltros.value.estados ?? []).includes(estado);
+  }
+
+  /** Marca o quita un estado de los filtros (botones de selección múltiple). */
+  alternarEstadoFiltro(estado : number) {
+    const control = this.formFiltros.get('estados')!;
+    const actuales : number[] = control.value ?? [];
+    control.setValue(actuales.includes(estado) ? actuales.filter(e => e !== estado) : [...actuales, estado]);
+  }
+
+  /** Limpia los filtros y vuelve a las solicitudes activas. */
+  limpiarCampos() {
+    this.formFiltros.reset({ estados: [] });
+    this.consultar({ estados: ESTADOS_ACTIVOS }, 'Solicitudes activas (pendientes y parciales)');
+  }
+
+  /**
+   * Consulta la lista. Si la solicitud seleccionada sigue en el resultado, se conserva y se recarga su detalle.
+   * @param filtros Filtros de la consulta.
+   * @param descripcion Texto que explica qué se muestra.
+   * @param conservarSeleccion Mantener la solicitud seleccionada (al refrescar después de una acción).
+   */
+  private consultar(filtros : FiltrosConsultaSolicitudes, descripcion : string, conservarSeleccion : boolean = false) {
+    this.ultimosFiltros = filtros;
+    this.descripcionConsulta = descripcion;
+    this.estadosConsultados = filtros.id != null ? [] : (filtros.estados ?? []);
+    const seleccionada = conservarSeleccion ? this.solicitudSeleccionada?.id : null;
+    if (!conservarSeleccion) this.quitarSeleccion();
+
+    this.consultaLista?.unsubscribe();
+    this.consultaLista = this.servicioSolicitudes.consultarSolicitudes(filtros)
+      .pipe(this.conCarga(), takeUntil(this.destroy$))
+      .subscribe({
+        next: datos => {
+          this.solicitudes = datos;
+          this.tutoriales.iniciarPrimeraVez(ClaveTutorialMovimientosSolicitud, this.AppComponent.storage_Id, () => this.pasosTutorial());
+          if (seleccionada != null) this.solicitudSeleccionada = datos.find(s => s.id === seleccionada) ?? null;
+          // Solicitud que se pidió seleccionar desde la URL (solo en la primera consulta).
+          const porSeleccionar = this.idPorSeleccionar != null ? datos.find(s => s.id === this.idPorSeleccionar) : undefined;
+          this.idPorSeleccionar = null;
+          if (datos.length === 0) this.msj.mensajeAdvertencia('Advertencia', 'No se encontraron solicitudes con esos filtros.');
+          else if (porSeleccionar) this.seleccionar(porSeleccionar);
+          else if (filtros.id != null) this.seleccionar(datos[0]);
+        },
+        error: error => this.notificarError(error, 'No se pudieron consultar las solicitudes de materia prima.', 'Consultar solicitudes de materia prima'),
+      });
+  }
+
+  /** Repite la última consulta y el conteo conservando la solicitud seleccionada, y recarga su detalle. */
+  private refrescar() {
+    this.cargarConteo();
+    const id = this.solicitudSeleccionada?.id ?? this.detalle?.id;
+    this.consultar(this.ultimosFiltros, this.descripcionConsulta, true);
+    if (id != null) this.cargarDetalle(id);
+  }
+
+  /** Texto de las máquinas de una solicitud, p. ej. "3, 5". */
+  textoMaquinas = (s : SolicitudConsultada) : string =>
+    s.maquinas.length === 0 ? String(s.maquinaPrincipal) : s.maquinas.map(m => m.maquina).join(', ');
+
+  // ───────────────────────── Detalle ─────────────────────────
+
+  /** Selecciona una solicitud de la lista y carga su detalle. */
+  seleccionar(solicitud : SolicitudConsultada) {
+    this.solicitudSeleccionada = solicitud;
+    this.cargarDetalle(solicitud.id);
+  }
+
+  private quitarSeleccion() {
+    this.consultaDetalle?.unsubscribe();
+    this.solicitudSeleccionada = null;
+    this.detalle = null;
+    this.datosOT = null;
+    this.cargandoDetalle = false;
+  }
+
+  /**
+   * Carga el detalle de la solicitud y los datos de su OT en BagPro. Si se selecciona otra antes de que
+   * responda, la consulta anterior se cancela para que sus datos no se mezclen.
+   */
+  private cargarDetalle(id : number) {
+    this.consultaDetalle?.unsubscribe();
+    this.cargandoDetalle = true;
+    this.consultaDetalle = this.servicioSolicitudes.obtenerSolicitud(id).pipe(
+      switchMap(detalle => this.servicioBagPro.srvObtenerListaClienteOT_Item(detalle.ot).pipe(
+        map(datos => ({ detalle, ot: datos?.[0] ?? null })),
+        catchError(() => of({ detalle, ot: null })),
+      )),
+      finalize(() => this.cargandoDetalle = false),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: ({ detalle, ot }) => {
+        this.detalle = detalle;
+        this.datosOT = ot ? { cliente: ot.clienteNom, item: ot.clienteItems, referencia: ot.clienteItemsNom, kgOT: Number(ot.datosotKg) || 0 } : null;
+      },
+      error: (error : HttpErrorResponse) => {
+        this.detalle = null;
+        this.notificarError(error, `No se pudo obtener la solicitud N° ${id}.`, 'Consultar detalle de la solicitud');
+      },
+    });
+  }
+
+  /** Total solicitado de la solicitud. */
+  get totalSolicitado() : number {
+    return (this.detalle?.subcategorias ?? []).reduce((t, s) => t + Number(s.solicitado), 0);
+  }
+
+  /** Unidad común de todas las subcategorías, o null si mezclan unidades (entonces no se suman). */
+  get unidadComun() : string | null {
+    const unidades = new Set((this.detalle?.subcategorias ?? []).map(s => s.undMed_Id));
+    return unidades.size === 1 ? [...unidades][0] : null;
+  }
+
+  totalDe = (campo : 'solicitado' | 'entregado' | 'faltante') : number =>
+    (this.detalle?.subcategorias ?? []).reduce((t, s) => t + Number(s[campo]), 0);
+
+  // ───────────────────────── Acciones ─────────────────────────
 
   /**
    * Pide confirmación para finalizar o cancelar la solicitud seleccionada.
-   * @param palabraClave 'finalizar' o 'cancelar'; también es la clave del mensaje.
+   * @param estado Finalizada (5) o Cancelada (4).
    */
-  mostrarEleccion(palabraClave : string) {
-    this.clave = palabraClave;
-    if (!this.solicitudActiva) {
-      this.msj.mensajeAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
-      return;
-    }
-    this.onReject();
-    this.messageService.add({
-      severity:'warn',
-      key: this.claveConfirmacion,
-      summary:'Elección',
-      detail: `Está seguro que desea ${this.clave} la solicitud N° ${this.solicitudSeleccionada}?`,
-      sticky: true
-    });
+  pedirCambioEstado(estado : number) {
+    const solicitud = this.detalle;
+    if (!solicitud || !this.solicitudActiva) return;
+    const accion = estado === EstadoSolicitudMaterial.Finalizada ? 'finalizar' : 'cancelar';
+    const aviso = estado === EstadoSolicitudMaterial.Finalizada && solicitud.estado_Id === EstadoSolicitudMaterial.Pendiente
+      ? ' No tiene material entregado.'
+      : estado === EstadoSolicitudMaterial.Cancelada && solicitud.estado_Id === EstadoSolicitudMaterial.Parcial
+        ? ' Ya tiene material entregado; lo entregado no se devuelve.' : '';
+    this.confirmar(estado === EstadoSolicitudMaterial.Finalizada ? 'Finalizar solicitud' : 'Cancelar solicitud',
+      `¿Está seguro que desea ${accion} la solicitud N° ${solicitud.id} de la OT ${solicitud.ot}?${aviso}`,
+      () => this.cambiarEstado(solicitud.id, estado, accion),
+      estado === EstadoSolicitudMaterial.Finalizada ? 'Finalizar' : 'Cancelar solicitud',
+      estado === EstadoSolicitudMaterial.Finalizada ? 'Cancelar' : 'Volver');
   }
 
-  /** True si el nombre del usuario solicitante quedó recortado con "..." (habilita su tooltip con el nombre completo). */
-  nombreSolicitanteRecortado : boolean = false;
-
-  /**
-   * Mide si el texto del usuario solicitante no cabe (está recortado con "..."). Se llama al entrar el cursor al
-   * contenedor y no al texto: PrimeNG cancela el tooltip que está por salir si `tooltipDisabled` cambia, así que el
-   * valor debe estar listo antes de que el cursor llegue al texto.
-   * @param texto Elemento con el nombre del usuario solicitante.
-   */
-  medirNombreSolicitante(texto : HTMLElement) {
-    this.nombreSolicitanteRecortado = texto.scrollWidth > texto.clientWidth;
-  }
-
-  /** Indica si el rol del usuario puede marcar solicitudes como verificadas (muestra el botón). */
-  get puedeVerificar() : boolean {
-    return ROLES_VERIFICAR_SOLICITUD.includes(Number(this.ValidarRol));
-  }
-
-  /** Indica si la solicitud seleccionada está finalizada (habilita "Marcar como Verificado"). */
-  get solicitudFinalizada() : boolean {
-    return this.estadoSolicitudId === EstadoSolicitudMaterial.Finalizada;
-  }
-
-  /** Pide confirmación para marcar como verificada la solicitud seleccionada. */
-  mostrarVerificacion() {
-    this.clave = 'verificar';
-    if (!this.solicitudFinalizada) {
-      this.msj.mensajeAdvertencia(`Advertencia`, `Solo se pueden verificar solicitudes finalizadas; la solicitud N° ${this.solicitudSeleccionada} está ${this.estadoSolicitud}!`);
-      return;
-    }
-    this.onReject();
-    this.messageService.add({
-      severity:'warn',
-      key: this.claveConfirmacion,
-      summary:'Verificar asignación',
-      detail: `¿Está seguro que la asignación de la solicitud N° ${this.solicitudSeleccionada} está completada? Se marcará como VERIFICADA.`,
-      sticky: true
-    });
-  }
-
-  /** Ejecuta la acción confirmada con "Sí" según la `clave`: verificar, finalizar o cancelar. */
-  confirmarEleccion() {
-    if (this.clave == 'verificar') this.verificarSolicitud();
-    else this.cancelarFinalizarSolicitud();
-  }
-
-  /** Cambia el estado de la solicitud seleccionada a VERIFICADA (55). */
-  verificarSolicitud() {
-    this.onReject();
-    const solicitud_Id : number = this.solicitudSeleccionada;
-    this.cargando = true;
-
-    this.servicioSolicitudesMPExt.verificarSolicitud(solicitud_Id)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.cargando = false)
-      )
+  /** Finaliza o cancela la solicitud con el endpoint que valida el estado y el permiso. */
+  private cambiarEstado(id : number, estado : number, accion : string) {
+    this.servicioSolicitudes.cambiarEstado(id, estado)
+      .pipe(this.conCarga(), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.msj.mensajeConfirmacion(`Confirmación`, `¡La solicitud N° ${solicitud_Id} se marcó como VERIFICADA!`);
-          this.getEstadoSolitudes();
-          this.consultarFiltros();
+          this.msj.mensajeConfirmacion('Confirmación', `¡La solicitud N° ${id} quedó ${accion === 'finalizar' ? 'FINALIZADA' : 'CANCELADA'}!`);
+          this.refrescar();
         },
-        error: (error) => {
-          if (error?.status == 403) this.msj.mensajeAdvertencia(`Advertencia`, `¡Su rol no tiene permiso para verificar solicitudes!`);
-          else if (error?.status == 409 || error?.status == 404) this.msj.mensajeAdvertencia(`Advertencia`, typeof error.error == 'string' ? error.error : `No fue posible verificar la solicitud N° ${solicitud_Id}.`);
-          else this.msj.mensajeError(`Error`, `¡No fue posible verificar la solicitud N° ${solicitud_Id}!`);
-        }
+        error: (error : HttpErrorResponse) => {
+          this.notificarError(error, `No fue posible ${accion} la solicitud N° ${id}.`, accion === 'finalizar' ? 'Finalizar solicitud' : 'Cancelar solicitud', 'PUT');
+          if (error.status === 409) this.refrescar();
+        },
       });
   }
 
-  /** Quitar el mensaje que sale luego de presionar si o no, en el mensaje de cancelar solicitud. */
-  onReject = () => this.messageService.clear(this.claveConfirmacion);
+  /** Pide confirmación para marcar como verificada la solicitud finalizada. */
+  pedirVerificacion() {
+    const solicitud = this.detalle;
+    if (!solicitud || !this.solicitudFinalizada) return;
+    this.confirmar('Verificar asignación',
+      `¿Está seguro que la asignación de la solicitud N° ${solicitud.id} está completada? Se marcará como VERIFICADA.`,
+      () => this.verificarSolicitud(solicitud.id), 'Marcar como verificada');
+  }
 
-  /** Finaliza o cancela (según `clave`) la solicitud seleccionada. */
-  cancelarFinalizarSolicitud() {
-    this.onReject();
-    this.cargando = true;
-    const solicitud_Id : number = this.solicitudSeleccionada;
-
-    this.servicioSolicitudesMPExt.GetId(solicitud_Id).subscribe(data => {
-      let modelo : modelSolicitudMP_Extrusion = {
-        SolMpExt_Id: solicitud_Id,
-        SolMpExt_OT: data.solMpExt_OT,
-        SolMpExt_Maquina: data.solMpExt_Maquina,
-        SolMpExt_Fecha: data.solMpExt_Fecha,
-        SolMpExt_Hora: data.solMpExt_Hora,
-        SolMpExt_Observacion: data.solMpExt_Observacion,
-        Estado_Id: this.clave == 'finalizar' ? 5 : 4,
-        Proceso_Id: data.proceso_Id,
-        Usua_Id: data.usua_Id, 
-        SolMpExt_FechaEstimadaEntrega: data.solMpExt_FechaEstimadaEntrega
-      }
-      this.servicioSolicitudesMPExt.Put(modelo.SolMpExt_Id, modelo)
-      .pipe(
-        finalize(() => this.cargando = false)
-      ).subscribe(updateData => {
-        this.msj.mensajeConfirmacion(`Confirmación`, `Estado de la solicitud N° ${solicitud_Id} actualizado exitosamente!`);
-        this.getEstadoSolitudes();
-        this.consultarFiltros();
-      }, error => {
-        this.cargando = false;
-        this.msj.mensajeError(`Error`, `No fue posible actualizar la solicitud N° ${solicitud_Id}`);
+  private verificarSolicitud(id : number) {
+    this.servicioSolicitudes.verificarSolicitud(id)
+      .pipe(this.conCarga(), takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.msj.mensajeConfirmacion('Confirmación', `¡La solicitud N° ${id} se marcó como VERIFICADA!`);
+          this.refrescar();
+        },
+        error : (error : HttpErrorResponse) => {
+          this.notificarError(error, `No fue posible verificar la solicitud N° ${id}.`, 'Verificar solicitud', 'PUT');
+          if (error.status === 409) this.refrescar();
+        },
       });
+  }
+
+  /**
+   * Genera el PDF de la solicitud seleccionada con los datos de la OT ya consultados. Si la OT no se encontró
+   * en BagPro, el PDF se genera igual indicándolo.
+   */
+  verPdf() {
+    const solicitud = this.detalle;
+    if (!solicitud) return;
+    const ot : DatosOTSolicitudPDF | null = this.datosOT
+      ? { cliente: this.datosOT.cliente, item: this.datosOT.item, referencia: this.datosOT.referencia, kgOT: this.datosOT.kgOT, kgLimite: this.datosOT.kgOT * (1 + ADICIONAL_KG_OT) }
+      : null;
+    this.servicioSolicitudes.obtenerSolicitud(solicitud.id)
+      .pipe(this.conCarga(), takeUntil(this.destroy$))
+      .subscribe({
+        next: (detalle : DetalleSolicitudMaterial) => {
+          if ((detalle.subcategorias ?? []).length === 0) return this.msj.mensajeAdvertencia('Advertencia', `No se encontraron subcategorías para la solicitud N° ${solicitud.id}.`);
+          this.servicioPDF.solicitudMaterialProduccionPDF(detalle, ot);
+          this.msj.mensajeConfirmacion('Confirmación', `Generando el PDF de la solicitud N° ${solicitud.id}; se abrirá en una nueva pestaña.`);
+        },
+        error: error => this.notificarError(error, `No se pudo obtener la información de la solicitud N° ${solicitud.id} para generar el PDF.`, 'Generar PDF de la solicitud'),
+      });
+  }
+
+  /** Abre el popup de asignación; el componente se crea con la solicitud seleccionada. */
+  cargarModalCrearAsignacion() {
+    if (!this.detalle || !this.solicitudActiva) return;
+    this.huboAsignacion = false;
+    this.modalAsignacion = true;
+  }
+
+  /**
+   * El popup creó una asignación y sigue abierto (para la siguiente máquina). No se refresca ahora: recargar el
+   * detalle con el popup abierto podría recrear el componente de asignación; se hace al cerrarlo.
+   */
+  alRegistrarAsignacion() : void {
+    this.huboAsignacion = true;
+  }
+
+  /** Al cerrarse el popup, si se asignó algo, refresca la lista, los conteos y el detalle. */
+  alCerrarModalAsignacion() : void {
+    if (!this.huboAsignacion) return;
+    this.huboAsignacion = false;
+    this.refrescar();
+  }
+
+  // ───────────────────────── Autorizaciones de exceso de la OT ─────────────────────────
+
+  verAutorizacionesPendientes() {
+    this.servicioAutorizaciones.getPendientes()
+      .pipe(this.conCarga(), takeUntil(this.destroy$))
+      .subscribe({
+        next: datos => {
+          this.autorizacionesPendientes = datos;
+          this.dialogoAutorizaciones = true;
+        },
+        error: error => this.notificarError(error, 'No fue posible consultar las autorizaciones pendientes.', 'Consultar autorizaciones de exceso pendientes'),
+      });
+  }
+
+  /**
+   * Aprueba o rechaza una autorización pendiente.
+   * @param autorizacion Autorización seleccionada.
+   * @param aprobar True para aprobar; false para rechazar con el motivo digitado.
+   */
+  responderAutorizacion(autorizacion : AutorizacionExcesoPendiente & { motivoRechazo?: string }, aprobar : boolean) {
+    const motivo = (autorizacion.motivoRechazo || '').trim();
+    if (!aprobar && !motivo) return this.msj.mensajeAdvertencia('Advertencia', 'Debe indicar el motivo del rechazo.');
+
+    const operacion = aprobar
+      ? this.servicioAutorizaciones.aprobar(autorizacion.autEx_Id)
+      : this.servicioAutorizaciones.rechazar(autorizacion.autEx_Id, motivo);
+    operacion.pipe(this.conCarga(), takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.autorizacionesPendientes = this.autorizacionesPendientes.filter(a => a.autEx_Id !== autorizacion.autEx_Id);
+        this.msj.mensajeConfirmacion('Confirmación', `Autorización de la OT ${autorizacion.autEx_OrdenTrabajo} ${aprobar ? 'aprobada' : 'rechazada'}.`);
+      },
+      error: error => this.notificarError(error, 'No fue posible responder la autorización.', 'Responder autorización de exceso', 'PUT'),
     });
   }
 
-  /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
-  cargarModalCrearAsignacion(){
-    if(!this.solicitudActiva) {
-      this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear asignaciones con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
-    } else {
-      this.mensajeAsignacionPendiente = null;
-      this.modalAsignacion = true;
-      this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({ Solicitud : this.solicitudSeleccionada });
-      this.AsignacionMatPrima.consultarSolicitudMaterial(true);
-    }
+  // ───────────────────────── Confirmaciones y errores ─────────────────────────
+
+  /**
+   * Abre el diálogo de confirmación de la página (p-confirmDialog "confirmarReporte"), con el mismo estilo que el resto.
+   * Enter acepta (el botón principal tiene el foco) y Esc o la X cancelan.
+   */
+  private confirmar(titulo : string, detalle : string, accion : () => void, aceptar = 'Continuar', rechazar = 'Cancelar') {
+    (document.activeElement as HTMLElement | null)?.blur();
+    this.confirmationService.confirm({
+      key: 'confirmarReporte',
+      header: titulo,
+      message: detalle,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: aceptar,
+      rejectLabel: rechazar,
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      defaultFocus: 'accept',
+      accept: accion,
+    });
   }
 
   /**
-   * Cierra el popup al completarse la asignación y prepara su mensaje de éxito.
-   * @param mensaje Mensaje de confirmación entregado por el formulario de asignación.
-   * @returns No retorna un valor.
+   * Control de errores de la página: mensaje entendible según la causa y "Ver detalles" con la información técnica.
+   * @param error Error recibido.
+   * @param porDefecto Mensaje si el servidor no explicó la causa.
+   * @param operacion Qué se estaba haciendo (se ve en "Ver detalles").
+   * @param metodo Método HTTP de la operación.
    */
-  finalizarModalAsignacion(mensaje: { summary: string; detail: string }): void {
-    this.mensajeAsignacionPendiente = mensaje;
-    this.modalAsignacion = false;
+  private notificarError(error : unknown, porDefecto : string, operacion : string, metodo : string = 'GET') {
+    this.msj.errorDetallado(error, porDefecto, { operacion, metodo });
   }
-
-  /**
-   * Muestra la confirmación después de terminar la animación de cierre del popup y refresca el listado,
-   * porque la asignación cambia lo entregado y el estado de la solicitud.
-   * @returns No retorna un valor.
-   */
-  alCerrarModalAsignacion(): void {
-    if (!this.mensajeAsignacionPendiente) return;
-
-    const mensaje = this.mensajeAsignacionPendiente;
-    this.mensajeAsignacionPendiente = null;
-    this.msj.mensajeConfirmacion(mensaje.summary, mensaje.detail);
-    this.getEstadoSolitudes();
-    this.consultarFiltros();
-  }
-
-  /** Consultar solicitudes por estado. */
-  consultarPorEstado(estado : number){
-    this.arrayRegistros = [];
-    this.arrayId = [];
-    this.formFiltros.patchValue({estadoDoc : estado});
-    this.cargando = true;
-    this.consultarFiltros();  
-  }
-
-  limpiarTodo(){
-    this.formFiltros.reset();
-    this.arrayRegistros = [];
-    this.arrayMatPrimas = [];
-    this.solicitudSeleccionada = 0;
-    this.usuarioSolicitante = '';
-    this.estadoSolicitud = '';
-    this.estadoSolicitudId = null;
-    this.clave = '';
-  }
-
-  /** Llenar la tabla dependiendo el estado seleccionado */
-  llenarTablaConEstados(datos : any){
-    let info : any = {
-      id : datos.solMpExt_Id,
-      ot : datos.solMpExt_OT,
-      fecha : '', //datos.solMpExt_Fecha.replace('T00:00:00', ''),
-      estadoId : datos.estado_Id,
-      estado : datos.estado,
-    }
-    if(info.estadoId == 5) info.estado = 'Finalizado';
-    if(info.estadoId == 11) info.estado = 'Pendiente';
-    if(info.estadoId == 4) info.estado = 'Cancelado';
-    if(info.estadoId == 12) info.estado = 'Parcial';
-
-    this.arrayRegistros.push(info);
-    this.arrayId.push(info.id)
-  }
-
-   // Funcion que va a hacer que se inicie el tutorial in-app
-  tutorial(){
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
-  }
-
-  /** Calcular la cantidad solicitada de materia prima */
-  calcularCantSolicitada() {
-    let valor : number = 0;
-    for (const solicitud of this.arrayMatPrimas) {
-      valor += solicitud.Cantidad
-    }
-    return valor;
-  }
-
-  /** Calcular la cantidad aprobada de materia prima */
-  calcularCantAprobada() {
-    let valor : number = 0;
-    for (const solicitud of this.arrayMatPrimas) {
-      valor += solicitud.CantAprobada
-    }
-    return valor;
-  }
-
-  /** Calcular la cantidad faltante de materia prima */
-  calcularCantFaltante() {
-    let valor : number = 0;
-    for (const solicitud of this.arrayMatPrimas) {
-      valor += solicitud.CantFaltante
-    }
-    return valor;
-  }
-
-  
 }

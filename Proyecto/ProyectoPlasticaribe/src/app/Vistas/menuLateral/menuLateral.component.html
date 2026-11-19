@@ -17,9 +17,30 @@
           </b>
         </button>
       </p>-->
-      <div class="p-2">
-        <i class="pi pi-envelope font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadCorreosNuevos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="modalCorreos = true" *ngIf="[1,6,2].includes(ValidarRol)"></i>
-        <i class="pi pi-calendar font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadEventos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="mostrarModalCalendario()"></i>
+      <div class="p-2 d-flex align-items-center">
+        <button type="button" class="botonFavorito m-2" *ngIf="vistaActual" (click)="alternarFavoritoActual()" [disabled]="guardandoFavorito"
+                [pTooltip]="esFavorita ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'" tooltipPosition="bottom"
+                [attr.aria-label]="(esFavorita ? 'Quitar de accesos rápidos: ' : 'Agregar a accesos rápidos: ') + vistaActual.nombre"
+                [attr.aria-pressed]="esFavorita">
+          <i class="pi font-size-25" [ngClass]="guardandoFavorito ? 'pi-spin pi-spinner' : (esFavorita ? 'pi-star-fill' : 'pi-star')"></i>
+        </button>
+        <!-- Tickets abiertos y en revisión (solo administradores con permiso a Gestionar Tickets) -->
+        <button type="button" class="botonBadge m-2" *ngIf="ValidarRol == 1 && cantidadesTickets" (click)="irAGestionTickets()"
+                [pTooltip]="tooltipTickets" tooltipPosition="bottom" [attr.aria-label]="tooltipTickets">
+          <i class="pi pi-ticket font-size-25"></i>
+          <p-badge *ngIf="totalTicketsPendientes > 0" [value]="totalTicketsPendientes > 99 ? '99+' : totalTicketsPendientes.toString()"></p-badge>
+        </button>
+        <!-- El badge solo aparece cuando hay algo nuevo (con 0 se oculta) -->
+        <button type="button" class="botonBadge m-2" *ngIf="[1,6,2].includes(ValidarRol)" (click)="modalCorreos = true"
+                [pTooltip]="cantidadCorreosNuevos > 0 ? cantidadCorreosNuevos + ' correo(s) sin leer' : 'Correos recibidos'" tooltipPosition="bottom" aria-label="Correos recibidos">
+          <i class="pi pi-envelope font-size-25"></i>
+          <p-badge *ngIf="cantidadCorreosNuevos > 0" [value]="cantidadCorreosNuevos.toString()"></p-badge>
+        </button>
+        <button type="button" class="botonBadge m-2" (click)="mostrarModalCalendario()"
+                [pTooltip]="tooltipCalendario" tooltipPosition="bottom" [attr.aria-label]="tooltipCalendario">
+          <i class="pi pi-calendar font-size-25"></i>
+          <p-badge *ngIf="cantidadEventos > 0" [value]="cantidadEventos.toString()"></p-badge>
+        </button>
         <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>
         <p-avatar class="cursor" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
       </div>
@@ -98,110 +119,113 @@
   </p-sidebar>
 
   <!-- Menú de Usuario -->
-  <p-sidebar [(visible)]="menuUsuario" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">  
-    <p-accordion class="w-full" [activeIndex]="1">
-      <!-- Editar Usuario -->
-      <p-accordionTab>
-        <ng-template pTemplate="header">
-          <div class="flex align-items-center">
-            <i class="pi pi-user mr-2"></i>
-            <span class="vertical-align-middle">Editar Perfil</span>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <form [formGroup]="FormUsuarios" (ngSubmit)="actualizarUsuario()">
-            <div class="row g-4">
-              <div class="col-12">
-                <span class="p-float-label">
-                  <input formControlName="usuNombre" id="usuarioNombre" type="text" pInputText required/>
-                  <label for="usuarioNombre">Nombre Usuario</label>
-                </span>
-              </div>
-      
-              <div class="col 12">
-                <span class="p-float-label">
-                  <p-password formControlName="usuPassword" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
-                  <label for="pass">Contraseña</label>
-                </span>
-              </div>
+  <p-sidebar [(visible)]="menuUsuario" position="right" styleClass="sidebarUsuario" [style]="{maxWidth : '30rem', minWidth : '27rem'}"
+             ariaCloseLabel="Cerrar menú de usuario">
+    <div class="menuUsuario">
+      <!-- Encabezado: quién tiene la sesión abierta -->
+      <div class="perfilUsuario">
+        <div class="avatarIniciales" aria-hidden="true">{{ inicialesUsuario }}</div>
+        <div class="datosUsuario">
+          <span class="nombreUsuario" [title]="storage_Nombre">{{ storage_Nombre }}</span>
+          <span class="rolUsuario" *ngIf="storage_Rol"><i class="pi pi-id-card"></i>{{ storage_Rol }}</span>
+          <span class="idUsuario">ID {{ storage_Id }}</span>
+        </div>
+      </div>
+
+      <p-accordion class="w-full" [(activeIndex)]="seccionMenuUsuario">
+        <!-- Editar Perfil -->
+        <p-accordionTab>
+          <ng-template pTemplate="header">
+            <div class="encabezadoSeccion">
+              <i class="pi pi-user-edit"></i>
+              <span>Editar perfil</span>
             </div>
-      
-            <div class="mb-4 d-grid gap-2 d-md-flex justify-content-md-center">
-              <button pButton pRipple label="Editar Información" type="submit" icon="pi pi-check" class="p-button-success"></button>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <div class="text-center py-3" *ngIf="cargandoPerfil">
+              <i class="pi pi-spin pi-spinner font-size-25 colorRojo"></i>
             </div>
-          </form>
-        </ng-template>
-      </p-accordionTab>
-      <!-- Eventos -->
-      <p-accordionTab>
-        <ng-template pTemplate="header">
-          <div class="flex align-items-center">
-            <i class="pi pi-calendar mr-2"></i>
-            <span class="vertical-align-middle">Eventos</span>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <div class="row eventos mt-2" *ngFor="let item of eventosMes">
-            <div class="col-6">
-              <div class="row calendarioFecha">
-                <div class="col-12 contenido dia d-grid d-md-flex justify-content-md-center">
-                  <span>{{item.Dia}}</span>
-                  <span>{{item.Mes}}</span>
+            <form [formGroup]="FormUsuarios" (ngSubmit)="actualizarUsuario()" *ngIf="!cargandoPerfil" autocomplete="off">
+              <div class="row g-4 pt-3">
+                <div class="col-12">
+                  <span class="p-float-label">
+                    <input formControlName="usuNombre" id="usuarioNombre" type="text" pInputText maxlength="50" class="mayusculas"/>
+                    <label for="usuarioNombre">Nombre de usuario</label>
+                  </span>
+                  <small class="ayudaCampo" [class.errorCampo]="campoInvalido('usuNombre')">
+                    {{ campoInvalido('usuNombre') ? 'El nombre es obligatorio.' : (FormUsuarios.value.usuNombre?.length || 0) + '/50' }}
+                  </small>
+                </div>
+
+                <div class="col-12">
+                  <span class="p-float-label">
+                    <p-password formControlName="usuPassword" [feedback]="false" inputId="usuarioPassword" [toggleMask]="true"
+                                [maxLength]="25" autocomplete="new-password"></p-password>
+                    <label for="usuarioPassword">Contraseña</label>
+                  </span>
+                  <small class="ayudaCampo errorCampo" *ngIf="campoInvalido('usuPassword')">La contraseña es obligatoria.</small>
                 </div>
               </div>
-            </div>
-            <div class="col-6 m-auto tituloEvento d-grid d-md-flex justify-content-md-start">
-              <span>{{item.Nombre}}</span>
-            </div>
-          </div>
 
-          <div *ngIf="eventosMes.length == 0">
-            <p class="font-size-20 colorRojo">¡No hay eventos por mostrar!</p>
-          </div>
-        </ng-template>
-      </p-accordionTab>
-      <!-- Cerrar Sesión -->
-      <p-accordionTab (click)="confirm($event)">
-        <ng-template pTemplate="header">
-          <div class="flex align-items-center">
-            <i class="pi pi-fw pi-power-off mr-2"></i>
-            <span class="vertical-align-middle">Cerrar Sesión</span>
-          </div>
-        </ng-template>      
-        <ng-template pTemplate="content">
-          <p-confirmPopup></p-confirmPopup>
-        </ng-template>
-      </p-accordionTab>
-    </p-accordion>
+              <div class="accionesPerfil">
+                <button pButton pRipple type="button" label="Descartar" icon="pi pi-undo" class="p-button-text p-button-secondary"
+                        [disabled]="FormUsuarios.pristine || guardandoPerfil" (click)="cargarPerfil()"></button>
+                <button pButton pRipple type="submit" label="Guardar cambios" icon="pi pi-save" class="p-button-danger"
+                        [loading]="guardandoPerfil" [disabled]="FormUsuarios.pristine || guardandoPerfil"></button>
+              </div>
+            </form>
+          </ng-template>
+        </p-accordionTab>
+        <!-- Eventos -->
+        <p-accordionTab>
+          <ng-template pTemplate="header">
+            <div class="encabezadoSeccion">
+              <i class="pi pi-calendar"></i>
+              <span>Eventos del mes</span>
+              <span class="contadorSeccion" *ngIf="cantidadEventos > 0">{{ cantidadEventos }}</span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <app-ListaEventos [eventos]="eventosMes" mensajeVacio="No hay eventos de aquí a fin de mes."
+                              (seleccionar)="mostrarModalCalendario()"></app-ListaEventos>
+            <button pButton pRipple type="button" label="Abrir calendario" icon="pi pi-external-link"
+                    class="p-button-text p-button-danger w-full mt-2" (click)="mostrarModalCalendario()"></button>
+          </ng-template>
+        </p-accordionTab>
+      </p-accordion>
+
+      <!-- Cerrar Sesión: es una acción, no una sección, por eso va como botón al pie (sin confirmación) -->
+      <div class="pieMenuUsuario">
+        <button pButton pRipple type="button" label="Cerrar sesión" icon="pi pi-power-off"
+                class="p-button-danger p-button-outlined w-full" (click)="cerrarSesion()"></button>
+      </div>
+    </div>
   </p-sidebar>
 
   <!-- Modal de Calendario -->
-  <p-dialog [(visible)]="modalCalendario" [style]="{width: '800px', margin: 'auto', height: '830px'}" [breakpoints]="{ '960px': '400px' }" header="Eventos Calendario" [modal]="true">
+  <p-dialog [(visible)]="modalCalendario" [style]="{width: '92vw', maxWidth: '1300px'}" [breakpoints]="{'900px': '100vw'}"
+            header="Calendario de eventos" [modal]="true" [draggable]="false" [resizable]="false">
     <ng-template pTemplate="content">
       <app-Calendario></app-Calendario>
     </ng-template>
   </p-dialog>
 
   <!-- Eventos del Día -->
-  <p-dialog [(visible)]="eventosDia" [style]="{width: '800px', margin: 'auto', height: '830px'}" [modal]="true" [breakpoints]="{ '960px': '400px' }" header="Eventos del Día">
-    <ng-template pTemplate="content">
-      <div class="card flex justify-content-center mb-3" *ngFor="let item of eventosHoy">
-        <p-fieldset legend="{{item.Nombre}}">
-          <p class="p-2 font-size-20">{{item.Descripcion}}</p>
-          <span>{{item.Fecha_Hora_Inicio}} - {{item.Fecha_Hora_Fin}}</span>
-        </p-fieldset>
-      </div>
-    </ng-template>
+  <p-dialog [(visible)]="eventosDia" [style]="{width: '32rem'}" [breakpoints]="{'640px': '94vw'}" [modal]="true"
+            [draggable]="false" [resizable]="false" header="Eventos de hoy">
+    <app-ListaEventos [eventos]="eventosHoy" [detallado]="true" (seleccionar)="mostrarModalCalendario()"></app-ListaEventos>
     <ng-template pTemplate="footer">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-success" type="button" label="No Volver a Mostrar" icon="pi pi-ban" (click)="noMostrarMasDialogoEventosDia('no')"></button>
-        <button pButton class="p-button-secondary" type="button" label="Cerrar" icon="pi pi-times" (click)="noMostrarMasDialogoEventosDia('si')"></button>
+      <div class="d-flex flex-wrap gap-2 justify-content-end">
+        <button pButton class="p-button-text p-button-secondary" type="button" label="No volver a mostrar" icon="pi pi-ban" (click)="noMostrarMasDialogoEventosDia('no')"></button>
+        <button pButton class="p-button-text p-button-secondary" type="button" label="Cerrar" icon="pi pi-times" (click)="noMostrarMasDialogoEventosDia('si')"></button>
+        <button pButton class="botonVerCalendario" type="button" label="Ver calendario" icon="pi pi-calendar" (click)="mostrarModalCalendario()"></button>
       </div>
     </ng-template>
   </p-dialog>
 
-  <!-- Correos de Ventas -->
-  <p-dialog [(visible)]="modalCorreos" [style]="{width: '90%', margin: 'auto', height: '80%'}" [modal]="true" header="Correos Recibidos">
+  <!-- Correos de la página web -->
+  <p-dialog [(visible)]="modalCorreos" [style]="{width: '90vw', maxWidth: '1400px'}" [breakpoints]="{'900px': '100vw'}"
+            [modal]="true" [draggable]="false" [resizable]="false" header="Correos de la página web">
     <ng-template pTemplate="content">
       <app-Correos_PaginaWeb></app-Correos_PaginaWeb>
     </ng-template>

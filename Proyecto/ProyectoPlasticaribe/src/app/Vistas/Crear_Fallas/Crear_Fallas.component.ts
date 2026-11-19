@@ -77,7 +77,7 @@ export class Crear_FallasComponent implements OnInit {
         Hora_Creacion: moment().format('HH:mm:ss'),
       }
       this.svTechnicalFails.Post(fail).subscribe(data => {
-        this.svMsjs.mensajeConfirmacion('Falla creada correctamente!');
+        this.svMsjs.mensajeConfirmacion('OK!', 'Falla creada correctamente!');
         this.load = false;
         this.cmDeleteRolls.modalFails = false;
         this.cmDeleteRolls.getFails();

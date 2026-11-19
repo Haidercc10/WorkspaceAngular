@@ -45,6 +45,10 @@ export class SrvRollosEliminadosService {
   getRemovedRolls = (fecha1: any, fecha2 : any, ruta : string):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/getRemovedRolls/${fecha1}/${fecha2}${ruta}`);
 
   Post = (data : modelRollosDesechos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Rollo_Desecho', data);
+
+  /** TEMPORAL: rollos eliminados en el rango que siguen eliminados, para reenviar la observación a BagPro. */
+  getDeletedRollsForBagPro = (date1: string, date2: string): Observable<{ roll: number, process: string, ot: number }[]> =>
+    this.http.get<{ roll: number, process: string, ot: number }[]>(`${this.rutaPlasticaribeAPI}/Rollo_Desecho/getDeletedRollsForBagPro/${date1}/${date2}`);
 }
 
 

@@ -10,6 +10,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardVentasVendedor as defaultSteps } from 'src/app/data';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 
 @Component({
@@ -51,9 +52,9 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.facturasOptions.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.facturasOptions.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.facturasOptions.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -130,13 +131,13 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
         });
       }
       setTimeout(() => {
-        let color: string = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+        const color: string = colorSerieGrafica(this.facturasData.datasets.length, this.modoSeleccionado);
         let info: any = {
           label: `Año ${this.anioSeleccionado} - Vendedor ${vendedor}`,
           data: [ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dic],
           yAxisID: 'y',
-          borderColor: color.substring(0, 4),
-          backgroundColor: color.substring(0, 4) + "2",
+          borderColor: color,
+          backgroundColor: rellenoSerieGrafica(color),
           pointStyle: 'circle',
           pointRadius: 10,
           pointHoverRadius: 15,
@@ -189,14 +190,14 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     forkJoin(consultas).subscribe({
       next: (resultados) => {
 
-        const color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+        const color: string = colorSerieGrafica(this.facturasData.datasets.length, this.modoSeleccionado);
 
         const info = {
           label: `Año ${this.anioSeleccionado} - Vendedor ${vendedor}`,
           data: resultados, // Enero a Diciembre
           yAxisID: 'y',
-          borderColor: color.substring(0, 4),
-          backgroundColor: color.substring(0, 4) + "2",
+          borderColor: color,
+          backgroundColor: rellenoSerieGrafica(color),
           pointStyle: 'circle',
           pointRadius: 10,
           pointHoverRadius: 15,
@@ -288,13 +289,13 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     this.facturasOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 20 },
             callback: (value: any) => {
               const label = this.facturasData.labels[value];
@@ -302,14 +303,14 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 20 } },
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
       },
       datalabels: { anchor: 'end', align: 'end' }

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, finalize, of, shareReplay, switchMap, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 /** Ids de la tabla Estados que usa un ticket. */
@@ -74,13 +74,53 @@ export interface TicketDetalle {
 
 export interface CantidadesTickets { abiertos: number; enRevision: number; resueltosMes: number; }
 
+/**
+ * Usuario que gestiona los tickets y recibe el aviso de tickets abiertos al entrar a Inicio.
+ * Para que el aviso aplique a todos los administradores (rol 1), quitar la condición que usa esta constante en PaginaPrincipal.
+ */
+export const USUARIO_AVISO_TICKETS = 7379;
+
+/**
+ * Llave de sessionStorage que marca que el aviso de tickets ya se mostró en la sesión actual.
+ * El logout limpia sessionStorage, así que el aviso vuelve a salir en el siguiente inicio de sesión.
+ */
+const LLAVE_AVISO_TICKETS = 'avisoTicketsMostrado';
+
 @Injectable({
   providedIn: 'root'
 })
 export class TicketsService {
   readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
+  /** Últimas cantidades de soporte conocidas (null = aún no consultadas o el rol no es soporte). Alimenta el botón de tickets de la barra superior. */
+  private readonly cantidadesSoporte = new BehaviorSubject<CantidadesTickets | null>(null);
+  readonly cantidadesSoporte$ = this.cantidadesSoporte.asObservable();
+  private consultaSoporteEnCurso : Observable<CantidadesTickets | null> | null = null;
+
   constructor(private http : HttpClient) { }
+
+  /** Indica si el aviso de tickets ya se mostró en esta sesión. */
+  static avisoYaMostrado() : boolean {
+    try { return sessionStorage.getItem(LLAVE_AVISO_TICKETS) === '1'; } catch { return false; }
+  }
+
+  static marcarAvisoMostrado() {
+    try { sessionStorage.setItem(LLAVE_AVISO_TICKETS, '1'); } catch { /* sin almacenamiento: el aviso podría repetirse al recargar */ }
+  }
+
+  /**
+   * Consulta las cantidades solo si el rol es soporte: /cantidades responde 403 a los demás y el interceptor cierra sesión con 403.
+   * Si la barra superior e Inicio la piden a la vez, comparten la misma petición. Emite null si no es soporte o si falla.
+   */
+  cargarCantidadesSoporte() : Observable<CantidadesTickets | null> {
+    this.consultaSoporteEnCurso ??= this.getPermisos().pipe(
+      switchMap(p => p.esSoporte ? this.getCantidades() : of(null)),
+      catchError(() => of(null)),
+      finalize(() => this.consultaSoporteEnCurso = null),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
+    return this.consultaSoporteEnCurso;
+  }
 
   getTipos = () : Observable<TipoTicket[]> => this.http.get<TipoTicket[]>(`${this.rutaPlasticaribeAPI}/Tickets/tipos`);
 
@@ -112,7 +152,9 @@ export class TicketsService {
     this.http.get<TicketListado[]>(`${this.rutaPlasticaribeAPI}/Tickets/gestion`,
       { params: paramsRango(fechaInicio, fechaFin).set('incluirFinalizados', String(incluirFinalizados)) });
 
-  getCantidades = () : Observable<CantidadesTickets> => this.http.get<CantidadesTickets>(`${this.rutaPlasticaribeAPI}/Tickets/cantidades`);
+  /** Solo soporte (403 para los demás). Cada respuesta actualiza también el badge de la barra superior. */
+  getCantidades = () : Observable<CantidadesTickets> => this.http.get<CantidadesTickets>(`${this.rutaPlasticaribeAPI}/Tickets/cantidades`)
+    .pipe(tap(c => this.cantidadesSoporte.next(c)));
 
   getDetalle = (codigo : number) : Observable<TicketDetalle> => this.http.get<TicketDetalle>(`${this.rutaPlasticaribeAPI}/Tickets/${codigo}`);
 

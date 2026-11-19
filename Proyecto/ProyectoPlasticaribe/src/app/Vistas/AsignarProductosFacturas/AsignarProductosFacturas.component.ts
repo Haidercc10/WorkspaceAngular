@@ -395,7 +395,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           }
           this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
             this.cargando = false;
-            this.mensajeService.mensajeConfirmacion(`¡Asignación Registrada!`,`¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`)
+            this.mensajeService.mensajeConfirmacion('OK!',`¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`)
           });
         }
       });

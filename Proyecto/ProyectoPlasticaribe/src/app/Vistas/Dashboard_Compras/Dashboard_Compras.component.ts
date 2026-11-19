@@ -9,6 +9,7 @@ import { defaultStepOptions, stepsDashboardCompras as defaultSteps } from 'src/a
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_Compras',
@@ -58,9 +59,9 @@ export class Dashboard_ComprasComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.opcionesGrafica.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.opcionesGrafica.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.opcionesGrafica.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -131,13 +132,13 @@ export class Dashboard_ComprasComponent implements OnInit {
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 20 },
             callback: function(value : any, index : any, values : any) {
               const label = labels[index];
@@ -145,14 +146,14 @@ export class Dashboard_ComprasComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' },
+          ticks: {  color: colorTextoGrafica(this.modoSeleccionado), font: { size: 20 } },
+          grid: { color: COLOR_REJILLA_GRAFICA },
           min : 0
         },
       },
@@ -260,13 +261,10 @@ export class Dashboard_ComprasComponent implements OnInit {
 
   // Funcion que va a cargar los datos de la grafica
   llenarGraficaPlasticaribe(data : any [], id : string){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info = {
       label: `Año - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -275,13 +273,13 @@ export class Dashboard_ComprasComponent implements OnInit {
     };
     if (id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado)) {
       this.anioGraficadoPlasticaribe.push(this.anioSeleccionado);
-      this.graficaComprasPlasticaribe.datasets.push(info);
+      this.agregarSerie(this.graficaComprasPlasticaribe, info);
     } else if (id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado)) {
       this.anioGraficadoInvergoal.push(this.anioSeleccionado);
-      this.graficaComprasInvergoal.datasets.push(info);
+      this.agregarSerie(this.graficaComprasInvergoal, info);
     } else if (id == '900458314' && !this.anioGraficadoInversuez.includes(this.anioSeleccionado)) {
       this.anioGraficadoInversuez.push(this.anioSeleccionado);
-      this.graficaComprasInversuez.datasets.push(info);
+      this.agregarSerie(this.graficaComprasInversuez, info);
     }
   }
 
@@ -301,5 +299,11 @@ export class Dashboard_ComprasComponent implements OnInit {
         if(registros == data.length) this.cargando = false;
       }
     });
+  }
+
+  // Agrega una serie a la gráfica con el siguiente color de la paleta de la marca
+  private agregarSerie(grafica: any, info: any) {
+    const color: string = colorSerieGrafica(grafica.datasets.length, this.modoSeleccionado);
+    grafica.datasets.push({ ...info, borderColor: color, backgroundColor: rellenoSerieGrafica(color) });
   }
 }

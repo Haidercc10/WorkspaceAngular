@@ -20,6 +20,8 @@ export class AreaService {
 
   srvGuardar = (data : modelAreas): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Areas', data);
 
+  srvActualizar = (id : number, data : modelAreas): Observable<any> => this.http.put(this.rutaPlasticaribeAPI + `/Areas/${id}`, data);
+
   getNombre = (dato : any) : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Areas/getNombreArea/${dato}`);
 
   likeGetNombreArea = (dato : any) : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Areas/getNombreAreaXLike/${dato}`);

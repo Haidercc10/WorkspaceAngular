@@ -15,7 +15,7 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosSolicitudesRollos as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
@@ -252,7 +252,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
           if (estado == 5) this.cambiarBodegaActualRollo();
           else {
             this.limpiarCampos();
-            this.msj.mensajeConfirmacion(`¡Se ha cambiado el estado de la solicitud satisfactoriamente!`, ``);
+            this.msj.mensajeConfirmacion('OK!', `¡Se ha cambiado el estado de la solicitud satisfactoriamente!`);
           }
         }, err => {
           this.msj.mensajeError(`No se ha podido cambiado a ${estadoNombre} solicitud!`, `¡${err.error}!`);
@@ -293,7 +293,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
             numDatos += 1;
             if (numDatos == this.detallesSolicitud.length) {
               this.limpiarCampos();
-              this.msj.mensajeConfirmacion(`¡Se ha cambiado el estado de la solicitud satisfactoriamente!`, ``);
+              this.msj.mensajeConfirmacion('OK!', `¡Se ha cambiado el estado de la solicitud satisfactoriamente!`);
             } else this.cargando = true;
           })
         }
@@ -362,7 +362,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
               {
                 margin: [20, 8, 20, 0],
                 columns: [
-                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 30] },
+                  { image : logoNuevoParaPdf, width : 150, fit : [150, 30], margin: [20, 30] },
                   {
                     width: 300,
                     alignment: 'center',

@@ -122,7 +122,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     });
   }
 
-  /** Consulta para cargar información de las solicitudes de materia prima.  */
+  /** Consulta para cargar información de las requisiciones de materia prima.  */
   consultarFiltros(){
     this.cargando = true;
     this.arrayRegistros = [];
@@ -246,7 +246,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     setTimeout(() => { this.cargando = false; }, 1500);
   }
 
-  /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
+  /** Llenar array con los registros del encabezado de las requisiciones de materia prima. */
   llenarTabla(datos : any){
     let info : any = {
       id : datos.consecutivo,
@@ -301,7 +301,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   crearPDF(solicitud_Id : number){
     this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud_Id).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
-        let titulo : string = `Solicitud de Materia Prima N° ${datos_orden[i].consecutivo}`;
+        let titulo : string = `Requisición de Materia Prima N° ${datos_orden[i].consecutivo}`;
         let content : any [] = this.contenidoPDF(datos_orden[i]);
         this.creacionPDFService.formatoPDF(titulo, content);
         setTimeout(() => this.cargando = false, 3000);
@@ -389,7 +389,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     });
   }
 
-  /** Llenar array con los registros de los detalles de las solicitudes de materia prima. */
+  /** Llenar array con los registros de los detalles de las requisiciones de materia prima. */
   llenarTablaDetalles(data : any) {
     let arrayIds : any = [];
     let arrayOc : any = [];
@@ -451,7 +451,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   /** Quitar el mensaje que sale luego de presionar si o no, en el mensaje de cancelar solicitud. */
   onReject = () => this.messageService.clear(this.clave);
 
-  /** Función que cancelará una solicitud de materia prima y sus detalles. */
+  /** Función que cancelará una requisición de materia prima y sus detalles. */
   cancelarFinalizarSolicitud(solicitud_Id : number) {
     this.onReject();
     this.cargando = true;
@@ -512,7 +512,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearOrden(){
     if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') {
-      this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
+      this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a requisiciones de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalOc = true;
       this.OrdenCompra.solicitud = true;

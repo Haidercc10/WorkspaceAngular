@@ -121,7 +121,7 @@ export class CrearTintasComponent implements OnInit, OnDestroy {
       Precio: valores.TintaPrecio,
     }).pipe(finalize(() => this.guardando = false)).subscribe({
       next: data => {
-        this.mensajeService.mensajeConfirmacion('¡Tinta creada!', `${data.tinta_Nombre} quedó con el Id ${data.tinta_Id}.`);
+        this.mensajeService.mensajeConfirmacion('OK!', `Tinta creada: ${data.tinta_Nombre} quedó con el Id ${data.tinta_Id}.`);
         this.creada.emit(data);
         this.limpiarCampos();
       },

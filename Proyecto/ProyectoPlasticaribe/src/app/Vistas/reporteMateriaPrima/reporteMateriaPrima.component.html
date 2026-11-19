@@ -541,7 +541,7 @@
                 <th class="text-center" id="stock" pSortableColumn="stock" pReorderableColumn scope="col">Stock
                   <p-sortIcon field="stock"></p-sortIcon>
                 </th>
-                <th class="text-center" id="reservada" pSortableColumn="reservada" pReorderableColumn scope="col" pTooltip="Cantidad solicitada y aún no asignada en las solicitudes de material de producción pendientes o parciales" tooltipPosition="top">Cant. Reservada
+                <th class="text-center" id="reservada" pSortableColumn="reservada" pReorderableColumn scope="col" pTooltip="Cantidad solicitada y aún no asignada en las solicitudes de materia prima pendientes o parciales" tooltipPosition="top">Cant. Reservada
                   <p-sortIcon field="reservada"></p-sortIcon>
                 </th>
                 <th class="text-center" id="disponible" pSortableColumn="disponible" pReorderableColumn scope="col" pTooltip="Stock menos la cantidad reservada" tooltipPosition="top">Cant. Disponible
@@ -685,7 +685,7 @@
             <p-dropdown formControlName="subcategory" inputId="editarSubcategoria" [options]="subcategoriasEdicion" optionValue="subCatMP_Id" optionLabel="subCatMP_Nombre" [autoDisplayFirst]="false" [filter]="true" filterBy="subCatMP_Nombre" [showClear]="true" appendTo="body" emptyMessage="La categoría no tiene subcategorías"></p-dropdown>
             <label for="editarSubcategoria">Subcategoría</label>
           </span>
-          <small class="ayuda aviso" *ngIf="FormEdicionMateriaPrima.value.subcategory == null"><i class="pi pi-exclamation-triangle"></i> Sin subcategoría no aparece en Subcategorías ni en las solicitudes de material.</small>
+          <small class="ayuda aviso" *ngIf="FormEdicionMateriaPrima.value.subcategory == null"><i class="pi pi-exclamation-triangle"></i> Sin subcategoría no aparece en Subcategorías ni en las solicitudes de materia prima.</small>
         </div>
 
         <!-- Ancho (BOPP) -->

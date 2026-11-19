@@ -10,7 +10,9 @@
     <!-- Navegador fin de parte superior -->
     <div class="container-fluid">
       <div class="mb-4 Titulo">
-        <h2 id="eliminar" [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}">Eliminar Rollos Producción</h2>
+        <h2 id="eliminar" [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}">Eliminar Rollos Producción
+          <p-button class="boton-tutorial-titulo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+        </h2>
       </div>
       <div class="mb-4">
         <hr class="colorLinea">
@@ -19,28 +21,32 @@
   </div>
   
   <p-card>
-  
-    <!--<div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-      <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-    </div>-->
 
-    <!--Crear Falla-->
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-      <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
-    </div>
-  
-    <div class="mb-5">
-      <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-search"></i> Consultar Rollos</h4>
+    <!-- Subtítulo y botones en la misma fila (igual que en Orden de Trabajo) -->
+    <div class="header-actions mb-4">
+      <!-- subtitulo -->
+      <div class="header-actions__title">
+        <h4 class="mb-0" [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-search"></i> Consultar Rollos</h4>
+      </div>
+
+      <!-- Botones -->
+      <div class="header-actions__buttons">
+        <!-- TEMPORAL: reenvía a BagPro la observación de los rollos eliminados en el rango de fechas (solo administradores) -->
+        <button *ngIf="isAdmin" pButton pRipple data-tutorial="reenviarBagPro" class="p-button-warning p-button-outlined" icon="pi pi-refresh" label="Reenviar observación BagPro" [disabled]="load" (click)="resendBagProObservation()"
+                pTooltip="Temporal: registra en BagPro la observación de los rollos eliminados en el rango de fechas seleccionado." tooltipPosition="top"></button>
+        <!--Crear Falla-->
+        <button pButton pRipple data-tutorial="crearFalla" class="p-button-success" icon="pi pi-plus" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+      </div>
     </div>
   
     <!-- Formulario -->
     <form [formGroup]="form">
   
-      <div class="mb-3" id="formulario">
+      <div class="mb-3" id="formulario" #formElement>
         <div class="row g-3">
 
-          <!--Rango fechas-->  
-          <div class="col-sm-12 col-md-6 col-xl-2">
+          <!--Rango fechas-->
+          <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="fechas">
             <span class="p-float-label">
               <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true"></p-calendar>
               <label for="fecha">Rango de Fechas</label>
@@ -48,47 +54,52 @@
           </div>  
 
           <!--* Usuario -->
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
+          <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="usuario">
+            <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+              <i class="pi pi-user"></i>
               <p-dropdown formControlName="user" inputId="user" [options]="users" optionLabel="usua_Nombre" optionValue="usua_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
               <label for="user">Usuario Autoriza*</label>
             </span>
           </div>
 
           <!-- Bodega -->
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
+          <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="bodega">
+            <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+              <i class="pi pi-building"></i>
               <p-dropdown formControlName="Bodega" inputId="Bodega" [autoDisplayFirst]="false" [options]="process" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
               <label for="Bodega">Bodega</label>
             </span>
           </div>
 
           <!-- Motivo -->
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
+          <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="motivo">
+            <span class="p-input-icon-left p-dropdown-icon-left p-float-label">
+              <i class="pi pi-exclamation-triangle"></i>
               <p-dropdown formControlName="Falla" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
               <label for="Falla">Motivo*</label>
             </span>
           </div>
   
           <!-- OT -->
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
+          <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="ot">
+            <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+              <i class="pi pi-file"></i>
               <p-inputNumber formControlName="OT" id="ot" (keyup.enter)="searchRolls()" [useGrouping]="false"></p-inputNumber>
               <label for="ot">OT</label>
             </span>
           </div>
   
           <!--Rollo -->
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
+          <div class="col-sm-12 col-md-6 col-xl-2" data-tutorial="rollo">
+            <span class="p-input-icon-left p-inputnumber-icon-left p-float-label">
+              <i class="pi pi-hashtag"></i>
               <p-inputNumber formControlName="Rollo" id="Rollo" (keyup.enter)="searchRolls()" [useGrouping]="false"></p-inputNumber>
               <label for="Rollo">N° Rollo</label>
             </span>
           </div>
 
           <!-- Observacion -->
-          <div class="col-sm-12 col-md-6 col-xl-12">
+          <div class="col-sm-12 col-md-6 col-xl-12" data-tutorial="observacion">
             <span class="p-float-label">
               <textarea formControlName="Observacion" id="Observacion" [rows]="1" pInputTextarea></textarea>
               <label for="textarea">Observación*</label>
@@ -99,8 +110,8 @@
       </div>
   
       <!-- Botones -->
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" [disabled]="!form.valid" (click)="searchRolls()"  id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" pTooltip="Si no llenas ningún filtro se cargarán todos los bultos pesados hoy."></button>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center" data-tutorial="botonesConsulta">
+        <button pButton class="p-button-danger" [disabled]="load" (click)="searchRolls()" id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" pTooltip="Consulta los rollos disponibles en el rango de fechas. Motivo, observación y usuario solo son obligatorios para eliminar."></button>
         <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos"  (click)="clearLabels()" icon="pi pi-eraser"></button>
         <button pButton class="p-button-secondary p-button-outlined" id="limpiarTodo" type="button" label="Limpiar Todo" (click)="clearAll()" icon="pi pi-eraser"></button>
       </div>
@@ -117,8 +128,8 @@
     </div>
   
     <!-- tabla 1-->
-    <div class="mb-3" *ngIf="!load">
-      <div class="row g-3 font-size-14" id="tabla1">
+    <div class="mb-3">
+      <div class="row g-3 font-size-14" id="tabla1" data-tutorial="tablaConsultados">
         <p-table
             #dt1
             [value]="rolls"
@@ -127,11 +138,11 @@
             styleClass="p-datatable-sm"
             responsiveLayout="scroll"
             [rowHover]="true"
-            dataKey="numeroRollo_BagPro"
+            dataKey="key"
             [(selection)]="rollsTableSelection"
             [scrollable]="true"
             scrollHeight="25rem"
-            *ngIf="!load">
+            >
           <ng-template pTemplate="header">
             <tr>
                 <th></th>
@@ -172,9 +183,9 @@
                 <td class="text-center">{{roll.ot}}</td>
                 <td class="text-center">{{roll.prod_Id}}</td>
                 <td>{{roll.prod_Nombre}}</td>
-                <td class="text-center">{{ ['Paquete', 'Und'].includes(roll.presentacion) ? ['Sellado'].includes(roll.proceso_Nombre) ? roll.cantidad : roll.peso_Neto : roll.peso_Neto | number: '1.2-2'}}</td>
+                <td class="text-center">{{quantity(roll) | number: '1.2-2'}}</td>
                 <td class="text-center">{{roll.presentacion}}</td>
-                <td class="text-center">{{roll.fecha | date : 'dd/MM/YYYY'}}</td>
+                <td class="text-center">{{roll.fecha | date : 'dd/MM/yyyy'}}</td>
                 <td class="text-center">{{roll.proceso_Nombre}}</td>
             </tr>
           </ng-template>
@@ -193,7 +204,7 @@
   
     <!--Tabla 2 -->
     <div class="mb-3">
-      <div class="row g-3" id="tabla2">
+      <div class="row g-3" id="tabla2" data-tutorial="tablaEliminar">
         <p-table
           #dt2
           styleClass="p-datatable-sm"
@@ -201,11 +212,11 @@
           [resizableColumns]="true"
           columnResizeMode="expand"
           [value]="rollsInsert"
-          dataKey="numeroRollo_BagPro"
+          dataKey="key"
           [(selection)]="rollsInsertTableSelection"
           [scrollable]="true"
           scrollHeight="25rem"
-          *ngIf="!load">
+          >
           <ng-template pTemplate="header">
             <tr>
                 <th></th>
@@ -246,7 +257,7 @@
               <td class="text-center">{{rollsIns.ot}}</td>
               <td class="text-center">{{rollsIns.prod_Id}}</td>
               <td>{{rollsIns.prod_Nombre}}</td>
-              <td class="text-center">{{['Paquete', 'Und'].includes(rollsIns.presentacion) ? rollsIns.cantidad : rollsIns.peso_Neto | number: '1.2-2'}}</td>
+              <td class="text-center">{{quantity(rollsIns) | number: '1.2-2'}}</td>
               <td class="text-center">{{rollsIns.presentacion}}</td>
               <td class="text-center">{{rollsIns.fecha | date : 'dd/MM/yyyy' }}</td>
               <td class="text-center">{{rollsIns.proceso_Nombre}}</td>
@@ -256,18 +267,18 @@
       </div>
     </div>
   
-    <div class="mb-4" *ngIf="!load">
+    <div class="mb-4">
       <hr class="Linea">
     </div>
   
     <!-- titulo tabla 3 -->
-    <div class="mb-4" *ngIf="!load">
+    <div class="mb-4">
       <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-table"></i> Consolidado por Referencia</h4>
     </div>
   
     <!-- tabla 3 -->
-    <div class="mb-3" *ngIf="!load">
-      <div class="row g-3" id="tabla3">
+    <div class="mb-3">
+      <div class="row g-3" id="tabla3" data-tutorial="tablaConsolidado">
         <div class="table-responsive">
           <p-table
           #dt3
@@ -294,16 +305,16 @@
               <td class="text-center">{{info.ot}}</td>
               <td class="text-center">{{info.prod_Id}}</td>
               <td>{{info.prod_Nombre}}</td>
-              <td class="text-center">{{['Und', 'Paquete'].includes(info.presentacion) ? totalQuantityByItem(info.prod_Id) : totalWeightByItem(info.prod_Id) | number : '1.2-2'}}</td>
-              <td class="text-center">{{totalRollsByItems(info.prod_Id)}}</td>
-              <td class="text-center">{{info.presentacion}}</td>
+              <td class="text-center">{{info.quantity | number : '1.2-2'}}</td>
+              <td class="text-center">{{info.rolls}}</td>
+              <td class="text-center">{{info.unit}}</td>
             </tr>
           </ng-template>
           <ng-template pTemplate="footer">
             <tr>
               <td colspan="3" class="text-right">Totales</td>
-              <td class="text-center">{{totalQuantityConsolidated() | number: '1.2-2'}}</td>
-              <td class="text-center">{{totalRollsConsolidated() | number}}</td>
+              <td class="text-center"><div *ngFor="let total of consolidatedTotals">{{total.quantity | number: '1.2-2'}} {{total.unit}}</div></td>
+              <td class="text-center">{{rollsInsert.length | number}}</td>
               <td></td>
             </tr>
           </ng-template>
@@ -313,9 +324,9 @@
     </div>
   
     <!-- Botones -->
-    <div class="bajarPagina" *ngIf="!load">
+    <div class="bajarPagina">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="eliminarRollos" type="button" label="Eliminar Rollos" [disabled]="rollsInsert.length == 0" (click)="seeMsgElection()" icon="pi pi-trash"></button>
+        <button pButton class="p-button-danger" id="eliminarRollos" data-tutorial="eliminar" type="button" label="Eliminar Rollos" [disabled]="rollsInsert.length == 0 || load" (click)="seeMsgElection()" icon="pi pi-trash"></button>
         <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" (click)="clearAll()" icon="pi pi-eraser"></button>
       </div>
     </div>
@@ -344,7 +355,7 @@
   </p-toast>
 
 <!-- Modal fallas tecnicas -->
-<p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
+<p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" (onHide)="getFails()" [style]="{width: '400px', height: 'auto'}">
   <ng-template pTemplate="content">
     <app-Crear_Fallas></app-Crear_Fallas>
   </ng-template>  

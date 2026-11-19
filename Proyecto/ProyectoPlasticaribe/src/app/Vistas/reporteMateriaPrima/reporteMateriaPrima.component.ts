@@ -463,7 +463,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
           this.guardarReservas(data);
           this.loadSubcategories();
         },
-        error: error => this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar las cantidades reservadas por las solicitudes de material!`)),
+        error: error => this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar las cantidades reservadas por las solicitudes de materia prima!`)),
       });
   }
 
@@ -578,7 +578,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
         };
       case 'subcategorias':
         return {
-          nombre: 'Subcategorias', visible: verPestanasBopp, subtitulo: () => 'Stock actual agrupado por subcategoría. Cant. Reservada: lo solicitado y aún no asignado en las solicitudes de material de producción',
+          nombre: 'Subcategorias', visible: verPestanasBopp, subtitulo: () => 'Stock actual agrupado por subcategoría. Cant. Reservada: lo solicitado y aún no asignado en las solicitudes de materia prima',
           filas: filtradas(this.dt_Subcategories, this.subcategories),
           columnas: [
             { titulo: 'Id', campo: 'id', ancho: 10 },
@@ -936,9 +936,9 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
   }
 
   /** Termina la edición con éxito: recarga el inventario y cierra el modal. */
-  private edicionGuardada(titulo: string, detalle: string) {
+  private edicionGuardada(detalle: string) {
     this.consultarInventario();
-    this.msj.mensajeConfirmacion(titulo, detalle);
+    this.msj.mensajeConfirmacion('OK!', detalle);
     this.modalEditarMateriasPrimas = false;
     this.esBopp = false;
     this.idBoppGenerico = 1;
@@ -988,7 +988,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
           this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).pipe(finalize(terminar)).subscribe({
             next: () => {
               this.crearAjustesMP(info.MatPri_Id, 2001, 1);
-              this.edicionGuardada(`¡Materia prima actualizada!`, `¡La materia prima '${info.MatPri_Nombre}' se actualizó con éxito!`);
+              this.edicionGuardada(`¡La materia prima '${info.MatPri_Nombre}' se actualizó con éxito!`);
             },
             error: error => this.edicionFallida(`¡Ocurrió un error al actualizar la materia prima!`, error),
           });
@@ -1017,7 +1017,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
           this.tintasService.srvActualizar(valores.Id, info).pipe(finalize(terminar)).subscribe({
             next: () => {
               this.crearAjustesMP(84, valores.Id, 1);
-              this.edicionGuardada(`¡Tinta actualizada!`, `¡La tinta '${info.Tinta_Nombre}' se actualizó con éxito!`);
+              this.edicionGuardada(`¡La tinta '${info.Tinta_Nombre}' se actualizó con éxito!`);
             },
             error: error => this.edicionFallida(`¡Ocurrió un error al actualizar la tinta!`, error),
           });
@@ -1062,7 +1062,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
           this.boppService.srvActualizar(info.BOPP_Id, info).pipe(finalize(terminar)).subscribe({
             next: () => {
               this.crearAjustesMP(84, 2001, info.BoppGen_Id);
-              this.edicionGuardada(`¡Biorientado actualizado!`, `¡El biorientado '${info.BOPP_Nombre}' se actualizó con éxito!`);
+              this.edicionGuardada(`¡El biorientado '${info.BOPP_Nombre}' se actualizó con éxito!`);
             },
             error: error => this.edicionFallida(`¡Ocurrió un error al actualizar el biorientado!`, error),
           });

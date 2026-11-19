@@ -72,7 +72,7 @@ export function pasosTutorialInventarioMateriaPrima(ctx : ContextoTutorialInvent
        Los rollos de BOPP no se crean aquí, se registran desde la entrada de BOPP.</p>
        <ul>
          <li>Si nos equivocamos de opción, con la flecha <i class="pi pi-arrow-left"></i> junto al título del formulario volvemos a elegir.</li>
-         <li>Los campos con <b>*</b> son obligatorios, entre ellos la <b>subcategoría</b>, que es la que usan las solicitudes de material. El botón de crear se habilita cuando están completos.</li>
+         <li>Los campos con <b>*</b> son obligatorios, entre ellos la <b>subcategoría</b>, que es la que usan las solicitudes de materia prima. El botón de crear se habilita cuando están completos.</li>
          <li>En las tintas, el <b>color</b> se puede elegir en el cuadro de colores o escribir en hexadecimal (por ejemplo FF0000).</li>
          <li>No se puede repetir el nombre de un material que ya existe.</li>
          <li>Podemos crear varios seguidos. El material se crea con stock en cero; al cerrar la ventana el reporte se actualiza y se activa <b>Mostrar sin Stock</b> para verlo.</li>
@@ -115,7 +115,7 @@ export function pasosTutorialInventarioMateriaPrima(ctx : ContextoTutorialInvent
     puedeEditarPrimeraPestana && paso(enPestana('th#editar'), '¡Editar!',
       `<p>Con el botón <i class="pi pi-pencil"></i> de cada fila abrimos una ventana para editar el material: nombre, descripción, categoría, subcategoría, stock, unidad${vePrecios ? ' y precios' : ''}.</p>
        <ul>
-         <li>Los campos con <b>*</b> son obligatorios. La subcategoría no lo es, pero sin ella el material no aparece en Subcategorías ni en las solicitudes de material.</li>
+         <li>Los campos con <b>*</b> son obligatorios. La subcategoría no lo es, pero sin ella el material no aparece en Subcategorías ni en las solicitudes de materia prima.</li>
          <li>Si cambiamos el <b>stock</b>, se registra un ajuste de entrada o salida.</li>
          <li>En los rollos de BOPP también se editan el ancho, las micras y su <b>BOPP genérico</b>; en las tintas, el <b>color</b>.</li>
        </ul>`,
@@ -141,7 +141,7 @@ export function pasosTutorialInventarioMateriaPrima(ctx : ContextoTutorialInvent
     veAgrupados && paso('.tab-subcategorias', '¡Subcategorías!',
       `<p>Aquí vemos el stock${vePrecios ? ' y el valor' : ''} de los materiales <b>sumados por subcategoría</b>, y además:</p>
        <ul>
-         <li><b>Cant. Reservada:</b> lo que ya se pidió en las <b>solicitudes de material de producción</b> pendientes o parciales y todavía no se ha asignado.</li>
+         <li><b>Cant. Reservada:</b> lo que ya se pidió en las <b>solicitudes de materia prima</b> pendientes o parciales y todavía no se ha asignado.</li>
          <li><b>Cant. Disponible:</b> el stock menos lo reservado. Sale en <b>rojo</b> si lo reservado supera el stock.</li>
        </ul>
        ${veInventarioGeneral ? `<p>Si una subcategoría tiene material reservado pero sus materiales no aparecen en las tablas (por ejemplo, todos con stock en cero), igual sale en la lista para que se vea lo que falta.</p>` : ''}

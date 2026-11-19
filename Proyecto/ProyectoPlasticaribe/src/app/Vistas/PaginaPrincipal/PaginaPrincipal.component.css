@@ -3,9 +3,12 @@
   isolation: isolate; /* las capas de fondo (z-index: -1) quedan detrás del contenido sin salirse del componente */
   height: 100%;
   min-height: 100vh;
-  /* Espacio reservado para la barra de favoritos (p-dock fijo abajo): al llegar al final de la página,
-     las tablas de los dashboards quedan por encima de los íconos y no tapados por ellos */
-  padding-bottom: 6.5rem;
+}
+
+/* Espacio reservado para la barra de accesos rápidos (p-dock fijo abajo) mientras está visible: al llegar al final
+   de la página, las tablas de los dashboards quedan por encima de los íconos y no tapados por ellos */
+:host-context(body.con-accesos-rapidos) .fondo {
+  padding-bottom: var(--alto-accesos-rapidos);
 }
 
 /* ===== Capas de fondo por sección (cambio con desvanecido) ===== */
@@ -303,4 +306,33 @@
   width: 0.875rem;
   height: 0.875rem;
   font-size: 0.875rem;
+}
+
+/* Aviso de tickets abiertos sin revisar (tipo info, se adapta al tema con las variables globales) */
+.avisoTickets-titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--texto-info);
+}
+
+.avisoTickets-cuerpo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--fondo-info);
+  color: var(--texto-fuerte);
+}
+
+.avisoTickets-cuerpo p {
+  margin: 0;
+}
+
+.avisoTickets-icono {
+  font-size: 2rem;
+  color: var(--texto-info);
 }

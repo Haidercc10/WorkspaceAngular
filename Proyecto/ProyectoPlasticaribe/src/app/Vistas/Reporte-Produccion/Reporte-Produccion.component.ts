@@ -219,7 +219,7 @@ export class ReporteProduccionComponent implements OnInit {
         rollosSellado.forEach(data => {
           this.bagProService.EnvioZeusProcSellado(data).subscribe(() => {
             count++;
-            if (count == rollosSellado.length) this.msj.mensajeConfirmacion(`¡Los rollos se han subido a Zeus!`)
+            if (count == rollosSellado.length) this.msj.mensajeConfirmacion('OK!', `¡Los rollos se han subido a Zeus!`)
           }, () => {
             this.msj.mensajeAdvertencia(`¡Ha ocurrido un error!`);
             this.cargando = false;
@@ -232,7 +232,7 @@ export class ReporteProduccionComponent implements OnInit {
         rollosEmpaque.forEach(data => {
           this.bagProService.EnvioZeusProcExtrusion(data).subscribe(() => {
             count++;
-            if (count == rollosEmpaque.length) this.msj.mensajeConfirmacion(`¡Los rollos se han subido a Zeus!`)
+            if (count == rollosEmpaque.length) this.msj.mensajeConfirmacion('OK!', `¡Los rollos se han subido a Zeus!`)
           }, () => {
             this.msj.mensajeAdvertencia(`¡Ha ocurrido un error!`);
             this.cargando = false;

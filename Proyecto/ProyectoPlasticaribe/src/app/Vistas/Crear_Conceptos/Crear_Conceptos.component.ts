@@ -44,7 +44,7 @@ export class Crear_ConceptosComponent implements OnInit {
         TpCcpto_Id: this.formConcepts.value.conceptType,
       }
       this.svcConcepts.postConcepts(data).subscribe(res => {
-        this.svcMsjs.mensajeConfirmacion(`Concepto creado correctamente!`);
+        this.svcMsjs.mensajeConfirmacion('OK!', `Concepto creado correctamente!`);
         this.clearLabels();
       }, error => this.svcMsjs.mensajeError(`No fue posible crear el concepto, verifique!`))
     } else this.svcMsjs.mensajeAdvertencia(`Faltan datos por llenar, por favor verifique!`);

@@ -7,6 +7,7 @@ import { DevolucionesCalidadService } from 'src/app/Servicios/Devoluciones_Calid
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MovDevolucionesCalidadComponent } from '../mov-devoluciones-calidad/mov-devoluciones-calidad.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-dashboard-calidad',
@@ -93,9 +94,9 @@ export class DashboardCalidadComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.ComparativoOptions.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptions.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.ComparativoOptions.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit() {
@@ -272,20 +273,20 @@ export class DashboardCalidadComponent implements OnInit {
     this.ComparativoData = {
       labels: [''],
       datasets: [
-        { label: 'Interno', backgroundColor: '#008cffff',  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data:  [this.totalRejectedInt] },
-        { label: 'Externo', backgroundColor: '#ffd000',  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalRejectedExt] }
+        { label: 'Interno', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado),  color: colorTextoGrafica(this.modoSeleccionado), data:  [this.totalRejectedInt] },
+        { label: 'Externo', backgroundColor: colorSerieGrafica(1, this.modoSeleccionado),  color: colorTextoGrafica(this.modoSeleccionado), data: [this.totalRejectedExt] }
       ]
     };
 
     this.ComparativoOptions = {
       indexAxis: 'y',
       plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: {  color: colorTextoGrafica(this.modoSeleccionado), } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}},
-        y: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: 'rgba(128, 128, 128, 0.2)'}}
+        x: {ticks: {color: colorTextoGrafica(this.modoSeleccionado)}, grid: {color: COLOR_REJILLA_GRAFICA}},
+        y: {ticks: {color: colorTextoGrafica(this.modoSeleccionado)}, grid: {color: COLOR_REJILLA_GRAFICA}}
       }
     };
   }
@@ -305,8 +306,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graficaPedidosClientes = {
       labels: areas,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#FFFF64'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: qty},
-        {label: "Valor total",  backgroundColor: ['#00a130ff'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: total}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Valor total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: total}
       ]
     };
     this.estilosGrafica();
@@ -317,14 +318,14 @@ export class DashboardCalidadComponent implements OnInit {
     this.opcionesGraficas = {
       stacked: false,
       plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: {  color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       tooltip: { usePointStyle: true, },
       scales: {
         x: {
           ticks: {
-              color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+              color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 18 },
             callback: function(value, index, values) {
               const label = labels[index];
@@ -334,21 +335,21 @@ export class DashboardCalidadComponent implements OnInit {
               //else return this.getLabelForValue(value);
             }
           },
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {drawOnChartArea: false, color: COLOR_REJILLA_GRAFICA}
         },
       },
     };
@@ -370,8 +371,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicForKg = {
       labels: areas,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#0081a1ff'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: qty},
-        {label: "Peso total",  backgroundColor: ['#89f7ffff'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: weight}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Peso total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: weight}
       ]
     };
     this.estilosGraficaPorKg();
@@ -382,14 +383,14 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicOptionsKg = {
       stacked: false,
       plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: {  color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       tooltip: { usePointStyle: true, },
       scales: {
         x: {
           ticks: {
-              color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+              color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 18 },
             callback: function(value, index, values) {
               const label = labels[index];
@@ -397,21 +398,21 @@ export class DashboardCalidadComponent implements OnInit {
               else return label;
             }
           },
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {drawOnChartArea: false, color: COLOR_REJILLA_GRAFICA}
         },
       },
     };
@@ -432,8 +433,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicForClientMoney = {
       labels: clients,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#9684ffff'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: qty},
-        {label: "Valor total",  backgroundColor: ['#4557ffff'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: total}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Valor total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: total}
       ]
     };
     this.estilosGraficaClientes();
@@ -445,14 +446,14 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicOptionsClientMoney = {
       stacked: false,
       plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: {  color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       tooltip: { usePointStyle: true, },
       scales: {
         x: {
           ticks: {
-              color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+              color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 18 },
             callback: function(value, index, values) {
               const label = labels[index];
@@ -465,21 +466,21 @@ export class DashboardCalidadComponent implements OnInit {
               //else return this.getLabelForValue(value);   
             }
           },
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {drawOnChartArea: false, color: COLOR_REJILLA_GRAFICA}
         },
       },
     };
@@ -500,8 +501,8 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicForClientKg = {
       labels: clients,
       datasets: [
-        {label: 'Cantidad', backgroundColor: ['#eeff90ff'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: qty},
-        {label: "Peso total",  backgroundColor: ['#45aa45ff'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: weight}
+        {label: 'Cantidad', backgroundColor: colorSerieGrafica(0, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y', data: qty},
+        {label: "Peso total",  backgroundColor: colorSerieGrafica(2, this.modoSeleccionado), color: colorTextoGrafica(this.modoSeleccionado), yAxisID: 'y1', data: weight}
       ]
     };
     this.estilosGraficaClientesPorKg();
@@ -513,14 +514,14 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicOptionsClientKg = {
       stacked: false,
       plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: {  color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       tooltip: { usePointStyle: true, },
       scales: {
         x: {
           ticks: {
-              color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+              color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 18 },
             callback: function(value, index, values) {
               const label = labels[index];
@@ -532,21 +533,21 @@ export class DashboardCalidadComponent implements OnInit {
               //else return this.getLabelForValue(value);   
             }
           },
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {color: COLOR_REJILLA_GRAFICA}
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
-          grid: {drawOnChartArea: false, color: 'rgba(128, 128, 128, 0.2)'}
+          ticks: {color: colorTextoGrafica(this.modoSeleccionado), font: {size: 18}},
+          grid: {drawOnChartArea: false, color: COLOR_REJILLA_GRAFICA}
         },
       },
     };
@@ -609,13 +610,13 @@ export class DashboardCalidadComponent implements OnInit {
     this.graphicOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 20 },
             callback: function(value, index, values) {
               const label = labels[index];
@@ -623,14 +624,14 @@ export class DashboardCalidadComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' },
+          ticks: { color: colorTextoGrafica(this.modoSeleccionado), font: { size: 20 } },
+          grid: { color: COLOR_REJILLA_GRAFICA },
           min : 0
         },
       },
@@ -648,13 +649,13 @@ export class DashboardCalidadComponent implements OnInit {
 
   // Funcion que se encargará de llenar las graficas de areas
   llenarGraficas(data : any []){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graphicForMonth.datasets.length, this.modoSeleccionado);
     let info = {
       label: `${this.selectedYear}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,

@@ -1,10 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
+/* ==================== PALETA PLASTICARIBE ====================
+   Tomada del logo (rojo #b11d28 y azul marino #131f4c). Usar siempre estas variables
+   en lugar de escribir el color: así un cambio de marca se hace en un solo lugar. */
 :root {
   --font-size: 1;
-  --rojo: #db4149;
-  --rojoHover: #a8262c;
-  --rojoClaro: rgb(214, 100, 106);
   --shadow-color: 286deg 36% 56%;
+
+  /* Marca */
+  --rojo: #b11d28;               /* rojo exacto del logo: botones y acentos (contraste con blanco 6,8:1) */
+  --rojoHover: #c42a35;          /* hover: un poco más claro que el del logo */
+  --rojoClaro: #e4636e;          /* detalles suaves; acento sobre fondo oscuro */
+  --azul-marca: #131f4c;         /* azul marino del logo: encabezados, menú, títulos */
+  --azul-marca-medio: #283a75;   /* hover, bordes y botones secundarios */
+
+  /* Neutros (reemplazan los #ccc, #ddd, #eee... sueltos; son iguales en ambos temas,
+     para fondos y textos que deban cambiar con el tema usar las variables de abajo) */
+  --gris-100: #f1f3f5;
+  --gris-200: #e9ecef;
+  --gris-300: #dee2e6;
+  --gris-400: #ced4da;
+  --gris-500: #adb5bd;
+  --gris-600: #6c757d;
+  --gris-700: #495057;
+  --gris-800: #343a40;
 }
 
 /* ==================== COLORES SEGÚN EL TEMA (CLARO / OSCURO) ====================
@@ -27,11 +45,33 @@
   --borde-sutil: #e1e4e8;                       /* bordes de tablas HTML simples */
   --fondo-info: #e0f2fe;                        /* avisos informativos */
   --texto-info: #0369a1;
-  --texto-peligro: #dc2626;                     /* valores negativos o vencidos */
+  --texto-peligro: #b91c1c;                     /* valores negativos o vencidos */
+  --fondo-peligro: #fee2e2;                     /* filas o celdas con error (p. ej. rollos ya registrados) */
+  --texto-advertencia: #92400e;                 /* avisos que requieren atención */
+  --fondo-advertencia: #fef3c7;
   --fondo-obligatorio: #fff1f1;                 /* campos obligatorios pendientes */
   --borde-obligatorio: #e24c4c;
-  --fondo-acento: #fff9f9;                      /* resaltado suave con el rojo de la marca */
+  --fondo-acento: #fdf2f3;                      /* resaltado suave con el rojo de la marca */
+  --rojo-texto: #b11d28;                        /* rojo para texto y bordes (botones de texto o con borde) */
+  --azul-marca-claro: #eef1f8;                 /* fondos de secciones con el azul de la marca */
+  --fondo-contador: var(--azul-marca-medio);   /* contadores (badges) de la barra superior: azul medio de la marca */
+  --texto-contador: #ffffff;
+  --fondo-exito: #dcfce7;                       /* confirmaciones (p. ej. botón "Copiado!") */
+  --texto-exito: #166534;                       /* texto y borde de las confirmaciones */
   --rejilla-graficas: rgba(128, 128, 128, 0.2); /* líneas de la cuadrícula de las gráficas (sirve en ambos temas) */
+
+  /* Series de las gráficas, en este orden (en TS: PALETA_GRAFICAS de Servicios/Tema/Paleta.ts) */
+  --grafica-1: #283a75;
+  --grafica-2: #c42a35;
+  --grafica-3: #2a9d8f;
+  --grafica-4: #e9a23b;
+  --grafica-5: #4a99b4;
+  --grafica-6: #7b5ea7;
+  --grafica-7: #8c6d46;
+  --grafica-8: #6c757d;
+  /* Texto legible encima de cada color (etiquetas, chips) */
+  --grafica-1-texto: #ffffff; --grafica-2-texto: #ffffff; --grafica-3-texto: #0b1020; --grafica-4-texto: #1f1300;
+  --grafica-5-texto: #0b1020; --grafica-6-texto: #ffffff; --grafica-7-texto: #ffffff; --grafica-8-texto: #ffffff;
 }
 
 /* Tema oscuro: se activa cuando el <link id="app-theme"> carga lara-dark-blue.css */
@@ -42,9 +82,31 @@
   --fondo-info: rgba(14, 165, 233, 0.16);
   --texto-info: #7dd3fc;
   --texto-peligro: #f87171;
+  --fondo-peligro: rgba(239, 68, 68, 0.16);
+  --texto-advertencia: #fcd34d;
+  --fondo-advertencia: rgba(245, 158, 11, 0.16);
   --fondo-obligatorio: rgba(226, 76, 76, 0.16);
   --borde-obligatorio: #f87171;
-  --fondo-acento: rgba(219, 65, 73, 0.14);
+  --fondo-acento: rgba(196, 42, 53, 0.16);
+  --rojo-texto: #e4636e;                        /* el rojo del logo no se lee sobre fondo oscuro */
+  --azul-marca-medio: #8597c9;
+  --azul-marca-claro: rgba(133, 151, 201, 0.12);
+  --fondo-contador: #f1f3f5;                    /* contadores en oscuro: blanco con número azul marino */
+  --texto-contador: #131f4c;
+  --fondo-exito: rgba(34, 197, 94, 0.16);
+  --texto-exito: #86efac;
+
+  --grafica-1: #8597c9;
+  --grafica-2: #e4636e;
+  --grafica-3: #3dbfae;
+  --grafica-4: #e9a23b;
+  --grafica-5: #6bb6d0;
+  --grafica-6: #a68bd1;
+  --grafica-7: #b89466;
+  --grafica-8: #adb5bd;
+  /* En oscuro todas las series son claras: texto oscuro encima */
+  --grafica-1-texto: #0b1020; --grafica-2-texto: #0b1020; --grafica-3-texto: #0b1020; --grafica-4-texto: #0b1020;
+  --grafica-5-texto: #0b1020; --grafica-6-texto: #0b1020; --grafica-7-texto: #0b1020; --grafica-8-texto: #0b1020;
 }
 
 * {
@@ -163,6 +225,21 @@ a {
 .tituloClaro {
   color: var(--rojoClaro);
   font-size: calc(var(--font-size) * 20px);
+}
+
+/*
+ * Botón de tutorial junto al texto del título (h2/h4), común a todas las páginas con tutorial.
+ * inline-flex: el contenedor mide exactamente lo que el botón (sin espacio extra de línea debajo).
+ * vertical-align: middle centra el botón a media altura de las minúsculas; el top negativo (en em del título,
+ * así escala con su tamaño) lo sube hasta la mitad de las mayúsculas, que es donde el ojo ve el centro del texto.
+ */
+.boton-tutorial-titulo {
+  display: inline-flex;
+  vertical-align: middle;
+  position: relative;
+  top: -0.1em;
+  margin-left: 0.4rem;
+  line-height: 1;
 }
 
 .colorLinea {
@@ -287,17 +364,23 @@ th {
   font-weight: 500;
 }
 
-/* Mensajes informativos en azul (el tema Lara los trae en índigo/morado). */
-.p-toast .p-toast-message.p-toast-message-info {
-  background: #e3effe;
-  border: solid #3b82f6;
-  border-width: 0 0 0 6px;
-  color: #1d4ed8;
+/* Mensajes informativos (severity 'info') en azul de la paleta: el tema lara los pinta en morado (#696cff).
+   El prefijo "html body" gana al tema, que se carga con <link id="app-theme"> (claro u oscuro). */
+html body .p-toast .p-toast-message.p-toast-message-info,
+html body .p-message.p-message-info,
+html body .p-inline-message.p-inline-message-info {
+  /* --fondo-info es translúcido en modo oscuro: se apoya sobre --surface-overlay para que no se vea lo de abajo */
+  background: linear-gradient(var(--fondo-info), var(--fondo-info)), var(--surface-overlay);
+  border-color: var(--texto-info);
+  color: var(--texto-info);
 }
 
-.p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon,
-.p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close {
-  color: #1d4ed8;
+html body .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon,
+html body .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close,
+html body .p-message.p-message-info .p-message-icon,
+html body .p-message.p-message-info .p-message-close,
+html body .p-inline-message.p-inline-message-info .p-inline-message-icon {
+  color: var(--texto-info);
 }
 
 /* ESTILO DE PRIMENG */
@@ -378,42 +461,74 @@ th {
   background: #ffefef;
 }
 
-.p-checkbox .p-checkbox-box.p-highlight {
-  border-color: #f63b3b;
-  background: #f63b3b;
+/* Checkbox (p-checkbox, checks de tablas y triestado) y radio buttons con el rojo de la marca:
+   rojo del logo marcado y --rojoHover al pasar el mouse, igual que los botones. La palomita y el punto
+   van en blanco también en oscuro (el tema oscuro los pinta oscuros y no se verían sobre el rojo). */
+.p-checkbox .p-checkbox-box.p-highlight,
+.p-input-filled .p-checkbox .p-checkbox-box.p-highlight {
+  border-color: var(--rojo);
+  background: var(--rojo);
+}
+
+.p-checkbox .p-checkbox-box.p-highlight .p-checkbox-icon,
+.p-checkbox .p-checkbox-box.p-highlight .p-icon {
+  color: #ffffff;
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-  border-color: #f63b3b;
+  border-color: var(--rojo);
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
-  box-shadow: 0 0 0 0.2rem #febfbf;
-  border-color: #f63b3b;
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+  border-color: var(--rojo);
 }
 
-.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-  border-color: #d81d1d;
-  background: #d81d1d;
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover,
+.p-input-filled .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+  border-color: var(--rojoHover);
+  background: var(--rojoHover);
 }
 
 .p-radiobutton .p-radiobutton-box.p-highlight {
-  border-color: #f63b3b;
-  background: #f63b3b;
+  border-color: var(--rojo);
+  background: var(--rojo);
+}
+
+.p-radiobutton .p-radiobutton-box.p-highlight .p-radiobutton-icon {
+  background-color: #ffffff;
 }
 
 .p-radiobutton .p-radiobutton-box.p-highlight:not(.p-disabled):hover {
-  border-color: #d81d1d;
-  background: #d81d1d;
+  border-color: var(--rojoHover);
+  background: var(--rojoHover);
 }
 
 .p-radiobutton .p-radiobutton-box:not(.p-disabled).p-focus {
-  box-shadow: 0 0 0 0.2rem #febfbf;
-  border-color: #f63b3b;
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+  border-color: var(--rojo);
 }
 
 .p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
-  border-color: #f63b3b;
+  border-color: var(--rojo);
+}
+
+/* Interruptor (p-inputSwitch) encendido con el rojo de la marca, igual que checkbox y radio (el tema lo pinta azul).
+   Apagado se deja el gris del tema. La bolita va blanca también en oscuro para que se vea sobre el rojo. */
+html body .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  background: var(--rojo);
+}
+
+html body .p-inputswitch.p-inputswitch-checked:not(.p-disabled):hover .p-inputswitch-slider {
+  background: var(--rojoHover);
+}
+
+html body .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
+  background: #ffffff;
+}
+
+html body .p-inputswitch.p-focus .p-inputswitch-slider {
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
 }
 
 .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
@@ -444,8 +559,27 @@ p-multiselect div[class*="p-multiselect p-component"] {
   border-color: #f63b3b;
 }
 
-p-multiselect div searchicon[class*="p-element p-icon-wrapper"] {
+/* Buscador de los paneles de multiselect y treeSelect (también con appendTo="body", donde el panel queda fuera del componente):
+   el envoltorio <searchicon> es inline y agrega una línea vacía bajo el input; eso agranda el contenedor y deja
+   la lupa y la X desalineadas hacia abajo. Como bloque (su ícono es absoluto) no ocupa alto y ambos quedan centrados. */
+p-multiselect div searchicon[class*="p-element p-icon-wrapper"],
+.p-multiselect-filter-container > searchicon,
+.p-treeselect-filter-container > searchicon,
+.p-dropdown-filter-container > searchicon {
   display: block;
+}
+
+/* Lista de vistas del modal de roles (Gestión de Usuarios, panelStyleClass="panel-vistas-rol").
+   Quita el "ul { padding-left: 2rem }" de Bootstrap (le gana a PrimeNG, que va en @layer primeng) y el espacio
+   reservado para la flecha de expandir, que estas vistas no usan porque no tienen sub-vistas. */
+.panel-vistas-rol .p-tree-container,
+.panel-vistas-rol .p-treenode-children {
+  margin: 0;
+  padding-left: 0;
+}
+
+.panel-vistas-rol .p-tree-toggler {
+  display: none;
 }
 
 p-dropdown .p-dropdown {
@@ -696,10 +830,17 @@ p-avatar div span {
   font-size: calc(var(--font-size) * 14px);
 }
 
-/* Badges de estado de tickets */
+/* Badges de estado de tickets (paleta oficial; cambian solos con el tema). Clase según claseEstadoTicket(). */
 .badge-estado-ticket {
   text-transform: uppercase;
+  font-size: calc(var(--font-size) * 14px);
 }
+
+.estado-ticket--abierto { background-color: var(--fondo-advertencia); color: var(--texto-advertencia); }
+.estado-ticket--revision { background-color: var(--fondo-info); color: var(--texto-info); }
+.estado-ticket--resuelto { background-color: var(--fondo-exito); color: var(--texto-exito); }
+.estado-ticket--cancelado { background-color: var(--fondo-peligro); color: var(--texto-peligro); }
+.estado-ticket--otro { background-color: var(--fondo-sutil); color: var(--text-color-secondary); }
 
 #texto-centrado {
   text-align: center;
@@ -818,4 +959,235 @@ input.con-contador-caracteres + .contador-caracteres {
    .p-checkbox-box (que siempre existe) y la lista sigue abierta. Aplica también al check de "seleccionar todos". */
 .p-multiselect-panel .p-checkbox-box * {
   pointer-events: none;
+}
+
+/* ===== Barra de accesos rápidos (VistasFavoritasComponent) =====
+   Mientras la barra está visible, <body> lleva la clase "con-accesos-rapidos": se reserva espacio abajo para que la
+   barra fija no tape el final de las páginas (tablas, botones). La página principal reserva su propio espacio dentro
+   de su fondo de 100vh (PaginaPrincipal.component.css), por eso se excluye aquí. */
+:root {
+  --alto-accesos-rapidos: 8rem; /* barra (6rem) + separación inferior (.5rem) + colina (24px) */
+  /* Modo claro: vidrio que desenfoca lo de atrás; borde gris suave porque el blanco no se distingue sobre fondo claro */
+  --desenfoque-accesos: blur(10px) saturate(1.4);
+  --fondo-accesos: rgba(255, 255, 255, .35);
+  --borde-accesos: rgba(0, 0, 0, .1);
+}
+
+:root:has(#app-theme[href*="dark"]) {
+  /* Modo oscuro: la transparencia del dock del tema ya se lee bien */
+  --desenfoque-accesos: none;
+  --fondo-accesos: rgba(255, 255, 255, .1);
+  --borde-accesos: rgba(255, 255, 255, .2);
+}
+
+body.con-accesos-rapidos:not(:has(app-PaginaPrincipal)) {
+  padding-bottom: var(--alto-accesos-rapidos);
+}
+
+/* ==================== BOTONES ROJOS (p-button-danger) ====================
+   PrimeNG trae su propio rojo (#EF4444 en claro, rosado pastel en oscuro). Aquí se usa el de la marca:
+   rojo del logo de base y --rojoHover al pasar el mouse, en ambos temas.
+   El prefijo "html" asegura que gane aunque el <link> del tema se vuelva a insertar al cambiar de modo. */
+html .p-button.p-button-danger,
+html .p-buttonset.p-button-danger > .p-button,
+html .p-splitbutton.p-button-danger > .p-button {
+  background: var(--rojo);
+  border: 1px solid var(--rojo);
+  color: #ffffff;
+}
+
+html .p-button.p-button-danger:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button:enabled:hover,
+html .p-button.p-button-danger:enabled:active,
+html .p-buttonset.p-button-danger > .p-button:enabled:active,
+html .p-splitbutton.p-button-danger > .p-button:enabled:active {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
+  color: #ffffff;
+}
+
+html .p-button.p-button-danger:enabled:focus,
+html .p-buttonset.p-button-danger > .p-button:enabled:focus,
+html .p-splitbutton.p-button-danger > .p-button:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+}
+
+/* Variantes con borde y de solo texto: el rojo como texto (en oscuro, uno más claro para que se lea) */
+html .p-button.p-button-danger.p-button-outlined,
+html .p-buttonset.p-button-danger > .p-button.p-button-outlined,
+html .p-splitbutton.p-button-danger > .p-button.p-button-outlined,
+html .p-button.p-button-danger.p-button-outlined:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-outlined:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-outlined:enabled:hover {
+  background-color: transparent;
+  color: var(--rojo-texto);
+  border: 1px solid;
+}
+
+html .p-button.p-button-danger.p-button-text,
+html .p-buttonset.p-button-danger > .p-button.p-button-text,
+html .p-splitbutton.p-button-danger > .p-button.p-button-text,
+html .p-button.p-button-danger.p-button-text:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-text:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-text:enabled:hover {
+  background-color: transparent;
+  color: var(--rojo-texto);
+  border-color: transparent;
+}
+
+html .p-button.p-button-danger.p-button-outlined:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-outlined:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-outlined:enabled:hover,
+html .p-button.p-button-danger.p-button-text:enabled:hover,
+html .p-buttonset.p-button-danger > .p-button.p-button-text:enabled:hover,
+html .p-splitbutton.p-button-danger > .p-button.p-button-text:enabled:hover {
+  background: var(--fondo-acento);
+}
+
+/* ===== Tabla agrupada de materiales (solicitud, reporte y asignación de material) =====
+   Una sola cabecera; cada subcategoría es una fila-título y sus materiales van debajo. */
+.tabla-agrupada.p-datatable .p-datatable-thead > tr > th {
+  background-color: var(--fondo-sutil);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-color-secondary);
+}
+
+.tabla-agrupada.p-datatable .p-datatable-tbody > tr > td {
+  vertical-align: middle;
+}
+
+.tabla-agrupada .tabla-agrupada__numero {
+  width: 9rem;
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.tabla-agrupada .tabla-agrupada__accion {
+  width: 3.5rem;
+  text-align: center !important;
+}
+
+.tabla-agrupada.p-datatable .p-datatable-tbody > tr.tabla-agrupada__grupo > td {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-top: 2px solid var(--surface-border);
+  background-color: var(--azul-marca-claro);
+}
+
+.tabla-agrupada.p-datatable .p-datatable-tbody > tr.tabla-agrupada__material > td:first-child {
+  padding-left: 2rem;
+}
+
+.tabla-agrupada__titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+}
+
+.tabla-agrupada__nombre {
+  font-weight: 700;
+  color: var(--texto-fuerte);
+}
+
+.tabla-agrupada__meta {
+  font-size: 0.85em;
+  color: var(--text-color-secondary);
+}
+
+.tabla-agrupada__meta--excede {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
+}
+
+/* Chip con el total de la subcategoría. */
+.chip-total {
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 700;
+  white-space: nowrap;
+  background-color: var(--fondo-contador);
+  color: var(--texto-contador);
+}
+
+.chip-total--ok {
+  background-color: var(--fondo-exito);
+  color: var(--texto-exito);
+}
+
+.chip-total--excede {
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
+}
+
+/* Campo de cantidad angosto, alineado a la derecha como número. */
+.tabla-agrupada .campo-cantidad,
+.tabla-agrupada .campo-cantidad .p-inputnumber,
+.tabla-agrupada .campo-cantidad input {
+  width: 100%;
+}
+
+.tabla-agrupada .campo-cantidad input {
+  padding: 0.35rem 0.5rem;
+  text-align: right;
+}
+
+/* Campos de cantidad con "0.00" de ejemplo: al enfocarlos el ejemplo desaparece para que el cursor no quede encima del cero. */
+input.campo-sin-cero::placeholder {
+  color: var(--text-color-secondary);
+  opacity: 0.6;
+}
+
+input.campo-sin-cero:focus::placeholder {
+  color: transparent;
+}
+
+/* Confirmación cuyo mensaje trae saltos de línea (p. ej. el resumen de la asignación de material). */
+.confirmacion-multilinea .p-confirm-dialog-message {
+  white-space: pre-line;
+}
+
+/* Todas las confirmaciones (p-confirmDialog) del sistema: botones separados
+   (el de texto se pegaba al principal y se notaba al pasar el mouse). */
+.p-confirm-dialog .p-dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.p-confirm-dialog .p-dialog-footer .p-button {
+  margin: 0;
+}
+
+/* Fila con desplazamiento horizontal por arrastre (directiva appArrastreHorizontal), como las pestañas de la página principal. */
+.arrastre-horizontal {
+  display: flex;
+  overflow-x: auto;
+  cursor: grab;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.arrastre-horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+.arrastre-horizontal.arrastrando {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+.arrastre-horizontal * {
+  -webkit-user-drag: none;
 }

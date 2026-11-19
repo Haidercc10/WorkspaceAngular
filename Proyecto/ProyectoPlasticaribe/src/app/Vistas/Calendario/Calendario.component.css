@@ -1,51 +1,306 @@
-full-calendar {
-  max-width: 1100px;
-  margin: 40px auto;
+/* Calendario de eventos. Solo variables del tema (styles.css) para que funcione en claro y oscuro. */
+
+.calendario {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---------- Barra superior ---------- */
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem 1rem;
+  font-size: .85rem;
+  color: var(--text-color-secondary);
+}
+
+.leyenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.punto {
+  display: inline-block;
+  width: .75rem;
+  height: .75rem;
+  border-radius: 3px;
+}
+
+.punto.evento-yo { background: var(--rojo); }
+.punto.evento-rol { background: #83D3FF; }      /* bg-blue1 */
+.punto.evento-todos { background: palegreen; }  /* bg-success1 */
+.ajeno-muestra .punto { opacity: .55; outline: 1px dashed var(--text-color-secondary); outline-offset: 1px; }
+
+.acciones-barra {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  color: var(--text-color-secondary);
+}
+
+:host ::ng-deep .boton-principal.p-button {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: #fff;
+}
+
+:host ::ng-deep .boton-principal.p-button:enabled:hover {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
+}
+
+/* ---------- Calendario + panel ---------- */
+.contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  gap: 1rem;
+  align-items: start;
+}
+
+.vista-calendario,
+.proximos {
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  background: var(--surface-card);
+  padding: 1rem;
+}
+
+.ayuda {
+  margin: .75rem 0 0;
+  font-size: .8rem;
+  color: var(--text-color-secondary);
+}
+
+.proximos h4 {
+  margin: 0 0 .5rem;
+  color: var(--texto-fuerte);
+}
+
+/* ---------- Tema de FullCalendar con las variables del proyecto ---------- */
+:host ::ng-deep .fc {
+  --fc-border-color: var(--surface-border);
+  --fc-page-bg-color: var(--surface-card);
+  --fc-neutral-bg-color: var(--fondo-sutil);
+  --fc-neutral-text-color: var(--text-color-secondary);
+  --fc-today-bg-color: var(--fondo-acento);
+  --fc-highlight-color: var(--fondo-info);
+  --fc-now-indicator-color: var(--rojo);
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: var(--rojo);
+  --fc-button-border-color: var(--rojo);
+  --fc-button-hover-bg-color: var(--rojoHover);
+  --fc-button-hover-border-color: var(--rojoHover);
+  --fc-button-active-bg-color: var(--rojoHover);
+  --fc-button-active-border-color: var(--rojoHover);
+  color: var(--text-color);
+  font-size: .9rem;
+}
+
+:host ::ng-deep .fc .fc-toolbar-title {
+  font-size: 1.25rem;
+  color: var(--texto-fuerte);
+  text-transform: capitalize;
+}
+
+:host ::ng-deep .fc .fc-button {
+  text-transform: capitalize;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .fc .fc-button:disabled {
+  opacity: .5;
+}
+
+:host ::ng-deep .fc .fc-col-header-cell-cushion,
+:host ::ng-deep .fc .fc-daygrid-day-number {
+  color: var(--text-color);
+  text-decoration: none;
+  text-transform: capitalize;
+}
+
+:host ::ng-deep .fc .fc-day-today .fc-daygrid-day-number {
+  background: var(--rojo);
+  color: #fff;
+  border-radius: 50%;
+  min-width: 1.8rem;
+  text-align: center;
+  margin: 2px;
+}
+
+:host ::ng-deep .fc .fc-daygrid-day:hover,
+:host ::ng-deep .fc .fc-timegrid-slot:hover {
+  background: var(--surface-hover);
   cursor: pointer;
 }
 
-::ng-deep .fc-day:hover, .fc-day-mon:hover, .fc-day-past:hover, .fc-daygrid-day:hover {
-  background-color: #93C5FD29;
-  color: black;
-}
-
-p-dialog ::ng-deep div .p-dialog-title {
+:host ::ng-deep .fc .fc-daygrid-more-link {
   color: var(--rojo);
+}
+
+/* Colores de los eventos según quién los ve (mismos que los badges de estado del proyecto) */
+:host ::ng-deep .fc-event {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0 2px;
+}
+
+:host ::ng-deep .fc-event.evento-yo {
+  --fc-event-bg-color: var(--rojo);
+  --fc-event-border-color: var(--rojo);
+  --fc-event-text-color: #fff;
+}
+
+:host ::ng-deep .fc-event.evento-rol {
+  --fc-event-bg-color: #83D3FF;      /* bg-blue1 */
+  --fc-event-border-color: #83D3FF;
+  --fc-event-text-color: #002677;
+}
+
+:host ::ng-deep .fc-event.evento-todos {
+  --fc-event-bg-color: palegreen;    /* bg-success1 */
+  --fc-event-border-color: palegreen;
+  --fc-event-text-color: rgb(6, 100, 3);
+}
+
+/* Eventos de otros usuarios: atenuados y con borde punteado */
+:host ::ng-deep .fc-event.evento-ajeno {
+  opacity: .75;
+  border-style: dashed;
+  border-color: var(--fc-event-text-color);
+}
+
+/* ---------- Formulario del evento ---------- */
+/* No usar la clase global .formulario (styles.css): pinta una tarjeta con sombra y centra los campos */
+.form-evento {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: .25rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  min-width: 0;
+}
+
+.campo label {
+  font-weight: 600;
+  color: var(--texto-fuerte);
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+}
+
+.fila-switch {
+  flex-direction: row;
   align-items: center;
+  gap: .6rem;
 }
 
-.p-input-icon-left {
+.fila-switch label {
+  font-weight: 500;
+}
+
+.fechas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+:host ::ng-deep .w-100,
+:host ::ng-deep .w-100 .p-inputtext {
   width: 100%;
 }
 
-p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+:host ::ng-deep p-calendar .p-datepicker-trigger {
+  background: var(--rojo);
+  border-color: var(--rojo);
+}
+
+:host ::ng-deep .selector-visibilidad {
   display: flex;
-  width: 100%;
+  flex-wrap: wrap;
 }
 
-p-calendar ::ng-deep span button {
-  background-color: var(--rojo);
-  border: 0;
-  transition: all 1s;
+:host ::ng-deep .selector-visibilidad .p-button {
+  flex: 1 1 auto;
+  padding: .5rem .75rem;
 }
 
-p-calendar ::ng-deep span .p-datepicker-trigger:hover {
-  background: var(--rojoHover);
+:host ::ng-deep .selector-visibilidad .p-button.p-highlight {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: #fff;
 }
 
-p-calendar ::ng-deep .p-datepicker-header button {
-  background: #fff0;
+.obligatorio,
+.error {
+  color: var(--texto-peligro);
 }
 
-p-calendar ::ng-deep .p-datepicker-header button:hover {
-  background: #fff0;
+.contador {
+  align-self: flex-end;
+  color: var(--text-color-secondary);
 }
 
-p-calendar ::ng-deep span button span {
-  display: block;
-}
-
-::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+.aviso-lectura {
   display: flex;
+  gap: .6rem;
+  align-items: flex-start;
+  padding: .75rem 1rem;
+  border-radius: 8px;
+  background: var(--fondo-info);
+  color: var(--texto-info);
+}
+
+.valor-lectura {
+  color: var(--text-color);
+}
+
+.pie {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
   width: 100%;
+}
+
+.espacio {
+  flex: 1;
+}
+
+/* ---------- Celular / tablet ---------- */
+@media (max-width: 960px) {
+  .contenido {
+    grid-template-columns: 1fr;
+  }
+
+  :host ::ng-deep .fc .fc-toolbar {
+    flex-direction: column;
+    gap: .5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .fechas {
+    grid-template-columns: 1fr;
+  }
+
+  .vista-calendario,
+  .proximos {
+    padding: .6rem;
+  }
 }

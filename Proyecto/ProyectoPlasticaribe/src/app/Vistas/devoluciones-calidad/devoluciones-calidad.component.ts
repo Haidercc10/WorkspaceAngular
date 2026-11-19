@@ -432,7 +432,7 @@ export class DevolucionesCalidadComponent {
       'initDate' : initDate, 
       'endDate' : endDate,
     });
-    this.msj.mensajeConfirmacion(`Orden de trabajo N° ${this.orderProduction[0].ot} encontrada!`);
+    this.msj.mensajeConfirmacion('OK!', `Orden de trabajo N° ${this.orderProduction[0].ot} encontrada!`);
     this.load = true;
   }
 
@@ -469,7 +469,7 @@ export class DevolucionesCalidadComponent {
             'observation' : this.infoOT.value.observation,
           });
           setTimeout(() => {
-            this.msj.mensajeConfirmacion(`OT N° ${this.orderProduction[0].ot} agregada exitosamente!`);
+            this.msj.mensajeConfirmacion('OK!', `OT N° ${this.orderProduction[0].ot} agregada exitosamente!`);
             this.clearFields(); 
           }, 500);
         } else this.msj.mensajeAdvertencia('Advertencia', 'Las ordenes de trabajo no coinciden, verifique!');
@@ -526,7 +526,7 @@ export class DevolucionesCalidadComponent {
       this.svDevolutions.Post(info).subscribe(data => {
         count++
         if(count == arrayLength) {
-          this.msj.mensajeConfirmacion('Registro creado exitosamente!');
+          this.msj.mensajeConfirmacion('OK!', 'Registro creado exitosamente!');
           this.clearAll();
         }
       }, error => {
@@ -540,7 +540,7 @@ export class DevolucionesCalidadComponent {
   quitRoll(data : any){
     this.load = false; 
     let index : any = this.devolutions.findIndex(x => x.ot == data.ot);
-    this.msj.mensajeConfirmacion(`Se ha quitado la OT N° ${data.ot} de la tabla.`);
+    this.msj.mensajeConfirmacion('OK!', `Se ha quitado la OT N° ${data.ot} de la tabla.`);
     this.devolutions.splice(index, 1);
     setTimeout(() => { this.load = true; }, 1000);
   }

@@ -281,7 +281,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
             ExProd_Hora: datos_productos[j].exProd_Hora,
           }
           this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
-            this.mensajeService.mensajeConfirmacion(`¡Devolución Exitosa!`,`¡Se ha creado la devolución de manera satisfactoria!`);
+            this.mensajeService.mensajeConfirmacion('OK!',`¡Se ha creado la devolución de manera satisfactoria!`);
             this.limpiarCampos();
           }, () => {
             this.mensajeService.mensajeError(`¡Opps...!`, `¡Error al mover el inventario de productos!`)

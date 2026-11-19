@@ -1,6 +1,6 @@
 {
   "name": "proyecto-plasticaribe",
-  "version": "8.0.0",
+  "version": "2026.11.17",
   "scripts": {
     "ng": "ng",
     "version": "node scripts/generar-version.js",
@@ -8,9 +8,7 @@
     "build": "node scripts/generar-version.js && ng build",
     "build:prod": "node scripts/generar-version.js && ng build --configuration production",
     "build:beta": "node scripts/generar-version.js && ng build --configuration production,beta",
-    "version:parche": "npm version patch --no-git-tag-version",
-    "version:menor": "npm version minor --no-git-tag-version",
-    "version:mayor": "npm version major --no-git-tag-version",
+    "version:subir": "node scripts/subir-version.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "aot": "node --max-old-space-size=8192 ./node_modules/@angular/cli/bin/ng serve -o"

@@ -1,5 +1,5 @@
 span{
-  color: #db4149;
+  color: var(--rojo);
 }
 
 p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {

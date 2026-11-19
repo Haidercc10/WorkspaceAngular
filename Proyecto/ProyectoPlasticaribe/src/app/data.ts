@@ -3677,279 +3677,6 @@ export const stepsArchivos : Step.StepOptions[] = [
 ];
 
 /**************************************************************** MATERIA PRIMA ******************************************************************/
-export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
-  {
-    attachTo: {
-      element: '#formulario',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'formulario',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información acerca de la asignación!</h4>',
-    text: `<p>¡Aquí se deberá llenar la información general de la asignación!</p>`
-  },
-  {
-    attachTo: {
-      element: '#ordenTrabajo',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'ordenTrabajo',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
-    text: `<p>¡Para realizar una <b>asignación de materia prima</b> debemos <b>primero buscar la orden</b> a la que le haremos la asignación, para ello diligenciamos este campo y presionamos <b>enter</b>!</p>`
-  },
-  {
-    attachTo: {
-      element: '#tabla1',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'tabla1',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información de la OT!</h4>',
-    text: `<p>¡Al buscar la orden de trabajo se colocará en este espacio una breve información de la esta. <br>
-    La columna llamada <b>Kg Total</b> dirá la cantidad total de kilos que se deben pesar para esta OT. <br>
-    La columna llamada <b>Kg Restante</b> indicará la cantidad de materia prima que hace falta por asignar a la OT. Sí la cantidad es negativa no se podrá hacer la asignación!</p>`
-  },
-  {
-    attachTo: {
-      element: '#maquina',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'maquina',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Maquina!</h4>',
-    text: `<p>¡Debemos colocar el <b>número de la maquina</b> a la que irá la materia prima, simplemente colocamos ese número en este campo!</p>`
-  },
-  {
-    attachTo: {
-      element: '#observacion',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'observacion',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
-    text: `<p>¡Si es necesario podemos colocar una descripción o observación acerca de la asignación de materia prima!</p>`
-  },
-  {
-    attachTo: {
-      element: '#materiaPrima',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'materiaPrima',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima!</h4>',
-    text: `<p>¡Para <b>elegir la Materia Prima</b> que se asignará debemos llenar estos campos!</p>`
-  },
-  {
-    attachTo: {
-      element: '#idMp',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'idMp',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Id Materia Prima!</h4>',
-    text: `<p>¡Para <b>elegir la Materia Prima</b> tenemos 2 formas de hacerlo, la primera es digitando el <b>Id de la Materia Prima</b> en este campo y se llenarán automaticamente los otros campos!</p>`
-  },
-  {
-    attachTo: {
-      element: '#nombreMp',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'nombreMp',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Nombre Materia Prima!</h4>',
-    text: `<p>¡La segunda opción para <b>elegir la Materia Prima</b> es seleccionarla de este campo, podemos filtrarla escribiendo el nombre o el código de la materia prima para que sea más rapida y sencilla la busqueda!</p>`
-  },
-  {
-    attachTo: {
-      element: '#stockMp',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'stockMp',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Stock Materia Prima!</h4>',
-    text: `<p>¡Aquí podremos ver al <b>cantidad total de materia prima que hay en la bodega</b>!</p>`
-  },
-  {
-    attachTo: {
-      element: '#cantidad',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'cantidad',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad Materia Prima!</h4>',
-    text: `<p>¡Tenemos que digitar la <b>cantidad de materia prima que asignaremos</b>, esta cantidad no puede ser mayor a la cantidad que aparece en stock!</p>`
-  },
-  {
-    attachTo: {
-      element: '#und',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'und',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Unidad de medida!</h4>',
-    text: `<p>¡Esta es la unidad de medida en que se presenta la materia prima (Kg, Und, etc...), por lo general siempre es Kg!</p>`
-  },
-  {
-    attachTo: {
-      element: '#proceso',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'proceso',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Proceso!</h4>',
-    text: `<p>¡Debe quedar registro del proceso al que saldrá la materia prima, por eso tenemos que elegirlo aquí!</p>`
-  },
-  {
-    attachTo: {
-      element: '#agregarMp',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'agregarMp',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Materia Prima!</h4>',
-    text: `<p>¡Al terminar de llenar todos los campos de materia prima debemos agregar esta a la tabla, esto lo hacemos presionando este botón!</p>`
-  },
-  {
-    attachTo: {
-      element: '#limpiarMp',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'limpiarMp',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Materia Prima!</h4>',
-    text: `<p>¡Si por X o Y motivo queremos limpiar todos los campos de materia prima presionamos aquí!</p>`
-  },
-  {
-    attachTo: {
-      element: '#tabla2',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'tabla2',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
-    text: `<p>¡Todas las materias primas que hayamos elegido se estarán guardando y mostrando en esta tabla para posteriormente crear la asignación!</p>`
-  },
-  {
-    attachTo: {
-      element: '#quitarMp',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'quitarMp',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
-    text: `<p>¡Antes de realizar la asignación debemos verificar todas las materias primas, sí llegamos a encontrar una materia prima con información erronea la podemos quitar de la tabla presionando el icono <i class="pi pi-trash"></i>!</p>`
-  },
-  {
-    attachTo: {
-      element: '#asignar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'asignar',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Asignar Materia Prima!</h4>',
-    text: `<p>¡Si ya tenemos toda la información correcta procedemos a <b>Crear la asignación</b> presionando este botón. Al presionarlo se validará toda la información digitada y si está correcta aparecerá un mensaje de 'Asignación creada' de lo contrario enviará un mensaje indicando el fallo que ocurrió!</p>`
-  },
-  {
-    attachTo: {
-      element: '#limpiarTodo',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-    ],
-    classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'limpiarTodo',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
-    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
-  },
-];
-
 export const stepAsignacionTintas : Step.StepOptions[] = [
   {
     attachTo: {
@@ -4569,7 +4296,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
     title: `<h5 class="tituloRojo" style="margin: auto;">Orden de Compra</h5>`,
     text: `<p>¡Inicialmente para crear una orden de compra debemos elegir quien nos venderá la materia prima, en el campo <b>Proveedor</b> escribimos el nombre y luego lo seleccionamos.
     <br>El campo de observación es opcional!</p>
-    <p>Si queremos hacer una orden de compra con base en una <b>Solicitud de Materia Prima</b>, podemos <b>llenar el campo 'Num. Solicitud' y presionar enter</b>. Al hacer lo anterior se cargará toda la información de la solicitud y podremos agregar, editar o quitar materias primas.</p>`
+    <p>Si queremos hacer una orden de compra con base en una <b>Requisición de Materia Prima</b>, podemos <b>llenar el campo 'Num. Solicitud' y presionar enter</b>. Al hacer lo anterior se cargará toda la información de la solicitud y podremos agregar, editar o quitar materias primas.</p>`
   },
   {
     attachTo: {
@@ -5006,7 +4733,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'none',
-    title: `<h4 class="tituloRojo" style="margin: auto;">¡Solicitud de Materia Prima!</h4>`,
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Requisición de Materia Prima!</h4>`,
     text: `<p>¡El operador a cargo de esa área presentará a la gerencia sus pedidos de materia prima.!</p>`
   },
   {
@@ -5035,7 +4762,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'codigoSolicitud',
     title: `<h4 class="tituloRojo" style="margin: auto;">¡Código Solicitud!</h4>`,
-    text: `<p>¡Desde aquí podemos <b>cosultar otras solicitudes de materias primas</b>, esto lo hacemos <b>digitando el código de la solicitud y presionando enter</b>. Si quieremos ver el PDF de esta solicitud digitamos el código y presionamos el botón rojo!</p>`
+    text: `<p>¡Desde aquí podemos <b>cosultar otras requisiciones de materia prima</b>, esto lo hacemos <b>digitando el código de la solicitud y presionando enter</b>. Si quieremos ver el PDF de esta solicitud digitamos el código y presionamos el botón rojo!</p>`
   },
   {
     attachTo: {
@@ -5177,7 +4904,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     title: `<h4 class="tituloRojo" style="margin: auto;">¡Quitar y Eliminar!</h4>`,
     text: `<p>En ese apartado podemos eliminar y quitar materias primas.</p>
           <p>
-            Cuando tenemos una solicitud de materia prima creada desde cero, si presionamos el icono <i class="pi pi-trash"></i> y nos saldrá un mensaje de confirmación.
+            Cuando tenemos una requisición de materia prima creada desde cero, si presionamos el icono <i class="pi pi-trash"></i> y nos saldrá un mensaje de confirmación.
           </p>`
   },
   {
@@ -5192,7 +4919,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'crearSolicitud',
     title: `<h4 class="tituloRojo" style="margin: auto;">¡Crear y Editar Solicitud!</h4>`,
-    text: `<p>Aquí podemos crear y editar la solicitud de materias primas</p>
+    text: `<p>Aquí podemos crear y editar la requisición de materia prima</p>
           <ul>
             <li><b>Crear Solicitud:</b> Luego de haber completado todos los campos, podemos presionar este botón y se empezarán a validar todos los pasos, si están correctos nos saldrá un mensaje de confirmación y se generará un PDF</li>
             <li><b>Editar Solicitud:</b> Si estamos editando una solicitud el nombre del botón cambiará, de igual manera que al crear las solicitudes, se empezarán a validar todos los pasos, si están correctos nos saldrá un mensaje de confirmación y se generará un PDF</li>
@@ -5227,7 +4954,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'movimientos',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Mov. de solicitudes</h5>',
-    text: `<p>En este reporte se pueden ver los <b>movimientos de solicitudes de materias primas</b>, podrás apreciar la cantidad de
+    text: `<p>En este reporte se pueden ver los <b>movimientos de requisiciones de materia prima</b>, podrás apreciar la cantidad de
     solicitudes tanto <b>aceptadas, como pendientes, parciales y finalizadas.</b> <br><br>
     Tendrás filtros de búsqueda por:<br>
     <b>- Id de solicitud</b><br>
@@ -5249,7 +4976,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'rojo',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Solicitudes canceladas</h5>',
-    text: `<p>Aquí se podrá apreciar <b>la cantidad de solicitudes de materia prima que se encuentran canceladas actualmente</b><br><br>
+    text: `<p>Aquí se podrá apreciar <b>la cantidad de requisiciones de materia prima que se encuentran canceladas actualmente</b><br><br>
     Las solicitudes con estado cancelado son las que: <br>
     - <b>No fueron aprobadas por gerencia,</b> por ende, no se les creó una orden de compra.<br>
     - Se les creó una orden de compra, pero la gerencia decidió cancelarla <b>porque no creyó necesaria la compra de más material.</b><br><br>
@@ -5268,7 +4995,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'naranja',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-exclamation-triangle"></i> Solicitudes pendientes</h5>',
-    text: `<p>En este apartado podrás apreciar <b>la cantidad de solicitudes de materia prima que se encuentran pendientes actualmente</b><br><br>
+    text: `<p>En este apartado podrás apreciar <b>la cantidad de requisiciones de materia prima que se encuentran pendientes actualmente</b><br><br>
     Las solicitudes con estado pendiente son las que <b>no han sido aprobadas por gerencia, por ende no se les ha creado ordenes de compra</b><br><br>
     Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
   },
@@ -5285,7 +5012,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'amarillo',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-sliders-h"></i> Solicitudes parciales</h5>',
-    text: `<p>En este apartado podrás visualizar <b>la cantidad de solicitudes de materia prima que se encuentran parciales actualmente</b><br><br>
+    text: `<p>En este apartado podrás visualizar <b>la cantidad de requisiciones de materia prima que se encuentran parciales actualmente</b><br><br>
     Las solicitudes con estado parcial son las que <b>ya han sido aprobadas por gerencia, ya tienen ordenes de compra asociadas, pero no se pidió toda la materia prima de la solicitud.</b><br><br>
     Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
   },
@@ -5302,7 +5029,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'verde',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check"></i> Solicitudes finalizadas</h5>',
-    text: `<p>Aquí encontraremos <b> la cantidad de solicitudes de materia prima que se encuentran finalizadas actualmente</b><br><br>
+    text: `<p>Aquí encontraremos <b> la cantidad de requisiciones de materia prima que se encuentran finalizadas actualmente</b><br><br>
     Las solicitudes con estado finalizado son las que <b>ya han sido aprobadas por gerencia, ya tienen ordenes de compra asociadas, y se pidió toda la materia prima solicitada.</b><br><br>
     Además  <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
   },
@@ -5340,7 +5067,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'botones1',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search"></i> Consultar / <i class="pi pi-eraser"></i> Limpiar Campos</h5>',
-    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la solicitud de materia prima en la tabla</b> de registros consultados.
+    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la requisición de materia prima en la tabla</b> de registros consultados.
     <br><br>Para reiniciar tu busqueda solo <b>haz click sobre el botón limpiar campos.</b></p>`
   },
   {
@@ -5356,7 +5083,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'tabla1',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Encabezado de solicitudes</h5>',
-    text: `<p>Aquí podrás apreciar <b>el encabezado de las solicitudes de materia prima que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
+    text: `<p>Aquí podrás apreciar <b>el encabezado de las requisiciones de materia prima que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
     <b>- Id</b><br>
     <b>- Fecha Creación</b><br>
     <b>- Estado General</b></p>`
@@ -5390,7 +5117,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'matprimas',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Detalles de la solicitud</h5>',
-    text: `<p>En este apartado podrás ver <b>los detalle de las solicitudes de materia prima que selecciones de la tabla registros consultados.</b></p>`
+    text: `<p>En este apartado podrás ver <b>los detalle de las requisiciones de materia prima que selecciones de la tabla registros consultados.</b></p>`
   },
   {
     attachTo: {
@@ -5450,7 +5177,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'crear-oc',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-window-maximize"></i> Cargar modal.</h5>',
-    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de ordenes de compras</b> y se cargará el <b>campo Num. Solicitud</b> con el Id de la solicitud de materia prima.</b><br><br>
+    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de ordenes de compras</b> y se cargará el <b>campo Num. Solicitud</b> con el Id de la requisición de materia prima.</b><br><br>
     Asi como también <b>se cargará la tabla con las materias pedidas en la solicitud,</b> dicha tabla cuenta con 2 funcionalidades importantes tales como:<br><br>
     <b>1. El campo de cantidad editable:</b> Haciendo clic sobre este campo podrás modificar la cantidad solicitada por el usuario.<br>
     <b>2. Quitar materia(s) prima(s):</b> Haciendo clic sobre el botón <i class="pi pi-trash"></i> <b>podrás quitar las materias primas</b> que no deseas que se encuentren en la orden de compra por el motivo que desees.<br> </p>`
@@ -5468,7 +5195,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'finalizar',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square"></i> Finalizar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás finalizar la solicitud de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
+    text: `<p>pulsando sobre este botón podrás finalizar la requisición de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
     Ten en cuenta que:<br>
     - <b>Si al menos una materia prima solicitada</b> tiene estado pendiente, <b>cambiará a cancelada.</b><br>
     - <b>Si al menos una materia prima solicitada</b> tiene estado parcial, <b>cambiará a finalizada.</b>
@@ -5486,283 +5213,10 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'cancelar',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Cancelar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás cancelar la solicitud de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
+    text: `<p>pulsando sobre este botón podrás cancelar la requisición de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
     Ten en cuenta que:<br>
     - <b>Si al menos una materia prima solicitada</b> tiene estado pendiente, <b>cambiará a cancelada.</b><br>
     - Si al menos <b>una materia prima solicitada</b> tiene estado parcial, <b>cambiará a finalizada.</b></p>`
-  },
-]
-
-export const stepsMovSolicitudesMPExtrusion : Step.StepOptions[] = [
-  {
-    attachTo: {
-      element: '#movimientos',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'movimientos',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Mov. de solicitudes</h5>',
-    text: `<p>En este reporte se pueden ver los <b>movimientos de solicitudes de material de producción</b>, podrás apreciar la cantidad de
-    solicitudes <b>aceptadas, pendientes, parciales y finalizadas.</b> <br><br>
-    Tendrás filtros de búsqueda por:<br>
-    <b>- Id de solicitud</b><br>
-    <b>- Fechas de la solicitud</b><br>
-    <b>- Estado de la solicitud</b><br><br>
-    Además podrás apreciar en que estado se encuentra las solicitudes y los materiales de la mismas.<br><br>
-    También podrás <b>cargar los datos de la solicitud en un modal de asignaciones, y cancelar o finalizar la solicitud</b>.</p>`
-  },
-  {
-    attachTo: {
-      element: '#rojo',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'rojo',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Solicitudes canceladas</h5>',
-    text: `<p>Aquí se podrá apreciar <b>la cantidad de solicitudes de material que se encuentran canceladas actualmente de las ultimas 100 creadas.</b><br><br>
-    <b>Nota:</b> A las solicitudes con estado cancelado no se les puede crear una asignación.<br><br>
-    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#naranja',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'naranja',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-exclamation-triangle"></i> Solicitudes pendientes</h5>',
-    text: `<p>En este apartado podrás apreciar <b>la cantidad de solicitudes de material que se encuentran pendientes actualmente de las ultimas 100 creadas.</b><br><br>
-    Las solicitudes con estado pendiente son a las que <b>no se les ha creado ó asociado una asignación.</b><br><br>
-    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#amarillo',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'amarillo',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-sliders-h"></i> Solicitudes parciales</h5>',
-    text: `<p>En este apartado podrás visualizar <b>la cantidad de solicitudes de material que se encuentran parciales actualmente de las ultimas 100 creadas.</b><br><br>
-    Las solicitudes con estado parcial son las que <b>ya han sido aprobadas por el encargado de materia prima, ya tienen asignaciones asociadas, pero no se entregó toda la materia prima de la solicitud.</b><br><br>
-    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#verde',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'verde',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check"></i> Solicitudes finalizadas</h5>',
-    text: `<p>Aquí encontraremos <b> la cantidad de solicitudes de materia prima que se encuentran finalizadas actualmente de las ultimas 100 creadas</b><br><br>
-    Las solicitudes con estado finalizado son las que <b> ya tienen asignaciones creadas, en las cuales se les entregó toda la materia prima solicitada.</b><br><br>
-    Además  <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#formulario1',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'formulario1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-filter"></i> Filtros</h5>',
-    text: `<p>Aquí encontraremos <b>los filtros de búsqueda donde podrás realizar tus consultas.</b><br><br>
-    Además podrás crear las combinaciones que desees llenando los campos: <br>
-    <b>- Id de solicitud</b><br>
-    <b>- Fecha Inicial de la solicitud</b><br>
-    <b>- Fecha Final de la solicitud</b><br>
-    <b>- Estado de la solicitud</b><br><br>
-    Y luego solo <b>pulsa el botón consultar para ver la información solicitada!</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#botones1',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'botones1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search"></i> Consultar / <i class="pi pi-eraser"></i> Limpiar Campos</h5>',
-    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la solicitud de material en la tabla</b> de registros consultados.
-    <br><br>Para reiniciar tu busqueda solo <b>haz click sobre el botón limpiar campos.</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#tabla1',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'tabla1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Encabezado de solicitudes</h5>',
-    text: `<p>Aquí podrás apreciar <b>el encabezado de las solicitudes de material que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
-    <b>- Id</b><br>
-    <b>- OT</b><br>
-    <b>- Fecha Creación</b><br>
-    <b>- Estado General</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#detalle',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'detalle',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-eye"></i> Ver detalles de la solicitud</h5>',
-    text: `<p>Si existen registros en la tabla, <b>pulsa sobre el botón <i class="pi pi-eye"></i></b> para ver detalles de la solicitud del registro que seleccionaste. <br><br>
-    podrás apreciar <b>número de solicitud, operario solicitante, materias primas, cantidad pedida, cantidad asignada unidad de medida y el estado de las mismas</b> en la tabla detalles de la solicitud.</p>`
-  },
-  {
-    attachTo: {
-      element: '#matprimas',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'matprimas',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Detalles de la solicitud</h5>',
-    text: `<p>En este apartado podrás ver <b>los detalle de las solicitudes de material que selecciones de la tabla registros consultados.</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#usuario',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'usuario',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user"></i> Usuario solicitante</h5>',
-    text: `<p>Luego de hacer click en <b>el botón <i class="pi pi-eye"></i> ver detalles</b> en la tabla registros consultados, <b>aquí visualizarás el nombre del usuario que realizó el pedido de materia prima.</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#tabla2',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'tabla2',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Materias Primas</h5>',
-    text: `<p>Aquí podrás apreciar <b>las materias primas solicitadas, la cantidad pedida, unidad de medida y el estado de las mismas</b><br><br></p>`
-  },
-  {
-    attachTo: {
-      element: '#aprobada',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'aprobada',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Cantidad aprobada</h5>',
-    text: `<p>Este campo se refiere a <b>la cantidad de cada item de materia prima que se ha asignado en base a la solicitud</b> que esté visualizando en el momento.<br><br></p>`
-  },
-  {
-    attachTo: {
-      element: '#crear-oc',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'crear-oc',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-window-maximize"></i> Cargar modal.</h5>',
-    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de asignaciones de materia prima</b> y se cargará el <b>campo N°. Solicitud</b> con el Id de la solicitud de materia prima.</b><br><br>
-    Asi como también <b>se cargará la tabla con las materias pedidas en la solicitud,</b> dicha tabla cuenta con 2 funcionalidades importantes tales como:<br><br>
-    <b>1. El campo de cantidad editable:</b> Haciendo clic sobre este campo podrás modificar la cantidad solicitada por el usuario.<br>
-    <b>2. Quitar materia(s) prima(s):</b> Haciendo clic sobre el botón <i class="pi pi-trash"></i> <b>podrás quitar las materias primas</b> que no deseas que se encuentren en la orden de compra por el motivo que desees.<br> </p>`
-  },
-  {
-    attachTo: {
-      element: '#finalizar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'finalizar',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square"></i> Finalizar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás finalizar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#cancelar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'cancelar',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Cancelar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás cancelar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b><br><br>
-    </p>`
   },
 ]
 
@@ -9510,215 +8964,6 @@ export const stepsReporteRecibosCaja : Step.StepOptions[] = [
 
 /******************************************************************* TICKETS **************************************************************************/
 // Los pasos de Tickets, Gestión de Tickets y Detalle del ticket están en src/app/Tutoriales/Tutoriales_Tickets.ts
-
-/********************************************************************* USUARIOS **********************************************************************/
-export const stepsUsuarios : Step.StepOptions[] = [
-  {
-    attachTo: {
-      element: '#usuarios',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'usuarios',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-users font-size-16"></i> Gestionar usuarios</h5>',
-    text: `Este módulo será el encargado de la gestión de usuarios de nuestro sistema de información. <br><br><b>Aquí podrás ver, crear, editar e inactivar los usuarios que desees!</b>`
-  },
-  {
-    attachTo: {
-      element: '#nuevo-rol',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'nuevo-rol',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-plus-circle font-size-16"></i> Registrar nuevo rol</h5>',
-    text: `Haciendo clic sobre este botón se cargará un modal para <b>registrar nuevos roles para los usuarios en el nuevo sistema de la empresa.</b><br><br>
-    Al crear un rol desde este modal, también se <b>registrará un nuevo tipo de usuario con las mismas caracteristicas del rol creado.</b>`
-  },
-  {
-    attachTo: {
-      element: '#nueva-area',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'nueva-area',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-plus-circle font-size-16"></i> Registrar nueva área</h5>',
-    text: `Haciendo clic sobre este botón se cargará un modal para <b>registrar una nueva área de la empresa</b>`
-  },
-  {
-    attachTo: {
-      element: '#nuevo-usuario',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'nuevo-usuario',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-plus-circle font-size-16"></i> Registrar nuevo usuario</h5>',
-    text: `Al hacer clic sobre este botón, <b>se cargará un modal para crear un nuevo usuario en el sistema</b>, para ello debes diligenciar los siguientes campos: <br><br>
-    - <b>Id Usuario</b><br>
-    - <b>Nombre</b><br>
-    - <b>Tipo</b><br>
-    - <b>Área</b><br>
-    - <b>Rol</b><br>
-    - <b>Estado</b><br>
-    - <b>Contraseña</b>
-    `
-  },
-  {
-    attachTo: {
-      element: '#eliminar-usuario',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'eliminar-usuario',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user-minus font-size-16"></i> Inactivar usuario</h5>',
-    text: `Este botón solo se habilitará cuando selecciones un usuario de la tabla.<br><br>
-    Si haces clic sobre él, luego de seleccionar un usuario, <b>este quedará con un estado inactivo y por ende, no podrá ingresar al sistema.</b>`
-  },
-  {
-    attachTo: {
-      element: '#exportar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'exportar',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-file-excel font-size-16"></i> Exportar datos</h5>',
-    text: `Haciendo clic sobre este botón <b>se exportará en formato excel el listado de todos los usuarios del sistema.</b>`
-  },
-  {
-    attachTo: {
-      element: '#buscar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'buscar',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search font-size-16"></i> Buscar usuarios</h5>',
-    text: `Aquí puedes buscar el usuario que desees, <b>por Id, nombre o área.</b>`
-  },
-  {
-    attachTo: {
-      element: '#tabla',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'tabla',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-table font-size-16"></i> Tabla de usuarios</h5>',
-    text: `En esta tabla <b>se cargarán todos los usuarios del sistema</b>, con sus respectivas areas, roles, tipos y estados.`
-  },
-  {
-    attachTo: {
-      element: '#check',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'check',
-    id: 'tabla',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square font-size-16"></i> Elegir usuarios</h5>',
-    text: `Haciendo click sobre estos checkbox y luego sobre el botón eliminar usuarios <b>podrás inactivar usuarios masivamente.<B>`
-  },
-  {
-    attachTo: {
-      element: '#editar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'editar',
-    id: 'tabla',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user-edit font-size-16"></i> Editar usuarios</h5>',
-    text: `Pulsando sobre este botón, <b>se cargará un modal para para editar la información del usuario seleccionado en la tabla.</b>`
-  },
-  {
-    attachTo: {
-      element: '#inactivar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'inactivar',
-    id: 'tabla',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user-minus font-size-16"></i> Inactivar usuarios</h5>',
-    text: `Al hacer click sobre este botón, <b>podrás inactivar el usuario seleccionado en la tabla.</b>`
-  },
-  {
-    attachTo: {
-      element: '#roles',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'roles',
-    id: 'tabla',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-users font-size-16"></i> Roles Usuarios</h5>',
-    text: `¡En esta sección podrás ver la lista de roles que se manejan!`
-  },
-  {
-    attachTo: {
-      element: '#editarRol',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.cancel
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'editarRol',
-    id: 'tabla',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-pencil font-size-16"></i> Editar Roles</h5>',
-    text: `¡Podemos editar los roles de los usuarios, cambiando el nombre, descripción y las vistas a las cuales el rol puede acceder!`
-  },
-];
 
 /******************************************************************** DASHBOARD **********************************************************************/
 export const stepsDashboardOT : Step.StepOptions[] = [

@@ -10,7 +10,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsPreIngresoRolloDespacho as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
@@ -270,7 +270,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
       if (info.UndMed_Rollo == 'UND') info.UndMed_Rollo = 'Und';
 
       this.dtPreEntRollosService.srvGuardar(info).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`¡PreEntrega Realizada!`, `¡Se ha registrado la PreEntrega de rollos!`);
+        this.mensajeService.mensajeConfirmacion('OK!', `¡Se ha registrado la PreEntrega de rollos!`);
         this.cargando = false;
       }, () => {
         this.mensajeService.mensajeError(`¡Ha Ocurrido Un Error!`,`¡No fue posible guardar los detalles de cada rollos PreEntregado!`);
@@ -310,9 +310,9 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Pre Cargue de Rollos`,

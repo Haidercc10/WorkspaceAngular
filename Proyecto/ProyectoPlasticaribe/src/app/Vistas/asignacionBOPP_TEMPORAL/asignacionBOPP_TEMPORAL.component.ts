@@ -544,7 +544,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           let cantidad = datos_bopp[j].bopP_Stock - this.ArrayBoppPedida[i].Cantidad2;
           this.boppService.PutInventarioBiorientado(datos_bopp[j].bopP_Id, cantidad).subscribe(() => {
             this.obtenerBOPP();
-            this.msj.mensajeConfirmacion(`Asignación exitosa`, `Se ha creado exitosamente la asignación de rollos!`);
+            this.msj.mensajeConfirmacion('OK!', `Se ha creado exitosamente la asignación de rollos!`);
             setTimeout(() => {
               this.limpiarTodosLosCampos()
             }, 2000);

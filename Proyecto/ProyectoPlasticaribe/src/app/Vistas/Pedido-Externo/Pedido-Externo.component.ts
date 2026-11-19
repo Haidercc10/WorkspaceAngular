@@ -17,7 +17,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsCrearPedidos as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
@@ -582,7 +582,7 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
         if (count == this.ArrayProducto.length) {
           this.productosPedido(id_pedido);
           this.limpiarTodosCampos();
-          this.msj.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
+          this.msj.mensajeConfirmacion('OK!', `¡El pedido fue creado de manera satisfactoria!`);
         }
       }, () => {
         this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!');
@@ -652,7 +652,7 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
             if (count == this.ArrayProducto.length) {
               this.limpiarTodosCampos();
               this.productosPedido(this.pedidoEditar);
-              this.msj.mensajeConfirmacion(`¡Pedido Editado exitosamente!`, `¡El pedido fue editado de manera satisfactoria!`);
+              this.msj.mensajeConfirmacion('OK!', `¡El pedido fue editado de manera satisfactoria!`);
             }
           }, () => {
             this.msj.mensajeError(`Error`, '¡No se pudo Editar el pedido, por favor intente de nuevo!');
@@ -698,7 +698,7 @@ export class PedidoExternoComponent implements OnInit, OnDestroy {
               {
                 margin: [20, 8, 20, 0],
                 columns: [
-                  { image: logoParaPdf, width: 150, height: 30, margin: [20, 25] },
+                  { image: logoNuevoParaPdf, width: 150, fit: [150, 30], margin: [20, 25] },
                   {
                     width: 300,
                     alignment: 'center',

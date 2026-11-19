@@ -11,6 +11,7 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCostos as defaultSteps } from 'src/app/data';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { colorTextoGrafica, COLOR_REJILLA_GRAFICA, colorSerieGrafica, rellenoSerieGrafica } from 'src/app/Servicios/Tema/Paleta';
 
 @Component({
   selector: 'app-Dashboard_Costos',
@@ -76,9 +77,9 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Actualiza los colores de texto de las gráficas cuando el usuario cambia de tema
   private actualizarColoresGraficas() {
-    this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-    this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    this.opcionesGrafica.plugins.legend.labels.color = colorTextoGrafica(this.modoSeleccionado);
+    this.opcionesGrafica.scales.x.ticks.color = colorTextoGrafica(this.modoSeleccionado);
+    this.opcionesGrafica.scales.y.ticks.color = colorTextoGrafica(this.modoSeleccionado);
   }
 
   ngOnInit(): void {
@@ -134,13 +135,13 @@ export class Dashboard_CostosComponent implements OnInit {
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: colorTextoGrafica(this.modoSeleccionado), usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: colorTextoGrafica(this.modoSeleccionado),
             font: { size: 20 },
             callback: function(value) {
               const labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -149,14 +150,14 @@ export class Dashboard_CostosComponent implements OnInit {
               else return label;
             }
           },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' }
+          grid: { color: COLOR_REJILLA_GRAFICA }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: 'rgba(128, 128, 128, 0.2)' },
+          ticks: {  color: colorTextoGrafica(this.modoSeleccionado), font: { size: 20 } },
+          grid: { color: COLOR_REJILLA_GRAFICA },
           min : 0
         },
       },
@@ -305,13 +306,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de fabricacion
   llenarGraficaCostos_Fabricacion(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosFabricacion.datasets.length, this.modoSeleccionado);
     this.graficaCostosFabricacion.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -348,13 +349,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de costos administrativos
   llenarGraficaCostos_Administrativos(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosAdministrativos.datasets.length, this.modoSeleccionado);
     this.graficaCostosAdministrativos.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -391,13 +392,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de costos de ventas
   llenarGraficaCostos_Ventas(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosVentas.datasets.length, this.modoSeleccionado);
     this.graficaCostosVentas.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -434,13 +435,13 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llenar la grafica de costos no operacionesles
   llenarGraficaCostos_NoOperacionesles(data, cuenta){
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    const color: string = colorSerieGrafica(this.graficaCostosNoOperacionesles.datasets.length, this.modoSeleccionado);
     this.graficaCostosNoOperacionesles.datasets.push({
       label: `${cuenta} - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
+      borderColor: color,
+      backgroundColor: rellenoSerieGrafica(color),
       pointStyle: 'rectRot',
       pointRadius: 10,
       pointHoverRadius: 15,
@@ -702,7 +703,7 @@ export class Dashboard_CostosComponent implements OnInit {
     this.agregarHojaDosExcel(workbook, fill, font, border, datosHojaDos);
     this.excelService.creacionExcel(nombreArchivo, workbook);
     this.cargando = false;
-    this.msj.mensajeConfirmacion(`¡Información Exportada!`, titulo);
+    this.msj.mensajeConfirmacion('OK!', `¡Se exportó la información de "${titulo}" a Excel!`);
   }
 
   // Funcion que agregará la primera hoja al archivo de excel, a su vez esta funcion llamará a otras funciones que añadirán información a la hoja creada aquí

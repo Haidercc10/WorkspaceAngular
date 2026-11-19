@@ -6,7 +6,7 @@ import { Reporte_SolicitudesMPComponent } from 'src/app/Vistas/Reporte_Solicitud
 const routes: Routes = [{
   path: '',
   canActivate: [VistasPermisosGuard], 
-  data: {nombre: 'Mov. Solicitud Materia Prima'}, 
+  data: {nombre: 'Mov. Requisición de Materia Prima'}, 
   component: Reporte_SolicitudesMPComponent
 }];
 

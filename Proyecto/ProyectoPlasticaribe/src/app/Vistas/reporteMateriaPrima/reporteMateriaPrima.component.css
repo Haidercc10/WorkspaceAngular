@@ -1,5 +1,5 @@
 span{
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .columnaCantidad {
@@ -49,7 +49,8 @@ p-dialog ::ng-deep .p-dialog-header span {
   margin-left: 10px;
 }
 
-::ng-deep .p-card {
+/* Con :host para que no se filtre a las tarjetas de otras páginas (sin él, quedaba global al cargar este reporte) */
+:host ::ng-deep .p-card {
   align-items: center;
   margin: auto;
   width: 90%;
@@ -58,6 +59,17 @@ p-dialog ::ng-deep .p-dialog-header span {
   border-radius: 10px;
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
+}
+
+/* Espacio sobrante bajo la tabla: styles.css le da a todo .p-card-content margin-bottom: 3rem !important y el tema
+   le da 1.25rem de relleno inferior al panel de pestañas. Sin ellos, el espacio bajo el paginador queda igual al de
+   los costados (relleno de la tarjeta + del cuerpo + .mb-3). */
+:host ::ng-deep .p-card .p-card-body .p-card-content {
+  margin-bottom: 0 !important;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-panels {
+  padding-bottom: 0;
 }
 
 ::ng-deep p-toolbar .p-toolbar {
@@ -80,15 +92,6 @@ p-dialog ::ng-deep .p-dialog-header span {
   width: 2rem;
   height: 2rem;
 }
-/* Botón de tutorial dentro del h2 del título (igual que en Tickets, Precargue y Solicitud de material). */
-.boton-tutorial-titulo {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 0.4rem;
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* Interruptor "Mostrar sin Stock": centrado verticalmente con el botón Consultar y el campo de fechas. */
 .switch-stock {
   display: flex;
@@ -108,7 +111,7 @@ p-dialog ::ng-deep .p-dialog-header span {
 
 /* Cantidad disponible negativa en Subcategorías: lo reservado supera el stock. */
 .disponible-negativo {
-  color: #db4149;
+  color: var(--rojo);
 }
 
 /* Modal "¿Qué material desea crear?": dos tarjetas grandes. */
@@ -199,7 +202,7 @@ p-dialog ::ng-deep .p-dialog-header span {
 }
 
 .formulario-editar .obligatorio {
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .formulario-editar .mensaje-error,
@@ -210,7 +213,7 @@ p-dialog ::ng-deep .p-dialog-header span {
 }
 
 .formulario-editar .mensaje-error {
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .formulario-editar .ayuda {

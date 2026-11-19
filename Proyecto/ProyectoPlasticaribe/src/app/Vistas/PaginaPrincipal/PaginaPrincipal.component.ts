@@ -4,6 +4,8 @@ import { TabView } from 'primeng/tabview';
 import { AppComponent } from 'src/app/app.component';
 import { modelUsabilidad_Modulos } from 'src/app/Modelo/modelUsabilidad_Modulos';
 import { UsabilidadModulosService } from 'src/app/Servicios/Usabilidad_Modulos/usabilidad-modulos.service';
+import { TicketsService, USUARIO_AVISO_TICKETS } from 'src/app/Servicios/Tickets/Tickets.service';
+import { Router } from '@angular/router';
 
 @Injectable({  providedIn: 'root' })
 
@@ -55,13 +57,19 @@ export class PaginaPrincipalComponent implements OnInit, AfterViewInit, OnDestro
   calidad : boolean = false; // Variable que se usará para mostrar el módulo de calidad
   production : boolean = false; // Variable que se usará para mostrar el módulo de producción
 
+  avisoTicketsVisible : boolean = false; //Aviso de tickets abiertos sin revisar (una vez por sesión)
+  ticketsAbiertos : number = 0;
+
   constructor(private AppComponent : AppComponent,
     private svUseModules : UsabilidadModulosService,
     private elementRef : ElementRef,
+    private ticketsService : TicketsService,
+    private router : Router,
   ) { }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.verificarAvisoTickets();
     this.fondoActivo = [2].includes(this.ValidarRol) ? 'fondo-ot' : 'fondo-produccion'; //Para el rol 2 la primera pestaña es Ordenes de Trabajo
     this.production = true;
     this.ordenTrabajo = true;
@@ -157,6 +165,29 @@ export class PaginaPrincipalComponent implements OnInit, AfterViewInit, OnDestro
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  /**
+   * Muestra, una sola vez por sesión, el aviso de tickets abiertos sin revisar.
+   * Por ahora solo para el administrador que gestiona los tickets (USUARIO_AVISO_TICKETS);
+   * para que aplique a todos los administradores, quitar la condición del id.
+   */
+  verificarAvisoTickets() {
+    if (this.ValidarRol != 1) return;
+    if (this.storage_Id != USUARIO_AVISO_TICKETS) return;
+    if (TicketsService.avisoYaMostrado()) return;
+
+    this.ticketsService.cargarCantidadesSoporte().subscribe(c => {
+      TicketsService.marcarAvisoMostrado(); // aunque no haya tickets, no se vuelve a consultar al regresar a Inicio
+      if (!c || c.abiertos <= 0) return;
+      this.ticketsAbiertos = c.abiertos;
+      this.avisoTicketsVisible = true;
+    });
+  }
+
+  verTicketsAbiertos() {
+    this.avisoTicketsVisible = false;
+    this.router.navigateByUrl('/Gestion-Tickets');
+  }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){

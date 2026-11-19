@@ -1,0 +1,20 @@
+<div class="vacio" *ngIf="eventos.length == 0">
+  <i class="pi pi-calendar"></i>
+  <p>{{ mensajeVacio }}</p>
+</div>
+
+<ul class="lista" *ngIf="eventos.length > 0">
+  <li *ngFor="let evento of eventos; trackBy: trackPorId">
+    <button type="button" class="item" [class.detallado]="detallado" (click)="seleccionar.emit(evento)">
+      <span class="marca" [ngClass]="clase(evento)" aria-hidden="true"></span>
+      <span class="contenido">
+        <span class="titulo">{{ evento.nombre }}</span>
+        <span class="cuando"><i class="pi pi-clock"></i> {{ cuando(evento) }}</span>
+        <span class="descripcion" *ngIf="evento.descripcion">{{ evento.descripcion }}</span>
+        <span class="meta">
+          {{ visibilidad(evento) }}<ng-container *ngIf="!evento.esPropio && evento.creador"> · Creado por {{ evento.creador }}</ng-container>
+        </span>
+      </span>
+    </button>
+  </li>
+</ul>

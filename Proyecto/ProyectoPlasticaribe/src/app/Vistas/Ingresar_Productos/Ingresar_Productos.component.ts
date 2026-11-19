@@ -9,7 +9,7 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { defaultStepOptions, stepsIngresoRolloDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -367,7 +367,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           }
           this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
             this.cargando = false;
-            this.mensajeService.mensajeConfirmacion('¡Rollos Ingresados!', `¡Entrada de Rollos registrada con exito!`);
+            this.mensajeService.mensajeConfirmacion('OK!', `¡Entrada de Rollos registrada con exito!`);
           }, () => {
             this.mensajeService.mensajeError('¡Rollos Ingresados con Error!', `¡Error al mover el inventario del Producto ${datos_productos[j].prod_Id}, mover el inventario manualmente!`);
             this.limpiarCampos();
@@ -404,9 +404,9 @@ export class Ingresar_ProductosComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Cargue de Rollos`,

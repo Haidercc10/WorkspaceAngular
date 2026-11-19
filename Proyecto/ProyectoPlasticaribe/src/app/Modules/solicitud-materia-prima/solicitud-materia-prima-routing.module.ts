@@ -7,7 +7,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [VistasPermisosGuard], 
-    data: {nombre: 'Solicitud Materia Prima'}, 
+    data: {nombre: 'Requisición de Materia Prima'}, 
     component: SolicitudMateriaPrimaComponent
   }
 ];

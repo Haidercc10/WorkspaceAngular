@@ -13,7 +13,7 @@ import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maqu
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovMaquilas as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
@@ -299,7 +299,7 @@ export class Reporte_MaquilasComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
+                { image : logoNuevoParaPdf, width : 220, fit : [220, 50] },
                 {
                   text: `${datos_facturacion[i].tipo_Documento} N° ${id}`,
                   alignment: 'right',
@@ -509,7 +509,7 @@ export class Reporte_MaquilasComponent implements OnInit {
               {
                 margin: [20, 8, 20, 0],
                 columns: [
-                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  { image : logoNuevoParaPdf, width : 150, fit : [150, 30], margin: [20, 25] },
                   {
                     width: 300,
                     alignment: 'center',

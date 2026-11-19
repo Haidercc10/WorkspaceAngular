@@ -96,6 +96,9 @@ export class BagproService {
 
   putObservationDeletedRolls = (data : Array<rollsToDelete>) => this.http.post(`${this.rutaBagPro}/ProcExtrusion/putObservationDeletedRolls`, data);
 
+  putObservationDeletedRolls2 = (data : Array<rollsToDelete>): Observable<{ updatedExtrusion: number, updatedSellado: number, notFound: number[] }> =>
+    this.http.post<{ updatedExtrusion: number, updatedSellado: number, notFound: number[] }>(`${this.rutaBagPro}/ProcExtrusion/putObservationDeletedRolls2`, data);
+
   getAvailablesRollsOT = (ot: string, process : string, notAvaible: Array<number>): Observable<any> => this.http.post(`${this.rutaBagPro}/ProcExtrusion/getAvailablesRollsOT/${ot}/${process}`, notAvaible);
 
   GetInformactionProductionForTag = (production: number): Observable<any> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getInformactionProductionForTag/${production}`);

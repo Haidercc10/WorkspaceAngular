@@ -224,7 +224,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
     this.produccionProcessService.PutDelivered_Avaible(idEntrace).subscribe(() => {
       this.barCode = null;
       this.load = false;
-      this.msg.mensajeConfirmacion(`¡Registro Exitoso!`, `¡Se ingresaron exitosamente todos los rollos/bultos!`);
+      this.msg.mensajeConfirmacion('OK!', `¡Se ingresaron exitosamente todos los rollos/bultos!`);
     }, (error: HttpErrorResponse) => this.errorMessage(`¡Ocurrió un error al actualizar el estado de los rollos/bultos!`, error));
   }
 

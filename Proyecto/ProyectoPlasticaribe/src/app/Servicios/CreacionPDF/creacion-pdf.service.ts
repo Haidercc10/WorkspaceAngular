@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import JsBarcode from 'jsbarcode';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -12,6 +12,7 @@ import { UtileriaService } from '../Utileria/utileria.service';
 import { catchError, map, Observable } from 'rxjs';
 import { BagproService } from '../BagPro/Bagpro.service';
 import { Orden_TrabajoService } from '../OrdenTrabajo/Orden_Trabajo.service';
+import { DatosPdfAsignacion, DetalleSolicitudMaterial, MaterialDetalleSolicitud, SubcategoriaAsignadaPdf, SubcategoriaDetalleSolicitud } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 
 @Injectable({
   providedIn: 'root'
@@ -29,12 +30,15 @@ export class CreacionPdfService {
     private bagProService: BagproService,
   ) { }
 
-  formatoPDF(titulo: string, content: any, headerAdicional: any = {}) {
+  /**
+   * @param tituloPestana Título del documento (el que se ve en la pestaña del navegador); por defecto el mismo título.
+   */
+  formatoPDF(titulo: string, content: any, headerAdicional: any = {}, tituloPestana: string = titulo) {
     this.title = titulo; 
     let today: any = moment().format('YYYY-MM-DD');
     let hour: any = moment().format('HH:mm:ss');
     const pdfDefinicion: any = {
-      info: { title: titulo },
+      info: { title: tituloPestana },
       pageOrientation: 'portrait',
       pageSize: 'LETTER',
       watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
@@ -47,7 +51,8 @@ export class CreacionPdfService {
 
   /**
    * Cabecera común: logo (ancho fijo), título (ocupa todo el espacio restante) y paginado/fecha/hora (ancho fijo).
-   * En carta (612 pt) quedan ~572 pt: 135 para el logo, 95 para el paginado y ~340 para el título,
+   * El logo necesita `width` además de `fit`: en pdfmake una columna sin width es '*' y se repartiría el espacio con el título.
+   * En carta (612 pt) quedan ~572 pt: 130 para el logo, 95 para el paginado y ~340 para el título,
    * suficiente para que cada línea del título (p. ej. "Asignación de Materia Prima N° 91510") quepa en un solo renglón.
    */
   private headerPDF(today: any, hour: any, titulo: string, headerAdicional: any): {} {
@@ -56,7 +61,8 @@ export class CreacionPdfService {
         {
           margin: [20, 8, 20, 0],
           columns: [
-            { image: logoParaPdf, width: 125, height: 25, margin: [10, 24, 0, 8] },
+            // Margen izquierdo 5: el logo empieza donde empieza la línea del encabezado (x = 25); arriba 20 lo centra con el título
+            { image: logoNuevoParaPdf, width: 130, fit: [130, 26], margin: [5, 20, 0, 8] },
             this.title == null ? null : this.empresaFechaHoraTituloPDF(titulo, today, hour),
             this.title == null ? null : this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
           ]
@@ -80,7 +86,8 @@ export class CreacionPdfService {
         { text: 'NIT. 800188732' },
         { text: titulo },
       ],
-      margin: [10, 18, 10, 8],
+      // Derecha 45 = 10 + (130 del logo − 95 del paginado): iguala los lados para que el título quede centrado en la página
+      margin: [10, 18, 45, 8],
     }
   }
 
@@ -1009,30 +1016,97 @@ export class CreacionPdfService {
    * Copia del PDF que genera SolicitudMP_ExtrusionComponent, sin depender de esa pantalla y con estas correcciones:
    * totales por unidad de medida (no suma Kg con Cms), Kg reales de la OT separados del límite, datos de la solicitud
    * (estado, fechas, solicitante, máquina, proceso), cantidades entregadas/faltantes y la cabecera común de los PDFs.
-   * @param detalles Filas de `DetSolicitud_MatPrimaExtrusion/getSolicitudMp_Extrusion/{id}`: encabezado repetido en cada fila más el detalle.
+   * Muestra las máquinas con su porcentaje y las subcategorías con sus materiales.
+   * @param solicitud Detalle de `SolicitudesExtrusion/{id}` (encabezado, máquinas y subcategorías con materiales).
    * @param ot Datos de la OT en BagPro, o null si no se encontró.
    */
-  solicitudMaterialProduccionPDF(detalles: any[], ot: DatosOTSolicitudPDF | null) {
-    const solicitud = detalles[0];
-    const subcategorias = detalles
-      .map(d => ({
-        id: d.id_Subcategoria,
-        nombre: d.subcategoria,
-        solicitada: Number(d.cantidad_Pedida) || 0,
-        entregada: Number(d.cantidad_Entregada) || 0,
-        faltante: Number(d.cantidad_Restante) || 0,
-        medida: d.medida,
-      }))
-      .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+  solicitudMaterialProduccionPDF(solicitud: DetalleSolicitudMaterial, ot: DatosOTSolicitudPDF | null) {
+    const { titulo, tituloPestana, content } = this.contenidoSolicitudMaterialPDF(solicitud, ot);
+    this.formatoPDF(titulo, content, {}, tituloPestana);
+  }
 
-    const titulo = `Solicitud de Material de Producción N° ${solicitud.id}\nOrden de Trabajo N° ${solicitud.ot}`;
+  /**
+   * Genera el PDF de la solicitud de material como archivo en memoria (sin abrirlo), para mostrar un aviso
+   * y abrirlo después (como `generarBlobOrdenTrabajo`).
+   */
+  generarBlobSolicitudMaterialProduccion(solicitud: DetalleSolicitudMaterial, ot: DatosOTSolicitudPDF | null): Observable<Blob> {
+    return this.generarBlobPDF(() => this.contenidoSolicitudMaterialPDF(solicitud, ot));
+  }
+
+  /**
+   * Genera el PDF de una asignación de materia prima y tintas como archivo en memoria (sin abrirlo), para mostrar un aviso
+   * y abrirlo después.
+   * @param datos Datos de `Asignacion_MatPrima/{id}/pdf`.
+   */
+  generarBlobAsignacionMateriaPrima(datos: DatosPdfAsignacion): Observable<Blob> {
+    return this.generarBlobPDF(() => this.contenidoAsignacionMaterialPDF(datos));
+  }
+
+  /**
+   * Arma un PDF con el formato común (cabecera, marca de agua, márgenes) y lo entrega como archivo en memoria.
+   * @param contenido Devuelve el título de la cabecera, el título de la pestaña y el contenido del documento.
+   */
+  private generarBlobPDF(contenido: () => {
+    titulo: string;
+    tituloPestana: string;
+    content: any[];
+    /** Título de la cabecera por hoja (si cambia de una hoja a otra); si no se envía, todas usan `titulo`. */
+    tituloPorPagina?: (pagina: number) => string;
+    /** Se ejecuta al maquetar cada nodo; sirve para saber en qué hoja empieza cada sección. */
+    pageBreakBefore?: (nodo: any) => boolean;
+  }): Observable<Blob> {
+    return new Observable<Blob>(suscriptor => {
+      try {
+        const hoy = moment().format('YYYY-MM-DD');
+        const hora = moment().format('HH:mm:ss');
+        // pdfmake modifica el contenido al maquetarlo: cada pasada arma el suyo con `contenido()`.
+        const definicion = () => {
+          const { titulo, tituloPestana, content, tituloPorPagina } = contenido();
+          this.title = titulo;
+          return {
+            info: { title: tituloPestana },
+            pageOrientation: 'portrait',
+            pageSize: 'LETTER',
+            watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
+            pageMargins: [25, 120, 25, 35],
+            header: tituloPorPagina
+              ? (pagina: number, total: number) => (this.headerPDF(hoy, hora, tituloPorPagina(pagina), {}) as any)(pagina, total)
+              : this.headerPDF(hoy, hora, titulo, {}),
+            content,
+          };
+        };
+        const entregar = (blob: Blob) => {
+          suscriptor.next(blob);
+          suscriptor.complete();
+        };
+        const { pageBreakBefore } = contenido();
+        if (pageBreakBefore) {
+          // pdfmake dibuja las cabeceras antes de llamar a pageBreakBefore: una primera pasada solo averigua
+          // en qué hoja empieza cada sección y la segunda dibuja las cabeceras ya con ese dato.
+          pdfMake.createPdf({ ...definicion(), pageBreakBefore } as any).getBuffer(() => pdfMake.createPdf(definicion() as any).getBlob(entregar));
+        } else {
+          pdfMake.createPdf(definicion() as any).getBlob(entregar);
+        }
+      } catch (error) {
+        suscriptor.error(error);
+      }
+    });
+  }
+
+  /** Título y contenido del PDF de una solicitud de material (comunes a abrirlo directo o como archivo). */
+  private contenidoSolicitudMaterialPDF(solicitud: DetalleSolicitudMaterial, ot: DatosOTSolicitudPDF | null): { titulo: string; tituloPestana: string; content: any[] } {
+    const subcategorias = [...(solicitud.subcategorias ?? [])].sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+
+    const titulo = `Solicitud de Materia Prima N° ${solicitud.id}\nOrden de Trabajo N° ${solicitud.ot}`;
     const content = [
-      this.infoSolicitudMaterialPDF(solicitud),
+      this.infoSolicitudMaterialPDF(solicitud, subcategorias),
       this.infoOTSolicitudMaterialPDF(solicitud, ot),
+      this.tablaMaquinasSolicitudPDF(solicitud),
       this.tablaSubcategoriasSolicitudPDF(subcategorias),
-      this.observacionSolicitudMaterialPDF(solicitud.observacion),
+      this.observacionSolicitudMaterialPDF(solicitud.observacion ?? ''),
     ];
-    this.formatoPDF(titulo, content);
+    // Título corto para la pestaña del navegador; el título completo va en la cabecera del documento.
+    return { titulo, tituloPestana: `Solicitud MP #${solicitud.id}`, content };
   }
 
   /** Formatea una cantidad con separador de miles y dos decimales. */
@@ -1044,8 +1118,33 @@ export class CreacionPdfService {
   /** Estilo de tabla con las dos primeras filas (título y columnas) sombreadas. */
   private layoutEncabezadoGris = { fillColor: (rowIndex: number) => rowIndex === 0 || rowIndex === 1 ? '#DDDDDD' : null };
 
-  /** Datos generales de la solicitud. */
-  private infoSolicitudMaterialPDF(solicitud: any): {} {
+  /** Suma lo solicitado, entregado y faltante de las subcategorías por unidad de medida (no suma Kg con otras unidades). */
+  private totalesPorMedidaPDF(subcategorias: SubcategoriaDetalleSolicitud[]): Map<string, { solicitado: number; entregado: number; faltante: number }> {
+    const totales = new Map<string, { solicitado: number; entregado: number; faltante: number }>();
+    subcategorias.forEach(s => {
+      const total = totales.get(s.undMed_Id) ?? { solicitado: 0, entregado: 0, faltante: 0 };
+      total.solicitado += Number(s.solicitado) || 0;
+      total.entregado += Number(s.entregado) || 0;
+      total.faltante += Number(s.faltante) || 0;
+      totales.set(s.undMed_Id, total);
+    });
+    return totales;
+  }
+
+  /** Datos generales de la solicitud y un resumen de lo pedido (total, subcategorías, materiales y máquinas). */
+  private infoSolicitudMaterialPDF(solicitud: DetalleSolicitudMaterial, subcategorias: SubcategoriaDetalleSolicitud[]): {} {
+    const maquinas = solicitud.maquinas ?? [];
+    const totalSolicitado = Array.from(this.totalesPorMedidaPDF(subcategorias).entries())
+      .map(([medida, total]) => `${this.cantidadPDF(total.solicitado)} ${medida}`).join(' + ') || '0.00';
+    const cantidadMateriales = subcategorias.reduce((suma, s) => suma + (s.materiales ?? []).filter(m => !this.materialNoPedidoPDF(m)).length, 0);
+    const plural = (n: number, singular: string, pluralTexto: string) => `${n} ${n === 1 ? singular : pluralTexto}`;
+    const resumen = [
+      `Total solicitado: ${totalSolicitado}`,
+      plural(subcategorias.length, 'subcategoría', 'subcategorías'),
+      ...(cantidadMateriales > 0 ? [plural(cantidadMateriales, 'material', 'materiales')] : []),
+      plural(maquinas.length, 'máquina', 'máquinas'),
+    ].join('  ·  ');
+
     return {
       margin: [0, 0, 0, 10],
       fontSize: 8,
@@ -1053,16 +1152,60 @@ export class CreacionPdfService {
         widths: ['*', '*', '*', '*'],
         body: [
           [{ text: 'Información de la Solicitud', colSpan: 4, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}],
-          [`Estado: ${solicitud.nombre_Estado ?? ''}`, `Proceso: ${solicitud.proceso ?? ''}`, `Máquina: ${solicitud.maquina ?? ''}`, `Solicitante: ${solicitud.nombre_Usuario ?? ''}`],
           [
-            { text: `Fecha creación: ${this.fechaPDF(solicitud.fecha)} ${solicitud.hora ?? ''}`, colSpan: 2 }, {},
-            { text: `Fecha estimada de entrega: ${this.fechaPDF(solicitud.fecha_Entrega)}`, colSpan: 2 }, {},
+            `Estado: ${solicitud.estado ?? ''}`,
+            `Proceso: ${solicitud.proceso_Id ?? ''}`,
+            `${maquinas.length === 1 ? 'Máquina' : 'Máquinas'}: ${maquinas.map(m => m.maquina).join(', ')}`,
+            `Solicitante: ${solicitud.usuario ?? ''}`,
           ],
+          [
+            { text: `Fecha creación: ${this.fechaPDF(solicitud.fecha)} ${String(solicitud.hora ?? '').substring(0, 8)}`, colSpan: 2 }, {},
+            { text: `Fecha estimada de entrega: ${this.fechaPDF(solicitud.fechaEntrega)}`, colSpan: 2 }, {},
+          ],
+          [{ text: resumen, colSpan: 4, bold: true }, {}, {}, {}],
         ]
       },
       layout: { fillColor: (rowIndex: number) => rowIndex === 0 ? '#DDDDDD' : null },
     };
   }
+
+  /**
+   * Distribución por máquina: porcentaje, kg que le tocan del total solicitado, lo ya entregado a cada una y lo que falta.
+   * Las solicitudes anteriores (una sola máquina guardada en el encabezado) llegan del API con esa máquina al 100 %.
+   */
+  private tablaMaquinasSolicitudPDF(solicitud: DetalleSolicitudMaterial): {} {
+    const maquinas = solicitud.maquinas ?? [];
+    const numero = (valor: number, bold = false) => ({ text: this.cantidadPDF(valor), alignment: 'right', bold });
+    const porcentaje = (valor: number, bold = false) => ({ text: `${this.cantidadPDF(valor)} %`, alignment: 'right', bold });
+    const faltante = (objetivo: number, entregado: number) => Math.max(0, (Number(objetivo) || 0) - (Number(entregado) || 0));
+    const total = maquinas.reduce((t, m) => ({
+      porcentaje: t.porcentaje + (Number(m.porcentaje) || 0),
+      objetivo: t.objetivo + (Number(m.objetivo) || 0),
+      entregado: t.entregado + (Number(m.entregado) || 0),
+      faltante: t.faltante + faltante(m.objetivo, m.entregado),
+    }), { porcentaje: 0, objetivo: 0, entregado: 0, faltante: 0 });
+
+    return {
+      margin: [0, 0, 0, 10],
+      fontSize: 8,
+      table: {
+        headerRows: 2,
+        keepWithHeaderRows: 1,
+        dontBreakRows: true,
+        widths: ['*', 85, 85, 85, 85],
+        body: [
+          [{ text: 'Distribución por máquina', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}],
+          ['Máquina', 'Porcentaje', 'Kg solicitados', 'Kg entregados', 'Kg faltantes'],
+          ...maquinas.map(m => [String(m.maquina), porcentaje(m.porcentaje), numero(m.objetivo), numero(m.entregado), numero(faltante(m.objetivo, m.entregado))]),
+          [{ text: 'Total', bold: true, alignment: 'right' }, porcentaje(total.porcentaje, true), numero(total.objetivo, true), numero(total.entregado, true), numero(total.faltante, true)],
+        ]
+      },
+      layout: this.layoutEncabezadoGris,
+    };
+  }
+
+  /** El material se entregó sin haberse pedido: sustituto, o material entregado en una solicitud anterior (sin materiales). */
+  private materialNoPedidoPDF = (m: MaterialDetalleSolicitud): boolean => m.esSustituto || (Number(m.solicitado) || 0) === 0;
 
   /** Datos de la OT: kg reales de la OT y kg límite (con el adicional permitido) por separado. */
   private infoOTSolicitudMaterialPDF(solicitud: any, ot: DatosOTSolicitudPDF | null): {} {
@@ -1083,15 +1226,32 @@ export class CreacionPdfService {
     };
   }
 
-  /** Subcategorías solicitadas con lo entregado y lo faltante, y un total por cada unidad de medida. */
-  private tablaSubcategoriasSolicitudPDF(subcategorias: { id: any; nombre: string; solicitada: number; entregada: number; faltante: number; medida: string }[]): {} {
-    const totales = new Map<string, { solicitada: number; entregada: number; faltante: number }>();
+  /**
+   * Subcategorías (en negrita, con el Id junto al nombre) y debajo, con sangría, sus materiales; cada fila con lo
+   * solicitado, entregado y faltante. Los materiales entregados sin pedirse salen en cursiva con su motivo.
+   * Al final, un total por cada unidad de medida.
+   */
+  private tablaSubcategoriasSolicitudPDF(subcategorias: SubcategoriaDetalleSolicitud[]): {} {
+    const numero = (valor: number, extra: {} = {}) => ({ text: this.cantidadPDF(valor), alignment: 'right', ...extra });
+    const filas: any[][] = [];
     subcategorias.forEach(s => {
-      const total = totales.get(s.medida) ?? { solicitada: 0, entregada: 0, faltante: 0 };
-      total.solicitada += s.solicitada;
-      total.entregada += s.entregada;
-      total.faltante += s.faltante;
-      totales.set(s.medida, total);
+      filas.push([
+        { text: `${s.subCatMP_Id} - ${s.nombre}`, bold: true },
+        numero(s.solicitado, { bold: true }), numero(s.entregado, { bold: true }), numero(s.faltante, { bold: true }),
+        { text: s.undMed_Id, bold: true },
+      ]);
+      (s.materiales ?? []).forEach(m => {
+        const noPedido = this.materialNoPedidoPDF(m);
+        const solicitado = Number(m.solicitado) || 0;
+        const entregado = Number(m.entregado) || 0;
+        const motivo = m.esSustituto ? ' (sustituto)' : noPedido ? ' (entregado)' : '';
+        const estilo = noPedido ? { italics: true } : {};
+        filas.push([
+          { text: `${m.materialId} - ${(m.nombre || '').trim()}${motivo}`, margin: [12, 0, 0, 0], ...estilo },
+          numero(solicitado, estilo), numero(entregado, estilo), numero(Math.max(0, solicitado - entregado), estilo),
+          { text: m.undMed_Id, ...estilo },
+        ]);
+      });
     });
 
     return {
@@ -1101,16 +1261,14 @@ export class CreacionPdfService {
         headerRows: 2,
         keepWithHeaderRows: 1,
         dontBreakRows: true,
-        widths: [40, '*', 65, 65, 65, 45],
+        widths: ['*', 65, 65, 65, 45],
         body: [
-          [{ text: 'Subcategorías solicitadas', colSpan: 6, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}, {}],
-          ['Id', 'Subcategoría', 'Solicitada', 'Entregada', 'Faltante', 'Medida'],
-          ...subcategorias.map(s => [s.id, s.nombre, this.cantidadPDF(s.solicitada), this.cantidadPDF(s.entregada), this.cantidadPDF(s.faltante), s.medida]),
-          ...Array.from(totales.entries()).map(([medida, total]) => [
-            { text: `Total ${medida}`, colSpan: 2, bold: true, alignment: 'right' }, {},
-            { text: this.cantidadPDF(total.solicitada), bold: true },
-            { text: this.cantidadPDF(total.entregada), bold: true },
-            { text: this.cantidadPDF(total.faltante), bold: true },
+          [{ text: 'Subcategorías y materiales solicitados', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}],
+          ['Subcategoría / Material', 'Solicitada', 'Entregada', 'Faltante', 'Medida'],
+          ...filas,
+          ...Array.from(this.totalesPorMedidaPDF(subcategorias).entries()).map(([medida, total]) => [
+            { text: `Total ${medida}`, bold: true, alignment: 'right' },
+            numero(total.solicitado, { bold: true }), numero(total.entregado, { bold: true }), numero(total.faltante, { bold: true }),
             { text: medida, bold: true },
           ]),
         ]
@@ -1133,13 +1291,20 @@ export class CreacionPdfService {
   /* ============================================================== ASIGNACIÓN DE MATERIA PRIMA ===================================================================== */
 
   /**
-   * Genera el PDF de una asignación (materia prima, tintas o BOPP) con datos ya consultados (este servicio no llama al API).
+   * Genera el PDF de una asignación de BOPP con datos ya consultados (este servicio no llama al API). Las de materia
+   * prima y tintas usan `asignacionMaterialPDF` (agrupadas por subcategoría y con el saldo de la solicitud).
    * Trasladado desde MovimientoMPComponent con estas correcciones: se quitan Precio, SubTotal y Valor Total (siempre
    * se imprimían en $0), el peso total se suma por unidad de medida, el título de la tabla corresponde al tipo de
    * material y se muestra la máquina.
    * @param datos Filas de `Materia_Prima/getInfoMovimientoAsignaciones/{id}/{tipo}`: encabezado repetido en cada fila más el material.
    */
   asignacionMateriaPrimaPDF(datos: any[]) {
+    const { titulo, tituloPestana, content } = this.contenidoAsignacionPDF(datos);
+    this.formatoPDF(titulo, content, {}, tituloPestana);
+  }
+
+  /** Título y contenido del PDF de una asignación (comunes a abrirlo directo o como archivo). */
+  private contenidoAsignacionPDF(datos: any[]): { titulo: string; tituloPestana: string; content: any[] } {
     const asignacion = datos[0];
     const solicitud = Number(asignacion.solicitud_Id) || 0;
     const titulo = [
@@ -1155,7 +1320,239 @@ export class CreacionPdfService {
       this.tablaMaterialesAsignadosPDF(asignacion.movimiento, materiales),
       this.observacionAsignacionPDF(asignacion.observacion),
     ];
-    this.formatoPDF(titulo, content);
+    // Título corto para la pestaña del navegador; el título completo va en la cabecera del documento.
+    return { titulo, tituloPestana: `Asignación MP #${asignacion.id}`, content };
+  }
+
+  /**
+   * Abre el PDF de una asignación de materia prima y tintas (un solo PDF con ambos tipos de material).
+   * @param datos Datos de `Asignacion_MatPrima/{id}/pdf`.
+   */
+  asignacionMaterialPDF(datos: DatosPdfAsignacion) {
+    const { titulo, tituloPestana, content } = this.contenidoAsignacionMaterialPDF(datos);
+    this.formatoPDF(titulo, content, {}, tituloPestana);
+  }
+
+  /**
+   * Título y contenido del PDF de una asignación de materia prima y tintas: información general, distribución por
+   * máquina (solo si viene de una solicitud), materiales agrupados por subcategoría y observación.
+   */
+  private contenidoAsignacionMaterialPDF(datos: DatosPdfAsignacion): { titulo: string; tituloPestana: string; content: any[] } {
+    const subcategorias = datos.subcategorias ?? [];
+    const titulo = [
+      `Asignación de Materia Prima N° ${datos.id}`,
+      datos.solicitud ? `Basado en Solicitud N° ${datos.solicitud.id}` : '',
+      `Orden de Trabajo N° ${datos.ot}`,
+    ].filter(linea => linea).join('\n');
+
+    const content = [
+      this.infoAsignacionMaterialPDF(datos, subcategorias),
+      ...(datos.solicitud ? [this.tablaMaquinasAsignacionPDF(datos)] : []),
+      this.tablaSubcategoriasAsignacionPDF(subcategorias, !!datos.solicitud),
+      this.observacionAsignacionPDF(datos.observacion ?? ''),
+    ];
+    return { titulo, tituloPestana: `Asignación MP #${datos.id}`, content };
+  }
+
+  /** Estilo de las tablas de la asignación: título y columnas sombreados. */
+  private layoutEncabezadoAsignacion = { fillColor: (rowIndex: number) => rowIndex === 0 || rowIndex === 1 ? '#CCCCCC' : null };
+
+  /** Datos generales de la asignación, la solicitud de la que viene (o que es manual) y un resumen de lo asignado. */
+  private infoAsignacionMaterialPDF(datos: DatosPdfAsignacion, subcategorias: SubcategoriaAsignadaPdf[]): {} {
+    const totales = new Map<string, number>();
+    subcategorias.forEach(s => totales.set(s.undMed_Id, (totales.get(s.undMed_Id) ?? 0) + (Number(s.estaAsignacion) || 0)));
+    const totalAsignado = Array.from(totales.entries()).map(([medida, total]) => `${this.cantidadPDF(total)} ${medida}`).join(' + ') || '0.00';
+    const cantidadMateriales = subcategorias.reduce((suma, s) => suma + (s.materiales ?? []).length, 0);
+    const plural = (n: number, singular: string, pluralTexto: string) => `${n} ${n === 1 ? singular : pluralTexto}`;
+    const resumen = [
+      `Total asignado: ${totalAsignado}`,
+      plural(subcategorias.length, 'subcategoría', 'subcategorías'),
+      plural(cantidadMateriales, 'material', 'materiales'),
+    ].join('  ·  ');
+    const origen = datos.solicitud
+      ? `Solicitud N° ${datos.solicitud.id}${datos.solicitud.estado ? ` (${datos.solicitud.estado})` : ''}`
+      : 'Asignación manual (sin solicitud)';
+
+    return {
+      fontSize: 8,
+      table: {
+        widths: ['15%', '30%', '15%', '20%', '20%'],
+        body: [
+          [{ text: 'Información General del Movimiento', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}],
+          [
+            `OT N°: ${datos.ot}`,
+            `Usuario: ${datos.usuario ?? ''}`,
+            `Máquina: ${datos.maquina || ''}`,
+            `Fecha Registro: ${this.fechaPDF(datos.fecha)} ${datos.hora ?? ''}`,
+            `Fecha Asignación: ${this.fechaPDF(datos.fechaReal ?? datos.fecha)}`,
+          ],
+          [{ text: origen, colSpan: 5 }, {}, {}, {}, {}],
+          [{ text: resumen, colSpan: 5, bold: true }, {}, {}, {}, {}],
+        ]
+      },
+      layout: { fillColor: (rowIndex: number) => rowIndex === 0 ? '#DDDDDD' : null },
+    };
+  }
+
+  /**
+   * Distribución por máquina de la solicitud con lo entregado hasta esta asignación (incluida); la máquina que
+   * recibió esta asignación va en negrita.
+   */
+  private tablaMaquinasAsignacionPDF(datos: DatosPdfAsignacion): {} {
+    const maquinas = datos.solicitud?.maquinas ?? [];
+    const faltante = (objetivo: number, entregado: number) => Math.max(0, (Number(objetivo) || 0) - (Number(entregado) || 0));
+    const celda = (text: string, bold: boolean, alignment = 'right') => ({ text, bold, alignment });
+    const total = maquinas.reduce((t, m) => ({
+      porcentaje: t.porcentaje + (Number(m.porcentaje) || 0),
+      objetivo: t.objetivo + (Number(m.objetivo) || 0),
+      entregado: t.entregado + (Number(m.entregado) || 0),
+      faltante: t.faltante + faltante(m.objetivo, m.entregado),
+    }), { porcentaje: 0, objetivo: 0, entregado: 0, faltante: 0 });
+
+    return {
+      margin: [0, 15, 0, 0],
+      fontSize: 8,
+      table: {
+        headerRows: 2,
+        keepWithHeaderRows: 1,
+        dontBreakRows: true,
+        widths: ['*', 75, 75, 75, 75],
+        body: [
+          [{ text: 'Distribución por máquina (hasta esta asignación)', colSpan: 5, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}],
+          ['Máquina', 'Porcentaje', 'Kg solicitados', 'Kg entregados', 'Kg faltantes'],
+          ...maquinas.map(m => {
+            const esta = Number(m.maquina) === Number(datos.maquina);
+            return [
+              celda(`${m.maquina}${esta ? '  (esta asignación)' : ''}`, esta, 'left'),
+              celda(`${this.cantidadPDF(m.porcentaje)} %`, esta),
+              celda(this.cantidadPDF(m.objetivo), esta),
+              celda(this.cantidadPDF(m.entregado), esta),
+              celda(this.cantidadPDF(faltante(m.objetivo, m.entregado)), esta),
+            ];
+          }),
+          [
+            celda('Total', true),
+            celda(`${this.cantidadPDF(total.porcentaje)} %`, true),
+            celda(this.cantidadPDF(total.objetivo), true),
+            celda(this.cantidadPDF(total.entregado), true),
+            celda(this.cantidadPDF(total.faltante), true),
+          ],
+        ]
+      },
+      layout: this.layoutEncabezadoAsignacion,
+    };
+  }
+
+  /**
+   * Subcategorías (en negrita, con el Id junto al nombre) y debajo, con sangría, los materiales de esta asignación.
+   * Con solicitud: Solicitada, Entregada antes, Esta asignación y Faltante (después de esta). Manual: solo la cantidad.
+   * Al final, un total por cada unidad de medida.
+   */
+  private tablaSubcategoriasAsignacionPDF(subcategorias: SubcategoriaAsignadaPdf[], conSolicitud: boolean): {} {
+    const numero = (valor: number, extra: {} = {}) => ({ text: this.cantidadPDF(valor), alignment: 'right', ...extra });
+    const nombreSubcategoria = (s: SubcategoriaAsignadaPdf) => Number(s.subCatMP_Id) > 0 ? `${s.subCatMP_Id} - ${s.nombre}` : s.nombre;
+    const totales = new Map<string, { solicitado: number; antes: number; esta: number; faltante: number }>();
+    const filas: any[][] = [];
+
+    subcategorias.forEach(s => {
+      const total = totales.get(s.undMed_Id) ?? { solicitado: 0, antes: 0, esta: 0, faltante: 0 };
+      total.solicitado += Number(s.solicitado) || 0;
+      total.antes += Number(s.entregadoAntes) || 0;
+      total.esta += Number(s.estaAsignacion) || 0;
+      total.faltante += Number(s.faltante) || 0;
+      totales.set(s.undMed_Id, total);
+
+      const negrita = { bold: true };
+      filas.push(conSolicitud
+        ? [{ text: nombreSubcategoria(s), bold: true }, numero(s.solicitado, negrita), numero(s.entregadoAntes, negrita), numero(s.estaAsignacion, negrita), numero(s.faltante, negrita), { text: s.undMed_Id, bold: true }]
+        : [{ text: nombreSubcategoria(s), bold: true }, numero(s.estaAsignacion, negrita), { text: s.undMed_Id, bold: true }]);
+
+      // Subcategoría pedida sin materiales (solicitudes anteriores) o no pedida: sus materiales no tienen cantidad solicitada propia.
+      const sinSolicitadoPorMaterial = (s.materiales ?? []).every(m => !m.esSustituto && !((Number(m.solicitado) || 0) > 0));
+      (s.materiales ?? []).forEach(m => {
+        const solicitado = Number(m.solicitado) || 0;
+        const antes = Number(m.entregadoAntes) || 0;
+        const esta = Number(m.estaAsignacion) || 0;
+        const estilo = m.esSustituto ? { italics: true } : {};
+        const nombre = { text: `${m.materialId} - ${(m.nombre || '').trim()}${m.esSustituto ? ' (sustituto)' : ''}`, margin: [12, 0, 0, 0], ...estilo };
+        const vacio = { text: '' };
+        filas.push(conSolicitud
+          ? [
+            nombre,
+            sinSolicitadoPorMaterial ? vacio : numero(solicitado, estilo),
+            numero(antes, estilo),
+            numero(esta, estilo),
+            sinSolicitadoPorMaterial ? vacio : numero(Math.max(0, solicitado - antes - esta), estilo),
+            { text: m.undMed_Id, ...estilo },
+          ]
+          : [nombre, numero(esta, estilo), { text: m.undMed_Id, ...estilo }]);
+      });
+    });
+
+    const filasTotales = Array.from(totales.entries()).map(([medida, total]) => conSolicitud
+      ? [{ text: `Total ${medida}`, bold: true, alignment: 'right' }, numero(total.solicitado, { bold: true }), numero(total.antes, { bold: true }), numero(total.esta, { bold: true }), numero(total.faltante, { bold: true }), { text: medida, bold: true }]
+      : [{ text: `Peso Total ${medida}`, bold: true, alignment: 'right' }, numero(total.esta, { bold: true }), { text: medida, bold: true }]);
+
+    const columnas = conSolicitud
+      ? ['Subcategoría / Material', 'Solicitada', 'Entregada antes', 'Esta asignación', 'Faltante', 'Medida']
+      : ['Subcategoría / Material', 'Cantidad', 'Medida'];
+    const titulo = { text: 'Subcategorías y materiales asignados', colSpan: columnas.length, alignment: 'center', fontSize: 10, bold: true };
+
+    return {
+      margin: [0, 15, 0, 0],
+      fontSize: 8,
+      table: {
+        headerRows: 2,
+        keepWithHeaderRows: 1,
+        dontBreakRows: true,
+        widths: conSolicitud ? ['*', 60, 60, 60, 60, 40] : ['*', 80, 50],
+        body: [
+          [titulo, ...columnas.slice(1).map(() => ({}))],
+          columnas,
+          ...filas,
+          ...filasTotales,
+        ]
+      },
+      layout: this.layoutEncabezadoAsignacion,
+    };
+  }
+
+  /**
+   * Genera en un solo PDF todas las asignaciones de una solicitud: una sección por asignación, cada una empieza
+   * en hoja nueva. Cada hoja lleva la misma cabecera que el PDF individual de su asignación.
+   * @param lotes Datos de `Asignacion_MatPrima/{id}/pdf` de cada asignación.
+   * @param solicitud Número de la solicitud.
+   * @param ot Número de la OT.
+   */
+  generarBlobAsignacionesSolicitud(lotes: DatosPdfAsignacion[], solicitud: number, ot: number): Observable<Blob> {
+    const ID_SECCION = 'seccion-asignacion-';
+    /** Hoja en la que empieza cada sección: la registra la primera pasada y la usa la segunda para las cabeceras. */
+    const conDatos = lotes.filter(datos => (datos.subcategorias ?? []).length > 0);
+    const hojaInicio: number[] = conDatos.map((_, i) => i + 1);
+    return this.generarBlobPDF(() => {
+      // Cada sección es el mismo contenido (y la misma cabecera) que el PDF individual de la asignación.
+      const secciones = conDatos.map(datos => this.contenidoAsignacionMaterialPDF(datos));
+      // El id va en el primer bloque de la sección (no en el que lleva el salto de hoja: pdfmake no consulta esos nodos).
+      const content = secciones.map((seccion, i) => ({
+        stack: seccion.content.map((bloque, j) => j === 0 ? { ...bloque, id: `${ID_SECCION}${i}` } : bloque),
+        pageBreak: i > 0 ? 'before' : undefined,
+      }));
+      return {
+        titulo: secciones[0]?.titulo ?? `Asignaciones de la Solicitud N° ${solicitud}\nOrden de Trabajo N° ${ot}`,
+        tituloPestana: `Asignaciones Solicitud MP #${solicitud}`,
+        content,
+        pageBreakBefore: (nodo: any) => {
+          const id: string = nodo?.id ?? '';
+          if (id.startsWith(ID_SECCION) && nodo.startPosition?.pageNumber) hojaInicio[Number(id.slice(ID_SECCION.length))] = nodo.startPosition.pageNumber;
+          return false; // Solo se registra la hoja; los saltos ya los define cada sección.
+        },
+        tituloPorPagina: (pagina: number) => {
+          let indice = 0;
+          hojaInicio.forEach((inicio, i) => { if (inicio <= pagina) indice = i; });
+          return secciones[indice]?.titulo ?? '';
+        },
+      };
+    });
   }
 
   /** Id y nombre del material de la fila según el tipo de movimiento. */
@@ -1336,7 +1733,8 @@ export class CreacionPdfService {
   // Funcion que va a colocar la información de la empresa en el header
   private informacionEmpresaHeaderOT(datos_ot) {
     return [
-      { image: logoParaPdf, width: 220, height: 50, margin: [5, 5] },
+      // El logo empieza en el borde izquierdo de las tablas del encabezado
+      { image: logoNuevoParaPdf, width: 170, fit: [170, 30], margin: [0, 10, 0, 5] },
       {
         text: `OT ${datos_ot.numero_Orden}`,
         style: 'orden_trabajo',
@@ -1371,16 +1769,19 @@ export class CreacionPdfService {
   // Funcion que va a colocar informacion general de la extrusion en el header
   private informacaionExtrusionHeaderOT(datos_ot) {
     return {
-      widths: ['*', '*', '*', '*', '*'],
+      widths: ['*', '*', '*', '*', '*', '*'],
       body: [
         [
-          { text: `Material`, style: 'titulosTablas', border: [true, true, false, true] },
+          { text: `Fecha Creación`, style: 'titulosTablas', border: [true, true, false, true] },
+          { text: `Material`, style: 'titulosTablas', border: [false, true, false, true] },
           { text: `Cant. Bolsas`, style: 'titulosTablas', border: [false, true, false, true] },
           { text: `Cant. Kilos (Kg)`, style: 'titulosTablas', border: [false, true, false, true] },
           { text: `Presentación`, style: 'titulosTablas', border: [false, true, false, true] },
-          { text: `Despachar`, style: 'titulosTablas', border: [false, true, true, true] },
+          { text: `Fecha Entrega`, style: 'titulosTablas', border: [false, true, true, true] },
         ],
         [
+          // Solo la fecha (yyyy-MM-dd): Plasticaribe y BagPro la envían con hora
+          { text: `${datos_ot.fecha_Creacion ? `${datos_ot.fecha_Creacion}`.substring(0, 10) : ''}`, style: 'datosTablaExtrusion' },
           { text: `${this.txtOT(datos_ot.material)}`, style: 'datosTablaExtrusion' },
           { text: `${this.numOT(datos_ot.cantidad_Pedida)}`, style: 'datosTablaExtrusion' },
           { text: `${this.numOT(datos_ot.peso_Neto)}`, style: 'datosTablaExtrusion' },
@@ -1715,13 +2116,14 @@ export class CreacionPdfService {
   /**
    * Coloca en la hoja 2 las tablas de cada proceso. El margen superior negativo acerca la primera fila
    * a la tabla del encabezado para reducir el espacio que deja el margen superior de la página.
+   * El margen inferior separa estas tablas de los encabezados de lo que sigue (Cyrel / observaciones).
    * @param datos_ot Datos de la orden de trabajo consultada.
    * @returns Nodo pdfmake con las tablas de los procesos.
    */
   private procesosHoja2OT(datos_ot) {
     return {
       pageBreak: 'before',
-      margin: [0, -18, 0, 0],
+      margin: [0, -18, 0, 10],
       table: {
         widths: ['*', 20, '*'],
         body: [
@@ -1929,11 +2331,10 @@ export class CreacionPdfService {
             { text: `${this.numOT(datos_ot.selladoCorte_Fuelle)}`, alignment: 'center', },
             { text: `${this.numOT(solapa)}   ${this.txtOT(datos_ot.und_Extrusion)}`, alignment: 'center', },
           ],
-          [{}, {}, {}, {}],
-          [{}, {}, {}, {}],
           [
-            { text: `Sellado: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.txtOT(datos_ot.tpSellados_Nombre)}` },
+            // Margen superior: separa "Sellado" de la fila de medidas (Ancho / Largo / Fuelle / Solapa)
+            { text: `Sellado: `, style: 'subtitulo', margin: [0, 6, 0, 0] },
+            { colSpan: 3, text: `${this.txtOT(datos_ot.tpSellados_Nombre)}`, margin: [0, 6, 0, 0] },
             {},
             {},
           ],

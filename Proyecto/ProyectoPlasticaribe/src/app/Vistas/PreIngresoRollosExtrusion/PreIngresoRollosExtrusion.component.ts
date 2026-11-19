@@ -4,7 +4,7 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
@@ -269,7 +269,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         preEntRollo_Id : idEntrada,
       }
       this.dtPreEntRollosService.srvGuardar(info).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`¡PreEntrega Realizada!`, `¡Se ha registrado la PreEntrega de rollos!`);
+        this.mensajeService.mensajeConfirmacion('OK!', `¡Se ha registrado la PreEntrega de rollos!`);
         this.cargando = false;
       }, () => {
         this.mensajeService.mensajeError(`¡Ha Ocurrido Un Error!`,`¡No fue posible guardar los detalles de cada rollos PreEntregado!`);
@@ -309,9 +309,9 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : logoParaPdf,
+                    image : logoNuevoParaPdf,
                     width : 220,
-                    height : 50
+                    fit : [220, 50]
                   },
                   {
                     text: `Pre Cargue de Rollos`,

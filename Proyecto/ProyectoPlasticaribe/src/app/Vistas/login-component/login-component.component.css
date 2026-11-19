@@ -65,7 +65,7 @@ p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
 
 .titulo h1{
   padding: 3%;
-  color: #db4149;
+  color: var(--rojo);
 }
 
 .contenedorLoginLigth {
@@ -104,7 +104,7 @@ p-card ::ng-deep .p-card-body {
 }
 
 .tituloRojo {
-  color: #db4149;
+  color: var(--rojo);
   text-align: center;
   padding: 2% 0 2% 0;
 }
@@ -140,7 +140,7 @@ a {
 }
 
 .invitado{
-  color: #a23;
+  color: var(--rojoHover);
   text-decoration: underline;
 }
 
@@ -234,7 +234,7 @@ a {
   margin: 1.5rem 0 0.5rem 0;
   padding: 0;
   width: 100%;
-  color: #db4149;
+  color: var(--rojo);
   font-weight: 600;
   font-size: 0.95rem;
   text-align: left;
@@ -343,4 +343,19 @@ a {
     filter: blur(0px);
     opacity: 1;
   }
+}
+/* Botón Ingresar: el icono se posiciona de forma absoluta para que el texto quede centrado en todo el ancho del botón */
+.btn-ingresar {
+  position: relative;
+  justify-content: center;
+}
+
+.btn-ingresar ::ng-deep .p-button-icon {
+  position: absolute;
+  left: 1rem;
+  margin: 0;
+}
+
+.btn-ingresar ::ng-deep .p-button-label {
+  flex: 0 0 auto;
 }

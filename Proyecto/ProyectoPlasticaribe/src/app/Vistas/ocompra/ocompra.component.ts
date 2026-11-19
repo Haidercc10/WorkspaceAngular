@@ -389,7 +389,7 @@ export class OcompraComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar una solicitud de materia prima
+  // Funcion que va a consultar una requisición de materia prima
   consultarSolicitudMP() {
     this.materiasPrimasSeleccionadas = [];
     let solicitud = this.FormOrdenCompra.value.Solicitud;
@@ -415,7 +415,7 @@ export class OcompraComponent implements OnInit {
             this.cargando = false;
           } else {
             this.cargando = false;
-            this.mensajeService.mensajeError(`¡La solicitud de material N° ${solicitud} se encuentra cancelada y/o finalizada!`);
+            this.mensajeService.mensajeError(`¡La requisición de materia prima N° ${solicitud} se encuentra cancelada y/o finalizada!`);
           }
         });    
       }, error => {
@@ -497,10 +497,10 @@ export class OcompraComponent implements OnInit {
     }
   }
 
-  // Funcion que va a crear la relación entre orden de compra y solicitud de materia prima
+  // Funcion que va a crear la relación entre orden de compra y requisición de materia prima
   crearRelacionOc_Solicitud(orden: number, solicitud: number) {
     let info: any = { Oc_Id: orden, Solicitud_Id: solicitud, }
-    this.relacionSolOcService.Post(info).subscribe(() => this.cambiarEstadoMpSolicitud(solicitud), () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la solicitud de materia prima y la orden de compra!`));
+    this.relacionSolOcService.Post(info).subscribe(() => this.cambiarEstadoMpSolicitud(solicitud), () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la requisición de materia prima y la orden de compra!`));
   }
 
   // Funcion que va a cambiar el estado de la solicitud. Posiciones Array => 0 : Pendiente, 1 : Parciales, 2 : Totales, 3 : Cantidad de Materias Primas
@@ -517,10 +517,10 @@ export class OcompraComponent implements OnInit {
       this.dtSolicitudMp.GetEstadosMateriasPrimas(solicitud).subscribe(data => {
         if ((data[1] > 0 && data[1] == data[3]) || (data[2] > 0 && data[2] < data[3])) {
           info.Estado_Id = 12;
-          this.solicitudMpService.Put(solicitud, info).subscribe(null, () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+          this.solicitudMpService.Put(solicitud, info).subscribe(null, () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la requisición de materia prima!`));
         } else if (data[2] > 0 && data[2] == data[3]) {
           info.Estado_Id = 5;
-          this.solicitudMpService.Put(solicitud, info).subscribe(null, () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+          this.solicitudMpService.Put(solicitud, info).subscribe(null, () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la requisición de materia prima!`));
         }
       });
     }, err => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡${err}!`));
