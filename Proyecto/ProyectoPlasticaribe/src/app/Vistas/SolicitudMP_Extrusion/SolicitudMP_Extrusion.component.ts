@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { Table } from 'primeng/table';
@@ -29,7 +29,6 @@ import {
   LOCALE_NUMEROS,
 } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { DetSolicitudMP_ExtrusionService } from 'src/app/Servicios/DetSolicitudMP_Extrusion/DetSolicitudMP_Extrusion.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MaquinasService } from 'src/app/Servicios/Maquinas/maquinas.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
@@ -221,6 +220,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
 
   /** Hay cambios en la solicitud que no se han guardado. */
   private cambiosSinGuardar: boolean = false;
+  /**
+   * Última OT consultada con éxito: a ella pertenecen las subcategorías de la tabla. No se borra al iniciar otra
+   * consulta, para seguir preguntando aunque en medio se haya consultado una OT que no existe.
+   */
+  private otDeLosMateriales: number | null = null;
   /** Consultas en curso; se cancelan al iniciar otra igual para que una respuesta vieja no pise a la nueva. */
   private consultaOT?: Subscription;
   private consultaSolicitud?: Subscription;
@@ -239,7 +243,6 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     private tutoriales: TutorialesService,
     private mensajeService: MensajesAplicacionService,
     private servicioSolicitudMpExt: SolicitudMP_ExtrusionService,
-    private servicioDetSolicitudMpExt: DetSolicitudMP_ExtrusionService,
     private svMaquinas: MaquinasService,
     private servicioPDF: CreacionPdfService,
     private messageService: MessageService,
@@ -560,13 +563,38 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     input.setSelectionRange(cursor, cursor);
   }
 
-  /** Consulta la OT del campo (Enter). En edición la OT es la de la solicitud y no se cambia. */
+  /**
+   * Consulta la OT del campo (Enter). En edición la OT es la de la solicitud y no se cambia.
+   * No se consulta mientras hay una carga en curso (p. ej. el guardado, que usa los datos de la OT consultada).
+   * Si ya hay subcategorías agregadas para otra OT, pregunta si se conservan o se quitan antes de consultar.
+   */
   consultarOT() {
-    if (this.esSolicitud) return;
+    if (this.esSolicitud || this.load) return;
     const texto = (this.formEncabezado.value.ot ?? '').toString().trim();
     if (!/^\d+$/.test(texto)) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `Digite un número de OT válido!`);
     this.formEncabezado.patchValue({ ot: texto });
-    this.cargarOT(Number(texto));
+    const ot = Number(texto);
+
+    const otAnterior = this.otDeLosMateriales;
+    const cantidad = this.subcategoriasSeleccionadas.length;
+    if (cantidad === 0 || otAnterior == null || otAnterior === ot) return this.cargarOT(ot);
+
+    this.confirmar('Cambiar de OT',
+      `Hay ${cantidad} subcategoría(s) agregadas para la OT N° ${otAnterior}. ¿Desea conservarlas para la OT N° ${ot} o quitarlas junto con las máquinas y la fecha de entrega para empezar de nuevo?`,
+      () => this.cargarOT(ot),
+      'Conservar y consultar', 'Quitar y consultar',
+      // Quitar: también se limpian las máquinas y la fecha de entrega para armar la solicitud desde cero (la observación se conserva).
+      () => {
+        this.subcategoriasSeleccionadas = [];
+        this.reiniciarModal();
+        this.formEncabezado.patchValue({ maquinas: null, fechaEntrega: null }, { emitEvent: false });
+        this.formEncabezado.get('maquinas')!.markAsUntouched();
+        this.formEncabezado.get('fechaEntrega')!.markAsUntouched();
+        this.distribucion = [];
+        this.cargarOT(ot);
+      },
+      // Esc o la X: no se consulta y el campo vuelve a la OT que se ve en la tabla.
+      () => { if (this.infoOT) this.formEncabezado.patchValue({ ot: String(this.infoOT.ot) }); });
   }
 
   /**
@@ -608,6 +636,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       cerrada: ESTADOS_OT_CERRADA.includes(Number(datos.estado)),
     };
     this.infoOrdenTrabajo = [info];
+    this.otDeLosMateriales = ot;
 
     if (info.cerrada) {
       this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} está cerrada, no se le pueden crear ni editar solicitudes!`, DURACION_ERROR_MS);
@@ -1161,9 +1190,12 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
    * Abre el diálogo de confirmación de la página (p-confirmDialog "confirmarSolicitud").
    * Enter acepta (el botón principal tiene el foco) y Esc o la X cancelan.
    * @param aceptar Texto del botón principal (por defecto "Continuar").
-   * @param rechazar Texto del botón para no hacer nada (por defecto "Cancelar").
+   * @param rechazar Texto del botón secundario (por defecto "Cancelar").
+   * @param alRechazar Acción del botón secundario; si no se indica, ese botón no hace nada.
+   * @param alCancelar Se ejecuta al cerrar con Esc o la X.
    */
-  private confirmar(titulo: string, detalle: string, accion: () => void, aceptar = 'Continuar', rechazar = 'Cancelar') {
+  private confirmar(titulo: string, detalle: string, accion: () => void, aceptar = 'Continuar', rechazar = 'Cancelar',
+    alRechazar?: () => void, alCancelar?: () => void) {
     (document.activeElement as HTMLElement | null)?.blur();
     this.confirmationService.confirm({
       key: 'confirmarSolicitud',
@@ -1176,6 +1208,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       rejectButtonStyleClass: 'p-button-text p-button-secondary',
       defaultFocus: 'accept',
       accept: accion,
+      reject: (tipo: ConfirmEventType) => tipo === ConfirmEventType.REJECT ? alRechazar?.() : alCancelar?.(),
     });
   }
 
@@ -1302,8 +1335,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
    */
   private generarPdfSolicitud(solicitud: number, ot: DatosOTSolicitudPDF | null) {
     this.generandoPdfSolicitud = true;
-    this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(solicitud).pipe(
-      switchMap(detalles => detalles.length === 0 ? of(null) : this.servicioPDF.generarBlobSolicitudMaterialProduccion(detalles, ot)),
+    this.servicioSolicitudMpExt.obtenerSolicitud(solicitud).pipe(
+      switchMap(detalle => (detalle.subcategorias ?? []).length === 0 ? of(null) : this.servicioPDF.generarBlobSolicitudMaterialProduccion(detalle, ot)),
       takeUntil(this.destroy$),
       finalize(() => this.generandoPdfSolicitud = false),
     ).subscribe({
@@ -1466,6 +1499,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     this.infoOrdenTrabajo = [];
     this.materialesAsignados = [];
     this.solicitudEnEdicion = null;
+    this.otDeLosMateriales = null;
     this.cambiosSinGuardar = false;
   }
 

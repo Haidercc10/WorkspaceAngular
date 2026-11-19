@@ -173,6 +173,56 @@ export interface MaquinaDetalleSolicitud {
   entregado: number;
 }
 
+/** Material de una asignación en su PDF (GET Asignacion_MatPrima/{id}/pdf). */
+export interface MaterialAsignadoPdf {
+  tipoMaterial: TipoMaterialInventario | string;
+  materialId: number;
+  nombre: string;
+  undMed_Id: string;
+  /** Lo solicitado de este material (0 en asignaciones manuales o si es sustituto). */
+  solicitado: number;
+  /** Lo entregado en las asignaciones anteriores de la misma solicitud. */
+  entregadoAntes: number;
+  estaAsignacion: number;
+  esSustituto: boolean;
+}
+
+/** Subcategoría de una asignación en su PDF, con sus materiales. */
+export interface SubcategoriaAsignadaPdf {
+  /** 0 para los materiales sin subcategoría. */
+  subCatMP_Id: number;
+  nombre: string;
+  undMed_Id: string;
+  solicitado: number;
+  entregadoAntes: number;
+  estaAsignacion: number;
+  /** Lo que falta de la solicitud después de esta asignación. */
+  faltante: number;
+  materiales: MaterialAsignadoPdf[];
+}
+
+/** Solicitud de la que viene una asignación, con lo entregado por máquina hasta esa asignación. */
+export interface SolicitudDeAsignacionPdf {
+  id: number;
+  estado: string | null;
+  maquinas: MaquinaDetalleSolicitud[];
+}
+
+/** Datos del PDF de una asignación de materia prima y tintas. */
+export interface DatosPdfAsignacion {
+  id: number;
+  ot: number;
+  maquina: number;
+  fecha: string;
+  hora: string | null;
+  fechaReal: string | null;
+  usuario: string;
+  observacion: string | null;
+  /** Null en las asignaciones manuales (sin solicitud o con la genérica). */
+  solicitud: SolicitudDeAsignacionPdf | null;
+  subcategorias: SubcategoriaAsignadaPdf[];
+}
+
 /** Fila de la consulta de solicitudes (GET SolicitudesExtrusion/consulta). */
 export interface SolicitudConsultada {
   id: number;

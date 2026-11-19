@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
 import { catchError, finalize, forkJoin, map, Observable, of, Subject, Subscription, switchMap, takeUntil } from 'rxjs';
-import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { AppComponent } from 'src/app/app.component';
 import {
   ADICIONAL_KG_OT,
@@ -22,7 +22,6 @@ import {
 import { AutorizacionesExcesoOTService } from 'src/app/Servicios/AutorizacionesExcesoOT/autorizacionesExcesoOT.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, DatosOTSolicitudPDF } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
-import { DetSolicitudMP_ExtrusionService } from 'src/app/Servicios/DetSolicitudMP_Extrusion/DetSolicitudMP_Extrusion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
@@ -101,11 +100,10 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
     private confirmationService : ConfirmationService,
     private AppComponent : AppComponent,
     private servicioSolicitudes : SolicitudMP_ExtrusionService,
-    private servicioDetSolicitudes : DetSolicitudMP_ExtrusionService,
     private msj : MensajesAplicacionService,
     private servicioBagPro : BagproService,
     private servicioPDF : CreacionPdfService,
-    private servicioMateriaPrima : MateriaPrimaService,
+    private servicioAsignacion : AsignacionMPService,
     private servicioAutorizaciones : AutorizacionesExcesoOTService,
     private tutoriales : TutorialesService,
     private ruta : ActivatedRoute,
@@ -229,13 +227,11 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
   verAsignacionesPdf() {
     const solicitud = this.detalle;
     if (!solicitud || this.generandoPdfAsignaciones || !solicitud.asignaciones?.length) return;
-    // De la más antigua a la más reciente; cada tipo de material es un movimiento distinto.
+    // De la más antigua a la más reciente; cada asignación es una hoja con sus materias primas y tintas.
     const consultas = [...solicitud.asignaciones]
+      .filter(a => a.conMateriasPrimas || a.conTintas)
       .sort((a, b) => a.id - b.id)
-      .flatMap(a => [
-        ...(a.conMateriasPrimas ? [this.servicioMateriaPrima.GetInfoMovimientoAsignaciones(a.id.toString(), 'ASIGMP')] : []),
-        ...(a.conTintas ? [this.servicioMateriaPrima.GetInfoMovimientoAsignaciones(a.id.toString(), 'ASIGTINTAS')] : []),
-      ]);
+      .map(a => this.servicioAsignacion.obtenerDatosPdf(a.id));
     if (consultas.length === 0) return this.msj.mensajeAdvertencia('Advertencia', 'Las asignaciones de esta solicitud no tienen materiales para imprimir.');
 
     this.generandoPdfAsignaciones = true;
@@ -507,12 +503,12 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
     const ot : DatosOTSolicitudPDF | null = this.datosOT
       ? { cliente: this.datosOT.cliente, item: this.datosOT.item, referencia: this.datosOT.referencia, kgOT: this.datosOT.kgOT, kgLimite: this.datosOT.kgOT * (1 + ADICIONAL_KG_OT) }
       : null;
-    this.servicioDetSolicitudes.GetSolicitudMp_Extrusion(solicitud.id)
+    this.servicioSolicitudes.obtenerSolicitud(solicitud.id)
       .pipe(this.conCarga(), takeUntil(this.destroy$))
       .subscribe({
-        next: (detalles : any[]) => {
-          if (detalles.length === 0) return this.msj.mensajeAdvertencia('Advertencia', `No se encontraron subcategorías para la solicitud N° ${solicitud.id}.`);
-          this.servicioPDF.solicitudMaterialProduccionPDF(detalles, ot);
+        next: (detalle : DetalleSolicitudMaterial) => {
+          if ((detalle.subcategorias ?? []).length === 0) return this.msj.mensajeAdvertencia('Advertencia', `No se encontraron subcategorías para la solicitud N° ${solicitud.id}.`);
+          this.servicioPDF.solicitudMaterialProduccionPDF(detalle, ot);
           this.msj.mensajeConfirmacion('Confirmación', `Generando el PDF de la solicitud N° ${solicitud.id}; se abrirá en una nueva pestaña.`);
         },
         error: error => this.notificarError(error, `No se pudo obtener la información de la solicitud N° ${solicitud.id} para generar el PDF.`, 'Generar PDF de la solicitud'),

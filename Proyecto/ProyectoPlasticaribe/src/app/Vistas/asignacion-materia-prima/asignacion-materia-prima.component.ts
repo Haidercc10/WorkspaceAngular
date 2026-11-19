@@ -32,6 +32,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { InventarioTransaccionalService } from 'src/app/Servicios/InventarioTransaccional/inventarioTransaccional.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
@@ -56,8 +57,6 @@ interface AsignacionCreada {
   asignacionId: number;
   /** Texto del aviso. */
   detalle: string;
-  /** Movimientos a imprimir: materias primas y/o tintas (una asignación mixta genera dos PDF). */
-  movimientos: ('ASIGMP' | 'ASIGTINTAS')[];
   /** Máquina sugerida para la siguiente asignación (otra con faltante), o null. */
   siguienteMaquina: number | null;
 }
@@ -209,6 +208,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     private servicioInventario: InventarioTransaccionalService,
     private servicioAutorizaciones: AutorizacionesExcesoOTService,
     private servicioPDF: CreacionPdfService,
+    private servicioAsignacion: AsignacionMPService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
@@ -942,11 +942,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
    */
   private asignacionExitosa(resultado: RegistrarAsignacionResult) {
     const asignacionId = resultado.asignacionId!;
-    // Las materias primas y las tintas se imprimen en PDFs distintos; una asignación mixta genera ambos.
-    const movimientos: ('ASIGMP' | 'ASIGTINTAS')[] = [];
-    if (this.materiasPrimasSeleccionadas.some(m => m.TipoMaterial === TipoMaterialInventario.MateriaPrima)) movimientos.push('ASIGMP');
-    if (this.materiasPrimasSeleccionadas.some(m => m.TipoMaterial === TipoMaterialInventario.Tinta)) movimientos.push('ASIGTINTAS');
-
     const finalizada = resultado.estadoSolicitud === EstadoSolicitudMaterial.Finalizada;
     const maquina = this.maquinaElegida;
     const siguienteMaquina = this.esSolicitud && !finalizada ? this.siguienteMaquinaConFaltante(maquina, this.resumenAsignar.total) : null;
@@ -954,7 +949,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     if (finalizada) detail += ' La solicitud quedó finalizada.';
     else if (resultado.estadoSolicitud === EstadoSolicitudMaterial.Parcial) detail += ' La solicitud quedó con entrega parcial.';
 
-    this.avisoCreada = { asignacionId, detalle: detail, movimientos, siguienteMaquina };
+    this.avisoCreada = { asignacionId, detalle: detail, siguienteMaquina };
     // Se lleva la vista al aviso (queda arriba del formulario).
     setTimeout(() => this.avisoCreadaElemento?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
 
@@ -996,34 +991,21 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
   /**
    * Botón "Generar PDF" del aviso: el botón muestra "Generando PDF…" y el aviso sigue abierto mientras se arma;
-   * al terminar sale el aviso "PDF generado" y se abre en una pestaña nueva (uno por tipo de movimiento).
+   * al terminar sale el aviso "PDF generado" y se abre en una pestaña nueva (materias primas y tintas en un solo PDF).
    */
   generarPdfDesdeAviso(creada: AsignacionCreada) {
     if (this.generandoPdfAsignacion) return;
     this.generandoPdfAsignacion = true;
-    const pendientes = [...creada.movimientos];
-    const siguiente = () => {
-      const movimiento = pendientes.shift();
-      if (!movimiento) {
-        this.generandoPdfAsignacion = false;
-        return;
-      }
-      this.materiaPrimaService.GetInfoMovimientoAsignaciones(creada.asignacionId.toString(), movimiento).pipe(
-        switchMap(datos => datos.length > 0 ? this.servicioPDF.generarBlobAsignacionMateriaPrima(datos) : of(null)),
-        takeUntil(this.destroy$),
-      ).subscribe({
-        next: pdf => {
-          const tipo = movimiento === 'ASIGTINTAS' ? ' (tintas)' : '';
-          if (pdf) this.abrirPdfConAviso(pdf, `El PDF de la asignación N° ${creada.asignacionId}${tipo}`, `Asignacion ${creada.asignacionId}${tipo}.pdf`);
-          siguiente();
-        },
-        error: error => {
-          this.generandoPdfAsignacion = false;
-          this.notificarError(error, `No fue posible generar el PDF de la asignación N° ${creada.asignacionId}.`, 'Generar PDF de la asignación');
-        },
-      });
-    };
-    siguiente();
+    this.servicioAsignacion.obtenerDatosPdf(creada.asignacionId).pipe(
+      switchMap(datos => (datos.subcategorias ?? []).length > 0 ? this.servicioPDF.generarBlobAsignacionMateriaPrima(datos) : of(null)),
+      finalize(() => this.generandoPdfAsignacion = false),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: pdf => {
+        if (pdf) this.abrirPdfConAviso(pdf, `El PDF de la asignación N° ${creada.asignacionId}`, `Asignacion ${creada.asignacionId}.pdf`);
+      },
+      error: error => this.notificarError(error, `No fue posible generar el PDF de la asignación N° ${creada.asignacionId}.`, 'Generar PDF de la asignación'),
+    });
   }
 
   /**
