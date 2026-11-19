@@ -23,341 +23,502 @@
     <i class="pi pi-lock"></i> No tiene permisos para crear items.
   </div>
 
-  <p-tabView *ngIf="puedeCrearItems">
+  <p-tabView *ngIf="puedeCrearItems" [(activeIndex)]="tabActiva">
     <!-- ======================================== CREAR ITEM ======================================== -->
     <p-tabPanel header="Crear Item" leftIcon="pi pi-plus-circle" tooltip="Crear un item nuevo en BagPro, Plasticaribe y Zeus">
-
-      <!-- Copiar desde item -->
-      <div class="mb-4 mt-2">
-        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-copy"></i> Copiar desde Item</h4>
-      </div>
-      <div class="row g-3 mb-3 align-items-center">
-        <div class="col-sm-12 col-md-8 col-xl-6">
-          <span class="p-float-label">
-            <p-autoComplete [formControl]="busquedaCopia" inputId="busquedaCopia" [suggestions]="itemsSugeridos"
-              (completeMethod)="buscarItems($event)" field="etiqueta" [minLength]="3" [delay]="400" appendTo="body"
-              [style]="{width: '100%'}" [inputStyle]="{width: '100%'}" (keyup.enter)="copiarDesdeItem()"></p-autoComplete>
-            <label for="busquedaCopia">Item (código o nombre)</label>
-          </span>
-        </div>
-        <div class="col-auto">
-          <button pButton type="button" label="Copiar Ficha" icon="pi pi-copy" class="p-button-secondary p-button-outlined"
-            [disabled]="copiando || guardando" (click)="copiarDesdeItem()"
-            pTooltip="Carga la ficha técnica del item buscado en el formulario; nombre, presentación y precio quedan vacíos" tooltipPosition="top"></button>
-        </div>
-        <div class="col-12" *ngIf="itemCopiado">
-          <small>Ficha copiada del item {{itemCopiado}}. Nombre, presentación y precio quedan vacíos.</small>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <hr class="Linea">
-      </div>
-
       <form [formGroup]="formItem" (ngSubmit)="guardar()">
-        <!-- General -->
-        <div class="mb-4">
-          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> General</h4>
-        </div>
-        <div class="row g-4 mb-4">
-          <div class="col-sm-12 col-md-6 col-xl-4">
-            <span class="p-float-label">
-              <p-autoComplete formControlName="cliente" inputId="cliente" [suggestions]="clientesSugeridos"
-                (completeMethod)="buscarClientes($event)" field="nombreComercial" [minLength]="3" [forceSelection]="true"
-                appendTo="body" [style]="{width: '100%'}" [inputStyle]="{width: '100%'}">
-                <ng-template let-cliente pTemplate="item">{{cliente.nombreComercial}} ({{cliente.codBagpro}})</ng-template>
-              </p-autoComplete>
-              <label for="cliente">Cliente*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-3">
-            <span class="p-float-label">
-              <p-dropdown formControlName="vendedor" inputId="vendedor" [options]="vendedores" optionValue="usua_Id"
-                optionLabel="usua_Nombre" [filter]="true" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="vendedor">Vendedor</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="formato" inputId="formato" [options]="formatos" optionValue="codigo"
-                optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="formato">Formato*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-3">
-            <span class="p-float-label">
-              <p-dropdown formControlName="material" inputId="material" [options]="materiales" optionValue="material_Id"
-                optionLabel="material_Nombre" [filter]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="material">Material*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="pigmento" inputId="pigmento" [options]="pigmentos" optionValue="pigmt_Id"
-                optionLabel="pigmt_Nombre" [filter]="true" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="pigmento">Pigmento</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="presentacion" inputId="presentacion" [options]="presentaciones" optionValue="valor"
-                optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="presentacion">Presentación*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="precio" inputId="precio" mode="decimal" [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="precio">Precio Unitario*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-2" *ngIf="esPaquete">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="cantidadPaquete" inputId="cantidadPaquete" [min]="0" [useGrouping]="false"></p-inputNumber>
-              <label for="cantidadPaquete">Unidades por Paquete*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-6 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="unidad" inputId="unidad" [options]="unidades" optionValue="codigo"
-                optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="unidad">Unidad Medidas*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="ancho" inputId="ancho" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="ancho">Ancho*</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="largo" inputId="largo" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="largo">Largo{{requiereLargo ? '*' : ''}}</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="fuelle" inputId="fuelle" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="fuelle">Fuelle</label>
-            </span>
-          </div>
-        </div>
+        <div class="row g-4 mt-1">
+          <!-- ========== Ficha ========== -->
+          <div class="col-12 col-xl-8 d-flex flex-column gap-4">
 
-        <div class="mb-3"><hr class="Linea"></div>
+            <!-- Partir de un item existente -->
+            <div class="barra-copiar">
+              <span class="copiar-titulo"><i class="pi pi-copy"></i> Partir de un item existente</span>
+              <div class="copiar-campo">
+                <!-- Item elegido: queda bloqueado; para cambiarlo se quita con la X -->
+                <div class="item-elegido" *ngIf="itemCopiaElegido as elegido; else buscadorCopia">
+                  <i class="pi pi-box"></i>
+                  <span class="item-elegido-texto" [title]="elegido.etiqueta ?? elegido.codigo">{{elegido.etiqueta ?? elegido.codigo}}</span>
+                  <button pButton type="button" icon="pi pi-times" class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                    [disabled]="copiando || guardando" (click)="quitarItemCopia()" pTooltip="Quitar para elegir otro item" tooltipPosition="top"></button>
+                </div>
+                <ng-template #buscadorCopia>
+                  <span class="p-float-label">
+                    <p-autoComplete [formControl]="busquedaCopia" inputId="busquedaCopia" [suggestions]="itemsSugeridos"
+                      (completeMethod)="buscarItems($event)" field="etiqueta" [minLength]="3" [delay]="400" appendTo="body"
+                      [style]="{width: '100%'}" [inputStyle]="{width: '100%'}" (keyup.enter)="copiarDesdeItem()"></p-autoComplete>
+                    <label for="busquedaCopia"><i class="pi pi-search"></i> Item (código o nombre)</label>
+                  </span>
+                </ng-template>
+              </div>
+              <button pButton type="button" label="Copiar Ficha" icon="pi pi-copy" class="p-button-danger"
+                [loading]="copiando" [disabled]="copiando || guardando" (click)="copiarDesdeItem()"
+                pTooltip="Carga la ficha técnica del item buscado; el nombre queda vacío; presentación y precio se cargan para cambiarlos" tooltipPosition="top"></button>
+              <button pButton type="button" label="Limpiar Campos" icon="pi pi-eraser" class="p-button-secondary p-button-outlined"
+                [disabled]="copiando || guardando" (click)="limpiarFormulario()" pTooltip="Vacía toda la ficha" tooltipPosition="top"></button>
+              <small class="copiar-aviso" *ngIf="itemCopiado"><i class="pi pi-check-circle"></i> Ficha copiada del item {{itemCopiado}}. Revise presentación y precio y defina el nombre.</small>
+            </div>
 
-        <!-- Extrusión: se contrae y deshabilita si el proceso no está marcado -->
-        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('extrusion')" styleClass="seccion-proceso">
-          <ng-template pTemplate="header">
-            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
-              <p-checkbox formControlName="extrusion" [binary]="true" inputId="extrusion"></p-checkbox>
-              <label for="extrusion" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-sliders-h"></i> Extrusión</label>
-            </span>
-          </ng-template>
-          <div class="row g-4 align-items-center pt-3">
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="calibre" inputId="calibre" mode="decimal" [min]="0" [minFractionDigits]="1" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="calibre">Calibre{{formItem.get('extrusion')?.value ? '*' : ''}}</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="formatoExtrusion" inputId="formatoExtrusion" [options]="formatosExtrusion" optionValue="formato_Id"
-                optionLabel="formato_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="formatoExtrusion">Formato Extrusión</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="tratado" inputId="tratado" [options]="tratados" optionValue="tratado_Id"
-                optionLabel="tratado_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="tratado">Tratado</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2" *ngFor="let n of [1, 2, 3]">
-            <span class="p-float-label">
-              <p-inputNumber [formControlName]="'anchoExtrusion' + n" [inputId]="'anchoExtrusion' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-              <label [for]="'anchoExtrusion' + n">Ancho Extrusión {{n}}</label>
-            </span>
-          </div>
-          </div>
-        </p-fieldset>
+            <!-- 1. Cliente y producto -->
+            <div class="bloque-ficha">
+              <h4 class="bloque-titulo"><span class="bloque-num">1</span> Cliente y producto</h4>
+              <div class="row g-4">
+                <div class="col-sm-12 col-md-6 col-xxl-5">
+                  <span class="p-float-label">
+                    <p-autoComplete formControlName="cliente" inputId="cliente" [suggestions]="clientesSugeridos"
+                      (completeMethod)="buscarClientes($event)" field="nombreComercial" [minLength]="3" [forceSelection]="true"
+                      appendTo="body" [style]="{width: '100%'}" [inputStyle]="{width: '100%'}">
+                      <ng-template let-cliente pTemplate="item">{{cliente.nombreComercial}} ({{cliente.codBagpro}})</ng-template>
+                    </p-autoComplete>
+                    <label for="cliente"><i class="pi pi-users"></i> Cliente*</label>
+                  </span>
+                </div>
+                <div class="col-sm-12 col-md-6 col-xxl-4">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="vendedor" inputId="vendedor" [options]="vendedores" optionValue="usua_Id"
+                      optionLabel="usua_Nombre" [filter]="true" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                    <label for="vendedor"><i class="pi pi-user"></i> Vendedor</label>
+                  </span>
+                </div>
+                <div class="col-sm-12 col-md-4 col-xxl-3">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="formato" inputId="formato" [options]="formatos" optionValue="codigo"
+                      optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                    <label for="formato"><i class="pi pi-box"></i> Formato*</label>
+                  </span>
+                </div>
+                <div class="col-sm-12 col-md-4 col-xxl-3">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="presentacion" inputId="presentacion" [options]="presentaciones" optionValue="valor"
+                      optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                    <label for="presentacion"><i class="pi pi-tag"></i> Presentación*</label>
+                  </span>
+                </div>
+                <div class="col-sm-12 col-md-4 col-xxl-3">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="precio" inputId="precio" mode="decimal" [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2"></p-inputNumber>
+                    <label for="precio"><i class="pi pi-dollar"></i> Precio Unitario*</label>
+                  </span>
+                </div>
+                <div class="col-sm-12 col-md-4 col-xxl-3" *ngIf="esPaquete">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="cantidadPaquete" inputId="cantidadPaquete" [min]="0" [useGrouping]="false"></p-inputNumber>
+                    <label for="cantidadPaquete"><i class="pi pi-th-large"></i> Unidades por Paquete*</label>
+                  </span>
+                </div>
+              </div>
 
-        <!-- Impresión: se contrae y deshabilita si el proceso no está marcado -->
-        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('impresion')" styleClass="seccion-proceso">
-          <ng-template pTemplate="header">
-            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
-              <p-checkbox formControlName="impresion" [binary]="true" inputId="impresion"></p-checkbox>
-              <label for="impresion" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-print"></i> Impresión</label>
-            </span>
-          </ng-template>
-          <div class="row g-4 align-items-center pt-3">
-          <div class="col-auto">
-            <p-checkbox formControlName="cyrel" [binary]="true" inputId="cyrel" label="Cyrel"></p-checkbox>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="tipoImpresion" inputId="tipoImpresion" [options]="tiposImpresion" optionValue="tpImpresion_Id"
-                optionLabel="tpImpresion_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="tipoImpresion">Tipo Impresión</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="rodillo" inputId="rodillo" [min]="0" [useGrouping]="false"></p-inputNumber>
-              <label for="rodillo">Rodillo</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="pista" inputId="pista" [min]="0" [useGrouping]="false"></p-inputNumber>
-              <label for="pista">Pistas</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-8 col-xl-4">
-            <span class="p-float-label">
-              <input formControlName="descripcionComercial" id="descripcionComercial" type="text" pInputText class="mayusculas"/>
-              <label for="descripcionComercial">Descripción Comercial (nombre)</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <input formControlName="gramaje" id="gramaje" type="text" pInputText class="mayusculas"/>
-              <label for="gramaje">Gramaje (ej. 500GR)</label>
-            </span>
-          </div>
-          <div class="col-12" *ngIf="formItem.get('impresion')?.value">
-            <small *ngIf="tintasCopiadas.length > 0">
-              Tintas copiadas del item {{itemCopiado}} (códigos BagPro): {{tintasCopiadas.join(', ')}}
-              <button pButton type="button" class="p-button-text p-button-sm p-button-secondary" icon="pi pi-times" label="Quitar"
-                (click)="quitarTintas()" pTooltip="Quita las tintas copiadas; el item se creará sin tintas" tooltipPosition="top"></button>
-            </small>
-            <small *ngIf="tintasCopiadas.length == 0">Las tintas solo se pueden tomar copiando la ficha de otro item.</small>
-          </div>
-          </div>
-        </p-fieldset>
+              <!-- Camisilla biodegradable: opciones que arman el nombre -->
+              <div class="opciones-bio" *ngIf="esBiodegradable">
+                <small class="opciones-bio-titulo"><i class="pi pi-sun"></i> Camisilla biodegradable: estas opciones arman el nombre (ej. BIODEGRADABLE ARROZ T2.0 KG ECO ...)</small>
+                <div class="row g-4">
+                  <div class="col-sm-6 col-md-3">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="bioTalla" inputId="bioTalla" [options]="tallasBio" optionValue="valor" optionLabel="nombre"
+                        [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                      <label for="bioTalla"><i class="pi pi-sort-amount-up"></i> Talla</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="bioLinea" inputId="bioLinea" [options]="lineasBio" optionValue="valor" optionLabel="nombre"
+                        [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                      <label for="bioLinea"><i class="pi pi-star"></i> Eco / Especial</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="bioTipo" inputId="bioTipo" [options]="tiposBio" optionValue="valor" optionLabel="nombre"
+                        [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                      <label for="bioTipo"><i class="pi pi-shopping-bag"></i> Arroz / Azúcar</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="bioCantidad" inputId="bioCantidad" [options]="cantidadesBio" [editable]="true"
+                        [showClear]="true" [autoDisplayFirst]="false" appendTo="body"
+                        pTooltip="Elija X 70 / X 80 o escriba otra cantidad (ej. 700 → X 700)" tooltipPosition="top"></p-dropdown>
+                      <label for="bioCantidad"><i class="pi pi-hashtag"></i> Cantidad (X 70)</label>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <!-- Laminado: se contrae y deshabilita si el proceso no está marcado -->
-        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('laminado')" styleClass="seccion-proceso">
-          <ng-template pTemplate="header">
-            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
-              <p-checkbox formControlName="laminado" [binary]="true" inputId="laminado"></p-checkbox>
-              <label for="laminado" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-clone"></i> Laminado</label>
-            </span>
-          </ng-template>
-          <div class="row g-4 align-items-center pt-3">          <ng-container *ngFor="let n of [1, 2, 3]">
-            <div class="col-sm-12 col-md-4 col-xl-2">
+            <!-- 2. Material y medidas -->
+            <div class="bloque-ficha">
+              <h4 class="bloque-titulo"><span class="bloque-num">2</span> Material y medidas</h4>
+              <div class="row g-4">
+                <div class="col-sm-12 col-md-6 col-xxl-3">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="material" inputId="material" [options]="materiales" optionValue="material_Id"
+                      optionLabel="material_Nombre" [filter]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                    <label for="material"><i class="pi pi-database"></i> Material*</label>
+                  </span>
+                </div>
+                <div class="col-sm-12 col-md-6 col-xxl-6">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="mezcla" inputId="mezcla" [options]="mezclas" optionValue="item"
+                      optionLabel="nombre" [filter]="true" filterBy="nombre" [autoDisplayFirst]="false" appendTo="body"
+                      pTooltip="Mezcla predefinida de BagPro: define los materiales y pigmentos por capa del item" tooltipPosition="top">
+                      <ng-template let-mezcla pTemplate="item">
+                        <span>{{mezcla.nombre}}</span>
+                        <small *ngIf="mezcla.capas" class="ms-2 texto-secundario">({{mezcla.capas}} {{mezcla.capas == 1 ? 'capa' : 'capas'}})</small>
+                      </ng-template>
+                    </p-dropdown>
+                    <label for="mezcla"><i class="pi pi-sitemap"></i> Mezcla*</label>
+                  </span>
+                </div>
+                <div class="col-sm-12 col-md-6 col-xxl-3">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="pigmento" inputId="pigmento" [options]="pigmentos" optionValue="pigmt_Id"
+                      optionLabel="pigmt_Nombre" [filter]="true" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                    <label for="pigmento"><i class="pi pi-palette"></i> Pigmento</label>
+                  </span>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="unidad" inputId="unidad" [options]="unidades" optionValue="codigo"
+                      optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                    <label for="unidad"><i class="pi pi-sliders-v"></i> Unidad Medidas*</label>
+                  </span>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="ancho" inputId="ancho" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                    <label for="ancho"><i class="pi pi-arrows-h"></i> Ancho*</label>
+                  </span>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="largo" inputId="largo" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                    <label for="largo"><i class="pi pi-arrows-v"></i> Largo{{requiereLargo ? '*' : ''}}</label>
+                  </span>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="fuelle" inputId="fuelle" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                    <label for="fuelle"><i class="pi pi-arrows-alt"></i> Fuelle</label>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Procesos -->
+            <div class="bloque-ficha">
+              <h4 class="bloque-titulo"><span class="bloque-num">3</span> Procesos</h4>
+              <div class="tarjetas-proceso">
+                <button type="button" *ngFor="let p of procesosItem" class="tarjeta-proceso" [class.activo]="procesoActivo(p.control)"
+                  [disabled]="guardando" (click)="alternarProceso(p.control)" [attr.aria-pressed]="procesoActivo(p.control)"
+                  [pTooltip]="procesoActivo(p.control) ? 'Clic para quitar ' + p.nombre : 'Clic para agregar ' + p.nombre" tooltipPosition="top">
+                  <span class="proceso-cabecera">
+                    <i [class]="p.icono"></i>
+                    <i class="pi proceso-check" [ngClass]="procesoActivo(p.control) ? 'pi-check-circle' : 'pi-circle'"></i>
+                  </span>
+                  <b>{{p.nombre}}</b>
+                  <small>{{resumenProceso(p.control)}}</small>
+                </button>
+              </div>
+
+              <!-- Extrusión -->
+              <div class="detalle-proceso" *ngIf="procesoActivo('extrusion')">
+                <h5><i class="pi pi-sliders-h"></i> Extrusión</h5>
+                <div class="row g-4">
+                  <div class="col-sm-6 col-md-4 col-xxl-2">
+                    <span class="p-float-label">
+                      <p-inputNumber formControlName="calibre" inputId="calibre" mode="decimal" [min]="0" [minFractionDigits]="1" [maxFractionDigits]="2"></p-inputNumber>
+                      <label for="calibre"><i class="pi pi-sort-alt"></i> Calibre*</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4 col-xxl-3">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="formatoExtrusion" inputId="formatoExtrusion" [options]="formatosExtrusion" optionValue="formato_Id"
+                        optionLabel="formato_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                      <label for="formatoExtrusion"><i class="pi pi-box"></i> Formato Extrusión</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4 col-xxl-3">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="tratado" inputId="tratado" [options]="tratados" optionValue="tratado_Id"
+                        optionLabel="tratado_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                      <label for="tratado"><i class="pi pi-bolt"></i> Tratado</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4 col-xxl" *ngFor="let n of [1, 2, 3]">
+                    <span class="p-float-label">
+                      <p-inputNumber [formControlName]="'anchoExtrusion' + n" [inputId]="'anchoExtrusion' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                      <label [for]="'anchoExtrusion' + n"><i class="pi pi-arrows-h"></i> Ancho Ext. {{n}}</label>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Impresión -->
+              <div class="detalle-proceso" *ngIf="procesoActivo('impresion')">
+                <h5><i class="pi pi-print"></i> Impresión <p-checkbox formControlName="cyrel" [binary]="true" inputId="cyrel" label="Cyrel" class="ms-3"></p-checkbox></h5>
+                <div class="row g-4">
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="tipoImpresion" inputId="tipoImpresion" [options]="tiposImpresion" optionValue="tpImpresion_Id"
+                        optionLabel="tpImpresion_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                      <label for="tipoImpresion"><i class="pi pi-print"></i> Tipo Impresión</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <p-inputNumber formControlName="rodillo" inputId="rodillo" [min]="0" [useGrouping]="false"></p-inputNumber>
+                      <label for="rodillo"><i class="pi pi-circle"></i> Rodillo</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <p-inputNumber formControlName="pista" inputId="pista" [min]="0" [useGrouping]="false"></p-inputNumber>
+                      <label for="pista"><i class="pi pi-bars"></i> Pistas</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-12 col-md-8">
+                    <span class="p-float-label">
+                      <input formControlName="descripcionComercial" id="descripcionComercial" type="text" pInputText class="mayusculas"/>
+                      <label for="descripcionComercial"><i class="pi pi-align-left"></i> Descripción Comercial (nombre)</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <input formControlName="gramaje" id="gramaje" type="text" pInputText class="mayusculas"/>
+                      <label for="gramaje"><i class="pi pi-percentage"></i> Gramaje (ej. 500GR)</label>
+                    </span>
+                  </div>
+                  <div class="col-12">
+                    <span class="p-float-label">
+                      <p-multiSelect formControlName="tintas" inputId="tintas" [options]="tintas" optionValue="id" optionLabel="nombre"
+                        [filter]="true" filterBy="nombre" [selectionLimit]="8" [showToggleAll]="false" display="chip" appendTo="body"
+                        pTooltip="Hasta 8 tintas, en el orden de impresión (Tinta 1, Tinta 2...)" tooltipPosition="top">
+                        <ng-template let-tinta pTemplate="item">
+                          <span class="muestra-tinta" [style.background]="tinta.color || 'transparent'"></span>
+                          <span>{{tinta.nombre}}</span>
+                        </ng-template>
+                      </p-multiSelect>
+                      <label for="tintas"><i class="pi pi-palette"></i> Tintas (máx. 8)</label>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Laminado -->
+              <div class="detalle-proceso" *ngIf="procesoActivo('laminado')">
+                <h5><i class="pi pi-clone"></i> Laminado</h5>
+                <!-- Una fila por capa: capa | calibre | cantidad -->
+                <div class="row g-4">
+                  <ng-container *ngFor="let n of [1, 2, 3]">
+                    <div class="col-12 col-md-6">
+                      <span class="p-float-label">
+                        <p-dropdown [formControlName]="'capa' + n" [inputId]="'capa' + n" [options]="capasLaminado" optionValue="lamCapa_Id"
+                          optionLabel="lamCapa_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                        <label [for]="'capa' + n"><i class="pi pi-clone"></i> Capa {{n}}</label>
+                      </span>
+                    </div>
+                    <div class="col-6 col-md-3">
+                      <span class="p-float-label">
+                        <p-inputNumber [formControlName]="'calibreCapa' + n" [inputId]="'calibreCapa' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                        <label [for]="'calibreCapa' + n"><i class="pi pi-sort-alt"></i> Calibre</label>
+                      </span>
+                    </div>
+                    <div class="col-6 col-md-3">
+                      <span class="p-float-label">
+                        <p-inputNumber [formControlName]="'cantidadCapa' + n" [inputId]="'cantidadCapa' + n" [min]="0" [useGrouping]="false"></p-inputNumber>
+                        <label [for]="'cantidadCapa' + n"><i class="pi pi-hashtag"></i> Cantidad</label>
+                      </span>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+
+              <!-- Sellado / Corte -->
+              <div class="detalle-proceso" *ngIf="procesoActivo('sellado') || procesoActivo('corte')">
+                <h5><i class="pi pi-inbox"></i> {{procesoActivo('sellado') && procesoActivo('corte') ? 'Sellado y Corte' : procesoActivo('sellado') ? 'Sellado' : 'Corte'}}</h5>
+                <div class="row g-4">
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <p-dropdown formControlName="tipoSellado" inputId="tipoSellado" [options]="tiposSellado" optionValue="tpSellado_Id"
+                        optionLabel="tpSellados_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
+                      <label for="tipoSellado"><i class="pi pi-inbox"></i> Tipo Sellado</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <p-inputNumber formControlName="cantidadBulto" inputId="cantidadBulto" [min]="0" [useGrouping]="false"></p-inputNumber>
+                      <label for="cantidadBulto"><i class="pi pi-briefcase"></i> Cantidad por Bulto</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <input formControlName="perforacion" id="perforacion" type="text" pInputText class="mayusculas"/>
+                      <label for="perforacion"><i class="pi pi-ellipsis-h"></i> Perforación (ej. 2 PERF 1/2)</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <p-inputNumber formControlName="pesoMillar" inputId="pesoMillar" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                      <label for="pesoMillar"><i class="pi pi-chart-bar"></i> Peso Millar</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <p-inputNumber formControlName="peso" inputId="peso" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                      <label for="peso"><i class="pi pi-chart-bar"></i> Peso</label>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <small class="texto-secundario" *ngIf="!algunProcesoActivo"><i class="pi pi-info-circle"></i> Seleccione los procesos por los que pasa el item.</small>
+            </div>
+
+            <!-- 4. Observación -->
+            <div class="bloque-ficha">
+              <h4 class="bloque-titulo"><span class="bloque-num">4</span> Observación</h4>
               <span class="p-float-label">
-                <p-dropdown [formControlName]="'capa' + n" [inputId]="'capa' + n" [options]="capasLaminado" optionValue="lamCapa_Id"
-                  optionLabel="lamCapa_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-                <label [for]="'capa' + n">Capa {{n}}</label>
+                <textarea formControlName="observacion" id="observacion" [rows]="2" pInputTextarea></textarea>
+                <label for="observacion"><i class="pi pi-comment"></i> Observación (opcional)</label>
               </span>
             </div>
-            <div class="col-sm-12 col-md-4 col-xl-1">
-              <span class="p-float-label">
-                <p-inputNumber [formControlName]="'calibreCapa' + n" [inputId]="'calibreCapa' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-                <label [for]="'calibreCapa' + n">Calibre</label>
-              </span>
-            </div>
-            <div class="col-sm-12 col-md-4 col-xl-1">
-              <span class="p-float-label">
-                <p-inputNumber [formControlName]="'cantidadCapa' + n" [inputId]="'cantidadCapa' + n" [min]="0" [useGrouping]="false"></p-inputNumber>
-                <label [for]="'cantidadCapa' + n">Cantidad</label>
-              </span>
-            </div>
-          </ng-container>
           </div>
-        </p-fieldset>
 
-        <!-- Sellado / Corte: se contrae y deshabilita si el proceso no está marcado -->
-        <p-fieldset [toggleable]="true" [collapsed]="!seccionActiva('selladoCorte')" styleClass="seccion-proceso">
-          <ng-template pTemplate="header">
-            <span class="cabecera-seccion" (click)="$event.stopPropagation()">
-              <p-checkbox formControlName="sellado" [binary]="true" inputId="sellado" label="Sellado"></p-checkbox>
-              <p-checkbox formControlName="corte" [binary]="true" inputId="corte" label="Corte"></p-checkbox>
-            </span>
-          </ng-template>
-          <div class="row g-4 align-items-center pt-3">
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-dropdown formControlName="tipoSellado" inputId="tipoSellado" [options]="tiposSellado" optionValue="tpSellado_Id"
-                optionLabel="tpSellados_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-              <label for="tipoSellado">Tipo Sellado</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="cantidadBulto" inputId="cantidadBulto" [min]="0" [useGrouping]="false"></p-inputNumber>
-              <label for="cantidadBulto">Cantidad por Bulto</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="pesoMillar" inputId="pesoMillar" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="pesoMillar">Peso Millar</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <p-inputNumber formControlName="peso" inputId="peso" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="peso">Peso</label>
-            </span>
-          </div>
-          <div class="col-sm-12 col-md-4 col-xl-2">
-            <span class="p-float-label">
-              <input formControlName="perforacion" id="perforacion" type="text" pInputText class="mayusculas"/>
-              <label for="perforacion">Perforación (ej. 2 PERF 1/2)</label>
-            </span>
-          </div>
-          </div>
-        </p-fieldset>
+          <!-- ========== Resumen en vivo ========== -->
+          <div class="col-12 col-xl-4">
+            <aside class="resumen-ficha">
+              <div class="resumen-nombre">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <small class="etiqueta-resumen">Nombre del item*</small>
+                  <button pButton type="button" icon="pi pi-sync" class="p-button-text p-button-sm p-button-secondary" label="Sugerir"
+                    (click)="sugerirNombre()"
+                    pTooltip="Arma el nombre con formato, material, medidas, calibre, densidad y pigmento (o descripción comercial si lleva impresión)" tooltipPosition="top"></button>
+                </div>
+                <textarea formControlName="nombre" id="nombre" [rows]="3" pInputTextarea class="mayusculas nombre-input" placeholder="Se sugiere al llenar la ficha"></textarea>
+                <small class="texto-secundario">
+                  <i class="pi" [ngClass]="nombreManual ? 'pi-pencil' : 'pi-bolt'"></i>
+                  {{nombreManual ? 'Editado a mano: pulse "Sugerir" para volver a la sugerencia.' : 'Se sugiere automáticamente mientras no lo edite.'}}
+                </small>
+              </div>
 
-        <div class="mb-3"><hr class="Linea"></div>
+              <div class="resumen-medidas">
+                <div class="dibujo-bolsa" [class.camisilla]="esBiodegradable" aria-hidden="true">
+                  <!-- Silueta: camisilla con asas o bolsa recta; con impresión se dibuja un arte en el centro con los colores de las tintas -->
+                  <svg class="silueta" viewBox="0 0 60 80" preserveAspectRatio="none">
+                    <ng-container *ngIf="esBiodegradable">
+                      <!-- Camisilla: asas con corte recto y líneas de fuelle -->
+                      <path class="silueta-bolsa"
+                        d="M3 2 L17 2 Q18 2 18 3 L18 25 Q18 27 20 27 L40 27 Q42 27 42 25 L42 3 Q42 2 43 2 L57 2 Q58 2 58 3 L58 73 Q58 78 53 78 L7 78 Q2 78 2 73 L2 3 Q2 2 3 2 Z"/>
+                      <line class="silueta-fuelle" x1="18" y1="33" x2="18" y2="70"/>
+                      <line class="silueta-fuelle" x1="42" y1="33" x2="42" y2="70"/>
+                    </ng-container>
+                    <rect *ngIf="!esBiodegradable" class="silueta-bolsa" x="2" y="2" width="56" height="76" rx="4"/>
+                    <g *ngIf="procesoActivo('impresion')" [attr.transform]="esBiodegradable ? 'translate(30 52) scale(0.62) translate(-30 -41)' : null">
+                      <rect class="impresion-marco" x="13" y="28" width="34" height="26" rx="3"/>
+                      <circle cx="21" cy="36" r="4.5" [style.fill]="coloresImpresion[0]"/>
+                      <rect x="28" y="33" width="15" height="2.6" rx="1.3" [style.fill]="coloresImpresion[1]"/>
+                      <rect x="28" y="37.5" width="11" height="2.6" rx="1.3" [style.fill]="coloresImpresion[2]"/>
+                      <rect x="17" y="45" width="26" height="2.6" rx="1.3" [style.fill]="coloresImpresion[1]"/>
+                      <rect x="20" y="49" width="20" height="2" rx="1" [style.fill]="coloresImpresion[0]" opacity="0.6"/>
+                    </g>
+                  </svg>
+                  <span class="cota-ancho">{{formItem.get('ancho')?.value || '—'}}</span>
+                  <span class="cota-largo">{{formItem.get('largo')?.value || '—'}}</span>
+                  <span class="cota-fuelle" *ngIf="formItem.get('fuelle')?.value">+{{formItem.get('fuelle')?.value}}</span>
+                </div>
+                <div class="medidas-texto">
+                  <small class="etiqueta-resumen">Medidas</small>
+                  <span>{{formItem.get('ancho')?.value || '—'}} x {{formItem.get('largo')?.value || '—'}}<ng-container *ngIf="formItem.get('fuelle')?.value"> · fuelle {{formItem.get('fuelle')?.value}}</ng-container></span>
+                  <small class="texto-secundario">{{nombreUnidad}}<ng-container *ngIf="procesoActivo('extrusion') && formItem.get('calibre')?.value"> · calibre {{formItem.get('calibre')?.value}}</ng-container></small>
+                </div>
+              </div>
 
-        <!-- Nombre y observación -->
-        <div class="mb-4">
-          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-tag"></i> Nombre del Item</h4>
-        </div>
-        <div class="row g-4 mb-4 align-items-center">
-          <div class="col-sm-12 col-xl-8">
-            <span class="p-float-label">
-              <input formControlName="nombre" id="nombre" type="text" pInputText class="mayusculas"/>
-              <label for="nombre">Nombre*</label>
-            </span>
-            <small>{{nombreManual ? 'Editado a mano: pulse "Sugerir Nombre" para volver a la sugerencia.' : 'Se sugiere automáticamente mientras no lo edite.'}}</small>
-          </div>
-          <div class="col-auto">
-            <button pButton type="button" label="Sugerir Nombre" icon="pi pi-sync" class="p-button-secondary p-button-outlined" (click)="sugerirNombre()"
-              pTooltip="Arma el nombre con formato, material, medidas, calibre, densidad y pigmento (o descripción comercial si lleva impresión) y lo vuelve a recalcular al cambiar la ficha" tooltipPosition="top"></button>
-          </div>
-          <div class="col-12">
-            <span class="p-float-label">
-              <textarea formControlName="observacion" id="observacion" [rows]="1" pInputTextarea></textarea>
-              <label for="observacion">Observación</label>
-            </span>
-          </div>
-        </div>
+              <div class="resumen-procesos">
+                <span *ngFor="let p of procesosItem" class="chip-proceso" [class.activo]="procesoActivo(p.control)">
+                  <i [class]="procesoActivo(p.control) ? 'pi pi-check' : 'pi pi-minus'"></i> {{p.nombre}}
+                </span>
+              </div>
 
-        <!-- Botones -->
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton type="submit" label="Crear Item" icon="pi pi-check" class="p-button-danger" [disabled]="guardando"
-            pTooltip="Valida duplicados, crea el item en BagPro (asigna el código), verifica el producto en Plasticaribe y crea el artículo en Zeus con el precio" tooltipPosition="top"></button>
-          <button pButton type="button" label="Limpiar Campos" icon="pi pi-eraser" class="p-button-secondary" [disabled]="guardando" (click)="limpiarFormulario()"
-            pTooltip="Limpia todos los campos de la ficha" tooltipPosition="top"></button>
+              <div class="resumen-pendientes" [class.listo]="pendientes.length == 0">
+                <ng-container *ngIf="pendientes.length == 0">
+                  <i class="pi pi-check-circle"></i> <b>Ficha lista para crear</b>
+                </ng-container>
+                <ng-container *ngIf="pendientes.length > 0">
+                  <b><i class="pi pi-exclamation-circle"></i> {{pendientes.length}} {{pendientes.length == 1 ? 'pendiente' : 'pendientes'}}</b>
+                  <ul>
+                    <li *ngFor="let p of pendientes">{{p}}</li>
+                  </ul>
+                </ng-container>
+              </div>
+
+              <div class="resumen-destinos">
+                <small class="etiqueta-resumen">Se creará en</small>
+                <div class="destinos">
+                  <span class="destino sistema-bagpro"><i class="pi pi-briefcase"></i> BagPro<small>Código automático</small></span>
+                  <span class="destino sistema-plasticaribe"><i class="pi pi-box"></i> Plasticaribe<small>Por trigger</small></span>
+                  <span class="destino sistema-zeus"><i class="pi pi-server"></i> Zeus<small>{{formItem.get('presentacion')?.value ? presentacionZeus(formItem.get('presentacion')?.value) : '—'}}<ng-container *ngIf="formItem.get('precio')?.value"> · ${{formItem.get('precio')?.value | number:'1.0-2'}}</ng-container></small></span>
+                </div>
+              </div>
+
+              <!-- Acciones en una sola línea -->
+              <div class="acciones-ficha">
+                <button pButton type="button" label="Limpiar Campos" icon="pi pi-eraser" class="p-button-secondary p-button-outlined" [disabled]="guardando" (click)="limpiarFormulario()"
+                  pTooltip="Limpia todos los campos de la ficha" tooltipPosition="top"></button>
+                <button pButton type="submit" label="Crear Item" icon="pi pi-check" class="p-button-danger" [loading]="guardando" [disabled]="guardando"
+                  pTooltip="Valida duplicados, crea el item en BagPro (asigna el código), verifica el producto en Plasticaribe y crea el artículo en Zeus con el precio" tooltipPosition="top"></button>
+              </div>
+            </aside>
+          </div>
         </div>
       </form>
 
-      <!-- Resultado por paso -->
-      <ng-container *ngIf="pasos.length > 0">
-        <div class="mb-3"><hr class="Linea"></div>
-        <div class="mb-3">
-          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Resultado</h4>
+      <!-- Confirmación antes de crear: nombre, consecutivo y avisos de ficha técnica igual -->
+      <p-dialog header="Confirmar creación del item" [(visible)]="confirmacionVisible" [modal]="true" [draggable]="false"
+        [resizable]="false" [style]="{width: '36rem'}" [breakpoints]="{'640px': '95vw'}">
+        <ng-container *ngIf="confirmacion as c">
+          <p class="mb-3">¿Está seguro de crear el item?</p>
+          <div class="confirmar-item">
+            <span class="confirmar-codigo"><small>Consecutivo</small><b>{{c.validacion.siguienteCodigo}}</b></span>
+            <div class="confirmar-datos">
+              <b>{{c.dto.nombre}}</b>
+              <small>{{c.dto.clienteNom}} · {{c.dto.presentacion}} · {{c.dto.precio | currency:'COP':'$':'1.0-2'}}</small>
+            </div>
+          </div>
+          <small class="texto-secundario d-block mt-2"><i class="pi pi-info-circle"></i> Si otro usuario crea un item antes, se asigna el siguiente consecutivo libre.</small>
+
+          <div class="confirmar-similares" *ngIf="c.validacion.similares?.length">
+            <b><i class="pi pi-exclamation-triangle"></i> Ya existen items con la misma ficha técnica</b>
+            <small>Mismo cliente, formato, material, pigmento, mezcla, medidas y calibre. Verifique que no sea el mismo producto:</small>
+            <ul>
+              <li *ngFor="let s of c.validacion.similares"><b>{{s.codigo}}</b> - {{s.nombre}}</li>
+            </ul>
+          </div>
+        </ng-container>
+        <ng-template pTemplate="footer">
+          <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary" (click)="confirmacionVisible = false"></button>
+          <button pButton type="button" label="Sí, crear item" icon="pi pi-check" class="p-button-danger" (click)="confirmarCreacion()"></button>
+        </ng-template>
+      </p-dialog>
+
+      <!-- Resultado de la creación -->
+      <div class="tarjeta-resultado mt-4" *ngIf="pasos.length > 0">
+        <div class="resultado-cabecera">
+          <span><i class="pi pi-flag"></i> Resultado de la creación</span>
+          <div class="d-flex align-items-center gap-2">
+            <button *ngIf="ultimoCodigo && !guardando" pButton type="button" class="p-button-text p-button-sm" icon="pi pi-sync"
+              [label]="'Ver item ' + ultimoCodigo" (click)="tabActiva = 1"
+              pTooltip="Abre el item en Estado de Sincronización" tooltipPosition="top"></button>
+            <span class="pildora" [ngClass]="'pildora-' + resumenPasos.estado">{{resumenPasos.texto}}</span>
+          </div>
         </div>
-        <ul class="lista-pasos">
-          <li *ngFor="let paso of pasos"><i [class]="iconoPaso(paso.estado)"></i> <b>{{paso.titulo}}</b><span *ngIf="paso.detalle">: {{paso.detalle}}</span></li>
-        </ul>
-      </ng-container>
+        <div class="stepper-sync">
+          <div *ngFor="let paso of pasos" class="paso-sync" [ngClass]="'paso-' + paso.estado">
+            <div class="paso-circulo"><i [class]="iconoCirculoPaso(paso.estado)"></i></div>
+            <b class="paso-titulo">{{paso.titulo}}</b>
+            <small class="paso-detalle">{{paso.detalle || textoEstadoPaso(paso.estado)}}</small>
+          </div>
+        </div>
+      </div>
     </p-tabPanel>
 
     <!-- ================================== ESTADO DE SINCRONIZACIÓN ================================== -->
@@ -365,123 +526,168 @@
       <div class="mb-4 mt-2">
         <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Item</h4>
       </div>
-      <div class="row g-3 mb-3 align-items-center">
-        <div class="col-sm-12 col-md-8 col-xl-6">
+      <!-- Buscador con sus acciones en la misma línea -->
+      <div class="barra-sync mb-3">
+        <div class="barra-sync-campo">
           <span class="p-float-label">
             <p-autoComplete [formControl]="busquedaSync" inputId="busquedaSync" [suggestions]="itemsSugeridos"
               (completeMethod)="buscarItems($event)" field="etiqueta" [minLength]="3" [delay]="400" appendTo="body"
               [style]="{width: '100%'}" [inputStyle]="{width: '100%'}"
               (keyup.enter)="consultarEstado()"></p-autoComplete>
-            <label for="busquedaSync">Item (código o nombre)</label>
+            <label for="busquedaSync"><i class="pi pi-search"></i> Item (código o nombre)</label>
           </span>
         </div>
-      </div>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton type="button" label="Consultar Estado" icon="pi pi-search" class="p-button-danger"
           [disabled]="consultandoSync" (click)="consultarEstado()"
           pTooltip="Consulta el item en BagPro (presentaciones), Plasticaribe (producto) y Zeus (artículos)" tooltipPosition="top"></button>
-        <button pButton type="button" label="Completar" icon="pi pi-cloud-upload" class="p-button-secondary"
-          [disabled]="!estadoSync || completando || agregandoPresentacion || faltantesZeus.length == 0 || !estadoSync.existePlasticaribe"
+        <button *ngIf="estadoSync && faltantesZeus.length > 0 && estadoSync.existePlasticaribe" pButton type="button" label="Completar en Zeus" icon="pi pi-cloud-upload"
+          class="p-button-warning" [loading]="completando" [disabled]="completando || agregandoPresentacion"
           (click)="completarSincronizacion()"
           pTooltip="Crea en Zeus las presentaciones de BagPro que faltan, con su precio (repetirlo es seguro)" tooltipPosition="top"></button>
       </div>
 
       <ng-container *ngIf="estadoSync as estado">
         <div class="mb-3"><hr class="Linea"></div>
-        <div class="mb-3">
-          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Item {{estado.codigo}} por Sistema</h4>
-        </div>
-        <div class="mb-2 avisos-sync">
-          <small *ngIf="estado.errorBagPro" class="paso-error d-block"><i class="pi pi-times-circle"></i> BagPro: {{estado.errorBagPro}}</small>
-          <small *ngIf="estado.errorPlasticaribe" class="paso-error d-block"><i class="pi pi-times-circle"></i> Plasticaribe: {{estado.errorPlasticaribe}}</small>
-          <small *ngIf="estado.errorZeus" class="paso-error d-block"><i class="pi pi-times-circle"></i> Zeus: {{estado.errorZeus}}</small>
-          <small *ngIf="faltantesZeus.length > 0" class="paso-advertencia d-block"><i class="pi pi-exclamation-triangle"></i> Faltan en Zeus: {{faltantesZeusTexto}}</small>
+
+        <!-- Resumen del item -->
+        <div class="resumen-sync mb-4" [ngClass]="'resumen-' + resumenSync.estado">
+          <div class="resumen-icono"><i [class]="resumenSync.icono"></i></div>
+          <div class="resumen-texto">
+            <span class="resumen-titulo">Item {{estado.codigo}}</span>
+            <span class="resumen-nombre" *ngIf="resumenSync.nombre">{{resumenSync.nombre}}</span>
+            <div class="resumen-pildoras">
+              <span class="pildora"><i class="pi pi-sitemap"></i> {{resumenSync.completos}}/{{tarjetasSync.length}} sistemas al día</span>
+              <span class="pildora"><i class="pi pi-tags"></i> {{resumenSync.presentaciones}} {{resumenSync.presentaciones == 1 ? 'presentación' : 'presentaciones'}}</span>
+              <span class="pildora pildora-estado">{{resumenSync.texto}}</span>
+            </div>
+          </div>
         </div>
 
-        <div class="mb-3 font-size-14">
-          <p-table #dtSync [value]="filasSync" styleClass="p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll"
-            [rowHover]="true" [scrollable]="true" scrollHeight="25rem" [resizableColumns]="true" columnResizeMode="expand">
-            <ng-template pTemplate="header">
-              <tr>
-                <th><input pInputText (input)="filtrarSync($event, 'sistema')"></th>
-                <th></th>
-                <th><input pInputText (input)="filtrarSync($event, 'codigo')"></th>
-                <th><input pInputText (input)="filtrarSync($event, 'nombre')"></th>
-                <th><input pInputText (input)="filtrarSync($event, 'descripcion')"></th>
-                <th><input pInputText (input)="filtrarSync($event, 'presentacion')"></th>
-                <th></th>
-              </tr>
-              <tr>
-                <th class="text-center">Sistema</th>
-                <th class="text-center">Estado</th>
-                <th class="text-center">Item</th>
-                <th class="text-center">Referencia</th>
-                <th class="text-center">Descripción</th>
-                <th class="text-center">Presentación</th>
-                <th class="text-center" style="min-width: 8rem;">Precio</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-fila>
-              <tr [class.fila-falta]="!fila.existe">
-                <td class="text-center"><b>{{fila.sistema}}</b></td>
-                <td class="text-center">
-                  <p-tag [severity]="fila.existe ? 'success' : 'danger'" [value]="fila.existe ? 'Existe' : 'Falta'"></p-tag>
-                </td>
-                <td class="text-center">{{fila.codigo}}</td>
-                <td [class.nombre-difiere]="fila.nombreDifiere">
-                  <i *ngIf="fila.nombreDifiere" class="pi pi-exclamation-triangle" pTooltip="El nombre difiere del de BagPro" tooltipPosition="top"></i>
-                  {{fila.nombre}}
-                </td>
-                <td>{{fila.descripcion}}</td>
-                <td class="text-center">{{fila.presentacion}}</td>
-                <td class="text-end pe-3" style="min-width: 8rem;">{{fila.precio != null ? (fila.precio | number:'1.0-2') : ''}}</td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr><td colspan="7">Sin información del item.</td></tr>
-            </ng-template>
-          </p-table>
-        </div>
+        <!-- Una card por sistema -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-lg-4" *ngFor="let tarjeta of tarjetasSync">
+            <div class="tarjeta-sync" [ngClass]="['sistema-' + tarjeta.sistema.toLowerCase(), 'estado-' + tarjeta.estado]">
+              <div class="tarjeta-cabecera">
+                <span class="tarjeta-icono"><i [class]="tarjeta.icono"></i></span>
+                <span class="tarjeta-sistema">{{tarjeta.sistema}}</span>
+                <span class="tarjeta-estado"><i [class]="iconoEstadoTarjeta(tarjeta.estado)"></i> {{tarjeta.etiqueta}}</span>
+              </div>
 
-        <div class="mb-3"><hr class="Linea"></div>
+              <div class="tarjeta-cuerpo">
+                <div *ngIf="tarjeta.error" class="tarjeta-error"><i class="pi pi-times-circle"></i> {{tarjeta.error}}</div>
+                <ng-container *ngIf="!tarjeta.error">
+                  <div class="dato-sync">
+                    <small>Referencia</small>
+                    <span [class.nombre-difiere]="tarjeta.nombreDifiere">
+                      <i *ngIf="tarjeta.nombreDifiere" class="pi pi-exclamation-triangle" pTooltip="El nombre difiere del de BagPro" tooltipPosition="top"></i>
+                      {{tarjeta.nombre || '—'}}
+                    </span>
+                  </div>
+                  <div class="datos-extra" *ngIf="tarjeta.datos.length">
+                    <div class="dato-sync" *ngFor="let dato of tarjeta.datos">
+                      <small>{{dato.etiqueta}}</small>
+                      <span>{{dato.valor}}</span>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+
+              <div class="tarjeta-chips" *ngIf="tarjeta.chips.length">
+                <span *ngFor="let chip of tarjeta.chips" class="chip-pres" [class.chip-falta]="!chip.existe"
+                  [pTooltip]="chip.existe ? (chip.costo != null ? 'Costo: ' + (chip.costo | number:'1.0-2') : '') : 'Falta en ' + tarjeta.sistema" tooltipPosition="top">
+                  <i [class]="chip.existe ? 'pi pi-check' : 'pi pi-times'"></i>
+                  {{chip.presentacion}}<b *ngIf="chip.precio != null"> · ${{chip.precio | number:'1.0-2'}}</b>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Agregar presentación -->
-        <div class="mb-4">
-          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-plus-circle"></i> Agregar Presentación al Item {{estado.codigo}}</h4>
+        <div class="tarjeta-agregar mb-4">
+          <div class="agregar-cabecera">
+            <i class="pi pi-plus-circle"></i>
+            <div>
+              <span class="agregar-titulo">Agregar presentación al item {{estado.codigo}}</span>
+              <small>Se crea en BagPro, el trigger la agrega en Plasticaribe y luego se crea el artículo en Zeus.</small>
+            </div>
+          </div>
+          <form [formGroup]="formPresentacion" (ngSubmit)="agregarPresentacion()">
+            <div class="opciones-pres mb-3">
+              <button type="button" *ngFor="let p of presentaciones" class="opcion-pres"
+                [class.seleccionada]="formPresentacion.value.presentacion == p.valor"
+                [disabled]="presentacionYaExiste(p.valor) || agregandoPresentacion"
+                (click)="formPresentacion.patchValue({ presentacion: p.valor })"
+                [pTooltip]="presentacionYaExiste(p.valor) ? 'El item ya tiene esta presentación en BagPro' : ''" tooltipPosition="top">
+                <i [class]="iconoPresentacion(p.valor)"></i>
+                <span>{{p.nombre}}</span>
+                <small>{{presentacionYaExiste(p.valor) ? 'Ya existe' : presentacionZeus(p.valor)}}</small>
+              </button>
+            </div>
+            <div class="row g-3 align-items-center mb-3">
+              <div class="col-sm-12 col-md-4 col-xl-3">
+                <span class="p-float-label">
+                  <p-inputNumber formControlName="precio" inputId="precioNuevo" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                  <label for="precioNuevo">Precio Unitario*</label>
+                </span>
+              </div>
+              <div class="col-sm-12 col-md-8 col-xl-9">
+                <div class="vista-previa" *ngIf="formPresentacion.value.presentacion as pres; else sinSeleccion">
+                  <span class="previa-titulo"><i class="pi pi-eye"></i> Se creará:</span>
+                  <span class="previa-paso sistema-bagpro"><i class="pi pi-briefcase"></i> BagPro {{pres}}</span>
+                  <i class="pi pi-arrow-right previa-flecha"></i>
+                  <span class="previa-paso sistema-plasticaribe"><i class="pi pi-box"></i> Plasticaribe (trigger)</span>
+                  <i class="pi pi-arrow-right previa-flecha"></i>
+                  <span class="previa-paso sistema-zeus"><i class="pi pi-server"></i> Zeus {{presentacionZeus(pres)}}
+                    <ng-container *ngIf="formPresentacion.value.precio > 0">· costo {{formPresentacion.value.precio * 0.75 | number:'1.0-2'}}</ng-container>
+                  </span>
+                </div>
+                <ng-template #sinSeleccion><small class="texto-secundario"><i class="pi pi-info-circle"></i> Seleccione una presentación y digite el precio.</small></ng-template>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end">
+              <button pButton type="submit" label="Agregar Presentación" icon="pi pi-plus" class="p-button-danger"
+                [loading]="agregandoPresentacion" [disabled]="agregandoPresentacion || completando || !formPresentacion.valid"
+                pTooltip="Agrega la presentación al item en BagPro (su trigger la crea en Plasticaribe) y crea el artículo en Zeus con el precio" tooltipPosition="top"></button>
+            </div>
+          </form>
         </div>
-        <form [formGroup]="formPresentacion" (ngSubmit)="agregarPresentacion()">
-          <div class="row g-4 mb-3 align-items-center">
-            <div class="col-sm-12 col-md-4 col-xl-2">
-              <span class="p-float-label">
-                <p-dropdown formControlName="presentacion" inputId="presentacionNueva" [options]="presentaciones" optionValue="valor"
-                  optionLabel="nombre" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
-                <label for="presentacionNueva">Presentación*</label>
-              </span>
-            </div>
-            <div class="col-sm-12 col-md-4 col-xl-2">
-              <span class="p-float-label">
-                <p-inputNumber formControlName="precio" inputId="precioNuevo" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-                <label for="precioNuevo">Precio Unitario*</label>
-              </span>
-            </div>
-          </div>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton type="submit" label="Agregar Presentación" icon="pi pi-plus" class="p-button-danger p-button-outlined"
-              [disabled]="agregandoPresentacion || completando || !formPresentacion.valid"
-              pTooltip="Agrega la presentación al item en BagPro (su trigger la crea en Plasticaribe) y crea el artículo en Zeus con el precio" tooltipPosition="top"></button>
-          </div>
-        </form>
       </ng-container>
 
-      <ng-container *ngIf="resultadosSync.length > 0">
-        <div class="mb-3"><hr class="Linea"></div>
-        <div class="mb-3">
-          <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Resultado</h4>
+      <!-- Confirmación antes de agregar una presentación -->
+      <p-dialog header="Confirmar nueva presentación" [(visible)]="confirmacionPresentacionVisible" [modal]="true" [draggable]="false"
+        [resizable]="false" [style]="{width: '34rem'}" [breakpoints]="{'640px': '95vw'}">
+        <ng-container *ngIf="confirmacionPresentacion as c">
+          <p class="mb-3">¿Está seguro de agregar la presentación <b>{{c.presentacion}}</b> al item?</p>
+          <div class="confirmar-item">
+            <span class="confirmar-codigo"><small>Item</small><b>{{c.codigo}}</b></span>
+            <div class="confirmar-datos">
+              <b>{{c.nombre}}</b>
+              <small>{{c.presentacion}} (Zeus {{presentacionZeus(c.presentacion)}}) · {{c.precio | currency:'COP':'$':'1.0-2'}} · costo {{c.precio * 0.75 | number:'1.0-2'}}</small>
+            </div>
+          </div>
+          <small class="texto-secundario d-block mt-2"><i class="pi pi-info-circle"></i> Se crea en BagPro, el trigger la agrega en Plasticaribe y luego se crea el artículo en Zeus.</small>
+        </ng-container>
+        <ng-template pTemplate="footer">
+          <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary" (click)="confirmacionPresentacionVisible = false"></button>
+          <button pButton type="button" label="Sí, agregar" icon="pi pi-check" class="p-button-danger" (click)="confirmarPresentacion()"></button>
+        </ng-template>
+      </p-dialog>
+
+      <!-- Resultado de Completar / Agregar presentación -->
+      <div class="tarjeta-resultado mb-3" *ngIf="resultadosSync.length > 0">
+        <div class="resultado-cabecera">
+          <span><i class="pi pi-flag"></i> Resultado</span>
+          <span class="pildora" [ngClass]="'pildora-' + resumenResultado.estado">{{resumenResultado.texto}}</span>
         </div>
-        <ul class="lista-pasos">
-          <li *ngFor="let paso of resultadosSync"><i [class]="iconoPaso(paso.estado)"></i> <b>{{paso.titulo}}</b><span *ngIf="paso.detalle">: {{paso.detalle}}</span></li>
-        </ul>
-      </ng-container>
+        <div class="stepper-sync">
+          <div *ngFor="let paso of resultadosSync" class="paso-sync" [ngClass]="'paso-' + paso.estado">
+            <div class="paso-circulo"><i [class]="iconoCirculoPaso(paso.estado)"></i></div>
+            <b class="paso-titulo">{{paso.titulo}}</b>
+            <small class="paso-detalle">{{paso.detalle || textoEstadoPaso(paso.estado)}}</small>
+          </div>
+        </div>
+      </div>
     </p-tabPanel>
   </p-tabView>
 </ng-template>

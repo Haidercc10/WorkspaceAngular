@@ -19,6 +19,8 @@ export interface CrearItemDto {
   formato: number;
   formatoExtrusion?: number | null;
   material: number;
+  /** Mezcla predefinida de BagPro (bpMezclasPreDef.Item). Obligatoria al crear. */
+  mezcla?: number | null;
   pigmento?: number | null;
   tratado?: number | null;
   unidad: number;
@@ -65,6 +67,31 @@ export interface FichaItem extends Omit<CrearItemDto, 'presentacion' | 'precio'>
   unidadNom?: string | null;
   tipoImpresionNom?: string | null;
   tipoSelladoNom?: string | null;
+  mezclaNom?: string | null;
+}
+
+/** Mezcla predefinida de BagPro (`GET api/ClientesOtItems/catalogos/mezclas`). */
+export interface MezclaPredefinida {
+  item: number;
+  nombre: string;
+  capas: number | null;
+}
+
+/** Tinta de impresión de BagPro (`GET api/ClientesOtItems/catalogos/tintas`). */
+/** Respuesta de `POST api/ClientesOtItems/validarDuplicado` cuando el nombre no está repetido. */
+export interface ValidacionItem {
+  duplicado: boolean;
+  /** Consecutivo estimado del item; se fija al crear (puede cambiar si otro usuario crea uno antes). */
+  siguienteCodigo: number;
+  /** Items con la misma ficha técnica (solo aviso). */
+  similares: { codigo: number, nombre: string }[];
+}
+
+export interface TintaBagPro {
+  id: number;
+  nombre: string;
+  /** Color hexadecimal de la tinta (#RRGGBB), tomado de la referencia en BagPro. */
+  color?: string | null;
 }
 
 /** Respuesta de la creación de un item o de una presentación en BagPro. */

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
-import { CrearItemDto, FichaItem, ItemBusqueda, ItemCreado, PresentacionBagPro } from 'src/app/Modelo/modelCrearItem';
+import { CrearItemDto, FichaItem, ItemBusqueda, ItemCreado, MezclaPredefinida, PresentacionBagPro, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
 import { rollsToDelete } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
@@ -168,7 +168,7 @@ export class BagproService {
    * @param ficha Ficha del item a crear.
    * @returns Observable con `{ duplicado: false }`; si hay duplicado responde 409 con `{ tipo, codigo, nombre }`.
    */
-  PostValidarDuplicadoItem = (ficha : CrearItemDto) => this.http.post<{ duplicado : boolean }>(`${this.rutaBagPro}/ClientesOtItems/validarDuplicado`, ficha);
+  PostValidarDuplicadoItem = (ficha : CrearItemDto) => this.http.post<ValidacionItem>(`${this.rutaBagPro}/ClientesOtItems/validarDuplicado`, ficha);
 
   /**
    * Crea el item en ClientesOT_Item; BagPro asigna el código y su trigger crea el producto en Plasticaribe.
@@ -199,6 +199,18 @@ export class BagproService {
    * @returns Observable con los items encontrados (código y nombre).
    */
   GetBuscarItems = (texto : string) : Observable<ItemBusqueda[]> => this.http.get<ItemBusqueda[]>(`${this.rutaBagPro}/ClientesOtItems/buscar`, { params: { texto } });
+
+  /**
+   * Mezclas predefinidas de BagPro (bpMezclasPreDef) para la creación de items.
+   * @returns Observable con las mezclas ordenadas por nombre.
+   */
+  GetMezclasPredefinidas = () : Observable<MezclaPredefinida[]> => this.http.get<MezclaPredefinida[]>(`${this.rutaBagPro}/ClientesOtItems/catalogos/mezclas`);
+
+  /**
+   * Tintas de impresión de BagPro para la creación de items (sin la tinta 1, que significa "sin tinta").
+   * @returns Observable con las tintas ordenadas por nombre.
+   */
+  GetTintasItem = () : Observable<TintaBagPro[]> => this.http.get<TintaBagPro[]>(`${this.rutaBagPro}/ClientesOtItems/catalogos/tintas`);
 
   /**
    * Ficha técnica de un item (primera fila en BagPro), para copiarla en un item nuevo.
