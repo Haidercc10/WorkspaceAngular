@@ -92,7 +92,7 @@
   <div class="row g-4">
     <!-- Lista de solicitudes -->
     <!-- Sin "col-12": PrimeFlex (cargado después de Bootstrap) también la define y deja la columna siempre al 100%. -->
-    <div class="col-lg-6" data-tutorial="listaSolicitudes">
+    <div class="col-lg-6 columna-panel" data-tutorial="listaSolicitudes">
       <h4 class="font-size-20 mb-1" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">
         <i class="pi pi-list"></i> <b> Lista de solicitudes</b></h4>
       <p class="texto-secundario mb-3">{{descripcionConsulta}} · {{solicitudes.length}} resultado(s)</p>
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Detalle de la solicitud seleccionada -->
-    <div class="col-lg-6" id="matprimas" data-tutorial="detalle">
+    <div class="col-lg-6 columna-panel" id="matprimas" data-tutorial="detalle">
       <!-- Mismo encabezado (título + una línea) que la lista: así el contenido queda a la altura de la tabla -->
       <div class="encabezado-detalle">
         <h4 class="font-size-20 mb-1" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">

@@ -361,3 +361,17 @@
   justify-content: space-between;
   gap: 0.5rem;
 }
+
+/* Títulos y subtítulos de la lista y del detalle siempre a la izquierda.
+   Otras vistas dejan reglas ::ng-deep que centran el texto dentro de p-card y,
+   al navegar entre pantallas, quedan activas; por eso a veces salían centrados. */
+:host ::ng-deep .p-card .p-card-content {
+  text-align: left;
+}
+
+.columna-panel,
+.columna-panel > h4,
+.columna-panel > p,
+.columna-panel .encabezado-detalle > h4 {
+  text-align: left !important;
+}
