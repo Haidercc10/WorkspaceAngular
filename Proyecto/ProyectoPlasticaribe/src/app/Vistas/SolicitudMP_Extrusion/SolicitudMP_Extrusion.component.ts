@@ -882,7 +882,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
    * No actúa sobre una fila, el buscador u otro control (ahí Enter tiene su propia acción), ni con algo abierto encima.
    */
   @HostListener('document:keydown.enter', ['$event'])
-  alPresionarEnter(event: KeyboardEvent) {
+  alPresionarEnter(event: Event) {
     if (!this.mostrarAgregar || this.panelModal !== 'subcategorias' || this.subcategoriasSeleccionadas.length === 0) return;
     if (this.tutoriales.activo || this.mensajeService.detalleVisible || document.querySelector('.p-confirm-dialog')) return;
     const objetivo = event.target as HTMLElement | null;
