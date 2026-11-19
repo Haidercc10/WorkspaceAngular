@@ -463,7 +463,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
           this.guardarReservas(data);
           this.loadSubcategories();
         },
-        error: error => this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar las cantidades reservadas por las solicitudes de material!`)),
+        error: error => this.msj.mensajeError(`¡Error!`, this.mensajeErrorApi(error, `¡Ocurrió un error al consultar las cantidades reservadas por las solicitudes de materia prima!`)),
       });
   }
 
@@ -578,7 +578,7 @@ export class ReporteMateriaPrimaComponent implements OnInit, OnDestroy {
         };
       case 'subcategorias':
         return {
-          nombre: 'Subcategorias', visible: verPestanasBopp, subtitulo: () => 'Stock actual agrupado por subcategoría. Cant. Reservada: lo solicitado y aún no asignado en las solicitudes de material de producción',
+          nombre: 'Subcategorias', visible: verPestanasBopp, subtitulo: () => 'Stock actual agrupado por subcategoría. Cant. Reservada: lo solicitado y aún no asignado en las solicitudes de materia prima',
           filas: filtradas(this.dt_Subcategories, this.subcategories),
           columnas: [
             { titulo: 'Id', campo: 'id', ancho: 10 },

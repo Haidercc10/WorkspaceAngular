@@ -48,7 +48,7 @@ const CLAVE_TOAST_SOLICITUD_GUARDADA = 'solicitudGuardada';
 /** Tiempo que se ve el aviso de éxito al guardar (da tiempo de elegir una opción). */
 const DURACION_AVISO_GUARDADA_MS = 15000;
 /** Nombre de la vista de Movimientos de solicitudes en los permisos (data.nombre de su ruta). */
-const VISTA_MOVIMIENTOS_SOLICITUD = 'Mov. Solicitud Material Producción';
+const VISTA_MOVIMIENTOS_SOLICITUD = 'Mov. Solicitud Materia Prima';
 
 /** Datos del aviso de éxito al guardar una solicitud. */
 interface SolicitudGuardada {
@@ -1229,8 +1229,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       return this.confirmar('Superar límite de la OT', `${cuerpo.mensaje} ¿Desea solicitar de todas formas?`,
         () => this.guardarSolicitud({ ...confirmaciones, excesoLimite: true }), 'Solicitar de todas formas');
     }
-    this.notificarError(error, 'No se pudo guardar la solicitud de material.',
-      this.esSolicitud ? 'Editar solicitud de material' : 'Crear solicitud de material', this.esSolicitud ? 'PUT' : 'POST');
+    this.notificarError(error, 'No se pudo guardar la solicitud de materia prima.',
+      this.esSolicitud ? 'Editar solicitud de materia prima' : 'Crear solicitud de materia prima', this.esSolicitud ? 'PUT' : 'POST');
   }
 
   /**

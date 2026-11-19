@@ -84,7 +84,7 @@ function pasosManual(ctx : ContextoTutorialAsignacion) : Step.StepOptions[] {
   return armar('tutorial-asignacion-manual', [
     paso(null, '¡Asignación de Materia Prima!',
       `<p>Aquí entregamos materia prima o tintas a una <b>orden de trabajo</b>.</p>
-       <p>Lo normal es asignar desde <b>Movimientos de solicitudes de material</b>, con el botón <b>Crear Asignación</b> de cada solicitud.
+       <p>Lo normal es asignar desde <b>Movimientos de solicitudes de materia prima</b>, con el botón <b>Crear Asignación</b> de cada solicitud.
        Esta página también permite asignar <b>sin solicitud</b>.</p>`),
 
     paso(el('solicitudAsignacion'), '¡Asignar una solicitud!',

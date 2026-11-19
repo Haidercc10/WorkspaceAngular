@@ -92,15 +92,6 @@ p-dialog ::ng-deep .p-dialog-header span {
   width: 2rem;
   height: 2rem;
 }
-/* Botón de tutorial dentro del h2 del título (igual que en Tickets, Precargue y Solicitud de material). */
-.boton-tutorial-titulo {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 0.4rem;
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* Interruptor "Mostrar sin Stock": centrado verticalmente con el botón Consultar y el campo de fechas. */
 .switch-stock {
   display: flex;

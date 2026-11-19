@@ -8,7 +8,8 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" id="titulo">Solicitud de Material de Producción
+      <!-- pasó de llamarse solicitud de material de produccion a solicitud de materia prima -->
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" id="titulo">Solicitud de Materia Prima
         <p-button class="boton-tutorial-titulo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
       </h2>
     </div>
@@ -381,7 +382,7 @@
       <button pButton pRipple [label]="esSolicitud ? 'Editar Solicitud' : 'Crear Solicitud'" type="button" icon="pi pi-check"
         class="p-button-danger" [disabled]="subcategoriasSeleccionadas.length == 0 || load"
         (click)="validarYGuardarSolicitud()"
-        [pTooltip]="esSolicitud ? 'Guarda los cambios de la solicitud de material de producción.' : 'Crea la solicitud de material de producción.'"></button>
+        [pTooltip]="esSolicitud ? 'Guarda los cambios de la solicitud de materia prima.' : 'Crea la solicitud de materia prima.'"></button>
       <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary"
         icon="pi pi-eraser" (click)="solicitarLimpiarTodo()" pTooltip="Limpia todos los campos del formulario."></button>
     </div>

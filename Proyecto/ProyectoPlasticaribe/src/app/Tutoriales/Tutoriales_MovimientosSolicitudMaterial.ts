@@ -34,8 +34,8 @@ export function pasosTutorialMovimientosSolicitud(ctx : ContextoTutorialMovimien
   });
 
   return armar('tutorial-movimientos-solicitud', [
-    paso(null, '¡Movimientos de solicitudes de material!',
-      `<p>Aquí vemos las <b>solicitudes de material</b> que hacen los operarios para producir sus órdenes de trabajo.</p>
+    paso(null, '¡Movimientos de solicitudes de materia prima!',
+      `<p>Aquí vemos las <b>solicitudes de materia prima</b> que hacen los operarios para producir sus órdenes de trabajo.</p>
        ${ctx.puedeGestionar
          ? `<p>Desde aquí las <b>atendemos</b>: vemos qué materiales pidieron, <b>asignamos</b> lo que hay disponible y, si hace falta, las finalizamos o cancelamos.</p>`
          : `<p>Podemos consultar cada solicitud con sus materiales, lo pedido y lo entregado.</p>`}

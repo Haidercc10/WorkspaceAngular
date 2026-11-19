@@ -131,18 +131,6 @@ p-chip ::ng-deep .p-chip-text {
   margin-left: 0.25rem;
 }
 
-/*
- * Botón de tutorial dentro del h2 del título: así el título conserva exactamente la altura y separación
- * de las demás páginas (márgenes globales de .Titulo .tituloRojo en styles.css), como en Precargue de Rollos.
- */
-.boton-tutorial-titulo {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 0.4rem;
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* Encabezado del popup del ticket: título rojo y, a su derecha, el botón del tutorial del detalle. */
 .titulo-dialogo-ticket {
   display: flex;

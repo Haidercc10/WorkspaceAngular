@@ -2,15 +2,6 @@ span{
     color: var(--rojo);
   }
 
-  /* Botón de tutorial dentro del h2 del título (igual que en Usuarios, Tickets, Precargue e Inventarios). */
-  .boton-tutorial-titulo {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 0.4rem;
-    font-size: 1rem;
-    line-height: 1;
-  }
-  
   .d-grid {
     padding-bottom: 2%;
   }

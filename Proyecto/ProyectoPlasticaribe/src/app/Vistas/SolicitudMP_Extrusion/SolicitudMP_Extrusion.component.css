@@ -12,15 +12,6 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   width: 100%;
 }
 
-/* Botón de tutorial dentro del h2 del título (igual que en Tickets y Precargue). */
-.boton-tutorial-titulo {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 0.4rem;
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* Campo con un botón pegado a la derecha, con el mismo aspecto del botón de los campos de fecha (p-calendar). */
 .campo-con-boton {
   display: flex;

@@ -1105,7 +1105,7 @@ export class CreacionPdfService {
       }))
       .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
-    const titulo = `Solicitud de Material de Producción N° ${solicitud.id}\nOrden de Trabajo N° ${solicitud.ot}`;
+    const titulo = `Solicitud de Materia Prima N° ${solicitud.id}\nOrden de Trabajo N° ${solicitud.ot}`;
     const content = [
       this.infoSolicitudMaterialPDF(solicitud),
       this.infoOTSolicitudMaterialPDF(solicitud, ot),

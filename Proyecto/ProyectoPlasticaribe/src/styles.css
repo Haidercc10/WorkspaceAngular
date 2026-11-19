@@ -227,6 +227,21 @@ a {
   font-size: calc(var(--font-size) * 20px);
 }
 
+/*
+ * Botón de tutorial junto al texto del título (h2/h4), común a todas las páginas con tutorial.
+ * inline-flex: el contenedor mide exactamente lo que el botón (sin espacio extra de línea debajo).
+ * vertical-align: middle centra el botón a media altura de las minúsculas; el top negativo (en em del título,
+ * así escala con su tamaño) lo sube hasta la mitad de las mayúsculas, que es donde el ojo ve el centro del texto.
+ */
+.boton-tutorial-titulo {
+  display: inline-flex;
+  vertical-align: middle;
+  position: relative;
+  top: -0.1em;
+  margin-left: 0.4rem;
+  line-height: 1;
+}
+
 .colorLinea {
   color: #b6bac2;
   height: 2px;

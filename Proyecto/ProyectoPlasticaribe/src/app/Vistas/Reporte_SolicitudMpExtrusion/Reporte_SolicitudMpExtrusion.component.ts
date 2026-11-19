@@ -364,7 +364,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
           else if (porSeleccionar) this.seleccionar(porSeleccionar);
           else if (filtros.id != null) this.seleccionar(datos[0]);
         },
-        error: error => this.notificarError(error, 'No se pudieron consultar las solicitudes de material.', 'Consultar solicitudes de material'),
+        error: error => this.notificarError(error, 'No se pudieron consultar las solicitudes de materia prima.', 'Consultar solicitudes de materia prima'),
       });
   }
 

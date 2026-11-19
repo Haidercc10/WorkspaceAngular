@@ -25,7 +25,7 @@ const el = (nombre : string) => `[data-tutorial="${nombre}"]`;
 
 export function pasosTutorialSolicitudMaterial({ puedeEditar, puedeElegirProceso, puedeExcederLimite, porcentajeAdicional } : ContextoTutorialSolicitudMaterial) : Step.StepOptions[] {
   return armar('tutorial-solicitud-material', [
-    paso(null, '¡Solicitud de Material de Producción!',
+    paso(null, '¡Solicitud de Materia Prima!',
       `<p>¡Aquí le pedimos al encargado del inventario el material que necesitamos para producir una <b>orden de trabajo (OT)</b>!</p>
        <p>El proceso es:</p>
        <ol>

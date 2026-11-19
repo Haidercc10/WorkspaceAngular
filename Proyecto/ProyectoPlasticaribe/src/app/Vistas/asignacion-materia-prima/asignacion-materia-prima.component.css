@@ -19,15 +19,6 @@
   width: 100%;
 }
 
-/* Botón de tutorial dentro del título (igual que en las demás páginas con tutorial). */
-.boton-tutorial-titulo {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 0.4rem;
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* Inputs con botón X para limpiar su contenido */
 .input-limpiable {
   position: relative;

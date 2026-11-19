@@ -1,12 +1,3 @@
-/* Botón de tutorial dentro del h2 del título (igual que en Tickets, Precargue e Inventarios). */
-.boton-tutorial-titulo {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 0.4rem;
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* Estado del usuario: colores del tema (claro/oscuro) */
 .estado-activo {
   color: var(--texto-exito);

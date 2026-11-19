@@ -4296,7 +4296,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
     title: `<h5 class="tituloRojo" style="margin: auto;">Orden de Compra</h5>`,
     text: `<p>¡Inicialmente para crear una orden de compra debemos elegir quien nos venderá la materia prima, en el campo <b>Proveedor</b> escribimos el nombre y luego lo seleccionamos.
     <br>El campo de observación es opcional!</p>
-    <p>Si queremos hacer una orden de compra con base en una <b>Solicitud de Materia Prima</b>, podemos <b>llenar el campo 'Num. Solicitud' y presionar enter</b>. Al hacer lo anterior se cargará toda la información de la solicitud y podremos agregar, editar o quitar materias primas.</p>`
+    <p>Si queremos hacer una orden de compra con base en una <b>Requisición de Materia Prima</b>, podemos <b>llenar el campo 'Num. Solicitud' y presionar enter</b>. Al hacer lo anterior se cargará toda la información de la solicitud y podremos agregar, editar o quitar materias primas.</p>`
   },
   {
     attachTo: {
@@ -4733,7 +4733,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'none',
-    title: `<h4 class="tituloRojo" style="margin: auto;">¡Solicitud de Materia Prima!</h4>`,
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Requisición de Materia Prima!</h4>`,
     text: `<p>¡El operador a cargo de esa área presentará a la gerencia sus pedidos de materia prima.!</p>`
   },
   {
@@ -4762,7 +4762,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'codigoSolicitud',
     title: `<h4 class="tituloRojo" style="margin: auto;">¡Código Solicitud!</h4>`,
-    text: `<p>¡Desde aquí podemos <b>cosultar otras solicitudes de materias primas</b>, esto lo hacemos <b>digitando el código de la solicitud y presionando enter</b>. Si quieremos ver el PDF de esta solicitud digitamos el código y presionamos el botón rojo!</p>`
+    text: `<p>¡Desde aquí podemos <b>cosultar otras requisiciones de materia prima</b>, esto lo hacemos <b>digitando el código de la solicitud y presionando enter</b>. Si quieremos ver el PDF de esta solicitud digitamos el código y presionamos el botón rojo!</p>`
   },
   {
     attachTo: {
@@ -4904,7 +4904,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     title: `<h4 class="tituloRojo" style="margin: auto;">¡Quitar y Eliminar!</h4>`,
     text: `<p>En ese apartado podemos eliminar y quitar materias primas.</p>
           <p>
-            Cuando tenemos una solicitud de materia prima creada desde cero, si presionamos el icono <i class="pi pi-trash"></i> y nos saldrá un mensaje de confirmación.
+            Cuando tenemos una requisición de materia prima creada desde cero, si presionamos el icono <i class="pi pi-trash"></i> y nos saldrá un mensaje de confirmación.
           </p>`
   },
   {
@@ -4919,7 +4919,7 @@ export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'crearSolicitud',
     title: `<h4 class="tituloRojo" style="margin: auto;">¡Crear y Editar Solicitud!</h4>`,
-    text: `<p>Aquí podemos crear y editar la solicitud de materias primas</p>
+    text: `<p>Aquí podemos crear y editar la requisición de materia prima</p>
           <ul>
             <li><b>Crear Solicitud:</b> Luego de haber completado todos los campos, podemos presionar este botón y se empezarán a validar todos los pasos, si están correctos nos saldrá un mensaje de confirmación y se generará un PDF</li>
             <li><b>Editar Solicitud:</b> Si estamos editando una solicitud el nombre del botón cambiará, de igual manera que al crear las solicitudes, se empezarán a validar todos los pasos, si están correctos nos saldrá un mensaje de confirmación y se generará un PDF</li>
@@ -4954,7 +4954,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'movimientos',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Mov. de solicitudes</h5>',
-    text: `<p>En este reporte se pueden ver los <b>movimientos de solicitudes de materias primas</b>, podrás apreciar la cantidad de
+    text: `<p>En este reporte se pueden ver los <b>movimientos de requisiciones de materia prima</b>, podrás apreciar la cantidad de
     solicitudes tanto <b>aceptadas, como pendientes, parciales y finalizadas.</b> <br><br>
     Tendrás filtros de búsqueda por:<br>
     <b>- Id de solicitud</b><br>
@@ -4976,7 +4976,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'rojo',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Solicitudes canceladas</h5>',
-    text: `<p>Aquí se podrá apreciar <b>la cantidad de solicitudes de materia prima que se encuentran canceladas actualmente</b><br><br>
+    text: `<p>Aquí se podrá apreciar <b>la cantidad de requisiciones de materia prima que se encuentran canceladas actualmente</b><br><br>
     Las solicitudes con estado cancelado son las que: <br>
     - <b>No fueron aprobadas por gerencia,</b> por ende, no se les creó una orden de compra.<br>
     - Se les creó una orden de compra, pero la gerencia decidió cancelarla <b>porque no creyó necesaria la compra de más material.</b><br><br>
@@ -4995,7 +4995,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'naranja',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-exclamation-triangle"></i> Solicitudes pendientes</h5>',
-    text: `<p>En este apartado podrás apreciar <b>la cantidad de solicitudes de materia prima que se encuentran pendientes actualmente</b><br><br>
+    text: `<p>En este apartado podrás apreciar <b>la cantidad de requisiciones de materia prima que se encuentran pendientes actualmente</b><br><br>
     Las solicitudes con estado pendiente son las que <b>no han sido aprobadas por gerencia, por ende no se les ha creado ordenes de compra</b><br><br>
     Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
   },
@@ -5012,7 +5012,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'amarillo',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-sliders-h"></i> Solicitudes parciales</h5>',
-    text: `<p>En este apartado podrás visualizar <b>la cantidad de solicitudes de materia prima que se encuentran parciales actualmente</b><br><br>
+    text: `<p>En este apartado podrás visualizar <b>la cantidad de requisiciones de materia prima que se encuentran parciales actualmente</b><br><br>
     Las solicitudes con estado parcial son las que <b>ya han sido aprobadas por gerencia, ya tienen ordenes de compra asociadas, pero no se pidió toda la materia prima de la solicitud.</b><br><br>
     Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
   },
@@ -5029,7 +5029,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'verde',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check"></i> Solicitudes finalizadas</h5>',
-    text: `<p>Aquí encontraremos <b> la cantidad de solicitudes de materia prima que se encuentran finalizadas actualmente</b><br><br>
+    text: `<p>Aquí encontraremos <b> la cantidad de requisiciones de materia prima que se encuentran finalizadas actualmente</b><br><br>
     Las solicitudes con estado finalizado son las que <b>ya han sido aprobadas por gerencia, ya tienen ordenes de compra asociadas, y se pidió toda la materia prima solicitada.</b><br><br>
     Además  <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
   },
@@ -5067,7 +5067,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'botones1',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search"></i> Consultar / <i class="pi pi-eraser"></i> Limpiar Campos</h5>',
-    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la solicitud de materia prima en la tabla</b> de registros consultados.
+    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la requisición de materia prima en la tabla</b> de registros consultados.
     <br><br>Para reiniciar tu busqueda solo <b>haz click sobre el botón limpiar campos.</b></p>`
   },
   {
@@ -5083,7 +5083,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'tabla1',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Encabezado de solicitudes</h5>',
-    text: `<p>Aquí podrás apreciar <b>el encabezado de las solicitudes de materia prima que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
+    text: `<p>Aquí podrás apreciar <b>el encabezado de las requisiciones de materia prima que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
     <b>- Id</b><br>
     <b>- Fecha Creación</b><br>
     <b>- Estado General</b></p>`
@@ -5117,7 +5117,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'matprimas',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Detalles de la solicitud</h5>',
-    text: `<p>En este apartado podrás ver <b>los detalle de las solicitudes de materia prima que selecciones de la tabla registros consultados.</b></p>`
+    text: `<p>En este apartado podrás ver <b>los detalle de las requisiciones de materia prima que selecciones de la tabla registros consultados.</b></p>`
   },
   {
     attachTo: {
@@ -5177,7 +5177,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'crear-oc',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-window-maximize"></i> Cargar modal.</h5>',
-    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de ordenes de compras</b> y se cargará el <b>campo Num. Solicitud</b> con el Id de la solicitud de materia prima.</b><br><br>
+    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de ordenes de compras</b> y se cargará el <b>campo Num. Solicitud</b> con el Id de la requisición de materia prima.</b><br><br>
     Asi como también <b>se cargará la tabla con las materias pedidas en la solicitud,</b> dicha tabla cuenta con 2 funcionalidades importantes tales como:<br><br>
     <b>1. El campo de cantidad editable:</b> Haciendo clic sobre este campo podrás modificar la cantidad solicitada por el usuario.<br>
     <b>2. Quitar materia(s) prima(s):</b> Haciendo clic sobre el botón <i class="pi pi-trash"></i> <b>podrás quitar las materias primas</b> que no deseas que se encuentren en la orden de compra por el motivo que desees.<br> </p>`
@@ -5195,7 +5195,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'finalizar',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square"></i> Finalizar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás finalizar la solicitud de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
+    text: `<p>pulsando sobre este botón podrás finalizar la requisición de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
     Ten en cuenta que:<br>
     - <b>Si al menos una materia prima solicitada</b> tiene estado pendiente, <b>cambiará a cancelada.</b><br>
     - <b>Si al menos una materia prima solicitada</b> tiene estado parcial, <b>cambiará a finalizada.</b>
@@ -5213,7 +5213,7 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'cancelar',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Cancelar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás cancelar la solicitud de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
+    text: `<p>pulsando sobre este botón podrás cancelar la requisición de materia prima, <b>solo si su estado general (estado del encabezado) es pendiente ó parcial</b><br><br>
     Ten en cuenta que:<br>
     - <b>Si al menos una materia prima solicitada</b> tiene estado pendiente, <b>cambiará a cancelada.</b><br>
     - Si al menos <b>una materia prima solicitada</b> tiene estado parcial, <b>cambiará a finalizada.</b></p>`
