@@ -151,6 +151,20 @@ export class TicketsComponent implements OnInit, OnDestroy {
 
   // ------------------------------------------------------------ crear ticket
 
+  /**
+   * Pasa el asunto a mayúsculas mientras se escribe. Conserva la posición del cursor (si se cambiara el valor del
+   * formulario sin más, el cursor saltaría al final al corregir una letra en medio del texto).
+   */
+  asuntoEnMayusculas(evento : Event) {
+    const campo = evento.target as HTMLInputElement;
+    const mayusculas = campo.value.toUpperCase();
+    if (mayusculas === campo.value) return;
+    const { selectionStart, selectionEnd } = campo;
+    campo.value = mayusculas;
+    campo.setSelectionRange(selectionStart, selectionEnd);
+    this.FormTickets.get('Asunto')?.setValue(mayusculas, { emitEvent: false });
+  }
+
   enviarTickets(){
     if (this.cargando) return;
     if (this.FormTickets.invalid) {
@@ -166,7 +180,7 @@ export class TicketsComponent implements OnInit, OnDestroy {
 
     this.cargando = true;
     const reportanteId = this.esSoporte ? Reportante : null;
-    this.ticketService.crearTicket(String(Asunto).trim(), TipoTicket, String(Descripcion).trim(), this.imagenes.map(i => i.archivo), reportanteId).subscribe({
+    this.ticketService.crearTicket(String(Asunto).trim().toUpperCase(), TipoTicket, String(Descripcion).trim(), this.imagenes.map(i => i.archivo), reportanteId).subscribe({
       next: ({ codigo, reportante }) => {
         this.limpiarTodo();
         this.messageService.clear('ticketCreado');

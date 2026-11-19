@@ -21,72 +21,74 @@
 </div>
 
 <p-card>
-  <!-- Trio de conteos de tickets -->
-  <div class="mb-3" id="cantTickets">
-    <div class="row g-3" id="fila">
-      <div class="col-xs-12 col-sm-12 col-md-4 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="naranja" icon="pi pi-exclamation-triangle" label="Abiertos: {{cantidades.abiertos | number}}"></p-chip>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="amarillo" icon="pi pi-hourglass" label="En Revisión: {{cantidades.enRevision | number}}"></p-chip>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="verde" icon="pi pi-check-square" label="Resueltos en el mes: {{cantidades.resueltosMes | number}}"></p-chip>
-        </div>
-      </div>
+  <!-- Conteos: al hacer clic filtran la tabla por ese estado (otro clic quita el filtro). El promedio es solo informativo. -->
+  <div class="chips-estado mb-4" id="cantTickets" role="group" aria-label="Tickets por estado">
+    <button *ngFor="let c of chipsEstado" type="button" class="chip-estado {{c.clase}}"
+      [class.chip-estado--activo]="filtroChip === c.filtro" [attr.aria-pressed]="filtroChip === c.filtro"
+      (click)="seleccionarChip(c.filtro)"
+      [pTooltip]="filtroChip === c.filtro ? 'Clic para volver a la vista anterior' : c.tooltip" tooltipPosition="top">
+      <i [class]="c.icono"></i>
+      <span>{{c.etiqueta}}</span>
+      <b>{{c.cantidad(cantidades) | number}}</b>
+    </button>
+    <div class="chip-estado chip-estado--dato" id="promedioResolucion"
+      pTooltip="Promedio de días entre la creación y la resolución de los tickets resueltos este mes" tooltipPosition="top">
+      <i class="pi pi-stopwatch"></i>
+      <span>Prom. resolución</span>
+      <b *ngIf="cantidades.promedioDiasResolucion != null">{{cantidades.promedioDiasResolucion | number:'1.1-1':'en-US'}} días</b>
+      <b *ngIf="cantidades.promedioDiasResolucion == null">—</b>
     </div>
   </div>
 
-  <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtro de búsqueda</h4>
-  </div>
-
-  <!-- FILTROS -->
   <div class="mb-3">
-    <div class="row g-3 justify-content-center align-items-center" id="filtrosFecha">
-      <div class="col-md-2">
-        <span class="p-float-label">
-          <p-calendar [(ngModel)]="fechaInicio" inputId="fechaInicioTickets" [showIcon]="true" dateFormat="yy-mm-dd"
-            [maxDate]="fechaFin || hoy" [readonlyInput]="true" appendTo="body"></p-calendar>
-          <label for="fechaInicioTickets">Fecha Inicial</label>
-        </span>
-      </div>
-      <div class="col-md-2">
-        <span class="p-float-label">
-          <p-calendar [(ngModel)]="fechaFin" inputId="fechaFinTickets" [showIcon]="true" dateFormat="yy-mm-dd"
-            [minDate]="fechaInicio" [maxDate]="hoy" [readonlyInput]="true" appendTo="body"></p-calendar>
-          <label for="fechaFinTickets">Fecha Final</label>
-        </span>
-      </div>
-      <div class="col-md-2 switch-finalizados" id="switchFinalizados">
-        <p-inputSwitch inputId="incluirFinalizados" [(ngModel)]="incluirFinalizados" (onChange)="consultar(true)"></p-inputSwitch>
-        <label for="incluirFinalizados">Ver resueltos y cancelados</label>
-      </div>
-      <div class="col-md-6 acciones-filtros" id="accionesFiltros">
-        <button pButton class="p-button-danger botonesOpciones" pRipple type="button" label="Consultar" icon="pi pi-search" (click)="consultar(true)"></button>
-        <button pButton class="p-button-danger p-button-outlined" type="button" label="Mes Actual" icon="pi pi-calendar" (click)="filtrarMesActual()"></button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser" (click)="clearFilters()"></button>
-        <button pButton class="p-button-secondary p-button-outlined" type="button" icon="pi pi-refresh" iconPos="left" label="Actualizar" (click)="consultar()"></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Línea -->
-  <div class="mb-4">
-    <hr class="Linea">
-  </div>
-
-  <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Lista de tickets</h4>
   </div>
 
+  <!-- Barra de filtros -->
+  <div class="barra-filtros mb-3">
+    <div class="barra-filtros__fila">
+      <p-selectButton id="vistaTickets" class="selector-vista" [options]="vistas" optionLabel="label" optionValue="value"
+        [ngModel]="filtroChip ? null : vista" (ngModelChange)="cambiarVista($event)"></p-selectButton>
+
+      <span class="p-input-icon-left buscador" id="busquedaTickets">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="busqueda" (input)="buscar()" placeholder="Buscar por N°, asunto o persona" aria-label="Buscar tickets">
+      </span>
+
+      <div class="filtros-lista" id="filtrosLista">
+        <p-dropdown [options]="opcionesTipo" [(ngModel)]="filtroTipo" (onChange)="filtrarTipo()" placeholder="Tipo"
+          [showClear]="true" appendTo="body" styleClass="w-100" ariaLabel="Filtrar por tipo"></p-dropdown>
+        <p-dropdown [options]="opcionesArea" [(ngModel)]="filtroArea" (onChange)="filtrarArea()" placeholder="Área"
+          [showClear]="true" [filter]="true" emptyFilterMessage="Sin resultados" appendTo="body" styleClass="w-100" ariaLabel="Filtrar por área"></p-dropdown>
+      </div>
+
+      <div class="acciones-filtros" id="accionesFiltros">
+        <button pButton class="p-button-secondary p-button-outlined" type="button" icon="pi pi-refresh" label="Actualizar" (click)="consultar()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser" (click)="clearFilters()"></button>
+        <small class="texto-actualizado" *ngIf="ultimaConsulta">Actualizado a las {{ultimaConsulta | date:'HH:mm'}}</small>
+      </div>
+    </div>
+
+    <!-- Fechas: solo limitan a los finalizados (los pendientes salen siempre) -->
+    <div class="barra-filtros__fila barra-filtros__fila--fechas" id="filtrosFecha" *ngIf="usaFechas">
+      <span class="texto-ayuda"><i class="pi pi-calendar"></i> Finalizados creados entre</span>
+      <span class="p-float-label campo-fecha">
+        <p-calendar [(ngModel)]="fechaInicio" inputId="fechaInicioTickets" [showIcon]="true" dateFormat="yy-mm-dd"
+          [maxDate]="fechaFin || hoy" [readonlyInput]="true" appendTo="body"></p-calendar>
+        <label for="fechaInicioTickets">Fecha Inicial</label>
+      </span>
+      <span class="p-float-label campo-fecha">
+        <p-calendar [(ngModel)]="fechaFin" inputId="fechaFinTickets" [showIcon]="true" dateFormat="yy-mm-dd"
+          [minDate]="fechaInicio" [maxDate]="hoy" [readonlyInput]="true" appendTo="body"></p-calendar>
+        <label for="fechaFinTickets">Fecha Final</label>
+      </span>
+      <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultar(true)"></button>
+      <button pButton class="p-button-danger p-button-outlined" type="button" label="Mes Actual" icon="pi pi-calendar" (click)="filtrarMesActual()"></button>
+    </div>
+  </div>
+
   <!-- Lista de tickets -->
-  <div class="row g-3" id="tablaTickets">
+  <div id="tablaTickets">
     <p-table
       #dt
       styleClass="p-datatable-gridlines p-datatable-sm tabla-tickets"
@@ -98,47 +100,57 @@
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} tickets"
       dataKey="codigo"
-      [value]="tickets">
+      [globalFilterFields]="['codigo', 'asunto', 'tipo', 'usuario', 'area', 'registradoPor']"
+      [value]="ticketsTabla">
       <ng-template pTemplate="header">
-        <!-- Filtros por columna (por encima de la cabecera, como en el resto del proyecto) -->
-        <tr id="filtrosColumna">
-          <th style="width: 80px"><input pInputText type="text" (input)="aplicarfiltro($event, 'codigo', 'contains')"></th>
-          <th><input pInputText type="text" (input)="aplicarfiltro($event, 'asunto', 'contains')"></th>
-          <th style="width: 130px"><input pInputText type="text" (input)="aplicarfiltro($event, 'tipo', 'contains')"></th>
-          <th style="width: 180px"><input pInputText type="text" (input)="aplicarfiltro($event, 'usuario', 'contains')"></th>
-          <th style="width: 140px"><input pInputText type="text" (input)="aplicarfiltro($event, 'area', 'contains')"></th>
-          <th style="width: 150px"></th>
-          <th style="width: 130px"><input pInputText type="text" (input)="aplicarfiltro($event, 'estado', 'contains')"></th>
-        </tr>
-        <!-- Cabecera -->
         <tr>
-          <th pSortableColumn="codigo">N° <p-sortIcon field="codigo"></p-sortIcon></th>
+          <th pSortableColumn="codigo" class="col-numero">N° <p-sortIcon field="codigo"></p-sortIcon></th>
           <th pSortableColumn="asunto">Asunto <p-sortIcon field="asunto"></p-sortIcon></th>
-          <th pSortableColumn="tipo">Tipo <p-sortIcon field="tipo"></p-sortIcon></th>
-          <th pSortableColumn="usuario">Reportado por <p-sortIcon field="usuario"></p-sortIcon></th>
-          <th pSortableColumn="area">Área <p-sortIcon field="area"></p-sortIcon></th>
-          <th pSortableColumn="fechaCreacion">Creado <p-sortIcon field="fechaCreacion"></p-sortIcon></th>
-          <th pSortableColumn="estado">Estado <p-sortIcon field="estado"></p-sortIcon></th>
+          <th pSortableColumn="usuario" class="col-persona">Reportado por <p-sortIcon field="usuario"></p-sortIcon></th>
+          <th pSortableColumn="creado" class="col-fecha">Creado <p-sortIcon field="creado"></p-sortIcon></th>
+          <th pSortableColumn="ultimaActividad" class="col-fecha" id="columnaActividad">Última actividad <p-sortIcon field="ultimaActividad"></p-sortIcon></th>
+          <th pSortableColumn="estado" class="col-estado">Estado <p-sortIcon field="estado"></p-sortIcon></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-item>
-        <tr (click)="abrirDetalle(item)" pTooltip="Haz click para ver el detalle del ticket" tooltipPosition="top">
-          <td>{{item.codigo}}</td>
-          <td><span class="descripcion-ticket" [title]="item.asunto">{{item.asunto}}</span></td>
-          <td>{{item.tipo}}</td>
+        <tr (click)="abrirDetalle(item)" [class.fila-esperando]="item.esperandoSoporte">
+          <td class="text-center">{{item.codigo}}</td>
           <td>
-            {{item.usuario}}
-            <i *ngIf="item.registradoPor" class="pi pi-user-edit icono-registrado" pTooltip="Registrado por {{item.registradoPor}}" tooltipPosition="top"></i>
+            <span class="texto-principal recortar" [title]="item.asunto | uppercase">{{item.asunto | uppercase}}</span>
+            <span class="texto-secundario">{{item.tipo}}</span>
           </td>
-          <td>{{item.area}}</td>
-          <td>{{item.fechaCreacion | date:'yyyy-MM-dd HH:mm'}}</td>
-          <td class="text-center"><span class="badge badge-estado-ticket" [ngClass]="claseEstado(item.estadoId)">{{item.estado}}</span></td>
+          <td>
+            <span class="texto-principal recortar" [title]="item.usuario">
+              {{item.usuario}}
+              <i *ngIf="item.registradoPor" class="pi pi-user-edit icono-registrado" pTooltip="Registrado por {{item.registradoPor}}" tooltipPosition="top"></i>
+            </span>
+            <span class="texto-secundario recortar">{{item.area}}</span>
+          </td>
+          <td>
+            <span class="texto-principal">{{item.creado | date:'yyyy-MM-dd'}}</span>
+            <span *ngIf="item.nivelAntiguedad" class="antiguedad antiguedad--{{item.nivelAntiguedad}}"
+              [pTooltip]="item.nivelAntiguedad === 'normal' ? '' : 'Pendiente hace ' + textoDias(item.dias)" tooltipPosition="top">
+              <i class="pi pi-clock"></i> {{textoDias(item.dias)}}
+            </span>
+          </td>
+          <td>
+            <span class="texto-principal" [title]="item.ultimaActividad | date:'yyyy-MM-dd HH:mm'">{{haceCuanto(item.ultimaActividad)}}</span>
+            <span class="texto-secundario">{{item.ultimaActividad | date:'yyyy-MM-dd HH:mm'}}</span>
+          </td>
+          <td class="text-center">
+            <span class="badge badge-estado-ticket" [ngClass]="claseEstado(item.estadoId)">{{item.estado}}</span>
+            <i *ngIf="item.esperandoSoporte" class="pi pi-comment icono-esperando"
+              pTooltip="El usuario comentó después de la última respuesta: falta que soporte responda" tooltipPosition="left"></i>
+          </td>
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center">
-            <h6>No se encontraron tickets</h6>
+          <td colspan="6">
+            <div class="tabla-vacia">
+              <i [class]="mensajeVacio.icono"></i>
+              <span>{{mensajeVacio.texto}}</span>
+            </div>
           </td>
         </tr>
       </ng-template>
@@ -153,6 +165,14 @@
     <div class="titulo-dialogo-ticket">
       <span class="p-dialog-title">Ticket N° {{codigoDetalle}}</span>
       <p-button class="boton-tutorial-dialogo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="detalleTicket.tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+      <!-- Moverse entre los tickets de la tabla (con sus filtros y orden) sin cerrar el popup -->
+      <div class="navegacion-detalle" *ngIf="posicionDetalle >= 0" id="navegacionDetalle">
+        <button pButton type="button" icon="pi pi-chevron-left" class="p-button-rounded p-button-text p-button-secondary"
+          [disabled]="posicionDetalle <= 0" (click)="moverDetalle(-1)" pTooltip="Ticket anterior" tooltipPosition="bottom" aria-label="Ticket anterior"></button>
+        <small>{{posicionDetalle + 1}} de {{totalDetalle}}</small>
+        <button pButton type="button" icon="pi pi-chevron-right" class="p-button-rounded p-button-text p-button-secondary"
+          [disabled]="posicionDetalle >= totalDetalle - 1" (click)="moverDetalle(1)" pTooltip="Ticket siguiente" tooltipPosition="bottom" aria-label="Ticket siguiente"></button>
+      </div>
     </div>
   </ng-template>
   <app-detalle-ticket #detalleTicket [codigo]="codigoDetalle" [modoSoporte]="true" (actualizado)="consultar()"></app-detalle-ticket>

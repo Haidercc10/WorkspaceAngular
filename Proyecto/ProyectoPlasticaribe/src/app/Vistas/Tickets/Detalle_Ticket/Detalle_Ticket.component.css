@@ -33,12 +33,12 @@
 }
 
 .texto-suave {
-  color: #6c757d;
+  color: var(--text-color-secondary);
   font-size: 0.85rem;
 }
 
 .texto-error {
-  color: #dc3545;
+  color: var(--texto-peligro);
 }
 
 .detalle-imagenes {
@@ -57,10 +57,17 @@
 }
 
 .historial li {
-  border-left: 3px solid var(--rojo, #c62828);
+  border-left: 3px solid var(--rojo-texto);
   padding: 0.4rem 0.75rem;
   margin-bottom: 0.6rem;
 }
+
+/* Línea de cada movimiento con el color del estado que tenía el ticket en ese momento (calcularLineasHistorial). */
+.historial li.linea-estado-ticket--abierto { border-left-color: var(--texto-advertencia); }
+.historial li.linea-estado-ticket--revision { border-left-color: var(--texto-info); }
+.historial li.linea-estado-ticket--resuelto { border-left-color: var(--texto-exito); }
+.historial li.linea-estado-ticket--cancelado { border-left-color: var(--texto-peligro); }
+.historial li.linea-estado-ticket--otro { border-left-color: var(--surface-border); }
 
 .historial-cabecera {
   display: flex;
@@ -79,6 +86,25 @@
 
 textarea {
   width: 100%;
+}
+
+/*
+ * "Tomar ticket" con el azul de la marca en vez del p-button-info del tema (azul fuera de la paleta).
+ * El texto usa --surface-card: blanco sobre el azul medio en claro, y oscuro sobre el azul claro del tema oscuro.
+ */
+:host ::ng-deep .p-button.boton-tomar-ticket,
+:host ::ng-deep .p-button.boton-tomar-ticket:enabled:hover {
+  background-color: var(--azul-marca-medio);
+  border-color: var(--azul-marca-medio);
+  color: var(--surface-card);
+}
+
+:host ::ng-deep .p-button.boton-tomar-ticket:enabled:hover {
+  filter: brightness(1.15);
+}
+
+:host ::ng-deep .p-button.boton-tomar-ticket:focus {
+  box-shadow: 0 0 0 2px var(--surface-card), 0 0 0 4px var(--azul-marca-medio);
 }
 
 /*

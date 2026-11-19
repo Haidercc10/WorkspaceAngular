@@ -13,15 +13,16 @@ export const EstadoTicket = {
 } as const;
 
 /**
- * Clase global (styles.css) del badge de estado, con el mismo criterio de colores de Mov. Precargue Rollos.
+ * Clase global (styles.css) del badge de estado, con los colores de estado de la paleta oficial
+ * (mismo tono que antes: amarillo, azul, verde y rojo). También la usan los chips de Gestión de Tickets.
  */
 export function claseEstadoTicket(estadoId : number | null) : string {
   switch (estadoId) {
-    case EstadoTicket.ABIERTO: return 'bg-warning1';    // amarillo (ANULADO en precargue)
-    case EstadoTicket.EN_REVISION: return 'bg-blue1';   // azul (ACEPTADO)
-    case EstadoTicket.RESUELTO: return 'bg-success1';   // verde (FINALIZADO)
-    case EstadoTicket.CANCELADO: return 'bg-danger1';   // rojo con letra blanca (PENDIENTE)
-    default: return 'bg-secondary1';
+    case EstadoTicket.ABIERTO: return 'estado-ticket--abierto';      // advertencia (amarillo)
+    case EstadoTicket.EN_REVISION: return 'estado-ticket--revision'; // info (azul)
+    case EstadoTicket.RESUELTO: return 'estado-ticket--resuelto';    // éxito (verde)
+    case EstadoTicket.CANCELADO: return 'estado-ticket--cancelado';  // peligro (rojo)
+    default: return 'estado-ticket--otro';
   }
 }
 
@@ -53,6 +54,11 @@ export interface TicketListado {
   area: string;
   /** Soporte que registró el ticket a nombre del reportante; null si lo creó el mismo reportante. */
   registradoPor: string | null;
+  /** Último movimiento del historial (fecha 'YYYY-MM-DDT00:00:00' y hora 'HH:mm:ss'); null si aún no tiene ninguno. */
+  ultimaActividadFecha: string | null;
+  ultimaActividadHora: string | null;
+  /** Usuario que hizo el último movimiento del historial; null si aún no tiene ninguno. */
+  ultimoAutorId: number | null;
 }
 
 export interface TicketHistorial {
@@ -72,7 +78,13 @@ export interface TicketDetalle {
   historial: TicketHistorial[];
 }
 
-export interface CantidadesTickets { abiertos: number; enRevision: number; resueltosMes: number; }
+export interface CantidadesTickets {
+  abiertos: number;
+  enRevision: number;
+  resueltosMes: number;
+  /** Promedio de días entre creación y resolución de los resueltos del mes (con un decimal); null si no hay resueltos. */
+  promedioDiasResolucion?: number | null;
+}
 
 /**
  * Usuario que gestiona los tickets y recibe el aviso de tickets abiertos al entrar a Inicio.
@@ -148,9 +160,15 @@ export class TicketsService {
     this.http.get<TicketListado[]>(`${this.rutaPlasticaribeAPI}/Tickets/misTickets`, { params: paramsRango(fechaInicio, fechaFin) });
 
   /** Tickets para soporte creados entre `fechaInicio` y `fechaFin` (ambas inclusive). */
-  getGestion = (fechaInicio : Date, fechaFin : Date, incluirFinalizados : boolean = false) : Observable<TicketListado[]> =>
+  /**
+   * Tickets para soporte. Los pendientes salen siempre; con incluirFinalizados se agregan los resueltos y cancelados
+   * creados en el rango, y con incluirResueltosMes los resueltos este mes (por fecha de resolución).
+   */
+  getGestion = (fechaInicio : Date, fechaFin : Date, incluirFinalizados : boolean = false, incluirResueltosMes : boolean = false) : Observable<TicketListado[]> =>
     this.http.get<TicketListado[]>(`${this.rutaPlasticaribeAPI}/Tickets/gestion`,
-      { params: paramsRango(fechaInicio, fechaFin).set('incluirFinalizados', String(incluirFinalizados)) });
+      { params: paramsRango(fechaInicio, fechaFin)
+          .set('incluirFinalizados', String(incluirFinalizados))
+          .set('incluirResueltosMes', String(incluirResueltosMes)) });
 
   /** Solo soporte (403 para los demás). Cada respuesta actualiza también el badge de la barra superior. */
   getCantidades = () : Observable<CantidadesTickets> => this.http.get<CantidadesTickets>(`${this.rutaPlasticaribeAPI}/Tickets/cantidades`)

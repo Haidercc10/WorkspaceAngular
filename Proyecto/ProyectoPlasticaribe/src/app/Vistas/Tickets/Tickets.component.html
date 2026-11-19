@@ -61,7 +61,7 @@
           <!-- Asunto -->
           <div class="col-lg-8 col-md-8 col-sm-12" id="campoAsunto">
             <span class="p-float-label">
-              <input formControlName="Asunto" id="asunto" type="text" pInputText maxlength="150" autocomplete="off" appContadorCaracteres/>
+              <input formControlName="Asunto" id="asunto" type="text" pInputText maxlength="150" autocomplete="off" appContadorCaracteres (input)="asuntoEnMayusculas($event)"/>
               <label for="asunto">Asunto *</label>
             </span>
             <small class="p-error" *ngIf="FormTickets.get('Asunto')?.touched && FormTickets.get('Asunto')?.invalid">Escriba un asunto corto.</small>
@@ -158,7 +158,7 @@
         <ng-template pTemplate="body" let-item>
           <tr class="fila-clic" (click)="abrirDetalle(item)" pTooltip="Haz click para ver el detalle del ticket" tooltipPosition="top">
             <td>{{item.codigo}}</td>
-            <td>{{item.asunto}}</td>
+            <td>{{item.asunto | uppercase}}</td>
             <td>{{item.tipo}}</td>
             <td *ngIf="esSoporte">
               {{item.usuario}}

@@ -12,7 +12,7 @@ import { armar, paso } from 'src/app/Tutoriales/Tutoriales_Comun';
 /** Claves del inicio automático. Subir la versión hace que el tutorial vuelva a salir solo a todos. */
 export const ClavesTutorialTickets = {
   TICKETS: 'tickets-v1',
-  GESTION: 'gestion-tickets-v1',
+  GESTION: 'gestion-tickets-v2',
   DETALLE: 'detalle-ticket-v1',
   DETALLE_SOPORTE: 'detalle-ticket-soporte-v1',
 } as const;
@@ -125,31 +125,38 @@ export function pasosTutorialGestionTickets() : Step.StepOptions[] {
       `<p>¡Aquí soporte ve los tickets de todos los usuarios, los toma, les responde y los cierra!</p>`),
 
     paso('#cantTickets', '¡Cantidad de Tickets!',
-      `<p>Muestra cuántos tickets están <b>Abiertos</b> (sin atender), cuántos están <b>En revisión</b> y cuántos se <b>resolvieron en el mes</b>.</p>`),
+      `<p>Muestra cuántos tickets están <b>Abiertos</b> (sin atender), cuántos están <b>En revisión</b> y cuántos se <b>resolvieron en el mes</b>.</p>
+       <p>¡Al hacer clic en uno, la tabla muestra solo esos tickets! Con otro clic sobre el mismo se vuelve a la vista anterior.</p>
+       <p><b>Prom. resolución</b> es el promedio de días que tardaron en resolverse los tickets de este mes.</p>`),
 
-    paso('#filtrosFecha', '¡Filtros por fecha!',
-      `<p>Con <b>Fecha Inicial</b> y <b>Fecha Final</b> elegimos el periodo de los tickets <b>resueltos y cancelados</b> que queremos ver.</p>
-       <p>Por defecto se consulta <b>el último año</b> (de hoy hacia atrás).</p>
-       <p>Los tickets <b>pendientes</b> (abiertos y en revisión) salen siempre, sin importar la fecha, para que ninguno quede sin atender.</p>`),
-
-    paso('#switchFinalizados', '¡Ver resueltos y cancelados!',
-      `<p>Por defecto solo salen los tickets <b>pendientes</b> (abiertos y en revisión).</p>
-       <p>Al activarlo también se muestran los <b>resueltos y cancelados</b>, por ejemplo para consultar o reabrir uno.</p>`),
-
-    paso('#accionesFiltros', '¡Botones de búsqueda!',
+    paso('#vistaTickets', '¡Qué tickets ver!',
       `<ul>
-         <li><b>Consultar:</b> busca los tickets del rango de fechas elegido.</li>
-         <li><b>Mes Actual:</b> consulta los tickets de este mes.</li>
-         <li><b>Limpiar:</b> vuelve al rango por defecto (el último año).</li>
-         <li><b>Actualizar:</b> vuelve a consultar para ver los tickets nuevos.</li>
+         <li><b>Pendientes:</b> abiertos y en revisión. Salen siempre, sin importar la fecha, para que ninguno quede sin atender.</li>
+         <li><b>Finalizados:</b> resueltos y cancelados, por ejemplo para consultar o reabrir uno.</li>
+         <li><b>Todos:</b> pendientes y finalizados juntos.</li>
+       </ul>
+       <p>Con Finalizados o Todos aparecen las <b>fechas</b>: limitan los finalizados por su fecha de creación (por defecto, el último año). <b>Mes Actual</b> consulta los de este mes.</p>`),
+
+    paso('#busquedaTickets', '¡Buscar!',
+      `<p>Escribiendo aquí buscamos por número, asunto, tipo, persona o área.</p>`),
+
+    paso('#filtrosLista', '¡Filtrar por tipo y área!',
+      `<p>Muestran solo los tickets de un <b>tipo</b> o de un <b>área</b>. Con la <b>X</b> se quita el filtro.</p>`),
+
+    paso('#accionesFiltros', '¡Actualizar y limpiar!',
+      `<ul>
+         <li><b>Actualizar:</b> vuelve a consultar para ver los tickets nuevos. Al lado se ve la hora de la última consulta.</li>
+         <li><b>Limpiar:</b> vuelve a los pendientes, al rango por defecto y quita la búsqueda y los filtros.</li>
        </ul>`),
 
-    paso('#filtrosColumna', '¡Filtros por columna!',
-      `<p>Escribiendo en estos campos buscamos por número, asunto, tipo, persona, área o estado.</p>`),
-
     paso('#tablaTickets', '¡Tabla de Tickets!',
-      `<p>¡Haciendo <b>clic sobre un ticket</b> se abre su detalle para atenderlo!</p>
-       <p>El ícono <i class="pi pi-user-edit"></i> junto al nombre indica que el ticket lo registró soporte a nombre de esa persona.</p>
+      `<p>¡Haciendo <b>clic sobre un ticket</b> se abre su detalle para atenderlo! Dentro, con <b>‹ ›</b> pasamos al ticket anterior o siguiente de la tabla.</p>
+       <ul>
+         <li>Debajo de la fecha de creación de los pendientes está su <b>antigüedad</b>: en amarillo desde 3 días y en rojo desde 6 días.</li>
+         <li><b>Última actividad:</b> cuándo fue el último comentario o cambio de estado.</li>
+         <li>Las filas resaltadas con <i class="pi pi-comment"></i> son tickets donde <b>el usuario comentó y falta la respuesta de soporte</b>.</li>
+         <li>El ícono <i class="pi pi-user-edit"></i> junto al nombre indica que el ticket lo registró soporte a nombre de esa persona.</li>
+       </ul>
        <p>El color de la columna Estado indica en qué va:</p>${leyendaEstados}`),
 
     paso(null, '¡Cómo se atiende un ticket!',
@@ -196,7 +203,7 @@ export function pasosTutorialDetalleTicket({ modoSoporte, tieneImagenes, accione
       `<p>Haciendo <b>clic sobre una imagen</b> se ve en tamaño completo.</p>`),
 
     paso('#seguimientoTicket', '¡Seguimiento!',
-      `<p>Aquí quedan los comentarios y cada cambio de estado, con quién lo hizo y cuándo.</p>
+      `<p>Aquí quedan los comentarios y cada cambio de estado, con quién lo hizo y cuándo. La línea de la izquierda tiene el color del estado que tenía el ticket en ese momento.</p>
        <p>${modoSoporte ? 'El usuario ve este mismo seguimiento en su pestaña "Mis tickets".' : 'Aquí aparecen las respuestas de soporte.'}</p>`),
 
     paso('#campoComentario', modoSoporte ? '¡Comentario / solución!' : '¡Comentario!',
@@ -206,7 +213,7 @@ export function pasosTutorialDetalleTicket({ modoSoporte, tieneImagenes, accione
 
     paso('#botones', '¡Botones!',
       `<ul>
-         <li><b>Agregar comentario:</b> envía el comentario sin cambiar el estado.</li>
+         <li><b>Agregar comentario:</b> envía el comentario sin cambiar el estado (también con <b>Ctrl + Enter</b> desde el comentario).</li>
          ${listaAcciones}
        </ul>`),
   ]);

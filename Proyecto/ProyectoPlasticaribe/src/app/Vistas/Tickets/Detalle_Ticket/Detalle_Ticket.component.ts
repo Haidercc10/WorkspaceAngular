@@ -61,7 +61,7 @@ export class Detalle_TicketComponent implements OnChanges {
   private calcularAcciones() : AccionEstado[] {
     const estado = this.detalle?.ticket.estadoId;
     if (estado == null) return [];
-    const enRevision : AccionEstado = { estadoId: EstadoTicket.EN_REVISION, etiqueta: 'Tomar ticket', icono: 'pi pi-wrench', clase: 'p-button-info', requiereComentario: false };
+    const enRevision : AccionEstado = { estadoId: EstadoTicket.EN_REVISION, etiqueta: 'Tomar ticket', icono: 'pi pi-wrench', clase: 'boton-tomar-ticket', requiereComentario: false };
     const resolver : AccionEstado = { estadoId: EstadoTicket.RESUELTO, etiqueta: 'Marcar como resuelto', icono: 'pi pi-check', clase: 'p-button-success', requiereComentario: true };
     const cancelar : AccionEstado = { estadoId: EstadoTicket.CANCELADO, etiqueta: 'Cancelar ticket', icono: 'pi pi-times', clase: 'p-button-danger', requiereComentario: true };
     const reabrir : AccionEstado = { estadoId: EstadoTicket.EN_REVISION, etiqueta: 'Reabrir', icono: 'pi pi-replay', clase: 'p-button-warning', requiereComentario: true };
@@ -75,6 +75,7 @@ export class Detalle_TicketComponent implements OnChanges {
   cargar() {
     this.detalle = null;
     this.acciones = [];
+    this.lineasHistorial = [];
     this.imagenes = [];
     this.subImagenes?.unsubscribe(); // evita que imágenes de una carga anterior lleguen al ticket nuevo
     this.imagenesPendientes = 0;
@@ -87,6 +88,7 @@ export class Detalle_TicketComponent implements OnChanges {
       next: detalle => {
         this.detalle = detalle;
         this.acciones = this.calcularAcciones();
+        this.calcularLineasHistorial();
         this.cargando = false;
         this.cargarImagenes();
         const clave = this.modoSoporte ? ClavesTutorialTickets.DETALLE_SOPORTE : ClavesTutorialTickets.DETALLE;
@@ -185,6 +187,27 @@ export class Detalle_TicketComponent implements OnChanges {
   });
 
   claseEstado = (estadoId : number | null) : string => claseEstadoTicket(estadoId);
+
+  /**
+   * Clase de la línea de cada movimiento del historial: el color del estado que tenía el ticket en ese momento.
+   * Los comentarios sin cambio de estado toman el último estado anterior (al crearse, el ticket está abierto).
+   * Se calcula al cargar (no en el template) para no recorrer el historial en cada detección de cambios.
+   */
+  lineasHistorial : string[] = [];
+
+  private calcularLineasHistorial() {
+    let estado : number = EstadoTicket.ABIERTO;
+    this.lineasHistorial = (this.detalle?.historial ?? []).map(h => {
+      if (h.estadoId != null) estado = h.estadoId;
+      return `linea-${claseEstadoTicket(estado)}`;
+    });
+  }
+
+  /** Ctrl+Enter en el comentario lo envía (sin cambiar el estado). */
+  enviarConTeclado(evento : Event) {
+    evento.preventDefault();
+    this.comentar();
+  }
 
   private mensajeApi = (error : HttpErrorResponse) : string => typeof error.error === 'string' && error.error ? error.error : `Error ${error.status}`;
 }
