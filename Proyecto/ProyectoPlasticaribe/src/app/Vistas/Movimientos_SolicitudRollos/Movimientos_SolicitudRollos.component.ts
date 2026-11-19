@@ -15,7 +15,7 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosSolicitudesRollos as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Component({
@@ -362,7 +362,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
               {
                 margin: [20, 8, 20, 0],
                 columns: [
-                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 30] },
+                  { image : logoNuevoParaPdf, width : 150, fit : [150, 30], margin: [20, 30] },
                   {
                     width: 300,
                     alignment: 'center',

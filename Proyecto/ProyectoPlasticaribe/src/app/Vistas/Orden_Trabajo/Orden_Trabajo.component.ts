@@ -54,6 +54,13 @@ const PRESENTACIONES_OT_PERMITIDAS: readonly string[] = ['Kg', 'Paquete', 'Und',
  */
 const ROLES_GUARDAR_OT: readonly number[] = [1, 98];
 
+/**
+ * Id del sellado LATERAL en `Tipos_Sellados` (Plasticaribe) y en `PtSelladoPt` (BagPro).
+ * Con sellado lateral el ancho del producto terminado es el del producto (PtAnchopt), no el de extrusión
+ * (regla de `getOrdenesTrabajo` en BagPro: `AnchoReal = LATERAL ? PtAnchopt : ExtAcho1`).
+ */
+const TIPO_SELLADO_LATERAL_ID = 2;
+
 /** OT encontrada al consultar por número: en Plasticaribe (editable) o solo en BagPro (plantilla). */
 interface ResultadoBusquedaOT {
   origen: 'plasticaribe' | 'bagpro';
@@ -113,6 +120,8 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   estados: any[] = []; //Variable que almacenará la informacion de los estados
   edicionOrdenTrabajo: boolean = false; //Variable para validar que se está editando o no una orden de trabajo
   otCargada: number | null = null; //Número de la OT cargada en pantalla; base para navegar con ◀ ▶ y para restaurar el campo si una búsqueda no encuentra la OT
+  altoMenuSuperior: number = 80; //Alto (px) del menú superior fijo (.navbar de menuLateral): la barra sticky de la OT cargada va justo debajo
+  private observadorMenuSuperior?: ResizeObserver; //Sigue el alto del menú superior (cambia con el zoom o en pantallas angostas)
   private busquedaOT?: Subscription; //Búsqueda de OT en curso; se cancela al iniciar otra para no mezclar datos de dos OTs
   private refrescoProducto?: Subscription; //Refresco en segundo plano de ArrayProducto (buscarInformacionProducto); se cancela en limpiarCampos
   private errorRefrescoAvisado: boolean = false; //Evita repetir el aviso de error del refresco de producto hasta que vuelva a responder
@@ -443,6 +452,7 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.observarMenuSuperior();
     this.iniciarBusquedaProductos();
     this.lecturaStorage();
     this.consultarVendedores();
@@ -1042,7 +1052,23 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     ).subscribe(data => this.productos = data ?? []);
   }
 
+  /**
+   * Mantiene `altoMenuSuperior` igual al alto real del menú superior fijo, para que la barra sticky de la OT cargada
+   * (OT / Item / Referencia) quede justo debajo y no tapada. Si el menú no existe se conserva el valor por defecto.
+   * @returns No retorna un valor.
+   */
+  private observarMenuSuperior(): void {
+    this.observadorMenuSuperior?.disconnect();
+    const menu = document.querySelector('nav.navbar') as HTMLElement | null;
+    if (!menu || typeof ResizeObserver == 'undefined') return;
+    const actualizar = () => this.altoMenuSuperior = Math.ceil(menu.getBoundingClientRect().height);
+    actualizar();
+    this.observadorMenuSuperior = new ResizeObserver(() => actualizar());
+    this.observadorMenuSuperior.observe(menu);
+  }
+
   ngOnDestroy(): void {
+    this.observadorMenuSuperior?.disconnect();
     this.suscripcionBusquedaProductos?.unsubscribe();
     this.busquedaOT?.unsubscribe();
     this.refrescoProducto?.unsubscribe();
@@ -1666,6 +1692,8 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   llenarFormularioSellado(data: any) {
     const observacionSelladoCorte = data.selladoCorte_Observacion || null;
     this.FormOrdenTrabajoCorte.patchValue({ SelladoCorte_Observacion: observacionSelladoCorte });
+    // El tipo de sellado va primero: decide si Ancho Total se recalcula al cargar Ancho/Fuelle Izq./Fuelle Der. (LATERAL no)
+    this.FormOrdenTrabajoSellado.patchValue({ TipoSellado: this.ArrayProducto[0]?.TipoSellado }, { emitEvent: false });
     this.FormOrdenTrabajoSellado.patchValue({
       Formato_Sellado: this.ArrayProducto[0]?.Tipo,
       Ancho_Sellado: this.ArrayProducto[0]?.Ancho,
@@ -1706,6 +1734,11 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
    * @returns No retorna un valor.
    */
   copiarAnchosExtrusionAProductoTerminado(soloVacios: boolean = false) {
+    // Con sellado lateral el ancho de extrusión no es el ancho de la bolsa: Ancho lleva el Largo
+    if (this.esSelladoLateral) {
+      this.recalcularAnchoTotalSellado();
+      return;
+    }
     const extrusion = this.FormOrdenTrabajoExtrusion.value;
     const sellado = this.FormOrdenTrabajoSellado.value;
     const campos: [string, string][] = [
@@ -1816,14 +1849,40 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   /**
    * Mantiene el Ancho Total de producto terminado como Ancho + Fuelle Izq. + Fuelle Der.
    * Si los tres valores están en 0 (OT antiguas sin desglose) se conserva el ancho total existente.
+   * Con sellado LATERAL no se recalcula: el ancho total es el del producto y se edita a mano, y Ancho sigue al Largo.
    * @returns No retorna un valor.
    */
   sincronizarAnchoTotalSellado(): void {
-    const controles = ['Ancho_Sellado1', 'Ancho_Sellado2', 'Ancho_Sellado3'];
-    controles.forEach(nombre => this.FormOrdenTrabajoSellado.get(nombre)?.valueChanges.subscribe(() => {
-      const total = controles.reduce((suma, c) => suma + (Number(this.FormOrdenTrabajoSellado.get(c)?.value) || 0), 0);
-      if (total > 0) this.FormOrdenTrabajoSellado.get('Ancho_Sellado')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
-    }));
+    ['Ancho_Sellado1', 'Ancho_Sellado2', 'Ancho_Sellado3', 'Largo_Sellado', 'TipoSellado']
+      .forEach(nombre => this.FormOrdenTrabajoSellado.get(nombre)?.valueChanges.subscribe(() => this.recalcularAnchoTotalSellado()));
+  }
+
+  /**
+   * Recalcula el Ancho Total de producto terminado como Ancho + Fuelle Izq. + Fuelle Der.
+   * Con sellado LATERAL (decisión de producción) el campo Ancho lleva el valor del Largo y el Ancho Total no se toca.
+   * @returns No retorna un valor.
+   */
+  private recalcularAnchoTotalSellado(): void {
+    if (this.esSelladoLateral) {
+      const largo = Number(this.FormOrdenTrabajoSellado.get('Largo_Sellado')?.value) || 0;
+      this.FormOrdenTrabajoSellado.get('Ancho_Sellado1')?.setValue(largo, { emitEvent: false });
+      return;
+    }
+    const total = ['Ancho_Sellado1', 'Ancho_Sellado2', 'Ancho_Sellado3']
+      .reduce((suma, c) => suma + (Number(this.FormOrdenTrabajoSellado.get(c)?.value) || 0), 0);
+    if (total > 0) this.FormOrdenTrabajoSellado.get('Ancho_Sellado')?.setValue(parseFloat(total.toFixed(2)), { emitEvent: false });
+  }
+
+  /**
+   * Indica si el tipo de sellado seleccionado es LATERAL. El dropdown guarda el nombre, así que se resuelve su Id
+   * con la lista de tipos de sellado; si la lista aún no está cargada se compara por nombre.
+   * @returns true si el sellado es lateral.
+   */
+  get esSelladoLateral(): boolean {
+    const nombre = `${this.FormOrdenTrabajoSellado?.get('TipoSellado')?.value ?? ''}`.trim().toUpperCase();
+    if (!nombre) return false;
+    const tipo = this.tipoSellado.find(t => `${t.tpSellados_Nombre ?? ''}`.trim().toUpperCase() == nombre);
+    return tipo ? tipo.tpSellado_Id == TIPO_SELLADO_LATERAL_ID : nombre == 'LATERAL';
   }
 
   /**

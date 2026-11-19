@@ -35,7 +35,7 @@ import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsCrearMezclasOT as defaultSteps3 } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
@@ -1371,7 +1371,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             {
               margin: [25, 5],
               columns: [
-                { image : logoParaPdf, width : 220, height : 50, margin: [10,5] },
+                { image : logoNuevoParaPdf, width : 220, fit : [220, 50], margin: [10,5] },
                 {
                   text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].numero_Orden}`,
                   style: 'titulo',

@@ -47,11 +47,33 @@
             Campo obligatorio vacío (se resalta al crear o editar la OT)</span>
         </div>
 
-        <div class="ot-header-actions mb-4">
+        <!-- Barra fija (sticky) con lo cargado: OT / Item / Referencia siguen visibles al hacer scroll.
+             - Editando (OT de Plasticaribe): amarilla; "Editar OT" la actualiza y "Salir de edición" limpia y vuelve a Consultar / Crear.
+             - Creando (item cargado, o OT de BagPro como plantilla): verde; al guardar se crea una OT nueva.
+               Sin OT de base solo muestra Item y Referencia. -->
+        <div class="ot-barra-cargada mb-3" *ngIf="edicionOrdenTrabajo || otCargada != null || ArrayProducto.length > 0"
+          id="avisoEdicionOT" [class.ot-barra-cargada--edicion]="edicionOrdenTrabajo" [style.top.px]="altoMenuSuperior + 6">
+          <div class="ot-barra-cargada__datos">
+            <span class="ot-barra-cargada__modo" *ngIf="edicionOrdenTrabajo"><i class="pi pi-pencil"></i> Editando</span>
+            <span class="ot-barra-cargada__modo" *ngIf="!edicionOrdenTrabajo"><i class="pi pi-plus-circle"></i> Creando OT nueva</span>
+            <span *ngIf="edicionOrdenTrabajo">OT <b>{{otCargada ?? FormOrdenTrabajo.value.OT_Id}}</b></span>
+            <span *ngIf="!edicionOrdenTrabajo && otCargada != null"
+              pTooltip="OT de BagPro cargada como plantilla" tooltipPosition="bottom">OT base (BagPro) <b>{{otCargada}}</b></span>
+            <span>Item <b>{{FormOrdenTrabajo.value.Id_Producto || '—'}}</b></span>
+            <span class="ot-barra-cargada__referencia" [attr.title]="FormOrdenTrabajo.value.Nombre_Producto || null">
+              Referencia <b>{{FormOrdenTrabajo.value.Nombre_Producto || '—'}}</b></span>
+          </div>
+          <button pButton type="button" [label]="edicionOrdenTrabajo ? 'Salir de edición' : 'Limpiar'" icon="pi pi-times"
+            class="p-button-secondary p-button-sm p-button-outlined" [disabled]="guardando" (click)="limpiarCampos()"></button>
+        </div>
+
+        <div class="ot-header-actions">
           <!-- subtitulo -->
           <div class="ot-header-actions__title">
-            <h4 class="tituloRojo mb-0"><i class="pi pi-search"></i> Consultar / <i class="pi pi-plus-circle"></i> Crear
-              OT</h4>
+            <h4 class="tituloRojo mb-0" *ngIf="!edicionOrdenTrabajo"><i class="pi pi-search"></i> Consultar / <i
+                class="pi pi-plus-circle"></i> Crear OT</h4>
+            <h4 class="tituloRojo mb-0" *ngIf="edicionOrdenTrabajo"><i class="pi pi-pencil"></i> Editar OT N°
+              {{otCargada ?? FormOrdenTrabajo.value.OT_Id}}</h4>
           </div>
 
           <!-- Botones -->
@@ -1098,9 +1120,11 @@
                             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="Ancho_Sellado1" inputId="AnchoSellado1" mode="decimal"
-                                  [minFractionDigits]="2"></p-inputNumber>
+                                  [minFractionDigits]="2" [readonly]="esSelladoLateral"></p-inputNumber>
                                 <label for="AnchoSellado1">Ancho</label>
                               </span>
+                              <!-- Con sellado LATERAL el Ancho lleva el valor del Largo -->
+                              <small class="ot-formula" *ngIf="esSelladoLateral">= Largo</small>
                             </div>
 
                             <!-- Fuelle Izq. -->
@@ -1121,14 +1145,14 @@
                               </span>
                             </div>
 
-                            <!-- Ancho Total = Ancho + Fuelle Izq. + Fuelle Der. (calculado) -->
+                            <!-- Ancho Total = Ancho + Fuelle Izq. + Fuelle Der. (calculado); con sellado LATERAL es el ancho del producto y se edita a mano -->
                             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                               <span class="p-float-label">
                                 <p-inputNumber formControlName="Ancho_Sellado" inputId="Ancho" mode="decimal"
-                                  [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
+                                  [minFractionDigits]="2" [required]="true" [readonly]="!esSelladoLateral"></p-inputNumber>
                                 <label for="Ancho">Ancho Total</label>
                               </span>
-                              <small class="ot-formula">= Ancho + Fuelle Izq. + Fuelle Der.</small>
+                              <small class="ot-formula" *ngIf="!esSelladoLateral">= Ancho + Fuelle Izq. + Fuelle Der.</small>
                             </div>
 
                             <!-- Largo-->
@@ -2768,10 +2792,10 @@
 </p-dialog>
 
 <!-- Modal de crear producto -->
-<p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80vw'}" [modal]="true"
+<!--<p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80vw'}" [modal]="true"
   [draggable]="false" (onHide)="ngOnInit()">
   <app-crear-producto></app-crear-producto>
-</p-dialog>
+</p-dialog>-->
 
 <!-- Modal de crear clientes -->
 <p-dialog header="Crear Clientes" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true"
