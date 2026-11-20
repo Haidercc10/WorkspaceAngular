@@ -600,7 +600,7 @@
 <!-- Modal de crear producto -->
 <p-dialog header="Crear Productos" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearProductos"
   [style]="{width: '80%'}" [modal]="true" *ngIf="ValidarRol == 1">
-  <app-crear-producto></app-crear-producto>
+  <app-crear-producto [embebido]="true"></app-crear-producto>
 </p-dialog>
 
 <!-- Modal de crear clientes -->
