@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/BodegasDespacho.service';
@@ -14,9 +14,6 @@ import moment from 'moment';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
-@Injectable({
-  providedIn: 'root'
-})
 
 @Component({
   selector: 'app-Ubicaciones_Rollos',
@@ -340,6 +337,12 @@ export class Ubicaciones_RollosComponent implements OnInit {
 
   //Función para filtrar la tabla de rollos a eliminar.
   applyFilter = ($event, campo: any, valorCampo: string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  //Falla creada desde el modal: lo cierra y recarga la lista de fallas.
+  failCreated() {
+    this.modalFails = false;
+    this.getFails();
+  }
 
   /** Obtiene las fallas técnicas del tipo 23 y las ordena alfabéticamente por nombre. */
   getFails = () => this.svFails.srvObtenerLista().subscribe(datos => {

@@ -96,9 +96,8 @@
         <!-- Editor de respuesta -->
         <div class="editor" *ngIf="!esArchivado(correo)">
           <label for="respuestaCorreo">{{ correo.respuesta ? 'Enviar otra respuesta' : 'Respuesta' }}</label>
-          <textarea id="respuestaCorreo" pInputTextarea [(ngModel)]="respuesta" [rows]="6" [maxlength]="maxCaracteres"
+          <textarea id="respuestaCorreo" pInputTextarea [(ngModel)]="respuesta" [rows]="6" [maxlength]="maxCaracteres" appContadorCaracteres
                     [disabled]="enviando" placeholder="Escriba la respuesta para {{ correo.nombre || correo.correo }}…"></textarea>
-          <small class="contador" [class.limite]="respuesta.length >= maxCaracteres">{{ respuesta.length }}/{{ maxCaracteres }}</small>
         </div>
 
         <footer class="acciones">

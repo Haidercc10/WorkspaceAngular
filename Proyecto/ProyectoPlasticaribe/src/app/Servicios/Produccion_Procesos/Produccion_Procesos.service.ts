@@ -80,11 +80,14 @@ export class Produccion_ProcesosService {
 
   putStateDeletedRolls = (data : Array<rollsToDelete>) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putStateDeletedRolls`, data);
 
-  /** Rollos disponibles para eliminar. Los filtros vacíos no se envían. */
-  getInfoProductionToDelete = (date1: string, date2: string, filters: { ot?: number | null, process?: string | null, roll?: number | null }): Observable<any[]> => {
+  /**
+   * Rollos disponibles para eliminar. Los filtros vacíos no se envían.
+   * Las fechas (YYYY-MM-DD) son opcionales si viene OT o rollo; sin OT ni rollo son obligatorias.
+   */
+  getInfoProductionToDelete = (filters: { date1?: string | null, date2?: string | null, ot?: number | null, process?: string | null, roll?: number | null }): Observable<any[]> => {
     let params = new HttpParams();
     Object.entries(filters).forEach(([key, value]) => { if (value != null && value !== '') params = params.set(key, String(value)); });
-    return this.http.get<any[]>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionToDelete/${date1}/${date2}`, { params });
+    return this.http.get<any[]>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProductionToDelete`, { params });
   }
 
   /** Elimina los rollos y crea sus registros de desecho en una sola transacción. Devuelve los rollos eliminados. */

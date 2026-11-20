@@ -22,7 +22,6 @@ import { AppComponent } from 'src/app/app.component';
 import { CrearMateriaprimaComponent } from '../crear-materiaprima/crear-materiaprima.component';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
-import { Crear_FallasComponent } from '../Crear_Fallas/Crear_Fallas.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
 @Injectable({
@@ -65,7 +64,6 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   reader: any;
   modalRecovery : boolean = false;
   @ViewChild(CrearMateriaprimaComponent) createRecovery : CrearMateriaprimaComponent | undefined;
-  @ViewChild(Crear_FallasComponent) cmpCreateFails : Crear_FallasComponent | undefined;
   modalPeletizado : boolean = false;
   peletizado : any = [];
   groupPeletizado : any = [];
@@ -260,8 +258,18 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
   //Función para obtener los tipos de recuperado
   getTypesRecovery = (types : any[]) => this.svTypesRecovery.GetTodo().subscribe(data => { this.typesRecovery = data.filter(x => types.includes(x.tpRecu_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los tipos de recuperados. | ${error}`); });
 
+  //Falla creada desde el modal: lo cierra y recarga la lista de fallas.
+  failCreated() {
+    this.modalFails = false;
+    this.getFails();
+  }
+
   //Función para obtener los tipos de fallas/no conformidades. 
-  getFails = () => this.svFails.srvObtenerLista().subscribe(data => { this.failsProcess = data.filter(x => [13,14,16,17,18,19,20,21,22,].includes(x.tipoFalla_Id)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
+  //Si ya hay un proceso elegido, vuelve a filtrar la lista visible para que aparezca la falla recién creada.
+  getFails = () => this.svFails.srvObtenerLista().subscribe(data => {
+    this.failsProcess = data.filter(x => [13,14,16,17,18,19,20,21,22,].includes(x.tipoFalla_Id));
+    if (this.form?.value.process) this.fails = this.failsProcess.filter(x => this.changeFailsForProcess(this.form.value.process).includes(x.tipoFalla_Id));
+  }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar las no conformidades. | ${error}`); });
 
   //Función para obtener los procesos.
   getProcess = () => this.svProcess.srvObtenerLista().subscribe(data => { this.process = data.filter(x => [3,4,15,2,1,14].includes(x.proceso_Codigo)) }, error => { this.svMsjs.mensajeError(`Error`, `Error al consultar los procesos. | ${error}`); });
@@ -271,12 +279,8 @@ export class Ingreso_PeletizadoComponent implements OnInit, OnDestroy {
 
   //*MODALES
 
-  loadModalFails(){
-    this.modalFails = true;
-    setTimeout(() => {
-      this.cmpCreateFails!.typeFails = this.cmpCreateFails?.typeFails.filter(x => [16,17,18,19,20,21].includes(x.tipoFalla_Id));
-    }, 1500);
-  }
+  //Los tipos de falla que se pueden crear (16 a 21) los limita el propio modal con [tiposPermitidos].
+  loadModalFails = () => this.modalFails = true;
 
   //Cargar modal para crear recuperado
   loadModalRecovery() {

@@ -1,21 +1,18 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
+import { finalize } from 'rxjs';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TpFallasTecnicasService } from 'src/app/Servicios/TipoFallasTecnicas/TpFallasTecnicas.service';
 import { AppComponent } from 'src/app/app.component';
-import { EliminarRollos_ProduccionComponent } from '../EliminarRollos_Produccion/EliminarRollos_Produccion.component';
-import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
-import { IngresoProduccion_DespachoComponent } from '../IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
-import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
-import { DevolucionesCalidadComponent } from '../devoluciones-calidad/devoluciones-calidad.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-
+/*
+ * Modal reutilizable para crear fallas técnicas. La vista que lo contiene:
+ *  - indica con [tiposPermitidos] qué tipos de falla se pueden crear desde ella (vacío = todos). Si es uno solo, queda seleccionado.
+ *  - recibe la falla creada con (creada) para cerrar su modal, recargar su lista y, si quiere, seleccionarla.
+ */
 @Component({
   selector: 'app-Crear_Fallas',
   templateUrl: './Crear_Fallas.component.html',
@@ -23,21 +20,23 @@ import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 })
 export class Crear_FallasComponent implements OnInit {
 
-  form !: FormGroup; //Variable que se usará para validar el formulario 
+  /** Tipos de falla que se pueden crear desde la vista que contiene el modal. Vacío = todos. */
+  @Input() tiposPermitidos : number[] = [];
+
+  /** Falla recién creada (con su falla_Id), para que la vista cierre el modal y recargue su lista. */
+  @Output() creada = new EventEmitter<any>();
+
+  form !: FormGroup; //Variable que se usará para validar el formulario
   load : boolean = false;
-  typeFails : any = [];
+  typeFails : any[] = [];
   selectedMode : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
 
-  constructor(private frmBuild : FormBuilder, 
-    private AppComponent : AppComponent, 
-    private svMsjs : MensajesAplicacionService, 
-    private svTypeFails : TpFallasTecnicasService, 
-    private svTechnicalFails : FallasTecnicasService, 
-    private cmDeleteRolls : EliminarRollos_ProduccionComponent, 
-    private cmpDevolutionItems : Devolucion_OrdenFacturacionComponent, 
-    private cmpUbicationsRolls : Ubicaciones_RollosComponent,
-    private cmpDvsQuality : DevolucionesCalidadComponent,
+  constructor(private frmBuild : FormBuilder,
+    private AppComponent : AppComponent,
+    private svMsjs : MensajesAplicacionService,
+    private svTypeFails : TpFallasTecnicasService,
+    private svTechnicalFails : FallasTecnicasService,
   ) {
       this.selectedMode = this.AppComponent.temaSeleccionado;
       this.loadForm();
@@ -45,6 +44,11 @@ export class Crear_FallasComponent implements OnInit {
 
   ngOnInit() {
     this.getTypeFails();
+  }
+
+  /** Hay un solo tipo posible: se selecciona solo y no se puede cambiar. */
+  get tipoFijo() : boolean {
+    return this.typeFails.length == 1;
   }
 
   //Función para cargar formulario
@@ -56,46 +60,57 @@ export class Crear_FallasComponent implements OnInit {
     });
   }
 
-  //Función para obtener los tipos de fallas
+  //Función para obtener los tipos de fallas, solo los permitidos por la vista.
   getTypeFails() {
-    this.svTypeFails.GetTodo().subscribe(data => { 
-      this.typeFails = data;
-      this.typeFails.sort((a, b) => Number(b.tipoFalla_Id) - Number(a.tipoFalla_Id)); 
-    }, error => {  });
-  } 
+    this.svTypeFails.GetTodo().subscribe({
+      next: (data : any[]) => {
+        this.typeFails = data
+          .filter(x => this.tiposPermitidos.length == 0 || this.tiposPermitidos.includes(Number(x.tipoFalla_Id)))
+          .sort((a, b) => Number(b.tipoFalla_Id) - Number(a.tipoFalla_Id));
+        this.selectFixedType();
+      },
+      error: error => this.svMsjs.errorDetallado(error, 'No se pudieron consultar los tipos de falla.', { operacion: 'Consultar tipos de falla', metodo: 'GET' }),
+    });
+  }
+
+  //Si solo hay un tipo posible, lo deja seleccionado.
+  private selectFixedType() {
+    if (this.tipoFijo) this.form.patchValue({ typeFail: this.typeFails[0].tipoFalla_Id });
+  }
 
   //Función para crear fallas tecnicas
   createFail(){
-    if(this.form.valid) {
-      this.load = true;
-      let fail : fails = {
-        Falla_Id : 0,
-        Falla_Nombre: this.form.value.fail,
-        Falla_Descripcion: this.form.value.description,
-        TipoFalla_Id: this.form.value.typeFail,
-        Fecha_Creacion: moment().format('YYYY-MM-DD'),
-        Hora_Creacion: moment().format('HH:mm:ss'),
-      }
-      this.svTechnicalFails.Post(fail).subscribe(data => {
+    if (this.load) return;
+    if (!this.form.valid) {
+      this.form.markAllAsTouched();
+      this.svMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar todos los campos!`);
+      return;
+    }
+
+    this.load = true;
+    let fail : fails = {
+      Falla_Id : 0,
+      Falla_Nombre: this.form.value.fail,
+      Falla_Descripcion: this.form.value.description,
+      TipoFalla_Id: this.form.value.typeFail,
+      Fecha_Creacion: moment().format('YYYY-MM-DD'),
+      Hora_Creacion: moment().format('HH:mm:ss'),
+    }
+    this.svTechnicalFails.Post(fail).pipe(finalize(() => this.load = false)).subscribe({
+      next: data => {
         this.svMsjs.mensajeConfirmacion('OK!', 'Falla creada correctamente!');
-        this.load = false;
-        this.cmDeleteRolls.modalFails = false;
-        this.cmDeleteRolls.getFails();
-        this.cmpDevolutionItems.modalFails = false;
-        this.cmpDevolutionItems.getFails(); 
-        this.cmpUbicationsRolls.modalFails = false;
-        this.cmpUbicationsRolls.getFails(); 
-        this.cmpDvsQuality.modalFails = false;
-        this.cmpDvsQuality.getFails(); 
-        setTimeout(() => { this.form.reset(); }, 2000);
-      }, error => {
-        this.svMsjs.mensajeError(`Error`, `Ha ocurrido un error, por favor verifique!`);
-        this.load = false;
-      });
-    } else this.svMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar todos los campos!`);
+        this.clearLabels();
+        this.creada.emit(data);
+      },
+      error: error => this.svMsjs.errorDetallado(error, 'No se pudo crear la falla.', { operacion: 'Crear falla técnica', metodo: 'POST' }),
+    });
   }
 
-  clearLabels = () => this.form.reset();    
+  //Limpia el formulario y deja el tipo seleccionado si es el único posible.
+  clearLabels() {
+    this.form.reset();
+    this.selectFixedType();
+  }
 
   //Función para cargar la información del nombre en la descripción
   loadDescription(){

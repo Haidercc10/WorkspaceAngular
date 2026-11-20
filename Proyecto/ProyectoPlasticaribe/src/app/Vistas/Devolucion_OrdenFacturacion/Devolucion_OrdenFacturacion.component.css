@@ -29,7 +29,7 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
     padding: 0.5rem   
 }
 
-::ng-deep .mb-4 {
+:host ::ng-deep .mb-4 {
     margin-bottom: 0.5rem !important;
 }
 

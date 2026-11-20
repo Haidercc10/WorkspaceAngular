@@ -32,7 +32,7 @@ p-table ::ng-deep div {
     padding: 0.5rem   
 }
 
-::ng-deep .mb-4 {
+:host ::ng-deep .mb-4 {
     margin-bottom: 0.5rem !important;
 }
 

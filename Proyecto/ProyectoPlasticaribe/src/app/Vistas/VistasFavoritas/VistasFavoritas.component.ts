@@ -38,7 +38,6 @@ export class VistasFavoritasComponent implements OnInit, OnDestroy {
   private static readonly SIN_MODULO = 'Otros';
   private static readonly CLAVE_OCULTO = 'accesosRapidos_oculto';
   private static readonly CLASE_BODY = 'con-accesos-rapidos';
-  private static readonly RUTA_INICIO = '/home';
 
   limite = 7; // máximo de favoritos; lo define la API
   favoritos: VistaFavorita[] = []; // favoritos guardados, en orden
@@ -94,8 +93,8 @@ export class VistasFavoritasComponent implements OnInit, OnDestroy {
     });
 
     this.dockItems = [
-      item('Inicio', 'Inicio', 'assets/Iconos_Menu/home.png', VistasFavoritasComponent.RUTA_INICIO,
-        () => this.router.navigateByUrl(VistasFavoritasComponent.RUTA_INICIO)),
+      item('Inicio', 'Inicio', 'assets/Iconos_Menu/home.png', VistasFavoritasService.RUTA_INICIO,
+        () => this.router.navigateByUrl(VistasFavoritasService.RUTA_INICIO)),
       ...this.favoritos.map(v => item(v.nombre, v.nombre, v.icono, v.ruta, () => this.router.navigateByUrl(v.ruta))),
       item('Añadir', 'Editar accesos rápidos', 'assets/Iconos_Menu/crear.png', '', () => this.abrirEditor()),
     ];
@@ -104,7 +103,7 @@ export class VistasFavoritasComponent implements OnInit, OnDestroy {
 
   /** Marca el acceso de la página actual (también en subrutas, p. ej. /inventario-areas/materiales). */
   private actualizarRutaActiva() {
-    const inicio = { id: 0, nombre: 'Inicio', icono: '', categoria: '', ruta: VistasFavoritasComponent.RUTA_INICIO };
+    const inicio = { id: 0, nombre: 'Inicio', icono: '', categoria: '', ruta: VistasFavoritasService.RUTA_INICIO };
     const vista = VistasFavoritasService.vistaDeUrl(this.router.url, [inicio, ...this.favoritos]);
     this.rutaActiva = vista ? VistasFavoritasService.normalizarRuta(vista.ruta) : '';
   }

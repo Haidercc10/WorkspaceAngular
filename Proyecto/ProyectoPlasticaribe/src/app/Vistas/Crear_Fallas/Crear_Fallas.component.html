@@ -23,7 +23,7 @@
       <!-- Tipos fallas -->
       <div class="col-xs-12">
         <span class="p-float-label">
-          <p-dropdown formControlName="typeFail" inputId="typeFail" [autoDisplayFirst]="true" [options]="typeFails" optionLabel="tipoFalla_Nombre" optionValue="tipoFalla_Id" autocomplete="off"></p-dropdown>
+          <p-dropdown formControlName="typeFail" inputId="typeFail" [autoDisplayFirst]="false" [readonly]="tipoFijo" [options]="typeFails" optionLabel="tipoFalla_Nombre" optionValue="tipoFalla_Id" autocomplete="off"></p-dropdown>
           <label for="typeFail">Tipo Falla</label>
         </span>
       </div>
@@ -34,7 +34,7 @@
   <!-- Botones -->
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="submit" label="Crear Falla" icon="pi pi-check"></button>
+      <button pButton class="p-button-danger" type="submit" label="Crear Falla" icon="pi pi-check" [disabled]="load"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearLabels()"></button>
     </div>
   </div>

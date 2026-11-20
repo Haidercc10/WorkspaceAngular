@@ -237,6 +237,6 @@
 <!-- Modal fallas tecnicas -->
 <p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
   <ng-template pTemplate="content">
-    <app-Crear_Fallas></app-Crear_Fallas>
+    <app-Crear_Fallas [tiposPermitidos]="[23]" (creada)="failCreated()"></app-Crear_Fallas>
   </ng-template>  
 </p-dialog> 

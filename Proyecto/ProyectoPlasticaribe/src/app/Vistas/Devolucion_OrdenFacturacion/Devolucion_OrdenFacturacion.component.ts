@@ -122,6 +122,12 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit, OnChanges {
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
+  //Falla creada desde el modal: lo cierra y recarga la lista de fallas.
+  failCreated() {
+    this.modalFails = false;
+    this.getFails();
+  }
+
   //Función para obtener las fallas técnicas.
   getFails = () => this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [13, 14, 15].includes(item.tipoFalla_Id)) });
 

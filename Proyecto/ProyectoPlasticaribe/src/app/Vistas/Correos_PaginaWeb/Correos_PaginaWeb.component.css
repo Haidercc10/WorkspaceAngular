@@ -302,15 +302,6 @@
   resize: vertical;
 }
 
-.contador {
-  align-self: flex-end;
-  color: var(--text-color-secondary);
-}
-
-.contador.limite {
-  color: var(--texto-peligro);
-}
-
 .acciones {
   display: flex;
   flex-wrap: wrap;

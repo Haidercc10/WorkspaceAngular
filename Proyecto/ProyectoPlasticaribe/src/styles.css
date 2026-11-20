@@ -1154,8 +1154,10 @@ input.campo-sin-cero:focus::placeholder {
   white-space: pre-line;
 }
 
-/* Todas las confirmaciones (p-confirmDialog) del sistema: botones separados
-   (el de texto se pegaba al principal y se notaba al pasar el mouse). */
+/* Footers de todos los diálogos (p-dialog y p-confirmDialog): botones separados con gap y alineados a la derecha
+   (con el margen del tema se pegaban entre sí, sobre todo en confirmaciones con pTemplate="footer").
+   Solo aplica cuando los botones son hijos directos del footer; los footers con su propio contenedor quedan igual. */
+.p-dialog .p-dialog-footer:has(> .p-button, > p-button),
 .p-confirm-dialog .p-dialog-footer {
   display: flex;
   flex-wrap: wrap;
@@ -1163,6 +1165,8 @@ input.campo-sin-cero:focus::placeholder {
   gap: 0.5rem;
 }
 
+.p-dialog .p-dialog-footer > .p-button,
+.p-dialog .p-dialog-footer > p-button .p-button,
 .p-confirm-dialog .p-dialog-footer .p-button {
   margin: 0;
 }

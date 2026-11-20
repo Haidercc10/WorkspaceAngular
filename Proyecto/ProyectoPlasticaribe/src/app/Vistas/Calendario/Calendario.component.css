@@ -252,9 +252,10 @@
   color: var(--texto-peligro);
 }
 
-.contador {
-  align-self: flex-end;
-  color: var(--text-color-secondary);
+/* En modo "ver" el formulario está deshabilitado: no se muestra el contador de caracteres (appContadorCaracteres). */
+:host ::ng-deep input:disabled + .contador-caracteres,
+:host ::ng-deep textarea:disabled + .contador-caracteres {
+  display: none;
 }
 
 .aviso-lectura {

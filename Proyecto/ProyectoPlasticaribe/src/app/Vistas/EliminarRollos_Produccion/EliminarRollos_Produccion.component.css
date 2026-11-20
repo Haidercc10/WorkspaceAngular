@@ -1,88 +1,362 @@
-span{
-    color: var(--rojo);
+/*
+ * Eliminar Rollos Producción.
+ * Todo va dentro de :host para no afectar otras vistas. Los ::ng-deep fijan lo que reglas globales de otras pantallas
+ * pueden cambiar al navegar (p. ej. ".row { text-align: center }" de dashboard-produccion, el ancho de .p-card o el
+ * padding de las celdas de p-datatable, que rompería la altura fija que necesita el scroll virtual).
+ */
+
+/* ---------- Tarjeta principal ---------- */
+:host ::ng-deep .p-card.eliminar-rollos {
+  width: 90%;
+  margin: 0 auto 5%;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 15px 4px rgba(0, 0, 0, 0.2);
+}
+
+:host ::ng-deep .p-card.eliminar-rollos .p-card-body,
+:host ::ng-deep .p-card.eliminar-rollos .p-card-content {
+  padding: 0;
+}
+
+:host .row {
+  text-align: left;
+}
+
+/* ---------- Pasos ---------- */
+.paso {
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  background: var(--surface-card);
+}
+
+.paso:last-child {
+  margin-bottom: 0;
+}
+
+.paso--autorizacion {
+  border-left: 4px solid var(--rojo);
+}
+
+.paso__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Espacio justo para la etiqueta flotante (sube ~1.25rem sobre el campo); el row g-3 de Bootstrap no suma espacio
+   en la primera fila (margen negativo del row + margen superior de las columnas). */
+.paso__encabezado + form {
+  padding-top: 0.75rem;
+}
+
+/* Separación vertical entre filas de campos: la etiqueta flotante de un campo lleno sube ~1.25rem y con el
+   gutter de g-3 (1rem) quedaba pegada al campo de arriba cuando los campos se apilan (tablet y móvil). */
+.paso form > .row {
+  --bs-gutter-y: 1.75rem;
+}
+
+.paso__numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-weight: 700;
+  background: var(--fondo-contador);
+  color: var(--texto-contador);
+}
+
+.paso__titulo {
+  margin: 0;
+  text-align: left;
+}
+
+.paso__ayuda {
+  flex: 1 1 100%;
+  padding-left: 2.75rem;
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+}
+
+.ayuda {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-color-secondary);
+}
+
+/* ---------- Aviso de pendientes en BagPro ---------- */
+.aviso-bagpro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  background: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+}
+
+.aviso-bagpro__texto {
+  flex: 1 1 16rem;
+}
+
+/* ---------- Campos (ancho completo aunque otras vistas cambien .p-inputtext) ---------- */
+:host .p-input-icon-left,
+:host .p-float-label {
+  display: block;
+  width: 100%;
+}
+
+/* p-inputnumber es inline: el propio elemento, su contenedor y el input deben ocupar todo el ancho. */
+:host p-inputnumber,
+:host ::ng-deep p-dropdown .p-dropdown,
+:host ::ng-deep p-calendar .p-calendar,
+:host ::ng-deep p-inputnumber .p-inputnumber,
+:host ::ng-deep p-inputnumber .p-inputtext,
+:host textarea.p-inputtext {
+  display: flex;
+  width: 100%;
+}
+
+:host ::ng-deep p-inputnumber .p-inputtext {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:host textarea.p-inputtext {
+  resize: vertical;
+  min-height: 5rem;
+}
+
+:host ::ng-deep p-calendar .p-datepicker-trigger {
+  background: var(--rojo);
+  border-color: var(--rojo);
+}
+
+:host ::ng-deep p-calendar .p-datepicker-trigger:enabled:hover {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
+}
+
+/* Motivo con su botón de crear al lado. */
+.campo-con-boton {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.campo-con-boton > .p-float-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ---------- Botones ---------- */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.acciones--final {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .acciones > button {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Tablas ---------- */
+.tabla-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between; /* botones a la izquierda, buscador a la derecha; en móvil el buscador queda arriba */
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tabla-barra__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Desde tablet: 3 columnas iguales (botones | espacio | buscador). La de botones nunca baja de lo que ocupan. */
+@media (min-width: 768px) {
+  .tabla-barra {
+    display: grid;
+    grid-template-columns: minmax(max-content, 1fr) 1fr 1fr;
   }
 
-  .d-grid {
-    padding-bottom: 2%;
+  .tabla-barra__botones {
+    grid-column: 1;
+    grid-row: 1;
   }
-  
-  .tabla1{
-    display: flex;
-  }
-  
-  .p-input-icon-left {
+
+  /* :host + .p-input-icon-left para ganarle a la regla de ancho completo de los campos del formulario. */
+  :host .tabla-barra .p-input-icon-left.buscador {
+    grid-column: 3;
+    grid-row: 1;
     width: 100%;
   }
-  
-  p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
-    display: flex;
+}
+
+.buscador input {
+  width: 100%;
+}
+
+:host ::ng-deep .tabla-rollos .p-datatable-thead > tr > th {
+  padding: 0.5rem;
+  white-space: nowrap;
+}
+
+/* Altura fija de fila (33px = virtualScrollItemSize de la tabla de disponibles). */
+:host ::ng-deep .tabla-rollos .p-datatable-tbody > tr > td {
+  height: 33px;
+  padding: 0.125rem 0.5rem;
+  white-space: nowrap;
+}
+
+/* Botón de la fila (agregar / quitar) más pequeño para no estirar la fila. */
+:host ::ng-deep .tabla-rollos .col-accion .p-button.p-button-icon-only {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+}
+
+:host ::ng-deep .tabla-rollos .p-datatable-tbody > tr > td.tabla-vacia {
+  height: auto;
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+  white-space: normal;
+  color: var(--text-color-secondary);
+}
+
+:host ::ng-deep .tabla-rollos .p-datatable-footer,
+:host ::ng-deep .tabla-rollos .p-datatable-summary {
+  padding: 0.6rem 0.75rem;
+}
+
+.celda-referencia {
+  max-width: 22rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.col-check {
+  width: 3rem;
+}
+
+.col-indice {
+  width: 3.5rem;
+  color: var(--text-color-secondary);
+}
+
+.col-accion {
+  width: 3.5rem;
+}
+
+.tabla-totales {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-weight: 400;
+}
+
+/* Pestañas de rollos a eliminar / consolidado. */
+:host ::ng-deep .pestanas-eliminar .p-tabview-panels {
+  padding: 1rem 0 0;
+  background: transparent;
+}
+
+:host ::ng-deep .pestanas-eliminar .p-tabview-nav {
+  background: transparent;
+}
+
+/* ---------- Confirmación ---------- */
+.confirmacion__aviso {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: var(--fondo-peligro);
+  color: var(--texto-peligro);
+}
+
+.confirmacion__resumen {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.confirmacion__resumen dt {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.confirmacion__resumen dd {
+  margin: 0;
+  color: var(--texto-fuerte);
+}
+
+.confirmacion__observacion {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ---------- Pantallas pequeñas ---------- */
+@media (max-width: 767.98px) {
+  :host ::ng-deep .p-card.eliminar-rollos {
     width: 100%;
+    padding: 0.75rem;
   }
-  
-  p-calendar ::ng-deep span button {
-    background-color: var(--rojo);
+
+  /* Sin marco por paso (la tarjeta ya lo tiene): los pasos se separan con una línea y los campos ganan ancho. */
+  .paso {
+    padding: 1.25rem 0;
+    margin-bottom: 0;
     border: 0;
-    transition: all 1s;
-  }
-  
-  p-calendar ::ng-deep span .p-datepicker-trigger:hover {
-    background: var(--rojoHover);
-  }
-  
-  p-calendar ::ng-deep .p-datepicker-header button {
-    background: #fff0;
-  }
-  
-  p-calendar ::ng-deep .p-datepicker-header button:hover {
-    background: #fff0;
-  }
-  
-  p-calendar ::ng-deep span button span {
-    display: block;
-  }
-  
-  
-  ::ng-deep .p-inputtext {
-      display: flex;
-      width: 100%;
-  }
-  
-  ::ng-deep .p-card {
-    align-items: center;
-    margin: auto;
-    width: 90%;
-    height: 100%;
-    padding: 2%;
-    border-radius: 10px;
-    box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
-    margin-bottom: 5%;
+    border-top: 1px solid var(--surface-border);
+    border-radius: 0;
+    background: transparent;
   }
 
-  .d-grid[_ngcontent-ng-c2623252385] {
-    padding-bottom: 0.5%;
-  }
-  
-  /* Subtítulo y botones en la misma fila (mismo patrón que .ot-header-actions en Orden de Trabajo). */
-  .header-actions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    align-items: center;
-    gap: 1rem;
+  .paso:first-of-type {
+    padding-top: 0.25rem;
+    border-top: 0;
   }
 
-  .header-actions__buttons {
-    display: grid;
-    gap: 0.5rem;
+  .paso:last-child {
+    padding-bottom: 0;
   }
 
-  @media (min-width: 992px) {
-    .header-actions {
-      grid-template-columns: auto minmax(0, 1fr);
-    }
-
-    .header-actions__buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
+  /* El paso de autorización conserva su marca roja, arriba en vez de a la izquierda. */
+  .paso--autorizacion {
+    border-left: 0;
+    border-top: 3px solid var(--rojo);
   }
+
+  :host .tabla-barra .p-input-icon-left.buscador {
+    order: 0;
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .tabla-barra__botones,
+  .tabla-barra__botones > button {
+    width: 100%;
+  }
+}

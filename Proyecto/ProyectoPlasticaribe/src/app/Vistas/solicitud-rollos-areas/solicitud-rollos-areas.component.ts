@@ -107,6 +107,12 @@ export class SolicitudRollosAreasComponent {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  //Falla creada desde el modal: lo cierra y recarga la lista de fallas.
+  failCreated() {
+    this.modalFails = false;
+    this.getFails();
+  }
+
   //Función para obtener las fallas técnicas.
   getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { 
     this.fails1 = datos.filter((item) => [1].includes(item.tipoFalla_Id));

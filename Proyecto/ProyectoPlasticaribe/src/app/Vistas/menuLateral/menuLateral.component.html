@@ -1,11 +1,11 @@
 <div>
   <!-- Navegador Principal -->
-  <nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
+  <nav class="navbar">
     <div class="container-fluid">
-      <div class="d-flex align-items-center">
+      <div class="marcaBarra d-flex align-items-center">
         <img class="logo2 cursor" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="" (click)="mostrarMenuLateral()">
         <span class="badgeBeta ms-3" *ngIf="esBeta" pTooltip="Entorno de pruebas" tooltipPosition="bottom">BETA</span>
-        <span class="versionApp" [ngClass]="{'versionAppDark' : modoSeleccionado, 'ms-2' : esBeta, 'ms-3' : !esBeta}" pTooltip="Versión de la aplicación" tooltipPosition="bottom">v{{ versionApp }}</span>
+        <span class="versionApp versionBarra" [ngClass]="{'ms-2' : esBeta, 'ms-3' : !esBeta}" pTooltip="Versión de la aplicación" tooltipPosition="bottom">v{{ versionApp }}</span>
       </div>
       <!--<p>
         <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button >
@@ -17,32 +17,31 @@
           </b>
         </button>
       </p>-->
-      <div class="p-2 d-flex align-items-center">
-        <button type="button" class="botonFavorito m-2" *ngIf="vistaActual" (click)="alternarFavoritoActual()" [disabled]="guardandoFavorito"
+      <div class="iconosBarra p-2 d-flex align-items-center">
+        <button type="button" class="botonFavorito" *ngIf="vistaActual" (click)="alternarFavoritoActual()" [disabled]="guardandoFavorito"
                 [pTooltip]="esFavorita ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'" tooltipPosition="bottom"
                 [attr.aria-label]="(esFavorita ? 'Quitar de accesos rápidos: ' : 'Agregar a accesos rápidos: ') + vistaActual.nombre"
                 [attr.aria-pressed]="esFavorita">
           <i class="pi font-size-25" [ngClass]="guardandoFavorito ? 'pi-spin pi-spinner' : (esFavorita ? 'pi-star-fill' : 'pi-star')"></i>
         </button>
         <!-- Tickets abiertos y en revisión (solo administradores con permiso a Gestionar Tickets) -->
-        <button type="button" class="botonBadge m-2" *ngIf="ValidarRol == 1 && cantidadesTickets" (click)="irAGestionTickets()"
+        <button type="button" class="botonBadge" *ngIf="ValidarRol == 1 && cantidadesTickets" (click)="irAGestionTickets()"
                 [pTooltip]="tooltipTickets" tooltipPosition="bottom" [attr.aria-label]="tooltipTickets">
           <i class="pi pi-ticket font-size-25"></i>
           <p-badge *ngIf="totalTicketsPendientes > 0" [value]="totalTicketsPendientes > 99 ? '99+' : totalTicketsPendientes.toString()"></p-badge>
         </button>
         <!-- El badge solo aparece cuando hay algo nuevo (con 0 se oculta) -->
-        <button type="button" class="botonBadge m-2" *ngIf="[1,6,2].includes(ValidarRol)" (click)="modalCorreos = true"
+        <button type="button" class="botonBadge" *ngIf="[1,6,2].includes(ValidarRol)" (click)="modalCorreos = true"
                 [pTooltip]="cantidadCorreosNuevos > 0 ? cantidadCorreosNuevos + ' correo(s) sin leer' : 'Correos recibidos'" tooltipPosition="bottom" aria-label="Correos recibidos">
           <i class="pi pi-envelope font-size-25"></i>
-          <p-badge *ngIf="cantidadCorreosNuevos > 0" [value]="cantidadCorreosNuevos.toString()"></p-badge>
+          <p-badge *ngIf="cantidadCorreosNuevos > 0" [value]="cantidadCorreosNuevos > 99 ? '99+' : cantidadCorreosNuevos.toString()"></p-badge>
         </button>
-        <button type="button" class="botonBadge m-2" (click)="mostrarModalCalendario()"
+        <button type="button" class="botonBadge" (click)="mostrarModalCalendario()"
                 [pTooltip]="tooltipCalendario" tooltipPosition="bottom" [attr.aria-label]="tooltipCalendario">
           <i class="pi pi-calendar font-size-25"></i>
-          <p-badge *ngIf="cantidadEventos > 0" [value]="cantidadEventos.toString()"></p-badge>
+          <p-badge *ngIf="cantidadEventos > 0" [value]="cantidadEventos > 99 ? '99+' : cantidadEventos.toString()"></p-badge>
         </button>
-        <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>
-        <p-avatar class="cursor" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
+        <p-avatar class="cursor avatarUsuario" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
       </div>
     </div>
   </nav>
@@ -55,12 +54,12 @@
   </div>
 
   <!-- Menú Principal -->
-  <p-sidebar [(visible)]="display" [style]="{width : '30rem'}">
+  <p-sidebar [(visible)]="display" [style]="{width : '30rem', maxWidth : '100vw'}">
     <div class="imagen">
       <img [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="Plasticaribe S.A.S">
       <div class="betaSidebar">
         <span class="badgeBeta" *ngIf="esBeta">BETA</span>
-        <span class="versionApp" [ngClass]="{'versionAppDark' : modoSeleccionado}">v{{ versionApp }}</span>
+        <span class="versionApp">v{{ versionApp }}</span>
       </div>
     </div>
     <br>
@@ -68,7 +67,7 @@
   </p-sidebar>
 
   <!-- Menú de Configuraciones -->
-  <p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
+  <p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{maxWidth : 'min(30rem, 100vw)', minWidth : 'min(27rem, 100vw)'}">
     <div class="escalabilidad">
       <div class="mb-2">
         <h4>Tamaño de Letra</h4>
@@ -119,7 +118,7 @@
   </p-sidebar>
 
   <!-- Menú de Usuario -->
-  <p-sidebar [(visible)]="menuUsuario" position="right" styleClass="sidebarUsuario" [style]="{maxWidth : '30rem', minWidth : '27rem'}"
+  <p-sidebar [(visible)]="menuUsuario" position="right" styleClass="sidebarUsuario" [style]="{maxWidth : 'min(30rem, 100vw)', minWidth : 'min(27rem, 100vw)'}"
              ariaCloseLabel="Cerrar menú de usuario">
     <div class="menuUsuario">
       <!-- Encabezado: quién tiene la sesión abierta -->

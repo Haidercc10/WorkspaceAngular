@@ -355,10 +355,7 @@
   <!--* Modal fallas tecnicas -->
   <p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
     <ng-template pTemplate="content">
-      <div class="mb-2">
-        <i class="pi pi-exclamation-triangle"></i> <b> Nota:</b> Luego de colocar el nombre y descripción de la falla, el tipo debe ser Devolución Calidad.
-      </div>
-      <app-Crear_Fallas></app-Crear_Fallas>
+      <app-Crear_Fallas [tiposPermitidos]="[14]" (creada)="failCreated()"></app-Crear_Fallas>
     </ng-template>  
   </p-dialog> 
   

@@ -66,20 +66,17 @@ p-panelmenu ::ng-deep div a {
 .versionApp {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #6c757d;
+  color: var(--text-color-secondary);
   user-select: none;
-}
-
-.versionAppDark {
-  color: #adb5bd;
 }
 
 .badgeBeta {
   display: inline-block;
   padding: 0.2rem 0.75rem;
   border-radius: 999px;
-  background-color: #f59e0b;
-  color: #ffffff;
+  border: 1px solid var(--texto-advertencia);
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
   font-weight: 700;
   font-size: 0.9rem;
   letter-spacing: 0.15em;
@@ -118,14 +115,7 @@ p-panelmenu ::ng-deep div a {
   top: 0;
   left: 0;
   z-index: 5;
-}
-
-.navbarDark {
-  background-color: #071426;
-}
-
-.navbarLigth {
-  background-color: #fff;
+  background-color: var(--surface-card); /* blanco en claro, #071426 en oscuro (tema lara) */
 }
 
 .userDark {
@@ -134,13 +124,6 @@ p-panelmenu ::ng-deep div a {
 
 .userLigth {
   color: #000;
-}
-
-.pi-cog {
-  color: #000;
-  font-size: calc(var(--font-size) * 25px);
-  cursor: pointer;
-  margin-left: 55%;
 }
 
 .tanamoLetra i {
@@ -254,6 +237,7 @@ input:checked + .colorMode svg.moon {
   border: none;
   color: #FFF;
   text-align: center;
+  cursor: pointer;
 }
 
 .botonFlotante button:hover {
@@ -485,6 +469,25 @@ p-dialog ::ng-deep div .p-dialog-title {
   height: auto;
   flex-shrink: 0;
 }
+/* Botones de la barra superior: área cuadrada (--lado-boton) con el ícono (--icono) centrado y 4px entre botones.
+   El badge se ancla a la esquina superior derecha del ícono y sobresale poco, para no montarse en el ícono vecino. */
+.iconosBarra {
+  --lado-boton: 44px;
+  --icono: calc(var(--font-size) * 25px); /* igual que .font-size-25: sigue la opción "Tamaño de Letra" */
+  gap: 4px;
+}
+
+.iconosBarra > .botonFavorito,
+.iconosBarra > .botonBadge {
+  width: var(--lado-boton);
+  height: var(--lado-boton);
+}
+
+/* 8px entre el último ícono y el botón de usuario (4px del gap + 4px). */
+.avatarUsuario {
+  margin-left: 4px;
+}
+
 /* Estrella: agrega o quita la página actual de los accesos rápidos (barra inferior) */
 .botonFavorito {
   display: inline-flex;
@@ -539,9 +542,9 @@ p-dialog ::ng-deep div .p-dialog-title {
 
 .botonBadge ::ng-deep .p-badge {
   position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(50%, -50%);
+  top: calc((var(--lado-boton) - var(--icono)) / 2);
+  right: calc((var(--lado-boton) - var(--icono)) / 2);
+  transform: translate(35%, -50%);
   min-width: 1.5rem;
   height: 1.5rem;
   line-height: 1.5rem;
@@ -562,4 +565,77 @@ p-dialog ::ng-deep div .p-dialog-title {
 :host ::ng-deep .botonVerCalendario.p-button:enabled:hover {
   background: var(--rojoHover);
   border-color: var(--rojoHover);
+}
+
+/* ---------- Barra superior compacta (menos de 768px) ----------
+   Todo en una sola fila (~60px): la página compensa la barra fija con 100px (body margin-top 40px + título 60px);
+   si los íconos bajaban a una segunda fila, la barra pasaba de 150px y tapaba el título de todas las vistas.
+   La versión se oculta (sigue en el menú principal). */
+@media (max-width: 767.98px) {
+  .navbar {
+    padding: 14px 4px; /* ~64px de alto: deja aire bajo la barra sin acercarse a los 100px que compensa la página */
+  }
+
+  .navbar > .container-fluid {
+    flex-wrap: nowrap;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .logo2 {
+    width: 130px;
+    min-width: 130px;
+  }
+
+  .versionBarra {
+    display: none;
+  }
+
+  .marcaBarra .badgeBeta {
+    margin-left: 0.5rem !important;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+  }
+
+  .iconosBarra {
+    padding: 0 !important;
+    flex-shrink: 0;
+  }
+
+  .iconosBarra {
+    --lado-boton: 40px;
+    --icono: 22px;
+  }
+
+  .iconosBarra .font-size-25 {
+    font-size: var(--icono);
+  }
+
+  .botonBadge ::ng-deep .p-badge {
+    min-width: 1.25rem;
+    height: 1.25rem;
+    line-height: 1.25rem;
+    padding: 0 .25rem;
+    font-size: .65rem;
+  }
+
+  :host ::ng-deep .avatarUsuario .p-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.1rem;
+    margin-right: 0 !important;
+  }
+}
+
+/* Teléfonos muy angostos: logo más pequeño para que quepan todos los íconos. */
+@media (max-width: 399.98px) {
+  .iconosBarra {
+    --lado-boton: 36px;
+  }
+
+  .logo2 {
+    width: 105px;
+    min-width: 105px;
+  }
 }

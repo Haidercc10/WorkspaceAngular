@@ -1,14 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { Observable, Subscription, catchError, finalize, forkJoin, map, merge, of, switchMap } from 'rxjs';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { DetalleError, ListadoDetalleError, MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -37,11 +35,8 @@ import { ClaveTutorialEliminarRollos, pasosTutorialEliminarRollos } from 'src/ap
 const USUARIOS_AUTORIZADORES = [100, 110, 117, 3139, 123456789, 115, 113, 3142, 3123, 101, 7676, 3130, 114, 59137];
 const PROCESOS_PRODUCCION = [8, 4, 3, 7, 2, 1, 9, 5, 6, 18];
 const TIPO_FALLA_ELIMINACION = 12;
-
-// Se mantiene @Injectable porque Crear_FallasComponent inyecta este componente.
-@Injectable({
-  providedIn: 'root'
-})
+/** Rollos eliminados cuya marca en BagPro falló; se guardan por usuario para poder reintentar aunque se recargue la página. */
+const CLAVE_PENDIENTES_BAGPRO = 'eliminar-rollos-bagpro-pendientes';
 
 @Component({
   selector: 'app-EliminarRollos_Produccion',
@@ -51,43 +46,60 @@ const TIPO_FALLA_ELIMINACION = 12;
 export class EliminarRollos_ProduccionComponent implements OnInit, OnDestroy {
   load : boolean = false; //Variable para validar que salga o no la imagen de carga
   today : string = moment().format('YYYY-MM-DD'); //Fecha actual
-  form !: FormGroup; //Formulario de filtros y datos de la eliminación
+  filters !: FormGroup; //Filtros de la consulta de rollos
+  authorization !: FormGroup; //Quién autoriza, motivo y observación: solo se piden para eliminar
   selectedMode : boolean = false; //Modo oscuro/claro
   private readonly suscripcionTema = alCambiarTema(oscuro => this.selectedMode = oscuro); // mantiene selectedMode al día con el tema
+  private subscriptions = new Subscription();
+
   process : any[] = []; //Procesos de producción
-  rolls : rollRow[] = []; //Rollos consultados
+  fails : any[] = []; //Motivos de eliminación
+  users : any[] = []; //Usuarios que pueden autorizar
+
+  rolls : rollRow[] = []; //Rollos disponibles consultados
   rollsInsert : rollRow[] = []; //Rollos a eliminar
   rollsTableSelection : rollRow[] = [];
   rollsInsertTableSelection : rollRow[] = [];
-  consolidatedInfo : consolidatedRow[] = []; //Consolidado por OT, ítem y unidad (totales ya calculados)
-  consolidatedTotals : { unit : string, quantity : number }[] = []; //Totales del consolidado por unidad
-  fails : any[] = [];
-  @ViewChild('dt1') dt1: Table | undefined;
-  @ViewChild('dt2') dt2: Table | undefined;
-  @ViewChild('formElement') formElement: ElementRef<HTMLElement> | undefined;
+  rollsTotals : unitTotal[] = []; //Totales de los rollos disponibles por unidad
+  rollsInsertTotals : unitTotal[] = []; //Totales de los rollos a eliminar por unidad
+  consolidatedInfo : consolidatedRow[] = []; //Consolidado por OT, ítem y unidad
+  searchRolls1 : string = ''; //Texto del buscador de la tabla de disponibles
+  searchRolls2 : string = ''; //Texto del buscador de la tabla de rollos a eliminar
+
+  tabEliminar : number = 0; //Pestaña activa de "Rollos a Eliminar": 0 = Rollos, 1 = Consolidado
+  readonly maxObservacion : number = 500; //Rollos_Desechos.Rollo_Observacion es varchar(max): límite de uso, no de la base de datos
+  confirmVisible : boolean = false; //Ventana de confirmación con el resumen
+  confirmSummary : confirmSummary | null = null;
+  pendingBagPro : pendingBagProRoll[] = []; //Rollos eliminados que quedaron sin marca en BagPro
+
   modalFails : boolean = false;
-  users : any[] = [];
   storage_Id: any;
   storage_Name: any;
   validateRole: any;
+
+  @ViewChild('dt1') dt1: Table | undefined;
+  @ViewChild('dt2') dt2: Table | undefined;
+  @ViewChild('authorizationElement') authorizationElement: ElementRef<HTMLElement> | undefined;
+
+  /** Campos en los que busca el buscador de cada tabla (los mismos textos que se ven). */
+  readonly searchFields = ['numeroRollo_BagPro', 'ot', 'prod_Id', 'prod_Nombre', 'cantidadMostrar', 'unidad', 'fechaTexto', 'proceso_Nombre'];
 
   constructor(private AppComponent : AppComponent,
     private frmBld : FormBuilder,
     private svcMsjs : MensajesAplicacionService,
     private svcProdProcess : Produccion_ProcesosService,
     private svcProcess : ProcesosService,
-    private svcMsg : MessageService,
     private failsService : FallasTecnicasService,
     private svBagPro : BagproService,
     private svUsers : UsuarioService,
-    private svDiscardRolls : SrvRollosEliminadosService,
     private tutoriales : TutorialesService,
   ) {
-    this.initForm();
+    this.initForms();
   }
 
   ngOnInit() {
     this.readStorage();
+    this.loadPendingBagPro();
     this.loadRankDates();
     this.loadCatalogs(true);
   }
@@ -95,17 +107,16 @@ export class EliminarRollos_ProduccionComponent implements OnInit, OnDestroy {
   //Cierra el tutorial si el usuario sale de la página con él abierto.
   ngOnDestroy() {
     this.tutoriales.cancelar();
+    this.subscriptions.unsubscribe();
   }
 
   //Muestra el tutorial de la página (botón "i" junto al título).
   tutorial = () => this.tutoriales.iniciar(this.pasosTutorial());
 
-  private pasosTutorial = () => pasosTutorialEliminarRollos({ esAdmin: this.isAdmin });
-
-  //TEMPORAL: solo el administrador (rol 1) ve el botón de reenviar la observación a BagPro.
-  get isAdmin() : boolean {
-    return Number(this.validateRole) === 1;
-  }
+  private pasosTutorial = () => pasosTutorialEliminarRollos({
+    irPestana: indice => this.tabEliminar = indice,
+    hayPendientesBagPro: this.pendingBagPro.length > 0,
+  });
 
   //Leer storage del navegador.
   readStorage() {
@@ -114,176 +125,217 @@ export class EliminarRollos_ProduccionComponent implements OnInit, OnDestroy {
     this.validateRole = this.AppComponent.storage_Rol;
   }
 
-  //Carga en paralelo los procesos, las fallas y los usuarios autorizadores.
+  //Inicializa los dos formularios. Con OT o N° de rollo se busca en todas las fechas, por eso el rango se deshabilita.
+  initForms(){
+    this.filters = this.frmBld.group({
+      RangoFechas : [null],
+      Bodega : [null],
+      OT : [null],
+      Rollo : [null],
+    });
+    this.authorization = this.frmBld.group({
+      user : [null, Validators.required],
+      Falla : [null, Validators.required],
+      Observacion : [null, [Validators.required, Validators.pattern(/\S/), Validators.maxLength(this.maxObservacion)]],
+    });
+
+    const ot = this.filters.get('OT')!, roll = this.filters.get('Rollo')!, dates = this.filters.get('RangoFechas')!;
+    this.subscriptions.add(merge(ot.valueChanges, roll.valueChanges).subscribe(() => {
+      if (this.searchByIdentifier) dates.disable({ emitEvent: false });
+      else dates.enable({ emitEvent: false });
+    }));
+  }
+
+  /** Hay OT o N° de rollo: la consulta no se limita por fechas. */
+  get searchByIdentifier() : boolean {
+    const { OT, Rollo } = this.filters.getRawValue();
+    return OT != null || Rollo != null;
+  }
+
+  //Carga en paralelo los procesos, los motivos y los usuarios autorizadores.
   //Con iniciarTutorial, al terminar muestra el tutorial si es la primera vez que el usuario entra.
   loadCatalogs(iniciarTutorial : boolean = false) {
     this.load = true;
     forkJoin({
-      process: this.svcProcess.srvObtenerLista().pipe(catchError(() => of([]))),
-      fails: this.failsService.getFallasPorTipo(TIPO_FALLA_ELIMINACION).pipe(catchError(() => of([]))),
-      users: this.svUsers.getUsuariosPorIds(USUARIOS_AUTORIZADORES).pipe(catchError(() => of([]))),
+      process: this.catalog(this.svcProcess.srvObtenerLista(), 'los procesos', 'Consultar procesos'),
+      fails: this.catalog(this.failsService.getFallasPorTipo(TIPO_FALLA_ELIMINACION), 'los motivos de eliminación', 'Consultar motivos de eliminación'),
+      users: this.catalog(this.svUsers.getUsuariosPorIds(USUARIOS_AUTORIZADORES), 'los usuarios que autorizan', 'Consultar usuarios autorizadores'),
     }).pipe(finalize(() => this.load = false)).subscribe(({ process, fails, users }) => {
-      this.process = (process as any[]).filter(x => PROCESOS_PRODUCCION.includes(x.proceso_Codigo));
+      this.process = process.filter(x => PROCESOS_PRODUCCION.includes(x.proceso_Codigo));
       this.fails = fails;
       this.users = users;
       if (iniciarTutorial) this.tutoriales.iniciarPrimeraVez(ClaveTutorialEliminarRollos, this.storage_Id, () => this.pasosTutorial());
     });
   }
 
-  //Función para obtener las fallas técnicas (también la usa Crear_FallasComponent).
-  getFails = () => this.failsService.getFallasPorTipo(TIPO_FALLA_ELIMINACION).subscribe(data => this.fails = data);
+  //Un catálogo que falla avisa con "Ver detalles" y deja la lista vacía sin detener los demás.
+  private catalog(request : Observable<any>, name : string, operacion : string) : Observable<any[]> {
+    return request.pipe(catchError(error => {
+      this.svcMsjs.errorDetallado(error, `No se pudieron consultar ${name}.`, { operacion, metodo: 'GET' });
+      return of([]);
+    }));
+  }
 
-  //Función para cargar fechas en el rango.
+  //Función para obtener los motivos de eliminación.
+  getFails = () => this.failsService.getFallasPorTipo(TIPO_FALLA_ELIMINACION).subscribe({
+    next: data => this.fails = data,
+    error: error => this.svcMsjs.errorDetallado(error, 'No se pudieron consultar los motivos de eliminación.', { operacion: 'Consultar motivos de eliminación', metodo: 'GET' }),
+  });
+
+  //Falla creada desde el modal: lo cierra, recarga los motivos y deja seleccionada la nueva.
+  failCreated(fail : any) {
+    this.modalFails = false;
+    this.getFails();
+    if (fail?.falla_Id) this.authorization.patchValue({ Falla: fail.falla_Id });
+  }
+
+  //Función para cargar fechas en el rango (últimos 30 días).
   loadRankDates(){
     let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
-    this.form.patchValue({ 'RangoFechas' : [initialDate, new Date()] });
+    this.filters.patchValue({ 'RangoFechas' : [initialDate, new Date()] });
   }
 
-  //Función para inicializar el formulario. Motivo, observación y usuario solo son obligatorios para eliminar.
-  initForm(){
-    this.form = this.frmBld.group({
-      RangoFechas : [null],
-      Bodega : [null],
-      Rollo : [null],
-      OT : [null],
-      Falla : [null, Validators.required],
-      Observacion : [null, Validators.required],
-      user : [null, Validators.required],
-    });
-  }
-
-  //Función para buscar los rollos a eliminar.
+  //Busca los rollos disponibles. Con OT o N° de rollo busca en todas las fechas; sin ellos el rango de fechas es obligatorio.
   searchRolls(){
-    const [start, end] = this.form.value.RangoFechas ?? [];
-    const date1 = start ? moment(start).format('YYYY-MM-DD') : this.today;
-    const date2 = end ? moment(end).format('YYYY-MM-DD') : date1;
+    if (this.load) return;
+    const { RangoFechas, Bodega, OT, Rollo } = this.filters.getRawValue();
+    const byIdentifier = this.searchByIdentifier;
+    const [start, end] = RangoFechas ?? [];
+
+    if (!byIdentifier && !start) {
+      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Indique un rango de fechas, una OT o un N° de rollo para consultar.`);
+      return;
+    }
 
     this.load = true;
-    this.svcProdProcess.getInfoProductionToDelete(date1, date2, {
-      ot: this.form.value.OT,
-      process: this.form.value.Bodega,
-      roll: this.form.value.Rollo,
+    this.svcProdProcess.getInfoProductionToDelete({
+      date1: byIdentifier ? null : moment(start).format('YYYY-MM-DD'),
+      date2: byIdentifier ? null : moment(end ?? start).format('YYYY-MM-DD'),
+      ot: OT,
+      process: Bodega,
+      roll: Rollo,
     }).pipe(finalize(() => this.load = false)).subscribe({
       next: data => {
-        if (data.length == 0) this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontraron rollos disponibles con los filtros indicados!`);
         this.loadTable(data);
+        if (data.length == 0) this.svcMsjs.mensajeAdvertencia(`Sin rollos`, byIdentifier
+          ? `No hay rollos disponibles con esa OT / N° de rollo. Puede que ya estén despachados, enviados a Zeus o eliminados.`
+          : `No se encontraron rollos disponibles con los filtros indicados.`, 6000);
+        else if (this.rolls.length == 0) this.svcMsjs.mensajeInformacion(`Sin rollos nuevos`, `Los rollos encontrados ya están en la tabla de rollos a eliminar.`, 5000);
       },
-      error: (error : HttpErrorResponse) => this.svcMsjs.errorHttp(`Error consultando los rollos`, error),
+      error: (error : HttpErrorResponse) => this.svcMsjs.errorDetallado(error, `No fue posible consultar los rollos.`, { operacion: 'Consultar rollos a eliminar', metodo: 'GET' }),
     });
   }
 
-  //Reemplaza la tabla de consultados con el resultado de la búsqueda, sin los rollos que ya están en la tabla de rollos a eliminar.
+  //Reemplaza la tabla de disponibles con el resultado de la búsqueda, sin los rollos que ya están en la tabla de rollos a eliminar.
   loadTable(data : any[]){
     const selected = new Set(this.rollsInsert.map(x => x.key));
     this.rolls = data
-      .map(x => ({ ...x, key: rollKey(x) }) as rollRow)
+      .map(x => ({ ...x, key: rollKey(x), fechaTexto: moment(x.fecha).format('DD/MM/YYYY') }) as rollRow)
       .filter(x => !selected.has(x.key));
-    this.rollsTableSelection = [];
+    this.afterMove();
   }
 
-  //Pasa a la tabla de rollos a eliminar todos los rollos consultados que estén visibles con el filtro actual.
-  selectAllRolls(){
-    const visible : rollRow[] = (this.dt1?.filteredValue as rollRow[]) ?? this.rolls;
-    const keys = new Set(visible.map(x => x.key));
-    this.rollsInsert = [...this.rollsInsert, ...visible];
+  //Pasa a la tabla de rollos a eliminar los rollos marcados en la tabla de disponibles.
+  addSelected = () => this.moveToDelete(this.rollsTableSelection);
+
+  //Pasa a la tabla de rollos a eliminar todos los disponibles que se ven con el buscador actual.
+  addAllVisible = () => this.moveToDelete(this.visibleRows(this.dt1, this.rolls));
+
+  //Pasa un rollo a la tabla de rollos a eliminar.
+  addRoll = (roll : rollRow) => this.moveToDelete([roll]);
+
+  //Devuelve a la tabla de disponibles los rollos marcados en la tabla de rollos a eliminar.
+  removeSelected = () => this.moveToAvailable(this.rollsInsertTableSelection);
+
+  //Devuelve a la tabla de disponibles todos los rollos a eliminar que se ven con el buscador actual.
+  removeAllVisible = () => this.moveToAvailable(this.visibleRows(this.dt2, this.rollsInsert));
+
+  //Devuelve un rollo a la tabla de disponibles.
+  removeRoll = (roll : rollRow) => this.moveToAvailable([roll]);
+
+  //Filas que se ven en una tabla: las filtradas por el buscador, o todas si no se ha buscado nada.
+  private visibleRows = (table : Table | undefined, all : rollRow[]) : rollRow[] => (table?.filteredValue as rollRow[]) ?? all;
+
+  private moveToDelete(rolls : rollRow[]) {
+    if (rolls.length == 0) return;
+    const keys = new Set(rolls.map(x => x.key));
+    const already = new Set(this.rollsInsert.map(x => x.key));
+    this.rollsInsert = [...this.rollsInsert, ...rolls.filter(x => !already.has(x.key))];
     this.rolls = this.rolls.filter(x => !keys.has(x.key));
     this.afterMove();
   }
 
-  //Función para seleccionar un rollo consultado a la tabla de rollos a eliminar.
-  loadRollInsert(roll : rollRow){
-    if(!this.rollsInsert.some(x => x.key == roll.key)) this.rollsInsert = [...this.rollsInsert, roll];
-    this.rolls = this.rolls.filter(x => x.key != roll.key);
-    this.afterMove();
-  }
-
-  //Devuelve a la tabla de consultados todos los rollos a eliminar que estén visibles con el filtro actual.
-  quitAllRolls(){
-    const visible : rollRow[] = (this.dt2?.filteredValue as rollRow[]) ?? this.rollsInsert;
-    const keys = new Set(visible.map(x => x.key));
-    this.rolls = [...this.rolls, ...visible];
+  private moveToAvailable(rolls : rollRow[]) {
+    if (rolls.length == 0) return;
+    const keys = new Set(rolls.map(x => x.key));
+    const already = new Set(this.rolls.map(x => x.key));
+    this.rolls = [...this.rolls, ...rolls.filter(x => !already.has(x.key))];
     this.rollsInsert = this.rollsInsert.filter(x => !keys.has(x.key));
     this.afterMove();
   }
 
-  //Función para deseleccionar un rollo a eliminar.
-  quitRollInsert(roll : rollRow){
-    if(!this.rolls.some(x => x.key == roll.key)) this.rolls = [...this.rolls, roll];
-    this.rollsInsert = this.rollsInsert.filter(x => x.key != roll.key);
-    this.afterMove();
-  }
-
+  //Limpia las selecciones y recalcula totales y consolidado (una sola vez por cambio, no en cada ciclo de la vista).
   private afterMove() {
     this.rollsTableSelection = [];
     this.rollsInsertTableSelection = [];
+    this.rollsTotals = totalsByUnit(this.rolls);
+    this.rollsInsertTotals = totalsByUnit(this.rollsInsert);
     this.getInfoConsolidated();
   }
 
-  //Cantidad que se muestra de un rollo: unidades si es sellado en Und/Paquete, si no kilos.
-  quantity = (roll : rollRow) : number => isUnits(roll) ? roll.cantidad : roll.peso_Neto;
+  //Formato del número según la unidad: kilos con 2 decimales, unidades y paquetes sin decimales.
+  numberFormat = (unit : string) : string => unit == 'Kg' ? '1.2-2' : '1.0-0';
 
-  //Unidad de la cantidad que se muestra.
-  unit = (roll : rollRow) : string => isUnits(roll) ? roll.presentacion : 'Kg';
-
-  //Consolidado por OT, ítem y unidad con sus totales, calculado una sola vez (no en cada ciclo de la vista).
+  //Consolidado por OT, ítem y unidad con su cantidad y número de rollos.
   getInfoConsolidated(){
     const groups = new Map<string, consolidatedRow>();
-    const totals = new Map<string, number>();
-
     for (const roll of this.rollsInsert) {
-      const unit = this.unit(roll);
-      const quantity = this.quantity(roll);
-      const key = `${roll.ot}|${roll.prod_Id}|${unit}`;
+      const key = `${roll.ot}|${roll.prod_Id}|${roll.unidad}`;
       const group = groups.get(key);
-
       if (group) {
-        group.quantity += quantity;
+        group.quantity += roll.cantidadMostrar;
         group.rolls++;
       } else {
-        groups.set(key, { ot: roll.ot, prod_Id: roll.prod_Id, prod_Nombre: roll.prod_Nombre, unit, quantity, rolls: 1 });
+        groups.set(key, { key, ot: roll.ot, prod_Id: roll.prod_Id, prod_Nombre: roll.prod_Nombre, unit: roll.unidad, quantity: roll.cantidadMostrar, rolls: 1 });
       }
-      totals.set(unit, (totals.get(unit) ?? 0) + quantity);
     }
-
     this.consolidatedInfo = [...groups.values()];
-    this.consolidatedTotals = [...totals.entries()].map(([unit, quantity]) => ({ unit, quantity }));
   }
 
-  //Función para mostrar mensaje de confirmación de eliminación de rollos.
-  seeMsgElection() {
-    if (!this.form.valid) {
-      this.markInvalidFields();
-      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe llenar el motivo, la observación y el usuario que autoriza.`);
+  //Valida la autorización y abre la ventana de confirmación con el resumen de lo que se va a eliminar.
+  requestDelete() {
+    if (this.load || this.rollsInsert.length == 0) return;
+    if (this.authorization.invalid) {
+      this.authorization.markAllAsTouched();
+      Object.values(this.authorization.controls).forEach(control => control.markAsDirty());
+      this.authorizationElement?.nativeElement.querySelector<HTMLElement>('.ng-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe indicar quién autoriza, el motivo y la observación.`);
       return;
     }
-    this.svcMsg.add({severity:'warn', key:'delete', summary:'Elección', detail: `¿Está seguro que desea eliminar el/los ${this.rollsInsert.length} rollo(s) seleccionado(s)?`, sticky: true});
+
+    const { user, Falla, Observacion } = this.authorization.value;
+    this.confirmSummary = {
+      rolls: this.rollsInsert.length,
+      ots: new Set(this.rollsInsert.map(x => x.ot)).size,
+      totals: this.rollsInsertTotals,
+      authorizes: this.users.find(x => x.usua_Id == user)?.usua_Nombre ?? user,
+      fail: this.fails.find(x => x.falla_Id == Falla)?.falla_Nombre ?? Falla,
+      observation: Observacion.trim(),
+    };
+    this.confirmVisible = true;
   }
 
-  //Marca en rojo los campos obligatorios vacíos (como en el formulario de usuarios) y desplaza la vista hasta el primero.
-  private markInvalidFields() {
-    Object.values(this.form.controls).forEach(control => {
-      control.markAsDirty();
-      control.markAsTouched();
-    });
-    const firstInvalid = this.formElement?.nativeElement.querySelector<HTMLElement>('[formControlName].ng-invalid');
-    firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  //Elimina los rollos (una sola petición transaccional) y luego registra la observación en BagPro.
+  //Elimina los rollos (una sola petición transaccional) y luego marca los eliminados en BagPro.
   deleteRolls(){
-    this.onReject('delete');
-    if (this.load) return;
-    if (!this.form.valid) {
-      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos requeridos.`);
-      return;
-    }
+    if (this.load || this.authorization.invalid || this.rollsInsert.length == 0) return;
+    this.confirmVisible = false;
 
     this.load = true;
     const request = {
       rolls: this.rollsInsert.map(x => ({ roll: x.numeroRollo_BagPro, process: x.proceso_Id })),
-      fail: this.form.value.Falla,
-      observation: this.form.value.Observacion,
-      userAuthorize: this.form.value.user,
+      fail: this.authorization.value.Falla,
+      observation: this.authorization.value.Observacion.trim(),
+      userAuthorize: this.authorization.value.user,
       userDelete: this.storage_Id,
     };
 
@@ -296,26 +348,35 @@ export class EliminarRollos_ProduccionComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: ({ deleted, notFound, bagProError }) => {
         if (bagProError) {
+          this.addPendingBagPro(deleted);
           this.svcMsjs.mensajeErrorDetallado(
-            `Se eliminaron ${deleted.length} rollo(s), pero no se pudo registrar la observación en BagPro.`,
-            this.errorDetail(bagProError, 'BagPro', 'Registrar observación de rollos eliminados', 'POST',
-              this.rollsListing('Rollos eliminados sin observación en BagPro', deleted)),
+            `Se eliminaron ${deleted.length} rollo(s), pero no se pudieron marcar en BagPro. Use "Reintentar BagPro".`,
+            this.errorDetail(bagProError, 'BagPro', 'Marcar rollos eliminados en BagPro', 'POST',
+              this.rollsListing('Rollos eliminados sin marca en BagPro', deleted)),
             20000);
         } else if (notFound.length > 0) {
-          const notFoundRolls = deleted.filter(x => notFound.includes(x.roll));
           this.svcMsjs.mensajeErrorDetallado(
             `Se eliminaron ${deleted.length} rollo(s), pero ${notFound.length} no se encontraron en BagPro.`,
-            { api: 'BagPro', operacion: 'Registrar observación de rollos eliminados', statusText: 'Rollos no encontrados en BagPro',
-              conInternet: navigator.onLine, fecha: moment().format('YYYY-MM-DD HH:mm:ss'),
-              listado: this.rollsListing('Rollos no encontrados en BagPro', notFoundRolls) },
+            this.notFoundDetail('Marcar rollos eliminados en BagPro', deleted.filter(x => notFound.includes(x.roll))),
             20000);
         } else {
           this.svcMsjs.mensajeConfirmacion(`OK!`, `${deleted.length} rollo(s) eliminado(s) con éxito!`);
         }
-        this.clearAll();
+        this.afterDelete();
       },
       error: (error : HttpErrorResponse) => this.handleDeleteError(error, request.rolls),
     });
+  }
+
+  //Tras eliminar: vacía la tabla de rollos a eliminar y la autorización (cada solicitud tiene su propio motivo y autorizador).
+  //Los filtros y la tabla de disponibles se conservan para seguir trabajando con la misma consulta.
+  private afterDelete() {
+    this.rollsInsert = [];
+    this.searchRolls2 = '';
+    this.dt2?.reset();
+    this.authorization.reset();
+    this.confirmSummary = null;
+    this.afterMove();
   }
 
   //Muestra el error con "Ver detalles" y la lista de rollos que no se eliminaron con su OT.
@@ -332,8 +393,73 @@ export class EliminarRollos_ProduccionComponent implements OnInit, OnDestroy {
       detail.listado!.titulo = 'Rollos no disponibles (se quitaron de la tabla)';
       this.svcMsjs.mensajeErrorDetallado(`${notAvailable.length} rollo(s) ya no están disponibles. No se eliminó ningún rollo, intente de nuevo.`, detail, 20000);
     } else {
-      this.svcMsjs.mensajeErrorDetallado(`No fue posible eliminar los rollos. No se eliminó ninguno.`, detail, 20000);
+      this.svcMsjs.mensajeErrorDetallado(MensajesAplicacionService.mensajeAmigable(error, `No fue posible eliminar los rollos. No se eliminó ninguno.`, 'Plasticaribe'), detail, 20000);
     }
+  }
+
+  //Vuelve a marcar en BagPro solo los rollos que quedaron pendientes. Es seguro repetirlo: solo vuelve a escribir el mismo texto.
+  retryBagPro() {
+    if (this.load || this.pendingBagPro.length == 0) return;
+    const pending = [...this.pendingBagPro];
+
+    this.load = true;
+    this.svBagPro.putObservationDeletedRolls2(pending.map(x => ({ roll: x.roll, process: x.process })))
+      .pipe(finalize(() => this.load = false))
+      .subscribe({
+        next: result => {
+          //Los no encontrados en BagPro no se arreglan reintentando: se informan y salen de la lista.
+          this.savePendingBagPro([]);
+          const updated = result.updatedExtrusion + result.updatedSellado;
+          if (result.notFound.length > 0) {
+            this.svcMsjs.mensajeErrorDetallado(
+              `Se marcaron ${updated} rollo(s) en BagPro; ${result.notFound.length} no se encontraron.`,
+              this.notFoundDetail('Reintentar marca de rollos eliminados en BagPro', pending.filter(x => result.notFound.includes(x.roll))),
+              20000);
+          } else {
+            this.svcMsjs.mensajeConfirmacion(`OK!`, `Se marcaron ${updated} rollo(s) eliminado(s) en BagPro.`, 6000);
+          }
+        },
+        error: error => this.svcMsjs.mensajeErrorDetallado(
+          MensajesAplicacionService.mensajeAmigable(error, `No fue posible marcar los rollos en BagPro. Siguen pendientes.`, 'BagPro'),
+          this.errorDetail(error, 'BagPro', 'Reintentar marca de rollos eliminados en BagPro', 'POST',
+            this.rollsListing('Rollos pendientes de marca en BagPro', pending)),
+          20000),
+      });
+  }
+
+  //Agrega a los pendientes de BagPro los rollos eliminados (con su OT, que se toma de la tabla antes de vaciarla).
+  private addPendingBagPro(deleted : rollsToDelete[]) {
+    const byKey = new Map(this.rollsInsert.map(x => [x.key, x]));
+    const current = new Set(this.pendingBagPro.map(x => rollKey({ numeroRollo_BagPro: x.roll, proceso_Id: x.process })));
+    const added = deleted
+      .filter(x => !current.has(rollKey({ numeroRollo_BagPro: x.roll, proceso_Id: x.process })))
+      .map(x => {
+        const row = byKey.get(rollKey({ numeroRollo_BagPro: x.roll, proceso_Id: x.process }));
+        return { roll: x.roll, process: x.process, ot: row?.ot, processName: row?.proceso_Nombre };
+      });
+    this.savePendingBagPro([...this.pendingBagPro, ...added]);
+  }
+
+  private get pendingKey() : string {
+    return `${CLAVE_PENDIENTES_BAGPRO}-${this.storage_Id}`;
+  }
+
+  //Lee los pendientes de BagPro guardados en el navegador (si el almacenamiento no está disponible, empieza vacío).
+  private loadPendingBagPro() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(this.pendingKey) ?? '[]');
+      this.pendingBagPro = Array.isArray(saved) ? saved : [];
+    } catch {
+      this.pendingBagPro = [];
+    }
+  }
+
+  private savePendingBagPro(pending : pendingBagProRoll[]) {
+    this.pendingBagPro = pending;
+    try {
+      if (pending.length > 0) localStorage.setItem(this.pendingKey, JSON.stringify(pending));
+      else localStorage.removeItem(this.pendingKey);
+    } catch { }
   }
 
   //Arma el detalle técnico del error para la ventana "Ver detalles".
@@ -341,95 +467,69 @@ export class EliminarRollos_ProduccionComponent implements OnInit, OnDestroy {
     return { ...MensajesAplicacionService.detalleDeError(error, { api, operacion, metodo }), listado };
   }
 
+  //Detalle para los rollos que BagPro no encontró (no es un error HTTP, sino rollos que no existen allá).
+  private notFoundDetail(operacion : string, rolls : rollReference[]) : DetalleError {
+    return {
+      api: 'BagPro', operacion, statusText: 'Rollos no encontrados en BagPro',
+      conInternet: navigator.onLine, fecha: moment().format('YYYY-MM-DD HH:mm:ss'),
+      listado: this.rollsListing('Rollos no encontrados en BagPro', rolls),
+    };
+  }
+
   //Tabla de rollos (N° rollo, OT, proceso) para la ventana "Ver detalles". Toma la OT de la tabla de rollos a eliminar si no viene.
-  private rollsListing(titulo : string, rolls : { roll : number, process : string, ot? : number }[]) : ListadoDetalleError {
+  private rollsListing(titulo : string, rolls : rollReference[]) : ListadoDetalleError {
     const byKey = new Map(this.rollsInsert.map(x => [x.key, x]));
     return {
       titulo,
       columnas: ['N° Rollo', 'OT', 'Proceso'],
       filas: rolls.map(x => {
         const row = byKey.get(rollKey({ numeroRollo_BagPro: x.roll, proceso_Id: x.process }));
-        return [x.roll, x.ot ?? row?.ot, row?.proceso_Nombre ?? x.process];
+        return [x.roll, x.ot ?? row?.ot, x.processName ?? row?.proceso_Nombre ?? x.process];
       }),
     };
   }
 
-  //TEMPORAL: reenvía a BagPro la observación de los rollos eliminados en el rango de fechas del formulario
-  //(para los que quedaron sin observación por el error de BagPro). Es seguro repetirlo: solo vuelve a escribir el mismo texto.
-  resendBagProObservation() {
-    if (this.load || !this.isAdmin) return;
-    const [start, end] = this.form.value.RangoFechas ?? [];
-    const date1 = start ? moment(start).format('YYYY-MM-DD') : this.today;
-    const date2 = end ? moment(end).format('YYYY-MM-DD') : date1;
-    let pending : { roll : number, process : string, ot : number }[] = [];
-
-    this.load = true;
-    this.svDiscardRolls.getDeletedRollsForBagPro(date1, date2).pipe(
-      switchMap(rolls => {
-        pending = rolls;
-        return rolls.length == 0 ? of(null) : this.svBagPro.putObservationDeletedRolls2(rolls.map(x => ({ roll: x.roll, process: x.process })));
-      }),
-      finalize(() => this.load = false),
-    ).subscribe({
-      next: result => {
-        if (!result) return this.svcMsjs.mensajeInformacion(`Sin rollos`, `No hay rollos eliminados entre ${date1} y ${date2}.`, 6000);
-        const updated = result.updatedExtrusion + result.updatedSellado;
-        if (result.notFound.length > 0) {
-          this.svcMsjs.mensajeErrorDetallado(
-            `Se actualizó la observación de ${updated} rollo(s) en BagPro; ${result.notFound.length} no se encontraron.`,
-            { api: 'BagPro', operacion: 'Reenviar observación de rollos eliminados', statusText: 'Rollos no encontrados en BagPro',
-              conInternet: navigator.onLine, fecha: moment().format('YYYY-MM-DD HH:mm:ss'),
-              listado: this.rollsListing('Rollos no encontrados en BagPro', pending.filter(x => result.notFound.includes(x.roll))) },
-            20000);
-        } else {
-          this.svcMsjs.mensajeConfirmacion(`OK!`, `Se actualizó la observación de ${updated} rollo(s) en BagPro (${date1} a ${date2}).`, 6000);
-        }
-      },
-      error: error => this.svcMsjs.mensajeErrorDetallado(
-        `No fue posible reenviar la observación a BagPro.`,
-        this.errorDetail(error, pending.length ? 'BagPro' : 'Plasticaribe', 'Reenviar observación de rollos eliminados', pending.length ? 'POST' : 'GET',
-          this.rollsListing('Rollos pendientes de observación en BagPro', pending)),
-        20000),
-    });
-  }
-
-  //Función para filtrar la tabla de rollos consultados.
-  applyFilter = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-
-  //Función para filtrar la tabla de rollos a eliminar.
-  applyFilter2 = ($event, campo : any, valorCampo : string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-
-  //Función para limpiar los campos de filtros.
-  clearLabels() {
-    this.form.reset();
+  //Limpia solo los filtros de la consulta: las tablas y la autorización se conservan.
+  clearFilters() {
+    this.filters.reset();
     this.loadRankDates();
   }
 
-  //Función para limpiar todo
+  //Limpia filtros, tablas, buscadores y autorización.
   clearAll() {
-    this.form.reset();
+    this.clearFilters();
+    this.authorization.reset();
     this.rolls = [];
     this.rollsInsert = [];
-    this.rollsTableSelection = [];
-    this.rollsInsertTableSelection = [];
-    this.consolidatedInfo = [];
-    this.consolidatedTotals = [];
-    this.loadRankDates();
+    this.searchRolls1 = '';
+    this.searchRolls2 = '';
+    this.dt1?.reset();
+    this.dt2?.reset();
+    this.afterMove();
   }
-
-  //Función para cerrar el dialogo de elección.
-  onReject = (key : any) => this.svcMsg.clear(key);
 }
 
 //Llave única de un rollo: el número de BagPro se puede repetir entre ProcExtrusion y ProcSellado.
 const rollKey = (x : { numeroRollo_BagPro : number, proceso_Id : string }) => `${x.numeroRollo_BagPro}|${x.proceso_Id}`;
 
-const isUnits = (roll : rollRow) => ['Paquete', 'Und'].includes(roll.presentacion) && roll.proceso_Id == 'SELLA';
+//Suma de cantidades por unidad (Kg, Und, Paquete).
+const totalsByUnit = (rolls : rollRow[]) : unitTotal[] => {
+  const totals = new Map<string, number>();
+  for (const roll of rolls) totals.set(roll.unidad, (totals.get(roll.unidad) ?? 0) + roll.cantidadMostrar);
+  return [...totals.entries()].map(([unit, quantity]) => ({ unit, quantity }));
+};
 
 export interface rollsToDelete {
   roll : number;
   process : string;
 }
+
+interface rollReference extends rollsToDelete {
+  ot? : number;
+  processName? : string;
+}
+
+interface pendingBagProRoll extends rollReference { }
 
 interface rollRow {
   key : string;
@@ -441,17 +541,34 @@ interface rollRow {
   proceso_Id : string;
   proceso_Nombre : string;
   fecha : string;
+  fechaTexto : string;
   presentacion : string;
   peso_Neto : number;
   cantidad : number;
-  [field : string] : any;
+  cantidadMostrar : number;
+  unidad : string;
+}
+
+interface unitTotal {
+  unit : string;
+  quantity : number;
 }
 
 interface consolidatedRow {
+  key : string;
   ot : number;
   prod_Id : number;
   prod_Nombre : string;
   unit : string;
   quantity : number;
   rolls : number;
+}
+
+interface confirmSummary {
+  rolls : number;
+  ots : number;
+  totals : unitTotal[];
+  authorizes : string;
+  fail : string;
+  observation : string;
 }

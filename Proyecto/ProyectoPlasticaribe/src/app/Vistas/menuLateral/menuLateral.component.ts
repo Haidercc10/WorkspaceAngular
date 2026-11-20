@@ -97,7 +97,9 @@ export class MenuLateralComponent implements OnInit {
     this.vistasFavService.misFavoritos$,
     this.vistasFavService.disponiblesSinError(),
   ]).pipe(takeUntilDestroyed()).subscribe(([, { favoritos }, disponibles]) => {
-    this.vistaActual = VistasFavoritasService.vistaDeUrl(this.router?.url ?? location.pathname, disponibles);
+    const url = this.router?.url ?? location.pathname;
+    // Inicio ya es un acceso rápido fijo: en esa página no se muestra la estrella.
+    this.vistaActual = VistasFavoritasService.esInicio(url) ? null : VistasFavoritasService.vistaDeUrl(url, disponibles);
     this.esFavorita = !!this.vistaActual && favoritos.some(f => f.id === this.vistaActual!.id);
   });
 

@@ -31,6 +31,15 @@ export interface MisFavoritos {
 })
 export class VistasFavoritasService {
 
+  /** Página de inicio: siempre es el primer acceso rápido, por eso no se puede agregar ni quitar con la estrella. */
+  static readonly RUTA_INICIO = '/home';
+
+  /** Indica si la URL es la página de inicio (o una subruta de ella). */
+  static esInicio = (url : string) : boolean => {
+    const ruta = VistasFavoritasService.normalizarRuta(url);
+    return ruta === VistasFavoritasService.RUTA_INICIO || ruta.startsWith(`${VistasFavoritasService.RUTA_INICIO}/`);
+  }
+
   private readonly ruta = `${environment.rutaPlasticaribeAPI}/VistasFavoritas`;
 
   private readonly estado = new BehaviorSubject<MisFavoritos>({ limite: 7, favoritos: [] });

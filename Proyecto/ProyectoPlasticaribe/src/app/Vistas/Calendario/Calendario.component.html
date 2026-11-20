@@ -44,7 +44,7 @@
 
     <div class="campo">
       <label for="nombreEvento">Nombre <span class="obligatorio" *ngIf="modo != 'ver'">*</span></label>
-      <input id="nombreEvento" type="text" pInputText formControlName="nombre" [maxlength]="maxNombre"
+      <input id="nombreEvento" type="text" pInputText formControlName="nombre" [maxlength]="maxNombre" appContadorCaracteres
              placeholder="Ej.: Reunión de producción" [class.ng-dirty]="campoInvalido('nombre')"/>
       <small class="error" *ngIf="campoInvalido('nombre')">El nombre es obligatorio.</small>
     </div>
@@ -94,8 +94,7 @@
     <div class="campo">
       <label for="descripcionEvento">Descripción</label>
       <textarea id="descripcionEvento" pInputTextarea formControlName="descripcion" [rows]="4" [autoResize]="true"
-                [maxlength]="maxDescripcion" placeholder="Detalles, lugar, participantes…"></textarea>
-      <small class="contador" *ngIf="modo != 'ver'">{{ (form.value.descripcion || '').length }}/{{ maxDescripcion }}</small>
+                [maxlength]="maxDescripcion" appContadorCaracteres placeholder="Detalles, lugar, participantes…"></textarea>
     </div>
   </form>
 

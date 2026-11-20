@@ -176,6 +176,12 @@ export class DevolucionesCalidadComponent {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  //Falla creada desde el modal: lo cierra y recarga la lista de fallas.
+  failCreated() {
+    this.modalFails = false;
+    this.getFails();
+  }
+
   //
   getFails = () =>  this.svFails.srvObtenerLista().subscribe(datos => { this.fails = datos.filter((item) => [14].includes(item.tipoFalla_Id)) });
   
