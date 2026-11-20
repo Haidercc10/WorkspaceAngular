@@ -15,17 +15,39 @@
   <link rel="manifest" href="manifest.beta.json">
   <meta name="theme-color" content="#131f4c">
   <link rel="apple-touch-icon" href="assets/PWA/icono-180.png">
-  <!-- Tema de PrimeNG (claro u oscuro). Se elige aquí, antes del primer pintado, según la preferencia guardada
-       (cookie "theme", la misma que lee AppComponent.mostrar()): así la página no se muestra primero en claro y luego cambia a
-       oscuro cuando arranca Angular. Se escribe con document.write para que el navegador espere este CSS antes de pintar. -->
+  <!-- Apariencia inicial: tema de PrimeNG y tamaño de letra. Se eligen aquí, antes del primer pintado, según las
+       preferencias guardadas, para que la página no se vea primero de una forma y luego cambie cuando arranca Angular.
+       Deben seguir las mismas reglas que TemaService y TamanoLetraService:
+       - Cookie "theme": light | dark | system ("system" sigue el tema del sistema operativo). El CSS se escribe con
+         document.write para que el navegador lo espere antes de pintar.
+       - Cookie "tamanoLetraPct": 80 | 90 | 100 | 110 | 125. --font-size = 0.9 × porcentaje / 100. Si no existe, se
+         convierte la cookie antigua "TamanoLetra" (multiplicador directo) al nivel más cercano. -->
   <script>
     (function () {
+      function leerCookie(nombre) {
+        var cookie = document.cookie.match(new RegExp('(?:^|;\\s*)' + nombre + '=([^;]*)'));
+        return cookie ? decodeURIComponent(cookie[1]) : '';
+      }
+
       var tema = 'light';
       try {
-        var cookie = document.cookie.match(/(?:^|;\s*)theme=([^;]*)/);
-        if (cookie && decodeURIComponent(cookie[1]) === 'dark') tema = 'dark';
+        var preferencia = leerCookie('theme');
+        if (preferencia === 'dark') tema = 'dark';
+        else if (preferencia === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) tema = 'dark';
       } catch (e) { }
       document.write('<link id="app-theme" href="lara-' + tema + '-blue.css" rel="stylesheet">');
+
+      try {
+        var niveles = [80, 90, 100, 110, 125];
+        var porcentaje = parseFloat(leerCookie('tamanoLetraPct'));
+        if (!isFinite(porcentaje)) {
+          var antigua = parseFloat(leerCookie('TamanoLetra'));
+          porcentaje = isFinite(antigua) && antigua > 0 ? antigua / 0.9 * 100 : 100;
+        }
+        var nivel = niveles[0];
+        for (var i = 1; i < niveles.length; i++) if (Math.abs(niveles[i] - porcentaje) < Math.abs(nivel - porcentaje)) nivel = niveles[i];
+        document.documentElement.style.setProperty('--font-size', String(+(0.9 * nivel / 100).toFixed(4)));
+      } catch (e) { }
     })();
   </script>
   <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css">-->

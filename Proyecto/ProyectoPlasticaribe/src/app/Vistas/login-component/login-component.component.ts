@@ -14,6 +14,8 @@ import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
 import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { MovimientosAplicacionService } from 'src/app/Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
+import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { PreferenciasUsuarioService } from 'src/app/Servicios/PreferenciasUsuario/PreferenciasUsuario.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
@@ -43,7 +45,8 @@ export class LoginComponentComponent implements OnInit {
   mostrarPass: boolean = false; // Variable para mostrar o ocultar la contraseña en el campo del formulario
   empresas: any[] = []; //  Variable para almacenar la información de las empresas que se mostrará en el combo box del formulario
   ipAddress: any; // Variable para almacenar la ip del usuario que inicia sesión
-  modoSeleccionado: boolean; //Variable para validar el tema seleccionado, si la variable es true estará en modo oscuro, si es false estará en modo claro
+  modoSeleccionado: boolean; // true = tema oscuro (ya resuelto si la preferencia es "Sistema"); cambia los logos
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro);
 
   /** Llave de localStorage del usuario recordado. Usa el prefijo `login:` para sobrevivir a la limpieza de TutorialesService. */
   static readonly CLAVE_USUARIO_RECORDADO = 'login:usuarioRecordado';
@@ -71,7 +74,8 @@ export class LoginComponentComponent implements OnInit {
     private cookiesServices: CookieService,
     private mensajeService: MensajesAplicacionService,
     private appComponent: AppComponent,
-    private http: HttpClient,) {
+    private http: HttpClient,
+    private preferenciasUsuario: PreferenciasUsuarioService,) {
 
     if (!this.storage.get('Token')) {
       TutorialesService.limpiarLocalStorageConservandoTutoriales();
@@ -79,10 +83,8 @@ export class LoginComponentComponent implements OnInit {
     if ((this.storage.get('Token')
       && this.storage.get('Token_BagPro')
       && this.storage.get('Token_Inv_Zeus')
-      && this.storage.get('Token_Conta_Zeus')) || localStorage.getItem('user')) this.router.navigate(['/home']);
+      && this.storage.get('Token_Conta_Zeus')) || sessionStorage.getItem('user')) this.router.navigate(['/home']);
 
-    window.localStorage.setItem('theme', this.cookiesServices.get('theme'));
-    this.modoSeleccionado = window.localStorage.getItem('theme') == 'dark' ? true : false;
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [null, Validators.required],
       Contrasena: [null, Validators.required],
@@ -96,6 +98,9 @@ export class LoginComponentComponent implements OnInit {
     this.cookiesServices.delete('MostrarEventosDia');
     TutorialesService.limpiarLocalStorageConservandoTutoriales();
     this.appComponent.ValidarRol = NaN;
+    // Red de seguridad para los cierres de sesión que no pasan por AuthenticationService.logout() (logout de las otras
+    // APIs, pestaña o navegador cerrados): el login siempre se ve con la apariencia por defecto (Claro y 100 %).
+    this.preferenciasUsuario.cerrarSesion();
     this.verificarConexion();
   }
 
@@ -258,6 +263,8 @@ export class LoginComponentComponent implements OnInit {
         this.saveInLocal('Nombre', this.encriptacion.encrypt(datos.usuario.toString()));
         this.saveInLocal('Rol', this.encriptacion.encrypt(datos.rolUsu_Id.toString()));
         this.guardarPreferenciaRecordarme();
+        // Se aplica antes de recargar para que index.html pinte /home ya con el tema y la letra del usuario (sin parpadeo)
+        this.preferenciasUsuario.iniciarSesion(datos.usua_Id);
         window.location.pathname = '/home';
       },
       error: (fallo: FalloLogin) => {
@@ -321,7 +328,7 @@ export class LoginComponentComponent implements OnInit {
   /** Borra los tokens que alcanzaron a guardarse si el inicio de sesión no se completó. */
   private limpiarSesionParcial() {
     ['Token', 'Token_Inv_Zeus', 'Token_Conta_Zeus', 'Token_BagPro', ''].forEach(clave => { try { this.storage.remove(clave); } catch { } });
-    ['user', 'user_Inv_Zeus', 'user_Conta_Zeus', 'user_BagPro', ''].forEach(clave => { try { localStorage.removeItem(clave); } catch { } });
+    ['user', 'user_Inv_Zeus', 'user_Conta_Zeus', 'user_BagPro'].forEach(clave => { try { sessionStorage.removeItem(clave); } catch { } });
   }
 }
 

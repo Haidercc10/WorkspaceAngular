@@ -4,6 +4,14 @@ import { Observable } from 'rxjs';
 import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { environment } from 'src/environments/environment';
 
+/** Vista del menú lateral (get_menu): si la vista está en varias categorías, llega una vez por cada una. */
+export interface OpcionMenuLateral {
+    categoria: string;
+    nombre: string;
+    icono: string;
+    ruta: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -30,6 +38,9 @@ export class Vistas_PermisosService {
     Get_Vistas_Rol = (rol : any, categoria : string) : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/Vistas_Permisos/get_vistas_rol/${rol}/${categoria}`);
 
     Get_By_Rol = (rol : any) : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/Vistas_Permisos/get_By_Rol/${rol}`);
+
+    /** Menú lateral del rol en una sola consulta: una fila por cada categoría de cada vista activa. */
+    GetMenu = (rol : any) : Observable<OpcionMenuLateral[]> => this.http.get<OpcionMenuLateral[]>(`${this.rutaPlasticaribeAPI}/Vistas_Permisos/get_menu/${rol}`);
 
     Post = (data : modelVistasPermisos) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Vistas_Permisos`, data);
 

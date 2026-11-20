@@ -62,7 +62,7 @@ export class ArchivosComponent implements OnInit {
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
-    !localStorage.getItem('user') ? this.modoInvitado = false : this.modoInvitado = true;
+    !sessionStorage.getItem('user') ? this.modoInvitado = false : this.modoInvitado = true;
 
     this.formularioArchivo = this.frmBuilder.group({
       catImagen: ['', Validators.required],

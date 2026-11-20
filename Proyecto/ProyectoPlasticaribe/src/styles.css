@@ -984,6 +984,17 @@ body.con-accesos-rapidos:not(:has(app-PaginaPrincipal)) {
   padding-bottom: var(--alto-accesos-rapidos);
 }
 
+/* Scroll bloqueado por un sidebar o diálogo con [blockScroll]: PrimeNG pone body.p-overflow-hidden y --scrollbar-width
+   (ancho de la barra que desaparece) y compensa el body con padding-right. Los elementos fijos no heredan ese padding,
+   así que se compensan aquí para que no se muevan hacia la derecha mientras el menú está abierto. */
+body.p-overflow-hidden app-menuLateral .navbar {
+  width: calc(100% - var(--scrollbar-width, 0px));
+}
+
+body.p-overflow-hidden app-VistasFavoritas .accesos-rapidos {
+  left: calc(50% - var(--scrollbar-width, 0px) / 2);
+}
+
 /* ==================== BOTONES ROJOS (p-button-danger) ====================
    PrimeNG trae su propio rojo (#EF4444 en claro, rosado pastel en oscuro). Aquí se usa el de la marca:
    rojo del logo de base y --rojoHover al pasar el mouse, en ambos temas.

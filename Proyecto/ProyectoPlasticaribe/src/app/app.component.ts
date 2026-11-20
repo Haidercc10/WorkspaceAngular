@@ -1,10 +1,10 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import moment from 'moment';
-import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { PrimeNGConfig } from 'primeng/api';
 import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
+import { TamanoLetraService } from './Servicios/TamanoLetra/TamanoLetra.service';
 import { TemaService } from './Servicios/Tema/Tema.service';
 import { User } from './_Models/user';
 import { User_BagPro } from './_Models/user_BagPro';
@@ -47,7 +47,6 @@ export class AppComponent implements OnInit {
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol !: any; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   rutaCarpetaArchivos: string = 'D:\\Calidad'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
-  tamanoLetra: number = 1;
   private destroy$ = new Subject<void>(); // Crear un Subject para controlar el ciclo de vida
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -55,11 +54,11 @@ export class AppComponent implements OnInit {
     private authenticationInvZeusService: AuthenticationService_InvZeus,
     private authenticationContaZeusService: authentication_ContaZeus,
     private authenticationBagProService: authentication_BagPro,
-    private cookieService: CookieService,
     private config: PrimeNGConfig,
     private encriptacion: EncriptacionService,
     @Inject(DOCUMENT) private document: Document,
     private temaService: TemaService,
+    private tamanoLetraService: TamanoLetraService, // se inyecta aquí para que el tamaño de letra se aplique al arrancar
     public mensajes: MensajesAplicacionService,) {
 
     this.authenticationService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user = x);
@@ -67,7 +66,6 @@ export class AppComponent implements OnInit {
     this.authenticationContaZeusService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user_ContaZeus = x);
     this.authenticationBagProService.user.pipe(takeUntil(this.destroy$)).subscribe(x => this.user_BagPro = x);
     this.inactividad();
-    this.mostrar();
   }
 
   /**
@@ -124,13 +122,6 @@ export class AppComponent implements OnInit {
   }
   //#endregion
 
-  /** Se mantiene por compatibilidad: el tema ya lo aplica TemaService al crearse. */
-  mostrar() { }
-
-  cambiar(estado: boolean) {
-    this.temaService.cambiar(estado);
-  }
-
   ngOnInit(): void {
     moment.locale('es');
     this.lecturaStorage();
@@ -180,29 +171,17 @@ export class AppComponent implements OnInit {
     this.storage_Nombre = this.encriptacion.decrypt(this.storage.get('Nombre') == undefined ? '' : this.storage.get('Nombre'));
     this.ValidarRol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
     this.storage_Rol = this.ValidarRol;
-    let tamanoLetraCambiado = this.cookieService.get('tamanoLetraCambiado');
-    if (tamanoLetraCambiado == '') this.cookieService.set('TamanoLetra', '0.90', { expires: 365, sameSite: 'Lax' });
-    this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra'));
-    if (this.tamanoLetra.toString() == 'NaN') this.tamanoLetra = 0.90;
-    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
-    this.cookieService.set('tamanoLetraCambiado', 'true', { expires: 365, sameSite: 'Lax' });
   }
 
-  //Funcion para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
+  /**
+   * Cierra la sesión cuando pasan 120 minutos sin actividad (mouse, teclado, toque o scroll) en esta pestaña.
+   * - Se usa addEventListener (no document.onclick = …) para no reemplazar otros manejadores de la página.
+   * - El scroll se escucha en fase de captura porque no burbujea: así cuenta también el de tablas y paneles internos.
+   * - En el login (/) no corre el contador: no hay sesión que cerrar.
+   */
   inactividad() {
-    let t: any;
-    let treintaMinutos: number = 7200000; // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos, 120 minutos son 7200000
-    window.onload = reiniciarTiempo;
-    document.onmousemove = reiniciarTiempo;
-    document.onkeypress = reiniciarTiempo;
-    document.onload = reiniciarTiempo;
-    document.onmousemove = reiniciarTiempo;
-    document.onmousedown = reiniciarTiempo;
-    document.ontouchstart = reiniciarTiempo;
-    document.onclick = reiniciarTiempo;
-    document.onscroll = reiniciarTiempo;
-    document.onkeypress = reiniciarTiempo;
+    const tiempoMaximoInactividadMs: number = 120 * 60 * 1000; // 120 minutos
+    let temporizador: ReturnType<typeof setTimeout> | undefined;
 
     const tiempoExcedido = () => {
       if (this.storage.get('Token')) this.authenticationService.logout();
@@ -210,13 +189,16 @@ export class AppComponent implements OnInit {
         this.storage.clear();
         window.location.pathname = '/';
       }
-    }
+    };
 
-    function reiniciarTiempo() {
-      let estadoConexion: boolean = window.navigator.onLine;
-      if (window.location.pathname != '/' || !estadoConexion) tiempoExcedido;
-      clearTimeout(t);
-      t = setTimeout(tiempoExcedido, treintaMinutos);
-    }
+    const reiniciarTiempo = () => {
+      clearTimeout(temporizador);
+      if (window.location.pathname === '/') return;
+      temporizador = setTimeout(tiempoExcedido, tiempoMaximoInactividadMs);
+    };
+
+    ['mousemove', 'mousedown', 'keydown', 'touchstart', 'click', 'scroll'].forEach(evento =>
+      this.document.addEventListener(evento, reiniciarTiempo, { capture: true, passive: true }));
+    reiniciarTiempo();
   }
 }

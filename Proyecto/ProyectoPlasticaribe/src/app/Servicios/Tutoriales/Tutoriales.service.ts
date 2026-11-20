@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import Step from 'shepherd.js/src/types/step';
 import { defaultStepOptions } from 'src/app/data';
+import { PreferenciasUsuarioService } from '../PreferenciasUsuario/PreferenciasUsuario.service';
 
 /**
  * Tutoriales guiados (Shepherd) reutilizables por cualquier módulo.
@@ -75,12 +76,15 @@ export class TutorialesService {
     });
   }
 
-  /** Prefijos de llaves que sobreviven a la limpieza: tutoriales vistos y preferencias del login ("Recuérdame"). */
-  private static readonly PREFIJOS_CONSERVADOS = [TutorialesService.PREFIJO_CLAVE, 'login:'];
+  /**
+   * Prefijos de llaves que sobreviven a la limpieza: tutoriales vistos, preferencias del login ("Recuérdame") y
+   * apariencia (tema y letra) de cada usuario.
+   */
+  private static readonly PREFIJOS_CONSERVADOS = [TutorialesService.PREFIJO_CLAVE, 'login:', PreferenciasUsuarioService.PREFIJO];
 
   /**
-   * Reemplazo de `localStorage.clear()` para login/logout: borra todo excepto las marcas de tutoriales vistos
-   * y el usuario recordado del login, así no se pierden cada vez que se inicia o cierra sesión.
+   * Reemplazo de `localStorage.clear()` para login/logout: borra todo excepto las marcas de tutoriales vistos,
+   * el usuario recordado del login y la apariencia de cada usuario, así no se pierden al iniciar o cerrar sesión.
    */
   static limpiarLocalStorageConservandoTutoriales() {
     try {

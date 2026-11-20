@@ -3,20 +3,13 @@
   <nav class="navbar">
     <div class="container-fluid">
       <div class="marcaBarra d-flex align-items-center">
-        <img class="logo2 cursor" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="" (click)="mostrarMenuLateral()">
+        <!-- El logo es el botón que abre el menú lateral (también con Enter o Espacio) -->
+        <img class="logo2 cursor" [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'"
+             alt="Abrir menú" role="button" tabindex="0" aria-haspopup="menu" [attr.aria-expanded]="display"
+             (click)="mostrarMenuLateral()" (keydown.enter)="mostrarMenuLateral()" (keydown.space)="$event.preventDefault(); mostrarMenuLateral()">
         <span class="badgeBeta ms-3" *ngIf="esBeta" pTooltip="Entorno de pruebas" tooltipPosition="bottom">BETA</span>
         <span class="versionApp versionBarra" [ngClass]="{'ms-2' : esBeta, 'ms-3' : !esBeta}" pTooltip="Versión de la aplicación" tooltipPosition="bottom">v{{ versionApp }}</span>
       </div>
-      <!--<p>
-        <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button >
-          <b>
-            <span class="font-size-18" [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">
-              <i class="pi pi-home font-size-20 px-2 py-3"></i>
-              Plasti<span class="colorRojo">caribe S.A.S</span>
-            </span>
-          </b>
-        </button>
-      </p>-->
       <div class="iconosBarra p-2 d-flex align-items-center">
         <button type="button" class="botonFavorito" *ngIf="vistaActual" (click)="alternarFavoritoActual()" [disabled]="guardandoFavorito"
                 [pTooltip]="esFavorita ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'" tooltipPosition="bottom"
@@ -46,15 +39,9 @@
     </div>
   </nav>
 
-  <!-- Boton de Configuración -->
-  <div class="botonFlotante">
-    <button type="button" (click)="configuracion()">
-      <i class="pi pi-cog"></i>
-    </button>
-  </div>
-
   <!-- Menú Principal -->
-  <p-sidebar [(visible)]="display" [style]="{width : '30rem', maxWidth : '100vw'}">
+  <p-sidebar [(visible)]="display" [blockScroll]="true" [style]="{width : '30rem', maxWidth : '100vw'}" ariaCloseLabel="Cerrar menú"
+             styleClass="sidebarMenu" (onShow)="enfocarBuscador()">
     <div class="imagen">
       <img [src]="!modoSeleccionado ? 'assets/PlasticaribeNewLogo2.png' : 'assets/PlasticaribeNewLogoWhite.png'" alt="Plasticaribe S.A.S">
       <div class="betaSidebar">
@@ -62,63 +49,53 @@
         <span class="versionApp">v{{ versionApp }}</span>
       </div>
     </div>
-    <br>
-    <p-panelMenu *ngIf="!cargando" [model]="categorias" [multiple]="true"></p-panelMenu>
-  </p-sidebar>
 
-  <!-- Menú de Configuraciones -->
-  <p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{maxWidth : 'min(30rem, 100vw)', minWidth : 'min(27rem, 100vw)'}">
-    <div class="escalabilidad">
-      <div class="mb-2">
-        <h4>Tamaño de Letra</h4>
-        <div class="iconos">
-          <button pButton pRipple type="button" icon="pi pi-minus" class="p-button-danger p-button-text" (click)="disminuirLetra()"></button>
-          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra1"></i>
-          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra2"></i>
-          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra3"></i>
-          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra4"></i>
-          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra5"></i>
-          <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-danger p-button-text" (click)="aumentarLetra()"></button>
+    <!-- Cargando: esqueleto con la forma de las opciones del menú -->
+    <div class="esqueletoMenu" *ngIf="cargando" aria-busy="true" aria-label="Cargando menú">
+      <div class="esqueletoOpcion" *ngFor="let ancho of ['45%', '70%', '60%', '80%', '55%', '75%', '65%', '50%']">
+        <p-skeleton shape="circle" size="1.5rem"></p-skeleton>
+        <p-skeleton [width]="ancho" height="1.1rem"></p-skeleton>
+      </div>
+    </div>
+
+    <!-- Error: el menú no se pudo consultar -->
+    <div class="errorMenu" *ngIf="!cargando && errorMenu" role="alert">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      <span>No se pudo cargar el menú.</span>
+      <button pButton pRipple type="button" label="Reintentar" icon="pi pi-refresh" class="p-button-danger p-button-outlined"
+              (click)="cargarMenuLateral(true)"></button>
+    </div>
+
+    <ng-container *ngIf="!cargando && !errorMenu">
+      <!-- Buscador: filtra las vistas de todas las categorías (queda fijo arriba al desplazar el menú) -->
+      <div class="buscadorMenu" role="search">
+        <div class="campoBusqueda">
+          <i class="pi pi-search" aria-hidden="true"></i>
+          <input #campoBuscarMenu type="text" class="campoBuscarMenu" placeholder="Buscar vista…" aria-label="Buscar vista en el menú"
+                 autocomplete="off" spellcheck="false" [value]="busquedaMenu" (input)="buscarEnMenu($any($event.target).value)"
+                 (keydown.enter)="abrirPrimerResultado()" (keydown.escape)="escapeEnBuscador($event)">
+          <button type="button" class="botonLimpiarBusqueda" *ngIf="busquedaMenu" (click)="limpiarBusqueda(); campoBuscarMenu.focus()"
+                  aria-label="Limpiar búsqueda">
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
         </div>
+        <small class="ayudaBusqueda" *ngIf="busquedaMenu.trim() && primerResultado" aria-live="polite">
+          {{ cantidadResultados }} {{ cantidadResultados == 1 ? 'vista' : 'vistas' }} · <kbd>Enter</kbd> abre «{{ primerResultado.label }}»
+        </small>
       </div>
-    </div>
 
-    <hr>
-
-    <div class="modo">
-      <div class="mb-2 switch">
-        <h4>Cambiar Tema</h4>
-        <input type="checkbox" id="darkmode-toggle" (change)="mostrar()" [(ngModel)]="modoSeleccionado"/>
-        <label class="colorMode" for="darkmode-toggle">
-          <svg version="1.1" class="sun" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 496 496" style="enable-background:new 0 0 496 496;" xml:space="preserve">
-            <rect x="152.994" y="58.921" transform="matrix(0.3827 0.9239 -0.9239 0.3827 168.6176 -118.5145)" width="40.001" height="16"/>
-            <rect x="46.9" y="164.979" transform="matrix(0.9239 0.3827 -0.3827 0.9239 71.29 -12.4346)" width="40.001" height="16"/>
-            <rect x="46.947" y="315.048" transform="matrix(0.9239 -0.3827 0.3827 0.9239 -118.531 50.2116)" width="40.001" height="16"/>
-            <rect x="164.966" y="409.112" transform="matrix(-0.9238 -0.3828 0.3828 -0.9238 168.4872 891.7491)" width="16" height="39.999"/>
-            <rect x="303.031" y="421.036" transform="matrix(-0.3827 -0.9239 0.9239 -0.3827 50.2758 891.6655)" width="40.001" height="16"/>
-            <rect x="409.088" y="315.018" transform="matrix(-0.9239 -0.3827 0.3827 -0.9239 701.898 785.6559)" width="40.001" height="16"/>
-            <rect x="409.054" y="165.011" transform="matrix(-0.9239 0.3827 -0.3827 -0.9239 891.6585 168.6574)" width="40.001" height="16"/>
-            <rect x="315.001" y="46.895" transform="matrix(0.9238 0.3828 -0.3828 0.9238 50.212 -118.5529)" width="16" height="39.999"/>
-            <path d="M248,88c-88.224,0-160,71.776-160,160s71.776,160,160,160s160-71.776,160-160S336.224,88,248,88z M248,392 c-79.4,0-144-64.6-144-144s64.6-144,144-144s144,64.6,144,144S327.4,392,248,392z"/>
-            <rect x="240" width="16" height="72"/>
-            <rect x="62.097" y="90.096" transform="matrix(0.7071 0.7071 -0.7071 0.7071 98.0963 -40.6334)" width="71.999" height="16"/>
-            <rect y="240" width="72" height="16"/>
-            <rect x="90.091" y="361.915" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 -113.9157 748.643)" width="16" height="71.999"/>
-            <rect x="240" y="424" width="16" height="72"/>
-            <rect x="361.881" y="389.915" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 397.8562 960.6281)" width="71.999" height="16"/>
-            <rect x="424" y="240" width="72" height="16"/>
-            <rect x="389.911" y="62.091" transform="matrix(0.7071 0.7071 -0.7071 0.7071 185.9067 -252.6357)" width="16" height="71.999"/>
-          </svg>
-          <svg version="1.1" class="moon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 49.739 49.739" style="enable-background:new 0 0 49.739 49.739;" xml:space="preserve">
-            <path d="M25.068,48.889c-9.173,0-18.017-5.06-22.396-13.804C-3.373,23.008,1.164,8.467,13.003,1.979l2.061-1.129l-0.615,2.268 c-1.479,5.459-0.899,11.25,1.633,16.306c2.75,5.493,7.476,9.587,13.305,11.526c5.831,1.939,12.065,1.492,17.559-1.258v0 c0.25-0.125,0.492-0.258,0.734-0.391l2.061-1.13l-0.585,2.252c-1.863,6.873-6.577,12.639-12.933,15.822 C32.639,48.039,28.825,48.888,25.068,48.889z M12.002,4.936c-9.413,6.428-12.756,18.837-7.54,29.253 c5.678,11.34,19.522,15.945,30.864,10.268c5.154-2.582,9.136-7.012,11.181-12.357c-5.632,2.427-11.882,2.702-17.752,0.748 c-6.337-2.108-11.473-6.557-14.463-12.528C11.899,15.541,11.11,10.16,12.002,4.936z"/>
-          </svg>
-        </label>
+      <div class="sinResultados" *ngIf="busquedaMenu.trim() && cantidadResultados == 0" role="status">
+        <i class="pi pi-search" aria-hidden="true"></i>
+        <span>No hay vistas que coincidan con «{{ busquedaMenu.trim() }}».</span>
       </div>
-    </div>
+
+      <!-- Una categoría abierta a la vez (al abrir otra se cierra la anterior); al buscar, todas las que tienen resultados salen abiertas -->
+      <p-panelMenu [model]="modeloMenu" [multiple]="false" styleClass="menuPrincipal"></p-panelMenu>
+    </ng-container>
   </p-sidebar>
 
   <!-- Menú de Usuario -->
-  <p-sidebar [(visible)]="menuUsuario" position="right" styleClass="sidebarUsuario" [style]="{maxWidth : 'min(30rem, 100vw)', minWidth : 'min(27rem, 100vw)'}"
+  <p-sidebar [(visible)]="menuUsuario" position="right" [blockScroll]="true" styleClass="sidebarUsuario" [style]="{maxWidth : 'min(30rem, 100vw)', minWidth : 'min(27rem, 100vw)'}"
              ariaCloseLabel="Cerrar menú de usuario">
     <div class="menuUsuario">
       <!-- Encabezado: quién tiene la sesión abierta -->
@@ -193,6 +170,52 @@
         </p-accordionTab>
       </p-accordion>
 
+      <!-- Apariencia: bloque fijo (no va en el acordeón) para cambiar tema y letra con dos clics: avatar → opción.
+           Botones nativos con aria-pressed en lugar de p-selectButton, para no heredar los ::ng-deep de otras vistas. -->
+      <section class="apariencia" aria-labelledby="tituloApariencia">
+        <div class="encabezadoSeccion tituloApariencia" id="tituloApariencia">
+          <i class="pi pi-palette"></i>
+          <span>Apariencia</span>
+        </div>
+
+        <!-- Tema -->
+        <div class="grupoApariencia">
+          <div class="etiquetaApariencia">
+            <span id="etiquetaTema">Tema</span>
+            <span class="ayudaApariencia" *ngIf="preferenciaTema === 'system'">Ahora: {{ modoSeleccionado ? 'oscuro' : 'claro' }}</span>
+          </div>
+          <div class="selectorSegmentado" role="group" aria-labelledby="etiquetaTema">
+            <button type="button" *ngFor="let opcion of opcionesTema" class="opcionSegmentada"
+                    [class.activa]="preferenciaTema === opcion.valor" [attr.aria-pressed]="preferenciaTema === opcion.valor"
+                    [pTooltip]="opcion.ayuda" tooltipPosition="top" (click)="cambiarPreferenciaTema(opcion.valor)">
+              <i class="pi" [ngClass]="opcion.icono" aria-hidden="true"></i>
+              <span>{{ opcion.etiqueta }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tamaño de letra -->
+        <div class="grupoApariencia">
+          <div class="etiquetaApariencia">
+            <span id="etiquetaLetra">Tamaño de letra</span>
+            <button type="button" class="botonRestablecer" *ngIf="!letraPredeterminada" (click)="restablecerLetra()"
+                    pTooltip="Ctrl + Alt + 0" tooltipPosition="top">
+              <i class="pi pi-replay" aria-hidden="true"></i>
+              <span>Restablecer</span>
+            </button>
+          </div>
+          <div class="selectorSegmentado" role="group" aria-labelledby="etiquetaLetra">
+            <button type="button" *ngFor="let nivel of nivelesLetra" class="opcionSegmentada opcionLetra"
+                    [class.activa]="porcentajeLetra === nivel" [attr.aria-pressed]="porcentajeLetra === nivel"
+                    [attr.aria-label]="nivel + ' %'" (click)="cambiarTamanoLetra(nivel)">
+              <span class="muestraLetra" [style.font-size.rem]="nivel / 100 * 1.15" aria-hidden="true">A</span>
+              <span class="porcentajeLetra" aria-hidden="true">{{ nivel }}%</span>
+            </button>
+          </div>
+          <small class="ayudaApariencia">Atajo: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>+</kbd> / <kbd>−</kbd></small>
+        </div>
+      </section>
+
       <!-- Cerrar Sesión: es una acción, no una sección, por eso va como botón al pie (sin confirmación) -->
       <div class="pieMenuUsuario">
         <button pButton pRipple type="button" label="Cerrar sesión" icon="pi pi-power-off"
@@ -200,6 +223,12 @@
       </div>
     </div>
   </p-sidebar>
+
+  <!-- Aviso breve al cambiar la letra con el atajo de teclado (el menú está cerrado y no se ve el porcentaje) -->
+  <div class="avisoLetra" *ngIf="avisoLetraVisible" role="status">
+    <i class="pi pi-search-plus" aria-hidden="true"></i>
+    Tamaño de letra: {{ porcentajeLetra }} %
+  </div>
 
   <!-- Modal de Calendario -->
   <p-dialog [(visible)]="modalCalendario" [style]="{width: '92vw', maxWidth: '1300px'}" [breakpoints]="{'900px': '100vw'}"

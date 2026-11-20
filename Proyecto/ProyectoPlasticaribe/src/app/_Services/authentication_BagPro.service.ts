@@ -22,7 +22,7 @@ export class authentication_BagPro {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private encriptacion : EncriptacionService,) {
 
-    let token = this.encriptacion.decrypt(localStorage.getItem('user_BagPro') ?? '')
+    let token = this.encriptacion.decrypt(sessionStorage.getItem('user_BagPro') ?? '')
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }
@@ -38,14 +38,14 @@ export class authentication_BagPro {
     let datos : any = { "Id_Usuario" : 1234568879, "Contrasena" : "123456879", }
     return this.http.post<any>(`${this.rutaBagPro}/Authentication/login`, datos).pipe(map(user => {
       this.saveInLocal('Token_BagPro', this.encriptacion.encrypt(user.token));
-      localStorage.setItem('user_BagPro', this.encriptacion.encrypt(JSON.stringify(user)));
+      sessionStorage.setItem('user_BagPro', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);
       return user;
     }));
   }
 
   logout() {
-    localStorage.removeItem('user_BagPro');
+    sessionStorage.removeItem('user_BagPro');
     this.storage.clear();
     this.userSubject.next(null);
     this.router.navigate(['/']);

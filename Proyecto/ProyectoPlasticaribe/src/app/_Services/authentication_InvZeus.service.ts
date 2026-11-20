@@ -21,7 +21,7 @@ export class AuthenticationService_InvZeus {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private encriptacion : EncriptacionService,) {
 
-    let token = this.encriptacion.decrypt(localStorage.getItem('user_Inv_Zeus') ?? '')
+    let token = this.encriptacion.decrypt(sessionStorage.getItem('user_Inv_Zeus') ?? '')
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }
@@ -39,16 +39,14 @@ export class AuthenticationService_InvZeus {
     let datos : any = { "Id_Usuario" : 123456798, "Contrasena" : "", }
     return this.http.post<any>(`${this.rutaZeus}/Authentication/login`, datos).pipe(map(user => {
       this.saveInLocal('Token_Inv_Zeus', this.encriptacion.encrypt(user.token));
-      localStorage.setItem('user_Inv_Zeus', this.encriptacion.encrypt(JSON.stringify(user)));
-      this.saveInLocal('', user.token);
-      localStorage.setItem('', JSON.stringify(user));
+      sessionStorage.setItem('user_Inv_Zeus', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);
       return user;
     }));
   }
 
   logout() {
-    localStorage.removeItem('user_Inv_Zeus');
+    sessionStorage.removeItem('user_Inv_Zeus');
     this.storage.clear();
     this.userSubject.next(null);
     this.router.navigate(['/']);

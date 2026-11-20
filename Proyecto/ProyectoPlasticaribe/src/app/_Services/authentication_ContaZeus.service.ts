@@ -21,7 +21,7 @@ export class authentication_ContaZeus {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private encriptacion : EncriptacionService,) {
 
-    let token = this.encriptacion.decrypt(localStorage.getItem('user_Conta_Zeus') ?? '');
+    let token = this.encriptacion.decrypt(sessionStorage.getItem('user_Conta_Zeus') ?? '');
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }
@@ -39,14 +39,14 @@ export class authentication_ContaZeus {
     let datos : any = { "Id_Usuario" : 123456987, "Contrasena" : "123456987", }
     return this.http.post<any>(`${this.rutaZeusContabilidad}/Authentication/login`, datos).pipe(map(user => {
       this.saveInLocal('Token_Conta_Zeus', this.encriptacion.encrypt(user.token));
-      localStorage.setItem('user_Conta_Zeus', this.encriptacion.encrypt(JSON.stringify(user)));
+      sessionStorage.setItem('user_Conta_Zeus', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);
       return user;
     }));
   }
 
   logout() {
-    localStorage.removeItem('user_Conta_Zeus');
+    sessionStorage.removeItem('user_Conta_Zeus');
     this.storage.clear();
     this.userSubject.next(null);
     this.router.navigate(['/']);

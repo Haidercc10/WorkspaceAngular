@@ -1,34 +1,50 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, OnInit, ViewChild, inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDrawerMode } from '@angular/material/sidenav';
+import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild, inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
 import { EventoCalendario, EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
+import { OpcionMenuLateral, Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
 import { CorreosWebService } from 'src/app/Servicios/CorreosWeb/CorreosWeb.service';
 import { environment } from 'src/environments/environment';
 import { VERSION_APP } from 'src/environments/version';
-import { TemaService, alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { PreferenciaTema, TemaService, alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { TamanoLetraService } from 'src/app/Servicios/TamanoLetra/TamanoLetra.service';
+import { PreferenciasUsuarioService } from 'src/app/Servicios/PreferenciasUsuario/PreferenciasUsuario.service';
 import { VistaFavorita, VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd } from '@angular/router';
 import { combineLatest, filter, fromEvent, interval, merge, startWith, switchMap, throttleTime } from 'rxjs';
 import { DestroyRef } from '@angular/core';
+import { CantidadesTickets, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
+import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 
 /** Cada cuánto se refrescan los contadores de la barra superior mientras la pestaña está visible. */
 const REFRESCO_CONTADORES_MS = 5 * 60 * 1000;
 /** Llave de sessionStorage: el aviso de eventos del día ya se mostró en esta sesión (el logout limpia sessionStorage). */
 const LLAVE_AVISO_EVENTOS_DIA = 'avisoEventosDiaMostrado';
-import { CantidadesTickets, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
-import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
+
+/** Categorías que no se muestran como panel: Inicio, Pruebas y Vistas van como enlaces directos al tope del menú. */
+const CATEGORIAS_ENLACE_DIRECTO = ['Inicio', 'Pruebas', 'Vistas'];
+/** Roles que ven "Inventario Areas" dentro de Materia Prima (los demás solo la ven en Productos). */
+const ROLES_INVENTARIO_AREAS_MP = [1, 3, 7, 61, 85, 63, 89, 62, 4, 88, 12, 2, 104];
+/** Usuario que ve "Pruebas" y "Vistas" (a propósito por usuario, no por rol). */
+const USUARIO_VISTAS_PRUEBAS = 123456789;
+/** Usuario que no ve "Sistema de Gestión" en Calidad (a propósito por usuario, no por rol). */
+const USUARIO_SIN_SISTEMA_GESTION = 1081784961;
+/** "Inventario Areas" no tiene página propia: según la categoría abre la de materiales o la de productos. */
+const RUTA_INVENTARIO_AREAS = '/inventario-areas';
+const SUBRUTA_INVENTARIO_AREAS: { [categoria: string]: string } = { 'Materia Prima': 'materiales', 'Productos': 'items' };
+
+/** Texto sin tildes, en minúsculas y sin espacios a los lados: "produccion" encuentra "Producción". */
+const normalizarTexto = (texto: any): string => `${texto ?? ''}`.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
 @Component({
   selector: 'app-menuLateral',
@@ -38,15 +54,17 @@ import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion
 
 export class MenuLateralComponent implements OnInit {
 
-  display: boolean = false;
-  items: MenuItem[];
-  mode = new FormControl('over' as MatDrawerMode);
-  @ViewChild(AppComponent) appComponent: AppComponent;
+  display: boolean = false; // menú lateral izquierdo abierto
   public FormUsuarios !: FormGroup; // Formulario alojado en el modal para editar y eliminar usuarios
 
-  categorias: any[] = [];
-  today: any = moment().format('YYYY-MM-DD');
-  menuConfiguracion: boolean = false;
+  categorias: MenuItem[] = []; // menú lateral completo (enlaces directos + categorías con sus vistas)
+  modeloMenu: MenuItem[] = []; // lo que muestra el p-panelMenu: el menú completo o el resultado de la búsqueda
+  cargando: boolean = false; // el menú lateral se está consultando
+  errorMenu: boolean = false; // la última carga del menú lateral falló (se muestra "Reintentar")
+  busquedaMenu: string = ''; // texto del buscador del menú lateral
+  cantidadResultados: number = 0; // vistas que coinciden con la búsqueda
+  primerResultado: MenuItem | null = null; // vista que se abre con Enter en el buscador
+  @ViewChild('campoBuscarMenu') campoBuscarMenu?: ElementRef<HTMLInputElement>;
   menuUsuario: boolean = false;
   seccionMenuUsuario: number | number[] | null = null; // sección abierta del menú de usuario (0 perfil, 1 eventos)
   cargandoPerfil: boolean = false;
@@ -58,19 +76,31 @@ export class MenuLateralComponent implements OnInit {
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  mostrarMenu: boolean = false; //Variable que se utilizará para mostrar el menú
   cantidadEventos: number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
   eventosHoy: EventoCalendario[] = []; //Eventos que ocurren hoy (aviso "Eventos de hoy")
   eventosMes: EventoCalendario[] = []; //Eventos de hoy a fin de mes (badge y sección "Eventos" del menú de usuario)
   eventosDia: boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
   cantidadCorreosNuevos: number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
-  position: string = '';
   modoSeleccionado: boolean;
-  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene el interruptor y los logos al día con el tema
+  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene los logos y el "Ahora: …" al día con el tema
+
+  // Sección "Apariencia" del menú de usuario: tema (claro / oscuro / sistema) y tamaño de letra
+  readonly opcionesTema: { valor: PreferenciaTema, etiqueta: string, icono: string, ayuda: string }[] = [
+    { valor: 'light', etiqueta: 'Claro', icono: 'pi-sun', ayuda: 'Tema claro' },
+    { valor: 'dark', etiqueta: 'Oscuro', icono: 'pi-moon', ayuda: 'Tema oscuro' },
+    { valor: 'system', etiqueta: 'Sistema', icono: 'pi-desktop', ayuda: 'Usa el mismo tema que Windows' },
+  ];
+  readonly nivelesLetra = TamanoLetraService.NIVELES;
+  preferenciaTema: PreferenciaTema = 'light';
+  porcentajeLetra: number = TamanoLetraService.PREDETERMINADO;
+  avisoLetraVisible: boolean = false;
+  private temporizadorAvisoLetra?: ReturnType<typeof setTimeout>;
+  private readonly suscripcionPreferenciaTema = inject(TemaService).preferencia$.pipe(takeUntilDestroyed())
+    .subscribe(preferencia => this.preferenciaTema = preferencia);
+  private readonly suscripcionLetra = inject(TamanoLetraService).porcentaje$.pipe(takeUntilDestroyed())
+    .subscribe(porcentaje => this.porcentajeLetra = porcentaje);
   esBeta: boolean = environment.esBeta; //Indica si la app se compiló para el entorno de pruebas (npm run build:beta)
   versionApp: string = VERSION_APP; //Versión de la app (package.json), se sube con npm run version:parche | version:menor | version:mayor
-  roles: any[] = [];
-  cargando: boolean = false;
 
   // Estrella de la barra superior: agrega o quita la página actual de los accesos rápidos (barra inferior)
   private readonly vistasFavService = inject(VistasFavoritasService);
@@ -106,7 +136,6 @@ export class MenuLateralComponent implements OnInit {
   constructor(private AppComponent: AppComponent,
     private formBuilder: FormBuilder,
     private rolService: RolesService,
-    private messageService: MessageService,
     private authenticationService: AuthenticationService,
     private cookieService: CookieService,
     @Inject(DOCUMENT) private document: Document,
@@ -115,7 +144,9 @@ export class MenuLateralComponent implements OnInit {
     private eventosCalService: EventosCalendarioService,
     private vistasPermisosService: Vistas_PermisosService,
     private router: Router,
-    private temaService: TemaService,) {
+    private temaService: TemaService,
+    private tamanoLetraService: TamanoLetraService,
+    private preferenciasUsuario: PreferenciasUsuarioService,) {
 
     this.FormUsuarios = this.formBuilder.group({
       usuNombre: [null, [Validators.required, Validators.maxLength(50)]],
@@ -123,11 +154,11 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.lecturaStorage();
     this.cantidadEventosMes();
     this.consultarEventosHoy();
-    this.CargarCategorias();
+    this.cargarMenuLateral();
     if (this.ValidarRol == 1) this.ticketsService.cargarCantidadesSoporte().subscribe();
     this.programarRefrescoContadores();
   }
@@ -178,150 +209,261 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria
-  materias primas  para los usuarios con roles de bopp, sellado, rotograbado e impresión */
+  /**
+   * Abre el menú lateral (clic en el logo) con el buscador vacío y la categoría de la página actual abierta.
+   * Si la última carga falló, la reintenta al abrirlo.
+   */
   mostrarMenuLateral() {
-    let ruta: any = this.router.url;
+    this.limpiarBusqueda();
+    this.abrirCategoriaActual();
     this.display = true;
-    if ([85, 7, 3, 8, 86, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol)) {
-      setTimeout(() => {
-        this.categorias.forEach(x => {
-          if ([85, 7, 3, 8, 86, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
-        });
-        this.router.navigate([ruta]);
-      }, 20);
+    if (this.errorMenu && !this.cargando) this.cargarMenuLateral(true);
+  }
+
+  /** Al terminar de abrirse el menú, pone el cursor en el buscador (solo con mouse: en celular abriría el teclado). */
+  enfocarBuscador() {
+    let conMouse = false;
+    try { conMouse = matchMedia('(hover: hover) and (pointer: fine)').matches; } catch { }
+    if (conMouse) this.campoBuscarMenu?.nativeElement.focus();
+  }
+
+  //#region Buscador del menú lateral
+  buscarEnMenu(texto: string) {
+    this.busquedaMenu = texto;
+    this.aplicarBusqueda();
+  }
+
+  limpiarBusqueda() {
+    this.busquedaMenu = '';
+    this.aplicarBusqueda();
+  }
+
+  /** Enter en el buscador: abre la primera vista encontrada. */
+  abrirPrimerResultado() {
+    if (!this.busquedaMenu.trim() || !this.primerResultado?.routerLink) return;
+    this.router.navigateByUrl(`${this.primerResultado.routerLink}`);
+    this.display = false;
+  }
+
+  /** Escape con texto: borra la búsqueda sin cerrar el menú. Sin texto, deja que el menú se cierre como siempre. */
+  escapeEnBuscador(evento: Event) {
+    if (!this.busquedaMenu) return;
+    evento.stopPropagation();
+    this.limpiarBusqueda();
+  }
+
+  private aplicarBusqueda() {
+    const termino = normalizarTexto(this.busquedaMenu);
+    this.modeloMenu = termino ? this.filtrarMenu(this.categorias, termino) : this.categorias;
+    const opciones = this.opcionesFinales(this.modeloMenu);
+    this.cantidadResultados = opciones.length;
+    this.primerResultado = opciones[0] ?? null;
+  }
+
+  /**
+   * Deja las vistas cuyo nombre contiene el texto; si el texto coincide con una categoría, la deja completa.
+   * Los grupos que quedan se muestran abiertos. Se copian los grupos para no cambiar el menú completo.
+   */
+  private filtrarMenu(items: MenuItem[], termino: string): MenuItem[] {
+    const resultado: MenuItem[] = [];
+    for (const item of items) {
+      const coincide = normalizarTexto(item.label).includes(termino);
+      if (item.items?.length) {
+        const hijos = coincide ? item.items : this.filtrarMenu(item.items, termino);
+        if (hijos.length > 0) resultado.push({ ...item, expanded: true, items: hijos });
+      } else if (coincide) resultado.push(item);
     }
+    return resultado;
+  }
+
+  /** Vistas (opciones con enlace) en el orden en que se ven en el menú. */
+  private opcionesFinales(items: MenuItem[]): MenuItem[] {
+    return items.flatMap(item => item.items?.length ? this.opcionesFinales(item.items) : (item.routerLink ? [item] : []));
+  }
+  //#endregion
+
+  /**
+   * Deja abierta solo la categoría (y el grupo interno) donde está la página actual; las demás se cierran,
+   * así el menú no acumula categorías abiertas de visitas anteriores. En Inicio quedan todas cerradas.
+   * Los grupos internos se leen al crear el p-panelMenu, por eso a la categoría se le pasa una copia de su lista.
+   */
+  private abrirCategoriaActual() {
+    const url = VistasFavoritasService.normalizarRuta(this.router.url);
+    this.categorias.forEach(categoria => {
+      if (!categoria.items?.length) return;
+      const contieneActual = this.marcarRutaActual(categoria.items, url);
+      categoria.expanded = contieneActual;
+      if (contieneActual) categoria.items = [...categoria.items];
+    });
+  }
+
+  /** Abre los grupos que contienen la página actual; indica si la encontró en esta lista. */
+  private marcarRutaActual(items: MenuItem[], url: string): boolean {
+    let encontrada = false;
+    for (const item of items) {
+      if (item.items?.length) {
+        if (this.marcarRutaActual(item.items, url)) {
+          item.expanded = true;
+          encontrada = true;
+        }
+      } else if (item.routerLink) {
+        const ruta = VistasFavoritasService.normalizarRuta(`${item.routerLink}`);
+        if (url === ruta || url.startsWith(`${ruta}/`)) encontrada = true;
+      }
+    }
+    return encontrada;
   }
 
   lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
+    this.preferenciasUsuario.iniciarSesion(this.storage_Id); // aplica el tema y la letra guardados de este usuario
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
     this.rolService.srvObtenerListaPorId(this.ValidarRol).subscribe(datos => this.storage_Rol = datos.rolUsu_Nombre);
     if ([1, 6, 2].includes(this.ValidarRol)) this.escucharCorreosNuevos(); // mismos roles que ven el botón de correos
   }
 
-  aumentarLetra() {
-    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    if (parseFloat(fontSize.toFixed(2)) < 1.2) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1569}`);
-    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')).toFixed(2)}`, { expires: 365, sameSite: 'Lax' });
-    this.cambiarColorIcono();
+  //#region Apariencia (tema y tamaño de letra)
+  get letraPredeterminada(): boolean {
+    return this.porcentajeLetra === TamanoLetraService.PREDETERMINADO;
   }
 
-  disminuirLetra() {
-    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    if (parseFloat(fontSize.toFixed(2)) > 0.67) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.86437}`);
-    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')).toFixed(2)}`, { expires: 365, sameSite: 'Lax' });
-    this.cambiarColorIcono();
+  cambiarPreferenciaTema(preferencia: PreferenciaTema) {
+    this.temaService.establecerPreferencia(preferencia);
   }
 
-  cambiarColorIcono() {
-    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    const icono1 = this.document.getElementById('iconoTanamoLetra1') as HTMLElement;
-    const icono2 = this.document.getElementById('iconoTanamoLetra2') as HTMLElement;
-    const icono3 = this.document.getElementById('iconoTanamoLetra3') as HTMLElement;
-    const icono4 = this.document.getElementById('iconoTanamoLetra4') as HTMLElement;
-    const icono5 = this.document.getElementById('iconoTanamoLetra5') as HTMLElement;
-
-    fontSize > 0.66 && fontSize < 0.68 ? icono1.className = 'pi pi-circle-fill font-size-25' : icono1.className = 'pi pi-circle font-size-16';
-    fontSize > 0.68 && fontSize < 0.89 ? icono2.className = 'pi pi-circle-fill font-size-25' : icono2.className = 'pi pi-circle font-size-16';
-    fontSize > 0.89 && fontSize < 1.03 ? icono3.className = 'pi pi-circle-fill font-size-25' : icono3.className = 'pi pi-circle font-size-16';
-    fontSize > 1.03 && fontSize < 1.19 ? icono4.className = 'pi pi-circle-fill font-size-25' : icono4.className = 'pi pi-circle font-size-16';
-    fontSize > 1.19 && fontSize < 1.30 ? icono5.className = 'pi pi-circle-fill font-size-25' : icono5.className = 'pi pi-circle font-size-16';
+  cambiarTamanoLetra(porcentaje: number) {
+    this.tamanoLetraService.establecer(porcentaje);
   }
 
-  configuracion() {
-    this.menuConfiguracion = true;
-    setTimeout(() => this.cambiarColorIcono(), 100);
+  restablecerLetra() {
+    this.tamanoLetraService.restablecer();
   }
 
-  CargarCategorias() {
-    this.vistasPermisosService.GetCategoriasMenu(this.ValidarRol).subscribe(data => {
-      this.cargando = true;
-      this.categorias = [];
-      for (let i = 0; i < data.length; i++) {
-        data[i].split('|').forEach(element => {
-          if (this.categorias.length > 0 && element != '' && !['Inicio', 'Pruebas', 'Vistas'].includes(element)) {
-            if (this.categorias.findIndex(item => item.label == element) == -1) this.categorias.push({ label: element, icon: '', items: [] });
-          } else if (element != '' && !['Inicio', 'Pruebas', 'Vistas'].includes(element)) this.categorias.push({ label: element, icon: '', items: [] });
-        });
-      }
-      this.categorias.sort((a, b) => a.label.localeCompare(b.label));
-      this.agregarOpcionesAdiciones();
-      setTimeout(() => this.cargarOpcionesMenu(), 50);
+  /**
+   * Atajos de teclado del tamaño de letra, en cualquier vista: Ctrl + Alt + (+ / −) y Ctrl + Alt + 0 para restablecer.
+   * Se usa event.code (posición de la tecla) porque en teclados en español Ctrl + Alt equivale a AltGr y event.key trae
+   * otro carácter. Por la misma razón no actúan mientras se escribe en un campo: ahí AltGr + tecla escribe símbolos
+   * (p. ej. "~" o "]") y no se deben robar.
+   */
+  @HostListener('document:keydown', ['$event'])
+  atajoTamanoLetra(evento: KeyboardEvent) {
+    if (!evento.ctrlKey || !evento.altKey || evento.shiftKey || evento.metaKey || this.esCampoEditable(evento.target)) return;
+
+    const antes = this.porcentajeLetra;
+    if (['NumpadAdd', 'Equal', 'BracketRight'].includes(evento.code)) this.tamanoLetraService.aumentar();
+    else if (['NumpadSubtract', 'Minus', 'Slash'].includes(evento.code)) this.tamanoLetraService.disminuir();
+    else if (['Numpad0', 'Digit0'].includes(evento.code)) this.tamanoLetraService.restablecer();
+    else return;
+
+    evento.preventDefault();
+    // Se avisa incluso si no cambió (ya estaba en el mínimo, el máximo o el 100 %), para que se vea que el atajo funcionó
+    if (!this.menuUsuario || antes === this.porcentajeLetra) this.mostrarAvisoLetra();
+  }
+
+  private esCampoEditable(destino: EventTarget | null): boolean {
+    const elemento = destino as HTMLElement | null;
+    if (!elemento?.tagName) return false;
+    return elemento.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(elemento.tagName);
+  }
+
+  private mostrarAvisoLetra() {
+    this.avisoLetraVisible = true;
+    clearTimeout(this.temporizadorAvisoLetra);
+    this.temporizadorAvisoLetra = setTimeout(() => this.avisoLetraVisible = false, 1500);
+  }
+  //#endregion
+
+  //#region Menú lateral
+  /**
+   * Consulta en una sola petición las vistas del rol y arma el menú agrupado por categoría.
+   * Las categorías sin vistas no se muestran. Si falla, el menú queda en estado de error con "Reintentar".
+   * @param avisarError muestra el error con "Ver detalles": solo cuando el usuario pidió la carga (abrir el menú o
+   * "Reintentar"), para no lanzar un aviso al entrar a la app por un menú que todavía no ha abierto.
+   */
+  cargarMenuLateral(avisarError: boolean = false) {
+    this.cargando = true;
+    this.errorMenu = false;
+    this.vistasPermisosService.GetMenu(this.ValidarRol).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: opciones => {
+        this.categorias = [...this.enlacesDirectos(), ...this.agruparPorCategoria(opciones ?? [])];
+        this.cargando = false;
+        this.aplicarBusqueda();
+        if (this.display) this.abrirCategoriaActual(); // se reintentó con el menú abierto
+      },
+      error: error => {
+        this.cargando = false;
+        this.errorMenu = true;
+        if (avisarError) this.mensajeService.errorDetallado(error, '¡No se pudo cargar el menú!', { operacion: 'Cargar el menú lateral', metodo: 'GET' });
+      },
     });
   }
 
-  agregarOpcionesAdiciones() {
-    this.categorias.unshift({
-      label: `Inicio`,
-      icon: 'pi pi-home',
-      command: () => {
-        this.router.navigate(['/home']);
-        this.display = false;
-      }
+  /** Paneles del menú en orden alfabético, sin las categorías que van como enlace directo (Inicio, Pruebas, Vistas). */
+  private agruparPorCategoria(opciones: OpcionMenuLateral[]): MenuItem[] {
+    const porCategoria = new Map<string, OpcionMenuLateral[]>();
+    opciones.filter(opcion => opcion.categoria && !CATEGORIAS_ENLACE_DIRECTO.includes(opcion.categoria)).forEach(opcion => {
+      if (!porCategoria.has(opcion.categoria)) porCategoria.set(opcion.categoria, []);
+      porCategoria.get(opcion.categoria)!.push(opcion);
     });
+    return [...porCategoria.keys()]
+      .sort((a, b) => a.localeCompare(b))
+      .map(nombre => this.crearCategoria(nombre, porCategoria.get(nombre)!))
+      .filter(categoria => categoria.items!.length > 0);
+  }
 
-    if (this.storage_Id == 123456789) {
-      this.categorias.unshift({
-        label: `Vistas`,
-        icon: 'pi pi-eye',
-        command: () => {
-          this.router.navigate(['/gestion-vistas']);
-          this.display = false;
-        }
-      });
-      this.categorias.unshift({
-        label: `Pruebas`,
-        icon: 'pi pi-wrench',
-        command: () => {
-          this.router.navigate(['/pruebas']);
-          this.display = false;
-        }
+  /** Panel de una categoría con sus vistas ordenadas alfabéticamente. */
+  private crearCategoria(nombre: string, vistas: OpcionMenuLateral[]): MenuItem {
+    let items: MenuItem[] = vistas.map(vista => this.crearOpcion(vista.nombre, vista.icono, this.rutaDeVista(nombre, vista.ruta)));
+
+    if (nombre == 'Materia Prima' && !ROLES_INVENTARIO_AREAS_MP.includes(this.ValidarRol)) items = items.filter(item => item.label != 'Inventario Areas');
+
+    if (nombre == 'Calidad' && this.storage_Id != USUARIO_SIN_SISTEMA_GESTION) {
+      items.push({
+        label: 'Sistema de Gestión', icon: '', items: [
+          this.crearOpcion('Aseguramiento de la Calidad', 'pi pi-flag-fill', '/aseguramiento-calidad'),
+          this.crearOpcion('Sistemas de Gestión', 'pi pi-check-circle', '/sistema-gestion-calidad'),
+        ]
       });
     }
+
+    items.sort((a, b) => `${a.label}`.localeCompare(`${b.label}`));
+    return { label: nombre, icon: '', items };
   }
 
-  cargarOpcionesMenu() {
-    let count: number = 0;
-    let storage_Id: number = this.storage_Id;
-    this.categorias.forEach(element => {
-      if (element.label == 'Calidad' && storage_Id != 1081784961) {
-        element.items.push(
-          {
-            label: 'Sistema de Gestión', icon: '', items: [
-              { label: 'Aseguramiento de la Calidad', icon: 'pi pi-flag-fill', command: () => { this.router.navigate(['/aseguramiento-calidad']); } },
-              { label: 'Sistemas de Gestión', icon: 'pi pi-check-circle', command: () => { this.router.navigate(['/sistema-gestion-calidad']); } }
-            ]
-          }
-        );
-      }
-
-      this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          if (element.items) {
-            element.items.push(
-              {
-                label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu,
-                command: () => {
-                  this.router.navigate([data[i].vp_Ruta]);
-                  if (element.label == `Materia Prima`) {
-                    if (data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
-                  } else if (element.label == `Productos`) {
-                    if (data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]);
-                  }
-                  this.display = false;
-                }
-              });
-          }
-        }
-        if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
-        if (![1, 3, 7, 61, 85, 63, 89, 62, 4, 88, 12, 2, 104].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1);
-        count++;
-        if (count == this.categorias.length) this.cargando = false;
-      });
-    });
+  /** "Inventario Areas" no tiene página propia: va directo a la de materiales o a la de productos según la categoría. */
+  private rutaDeVista(categoria: string, ruta: string): string {
+    const subruta = SUBRUTA_INVENTARIO_AREAS[categoria];
+    return ruta == RUTA_INVENTARIO_AREAS && subruta ? `${ruta}/${subruta}` : ruta;
   }
+
+  /**
+   * Opción del menú como enlace real (routerLink): se puede abrir en otra pestaña con Ctrl/Shift + clic o clic central,
+   * y PrimeNG la resalta (p-menuitem-link-active) cuando es la página actual.
+   * Con un clic normal cierra el menú; con Ctrl/Shift/⌘ el navegador abre otra pestaña y el menú sigue abierto.
+   */
+  private crearOpcion(label: string, icon: string, ruta: string): MenuItem {
+    return {
+      label, icon,
+      routerLink: ruta,
+      command: ({ originalEvent }) => {
+        const evento = originalEvent as MouseEvent | undefined;
+        if (!evento?.ctrlKey && !evento?.shiftKey && !evento?.metaKey) this.display = false;
+      },
+    };
+  }
+
+  /** Enlaces al tope del menú: Inicio para todos; Pruebas y Vistas solo para el usuario autorizado. */
+  private enlacesDirectos(): MenuItem[] {
+    const enlaces: MenuItem[] = [];
+    if (this.storage_Id == USUARIO_VISTAS_PRUEBAS) {
+      enlaces.push(this.crearOpcion('Pruebas', 'pi pi-wrench', '/pruebas'));
+      enlaces.push(this.crearOpcion('Vistas', 'pi pi-eye', '/gestion-vistas'));
+    }
+    enlaces.push(this.crearOpcion('Inicio', 'pi pi-home', '/home'));
+    return enlaces;
+  }
+  //#endregion
 
   /** Iniciales del usuario para el avatar del menú de usuario (máx. 2 letras). */
   get inicialesUsuario(): string {
@@ -467,11 +609,6 @@ export class MenuLateralComponent implements OnInit {
   cerrarSesion() {
     this.menuUsuario = false;
     this.authenticationService.logout();
-  }
-
-  // Interruptor de tema: TemaService guarda la preferencia, cambia el CSS y avisa a todas las vistas abiertas
-  mostrar() {
-    this.temaService.cambiar(!!this.modoSeleccionado);
   }
 
   /**

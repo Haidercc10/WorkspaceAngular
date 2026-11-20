@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
 import { MovimientosAplicacionService } from '../Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
+import { PreferenciasUsuarioService } from '../Servicios/PreferenciasUsuario/PreferenciasUsuario.service';
 import { User } from '../_Models/user';
 import { authentication_BagPro } from './authentication_BagPro.service';
 import { authentication_ContaZeus } from './authentication_ContaZeus.service';
@@ -29,12 +30,25 @@ export class AuthenticationService {
                     private authenticationInvZeusService : AuthenticationService_InvZeus,
                       private authenticationContaZeusService : authentication_ContaZeus,
                         private authenticationBagPro : authentication_BagPro,
-                          private encriptacion : EncriptacionService,) {
+                          private encriptacion : EncriptacionService,
+                            private preferenciasUsuario : PreferenciasUsuarioService,) {
 
-    let token = this.encriptacion.decrypt(localStorage.getItem('user') ?? '');
+    AuthenticationService.borrarSesionesAntiguasDeLocalStorage();
+    let token = this.encriptacion.decrypt(sessionStorage.getItem('user') ?? '');
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     //this.userSubject = new BehaviorSubject<any>(null);
     this.user = this.userSubject.asObservable();
+  }
+
+  /**
+   * Antes, la copia del usuario de cada API (con su token) se guardaba en localStorage y quedaba en el disco al cerrar
+   * el navegador. Ahora vive en sessionStorage con el resto de la sesión; aquí se borran las copias que quedaron de
+   * versiones anteriores (incluida la llave vacía "" en la que Inventario de Zeus guardaba el usuario sin cifrar).
+   */
+  private static borrarSesionesAntiguasDeLocalStorage() {
+    ['user', 'user_Inv_Zeus', 'user_Conta_Zeus', 'user_BagPro', ''].forEach(llave => {
+      try { localStorage.removeItem(llave); } catch { /* sin localStorage: nada que borrar */ }
+    });
   }
 
   public get userValue() {
@@ -49,13 +63,15 @@ export class AuthenticationService {
   login(datos : any) {
     return this.http.post<any>(`${this.rutaPlasticaribeAPI}/Authentication/login`, datos).pipe(map(user => {
       this.saveInLocal('Token', this.encriptacion.encrypt(user.token));
-      localStorage.setItem('user', this.encriptacion.encrypt(JSON.stringify(user)));
+      sessionStorage.setItem('user', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);
       return user;
     }));
   }
 
   logout() {
+    // El login se muestra con la apariencia por defecto; la del usuario queda guardada y vuelve al iniciar sesión
+    this.preferenciasUsuario.cerrarSesion();
     let id = this.encriptacion.decrypt(this.storage.get('Id'));
     let Nombre = this.encriptacion.decrypt(this.storage.get('Nombre'));
     let infoMovimientoAplicacion : any = {
