@@ -1,6 +1,64 @@
 import { AfterViewInit, Directive, ElementRef, HostBinding, NgZone, OnDestroy } from '@angular/core';
 
 /**
+ * Permite desplazar horizontalmente un elemento con scroll arrastrándolo con el mouse.
+ * - Presionar y arrastrar desplaza la fila (agrega la clase `arrastrando` mientras dura).
+ * - Si hubo arrastre, el clic al soltar se cancela (no activa el botón o la pestaña).
+ * - La rueda vertical del mouse la desplaza horizontalmente (solo si hay algo oculto).
+ * Conviene llamarla fuera de Angular (NgZone.runOutsideAngular) para no disparar la detección de cambios en cada movimiento.
+ * @returns función que quita todos los eventos agregados.
+ */
+export function habilitarArrastreHorizontal(fila: HTMLElement): () => void {
+  let presionado = false;
+  let arrastro = false;
+  let inicioX = 0;
+  let scrollInicial = 0;
+  const limpiar: (() => void)[] = [];
+
+  const escuchar = (objetivo: EventTarget, evento: string, manejador: (e: any) => void, opciones?: boolean | AddEventListenerOptions) => {
+    objetivo.addEventListener(evento, manejador, opciones);
+    limpiar.push(() => objetivo.removeEventListener(evento, manejador, opciones));
+  };
+
+  escuchar(fila, 'mousedown', (e: MouseEvent) => {
+    if (e.button !== 0) return;
+    presionado = true;
+    arrastro = false;
+    inicioX = e.pageX;
+    scrollInicial = fila.scrollLeft;
+  });
+  escuchar(window, 'mousemove', (e: MouseEvent) => {
+    if (!presionado) return;
+    const desplazamiento = e.pageX - inicioX;
+    if (!arrastro && Math.abs(desplazamiento) > 5) {
+      arrastro = true;
+      fila.classList.add('arrastrando');
+    }
+    if (arrastro) {
+      e.preventDefault();
+      fila.scrollLeft = scrollInicial - desplazamiento;
+    }
+  });
+  escuchar(window, 'mouseup', () => {
+    presionado = false;
+    fila.classList.remove('arrastrando');
+  });
+  escuchar(fila, 'click', (e: MouseEvent) => {
+    if (!arrastro) return;
+    e.preventDefault();
+    e.stopPropagation();
+    arrastro = false;
+  }, true);
+  escuchar(fila, 'wheel', (e: WheelEvent) => {
+    if (fila.scrollWidth <= fila.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    fila.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  return () => limpiar.forEach(quitar => quitar());
+}
+
+/**
  * Fila con desplazamiento horizontal que se mueve arrastrando con el mouse (como la barra de pestañas de la página principal).
  * - Presionar y arrastrar desplaza la fila; si hubo arrastre, el clic al soltar se cancela (no activa el botón).
  * - La rueda vertical del mouse la desplaza horizontalmente.
@@ -23,10 +81,6 @@ export class ArrastreHorizontalDirective implements AfterViewInit, OnDestroy {
 
   @HostBinding('class.arrastre-horizontal') readonly claseBase = true;
 
-  private presionado = false;
-  private arrastro = false;
-  private inicioX = 0;
-  private scrollInicial = 0;
   private observador?: ResizeObserver;
   private limpiar: (() => void)[] = [];
 
@@ -40,42 +94,7 @@ export class ArrastreHorizontalDirective implements AfterViewInit, OnDestroy {
     const fila = this.fila;
     // Los eventos de mouse se escuchan fuera de Angular para no disparar la detección de cambios en cada movimiento.
     this.zona.runOutsideAngular(() => {
-      this.escuchar(fila, 'mousedown', (e: MouseEvent) => {
-        if (e.button !== 0) return;
-        this.presionado = true;
-        this.arrastro = false;
-        this.inicioX = e.pageX;
-        this.scrollInicial = fila.scrollLeft;
-      });
-      this.escuchar(window, 'mousemove', (e: MouseEvent) => {
-        if (!this.presionado) return;
-        const desplazamiento = e.pageX - this.inicioX;
-        if (!this.arrastro && Math.abs(desplazamiento) > 5) {
-          this.arrastro = true;
-          fila.classList.add('arrastrando');
-        }
-        if (this.arrastro) {
-          e.preventDefault();
-          fila.scrollLeft = this.scrollInicial - desplazamiento;
-        }
-      });
-      this.escuchar(window, 'mouseup', () => {
-        this.presionado = false;
-        fila.classList.remove('arrastrando');
-      });
-      // Si hubo arrastre, se cancela el clic para que no se active el botón al soltar.
-      this.escuchar(fila, 'click', (e: MouseEvent) => {
-        if (!this.arrastro) return;
-        e.preventDefault();
-        e.stopPropagation();
-        this.arrastro = false;
-      }, true);
-      // La rueda vertical desplaza la fila horizontalmente (solo si hay algo oculto).
-      this.escuchar(fila, 'wheel', (e: WheelEvent) => {
-        if (fila.scrollWidth <= fila.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-        e.preventDefault();
-        fila.scrollLeft += e.deltaY;
-      }, { passive: false });
+      this.limpiar.push(habilitarArrastreHorizontal(fila));
       this.escuchar(fila, 'scroll', () => this.actualizarFlechas(), { passive: true });
     });
 
