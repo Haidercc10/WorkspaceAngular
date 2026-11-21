@@ -647,10 +647,25 @@ p-dialog ::ng-deep div .p-dialog-title {
 
 
 .logo2 {
-  width: 185px;
-  min-width: 185px;
+  width: var(--logo-ancho);
+  min-width: var(--logo-ancho);
   height: auto;
   flex-shrink: 0;
+}
+
+/* Alineación con el TEXTO del logo, no con la caja del PNG. Medidas del PNG (1080×170): centro de la caja en y=85,
+   mayúsculas de y=44 a la línea base en y=148. Por eso, con align-items:center, todo quedaba alto.
+   Los desplazamientos escalan con --logo-ancho, que cambia por breakpoint. */
+.marcaBarra {
+  --logo-ancho: 185px;
+}
+
+/* BETA y versión: centrados con la altura de las mayúsculas del logo ((44+148)/2 = 96, 11px de PNG bajo el centro
+   de la caja). Se ve mejor que apoyar la versión en la línea base, que la dejaba baja. */
+.marcaBarra .badgeBeta,
+.marcaBarra .versionBarra {
+  position: relative;
+  top: calc(var(--logo-ancho) * 11 / 1080);
 }
 /* Botones de la barra superior: área cuadrada (--lado-boton) con el ícono (--icono) centrado y 4px entre botones.
    El badge se ancla a la esquina superior derecha del ícono y sobresale poco, para no montarse en el ícono vecino. */
@@ -765,17 +780,16 @@ p-dialog ::ng-deep div .p-dialog-title {
     padding-right: 8px;
   }
 
-  .logo2 {
-    width: 130px;
-    min-width: 130px;
+  .marcaBarra {
+    --logo-ancho: 130px;
   }
 
   .versionBarra {
     display: none;
   }
 
+  /* El margen lo da ms-2 (8px); con el logo a 130px/105px quedan ~19px/~17px visibles hasta el dibujo */
   .marcaBarra .badgeBeta {
-    margin-left: 0.5rem !important;
     padding: 0.1rem 0.4rem;
     font-size: 0.65rem;
     letter-spacing: 0.08em;
@@ -817,8 +831,7 @@ p-dialog ::ng-deep div .p-dialog-title {
     --lado-boton: 36px;
   }
 
-  .logo2 {
-    width: 105px;
-    min-width: 105px;
+  .marcaBarra {
+    --logo-ancho: 105px;
   }
 }

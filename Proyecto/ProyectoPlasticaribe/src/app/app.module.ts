@@ -179,6 +179,7 @@ import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-pri
 import { SelectorMaterialComponent } from './Vistas/selector-material/selector-material.component';
 import { ContadorCaracteresDirective } from './Directivas/contador-caracteres.directive';
 import { ArrastreHorizontalDirective } from './Directivas/arrastre-horizontal.directive';
+import { ArrastrePestanasDirective } from './Directivas/arrastre-pestanas.directive';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
@@ -286,6 +287,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     SelectorMaterialComponent,
     ContadorCaracteresDirective,
     ArrastreHorizontalDirective,
+    ArrastrePestanasDirective,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
     PruebaImagenCatInsumoComponent,

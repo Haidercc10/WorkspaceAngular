@@ -536,8 +536,64 @@ html body .p-inputswitch.p-focus .p-inputswitch-slider {
   color: var(--rojo);
 }
 
+/* ===== Barras de pestañas (p-tabView) =====
+   Bootstrap agrega margin-bottom: 1rem a los <ul>; el contenedor quedaba más alto que las pestañas y los botones
+   laterales de desplazamiento (height: 100% del contenedor) sobresalían por debajo de la barra. */
+.p-tabview .p-tabview-nav {
+  margin-bottom: 0;
+}
+
+/* Botones laterales de desplazamiento alineados con la altura de las pestañas */
 .p-tabview .p-tabview-nav-btn.p-link {
-  color: #f63b3b;
+  top: 0;
+  height: calc(100% - 2px); /* deja visible el borde inferior de la barra */
+  width: 2rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--surface-card);
+  color: var(--rojo-texto);
+}
+
+.p-tabview .p-tabview-nav-btn.p-tabview-nav-prev {
+  left: 0;
+  box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.25);
+}
+
+.p-tabview .p-tabview-nav-btn.p-tabview-nav-next {
+  right: 0;
+  box-shadow: -4px 0 6px -4px rgba(0, 0, 0, 0.25);
+}
+
+.p-tabview .p-tabview-nav-btn.p-link:hover {
+  /* --fondo-acento es translúcido en modo oscuro: se apoya sobre la superficie para no dejar ver las pestañas */
+  background: linear-gradient(var(--fondo-acento), var(--fondo-acento)), var(--surface-card);
+}
+
+.p-tabview .p-tabview-nav-btn .p-icon,
+.p-tabview .p-tabview-nav-btn .pi {
+  width: 0.875rem;
+  height: 0.875rem;
+  font-size: 0.875rem;
+}
+
+/* Arrastre con mouse y deslizamiento táctil de las barras desplazables (directiva ArrastrePestanasDirective) */
+.p-tabview .p-tabview-nav-content.arrastre-pestanas {
+  cursor: grab;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.p-tabview .p-tabview-nav-content.arrastre-pestanas.arrastrando {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+.p-tabview .p-tabview-nav-content.arrastre-pestanas .p-tabview-nav-link {
+  -webkit-user-drag: none;
 }
 
 .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
