@@ -227,6 +227,13 @@ a {
   font-size: calc(var(--font-size) * 20px);
 }
 
+/* Títulos de los módulos: tipografía de PrimeNG (Inter, --font-family del tema) en seminegrita; el tamaño no cambia */
+.tituloRojo,
+.tituloClaro {
+  font-family: var(--font-family);
+  font-weight: 600;
+}
+
 /*
  * Botón de tutorial junto al texto del título (h2/h4), común a todas las páginas con tutorial.
  * inline-flex: el contenedor mide exactamente lo que el botón (sin espacio extra de línea debajo).
@@ -240,6 +247,142 @@ a {
   top: -0.1em;
   margin-left: 0.4rem;
   line-height: 1;
+}
+
+/* ==================== TARJETAS DE LOS TUTORIALES GUIADOS (Shepherd) ====================
+   Pasos creados con paso()/armar() de src/app/Tutoriales/Tutoriales_Comun.ts (clase tutorial-paso).
+   Imitan un p-dialog de PrimeNG: superficie, borde, sombra, radio y tipografía del tema, en claro y oscuro.
+   Se antepone .shepherd-element porque shepherd.css se carga después de este archivo. */
+.shepherd-element.tutorial-paso {
+  max-width: 27rem;
+  background: var(--surface-overlay);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+}
+
+.shepherd-element.tutorial-paso .shepherd-content {
+  border-radius: var(--border-radius);
+}
+
+.shepherd-element.tutorial-paso.shepherd-has-title .shepherd-content .shepherd-header {
+  background: transparent;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+
+.shepherd-element.tutorial-paso .shepherd-title {
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 0.25rem;
+  color: var(--text-color);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.shepherd-element.tutorial-paso .tutorial-paso-contador {
+  color: var(--rojo-texto);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Botón de cerrar como el ícono de cabecera de p-dialog */
+.shepherd-element.tutorial-paso.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem -0.5rem 0 0;
+  border-radius: 50%;
+  color: var(--text-color-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.shepherd-element.tutorial-paso.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
+  background: var(--surface-hover);
+  color: var(--text-color);
+}
+
+.shepherd-element.tutorial-paso .shepherd-text {
+  padding: 0 1.25rem 1.25rem;
+  color: var(--text-color);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.shepherd-element.tutorial-paso .shepherd-text p {
+  margin: 0 0 0.625rem;
+}
+
+.shepherd-element.tutorial-paso .shepherd-text p:last-child {
+  margin-bottom: 0;
+}
+
+.shepherd-element.tutorial-paso .shepherd-text ol,
+.shepherd-element.tutorial-paso .shepherd-text ul {
+  margin: 0 0 0.625rem;
+  padding-left: 1.25rem;
+}
+
+.shepherd-element.tutorial-paso .shepherd-text li + li {
+  margin-top: 0.25rem;
+}
+
+.shepherd-element.tutorial-paso .shepherd-text b {
+  font-weight: 600;
+}
+
+/* Pie separado del contenido, botones como p-button (Atrás/Cerrar: secundario con borde; Siguiente/Terminar: rojo) */
+.shepherd-element.tutorial-paso .shepherd-footer {
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+.shepherd-element.tutorial-paso .shepherd-footer .shepherd-button {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.shepherd-element.tutorial-paso .shepherd-footer .shepherd-button b {
+  font-weight: 600;
+}
+
+.shepherd-element.tutorial-paso .shepherd-footer .shepherd-button.botonRojo:not(:disabled):hover {
+  background-color: var(--rojoHover) !important;
+}
+
+.shepherd-element.tutorial-paso .shepherd-footer .shepherd-button.botonGris {
+  background-color: transparent !important;
+  border-color: var(--surface-border);
+  color: var(--text-color-secondary) !important;
+}
+
+.shepherd-element.tutorial-paso .shepherd-footer .shepherd-button.botonGris:not(:disabled):hover {
+  background-color: var(--surface-hover) !important;
+  color: var(--text-color) !important;
+}
+
+/* La flecha toma el color de la tarjeta (Shepherd la pinta gris o blanca) */
+.shepherd-element.tutorial-paso .shepherd-arrow:before,
+.shepherd-element.tutorial-paso.shepherd-has-title[data-popper-placement^=bottom] > .shepherd-arrow:before {
+  background-color: var(--surface-overlay);
 }
 
 .colorLinea {

@@ -39,19 +39,19 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
   const enMisTickets = (selector : string) => ({ beforeShowPromise: TutorialesService.prepararPantalla(() => irAPestana(1), selector) });
 
   return armar('tutorial-tickets', [
-    paso(null, '¡Tickets!',
-      `<p>¡Aquí le contamos a soporte cuando algo no funciona: una falla en el programa, un equipo dañado, o cuando necesitamos algo nuevo!</p>
+    paso(null, 'Tickets',
+      `<p>Aquí le contamos a soporte cuando algo no funciona: una falla en el programa, un equipo dañado, o cuando necesitamos algo nuevo.</p>
        <p>Soporte revisa cada ticket y nos responde aquí mismo.</p>`),
 
-    esSoporte && paso('#campoReportante', '¡Reportado por! (solo soporte)',
+    esSoporte && paso('#campoReportante', 'Reportado por (solo soporte)',
       `<p>Si una persona les reporta algo por teléfono, chat o en persona, pueden registrar el ticket <b>a nombre de ella</b>.</p>
        <p>Busque por <b>nombre, ID o área</b>. Si lo deja vacío, el ticket queda a su propio nombre.</p>
        <p>Cómo llegó el reporte u otros detalles se pueden dejar después como comentario.</p>`, enNuevo('#campoReportante')),
 
-    paso('#campoAsunto', '¡Asunto!',
-      `<p>¡Escribimos en pocas palabras qué está pasando, por ejemplo <i>"No imprime la etiqueta de sellado"</i>!</p>`, enNuevo('#campoAsunto')),
+    paso('#campoAsunto', 'Asunto',
+      `<p>Escribimos en pocas palabras qué está pasando, por ejemplo <i>"No imprime la etiqueta de sellado"</i>.</p>`, enNuevo('#campoAsunto')),
 
-    paso('#campoTipo', '¡Tipo de Ticket!',
+    paso('#campoTipo', 'Tipo de Ticket',
       `<p>Elegimos el que más se parezca:</p>
        <ul>
          <li><b>Incidente:</b> algo dejó de funcionar (el programa, un computador, una impresora...).</li>
@@ -61,11 +61,11 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
          <li><b>Otro:</b> si no encaja en ninguno.</li>
        </ul>`, enNuevo('#campoTipo')),
 
-    paso('#campoDescripcion', '¡Descripción!',
-      `<p>¡Contamos con detalle qué pasó: en qué pantalla o equipo, qué estábamos haciendo y qué mensaje salió!</p>
+    paso('#campoDescripcion', 'Descripción',
+      `<p>Contamos con detalle qué pasó: en qué pantalla o equipo, qué estábamos haciendo y qué mensaje salió.</p>
        <p>Mientras más claro, más rápido lo pueden solucionar.</p>`, enNuevo('#campoDescripcion')),
 
-    paso('#imagen', '¡Imágenes! (opcional)',
+    paso('#imagen', 'Imágenes (opcional)',
       `<p>Podemos adjuntar hasta <b>5 imágenes .png o .jpg</b> de máximo 5 MB:</p>
        <ul>
          <li>Con el botón <b>Elegir imágenes</b>.</li>
@@ -74,36 +74,36 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
        </ul>
        <p>Para quitar una, se presiona la <b>X</b> de su miniatura.</p>`, enNuevo('#imagen')),
 
-    paso('#enviarTicket', '¡Crear Ticket!',
-      `<p>¡Cuando hayamos llenado el asunto, el tipo y la descripción, presionamos este botón para enviar el ticket!</p>`, enNuevo('#enviarTicket')),
+    paso('#enviarTicket', 'Crear Ticket',
+      `<p>Cuando hayamos llenado el asunto, el tipo y la descripción, presionamos este botón para enviar el ticket.</p>`, enNuevo('#enviarTicket')),
 
-    paso('#limpiarTodo', '¡Limpiar Todo!',
-      `<p>¡Borra lo que hayamos escrito y las imágenes elegidas, para empezar de nuevo!</p>`, enNuevo('#limpiarTodo')),
+    paso('#limpiarTodo', 'Limpiar Todo',
+      `<p>Borra lo que hayamos escrito y las imágenes elegidas, para empezar de nuevo.</p>`, enNuevo('#limpiarTodo')),
 
-    paso(null, '¡Ticket creado!',
+    paso(null, 'Ticket creado',
       `<p>Al crear el ticket sale un mensaje en el centro de la pantalla con su <b>número</b>.</p>
        <p>Desde ese mensaje podemos ir a <b>VER MIS TICKETS</b>, cerrarlo con la <b>X</b> o dejar que se cierre solo después de unos segundos.</p>`),
 
-    esSoporte && paso('#btnGestion', '¡Gestión de Tickets! (solo soporte)',
+    esSoporte && paso('#btnGestion', 'Gestión de Tickets (solo soporte)',
       `<p>Con este botón vamos a la pantalla donde soporte ve <b>los tickets de todos</b> y los atiende.</p>`),
 
-    paso('#tablaMisTickets', '¡Mis tickets!',
+    paso('#tablaMisTickets', 'Mis tickets',
       esSoporte
         ? `<p>En esta pestaña están los tickets que usted creó y también <b>los que registró a nombre de otras personas</b>.</p>
            <p>La columna <b>Reportado por</b> muestra a nombre de quién quedó; el ícono <i class="pi pi-user-edit"></i> indica que lo registró soporte.</p>`
-        : `<p>¡En esta pestaña vemos todos los tickets que hemos creado, del más reciente al más antiguo!</p>`,
+        : `<p>En esta pestaña vemos todos los tickets que hemos creado, del más reciente al más antiguo.</p>`,
       enMisTickets('#tablaMisTickets')),
 
-    paso('#filtrosMisTickets', '¡Filtro por fechas!',
+    paso('#filtrosMisTickets', 'Filtro por fechas',
       `<p>Por defecto vemos los tickets creados en <b>el último año</b>.</p>
        <p>Para ver otro periodo elegimos la <b>Fecha Inicial</b> y la <b>Fecha Final</b> y presionamos <b>Consultar</b>. <b>Limpiar</b> vuelve al último año.</p>`,
       enMisTickets('#filtrosMisTickets')),
 
-    paso('#tablaMisTickets', '¡Estados del ticket!',
+    paso('#tablaMisTickets', 'Estados del ticket',
       `<p>El color de la columna <b>Estado</b> nos dice en qué va cada ticket:</p>${leyendaEstados}`, enMisTickets('#tablaMisTickets')),
 
-    paso('#tablaMisTickets', '¡Ver el detalle!',
-      `<p>¡Haciendo <b>clic sobre un ticket</b> se abre su detalle!</p>
+    paso('#tablaMisTickets', 'Ver el detalle',
+      `<p>Haciendo <b>clic sobre un ticket</b> se abre su detalle.</p>
        <ul>
          <li>Vemos la descripción, las imágenes y las respuestas de soporte.</li>
          <li>Podemos agregar comentarios.</li>
@@ -111,8 +111,8 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
        </ul>
        <p>Dentro del detalle también hay un botón <b>i</b> con su propio tutorial.</p>`, enMisTickets('#tablaMisTickets')),
 
-    paso('#btnActualizarMisTickets', '¡Actualizar!',
-      `<p>¡Vuelve a consultar la lista para ver si soporte ya respondió o cambió el estado de algún ticket!</p>
+    paso('#btnActualizarMisTickets', 'Actualizar',
+      `<p>Vuelve a consultar la lista para ver si soporte ya respondió o cambió el estado de algún ticket.</p>
        <p>Puede volver a ver este tutorial cuando quiera con el botón <b>i</b> junto al título.</p>`, enMisTickets('#btnActualizarMisTickets')),
   ]);
 }
@@ -121,15 +121,15 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
 
 export function pasosTutorialGestionTickets() : Step.StepOptions[] {
   return armar('tutorial-gestion-tickets', [
-    paso(null, '¡Gestión de Tickets!',
-      `<p>¡Aquí soporte ve los tickets de todos los usuarios, los toma, les responde y los cierra!</p>`),
+    paso(null, 'Gestión de Tickets',
+      `<p>Aquí soporte ve los tickets de todos los usuarios, los toma, les responde y los cierra.</p>`),
 
-    paso('#cantTickets', '¡Cantidad de Tickets!',
+    paso('#cantTickets', 'Cantidad de Tickets',
       `<p>Muestra cuántos tickets están <b>Abiertos</b> (sin atender), cuántos están <b>En revisión</b> y cuántos se <b>resolvieron en el mes</b>.</p>
-       <p>¡Al hacer clic en uno, la tabla muestra solo esos tickets! Con otro clic sobre el mismo se vuelve a la vista anterior.</p>
+       <p>Al hacer clic en uno, la tabla muestra solo esos tickets. Con otro clic sobre el mismo se vuelve a la vista anterior.</p>
        <p><b>Prom. resolución</b> es el promedio de días que tardaron en resolverse los tickets de este mes.</p>`),
 
-    paso('#vistaTickets', '¡Qué tickets ver!',
+    paso('#vistaTickets', 'Qué tickets ver',
       `<ul>
          <li><b>Pendientes:</b> abiertos y en revisión. Salen siempre, sin importar la fecha, para que ninguno quede sin atender.</li>
          <li><b>Finalizados:</b> resueltos y cancelados, por ejemplo para consultar o reabrir uno.</li>
@@ -137,20 +137,20 @@ export function pasosTutorialGestionTickets() : Step.StepOptions[] {
        </ul>
        <p>Con Finalizados o Todos aparecen las <b>fechas</b>: limitan los finalizados por su fecha de creación (por defecto, el último año). <b>Mes Actual</b> consulta los de este mes.</p>`),
 
-    paso('#busquedaTickets', '¡Buscar!',
+    paso('#busquedaTickets', 'Buscar',
       `<p>Escribiendo aquí buscamos por número, asunto, tipo, persona o área.</p>`),
 
-    paso('#filtrosLista', '¡Filtrar por tipo y área!',
+    paso('#filtrosLista', 'Filtrar por tipo y área',
       `<p>Muestran solo los tickets de un <b>tipo</b> o de un <b>área</b>. Con la <b>X</b> se quita el filtro.</p>`),
 
-    paso('#accionesFiltros', '¡Actualizar y limpiar!',
+    paso('#accionesFiltros', 'Actualizar y limpiar',
       `<ul>
          <li><b>Actualizar:</b> vuelve a consultar para ver los tickets nuevos. Al lado se ve la hora de la última consulta.</li>
          <li><b>Limpiar:</b> vuelve a los pendientes, al rango por defecto y quita la búsqueda y los filtros.</li>
        </ul>`),
 
-    paso('#tablaTickets', '¡Tabla de Tickets!',
-      `<p>¡Haciendo <b>clic sobre un ticket</b> se abre su detalle para atenderlo! Dentro, con <b>‹ ›</b> pasamos al ticket anterior o siguiente de la tabla.</p>
+    paso('#tablaTickets', 'Tabla de Tickets',
+      `<p>Haciendo <b>clic sobre un ticket</b> se abre su detalle para atenderlo. Dentro, con <b>‹ ›</b> pasamos al ticket anterior o siguiente de la tabla.</p>
        <ul>
          <li>Debajo de la fecha de creación de los pendientes está su <b>antigüedad</b>: en amarillo desde 3 días y en rojo desde 6 días.</li>
          <li><b>Última actividad:</b> cuándo fue el último comentario o cambio de estado.</li>
@@ -159,7 +159,7 @@ export function pasosTutorialGestionTickets() : Step.StepOptions[] {
        </ul>
        <p>El color de la columna Estado indica en qué va:</p>${leyendaEstados}`),
 
-    paso(null, '¡Cómo se atiende un ticket!',
+    paso(null, 'Cómo se atiende un ticket',
       `<p>Dentro del detalle están los botones para cambiar el estado:</p>
        <ol>
          <li>${badge(EstadoTicket.ABIERTO, 'Abierto')} → <b>Tomar ticket</b> → ${badge(EstadoTicket.EN_REVISION, 'En revisión')}: el usuario sabe que ya lo estamos atendiendo.</li>
@@ -193,25 +193,25 @@ export function pasosTutorialDetalleTicket({ modoSoporte, tieneImagenes, accione
   const listaAcciones = acciones.map(a => `<li><b>${a}:</b> ${a === 'Cancelar ticket' ? textoCancelar : explicacionAccion[a] ?? ''}</li>`).join('');
 
   return armar('tutorial-detalle-ticket', [
-    paso('#infoTicket', '¡Detalle del ticket!',
+    paso('#infoTicket', 'Detalle del ticket',
       `<p>Arriba vemos el <b>asunto</b> y el <b>estado</b> del ticket, y debajo su tipo, la fecha de creación${modoSoporte ? ' y quién lo reportó' : ''}.</p>`),
 
-    paso('#descripcionTicket', '¡Descripción!',
+    paso('#descripcionTicket', 'Descripción',
       `<p>Es lo que se escribió al crear el ticket.</p>`),
 
-    tieneImagenes && paso('#imagenesTicket', '¡Imágenes!',
+    tieneImagenes && paso('#imagenesTicket', 'Imágenes',
       `<p>Haciendo <b>clic sobre una imagen</b> se ve en tamaño completo.</p>`),
 
-    paso('#seguimientoTicket', '¡Seguimiento!',
+    paso('#seguimientoTicket', 'Seguimiento',
       `<p>Aquí quedan los comentarios y cada cambio de estado, con quién lo hizo y cuándo. La línea de la izquierda tiene el color del estado que tenía el ticket en ese momento.</p>
        <p>${modoSoporte ? 'El usuario ve este mismo seguimiento en su pestaña "Mis tickets".' : 'Aquí aparecen las respuestas de soporte.'}</p>`),
 
-    paso('#campoComentario', modoSoporte ? '¡Comentario / solución!' : '¡Comentario!',
+    paso('#campoComentario', modoSoporte ? 'Comentario / solución' : 'Comentario',
       modoSoporte
         ? `<p>Escriba aquí lo que se le responde al usuario, la <b>solución aplicada</b> o el motivo de un cambio de estado.</p>`
         : `<p>¿Algo más que contarle a soporte? Escríbalo aquí, por ejemplo si el problema volvió a pasar.</p>`),
 
-    paso('#botones', '¡Botones!',
+    paso('#botones', 'Botones',
       `<ul>
          <li><b>Agregar comentario:</b> envía el comentario sin cambiar el estado (también con <b>Ctrl + Enter</b> desde el comentario).</li>
          ${listaAcciones}

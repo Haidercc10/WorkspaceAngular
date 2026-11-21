@@ -541,6 +541,8 @@ p-autocomplete ::ng-deep .p-autocomplete {
 }
 
 .copiar-titulo {
+  /* Título en su propia línea para que el buscador use todo el ancho */
+  flex-basis: 100%;
   font-weight: 600;
   color: var(--text-color);
   white-space: nowrap;
@@ -563,6 +565,14 @@ p-autocomplete ::ng-deep .p-autocomplete {
   border: 1px solid var(--surface-border);
   background: var(--surface-card);
   color: var(--text-color);
+}
+
+/* Item elegido con foco (listo para Enter): mismo resalte rojo que los campos del formulario */
+.item-elegido:focus,
+.item-elegido:focus-visible {
+  outline: none;
+  border-color: var(--rojoClaro);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--rojoClaro) 40%, transparent);
 }
 
 .item-elegido-texto {
@@ -666,18 +676,24 @@ p-autocomplete ::ng-deep .p-autocomplete {
   margin-top: 1.2rem;
   padding: 0.9rem 1rem 1.1rem;
   border-radius: 10px;
-  border: 1px dashed rgba(34, 197, 94, 0.5);
-  background: rgba(34, 197, 94, 0.07);
+  border: 1px dashed var(--texto-exito);
+  background: var(--fondo-exito);
 }
 
 .opciones-bio-titulo {
   display: block;
   margin-bottom: 1.2rem;
-  color: #15803d;
+  color: var(--texto-exito);
   font-weight: 600;
 }
 
 /* Etiqueta del buscador de la barra en el color del texto (no gris) */
+/* Espacio para que la etiqueta flotante del buscador no choque con el título de la barra */
+.copiar-campo .p-float-label {
+  display: block;
+  margin-top: 0.9rem;
+}
+
 .copiar-campo .p-float-label label {
   color: var(--text-color);
 }
@@ -795,16 +811,50 @@ p-autocomplete ::ng-deep .p-autocomplete {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0 0 1.4rem;
-  font-size: 1rem;
+  margin: 0 0 2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--rojo-texto);
+}
+
+.detalle-proceso h5 > .pi {
+  font-size: 1.2rem;
+}
+
+/* Etiqueta flotante de campos llenos: un poco más arriba para que no quede pegada al valor */
+:host ::ng-deep .p-float-label input:focus ~ label,
+:host ::ng-deep .p-float-label input.p-filled ~ label,
+:host ::ng-deep .p-float-label textarea:focus ~ label,
+:host ::ng-deep .p-float-label textarea.p-filled ~ label,
+:host ::ng-deep .p-float-label .p-inputwrapper-focus ~ label,
+:host ::ng-deep .p-float-label .p-inputwrapper-filled ~ label {
+  top: -1.05rem;
+}
+
+/* Chips de tintas con su color */
+.chip-tinta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 16px;
+  border: 1px solid var(--surface-border);
   font-weight: 600;
-  color: var(--text-color);
+}
+
+.chip-tinta .pi {
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 /* Panel de resumen fijo */
 .resumen-ficha {
   position: sticky;
   top: 1rem;
+  /* Si el resumen es más alto que la pantalla, se desplaza por dentro y sigue acompañando el scroll */
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -996,8 +1046,29 @@ p-autocomplete ::ng-deep .p-autocomplete {
   opacity: 0.85;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 991px) {
   .resumen-ficha {
     position: static;
   }
+}
+
+/* Botón "Sugerir" del nombre: rojo de marca para que no pierda foco */
+.boton-sugerir,
+.boton-sugerir:enabled:focus {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: var(--gris-100);
+  font-weight: 600;
+}
+
+.boton-sugerir:enabled:hover {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
+}
+
+/* Regla de espaciado: la etiqueta flotante de cada campo tiene su propio espacio arriba, para que no
+   choque con el título del bloque/proceso ni con los campos de la fila de arriba */
+.bloque-ficha .p-float-label {
+  display: block;
+  margin-top: 1rem;
 }

@@ -34,14 +34,14 @@ export function pasosTutorialMovimientosSolicitud(ctx : ContextoTutorialMovimien
   });
 
   return armar('tutorial-movimientos-solicitud', [
-    paso(null, '¡Movimientos de solicitudes de materia prima!',
+    paso(null, 'Movimientos de solicitudes de materia prima',
       `<p>Aquí vemos las <b>solicitudes de materia prima</b> que hacen los operarios para producir sus órdenes de trabajo.</p>
        ${ctx.puedeGestionar
          ? `<p>Desde aquí las <b>atendemos</b>: vemos qué materiales pidieron, <b>asignamos</b> lo que hay disponible y, si hace falta, las finalizamos o cancelamos.</p>`
          : `<p>Podemos consultar cada solicitud con sus materiales, lo pedido y lo entregado.</p>`}
        <p>Al entrar se cargan solas las solicitudes <b>activas</b> (pendientes y parciales).</p>`),
 
-    paso(el('chipsEstado'), '¡Solicitudes por estado!',
+    paso(el('chipsEstado'), 'Solicitudes por estado',
       `<p>Cada botón muestra cuántas solicitudes hay en ese estado:</p>
        <ul>
          <li><b>Pendientes:</b> sin material entregado.</li>
@@ -52,38 +52,38 @@ export function pasosTutorialMovimientosSolicitud(ctx : ContextoTutorialMovimien
        </ul>
        <p>Con un clic vemos <b>todas</b> las de ese estado, sin importar la fecha.</p>`),
 
-    ctx.puedeAutorizarExceso && paso(el('autorizaciones'), '¡Autorizaciones de exceso!',
+    ctx.puedeAutorizarExceso && paso(el('autorizaciones'), 'Autorizaciones de exceso',
       `<p>Cuando alguien necesita asignar <b>más kg de los permitidos</b> en una OT, pide autorización.</p>
        <p>Aquí las vemos y las <b>aprobamos</b> o <b>rechazamos</b> (para rechazar hay que escribir el motivo).</p>`),
 
-    paso(el('filtros'), '¡Filtros de búsqueda!',
+    paso(el('filtros'), 'Filtros de búsqueda',
       `<ul>
          <li><b>N° Solicitud:</b> busca esa solicitud exacta, sin importar fechas ni estados.</li>
          <li><b>OT</b>, <b>Creada desde / hasta</b> y los <b>estados</b>: con un clic marcamos o quitamos cada uno (podemos marcar varios).</li>
        </ul>
        <p>Si consultamos sin filtros vuelven las solicitudes activas. <b>Limpiar</b> borra los filtros.</p>`),
 
-    paso(el('listaSolicitudes'), '¡Lista de solicitudes!',
+    paso(el('listaSolicitudes'), 'Lista de solicitudes',
       `<p>Arriba dice qué estamos viendo y cuántos resultados hay. Con un clic en el encabezado <b>N°</b>, <b>OT</b> o <b>Entrega</b> ordenamos la lista de menor a mayor; con otro clic, de mayor a menor.</p>
        <p>Hacemos <b>clic en una solicitud</b> para ver su detalle a la derecha; queda <b>resaltada</b>.</p>`),
 
-    paso(enDetalle('resumenSolicitud'), '¡Resumen de la solicitud!',
+    paso(enDetalle('resumenSolicitud'), 'Resumen de la solicitud',
       `<p>Muestra el <b>estado</b>, la OT con su cliente y referencia, el proceso, quién la pidió, cuándo y para cuándo la necesita.</p>
        <p>En <b>Máquinas</b> vemos a qué máquinas va el material y, si son varias, qué parte le toca a cada una.</p>`,
       conDetalle('resumenSolicitud')),
 
-    paso(enDetalle('materialesSolicitud'), '¡Materiales solicitados!',
+    paso(enDetalle('materialesSolicitud'), 'Materiales solicitados',
       `<p>Cada <b>subcategoría</b> es una fila‑título con lo <b>solicitado</b>, lo <b>entregado</b> y lo que <b>falta</b> (en rojo) o <b>Completa</b> (en verde).</p>
        <p>Debajo de cada una están los <b>materiales exactos</b> que pidió el solicitante, con su stock y lo entregado de cada uno.
        Si se entregó un material distinto de la misma subcategoría, sale marcado como <b>Sustituto</b>.</p>
        <p>Al final salen los <b>totales</b> de la solicitud.</p>`,
       conDetalle('materialesSolicitud')),
 
-    paso(enDetalle('observacionSolicitud'), '¡Observación del solicitante!',
+    paso(enDetalle('observacionSolicitud'), 'Observación del solicitante',
       `<p>El comentario que dejó quien hizo la solicitud.</p>`,
       conDetalle('observacionSolicitud')),
 
-    paso(enDetalle('accionesSolicitud'), '¡Acciones!',
+    paso(enDetalle('accionesSolicitud'), 'Acciones',
       `<ul>
          ${ctx.puedeGestionar ? `
          <li><b>Crear Asignación:</b> abre la ventana para entregar los materiales de esta solicitud.</li>
