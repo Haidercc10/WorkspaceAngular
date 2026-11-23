@@ -18,13 +18,16 @@ export const botonTerminar = {
  */
 export type ElementoPaso = string | (() => string) | null;
 
-/** Paso con el formato del proyecto. */
+/**
+ * Paso con el formato del proyecto. La tarjeta se dibuja con la clase `tutorial-paso` (styles.css), al estilo de los
+ * diálogos de PrimeNG. Los títulos van sin signos de admiración; el contador "Paso n de N" lo agrega defaultStepOptions (data.ts).
+ */
 export function paso(elemento : ElementoPaso, titulo : string, texto : string, extra : Partial<Step.StepOptions> = {}) : Step.StepOptions {
   return {
     ...(elemento ? { attachTo: { element: elemento, on: 'bottom' } } : {}),
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    title: `<h4 style="margin: auto; color: var(--rojo)">${titulo}</h4>`,
+    classes: 'tutorial-paso',
+    title: titulo,
     text: texto,
     ...extra,
   } as Step.StepOptions;

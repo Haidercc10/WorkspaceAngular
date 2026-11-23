@@ -19,6 +19,8 @@ import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { ClaveTutorialCrearItem, pasosTutorialCrearItem } from 'src/app/Tutoriales/Tutoriales_CrearItem';
 
 /** Roles que pueden crear items y completar su sincronización (igual que crear/editar OT). */
 const ROLES_CREAR_ITEM: readonly number[] = [1, 98];
@@ -223,7 +225,8 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     private tipoSelladoService: TiposSelladoService,
     private estadosService: EstadosService,
     private existenciasService: ExistenciasProductosService,
-    private msj: MensajesAplicacionService,) {
+    private msj: MensajesAplicacionService,
+    private tutoriales: TutorialesService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formItem = this.frmBuilder.group({
@@ -296,9 +299,17 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     // La sugerencia se escribe sin emitir eventos: cualquier cambio emitido por el campo nombre es del usuario
     this.formItem.get('nombre')?.valueChanges.subscribe(() => this.marcarNombreManual());
     this.suscripcionNombre = this.formItem.valueChanges.subscribe(() => this.recalcularNombre());
+    // La primera vez que el usuario entra se muestra el tutorial (no dentro del modal de Pedido Externo)
+    if (!this.embebido) this.tutoriales.iniciarPrimeraVez(ClaveTutorialCrearItem, this.AppComponent.storage_Id, () => this.pasosTutorial(), 1000);
   }
 
+  /** Muestra el tutorial de la página (botón "i" junto al título). */
+  tutorial = () => this.tutoriales.iniciar(this.pasosTutorial());
+
+  private pasosTutorial = () => pasosTutorialCrearItem({ irPestana: indice => this.tabActiva = indice });
+
   ngOnDestroy(): void {
+    this.tutoriales.cancelar(); // que no quede encima de otra página
     this.suscripcionNombre?.unsubscribe();
   }
 
@@ -326,6 +337,19 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     const colores = elegidas.map(id => this.tintas.find(t => t.id == id)?.color).filter((c): c is string => !!c);
     const base = colores.length ? colores : ['#C62828', '#1565C0', '#F9A825'];
     return [0, 1, 2].map(i => base[i % base.length]);
+  }
+
+  /** Tintas elegidas, en el orden de selección, para pintar los chips del campo con su color. */
+  get tintasElegidas(): TintaBagPro[] {
+    const elegidas: number[] = this.formItem.get('tintas')?.value ?? [];
+    return elegidas.map(id => this.tintas.find(t => t.id == id)).filter((t): t is TintaBagPro => !!t);
+  }
+
+  /** Texto claro u oscuro según la luminosidad del color de la tinta, para que el nombre se lea sobre el chip. */
+  textoSobreTinta(color?: string | null): string {
+    if (!color) return 'var(--text-color)';
+    const r = parseInt(color.substring(1, 3), 16), g = parseInt(color.substring(3, 5), 16), b = parseInt(color.substring(5, 7), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 160 ? 'var(--gris-800)' : 'var(--gris-100)';
   }
 
   /** Item elegido en la barra de copiar; mientras exista, el campo queda bloqueado hasta quitarlo con la X. */
@@ -643,6 +667,16 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
    * carga presentación y precio para que el usuario los revise y cambie.
    * @returns No retorna un valor.
    */
+  /** Al elegir un item del autocompletado, deja el foco en él para que con Enter se copie la ficha. */
+  enfocarItemElegido() {
+    setTimeout(() => document.getElementById('itemElegidoCopia')?.focus());
+  }
+
+  /** Enter en el buscador: copia la ficha si se digitó un código (sin elegirlo de la lista). */
+  copiarCodigoDigitado() {
+    if (typeof this.busquedaCopia.value == 'string' && !this.copiando && !this.guardando) this.copiarDesdeItem();
+  }
+
   copiarDesdeItem() {
     const codigo = this.codigoDe(this.busquedaCopia.value);
     if (!(codigo > 0)) { this.msj.mensajeAdvertencia('Advertencia', 'Busque el item a copiar por nombre o digite su código.'); return; }

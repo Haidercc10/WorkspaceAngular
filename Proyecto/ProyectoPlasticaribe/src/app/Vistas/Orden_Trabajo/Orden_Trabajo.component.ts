@@ -2157,8 +2157,9 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas() {
     let simboloPorcentaje: boolean = false;
-    let data: string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
-    if (['CUSTOM', ''].includes(`${data}`.trim())) data = 'NO APLICA MEZCLA';
+    // Items sin mezcla en BagPro (MezModoNom NULL) se tratan como "NO APLICA MEZCLA" para no romper la carga
+    let data: string = `${this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas ?? ''}`.trim();
+    if (['CUSTOM', ''].includes(data)) data = 'NO APLICA MEZCLA';
     simboloPorcentaje = data.includes("%") ? true : false;
     if (simboloPorcentaje) data = data.replace('%', '%25')
     else data = data;

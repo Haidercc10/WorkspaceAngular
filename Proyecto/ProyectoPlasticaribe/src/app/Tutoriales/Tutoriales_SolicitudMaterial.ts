@@ -25,8 +25,8 @@ const el = (nombre : string) => `[data-tutorial="${nombre}"]`;
 
 export function pasosTutorialSolicitudMaterial({ puedeEditar, puedeElegirProceso, puedeExcederLimite, porcentajeAdicional } : ContextoTutorialSolicitudMaterial) : Step.StepOptions[] {
   return armar('tutorial-solicitud-material', [
-    paso(null, '¡Solicitud de Materia Prima!',
-      `<p>¡Aquí le pedimos al encargado del inventario el material que necesitamos para producir una <b>orden de trabajo (OT)</b>!</p>
+    paso(null, 'Solicitud de Materia Prima',
+      `<p>Aquí le pedimos al encargado del inventario el material que necesitamos para producir una <b>orden de trabajo (OT)</b>.</p>
        <p>El proceso es:</p>
        <ol>
          <li>Llenamos el encabezado: <b>proceso</b>, <b>OT</b>, <b>fecha de entrega</b> y una o varias <b>máquinas</b>.</li>
@@ -37,17 +37,17 @@ export function pasosTutorialSolicitudMaterial({ puedeEditar, puedeElegirProceso
        <p><b>Importante:</b> una solicitud creada <b>no se puede editar</b>; revise bien antes de guardar.
        Si se equivoca, puede <b>cancelarla</b> mientras no tenga material entregado y crear otra.</p>`),
 
-    paso(el('misSolicitudes'), '¡Mis solicitudes pendientes!',
+    paso(el('misSolicitudes'), 'Mis solicitudes pendientes',
       `<p>Aquí vemos las solicitudes que <b>nosotros</b> creamos y que todavía no tienen material entregado.</p>
        <p>Si nos equivocamos en una, la <b>cancelamos</b> con <i class="pi pi-ban"></i> (pide confirmar) y creamos una nueva.
        Cuando ya tiene material entregado, solo quien asigna puede finalizarla o cancelarla.</p>`),
 
-    puedeEditar && paso(el('solicitud'), '¡Editar una solicitud!',
+    puedeEditar && paso(el('solicitud'), 'Editar una solicitud',
       `<p>Como <b>administrador</b>, para <b>modificar</b> una solicitud ya creada escribimos su número y presionamos <b>Enter</b>.</p>
        <p>Se cargan su OT, máquinas con su reparto, fecha, observación y los materiales pedidos, y el botón cambia a <b>Editar Solicitud</b>.</p>
        <p>Mientras se edita, la <b>OT</b> y el <b>proceso</b> no se pueden cambiar. Solo se pueden editar solicitudes <b>pendientes o parciales</b>.</p>`),
 
-    paso(el('proceso'), '¡Proceso!',
+    paso(el('proceso'), 'Proceso',
       puedeElegirProceso
         ? `<p>Elegimos el proceso en el que se va a usar el material:</p>
            <ul>
@@ -58,13 +58,13 @@ export function pasosTutorialSolicitudMaterial({ puedeEditar, puedeElegirProceso
         : `<p>El proceso <b>se carga solo según su rol</b> y no se puede cambiar.</p>
            <p>En <b>Extrusión</b> se solicitan materias primas; en Impresión, Empaque y Laminado se solicitan tintas.</p>`),
 
-    paso(el('ot'), '¡Orden de Trabajo!',
+    paso(el('ot'), 'Orden de Trabajo',
       `<p>Escribimos el número de la OT y presionamos <b>Enter</b>.</p>
        <p>Si existe, se carga su información en la tabla de abajo y, en Extrusión, sale un mensaje con los <b>kg que aún se pueden solicitar</b>.
        Si la OT está <b>cerrada</b> nos avisa de una vez y no deja pedirle materiales.</p>
        <p>Con el botón <i class="pi pi-file-pdf"></i> de la derecha vemos el <b>PDF de la OT consultada</b>.</p>`),
 
-    paso(el('fechaEntrega'), '¡Fecha de entrega!',
+    paso(el('fechaEntrega'), 'Fecha de entrega',
       `<p>Es la fecha en que <b>necesitamos</b> el material. Es <b>obligatoria</b> y no se pueden elegir fechas pasadas.</p>`),
 
     paso(el('tablaOT'), '¡Información de la OT!',
@@ -77,19 +77,19 @@ export function pasosTutorialSolicitudMaterial({ puedeEditar, puedeElegirProceso
          <li>Si la OT ya está <b>completada</b>, no admite más solicitudes de materia prima; si está <b>finalizada</b>, no admite ninguna.</li>
        </ul>`),
 
-    paso(el('maquinas'), '¡Máquinas!',
+    paso(el('maquinas'), 'Máquinas',
       `<p>En la sección <b>Distribución por máquinas</b>, debajo de la OT, salen las máquinas del proceso como botones.
        Con <b>un clic</b> elegimos una máquina (queda marcada con <i class="pi pi-check"></i>) y con otro clic la quitamos; podemos elegir <b>varias</b>.</p>
        <p>Si no caben todas, la fila se desplaza <b>arrastrando</b> con el mouse, con la rueda o con las flechas de los lados.</p>`),
 
-    paso(el('distribucion'), '¡Distribución por máquinas!',
+    paso(el('distribucion'), 'Distribución por máquinas',
       `<p>Con <b>una</b> máquina, todo el material va a ella.</p>
        <p>Con <b>varias</b>, cada máquina tiene su tarjeta donde escribimos el <b>porcentaje</b> o la <b>cantidad</b> (por ejemplo 2000 y 1000 de 3000).
        La cantidad aparece cuando agregamos materiales; antes sale un guion.
        Con <b>dos</b> máquinas, al cambiar una la otra se ajusta sola. <b>Repartir en partes iguales</b> divide el total por igual.</p>
        <p>Los porcentajes deben sumar <b>100%</b> para poder guardar.</p>`),
 
-    paso(el('agregarSubcategoria'), '¡Agregar subcategoría!',
+    paso(el('agregarSubcategoria'), 'Agregar subcategoría',
       `<p>Se habilita con el encabezado completo (OT consultada, fecha de entrega y máquinas). Abre una ventana con dos pasos:</p>
        <ol>
          <li><b>Subcategorías:</b> la lista con su <b>stock</b>, su <b>disponible</b> y lo que ya está en la solicitud. Hacemos clic en una.</li>
@@ -99,16 +99,16 @@ export function pasosTutorialSolicitudMaterial({ puedeEditar, puedeElegirProceso
        <p>Con la flecha <i class="pi pi-arrow-left"></i> (o la tecla <b>Esc</b>) regresamos a las subcategorías: la que elegimos queda <b>resaltada</b> para no perder el hilo. En las subcategorías, <b>Esc</b> cierra la ventana y, si ya agregamos materiales, <b>Enter</b> hace lo mismo que <b>Listo</b>.</p>
        <p>Si se nos olvidó algo, volvemos a buscar el material y escribimos lo que falta: <b>se suma</b> a lo que ya tenía.</p>`),
 
-    paso(el('tablaSolicitadas'), '¡Subcategorías solicitadas!',
+    paso(el('tablaSolicitadas'), 'Subcategorías solicitadas',
       `<p>Cada subcategoría es una <b>fila‑título</b> con el <b>total</b> de sus materiales y su <b>disponible</b>; debajo van sus materiales,
        donde podemos <b>corregir la cantidad</b> o quitar un material con <i class="pi pi-times"></i>.</p>
        <p>Con <i class="pi pi-trash"></i> quitamos la subcategoría completa. El <b>disponible</b> se pone en <b>rojo</b> si lo pedido lo supera.</p>
        <p>Al final sale el <b>total solicitado</b> y, en <b>Extrusión</b>, los kg por solicitar de la OT y cuántos quedarían después de guardar.</p>`),
 
-    paso(el('observacion'), '¡Observación!',
+    paso(el('observacion'), 'Observación',
       `<p>Un comentario general de la solicitud (hasta 2000 caracteres). Lo ve el encargado de entregar el material y sale en el PDF.</p>`),
 
-    paso(el('botonesSolicitud'), puedeEditar ? '¡Crear o Editar Solicitud!' : '¡Crear Solicitud!',
+    paso(el('botonesSolicitud'), puedeEditar ? 'Crear o Editar Solicitud' : 'Crear Solicitud',
       `<p>Al presionar <b>${puedeEditar ? 'Crear Solicitud / Editar Solicitud' : 'Crear Solicitud'}</b> se revisa que:</p>
        <ul>
          <li>El encabezado esté completo y la OT consultada y <b>abierta</b>.</li>

@@ -1,1848 +1,1008 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
-import { OverlayPanel } from 'primeng/overlaypanel';
-import { Table } from 'primeng/table';
-import { modelOpedido } from 'src/app/Modelo/modelOpedido';
-import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
-import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
+import { MenuItem } from 'primeng/api';
+import { Subject, debounceTime, finalize, forkJoin, of, shareReplay, catchError, map, Observable } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
-import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
-import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-import { defaultStepOptions, stepsVerPedidos as defaultSteps } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { DepartamentosMunicipiosColombiaService } from 'src/app/Servicios/DepartamentosMunicipiosColombia/DepartamentosMunicipiosColombia.service';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { DepartamentosMunicipiosColombiaService, MunicipioColombia } from 'src/app/Servicios/DepartamentosMunicipiosColombia/DepartamentosMunicipiosColombia.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
+import { COLOR_REJILLA_GRAFICA, colorSerieGrafica, colorTextoGrafica } from 'src/app/Servicios/Tema/Paleta';
+import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
+import { pasosTutorialPedidosZeus } from 'src/app/Tutoriales/Tutoriales_PedidosZeus';
+import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import {
+  DIAS_PROXIMOS, ESTADOS_OT, IndicadoresPedidos, OtDePedido, PedidoZeusLinea, ResumenPedido, Semaforo,
+  calcularIndicadores, calcularSemaforo, ciudadLegible, mapearLinea, normalizar, normalizarMunicipio, parsearCiudad,
+  procesoActualOt, resumirPedidos, sumarPor, textoBusqueda,
+} from './ReportePedidos_Zeus.modelo';
+
+/** Columna de la tabla de detalle. */
+interface ColumnaPedido {
+  field: keyof PedidoZeusLinea | 'ciudadLegible';
+  header: string;
+  tipo: 'texto' | 'numero' | 'moneda' | 'estado' | 'ot' | 'proceso' | 'producto';
+  defecto: boolean;
+}
+
+/** Filtros que se activan al hacer clic en una tarjeta de indicadores. */
+type FiltroKpi = 'facturable' | 'vencido' | 'proximos' | 'programados' | 'sinOt' | null;
+
+/** Fila del consolidado de asesores. */
+interface ConsolidadoAsesor {
+  codigo: string;
+  vendedor: string;
+  factMesAnterior: number | null;
+  factMesActual: number | null;
+  pendienteVencido: number;
+  pendienteMes: number;
+  pendienteFuturo: number;
+  pendienteTotal: number;
+  proyectado: number | null;
+}
+
+const CLAVE_COLUMNAS = 'pedidos-zeus-columnas-v1';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
   templateUrl: './ReportePedidos_Zeus.component.html',
   styleUrls: ['./ReportePedidos_Zeus.component.css']
 })
-export class ReportePedidos_ZeusComponent implements OnInit {
+export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
 
-  @ViewChild('op') op: OverlayPanel | undefined;
-  @ViewChild('dt') dt: Table | undefined;
-  @ViewChild('dtModal2') dtModal2: Table | undefined;
   @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT: Reporte_Procesos_OTComponent;
-  @ViewChild(PedidoExternoComponent) modalPedidoExterno: PedidoExternoComponent;
+  /** true cuando la vista se muestra dentro de Reportes Consolidados (sin título propio). */
   @Input() reporteConsolidado: boolean = false;
 
-  cargando: boolean = false;
-  today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente.
-  infoColor: string = ''; //Varable que almcanerá la descripcion del un color
-  pedidosOriginales: Array<any> = [];
-  ArrayPedidos: any[] = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
-  virtualPedidos !: any[];
-  modalEditar: boolean = false; //Variable que validará si el pedido está en edición o no
-  columnas: any[] = [];
-  columnasSeleccionadas: any[] = [];
-  expandedRows: {} = {};
-  itemSeleccionado: any;
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly busqueda$ = new Subject<string>();
+
+  // ---------- Estado general ----------
+  cargando: boolean = false;            // spinner global (exportaciones)
+  cargandoTabla: boolean = true;        // primera carga de pedidos
+  cargandoOts: boolean = false;         // las OT llegan después de la tabla
+  errorCarga: boolean = false;
+  ultimaActualizacion: Date | null = null;
+  storage_Id: number;
+  storage_Nombre: any;
+  ValidarRol: number;
+  modoSeleccionado: boolean;
+  private readonly temaActual = alCambiarTema(oscuro => {
+    this.modoSeleccionado = oscuro;
+    if (this.mostrarAnalisis) this.armarGraficas();
+  });
+
+  // ---------- Datos ----------
+  lineas: PedidoZeusLinea[] = [];
+  lineasFiltradas: PedidoZeusLinea[] = [];
+  resumenes = new Map<string, ResumenPedido>();
+  indicadores: IndicadoresPedidos = calcularIndicadores([]);
+  expandedRows: { [consecutivo: string]: boolean } = {};
+  readonly estadosOt = ESTADOS_OT;
+  readonly diasProximos = DIAS_PROXIMOS;
+
+  // ---------- Filtros ----------
+  busqueda: string = '';
+  departamentosSel: string[] = [];
+  municipiosSel: string[] = [];
+  clientesSel: string[] = [];
+  vendedorSel: string | null = null;
+  rangoEntrega: Date[] | null = null;
+  estadosSel: string[] = [];
+  semaforosSel: Semaforo[] = [];
+  filtroKpi: FiltroKpi = null;
+  ordenarPor: 'semaforo' | 'entrega' | 'valor' | 'cliente' | 'pedido' = 'semaforo';
+
+  opcionesDepartamentos: { label: string; value: string }[] = [];
+  opcionesMunicipios: { label: string; value: string; departamento: string }[] = [];
+  opcionesClientes: { label: string; value: string }[] = [];
+  opcionesVendedores: { label: string; value: string }[] = [];
+  readonly opcionesEstado = [
+    { label: 'Pendiente', value: 'Pendiente' },
+    { label: 'Parcialmente satisfecho', value: 'Parcialmente Satisfecho' },
+  ];
+  readonly opcionesSemaforo: { label: string; value: Semaforo; tooltip: string }[] = [
+    { label: 'Completo', value: 'completo', tooltip: 'Todos los ítems del pedido tienen stock suficiente: se puede facturar completo' },
+    { label: 'Parcial', value: 'parcial', tooltip: 'Al menos un ítem del pedido tiene stock suficiente' },
+    { label: 'Sin stock', value: 'sinStock', tooltip: 'Ningún ítem del pedido tiene stock suficiente' },
+  ];
+  readonly opcionesOrden = [
+    { label: 'Semáforo', value: 'semaforo' },
+    { label: 'Fecha de entrega', value: 'entrega' },
+    { label: 'Valor pendiente', value: 'valor' },
+    { label: 'Cliente', value: 'cliente' },
+    { label: 'N° de pedido', value: 'pedido' },
+  ];
+  private municipiosDane: MunicipioColombia[] = [];
+
+  // ---------- Tabla ----------
+  readonly columnas: ColumnaPedido[] = [
+    { field: 'id_Producto', header: 'Ítem', tipo: 'texto', defecto: true },
+    { field: 'producto', header: 'Producto', tipo: 'producto', defecto: true },
+    { field: 'cant_Pendiente', header: 'Pendiente', tipo: 'numero', defecto: true },
+    { field: 'existencias', header: 'Stock', tipo: 'numero', defecto: true },
+    { field: 'presentacion', header: 'Und', tipo: 'texto', defecto: true },
+    { field: 'precioUnidad', header: 'Precio U.', tipo: 'moneda', defecto: true },
+    { field: 'costo_Cant_Pendiente', header: 'Total pendiente', tipo: 'moneda', defecto: true },
+    { field: 'estado', header: 'Estado', tipo: 'estado', defecto: true },
+    { field: 'OT', header: 'OT', tipo: 'ot', defecto: true },
+    { field: 'Proceso_OT', header: 'Proceso actual', tipo: 'proceso', defecto: true },
+    { field: 'ciudadLegible', header: 'Ciudad', tipo: 'texto', defecto: false },
+    { field: 'cant_Pedida', header: 'Cant. pedida', tipo: 'numero', defecto: false },
+    { field: 'cant_Facturada', header: 'Facturada', tipo: 'numero', defecto: false },
+    { field: 'vendedor', header: 'Vendedor', tipo: 'texto', defecto: false },
+    { field: 'orden_Compra_CLiente', header: 'OC cliente', tipo: 'texto', defecto: false },
+    { field: 'fecha_Creacion', header: 'Fecha creación', tipo: 'texto', defecto: false },
+    { field: 'fecha_Entrega', header: 'Fecha entrega', tipo: 'texto', defecto: false },
+    { field: 'costo_Cant_Total', header: 'Total', tipo: 'moneda', defecto: false },
+  ];
+  columnasSeleccionadas: ColumnaPedido[] = [];
+  lineaDetalle: PedidoZeusLinea | null = null;
+  detalleVisible: boolean = false;
   modalEstadosOrdenes: boolean = false;
-  consecutivoPedido: any = '';
-  productosPedidos: any[] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
-  costoCantidadTotal: number = 0;
-  costoCantidadPendiente: number = 0;
-  arrayPedidosIndividuales: any = [];
-  datosExcel: any[] = []; //VAriable que almcanerá la informacion que se verá en el archivo de excel
-  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
-  modalExportarPDF: boolean = false;
-  informacionPDF: any[] = [];
-  vendedores: any[] = [];
-  clientes: any[] = [];
-  departamentos: any[] = [];
-  municipios: any[] = [];
-  clienteSeleccionado: any;
-  vendedorSeleccionado: any;
-  departamentoSeleccionado: any = [];
-  municipioSeleccionado: any;
-  test: any = [];
-  groupedSales: any = [];
-  modal: boolean = false;
-  actualMonth = parseInt(moment().format('MM'));
-  previousMonth = parseInt(moment().subtract(1, 'month').format('MM'));
-  asesors: any = [];
-  modalSalesAsesor: boolean = false;
-  salesAsesor: any = [];
-  selectedAsesor: string = '';
+  consecutivoPedido: string = '';
+
+  // ---------- Exportar ----------
+  menuExportar: MenuItem[] = [
+    { label: 'PDF consolidado', icon: 'pi pi-file-pdf', command: () => this.pdfConsolidado() },
+    { label: 'Excel detallado', icon: 'pi pi-file-excel', command: () => this.exportarExcel() },
+    { label: 'Excel planeación de OT', icon: 'pi pi-file-excel', command: () => this.exportarExcelPlaneacion() },
+  ];
+
+  // ---------- Análisis (gráficas) ----------
+  mostrarAnalisis: boolean = false;
+  graficaMeses: any;
+  graficaClientes: any;
+  graficaVendedores: any;
+  opcionesGraficaMeses: any;
+  opcionesGraficaBarras: any;
+
+  // ---------- Consolidado de asesores ----------
+  modalConsolidado: boolean = false;
+  cargandoConsolidado: boolean = false;
+  consolidadoAsesores: ConsolidadoAsesor[] = [];
+  totalesConsolidado: ConsolidadoAsesor | null = null;
+  readonly nombreMesActual = this.nombreMes(moment());
+  readonly nombreMesAnterior = this.nombreMes(moment().subtract(1, 'month'));
+  private facturacion$?: Observable<{ anterior: Map<string, number>; actual: Map<string, number> } | null>;
+  modalPedidosAsesor: boolean = false;
+  asesorSeleccionado: string = '';
+  pedidosAsesor: PedidoZeusLinea[] = [];
+  totalesClienteAsesor = new Map<string, number>();
+  totalAsesor: number = 0;
 
   constructor(private AppComponent: AppComponent,
-    private messageService: MessageService,
     private inventarioZeusService: InventarioZeusService,
-    private pedidoProductosService: PedidoProductosService,
-    private pedidoExternoService: OpedidoproductoService,
     private estadosProcesos_OTService: EstadosProcesos_OTService,
-    private shepherdService: ShepherdService,
     private msj: MensajesAplicacionService,
-    private deparMuniciosColService: DepartamentosMunicipiosColombiaService,
-    private svBagpro: BagproService,
+    private svMunicipios: DepartamentosMunicipiosColombiaService,
     private svExcel: CreacionExcelService,
-    private svUsers: UsuarioService,
+    private svPdf: CreacionPdfService,
+    private tutoriales: TutorialesService,
   ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
-    this.lecturaStorage();
-    this.consultarDepartamentos();
-    this.seleccionarColumnas();
-    this.consultarPedidosZeus();
-    this.getBillingSales();
-    //this.consultarPedidos();
-  }
-
-  tutorial() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
-  }
-
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
-  }
-
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
-  // Funcion que consultará los departamentos de colombia
-  consultarDepartamentos() {
-    this.deparMuniciosColService.getDepartamentos().subscribe(res => {
-      res.push(this.agregarMunicipio());
-      this.departamentos = res.reduce((a, b) => {
-        if (!a.map(x => x.departamento).includes(b.departamento)) a = [...a, b];
-        return a;
-      }, []);
-      this.departamentos.sort((a, b) => a.departamento.localeCompare(b.departamento));
+    this.columnasSeleccionadas = this.leerColumnas();
+    this.busqueda$.pipe(debounceTime(250), takeUntilDestroyed(this.destroyRef)).subscribe(() => this.aplicarFiltros());
+    this.svMunicipios.getMunicipios().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(lista => {
+      this.municipiosDane = lista;
+      this.armarOpcionesLugares();
     });
-  }
-
-  // Funcion que agregará el municipio de cartagena de forma manual para poder filtrar por él
-  agregarMunicipio() {
-    return { "region": "Región Caribe", "c_digo_dane_del_departamento": "0", "departamento": "Bolívar", "c_digo_dane_del_municipio": "0", "municipio": "Cartagena" }
-  }
-
-  // Funcion que devolverá los municipios de los departamentos seleccionados
-  consultarMunicipios() {
-    this.municipios = [];
-    this.deparMuniciosColService.getDepartamentos().subscribe(res => {
-      res.push(this.agregarMunicipio());
-      this.departamentoSeleccionado.forEach(depar => this.municipios = this.municipios.concat(res.filter(x => x.departamento == depar.departamento)));
-    });
-    // this.filtrarPedidos();
-  }
-
-  // Funcion que va a consultar los pedidos de zeus
-  consultarPedidosZeus() {
-    this.cargando = true;
-    this.pedidosOriginales = [];
-    this.ArrayPedidos = [];
-    this.datosExcel = [];
-    const sales = this.ValidarRol == 2
-      ? `?sales=${String(this.storage_Id).padStart(3, '0')}`
-      : '';
-
-    this.inventarioZeusService.GetPedidos(sales).subscribe(datos_pedidos => {
-      for (let i = 0; i < datos_pedidos.length; i++) {
-        this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-        this.loadOtInCustomerOrder(datos_pedidos[i], datos_pedidos.length);
-      }
-    });
-    setTimeout(() => {
-      this.getClientes();
-      this.getVendedores();
-      this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-      // Utiliza un enfoque de mapeo para expandir las filas
-      this.expandedRows = this.ArrayPedidos.reduce((acc: any, pedido: any) => {
-        acc[pedido.consecutivo] = true;
-        return acc;
-      }, {});
-    }, 6000);
-  }
-
-  //Función que obtendrá la información de 
-  getBillingSales() {
-    let previousMonth = moment().subtract(1, 'month').format('MM');
-    let actualMonth = moment().format('MM');
-    let months: any = [previousMonth, actualMonth];
-    let year: any = moment().format('YYYY');
-
-    this.svUsers.GetVendedores().subscribe(data => {
-      data.forEach(x => {
-        let code: string = x.usua_Id.toString()
-        let asesorId: string = code.length == 1 ? `00${x.usua_Id}` : code.length == 2 ? `0${x.usua_Id}` : `${x.usua_Id}`;
-        x.asesor = x.usua_Nombre;
-        x.id = asesorId
-        months.forEach(month => {
-          this.inventarioZeusService.GetCostoFacturado_Vendedor(x.id, month, year).subscribe(fact => {
-            if (month == previousMonth) x.factMesAnterior = fact
-            if (month == actualMonth) x.factMesActual = fact
-          });
-        });
-      });
-      this.asesors = data;
-    });
-  }
-
-  //*MODAL 3
-  //*Función que mostrará los pedidos de cada vendedor por cliente. 
-  getSalesAsesor(asesor: any) {
-    this.salesAsesor = [];
-    this.selectedAsesor = asesor.vendedor
-    let sales: any = this.ArrayPedidos.filter((x: any) => x.idVendedor == asesor.codigo);
-    if (sales?.length) {
-      this.salesAsesor = sales.map((x: any) => ({
-        ...x,
-        sales: {
-          cliente: x.cliente
-        }
-      }));
-    }
-    this.salesAsesor.sort((a, b) => a.sales.cliente.localeCompare(b.sales.cliente));
-    if (this.salesAsesor.length > 0) this.modalSalesAsesor = true;
-    else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró información de ventas para el asesor ${this.selectedAsesor}`);
-  }
-
-  //
-  totalSalesPending(asesor: string) {
-    let total: number = 0;
-    total = this.salesAsesor.filter(x => x.vendedor == asesor).reduce((acc, x) => acc += parseFloat(x.costo_Cant_Pendiente), 0);
-    return total;
-  }
-
-  //
-  totalSalesPendingForClient = (asesor: string, client: any) => this.salesAsesor.filter(x => x.idVendedor == asesor && x.cliente == client).reduce((acc, x) => acc + parseFloat(x.costo_Cant_Pendiente), 0);
-
-  // Funcion que va a consultar los pedidos que no han sido cargados a zeus
-  consultarPedidos() {
-    this.cargando = true;
-    this.pedidoProductosService.getPedidoPendiente().subscribe(datos_pedidos => {
-      for (let i = 0; i < datos_pedidos.length; i++) {
-        if (this.ValidarRol == 2) {
-          if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarArrayPedidos(datos_pedidos[i], i);
-        } else if ([1, 6, 60, 96, 12].includes(this.ValidarRol)) this.llenarArrayPedidos(datos_pedidos[i], i);
-      }
-    });
-    setTimeout(() => this.cargando = false, 1500);
-  }
-
-  // Funcion que va a almcanear las columnas que se podrán elegir y que saldrán elegidas desde el principio
-  seleccionarColumnas() {
-    this.columnas = [
-      { header: 'Pedido', field: 'consecutivo', tipo: '' },
-      { header: 'Cliente', field: 'cliente', tipo: '' },
-      { header: 'Ciudad', field: 'ciudad', tipo: '' },
-      { header: 'Item', field: 'id_Producto', tipo: '' },
-      { header: 'Producto', field: 'producto', tipo: '' },
-      { header: 'Cant. Pedida', field: 'cant_Pedida', tipo: 'numero' },
-      { header: 'Facturada', field: 'cant_Facturada', tipo: 'numero' },
-      { header: 'Pendiente', field: 'cant_Pendiente', tipo: 'numero' },
-      { header: 'Stock', field: 'existencias', tipo: 'numero' },
-      { header: 'Und', field: 'presentacion', tipo: '' },
-      { header: 'Precio U.', field: 'precioUnidad', tipo: 'numero' },
-      { header: 'Total Pendiente', field: 'costo_Cant_Pendiente', tipo: 'numero' },
-      { header: 'Estado', field: 'estado', tipo: '' },
-      { header: 'Vendedor', field: 'vendedor', tipo: '' },
-      { header: 'OT', field: 'OT', tipo: '' },
-      { header: 'Proceso Actual', field: 'Proceso_OT', tipo: '' },
-      { header: 'Total', field: 'costo_Cant_Total', tipo: 'numero' },
-      { header: 'OC Cliente', field: 'orden_Compra_CLiente', tipo: '' },
-      { header: 'Fecha Creación', field: 'fecha_Creacion', tipo: '' },
-      { header: 'Fecha Entrega', field: 'fecha_Entrega', tipo: '' },
-    ];
-    this.columnasSeleccionadas = this.columnas;
-    let posicion = this.columnasSeleccionadas.findIndex((item) => item.header == 'Total');
-    this.columnasSeleccionadas.splice(posicion, 1);
-  }
-
-  // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos en zeus
-  llenarArrayPedidosZeus(datos: any, index: number) {
-    let info: any = {
-      id: index,
-      id_color: 4,
-      color: 'blanco',
-      consecutivo: (datos.consecutivo).toString().trim(),
-      nitCliente: datos.id_Cliente,
-      cliente: datos.cliente,
-      ciudad: datos.ciudad,
-      producto: datos.producto,
-      id_Producto: datos.id_Producto,
-      cant_Pedida: datos.cant_Pedida.toFixed(2),
-      cant_Pendiente: parseFloat(datos.cant_Pendiente).toFixed(2),
-      cant_Facturada: datos.cant_Facturada.toFixed(2),
-      existencias: parseFloat(datos.existencias).toFixed(2),
-      presentacion: datos.presentacion,
-      presentacion2: datos.presentacion == 'KLS' ? 'Kilo' : datos.presentacion == 'UND' ? 'Unidad' : datos.presentacion == 'PAQ' ? 'Paquete' : '',
-      estado: datos.estado,
-      vendedor: datos.vendedor,
-      idVendedor: datos.id_Vendedor,
-      precioUnidad: datos.precioUnidad.toFixed(2),
-      orden_Compra_CLiente: datos.orden_Compra_CLiente,
-      costo_Cant_Pendiente: datos.costo_Cant_Pendiente.toFixed(2),
-      costo_Cant_Total: datos.costo_Cant_Total.toFixed(2),
-      fecha_Creacion: datos.fecha_Creacion.replace('T00:00:00', ''),
-      fecha_Entrega: datos.fecha_Entrega.replace('T00:00:00', ''),
-      OT: '',
-      Proceso_OT: '',
-      CantPesada: '',
-      Estado_OT: '',
-      CantPedidaKg_OT: '',
-      CantPedidaUnd_OT: '',
-      Zeus: 1,
-      'fecha_Factura': datos.fecha_Factura
-    };
-
-    /*this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
-      for (let i = 0; i < datos_orden.length; i++) {
-        if (parseInt(datos.id_Producto) == datos_orden[i].prod_Id) {
-          info.OT = datos_orden[i].estProcOT_OrdenTrabajo;
-          if (datos_orden[i].estProcOT_ExtrusionKg > 0) {
-            info.Proceso_OT = `Extrusión ${this.formatonumeros(datos_orden[i].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_ImpresionKg > 0) {
-            info.Proceso_OT = `Impresión ${this.formatonumeros(datos_orden[i].estProcOT_ImpresionKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_ImpresionKg.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_RotograbadoKg > 0) {
-            info.Proceso_OT = `Rotograbado ${this.formatonumeros(datos_orden[i].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_RotograbadoKg.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_LaminadoKg > 0) {
-            info.Proceso_OT = `Laminado ${this.formatonumeros(datos_orden[i].estProcOT_LaminadoKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_LaminadoKg.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_CorteKg > 0) {
-            info.Proceso_OT = `Corte - ${this.formatonumeros(datos_orden[i].estProcOT_CorteKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_CorteKg.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_DobladoKg > 0) {
-            info.Proceso_OT = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_DobladoKg.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_EmpaqueKg > 0) {
-            info.Proceso_OT = `Empaque ${this.formatonumeros(datos_orden[i].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_EmpaqueKg.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_SelladoKg > 0) {
-            info.Proceso_OT = `Sellado ${this.formatonumeros(datos_orden[i].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_SelladoKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_SelladoUnd.toFixed(2);
-          }
-          if (datos_orden[i].estProcOT_WiketiadoKg > 0) {
-            info.Proceso_OT = `Wiketiado ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
-            info.CantPesada = datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2);
-          }
-          info.Estado_OT = datos_orden[i].estado_Id;
-          info.CantPedidaKg_OT = datos_orden[i].estProcOT_CantidadPedida;
-          info.CantPedidaUnd_OT = datos_orden[i].estProcOT_CantidadPedidaUnd;
-        }
-      }
-    });*/
-    this.ArrayPedidos.push(info);
-    this.datosExcel = this.ArrayPedidos;
-
-    let pedidos = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo);
-    let cantidad = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo && parseFloat(item.existencias) >= parseFloat(item.cant_Pendiente));
-
-    if (pedidos.length == cantidad.length) {
-      for (let i = 0; i < pedidos.length; i++) {
-        let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
-        this.ArrayPedidos[posicion].id_color = 1;
-        this.ArrayPedidos[posicion].color = 'verde';
-      }
-    } else if (cantidad.length > 0 && cantidad.length < pedidos.length) {
-      for (let i = 0; i < pedidos.length; i++) {
-        if (parseFloat(pedidos[i].existencias) >= parseFloat(pedidos[i].cant_Pendiente)) {
-          let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
-          this.ArrayPedidos[posicion].id_color = 2;
-          this.ArrayPedidos[posicion].color = 'verde';
-        } else {
-          let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
-          this.ArrayPedidos[posicion].id_color = 2;
-          this.ArrayPedidos[posicion].color = 'azul';
-        }
-      }
-    } else {
-      for (let i = 0; i < pedidos.length; i++) {
-        let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
-        this.ArrayPedidos[posicion].id_color = 4;
-        this.ArrayPedidos[posicion].color = 'blanco';
-      }
-    }
-    this.pedidosOriginales = this.ArrayPedidos;
-  }
-
-  //*Función que agrupará los vendedores según su facturación y pedidos
-  groupSales() {
-    this.groupedSales = [];
-    this.modal = true;
-    this.modal = true
-    let actualMonth = parseInt(moment().format('MM'));
-
-    this.ArrayPedidos.filter(x => parseInt(moment(x.fecha_Entrega).format('YYYY')) == 2025).forEach((item) => {
-      let month = moment(item.fecha_Entrega).format('MM');
-      let index = this.groupedSales.findIndex((x) => x.codigo == item.idVendedor);
-
-      let pendiente: number = parseFloat(item.costo_Cant_Pendiente);
-
-      if (index == -1) {
-        this.groupedSales.push({
-          'codigo': item.idVendedor,
-          'vendedor': item.vendedor,
-          'pendiente': pendiente,
-          'mes': month,
-          'anio': 2025,
-          'factMesAnterior': this.totalPreviousMonth(item.idVendedor),
-          'factMesActual': this.totalActualMonth(item.idVendedor),
-          'proyectado': pendiente + this.totalActualMonth(item.idVendedor),
-        });
-      } else {
-        this.groupedSales[index].pendiente += pendiente,
-          this.groupedSales[index].proyectado = this.groupedSales[index].pendiente + this.totalActualMonth(item.idVendedor)
-
-        //this.groupedSales[index].factMesAnterior = datos;
-      }
-    });
-  }
-
-  //*Función que mostrará el valor total de todos los pedidos
-  totalSales = () => this.groupedSales.reduce((a, b) => a + b.total, 0);
-
-  //*Función que mostrará el valor pendiente por facturar en todos los pedidos
-  totalPending = () => this.groupedSales.reduce((a, b) => a + b.pendiente, 0);
-
-  //*Función que mostrará la facturación del mes anterior de cada vendedor
-  totalPreviousMonth = (code: string) => this.asesors.filter(x => x.id == code).reduce((a, b) => a + b.factMesAnterior, 0);
-
-  //*Función que mostrará la facturación del mes actual de cada vendedor
-  totalActualMonth = (code: string) => this.asesors.filter(x => x.id == code).reduce((a, b) => a + b.factMesActual, 0);
-
-  //*Función que mostrará la facturación del mes anterior de cada vendedor
-  getTotalMonth1 = () => this.asesors.reduce((a, b) => a + b.factMesAnterior, 0);
-
-  //*Función que mostrará la facturación del mes actual de cada vendedor
-  getTotalMonth2 = () => this.asesors.reduce((a, b) => a + b.factMesActual, 0);
-
-  //*Función que mostrará la facturación del mes actual de cada vendedor
-  getTotalProyectado = () => this.groupedSales.reduce((a, b) => a + b.proyectado, 0);
-
-
-  loadOtInCustomerOrder(data, lenght) {
-    this.test.push({
-      'date1': moment(data.fecha_Creacion).subtract(8, 'd').format('YYYY-MM-DD'),
-      'date2': moment(data.fecha_Creacion).add(8, 'd').format('YYYY-MM-DD'),
-      'item': data.id_Producto,
-      'consecutivo': (data.consecutivo).toString().trim(),
-    });
-    if (this.test.length == lenght) {
-      let count: number = 0;
-      let count2: number = 0;
-      this.estadosProcesos_OTService.getOtsForSalesOrder(this.test).subscribe(dataOts => {
-        dataOts.forEach(x => {
-          if (x != null) {
-            let index: number = this.ArrayPedidos.findIndex((item) => item.consecutivo == x.consecutivo && item.id_Producto == x.item.toString());
-            if (index) {
-              this.ArrayPedidos[index].OT = x.ot;
-              this.ArrayPedidos[index].Estado_OT = x.status;
-              if (x.extrusion > 0) this.ArrayPedidos[index].Proceso_OT = `Extrusión ${this.formatonumeros(x.extrusion.toFixed(2))} Kg`;
-              if (x.impresión > 0) this.ArrayPedidos[index].Proceso_OT = `Impresión ${this.formatonumeros(x.impresión.toFixed(2))} Kg`;
-              if (x.rotograbado > 0) this.ArrayPedidos[index].Proceso_OT = `Rotograbado ${this.formatonumeros(x.rotograbado.toFixed(2))} Kg`;
-              if (x.laminado > 0) this.ArrayPedidos[index].Proceso_OT = `Laminado ${this.formatonumeros(x.laminado.toFixed(2))} Kg`;
-              if (x.corte > 0) this.ArrayPedidos[index].Proceso_OT = `Corte ${this.formatonumeros(x.corte.toFixed(2))} Kg`;
-              if (x.doblado > 0) this.ArrayPedidos[index].Proceso_OT = `Doblado ${this.formatonumeros(x.doblado.toFixed(2))} Kg`;
-              if (x.empaque > 0) this.ArrayPedidos[index].Proceso_OT = `Empaque ${this.formatonumeros(x.empaque.toFixed(2))} Kg`;
-              if (x.selladoKg > 0) this.ArrayPedidos[index].Proceso_OT = `Sellado ${this.formatonumeros(x.selladoUnd.toFixed(2))} Und - ${this.formatonumeros(x.selladoKg.toFixed(2))} Kg`;
-              if (x.wiketiadoKg > 0) this.ArrayPedidos[index].Proceso_OT = `Wiketiado ${this.formatonumeros(x.wiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(x.wiketiadoKg.toFixed(2))} Kg`;
-              count2++
-            }
-          }
-          count += 1;
-          if (dataOts.length == count) {
-            this.cargando = false;
-          }
-        });
-      }, error => { console.log(error); });
-      //});
-    }
-  }
-
-  // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos
-  llenarArrayPedidos(datos: any, index: number) {
-    console.log(datos);
-    if (datos.undMed_Id == 'Und') datos.undMed_Id = 'UND';
-    if (datos.undMed_Id == 'Kg') datos.undMed_Id = 'KLS';
-    if (datos.undMed_Id == 'Paquete') datos.undMed_Id = 'PAQ';
-
-    let info: any = {
-      'id': index,
-      'id_color': 3,
-      'color': 'rojo',
-      'consecutivo': datos.pedExt_Id,
-      'cliente': datos.cli_Nombre,
-      'producto': datos.prod_Nombre,
-      'id_Producto': datos.prod_Id,
-      'cant_Pedida': datos.pedExtProd_Cantidad,
-      'cant_Pendiente': datos.pedExtProd_Cantidad,
-      'cant_Facturada': 0,
-      'existencias': datos.existencias,
-      'presentacion': datos.undMed_Id,
-      'estado': datos.estado_Nombre,
-      'vendedor': datos.usua_Nombre,
-      'precioUnidad': datos.pedExtProd_PrecioUnitario,
-      'orden_Compra_CLiente': datos.orden_Compra_CLiente,
-      'costo_Cant_Pendiente': datos.costo_Cant_Pendiente,
-      'costo_Cant_Total': datos.pedExtProd_Cantidad * datos.pedExtProd_PrecioUnitario,
-      'fecha_Creacion': datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
-      'fecha_Entrega': datos.pedExtProd_FechaEntrega.replace('T00:00:00', ''),
-      'OT': '',
-      'Proceso_OT': '',
-      'CantPesada': '',
-      'Estado_OT': '',
-      'CantPedidaKg_OT': '',
-      'CantPedidaUnd_OT': '',
-      'Zeus': 0,
-    };
-
-    //this.inventarioZeusService.getExistenciasProductos(datos.prod_Id.toString(), datos.undMed_Id).subscribe(data => data.forEach(exi => info.existencias = exi.existencias));
-    this.ArrayPedidos.push(info);
-    this.datosExcel = this.ArrayPedidos;
-    this.ArrayPedidos.sort((a, b) => Number(a.id) - Number(b.id));
-    this.pedidosOriginales = this.ArrayPedidos;
-  }
-
-  filtrarPedidos() {
-    this.ArrayPedidos = this.seleccionarInformacionPDf();
-    this.ArrayPedidos.sort((a, b) => Number(a.id) - Number(b.id));
-    this.cargando = false;
-    this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-    const thisRef = this;
-    this.ArrayPedidos.forEach((pedido) => thisRef.expandedRows[pedido.consecutivo] = true);
-  }
-
-  // Funcion que va a calcular el costo total del pedido
-  calcularCostoPedido(consecutivo: number): number {
-    let nuevo = this.ArrayPedidos.filter((item) => item.consecutivo == consecutivo);
-    let total: number = nuevo.reduce((a, b) => a + (b.cant_Pendiente * b.precioUnidad), 0);
-    return total;
-  }
-
-  // Funcion que creará un archivo de excel con base de lo que esté en la tabla
-  exportarExcel() {
-    if (this.ArrayPedidos.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
-    else {
-      this.cargando = true;
-      const title = `Reporte de Pedidos Zeus - ${this.today}`;
-      const header = ["N° Pedido", "Cliente", "Ciudad", "Id Producto", "Producto", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
-
-      let datos: any = [];
-      for (const item of this.datosExcel) {
-        const datos1: any = [item.consecutivo, item.cliente, item.ciudad, item.id_Producto, item.producto, parseFloat(item.cant_Pedida).toFixed(2), parseFloat(item.cant_Pendiente).toFixed(2), parseFloat(item.cant_Facturada).toFixed(2), parseFloat(item.existencias).toFixed(2), item.presentacion, parseFloat(item.precioUnidad).toFixed(2), item.estado, item.vendedor, item.orden_Compra_CLiente, parseFloat(item.costo_Cant_Pendiente).toFixed(2), parseFloat(item.costo_Cant_Total).toFixed(2), item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT];
-        datos.push(datos1);
-      }
-      //console.log(datos);
-      let workbook = new Workbook();
-      const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(`Reporte Pedidos Zeus - ${this.today}`);
-      worksheet.addImage(imageId1, 'A1:C3');
-      let titleRow = worksheet.addRow([title]);
-      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-      worksheet.addRow([]);
-      worksheet.addRow([]);
-      let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell) => {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
-        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      });
-      worksheet.mergeCells('A1:U3');
-      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-
-      datos.forEach(d => {
-        d[5] = parseFloat(d[5].toString().replace(',', '.'));
-        d[6] = parseFloat(d[6].toString().replace(',', '.'));
-        d[7] = parseFloat(d[7].toString().replace(',', '.'));
-        d[8] = parseFloat(d[8].toString().replace(',', '.'));
-        d[10] = parseFloat(d[10].toString().replace(',', '.'));
-        d[14] = parseFloat(d[14].toString().replace(',', '.'));
-        d[15] = parseFloat(d[15].toString().replace(',', '.'));
-
-        let row = worksheet.addRow(d);
-        row.alignment = { horizontal: 'center' }
-        row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(6).font = { color: { 'argb': 'FF7F71' }, 'name': 'Calibri', 'bold': true, 'size': 11 };
-
-        row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(15).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(16).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-
-        let colorEstadoPedido: string = 'FFFFFF';
-        let colorEstadoOT: string = 'FFFFFF';
-        // OT con Estado
-        if (row.getCell(21).value == 17) {
-          colorEstadoOT = '8AFC9B';
-          row.getCell(21).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(21).value = "Terminada";
-        } else if (row.getCell(21).value == 18) {
-          colorEstadoOT = '53CC48';
-          row.getCell(21).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(21).value = "Cerrada";
-        } else if (row.getCell(21).value == 3) {
-          colorEstadoOT = 'FF7878';
-          row.getCell(21).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(21).value = "Anulado";
-        } else if (row.getCell(21).value == 14) {
-          colorEstadoOT = '83D3FF';
-          row.getCell(21).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(21).value = "Asignada";
-        } else if (row.getCell(21).value == 16) {
-          colorEstadoOT = 'F3FC20;';
-          row.getCell(21).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(21).value = "En proceso";
-        } else if (row.getCell(21).value == 15) {
-          colorEstadoOT = 'F6D45D';
-          row.getCell(21).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
-          row.getCell(21).value = "Abierta";
-        } else colorEstadoOT = 'FFFFFF';
-
-        /** Estado Pedido*/
-        if (row.getCell(12).value == 'Pendiente') colorEstadoPedido = 'FF7F71'
-        else if (row.getCell(12).value == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
-        row.getCell(12).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoPedido }, }
-
-        //console.log(worksheet.getColumn(5));
-
-        worksheet.getColumn(1).width = 12;
-        worksheet.getColumn(2).width = 60;
-        worksheet.getColumn(3).width = 30;
-        worksheet.getColumn(4).width = 15;
-        worksheet.getColumn(5).width = 60;
-        worksheet.getColumn(6).width = 15;
-        worksheet.getColumn(7).width = 15;
-        worksheet.getColumn(8).width = 15;
-        worksheet.getColumn(9).width = 18;
-        worksheet.getColumn(10).width = 15;
-        worksheet.getColumn(11).width = 15;
-        worksheet.getColumn(12).width = 30;
-        worksheet.getColumn(13).width = 50;
-        worksheet.getColumn(14).width = 25;
-        worksheet.getColumn(15).width = 20;
-        worksheet.getColumn(16).width = 20;
-        worksheet.getColumn(17).width = 15;
-        worksheet.getColumn(18).width = 15;
-        worksheet.getColumn(19).width = 15;
-        worksheet.getColumn(20).width = 40;
-        worksheet.getColumn(21).width = 30;
-      });
-      setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, `Reporte Pedidos Zeus - ${this.today}.xlsx`);
-        });
-        setTimeout(() => {
-          this.msj.mensajeConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!');
-          this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-        }, 3500);
-        this.datosExcel = this.ArrayPedidos;
-        this.cargando = false;
-      }, 2500);
-    }
-  }
-
-  // Funcion que llenará el archivo de excel con los datos de la tabla
-  llenarArrayExcel(datos: any, arrayDatos: any) {
-    this.cargando = true;
-    for (let i = 0; i < datos.length; i++) {
-      arrayDatos.push([
-        datos[i].consecutivo,
-        datos[i].cliente,
-        datos[i].ciudad,
-        datos[i].producto,
-        datos[i].cant_Pedida,
-        datos[i].cant_Pendiente,
-        datos[i].cant_Facturada,
-        datos[i].existencias,
-        datos[i].presentacion,
-        datos[i].precioUnidad,
-        datos[i].estado,
-        datos[i].vendedor,
-        datos[i].orden_Compra_CLiente,
-        datos[i].costo_Cant_Pendiente,
-        datos[i].costo_Cant_Total,
-        datos[i].fecha_Creacion.replace('T00:00:00', ''),
-        datos[i].fecha_Entrega.replace('T00:00:00', ''),
-        datos[i].OT,
-        datos[i].Proceso_OT,
-        datos[i].Estado_OT,
-      ]);
-    }
-  }
-
-  // Funcion que permitirá filtrar la información de la tabla
-  aplicarfiltro($event, campo: any, valorCampo: string) {
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if (this.dt?.filteredValue != null) this.datosExcel = this.dt.filteredValue;
-      else this.datosExcel = this.ArrayPedidos;
-    }, 400);
-  }
-
-
-  applyFilter = ($event, campo: any, datos: Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
-
-  // Función que mostrará la descripción de cada una de las card de los dashboard's
-  mostrarDescripcion($event, color: string) {
-    if (color == 'verde') this.infoColor = `El color verde indica que <b>${'todos los items de un pedido pueden ser facturados.'}</b><br><br> Debido a que <b>${'las existencias de el/los item(s) son mayores que las cantidades pendientes.'}</b>`;
-    if (color == 'azul') this.infoColor = `El color azul indica que <b>${'al menos uno de los items de un pedido pueden ser facturados.'}</b><br><br> Debido a que <b>${'el stock de dicho(s) producto(s) es mayor que las cantidad solicitada.'}</b><br><br>
-    <b>${'Nota:'}</b> Si encuentra filas de color verde dentro de encabezados de pedidos de color azul <b>${'es porque ese item en específico está listo para ser facturado!'}</b>`;
-    if (color == 'rojo') this.infoColor = `El color rojo muestra los pedidos <b>${'que aún no han sido aprobados por gerencia para ser creados en Zeus'}</b>`;
-
-    setTimeout(() => {
-      this.op!.toggle($event);
-      $event.stopPropagation();
-    }, 500);
-  }
-
-  // Funcion que mostrará un modal con la informacion del pedido seleccionado y en el que se podrá editar el pedido selecionado
-  editarPedido(data: any) {
-    this.modalEditar = true;
-    setTimeout(() => {
-      this.modalPedidoExterno.limpiarTodosCampos();
-      this.modalPedidoExterno.modalMode = true;
-      this.pedidoExternoService.GetInfoEditarPedido(data.consecutivo).subscribe(datos_pedido => {
-        console.log(datos_pedido);
-
-        datos_pedido.forEach(dato => {
-          console.log(dato);
-          this.modalPedidoExterno.pedidoEditar = dato.consecutivo;
-          this.modalPedidoExterno.form1.patchValue({
-            'PedId': dato.consecutivo,
-            'PedClienteId': dato.id_Cliente,
-            'PedClienteNombre': dato.cliente,
-            'PedOc': dato.orden_Compra,
-            'PedObservacion': dato.observacion,
-          });
-          this.modalPedidoExterno.buscarClientes();
-          this.loadArrayPedidos(dato);
-          setTimeout(() => {
-            this.modalPedidoExterno.clienteSeleccionado();
-          }, 500);
-        });
-      });
-    }, 500);
-  }
-
-  loadArrayPedidos(dato: any) {
-    this.modalPedidoExterno.ArrayProducto.push({
-      'Id': dato.id_Producto,
-      'Nombre': dato.producto,
-      'Cant': dato.cantidad_Pedida,
-      'UndCant': dato.presentacion,
-      'PrecioUnd': dato.precio_Unitario,
-      'SubTotal': (dato.cantidad_Pedida * dato.precio_Unitario),
-      'FechaEntrega': dato.fecha_Entrega.replace('T00:00:00', ''),
-    })
-  }
-
-  //Funcion que va a cargar un modal con la informacion de la orden de trabajo que tiene asignada el pedido
-  varOrdenTranajo(data: any) {
-    if (this.ValidarRol == 1) {
-      this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(data.consecutivo).subscribe(datos_orden => {
-        if (datos_orden.length > 0) {
-          this.modalEstadosOrdenes = true;
-          setTimeout(() => {
-            this.modalEstadosProcesos_OT.modeModal = true;
-            this.modalEstadosProcesos_OT.ArrayDocumento = [];
-            datos_orden.forEach(ot => this.modalEstadosProcesos_OT.llenarArray(ot));
-          }, 500);
-        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡No hay orden asociada al pedido ${data.consecutivo}!`);
-      }, () => this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`));
-    }
-  }
-
-  // Funcion que va a actualizar la orden de trabajo de un pedido
-  cambiarOrden_Pedido(data: any) {
-    this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(data.consecutivo).subscribe(datos_ot => {
-      if (datos_ot.length > 0) {
-        for (let i = 0; i < datos_ot.length; i++) {
-          if (data.OT == datos_ot[i].estProcOT_OrdenTrabajo) {
-            let info: any = {
-              EstProcOT_OrdenTrabajo: datos_ot[i].estProcOT_OrdenTrabajo,
-              EstProcOT_ExtrusionKg: datos_ot[i].estProcOT_ExtrusionKg,
-              EstProcOT_ImpresionKg: datos_ot[i].estProcOT_ImpresionKg,
-              EstProcOT_RotograbadoKg: datos_ot[i].estProcOT_RotograbadoKg,
-              EstProcOT_LaminadoKg: datos_ot[i].estProcOT_LaminadoKg,
-              EstProcOT_CorteKg: datos_ot[i].estProcOT_CorteKg,
-              EstProcOT_DobladoKg: datos_ot[i].estProcOT_DobladoKg,
-              EstProcOT_SelladoKg: datos_ot[i].estProcOT_SelladoKg,
-              EstProcOT_SelladoUnd: datos_ot[i].estProcOT_SelladoUnd,
-              EstProcOT_WiketiadoKg: datos_ot[i].estProcOT_WiketiadoKg,
-              EstProcOT_WiketiadoUnd: datos_ot[i].estProcOT_WiketiadoUnd,
-              EstProcOT_CantProdFacturada: datos_ot[i].estProcOT_CantProdFacturada,
-              EstProcOT_CantProdIngresada: datos_ot[i].estProcOT_CantProdIngresada,
-              EstProcOT_CantMatPrimaAsignada: datos_ot[i].estProcOT_CantMatPrimaAsignada,
-              EstProcOT_CantidadPedida: datos_ot[i].estProcOT_CantidadPedida,
-              UndMed_Id: datos_ot[i].undMed_Id,
-              Estado_Id: datos_ot[i].estado_Id,
-              Falla_Id: datos_ot[i].falla_Id,
-              EstProcOT_Observacion: datos_ot[i].estProcOT_Observacion,
-              EstProcOT_FechaCreacion: datos_ot[i].estProcOT_FechaCreacion,
-              EstProcOT_EmpaqueKg: datos_ot[i].estProcOT_EmpaqueKg,
-              Usua_Id: datos_ot[i].usua_Id,
-              EstProcOT_FechaFinal: datos_ot[i].estProcOT_FechaFinal,
-              EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
-              EstProcOT_CantidadPedidaUnd: datos_ot[i].estProcOT_CantidadPedidaUnd,
-              EstProcOT_HoraFinal: datos_ot[i].estProcOT_HoraFinal,
-              EstProcOT_HoraInicio: datos_ot[i].estProcOT_HoraInicio,
-              EstProcOT_DiffDiasInicio_Fin: datos_ot[i].estProcOT_DiffDiasInicio_Fin,
-              Cli_Id: datos_ot[i].cli_Id,
-              Prod_Id: datos_ot[i].prod_Id,
-              EstProcOT_CLiente: datos_ot[i].estProcOT_Cliente,
-              EstProcOT_Pedido: null,
-            }
-            this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(() => {
-              this.msj.mensajeConfirmacion(`Confirmación`, `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`);
-              this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-            });
-          }
-        }
-      }
-    }, () => this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`));
-
-    this.estadosProcesos_OTService.srvObtenerListaPorOT(data.OT).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        if (datos_ot[i].EstProcOT_Pedido == null) {
-          if (parseInt(data.id_Producto) == datos_ot[i].prod_Id) {
-            let info: any = {
-              EstProcOT_OrdenTrabajo: datos_ot[i].estProcOT_OrdenTrabajo,
-              EstProcOT_ExtrusionKg: datos_ot[i].estProcOT_ExtrusionKg,
-              EstProcOT_ImpresionKg: datos_ot[i].estProcOT_ImpresionKg,
-              EstProcOT_RotograbadoKg: datos_ot[i].estProcOT_RotograbadoKg,
-              EstProcOT_LaminadoKg: datos_ot[i].estProcOT_LaminadoKg,
-              EstProcOT_CorteKg: datos_ot[i].estProcOT_CorteKg,
-              EstProcOT_DobladoKg: datos_ot[i].estProcOT_DobladoKg,
-              EstProcOT_SelladoKg: datos_ot[i].estProcOT_SelladoKg,
-              EstProcOT_SelladoUnd: datos_ot[i].estProcOT_SelladoUnd,
-              EstProcOT_WiketiadoKg: datos_ot[i].estProcOT_WiketiadoKg,
-              EstProcOT_WiketiadoUnd: datos_ot[i].estProcOT_WiketiadoUnd,
-              EstProcOT_CantProdFacturada: datos_ot[i].estProcOT_CantProdFacturada,
-              EstProcOT_CantProdIngresada: datos_ot[i].estProcOT_CantProdIngresada,
-              EstProcOT_CantMatPrimaAsignada: datos_ot[i].estProcOT_CantMatPrimaAsignada,
-              EstProcOT_CantidadPedida: datos_ot[i].estProcOT_CantidadPedida,
-              UndMed_Id: datos_ot[i].undMed_Id,
-              Estado_Id: datos_ot[i].estado_Id,
-              Falla_Id: datos_ot[i].falla_Id,
-              EstProcOT_Observacion: datos_ot[i].estProcOT_Observacion,
-              EstProcOT_FechaCreacion: datos_ot[i].estProcOT_FechaCreacion,
-              EstProcOT_EmpaqueKg: datos_ot[i].estProcOT_EmpaqueKg,
-              Usua_Id: datos_ot[i].usua_Id,
-              EstProcOT_FechaFinal: datos_ot[i].estProcOT_FechaFinal,
-              EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
-              EstProcOT_CantidadPedidaUnd: datos_ot[i].estProcOT_CantidadPedidaUnd,
-              EstProcOT_HoraFinal: datos_ot[i].estProcOT_HoraFinal,
-              EstProcOT_HoraInicio: datos_ot[i].estProcOT_HoraInicio,
-              EstProcOT_DiffDiasInicio_Fin: datos_ot[i].estProcOT_DiffDiasInicio_Fin,
-              Cli_Id: datos_ot[i].cli_Id,
-              Prod_Id: datos_ot[i].prod_Id,
-              EstProcOT_CLiente: datos_ot[i].estProcOT_Cliente,
-              EstProcOT_Pedido: data.consecutivo,
-            }
-            this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(() => {
-              this.msj.mensajeConfirmacion(`Confirmación`, `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`);
-              this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-            });
-          } else this.msj.mensajeAdvertencia(`Advertencia`, `¡El producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`);
-        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
-      }
-    });
-    setTimeout(() => this.consultarPedidos(), 1000);
-  }
-
-  // Funcion que mostrará un mensaje de confirmación para aceptar un pedido o no
-  mostrarEleccion(item: any, eleccion: any) {
-    let mensaje: string = "";
-    this.itemSeleccionado = item;
-    if (eleccion == 'aceptar') {
-      this.onReject('aceptar');
-      this.onReject('cancelar');
-      mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`;
-    }
-    if (eleccion == 'cancelar') {
-      this.onReject('cancelar');
-      this.onReject('aceptar');
-      mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`;
-    }
-    this.messageService.add({ severity: 'warn', key: eleccion, summary: 'Elección', detail: mensaje, sticky: true });
-  }
-
-  /** Aceptar Pedido para luego crearlo en Zeus */
-  aceptarPedido(item: any) {
-    this.onReject('aceptar');
-    this.pedidoExternoService.srvObtenerListaPorId(item).subscribe(dataPedidos => {
-      const info: modelOpedido = {
-        PedExt_Id: dataPedidos.pedExt_Id,
-        PedExt_Codigo: dataPedidos.pedExt_Codigo,
-        PedExt_FechaCreacion: dataPedidos.pedExt_FechaCreacion,
-        PedExt_FechaEntrega: dataPedidos.pedExt_FechaEntrega,
-        Empresa_Id: dataPedidos.empresa_Id,
-        SedeCli_Id: dataPedidos.sedeCli_Id,
-        Estado_Id: 26,
-        PedExt_Observacion: dataPedidos.pedExt_Observacion,
-        PedExt_PrecioTotal: dataPedidos.pedExt_PrecioTotal,
-        Usua_Id: dataPedidos.usua_Id,
-        PedExt_Descuento: dataPedidos.pedExt_Descuento,
-        PedExt_Iva: dataPedidos.pedExt_Iva,
-        PedExt_PrecioTotalFinal: dataPedidos.pedExt_PrecioTotalFinal,
-        PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
-        Creador_Id: dataPedidos.creador_Id,
-      }
-      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
-        this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} aceptado con exito!`);
-        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-        setTimeout(() => {
-          this.consultarPedidosZeus();
-          this.consultarPedidos();
-        }, 100);
-      }, () => this.msj.mensajeError(`Error`, `No fue posible aceptar el pedido ${item}, por favor, verifique!`));
-    });
-  }
-
-  /** Aceptar Pedido para luego crearlo en Zeus */
-  cancelarPedido(item: any) {
-    this.onReject('cancelar');
-    this.pedidoExternoService.srvObtenerListaPorId(item).subscribe(dataPedidos => {
-      const info: any = {
-        PedExt_Id: dataPedidos.pedExt_Id,
-        PedExt_Codigo: dataPedidos.pedExt_Codigo,
-        PedExt_FechaCreacion: dataPedidos.pedExt_FechaCreacion,
-        PedExt_FechaEntrega: dataPedidos.pedExt_FechaEntrega,
-        Empresa_Id: dataPedidos.empresa_Id,
-        SedeCli_Id: dataPedidos.sedeCli_Id,
-        Estado_Id: 4,
-        PedExt_Observacion: dataPedidos.pedExt_Observacion,
-        PedExt_PrecioTotal: dataPedidos.pedExt_PrecioTotal,
-        Usua_Id: dataPedidos.usua_Id,
-        PedExt_Descuento: dataPedidos.pedExt_Descuento,
-        PedExt_Iva: dataPedidos.pedExt_Iva,
-        PedExt_PrecioTotalFinal: dataPedidos.pedExt_PrecioTotalFinal,
-        PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
-        Creador_Id: dataPedidos.creador_Id,
-      }
-      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
-        this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} cancelado con exito!`);
-        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-        setTimeout(() => {
-          this.consultarPedidosZeus();
-          this.consultarPedidos();
-        }, 100);
-      }, () => this.msj.mensajeError(`Error`, `No fue posible cancelar el pedido ${item}, por favor, verifique!`));
-    });
-  }
-
-  /** Llenar array al momento de seleccionar VER PDF */
-  llenarArrayPdf(item: any) {
-    this.arrayPedidosIndividuales = [];
-    this.costoCantidadPendiente = 0;
-    this.costoCantidadTotal = 0;
-
-    this.inventarioZeusService.getPedidosXConsecutivo(item.consecutivo).subscribe(dataPedidos => {
-      for (let i = 0; i < dataPedidos.length; i++) {
-        const info: any = {
-          Nombre: dataPedidos[i].producto,
-          Cantidad: this.formatonumeros(dataPedidos[i].cant_Pedida),
-          Und: dataPedidos[i].presentacion,
-          Precio: this.formatonumeros(dataPedidos[i].precioUnidad),
-          SubTotal: this.formatonumeros(dataPedidos[i].costo_Cant_Total),
-          "Fecha Entrega": dataPedidos[i].fecha_Entrega.replace('T00:00:00', ''),
-        }
-        this.arrayPedidosIndividuales.push(info);
-        this.costoCantidadTotal += dataPedidos[i].costo_Cant_Total;
-        this.costoCantidadPendiente += dataPedidos[i].costo_Cant_Pendiente;
-      }
-    });
-  }
-
-  /** Mostrar el PDF que contiene la información detallada del pedido. */
-  mostrarPedidoPdf(item: any) {
-    this.llenarArrayPdf(item);
-    let usuario: string = this.storage_Nombre;
-    this.inventarioZeusService.getPedidosXConsecutivo(item.consecutivo).subscribe(dataPedidos => {
-      for (let index = 0; index < dataPedidos.length; index++) {
-        const infoPdf: any = {
-          info: { title: `Pedido Nro.  ${item.consecutivo}` },
-          pageSize: { width: 630, height: 760 },
-          footer: function (currentPage: any, pageCount: any) {
-            return [
-              '\n',
-              {
-                columns: [
-                  { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          content: [
-            {
-              columns: [
-                { image: logoNuevoParaPdf, width: 220, fit: [220, 50] },
-                { text: `Pedido Zeus ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
-              ]
-            },
-            '\n \n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [90, 167, 90, 166],
-                style: 'header',
-                body: [
-                  [
-                    { border: [false, false, false, false], text: `Comercial` },
-                    { border: [false, false, false, true], text: `${dataPedidos[index].vendedor}`, fontSize: 8 },
-                    { border: [false, false, false, false], text: `Fecha de pedido` },
-                    { border: [false, false, false, true], text: `${dataPedidos[index].fecha_Creacion.replace('T00:00:00', '')}` },
-                  ],
-                  [
-                    { border: [false, false, false, false], text: `Código` },
-                    { border: [false, false, false, true], text: `` },
-                    {},
-                    {}
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 9,
-            },
-            '\n',
-            { text: `\n Información detallada del cliente \n \n`, alignment: 'center', style: 'header' },
-            {
-              style: 'tablaCliente',
-              table: {
-                widths: [170, 170, 170],
-                style: 'header',
-                body: [
-                  [`NIT Cliente: ${dataPedidos[index].id_Cliente}`, `Nombre: ${dataPedidos[index].cliente}`, `Ciudad: ${dataPedidos[index].ciudad}`,],
-                  [`OC: ${dataPedidos[index].orden_Compra_CLiente}`, ``, ``]
-                ]
-              },
-              layout: 'lightHorizontalLines',
-              fontSize: 9,
-            },
-            '\n \n',
-            { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
-            this.table(this.arrayPedidosIndividuales, ['Nombre', 'Cantidad', 'Und', 'Fecha Entrega', 'Precio', 'SubTotal']),
-            {
-              style: 'tablaTotales',
-              table: {
-                widths: [270, 145, 98],
-                style: 'header',
-                body: [
-                  [
-                    '',
-                    { border: [true, false, true, true], text: `Total Pedido` },
-                    { border: [false, false, true, true], text: `$${this.formatonumeros(this.costoCantidadTotal.toFixed(2))}` },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 8,
-            },
-          ],
-          styles: {
-            header: { fontSize: 10, bold: true },
-            texto: { fontSize: 8, },
-            titulo: { fontSize: 20, bold: true },
-            subtitulo: { fontSize: 14, bold: true }
-          }
-        }
-        const pdf = pdfMake.createPdf(infoPdf);
-        pdf.open();
-        this.cargando = false;
-        this.msj.mensajeConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
-        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-        break;
-      }
-    });
-  }
-
-  // Funcion que consultará los productos del ultimo pedido creado
-  productosPedido(pedido: number) {
-    this.productosPedidos = [];
-    this.pedidoExternoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
-      for (let i = 0; i < datos_pedido.length; i++) {
-        let info: any = {
-          Id: datos_pedido[i].producto_Id,
-          Nombre: datos_pedido[i].producto,
-          Cantidad: this.formatonumeros(datos_pedido[i].cantidad),
-          Und: datos_pedido[i].presentacion,
-          Precio: this.formatonumeros(datos_pedido[i].precio_Unitario),
-          SubTotal: this.formatonumeros(datos_pedido[i].subTotal_Producto),
-          "Fecha Entrega": datos_pedido[i].fecha_Entrega.replace('T00:00:00', ''),
-        }
-        this.productosPedidos.push(info);
-        this.productosPedidos.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-      }
-      setTimeout(() => this.crearpdf(pedido), 1000);
-    });
-  }
-
-  // Fucnion para que crear ub pdf apenas se realiza el pedido de productos
-  crearpdf(pedido: number) {
-    this.pedidoExternoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
-      for (let i = 0; i < datos_pedido.length; i++) {
-        let titulo = `Pedido N° ${datos_pedido[i].id_Pedido}`;
-        const pdfDefinicion: any = {
-          info: { title: titulo },
-          pageSize: { width: 630, height: 760 },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins: [25, 100, 25, 35],
-          header: function (currentPage: any, pageCount: any) {
-            return [
-              {
-                margin: [20, 8, 20, 0],
-                columns: [
-                  { image: logoNuevoParaPdf, width: 150, fit: [150, 30], margin: [20, 25] },
-                  {
-                    width: 300,
-                    alignment: 'center',
-                    table: {
-                      body: [
-                        [{ text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10 }],
-                        [{ text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8 }],
-                        [{ text: titulo, bold: true, alignment: 'center', fontSize: 10 }],
-                      ]
-                    },
-                    layout: 'noBorders',
-                    margin: [85, 20],
-                  },
-                  {
-                    width: '*',
-                    alignment: 'center',
-                    margin: [20, 20, 20, 0],
-                    table: {
-                      body: [
-                        [{ text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{ text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true }, { text: datos_pedido[i].fechaCreacion.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{ text: `Hora: `, alignment: 'left', fontSize: 8, bold: true }, { text: datos_pedido[i].hora, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      ]
-                    },
-                    layout: 'noBorders',
-                  }
-                ]
-              },
-              {
-                margin: [20, 0],
-                table: {
-                  headerRows: 1,
-                  widths: ['*'],
-                  body: [
-                    [
-                      {
-                        border: [false, true, false, false],
-                        text: ''
-                      },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, }
-              },
-            ];
-          },
-          content: [
-            { text: `\n Información del Pedido \n`, alignment: 'center', style: 'header' },
-            '\n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [305, 152, 100],
-                style: 'header',
-                body: [
-                  [
-                    { border: [false, false, false, true], text: `Comercial:  ${String(datos_pedido[i].vendedor_Id).padStart(3, '0')} - ${datos_pedido[i].vendedor}` },
-                    { border: [false, false, false, true], text: `Estado:  ${datos_pedido[i].estado}` },
-                    { border: [false, false, false, true], text: `Código:  ${datos_pedido[i].consecutivo}` },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 9,
-            },
-            '\n \n',
-            { text: `\n Información detallada del cliente \n \n`, alignment: 'center', style: 'header' },
-            {
-              style: 'tablaCliente',
-              table: {
-                widths: [242, 130, 180],
-                style: 'header',
-                body: [
-                  [`ID: ${datos_pedido[i].cliente_Id}`, `Tipo de ID: ${datos_pedido[i].tipo_Id}`, `Tipo de Cliente: ${datos_pedido[i].tipo_Cliente}`],
-                  [`Nombre: ${datos_pedido[i].cliente}`, `Telefono: ${datos_pedido[i].telefono_Cliente}`, `Ciudad: ${datos_pedido[i].ciudad_Cliente}`],
-                  [`Dirección: ${datos_pedido[i].direccion_Cliente}`, `Codigo Postal: ${datos_pedido[i].codPostal_Cliente}`, `E-mail: ${datos_pedido[i].correo_Cliente}`]
-                ]
-              },
-              layout: 'lightHorizontalLines',
-              fontSize: 9,
-            },
-            { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
-            this.table2(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Fecha Entrega', 'Precio', 'SubTotal']),
-            {
-              style: 'tablaTotales',
-              table: {
-                widths: [275, '*', 98],
-                style: 'header',
-                body: [
-                  [
-                    '',
-                    { border: [true, false, true, true], text: `TOTAL` },
-                    { border: [false, false, true, true], text: `$${this.formatonumeros(datos_pedido[i].precio_Total)}` },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 8,
-            },
-            { text: `\n \nObservación sobre el pedido: \n ${datos_pedido[i].observacion}\n`, style: 'header', }
-          ],
-          styles: {
-            header: { fontSize: 10, bold: true },
-            general: { fontSize: 8, bold: true },
-            titulo: { fontSize: 20, bold: true }
-          }
-        }
-        const pdf = pdfMake.createPdf(pdfDefinicion);
-        pdf.open();
-        this.msj.mensajeConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
-        this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-        break;
-      }
-    });
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table2(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [40, 177, 40, 50, 61, 50, 98],
-        body: this.buildTableBody(data, columns),
-      },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
-    };
-  }
-
-  // Funcion que se encagará de llenar la tabla del pd
-  buildTableBody(data, columns) {
-    var body: any = [];
-    body.push(columns);
-    data.forEach(function (row) {
-      var dataRow: any = [];
-      columns.forEach((column) => dataRow.push(row[column]));
-      body.push(dataRow);
-    });
-
-    return body;
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información
-  table(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [177, 50, 40, 61, 60, 98],
-        body: this.buildTableBody(data, columns)
-      },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
-    };
-  }
-
-  /** Cerrar Dialogo de eliminación de OT/rollos.*/
-  onReject = (dato: any) => this.messageService.clear(dato);
-
-  formatoPDF() {
-    let today: any = moment().format('YYYY-MM-DD');
-    let hour: any = moment().format('HH:mm:ss');
-    this.cargando = true;
-    this.modalExportarPDF = false;
-    this.informacionPDF = this.seleccionarInformacionPDf();
-    let vendedores = this.getVendedores(this.informacionPDF);
-    const pdfDefinicion: any = {
-      info: { title: 'Pedidos de Ventas' },
-      pageOrientation: 'landscape',
-      pageSize: 'LETTER',
-      watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-      pageMargins: [20, 80, 20, 10],
-      header: this.headerPDF(today, hour),
-      content: this.pedidosVendedores(vendedores),
-    }
-    setTimeout(() => this.crearPDF(pdfDefinicion), 3000);
-  }
-
-  seleccionarInformacionPDf(): any[] {
-    let informacion: any[] = [];
-    informacion = this.pedidosOriginales.filter(x => x.Zeus == 1);
-
-    if (this.vendedorSeleccionado) informacion = informacion.filter(x => x.idVendedor == this.vendedorSeleccionado && x.Zeus == 1);
-
-    if (this.departamentoSeleccionado.length > 0) {
-      let departamentos = this.departamentoSeleccionado.map(x => (x.departamento).toLowerCase());
-      let municipios = this.municipios.map(x => (x.municipio).toLowerCase());
-      informacion = informacion.reduce((a, b) => {
-        if (departamentos.includes((b.ciudad).toLowerCase()) && b.Zeus == 1) a = [...a, b];
-        else if (municipios.includes((b.ciudad).toLowerCase()) && b.Zeus == 1) a = [...a, b];
-        return a;
-      }, []);
-    }
-
-    if (this.clienteSeleccionado) {
-      let clientes = this.clienteSeleccionado.map(x => x.id);
-      informacion = informacion.reduce((a, b) => {
-        if (clientes.includes(b.nitCliente) && b.Zeus == 1) a = [...a, b];
-        return a;
-      }, []);
-    }
-
-    return informacion;
-  }
-
-  headerPDF(today, hour) {
-    return (currentPage: any, pageCount: any) => {
-      return [
-        {
-          margin: [20, 5, 20, 0],
-          columns: [
-            { image: logoNuevoParaPdf, width: 150, fit: [150, 30], margin: [20, 25, 80, 10] },
-            this.empresaFechaHoraTituloPDF(),
-            this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
-          ]
-        },
-        //this.lineaHeaderFooterPDF([false, true, false, false]),
-      ];
-    }
-  }
-
-  empresaFechaHoraTituloPDF() {
-    return {
-      width: '*',
-      alignment: 'center',
-      table: {
-        body: [
-          [{ text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10 }],
-          [{ text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8 }],
-          [{ text: 'Pedidos de Ventas', bold: true, alignment: 'center', fontSize: 10 }],
-        ]
-      },
-      layout: 'noBorders',
-      margin: [180, 10, 0, 3],
-    }
-  }
-
-  paginadoFechaHoraPDF(currentPage, pageCount, today, hour) {
-    return {
-      width: '*',
-      alignment: 'center',
-      margin: [180, 10, 20, 0],
-      table: {
-        body: [
-          [{ text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-          [{ text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true }, { text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-          [{ text: `Hora: `, alignment: 'left', fontSize: 8, bold: true }, { text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-        ]
-      },
-      layout: 'noBorders',
-    }
-  }
-
-  lineaHeaderFooterPDF(borders: boolean[]) {
-    return {
-      margin: [20, 0],
-      table: {
-        headerRows: 1,
-        widths: ['*'],
-        body: [
-          [{ border: borders, text: '' }],
-        ]
-      },
-      layout: { defaultBorder: false, }
-    }
-  }
-
-  pedidosVendedores(vedendores: any) {
-    let data: any = [];
-    for (let i = 0; i < vedendores.length; i++) {
-      data.push([
-        {
-          margin: [15, 1],
-          text: `${vedendores[i].id} - ${vedendores[i].nombre}`,
-          bold: true,
-          fontSize: 9,
-          alignment: 'left'
-        },
-        this.clientesVendedor(vedendores[i].id),
-      ]);
-    }
-    data.push(this.valorTotalPedidos());
-    return data;
-  }
-
-  valorTotalPedidos() {
-    return [
-      {
-        margin: 0,
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                margin: [10, 0, 10, 0],
-                border: [true, true, true, true],
-                alignment: 'right',
-                fontSize: 9,
-                bold: true,
-                text: `Total Pedidos: $ ${this.formatonumeros((this.subTotalPedidos()))}`
-              }
-            ]
-          ],
-        }
-      },
-    ]
-  }
-
-  clientesVendedor(vendedor: number) {
-    let clientes: any[] = this.informacionPDF.filter(x => x.idVendedor == vendedor);
-    let clientesIncluidos: any[] = [];
-    let data: any = [];
-    for (let i = 0; i < clientes.length; i++) {
-      if (!clientesIncluidos.includes(clientes[i].nitCliente)) {
-        clientesIncluidos.push(clientes[i].nitCliente);
-        data.push([
-          {
-            margin: [0, 0],
-            table: {
-              dontBreakRows: true,
-              widths: ['auto', '*', '*'],
-              body: this.pedidoClientes(clientes[i]),
-            },
-            fontSize: 7,
-          }
-        ]);
-      }
-    }
-    return data;
-  }
-
-  pedidoClientes(pedido) {
-    let pedidos: any[] = this.informacionPDF.filter(x => x.nitCliente == pedido.nitCliente);
-    let pedidosIncluidos: any[] = [];
-    let data: any = [this.informacionClientePDF(pedido)];
-    for (let i = 0; i < pedidos.length; i++) {
-      if (!pedidosIncluidos.includes(pedidos[i].consecutivo)) {
-        pedidosIncluidos.push(pedidos[i].consecutivo);
-        data.push([
-          {
-            margin: [0, 0],
-            colSpan: 3,
-            border: [true, false, true, false],
-            table: {
-              widths: ['10%', '10%', '40%', '20%', '20%'],
-              body: this.infoPedido(pedidos[i])
-            }
-          },
-          {},
-          {},
-        ])
-      }
-    }
-    data.push(this.valorTotalClientePDF(pedido));
-    return data;
-  }
-
-  informacionClientePDF(pedido) {
-    return [
-      { border: [true, true, false, true], text: `${pedido.nitCliente}`, fillColor: '#ccc', bold: true, lineHeight: 0.7, },
-      { border: [false, true, false, true], text: `${pedido.cliente}`, fillColor: '#ccc', bold: true, lineHeight: 0.7, },
-      { border: [false, true, true, true], text: `${pedido.ciudad}`, fillColor: '#ccc', bold: true, lineHeight: 0.7, },
-    ]
-  }
-
-  valorTotalClientePDF(pedido) {
-    return [
-      {
-        margin: [0, 0],
-        colSpan: 3,
-        alignment: 'right',
-        fontSize: 8,
-        bold: true,
-        border: [false, true, false, false],
-        text: `Total Cliente: $ ${this.formatonumeros((this.subTotalPedidosCliente(pedido.nitCliente)))}`,
-        lineHeight: 0.7,
-      },
-      {},
-      {}
-    ]
-  }
-
-  infoPedido(pedido) {
-    let items: any[] = this.informacionPDF.filter(x => x.consecutivo == pedido.consecutivo);
-    let data: any = [this.infoPedidoPDF(pedido)];
-    for (let i = 0; i < items.length; i++) {
-      data.push([
-        {
-          margin: [0, 0],
-          colSpan: 5,
-          border: [false, false, false, false],
-          table: {
-            dontBreakRows: true,
-            widths: ['5%', '33%', '10%', '8%', '8%', '8%', '8%', '10%', '10%'],
-            body: this.itemsPedido(pedido)
-          },
-          layout: { defaultBorder: false, },
-          fontSize: 7,
-        },
-        {},
-        {},
-        {},
-        {}
-      ]);
-      break;
-    }
-    return data;
-  }
-
-  infoPedidoPDF(pedido) {
-    return [
-      { text: `PV ${pedido.consecutivo}`, bold: true, border: [true, true, false, true], fontSize: 7, lineHeight: 0.7, },
-      { text: `${pedido.fecha_Creacion}`, bold: true, border: [false, true, false, true], fontSize: 7, lineHeight: 0.7, },
-      { text: ``, bold: true, border: [false, true, false, true], fontSize: 7, lineHeight: 0.7, },
-      { text: `Orden Compra: ${pedido.orden_Compra_CLiente}`, bold: true, border: [false, true, false, true], fontSize: 7, lineHeight: 0.7, },
-      { text: `Fecha Entrega: ${pedido.fecha_Entrega}`, bold: true, border: [false, true, true, true], fontSize: 7, lineHeight: 0.7, },
-    ]
-  }
-
-  titulosProductosPDF() {
-    return [
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Item`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Referencia`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Presentación`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Pedida`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Facturada`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Pendiente`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Disponible`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `Precio Unitario`, fillColor: '#ddd', bold: true },
-      { border: [false, false, false, false], margin: [0, 0], lineHeight: 0.6, text: `SubTotal`, fillColor: '#ddd', bold: true },
-    ]
-  }
-
-  itemsPedido(pedido) {
-    let items: any[] = this.informacionPDF.filter(x => x.consecutivo == pedido.consecutivo);
-    let data: any = [this.titulosProductosPDF()];
-    for (let i = 0; i < items.length; i++) {
-      data.push([
-        { text: `${items[i].id_Producto}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `${items[i].producto}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `${items[i].presentacion}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `${this.formatonumeros((items[i].cant_Pedida))}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `${this.formatonumeros((items[i].cant_Facturada))}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `${this.formatonumeros((items[i].cant_Pendiente))}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `${this.formatonumeros((items[i].existencias))}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `$ ${this.formatonumeros((items[i].precioUnidad))}`, margin: [0, 0], lineHeight: 0.4, },
-        { text: `$ ${this.formatonumeros((items[i].costo_Cant_Pendiente))}`, margin: [0, 0], lineHeight: 0.4, },
-      ]);
-    }
-    return data;
-  }
-
-  subTotalPedidosCliente(cliente) {
-    let total: number = 0;
-    total = this.informacionPDF.filter(x => x.nitCliente == cliente).reduce((a, b) => a + parseFloat(b.costo_Cant_Pendiente), 0);
-    return total;
-  }
-
-  subTotalPedidos() {
-    let total: number = 0;
-    total = this.informacionPDF.reduce((a, b) => a + parseFloat(b.costo_Cant_Pendiente), 0);
-    return total;
-  }
-
-  crearPDF(pdfDefinicion) {
-    pdfMake.createPdf(pdfDefinicion).open();
-    this.clienteSeleccionado = null;
-    this.vendedorSeleccionado = null;
-    this.getVendedores();
-    this.cargando = false;
-    this.consultarPedidosZeus();
     this.consultarPedidos();
   }
 
-  getVendedores(infoPedidos = this.ArrayPedidos): any[] {
-    let vendedores: any[] = [];
-    infoPedidos.forEach(pedido => {
-      if (vendedores.map(x => x.nombre).indexOf(pedido.vendedor) == -1) {
-        vendedores.push({
-          id: pedido.idVendedor,
-          nombre: pedido.vendedor
+  ngOnDestroy() {
+    this.tutoriales.cancelar(); // alCambiarTema ya se desuscribe solo al destruir el componente
+  }
+
+  tutorial = () => this.tutoriales.iniciar(pasosTutorialPedidosZeus({ veFiltroVendedor: this.veFiltroVendedor, puedeVerOt: this.ValidarRol == 1 }));
+
+  /** El rol 2 (vendedor) ya recibe solo sus pedidos desde el servidor. */
+  get veFiltroVendedor(): boolean { return this.ValidarRol != 2; }
+
+  // =====================================================================
+  // Carga
+  // =====================================================================
+
+  /** Consulta los pedidos abiertos de Zeus; la tabla se muestra apenas llegan y las OT se completan después. */
+  consultarPedidos() {
+    this.cargandoTabla = true;
+    this.errorCarga = false;
+    const ventas = this.ValidarRol == 2 ? `?sales=${String(this.storage_Id).padStart(3, '0')}` : '';
+    this.inventarioZeusService.GetPedidos(ventas).pipe(
+      finalize(() => this.cargandoTabla = false),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: (datos: any[]) => {
+        const hoy = moment().startOf('day');
+        this.lineas = (datos ?? []).map((d, i) => mapearLinea(d, i, hoy));
+        calcularSemaforo(this.lineas);
+        this.ultimaActualizacion = new Date();
+        this.armarOpciones();
+        this.aplicarFiltros();
+        this.cargarOts();
+      },
+      error: () => {
+        this.errorCarga = true;
+        this.lineas = [];
+        this.aplicarFiltros();
+        this.msj.mensajeError('Error', 'No fue posible consultar los pedidos de Zeus. Intenta de nuevo con el botón Actualizar.');
+      },
+    });
+  }
+
+  /** Una sola petición con todas las líneas: busca la OT de cada ítem (±8 días de la fecha del pedido). */
+  private cargarOts() {
+    if (!this.lineas.length) return;
+    this.cargandoOts = true;
+    const solicitud = this.lineas.map(l => ({
+      date1: moment(l.fecha_Creacion).subtract(8, 'd').format('YYYY-MM-DD'),
+      date2: moment(l.fecha_Creacion).add(8, 'd').format('YYYY-MM-DD'),
+      item: Number(l.id_Producto) || 0,
+      consecutivo: l.consecutivo,
+    }));
+    const lineasConsultadas = this.lineas;
+    this.estadosProcesos_OTService.getOtsForSalesOrder(solicitud).pipe(
+      finalize(() => this.cargandoOts = false),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: (ots: (OtDePedido | null)[]) => {
+        if (lineasConsultadas !== this.lineas) return; // llegó tarde: ya se recargaron los pedidos
+        // La respuesta trae un elemento por línea, en el mismo orden de la solicitud
+        (ots ?? []).forEach((ot, i) => {
+          const linea = lineasConsultadas[i];
+          if (!ot || !linea) return;
+          linea.OT = String(ot.ot ?? '');
+          linea.Estado_OT = ot.status ?? null;
+          linea.Proceso_OT = procesoActualOt(ot);
+          linea.busqueda = textoBusqueda(linea);
         });
+        this.aplicarFiltros();
+      },
+      error: () => this.msj.mensajeAdvertencia('Advertencia', 'No se pudieron consultar las órdenes de trabajo asociadas. Los pedidos se muestran sin OT.'),
+    });
+  }
+
+  /** Opciones de cliente, vendedor y lugares a partir de los pedidos consultados. */
+  private armarOpciones() {
+    const clientes = new Map<string, string>();
+    const vendedores = new Map<string, string>();
+    this.lineas.forEach(l => {
+      if (!clientes.has(l.nitCliente)) clientes.set(l.nitCliente, `${l.cliente} · ${ciudadLegible(l)}`);
+      if (!vendedores.has(l.idVendedor)) vendedores.set(l.idVendedor, `${l.idVendedor} - ${l.vendedor}`);
+    });
+    this.opcionesClientes = [...clientes].map(([value, label]) => ({ value, label })).sort((a, b) => a.label.localeCompare(b.label));
+    this.opcionesVendedores = [...vendedores].map(([value, label]) => ({ value, label })).sort((a, b) => a.label.localeCompare(b.label));
+    this.armarOpcionesLugares();
+  }
+
+  /**
+   * Departamentos y municipios: solo los que tienen pedidos (así ningún filtro deja la tabla vacía),
+   * con el nombre oficial del DANE (datos.gov.co) cuando coincide; si la API no responde, el de Zeus.
+   */
+  private armarOpcionesLugares() {
+    const nombreDane = new Map<string, string>();
+    this.municipiosDane.forEach(m => {
+      nombreDane.set(`d|${normalizar(m.departamento)}`, m.departamento);
+      nombreDane.set(`m|${normalizar(m.departamento)}|${normalizar(m.municipio)}`, m.municipio);
+    });
+    const titulo = (texto: string) => texto.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
+    const departamentos = new Map<string, string>();
+    const municipios = new Map<string, { label: string; value: string; departamento: string }>();
+    this.lineas.forEach(l => {
+      const dep = normalizar(l.departamento);
+      const mun = normalizarMunicipio(l.municipio);
+      if (dep && !departamentos.has(dep)) departamentos.set(dep, titulo(nombreDane.get(`d|${dep}`) ?? l.departamento));
+      if (mun && !municipios.has(`${dep}|${mun}`)) {
+        const nombre = titulo(nombreDane.get(`m|${dep}|${mun}`) ?? l.municipio);
+        municipios.set(`${dep}|${mun}`, { value: `${dep}|${mun}`, label: dep ? `${nombre} (${departamentos.get(dep)})` : nombre, departamento: dep });
       }
     });
-    this.vendedores = vendedores;
-    return vendedores;
+    this.opcionesDepartamentos = [...departamentos].map(([value, label]) => ({ value, label })).sort((a, b) => a.label.localeCompare(b.label));
+    this.todosMunicipios = [...municipios.values()].sort((a, b) => a.label.localeCompare(b.label));
+    this.filtrarOpcionesMunicipios();
+  }
+  private todosMunicipios: { label: string; value: string; departamento: string }[] = [];
+
+  /** Municipios en cascada: si hay departamentos elegidos, solo los de esos departamentos. */
+  private filtrarOpcionesMunicipios() {
+    this.opcionesMunicipios = this.departamentosSel.length
+      ? this.todosMunicipios.filter(m => this.departamentosSel.includes(m.departamento))
+      : this.todosMunicipios;
+    const validos = new Set(this.opcionesMunicipios.map(m => m.value));
+    this.municipiosSel = this.municipiosSel.filter(m => validos.has(m));
   }
 
-  getClientes() {
-    let clientes: any[] = [];
-    this.ArrayPedidos.forEach(pedido => {
-      if (clientes.map(x => x.id).indexOf(pedido.nitCliente) == -1) {
-        clientes.push({
-          id: pedido.nitCliente,
-          nombre: `${pedido.cliente} - ${pedido.ciudad}`
-        });
+  // =====================================================================
+  // Filtros
+  // =====================================================================
+
+  buscar = () => this.busqueda$.next(this.busqueda);
+
+  cambiarDepartamentos() {
+    this.filtrarOpcionesMunicipios();
+    this.aplicarFiltros();
+  }
+
+  seleccionarKpi(filtro: FiltroKpi) {
+    this.filtroKpi = this.filtroKpi === filtro ? null : filtro;
+    this.aplicarFiltros();
+  }
+
+  alternarSemaforo(valor: Semaforo) {
+    this.semaforosSel = this.semaforosSel.includes(valor) ? this.semaforosSel.filter(s => s !== valor) : [...this.semaforosSel, valor];
+    this.aplicarFiltros();
+  }
+
+  alternarEstado(valor: string) {
+    this.estadosSel = this.estadosSel.includes(valor) ? this.estadosSel.filter(s => s !== valor) : [...this.estadosSel, valor];
+    this.aplicarFiltros();
+  }
+
+  /** Aplica todos los filtros: la tabla, los indicadores, las gráficas y las exportaciones usan este resultado. */
+  aplicarFiltros() {
+    const texto = normalizar(this.busqueda);
+    const departamentos = new Set(this.departamentosSel);
+    const municipios = new Set(this.municipiosSel);
+    const clientes = new Set(this.clientesSel);
+    const estados = new Set(this.estadosSel);
+    const semaforos = new Set(this.semaforosSel);
+    const [desde, hasta] = (this.rangoEntrega ?? []).map(f => f ? moment(f).format('YYYY-MM-DD') : null);
+
+    this.lineasFiltradas = this.lineas.filter(l => {
+      if (texto && !l.busqueda.includes(texto)) return false;
+      if (departamentos.size && !departamentos.has(normalizar(l.departamento))) return false;
+      if (municipios.size && !municipios.has(`${normalizar(l.departamento)}|${normalizarMunicipio(l.municipio)}`)) return false;
+      if (clientes.size && !clientes.has(l.nitCliente)) return false;
+      if (this.vendedorSel && l.idVendedor !== this.vendedorSel) return false;
+      if (estados.size && !estados.has(l.estado)) return false;
+      if (semaforos.size && !semaforos.has(l.semaforoPedido)) return false;
+      if (desde && l.fecha_Entrega < desde) return false;
+      if (hasta && l.fecha_Entrega > hasta) return false;
+      switch (this.filtroKpi) {
+        case 'facturable': return l.facturable;
+        case 'vencido': return l.vencido;
+        case 'proximos': return !l.vencido && l.diasEntrega <= DIAS_PROXIMOS;
+        case 'programados': return l.diasEntrega > DIAS_PROXIMOS;
+        case 'sinOt': return !l.OT;
       }
+      return true;
     });
-    this.clientes = clientes;
+
+    this.resumenes = resumirPedidos(this.lineasFiltradas);
+    this.indicadores = calcularIndicadores(this.lineasFiltradas);
+    this.ordenarLineas();
+    this.expandedRows = {};
+    this.resumenes.forEach((_, consecutivo) => this.expandedRows[consecutivo] = true);
+    if (this.mostrarAnalisis) this.armarGraficas();
   }
 
-  //Exportar formato para planeación de OT's
-  exportExcel() {
-    if (this.ArrayPedidos.length > 0) {
-      this.cargando = true;
-      setTimeout(() => {
-        let title: string = `Formato de pedidos de Zeus `;
-        let fill: any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
-        let font: any = { size: 10, bold: true, alignment: 'center', name: 'Calibri' };
-        let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-        let workbook = this.svExcel.formatoExcel(title, true);
-        this.addSheet(workbook, fill, font, border, this.infoProduction2(), 1);
-        //this.svExcel.creacionHoja(workbook, `Pedidos ${moment().format('DD-MM-YYYY')}`, false);
-        this.svExcel.creacionExcel(`Pedidos Zeus ${moment().format('DD-MM-YYYY')}`, workbook);
-        setTimeout(() => {
-          this.msj.mensajeConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!');
-          this.dt?.value.sort((a, b) => Number(a.id_color) - Number(b.id_color));
-        }, 3500);
-        this.cargando = false;
-        this.datosExcel = this.ArrayPedidos;
-      }, 2000);
-    } else this.msj.mensajeAdvertencia(`No hay registros para exportar!`);
+  /** Ordena los pedidos (grupos) según el criterio elegido; la tabla agrupada necesita las líneas de cada pedido juntas. */
+  ordenarLineas() {
+    const prioridadSemaforo: Record<Semaforo, number> = { completo: 0, parcial: 1, sinStock: 2 };
+    const r = (l: PedidoZeusLinea) => this.resumenes.get(l.consecutivo)!;
+    const criterio: Record<string, (a: PedidoZeusLinea, b: PedidoZeusLinea) => number> = {
+      semaforo: (a, b) => prioridadSemaforo[a.semaforoPedido] - prioridadSemaforo[b.semaforoPedido] || r(a).fechaEntrega.localeCompare(r(b).fechaEntrega),
+      entrega: (a, b) => r(a).fechaEntrega.localeCompare(r(b).fechaEntrega),
+      valor: (a, b) => r(b).totalPendiente - r(a).totalPendiente,
+      cliente: (a, b) => a.cliente.localeCompare(b.cliente),
+      pedido: (a, b) => Number(b.consecutivo) - Number(a.consecutivo),
+    };
+    const comparar = criterio[this.ordenarPor];
+    this.lineasFiltradas = [...this.lineasFiltradas].sort((a, b) =>
+      comparar(a, b) || a.consecutivo.localeCompare(b.consecutivo) || a.id - b.id);
   }
 
-  //.Agregar hoja al formato excel.
-  addSheet(workbook, fill, font, border, data: any, pageNumber: number) {
-    let page = workbook.worksheets[pageNumber - 1];
-    this.addHeaderPage2(page, font, border, fill);
-    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-    this.addInfoExcel2(page, data);
+  /** Chips de los filtros activos (cada uno se puede quitar con la ×). */
+  get filtrosActivos(): { etiqueta: string; quitar: () => void }[] {
+    const chips: { etiqueta: string; quitar: () => void }[] = [];
+    const etiqueta = (opciones: { label: string; value: any }[], valor: any) => opciones.find(o => o.value === valor)?.label ?? valor;
+    if (this.busqueda) chips.push({ etiqueta: `Búsqueda: "${this.busqueda}"`, quitar: () => { this.busqueda = ''; this.aplicarFiltros(); } });
+    this.departamentosSel.forEach(d => chips.push({ etiqueta: etiqueta(this.opcionesDepartamentos, d), quitar: () => { this.departamentosSel = this.departamentosSel.filter(x => x !== d); this.cambiarDepartamentos(); } }));
+    this.municipiosSel.forEach(m => chips.push({ etiqueta: etiqueta(this.todosMunicipios, m), quitar: () => { this.municipiosSel = this.municipiosSel.filter(x => x !== m); this.aplicarFiltros(); } }));
+    this.clientesSel.forEach(c => chips.push({ etiqueta: etiqueta(this.opcionesClientes, c).split(' · ')[0], quitar: () => { this.clientesSel = this.clientesSel.filter(x => x !== c); this.aplicarFiltros(); } }));
+    if (this.vendedorSel) chips.push({ etiqueta: etiqueta(this.opcionesVendedores, this.vendedorSel), quitar: () => { this.vendedorSel = null; this.aplicarFiltros(); } });
+    if (this.rangoEntrega?.[0]) chips.push({ etiqueta: `Entrega ${moment(this.rangoEntrega[0]).format('DD/MM/YYYY')}${this.rangoEntrega[1] ? ' - ' + moment(this.rangoEntrega[1]).format('DD/MM/YYYY') : ''}`, quitar: () => { this.rangoEntrega = null; this.aplicarFiltros(); } });
+    this.estadosSel.forEach(e => chips.push({ etiqueta: etiqueta(this.opcionesEstado, e), quitar: () => this.alternarEstado(e) }));
+    this.semaforosSel.forEach(s => chips.push({ etiqueta: `Semáforo: ${etiqueta(this.opcionesSemaforo, s)}`, quitar: () => this.alternarSemaforo(s) }));
+    const nombresKpi: Record<string, string> = { facturable: 'Listo para facturar', vencido: 'Vencidos', proximos: `Próximos ${DIAS_PROXIMOS} días`, programados: 'Programados', sinOt: 'Sin OT' };
+    if (this.filtroKpi) chips.push({ etiqueta: nombresKpi[this.filtroKpi], quitar: () => this.seleccionarKpi(this.filtroKpi) });
+    return chips;
   }
 
-  //.Información de la producción.
-  infoProduction2() {
-    let info: any = [];
-    //this.ordenesConsultadas.sort((a,b) => a.id_Vendedor - b.id_Vendedor);
-    this.ArrayPedidos.forEach(p => {
-      info.push([parseInt(p.consecutivo), parseInt(p.id_Producto), p.estado, p.cliente, p.producto, p.OT, p.fecha_Creacion, parseFloat(p.cant_Pedida).toFixed(2), p.fecha_Entrega, parseFloat(p.cant_Facturada).toFixed(2), parseFloat(p.cant_Facturada) > 0 ? p.fecha_Factura : '', parseFloat(p.precioUnidad).toFixed(2), parseFloat(p.costo_Cant_Total).toFixed(2), p.vendedor]);
+  limpiarFiltros() {
+    this.busqueda = '';
+    this.departamentosSel = [];
+    this.municipiosSel = [];
+    this.clientesSel = [];
+    this.vendedorSel = null;
+    this.rangoEntrega = null;
+    this.estadosSel = [];
+    this.semaforosSel = [];
+    this.filtroKpi = null;
+    this.filtrarOpcionesMunicipios();
+    this.aplicarFiltros();
+  }
+
+  // =====================================================================
+  // Tabla
+  // =====================================================================
+
+  valorCelda(linea: PedidoZeusLinea, col: ColumnaPedido): any {
+    return col.field === 'ciudadLegible' ? ciudadLegible(linea) : linea[col.field];
+  }
+
+  cambiarColumnas() {
+    // Conserva el orden original de las columnas aunque se elijan en otro orden
+    const elegidas = new Set(this.columnasSeleccionadas.map(c => c.field));
+    this.columnasSeleccionadas = this.columnas.filter(c => elegidas.has(c.field));
+    try { localStorage.setItem(CLAVE_COLUMNAS, JSON.stringify([...elegidas])); } catch { }
+  }
+
+  restablecerColumnas() {
+    this.columnasSeleccionadas = this.columnas.filter(c => c.defecto);
+    try { localStorage.removeItem(CLAVE_COLUMNAS); } catch { }
+  }
+
+  private leerColumnas(): ColumnaPedido[] {
+    try {
+      const guardadas: string[] = JSON.parse(localStorage.getItem(CLAVE_COLUMNAS) ?? 'null');
+      if (Array.isArray(guardadas) && guardadas.length) {
+        const elegidas = this.columnas.filter(c => guardadas.includes(c.field));
+        if (elegidas.length) return elegidas;
+      }
+    } catch { }
+    return this.columnas.filter(c => c.defecto);
+  }
+
+  get todosExpandidos(): boolean {
+    return this.resumenes.size > 0 && Object.keys(this.expandedRows).length === this.resumenes.size;
+  }
+
+  alternarExpandirTodo() {
+    const expandir = !this.todosExpandidos;
+    this.expandedRows = {};
+    if (expandir) this.resumenes.forEach((_, consecutivo) => this.expandedRows[consecutivo] = true);
+  }
+
+  verDetalle(linea: PedidoZeusLinea) {
+    this.lineaDetalle = linea;
+    this.detalleVisible = true;
+  }
+
+  ciudadDe = (linea: PedidoZeusLinea) => ciudadLegible(linea);
+
+  /** Nombre y clase del badge del estado de la OT (undefined si no tiene). */
+  estadoOt = (linea: PedidoZeusLinea) => linea.Estado_OT != null ? ESTADOS_OT[linea.Estado_OT] : undefined;
+
+  /** Doble clic en la OT (rol 1): estados de la orden de trabajo del pedido. */
+  verOrdenTrabajo(linea: PedidoZeusLinea, evento?: Event) {
+    evento?.stopPropagation();
+    if (this.ValidarRol != 1) return;
+    this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(Number(linea.consecutivo)).subscribe(datos_orden => {
+      if (datos_orden.length > 0) {
+        this.consecutivoPedido = linea.consecutivo;
+        this.modalEstadosOrdenes = true;
+        setTimeout(() => { // espera a que el diálogo cree el componente hijo
+          this.modalEstadosProcesos_OT.modeModal = true;
+          this.modalEstadosProcesos_OT.ArrayDocumento = [];
+          datos_orden.forEach(ot => this.modalEstadosProcesos_OT.llenarArray(ot));
+        });
+      } else this.msj.mensajeAdvertencia('Advertencia', `¡No hay orden asociada al pedido ${linea.consecutivo}!`);
+    }, () => this.msj.mensajeError('Error', `¡No se obtuvo información de las órdenes de trabajo asociadas al pedido ${linea.consecutivo}!`));
+  }
+
+  // =====================================================================
+  // Análisis (gráficas)
+  // =====================================================================
+
+  alternarAnalisis() {
+    this.mostrarAnalisis = !this.mostrarAnalisis;
+    if (this.mostrarAnalisis) this.armarGraficas();
+  }
+
+  private armarGraficas() {
+    const oscuro = this.modoSeleccionado;
+    const texto = colorTextoGrafica(oscuro);
+    const millones = (v: number) => `$${(v / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })}M`;
+    const tooltipMoneda = { callbacks: { label: (c: any) => `${c.dataset.label ?? ''}: $${Number(c.raw).toLocaleString('en-US', { maximumFractionDigits: 0 })}` } };
+
+    // Pendiente por mes de entrega: vencido, mes actual y los 5 siguientes, y posteriores; separado por facturable o no
+    const inicioMes = moment().startOf('month');
+    const etiquetas = ['Vencido', ...Array.from({ length: 6 }, (_, i) => this.nombreMes(inicioMes.clone().add(i, 'month'))), 'Posteriores'];
+    const facturable = new Array(etiquetas.length).fill(0);
+    const sinStock = new Array(etiquetas.length).fill(0);
+    this.lineasFiltradas.forEach(l => {
+      let indice: number;
+      if (l.vencido) indice = 0;
+      else {
+        const meses = moment(l.fecha_Entrega).startOf('month').diff(inicioMes, 'months');
+        indice = meses < 0 ? 1 : meses > 5 ? etiquetas.length - 1 : meses + 1;
+      }
+      (l.facturable ? facturable : sinStock)[indice] += l.costo_Cant_Pendiente;
     });
-    //this.addTotalSheet1(info);
-    return info;
+    this.graficaMeses = {
+      labels: etiquetas,
+      datasets: [
+        { label: 'Con stock', data: facturable, backgroundColor: colorSerieGrafica(2, oscuro), stack: 'pendiente' },
+        { label: 'Sin stock', data: sinStock, backgroundColor: colorSerieGrafica(0, oscuro), stack: 'pendiente' },
+      ],
+    };
+    this.opcionesGraficaMeses = {
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: texto } }, tooltip: tooltipMoneda },
+      scales: {
+        x: { stacked: true, ticks: { color: texto }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { stacked: true, ticks: { color: texto, callback: (v: number) => millones(v) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+      },
+    };
+
+    const top = (lista: { clave: string; valor: number }[], n: number) => lista.slice(0, n);
+    const clientes = top(sumarPor(this.lineasFiltradas, l => l.cliente, l => l.costo_Cant_Pendiente), 10);
+    const vendedores = top(sumarPor(this.lineasFiltradas, l => l.vendedor, l => l.costo_Cant_Pendiente), 10);
+    const recortar = (t: string) => t.length > 28 ? t.substring(0, 27) + '…' : t;
+    this.graficaClientes = {
+      labels: clientes.map(c => recortar(c.clave)),
+      datasets: [{ label: 'Valor pendiente', data: clientes.map(c => c.valor), backgroundColor: colorSerieGrafica(1, oscuro) }],
+    };
+    this.graficaVendedores = {
+      labels: vendedores.map(c => recortar(c.clave)),
+      datasets: [{ label: 'Valor pendiente', data: vendedores.map(c => c.valor), backgroundColor: colorSerieGrafica(4, oscuro) }],
+    };
+    this.opcionesGraficaBarras = {
+      indexAxis: 'y',
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: tooltipMoneda },
+      scales: {
+        x: { ticks: { color: texto, callback: (v: number) => millones(v) }, grid: { color: COLOR_REJILLA_GRAFICA } },
+        y: { ticks: { color: texto }, grid: { color: COLOR_REJILLA_GRAFICA } },
+      },
+    };
   }
 
-  //.Agregar información a la hoja del excel.
-  addInfoExcel2(worksheet: any, data: any) {
-    let formatNumber: Array<number> = [8, 10, 11, 12, 13];
-    let contador: any = 6;
-    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
-    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    data.forEach(d => {
-      d[7] = parseFloat(d[7].toString().replace(',', '.'));
-      d[9] = parseFloat(d[9].toString().replace(',', '.'));
-      d[11] = parseFloat(d[11].toString().replace(',', '.'));
-      d[12] = parseFloat(d[12].toString().replace(',', '.'));
-      worksheet.addRow(d)
-      row.forEach(r => {
-        worksheet.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+  private nombreMes(fecha: moment.Moment): string {
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    return `${meses[fecha.month()]} ${fecha.format('YY')}`;
+  }
+
+  // =====================================================================
+  // Consolidado de asesores
+  // =====================================================================
+
+  /**
+   * Por asesor: facturación del mes anterior y del actual (una consulta por mes para todos los asesores) y lo pendiente
+   * de los pedidos filtrados, separado en vencido, con entrega este mes y futuro.
+   * Proyectado del mes = facturado este mes + pendiente vencido + pendiente con entrega este mes.
+   */
+  abrirConsolidado() {
+    this.modalConsolidado = true;
+    this.cargandoConsolidado = true;
+    this.obtenerFacturacion().pipe(
+      finalize(() => this.cargandoConsolidado = false),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(facturacion => {
+      if (!facturacion) this.msj.mensajeAdvertencia('Advertencia', 'No se pudo consultar la facturación de los asesores; se muestra solo lo pendiente.');
+      const finMes = moment().endOf('month').format('YYYY-MM-DD');
+      const asesores = new Map<string, ConsolidadoAsesor>();
+      this.lineasFiltradas.forEach(l => {
+        const codigo = this.codigoVendedor(l.idVendedor);
+        let a = asesores.get(codigo);
+        if (!a) {
+          a = {
+            codigo, vendedor: l.vendedor,
+            factMesAnterior: facturacion ? facturacion.anterior.get(codigo) ?? 0 : null,
+            factMesActual: facturacion ? facturacion.actual.get(codigo) ?? 0 : null,
+            pendienteVencido: 0, pendienteMes: 0, pendienteFuturo: 0, pendienteTotal: 0, proyectado: null,
+          };
+          asesores.set(codigo, a);
+        }
+        if (l.vencido) a.pendienteVencido += l.costo_Cant_Pendiente;
+        else if (l.fecha_Entrega <= finMes) a.pendienteMes += l.costo_Cant_Pendiente;
+        else a.pendienteFuturo += l.costo_Cant_Pendiente;
+        a.pendienteTotal += l.costo_Cant_Pendiente;
       });
-      contador++
+      asesores.forEach(a => a.proyectado = a.factMesActual == null ? null : a.factMesActual + a.pendienteVencido + a.pendienteMes);
+      this.consolidadoAsesores = [...asesores.values()].sort((a, b) => b.pendienteTotal - a.pendienteTotal);
+      const suma = (campo: keyof ConsolidadoAsesor) => this.consolidadoAsesores.reduce((t, a) => t + (Number(a[campo]) || 0), 0);
+      this.totalesConsolidado = {
+        codigo: '', vendedor: 'Totales',
+        factMesAnterior: facturacion ? suma('factMesAnterior') : null,
+        factMesActual: facturacion ? suma('factMesActual') : null,
+        pendienteVencido: suma('pendienteVencido'), pendienteMes: suma('pendienteMes'),
+        pendienteFuturo: suma('pendienteFuturo'), pendienteTotal: suma('pendienteTotal'),
+        proyectado: facturacion ? suma('proyectado') : null,
+      };
     });
-    //row.forEach(r => worksheet.getCell(`${r}${contador - 1}`).font = { name: 'Calibri', family: 4, size: 11, bold : true, }); 
   }
 
-  //.Agregar encabezado a la hoja del excel.
-  addHeaderPage2(worksheet, font, border, fill) {
-    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5',]
-    worksheet.addRow(['Consecutivo', 'Item', 'Estado', 'Cliente', 'Referencia', 'OT', 'Fecha Pedido', 'Cantidad', 'Fecha Solicitada', 'Cantidad Despachada', 'Fecha Despacho', 'Precio', 'Total Factura', 'Vendedor']);
-
-    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
-    rowHeader.forEach(x => worksheet.getCell(x).font = font);
-    rowHeader.forEach(x => worksheet.getCell(x).border = border);
-
-    let concatCells: any = ['A1:N3'];
-    this.stylesPage2(worksheet, concatCells, []);
+  /** Facturación de todos los asesores en el mes anterior y el actual; se consulta una sola vez por visita. */
+  private obtenerFacturacion() {
+    if (!this.facturacion$) {
+      const actual = moment();
+      const anterior = moment().subtract(1, 'month'); // en enero, el mes anterior es diciembre del año pasado
+      const aMapa = (lista: { vendedor: string; total: number }[]) =>
+        new Map((lista ?? []).map(x => [this.codigoVendedor(x.vendedor), Number(x.total) || 0] as [string, number]));
+      this.facturacion$ = forkJoin([
+        this.inventarioZeusService.GetCostoFacturado_Vendedores(anterior.format('MM'), anterior.year()),
+        this.inventarioZeusService.GetCostoFacturado_Vendedores(actual.format('MM'), actual.year()),
+      ]).pipe(
+        map(([ant, act]) => ({ anterior: aMapa(ant), actual: aMapa(act) })),
+        catchError(() => {
+          this.facturacion$ = undefined; // se reintenta al volver a abrir
+          return of(null);
+        }),
+        shareReplay(1),
+      );
+    }
+    return this.facturacion$;
   }
 
-  //.Estilos de la hoja del excel.
-  stylesPage2(worksheet, concatCells, formatNumber) {
-    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    [1, 7, 8, 12,].forEach(x => worksheet.getColumn(x).width = 12);
-    [4, 5, 14].forEach(x => worksheet.getColumn(x).width = 50);
-    [14].forEach(x => worksheet.getColumn(x).width = 40);
-    [9, 11, 13,].forEach(x => worksheet.getColumn(x).width = 15);
-    [10].forEach(x => worksheet.getColumn(x).width = 20);
-    [3].forEach(x => worksheet.getColumn(x).width = 25);
-    [2, 6].forEach(x => worksheet.getColumn(x).width = 10);
-    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  /** Zeus usa códigos de vendedor de 3 dígitos ("007"). */
+  private codigoVendedor = (codigo: string) => String(codigo ?? '').trim().padStart(3, '0');
+
+  /** Doble clic en un asesor del consolidado: sus pedidos agrupados por cliente. */
+  verPedidosAsesor(asesor: ConsolidadoAsesor) {
+    this.asesorSeleccionado = asesor.vendedor;
+    this.pedidosAsesor = this.lineasFiltradas
+      .filter(l => this.codigoVendedor(l.idVendedor) === asesor.codigo)
+      .sort((a, b) => a.cliente.localeCompare(b.cliente) || a.consecutivo.localeCompare(b.consecutivo));
+    this.totalesClienteAsesor = new Map(sumarPor(this.pedidosAsesor, l => l.cliente, l => l.costo_Cant_Pendiente).map(x => [x.clave, x.valor]));
+    this.totalAsesor = this.pedidosAsesor.reduce((t, l) => t + l.costo_Cant_Pendiente, 0);
+    if (this.pedidosAsesor.length) this.modalPedidosAsesor = true;
+    else this.msj.mensajeAdvertencia('Advertencia', `No se encontraron pedidos pendientes del asesor ${asesor.vendedor}`);
   }
 
-  //EXPORTAR DOCUMENTO CONSOLIDADO
-  exportExcel2() {
-    if (this.groupedSales.length > 0) {
-      setTimeout(() => { this.loadSheetAndStyles(this.groupedSales); }, 500);
-    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay datos para exportar.`);
+  exportarExcelConsolidado() {
+    if (!this.consolidadoAsesores.length || !this.totalesConsolidado) {
+      this.msj.mensajeAdvertencia('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+    const titulo = 'Información consolidada por asesores';
+    const workbook = this.svExcel.formatoExcel(titulo, true);
+    const hoja: any = workbook.worksheets[0];
+    const borde = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    const alineacion = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    hoja.getCell('A1').value = titulo;
+    hoja.getCell('A1').alignment = alineacion;
+    hoja.getCell('A1').font = { name: 'Calibri', family: 4, size: 15, bold: true };
+    hoja.mergeCells('A1:J3');
+    const encabezado = ['N°', 'Código', 'Asesor', `Facturado ${this.nombreMesAnterior}`, `Facturado ${this.nombreMesActual}`, 'Pendiente vencido', 'Pendiente este mes', 'Pendiente futuro', 'Pendiente total', 'Proyectado mes'];
+    const filaEncabezado = hoja.addRow(encabezado);
+    filaEncabezado.eachCell((c: any) => {
+      c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+      c.font = { name: 'Calibri', family: 4, size: 10, bold: true };
+      c.border = borde;
+      c.alignment = alineacion;
+    });
+    const filas = [...this.consolidadoAsesores.map((a, i) => [i + 1, a.codigo, a.vendedor, a.factMesAnterior, a.factMesActual, a.pendienteVencido, a.pendienteMes, a.pendienteFuturo, a.pendienteTotal, a.proyectado]),
+      ['', '', 'TOTALES', this.totalesConsolidado.factMesAnterior, this.totalesConsolidado.factMesActual, this.totalesConsolidado.pendienteVencido, this.totalesConsolidado.pendienteMes, this.totalesConsolidado.pendienteFuturo, this.totalesConsolidado.pendienteTotal, this.totalesConsolidado.proyectado]];
+    filas.forEach((f, i) => {
+      const fila = hoja.addRow(f);
+      fila.eachCell((c: any) => { c.border = borde; c.font = { name: 'Calibri', family: 4, size: 10, bold: i === filas.length - 1 }; });
+    });
+    [4, 5, 6, 7, 8, 9, 10].forEach(c => { hoja.getColumn(c).numFmt = '""#,##0.00;[Red]\-""#,##0.00'; hoja.getColumn(c).width = 18; });
+    hoja.getColumn(1).width = 5;
+    hoja.getColumn(2).width = 10;
+    hoja.getColumn(3).width = 40;
+    this.svExcel.creacionExcel(titulo, workbook);
   }
 
-  //Función que cargará la hoja y los estilos. 
-  loadSheetAndStyles(data: any) {
-    let title: any = `Información consolidada por asesores`;
-    let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
-    let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
-    let font = { name: 'Calibri', family: 4, size: 10, bold: true };
-    let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-    let workbook = this.svExcel.formatoExcel(title, true);
-    this.addNewSheet(workbook, title, fill, border, font, alignment, data);
-    this.svExcel.creacionExcel(title, workbook);
+  // =====================================================================
+  // PDF
+  // =====================================================================
+
+  private moneda = (v: number) => `$${(Number(v) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  private cantidad = (v: number) => (Number(v) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  private readonly grisPdf = '#DDDDDD'; // mismo gris de los demás PDF (CreacionPdfService)
+
+  /** Abre el PDF en una pestaña nueva; si el navegador la bloquea, lo descarga. */
+  private abrirPdf(pdf: Blob, archivo: string) {
+    const url = URL.createObjectURL(pdf);
+    if (!window.open(url, '_blank')) fs.saveAs(pdf, archivo);
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
 
-  //Función para agregar una nueva hoja de calculo.
-  addNewSheet(wb: any, title: any, fill: any, border: any, font: any, alignment: any, data: any) {
-    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
-    let worksheet: any = wb.worksheets[0];
-    this.loadStyleTitle(worksheet, title, fontTitle, alignment);
-    this.loadHeader(worksheet, fill, border, font, alignment);
-    this.loadInfoExcel(worksheet, this.dataExcel(data), border, alignment);
+  /** PDF de un pedido, con el formato común de los PDF del sistema. Una sola consulta. */
+  pdfPedido(consecutivo: string, evento?: Event) {
+    evento?.stopPropagation();
+    this.cargando = true;
+    this.inventarioZeusService.getPedidosXConsecutivo(consecutivo).pipe(
+      finalize(() => this.cargando = false),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: (items: any[]) => {
+        if (!items?.length) {
+          this.msj.mensajeAdvertencia('Advertencia', `No se encontró información del pedido ${consecutivo}.`);
+          return;
+        }
+        this.cargando = true;
+        this.svPdf.generarBlobFormatoComun(`Pedido Zeus N° ${consecutivo}`, () => this.contenidoPdfPedido(items), `Pedido ${consecutivo}`)
+          .pipe(finalize(() => this.cargando = false))
+          .subscribe({
+            next: pdf => this.abrirPdf(pdf, `Pedido ${consecutivo}.pdf`),
+            error: () => this.msj.mensajeError('Error', `No fue posible generar el PDF del pedido ${consecutivo}.`),
+          });
+      },
+      error: () => this.msj.mensajeError('Error', `No fue posible consultar el pedido ${consecutivo}.`),
+    });
   }
 
-  //Cargar estilos del titulo de la hoja.
-  loadStyleTitle(ws: any, title: any, fontTitle: any, alignment: any) {
-    ws.getCell('A1').alignment = alignment;
-    ws.getCell('A1').font = fontTitle;
-    ws.getCell('A1').value = title;
+  private contenidoPdfPedido(items: any[]): any[] {
+    const p = items[0];
+    const ciudad = ciudadLegible({ ciudad: p.ciudad ?? '', ...parsearCiudad(p.ciudad) });
+    const total = items.reduce((t, i) => t + (Number(i.costo_Cant_Total) || 0), 0);
+    const pendiente = items.reduce((t, i) => t + (Number(i.costo_Cant_Pendiente) || 0), 0);
+    const etiqueta = (texto: string) => ({ text: texto, bold: true });
+    const fecha = (v: any) => v ? String(v).substring(0, 10) : '';
+
+    const datosGenerales = {
+      margin: [0, 0, 0, 12],
+      table: {
+        widths: [80, '*', 80, '*'],
+        body: [
+          [{ text: 'Información del pedido', colSpan: 4, bold: true, fontSize: 10 }, {}, {}, {}],
+          [etiqueta('Cliente'), p.cliente ?? '', etiqueta('NIT'), String(p.id_Cliente ?? '')],
+          [etiqueta('Ciudad'), ciudad, etiqueta('Dirección'), p.direccion_Cliente ?? ''],
+          [etiqueta('Comercial'), `${String(p.id_Vendedor ?? '').trim()} - ${p.vendedor ?? ''}`, etiqueta('OC cliente'), p.orden_Compra_CLiente ?? ''],
+          [etiqueta('Fecha pedido'), fecha(p.fecha_Creacion), etiqueta('Estado'), p.estado ?? ''],
+        ],
+      },
+      layout: { fillColor: (fila: number) => fila === 0 ? this.grisPdf : null, hLineColor: () => '#BBBBBB', vLineColor: () => '#BBBBBB' },
+      fontSize: 8,
+    };
+
+    const derecha = (texto: string) => ({ text: texto, alignment: 'right' });
+    const productos = {
+      table: {
+        headerRows: 2,
+        dontBreakRows: true,
+        widths: [35, '*', 25, 50, 50, 50, 48, 45, 60],
+        body: [
+          [{ text: 'Productos del pedido', colSpan: 9, bold: true, fontSize: 10 }, {}, {}, {}, {}, {}, {}, {}, {}],
+          ['Ítem', 'Producto', 'Und', derecha('Pedida'), derecha('Facturada'), derecha('Pendiente'), 'F. entrega', derecha('Precio'), derecha('Subtotal')].map(c => typeof c === 'string' ? { text: c, bold: true } : { ...c, bold: true }),
+          ...items.map(i => [
+            String(i.id_Producto ?? ''),
+            i.producto ?? '',
+            i.presentacion ?? '',
+            derecha(this.cantidad(i.cant_Pedida)),
+            derecha(this.cantidad(i.cant_Facturada)),
+            derecha(this.cantidad(i.cant_Pendiente)),
+            fecha(i.fecha_Entrega),
+            derecha(this.moneda(i.precioUnidad)),
+            derecha(this.moneda(i.costo_Cant_Total)),
+          ]),
+        ],
+      },
+      layout: { fillColor: (fila: number) => fila <= 1 ? this.grisPdf : null, hLineColor: () => '#BBBBBB', vLineColor: () => '#BBBBBB' },
+      fontSize: 7.5,
+    };
+
+    const totales = {
+      margin: [0, 10, 0, 0],
+      columns: [
+        { width: '*', text: '' },
+        {
+          width: 220,
+          table: {
+            widths: ['*', 100],
+            body: [
+              [etiqueta('Total pedido'), derecha(this.moneda(total))],
+              [etiqueta('Total facturado'), derecha(this.moneda(total - pendiente))],
+              [{ text: 'Total pendiente', bold: true, fillColor: this.grisPdf }, { ...derecha(this.moneda(pendiente)), bold: true, fillColor: this.grisPdf }],
+            ],
+          },
+          layout: { hLineColor: () => '#BBBBBB', vLineColor: () => '#BBBBBB' },
+          fontSize: 8,
+        },
+      ],
+    };
+
+    const pie = { text: `Documento generado por ${this.storage_Nombre ?? ''}`, fontSize: 7, color: '#6c757d', margin: [0, 14, 0, 0] };
+    return [datosGenerales, productos, totales, pie];
   }
 
-  //Función para cargar los titulos de el header y los estilos.
-  loadHeader(ws: any, fill: any, border: any, font: any, alignment: any) {
-    let rowHeader: any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5'];
-    //ws.addRow([]);
-    ws.addRow(this.loadFieldsHeader());
-
-    rowHeader.forEach(x => ws.getCell(x).fill = fill);
-    rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
-    rowHeader.forEach(x => ws.getCell(x).border = border);
-    rowHeader.forEach(x => ws.getCell(x).font = font);
-    ws.mergeCells('A1:G3');
-
-    this.loadSizeHeader(ws);
+  /** PDF de los pedidos filtrados: resumen (indicadores y totales por vendedor) y detalle vendedor → cliente → pedido. */
+  pdfConsolidado() {
+    if (!this.lineasFiltradas.length) {
+      this.msj.mensajeAdvertencia('Advertencia', 'No hay pedidos para exportar con los filtros actuales.');
+      return;
+    }
+    this.cargando = true;
+    const lineas = [...this.lineasFiltradas];
+    this.svPdf.generarBlobFormatoComun('Pedidos de Ventas', () => this.contenidoPdfConsolidado(lineas), 'Pedidos de Ventas', 'landscape').pipe(
+      finalize(() => this.cargando = false),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: pdf => this.abrirPdf(pdf, `Pedidos de Ventas ${moment().format('YYYY-MM-DD')}.pdf`),
+      error: () => this.msj.mensajeError('Error', 'No fue posible generar el PDF de los pedidos.'),
+    });
   }
 
-  //Función para cargar el tamaño y el alto de las columnas del header.
-  loadSizeHeader(ws: any) {
-    [5].forEach(x => ws.getColumn(x).width = 15);
-    [6, 2].forEach(x => ws.getColumn(x).width = 20);
-    [1].forEach(x => ws.getColumn(x).width = 5);
-    [4].forEach(x => ws.getColumn(x).width = 10);
-    [3].forEach(x => ws.getColumn(x).width = 40);
-    [7].forEach(x => ws.getColumn(x).width = 20);
-  }
+  private contenidoPdfConsolidado(lineas: PedidoZeusLinea[]): any[] {
+    const ind = calcularIndicadores(lineas);
+    const lineaGris = { hLineColor: () => '#BBBBBB', vLineColor: () => '#BBBBBB' };
+    const derecha = (texto: string, extra: any = {}) => ({ text: texto, alignment: 'right', ...extra });
+    const contenido: any[] = [];
 
-  //Función para cargar los nombres de las columnas del header
-  loadFieldsHeader() {
-    let headerRow = [
-      'N°',
-      'Codigo',
-      'Asesor',
-      'Fact. Mes Anterior',
-      'Valor Pendiente',
-      'Fact. Mes Actual',
-      'Proyectado'
-    ];
-    return headerRow;
-  }
+    // Filtros aplicados
+    const filtros = this.filtrosActivos.map(f => f.etiqueta);
+    contenido.push({ text: filtros.length ? `Filtros: ${filtros.join(' · ')}` : 'Sin filtros: todos los pedidos abiertos', fontSize: 8, italics: true, margin: [0, 0, 0, 8] });
 
-  //Cargar información con los estilos al formato excel. 
-  loadInfoExcel(ws: any, data: any, border: any, alignment: any) {
-    let contador: any = 6;
-    let formatNumber: Array<number> = [4, 5, 6, 7];
-    let row: any = ['A', 'B', 'C', 'D', 'E', 'F', 'G',];
+    // Resumen de indicadores
+    const celdaKpi = (titulo: string, valor: string, detalle: string) => ({
+      stack: [{ text: titulo, fontSize: 7, bold: true }, { text: valor, fontSize: 11, bold: true }, { text: detalle, fontSize: 7 }],
+      margin: [4, 3, 4, 3],
+    });
+    contenido.push({
+      margin: [0, 0, 0, 10],
+      table: {
+        widths: ['*', '*', '*', '*', '*'],
+        body: [[
+          celdaKpi('Valor pendiente', this.moneda(ind.valorPendiente), `${ind.pedidos} pedidos · ${ind.items} ítems`),
+          celdaKpi('Listo para facturar', this.moneda(ind.facturableValor), `${ind.facturableItems} ítems con stock`),
+          celdaKpi('Vencido', this.moneda(ind.vencidoValor), `${ind.vencidoItems} ítems`),
+          celdaKpi(`Próximos ${DIAS_PROXIMOS} días`, this.moneda(ind.proximosValor), `${ind.proximosItems} ítems`),
+          celdaKpi('Programado', this.moneda(ind.programadosValor), `${ind.programadosItems} ítems`),
+        ]],
+      },
+      layout: { ...lineaGris, fillColor: () => '#F1F3F5' },
+    });
 
-    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    data.forEach(x => {
-      ws.addRow(x);
-      row.forEach(r => {
-        ws.getCell(`${r}${contador}`).border = border;
-        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
-        ws.getCell(`${r}${contador}`).alignment = alignment;
+    // Totales por vendedor
+    const porVendedor = sumarPor(lineas, l => `${l.idVendedor} - ${l.vendedor}`, l => l.costo_Cant_Pendiente);
+    contenido.push({
+      margin: [0, 0, 0, 12],
+      table: {
+        headerRows: 2,
+        widths: ['*', 120, 60],
+        body: [
+          [{ text: 'Pendiente por vendedor', colSpan: 3, bold: true, fontSize: 10 }, {}, {}],
+          [{ text: 'Vendedor', bold: true }, derecha('Valor pendiente', { bold: true }), derecha('%', { bold: true })],
+          ...porVendedor.map(v => [v.clave, derecha(this.moneda(v.valor)), derecha(ind.valorPendiente ? `${(v.valor / ind.valorPendiente * 100).toFixed(1)}%` : '0%')]),
+        ],
+      },
+      layout: { ...lineaGris, fillColor: (fila: number) => fila <= 1 ? this.grisPdf : null },
+      fontSize: 8,
+    });
+
+    // Detalle: vendedor → cliente → pedido → ítems
+    const vendedores = new Map<string, PedidoZeusLinea[]>();
+    lineas.forEach(l => {
+      const clave = `${l.idVendedor} - ${l.vendedor}`;
+      vendedores.set(clave, [...(vendedores.get(clave) ?? []), l]);
+    });
+    const anchos = [40, '*', 30, 55, 55, 55, 55, 55, 60, 70];
+    const encabezadoItems = ['Ítem', 'Referencia', 'Und', 'F. entrega', 'Pedida', 'Facturada', 'Pendiente', 'Stock', 'Precio U.', 'Subtotal pend.']
+      .map((t, i) => i >= 4 ? derecha(t, { bold: true }) : { text: t, bold: true });
+
+    [...vendedores.keys()].sort().forEach(vendedor => {
+      const lineasVendedor = vendedores.get(vendedor)!;
+      contenido.push({ text: vendedor, bold: true, fontSize: 10, margin: [0, 8, 0, 4], color: '#131f4c' });
+      const clientes = new Map<string, PedidoZeusLinea[]>();
+      lineasVendedor.forEach(l => clientes.set(l.nitCliente, [...(clientes.get(l.nitCliente) ?? []), l]));
+      clientes.forEach(lineasCliente => {
+        const c = lineasCliente[0];
+        const body: any[] = [
+          [{ text: `${c.cliente}   ·   NIT ${c.nitCliente}   ·   ${ciudadLegible(c)}`, colSpan: anchos.length, bold: true, fillColor: this.grisPdf }, ...new Array(anchos.length - 1).fill({})],
+        ];
+        const pedidos = new Map<string, PedidoZeusLinea[]>();
+        lineasCliente.forEach(l => pedidos.set(l.consecutivo, [...(pedidos.get(l.consecutivo) ?? []), l]));
+        pedidos.forEach((items, consecutivo) => {
+          const r = items[0];
+          body.push([{ text: `PV ${consecutivo}   ·   Creado ${r.fecha_Creacion}   ·   OC ${r.orden_Compra_CLiente || '—'}`, colSpan: anchos.length, bold: true, fillColor: '#F1F3F5' }, ...new Array(anchos.length - 1).fill({})]);
+          body.push(encabezadoItems);
+          items.forEach(i => body.push([
+            i.id_Producto, i.producto, i.presentacion,
+            { text: i.fecha_Entrega, color: i.vencido ? '#b91c1c' : undefined },
+            derecha(this.cantidad(i.cant_Pedida)), derecha(this.cantidad(i.cant_Facturada)), derecha(this.cantidad(i.cant_Pendiente)),
+            derecha(this.cantidad(i.existencias), i.facturable ? { color: '#166534', bold: true } : {}),
+            derecha(this.moneda(i.precioUnidad)), derecha(this.moneda(i.costo_Cant_Pendiente)),
+          ]));
+        });
+        const totalCliente = lineasCliente.reduce((t, l) => t + l.costo_Cant_Pendiente, 0);
+        body.push([{ text: `Total cliente: ${this.moneda(totalCliente)}`, colSpan: anchos.length, alignment: 'right', bold: true }, ...new Array(anchos.length - 1).fill({})]);
+        contenido.push({ margin: [0, 0, 0, 6], table: { widths: anchos, body, dontBreakRows: true }, layout: lineaGris, fontSize: 7 });
       });
-      contador++
+      const totalVendedor = lineasVendedor.reduce((t, l) => t + l.costo_Cant_Pendiente, 0);
+      contenido.push({ text: `Total ${vendedor}: ${this.moneda(totalVendedor)}`, alignment: 'right', bold: true, fontSize: 8, margin: [0, 0, 0, 6] });
+    });
+
+    contenido.push({ text: `Total pedidos: ${this.moneda(ind.valorPendiente)}`, alignment: 'right', bold: true, fontSize: 10, margin: [0, 6, 0, 0] });
+    contenido.push({ text: `Documento generado por ${this.storage_Nombre ?? ''}`, fontSize: 7, color: '#6c757d', margin: [0, 10, 0, 0] });
+    return contenido;
+  }
+
+  // =====================================================================
+  // Excel
+  // =====================================================================
+
+  /** Excel con el detalle de los pedidos filtrados. */
+  exportarExcel() {
+    if (!this.lineasFiltradas.length) {
+      this.msj.mensajeAdvertencia('Advertencia', 'No hay pedidos para exportar con los filtros actuales.');
+      return;
+    }
+    const hoy = moment().format('YYYY-MM-DD');
+    const titulo = `Reporte de Pedidos Zeus - ${hoy}`;
+    const encabezado = ['N° Pedido', 'Cliente', 'Ciudad', 'Id Producto', 'Producto', 'Cant. Pedida', 'Pendiente', 'Facturada', 'Stock', 'Und', 'Precio Und', 'Estado', 'Vendedor', 'OC', 'Costo Cant. Pendiente', 'Costo Cant. Total', 'Fecha Creación', 'Fecha Entrega', 'OT', 'Proceso Actual', 'Estado OT'];
+    const borde = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    const workbook = new Workbook();
+    const logo = workbook.addImage({ base64: logoParaPdf, extension: 'png' });
+    const hoja = workbook.addWorksheet(`Reporte Pedidos Zeus - ${hoy}`);
+    hoja.addImage(logo, 'A1:C3');
+    const filaTitulo = hoja.addRow([titulo]);
+    filaTitulo.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+    hoja.addRow([]);
+    hoja.addRow([]);
+    hoja.addRow(encabezado).eachCell(c => {
+      c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+      c.border = borde as any;
+    });
+    hoja.mergeCells('A1:U3');
+    hoja.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+    const coloresOt: Record<number, string> = { 17: '8AFC9B', 18: '53CC48', 3: 'FF7878', 14: '83D3FF', 16: 'F3FC20', 15: 'F6D45D' };
+    const formatoNumero = '""#,##0.00;[Red]\-""#,##0.00';
+    this.lineasFiltradas.forEach(l => {
+      const fila = hoja.addRow([l.consecutivo, l.cliente, l.ciudad, l.id_Producto, l.producto, l.cant_Pedida, l.cant_Pendiente, l.cant_Facturada, l.existencias, l.presentacion, l.precioUnidad, l.estado, l.vendedor, l.orden_Compra_CLiente, l.costo_Cant_Pendiente, l.costo_Cant_Total, l.fecha_Creacion, l.fecha_Entrega, l.OT, l.Proceso_OT, l.Estado_OT != null ? (ESTADOS_OT[l.Estado_OT]?.nombre ?? '') : '']);
+      fila.alignment = { horizontal: 'center' };
+      [6, 7, 8, 9, 11, 15, 16].forEach(c => fila.getCell(c).numFmt = formatoNumero);
+      fila.getCell(6).font = { color: { argb: 'FF7F71' }, name: 'Calibri', bold: true, size: 11 };
+      if (l.Estado_OT != null && coloresOt[l.Estado_OT]) fila.getCell(21).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: coloresOt[l.Estado_OT] } };
+      const colorEstado = l.estado == 'Pendiente' ? 'FF7F71' : l.estado == 'Parcialmente Satisfecho' ? 'FFF55D' : null;
+      if (colorEstado) fila.getCell(12).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colorEstado } };
+    });
+    [12, 60, 30, 15, 60, 15, 15, 15, 18, 15, 15, 30, 50, 25, 20, 20, 15, 15, 15, 40, 30].forEach((ancho, i) => hoja.getColumn(i + 1).width = ancho);
+    workbook.xlsx.writeBuffer().then(datos => {
+      fs.saveAs(new Blob([datos], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `Reporte Pedidos Zeus - ${hoy}.xlsx`);
+      this.msj.mensajeConfirmacion('Confirmación', '¡Archivo de excel generado exitosamente!');
     });
   }
 
-  //.Función que contendrá la info al documento excel. 
-  dataExcel(data: any) {
-    let info: any = [];
-    let count: number = 0;
-    data.forEach(x => {
-      info.push([
-        count += 1,
-        x.codigo,
-        x.vendedor,
-        x.factMesAnterior,
-        x.pendiente,
-        x.factMesActual,
-        x.proyectado
-      ]);
+  /** Excel con el formato para la planeación de OT (pedidos filtrados). */
+  exportarExcelPlaneacion() {
+    if (!this.lineasFiltradas.length) {
+      this.msj.mensajeAdvertencia('Advertencia', 'No hay pedidos para exportar con los filtros actuales.');
+      return;
+    }
+    const fill: any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+    const font: any = { size: 10, bold: true, name: 'Calibri' };
+    const border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    const workbook = this.svExcel.formatoExcel('Formato de pedidos de Zeus ', true);
+    const hoja = workbook.worksheets[0];
+    hoja.addRow(['Consecutivo', 'Item', 'Estado', 'Cliente', 'Referencia', 'OT', 'Fecha Pedido', 'Cantidad', 'Fecha Solicitada', 'Cantidad Despachada', 'Fecha Despacho', 'Precio', 'Total Factura', 'Vendedor']);
+    ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5'].forEach(c => {
+      hoja.getCell(c).fill = fill;
+      hoja.getCell(c).font = font;
+      hoja.getCell(c).border = border;
     });
-    this.addTotal(info);
-    return info;
-  }
-
-  //Agregar fila de totales al formato excel.
-  addTotal(info: any) {
-    info.push([
-      '',
-      '',
-      'TOTALES',
-      this.getTotalMonth1(),
-      this.totalPending(),
-      this.getTotalMonth2(),
-      0
-    ]);
+    hoja.mergeCells('A1:N3');
+    hoja.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    [8, 10, 12, 13].forEach(c => hoja.getColumn(c).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    this.lineasFiltradas.forEach(p => {
+      const fila = hoja.addRow([parseInt(p.consecutivo), parseInt(p.id_Producto), p.estado, p.cliente, p.producto, p.OT, p.fecha_Creacion, p.cant_Pedida, p.fecha_Entrega, p.cant_Facturada, p.cant_Facturada > 0 ? p.fecha_Factura : '', p.precioUnidad, p.costo_Cant_Total, p.vendedor]);
+      fila.font = { name: 'Calibri', family: 4, size: 10 };
+    });
+    [1, 7, 8, 12].forEach(x => hoja.getColumn(x).width = 12);
+    [4, 5].forEach(x => hoja.getColumn(x).width = 50);
+    [14].forEach(x => hoja.getColumn(x).width = 40);
+    [9, 11, 13].forEach(x => hoja.getColumn(x).width = 15);
+    [10].forEach(x => hoja.getColumn(x).width = 20);
+    [3].forEach(x => hoja.getColumn(x).width = 25);
+    [2, 6].forEach(x => hoja.getColumn(x).width = 10);
+    this.svExcel.creacionExcel(`Pedidos Zeus ${moment().format('DD-MM-YYYY')}`, workbook);
+    this.msj.mensajeConfirmacion('Confirmación', '¡Archivo de excel generado exitosamente!');
   }
 }

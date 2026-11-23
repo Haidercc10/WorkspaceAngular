@@ -1,6 +1,6 @@
 {
   "name": "proyecto-plasticaribe",
-  "version": "2026.11.17",
+  "version": "2026.11.20",
   "scripts": {
     "ng": "ng",
     "version": "node scripts/generar-version.js",

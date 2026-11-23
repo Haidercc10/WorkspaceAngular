@@ -51,8 +51,8 @@ export function pasosTutorialInventarioProductos(ctx : ContextoTutorialInventari
   ].filter(Boolean).join('');
 
   return armar('tutorial-inventario-productos', [
-    paso(null, '¡Inventario de Productos Terminados!',
-      `<p>¡Aquí consultamos el <b>inventario de producto terminado</b>!</p>
+    paso(null, 'Inventario de Productos Terminados',
+      `<p>Aquí consultamos el <b>inventario de producto terminado</b>.</p>
        <p>La página tiene ${veProductos ? '<b>dos pestañas</b>' : 'una pestaña'}:</p>
        <ul>
          ${veProductos ? `<li><b>Inventario de Producto Terminado:</b> las existencias de cada producto según <b>Zeus</b> (el sistema contable)${vePrecios ? ', con su precio y valor total' : ''}.</li>` : ''}
@@ -60,22 +60,22 @@ export function pasosTutorialInventarioProductos(ctx : ContextoTutorialInventari
        </ul>
        <p>Al entrar, la información se carga sola; no hace falta consultar.</p>`),
 
-    veProductos && paso(`${el('pestanasPrincipales')} .p-tabview-nav`, '¡Pestañas!',
+    veProductos && paso(`${el('pestanasPrincipales')} .p-tabview-nav`, 'Pestañas',
       `<p>Con estas pestañas cambiamos entre el inventario de <b>Zeus</b> y el inventario <b>Por Bodegas</b>.</p>
        <p>Primero veamos la pestaña de <b>Inventario de Producto Terminado</b>.</p>`,
       enProductos(`${el('pestanasPrincipales')} .p-tabview-nav`)),
 
     // ---------- Pestaña: Inventario de Producto Terminado (Zeus) ----------
-    veProductos && veTotalStock && paso(el('totalStock'), '¡Total Stock!',
+    veProductos && veTotalStock && paso(el('totalStock'), 'Total Stock',
       `<p>Es el <b>valor total</b> (en pesos) de todo el inventario de producto terminado: la suma del <b>subtotal</b> (existencias × precio) de todos los productos.</p>`,
       enProductos(el('totalStock'))),
 
-    veProductos && paso(el('exportarExcel'), '¡Exportar Excel!',
+    veProductos && paso(el('exportarExcel'), 'Exportar Excel',
       `<p>Descarga la tabla en un archivo de <b>Excel</b>.</p>
        <p>Si escribimos algún <b>filtro</b> en la tabla, el Excel trae <b>solo los productos filtrados</b>; si no, trae todos.</p>`,
       enProductos(el('exportarExcel'))),
 
-    veProductos && paso(el('tablaProductos'), '¡Tabla de productos!',
+    veProductos && paso(el('tablaProductos'), 'Tabla de productos',
       `<p>Cada fila es un producto con existencias en Zeus:</p>
        <ul>
          <li><b>Item</b>, <b>Cliente</b>, <b>Referencia</b> y <b>Vendedor</b> del producto.</li>
@@ -86,28 +86,28 @@ export function pasosTutorialInventarioProductos(ctx : ContextoTutorialInventari
        <p>La celda de <b>Existencias</b> sale con fondo <b>azul</b>; si las existencias quedan <b>iguales o por debajo de la cantidad mínima</b> sale con fondo <b>rojo</b>, para saber qué producto hay que reponer.</p>`,
       enProductos(el('tablaProductos'))),
 
-    veProductos && paso(el('filtrosProductos'), '¡Filtros y orden!',
+    veProductos && paso(el('filtrosProductos'), 'Filtros y orden',
       `<p>En la primera fila de la tabla escribimos para <b>filtrar</b> por cualquier columna; podemos combinar varios filtros.</p>
        <p>Haciendo <b>clic en el título</b> de una columna ordenamos de menor a mayor, y con otro clic de mayor a menor.</p>`,
       enProductos(el('filtrosProductos'))),
 
-    veProductos && editaCantMinima && paso(el('tablaProductos'), '¡Cantidad mínima!',
+    veProductos && editaCantMinima && paso(el('tablaProductos'), 'Cantidad mínima',
       `<p>Para cambiar la <b>Cant. Mínima</b> de un producto hacemos <b>clic en su celda</b>, escribimos la cantidad y presionamos <b>Enter</b> para guardarla.</p>
        <p>Al guardar, la fila se vuelve a evaluar y, si las existencias quedan por debajo, pasa a <b>rojo</b>.</p>`,
       enProductos(el('tablaProductos'))),
 
-    veProductos && vePrecios && paso(el('totalesProductos'), '¡Totales!',
+    veProductos && vePrecios && paso(el('totalesProductos'), 'Totales',
       `<p>Al final de la tabla vemos el <b>valor total</b> del inventario (la suma de los subtotales), el mismo de <b>Total Stock</b>.</p>`,
       enProductos(el('totalesProductos'))),
 
     // ---------- Pestaña: Inventario Por Bodegas ----------
-    paso(`${el('pestanasBodegas')} .p-tabview-nav`, '¡Inventario Por Bodegas!',
+    paso(`${el('pestanasBodegas')} .p-tabview-nav`, 'Inventario Por Bodegas',
       `<p>Aquí el inventario se divide en <b>sub-pestañas</b>:</p>
        <ul>${subpestanas}</ul>
        <p>Algunas sub-pestañas cargan su información la primera vez que entramos a ellas; mientras tanto se ve el ícono de carga.</p>`,
       enBodegas(`${el('pestanasBodegas')} .p-tabview-nav`)),
 
-    paso(panelBodegaVisible, '¡Tablas por item!',
+    paso(panelBodegaVisible, 'Tablas por item',
       `<p>En las sub-pestañas que suman <b>por item</b> (Despacho, Empaque, Sellado, Rollos, Bultos y Comparativo):</p>
        <ul>
          <li>Con el selector de <b>columnas</b> elegimos qué columnas ver (Existencia, Área, Exis. Total, Precio, Ciudad, Peso Bruto...). También podemos <b>arrastrar</b> los títulos para cambiar el orden.</li>
@@ -116,7 +116,7 @@ export function pasosTutorialInventarioProductos(ctx : ContextoTutorialInventari
        </ul>`,
       enBodegas(panelBodegaVisible)),
 
-    paso(panelBodegaVisible, '¡Tablas rollo a rollo!',
+    paso(panelBodegaVisible, 'Tablas rollo a rollo',
       `<p>En las sub-pestañas de <b>rollo a rollo</b>, <b>bulto a bulto</b>, <b>Calidad</b> y <b>Reempaque</b> cada fila es un rollo o bulto, con su OT, item, referencia${vePreciosBodegas ? ', precio y subtotal' : ''} y fecha.</p>
        <ul>
          <li>En la primera fila de la tabla escribimos para <b>filtrar</b>, y con clic en el título de una columna <b>ordenamos</b>.</li>
@@ -126,7 +126,7 @@ export function pasosTutorialInventarioProductos(ctx : ContextoTutorialInventari
        ${vePreciosBodegas ? '<p>Al final de cada tabla vemos el <b>total</b> (en pesos) de lo que hay en esa bodega.</p>' : ''}`,
       enBodegas(panelBodegaVisible)),
 
-    paso(null, '¡Listo!',
+    paso(null, 'Listo',
       `<p>Ya conocemos el inventario de productos terminados.</p>
        <p>Puede volver a ver este tutorial cuando quiera con el botón <b>i</b> junto al título.</p>`),
   ]);

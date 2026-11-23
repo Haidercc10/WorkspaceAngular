@@ -3,7 +3,9 @@
 <div class="contain" *ngIf="!embebido">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Crear Item</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Crear Item
+        <p-button *ngIf="puedeCrearItems" class="boton-tutorial-titulo" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+      </h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -29,14 +31,15 @@
       <form [formGroup]="formItem" (ngSubmit)="guardar()">
         <div class="row g-4 mt-1">
           <!-- ========== Ficha ========== -->
-          <div class="col-12 col-xl-8 d-flex flex-column gap-4">
+          <div class="col-sm-12 col-lg-8 d-flex flex-column gap-4">
 
             <!-- Partir de un item existente -->
-            <div class="barra-copiar">
+            <div class="barra-copiar" data-tutorial="copiar">
               <span class="copiar-titulo"><i class="pi pi-copy"></i> Partir de un item existente</span>
               <div class="copiar-campo">
                 <!-- Item elegido: queda bloqueado; para cambiarlo se quita con la X -->
-                <div class="item-elegido" *ngIf="itemCopiaElegido as elegido; else buscadorCopia">
+                <div class="item-elegido" id="itemElegidoCopia" tabindex="0" *ngIf="itemCopiaElegido as elegido; else buscadorCopia"
+                  (keydown.enter)="!copiando && !guardando && copiarDesdeItem()" pTooltip="Pulse Enter o 'Copiar Ficha' para cargar la ficha de este item" tooltipPosition="top">
                   <i class="pi pi-box"></i>
                   <span class="item-elegido-texto" [title]="elegido.etiqueta ?? elegido.codigo">{{elegido.etiqueta ?? elegido.codigo}}</span>
                   <button pButton type="button" icon="pi pi-times" class="p-button-rounded p-button-text p-button-sm p-button-danger"
@@ -46,7 +49,8 @@
                   <span class="p-float-label">
                     <p-autoComplete [formControl]="busquedaCopia" inputId="busquedaCopia" [suggestions]="itemsSugeridos"
                       (completeMethod)="buscarItems($event)" field="etiqueta" [minLength]="3" [delay]="400" appendTo="body"
-                      [style]="{width: '100%'}" [inputStyle]="{width: '100%'}" (keyup.enter)="copiarDesdeItem()"></p-autoComplete>
+                      [style]="{width: '100%'}" [inputStyle]="{width: '100%'}" (onSelect)="enfocarItemElegido()" (keyup.enter)="copiarCodigoDigitado()"
+                      pTooltip="Escriba el código o al menos 3 letras del nombre, elija el item y pulse Enter para copiar su ficha" tooltipPosition="top"></p-autoComplete>
                     <label for="busquedaCopia"><i class="pi pi-search"></i> Item (código o nombre)</label>
                   </span>
                 </ng-template>
@@ -60,7 +64,7 @@
             </div>
 
             <!-- 1. Cliente y producto -->
-            <div class="bloque-ficha">
+            <div class="bloque-ficha" data-tutorial="bloqueCliente">
               <h4 class="bloque-titulo"><span class="bloque-num">1</span> Cliente y producto</h4>
               <div class="row g-4">
                 <div class="col-sm-12 col-md-6 col-xxl-5">
@@ -146,7 +150,7 @@
             </div>
 
             <!-- 2. Material y medidas -->
-            <div class="bloque-ficha">
+            <div class="bloque-ficha" data-tutorial="bloqueMaterial">
               <h4 class="bloque-titulo"><span class="bloque-num">2</span> Material y medidas</h4>
               <div class="row g-4">
                 <div class="col-sm-12 col-md-6 col-xxl-3">
@@ -205,9 +209,9 @@
             </div>
 
             <!-- 3. Procesos -->
-            <div class="bloque-ficha">
+            <div class="bloque-ficha" data-tutorial="bloqueProcesos">
               <h4 class="bloque-titulo"><span class="bloque-num">3</span> Procesos</h4>
-              <div class="tarjetas-proceso">
+              <div class="tarjetas-proceso" data-tutorial="procesos">
                 <button type="button" *ngFor="let p of procesosItem" class="tarjeta-proceso" [class.activo]="procesoActivo(p.control)"
                   [disabled]="guardando" (click)="alternarProceso(p.control)" [attr.aria-pressed]="procesoActivo(p.control)"
                   [pTooltip]="procesoActivo(p.control) ? 'Clic para quitar ' + p.nombre : 'Clic para agregar ' + p.nombre" tooltipPosition="top">
@@ -297,6 +301,14 @@
                           <span class="muestra-tinta" [style.background]="tinta.color || 'transparent'"></span>
                           <span>{{tinta.nombre}}</span>
                         </ng-template>
+                        <!-- Chips con el color de cada tinta (el mismo del punto del listado) -->
+                        <ng-template let-removeChip="removeChip" pTemplate="selectedItems">
+                          <div class="chip-tinta" *ngFor="let tinta of tintasElegidas"
+                            [style.background]="tinta.color || 'var(--surface-hover)'" [style.color]="textoSobreTinta(tinta.color)">
+                            <span>{{tinta.nombre}}</span>
+                            <i class="pi pi-times-circle" *ngIf="!formItem.get('tintas')?.disabled" (click)="removeChip(tinta.id, $event)"></i>
+                          </div>
+                        </ng-template>
                       </p-multiSelect>
                       <label for="tintas"><i class="pi pi-palette"></i> Tintas (máx. 8)</label>
                     </span>
@@ -310,20 +322,20 @@
                 <!-- Una fila por capa: capa | calibre | cantidad -->
                 <div class="row g-4">
                   <ng-container *ngFor="let n of [1, 2, 3]">
-                    <div class="col-12 col-md-6">
+                    <div class="col-sm-12 col-md-6">
                       <span class="p-float-label">
                         <p-dropdown [formControlName]="'capa' + n" [inputId]="'capa' + n" [options]="capasLaminado" optionValue="lamCapa_Id"
                           optionLabel="lamCapa_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
                         <label [for]="'capa' + n"><i class="pi pi-clone"></i> Capa {{n}}</label>
                       </span>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-sm-6 col-md-3">
                       <span class="p-float-label">
                         <p-inputNumber [formControlName]="'calibreCapa' + n" [inputId]="'calibreCapa' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
                         <label [for]="'calibreCapa' + n"><i class="pi pi-sort-alt"></i> Calibre</label>
                       </span>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-sm-6 col-md-3">
                       <span class="p-float-label">
                         <p-inputNumber [formControlName]="'cantidadCapa' + n" [inputId]="'cantidadCapa' + n" [min]="0" [useGrouping]="false"></p-inputNumber>
                         <label [for]="'cantidadCapa' + n"><i class="pi pi-hashtag"></i> Cantidad</label>
@@ -375,7 +387,7 @@
             </div>
 
             <!-- 4. Observación -->
-            <div class="bloque-ficha">
+            <div class="bloque-ficha" data-tutorial="bloqueObservacion">
               <h4 class="bloque-titulo"><span class="bloque-num">4</span> Observación</h4>
               <span class="p-float-label">
                 <textarea formControlName="observacion" id="observacion" [rows]="2" pInputTextarea></textarea>
@@ -385,12 +397,12 @@
           </div>
 
           <!-- ========== Resumen en vivo ========== -->
-          <div class="col-12 col-xl-4">
+          <div class="col-sm-12 col-lg-4">
             <aside class="resumen-ficha">
-              <div class="resumen-nombre">
+              <div class="resumen-nombre" data-tutorial="nombre">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <small class="etiqueta-resumen">Nombre del item*</small>
-                  <button pButton type="button" icon="pi pi-sync" class="p-button-text p-button-sm p-button-secondary" label="Sugerir"
+                  <button pButton type="button" icon="pi pi-sync" class="p-button-sm boton-sugerir" label="Sugerir"
                     (click)="sugerirNombre()"
                     pTooltip="Arma el nombre con formato, material, medidas, calibre, densidad y pigmento (o descripción comercial si lleva impresión)" tooltipPosition="top"></button>
                 </div>
@@ -401,7 +413,7 @@
                 </small>
               </div>
 
-              <div class="resumen-medidas">
+              <div class="resumen-medidas" data-tutorial="medidas">
                 <div class="dibujo-bolsa" [class.camisilla]="esBiodegradable" aria-hidden="true">
                   <!-- Silueta: camisilla con asas o bolsa recta; con impresión se dibuja un arte en el centro con los colores de las tintas -->
                   <svg class="silueta" viewBox="0 0 60 80" preserveAspectRatio="none">
@@ -439,9 +451,9 @@
                 </span>
               </div>
 
-              <div class="resumen-pendientes" [class.listo]="pendientes.length == 0">
+              <div class="resumen-pendientes" data-tutorial="pendientes" [class.listo]="pendientes.length == 0">
                 <ng-container *ngIf="pendientes.length == 0">
-                  <i class="pi pi-check-circle"></i> <b>Ficha lista para crear</b>
+                  <i class="pi pi-check-circle"></i> <b> Ficha lista para crear</b>
                 </ng-container>
                 <ng-container *ngIf="pendientes.length > 0">
                   <b><i class="pi pi-exclamation-circle"></i> {{pendientes.length}} {{pendientes.length == 1 ? 'pendiente' : 'pendientes'}}</b>
@@ -451,7 +463,7 @@
                 </ng-container>
               </div>
 
-              <div class="resumen-destinos">
+              <div class="resumen-destinos" data-tutorial="destinos">
                 <small class="etiqueta-resumen">Se creará en</small>
                 <div class="destinos">
                   <span class="destino sistema-bagpro"><i class="pi pi-briefcase"></i> BagPro<small>Código automático</small></span>
@@ -461,7 +473,7 @@
               </div>
 
               <!-- Acciones en una sola línea -->
-              <div class="acciones-ficha">
+              <div class="acciones-ficha" data-tutorial="acciones">
                 <button pButton type="button" label="Limpiar Campos" icon="pi pi-eraser" class="p-button-secondary p-button-outlined" [disabled]="guardando" (click)="limpiarFormulario()"
                   pTooltip="Limpia todos los campos de la ficha" tooltipPosition="top"></button>
                 <button pButton type="submit" label="Crear Item" icon="pi pi-check" class="p-button-danger" [loading]="guardando" [disabled]="guardando"
@@ -527,7 +539,7 @@
         <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Item</h4>
       </div>
       <!-- Buscador con sus acciones en la misma línea -->
-      <div class="barra-sync mb-3">
+      <div class="barra-sync mb-3" data-tutorial="buscarSync">
         <div class="barra-sync-campo">
           <span class="p-float-label">
             <p-autoComplete [formControl]="busquedaSync" inputId="busquedaSync" [suggestions]="itemsSugeridos"
@@ -565,7 +577,7 @@
 
         <!-- Una card por sistema -->
         <div class="row g-3 mb-4">
-          <div class="col-12 col-lg-4" *ngFor="let tarjeta of tarjetasSync">
+          <div class="col-sm-12 col-lg-4" *ngFor="let tarjeta of tarjetasSync">
             <div class="tarjeta-sync" [ngClass]="['sistema-' + tarjeta.sistema.toLowerCase(), 'estado-' + tarjeta.estado]">
               <div class="tarjeta-cabecera">
                 <span class="tarjeta-icono"><i [class]="tarjeta.icono"></i></span>

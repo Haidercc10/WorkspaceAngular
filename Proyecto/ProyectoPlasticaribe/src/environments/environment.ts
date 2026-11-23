@@ -20,8 +20,8 @@ export const environment = {
   //rutaZeusContabilidad: "http://192.168.0.250:9065/api"
 
   // LOCALES
-  rutaPlasticaribeAPI : `https://${host}:7137/api`,
-  // rutaPlasticaribeAPI : `http://${host}:9085/api`,
+  //rutaPlasticaribeAPI : `https://${host}:7137/api`,
+  rutaPlasticaribeAPI : `http://${host}:9085/api`,
   rutaBagPro : `http://${host}:9095/api`,
   rutaZeus : `http://${host}:9055/api`,
   rutaZeusContabilidad : `http://${host}:9065/api`,

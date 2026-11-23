@@ -1043,6 +1043,15 @@ export class CreacionPdfService {
   }
 
   /**
+   * PDF con el formato común (cabecera con logo, NIT, título y paginado; marca de agua y márgenes) para un contenido
+   * armado por el componente. Lo usa, por ejemplo, Pedidos de Productos (ReportePedidos_Zeus).
+   * @param contenido Función que arma el contenido (pdfmake lo modifica al maquetarlo, por eso se pide una función).
+   */
+  generarBlobFormatoComun(titulo: string, contenido: () => any[], tituloPestana: string = titulo, orientacion: 'portrait' | 'landscape' = 'portrait'): Observable<Blob> {
+    return this.generarBlobPDF(() => ({ titulo, tituloPestana, content: contenido(), orientacion }));
+  }
+
+  /**
    * Arma un PDF con el formato común (cabecera, marca de agua, márgenes) y lo entrega como archivo en memoria.
    * @param contenido Devuelve el título de la cabecera, el título de la pestaña y el contenido del documento.
    */
@@ -1054,6 +1063,8 @@ export class CreacionPdfService {
     tituloPorPagina?: (pagina: number) => string;
     /** Se ejecuta al maquetar cada nodo; sirve para saber en qué hoja empieza cada sección. */
     pageBreakBefore?: (nodo: any) => boolean;
+    /** Orientación de la hoja; por defecto vertical. */
+    orientacion?: 'portrait' | 'landscape';
   }): Observable<Blob> {
     return new Observable<Blob>(suscriptor => {
       try {
@@ -1061,11 +1072,11 @@ export class CreacionPdfService {
         const hora = moment().format('HH:mm:ss');
         // pdfmake modifica el contenido al maquetarlo: cada pasada arma el suyo con `contenido()`.
         const definicion = () => {
-          const { titulo, tituloPestana, content, tituloPorPagina } = contenido();
+          const { titulo, tituloPestana, content, tituloPorPagina, orientacion } = contenido();
           this.title = titulo;
           return {
             info: { title: tituloPestana },
-            pageOrientation: 'portrait',
+            pageOrientation: orientacion ?? 'portrait',
             pageSize: 'LETTER',
             watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
             pageMargins: [25, 120, 25, 35],
