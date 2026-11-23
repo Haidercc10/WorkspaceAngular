@@ -738,11 +738,15 @@ p-dialog ::ng-deep div .p-dialog-title {
   border-radius: 4px;
 }
 
+/* El badge sale en diagonal hacia arriba a la derecha para dejar ver la parte superior del ícono (los aros del
+   calendario y la solapa del sobre, que es lo que los distingue). El anillo del color de la barra (box-shadow)
+   lo "recorta" del ícono. Con "99+" sobresale ~17px a la derecha: sigue sin tocar el ícono vecino (~23px). */
 .botonBadge ::ng-deep .p-badge {
   position: absolute;
   top: calc((var(--lado-boton) - var(--icono)) / 2);
   right: calc((var(--lado-boton) - var(--icono)) / 2);
-  transform: translate(35%, -50%);
+  transform: translate(55%, -70%);
+  box-shadow: 0 0 0 2px var(--surface-card);
   min-width: 1.5rem;
   height: 1.5rem;
   line-height: 1.5rem;
