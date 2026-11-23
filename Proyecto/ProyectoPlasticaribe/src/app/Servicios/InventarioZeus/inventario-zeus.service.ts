@@ -174,6 +174,10 @@ export class InventarioZeusService {
 
   GetCostoFacturado_Vendedor = (vendedor: string, mes: any, anio: any) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getCostoFacturado_Vendedor/${vendedor}/${mes}/${anio}`);
 
+  /** Costo facturado del mes de todos los vendedores en una sola consulta (misma fórmula que GetCostoFacturado_Vendedor). */
+  GetCostoFacturado_Vendedores = (mes: string, anio: number): Observable<{ vendedor: string; total: number }[]> =>
+    this.http.get<{ vendedor: string; total: number }[]>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getCostoFacturado_Vendedores/${mes}/${anio}`);
+
   GetClienteFacturadosMes = (sales? : string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getClienteFacturadosMes${sales}`);
 
   GetProductosFaturadosMes = (sales? : string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getProductosFaturadosMes${sales}`);
