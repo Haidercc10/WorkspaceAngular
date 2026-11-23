@@ -5,8 +5,10 @@ import {
   CrearSolicitudRequest,
   DetalleSolicitudMaterial,
   EditarSolicitudRequest,
+  EstadoSolicitudMaterial,
   FiltrosConsultaSolicitudes,
   ReservaInventario,
+  ResumenSolicitudOT,
   SolicitudConsultada,
 } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
@@ -30,9 +32,6 @@ export class SolicitudMP_ExtrusionService {
   Put = (id : number, data : modelSolicitudMP_Extrusion) => this.http.put(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`, data);
 
   Delete = (id : number) => this.http.delete(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`);
-
-  /** Marca como verificada (estado 55) una solicitud finalizada. Responde 409 si no está finalizada y 403 si el rol no tiene permiso. */
-  verificarSolicitud = (id : number) => this.http.put(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/verificar/${id}`, null);
 
   getEstadosSolicitudes = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getEstadosSolicitudes`);
 
@@ -65,11 +64,35 @@ export class SolicitudMP_ExtrusionService {
     this.http.get<{ estado_Id : number; estado : string; cantidad : number }[]>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/conteo-estados`);
 
   /**
-   * Finaliza (5) o cancela (4) una solicitud. Quien asigna lo hace con pendientes y parciales; el solicitante solo
-   * cancela la suya mientras esté pendiente. Responde 409 si la solicitud cambió de estado y 403 sin permiso.
+   * Cancela una solicitud con su motivo; el API guarda el motivo, la fecha y el usuario que la canceló (las solicitudes
+   * se finalizan con su OT, no una por una). Quien asigna cancela pendientes y parciales; el solicitante solo la suya
+   * mientras esté pendiente. 400 sin motivo, 409 si cambió de estado, 403 sin permiso.
    */
-  cambiarEstado = (id : number, estado : number) =>
-    this.http.put<{ solMpExt_Id : number; estado_Id : number }>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/${id}/estado`, { Estado: estado });
+  cancelarSolicitud = (id : number, motivo : string) =>
+    this.http.put<{ solMpExt_Id : number; estado_Id : number }>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/${id}/estado`,
+      { Estado: EstadoSolicitudMaterial.Cancelada, Motivo: motivo });
+
+  // ───────────────────────── Solicitud de la OT ─────────────────────────
+
+  /** Avance y estado de la solicitud de la OT (todas sus solicitudes). Responde 404 si la OT aún no tiene solicitudes. */
+  obtenerResumenOT = (ot : number) : Observable<ResumenSolicitudOT> =>
+    this.http.get<ResumenSolicitudOT>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/ot/${ot}`);
+
+  /** Guarda los kg de la OT tomados de BagPro, recalcula su estado y devuelve el resumen. 404 si la OT no tiene solicitudes. */
+  registrarKgOT = (ot : number, kgOT : number) : Observable<ResumenSolicitudOT> =>
+    this.http.put<ResumenSolicitudOT>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/ot/${ot}/kg`, { KgOT: kgOT });
+
+  /** Completa a mano la solicitud de la OT (lo asignado llegó a los kg de la OT). No se puede deshacer. Roles 1, 3 y 85. */
+  completarOT = (ot : number) : Observable<ResumenSolicitudOT> =>
+    this.http.put<ResumenSolicitudOT>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/ot/${ot}/completar`, null);
+
+  /** Finaliza la solicitud de la OT (cierra la asignación de materiales). Roles 1, 3 y 85. */
+  finalizarOT = (ot : number) : Observable<ResumenSolicitudOT> =>
+    this.http.put<ResumenSolicitudOT>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/ot/${ot}/finalizar`, null);
+
+  /** Verifica la solicitud de la OT finalizada (el solicitante comprobó lo recibido). Roles 1 y 85. */
+  verificarOT = (ot : number) : Observable<ResumenSolicitudOT> =>
+    this.http.put<ResumenSolicitudOT>(`${this.rutaPlasticaribeAPI}/SolicitudesExtrusion/ot/${ot}/verificar`, null);
 
   /** Consulta existencia, reserva informativa y disponible de las subcategorías indicadas. */
   getReservas = (subcategorias : number[]) : Observable<ReservaInventario[]> =>

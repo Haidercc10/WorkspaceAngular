@@ -6,7 +6,7 @@ import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/a
 import { Router } from '@angular/router';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { Table } from 'primeng/table';
-import { defer, finalize, map, Observable, of, Subject, Subscription, switchMap, takeUntil } from 'rxjs';
+import { catchError, defer, finalize, forkJoin, map, Observable, of, Subject, Subscription, switchMap, takeUntil, throwError } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { ClaveTutorialSolicitudMaterial, pasosTutorialSolicitudMaterial } from 'src/app/Tutoriales/Tutoriales_SolicitudMaterial';
@@ -16,6 +16,7 @@ import {
   DetalleSolicitudRequest,
   EstadoSolicitudMaterial,
   MaterialAsignadoOT,
+  ResumenSolicitudOT,
   SolicitudConsultada,
   TipoMaterialInventario,
   ADICIONAL_KG_OT,
@@ -24,9 +25,11 @@ import {
   ROLES_ELEGIR_PROCESO,
   ROLES_EXCEDER_LIMITE_OT,
   solicitudCerrada,
+  motivoOTCerrada,
   formatoNumero,
   aTipoMaterial,
   LOCALE_NUMEROS,
+  RETRASO_TOOLTIP_AYUDA_MS,
 } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
@@ -52,6 +55,8 @@ const VISTA_MOVIMIENTOS_SOLICITUD = 'Mov. Solicitud Materia Prima';
 /** Datos del aviso de éxito al guardar una solicitud. */
 interface SolicitudGuardada {
   solicitud: number;
+  /** Número de la OT de la solicitud (para ver en Movimientos todas las solicitudes de esa OT). */
+  numeroOT: number | null;
   ot: DatosOTSolicitudPDF | null;
   creada: boolean;
 }
@@ -134,7 +139,10 @@ interface InfoOrdenTrabajo {
   kgAsignado: number;
   kgRestante: number;
   kgPorSolicitar: number;
+  /** Cerrada en BagPro. */
   cerrada: boolean;
+  /** Solicitud de la OT (estado y avance de todas sus solicitudes); null si la OT aún no tiene solicitudes. */
+  solicitudOT: ResumenSolicitudOT | null;
 }
 
 /** Confirmaciones que el usuario ya dio al guardar la solicitud. */
@@ -149,6 +157,8 @@ interface ConfirmacionesSolicitud {
   styleUrls: ['./SolicitudMP_Extrusion.component.css']
 })
 export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
+  /** Retraso de los tooltips de información o ayuda (los de botones de acción inmediata salen sin retraso). */
+  readonly retrasoAyuda = RETRASO_TOOLTIP_AYUDA_MS;
   /** Punto decimal y coma de miles en los campos numéricos (igual que el pipe number). */
   readonly localeNumeros = LOCALE_NUMEROS;
 
@@ -358,9 +368,39 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     return this.infoOT != null && enCampo === String(this.infoOT.ot);
   }
 
-  /** Encabezado completo, OT consultada y abierta: se pueden agregar subcategorías. */
+  /**
+   * Por qué la OT consultada no admite solicitudes del proceso elegido: cerrada en BagPro, o su solicitud de OT
+   * completada (materia prima), finalizada o verificada. Null si las admite.
+   */
+  get motivoOTNoAdmite(): string | null {
+    const info = this.infoOT;
+    if (!info) return null;
+    if (info.cerrada) return `La OT N° ${info.ot} está cerrada, no se le pueden crear ni editar solicitudes!`;
+    return motivoOTCerrada(info.solicitudOT?.estado_Id, this.formEncabezado.value.proceso ?? '', info.ot);
+  }
+
+  /** Clase del rótulo del estado de la solicitud de la OT (mismas clases que Movimientos). */
+  get claseEstadoOT(): string {
+    switch (this.infoOT?.solicitudOT?.estado_Id) {
+      case EstadoSolicitudMaterial.Parcial: return 'parcial';
+      case EstadoSolicitudMaterial.Completada: return 'completada';
+      case EstadoSolicitudMaterial.Finalizada: return 'finalizada';
+      case EstadoSolicitudMaterial.Verificada: return 'verificada';
+      default: return 'pendiente';
+    }
+  }
+
+  /** Posición (%) de los kg de la OT (umbral) sobre la barra de avance. */
+  get posicionUmbralOT(): number {
+    const ot = this.infoOT;
+    if (!ot) return 0;
+    const base = Math.max(ot.kg, ot.kgAsignado + ot.kgSolicitados + Math.max(ot.kgPorSolicitar, 0)) || 1;
+    return Math.min(ot.kgReal / base * 100, 100);
+  }
+
+  /** Encabezado completo, OT consultada y que admite solicitudes: se pueden agregar subcategorías. */
   get encabezadoCompleto(): boolean {
-    return this.formEncabezado.valid && this.otVigente && !this.infoOT!.cerrada;
+    return this.formEncabezado.valid && this.otVigente && this.motivoOTNoAdmite == null;
   }
 
   /** El PDF solo se puede exportar si la OT del campo es la consultada. */
@@ -598,8 +638,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Consulta la OT en BagPro y lo asignado y solicitado pendiente de la OT para calcular lo que queda por solicitar.
-   * Si había otra consulta de OT en curso, se cancela.
+   * Consulta la OT en BagPro, lo asignado y solicitado pendiente (para calcular lo que queda por solicitar) y la
+   * solicitud de la OT. Si había otra consulta de OT en curso, se cancela.
    */
   private cargarOT(ot: number) {
     this.consultaOT?.unsubscribe();
@@ -607,19 +647,37 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     this.consultaOT = this.bagProServices.srvObtenerListaClienteOT_Item(ot).pipe(
       switchMap(datos => datos.length == 0
         ? of(null)
-        : this.detallesAsignacionService.getMateriasPrimaSolicitada(ot).pipe(map(asig => ({ datos: datos[0], asig })))),
+        : forkJoin({
+          asig: this.detallesAsignacionService.getMateriasPrimaSolicitada(ot),
+          solicitudOT: this.cargarSolicitudOT(ot, Number(datos[0].datosotKg)),
+        }).pipe(map(r => ({ datos: datos[0], ...r })))),
       this.conCarga(),
       takeUntil(this.destroy$),
     ).subscribe({
       next: resultado => resultado
-        ? this.mostrarInfoOT(ot, resultado.datos, resultado.asig)
+        ? this.mostrarInfoOT(ot, resultado.datos, resultado.asig, resultado.solicitudOT)
         : this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`),
       error: error => this.notificarError(error, `No se pudo consultar la OT N° ${ot}.`, 'Consultar OT'),
     });
   }
 
-  /** Llena la tabla de la OT y avisa si está cerrada o cuántos kg quedan por solicitar. */
-  private mostrarInfoOT(ot: number, datos: any, asig: any) {
+  /**
+   * Trae la solicitud de la OT (null si la OT aún no tiene solicitudes). Si sus kg no coinciden con los de BagPro
+   * (p. ej. OT anteriores a la regla por OT, que no los tienen), se actualizan y se recalcula su estado.
+   * @param ot Número de la OT.
+   * @param kgOT Kg de la OT en BagPro.
+   */
+  private cargarSolicitudOT(ot: number, kgOT: number): Observable<ResumenSolicitudOT | null> {
+    return this.servicioSolicitudMpExt.obtenerResumenOT(ot).pipe(
+      catchError((error: HttpErrorResponse) => error.status === 404 ? of(null) : throwError(() => error)),
+      switchMap(resumen => resumen && kgOT > 0 && Math.abs((resumen.kgOT ?? 0) - kgOT) > TOLERANCIA_KG
+        ? this.servicioSolicitudMpExt.registrarKgOT(ot, kgOT)
+        : of(resumen)),
+    );
+  }
+
+  /** Llena la tabla de la OT y avisa si no admite solicitudes o cuántos kg quedan por solicitar. */
+  private mostrarInfoOT(ot: number, datos: any, asig: any, solicitudOT: ResumenSolicitudOT | null) {
     const kg = redondear2(datos.datosotKg * (1 + ADICIONAL_KG_OT));
     const kgRestante = kg - asig.cantidad_Asignada;
     const info: InfoOrdenTrabajo = {
@@ -634,12 +692,17 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       kgRestante,
       kgPorSolicitar: kgRestante - asig.cantidad_Solicitada,
       cerrada: ESTADOS_OT_CERRADA.includes(Number(datos.estado)),
+      solicitudOT,
     };
     this.infoOrdenTrabajo = [info];
     this.otDeLosMateriales = ot;
 
-    if (info.cerrada) {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} está cerrada, no se le pueden crear ni editar solicitudes!`, DURACION_ERROR_MS);
+    const motivo = this.motivoOTNoAdmite;
+    if (motivo) {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, motivo, DURACION_ERROR_MS);
+    } else if (solicitudOT?.umbralAlcanzado && this.solicitaMateriaPrima) {
+      this.mensajeService.mensajeAdvertencia(`OT N° ${ot}`,
+        `Lo asignado ya llegó a los kg de la OT (${formatoNumero(info.kgReal)} kg). Puede solicitar hasta el tope con el ${this.porcentajeAdicional}% o completar la OT desde Movimientos.`, DURACION_ERROR_MS);
     } else if (!this.solicitaMateriaPrima) {
       this.mensajeService.mensajeInformacion(`Información`, `OT N° ${ot} consultada. Las tintas no cuentan para el límite de kg de la OT.`);
     } else if (info.kgPorSolicitar > TOLERANCIA_KG) {
@@ -1077,7 +1140,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
 
     const encabezado = this.formEncabezado.value;
     if (!encabezado.proceso) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un proceso para agregar subcategorías!`);
-    if (this.otVigente && this.infoOT!.cerrada) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${this.infoOT!.ot} está cerrada, no se le pueden solicitar materiales!`);
+    if (this.otVigente && this.motivoOTNoAdmite) return this.mensajeService.mensajeAdvertencia(`Advertencia`, this.motivoOTNoAdmite, DURACION_ERROR_MS);
 
     const faltantes: string[] = [];
     if (!this.otVigente) faltantes.push('consultar la OT (Enter)');
@@ -1152,7 +1215,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
   validarYGuardarSolicitud() {
     if (this.load) return;
     if (!this.otVigente) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe consultar la OT (Enter) antes de guardar la solicitud!');
-    if (this.infoOT!.cerrada) return this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible crear/editar solicitudes a la OT ${this.infoOT!.ot}, porque está cerrada!`);
+    if (this.motivoOTNoAdmite) return this.mensajeService.mensajeAdvertencia(`Advertencia`, this.motivoOTNoAdmite, DURACION_ERROR_MS);
     if (!this.formEncabezado.value.fechaEntrega) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe elegir la fecha de entrega del material!');
     if (!this.formEncabezado.valid) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe llenar los campos vacíos del encabezado (proceso y máquinas)!');
     if (this.subcategoriasSeleccionadas.length == 0) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe agregar mínimo una subcategoría para guardar la solicitud!');
@@ -1167,7 +1230,57 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La distribución por máquina debe sumar 100% y ninguna máquina puede quedar en 0% (suma ${this.sumaPorcentajes}%).`, DURACION_ERROR_MS);
     }
 
-    this.validarLimiteOT();
+    this.confirmarResumenSolicitud();
+  }
+
+  /** Resumen que se muestra en el diálogo "¿Crear la solicitud?" para que el usuario revise lo que ingresó. */
+  resumenSolicitud: {
+    ot: number;
+    cliente: string;
+    referencia: string;
+    proceso: string;
+    fechaEntrega: Date;
+    maquinas: string;
+    subcategorias: { nombre: string; und: string; cantidad: number; materiales: { nombre: string; cantidad: number }[] }[];
+    total: number;
+    observacion: string;
+  } | null = null;
+
+  /**
+   * Muestra el resumen de la solicitud (OT, fecha de entrega, máquinas y materiales) para que el usuario lo revise
+   * antes de guardar. "Revisar" vuelve al formulario sin guardar; aceptar sigue con la validación del límite de la OT.
+   */
+  private confirmarResumenSolicitud() {
+    const form = this.formEncabezado.value;
+    const info = this.infoOT!;
+    this.resumenSolicitud = {
+      ot: info.ot,
+      cliente: info.cliente,
+      referencia: `${info.item} · ${info.ref}`,
+      proceso: this.procesos.find(p => p.proceso_Id === form.proceso)?.proceso_Nombre ?? form.proceso,
+      fechaEntrega: form.fechaEntrega,
+      maquinas: this.distribucion.map(d => this.distribucion.length === 1 ? `${d.Maquina}` : `${d.Maquina} (${d.Porcentaje}%)`).join(', '),
+      subcategorias: this.subcategoriasSeleccionadas.map(s => ({
+        nombre: s.Nombre,
+        und: s.Und_Medida,
+        cantidad: redondear2(s.Cantidad),
+        materiales: s.SinMateriales ? [] : s.Materiales.map(m => ({ nombre: m.Nombre, cantidad: redondear2(m.Cantidad) })),
+      })),
+      total: this.totalSolicitado,
+      observacion: (form.observacion ?? '').trim(),
+    };
+    // Diálogo propio con el resumen (plantilla en el HTML); Enter guarda y Esc vuelve a revisar.
+    (document.activeElement as HTMLElement | null)?.blur();
+    this.confirmationService.confirm({
+      key: 'resumenSolicitud',
+      header: this.esSolicitud ? '¿Guardar los cambios de la solicitud?' : '¿Crear la solicitud?',
+      acceptLabel: this.esSolicitud ? 'Guardar cambios' : 'Crear solicitud',
+      rejectLabel: 'Revisar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      defaultFocus: 'accept',
+      accept: () => this.validarLimiteOT(),
+    });
   }
 
   /**
@@ -1236,6 +1349,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       FechaEstimadaEntrega: moment(form.fechaEntrega).format('YYYY-MM-DD'),
       ConfirmarSaldoNegativo: !!confirmaciones.saldoNegativo,
       LimiteKgOT: this.solicitaMateriaPrima ? info.kg : null,
+      // Kg de la OT en BagPro (umbral de la solicitud de la OT); también en tintas, para el estado de la OT.
+      KgOT: info.kgReal,
       ConfirmarExcesoLimite: !!confirmaciones.excesoLimite,
       Detalles: this.detallesSolicitud,
     };
@@ -1297,16 +1412,18 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       summary: creada ? '¡Solicitud creada!' : '¡Solicitud actualizada!',
       detail: `Solicitud N° ${solicitud} ${creada ? 'creada' : 'actualizada'} satisfactoriamente.`,
       life: DURACION_AVISO_GUARDADA_MS,
-      data: { solicitud, ot, creada } as SolicitudGuardada,
+      data: { solicitud, numeroOT: info?.ot ?? null, ot, creada } as SolicitudGuardada,
     });
   }
 
-  /** Botón "Ver en movimientos" del aviso: abre Movimientos de solicitudes con la solicitud seleccionada. */
+  /**
+   * Botón "Ver solicitudes de la OT" del aviso: abre Movimientos con todas las solicitudes de la OT (cualquier estado)
+   * y su panel de la OT, dejando seleccionada la solicitud que se acaba de guardar. Sin OT, se busca por su número.
+   */
   verSolicitudEnMovimientos(guardada: SolicitudGuardada) {
     this.messageService.clear(CLAVE_TOAST_SOLICITUD_GUARDADA);
-    // Recién creada: las pendientes de hoy (ahí está). Editada: se busca por su número (puede ser de otro día o parcial).
-    const queryParams = guardada.creada
-      ? { fecha: moment().format('YYYY-MM-DD'), estado: EstadoSolicitudMaterial.Pendiente, seleccionar: guardada.solicitud }
+    const queryParams = guardada.numeroOT != null
+      ? { ot: guardada.numeroOT, seleccionar: guardada.solicitud }
       : { solicitud: guardada.solicitud };
     this.router.navigate(['/reporte-solicitud-mp-extrusion'], { queryParams });
   }
@@ -1372,26 +1489,43 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
     ? String(solicitud.maquinaPrincipal)
     : solicitud.maquinas.map(m => solicitud.maquinas.length === 1 ? `${m.maquina}` : `${m.maquina} (${m.porcentaje}%)`).join(', ');
 
-  /** Pide confirmar la cancelación de una solicitud propia pendiente. */
+  /** Popup de cancelación con el motivo (obligatorio). */
+  dialogoCancelar = false;
+  motivoCancelacion = '';
+  solicitudPorCancelar: SolicitudConsultada | null = null;
+
+  /** Abre el popup para cancelar una solicitud propia pendiente, donde se escribe el motivo. */
   pedirCancelarSolicitud(solicitud: SolicitudConsultada) {
-    this.confirmar('Cancelar solicitud',
-      `¿Está seguro que desea cancelar la solicitud N° ${solicitud.id} de la OT ${solicitud.ot}? No se puede deshacer; si la necesita, deberá crear una nueva.`,
-      () => this.cancelarSolicitud(solicitud), 'Cancelar solicitud', 'Volver');
+    this.solicitudPorCancelar = solicitud;
+    this.motivoCancelacion = '';
+    this.dialogoCancelar = true;
   }
 
-  /** Cancela la solicitud (el API solo lo permite al dueño mientras esté pendiente). */
-  private cancelarSolicitud(solicitud: SolicitudConsultada) {
-    this.servicioSolicitudMpExt.cambiarEstado(solicitud.id, EstadoSolicitudMaterial.Cancelada)
+  /**
+   * Botón "Cancelar solicitud" del popup: cancela con el motivo (el API solo lo permite al dueño mientras esté
+   * pendiente y guarda la fecha y el usuario).
+   */
+  confirmarCancelacion() {
+    const solicitud = this.solicitudPorCancelar;
+    const motivo = this.motivoCancelacion.trim();
+    if (!solicitud || this.load) return;
+    if (!motivo) return this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe escribir el motivo de la cancelación.');
+
+    this.servicioSolicitudMpExt.cancelarSolicitud(solicitud.id, motivo)
       .pipe(this.conCarga(), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          this.dialogoCancelar = false;
           this.misSolicitudes = this.misSolicitudes.filter(s => s.id !== solicitud.id);
           this.mensajeService.mensajeConfirmacion('Confirmación', `La solicitud N° ${solicitud.id} fue cancelada.`);
           if (this.solicitudEnEdicion === solicitud.id) this.limpiarTodo();
         },
         error: (error: HttpErrorResponse) => {
           this.notificarError(error, `No fue posible cancelar la solicitud N° ${solicitud.id}.`, 'Cancelar solicitud', 'PUT');
-          if (error.status === 409) this.verMisSolicitudes();
+          if (error.status === 409) {
+            this.dialogoCancelar = false;
+            this.verMisSolicitudes();
+          }
         },
       });
   }
@@ -1416,7 +1550,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: datos => {
           if (solicitudCerrada(datos.estado_Id)) {
-            return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} está ${String(datos.estado ?? 'cerrada').toLowerCase()}; no se pueden editar solicitudes finalizadas, verificadas o canceladas!`, DURACION_ERROR_MS);
+            return this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} está ${String(datos.estado ?? 'cerrada').toLowerCase()}; solo se editan solicitudes pendientes o parciales!`, DURACION_ERROR_MS);
           }
           this.cargarDetallesSolicitud(datos);
         },

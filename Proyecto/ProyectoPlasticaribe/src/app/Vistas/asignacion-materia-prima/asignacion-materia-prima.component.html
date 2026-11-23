@@ -71,7 +71,7 @@
           <span class="p-input-icon-left p-float-label input-limpiable">
             <i class="pi pi-search"></i>
             <input formControlName="Solicitud" id="solicitud" type="text" autocomplete="off" pInputText [readonly]="modoPopup || esSolicitud"
-              pTooltip="Ingrese el número de solicitud y presione Enter" [tooltipDisabled]="modoPopup || esSolicitud" tooltipPosition="top"
+              [showDelay]="retrasoAyuda" pTooltip="Ingrese el número de solicitud y presione Enter" [tooltipDisabled]="modoPopup || esSolicitud" tooltipPosition="top"
               (keyup.enter)="!modoPopup && !esSolicitud && consultarSolicitudMaterial()" />
             <button *ngIf="FormMateriaPrimaRetiro.get('Solicitud')?.value && !modoPopup" pButton
               type="button" class="p-button-text p-button-rounded p-button-sm boton-limpiar-input"
@@ -85,7 +85,7 @@
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="OTRetiro" id="ordenTrabajo" type="text" autocomplete="off" pInputText [readonly]="esSolicitud"
-              pTooltip="Ingrese el número de OT y presione Enter" [tooltipDisabled]="esSolicitud" tooltipPosition="top"
+              [showDelay]="retrasoAyuda" pTooltip="Ingrese el número de OT y presione Enter" [tooltipDisabled]="esSolicitud" tooltipPosition="top"
               (keyup.enter)="!esSolicitud && infoOT()" required />
             <label for="ordenTrabajo">OT</label>
           </span>
@@ -141,7 +141,7 @@
         <button *ngFor="let m of maquinasSolicitud" type="button" class="maquina-asignar"
           [class.maquina-asignar--elegida]="m.maquina === maquinaElegida" [class.maquina-asignar--completa]="faltanteMaquina(m) <= 0"
           [disabled]="maquinaBloqueada(m)" [attr.aria-pressed]="m.maquina === maquinaElegida"
-          [pTooltip]="maquinaBloqueada(m) ? 'Ya recibió su parte de la solicitud' : ''" tooltipPosition="top"
+          [showDelay]="retrasoAyuda" [pTooltip]="maquinaBloqueada(m) ? 'Ya recibió su parte de la solicitud' : ''" tooltipPosition="top"
           (click)="elegirMaquina(m.maquina)">
           <span class="maquina-asignar__titulo">
             <i class="pi" [ngClass]="m.maquina === maquinaElegida ? 'pi-check-circle' : 'pi-circle'"></i>
@@ -212,7 +212,7 @@
                 </div>
                 <div class="tabla-agrupada__titulo">
                   <span *ngIf="totalAsignar(sub) > 0" class="etiqueta-asignar" [class.etiqueta-asignar--excede]="quedaria(sub) < 0"
-                    [pTooltip]="quedaria(sub) < 0 ? 'Supera lo que falta de la subcategoría' : ''" tooltipPosition="top">
+                    [showDelay]="retrasoAyuda" [pTooltip]="quedaria(sub) < 0 ? 'Supera lo que falta de la subcategoría' : ''" tooltipPosition="top">
                     A asignar {{totalAsignar(sub) | number : '1.2-2'}} · quedaría {{quedaria(sub) | number : '1.2-2'}}
                   </span>
                   <p-button icon="pi pi-bolt" label="Llenar" [rounded]="true" [text]="true" severity="danger" size="small" [disabled]="sub.faltante <= 0 || solicitudCompleta"
@@ -234,7 +234,7 @@
           <tr *ngFor="let m of sub.materiales" class="tabla-agrupada__material" [ngClass]="{ 'fila-con-cantidad': (m.cantidad ?? 0) > 0 }">
             <td class="text-start">
               {{m.nombre}}
-              <span *ngIf="m.esSustituto" class="etiqueta-sustituto" pTooltip="No lo pidió el solicitante; se entrega en lugar de otro material de la subcategoría" tooltipPosition="top">Sustituto</span>
+              <span *ngIf="m.esSustituto" class="etiqueta-sustituto" [showDelay]="retrasoAyuda" pTooltip="No lo pidió el solicitante; se entrega en lugar de otro material de la subcategoría" tooltipPosition="top">Sustituto</span>
             </td>
             <td class="tabla-agrupada__numero texto-secundario" [ngClass]="{ 'colorRojo': m.stock <= 0 || (m.cantidad || 0) > m.stock }">{{m.stock | number : '1.2-2'}} {{m.und}}</td>
             <td class="tabla-agrupada__numero">{{m.solicitado > 0 ? (m.solicitado | number : '1.2-2') : '—'}}</td>
@@ -335,7 +335,7 @@
               <p-inputNumber [locale]="localeNumeros" formControlName="MpCantidadRetirada" mode="decimal"
                 (keyup.enter)="validarCamposVaciosMPRetirada()" [showClear]="true" inputId="Cantidad"
                 [minFractionDigits]="2" [maxFractionDigits]="2"
-                pTooltip="Digita la cantidad a asignar y presiona ENTER para añadir el registro a la tabla"></p-inputNumber>
+                [showDelay]="retrasoAyuda" pTooltip="Digita la cantidad a asignar y presiona ENTER para añadir el registro a la tabla"></p-inputNumber>
               <label for="Cantidad">Cantidad</label>
             </span>
           </div>
@@ -401,8 +401,8 @@
               <td>{{mp.Und_Medida}}</td>
               <td><b>{{mp.Proceso}}</b></td>
               <td id="quitarMp" class="text-center">
-                <button pButton class="p-button-danger" id="btnQuitarMP" type="button"
-                  pTooltip="Quitar de la tabla este registro" (click)="mostrarEleccion(mp)"
+                <button pButton class="p-button-danger" id="btnQuitarMP" type="button" aria-label="Quitar registro"
+                  (click)="mostrarEleccion(mp)"
                   icon="pi pi-trash" style="width: 2rem !important; height: 2rem !important;"></button>
               </td>
             </tr>

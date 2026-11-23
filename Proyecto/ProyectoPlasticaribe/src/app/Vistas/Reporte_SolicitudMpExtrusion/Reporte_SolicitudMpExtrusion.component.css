@@ -12,14 +12,7 @@
   width: 100%;
 }
 
-:host ::ng-deep p-calendar span button {
-  background-color: var(--rojo);
-  border: 0;
-}
-
-:host ::ng-deep p-calendar span .p-datepicker-trigger:hover {
-  background: var(--rojoHover);
-}
+/* El botón del calendario (rojo) y su encabezado se definen una sola vez en styles.css. */
 
 :host ::ng-deep .p-card {
   margin: auto;
@@ -61,42 +54,184 @@
 /* Colores por estado (chips y etiquetas), con la paleta oficial. */
 .estado--pendiente { background-color: var(--fondo-advertencia); color: var(--texto-advertencia); }
 .estado--parcial { background-color: var(--fondo-info); color: var(--texto-info); }
-.estado--finalizada { background-color: var(--fondo-exito); color: var(--texto-exito); }
-.estado--verificada { background-color: var(--azul-marca-claro); color: var(--azul-marca-medio); }
+.estado--completada { background-color: var(--fondo-exito); color: var(--texto-exito); }
+.estado--finalizada { background-color: var(--azul-marca-claro); color: var(--azul-marca-medio); }
+.estado--verificada { background-color: var(--fondo-contador); color: var(--texto-contador); }
 .estado--cancelada { background-color: var(--fondo-peligro); color: var(--texto-peligro); }
 
-.chips-estado {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 0.75rem;
-}
-
-.chip-estado {
+/* Panel de la solicitud de la OT (al filtrar por OT). */
+.panel-ot {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+}
+
+.panel-ot__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.panel-ot__botones {
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.55rem 1rem;
-  border: 2px solid transparent;
-  border-radius: 999px;
-  font: inherit;
+}
+
+.panel-ot__datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.panel-ot__datos > div {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background-color: var(--fondo-sutil);
+}
+
+.panel-ot__datos dt {
+  font-size: 0.75rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: border-color 0.2s, transform 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-color-secondary);
 }
 
-.chip-estado:hover,
-.chip-estado:focus-visible {
-  border-color: currentColor;
+.panel-ot__datos dd {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--texto-fuerte);
 }
 
-.chip-estado b {
-  font-size: 1.1em;
+/* Barra: lo asignado sobre el tope; la marca es el umbral (kg de la OT). */
+.panel-ot__barra {
+  position: relative;
+  height: 0.6rem;
+  border-radius: 999px;
+  background-color: var(--fondo-sutil);
 }
 
-.chip-estado--activo {
-  border-color: currentColor;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+.panel-ot__barra-avance {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background-color: var(--texto-info);
+  transition: width 0.3s;
+}
+
+.panel-ot__barra-avance--umbral { background-color: var(--texto-exito); }
+
+.panel-ot__barra-umbral {
+  position: absolute;
+  top: -0.25rem;
+  bottom: -0.25rem;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background-color: var(--texto-fuerte);
+}
+
+.panel-ot__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.panel-ot__aviso {
+  font-weight: 600;
+  color: var(--texto-exito);
+}
+
+.panel-ot__aviso--atencion { color: var(--texto-advertencia); }
+
+.encabezado-seccion__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Panel "Resumen de solicitudes" (mismo estilo que el detalle de cartera del dashboard de recaudos).
+   El panel se monta en el body: su contenedor se alcanza con su clase propia. */
+::ng-deep .p-overlaypanel.panel-resumen-solicitudes {
+  background: var(--surface-overlay);
+  border-top: 4px solid var(--azul-marca-medio);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+::ng-deep .p-overlaypanel.panel-resumen-solicitudes .p-overlaypanel-content {
+  padding: 1rem 1.25rem;
+}
+
+::ng-deep .p-overlaypanel.panel-resumen-solicitudes:not(.p-overlaypanel-flipped):before,
+::ng-deep .p-overlaypanel.panel-resumen-solicitudes:not(.p-overlaypanel-flipped):after {
+  border-bottom-color: var(--azul-marca-medio);
+}
+
+.resumen-estados {
+  width: 300px;
+  max-width: calc(100vw - 3rem);
+  color: var(--text-color);
+}
+
+.resumen-estados__titulo {
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--texto-fuerte);
+}
+
+/* Tabla de dos columnas con bordes suaves: estado y cantidad de solicitudes; al pie, el total. */
+.resumen-estados__tabla {
+  width: 100%;
+  border: 1px solid var(--borde-sutil);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.resumen-estados__tabla th,
+.resumen-estados__tabla td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--borde-sutil);
+}
+
+.resumen-estados__tabla th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-color-secondary);
+  background-color: var(--fondo-sutil);
+  text-align: left;
+}
+
+.resumen-estados__tabla th:last-child {
+  text-align: right;
+}
+
+.resumen-estados__tabla tfoot td {
+  border-bottom: 0;
+  font-weight: 700;
+  color: var(--texto-fuerte);
+  background-color: var(--fondo-sutil);
+}
+
+.resumen-estados__cantidad {
+  text-align: right;
+  font-weight: 600;
+  color: var(--texto-fuerte);
+  font-variant-numeric: tabular-nums;
 }
 
 .etiqueta-estado {
@@ -248,7 +383,9 @@
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 1.5rem 0.75rem; /* el espacio vertical deja lugar al label flotante */
-  padding-top: 0.75rem;
+  /* Con el margen del encabezado (1rem) quedan 2rem sobre los campos: el label flotante sube ~1.25rem y así
+     no toca los botones "Resumen de solicitudes" y "Autorizaciones de exceso". */
+  padding-top: 1rem;
 }
 
 .filtros__campo--numero { flex: 0 1 10rem; }
@@ -365,4 +502,36 @@
 .columna-panel > p,
 .columna-panel .encabezado-detalle > h4 {
   text-align: left !important;
+}
+
+/* Columna "Solicitado" de la lista y su total (solo al consultar por OT). */
+.columna-numero {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.texto-tachado {
+  text-decoration: line-through;
+  color: var(--text-color-secondary);
+}
+
+.fila-total > td {
+  background-color: var(--fondo-sutil) !important;
+  color: var(--texto-fuerte);
+  font-weight: 600;
+}
+
+/* Motivo de la cancelación en el detalle. */
+.observacion--cancelada {
+  border-left-color: var(--texto-peligro);
+  background-color: var(--fondo-peligro);
+}
+
+/* Aviso del popup de cancelación cuando la solicitud ya tiene entregas. */
+.aviso-cancelar {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+  font-weight: 600;
 }

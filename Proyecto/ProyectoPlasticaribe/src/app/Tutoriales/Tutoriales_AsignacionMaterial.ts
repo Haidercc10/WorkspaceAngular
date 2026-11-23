@@ -41,7 +41,7 @@ function pasosPorSolicitud(ctx : ContextoTutorialAsignacion) : Step.StepOptions[
   return armar('tutorial-asignacion-solicitud', [
     paso(null, '¡Asignar material de una solicitud!',
       `<p>Aquí <b>entregamos</b> el material que pidió el solicitante: escribimos cuánto damos de cada material y creamos la asignación.</p>
-       <p>Se descuenta del inventario y la solicitud queda <b>parcial</b> o <b>finalizada</b> según lo entregado. La solicitud y la OT están en el título de la ventana.</p>`),
+       <p>Se descuenta del inventario y la solicitud queda <b>parcial</b> o <b>completada</b> según lo entregado (y si la OT llega a su tope con el adicional, se completa sola). La solicitud y la OT están en el título de la ventana.</p>`),
 
     paso(el('encabezadoAsignacion'), '¡Fecha de entrega!',
       `<p>Cuándo se entrega el material (por defecto hoy).</p>`),

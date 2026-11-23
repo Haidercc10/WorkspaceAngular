@@ -695,7 +695,7 @@ button {
 }
 
 span button,
-p-calendar button,
+p-calendar .p-datepicker-trigger,
 .p-inputgroup button {
   border-radius: 0 10px 10px 0;
 }
@@ -705,24 +705,40 @@ p-calendar {
   width: 100%;
 }
 
-p-calendar .p-datepicker-header button {
-  background: #fff0;
-}
-
-p-calendar .p-datepicker-header button:hover {
-  background: #fff0;
-}
-
-p-calendar span button span {
+/* Botón que abre el calendario (el del icono). Antes las reglas eran "p-calendar span button" y, como el panel del
+   calendario se dibuja dentro del mismo span, también alcanzaban las flechas y los botones de mes y año. */
+p-calendar .p-datepicker-trigger span {
   display: block;
 }
 
-p-calendar span button {
+p-calendar .p-datepicker-trigger {
   background-color: var(--rojo);
   border: 0;
   transition: all 1s;
-  /* width: 2rem !important;  */ /*afectaba al mes y año del calendario se quedaba pegado ambas palabras*/
   height: 3.12rem !important;
+}
+
+p-calendar .p-datepicker-trigger:hover {
+  background: var(--rojoHover);
+}
+
+/* Encabezado del calendario (flechas, mes y año): transparente y con su forma normal. El ".p-datepicker" de más le da
+   prioridad sobre las copias de "p-calendar ::ng-deep span button" que tienen muchas vistas, que lo pintaban de rojo. */
+p-calendar .p-datepicker .p-datepicker-header button,
+p-calendar .p-datepicker .p-datepicker-header button:hover {
+  height: 2rem !important;
+  background: transparent;
+}
+
+p-calendar .p-datepicker .p-datepicker-header .p-datepicker-prev,
+p-calendar .p-datepicker .p-datepicker-header .p-datepicker-next {
+  width: 2rem;
+  border-radius: 50%;
+}
+
+p-calendar .p-datepicker .p-datepicker-header .p-datepicker-month,
+p-calendar .p-datepicker .p-datepicker-header .p-datepicker-year {
+  border-radius: 6px;
 }
 
 .p-datepicker-buttonbar button {
@@ -733,18 +749,6 @@ p-calendar span button {
 .p-button.p-button-text:enabled:hover {
   background: rgb(246 59 59 / 4%);
   border-color: transparent;
-}
-
-p-calendar span .p-datepicker-trigger:hover {
-  background: var(--rojoHover);
-}
-
-p-calendar .p-datepicker-header button {
-  background: #fff0;
-}
-
-p-calendar .p-datepicker-header button:hover {
-  background: #fff0;
 }
 
 .p-datepicker table td.p-datepicker-today > span {

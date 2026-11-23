@@ -4,7 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
-import { catchError, finalize, forkJoin, map, Observable, of, Subject, Subscription, switchMap, takeUntil } from 'rxjs';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { catchError, finalize, forkJoin, map, Observable, of, Subject, Subscription, switchMap, takeUntil, throwError } from 'rxjs';
 import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { AppComponent } from 'src/app/app.component';
 import {
@@ -15,9 +16,14 @@ import {
   FiltrosConsultaSolicitudes,
   ROLES_EXCEDER_LIMITE_OT,
   ROLES_GESTIONAR_SOLICITUD,
+  ROLES_GESTIONAR_SOLICITUD_OT,
   ROLES_VERIFICAR_SOLICITUD,
   ROLES_VER_PDF_SOLICITUD,
+  ResumenSolicitudOT,
   SolicitudConsultada,
+  solicitudActiva,
+  formatoNumero,
+  RETRASO_TOOLTIP_AYUDA_MS,
 } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 import { AutorizacionesExcesoOTService } from 'src/app/Servicios/AutorizacionesExcesoOT/autorizacionesExcesoOT.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -33,7 +39,8 @@ import { ClaveTutorialMovimientosSolicitud, pasosTutorialMovimientosSolicitud } 
 const ESTADOS_SOLICITUD = [
   { id: EstadoSolicitudMaterial.Pendiente, nombre: 'Pendientes', clase: 'pendiente', icono: 'pi pi-hourglass' },
   { id: EstadoSolicitudMaterial.Parcial, nombre: 'Parciales', clase: 'parcial', icono: 'pi pi-sliders-h' },
-  { id: EstadoSolicitudMaterial.Finalizada, nombre: 'Finalizadas', clase: 'finalizada', icono: 'pi pi-check-square' },
+  { id: EstadoSolicitudMaterial.Completada, nombre: 'Completadas', clase: 'completada', icono: 'pi pi-check-circle' },
+  { id: EstadoSolicitudMaterial.Finalizada, nombre: 'Finalizadas', clase: 'finalizada', icono: 'pi pi-lock' },
   { id: EstadoSolicitudMaterial.Verificada, nombre: 'Verificadas', clase: 'verificada', icono: 'pi pi-verified' },
   { id: EstadoSolicitudMaterial.Cancelada, nombre: 'Canceladas', clase: 'cancelada', icono: 'pi pi-ban' },
 ];
@@ -55,16 +62,18 @@ interface DatosOTResumen {
   styleUrls: ['./Reporte_SolicitudMpExtrusion.component.css']
 })
 export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy {
+  /** Retraso de los tooltips de información o ayuda (los de botones de acción inmediata salen sin retraso). */
+  readonly retrasoAyuda = RETRASO_TOOLTIP_AYUDA_MS;
   modoSeleccionado : boolean;
   private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   ValidarRol : number;
   readonly estadosSolicitud = ESTADOS_SOLICITUD;
+  readonly estadoCompletada = EstadoSolicitudMaterial.Completada;
+  readonly estadoCancelada = EstadoSolicitudMaterial.Cancelada;
   formFiltros !: FormGroup;
 
-  /** Cantidad de solicitudes por estado (chips). */
+  /** Cantidad de solicitudes por estado (panel "Resumen de solicitudes"). */
   conteo : { [estado: number]: number } = {};
-  /** Estados de la última consulta (resalta el chip correspondiente). */
-  estadosConsultados : number[] = [];
   /** Texto que explica qué se está mostrando en la tabla. */
   descripcionConsulta : string = '';
 
@@ -75,6 +84,21 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
   detalle : DetalleSolicitudMaterial | null = null;
   datosOT : DatosOTResumen | null = null;
   cargandoDetalle : boolean = false;
+
+  /** Solicitud de la OT consultada en el filtro (panel de la OT); null si no se filtra por OT o aún no tiene solicitudes. */
+  solicitudOT : ResumenSolicitudOT | null = null;
+  /** OT del panel (la del filtro), aunque aún no tenga solicitudes. */
+  otPanel : number | null = null;
+  datosOTPanel : DatosOTResumen | null = null;
+  cargandoOT : boolean = false;
+  /** El PDF de las solicitudes de la OT se está generando. */
+  generandoPdfOT = false;
+  private consultaOT? : Subscription;
+
+  /** Popup de cancelación con el motivo (obligatorio). */
+  dialogoCancelar = false;
+  motivoCancelacion = '';
+  solicitudPorCancelar : { id : number; ot : number; conEntregas : boolean } | null = null;
 
   modalAsignacion : boolean = false;
   /** El PDF de las asignaciones de la solicitud se está generando. */
@@ -127,23 +151,33 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
   /**
    * Filtros que llegan en la URL desde otra página (p. ej. el aviso "Ver en movimientos" de la solicitud):
    * - `solicitud=N`: consulta esa solicitud y la selecciona.
+   * - `ot=N`: todas las solicitudes de esa OT (cualquier estado) con el panel de la OT; con `seleccionar=N` deja esa seleccionada.
    * - `fecha=YYYY-MM-DD` y `estado=E`: solicitudes creadas ese día en ese estado; con `seleccionar=N` deja esa seleccionada.
    * @returns true si había filtros en la URL (ya se consultó).
    */
   private aplicarFiltrosDeLaUrl() : boolean {
     const parametros = this.ruta.snapshot.queryParamMap;
     const solicitud = parametros.get('solicitud');
+    const ot = parametros.get('ot');
     const fecha = parametros.get('fecha');
+    const seleccionar = Number(parametros.get('seleccionar'));
+    this.idPorSeleccionar = Number.isInteger(seleccionar) && seleccionar > 0 ? seleccionar : null;
     if (solicitud && /^\d+$/.test(solicitud)) {
       this.formFiltros.patchValue({ documento: solicitud });
       this.consultarFiltros();
       return true;
     }
-    if (!fecha || !moment(fecha, 'YYYY-MM-DD', true).isValid()) return false;
+    if (ot && /^\d+$/.test(ot)) {
+      this.formFiltros.patchValue({ ot, estados: [] });
+      this.consultarFiltros();
+      return true;
+    }
+    if (!fecha || !moment(fecha, 'YYYY-MM-DD', true).isValid()) {
+      this.idPorSeleccionar = null;
+      return false;
+    }
 
     const estado = Number(parametros.get('estado'));
-    const seleccionar = Number(parametros.get('seleccionar'));
-    this.idPorSeleccionar = Number.isInteger(seleccionar) && seleccionar > 0 ? seleccionar : null;
     const dia = moment(fecha, 'YYYY-MM-DD').toDate();
     this.formFiltros.patchValue({ fechaDoc: dia, fechaFinalDoc: dia, estados: ESTADOS_SOLICITUD.some(e => e.id === estado) ? [estado] : [] });
     this.consultarFiltros();
@@ -164,6 +198,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
   private pasosTutorial() {
     return pasosTutorialMovimientosSolicitud({
       puedeGestionar: this.puedeGestionar,
+      puedeGestionarOT: this.puedeGestionarOT,
       puedeVerificar: this.puedeVerificar,
       puedeVerPdf: this.puedeVerPdf,
       puedeAutorizarExceso: this.puedeAutorizarExceso,
@@ -185,12 +220,17 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
     };
   }
 
-  /** Asigna material y finaliza o cancela solicitudes. */
+  /** Asigna material y cancela solicitudes. */
   get puedeGestionar() : boolean {
     return ROLES_GESTIONAR_SOLICITUD.includes(this.ValidarRol);
   }
 
-  /** Marca como verificadas las solicitudes finalizadas. */
+  /** Completa y finaliza la solicitud de la OT: administrador, asignador y solicitante. */
+  get puedeGestionarOT() : boolean {
+    return ROLES_GESTIONAR_SOLICITUD_OT.includes(this.ValidarRol);
+  }
+
+  /** Verifica la solicitud de la OT finalizada: administrador y solicitante. */
   get puedeVerificar() : boolean {
     return ROLES_VERIFICAR_SOLICITUD.includes(this.ValidarRol);
   }
@@ -204,20 +244,41 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
     return ROLES_EXCEDER_LIMITE_OT.includes(this.ValidarRol);
   }
 
-  /** La solicitud seleccionada está pendiente o parcial: se puede asignar, finalizar o cancelar. */
+  /** La solicitud seleccionada está pendiente o parcial: se puede asignar o cancelar. */
   get solicitudActiva() : boolean {
-    return this.detalle?.estado_Id === EstadoSolicitudMaterial.Pendiente || this.detalle?.estado_Id === EstadoSolicitudMaterial.Parcial;
+    return this.detalle != null && solicitudActiva(this.detalle.estado_Id);
   }
 
-  get solicitudFinalizada() : boolean {
-    return this.detalle?.estado_Id === EstadoSolicitudMaterial.Finalizada;
-  }
-
-  /** "Ver asignaciones PDF": solo en solicitudes parciales, finalizadas o verificadas que tengan asignaciones. */
+  /** "Ver asignaciones PDF": en las solicitudes que ya tienen asignaciones. */
   get puedeVerAsignacionesPdf() : boolean {
-    const estado = this.detalle?.estado_Id;
-    return (estado === EstadoSolicitudMaterial.Parcial || estado === EstadoSolicitudMaterial.Finalizada || estado === EstadoSolicitudMaterial.Verificada)
-      && (this.detalle?.asignaciones?.length ?? 0) > 0;
+    return (this.detalle?.asignaciones?.length ?? 0) > 0;
+  }
+
+  /** Estado de la solicitud de la OT de la solicitud seleccionada (viene en la fila de la lista). */
+  get estadoOTSeleccionada() : { id : number; nombre : string } | null {
+    const s = this.solicitudSeleccionada;
+    return s?.estadoOT_Id != null && s.id === this.detalle?.id ? { id: s.estadoOT_Id, nombre: s.estadoOT ?? '' } : null;
+  }
+
+  /** Avance (%) de lo asignado sobre el tope de la OT, para la barra del panel. */
+  get avanceOT() : { asignado : number; umbral : number } {
+    const r = this.solicitudOT;
+    if (!r?.topeKgOT) return { asignado: 0, umbral: 0 };
+    const base = Math.max(r.topeKgOT, r.kgAsignados) || 1;
+    return { asignado: Math.min(r.kgAsignados / base * 100, 100), umbral: (r.kgOT ?? 0) / base * 100 };
+  }
+
+  /**
+   * Por qué no se puede finalizar la OT completada (solicitudes que siguen activas), para mostrarlo junto al botón.
+   * Null si no aplica.
+   */
+  get motivoNoFinaliza() : string | null {
+    const r = this.solicitudOT;
+    if (!r || r.estado_Id !== EstadoSolicitudMaterial.Completada || r.puedeFinalizar) return null;
+    const activas = r.solicitudes.filter(s => solicitudActiva(s.estado_Id)).reduce((t, s) => t + s.cantidad, 0);
+    return activas > 0
+      ? `Hay ${activas} solicitud(es) pendiente(s) o parcial(es) en la OT; deben completarse o cancelarse para finalizarla.`
+      : null;
   }
 
   /**
@@ -240,16 +301,15 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
       finalize(() => this.generandoPdfAsignaciones = false),
       takeUntil(this.destroy$),
     ).subscribe({
-      next: pdf => this.abrirPdfConAviso(pdf, solicitud.asignaciones!.length, solicitud.id),
+      next: pdf => this.abrirPdfConAviso(pdf, `Asignaciones solicitud ${solicitud.id}.pdf`,
+        `El PDF con ${solicitud.asignaciones!.length} asignación(es) de la solicitud N° ${solicitud.id} se generó correctamente.`),
       error: error => this.notificarError(error, `No fue posible generar el PDF de las asignaciones de la solicitud N° ${solicitud.id}.`, 'Generar PDF de asignaciones'),
     });
   }
 
   /** Aviso "PDF generado" y, pasado un momento, lo abre en una pestaña nueva (si el navegador la bloquea, lo descarga). */
-  private abrirPdfConAviso(pdf : Blob, cantidad : number, solicitud : number) {
-    const archivo = `Asignaciones solicitud ${solicitud}.pdf`;
-    this.msj.mensajeConfirmacion('¡PDF generado!',
-      `El PDF con ${cantidad} asignación(es) de la solicitud N° ${solicitud} se generó correctamente. A continuación se abrirá en una nueva pestaña.`, 2000);
+  private abrirPdfConAviso(pdf : Blob, archivo : string, mensaje : string) {
+    this.msj.mensajeConfirmacion('¡PDF generado!', `${mensaje} A continuación se abrirá en una nueva pestaña.`, 2000);
     const url = URL.createObjectURL(pdf);
     setTimeout(() => {
       if (!window.open(url, '_blank')) {
@@ -276,12 +336,17 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
     });
   }
 
-  /** Chip de estado: muestra todas las solicitudes de ese estado, sin límite de fechas (igual que su conteo). */
-  consultarPorEstado(estado : number) {
-    this.formFiltros.reset({ estados: [estado] });
-    const nombre = ESTADOS_SOLICITUD.find(e => e.id === estado)?.nombre ?? '';
-    this.consultar({ estados: [estado] }, `Todas las solicitudes ${nombre.toLowerCase()}`);
+  /** Abre o cierra el panel "Resumen de solicitudes"; al abrirlo vuelve a contar para mostrar cifras al día. */
+  abrirResumenEstados(evento : Event, panel : OverlayPanel) {
+    if (!panel.overlayVisible) this.cargarConteo();
+    panel.toggle(evento);
   }
+
+  /** Total de solicitudes de todos los estados del resumen. */
+  get totalConteo() : number {
+    return ESTADOS_SOLICITUD.reduce((total, e) => total + (this.conteo[e.id] ?? 0), 0);
+  }
+
 
   /**
    * Consulta con los filtros del formulario. Por N° de solicitud no se aplican las demás condiciones.
@@ -341,9 +406,10 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
   private consultar(filtros : FiltrosConsultaSolicitudes, descripcion : string, conservarSeleccion : boolean = false) {
     this.ultimosFiltros = filtros;
     this.descripcionConsulta = descripcion;
-    this.estadosConsultados = filtros.id != null ? [] : (filtros.estados ?? []);
     const seleccionada = conservarSeleccion ? this.solicitudSeleccionada?.id : null;
     if (!conservarSeleccion) this.quitarSeleccion();
+    // Al filtrar por OT se muestra el panel de su solicitud de OT (por N° de solicitud no aplica el filtro de OT).
+    this.cargarPanelOT(filtros.id == null ? filtros.ot ?? null : null);
 
     this.consultaLista?.unsubscribe();
     this.consultaLista = this.servicioSolicitudes.consultarSolicitudes(filtros)
@@ -370,6 +436,152 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
     const id = this.solicitudSeleccionada?.id ?? this.detalle?.id;
     this.consultar(this.ultimosFiltros, this.descripcionConsulta, true);
     if (id != null) this.cargarDetalle(id);
+  }
+
+  /** Muestra todas las solicitudes de la OT de la solicitud seleccionada (cualquier estado) con el panel de la OT. */
+  verSolicitudesDeLaOT() {
+    const ot = this.detalle?.ot;
+    if (ot == null) return;
+    const id = this.detalle!.id;
+    this.formFiltros.reset({ ot: String(ot), estados: [] });
+    this.idPorSeleccionar = id;
+    this.consultar({ ot }, `Solicitudes: OT ${ot}`);
+  }
+
+  // ───────────────────────── Solicitud de la OT ─────────────────────────
+
+  /**
+   * Carga el panel de la OT: sus datos en BagPro y su solicitud de OT. Si los kg guardados no coinciden con los de
+   * BagPro (p. ej. OT anteriores a la regla por OT), se actualizan y se recalcula su estado.
+   * @param ot OT del filtro; null quita el panel.
+   */
+  private cargarPanelOT(ot : number | null) {
+    this.consultaOT?.unsubscribe();
+    if (ot !== this.otPanel) {
+      this.solicitudOT = null;
+      this.datosOTPanel = null;
+    }
+    this.otPanel = ot;
+    if (ot == null) return;
+
+    this.cargandoOT = true;
+    this.consultaOT = forkJoin({
+      bagPro: this.servicioBagPro.srvObtenerListaClienteOT_Item(ot).pipe(map(datos => datos?.[0] ?? null), catchError(() => of(null))),
+      resumen: this.servicioSolicitudes.obtenerResumenOT(ot).pipe(
+        catchError((error : HttpErrorResponse) => error.status === 404 ? of(null) : throwError(() => error))),
+    }).pipe(
+      switchMap(({ bagPro, resumen }) => {
+        const kgOT = Number(bagPro?.datosotKg) || 0;
+        const sincronizar = resumen && kgOT > 0 && Math.abs((resumen.kgOT ?? 0) - kgOT) > 0.005;
+        return (sincronizar ? this.servicioSolicitudes.registrarKgOT(ot, kgOT) : of(resumen)).pipe(map(r => ({ bagPro, resumen: r })));
+      }),
+      finalize(() => this.cargandoOT = false),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: ({ bagPro, resumen }) => {
+        this.solicitudOT = resumen;
+        this.datosOTPanel = bagPro
+          ? { cliente: bagPro.clienteNom, item: bagPro.clienteItems, referencia: bagPro.clienteItemsNom, kgOT: Number(bagPro.datosotKg) || 0 }
+          : null;
+      },
+      error: error => this.notificarError(error, `No se pudo consultar la solicitud de la OT ${ot}.`, 'Consultar solicitud de la OT'),
+    });
+  }
+
+  /** Pide confirmar que se completa la OT a mano (no se puede deshacer). */
+  pedirCompletarOT() {
+    const r = this.solicitudOT;
+    if (!r?.puedeCompletar) return;
+    this.confirmar('Completar solicitud de la OT',
+      `Lo asignado a la OT ${r.ot} (${this.numero(r.kgAsignados)} kg) ya llegó a sus kg (${this.numero(r.kgOT)} kg). `
+      + `Al completarla no se podrán crear más solicitudes ni asignaciones de materia prima para esta OT y sus solicitudes activas de materia prima quedarán completadas. `
+      + `Esta acción NO se puede deshacer. ¿Desea completarla?`,
+      () => this.accionOT(this.servicioSolicitudes.completarOT(r.ot), 'completar', `¡La solicitud de la OT ${r.ot} quedó COMPLETADA!`),
+      'Completar OT', 'Volver');
+  }
+
+  /** Pide confirmar que se finaliza la OT (se cierra la asignación de materiales). */
+  pedirFinalizarOT() {
+    const r = this.solicitudOT;
+    if (!r?.puedeFinalizar) return;
+    this.confirmar('Finalizar solicitud de la OT',
+      `Se cerrará la asignación de materiales de la OT ${r.ot}: ya no admitirá solicitudes ni asignaciones. `
+      + `Si la OT aún no tiene producción, quedará como ASIGNADA en el estado de procesos. ¿Desea finalizarla?`,
+      () => this.accionOT(this.servicioSolicitudes.finalizarOT(r.ot), 'finalizar', `¡La solicitud de la OT ${r.ot} quedó FINALIZADA!`),
+      'Finalizar OT', 'Volver');
+  }
+
+  /** Pide confirmar que se recibió físicamente el material de la OT. */
+  pedirVerificarOT() {
+    const r = this.solicitudOT;
+    if (!r?.puedeVerificar) return;
+    this.confirmar('Verificar solicitud de la OT',
+      `¿Comprobó que recibió físicamente los materiales de la OT ${r.ot} con las cantidades pedidas? Se marcará como VERIFICADA.`,
+      () => this.accionOT(this.servicioSolicitudes.verificarOT(r.ot), 'verificar', `¡La solicitud de la OT ${r.ot} quedó VERIFICADA!`),
+      'Marcar como verificada', 'Volver');
+  }
+
+  /**
+   * Ejecuta una acción sobre la solicitud de la OT, muestra el resumen actualizado y refresca la lista y el detalle.
+   * @param operacion Llamada al API (responde el resumen actualizado).
+   * @param accion Verbo de la acción, para el mensaje de error.
+   * @param exito Mensaje de éxito.
+   */
+  private accionOT(operacion : Observable<ResumenSolicitudOT>, accion : string, exito : string) {
+    const ot = this.solicitudOT?.ot;
+    operacion.pipe(this.conCarga(), takeUntil(this.destroy$)).subscribe({
+      next: resumen => {
+        this.solicitudOT = resumen;
+        this.msj.mensajeConfirmacion('Confirmación', exito);
+        this.refrescar();
+      },
+      error: (error : HttpErrorResponse) => {
+        this.notificarError(error, `No fue posible ${accion} la solicitud de la OT ${ot}.`, `${accion[0].toUpperCase()}${accion.slice(1)} solicitud de la OT`, 'PUT');
+        if (error.status === 409) this.refrescar();
+      },
+    });
+  }
+
+  /**
+   * Genera un solo PDF con las solicitudes de la OT del panel: una hoja de resumen y una hoja por solicitud
+   * (sin las canceladas), de la más antigua a la más reciente.
+   */
+  verPdfOT() {
+    const resumen = this.solicitudOT;
+    if (!resumen || this.generandoPdfOT) return;
+    const datos = this.datosOTPanel;
+    const ot : DatosOTSolicitudPDF | null = datos
+      ? { cliente: datos.cliente, item: datos.item, referencia: datos.referencia, kgOT: datos.kgOT, kgLimite: datos.kgOT * (1 + ADICIONAL_KG_OT) }
+      : null;
+
+    this.generandoPdfOT = true;
+    this.servicioSolicitudes.consultarSolicitudes({ ot: resumen.ot }).pipe(
+      map(lista => lista.filter(s => s.estado_Id !== EstadoSolicitudMaterial.Cancelada).sort((a, b) => a.id - b.id)),
+      switchMap(lista => lista.length === 0
+        ? of([] as DetalleSolicitudMaterial[])
+        : forkJoin(lista.map(s => this.servicioSolicitudes.obtenerSolicitud(s.id)))),
+      switchMap(detalles => detalles.length === 0
+        ? of(null)
+        : this.servicioPDF.generarBlobSolicitudesOT(resumen, detalles, ot).pipe(map(pdf => ({ pdf, cantidad: detalles.length })))),
+      finalize(() => this.generandoPdfOT = false),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: resultado => resultado
+        ? this.abrirPdfConAviso(resultado.pdf, `Solicitudes OT ${resumen.ot}.pdf`,
+          `El PDF con el resumen y ${resultado.cantidad} solicitud(es) de la OT ${resumen.ot} se generó correctamente.`)
+        : this.msj.mensajeAdvertencia('Advertencia', `La OT ${resumen.ot} no tiene solicitudes (sin contar las canceladas) para imprimir.`),
+      error: error => this.notificarError(error, `No fue posible generar el PDF de las solicitudes de la OT ${resumen.ot}.`, 'Generar PDF de la OT'),
+    });
+  }
+
+  /** Cantidad con dos decimales y separador de miles, para los mensajes. */
+  private numero = (valor : number | null | undefined) : string => formatoNumero(valor);
+
+  /** Total solicitado de la lista (pie de la tabla al consultar por OT), sin las solicitudes canceladas. */
+  get totalSolicitadoLista() : number {
+    return this.solicitudes
+      .filter(s => s.estado_Id !== EstadoSolicitudMaterial.Cancelada)
+      .reduce((total, s) => total + (Number(s.totalSolicitado) || 0), 0);
   }
 
   /** Texto de las máquinas de una solicitud, p. ej. "3, 5". */
@@ -435,60 +647,38 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit, OnDestroy 
   // ───────────────────────── Acciones ─────────────────────────
 
   /**
-   * Pide confirmación para finalizar o cancelar la solicitud seleccionada.
-   * @param estado Finalizada (5) o Cancelada (4).
+   * Abre el popup para cancelar la solicitud seleccionada, donde se escribe el motivo (obligatorio). Las solicitudes
+   * ya no se finalizan una por una: se completan solas al recibir todo y se finalizan con su OT (panel de la OT).
    */
-  pedirCambioEstado(estado : number) {
+  pedirCancelacion() {
     const solicitud = this.detalle;
     if (!solicitud || !this.solicitudActiva) return;
-    const accion = estado === EstadoSolicitudMaterial.Finalizada ? 'finalizar' : 'cancelar';
-    const aviso = estado === EstadoSolicitudMaterial.Finalizada && solicitud.estado_Id === EstadoSolicitudMaterial.Pendiente
-      ? ' No tiene material entregado.'
-      : estado === EstadoSolicitudMaterial.Cancelada && solicitud.estado_Id === EstadoSolicitudMaterial.Parcial
-        ? ' Ya tiene material entregado; lo entregado no se devuelve.' : '';
-    this.confirmar(estado === EstadoSolicitudMaterial.Finalizada ? 'Finalizar solicitud' : 'Cancelar solicitud',
-      `¿Está seguro que desea ${accion} la solicitud N° ${solicitud.id} de la OT ${solicitud.ot}?${aviso}`,
-      () => this.cambiarEstado(solicitud.id, estado, accion),
-      estado === EstadoSolicitudMaterial.Finalizada ? 'Finalizar' : 'Cancelar solicitud',
-      estado === EstadoSolicitudMaterial.Finalizada ? 'Cancelar' : 'Volver');
+    this.solicitudPorCancelar = { id: solicitud.id, ot: solicitud.ot, conEntregas: solicitud.estado_Id === EstadoSolicitudMaterial.Parcial };
+    this.motivoCancelacion = '';
+    this.dialogoCancelar = true;
   }
 
-  /** Finaliza o cancela la solicitud con el endpoint que valida el estado y el permiso. */
-  private cambiarEstado(id : number, estado : number, accion : string) {
-    this.servicioSolicitudes.cambiarEstado(id, estado)
+  /** Botón "Cancelar solicitud" del popup: cancela con el motivo; el API guarda la fecha y el usuario. */
+  confirmarCancelacion() {
+    const solicitud = this.solicitudPorCancelar;
+    const motivo = this.motivoCancelacion.trim();
+    if (!solicitud || this.cargando) return;
+    if (!motivo) return this.msj.mensajeAdvertencia('Advertencia', 'Debe escribir el motivo de la cancelación.');
+
+    this.servicioSolicitudes.cancelarSolicitud(solicitud.id, motivo)
       .pipe(this.conCarga(), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.msj.mensajeConfirmacion('Confirmación', `¡La solicitud N° ${id} quedó ${accion === 'finalizar' ? 'FINALIZADA' : 'CANCELADA'}!`);
+          this.dialogoCancelar = false;
+          this.msj.mensajeConfirmacion('Confirmación', `¡La solicitud N° ${solicitud.id} quedó CANCELADA!`);
           this.refrescar();
         },
         error: (error : HttpErrorResponse) => {
-          this.notificarError(error, `No fue posible ${accion} la solicitud N° ${id}.`, accion === 'finalizar' ? 'Finalizar solicitud' : 'Cancelar solicitud', 'PUT');
-          if (error.status === 409) this.refrescar();
-        },
-      });
-  }
-
-  /** Pide confirmación para marcar como verificada la solicitud finalizada. */
-  pedirVerificacion() {
-    const solicitud = this.detalle;
-    if (!solicitud || !this.solicitudFinalizada) return;
-    this.confirmar('Verificar asignación',
-      `¿Está seguro que la asignación de la solicitud N° ${solicitud.id} está completada? Se marcará como VERIFICADA.`,
-      () => this.verificarSolicitud(solicitud.id), 'Marcar como verificada');
-  }
-
-  private verificarSolicitud(id : number) {
-    this.servicioSolicitudes.verificarSolicitud(id)
-      .pipe(this.conCarga(), takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.msj.mensajeConfirmacion('Confirmación', `¡La solicitud N° ${id} se marcó como VERIFICADA!`);
-          this.refrescar();
-        },
-        error : (error : HttpErrorResponse) => {
-          this.notificarError(error, `No fue posible verificar la solicitud N° ${id}.`, 'Verificar solicitud', 'PUT');
-          if (error.status === 409) this.refrescar();
+          this.notificarError(error, `No fue posible cancelar la solicitud N° ${solicitud.id}.`, 'Cancelar solicitud', 'PUT');
+          if (error.status === 409) {
+            this.dialogoCancelar = false;
+            this.refrescar();
+          }
         },
       });
   }

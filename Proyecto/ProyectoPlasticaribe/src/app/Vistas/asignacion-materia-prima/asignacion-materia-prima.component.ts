@@ -18,6 +18,8 @@ import {
   EstadoSolicitudMaterial,
   RegistrarAsignacionRequest,
   RegistrarAsignacionResult,
+  ResumenSolicitudOT,
+  motivoOTCerrada,
   ADICIONAL_KG_OT,
   ESTADOS_OT_CERRADA,
   ROLES_EXCEDER_LIMITE_OT,
@@ -26,6 +28,7 @@ import {
   formatoNumero,
   aTipoMaterial,
   LOCALE_NUMEROS,
+  RETRASO_TOOLTIP_AYUDA_MS,
 } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 import { AutorizacionesExcesoOTService } from 'src/app/Servicios/AutorizacionesExcesoOT/autorizacionesExcesoOT.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -116,6 +119,8 @@ interface SubcategoriaAsignar {
   styleUrls: ['./asignacion-materia-prima.component.css']
 })
 export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
+  /** Retraso de los tooltips de información o ayuda (los de botones de acción inmediata salen sin retraso). */
+  readonly retrasoAyuda = RETRASO_TOOLTIP_AYUDA_MS;
   /** Punto decimal y coma de miles en los campos numéricos (igual que el pipe number). */
   readonly localeNumeros = LOCALE_NUMEROS;
 
@@ -146,7 +151,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   procesos: any[] = [];
   today: string = moment().format('YYYY-MM-DD');
   kgOT: number = 0; //Kg máximos de la OT (kg de la OT más el adicional permitido)
+  /** Kg de la OT en BagPro, sin el adicional (umbral de la solicitud de la OT). */
+  kgRealOT: number = 0;
   estadoOT: any;
+  /** Solicitud de la OT (estado de todas sus solicitudes); null si la OT aún no tiene solicitudes. */
+  solicitudOT: ResumenSolicitudOT | null = null;
   infoOrdenTrabajo: any[] = [];
   categoriasMP: any[] = [];
   categoriasTintas: any[] = [];
@@ -163,7 +172,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
   maquinasSolicitud: MaquinaDetalleSolicitud[] = [];
   /** Máquina que se deja elegida al recargar la solicitud (después de crear una asignación). */
   private maquinaPreferida: number | null = null;
-  /** La solicitud quedó finalizada después de una asignación: se ve, pero ya no se asigna. */
+  /** La solicitud ya no está activa (p. ej. quedó completada después de una asignación): se ve, pero ya no se asigna. */
   solicitudCompleta = false;
   /** El PDF de la asignación se está generando (botón del aviso con "Generando PDF…"). */
   generandoPdfAsignacion = false;
@@ -281,6 +290,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.limpiarCamposMP();
     this.FormMateriaPrimaRetiro.reset({ FechaRetiro: this.today, dateIn: new Date(), ObservacionRetiro: '' });
     this.kgOT = 0;
+    this.kgRealOT = 0;
+    this.solicitudOT = null;
     this.cargando = false;
     this.materiasPrimasSeleccionadas = [];
     this.infoOrdenTrabajo = [];
@@ -293,6 +304,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     this.infoOrdenTrabajo = [];
     this.materiasPrimasSeleccionadas = [];
     this.kgOT = 0;
+    this.kgRealOT = 0;
+    this.solicitudOT = null;
     this.limpiarDatosSolicitud();
   }
 
@@ -369,10 +382,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
             return;
           }
           const datosOT = datos[0];
+          this.kgRealOT = Number(datosOT.datosotKg) || 0;
           this.kgOT = datosOT.datosotKg * (1 + ADICIONAL_KG_OT);
           this.estadoOT = datosOT.estado;
           this.FormMateriaPrimaRetiro.patchValue({ kgOt: this.kgOT });
           this.cargarInformacionOT(ot, datosOT);
+          this.cargarSolicitudOT(Number(ot));
         },
         error: error => this.notificarError(error, `No se pudo consultar la OT N° ${ot}.`, 'Consultar OT')
       });
@@ -407,6 +422,56 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
         und: pedido.und,
       }];
     }});
+  }
+
+  /**
+   * Consulta la solicitud de la OT (null si aún no tiene solicitudes) y avisa si la OT ya no admite asignaciones
+   * de materia prima (completada) o de nada (finalizada o verificada).
+   * @param ot Número de la OT.
+   * @param alTerminar Recibe el resumen consultado (p. ej. para avisar el cambio de estado después de asignar).
+   */
+  private cargarSolicitudOT(ot: number, alTerminar?: (resumen: ResumenSolicitudOT | null) => void) {
+    this.servicioSolicitudes.obtenerResumenOT(ot).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status !== 404) this.notificarError(error, `No se pudo consultar la solicitud de la OT N° ${ot}.`, 'Consultar solicitud de la OT');
+        return of(null);
+      }),
+      takeUntil(this.destroy$),
+    ).subscribe(resumen => {
+      this.solicitudOT = resumen;
+      if (alTerminar) return alTerminar(resumen);
+
+      // Recarga después de asignar: si esta asignación completó la OT es un logro, no una advertencia.
+      const estadoAntes = this.estadoOTAntesDeAsignar;
+      this.estadoOTAntesDeAsignar = undefined;
+      if (estadoAntes !== undefined && resumen?.estado_Id === EstadoSolicitudMaterial.Completada) {
+        if (estadoAntes !== EstadoSolicitudMaterial.Completada)
+          this.mensajeService.mensajeConfirmacion('¡OT completada!',
+            `La OT N° ${ot} llegó a su tope y quedó COMPLETADA: sus solicitudes de materia prima ya recibieron todo el material.`);
+        return;
+      }
+      const motivo = this.motivoOTNoAdmite;
+      if (motivo) this.mensajeService.mensajeAdvertencia('Advertencia', motivo, DURACION_ERROR_MS);
+    });
+  }
+
+  /**
+   * Estado de la solicitud de la OT antes de la última asignación, mientras se recarga la solicitud después de asignar
+   * (undefined fuera de esa recarga). Sirve para mostrar como éxito, y no como advertencia, que la OT quedó completada.
+   */
+  private estadoOTAntesDeAsignar: number | null | undefined = undefined;
+
+  /**
+   * Por qué la OT no admite la asignación: completada (no recibe más materia prima) o finalizada / verificada.
+   * Las tintas sí se admiten en una OT completada (solicitud de tintas, o asignación manual sin materias primas),
+   * igual que en el API. Null si se puede asignar.
+   */
+  get motivoOTNoAdmite(): string | null {
+    const sinMateriaPrima = this.materiasPrimasSeleccionadas.length > 0
+      && !this.materiasPrimasSeleccionadas.some(m => m.TipoMaterial === TipoMaterialInventario.MateriaPrima);
+    const proceso = this.esSolicitud ? (this.detalleSolicitud?.proceso_Id ?? '') : (sinMateriaPrima ? '' : 'EXT');
+    const motivo = motivoOTCerrada(this.solicitudOT?.estado_Id, proceso, Number(this.FormMateriaPrimaRetiro.value.OTRetiro));
+    return motivo?.replace('no admite más solicitudes', 'no admite más asignaciones') ?? null;
   }
 
   // ───────────────────────── Modo manual (sin solicitud) ─────────────────────────
@@ -519,6 +584,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${this.FormMateriaPrimaRetiro.value.OTRetiro}, porque ya se encuentra cerrada!`);
       return false;
     }
+    // El API también lo valida; aquí se avisa antes de armar la asignación.
+    const motivo = this.motivoOTNoAdmite;
+    if (motivo) {
+      this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, motivo, DURACION_ERROR_MS);
+      return false;
+    }
     return true;
   }
 
@@ -543,7 +614,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
    * @param id Solicitud a asignar.
    */
   /**
-   * @param permitirCerrada true al recargar después de una asignación que la finalizó: se muestra sin poder asignar.
+   * @param permitirCerrada true al recargar después de una asignación que la completó: se muestra sin poder asignar.
    */
   cargarSolicitud(id: number, permitirCerrada: boolean = false) {
     this.consultaSolicitud?.unsubscribe();
@@ -686,7 +757,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
 
   /** Qué falta para poder crear la asignación (se muestra en el pie y deshabilita el botón), o null si está lista. */
   get faltaParaAsignar(): string | null {
-    if (this.solicitudCompleta) return 'La solicitud quedó finalizada: ya no hay material por asignar.';
+    if (this.solicitudCompleta) return `La solicitud quedó ${(this.detalleSolicitud?.estado ?? 'completada').toLowerCase()}: ya no admite más asignaciones.`;
     if (this.maquinaElegida == null) return 'Elija la máquina que recibe el material.';
     if (this.resumenAsignar.materiales === 0) return 'Escriba en "A asignar" lo que va a entregar de cada material.';
     return null;
@@ -876,6 +947,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       CantidadPedidaOT: Number(ot.cantPedida) || 0,
       UnidadMedidaOT: ot.und || 'Kg',
       LimiteKgOT: this.kgOT,
+      // Kg de la OT en BagPro (umbral de la solicitud de la OT).
+      KgOT: this.kgRealOT || null,
       ConfirmarExceso: confirmarExceso,
       Materiales: this.materiasPrimasSeleccionadas.map(m => ({
         TipoMaterial: m.TipoMaterial,
@@ -942,20 +1015,22 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
    */
   private asignacionExitosa(resultado: RegistrarAsignacionResult) {
     const asignacionId = resultado.asignacionId!;
-    const finalizada = resultado.estadoSolicitud === EstadoSolicitudMaterial.Finalizada;
+    const completada = resultado.estadoSolicitud === EstadoSolicitudMaterial.Completada;
     const maquina = this.maquinaElegida;
-    const siguienteMaquina = this.esSolicitud && !finalizada ? this.siguienteMaquinaConFaltante(maquina, this.resumenAsignar.total) : null;
+    const siguienteMaquina = this.esSolicitud && !completada ? this.siguienteMaquinaConFaltante(maquina, this.resumenAsignar.total) : null;
     let detail = `Asignación N° ${asignacionId} creada satisfactoriamente${maquina != null ? ` para la máquina ${maquina}` : ''}.`;
-    if (finalizada) detail += ' La solicitud quedó finalizada.';
+    if (completada) detail += ' La solicitud quedó completada.';
     else if (resultado.estadoSolicitud === EstadoSolicitudMaterial.Parcial) detail += ' La solicitud quedó con entrega parcial.';
 
     this.avisoCreada = { asignacionId, detalle: detail, siguienteMaquina };
+    this.avisarCambioOT(Number(this.FormMateriaPrimaRetiro.value.OTRetiro), asignacionId);
     // Se lleva la vista al aviso (queda arriba del formulario).
     setTimeout(() => this.avisoCreadaElemento?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
 
     if (this.esSolicitud && this.detalleSolicitud) {
       // Se recarga con lo entregado al día; queda elegida la misma máquina (el aviso ofrece pasar a la siguiente).
       this.maquinaPreferida = maquina;
+      this.estadoOTAntesDeAsignar = this.solicitudOT?.estado_Id ?? null;
       this.cargarSolicitud(this.detalleSolicitud.id, true);
       this.asignacionRegistrada.emit(asignacionId);
       return;
@@ -963,6 +1038,27 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
     // La asignación descontó inventario: se recarga la lista para que el stock que se muestra esté actualizado.
     this.obtenerMateriaPrima();
     this.LimpiarCampos();
+  }
+
+  /**
+   * Después de asignar, consulta la solicitud de la OT y agrega al aviso si la OT se completó sola (llegó al tope)
+   * o si ya llegó a sus kg y se puede completar desde Movimientos.
+   * @param ot Número de la OT.
+   * @param asignacionId Asignación del aviso (si el aviso ya cambió, no se toca).
+   */
+  private avisarCambioOT(ot: number, asignacionId: number) {
+    const estadoAntes = this.solicitudOT?.estado_Id;
+    const umbralAntes = this.solicitudOT?.umbralAlcanzado ?? false;
+    if (!(ot > 0)) return;
+    this.cargarSolicitudOT(ot, resumen => {
+      if (!resumen || this.avisoCreada?.asignacionId !== asignacionId) return;
+      let extra = '';
+      if (resumen.estado_Id === EstadoSolicitudMaterial.Completada && estadoAntes !== EstadoSolicitudMaterial.Completada)
+        extra = ` La OT llegó al tope (${formatoNumero(resumen.topeKgOT)} kg) y quedó COMPLETADA: sus solicitudes de materia prima ya no reciben más material.`;
+      else if (resumen.puedeCompletar && !umbralAntes)
+        extra = ` La OT ya llegó a sus kg (${formatoNumero(resumen.kgOT)} kg): se puede completar desde Movimientos.`;
+      if (extra) this.avisoCreada = { ...this.avisoCreada, detalle: this.avisoCreada.detalle + extra };
+    });
   }
 
   /**

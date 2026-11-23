@@ -68,11 +68,13 @@ export function pasosTutorialSolicitudMaterial({ puedeEditar, puedeElegirProceso
       `<p>Es la fecha en que <b>necesitamos</b> el material. Es <b>obligatoria</b> y no se pueden elegir fechas pasadas.</p>`),
 
     paso(el('tablaOT'), '¡Información de la OT!',
-      `<p>Al consultar la OT vemos su cliente y referencia, y a la derecha el <b>Kg total OT</b>: lo que se puede solicitar (incluye un <b>${porcentajeAdicional}% adicional</b>).</p>
+      `<p>Al consultar la OT vemos su cliente y referencia, y a la derecha sus <b>kg</b> y el <b>tope</b> que se puede solicitar (los kg más un <b>${porcentajeAdicional}% adicional</b>).</p>
        <ul>
+         <li>Una OT puede tener <b>varias solicitudes</b>; su <b>Solicitud de la OT</b> muestra el estado de todas: pendiente, parcial, completada, finalizada o verificada.</li>
          <li><b>Solicitud:</b> lo <b>solicitado</b> que aún no se ha asignado y lo que todavía podemos pedir (<b>por solicitar</b>, en verde si queda y en rojo si ya no).</li>
          <li><b>Asignación:</b> lo que ya se entregó y lo que falta por entregar. Con <b>Ver materiales asignados</b> vemos el detalle de lo entregado.</li>
-         <li>La <b>barra</b> resume los kg de la OT: asignado, solicitado sin asignar y por solicitar.</li>
+         <li>La <b>barra</b> resume los kg de la OT: asignado, solicitado sin asignar y por solicitar. La <b>marca</b> señala los kg de la OT: al asignarlos se puede completar la OT, y al llegar al tope se completa sola.</li>
+         <li>Si la OT ya está <b>completada</b>, no admite más solicitudes de materia prima; si está <b>finalizada</b>, no admite ninguna.</li>
        </ul>`),
 
     paso(el('maquinas'), '¡Máquinas!',

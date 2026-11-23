@@ -24,7 +24,6 @@
   <div class="aviso-edicion mb-4" *ngIf="esSolicitud" data-tutorial="avisoEdicion">
     <span><i class="pi pi-pencil"></i> Editando la solicitud N° <b>{{solicitudEnEdicion}}</b><ng-container *ngIf="infoOT"> de la OT N° <b>{{infoOT.ot}}</b></ng-container>. La OT y el proceso no se pueden cambiar.</span>
     <button pButton type="button" label="Cancelar edición" icon="pi pi-times" class="p-button-secondary p-button-sm"
-      pTooltip="Solo limpia todos los campos y sale de la edición. La solicitud NO se cancela ni se modifica." tooltipPosition="bottom"
       (click)="cancelarEdicion()"></button>
   </div>
 
@@ -52,7 +51,7 @@
             <input formControlName="Solicitud" id="solicitud" type="text" autocomplete="off" pInputText inputmode="numeric"
               (input)="soloDigitos($event, 'Solicitud')"
               (keyup.enter)="consultarSolicitudMaterial()"
-              pTooltip="Digite el N° de una solicitud activa y presione Enter para editarla" tooltipPosition="top" />
+              [showDelay]="retrasoAyuda" pTooltip="Digite el N° de una solicitud activa y presione Enter para editarla" tooltipPosition="top" />
             <label for="solicitud">Solicitud</label>
           </span>
         </div>
@@ -75,7 +74,7 @@
               <i class="pi pi-search"></i>
               <input formControlName="ot" id="ordenTrabajo" type="text" autocomplete="off" pInputText [readonly]="esSolicitud" inputmode="numeric"
                 (input)="soloDigitos($event, 'ot')"
-                [pTooltip]="esSolicitud ? 'La OT de una solicitud existente no se puede cambiar' : 'Ingrese el número de OT y presione Enter'"
+                [showDelay]="retrasoAyuda" [pTooltip]="esSolicitud ? 'La OT de una solicitud existente no se puede cambiar' : 'Ingrese el número de OT y presione Enter'"
                 tooltipPosition="top" (keyup.enter)="consultarOT()" required />
               <label for="ordenTrabajo">OT</label>
             </span>
@@ -116,21 +115,34 @@
             <p-tag *ngIf="ot.cerrada" severity="danger" value="Cerrada" styleClass="ms-1"></p-tag>
           </div>
           <div class="texto-secundario">Ítem: {{ot.item}} · Referencia: {{ot.ref}}</div>
+          <!-- Estado de todas las solicitudes de la OT -->
+          <div class="ficha-ot__estado-ot">
+            <span class="ficha-ot__rotulo">Solicitud de la OT:</span>
+            <span *ngIf="ot.solicitudOT as sot; else sinSolicitudesOT" class="etiqueta-estado estado--{{claseEstadoOT}}"
+              [showDelay]="retrasoAyuda" pTooltip="Estado de todas las solicitudes de la OT" tooltipPosition="top">{{sot.estado}}</span>
+            <ng-template #sinSolicitudesOT><span class="texto-secundario">sin solicitudes</span></ng-template>
+            <span *ngIf="ot.solicitudOT?.umbralAlcanzado && !ot.solicitudOT?.topeAlcanzado" class="ficha-ot__aviso-umbral">
+              <i class="pi pi-flag"></i> Llegó a los kg de la OT</span>
+          </div>
         </div>
-        <div class="ficha-ot__total" [pTooltip]="'Kg que se pueden solicitar para la OT (incluye el ' + porcentajeAdicional + '% adicional)'" tooltipPosition="top">
-          <span class="ficha-ot__etiqueta">Kg total OT</span>
-          <b>{{ot.kg | number : '1.2-2'}} kg</b>
+        <div class="ficha-ot__total" [showDelay]="retrasoAyuda" [pTooltip]="'Kg de la OT: ' + (ot.kgReal | number : '1.2-2') + ' kg. Con el ' + porcentajeAdicional + '% adicional se pueden solicitar hasta ' + (ot.kg | number : '1.2-2') + ' kg.'" tooltipPosition="top">
+          <span class="ficha-ot__etiqueta">Kg OT · tope con {{porcentajeAdicional}}%</span>
+          <b>{{ot.kgReal | number : '1.2-2'}} · {{ot.kg | number : '1.2-2'}} kg</b>
         </div>
+      </div>
+
+      <div *ngIf="motivoOTNoAdmite as motivo" class="ficha-ot__bloqueo" role="alert">
+        <i class="pi pi-lock"></i> {{motivo}}
       </div>
 
       <div class="ficha-ot__bloques">
         <div class="ficha-ot__bloque">
           <span class="ficha-ot__bloque-titulo">Solicitud</span>
-          <div class="ficha-ot__fila" pTooltip="Kg pedidos en solicitudes que aún no se han asignado" tooltipPosition="top">
+          <div class="ficha-ot__fila" [showDelay]="retrasoAyuda" pTooltip="Kg pedidos en solicitudes que aún no se han asignado" tooltipPosition="top">
             <span>Solicitados</span><span>{{ot.kgSolicitados | number : '1.2-2'}} kg</span>
           </div>
           <div class="ficha-ot__fila ficha-ot__fila--principal" [ngClass]="ot.kgPorSolicitar > 0 ? 'colorVerde' : 'colorRojo'"
-            pTooltip="Kg que todavía se pueden solicitar" tooltipPosition="top">
+            [showDelay]="retrasoAyuda" pTooltip="Kg que todavía se pueden solicitar" tooltipPosition="top">
             <span>Por solicitar</span><b>{{ot.kgPorSolicitar | number : '1.2-2'}} kg</b>
           </div>
         </div>
@@ -139,30 +151,35 @@
             <span class="ficha-ot__bloque-titulo">Asignación</span>
             <button type="button" class="enlace-ficha" data-tutorial="verAsignados" (click)="verMaterialesAsignados(ot.ot)">Ver materiales asignados</button>
           </div>
-          <div class="ficha-ot__fila" pTooltip="Kg ya entregados a la OT" tooltipPosition="top">
+          <div class="ficha-ot__fila" [showDelay]="retrasoAyuda" pTooltip="Kg ya entregados a la OT" tooltipPosition="top">
             <span>Asignados</span><span>{{ot.kgAsignado | number : '1.2-2'}} kg</span>
           </div>
           <div class="ficha-ot__fila ficha-ot__fila--principal" [ngClass]="ot.kgRestante > 0 ? 'colorVerde' : 'colorRojo'"
-            pTooltip="Kg que faltan por entregar a la OT" tooltipPosition="top">
+            [showDelay]="retrasoAyuda" pTooltip="Kg que faltan por entregar a la OT" tooltipPosition="top">
             <span>Por asignar</span><b>{{ot.kgRestante | number : '1.2-2'}} kg</b>
           </div>
         </div>
       </div>
 
-      <!-- Barra de avance: asignado | solicitado sin asignar | por solicitar -->
+      <!-- Barra de avance: asignado | solicitado sin asignar | por solicitar; la marca indica los kg de la OT (umbral) -->
+      <div class="barra-ot-contenedor">
+      <span class="barra-ot__umbral" [style.left.%]="posicionUmbralOT"
+        [showDelay]="retrasoAyuda" [pTooltip]="'Kg de la OT: ' + (ot.kgReal | number : '1.2-2') + ' kg. Al asignarlos se puede completar la OT; al llegar al tope (' + (ot.kg | number : '1.2-2') + ' kg) se completa sola.'" tooltipPosition="top"></span>
       <div class="barra-ot" role="img"
         [attr.aria-label]="'Asignado ' + (ot.kgAsignado | number : '1.2-2') + ', solicitado sin asignar ' + (ot.kgSolicitados | number : '1.2-2') + ', por solicitar ' + (ot.kgPorSolicitar | number : '1.2-2') + ' kg'">
         <span class="barra-ot__tramo barra-ot__tramo--asignado" [style.width.%]="tramosBarraOT.asignado"
-          [pTooltip]="'Asignado: ' + (ot.kgAsignado | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
+          [showDelay]="retrasoAyuda" [pTooltip]="'Asignado: ' + (ot.kgAsignado | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
         <span class="barra-ot__tramo barra-ot__tramo--solicitado" [style.width.%]="tramosBarraOT.solicitado"
-          [pTooltip]="'Solicitado sin asignar: ' + (ot.kgSolicitados | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
+          [showDelay]="retrasoAyuda" [pTooltip]="'Solicitado sin asignar: ' + (ot.kgSolicitados | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
         <span class="barra-ot__tramo barra-ot__tramo--libre" [style.width.%]="tramosBarraOT.porSolicitar"
-          [pTooltip]="'Por solicitar: ' + (ot.kgPorSolicitar | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
+          [showDelay]="retrasoAyuda" [pTooltip]="'Por solicitar: ' + (ot.kgPorSolicitar | number : '1.2-2') + ' kg'" tooltipPosition="top"></span>
+      </div>
       </div>
       <div class="barra-ot__leyenda">
         <span><i class="punto barra-ot__tramo--asignado"></i> Asignado</span>
         <span><i class="punto barra-ot__tramo--solicitado"></i> Solicitado sin asignar</span>
         <span><i class="punto barra-ot__tramo--libre"></i> Por solicitar</span>
+        <span><i class="marca-umbral"></i> Kg de la OT</span>
       </div>
     </div>
 
@@ -235,7 +252,7 @@
             <p-inputNumber *ngIf="totalSolicitado > 0; else sinKg" [locale]="localeNumeros" [ngModel]="d.Kg" (ngModelChange)="cambiarKg(d, $event)"
               mode="decimal" [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" inputStyleClass="text-end campo-compacto"
               (click)="seleccionarContenido($event)" [attr.aria-label]="'Cantidad de la máquina ' + d.Maquina"></p-inputNumber>
-            <ng-template #sinKg><span class="tarjeta-maquina__sin-kg" pTooltip="Se calcula al agregar materiales" tooltipPosition="top">—</span></ng-template>
+            <ng-template #sinKg><span class="tarjeta-maquina__sin-kg" [showDelay]="retrasoAyuda" pTooltip="Se calcula al agregar materiales" tooltipPosition="top">—</span></ng-template>
           </label>
         </div>
       </div>
@@ -262,7 +279,7 @@
     </div>
     <div class="header-actions__buttons" data-tutorial="agregarSubcategoria">
       <!-- El tooltip va en el contenedor porque un botón deshabilitado no recibe el mouse -->
-      <span [pTooltip]="encabezadoCompleto ? '' : 'Complete el encabezado: OT consultada, fecha de entrega y máquinas'" tooltipPosition="top"
+      <span [showDelay]="retrasoAyuda" [pTooltip]="encabezadoCompleto ? '' : 'Complete el encabezado: OT consultada, fecha de entrega y máquinas'" tooltipPosition="top"
         (click)="!encabezadoCompleto && abrirAgregarSubcategoria()">
         <button pButton type="button" label="Agregar subcategoría" icon="pi pi-plus" class="p-button-rounded p-button-danger"
           [disabled]="!encabezadoCompleto" (click)="abrirAgregarSubcategoria()"></button>
@@ -292,7 +309,7 @@
                 <span class="chip-total">{{subcat.Cantidad | number : '1.2-2'}} {{subcat.Und_Medida}}</span>
                 <span class="tabla-agrupada__meta" data-tutorial="disponibleTabla"
                   [ngClass]="{ 'tabla-agrupada__meta--excede' : excedeDisponible(subcat) }"
-                  [pTooltip]="excedeDisponible(subcat) ? 'Lo solicitado supera el disponible; se pedirá confirmación al guardar' : 'Stock menos lo solicitado y aún no asignado en solicitudes activas'"
+                  [showDelay]="retrasoAyuda" [pTooltip]="excedeDisponible(subcat) ? 'Lo solicitado supera el disponible; se pedirá confirmación al guardar' : 'Stock menos lo solicitado y aún no asignado en solicitudes activas'"
                   tooltipPosition="top">
                   <i *ngIf="excedeDisponible(subcat)" class="pi pi-exclamation-triangle"></i>
                   Disponible
@@ -306,8 +323,7 @@
             </td>
             <td class="tabla-agrupada__accion">
               <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" [disabled]="subcat.Cantidad_Entregada > 0"
-                [pTooltip]="subcat.Cantidad_Entregada > 0 ? 'No se puede quitar: ya tiene entregas' : 'Quitar la subcategoría y sus materiales'"
-                tooltipPosition="top" [attr.aria-label]="'Quitar ' + subcat.Nombre" (onClick)="pedirQuitarSubcategoria(subcat)"></p-button>
+                [attr.aria-label]="'Quitar ' + subcat.Nombre" (onClick)="pedirQuitarSubcategoria(subcat)"></p-button>
             </td>
           </tr>
 
@@ -336,7 +352,7 @@
                   (click)="seleccionarContenido($event)" [attr.aria-label]="'Cantidad de ' + mat.Nombre"></p-inputNumber>
               </td>
               <td class="tabla-agrupada__accion">
-                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary" pTooltip="Quitar este material" tooltipPosition="top"
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary"
                   [attr.aria-label]="'Quitar ' + mat.Nombre" (onClick)="pedirQuitarMaterial(subcat, mat)"></p-button>
               </td>
             </tr>
@@ -371,7 +387,7 @@
   <!-- Observación -->
   <div class="mt-4" [formGroup]="formEncabezado" data-tutorial="observacion">
     <span class="p-float-label">
-      <textarea formControlName="observacion" id="observacion" [rows]="5"
+      <textarea formControlName="observacion" id="observacion" [rows]="5" spellcheck="false"
         pInputTextarea appContadorCaracteres maxLength="2000"></textarea>
       <label for="observacion">Observación</label>
     </span>
@@ -381,10 +397,9 @@
     <div class="d-grid gap-2 d-md-flex justify-content-md-center" data-tutorial="botonesSolicitud">
       <button pButton pRipple [label]="esSolicitud ? 'Editar Solicitud' : 'Crear Solicitud'" type="button" icon="pi pi-check"
         class="p-button-danger" [disabled]="subcategoriasSeleccionadas.length == 0 || load"
-        (click)="validarYGuardarSolicitud()"
-        [pTooltip]="esSolicitud ? 'Guarda los cambios de la solicitud de materia prima.' : 'Crea la solicitud de materia prima.'"></button>
+        (click)="validarYGuardarSolicitud()"></button>
       <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary"
-        icon="pi pi-eraser" (click)="solicitarLimpiarTodo()" pTooltip="Limpia todos los campos del formulario."></button>
+        icon="pi pi-eraser" (click)="solicitarLimpiarTodo()"></button>
     </div>
   </div>
 </p-card>
@@ -401,7 +416,8 @@
         </div>
       </div>
       <div class="aviso-guardada__botones">
-        <button *ngIf="puedeVerMovimientos" pButton type="button" label="Ver en movimientos" icon="pi pi-list"
+        <button *ngIf="puedeVerMovimientos" pButton type="button" label="Ver solicitudes de la OT" icon="pi pi-list"
+          pTooltip="Abre Movimientos con todas las solicitudes de esta OT y su estado" tooltipPosition="top"
           class="p-button-sm p-button-outlined p-button-secondary" (click)="verSolicitudEnMovimientos(message.data)"></button>
         <button pButton type="button" [label]="generandoPdfSolicitud ? 'Generando PDF…' : 'Generar PDF'" icon="pi pi-file-pdf"
           [loading]="generandoPdfSolicitud" [disabled]="generandoPdfSolicitud"
@@ -413,6 +429,42 @@
 
 <!-- Confirmaciones de la página (mismo estilo que el de eliminar evento del calendario). Enter acepta y Esc cancela. -->
 <p-confirmDialog key="confirmarSolicitud" [style]="{width: '30rem'}" [breakpoints]="{'640px': '92vw'}" [baseZIndex]="6000" appendTo="body"></p-confirmDialog>
+
+<!-- Resumen antes de crear o editar: el usuario revisa la OT, la fecha, las máquinas y los materiales. Enter guarda, Esc vuelve. -->
+<p-confirmDialog key="resumenSolicitud" [style]="{width: '40rem'}" [breakpoints]="{'640px': '94vw'}" [baseZIndex]="6000" appendTo="body">
+  <ng-template pTemplate="message">
+    <div class="resumen-confirmacion" *ngIf="resumenSolicitud as r">
+      <dl class="resumen-confirmacion__datos">
+        <div><dt>OT</dt><dd><b>{{r.ot}}</b> · {{r.cliente}}</dd></div>
+        <div><dt>Referencia</dt><dd>{{r.referencia}}</dd></div>
+        <div><dt>Proceso</dt><dd>{{r.proceso}}</dd></div>
+        <div><dt>Fecha de entrega</dt><dd><b>{{r.fechaEntrega | date : 'yyyy-MM-dd'}}</b></dd></div>
+        <div><dt>Máquinas</dt><dd>{{r.maquinas}}</dd></div>
+      </dl>
+      <table class="resumen-confirmacion__tabla">
+        <thead>
+          <tr><th scope="col">Material</th><th scope="col">Cantidad</th></tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let s of r.subcategorias">
+            <tr class="resumen-confirmacion__grupo">
+              <td><b>{{s.nombre}}</b></td>
+              <td class="numero"><b>{{s.cantidad | number : '1.2-2'}}</b> {{s.und}}</td>
+            </tr>
+            <tr *ngFor="let m of s.materiales" class="resumen-confirmacion__material">
+              <td>{{m.nombre}}</td>
+              <td class="numero">{{m.cantidad | number : '1.2-2'}}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+        <tfoot>
+          <tr><td>Total solicitado</td><td class="numero"><b>{{r.total | number : '1.2-2'}}</b></td></tr>
+        </tfoot>
+      </table>
+      <p *ngIf="r.observacion" class="resumen-confirmacion__observacion"><b>Observación:</b> {{r.observacion}}</p>
+    </div>
+  </ng-template>
+</p-confirmDialog>
 
 <!-- Modal "Agregar subcategoría": la lista de subcategorías se desliza para dar paso a sus materiales -->
 <p-dialog [(visible)]="mostrarAgregar" [modal]="true" [style]="{ width: '60vw' }" [breakpoints]="{ '1200px': '80vw', '960px': '95vw' }"
@@ -448,7 +500,7 @@
             <tr>
               <th scope="col">Subcategoría</th>
               <th scope="col">Stock {{unidadStockModal}}</th>
-              <th scope="col" pTooltip="Stock menos lo solicitado y aún no asignado en solicitudes activas" tooltipPosition="top">Disponible {{unidadStockModal}}</th>
+              <th scope="col" [showDelay]="retrasoAyuda" pTooltip="Stock menos lo solicitado y aún no asignado en solicitudes activas" tooltipPosition="top">Disponible {{unidadStockModal}}</th>
               <th scope="col">En la solicitud</th>
             </tr>
           </ng-template>
@@ -564,7 +616,7 @@
       <ng-container *ngIf="panelModal === 'subcategorias'">
         <!-- Confirmación de lo recién agregado (unos segundos); luego vuelve el resumen de la solicitud -->
         <span *ngIf="ultimoAgregado; else resumenSolicitudModal" class="pie-modal__resumen pie-modal__agregado" role="status"
-          [pTooltip]="ultimoAgregado.detalle" tooltipPosition="top">
+          [showDelay]="retrasoAyuda" [pTooltip]="ultimoAgregado.detalle" tooltipPosition="top">
           <i class="pi pi-check-circle"></i> {{ultimoAgregado.texto}}
         </span>
         <ng-template #resumenSolicitudModal>
@@ -613,7 +665,7 @@
         <td>{{s.fecha | date : 'yyyy-MM-dd'}}</td>
         <td>{{s.fechaEntrega | date : 'yyyy-MM-dd'}}</td>
         <td>
-          <p-button icon="pi pi-ban" [rounded]="true" severity="danger" [outlined]="true" pTooltip="Cancelar solicitud" tooltipPosition="left"
+          <p-button icon="pi pi-ban" [rounded]="true" severity="danger" [outlined]="true" aria-label="Cancelar solicitud"
             (onClick)="pedirCancelarSolicitud(s)"></p-button>
         </td>
       </tr>
@@ -624,6 +676,22 @@
       </tr>
     </ng-template>
   </p-table>
+</p-dialog>
+
+<!-- Cancelar una solicitud propia: el motivo es obligatorio; se guarda con la fecha y el usuario -->
+<p-dialog header="Cancelar solicitud N° {{solicitudPorCancelar?.id}} · OT {{solicitudPorCancelar?.ot}}" [(visible)]="dialogoCancelar"
+  [modal]="true" [style]="{ width: '34rem' }" [breakpoints]="{ '640px': '94vw' }" [draggable]="false" [resizable]="false">
+  <p class="texto-secundario">La cancelación no se puede deshacer; si la necesita, deberá crear una nueva. Escriba por qué la cancela; quedará registrado con la fecha y su usuario.</p>
+  <span class="p-float-label mt-4">
+    <textarea id="motivoCancelacion" pInputTextarea appContadorCaracteres maxlength="1000" [rows]="4" class="w-100"
+      [(ngModel)]="motivoCancelacion" (keydown.control.enter)="confirmarCancelacion()"></textarea>
+    <label for="motivoCancelacion">Motivo de la cancelación *</label>
+  </span>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Volver" class="p-button-text p-button-secondary" (click)="dialogoCancelar = false"></button>
+    <button pButton type="button" label="Cancelar solicitud" icon="pi pi-ban" class="p-button-danger"
+      [disabled]="!motivoCancelacion.trim() || load" (click)="confirmarCancelacion()"></button>
+  </ng-template>
 </p-dialog>
 
 <!-- Modal de materiales asignados a la OT -->
@@ -653,7 +721,7 @@
           <td class="text-center">{{mat.id}}</td>
           <td>{{mat.nombre}}</td>
           <td class="text-center" [ngClass]="{ 'colorRojo' : mat.esDevolucion }"
-            [pTooltip]="mat.esDevolucion ? 'Cantidad devuelta: resta de lo asignado' : ''" tooltipPosition="top">
+            [showDelay]="retrasoAyuda" [pTooltip]="mat.esDevolucion ? 'Cantidad devuelta: resta de lo asignado' : ''" tooltipPosition="top">
             <b>{{mat.esDevolucion ? '-' : ''}}{{mat.cantidad | number : '1.2-2'}}</b>
           </td>
           <td class="text-center">{{mat.undMedida}}</td>

@@ -12,7 +12,7 @@ import { UtileriaService } from '../Utileria/utileria.service';
 import { catchError, map, Observable } from 'rxjs';
 import { BagproService } from '../BagPro/Bagpro.service';
 import { Orden_TrabajoService } from '../OrdenTrabajo/Orden_Trabajo.service';
-import { DatosPdfAsignacion, DetalleSolicitudMaterial, MaterialDetalleSolicitud, SubcategoriaAsignadaPdf, SubcategoriaDetalleSolicitud } from 'src/app/Modelo/modelFlujoMaterialProduccion';
+import { DatosPdfAsignacion, DetalleSolicitudMaterial, MaterialDetalleSolicitud, ResumenSolicitudOT, SubcategoriaAsignadaPdf, SubcategoriaDetalleSolicitud } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 
 @Injectable({
   providedIn: 'root'
@@ -1525,21 +1525,53 @@ export class CreacionPdfService {
    * @param ot Número de la OT.
    */
   generarBlobAsignacionesSolicitud(lotes: DatosPdfAsignacion[], solicitud: number, ot: number): Observable<Blob> {
-    const ID_SECCION = 'seccion-asignacion-';
-    /** Hoja en la que empieza cada sección: la registra la primera pasada y la usa la segunda para las cabeceras. */
+    // Cada sección es el mismo contenido (y la misma cabecera) que el PDF individual de la asignación.
     const conDatos = lotes.filter(datos => (datos.subcategorias ?? []).length > 0);
-    const hojaInicio: number[] = conDatos.map((_, i) => i + 1);
+    return this.generarBlobPorSecciones(
+      () => conDatos.map(datos => this.contenidoAsignacionMaterialPDF(datos)),
+      `Asignaciones de la Solicitud N° ${solicitud}\nOrden de Trabajo N° ${ot}`,
+      `Asignaciones Solicitud MP #${solicitud}`);
+  }
+
+  /**
+   * Genera en un solo PDF las solicitudes de material de una OT: una hoja de resumen de la solicitud de la OT
+   * (kg, tope, asignado, estado y lista de solicitudes) y luego cada solicitud en hoja nueva, con el mismo contenido
+   * y cabecera que su PDF individual.
+   * @param resumen Solicitud de la OT (`SolicitudesExtrusion/ot/{ot}`).
+   * @param solicitudes Detalle de cada solicitud (`SolicitudesExtrusion/{id}`), en el orden en que se imprimen.
+   * @param ot Datos de la OT en BagPro, o null si no se encontró.
+   */
+  generarBlobSolicitudesOT(resumen: ResumenSolicitudOT, solicitudes: DetalleSolicitudMaterial[], ot: DatosOTSolicitudPDF | null): Observable<Blob> {
+    return this.generarBlobPorSecciones(
+      () => [
+        this.contenidoResumenSolicitudOTPDF(resumen, solicitudes, ot),
+        ...solicitudes.map(s => this.contenidoSolicitudMaterialPDF(s, ot)),
+      ],
+      `Solicitudes de Materia Prima\nOrden de Trabajo N° ${resumen.ot}`,
+      `Solicitudes MP OT ${resumen.ot}`);
+  }
+
+  /**
+   * Arma un PDF con varias secciones; cada una empieza en hoja nueva y sus hojas llevan su propio título en la cabecera.
+   * @param secciones Devuelve el título y el contenido de cada sección (se llama en cada pasada: pdfmake modifica el contenido).
+   * @param tituloPorDefecto Título si no hay secciones.
+   * @param tituloPestana Título del documento en la pestaña del navegador.
+   */
+  private generarBlobPorSecciones(secciones: () => { titulo: string; content: any[] }[], tituloPorDefecto: string, tituloPestana: string): Observable<Blob> {
+    const ID_SECCION = 'seccion-pdf-';
+    /** Hoja en la que empieza cada sección: la registra la primera pasada y la usa la segunda para las cabeceras. */
+    const hojaInicio: number[] = [];
     return this.generarBlobPDF(() => {
-      // Cada sección es el mismo contenido (y la misma cabecera) que el PDF individual de la asignación.
-      const secciones = conDatos.map(datos => this.contenidoAsignacionMaterialPDF(datos));
+      const lista = secciones();
+      lista.forEach((_, i) => hojaInicio[i] ??= i + 1);
       // El id va en el primer bloque de la sección (no en el que lleva el salto de hoja: pdfmake no consulta esos nodos).
-      const content = secciones.map((seccion, i) => ({
+      const content = lista.map((seccion, i) => ({
         stack: seccion.content.map((bloque, j) => j === 0 ? { ...bloque, id: `${ID_SECCION}${i}` } : bloque),
         pageBreak: i > 0 ? 'before' : undefined,
       }));
       return {
-        titulo: secciones[0]?.titulo ?? `Asignaciones de la Solicitud N° ${solicitud}\nOrden de Trabajo N° ${ot}`,
-        tituloPestana: `Asignaciones Solicitud MP #${solicitud}`,
+        titulo: lista[0]?.titulo ?? tituloPorDefecto,
+        tituloPestana,
         content,
         pageBreakBefore: (nodo: any) => {
           const id: string = nodo?.id ?? '';
@@ -1549,10 +1581,61 @@ export class CreacionPdfService {
         tituloPorPagina: (pagina: number) => {
           let indice = 0;
           hojaInicio.forEach((inicio, i) => { if (inicio <= pagina) indice = i; });
-          return secciones[indice]?.titulo ?? '';
+          return lista[indice]?.titulo ?? '';
         },
       };
     });
+  }
+
+  /** Hoja de resumen de la solicitud de la OT: datos de la OT, avance contra sus kg y la lista de sus solicitudes. */
+  private contenidoResumenSolicitudOTPDF(resumen: ResumenSolicitudOT, solicitudes: DetalleSolicitudMaterial[], ot: DatosOTSolicitudPDF | null): { titulo: string; content: any[] } {
+    const numero = (valor: number | null | undefined, bold = false) => ({ text: valor == null ? '—' : this.cantidadPDF(valor), alignment: 'right', bold });
+    const quien = (fecha: string | null, usuario: string | null, sola = false) =>
+      fecha ? `${this.fechaPDF(fecha)} · ${usuario ?? (sola ? 'automática (llegó al tope)' : '')}` : '—';
+    const totalDe = (s: DetalleSolicitudMaterial, campo: 'solicitado' | 'entregado') => (s.subcategorias ?? []).reduce((t, x) => t + (Number(x[campo]) || 0), 0);
+
+    const estadoOT = {
+      margin: [0, 0, 0, 10],
+      fontSize: 8,
+      table: {
+        widths: ['*', '*', '*', '*'],
+        body: [
+          [{ text: 'Solicitud de la OT', colSpan: 4, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}],
+          [`Estado: ${resumen.estado}`, `Kg OT: ${resumen.kgOT == null ? 'Sin dato' : this.cantidadPDF(resumen.kgOT)}`,
+            `Tope con adicional: ${resumen.topeKgOT == null ? 'Sin dato' : this.cantidadPDF(resumen.topeKgOT)}`,
+            `Llegó a los kg de la OT: ${resumen.umbralAlcanzado ? 'Sí' : 'No'}`],
+          [`Kg solicitados (MP): ${this.cantidadPDF(resumen.kgSolicitados)}`, `Kg asignados: ${this.cantidadPDF(resumen.kgAsignados)}`,
+            { text: `Kg solicitados sin asignar: ${this.cantidadPDF(resumen.kgPendientesPorAsignar)}`, colSpan: 2 }, {}],
+          [{ text: `Completada: ${quien(resumen.fechaCompletada, resumen.usuarioCompleta, true)}`, colSpan: 2 }, {},
+            `Finalizada: ${quien(resumen.fechaFinalizada, resumen.usuarioFinaliza)}`, `Verificada: ${quien(resumen.fechaVerificada, resumen.usuarioVerifica)}`],
+        ]
+      },
+      layout: { fillColor: (rowIndex: number) => rowIndex === 0 ? '#DDDDDD' : null },
+    };
+
+    const lista = {
+      margin: [0, 0, 0, 10],
+      fontSize: 8,
+      table: {
+        headerRows: 2,
+        dontBreakRows: true,
+        widths: [35, 55, 55, 40, '*', 60, 60, 60],
+        body: [
+          [{ text: 'Solicitudes de la OT', colSpan: 8, alignment: 'center', fontSize: 10, bold: true }, {}, {}, {}, {}, {}, {}, {}],
+          ['N°', 'Creada', 'Entrega', 'Proceso', 'Solicitante', 'Estado', 'Solicitado', 'Entregado'],
+          ...solicitudes.map(s => [String(s.id), this.fechaPDF(s.fecha), this.fechaPDF(s.fechaEntrega), s.proceso_Id ?? '', s.usuario ?? '',
+            s.estado ?? '', numero(totalDe(s, 'solicitado')), numero(totalDe(s, 'entregado'))]),
+          [{ text: 'Total', colSpan: 6, bold: true, alignment: 'right' }, {}, {}, {}, {}, {},
+            numero(solicitudes.reduce((t, s) => t + totalDe(s, 'solicitado'), 0), true), numero(solicitudes.reduce((t, s) => t + totalDe(s, 'entregado'), 0), true)],
+        ]
+      },
+      layout: this.layoutEncabezadoGris,
+    };
+
+    return {
+      titulo: `Solicitudes de Materia Prima\nOrden de Trabajo N° ${resumen.ot}`,
+      content: [this.infoOTSolicitudMaterialPDF({ ot: resumen.ot }, ot), estadoOT, lista],
+    };
   }
 
   /** Id y nombre del material de la fila según el tipo de movimiento. */

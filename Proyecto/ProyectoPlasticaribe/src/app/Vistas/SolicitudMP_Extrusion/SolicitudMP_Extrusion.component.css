@@ -663,3 +663,139 @@ p-multiselect ::ng-deep .p-multiselect {
     margin-left: 0;
   }
 }
+
+/* Estado de la solicitud de la OT (todas sus solicitudes), con la paleta oficial. */
+.ficha-ot__estado-ot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  margin-top: 0.35rem;
+}
+
+.etiqueta-estado {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estado--pendiente { background-color: var(--fondo-advertencia); color: var(--texto-advertencia); }
+.estado--parcial { background-color: var(--fondo-info); color: var(--texto-info); }
+.estado--completada { background-color: var(--fondo-exito); color: var(--texto-exito); }
+.estado--finalizada { background-color: var(--azul-marca-claro); color: var(--azul-marca-medio); }
+.estado--verificada { background-color: var(--fondo-contador); color: var(--texto-contador); }
+
+.ficha-ot__aviso-umbral {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto-exito);
+}
+
+/* Aviso de que la OT ya no admite solicitudes (cerrada, completada, finalizada o verificada). */
+.ficha-ot__bloqueo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+  font-weight: 600;
+}
+
+/* Marca de los kg de la OT (umbral) sobre la barra de avance. */
+.barra-ot-contenedor {
+  position: relative;
+}
+
+.barra-ot__umbral {
+  position: absolute;
+  top: -0.25rem;
+  bottom: -0.25rem;
+  z-index: 1;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background-color: var(--texto-fuerte);
+}
+
+.barra-ot__leyenda .marca-umbral {
+  display: inline-block;
+  width: 3px;
+  height: 0.8rem;
+  margin-right: 0.25rem;
+  border-radius: 2px;
+  background-color: var(--texto-fuerte);
+  vertical-align: middle;
+}
+
+/* Resumen antes de crear o editar la solicitud (mismo estilo que el resumen de la asignación). */
+.resumen-confirmacion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.resumen-confirmacion__datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.4rem 1rem;
+  margin: 0;
+}
+
+.resumen-confirmacion__datos dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-color-secondary);
+}
+
+.resumen-confirmacion__datos dd {
+  margin: 0;
+  color: var(--texto-fuerte);
+}
+
+.resumen-confirmacion__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+
+.resumen-confirmacion__tabla th {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-color-secondary);
+  background-color: var(--fondo-sutil);
+  text-align: left;
+}
+
+.resumen-confirmacion__tabla td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.resumen-confirmacion__tabla .numero,
+.resumen-confirmacion__tabla th:not(:first-child) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.resumen-confirmacion__grupo td { background-color: var(--azul-marca-claro); }
+.resumen-confirmacion__material td:first-child { padding-left: 1.5rem; }
+
+.resumen-confirmacion__tabla tfoot td {
+  border-bottom: 0;
+  font-weight: 600;
+}
+
+.resumen-confirmacion__observacion {
+  margin: 0;
+  white-space: pre-line;
+  color: var(--text-color-secondary);
+}
