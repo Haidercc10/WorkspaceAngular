@@ -286,14 +286,21 @@ export class MenuLateralComponent implements OnInit {
    * Deja abierta solo la categoría (y el grupo interno) donde está la página actual; las demás se cierran,
    * así el menú no acumula categorías abiertas de visitas anteriores. En Inicio quedan todas cerradas.
    * Los grupos internos se leen al crear el p-panelMenu, por eso a la categoría se le pasa una copia de su lista.
+   * Una vista puede estar en varias categorías (p. ej. "Ver Pedidos" en Comercial y Pedidos): solo se abre la primera,
+   * porque el p-panelMenu es de una categoría a la vez ([multiple]="false") y con dos abiertas el contenido de una
+   * queda encimado sobre las categorías siguientes.
    */
   private abrirCategoriaActual() {
     const url = VistasFavoritasService.normalizarRuta(this.router.url);
+    let yaAbierta = false;
     this.categorias.forEach(categoria => {
       if (!categoria.items?.length) return;
-      const contieneActual = this.marcarRutaActual(categoria.items, url);
+      const contieneActual = !yaAbierta && this.marcarRutaActual(categoria.items, url);
       categoria.expanded = contieneActual;
-      if (contieneActual) categoria.items = [...categoria.items];
+      if (contieneActual) {
+        yaAbierta = true;
+        categoria.items = [...categoria.items];
+      }
     });
   }
 
