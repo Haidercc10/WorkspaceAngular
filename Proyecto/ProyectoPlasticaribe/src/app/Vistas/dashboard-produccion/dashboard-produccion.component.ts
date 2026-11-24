@@ -119,6 +119,20 @@ export class DashboardProduccionComponent implements OnInit {
     EXTRUSION: 0, IMPRESION: 1, PERFORADO: 2, CORTE: 3, SELLADO: 4, CAMISILLA: 5, LAMINADO: 6, DOBLADO: 7,
   };
 
+  /** Tarjetas de "Producción diaria por máquina", en el orden del flujo de planta.
+   *  codigo: proceso en productionMachines; clase: sufijo de las clases CSS (color --grafica-N);
+   *  desperdicio: proceso fijo para el detalle de desperdicios (si no, se usa data.process). */
+  readonly procesosMaquinas: { codigo: string, nombre: string, icono: string, clase: string, desperdicio?: string }[] = [
+    { codigo: 'EXT', nombre: 'Extrusión', icono: 'pi pi-bolt', clase: 'extrusion' },
+    { codigo: 'IMP', nombre: 'Impresión', icono: 'pi pi-palette', clase: 'impresion' },
+    { codigo: 'LAM', nombre: 'Laminado', icono: 'pi pi-file', clase: 'laminado' },
+    { codigo: 'PERF', nombre: 'Perforado', icono: 'pi pi-ellipsis-v', clase: 'perforado' },
+    { codigo: 'DBLD', nombre: 'Doblado', icono: 'pi pi-map', clase: 'doblado' },
+    { codigo: 'EMP', nombre: 'Corte', icono: 'pi pi-database', clase: 'corte', desperdicio: 'CORTE' },
+    { codigo: 'SELLA', nombre: 'Sellado', icono: 'pi pi-box', clase: 'sellado' },
+    { codigo: 'CAMISILLA', nombre: 'Camisilla', icono: 'pi pi-bookmark', clase: 'camisilla', desperdicio: 'SELLA' },
+  ];
+
   /** Color del proceso: anillo de cumplimiento, barras de producción y meta. */
   colorProceso(proceso: string): string {
     return colorSerieGrafica(DashboardProduccionComponent.INDICE_PROCESO[proceso] ?? 0, this.modoSeleccionado);
