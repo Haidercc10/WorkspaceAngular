@@ -36,6 +36,9 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { OtCalculoCostosService, RangoPesoTeorico, REGLA_PESO_MILLAR_D2 } from 'src/app/Servicios/OrdenTrabajo/OtCalculoCostos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { FichaComplementariaItemService } from 'src/app/Servicios/FichaComplementariaItem/FichaComplementariaItem.service';
+import { FichaComplementariaItem, descripcionEmbobinado, imagenEmbobinado } from 'src/app/Modelo/modelEmbobinado';
+import { MezclaDetalle } from 'src/app/Modelo/modelCrearItem';
 
 /**
  * Presentaciones con las que se puede crear una OT; también son las opciones del dropdown de presentación.
@@ -230,7 +233,8 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     private svcSedes: SedeClienteService,
     private estadosProcesosService: EstadosProcesos_OTService,
     private calculoCostos: OtCalculoCostosService,
-    private creacionPdf: CreacionPdfService,) {
+    private creacionPdf: CreacionPdfService,
+    private fichaComplementariaService: FichaComplementariaItemService,) {
 
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -679,6 +683,7 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
   limpiarCampos() {
     console.log('Limpiando campos de la orden de trabajo');
     this.refrescoProducto?.unsubscribe();
+    this.limpiarComplementoItem();
     this.cancelarCalculosPendientes();
     this.limpiarFormOrdenTrabajo();
     this.limpiarFormExtrusion();
@@ -1208,7 +1213,7 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
         console.error(error);
         if (this.errorRefrescoAvisado && !alGuardar) return;
         this.errorRefrescoAvisado = true;
-        this.msj.mensajeError(`¡No fue posible consultar la información del item ${producto}!`, error?.error);
+        this.msj.errorDetallado(error, `No se pudo cargar la ficha del item ${producto} desde BagPro. Revise que el item tenga completa su ficha técnica o inténtelo de nuevo.`, { operacion: `Consultar item ${producto} para OT`, metodo: "GET" });
       }
     });
   }
@@ -1329,7 +1334,7 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
       if (otEnEdicion != null) this.msj.mensajeAdvertencia(`¡Advertencia!`, `Se cargó el item ${producto} como plantilla para una OT nueva; la OT N° ${otEnEdicion} no se modificó.`, 6000);
       alCargar?.();
     }, error => {
-      this.msj.mensajeError(`¡No fue posible consultar la información del item ${producto}!`, error.error);
+      this.msj.errorDetallado(error, `No se pudo cargar la ficha del item ${producto} desde BagPro. Revise que el item tenga completa su ficha técnica o inténtelo de nuevo.`, { operacion: `Consultar item ${producto} para OT`, metodo: "GET" });
       this.cargando = false;
     });
   }
@@ -1437,6 +1442,43 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: dataOt.mezcla_Nombre, });
     if (ot != null) this.FormOrdenTrabajo.patchValue({ OT_Id: ot, });
     this.cargarCombinacionMezclas();
+    this.cargarComplementoItem(dataOt?.id_Producto);
+  }
+
+  /** Datos del item guardados en Plasticaribe desde Crear Item (embobinado, código de barras, guías...). */
+  fichaComplementaria: FichaComplementariaItem | null = null;
+  /** Composición de la mezcla ajustada para el item en Crear Item (null si usa la predefinida). */
+  mezclaItemAjustada: MezclaDetalle | null = null;
+  readonly imagenEmbobinado = imagenEmbobinado;
+  readonly descripcionEmbobinado = descripcionEmbobinado;
+  private suscripcionComplemento?: Subscription;
+
+  /**
+   * Consulta la ficha complementaria del item y, si su mezcla se ajustó en Crear Item, la composición guardada en
+   * BagPro. Es solo informativa: la OT sigue guardando la mezcla predefinida (consumos y reportes no cambian).
+   * @param item Código del item.
+   * @returns No retorna un valor.
+   */
+  cargarComplementoItem(item: any) {
+    this.limpiarComplementoItem();
+    const codigo = Number(item);
+    if (!(codigo > 0)) return;
+    this.suscripcionComplemento = this.fichaComplementariaService.obtener(codigo).pipe(
+      catchError(() => of(null)),
+      switchMap(ficha => {
+        this.fichaComplementaria = ficha;
+        return ficha?.mezclaAjustada
+          ? this.bagProService.GetFichaItem(codigo).pipe(map(f => f.mezclaComposicion ?? null), catchError(() => of(null)))
+          : of(null);
+      }),
+    ).subscribe(mezcla => this.mezclaItemAjustada = mezcla);
+  }
+
+  /** Quita los datos complementarios del item mostrado. */
+  limpiarComplementoItem() {
+    this.suscripcionComplemento?.unsubscribe();
+    this.fichaComplementaria = null;
+    this.mezclaItemAjustada = null;
   }
 
   /**
@@ -3782,6 +3824,27 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.msj.mensajeError(`¡No fue posible generar el PDF de la Orden de Trabajo!`);
     }
+  }
+
+  /**
+   * Abre el PDF de la OT con el formato 2 (en prueba, estilo del PDF de pedidos). El formato actual no cambia.
+   * @param ot Número de la OT; por defecto la del formulario.
+   */
+  pdfOrdenTrabajoV2(ot: number = this.FormOrdenTrabajo.value.OT_Id) {
+    if (ot == null) return this.msj.mensajeAdvertencia(`¡Debe llenar el campo con el Número de un OT para mostrar el PDF de dicha OT!`);
+
+    this.cargando = true;
+    this.creacionPdf.obtenerDatosOrdenTrabajo(ot).pipe(finalize(() => this.cargando = false)).subscribe({
+      next: datos_ot => {
+        if (!datos_ot) return this.msj.mensajeAdvertencia(`¡No se encontró información para generar el PDF de la Orden de Trabajo!`);
+        try {
+          this.creacionPdf.crearPdfOrdenTrabajoV2(datos_ot, this.AppComponent.storage_Nombre).open();
+        } catch (error) {
+          this.msj.mensajeError(`¡No fue posible generar el PDF de la Orden de Trabajo!`);
+        }
+      },
+      error: () => this.msj.mensajeError(`¡No se encontró una Orden con el Numero ${ot}!`),
+    });
   }
 
   //Función que cargará la última OT de Plasticaribe. 

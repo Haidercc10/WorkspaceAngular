@@ -8,7 +8,7 @@ import { armar, paso } from 'src/app/Tutoriales/Tutoriales_Comun';
  * "Crear Item" y "Estado de Sincronización".
  */
 
-export const ClaveTutorialCrearItem = 'crear-item-v1';
+export const ClaveTutorialCrearItem = 'crear-item-v2';
 
 export interface ContextoTutorialCrearItem {
   /** Cambia a la pestaña indicada (0 Crear Item, 1 Estado de Sincronización). */
@@ -52,11 +52,12 @@ export function pasosTutorialCrearItem(ctx : ContextoTutorialCrearItem) : Step.S
 
     crear('bloqueMaterial', '2. Material y Medidas',
       `<p><b>Material</b> y <b>mezcla</b> son obligatorios. Luego el pigmento, la unidad de medida y las medidas: <b>ancho</b>, <b>largo</b> (obligatorio en bolsa, camisilla, precorte y hoja), <b>fuelle</b> y <b>calibre</b>.</p>
-       <p>Los valores se validan dentro de rangos razonables antes de crear.</p>`),
+       <p>El botón junto a la mezcla muestra sus <b>capas, materiales y pigmentos</b> y permite ajustarlos <b>solo para este item</b> (la mezcla predefinida no cambia).</p>
+       <p>En las <b>láminas</b> se puede marcar <b>Largo continuo</b>: el largo deja de ser obligatorio.</p>`),
 
     crear('procesos', '3. Procesos',
       `<p>Activa con un clic los procesos que lleva el item: <b>Extrusión</b>, <b>Impresión</b>, <b>Laminado</b>, <b>Sellado</b> y <b>Corte</b>.</p>
-       <p>Cada proceso activo despliega debajo sus propios campos (tipo de impresión, <b>tintas</b> con su color, capas de laminado, tipo de sellado, peso millar...).</p>
+       <p>Cada proceso activo despliega debajo sus propios campos: en Impresión el tipo, las <b>tintas</b>, el <b>código de barras</b> y las <b>repeticiones</b>; en Sellado el tipo de sellado, bulto y perforación; en Corte el <b>paso entre guías</b>, la <b>ubicación de la guía</b> y el <b>desembobinado final</b> (se elige con su imagen y sale en el PDF de la OT).</p>
        <p>Si lleva impresión, el nombre usa la <b>descripción comercial</b> que escribas.</p>`),
 
     crear('bloqueObservacion', '4. Observación',

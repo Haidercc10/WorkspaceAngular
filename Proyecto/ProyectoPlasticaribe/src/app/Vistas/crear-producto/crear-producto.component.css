@@ -317,6 +317,24 @@ p-autocomplete ::ng-deep .p-autocomplete {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
+/* Mientras se crea el item la tarjeta se resalta con el rojo de la marca y un pulso suave. */
+.tarjeta-resultado.creando {
+  border-color: var(--rojo);
+  animation: pulso-creacion 1.6s ease-in-out infinite;
+}
+
+@keyframes pulso-creacion {
+  0%, 100% { box-shadow: 0 0 0 0 var(--rojoClaro); }
+  50% { box-shadow: 0 0 0 4px var(--rojoClaro); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-resultado.creando {
+    animation: none;
+    box-shadow: 0 0 0 3px var(--rojoClaro);
+  }
+}
+
 .agregar-cabecera {
   display: flex;
   align-items: flex-start;
@@ -496,7 +514,8 @@ p-autocomplete ::ng-deep .p-autocomplete {
 .paso-ok { --paso-color: var(--sync-ok); }
 .paso-error { --paso-color: var(--sync-error); }
 .paso-advertencia { --paso-color: var(--sync-aviso); }
-.paso-proceso { --paso-color: var(--sync-bagpro); }
+/* El paso en curso va en azul (info), no en rojo, para no confundirse con un error; los completados siguen en verde. */
+.paso-proceso { --paso-color: var(--texto-info); }
 .paso-pendiente .paso-circulo { color: var(--text-color-secondary); }
 
 .paso-ok .paso-circulo, .paso-error .paso-circulo {
@@ -505,7 +524,7 @@ p-autocomplete ::ng-deep .p-autocomplete {
 }
 
 .paso-proceso .paso-circulo {
-  box-shadow: 0 0 0 6px var(--sync-bagpro-suave);
+  box-shadow: 0 0 0 6px var(--fondo-info);
 }
 
 .paso-titulo {
@@ -1071,4 +1090,221 @@ p-autocomplete ::ng-deep .p-autocomplete {
 .bloque-ficha .p-float-label {
   display: block;
   margin-top: 1rem;
+}
+
+/* Desembobinado final (Corte): cuadro "Tipos de Embobinado" */
+.embobinado-campo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+}
+
+.embobinado-etiqueta {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.embobinado-elegido {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 18rem;
+}
+
+.embobinado-elegido img {
+  width: 5rem;
+  height: auto;
+  background: var(--gris-100);
+  border-radius: 4px;
+}
+
+.embobinado-grupo {
+  margin: 0.5rem 0 0.75rem;
+  color: var(--rojo-texto);
+  font-weight: 600;
+}
+
+.embobinado-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.embobinado-opcion {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border: 2px solid var(--surface-border);
+  border-radius: 6px;
+  background: var(--surface-card);
+  color: var(--text-color);
+  cursor: pointer;
+  text-align: center;
+}
+
+.embobinado-opcion:hover,
+.embobinado-opcion:focus-visible {
+  outline: none;
+  border-color: var(--rojoClaro);
+}
+
+.embobinado-opcion.elegido {
+  border-color: var(--rojo);
+  background: var(--fondo-acento);
+}
+
+.embobinado-opcion img {
+  width: 100%;
+  max-width: 9rem;
+  height: auto;
+  background: var(--gris-100);
+  border-radius: 4px;
+}
+
+.embobinado-numero {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  min-width: 1.6rem;
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  background: var(--rojo);
+  color: var(--gris-100);
+  font-weight: 700;
+}
+
+/* Mezcla del item: botón junto al combo y modal de composición */
+.campo-mezcla {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.campo-mezcla > .p-float-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.campo-mezcla > .p-button {
+  margin-top: 1rem;
+}
+
+/* Botones secundarios con borde (Mezcla, Elegir embobinado): rojo de marca en vez del azul del tema */
+.boton-marca-borde.p-button.p-button-outlined,
+.boton-marca-borde.p-button.p-button-outlined:enabled:focus {
+  background: transparent;
+  border-color: var(--rojo-texto);
+  color: var(--rojo-texto);
+  box-shadow: none;
+}
+
+.boton-marca-borde.p-button.p-button-outlined:enabled:hover,
+.boton-marca-borde.p-button.p-button-outlined:enabled:active {
+  background: var(--fondo-acento);
+  border-color: var(--rojo-texto);
+  color: var(--rojo-texto);
+}
+
+/* Botones de texto (Usar la predefinida, Ver item): mismo rojo de marca */
+.boton-marca-texto.p-button.p-button-text,
+.boton-marca-texto.p-button.p-button-text:enabled:focus {
+  background: transparent;
+  color: var(--rojo-texto);
+  box-shadow: none;
+}
+
+.boton-marca-texto.p-button.p-button-text:enabled:hover,
+.boton-marca-texto.p-button.p-button-text:enabled:active {
+  background: var(--fondo-acento);
+  color: var(--rojo-texto);
+}
+
+.boton-marca-texto.p-button.p-button-text:enabled:focus-visible,
+.boton-marca-borde.p-button.p-button-outlined:enabled:focus-visible {
+  box-shadow: 0 0 0 2px var(--surface-card), 0 0 0 4px var(--rojoClaro);
+}
+
+.tag-mezcla {
+  margin-top: 1.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  background: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mezcla-etiqueta,
+.mezcla-subtitulo {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.mezcla-subtitulo {
+  display: block;
+  margin: 0.75rem 0 0.4rem;
+}
+
+.mezcla-total {
+  font-weight: 600;
+  color: var(--texto-exito);
+}
+
+.mezcla-total-error {
+  color: var(--texto-peligro);
+}
+
+.mezcla-capa {
+  height: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+}
+
+.mezcla-capa-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--rojo-texto);
+}
+
+.mezcla-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6.5rem;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+/* El modal de mezcla se monta en el body (appendTo), por eso estas reglas van sin :host. */
+::ng-deep .mezcla-fila .p-dropdown,
+::ng-deep .mezcla-fila .p-inputnumber {
+  width: 100%;
+}
+
+::ng-deep .mezcla-fila .mezcla-porcentaje {
+  width: 6.5rem;
+  text-align: right;
+}
+
+/* N° de capas con el rojo de la marca (el tema lo pinta azul). */
+::ng-deep .selector-capas-mezcla .p-button.p-highlight,
+::ng-deep .selector-capas-mezcla .p-button.p-highlight:hover {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: #fff;
+}
+
+::ng-deep .selector-capas-mezcla .p-button:focus {
+  box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
 }

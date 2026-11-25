@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
-import { CrearItemDto, FichaItem, ItemBusqueda, ItemCreado, MezclaPredefinida, PresentacionBagPro, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
+import { CatalogoMezcla, CrearItemDto, FichaItem, ItemBusqueda, MezclaDetalle, ItemCreado, MezclaPredefinida, PresentacionBagPro, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
 import { rollsToDelete } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
@@ -208,6 +208,15 @@ export class BagproService {
    * @returns Observable con las mezclas ordenadas por nombre.
    */
   GetMezclasPredefinidas = () : Observable<MezclaPredefinida[]> => this.http.get<MezclaPredefinida[]>(`${this.rutaBagPro}/ClientesOtItems/catalogos/mezclas`);
+
+  /** Detalle (capas, materiales y pigmentos) de una mezcla predefinida de BagPro. */
+  GetMezclaDetalle = (item : number) : Observable<MezclaDetalle> => this.http.get<MezclaDetalle>(`${this.rutaBagPro}/ClientesOtItems/catalogos/mezclas/${item}`);
+
+  /** Materiales de mezcla de BagPro (MezclaProductos). */
+  GetMaterialesMezcla = () : Observable<CatalogoMezcla[]> => this.http.get<CatalogoMezcla[]>(`${this.rutaBagPro}/ClientesOtItems/catalogos/mezclas/materiales`);
+
+  /** Pigmentos de mezcla de BagPro (MezclaPigmentos). */
+  GetPigmentosMezcla = () : Observable<CatalogoMezcla[]> => this.http.get<CatalogoMezcla[]>(`${this.rutaBagPro}/ClientesOtItems/catalogos/mezclas/pigmentos`);
 
   /**
    * Tintas de impresión de BagPro para la creación de items (sin la tinta 1, que significa "sin tinta").

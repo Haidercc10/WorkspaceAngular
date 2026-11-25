@@ -52,6 +52,8 @@ export interface CrearItemDto {
   precio: number;
   vendedor?: string | null;
   observacion?: string | null;
+  /** Mezcla editada solo para este item; null usa la predefinida tal cual. */
+  mezclaPersonalizada?: MezclaPersonalizada | null;
 }
 
 /** Ficha de un item existente (`GET api/ClientesOtItems/{codigo}/ficha`). */
@@ -68,6 +70,43 @@ export interface FichaItem extends Omit<CrearItemDto, 'presentacion' | 'precio'>
   tipoImpresionNom?: string | null;
   tipoSelladoNom?: string | null;
   mezclaNom?: string | null;
+  /** Composición de la mezcla guardada en el item (puede diferir de la predefinida). */
+  mezclaComposicion?: MezclaDetalle | null;
+}
+
+/** Material o pigmento de una capa de mezcla (BagPro MezclaProductos / MezclaPigmentos). */
+export interface ComponenteMezcla {
+  codigo: number;
+  nombre?: string | null;
+  porcentaje: number;
+}
+
+/** Capa de una mezcla: % de la capa, hasta 4 materiales (suman 100 %) y 2 pigmentos (aditivos). */
+export interface CapaMezcla {
+  capa?: number;
+  porcentaje: number;
+  materiales: ComponenteMezcla[];
+  pigmentos: ComponenteMezcla[];
+}
+
+/** Detalle de una mezcla (`GET api/ClientesOtItems/catalogos/mezclas/{item}`). */
+export interface MezclaDetalle {
+  item: number;
+  nombre: string;
+  capas: number;
+  composicion: CapaMezcla[];
+}
+
+/** Mezcla editada para un item (`mezclaPersonalizada` del POST crear). */
+export interface MezclaPersonalizada {
+  capas: number;
+  composicion: CapaMezcla[];
+}
+
+/** Material o pigmento de mezcla para los desplegables. */
+export interface CatalogoMezcla {
+  id: number;
+  nombre: string;
 }
 
 /** Mezcla predefinida de BagPro (`GET api/ClientesOtItems/catalogos/mezclas`). */

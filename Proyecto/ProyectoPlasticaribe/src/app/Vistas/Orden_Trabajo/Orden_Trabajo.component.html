@@ -112,6 +112,9 @@
                   </span>
                   <button pButton class="p-button-danger" id="pdf" type="button" icon="pi pi-file-pdf"
                     (click)="pdfOrdenTrabajo()"></button>
+                  <!-- Formato 2 del PDF (en prueba); el botón anterior sigue con el formato actual -->
+                  <button pButton class="p-button-outlined p-button-danger" type="button" icon="pi pi-file"
+                    pTooltip="PDF formato nuevo (prueba)" tooltipPosition="top" (click)="pdfOrdenTrabajoV2()"></button>
                 </div>
               </div>
 
@@ -1412,6 +1415,31 @@
                       </div>
                     </ng-template>
                   </p-accordionTab>
+                  <!-- Datos del item guardados en Plasticaribe desde Crear Item (solo lectura) -->
+                  <p-accordionTab *ngIf="fichaComplementaria as ficha">
+                    <ng-template pTemplate="header">
+                      <div class="flex align-items-center">
+                        <i class="pi pi-bookmark mr-2"></i>
+                        <span class="vertical-align-middle">Datos Complementarios del Item</span>
+                      </div>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <div class="complemento-ot">
+                        <dl class="complemento-ot-datos">
+                          <ng-container *ngIf="ficha.codigoBarras"><dt>Código de Barras</dt><dd>{{ficha.codigoBarras}}</dd></ng-container>
+                          <ng-container *ngIf="ficha.repeticiones"><dt>Repeticiones</dt><dd>{{ficha.repeticiones}}</dd></ng-container>
+                          <ng-container *ngIf="ficha.pasoGuias"><dt>Paso entre Guías</dt><dd>{{ficha.pasoGuias}}</dd></ng-container>
+                          <ng-container *ngIf="ficha.ubicacionGuia"><dt>Ubicación de la Guía</dt><dd>{{ficha.ubicacionGuia}}</dd></ng-container>
+                          <ng-container *ngIf="ficha.largoContinuo"><dt>Largo</dt><dd>Continuo</dd></ng-container>
+                          <ng-container *ngIf="ficha.mezclaAjustada"><dt>Mezcla</dt><dd>Ajustada para este item (ver pestaña Mezclas)</dd></ng-container>
+                        </dl>
+                        <figure class="complemento-ot-embobinado" *ngIf="ficha.embobinado_Id">
+                          <img [src]="imagenEmbobinado(ficha.embobinado_Id)" [alt]="'Embobinado ' + ficha.embobinado_Id"/>
+                          <figcaption><b>Desembobinado final:</b> {{descripcionEmbobinado(ficha.embobinado_Id)}}</figcaption>
+                        </figure>
+                      </div>
+                    </ng-template>
+                  </p-accordionTab>
                 </p-accordion>
               </p-tabPanel>
 
@@ -1422,6 +1450,21 @@
                   <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning"
                     [style]="{width: '25px', height: '25px'}" (click)="verTutorial2()" pTooltip="Ver Tutorial"
                     tooltipPosition="left"></p-button>
+                </div>
+
+                <!-- Mezcla ajustada para el item en Crear Item: se muestra y se imprime en el PDF; la OT guarda la predefinida -->
+                <div class="mezcla-item-ajustada" *ngIf="mezclaItemAjustada as mezcla">
+                  <div class="mezcla-item-ajustada-aviso">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>La mezcla de este item se ajustó al crearlo. El PDF de la OT muestra esta composición; los consumos siguen con la mezcla predefinida.</span>
+                  </div>
+                  <div class="mezcla-item-ajustada-capas">
+                    <div class="mezcla-item-ajustada-capa" *ngFor="let capa of mezcla.composicion; let i = index">
+                      <b>Capa {{i + 1}} · {{capa.porcentaje}} %</b>
+                      <span *ngFor="let m of capa.materiales">{{m.nombre}}: {{m.porcentaje}} %</span>
+                      <span *ngFor="let p of capa.pigmentos" class="texto-secundario">{{p.nombre}}: {{p.porcentaje}} %</span>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Boton para crear Mezclas -->

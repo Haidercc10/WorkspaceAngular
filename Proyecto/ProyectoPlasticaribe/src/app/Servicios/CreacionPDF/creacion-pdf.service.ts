@@ -9,9 +9,13 @@ import { EncriptacionService } from '../Encriptacion/Encriptacion.service';
 import { ReImpresionEtiquetasService, ReImpresionEtiquetas } from '../ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { referenceWike } from './referenciaWiketiado';
 import { UtileriaService } from '../Utileria/utileria.service';
-import { catchError, map, Observable } from 'rxjs';
+import { catchError, forkJoin, from, map, Observable, of, switchMap } from 'rxjs';
 import { BagproService } from '../BagPro/Bagpro.service';
 import { Orden_TrabajoService } from '../OrdenTrabajo/Orden_Trabajo.service';
+import { FichaComplementariaItemService } from '../FichaComplementariaItem/FichaComplementariaItem.service';
+import { FichaComplementariaItem, descripcionEmbobinado, imagenEmbobinado } from 'src/app/Modelo/modelEmbobinado';
+import { MezclaDetalle } from 'src/app/Modelo/modelCrearItem';
+import { definicionPdfOrdenTrabajoV2 } from './pdf-orden-trabajo-v2';
 import { DatosPdfAsignacion, DetalleSolicitudMaterial, MaterialDetalleSolicitud, ResumenSolicitudOT, SubcategoriaAsignadaPdf, SubcategoriaDetalleSolicitud } from 'src/app/Modelo/modelFlujoMaterialProduccion';
 
 @Injectable({
@@ -28,6 +32,7 @@ export class CreacionPdfService {
     private util: UtileriaService,
     private ordenTrabajoService: Orden_TrabajoService,
     private bagProService: BagproService,
+    private fichaComplementariaService: FichaComplementariaItemService,
   ) { }
 
   /**
@@ -1046,9 +1051,10 @@ export class CreacionPdfService {
    * PDF con el formato común (cabecera con logo, NIT, título y paginado; marca de agua y márgenes) para un contenido
    * armado por el componente. Lo usa, por ejemplo, Pedidos de Productos (ReportePedidos_Zeus).
    * @param contenido Función que arma el contenido (pdfmake lo modifica al maquetarlo, por eso se pide una función).
+   * @param margenSuperior Espacio reservado para la cabecera; 85 basta para la cabecera de dos líneas y deja menos blanco.
    */
-  generarBlobFormatoComun(titulo: string, contenido: () => any[], tituloPestana: string = titulo, orientacion: 'portrait' | 'landscape' = 'portrait'): Observable<Blob> {
-    return this.generarBlobPDF(() => ({ titulo, tituloPestana, content: contenido(), orientacion }));
+  generarBlobFormatoComun(titulo: string, contenido: () => any[], tituloPestana: string = titulo, orientacion: 'portrait' | 'landscape' = 'portrait', margenSuperior: number = 120): Observable<Blob> {
+    return this.generarBlobPDF(() => ({ titulo, tituloPestana, content: contenido(), orientacion, margenSuperior }));
   }
 
   /**
@@ -1065,6 +1071,8 @@ export class CreacionPdfService {
     pageBreakBefore?: (nodo: any) => boolean;
     /** Orientación de la hoja; por defecto vertical. */
     orientacion?: 'portrait' | 'landscape';
+    /** Margen superior (espacio de la cabecera); por defecto 120. */
+    margenSuperior?: number;
   }): Observable<Blob> {
     return new Observable<Blob>(suscriptor => {
       try {
@@ -1072,14 +1080,14 @@ export class CreacionPdfService {
         const hora = moment().format('HH:mm:ss');
         // pdfmake modifica el contenido al maquetarlo: cada pasada arma el suyo con `contenido()`.
         const definicion = () => {
-          const { titulo, tituloPestana, content, tituloPorPagina, orientacion } = contenido();
+          const { titulo, tituloPestana, content, tituloPorPagina, orientacion, margenSuperior } = contenido();
           this.title = titulo;
           return {
             info: { title: tituloPestana },
             pageOrientation: orientacion ?? 'portrait',
             pageSize: 'LETTER',
             watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
-            pageMargins: [25, 120, 25, 35],
+            pageMargins: [25, margenSuperior ?? 120, 25, 35],
             header: tituloPorPagina
               ? (pagina: number, total: number) => (this.headerPDF(hoy, hora, tituloPorPagina(pagina), {}) as any)(pagina, total)
               : this.headerPDF(hoy, hora, titulo, {}),
@@ -1736,7 +1744,84 @@ export class CreacionPdfService {
     return this.ordenTrabajoService.GetOrdenTrabajo(ot, '').pipe(
       catchError(() => this.bagProService.GetOrdenTrabajo(ot)),
       map((datos: any) => (Array.isArray(datos) ? datos[0] : datos) ?? null),
+      switchMap((datos: any) => datos ? this.complementarDatosOT(datos) : of(null)),
     );
+  }
+
+  /**
+   * Agrega a los datos de la OT lo que se guarda aparte del item: la ficha complementaria de Plasticaribe
+   * (embobinado con su imagen, código de barras, repeticiones, guías, largo continuo) y, si la mezcla del item se
+   * ajustó en Crear Item, la composición guardada en BagPro en vez de la predefinida. Si algo falla, el PDF sale
+   * con los datos de siempre.
+   * @param datos Fila de la OT.
+   * @returns Los mismos datos con `fichaComplementaria`, `embobinadoImagen` y la mezcla del item cuando aplica.
+   */
+  complementarDatosOT(datos: any): Observable<any> {
+    const item = Number(datos.id_Producto);
+    if (!(item > 0)) return of(datos);
+    return this.fichaComplementariaService.obtener(item).pipe(
+      catchError(() => of(null)),
+      switchMap((ficha: FichaComplementariaItem | null) => {
+        if (!ficha) return of(datos);
+        return forkJoin({
+          imagen: ficha.embobinado_Id ? this.imagenComoDataUrl(imagenEmbobinado(ficha.embobinado_Id)) : of(null),
+          mezcla: ficha.mezclaAjustada
+            ? this.bagProService.GetFichaItem(item).pipe(map(f => f.mezclaComposicion ?? null), catchError(() => of(null)))
+            : of(null),
+        }).pipe(map(({ imagen, mezcla }) => ({
+          ...datos,
+          ...(mezcla ? this.camposMezclaOT(mezcla) : {}),
+          fichaComplementaria: ficha,
+          embobinadoImagen: imagen,
+        })));
+      }),
+    );
+  }
+
+  /**
+   * Lee una imagen de assets como data URL (pdfmake no carga rutas). Si no existe, devuelve null.
+   * @param ruta Ruta dentro de la aplicación.
+   * @returns Observable con el data URL o null.
+   */
+  private imagenComoDataUrl(ruta: string): Observable<string | null> {
+    const leer = async () => {
+      const respuesta = await fetch(ruta);
+      if (!respuesta.ok) return null;
+      const blob = await respuesta.blob();
+      if (!blob.type.startsWith('image/')) return null;
+      return await new Promise<string | null>(resolver => {
+        const lector = new FileReader();
+        lector.onload = () => resolver(lector.result as string);
+        lector.onerror = () => resolver(null);
+        lector.readAsDataURL(blob);
+      });
+    };
+    return from(leer()).pipe(catchError(() => of(null)));
+  }
+
+  /**
+   * Convierte la composición de la mezcla guardada en el item a los campos que usa el PDF de la OT
+   * (mezcla_PorcentajeCapaN, mXCN_nombre, pXCN_Nombre y sus porcentajes). Los huecos quedan en "NO APLICA".
+   * @param mezcla Composición de la mezcla del item en BagPro.
+   * @returns Campos de mezcla para la fila de la OT.
+   */
+  camposMezclaOT(mezcla: MezclaDetalle): any {
+    const campos: any = { mezcla_NroCapas: mezcla.capas, mezclaAjustada: true };
+    for (let c = 1; c <= 3; c++) {
+      const capa = mezcla.composicion?.[c - 1];
+      campos[`mezcla_PorcentajeCapa${c}`] = c <= mezcla.capas ? Number(capa?.porcentaje) || 0 : 0;
+      for (let n = 1; n <= 4; n++) {
+        const material = c <= mezcla.capas ? capa?.materiales?.[n - 1] : undefined;
+        campos[`m${n}C${c}_nombre`] = material?.nombre ?? 'NO APLICA MATERIAL';
+        campos[`mezcla_PorcentajeMaterial${n}_Capa${c}`] = Number(material?.porcentaje) || 0;
+      }
+      for (let n = 1; n <= 2; n++) {
+        const pigmento = c <= mezcla.capas ? capa?.pigmentos?.[n - 1] : undefined;
+        campos[`p${n}C${c}_Nombre`] = pigmento?.nombre ?? 'NO APLICA PIGMENTO';
+        campos[`mezcla_PorcentajePigmto${n}_Capa${c}`] = Number(pigmento?.porcentaje) || 0;
+      }
+    }
+    return campos;
   }
 
   /**
@@ -1764,6 +1849,16 @@ export class CreacionPdfService {
    * @param datos_ot Fila de la OT devuelta por Plasticaribe o BagPro.
    * @param usuario Nombre que se muestra en el pie como quien generó el documento.
    */
+  /**
+   * Arma el PDF de la OT con el formato 2 (en prueba, estilo del PDF de pedidos, dos hojas). No reemplaza
+   * a crearPdfOrdenTrabajo; usa los mismos datos de obtenerDatosOrdenTrabajo.
+   * @param datos_ot Fila de la OT devuelta por Plasticaribe o BagPro.
+   * @param usuario Nombre que se muestra en el pie como quien generó el documento.
+   */
+  crearPdfOrdenTrabajoV2(datos_ot: any, usuario: string) {
+    return pdfMake.createPdf(definicionPdfOrdenTrabajoV2(datos_ot, usuario));
+  }
+
   generarBlobOrdenTrabajo(datos_ot: any, usuario: string): Observable<Blob> {
     return new Observable<Blob>(suscriptor => {
       try {
@@ -1929,7 +2024,7 @@ export class CreacionPdfService {
       table: {
         widths: ['*'],
         body: [
-          [{ text: this.txtOT(datos_ot.mezcla_Nombre) == '' ? 'MATERIA PRIMA' : this.txtOT(datos_ot.mezcla_Nombre), style: 'titulosTablas' }]
+          [{ text: `${this.txtOT(datos_ot.mezcla_Nombre) == '' ? 'MATERIA PRIMA' : this.txtOT(datos_ot.mezcla_Nombre)}${datos_ot.mezclaAjustada ? ' (AJUSTADA PARA ESTE ITEM)' : ''}`, style: 'titulosTablas' }]
         ]
       },
       fontSize: 9,
@@ -2208,6 +2303,16 @@ export class CreacionPdfService {
   }
 
   /**
+   * Datos del item guardados en Plasticaribe desde Crear Item (ver complementarDatosOT).
+   * Van dentro de la sección de su proceso: código de barras y repeticiones en Impresión; guías, largo continuo
+   * y desembobinado final en Producto Terminado. Si el item no los tiene se devuelve un objeto vacío.
+   * @param datos_ot Datos de la OT consultada.
+   */
+  private fichaComplementariaOT(datos_ot): Partial<FichaComplementariaItem> {
+    return datos_ot?.fichaComplementaria ?? {};
+  }
+
+  /**
    * Coloca en la hoja 2 las tablas de cada proceso. El margen superior negativo acerca la primera fila
    * a la tabla del encabezado para reducir el espacio que deja el margen superior de la página.
    * El margen inferior separa estas tablas de los encabezados de lo que sigue (Cyrel / observaciones).
@@ -2329,60 +2434,33 @@ export class CreacionPdfService {
     }
   }
 
-  // Función que va a colocar en la hoja 2 la información del proceso de impresión
+  /**
+   * Coloca en la hoja 2 la información del proceso de impresión. Rodillo/pista y las tintas van de a dos por fila
+   * para dejar espacio al código de barras y las repeticiones (Crear Item) sin pasar a otra hoja.
+   * @param datos_ot Datos de la orden de trabajo consultada.
+   * @returns Nodo pdfmake con la tabla del proceso de impresión.
+   */
   private procesoImpresionOT(datos_ot) {
+    const ficha = this.fichaComplementariaOT(datos_ot);
+    const par = (titulo1: string, valor1: string, titulo2: string, valor2: string) => [
+      { text: titulo1, style: 'subtitulo' }, { text: valor1 },
+      { text: titulo2, style: 'subtitulo' }, { text: valor2 },
+    ];
+    const fila = (titulo: string, valor: string) => [{ text: titulo, style: 'subtitulo' }, { colSpan: 3, text: valor }, {}, {}];
+    const tipo = this.txtOT(datos_ot.tipo_Impresion);
     return {
       table: {
-        widths: ['*', '*'],
+        widths: ['auto', '*', 'auto', '*'],
         body: [
-          [
-            { colSpan: 2, text: `IMPRESIÓN`, style: 'titulosTablas', border: [true, true, true, true] },
-            {},
-          ],
-          [
-            { text: `Tipo Impresión: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tipo_Impresion) == 'NO APLICA' ? 'FLEXOGRAFIA' : this.txtOT(datos_ot.tipo_Impresion)}` }
-          ],
-          [
-            { text: `Rodillo N°: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.rodillo)}` }
-          ],
-          [
-            { text: `N° de Pista: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.pista)}` }
-          ],
-          [
-            { text: `Tinta 1: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta1)}` }
-          ],
-          [
-            { text: `Tinta 2: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta2)}` }
-          ],
-          [
-            { text: `Tinta 3: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta3)}` }
-          ],
-          [
-            { text: `Tinta 4: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta4)}` }
-          ],
-          [
-            { text: `Tinta 5: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta5)}` }
-          ],
-          [
-            { text: `Tinta 6: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta6)}` }
-          ],
-          [
-            { text: `Tinta 7: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta7)}` }
-          ],
-          [
-            { text: `Tinta 8: `, style: 'subtitulo' },
-            { text: `${this.txtOT(datos_ot.tinta8)}` }
-          ],
+          [{ colSpan: 4, text: `IMPRESIÓN`, style: 'titulosTablas', border: [true, true, true, true] }, {}, {}, {}],
+          fila(`Tipo Impresión: `, tipo == 'NO APLICA' ? 'FLEXOGRAFIA' : tipo),
+          par(`Rodillo N°: `, this.txtOT(datos_ot.rodillo), `N° de Pista: `, this.txtOT(datos_ot.pista)),
+          par(`Tinta 1: `, this.txtOT(datos_ot.tinta1), `Tinta 2: `, this.txtOT(datos_ot.tinta2)),
+          par(`Tinta 3: `, this.txtOT(datos_ot.tinta3), `Tinta 4: `, this.txtOT(datos_ot.tinta4)),
+          par(`Tinta 5: `, this.txtOT(datos_ot.tinta5), `Tinta 6: `, this.txtOT(datos_ot.tinta6)),
+          par(`Tinta 7: `, this.txtOT(datos_ot.tinta7), `Tinta 8: `, this.txtOT(datos_ot.tinta8)),
+          fila(`Código de Barras: `, this.txtOT(ficha.codigoBarras)),
+          fila(`Repeticiones: `, this.txtOT(ficha.repeticiones)),
         ]
       },
       layout: { defaultBorder: false, },
@@ -2391,12 +2469,34 @@ export class CreacionPdfService {
 
   /**
    * Coloca en la hoja 2 la información de producto terminado (sellado/corte), con la solapa al lado del fuelle.
+   * Los datos de sellado van de a dos por fila para dar espacio a los de corte de Crear Item (guías y desembobinado
+   * final con su imagen). Si el item es de largo continuo, el largo sale como "CONTINUO".
    * @param datos_ot Datos de la orden de trabajo consultada.
    * @returns Nodo pdfmake con la tabla de producto terminado.
    */
   private productoTermiandoOT(datos_ot) {
     // Las OT que vienen de BagPro no traen la solapa, por eso se toma 0 por defecto
     const solapa: number = Number(datos_ot.selladoCorte_Solapa) || 0;
+    const ficha = this.fichaComplementariaOT(datos_ot);
+    const embobinado = ficha.embobinado_Id ? descripcionEmbobinado(ficha.embobinado_Id) : '';
+    const par = (titulo1: string, valor1: string, titulo2: string, valor2: string, margen?: number[]) => [
+      { text: titulo1, style: 'subtitulo', margin: margen }, { text: valor1, margin: margen },
+      { text: titulo2, style: 'subtitulo', margin: margen }, { text: valor2, margin: margen },
+    ];
+    // Ocupa las 4 columnas: si la imagen fuera en una sola columna, su ancho fijo suma al mínimo de la tabla
+    // y pdfmake desborda toda la hoja hacia la derecha.
+    const filaEmbobinado = embobinado ? [[
+      {
+        colSpan: 4,
+        margin: [0, 4, 0, 0],
+        columnGap: 8,
+        columns: [
+          { width: '*', stack: [{ text: `Desembobinado Final:`, style: 'subtitulo' }, { text: embobinado, fontSize: 8, margin: [0, 2, 0, 0] }] },
+          ...(datos_ot.embobinadoImagen ? [{ width: 60, image: datos_ot.embobinadoImagen, fit: [60, 50] }] : []),
+        ],
+      },
+      {}, {}, {},
+    ]] : [];
     return {
       table: {
         widths: ['*', '*', '*', '*'],
@@ -2421,41 +2521,16 @@ export class CreacionPdfService {
           ],
           [
             { text: `${this.numOT(datos_ot.selladoCorte_Ancho)}   x`, alignment: 'center', },
-            { text: `${this.numOT(datos_ot.selladoCorte_Largo)}   x`, alignment: 'center', },
+            { text: `${ficha.largoContinuo ? 'CONTINUO' : this.numOT(datos_ot.selladoCorte_Largo)}   x`, alignment: 'center', },
             { text: `${this.numOT(datos_ot.selladoCorte_Fuelle)}`, alignment: 'center', },
             { text: `${this.numOT(solapa)}   ${this.txtOT(datos_ot.und_Extrusion)}`, alignment: 'center', },
           ],
-          [
-            // Margen superior: separa "Sellado" de la fila de medidas (Ancho / Largo / Fuelle / Solapa)
-            { text: `Sellado: `, style: 'subtitulo', margin: [0, 6, 0, 0] },
-            { colSpan: 3, text: `${this.txtOT(datos_ot.tpSellados_Nombre)}`, margin: [0, 6, 0, 0] },
-            {},
-            {},
-          ],
-          [
-            { text: `Margen: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.numOT(datos_ot.margen)}` },
-            {},
-            {},
-          ],
-          [
-            { text: `Peso Millar: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.numOT(datos_ot.selladoCorte_PesoMillar)}` },
-            {},
-            {},
-          ],
-          [
-            { text: `Cant. x Paquete: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.numOT(datos_ot.selladoCorte_CantBolsasPaquete)}` },
-            {},
-            {},
-          ],
-          [
-            { text: `Cant. x Bulto: `, style: 'subtitulo' },
-            { colSpan: 3, text: `${this.numOT(datos_ot.selladoCorte_CantBolsasBulto)}` },
-            {},
-            {},
-          ]
+          // Margen superior: separa los datos de la fila de medidas (Ancho / Largo / Fuelle / Solapa)
+          par(`Sellado: `, this.txtOT(datos_ot.tpSellados_Nombre), `Margen: `, this.numOT(datos_ot.margen), [0, 6, 0, 0]),
+          par(`Peso Millar: `, this.numOT(datos_ot.selladoCorte_PesoMillar), `Cant. x Paq.: `, this.numOT(datos_ot.selladoCorte_CantBolsasPaquete)),
+          par(`Cant. x Bulto: `, this.numOT(datos_ot.selladoCorte_CantBolsasBulto), `Paso Guías: `, this.txtOT(ficha.pasoGuias)),
+          [{ text: `Ubicación Guía: `, style: 'subtitulo' }, { colSpan: 3, text: this.txtOT(ficha.ubicacionGuia) }, {}, {}],
+          ...filaEmbobinado,
         ]
       },
       layout: { defaultBorder: false, },

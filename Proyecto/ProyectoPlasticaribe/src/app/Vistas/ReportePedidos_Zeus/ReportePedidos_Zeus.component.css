@@ -169,25 +169,25 @@ button.kpi:disabled {
   gap: 0.6rem;
 }
 
-.buscador {
-  flex: 1 1 18rem;
-  min-width: 14rem;
+/* Filtros en una rejilla de columnas iguales: todos del mismo ancho y alineados (el buscador ocupa una más) */
+.barra-filtros__rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.6rem;
+}
+
+.barra-filtros__rejilla .buscador {
+  grid-column: span 2;
 }
 
 .buscador input {
   width: 100%;
 }
 
-:host ::ng-deep .filtro {
-  width: 11rem;
-}
-
-:host ::ng-deep .filtro--ancho {
-  width: 15rem;
-}
-
-:host ::ng-deep .filtro.p-calendar {
-  width: 14rem;
+:host ::ng-deep .barra-filtros__rejilla .filtro,
+:host ::ng-deep .barra-filtros__rejilla .filtro.p-calendar {
+  width: 100%;
+  min-width: 0;
 }
 
 .etiqueta-grupo {
@@ -233,6 +233,10 @@ button.kpi:disabled {
   color: var(--rojo-texto);
 }
 
+:host ::ng-deep .boton-limpiar.p-button.p-button-outlined {
+  border-color: var(--gris-400);
+}
+
 /* ---------- Semáforo ---------- */
 .punto {
   display: inline-block;
@@ -244,7 +248,7 @@ button.kpi:disabled {
 
 .punto--completo { background-color: var(--texto-exito); }
 .punto--parcial { background-color: var(--texto-info); }
-.punto--sinStock { background-color: var(--gris-500); }
+.punto--sinStock { background-color: var(--texto-peligro); }
 
 /* ---------- Tabla ---------- */
 .cabecera-tabla {
@@ -298,6 +302,62 @@ button.kpi:disabled {
 
 :host ::ng-deep .tabla-pedidos .p-datatable-tbody > tr.fila-pedido--completo > td { border-left-color: var(--texto-exito); }
 :host ::ng-deep .tabla-pedidos .p-datatable-tbody > tr.fila-pedido--parcial > td { border-left-color: var(--texto-info); }
+:host ::ng-deep .tabla-pedidos .p-datatable-tbody > tr.fila-pedido--sinStock > td { border-left-color: var(--texto-peligro); }
+
+/* Días de atraso junto a la fecha de entrega */
+.dias-vencido {
+  margin-left: 0.3rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background-color: var(--fondo-peligro);
+  color: var(--texto-peligro);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.celda-entrega {
+  white-space: nowrap;
+}
+
+/* Paginación por pedidos */
+.pie-tabla {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-weight: normal;
+}
+
+.pie-tabla small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+:host ::ng-deep .paginador-pedidos.p-paginator {
+  padding: 0;
+  background: transparent;
+}
+
+/* Página activa con el rojo de marca (el tema la pinta azul) */
+:host ::ng-deep .paginador-pedidos .p-paginator-pages .p-paginator-page.p-highlight {
+  background: var(--fondo-acento);
+  border-color: var(--rojo-texto);
+  color: var(--rojo-texto);
+}
+
+:host ::ng-deep .paginador-pedidos .p-paginator-page:focus,
+:host ::ng-deep .paginador-pedidos .p-paginator-first:focus,
+:host ::ng-deep .paginador-pedidos .p-paginator-prev:focus,
+:host ::ng-deep .paginador-pedidos .p-paginator-next:focus,
+:host ::ng-deep .paginador-pedidos .p-paginator-last:focus {
+  box-shadow: 0 0 0 2px var(--rojoClaro);
+}
+
+:host ::ng-deep .control-pagina {
+  min-width: 9rem;
+}
 
 .fila-pedido__contenido {
   display: flex;
@@ -447,6 +507,59 @@ button.kpi:disabled {
   cursor: pointer;
 }
 
+.texto-accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.25rem;
+  color: var(--texto-info);
+  font-weight: 600;
+}
+
+/* Consolidado: dos paneles en una pista que se desliza (mismo patrón de Solicitud de Material) */
+.encabezado-modal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.carrusel {
+  overflow: hidden;
+}
+
+.carrusel__pista {
+  display: flex;
+  width: 200%;
+  transition: transform 0.35s ease;
+}
+
+.carrusel__pista--segundo {
+  transform: translateX(-50%);
+}
+
+.carrusel__panel {
+  flex: 0 0 50%;
+  width: 50%;
+  min-width: 0;
+  padding: 0 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carrusel__pista {
+    transition: none;
+  }
+}
+
+/* Asesor visto por última vez: se resalta al volver para no perder el hilo */
+:host ::ng-deep .fila-resaltada > td {
+  background-color: var(--fondo-acento) !important;
+}
+
+:host ::ng-deep .fila-resaltada > td:first-child {
+  box-shadow: inset 4px 0 0 var(--rojo);
+}
+
 @media (max-width: 768px) {
   .graficas {
     grid-template-columns: 1fr;
@@ -454,6 +567,10 @@ button.kpi:disabled {
 
   .fila-pedido__total {
     margin-left: 0;
+  }
+
+  .barra-filtros__rejilla .buscador {
+    grid-column: 1 / -1;
   }
 
   .vista-embebida {
