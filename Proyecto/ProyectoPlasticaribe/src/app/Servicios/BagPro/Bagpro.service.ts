@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
-import { CatalogoMezcla, CrearItemDto, FichaItem, ItemBusqueda, MezclaDetalle, ItemCreado, MezclaPredefinida, PresentacionBagPro, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
+import { CatalogoMezcla, CrearItemDto, FichaItem, ItemBusqueda, ItemCliente, MezclaDetalle, ItemCreado, MezclaPredefinida, PresentacionBagPro, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
 import { rollsToDelete } from 'src/app/Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { environment } from 'src/environments/environment';
 
@@ -202,6 +202,13 @@ export class BagproService {
    * @returns Observable con los items encontrados (código y nombre).
    */
   GetBuscarItems = (texto : string) : Observable<ItemBusqueda[]> => this.http.get<ItemBusqueda[]>(`${this.rutaBagPro}/ClientesOtItems/buscar`, { params: { texto } });
+
+  /**
+   * Items de un cliente (uno por código) con presentaciones, medidas, material, impresión y tintas, del más reciente
+   * al más antiguo. V1 temporal en BagPro mientras se completa la relación cliente/item en Plasticaribe.
+   * @param cliente Código del cliente en BagPro.
+   */
+  GetItemsCliente = (cliente : number) : Observable<ItemCliente[]> => this.http.get<ItemCliente[]>(`${this.rutaBagPro}/ClientesOtItems/cliente/${cliente}`);
 
   /**
    * Mezclas predefinidas de BagPro (bpMezclasPreDef) para la creación de items.
