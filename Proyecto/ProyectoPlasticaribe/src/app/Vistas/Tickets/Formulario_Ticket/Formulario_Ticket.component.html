@@ -1,0 +1,91 @@
+<!-- Animacion de Carga -->
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<!-- Mientras llegan los tipos de ticket y los permisos: campos de relleno con la forma del formulario -->
+<div *ngIf="cargandoInicial" class="row g-4 pt-3 carga-formulario" aria-busy="true">
+  <div [ngClass]="compacto ? 'col-12' : 'col-lg-8 col-md-8 col-sm-12'"><p-skeleton height="2.6rem"></p-skeleton></div>
+  <div [ngClass]="compacto ? 'col-12' : 'col-lg-4 col-md-4 col-sm-12'"><p-skeleton height="2.6rem"></p-skeleton></div>
+  <div class="col-12"><p-skeleton height="7.5rem"></p-skeleton></div>
+  <div class="col-12 d-flex justify-content-center gap-2 pt-2">
+    <p-skeleton width="8.5rem" height="2.6rem"></p-skeleton>
+    <p-skeleton width="8.5rem" height="2.6rem"></p-skeleton>
+  </div>
+</div>
+
+<form *ngIf="!cargandoInicial" [formGroup]="FormTickets" (ngSubmit)="enviarTickets()">
+  <div class="row g-4 pt-3">
+
+    <!-- Reportado por (solo soporte) -->
+    <div class="col-12" id="campoReportante" *ngIf="esSoporte">
+      <span class="p-float-label">
+        <p-dropdown formControlName="Reportante" inputId="reportante" [options]="reportantes"
+                    optionLabel="etiqueta" optionValue="id" [filter]="true" filterBy="etiqueta"
+                    [showClear]="true" [virtualScroll]="true" [virtualScrollItemSize]="38"
+                    emptyFilterMessage="No se encontraron usuarios" styleClass="w-100" appendTo="body"></p-dropdown>
+        <label for="reportante">Reportado por (opcional)</label>
+      </span>
+      <small class="texto-suave">Busque por nombre, ID o área. Si lo deja vacío, el ticket queda a su nombre.</small>
+    </div>
+
+    <!-- Asunto -->
+    <div [ngClass]="compacto ? 'col-12' : 'col-lg-8 col-md-8 col-sm-12'" id="campoAsunto">
+      <span class="p-float-label">
+        <input formControlName="Asunto" id="asunto" type="text" pInputText maxlength="150" autocomplete="off" appContadorCaracteres (input)="asuntoEnMayusculas($event)"/>
+        <label for="asunto">Asunto *</label>
+      </span>
+      <small class="p-error" *ngIf="FormTickets.get('Asunto')?.touched && FormTickets.get('Asunto')?.invalid">Escriba un asunto corto.</small>
+    </div>
+
+    <!-- Tipo -->
+    <div [ngClass]="compacto ? 'col-12' : 'col-lg-4 col-md-4 col-sm-12'" id="campoTipo">
+      <span class="p-float-label">
+        <p-dropdown formControlName="TipoTicket" inputId="tipoTicket" [options]="tiposTicket" optionLabel="nombre" optionValue="id" styleClass="w-100" appendTo="body"></p-dropdown>
+        <label for="tipoTicket">Tipo de ticket *</label>
+      </span>
+    </div>
+
+    <!-- Descripcion: el límite descuenta la nota de la página de origen, que se agrega al enviar -->
+    <div class="col-12" id="campoDescripcion">
+      <span class="p-float-label">
+        <textarea formControlName="Descripcion" id="descripcion" rows="5" [maxlength]="maxDescripcion" pInputTextarea appContadorCaracteres class="textarea-acotado"></textarea>
+        <label for="descripcion">Descripción *</label>
+      </span>
+      <small class="p-error" *ngIf="FormTickets.get('Descripcion')?.touched && FormTickets.get('Descripcion')?.invalid">Cuéntenos qué está pasando.</small>
+      <small class="texto-suave nota-pagina" *ngIf="paginaOrigen">
+        <i class="pi pi-map-marker"></i> Se anotará la página desde donde reporta: <b>{{paginaOrigen?.nombre}}</b>
+      </small>
+    </div>
+
+    <!-- Imágenes: desactivadas con IMAGENES_HABILITADAS (Formulario_Ticket.component.ts) hasta definir el cargue en producción -->
+    <div class="col-12" id="imagen" *ngIf="imagenesHabilitadas">
+      <div class="zona-imagenes" [class.arrastrando]="arrastrando"
+           (dragover)="$event.preventDefault(); arrastrando = true"
+           (dragleave)="arrastrando = false"
+           (drop)="soltarArchivos($event)">
+        <input #inputImagenes type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" multiple hidden (change)="seleccionarArchivos($event)">
+        <button pButton type="button" class="p-button-secondary p-button-sm" icon="pi pi-image" label="Elegir imágenes"
+                [disabled]="imagenes.length >= maxImagenes" (click)="inputImagenes.click()"></button>
+        <span class="texto-suave">o arrástrelas aquí, o pegue una captura con <strong>Ctrl+V</strong>. Solo .png o .jpg, máximo {{maxImagenes}} de 5 MB.</span>
+
+        <div class="miniaturas" *ngIf="imagenes.length">
+          <div class="miniatura" *ngFor="let img of imagenes; let i = index">
+            <img *ngIf="img.vistaPrevia" [src]="img.vistaPrevia" [alt]="img.archivo.name">
+            <button type="button" class="miniatura-quitar" (click)="quitarImagen(i)" pTooltip="Quitar" tooltipPosition="top"><i class="pi pi-times"></i></button>
+            <span class="miniatura-nombre" [title]="img.archivo.name">{{img.archivo.name}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="p-4 d-grid gap-2 d-md-flex justify-content-md-center">
+      <p-button label="Crear Ticket" type="submit" icon="pi pi-send" id="enviarTicket" iconPos="right" styleClass="p-button-danger" [disabled]="cargando"></p-button>
+      <p-button label="Limpiar Todo" icon="pi pi-eraser" id="limpiarTodo" iconPos="right" styleClass="p-button-secondary" (click)="limpiarTodo()"></p-button>
+    </div>
+  </div>
+</form>

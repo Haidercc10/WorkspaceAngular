@@ -6,6 +6,7 @@ import { modelUsabilidad_Modulos } from 'src/app/Modelo/modelUsabilidad_Modulos'
 import { UsabilidadModulosService } from 'src/app/Servicios/Usabilidad_Modulos/usabilidad-modulos.service';
 import { TicketsService, USUARIO_AVISO_TICKETS } from 'src/app/Servicios/Tickets/Tickets.service';
 import { Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 
 @Injectable({  providedIn: 'root' })
 
@@ -55,13 +56,11 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   calidad : boolean = false; // Variable que se usará para mostrar el módulo de calidad
   production : boolean = false; // Variable que se usará para mostrar el módulo de producción
 
-  avisoTicketsVisible : boolean = false; //Aviso de tickets abiertos sin revisar (una vez por sesión)
-  ticketsAbiertos : number = 0;
-
   constructor(private AppComponent : AppComponent,
     private svUseModules : UsabilidadModulosService,
     private ticketsService : TicketsService,
     private router : Router,
+    private confirmationService : ConfirmationService,
   ) { }
 
   ngOnInit() {
@@ -105,14 +104,25 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
     this.ticketsService.cargarCantidadesSoporte().subscribe(c => {
       TicketsService.marcarAvisoMostrado(); // aunque no haya tickets, no se vuelve a consultar al regresar a Inicio
       if (!c || c.abiertos <= 0) return;
-      this.ticketsAbiertos = c.abiertos;
-      this.avisoTicketsVisible = true;
+      this.avisarTicketsAbiertos(c.abiertos);
     });
   }
 
-  verTicketsAbiertos() {
-    this.avisoTicketsVisible = false;
-    this.router.navigateByUrl('/Gestion-Tickets');
+  /** Confirmación estándar (CLAUDE.md, "Confirmaciones"): acción principal en rojo, Cancelar en gris. */
+  private avisarTicketsAbiertos(abiertos : number) {
+    this.confirmationService.confirm({
+      key: 'avisoTickets',
+      header: 'Tickets pendientes',
+      message: `Tiene <b>${abiertos}</b> ${abiertos == 1 ? 'ticket abierto' : 'tickets abiertos'} sin revisar. ¿Desea verlos?`,
+      icon: 'pi pi-info-circle',
+      acceptLabel: 'Ver tickets',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      defaultFocus: 'accept',
+      dismissableMask: true,
+      accept: () => this.router.navigateByUrl('/Gestion-Tickets'),
+    });
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

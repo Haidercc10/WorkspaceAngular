@@ -96,8 +96,43 @@
 .grid-maquinas > .tarjeta-proceso {
     display: grid;
     grid-template-rows: subgrid;
+    /* minmax(0, 1fr): la columna no se estira al ancho de la tabla; si no cabe (celular), la tabla hace
+       scroll horizontal dentro de la tarjeta en vez de quedar cortada sin poder llegar al botón Ver */
+    grid-template-columns: minmax(0, 1fr);
     grid-row: span 2;
     row-gap: 0;
+}
+
+.grid-maquinas > .tarjeta-proceso > p-table {
+    min-width: 0;
+}
+
+/* Barras de scroll delgadas en las tablas (la global de styles.css solo fija el ancho de la vertical; la
+   horizontal quedaba con el grosor del navegador). Colores de la paleta. */
+/* Firefox (no tiene ::-webkit-scrollbar). En Chrome no se ponen: si están, ignora los ::-webkit-scrollbar de 5px */
+@supports (-moz-appearance: none) {
+    ::ng-deep .tabla-maquinas .p-datatable-wrapper {
+        scrollbar-width: thin;
+        scrollbar-color: var(--rojoClaro) transparent;
+    }
+}
+
+::ng-deep .tabla-maquinas .p-datatable-wrapper::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::ng-deep .tabla-maquinas .p-datatable-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::ng-deep .tabla-maquinas .p-datatable-wrapper::-webkit-scrollbar-thumb {
+    background: var(--rojoClaro);
+    border-radius: 999px;
+}
+
+::ng-deep .tabla-maquinas .p-datatable-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--rojo);
 }
 
 .tarjeta-proceso {

@@ -3,6 +3,8 @@
 
 <app-menuLateral *ngIf="this.ValidarRol"></app-menuLateral>
 <app-VistasFavoritas *ngIf="this.ValidarRol"></app-VistasFavoritas>
+<!-- Botón flotante para reportar a soporte (oculto en Tickets, Gestión de Tickets y login) -->
+<app-boton-soporte *ngIf="this.ValidarRol"></app-boton-soporte>
 
 <!--
 <ng-container *ngIf="ValidarRol">

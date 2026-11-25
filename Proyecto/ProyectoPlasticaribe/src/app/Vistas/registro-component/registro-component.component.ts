@@ -448,8 +448,12 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
       header: 'Inactivar usuarios',
       message: `¿Seguro que desea inactivar ${texto}? No podrán ingresar a la aplicación hasta que se activen de nuevo.`,
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí',
-      rejectLabel: 'No',
+      // Confirmación estándar (CLAUDE.md, "Confirmaciones"): acción principal en rojo con su verbo, Cancelar en gris
+      acceptLabel: 'Inactivar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      defaultFocus: 'accept',
       accept: () => this.inactivar(activos),
     });
   }

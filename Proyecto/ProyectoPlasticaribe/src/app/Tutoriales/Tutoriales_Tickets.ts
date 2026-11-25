@@ -2,6 +2,7 @@ import Step from 'shepherd.js/src/types/step';
 import { claseEstadoTicket, EstadoTicket } from 'src/app/Servicios/Tickets/Tickets.service';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { armar, paso } from 'src/app/Tutoriales/Tutoriales_Comun';
+import { IMAGENES_HABILITADAS } from 'src/app/Vistas/Tickets/Formulario_Ticket/Formulario_Ticket.component';
 
 /*
  * Tutoriales del módulo de Tickets. Los pasos se arman con funciones (no con arreglos fijos) para
@@ -65,7 +66,7 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
       `<p>Contamos con detalle qué pasó: en qué pantalla o equipo, qué estábamos haciendo y qué mensaje salió.</p>
        <p>Mientras más claro, más rápido lo pueden solucionar.</p>`, enNuevo('#campoDescripcion')),
 
-    paso('#imagen', 'Imágenes (opcional)',
+    IMAGENES_HABILITADAS && paso('#imagen', 'Imágenes (opcional)',
       `<p>Podemos adjuntar hasta <b>5 imágenes .png o .jpg</b> de máximo 5 MB:</p>
        <ul>
          <li>Con el botón <b>Elegir imágenes</b>.</li>
@@ -78,7 +79,7 @@ export function pasosTutorialTickets({ esSoporte, irAPestana } : ContextoTutoria
       `<p>Cuando hayamos llenado el asunto, el tipo y la descripción, presionamos este botón para enviar el ticket.</p>`, enNuevo('#enviarTicket')),
 
     paso('#limpiarTodo', 'Limpiar Todo',
-      `<p>Borra lo que hayamos escrito y las imágenes elegidas, para empezar de nuevo.</p>`, enNuevo('#limpiarTodo')),
+      `<p>Borra lo que hayamos escrito${IMAGENES_HABILITADAS ? ' y las imágenes elegidas' : ''}, para empezar de nuevo.</p>`, enNuevo('#limpiarTodo')),
 
     paso(null, 'Ticket creado',
       `<p>Al crear el ticket sale un mensaje en el centro de la pantalla con su <b>número</b>.</p>

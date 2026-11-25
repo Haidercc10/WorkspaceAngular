@@ -254,31 +254,4 @@
 
 /* La barra de pestañas (altura de los botones laterales, arrastre) usa los estilos globales de styles.css */
 
-/* Aviso de tickets abiertos sin revisar (tipo info, se adapta al tema con las variables globales) */
-.avisoTickets-titulo {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  font-weight: 700;
-  font-size: 1.15rem;
-  color: var(--texto-info);
-}
-
-.avisoTickets-cuerpo {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 8px;
-  background: var(--fondo-info);
-  color: var(--texto-fuerte);
-}
-
-.avisoTickets-cuerpo p {
-  margin: 0;
-}
-
-.avisoTickets-icono {
-  font-size: 2rem;
-  color: var(--texto-info);
-}
+/* El aviso de tickets abiertos sin revisar es una confirmación estándar (p-confirmDialog; CLAUDE.md, "Confirmaciones") */

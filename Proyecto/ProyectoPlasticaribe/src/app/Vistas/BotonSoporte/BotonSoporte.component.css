@@ -1,0 +1,125 @@
+/* ===== Botón flotante "Reportar incidente a soporte" ===== */
+
+/* Primer botón de la pila flotante (variables --flotante-* en styles.css): abajo a la derecha, encima del dock en
+   celular, por encima del contenido y por debajo de diálogos y paneles de PrimeNG (z-index 1100+).
+   Completo en pantallas grandes; semioculto solo en celular (ver la media query de abajo). */
+.boton-soporte {
+  position: fixed;
+  right: var(--flotante-margen);
+  bottom: var(--flotante-base);
+  z-index: 1020;
+  width: var(--flotante-tamano);
+  height: var(--flotante-tamano);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--rojo);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.25s ease, opacity 0.25s ease, background-color 0.15s ease;
+}
+
+.boton-soporte:hover,
+.boton-soporte:focus-visible {
+  background-color: var(--rojoHover);
+}
+
+/* Celular (mismo corte que la pila en styles.css): en pantalla angosta tapa más contenido, así que asoma la mitad
+   en el borde derecho y sale completo al pasar el cursor o al llegar con Tab; con el dedo, un toque lo abre. */
+@media (max-width: 768px) {
+  .boton-soporte {
+    transform: translateX(calc(var(--flotante-margen) + 50%));
+    opacity: 0.85;
+  }
+
+  .boton-soporte:hover,
+  .boton-soporte:focus-visible {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.boton-soporte:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--surface-card), 0 0 0 5px var(--rojo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton-soporte {
+    transition: none;
+  }
+}
+
+.boton-soporte-icono {
+  font-size: 1.5rem;
+}
+
+/* "+" en un círculo blanco sobre la esquina del ícono */
+.boton-soporte-mas {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.45rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #fff;
+  color: var(--rojo);
+}
+
+.boton-soporte-mas i {
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* ===== Panel lateral ===== */
+
+/* Sin máscara: la sombra lo separa de la página */
+:host ::ng-deep .panel-soporte {
+  width: 30rem;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Título a la izquierda y la X de cerrar a la derecha */
+:host ::ng-deep .panel-soporte .p-sidebar-header {
+  justify-content: space-between;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+/* En celular el panel ocupa toda la pantalla */
+@media (max-width: 576px) {
+  :host ::ng-deep .panel-soporte {
+    width: 100vw;
+  }
+}
+
+.panel-soporte-titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--rojo-texto);
+}
+
+/* ===== Aviso de ticket creado (mismo diseño que en la página de tickets) ===== */
+
+.toast-ticket {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.toast-ticket-icono {
+  font-size: 2rem;
+  color: var(--texto-exito);
+}
+
+.toast-ticket-titulo {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}

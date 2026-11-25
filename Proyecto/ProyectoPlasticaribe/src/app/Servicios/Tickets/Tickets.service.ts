@@ -134,7 +134,19 @@ export class TicketsService {
     return this.consultaSoporteEnCurso;
   }
 
-  getTipos = () : Observable<TipoTicket[]> => this.http.get<TipoTicket[]>(`${this.rutaPlasticaribeAPI}/Tickets/tipos`);
+  private tipos$ : Observable<TipoTicket[]> | null = null;
+
+  /**
+   * Tipos de ticket (catálogo igual para todos): se consultan una vez y se reutilizan, así el panel del botón flotante
+   * de soporte abre al instante después de la primera vez. Si la consulta falla, la siguiente vuelve a intentar.
+   */
+  getTipos() : Observable<TipoTicket[]> {
+    this.tipos$ ??= this.http.get<TipoTicket[]>(`${this.rutaPlasticaribeAPI}/Tickets/tipos`).pipe(
+      catchError(err => { this.tipos$ = null; throw err; }),
+      shareReplay(1),
+    );
+    return this.tipos$;
+  }
 
   getPermisos = () : Observable<{ esSoporte: boolean }> => this.http.get<{ esSoporte: boolean }>(`${this.rutaPlasticaribeAPI}/Tickets/permisos`);
 

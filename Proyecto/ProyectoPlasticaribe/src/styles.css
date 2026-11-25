@@ -25,6 +25,25 @@
   --gris-800: #343a40;
 }
 
+/* ==================== BOTONES FLOTANTES (ESQUINA INFERIOR DERECHA) ====================
+   Pila de botones fijos abajo a la derecha. El primero (abajo) es siempre el de "Reportar incidente a soporte"
+   (Vistas/BotonSoporte); los botones fijos de cada página se ponen encima, en la misma columna:
+     .mi-boton { position: fixed; right: var(--flotante-margen); bottom: var(--flotante-nivel-2); }
+   En celular la pila sube por encima del dock de accesos rápidos (barra inferior). */
+:root {
+  --flotante-tamano: 3.5rem;    /* diámetro del botón de soporte */
+  --flotante-margen: 1.25rem;   /* separación del borde derecho */
+  --flotante-separacion: 0.75rem;
+  --flotante-base: 1.25rem;     /* distancia del primer botón al borde inferior */
+  --flotante-nivel-2: calc(var(--flotante-base) + var(--flotante-tamano) + var(--flotante-separacion));
+}
+
+@media (max-width: 768px) {
+  :root {
+    --flotante-base: 8.5rem;    /* encima del dock: en celular mide ~7rem de alto + 0.5rem de margen + separación */
+  }
+}
+
 /* ==================== COLORES SEGÚN EL TEMA (CLARO / OSCURO) ====================
    En los CSS de las vistas no se deben escribir colores fijos de fondo o de texto (#fff, #000, #495057...):
    en modo oscuro quedan cajas blancas o textos que no se leen. Usar en su lugar:
@@ -1383,6 +1402,18 @@ input.campo-sin-cero:focus::placeholder {
 .p-dialog .p-dialog-footer > p-button .p-button,
 .p-confirm-dialog .p-dialog-footer .p-button {
   margin: 0;
+}
+
+/* ==================== CONFIRMACIONES (ESTÁNDAR) ====================
+   Toda confirmación nueva usa p-confirmDialog con este estándar (detalle y ejemplos en CLAUDE.md, "Confirmaciones"):
+   tarjeta blanca, título a la izquierda, X arriba a la derecha, mensaje con ícono según el caso
+   (pi-info-circle, pi-exclamation-triangle, pi-times-circle, pi-question-circle), acción principal en rojo del logo
+   (p-button-danger), Cancelar en gris (p-button-text p-button-secondary) y una tercera acción opcional en outline
+   (p-button-outlined p-button-danger). Reemplaza poco a poco al toast amarillo de confirmación.
+   El título se fija aquí con más especificidad para que reglas de otras vistas (p. ej. "::ng-deep .p-dialog
+   .p-dialog-title { color: #ff5252 }" de Reporte_Procesos_OT) no lo cambien. */
+.p-dialog.p-confirm-dialog .p-dialog-header .p-dialog-title {
+  color: var(--texto-fuerte);
 }
 
 /* Fila con desplazamiento horizontal por arrastre (directiva appArrastreHorizontal), como las pestañas de la página principal. */

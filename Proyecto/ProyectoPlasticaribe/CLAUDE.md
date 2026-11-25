@@ -43,6 +43,49 @@ La paleta está definida en `src/styles.css` (fuente de verdad; revisarla antes 
   nunca con `setInterval`.
 - Excepciones conocidas con colores fijos: PDF (pdfmake), el azul del tema PrimeNG lara y `.botonGris`.
 
+## Confirmaciones (estándar único)
+Toda confirmación o aviso que pida una decisión usa `p-confirmDialog` con este diseño. No crear diseños de
+confirmación distintos (recuadros de color, botones azules, toasts). Reemplaza poco a poco al toast amarillo de
+confirmación (`p-toast` con botones Sí/No) de las páginas que aún lo usan: al tocar una de esas páginas, migrarla.
+Ejemplos: Calendario (eliminar evento), registro-component (inactivar usuarios), PaginaPrincipal (tickets pendientes).
+- Tarjeta blanca del tema, título a la izquierda (sin ícono), botón X arriba a la derecha.
+- Mensaje con ícono según el caso: `pi pi-info-circle` (información), `pi pi-exclamation-triangle` (advertencia o
+  acción delicada), `pi pi-times-circle` (error), `pi pi-question-circle` (pregunta).
+- Acción principal: siempre el rojo del logo (`p-button-danger`) y con el verbo de la acción ("Eliminar",
+  "Inactivar", "Ver tickets"), no "Sí". Cancelar: gris (`p-button-text p-button-secondary`), texto "Cancelar".
+- Tercera acción (opcional): outline (`p-button-outlined p-button-danger`), entre Cancelar y la principal.
+- Enter acepta (`defaultFocus: 'accept'`); Esc o la X cancelan.
+- Solo colores de la paleta: no agregar estilos de color propios al confirm. styles.css solo fija el color del
+  título (`.p-dialog.p-confirm-dialog .p-dialog-title`) para que reglas `::ng-deep` de otras vistas no lo cambien.
+
+```html
+<p-confirmDialog key="eliminarEvento" [style]="{width: '28rem'}" [breakpoints]="{'640px': '92vw'}"></p-confirmDialog>
+```
+```ts
+this.confirmationService.confirm({
+  key: 'eliminarEvento',
+  header: 'Eliminar evento',
+  message: `¿Seguro que desea eliminar el evento <b>${nombre}</b>? Esta acción no se puede deshacer.`,
+  icon: 'pi pi-exclamation-triangle',
+  acceptLabel: 'Eliminar',
+  rejectLabel: 'Cancelar',
+  acceptButtonStyleClass: 'p-button-danger',
+  rejectButtonStyleClass: 'p-button-text p-button-secondary',
+  defaultFocus: 'accept',
+  accept: () => this.eliminar(),
+});
+```
+Con tercera acción, footer propio (el mensaje, el ícono y el título siguen saliendo de `confirm()`):
+```html
+<p-confirmDialog #cd key="guardarCambios" [style]="{width: '30rem'}" [breakpoints]="{'640px': '92vw'}">
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary" (click)="cd.reject()"></button>
+    <button pButton type="button" label="Guardar como borrador" icon="pi pi-file" class="p-button-outlined p-button-danger" (click)="cd.hide(); guardarBorrador()"></button>
+    <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-danger" (click)="cd.accept()"></button>
+  </ng-template>
+</p-confirmDialog>
+```
+
 ## Flujo de trabajo del usuario
 - El usuario publica, configura, depura y prueba en Visual Studio Community.
 - No modificar perfiles de publicación, appsettings.Production.json

@@ -22,10 +22,21 @@ span{
   margin-top: -5%;
 }
 
+/* Botón "Bajar": encima del botón flotante de soporte, en la misma columna (variables en styles.css) */
 .scroll {
   position: fixed;
-  bottom: 15px;
-  right: 15px;
+  bottom: var(--flotante-nivel-2);
+  right: var(--flotante-margen);
+  z-index: 1020;
+  /* Mismo diámetro que el botón de soporte, para que la pila quede alineada */
+  width: var(--flotante-tamano);
+  height: var(--flotante-tamano);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
  }
 
 .p-input-icon-left {

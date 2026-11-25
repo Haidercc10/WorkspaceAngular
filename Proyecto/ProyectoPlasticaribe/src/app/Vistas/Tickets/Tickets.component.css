@@ -2,10 +2,6 @@
   width: 100%;
 }
 
-textarea {
-  width: 100%;
-}
-
 /* Con :host para no cambiar las tarjetas de otras pantallas (sin él, la regla queda activa en toda la app). */
 :host ::ng-deep .p-card {
   align-items: center;
@@ -39,82 +35,11 @@ p-fileupload ::ng-deep button:hover, p-fileupload ::ng-deep span:hover {
 
 
 
-/* Sin [autoResize] (hace saltar el scroll): altura acotada con scroll propio */
-.textarea-acotado {
-  min-height: 7rem;
-  max-height: 18rem;
-  overflow-y: auto;
-  resize: vertical;
-}
-
-/* ---------- Imágenes del ticket ---------- */
-.zona-imagenes {
-  border: 2px dashed var(--surface-border);
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.zona-imagenes.arrastrando {
-  border-color: var(--rojo-texto);
-  background-color: var(--fondo-acento);
-}
+/* El textarea, la zona de imágenes y las miniaturas se movieron con el formulario a Formulario_Ticket.component.css */
 
 .texto-suave {
   color: var(--text-color-secondary);
   font-size: 0.875rem;
-}
-
-.miniaturas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  width: 100%;
-}
-
-.miniatura {
-  position: relative;
-  width: 110px;
-}
-
-.miniatura img {
-  width: 110px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid var(--surface-border);
-}
-
-.miniatura-quitar {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: var(--rojo);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 0.7rem;
-}
-
-.miniatura-nombre {
-  display: block;
-  font-size: 0.75rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.miniatura-quitar:hover {
-  background: var(--rojoHover);
 }
 
 .fila-clic {
