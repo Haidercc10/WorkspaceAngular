@@ -55,10 +55,10 @@
                   </span>
                 </ng-template>
               </div>
-              <button pButton type="button" label="Copiar Ficha" icon="pi pi-copy" class="p-button-danger"
+              <button pButton type="button" label="Copiar" icon="pi pi-copy" class="p-button-danger"
                 [loading]="copiando" [disabled]="copiando || guardando" (click)="copiarDesdeItem()"
                 pTooltip="Carga la ficha técnica del item buscado; el nombre queda vacío; presentación y precio se cargan para cambiarlos" tooltipPosition="top"></button>
-              <button pButton type="button" label="Limpiar Campos" icon="pi pi-eraser" class="p-button-secondary p-button-outlined"
+              <button pButton type="button" label="Limpiar" icon="pi pi-eraser" class="p-button-secondary p-button-outlined"
                 [disabled]="copiando || guardando" (click)="limpiarFormulario()" pTooltip="Vacía toda la ficha" tooltipPosition="top"></button>
               <small class="copiar-aviso" *ngIf="itemCopiado"><i class="pi pi-check-circle"></i> Ficha copiada del item {{itemCopiado}}. Revise presentación y precio y defina el nombre.</small>
             </div>
@@ -160,7 +160,7 @@
                     <label for="material"><i class="pi pi-database"></i> Material*</label>
                   </span>
                 </div>
-                <div class="col-sm-12 col-md-6 col-xxl-6">
+                <div class="col-sm-12 col-md-6 col-xxl-6 campo-mezcla">
                   <span class="p-float-label">
                     <p-dropdown formControlName="mezcla" inputId="mezcla" [options]="mezclas" optionValue="item"
                       optionLabel="nombre" [filter]="true" filterBy="nombre" [autoDisplayFirst]="false" appendTo="body"
@@ -172,6 +172,11 @@
                     </p-dropdown>
                     <label for="mezcla"><i class="pi pi-sitemap"></i> Mezcla*</label>
                   </span>
+                  <button pButton type="button" icon="pi pi-sliders-h" class="p-button-sm p-button-outlined boton-marca-borde" [loading]="cargandoMezcla"
+                    [disabled]="!formItem.get('mezcla')?.value || guardando" (click)="abrirMezcla()"
+                    pTooltip="Ver y ajustar los materiales y pigmentos de la mezcla para este item" tooltipPosition="top"
+                    aria-label="Ver y ajustar la mezcla"></button>
+                  <span class="tag-mezcla" *ngIf="mezclaEditada" pTooltip="La composición de este item difiere o viene del item copiado" tooltipPosition="top">Ajustada</span>
                 </div>
                 <div class="col-sm-12 col-md-6 col-xxl-3">
                   <span class="p-float-label">
@@ -195,9 +200,12 @@
                 </div>
                 <div class="col-sm-6 col-md-3">
                   <span class="p-float-label">
-                    <p-inputNumber formControlName="largo" inputId="largo" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                    <p-inputNumber formControlName="largo" inputId="largo" mode="decimal" [min]="0" [maxFractionDigits]="2"
+                      [readonly]="largoContinuo" [placeholder]="largoContinuo ? 'Continuo' : ''"></p-inputNumber>
                     <label for="largo"><i class="pi pi-arrows-v"></i> Largo{{requiereLargo ? '*' : ''}}</label>
                   </span>
+                  <p-checkbox *ngIf="esLamina" formControlName="largoContinuo" [binary]="true" inputId="largoContinuo" label="Largo continuo"
+                    class="mt-2" pTooltip="Lámina sin largo de corte: el largo no se exige y se guarda en 0" tooltipPosition="top"></p-checkbox>
                 </div>
                 <div class="col-sm-6 col-md-3">
                   <span class="p-float-label">
@@ -251,7 +259,7 @@
                   <div class="col-sm-6 col-md-4 col-xxl" *ngFor="let n of [1, 2, 3]">
                     <span class="p-float-label">
                       <p-inputNumber [formControlName]="'anchoExtrusion' + n" [inputId]="'anchoExtrusion' + n" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-                      <label [for]="'anchoExtrusion' + n"><i class="pi pi-arrows-h"></i> Ancho Ext. {{n}}</label>
+                      <label [for]="'anchoExtrusion' + n"><i class="pi pi-arrows-h"></i> Ancho {{n}}</label>
                     </span>
                   </div>
                 </div>
@@ -263,7 +271,7 @@
                 <div class="row g-4">
                   <div class="col-sm-6 col-md-4">
                     <span class="p-float-label">
-                      <p-dropdown formControlName="tipoImpresion" inputId="tipoImpresion" [options]="tiposImpresion" optionValue="tpImpresion_Id"
+                      <p-dropdown formControlName="tipoImpresion" inputId="tipoImpresion" [options]="tiposImpresionVisibles" optionValue="tpImpresion_Id"
                         optionLabel="tpImpresion_Nombre" [showClear]="true" [autoDisplayFirst]="false" appendTo="body"></p-dropdown>
                       <label for="tipoImpresion"><i class="pi pi-print"></i> Tipo Impresión</label>
                     </span>
@@ -290,6 +298,19 @@
                     <span class="p-float-label">
                       <input formControlName="gramaje" id="gramaje" type="text" pInputText class="mayusculas"/>
                       <label for="gramaje"><i class="pi pi-percentage"></i> Gramaje (ej. 500GR)</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <input formControlName="codigoBarras" id="codigoBarras" type="text" inputmode="numeric" maxlength="20" pInputText
+                        [class.ng-dirty]="formItem.get('codigoBarras')?.invalid" pTooltip="Solo dígitos; se conservan los ceros a la izquierda" tooltipPosition="top"/>
+                      <label for="codigoBarras"><i class="pi pi-qrcode"></i> Código de Barras</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <input formControlName="repeticiones" id="repeticiones" type="text" maxlength="50" pInputText class="mayusculas"/>
+                      <label for="repeticiones"><i class="pi pi-replay"></i> Repeticiones</label>
                     </span>
                   </div>
                   <div class="col-12">
@@ -345,9 +366,9 @@
                 </div>
               </div>
 
-              <!-- Sellado / Corte -->
-              <div class="detalle-proceso" *ngIf="procesoActivo('sellado') || procesoActivo('corte')">
-                <h5><i class="pi pi-inbox"></i> {{procesoActivo('sellado') && procesoActivo('corte') ? 'Sellado y Corte' : procesoActivo('sellado') ? 'Sellado' : 'Corte'}}</h5>
+              <!-- Sellado (lo propio del sellado ya no aparece en Corte) -->
+              <div class="detalle-proceso" *ngIf="procesoActivo('sellado')">
+                <h5><i class="pi pi-inbox"></i> Sellado</h5>
                 <div class="row g-4">
                   <div class="col-sm-6 col-md-4">
                     <span class="p-float-label">
@@ -374,14 +395,116 @@
                       <label for="pesoMillar"><i class="pi pi-chart-bar"></i> Peso Millar</label>
                     </span>
                   </div>
-                  <div class="col-sm-6 col-md-4">
-                    <span class="p-float-label">
-                      <p-inputNumber formControlName="peso" inputId="peso" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
-                      <label for="peso"><i class="pi pi-chart-bar"></i> Peso</label>
-                    </span>
+                  <!-- El peso es de los dos procesos: aquí solo si no lleva corte -->
+                  <div class="col-sm-6 col-md-4" *ngIf="!procesoActivo('corte')">
+                    <ng-container *ngTemplateOutlet="campoPeso"></ng-container>
                   </div>
                 </div>
               </div>
+
+              <!-- Corte -->
+              <div class="detalle-proceso" *ngIf="procesoActivo('corte')">
+                <h5><i class="pi pi-sort-alt"></i> Corte</h5>
+                <div class="row g-4">
+                  <div class="col-sm-6 col-md-4">
+                    <ng-container *ngTemplateOutlet="campoPeso"></ng-container>
+                  </div>
+                  <div class="col-sm-6 col-md-4">
+                    <span class="p-float-label">
+                      <input formControlName="pasoGuias" id="pasoGuias" type="text" maxlength="50" pInputText class="mayusculas"/>
+                      <label for="pasoGuias"><i class="pi pi-arrows-h"></i> Paso entre Guías</label>
+                    </span>
+                  </div>
+                  <div class="col-sm-12 col-md-4">
+                    <span class="p-float-label">
+                      <input formControlName="ubicacionGuia" id="ubicacionGuia" type="text" maxlength="100" pInputText class="mayusculas"/>
+                      <label for="ubicacionGuia"><i class="pi pi-map-marker"></i> Ubicación de la Guía</label>
+                    </span>
+                  </div>
+                  <div class="col-12">
+                    <div class="embobinado-campo" data-tutorial="embobinado">
+                      <span class="embobinado-etiqueta"><i class="pi pi-replay"></i> Desembobinado Final</span>
+                      <div class="embobinado-elegido" *ngIf="embobinadoElegido as tipo; else sinEmbobinado">
+                        <img [src]="imagenEmbobinado(tipo.id)" [alt]="'Embobinado ' + tipo.id"/>
+                        <span>{{descripcionEmbobinado(tipo.id)}}</span>
+                      </div>
+                      <ng-template #sinEmbobinado><small class="texto-secundario">Sin elegir</small></ng-template>
+                      <button pButton type="button" [label]="embobinadoElegido ? 'Cambiar' : 'Elegir'" icon="pi pi-images"
+                        class="p-button-sm p-button-outlined boton-marca-borde" [disabled]="guardando" (click)="selectorEmbobinado = true"></button>
+                      <p-button *ngIf="embobinadoElegido" icon="pi pi-times" styleClass="p-button-sm p-button-text p-button-danger"
+                        [disabled]="guardando" (click)="formItem.get('embobinado')?.setValue(null)" pTooltip="Quitar embobinado" tooltipPosition="top"></p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <ng-template #campoPeso>
+                <span class="p-float-label">
+                  <p-inputNumber formControlName="peso" inputId="peso" mode="decimal" [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                  <label for="peso"><i class="pi pi-chart-bar"></i> Peso</label>
+                </span>
+              </ng-template>
+
+              <!-- Mezcla del item: se carga la predefinida completa y se puede ajustar solo para este item -->
+              <p-dialog [header]="'Mezcla: ' + nombreMezcla" [(visible)]="modalMezcla" [modal]="true" [style]="{width: '70rem'}"
+                [breakpoints]="{'960px': '95vw'}" [draggable]="false" appendTo="body">
+                <ng-container *ngIf="edicionMezcla as e">
+                  <small class="texto-secundario d-block mb-3"><i class="pi pi-info-circle"></i>
+                    Los cambios aplican solo a este item; la mezcla predefinida no cambia. Las capas suman 100 % y los materiales de cada capa suman 100 %; los pigmentos son aditivos.</small>
+                  <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="mezcla-etiqueta">N° de capas</span>
+                    <p-selectButton [options]="opcionesCapasMezcla" [(ngModel)]="e.capas" [ngModelOptions]="{standalone: true}" styleClass="selector-capas-mezcla"></p-selectButton>
+                    <span class="mezcla-total" [class.mezcla-total-error]="totalCapasMezcla != 100">Capas: {{totalCapasMezcla}} %</span>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-sm-12" [ngClass]="e.capas == 1 ? 'col-lg-12' : e.capas == 2 ? 'col-lg-6' : 'col-lg-4'"
+                      *ngFor="let capa of e.composicion.slice(0, e.capas); let i = index">
+                      <div class="mezcla-capa">
+                        <div class="mezcla-capa-titulo">
+                          <span>Capa {{i + 1}}</span>
+                          <p-inputNumber [(ngModel)]="capa.porcentaje" [ngModelOptions]="{standalone: true}" [min]="0" [max]="100" [maxFractionDigits]="2"
+                            suffix=" %" inputStyleClass="mezcla-porcentaje"></p-inputNumber>
+                        </div>
+                        <span class="mezcla-subtitulo">Materiales <b [class.mezcla-total-error]="totalMaterialesCapa(i) != 100">({{totalMaterialesCapa(i)}} %)</b></span>
+                        <div class="mezcla-fila" *ngFor="let m of capa.materiales">
+                          <p-dropdown [options]="materialesMezcla" optionValue="id" optionLabel="nombre" [(ngModel)]="m.codigo" [ngModelOptions]="{standalone: true}"
+                            [filter]="true" filterBy="nombre" [showClear]="true" placeholder="Sin material" appendTo="body"></p-dropdown>
+                          <p-inputNumber [(ngModel)]="m.porcentaje" [ngModelOptions]="{standalone: true}" [min]="0" [max]="100" [maxFractionDigits]="2"
+                            suffix=" %" [disabled]="!m.codigo" inputStyleClass="mezcla-porcentaje"></p-inputNumber>
+                        </div>
+                        <span class="mezcla-subtitulo">Pigmentos</span>
+                        <div class="mezcla-fila" *ngFor="let p of capa.pigmentos">
+                          <p-dropdown [options]="pigmentosMezcla" optionValue="id" optionLabel="nombre" [(ngModel)]="p.codigo" [ngModelOptions]="{standalone: true}"
+                            [filter]="true" filterBy="nombre" [showClear]="true" placeholder="Sin pigmento" appendTo="body"></p-dropdown>
+                          <p-inputNumber [(ngModel)]="p.porcentaje" [ngModelOptions]="{standalone: true}" [min]="0" [max]="100" [maxFractionDigits]="2"
+                            suffix=" %" [disabled]="!p.codigo" inputStyleClass="mezcla-porcentaje"></p-inputNumber>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-template pTemplate="footer">
+                  <button *ngIf="mezclaEditada" pButton type="button" label="Usar la predefinida" icon="pi pi-undo" class="p-button-text boton-marca-texto" (click)="restaurarMezcla()"></button>
+                  <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-secondary" (click)="modalMezcla = false"></p-button>
+                  <p-button label="Aplicar al item" icon="pi pi-check" styleClass="p-button-danger" (click)="aplicarMezcla()"></p-button>
+                </ng-template>
+              </p-dialog>
+
+              <!-- Selector de embobinado: cuadro "Tipos de Embobinado" de Plasticaribe -->
+              <p-dialog header="Desembobinado Final" [(visible)]="selectorEmbobinado" [modal]="true" [style]="{width: '60rem'}"
+                [breakpoints]="{'960px': '95vw'}" [draggable]="false" appendTo="body">
+                <ng-container *ngFor="let grupo of gruposEmbobinado">
+                  <h6 class="embobinado-grupo">Embobinado {{grupo.nombre}}</h6>
+                  <div class="embobinado-rejilla">
+                    <button type="button" class="embobinado-opcion" *ngFor="let tipo of grupo.tipos"
+                      [class.elegido]="tipo.id == embobinadoElegido?.id" (click)="elegirEmbobinado(tipo)">
+                      <span class="embobinado-numero">{{tipo.id}}</span>
+                      <img [src]="imagenEmbobinado(tipo.id)" [alt]="'Embobinado ' + tipo.id" loading="lazy"/>
+                      <small><b>{{tipo.haciaMaquina}}</b> del diseño hacia la máquina. Fotocelda al lado {{tipo.fotocelda}}.</small>
+                    </button>
+                  </div>
+                </ng-container>
+              </p-dialog>
 
               <small class="texto-secundario" *ngIf="!algunProcesoActivo"><i class="pi pi-info-circle"></i> Seleccione los procesos por los que pasa el item.</small>
             </div>
@@ -513,11 +636,11 @@
       </p-dialog>
 
       <!-- Resultado de la creación -->
-      <div class="tarjeta-resultado mt-4" *ngIf="pasos.length > 0">
+      <div #tarjetaResultado class="tarjeta-resultado mt-4" [class.creando]="guardando" *ngIf="pasos.length > 0">
         <div class="resultado-cabecera">
           <span><i class="pi pi-flag"></i> Resultado de la creación</span>
           <div class="d-flex align-items-center gap-2">
-            <button *ngIf="ultimoCodigo && !guardando" pButton type="button" class="p-button-text p-button-sm" icon="pi pi-sync"
+            <button *ngIf="ultimoCodigo && !guardando" pButton type="button" class="p-button-text p-button-sm boton-marca-texto" icon="pi pi-sync"
               [label]="'Ver item ' + ultimoCodigo" (click)="tabActiva = 1"
               pTooltip="Abre el item en Estado de Sincronización" tooltipPosition="top"></button>
             <span class="pildora" [ngClass]="'pildora-' + resumenPasos.estado">{{resumenPasos.texto}}</span>

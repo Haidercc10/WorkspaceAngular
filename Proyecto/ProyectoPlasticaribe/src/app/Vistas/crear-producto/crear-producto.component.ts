@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Injectable, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, Injectable, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription, catchError, concatMap, finalize, forkJoin, from, map, of, retry, switchMap, throwError, timer, toArray } from 'rxjs';
-import { ArticuloZeus, CapaLaminadoItem, CrearItemDto, FichaItem, ItemBusqueda, ItemDuplicado, MezclaPredefinida, PresentacionBagPro, PresentacionItem, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
+import { ArticuloZeus, CapaLaminadoItem, CatalogoMezcla, CrearItemDto, MezclaPersonalizada, FichaItem, ItemBusqueda, ItemDuplicado, MezclaPredefinida, PresentacionBagPro, PresentacionItem, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { FormatosService } from 'src/app/Servicios/Formato/Formatos.service';
@@ -21,6 +21,8 @@ import { AppComponent } from 'src/app/app.component';
 import { alCambiarTema } from 'src/app/Servicios/Tema/Tema.service';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { ClaveTutorialCrearItem, pasosTutorialCrearItem } from 'src/app/Tutoriales/Tutoriales_CrearItem';
+import { FichaComplementariaItem, TIPOS_EMBOBINADO, TipoEmbobinado, descripcionEmbobinado, imagenEmbobinado } from 'src/app/Modelo/modelEmbobinado';
+import { FichaComplementariaItemService } from 'src/app/Servicios/FichaComplementariaItem/FichaComplementariaItem.service';
 
 /** Roles que pueden crear items y completar su sincronización (igual que crear/editar OT). */
 const ROLES_CREAR_ITEM: readonly number[] = [1, 98];
@@ -53,15 +55,26 @@ const UNIDADES_BAGPRO = [
 ];
 
 /** Secciones del formulario que dependen de un proceso; General y Nombre siempre están activas. */
-type SeccionProceso = 'extrusion' | 'impresion' | 'laminado' | 'selladoCorte';
+type SeccionProceso = 'extrusion' | 'impresion' | 'laminado' | 'sellado' | 'corte' | 'selladoCorte';
 
 /** Campos de cada sección de proceso: se deshabilitan (y no se envían) si el proceso no está marcado. */
 const CAMPOS_SECCION: Readonly<Record<SeccionProceso, readonly string[]>> = {
   extrusion: ['calibre', 'formatoExtrusion', 'tratado', 'anchoExtrusion1', 'anchoExtrusion2', 'anchoExtrusion3'],
-  impresion: ['tipoImpresion', 'tintas', 'rodillo', 'pista', 'cyrel', 'descripcionComercial', 'gramaje'],
+  impresion: ['tipoImpresion', 'tintas', 'rodillo', 'pista', 'cyrel', 'descripcionComercial', 'gramaje', 'codigoBarras', 'repeticiones'],
   laminado: [1, 2, 3].flatMap(n => [`capa${n}`, `calibreCapa${n}`, `cantidadCapa${n}`]),
-  selladoCorte: ['tipoSellado', 'cantidadBulto', 'pesoMillar', 'peso', 'perforacion'],
+  // Lo propio del sellado no aplica al corte (reunión 21-nov)
+  sellado: ['tipoSellado', 'cantidadBulto', 'pesoMillar', 'perforacion'],
+  corte: ['pasoGuias', 'ubicacionGuia', 'embobinado'],
+  // El peso es de los dos procesos
+  selladoCorte: ['peso'],
 };
+
+/** El tipo de impresión Rotograbado ya no se usa (reunión 21-nov): no se ofrece al crear. */
+const esRotograbado = (nombre: string | null | undefined): boolean => (nombre ?? '').toUpperCase().includes('ROTOGRAB');
+
+/** El formato lámina puede tener largo continuo (sin largo de corte). */
+const esFormatoLamina = (nombre: string | null | undefined): boolean =>
+  (nombre ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().includes('LAMINA');
 
 /** Presentación de BagPro → presentación del artículo en Zeus. */
 const PRESENTACION_ZEUS: Readonly<Record<string, string>> = { Kilo: 'KLS', Unidad: 'UND', Paquete: 'PAQ', MTS: 'MTS' };
@@ -184,6 +197,8 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
   itemCopiado: number | null = null;
 
   guardando: boolean = false;
+  /** Tarjeta "Resultado de la creación"; se centra en pantalla mientras avanzan las etapas. */
+  @ViewChild('tarjetaResultado') tarjetaResultado?: ElementRef<HTMLElement>;
   copiando: boolean = false;
   pasos: PasoGuardado[] = [];
 
@@ -226,7 +241,8 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     private estadosService: EstadosService,
     private existenciasService: ExistenciasProductosService,
     private msj: MensajesAplicacionService,
-    private tutoriales: TutorialesService,) {
+    private tutoriales: TutorialesService,
+    private fichaComplementariaService: FichaComplementariaItemService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formItem = this.frmBuilder.group({
@@ -268,6 +284,11 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       descripcionComercial: [{ value: null, disabled: true }],
       gramaje: [{ value: null, disabled: true }],
       tintas: [{ value: [], disabled: true }],
+      // Código de barras: solo dígitos, como texto para no perder los ceros a la izquierda
+      codigoBarras: [{ value: null, disabled: true }, Validators.pattern(/^\d{1,20}$/)],
+      repeticiones: [{ value: null, disabled: true }, Validators.maxLength(50)],
+      // Largo continuo (láminas): el largo deja de ser obligatorio
+      largoContinuo: [false],
       // Laminado
       laminado: [false],
       capa1: [{ value: null, disabled: true }], calibreCapa1: [{ value: null, disabled: true }], cantidadCapa1: [{ value: null, disabled: true }],
@@ -281,6 +302,10 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       pesoMillar: [{ value: null, disabled: true }],
       peso: [{ value: null, disabled: true }],
       perforacion: [{ value: null, disabled: true }],
+      // Corte
+      pasoGuias: [{ value: null, disabled: true }, Validators.maxLength(50)],
+      ubicacionGuia: [{ value: null, disabled: true }, Validators.maxLength(100)],
+      embobinado: [{ value: null, disabled: true }],
     });
 
     this.formPresentacion = this.frmBuilder.group({
@@ -298,6 +323,8 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     this.aplicarProcesos();
     // La sugerencia se escribe sin emitir eventos: cualquier cambio emitido por el campo nombre es del usuario
     this.formItem.get('nombre')?.valueChanges.subscribe(() => this.marcarNombreManual());
+    // Cambiar la mezcla del combo descarta lo editado de la anterior
+    this.formItem.get('mezcla')?.valueChanges.subscribe(() => this.mezclaEditada = null);
     this.suscripcionNombre = this.formItem.valueChanges.subscribe(() => this.recalcularNombre());
     // La primera vez que el usuario entra se muestra el tutorial (no dentro del modal de Pedido Externo)
     if (!this.embebido) this.tutoriales.iniciarPrimeraVez(ClaveTutorialCrearItem, this.AppComponent.storage_Id, () => this.pasosTutorial(), 1000);
@@ -318,9 +345,191 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     return ROLES_CREAR_ITEM.includes(Number(this.ValidarRol));
   }
 
-  /** Indica si el formato elegido exige largo (bolsa, camisilla, precorte u hoja). */
+  /** Indica si el formato elegido exige largo (bolsa, camisilla, precorte u hoja), salvo que sea de largo continuo. */
   get requiereLargo(): boolean {
-    return FORMATOS_CON_LARGO.includes(Number(this.formItem.get('formato')?.value));
+    return FORMATOS_CON_LARGO.includes(Number(this.formItem.get('formato')?.value)) && !this.largoContinuo;
+  }
+
+  /** Indica si el formato elegido es lámina (permite largo continuo). */
+  get esLamina(): boolean {
+    const formato = Number(this.formItem.get('formato')?.value);
+    return esFormatoLamina(this.formatos.find(f => f.codigo == formato)?.nombre);
+  }
+
+  /** Largo continuo marcado (solo cuenta en láminas). */
+  get largoContinuo(): boolean {
+    return this.esLamina && !!this.formItem.get('largoContinuo')?.value;
+  }
+
+  /** Tipos de impresión que se ofrecen (sin Rotograbado, descontinuado). */
+  get tiposImpresionVisibles(): any[] {
+    return this.tiposImpresion.filter(t => !esRotograbado(t.tpImpresion_Nombre));
+  }
+
+  /** Tipos de embobinado del cuadro de Plasticaribe (1-8 exterior, 9-16 interior). */
+  readonly gruposEmbobinado = (['Exterior', 'Interior'] as const).map(nombre => ({ nombre, tipos: TIPOS_EMBOBINADO.filter(t => t.grupo == nombre) }));
+  readonly imagenEmbobinado = imagenEmbobinado;
+  readonly descripcionEmbobinado = descripcionEmbobinado;
+
+  /** Visibilidad del selector de embobinado. */
+  selectorEmbobinado: boolean = false;
+
+  /** Tipo de embobinado elegido (null si ninguno). */
+  get embobinadoElegido(): TipoEmbobinado | null {
+    const id = this.formItem.get('embobinado')?.value;
+    return TIPOS_EMBOBINADO.find(t => t.id == id) ?? null;
+  }
+
+  /**
+   * Elige un tipo de embobinado desde el selector y lo cierra.
+   * @param tipo Tipo elegido.
+   * @returns No retorna un valor.
+   */
+  elegirEmbobinado(tipo: TipoEmbobinado) {
+    this.formItem.get('embobinado')?.setValue(tipo.id);
+    this.selectorEmbobinado = false;
+  }
+
+  /** Mezcla editada solo para este item (null = se usa la predefinida tal cual). No cambia bpMezclasPreDef. */
+  mezclaEditada: MezclaPersonalizada | null = null;
+  /** Visibilidad del modal de la mezcla. */
+  modalMezcla: boolean = false;
+  /** Cargando el detalle de la mezcla. */
+  cargandoMezcla: boolean = false;
+  /** Copia de trabajo del modal: siempre 3 capas con 4 materiales y 2 pigmentos (huecos con código null). */
+  edicionMezcla: { capas: number, composicion: { porcentaje: number, materiales: { codigo: number | null, porcentaje: number }[], pigmentos: { codigo: number | null, porcentaje: number }[] }[] } | null = null;
+  materialesMezcla: CatalogoMezcla[] = [];
+  pigmentosMezcla: CatalogoMezcla[] = [];
+  readonly opcionesCapasMezcla = [1, 2, 3];
+
+  /** Nombre de la mezcla elegida en el combo. */
+  get nombreMezcla(): string {
+    const item = this.formItem.get('mezcla')?.value;
+    return this.mezclas.find(m => m.item == item)?.nombre ?? '';
+  }
+
+  /**
+   * Abre el modal con la composición de la mezcla: la editada si ya hay, o la predefinida de BagPro.
+   * @returns No retorna un valor.
+   */
+  abrirMezcla() {
+    const item = Number(this.formItem.get('mezcla')?.value);
+    if (!(item > 0)) { this.msj.mensajeAdvertencia('Elija primero una mezcla'); return; }
+    if (this.materialesMezcla.length == 0) this.bagProService.GetMaterialesMezcla().subscribe({ next: d => this.materialesMezcla = d ?? [], error: () => { } });
+    if (this.pigmentosMezcla.length == 0) this.bagProService.GetPigmentosMezcla().subscribe({ next: d => this.pigmentosMezcla = d ?? [], error: () => { } });
+    if (this.mezclaEditada) { this.edicionMezcla = this.aEdicion(this.mezclaEditada); this.modalMezcla = true; return; }
+    this.cargandoMezcla = true;
+    this.bagProService.GetMezclaDetalle(item).pipe(finalize(() => this.cargandoMezcla = false)).subscribe({
+      next: detalle => { this.edicionMezcla = this.aEdicion(detalle); this.modalMezcla = true; },
+      error: (error: HttpErrorResponse) => this.msj.mensajeError('No fue posible cargar la mezcla', this.detalleError(error), 6000),
+    });
+  }
+
+  /**
+   * Convierte una mezcla a la copia de trabajo del modal (3 capas con todos los huecos).
+   * @param mezcla Mezcla con capas y composición.
+   * @returns Copia de trabajo.
+   */
+  private aEdicion(mezcla: MezclaPersonalizada) {
+    const capas = Math.min(Math.max(Number(mezcla.capas) || 1, 1), 3);
+    const huecos = (lista: any[] | undefined, n: number) => Array.from({ length: n }, (_, i) => ({ codigo: lista?.[i]?.codigo ?? null, porcentaje: Number(lista?.[i]?.porcentaje) || 0 }));
+    return {
+      capas,
+      composicion: [0, 1, 2].map(i => ({
+        porcentaje: Number(mezcla.composicion?.[i]?.porcentaje) || 0,
+        materiales: huecos(mezcla.composicion?.[i]?.materiales, 4),
+        pigmentos: huecos(mezcla.composicion?.[i]?.pigmentos, 2),
+      })),
+    };
+  }
+
+  /** Suma con dos decimales. */
+  private sumar = (valores: number[]) => Math.round(valores.reduce((t, v) => t + (Number(v) || 0), 0) * 100) / 100;
+
+  /** % total de las capas en uso. */
+  get totalCapasMezcla(): number {
+    return this.edicionMezcla ? this.sumar(this.edicionMezcla.composicion.slice(0, this.edicionMezcla.capas).map(c => c.porcentaje)) : 0;
+  }
+
+  /**
+   * % total de los materiales de una capa (los pigmentos son aditivos y no suman).
+   * @param indice Capa (0-2).
+   * @returns Suma de los materiales.
+   */
+  totalMaterialesCapa(indice: number): number {
+    return this.sumar((this.edicionMezcla?.composicion[indice]?.materiales ?? []).filter(m => m.codigo).map(m => m.porcentaje));
+  }
+
+  /**
+   * Valida la mezcla del modal y la deja como mezcla del item. Reglas de BagPro: las capas suman 100 % y los
+   * materiales de cada capa suman 100 %; los pigmentos son aditivos.
+   * @returns No retorna un valor.
+   */
+  aplicarMezcla() {
+    const e = this.edicionMezcla;
+    if (!e) return;
+    const errores: string[] = [];
+    if (this.totalCapasMezcla != 100) errores.push(`Las capas suman ${this.totalCapasMezcla} % y deben sumar 100 %.`);
+    for (let i = 0; i < e.capas; i++) {
+      const capa = e.composicion[i];
+      if (!(capa.porcentaje > 0)) errores.push(`La capa ${i + 1} debe tener un porcentaje mayor que 0.`);
+      if (this.totalMaterialesCapa(i) != 100) errores.push(`Los materiales de la capa ${i + 1} suman ${this.totalMaterialesCapa(i)} % y deben sumar 100 %.`);
+      if ([...capa.materiales, ...capa.pigmentos].some(c => c.codigo && !(c.porcentaje > 0))) errores.push(`En la capa ${i + 1} hay materiales o pigmentos sin porcentaje.`);
+    }
+    if (errores.length) { this.msj.mensajeAdvertencia('Revise la mezcla', errores.join(' '), 8000); return; }
+    const compactar = (lista: { codigo: number | null, porcentaje: number }[]) => lista.filter(c => c.codigo).map(c => ({ codigo: Number(c.codigo), porcentaje: Number(c.porcentaje) }));
+    this.mezclaEditada = {
+      capas: e.capas,
+      composicion: e.composicion.slice(0, e.capas).map(c => ({ porcentaje: Number(c.porcentaje), materiales: compactar(c.materiales), pigmentos: compactar(c.pigmentos) })),
+    };
+    this.modalMezcla = false;
+    this.msj.mensajeInformacion('Mezcla del item actualizada', 'Los cambios aplican solo a este item; la mezcla predefinida no cambia.', 5000);
+    // Si quedó igual a la predefinida (p. ej. se pulsó Aplicar sin cambiar nada), el item no se marca como ajustado
+    this.descartarSiEsPredefinida();
+  }
+
+  /**
+   * Compara la mezcla editada con la predefinida de BagPro y, si son iguales (mismas capas, porcentajes,
+   * materiales y pigmentos), la descarta: el item usa la predefinida y no queda marcado como "mezcla ajustada".
+   * Si la consulta falla se deja la editada, que es lo que el usuario ve.
+   * @returns No retorna un valor.
+   */
+  private descartarSiEsPredefinida() {
+    const editada = this.mezclaEditada;
+    const item = Number(this.formItem.get('mezcla')?.value);
+    if (!editada || !(item > 0)) return;
+    this.bagProService.GetMezclaDetalle(item).subscribe({
+      next: predefinida => {
+        if (this.mezclaEditada === editada && this.firmaMezcla(editada) == this.firmaMezcla(predefinida)) this.mezclaEditada = null;
+      },
+      error: () => { },
+    });
+  }
+
+  /**
+   * Texto que resume una mezcla para compararla: por capa en uso, su % y los códigos con % de materiales y pigmentos
+   * (sin los huecos vacíos ni los códigos "no aplica" 1 y 2001).
+   * @param mezcla Mezcla a resumir.
+   * @returns Firma de la mezcla.
+   */
+  private firmaMezcla(mezcla: MezclaPersonalizada): string {
+    const componentes = (lista: { codigo: number | null, porcentaje: number }[] | undefined) => (lista ?? [])
+      .filter(c => c.codigo && ![1, 2001].includes(Number(c.codigo)))
+      .map(c => `${Number(c.codigo)}:${Number(c.porcentaje) || 0}`)
+      .join(',');
+    const capas = Number(mezcla.capas) || mezcla.composicion?.length || 0;
+    return (mezcla.composicion ?? []).slice(0, capas)
+      .map(c => `${Number(c.porcentaje) || 0}|${componentes(c.materiales)}|${componentes(c.pigmentos)}`)
+      .join(';');
+  }
+
+  /**
+   * Descarta las ediciones y vuelve a la mezcla predefinida.
+   * @returns No retorna un valor.
+   */
+  restaurarMezcla() {
+    this.mezclaEditada = null;
+    this.modalMezcla = false;
   }
 
   /** Indica si el formato elegido es camisilla (se nombra como biodegradable). */
@@ -416,7 +625,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         return n > 0 ? `${n} ${n == 1 ? 'capa' : 'capas'}` : 'Sin capas';
       }
       case 'sellado': return this.tiposSellado.find(t => t.tpSellado_Id == v.tipoSellado)?.tpSellados_Nombre ?? 'Sin tipo de sellado';
-      default: return 'Con corte';
+      default: return this.embobinadoElegido ? `Embobinado N° ${this.embobinadoElegido.id}` : 'Sin embobinado';
     }
   }
 
@@ -683,6 +892,9 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     this.copiando = true;
     this.bagProService.GetFichaItem(codigo).pipe(finalize(() => this.copiando = false)).subscribe({
       next: ficha => {
+        // Una ficha nueva empieza otra creación: se quita el resultado de la creación anterior
+        this.pasos = [];
+        this.ultimoCodigo = null;
         this.cargarFicha(ficha);
         // Deja el item elegido bloqueado en la barra (se cambia con la X)
         if (!this.itemCopiaElegido) this.busquedaCopia.setValue({ codigo, nombre: ficha.nombre ?? '', etiqueta: `${codigo}${ficha.nombre ? ' - ' + ficha.nombre : ''}` });
@@ -711,6 +923,9 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     if (tintasFaltantes.length) this.tintas = [...this.tintas, ...tintasFaltantes];
     if (ficha.mezcla && !this.mezclas.some(m => m.item == ficha.mezcla)) this.mezclas = [...this.mezclas, { item: ficha.mezcla, nombre: ficha.mezclaNom || `Mezcla ${ficha.mezcla}`, capas: null }];
     this.itemCopiado = ficha.clienteItems;
+    // Rotograbado ya no se ofrece como tipo de impresión: se deja vacío para que elijan otro
+    const tipoImpresionCopiado = this.tiposImpresion.find(t => t.tpImpresion_Id == ficha.tipoImpresion);
+    const tipoImpresion = esRotograbado(tipoImpresionCopiado?.tpImpresion_Nombre) ? null : (ficha.tipoImpresion ?? null);
 
     this.formItem.patchValue({
       cliente: ficha.cliente ? { codBagpro: String(ficha.cliente), nombreComercial: ficha.clienteNom } : null,
@@ -746,7 +961,8 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     }, { emitEvent: false });
     this.aplicarProcesos();
     this.formItem.patchValue({
-      tipoImpresion: ficha.tipoImpresion ?? null,
+      tipoImpresion,
+      codigoBarras: null, repeticiones: null, pasoGuias: null, ubicacionGuia: null, embobinado: null, largoContinuo: false,
       rodillo: ficha.rodillo ?? null,
       pista: ficha.pista ?? null,
       cyrel: !!ficha.cyrel,
@@ -758,6 +974,13 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       ...this.bioDesdeNombre(Number(ficha.formato) == FORMATO_CAMISILLA ? ficha.nombre : null),
     }, { emitEvent: false });
     if (ficha.rotograbado) this.msj.mensajeAdvertencia('Proceso de Rotograbado', 'El item tenía Rotograbado, que ya no existe; se cargó como Impresión.');
+    if (ficha.tipoImpresion && tipoImpresion == null) this.msj.mensajeAdvertencia('Tipo de impresión', 'El item tenía impresión por Rotograbado, que ya no se usa; elija otro tipo de impresión.', 6000);
+    if (ficha.clienteItems) this.cargarComplemento(ficha.clienteItems);
+    // La composición real del item copiado queda como mezcla del item nuevo solo si difiere de la predefinida;
+    // si es igual, el item nuevo usa la predefinida y no se marca como ajustada.
+    const comp = ficha.mezclaComposicion;
+    this.mezclaEditada = comp?.composicion?.length ? { capas: comp.capas || comp.composicion.length, composicion: comp.composicion } : null;
+    this.descartarSiEsPredefinida();
     // El nombre queda vacío: no se recalcula hasta que el usuario pulse "Sugerir" o lo escriba
     this.nombreManual = true;
   }
@@ -810,6 +1033,8 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     if (v.presentacion == 'Paquete' && !(Number(v.cantidadPaquete) > 0)) errores.push('La presentación Paquete requiere las unidades por paquete.');
     if (v.extrusion && !(Number(v.calibre) > 0)) errores.push('El calibre debe ser mayor que 0 cuando el item lleva extrusión.');
     if ((v.nombre ?? '').toString().trim().length < 3) errores.push('El nombre es obligatorio (mínimo 3 caracteres).');
+    if (v.impresion && this.formItem.get('codigoBarras')?.invalid) errores.push('El código de barras solo admite dígitos (máximo 20).');
+    if (['repeticiones', 'pasoGuias', 'ubicacionGuia'].some(campo => this.formItem.get(campo)?.enabled && this.formItem.get(campo)?.invalid)) errores.push('Repeticiones o datos de las guías superan el largo permitido.');
     const numericos = ['precio', 'cantidadPaquete', 'ancho', 'largo', 'fuelle', 'calibre', 'anchoExtrusion1', 'anchoExtrusion2', 'anchoExtrusion3',
       'rodillo', 'pista', 'calibreCapa1', 'cantidadCapa1', 'calibreCapa2', 'cantidadCapa2', 'calibreCapa3', 'cantidadCapa3', 'cantidadBulto', 'pesoMillar', 'peso'];
     if (numericos.some(campo => this.formItem.get(campo)?.enabled !== false && Number(v[campo]) < 0)) errores.push('No se permiten valores negativos.');
@@ -841,7 +1066,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       tratado: ext ? decimal(v.tratado) : null,
       unidad: Number(v.unidad),
       ancho: Number(v.ancho),
-      largo: Number(v.largo) || 0,
+      largo: this.largoContinuo ? 0 : (Number(v.largo) || 0),
       fuelle: Number(v.fuelle) || 0,
       calibre: ext ? (Number(v.calibre) || 0) : 0,
       anchoExtrusion1: ext ? decimal(v.anchoExtrusion1) : null,
@@ -859,16 +1084,63 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       pista: v.impresion ? decimal(v.pista) : null,
       tintas: v.impresion ? [...(v.tintas ?? [])].slice(0, 8) : [],
       capasLaminado: capas,
-      tipoSellado: sc ? decimal(v.tipoSellado) : null,
+      tipoSellado: v.sellado ? decimal(v.tipoSellado) : null,
       cantidadPaquete: decimal(v.cantidadPaquete),
-      cantidadBulto: sc ? decimal(v.cantidadBulto) : null,
-      pesoMillar: sc ? decimal(v.pesoMillar) : null,
+      cantidadBulto: v.sellado ? decimal(v.cantidadBulto) : null,
+      pesoMillar: v.sellado ? decimal(v.pesoMillar) : null,
       peso: sc ? decimal(v.peso) : null,
       presentacion: v.presentacion,
       precio: Number(v.precio),
       vendedor: v.vendedor ? String(v.vendedor).padStart(3, '0') : null,
       observacion: (v.observacion ?? '').toString().trim() || null,
+      mezclaPersonalizada: this.mezclaEditada,
     };
+  }
+
+  /**
+   * Arma los datos que no existen en BagPro y se guardan en Plasticaribe: código de barras y repeticiones (impresión),
+   * paso entre guías, ubicación de la guía y embobinado (corte) y largo continuo (láminas).
+   * @returns Ficha complementaria, o null si el item no lleva ninguno de esos datos.
+   */
+  construirComplemento(): FichaComplementariaItem | null {
+    const v = this.formItem.getRawValue();
+    const texto = (valor: any, mayusculas = false) => {
+      const t = (valor ?? '').toString().trim();
+      return t ? (mayusculas ? t.toUpperCase() : t) : null;
+    };
+    const ficha: FichaComplementariaItem = {
+      prod_Id: 0,
+      codigoBarras: v.impresion ? texto(v.codigoBarras) : null,
+      repeticiones: v.impresion ? texto(v.repeticiones, true) : null,
+      pasoGuias: v.corte ? texto(v.pasoGuias, true) : null,
+      ubicacionGuia: v.corte ? texto(v.ubicacionGuia, true) : null,
+      embobinado_Id: v.corte && v.embobinado ? Number(v.embobinado) : null,
+      largoContinuo: this.largoContinuo,
+      mezclaAjustada: !!this.mezclaEditada,
+    };
+    const tieneDatos = ficha.largoContinuo || ficha.mezclaAjustada || [ficha.codigoBarras, ficha.repeticiones, ficha.pasoGuias, ficha.ubicacionGuia, ficha.embobinado_Id].some(x => x != null);
+    return tieneDatos ? ficha : null;
+  }
+
+  /**
+   * Carga en el formulario la ficha complementaria del item copiado (si no tiene, no hace nada).
+   * @param codigo Código del item copiado.
+   * @returns No retorna un valor.
+   */
+  private cargarComplemento(codigo: number) {
+    this.fichaComplementariaService.obtener(codigo).subscribe({
+      next: ficha => this.formItem.patchValue({
+        codigoBarras: ficha.codigoBarras ?? null,
+        repeticiones: ficha.repeticiones ?? null,
+        pasoGuias: ficha.pasoGuias ?? null,
+        ubicacionGuia: ficha.ubicacionGuia ?? null,
+        embobinado: ficha.embobinado_Id ?? null,
+        largoContinuo: !!ficha.largoContinuo,
+      }, { emitEvent: false }),
+      error: (error: HttpErrorResponse) => {
+        if (error.status != 404) this.msj.mensajeAdvertencia(`No se cargaron los datos complementarios del item ${codigo}`, this.detalleError(error), 6000);
+      },
+    });
   }
 
   /**
@@ -883,13 +1155,13 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     this.pasos = [];
     this.guardando = true;
     this.bagProService.PostValidarDuplicadoItem(dto).pipe(finalize(() => this.guardando = false)).subscribe({
-      next: validacion => this.confirmacion = { dto, validacion },
+      next: validacion => this.confirmacion = { dto, validacion, complemento: this.construirComplemento() },
       error: (error: HttpErrorResponse) => this.msj.mensajeError('No se puede crear el item', this.mensajePaso(0, error, 0), 6000),
     });
   }
 
   /** Datos de la confirmación abierta antes de crear (null si está cerrada). */
-  confirmacion: { dto: CrearItemDto, validacion: ValidacionItem } | null = null;
+  confirmacion: { dto: CrearItemDto, validacion: ValidacionItem, complemento: FichaComplementariaItem | null } | null = null;
 
   /** Visibilidad del diálogo de confirmación (cerrarlo cancela la creación). */
   get confirmacionVisible(): boolean { return this.confirmacion != null; }
@@ -903,7 +1175,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
    */
   confirmarCreacion() {
     if (!this.confirmacion) return;
-    const { dto, validacion } = this.confirmacion;
+    const { dto, validacion, complemento } = this.confirmacion;
     this.confirmacion = null;
     let codigo = 0;
     this.ultimoCodigo = null;
@@ -911,14 +1183,17 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       { titulo: 'Validar duplicados en BagPro', estado: 'ok', detalle: 'Nombre sin duplicados; creación confirmada.' },
       { titulo: 'Crear item en BagPro', estado: 'pendiente' },
       { titulo: 'Verificar producto en Plasticaribe', estado: 'pendiente' },
+      ...(complemento ? [{ titulo: 'Guardar datos complementarios en Plasticaribe', estado: 'pendiente' as EstadoPaso }] : []),
       { titulo: `Crear artículo en Zeus (${PRESENTACION_ZEUS[dto.presentacion]})`, estado: 'pendiente' },
     ];
+    const pasoZeus = this.pasos.length - 1;
     let actual = 1;
     const iniciar = (indice: number) => { actual = indice; this.pasos[indice].estado = 'proceso'; };
     const terminar = (indice: number, detalle?: string) => { this.pasos[indice].estado = 'ok'; this.pasos[indice].detalle = detalle; };
 
     this.guardando = true;
     iniciar(1);
+    this.enfocarResultado();
     this.bagProService.PostCrearItem(dto).pipe(
       switchMap(creado => {
         codigo = creado.clienteItems;
@@ -928,11 +1203,25 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         iniciar(2);
         return this.esperarProductoPlasticaribe$(codigo);
       }),
-      switchMap(() => { terminar(2, `Producto ${codigo} encontrado.`); iniciar(3); return this.productoService.PostArticuloZeus(codigo, dto.presentacion, dto.precio); }),
+      switchMap(() => {
+        terminar(2, `Producto ${codigo} encontrado.`);
+        if (!complemento) return of(null);
+        // Si falla no detiene la creación: queda como advertencia y se puede completar después
+        iniciar(3);
+        return this.fichaComplementariaService.guardar(codigo, { ...complemento, prod_Id: codigo }).pipe(
+          map(() => terminar(3, 'Embobinado, código de barras, repeticiones y guías guardados.')),
+          catchError((error: HttpErrorResponse) => {
+            this.pasos[3].estado = 'advertencia';
+            this.pasos[3].detalle = `No se guardaron los datos complementarios: ${this.detalleError(error)}`;
+            return of(null);
+          }),
+        );
+      }),
+      switchMap(() => { iniciar(pasoZeus); return this.productoService.PostArticuloZeus(codigo, dto.presentacion, dto.precio); }),
       finalize(() => this.guardando = false),
     ).subscribe({
       next: resultado => {
-        terminar(3, resultado.yaExistia ? 'El artículo ya existía en Zeus.' : 'Artículo creado en Zeus.');
+        terminar(pasoZeus, resultado.yaExistia ? 'El artículo ya existía en Zeus.' : 'Artículo creado en Zeus.');
         this.msj.mensajeConfirmacion(`¡Item ${codigo} creado!`, 'Se creó en BagPro, Plasticaribe y Zeus.', 5000);
         this.limpiarFormulario();
         this.verEstado(codigo);
@@ -947,6 +1236,14 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         }
       },
     });
+  }
+
+  /**
+   * Lleva la vista a la tarjeta de resultado y la deja centrada, para que el usuario siga las etapas de la creación.
+   * Espera un ciclo porque la tarjeta aparece con *ngIf al llenarse los pasos.
+   */
+  private enfocarResultado() {
+    setTimeout(() => this.tarjetaResultado?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' }));
   }
 
   /**
@@ -985,6 +1282,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     this.formItem.reset({ unidad: 2, extrusion: true, impresion: false, laminado: false, sellado: false, corte: false, cyrel: false, tintas: [] }, { emitEvent: false });
     this.aplicarProcesos();
     this.itemCopiado = null;
+    this.mezclaEditada = null;
     this.busquedaCopia.reset();
     this.nombreManual = false;
   }

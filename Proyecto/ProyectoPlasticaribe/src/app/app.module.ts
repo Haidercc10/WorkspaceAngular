@@ -61,6 +61,7 @@ import { SlideMenuModule } from 'primeng/slidemenu';
 import { SliderModule } from 'primeng/slider';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { TableModule } from 'primeng/table';
+import { PaginatorModule } from 'primeng/paginator';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
@@ -457,6 +458,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     MaterialExampleModule,
     AutocompleteLibModule,
     TableModule,
+    PaginatorModule,
     CalendarModule,
 		SliderModule,
 		DialogModule,

@@ -126,11 +126,11 @@
 
   <!-- Filtros -->
   <div class="barra-filtros mb-2" id="filtrosPedidos">
-    <div class="barra-filtros__fila">
+    <div class="barra-filtros__rejilla">
       <span class="p-input-icon-left buscador">
         <i class="pi pi-search"></i>
-        <input pInputText type="text" [(ngModel)]="busqueda" (input)="buscar()" placeholder="Buscar pedido, cliente, ítem, producto, OC u OT"
-          aria-label="Buscar pedidos">
+        <input pInputText type="text" [(ngModel)]="busqueda" (input)="buscar()" placeholder="Buscar pedido, cliente, ítem, OC u OT"
+          pTooltip="Busca por N° de pedido, cliente, NIT, ítem, producto, OC u OT" tooltipPosition="top" aria-label="Buscar pedidos">
       </span>
       <p-multiSelect [options]="opcionesDepartamentos" [(ngModel)]="departamentosSel" (onChange)="cambiarDepartamentos()"
         placeholder="Departamento" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} departamentos"
@@ -140,13 +140,19 @@
         [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por municipio"></p-multiSelect>
       <p-multiSelect [options]="opcionesClientes" [(ngModel)]="clientesSel" (onChange)="aplicarFiltros()"
         placeholder="Cliente" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} clientes"
-        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro filtro--ancho" ariaLabel="Filtrar por cliente"></p-multiSelect>
+        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por cliente"></p-multiSelect>
       <p-dropdown *ngIf="veFiltroVendedor" [options]="opcionesVendedores" [(ngModel)]="vendedorSel" (onChange)="aplicarFiltros()"
         placeholder="Vendedor" [filter]="true" emptyFilterMessage="Sin resultados" [showClear]="true" appendTo="body"
         styleClass="filtro" ariaLabel="Filtrar por vendedor"></p-dropdown>
       <p-calendar [(ngModel)]="rangoEntrega" selectionMode="range" [readonlyInput]="true" dateFormat="dd/mm/yy" placeholder="Fecha de entrega"
         [showIcon]="true" [showButtonBar]="true" (onSelect)="aplicarFiltros()" (onClearClick)="aplicarFiltros()" appendTo="body"
         styleClass="filtro" ariaLabel="Filtrar por rango de fecha de entrega"></p-calendar>
+      <p-multiSelect [options]="opcionesMesesCreacion" [(ngModel)]="mesesCreacionSel" (onChange)="aplicarFiltros()"
+        placeholder="Mes de creación" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} meses"
+        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por año y mes de creación"></p-multiSelect>
+      <p-multiSelect [options]="opcionesMesesEntrega" [(ngModel)]="mesesEntregaSel" (onChange)="aplicarFiltros()"
+        placeholder="Mes de entrega" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} meses"
+        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por año y mes de entrega (vencimiento)"></p-multiSelect>
     </div>
     <div class="barra-filtros__fila">
       <span class="texto-secundario etiqueta-grupo">Estado:</span>
@@ -163,12 +169,12 @@
   <div class="filtros-activos mb-2" *ngIf="filtrosActivos.length">
     <span class="texto-secundario">Filtrando por:</span>
     <p-chip *ngFor="let f of filtrosActivos" [label]="f.etiqueta" [removable]="true" (onRemove)="f.quitar()" styleClass="chip-activo"></p-chip>
-    <button pButton type="button" class="p-button-text p-button-sm p-button-secondary" icon="pi pi-eraser" label="Limpiar" (click)="limpiarFiltros()"></button>
+    <button pButton type="button" class="p-button-outlined p-button-sm p-button-secondary boton-limpiar" icon="pi pi-eraser" label="Limpiar" (click)="limpiarFiltros()"></button>
   </div>
 
   <!-- Tabla agrupada por pedido -->
   <div id="tablaPedidos">
-    <p-table #dt [columns]="columnasSeleccionadas" [value]="lineasFiltradas" rowGroupMode="subheader" groupRowsBy="consecutivo"
+    <p-table #dt [columns]="columnasSeleccionadas" [value]="lineasPagina" rowGroupMode="subheader" groupRowsBy="consecutivo"
       dataKey="consecutivo" [expandedRowKeys]="expandedRows" styleClass="p-datatable-sm tabla-pedidos" [rowHover]="true"
       [scrollable]="true" scrollHeight="60vh" [loading]="cargandoTabla">
       <ng-template pTemplate="caption">
@@ -178,7 +184,7 @@
             <ng-container *ngIf="lineasFiltradas.length !== lineas.length"> (de {{lineas.length | number}})</ng-container>
           </span>
           <div class="cabecera-tabla__controles">
-            <p-dropdown [options]="opcionesOrden" [(ngModel)]="ordenarPor" (onChange)="ordenarLineas()" appendTo="body"
+            <p-dropdown [options]="opcionesOrden" [(ngModel)]="ordenarPor" (onChange)="cambiarOrden()" appendTo="body"
               styleClass="control-orden" ariaLabel="Ordenar pedidos por">
               <ng-template pTemplate="selectedItem" let-opcion><i class="pi pi-sort-alt mr-2"></i>Ordenar: {{opcion.label}}</ng-template>
             </p-dropdown>
@@ -191,6 +197,8 @@
                 </div>
               </ng-template>
             </p-multiSelect>
+            <p-dropdown [options]="opcionesPorPagina" [(ngModel)]="pedidosPorPagina" (onChange)="cambiarPedidosPorPagina()" appendTo="body"
+              styleClass="control-pagina" ariaLabel="Pedidos por página" pTooltip="Pedidos por página" tooltipPosition="top"></p-dropdown>
             <button pButton type="button" class="p-button-text p-button-secondary p-button-sm"
               [icon]="todosExpandidos ? 'pi pi-minus' : 'pi pi-plus'" [label]="todosExpandidos ? 'Contraer todo' : 'Expandir todo'"
               (click)="alternarExpandirTodo()"></button>
@@ -217,7 +225,9 @@
               <span class="texto-secundario"><i class="pi pi-map-marker"></i> {{resumenes.get(linea.consecutivo)?.ciudad}}</span>
               <span class="badge-entrega" [class.badge-entrega--vencido]="resumenes.get(linea.consecutivo)?.vencido">
                 <i class="pi pi-calendar"></i> {{resumenes.get(linea.consecutivo)?.fechaEntrega | date:'dd/MM/yyyy'}}
-                <ng-container *ngIf="resumenes.get(linea.consecutivo)?.vencido"> · Vencido</ng-container>
+                <ng-container *ngIf="resumenes.get(linea.consecutivo)?.vencido">
+                · Vencido<ng-container *ngIf="resumenes.get(linea.consecutivo)?.diasVencido as dias"> hace {{dias}} {{dias === 1 ? 'día' : 'días'}}</ng-container>
+              </ng-container>
               </span>
               <span class="fila-pedido__total">
                 <small class="texto-secundario">Pendiente</small>
@@ -252,10 +262,27 @@
                 <p-skeleton *ngIf="cargandoOts && !linea.OT" width="6rem" height="1rem"></p-skeleton>
                 <span class="texto-recortado">{{linea.Proceso_OT}}</span>
               </ng-container>
+              <span *ngSwitchCase="'entrega'" class="celda-entrega" [class.texto-peligro]="linea.vencido">{{linea.fecha_Entrega}}
+                <small *ngIf="linea.diasVencido" class="dias-vencido" pTooltip="Días de atraso respecto a la fecha de entrega" tooltipPosition="top">{{linea.diasVencido}} d</small>
+              </span>
               <span *ngSwitchDefault>{{valorCelda(linea, col)}}</span>
             </ng-container>
           </td>
         </tr>
+      </ng-template>
+
+      <!-- Paginación por pedidos: con el orden por semáforo, los pedidos sin stock empiezan en su propia página -->
+      <ng-template pTemplate="summary">
+        <div class="pie-tabla" *ngIf="paginas.length > 1">
+          <small class="texto-secundario">
+            <ng-container *ngIf="paginaSinStock !== null">
+              <span class="punto punto--sinStock"></span> Sin stock desde la página {{paginaSinStock + 1}}
+            </ng-container>
+          </small>
+          <p-paginator [rows]="1" [totalRecords]="paginas.length" [first]="pagina" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Página {currentPage} de {totalPages}" [pageLinkSize]="5"
+            (onPageChange)="cambiarPagina($event.page ?? 0, dt)" styleClass="paginador-pedidos"></p-paginator>
+        </div>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
@@ -331,110 +358,129 @@
   </ng-template>
 </p-dialog>
 
-<!-- Consolidado de asesores -->
-<p-dialog [(visible)]="modalConsolidado" [style]="{width: '90%'}" [breakpoints]="{'960px': '95vw', '640px': '100vw'}"
-  header="Consolidado de asesores" [modal]="true">
-  <div class="cabecera-modal">
-    <small class="texto-secundario">
-      Según los filtros activos. <b>Proyectado del mes</b> = facturado en {{nombreMesActual}} + pendiente vencido + pendiente con entrega este mes.
-      Doble clic en un asesor para ver sus pedidos.
-    </small>
-    <button pButton type="button" class="p-button-success" icon="pi pi-file-excel" label="Exportar Excel" [disabled]="cargandoConsolidado"
-      (click)="exportarExcelConsolidado()"></button>
-  </div>
-  <p-table [value]="consolidadoAsesores" styleClass="p-datatable-sm p-datatable-gridlines" [rowHover]="true" [scrollable]="true"
-    scrollHeight="60vh" [loading]="cargandoConsolidado">
-    <ng-template pTemplate="header">
-      <tr>
-        <th rowspan="2">Asesor</th>
-        <th colspan="2" class="text-center">Facturado</th>
-        <th colspan="4" class="text-center">Pendiente de pedidos</th>
-        <th rowspan="2" class="text-right">Proyectado mes</th>
-      </tr>
-      <tr>
-        <th class="text-right">{{nombreMesAnterior}}</th>
-        <th class="text-right">{{nombreMesActual}}</th>
-        <th class="text-right">Vencido</th>
-        <th class="text-right">Este mes</th>
-        <th class="text-right">Futuro</th>
-        <th class="text-right">Total</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-a>
-      <tr class="cursor" (dblclick)="verPedidosAsesor(a)">
-        <td><b>{{a.codigo}}</b> - {{a.vendedor}}</td>
-        <td class="text-right">{{a.factMesAnterior == null ? '—' : (a.factMesAnterior | currency:'USD':'symbol':'1.0-0')}}</td>
-        <td class="text-right">{{a.factMesActual == null ? '—' : (a.factMesActual | currency:'USD':'symbol':'1.0-0')}}</td>
-        <td class="text-right texto-peligro">{{a.pendienteVencido | currency:'USD':'symbol':'1.0-0'}}</td>
-        <td class="text-right">{{a.pendienteMes | currency:'USD':'symbol':'1.0-0'}}</td>
-        <td class="text-right">{{a.pendienteFuturo | currency:'USD':'symbol':'1.0-0'}}</td>
-        <td class="text-right"><b>{{a.pendienteTotal | currency:'USD':'symbol':'1.0-0'}}</b></td>
-        <td class="text-right texto-info"><b>{{a.proyectado == null ? '—' : (a.proyectado | currency:'USD':'symbol':'1.0-0')}}</b></td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="footer">
-      <tr *ngIf="totalesConsolidado as t">
-        <td><b>Totales</b></td>
-        <td class="text-right">{{t.factMesAnterior == null ? '—' : (t.factMesAnterior | currency:'USD':'symbol':'1.0-0')}}</td>
-        <td class="text-right">{{t.factMesActual == null ? '—' : (t.factMesActual | currency:'USD':'symbol':'1.0-0')}}</td>
-        <td class="text-right texto-peligro">{{t.pendienteVencido | currency:'USD':'symbol':'1.0-0'}}</td>
-        <td class="text-right">{{t.pendienteMes | currency:'USD':'symbol':'1.0-0'}}</td>
-        <td class="text-right">{{t.pendienteFuturo | currency:'USD':'symbol':'1.0-0'}}</td>
-        <td class="text-right">{{t.pendienteTotal | currency:'USD':'symbol':'1.0-0'}}</td>
-        <td class="text-right texto-info">{{t.proyectado == null ? '—' : (t.proyectado | currency:'USD':'symbol':'1.0-0')}}</td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-      <tr><td colspan="8" class="text-center p-3">No hay pedidos con los filtros actuales.</td></tr>
-    </ng-template>
-  </p-table>
-</p-dialog>
+<!-- Consolidado de asesores: la lista de asesores se desliza para dar paso a los pedidos del asesor elegido -->
+<p-dialog [(visible)]="modalConsolidado" [style]="{width: '90%'}" [breakpoints]="{'960px': '95vw', '640px': '100vw'}" [modal]="true"
+  [draggable]="false" (onHide)="volverAsesores()">
+  <ng-template pTemplate="header">
+    <div class="encabezado-modal">
+      <button *ngIf="panelConsolidado === 'pedidos'" pButton type="button" icon="pi pi-arrow-left"
+        class="p-button-text p-button-secondary p-button-rounded" pTooltip="Volver al consolidado" tooltipPosition="bottom"
+        aria-label="Volver al consolidado de asesores" (click)="volverAsesores()"></button>
+      <span class="p-dialog-title">{{ panelConsolidado === 'pedidos' ? 'Pedidos de ' + asesorSeleccionado : 'Consolidado de asesores' }}</span>
+    </div>
+  </ng-template>
 
-<!-- Pedidos de un asesor, agrupados por cliente -->
-<p-dialog [(visible)]="modalPedidosAsesor" [style]="{width: '95%'}" [breakpoints]="{'960px': '95vw', '640px': '100vw'}"
-  header="Pedidos de {{asesorSeleccionado}}" [modal]="true">
-  <p-table #dtAsesor [value]="pedidosAsesor" [globalFilterFields]="['cliente', 'consecutivo', 'id_Producto', 'producto']" rowGroupMode="rowspan" groupRowsBy="cliente" styleClass="p-datatable-sm p-datatable-gridlines"
-    [rowHover]="true" [scrollable]="true" scrollHeight="60vh">
-    <ng-template pTemplate="caption">
-      <span class="p-input-icon-left buscador">
-        <i class="pi pi-search"></i>
-        <input pInputText type="text" (input)="dtAsesor.filterGlobal($any($event.target).value, 'contains')" placeholder="Buscar cliente, pedido o producto">
-      </span>
-    </ng-template>
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Cliente</th>
-        <th>Pedido</th>
-        <th>Ítem</th>
-        <th class="col-producto">Producto</th>
-        <th>F. entrega</th>
-        <th class="text-right">Pendiente</th>
-        <th class="text-right">Stock</th>
-        <th>Und</th>
-        <th class="text-right">Valor pendiente</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-l let-rowgroup="rowgroup" let-rowspan="rowspan">
-      <tr [class.fila-item--facturable]="l.facturable">
-        <td *ngIf="rowgroup" [attr.rowspan]="rowspan" class="celda-cliente">
-          <b>{{l.cliente}}</b><br>
-          <small class="texto-peligro">Pendiente: {{totalesClienteAsesor.get(l.cliente) | currency:'USD':'symbol':'1.0-0'}}</small>
-        </td>
-        <td><b>{{l.consecutivo}}</b></td>
-        <td>{{l.id_Producto}}</td>
-        <td class="col-producto"><span class="texto-recortado" [pTooltip]="l.producto">{{l.producto}}</span></td>
-        <td [class.texto-peligro]="l.vencido">{{l.fecha_Entrega | date:'dd/MM/yyyy'}}</td>
-        <td class="text-right">{{l.cant_Pendiente | number:'1.0-2'}}</td>
-        <td class="text-right">{{l.existencias | number:'1.0-2'}}</td>
-        <td>{{l.presentacion}}</td>
-        <td class="text-right"><b>{{l.costo_Cant_Pendiente | currency:'USD':'symbol':'1.0-0'}}</b></td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="footer">
-      <tr>
-        <td colspan="8" class="text-right"><b>Total</b></td>
-        <td class="text-right"><b>{{totalAsesor | currency:'USD':'symbol':'1.0-0'}}</b></td>
-      </tr>
-    </ng-template>
-  </p-table>
+  <div class="carrusel">
+    <div class="carrusel__pista" [class.carrusel__pista--segundo]="panelConsolidado === 'pedidos'">
+
+      <!-- Panel 1: consolidado por asesor -->
+      <div class="carrusel__panel" [attr.inert]="panelConsolidado !== 'asesores' ? '' : null" [attr.aria-hidden]="panelConsolidado !== 'asesores'">
+        <div class="cabecera-modal">
+          <small class="texto-secundario">
+            Según los filtros activos. <b>Proyectado del mes</b> = facturado en {{nombreMesActual}} + pendiente vencido + pendiente con entrega este mes.
+            <span class="texto-accion"><i class="pi pi-arrow-right"></i> Doble clic en un asesor para ver sus pedidos.</span>
+          </small>
+          <button pButton type="button" class="p-button-success" icon="pi pi-file-excel" label="Exportar Excel" [disabled]="cargandoConsolidado"
+            (click)="exportarExcelConsolidado()"></button>
+        </div>
+        <p-table [value]="consolidadoAsesores" styleClass="p-datatable-sm p-datatable-gridlines" [rowHover]="true" [scrollable]="true"
+          scrollHeight="60vh" [loading]="cargandoConsolidado">
+          <ng-template pTemplate="header">
+            <tr>
+              <th rowspan="2">Asesor</th>
+              <th colspan="2" class="text-center">Facturado</th>
+              <th colspan="4" class="text-center">Pendiente de pedidos</th>
+              <th rowspan="2" class="text-right">Proyectado mes</th>
+            </tr>
+            <tr>
+              <th class="text-right">{{nombreMesAnterior}}</th>
+              <th class="text-right">{{nombreMesActual}}</th>
+              <th class="text-right">Vencido</th>
+              <th class="text-right">Este mes</th>
+              <th class="text-right">Futuro</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-a>
+            <tr class="cursor" [class.fila-resaltada]="a.codigo === codigoAsesorSeleccionado" (dblclick)="verPedidosAsesor(a)"
+              pTooltip="Doble clic para ver los pedidos de {{a.vendedor}}" tooltipPosition="top" [showDelay]="400">
+              <td><b>{{a.codigo}}</b> - {{a.vendedor}}</td>
+              <td class="text-right">{{a.factMesAnterior == null ? '—' : (a.factMesAnterior | currency:'USD':'symbol':'1.0-0')}}</td>
+              <td class="text-right">{{a.factMesActual == null ? '—' : (a.factMesActual | currency:'USD':'symbol':'1.0-0')}}</td>
+              <td class="text-right texto-peligro">{{a.pendienteVencido | currency:'USD':'symbol':'1.0-0'}}</td>
+              <td class="text-right">{{a.pendienteMes | currency:'USD':'symbol':'1.0-0'}}</td>
+              <td class="text-right">{{a.pendienteFuturo | currency:'USD':'symbol':'1.0-0'}}</td>
+              <td class="text-right"><b>{{a.pendienteTotal | currency:'USD':'symbol':'1.0-0'}}</b></td>
+              <td class="text-right texto-info"><b>{{a.proyectado == null ? '—' : (a.proyectado | currency:'USD':'symbol':'1.0-0')}}</b></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr *ngIf="totalesConsolidado as t">
+              <td><b>Totales</b></td>
+              <td class="text-right">{{t.factMesAnterior == null ? '—' : (t.factMesAnterior | currency:'USD':'symbol':'1.0-0')}}</td>
+              <td class="text-right">{{t.factMesActual == null ? '—' : (t.factMesActual | currency:'USD':'symbol':'1.0-0')}}</td>
+              <td class="text-right texto-peligro">{{t.pendienteVencido | currency:'USD':'symbol':'1.0-0'}}</td>
+              <td class="text-right">{{t.pendienteMes | currency:'USD':'symbol':'1.0-0'}}</td>
+              <td class="text-right">{{t.pendienteFuturo | currency:'USD':'symbol':'1.0-0'}}</td>
+              <td class="text-right">{{t.pendienteTotal | currency:'USD':'symbol':'1.0-0'}}</td>
+              <td class="text-right texto-info">{{t.proyectado == null ? '—' : (t.proyectado | currency:'USD':'symbol':'1.0-0')}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="8" class="text-center p-3">No hay pedidos con los filtros actuales.</td></tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- Panel 2: pedidos del asesor, agrupados por cliente -->
+      <div class="carrusel__panel" [attr.inert]="panelConsolidado !== 'pedidos' ? '' : null" [attr.aria-hidden]="panelConsolidado !== 'pedidos'">
+        <p-table #dtAsesor [value]="pedidosAsesor" [globalFilterFields]="['cliente', 'consecutivo', 'id_Producto', 'producto']" rowGroupMode="rowspan"
+          groupRowsBy="cliente" styleClass="p-datatable-sm p-datatable-gridlines" [rowHover]="true" [scrollable]="true" scrollHeight="60vh">
+          <ng-template pTemplate="caption">
+            <span class="p-input-icon-left buscador">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" [(ngModel)]="filtroAsesor" (input)="dtAsesor.filterGlobal(filtroAsesor, 'contains')"
+                placeholder="Buscar cliente, pedido o producto" aria-label="Buscar en los pedidos del asesor">
+            </span>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Cliente</th>
+              <th>Pedido</th>
+              <th>Ítem</th>
+              <th class="col-producto">Producto</th>
+              <th>F. entrega</th>
+              <th class="text-right">Pendiente</th>
+              <th class="text-right">Stock</th>
+              <th>Und</th>
+              <th class="text-right">Valor pendiente</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-l let-rowgroup="rowgroup" let-rowspan="rowspan">
+            <tr [class.fila-item--facturable]="l.facturable">
+              <td *ngIf="rowgroup" [attr.rowspan]="rowspan" class="celda-cliente">
+                <b>{{l.cliente}}</b><br>
+                <small class="texto-peligro">Pendiente: {{totalesClienteAsesor.get(l.cliente) | currency:'USD':'symbol':'1.0-0'}}</small>
+              </td>
+              <td><b>{{l.consecutivo}}</b></td>
+              <td>{{l.id_Producto}}</td>
+              <td class="col-producto"><span class="texto-recortado" [pTooltip]="l.producto">{{l.producto}}</span></td>
+              <td [class.texto-peligro]="l.vencido">{{l.fecha_Entrega | date:'dd/MM/yyyy'}}
+                <small *ngIf="l.diasVencido" class="dias-vencido">{{l.diasVencido}} d</small></td>
+              <td class="text-right">{{l.cant_Pendiente | number:'1.0-2'}}</td>
+              <td class="text-right">{{l.existencias | number:'1.0-2'}}</td>
+              <td>{{l.presentacion}}</td>
+              <td class="text-right"><b>{{l.costo_Cant_Pendiente | currency:'USD':'symbol':'1.0-0'}}</b></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="8" class="text-right"><b>Total</b></td>
+              <td class="text-right"><b>{{totalAsesor | currency:'USD':'symbol':'1.0-0'}}</b></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
 </p-dialog>

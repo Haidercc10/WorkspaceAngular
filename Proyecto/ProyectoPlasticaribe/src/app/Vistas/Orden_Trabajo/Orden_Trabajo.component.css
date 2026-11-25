@@ -385,3 +385,81 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
   font-size: 1.05rem;
   margin-bottom: 0.25rem;
 }
+
+/* Datos complementarios del item (Crear Item) */
+.complemento-ot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.complemento-ot-datos {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  flex: 1 1 18rem;
+}
+
+.complemento-ot-datos dt {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.complemento-ot-datos dd {
+  margin: 0;
+}
+
+.complemento-ot-embobinado {
+  margin: 0;
+  max-width: 16rem;
+  text-align: center;
+}
+
+.complemento-ot-embobinado img {
+  width: 100%;
+  height: auto;
+  background: var(--gris-100);
+  border-radius: 4px;
+}
+
+.complemento-ot-embobinado figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+}
+
+/* Mezcla ajustada para el item */
+.mezcla-item-ajustada {
+  margin: 0 0.75rem 1.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+}
+
+.mezcla-item-ajustada-aviso {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+}
+
+.mezcla-item-ajustada-capas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.mezcla-item-ajustada-capa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.mezcla-item-ajustada-capa b {
+  color: var(--rojo-texto);
+}

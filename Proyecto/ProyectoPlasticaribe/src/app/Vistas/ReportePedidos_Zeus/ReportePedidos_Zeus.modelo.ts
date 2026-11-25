@@ -42,6 +42,11 @@ export interface PedidoZeusLinea {
   vencido: boolean;
   /** Días que faltan para la entrega (negativo si está vencido). */
   diasEntrega: number;
+  /**
+   * Días de atraso: solo si está vencido y la fecha de entrega es distinta a la de creación
+   * (cuando son iguales la entrega no fue pactada y el atraso no es real). null en otro caso.
+   */
+  diasVencido: number | null;
   OT: string;
   Estado_OT: number | null;
   Proceso_OT: string;
@@ -61,6 +66,8 @@ export interface ResumenPedido {
   ciudad: string;
   fechaEntrega: string;
   vencido: boolean;
+  /** Días de atraso de la línea con la entrega más antigua (ver PedidoZeusLinea.diasVencido). */
+  diasVencido: number | null;
   totalPendiente: number;
   totalPedido: number;
   items: number;
@@ -164,6 +171,7 @@ export function mapearLinea(datos: any, indice: number, hoy: moment.Moment = mom
     semaforoPedido: 'sinStock',
     vencido: !!fechaEntrega && diasEntrega < 0,
     diasEntrega,
+    diasVencido: fechaEntrega && diasEntrega < 0 && fechaEntrega !== fecha(datos.fecha_Creacion) ? -diasEntrega : null,
     OT: '',
     Estado_OT: null,
     Proceso_OT: '',
@@ -201,14 +209,16 @@ export function resumirPedidos(lineas: PedidoZeusLinea[]): Map<string, ResumenPe
   const resumenes = new Map<string, ResumenPedido>();
   for (const [consecutivo, grupo] of agruparPorConsecutivo(lineas)) {
     const primera = grupo[0];
-    // Fecha de entrega más próxima entre las líneas del pedido
-    const fechaEntrega = grupo.map(l => l.fecha_Entrega).filter(Boolean).sort()[0] ?? '';
+    // Línea con la fecha de entrega más próxima (o la más atrasada) del pedido
+    const masProxima = grupo.filter(l => l.fecha_Entrega).sort((a, b) => a.fecha_Entrega.localeCompare(b.fecha_Entrega))[0];
+    const fechaEntrega = masProxima?.fecha_Entrega ?? '';
     resumenes.set(consecutivo, {
       consecutivo,
       cliente: primera.cliente,
       ciudad: ciudadLegible(primera),
       fechaEntrega,
       vencido: grupo.some(l => l.vencido),
+      diasVencido: masProxima?.diasVencido ?? null,
       totalPendiente: grupo.reduce((a, l) => a + l.costo_Cant_Pendiente, 0),
       totalPedido: grupo.reduce((a, l) => a + l.costo_Cant_Total, 0),
       items: grupo.length,

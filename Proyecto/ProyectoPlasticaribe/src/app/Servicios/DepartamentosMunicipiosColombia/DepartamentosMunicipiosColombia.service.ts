@@ -9,9 +9,12 @@ export interface MunicipioColombia {
   codigoDane: string;
 }
 
-/** Dataset oficial del DANE: departamentos y municipios de Colombia (sin clave, gratuito). */
-const URL_MUNICIPIOS = 'https://www.datos.gov.co/resource/8xzg-cn6x.json';
-const CLAVE_CACHE = 'municipios-colombia-v1';
+/**
+ * DIVIPOLA del DANE en datos.gov.co (1.122 municipios; sin clave, gratuito). Campos: dpto, nom_mpio, cod_mpio.
+ * El dataset anterior (8xzg-cn6x) fue retirado y responde "dataset.missing".
+ */
+const URL_MUNICIPIOS = 'https://www.datos.gov.co/resource/gdxc-w37w.json';
+const CLAVE_CACHE = 'municipios-colombia-v2';
 const VIGENCIA_CACHE_MS = 7 * 24 * 60 * 60 * 1000; // 7 días: la división política casi no cambia
 
 @Injectable({
@@ -35,13 +38,13 @@ export class DepartamentosMunicipiosColombiaService {
     if (!this.municipios$) {
       const enCache = this.leerCache();
       this.municipios$ = (enCache ? of(enCache) : this.http.get<any[]>(URL_MUNICIPIOS, {
-        params: { '$select': 'departamento,municipio,c_digo_dane_del_municipio', '$limit': '2000' }
+        params: { '$select': 'dpto,nom_mpio,cod_mpio', '$limit': '2000' }
       }).pipe(
-        map(filas => (filas ?? []).map(f => ({
-          departamento: f.departamento ?? '',
-          municipio: f.municipio ?? '',
-          codigoDane: f.c_digo_dane_del_municipio ?? '',
-        }) as MunicipioColombia)),
+        map(filas => (Array.isArray(filas) ? filas : []).map(f => ({
+          departamento: f.dpto ?? '',
+          municipio: f.nom_mpio ?? '',
+          codigoDane: f.cod_mpio ?? '',
+        }) as MunicipioColombia).filter(m => m.departamento && m.municipio)),
         tap(lista => this.guardarCache(lista)),
         catchError(() => {
           this.municipios$ = undefined; // se reintenta la próxima vez
