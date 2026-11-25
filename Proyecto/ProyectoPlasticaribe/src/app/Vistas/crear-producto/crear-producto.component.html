@@ -35,7 +35,15 @@
 
             <!-- Partir de un item existente -->
             <div class="barra-copiar" data-tutorial="copiar">
-              <span class="copiar-titulo"><i class="pi pi-copy"></i> Partir de un item existente</span>
+              <div class="copiar-encabezado">
+                <span class="copiar-titulo"><i class="pi pi-copy"></i> Partir de un item existente</span>
+                <!-- Buscar el item por código/nombre o por cliente (lista de los items del cliente) -->
+                <p-selectButton [options]="opcionesModoCopia" [(ngModel)]="modoCopia" [ngModelOptions]="{standalone: true}"
+                  optionLabel="nombre" optionValue="valor" styleClass="selector-modo-copia" [disabled]="copiando || guardando || !!itemCopiaElegido"
+                  pTooltip="Buscar el item por código o nombre, o elegir un cliente y ver todos sus items" tooltipPosition="top">
+                  <ng-template let-opcion pTemplate><i [class]="opcion.icono"></i><span class="ms-2">{{opcion.nombre}}</span></ng-template>
+                </p-selectButton>
+              </div>
               <div class="copiar-campo">
                 <!-- Item elegido: queda bloqueado; para cambiarlo se quita con la X -->
                 <div class="item-elegido" id="itemElegidoCopia" tabindex="0" *ngIf="itemCopiaElegido as elegido; else buscadorCopia"
@@ -46,7 +54,16 @@
                     [disabled]="copiando || guardando" (click)="quitarItemCopia()" pTooltip="Quitar para elegir otro item" tooltipPosition="top"></button>
                 </div>
                 <ng-template #buscadorCopia>
-                  <span class="p-float-label">
+                  <span class="p-float-label" *ngIf="modoCopia == 'cliente'">
+                    <p-autoComplete [formControl]="clienteCopia" inputId="clienteCopia" [suggestions]="clientesCopiaSugeridos"
+                      (completeMethod)="buscarClientesCopia($event)" field="nombreComercial" [minLength]="3" [delay]="400" [forceSelection]="true"
+                      appendTo="body" [style]="{width: '100%'}" [inputStyle]="{width: '100%'}" (onSelect)="verItemsCliente()"
+                      pTooltip="Escriba al menos 3 letras del cliente y elíjalo para ver sus items" tooltipPosition="top">
+                      <ng-template let-cliente pTemplate="item">{{cliente.nombreComercial}} ({{cliente.codBagpro}})</ng-template>
+                    </p-autoComplete>
+                    <label for="clienteCopia"><i class="pi pi-users"></i> Cliente</label>
+                  </span>
+                  <span class="p-float-label" *ngIf="modoCopia == 'item'">
                     <p-autoComplete [formControl]="busquedaCopia" inputId="busquedaCopia" [suggestions]="itemsSugeridos"
                       (completeMethod)="buscarItems($event)" field="etiqueta" [minLength]="3" [delay]="400" appendTo="body"
                       [style]="{width: '100%'}" [inputStyle]="{width: '100%'}" (onSelect)="enfocarItemElegido()" (keyup.enter)="copiarCodigoDigitado()"
@@ -55,7 +72,10 @@
                   </span>
                 </ng-template>
               </div>
-              <button pButton type="button" label="Copiar" icon="pi pi-copy" class="p-button-danger"
+              <button *ngIf="modoCopia == 'cliente' && !itemCopiaElegido" pButton type="button" label="Ver items" icon="pi pi-list" class="p-button-danger"
+                [loading]="cargandoItemsCliente" [disabled]="cargandoItemsCliente || copiando || guardando || !clienteCopia.value?.codBagpro" (click)="verItemsCliente()"
+                pTooltip="Muestra los items del cliente para elegir cuál copiar" tooltipPosition="top"></button>
+              <button *ngIf="modoCopia == 'item' || itemCopiaElegido" pButton type="button" label="Copiar" icon="pi pi-copy" class="p-button-danger"
                 [loading]="copiando" [disabled]="copiando || guardando" (click)="copiarDesdeItem()"
                 pTooltip="Carga la ficha técnica del item buscado; el nombre queda vacío; presentación y precio se cargan para cambiarlos" tooltipPosition="top"></button>
               <button pButton type="button" label="Limpiar" icon="pi pi-eraser" class="p-button-secondary p-button-outlined"
@@ -635,11 +655,85 @@
         </ng-template>
       </p-dialog>
 
+      <!-- Items del cliente elegido en "Partir de un item existente" (por cliente): doble clic o "Copiar" carga su ficha -->
+      <p-dialog [header]="'Items de ' + (clienteCopia.value?.nombreComercial ?? 'el cliente')" [(visible)]="modalItemsCliente" [modal]="true"
+        [draggable]="false" [style]="{width: '96rem'}" [breakpoints]="{'1600px': '96vw'}" appendTo="body" styleClass="dialogo-items-cliente">
+        <p-table #tablaItemsCliente [value]="itemsCliente" [rows]="10" [paginator]="itemsCliente.length > 10" [rowHover]="true"
+          [globalFilterFields]="['codigo', 'nombre', 'formato', 'material', 'pigmento']" styleClass="p-datatable-sm tabla-items-cliente"
+          responsiveLayout="scroll">
+          <ng-template pTemplate="caption">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+              <small class="texto-secundario"><i class="pi pi-info-circle"></i> {{itemsCliente.length}} items. Doble clic en una fila o "Copiar" para cargar su ficha.</small>
+              <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Filtrar por código, referencia, material..." autocomplete="off"
+                  (input)="tablaItemsCliente.filterGlobal($any($event.target).value, 'contains')">
+              </span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="codigo">Item <p-sortIcon field="codigo"></p-sortIcon></th>
+              <th pSortableColumn="nombre" class="columna-referencia">Referencia <p-sortIcon field="nombre"></p-sortIcon></th>
+              <th>Presentación</th>
+              <th pSortableColumn="formato">Formato <p-sortIcon field="formato"></p-sortIcon></th>
+              <th pSortableColumn="material">Material <p-sortIcon field="material"></p-sortIcon></th>
+              <th>Medidas <i class="pi pi-info-circle texto-secundario"
+                pTooltip="Ancho × Largo × Fuelle del producto terminado, tal como están en la ficha del item (sección Producto terminado: sellado/corte), en la unidad del item. Se omiten las medidas en 0."
+                tooltipPosition="top"></i></th>
+              <th pSortableColumn="calibre">Calibre <p-sortIcon field="calibre"></p-sortIcon></th>
+              <th>Impresión</th>
+              <th pSortableColumn="fechaCreacion">Creado <p-sortIcon field="fechaCreacion"></p-sortIcon></th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr class="cursor" (dblclick)="copiarItemCliente(item)"
+              pTooltip="Doble clic: copia la ficha de este item en el formulario" tooltipPosition="top" [showDelay]="600">
+              <td>{{item.codigo}}</td>
+              <td class="columna-referencia"><b>{{item.nombre}}</b></td>
+              <td>{{item.presentaciones.join(', ')}}</td>
+              <td>{{item.formato}}</td>
+              <td>{{item.material}}<small *ngIf="item.pigmento" class="d-block texto-secundario">{{item.pigmento}}</small></td>
+              <td class="text-nowrap">{{medidasItem(item)}}</td>
+              <td>{{item.calibre | number:'1.0-2'}}</td>
+              <td>
+                <span *ngIf="item.impresion; else sinImpresion" class="etiqueta-tintas"
+                  [pTooltip]="item.tintas.length ? 'Tintas: ' + item.tintas.join(', ') : 'Sin tintas registradas'" tooltipPosition="top">
+                  {{item.tintas.length}} tinta(s)</span>
+                <ng-template #sinImpresion><small class="texto-secundario">No</small></ng-template>
+              </td>
+              <td class="text-nowrap">{{item.fechaCreacion | date:'yyyy-MM-dd'}}</td>
+              <td class="text-nowrap">
+                <div class="d-flex align-items-center justify-content-end gap-2">
+                  <button *ngIf="item.impresion" pButton type="button" icon="pi pi-image" class="p-button-sm p-button-outlined p-button-danger"
+                    pTooltip="Ver arte: abre el arte de impresión del item para confirmar que es el que se quiere copiar" tooltipPosition="top"
+                    (click)="arteItemCliente.abrir(item.codigo)" (dblclick)="$event.stopPropagation()"></button>
+                  <button pButton type="button" icon="pi pi-copy" label="Copiar" class="p-button-sm p-button-danger"
+                    pTooltip="Copiar: carga la ficha técnica de este item en el formulario para crear uno nuevo; el nombre queda vacío y la presentación y el precio se cargan para revisarlos"
+                    tooltipPosition="top" [disabled]="copiando || guardando" (click)="copiarItemCliente(item)" (dblclick)="$event.stopPropagation()"></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="10" class="text-center texto-secundario">Ningún item coincide con el filtro.</td></tr>
+          </ng-template>
+        </p-table>
+      </p-dialog>
+      <app-arte-item #arteItemCliente></app-arte-item>
+
+      <!-- Vía directa a la OT al terminar la creación (confirmación estándar) -->
+      <p-confirmDialog key="crearOTItem" [style]="{width: '30rem'}" [breakpoints]="{'640px': '92vw'}"></p-confirmDialog>
+
       <!-- Resultado de la creación -->
       <div #tarjetaResultado class="tarjeta-resultado mt-4" [class.creando]="guardando" *ngIf="pasos.length > 0">
         <div class="resultado-cabecera">
           <span><i class="pi pi-flag"></i> Resultado de la creación</span>
           <div class="d-flex align-items-center gap-2">
+            <button *ngIf="puedeCrearOT && itemParaOT && !guardando" pButton type="button" class="p-button-sm p-button-danger" icon="pi pi-file-edit"
+              [label]="'Crear OT con el item ' + itemParaOT.codigo" (click)="crearOTConItem()"
+              pTooltip="Abre Orden de Trabajo con este item ya consultado" tooltipPosition="top"></button>
             <button *ngIf="ultimoCodigo && !guardando" pButton type="button" class="p-button-text p-button-sm boton-marca-texto" icon="pi pi-sync"
               [label]="'Ver item ' + ultimoCodigo" (click)="tabActiva = 1"
               pTooltip="Abre el item en Estado de Sincronización" tooltipPosition="top"></button>

@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Injectable, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription, catchError, concatMap, finalize, forkJoin, from, map, of, retry, switchMap, throwError, timer, toArray } from 'rxjs';
-import { ArticuloZeus, CapaLaminadoItem, CatalogoMezcla, CrearItemDto, MezclaPersonalizada, FichaItem, ItemBusqueda, ItemDuplicado, MezclaPredefinida, PresentacionBagPro, PresentacionItem, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
+import { ArticuloZeus, CapaLaminadoItem, CatalogoMezcla, CrearItemDto, MezclaPersonalizada, FichaItem, ItemBusqueda, ItemCliente, ItemDuplicado, MezclaPredefinida, PresentacionBagPro, PresentacionItem, TintaBagPro, ValidacionItem } from 'src/app/Modelo/modelCrearItem';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { FormatosService } from 'src/app/Servicios/Formato/Formatos.service';
@@ -23,6 +23,9 @@ import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.servi
 import { ClaveTutorialCrearItem, pasosTutorialCrearItem } from 'src/app/Tutoriales/Tutoriales_CrearItem';
 import { FichaComplementariaItem, TIPOS_EMBOBINADO, TipoEmbobinado, descripcionEmbobinado, imagenEmbobinado } from 'src/app/Modelo/modelEmbobinado';
 import { FichaComplementariaItemService } from 'src/app/Servicios/FichaComplementariaItem/FichaComplementariaItem.service';
+import { Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
+import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 
 /** Roles que pueden crear items y completar su sincronización (igual que crear/editar OT). */
 const ROLES_CREAR_ITEM: readonly number[] = [1, 98];
@@ -169,6 +172,14 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
   busquedaCopia = new FormControl<any>(null); //Item (o código escrito) del que se copia la ficha
   busquedaSync = new FormControl<any>(null); //Item (o código escrito) del panel de sincronización
   itemsSugeridos: ItemBusqueda[] = []; //Resultados del autocompletado de items
+  /** Cómo se busca el item a copiar: por código/nombre o por cliente (lista de sus items). */
+  modoCopia: 'item' | 'cliente' = 'item';
+  readonly opcionesModoCopia = [{ valor: 'item', nombre: 'Por item', icono: 'pi pi-box' }, { valor: 'cliente', nombre: 'Por cliente', icono: 'pi pi-users' }];
+  clienteCopia = new FormControl<any>(null); //Cliente cuyos items se listan para copiar
+  clientesCopiaSugeridos: any[] = [];
+  itemsCliente: ItemCliente[] = []; //Items del cliente elegido
+  cargandoItemsCliente: boolean = false;
+  modalItemsCliente: boolean = false;
   formPresentacion: FormGroup; //Presentación nueva para un item existente
 
   clientesSugeridos: any[] = [];
@@ -210,6 +221,10 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
   tarjetasSync: TarjetaSync[] = [];
   tabActiva: number = 0; //Pestaña visible (0 Crear Item, 1 Estado de Sincronización)
   ultimoCodigo: number | null = null; //Código del último item creado, para abrirlo en Estado de Sincronización
+  /** Item recién creado con el que se puede crear una OT (ya existe en Plasticaribe); null si no hay. */
+  itemParaOT: { codigo: number, nombre: string, presentacion: string } | null = null;
+  /** El rol tiene permiso para Orden de Trabajo (y la vista no está embebida en Pedido Externo). */
+  puedeCrearOT: boolean = false;
 
   /** Procesos de la ficha, en el orden de producción, con su control e icono. */
   readonly tallasBio = TALLAS_BIO.map(t => ({ valor: t, nombre: `${t} KG` }));
@@ -242,7 +257,10 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     private existenciasService: ExistenciasProductosService,
     private msj: MensajesAplicacionService,
     private tutoriales: TutorialesService,
-    private fichaComplementariaService: FichaComplementariaItemService,) {
+    private fichaComplementariaService: FichaComplementariaItemService,
+    private router: Router,
+    private vistasPermisosService: Vistas_PermisosService,
+    private confirmationService: ConfirmationService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formItem = this.frmBuilder.group({
@@ -318,6 +336,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     this.ValidarRol = this.AppComponent.storage_Rol;
     if (!this.puedeCrearItems) return;
     this.cargarCatalogos();
+    this.verificarPermisoOT();
     ['extrusion', 'impresion', 'laminado', 'sellado', 'corte']
       .forEach(proceso => this.formItem.get(proceso)?.valueChanges.subscribe(() => this.aplicarProcesos()));
     this.aplicarProcesos();
@@ -895,6 +914,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         // Una ficha nueva empieza otra creación: se quita el resultado de la creación anterior
         this.pasos = [];
         this.ultimoCodigo = null;
+        this.itemParaOT = null;
         this.cargarFicha(ficha);
         // Deja el item elegido bloqueado en la barra (se cambia con la X)
         if (!this.itemCopiaElegido) this.busquedaCopia.setValue({ codigo, nombre: ficha.nombre ?? '', etiqueta: `${codigo}${ficha.nombre ? ' - ' + ficha.nombre : ''}` });
@@ -1153,6 +1173,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     if (errores.length > 0) { this.msj.mensajeAdvertencia('Revise la ficha del item', errores.join(' '), 6000); return; }
     const dto = this.construirDto();
     this.pasos = [];
+    this.itemParaOT = null;
     this.guardando = true;
     this.bagProService.PostValidarDuplicadoItem(dto).pipe(finalize(() => this.guardando = false)).subscribe({
       next: validacion => this.confirmacion = { dto, validacion, complemento: this.construirComplemento() },
@@ -1178,7 +1199,9 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     const { dto, validacion, complemento } = this.confirmacion;
     this.confirmacion = null;
     let codigo = 0;
+    let creadoInfo: { nombre: string, presentacion: string } = { nombre: dto.nombre, presentacion: dto.presentacion };
     this.ultimoCodigo = null;
+    this.itemParaOT = null;
     this.pasos = [
       { titulo: 'Validar duplicados en BagPro', estado: 'ok', detalle: 'Nombre sin duplicados; creación confirmada.' },
       { titulo: 'Crear item en BagPro', estado: 'pendiente' },
@@ -1198,6 +1221,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       switchMap(creado => {
         codigo = creado.clienteItems;
         this.ultimoCodigo = codigo;
+        creadoInfo = { nombre: creado.nombre || dto.nombre, presentacion: creado.presentacion || dto.presentacion };
         const cambio = codigo != validacion.siguienteCodigo ? ` El consecutivo cambió de ${validacion.siguienteCodigo} a ${codigo} porque se creó otro item antes.` : '';
         terminar(1, `Item ${codigo} creado: ${creado.nombre} (${creado.presentacion}).${cambio}`);
         iniciar(2);
@@ -1205,6 +1229,8 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
       }),
       switchMap(() => {
         terminar(2, `Producto ${codigo} encontrado.`);
+        // El producto ya existe en Plasticaribe: desde aquí se puede crear la OT
+        this.itemParaOT = { codigo, ...creadoInfo };
         if (!complemento) return of(null);
         // Si falla no detiene la creación: queda como advertencia y se puede completar después
         iniciar(3);
@@ -1225,6 +1251,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         this.msj.mensajeConfirmacion(`¡Item ${codigo} creado!`, 'Se creó en BagPro, Plasticaribe y Zeus.', 5000);
         this.limpiarFormulario();
         this.verEstado(codigo);
+        this.preguntarCrearOT();
       },
       error: (error: HttpErrorResponse) => {
         this.pasos[actual].estado = 'error';
@@ -1236,6 +1263,103 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         }
       },
     });
+  }
+
+  /**
+   * Consulta si el rol tiene permiso para la vista Orden de Trabajo, para ofrecer la vía directa a crear la OT.
+   * Embebida en Pedido Externo no se ofrece: navegar sacaría al usuario del pedido.
+   * @returns No retorna un valor.
+   */
+  private verificarPermisoOT() {
+    if (this.embebido) return;
+    this.vistasPermisosService.GetPermisos(this.ValidarRol, 'Orden de Trabajo').subscribe({
+      next: () => this.puedeCrearOT = true,
+      error: () => this.puedeCrearOT = false,
+    });
+  }
+
+  /**
+   * Al terminar la creación pregunta si se quiere crear una OT con el item (confirmación estándar del proyecto).
+   * @returns No retorna un valor.
+   */
+  private preguntarCrearOT() {
+    if (!this.puedeCrearOT || !this.itemParaOT) return;
+    const { codigo, nombre } = this.itemParaOT;
+    this.confirmationService.confirm({
+      key: 'crearOTItem',
+      header: 'Item creado',
+      message: `El item <b>${codigo} - ${nombre}</b> se creó correctamente. ¿Desea crear una orden de trabajo con este item?`,
+      icon: 'pi pi-question-circle',
+      acceptLabel: 'Crear OT',
+      acceptIcon: 'pi pi-file-edit',
+      rejectLabel: 'Cancelar',
+      rejectIcon: 'pi pi-times',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      defaultFocus: 'accept',
+      accept: () => this.crearOTConItem(),
+    });
+  }
+
+  /**
+   * Abre Orden de Trabajo en la pestaña Crear OT con el item recién creado ya consultado.
+   * @returns No retorna un valor.
+   */
+  crearOTConItem() {
+    if (!this.itemParaOT) return;
+    const { codigo, nombre, presentacion } = this.itemParaOT;
+    this.router.navigate(['/ordenes-trabajo'], { queryParams: { item: codigo, presentacion, referencia: nombre } });
+  }
+
+  /**
+   * Busca clientes de BagPro para la copia por cliente (mismo criterio que el cliente de la ficha).
+   * @param evento Evento del autocompletado con el texto escrito (`query`).
+   * @returns No retorna un valor.
+   */
+  buscarClientesCopia(evento: any) {
+    const texto = (evento?.query ?? '').trim();
+    if (texto.length < 3) { this.clientesCopiaSugeridos = []; return; }
+    this.bagProService.GetClientesNombre(texto).subscribe({
+      next: data => this.clientesCopiaSugeridos = (data ?? []).filter((c: any) => Number(c.codBagpro) > 0),
+      error: (error: HttpErrorResponse) => this.msj.mensajeError('No fue posible consultar los clientes', this.detalleError(error)),
+    });
+  }
+
+  /**
+   * Consulta los items del cliente elegido y los muestra en el diálogo para escoger cuál copiar.
+   * @returns No retorna un valor.
+   */
+  verItemsCliente() {
+    const cliente = Number(this.clienteCopia.value?.codBagpro);
+    if (!(cliente > 0)) { this.msj.mensajeAdvertencia('Advertencia', 'Busque y elija el cliente.'); return; }
+    this.cargandoItemsCliente = true;
+    this.itemsCliente = [];
+    this.bagProService.GetItemsCliente(cliente).pipe(finalize(() => this.cargandoItemsCliente = false)).subscribe({
+      next: items => {
+        this.itemsCliente = items ?? [];
+        if (this.itemsCliente.length == 0) { this.msj.mensajeAdvertencia('El cliente no tiene items registrados'); return; }
+        this.modalItemsCliente = true;
+      },
+      error: (error: HttpErrorResponse) => this.msj.mensajeError('No fue posible consultar los items del cliente', this.detalleError(error)),
+    });
+  }
+
+  /**
+   * Copia la ficha del item elegido en la lista del cliente (mismo flujo que "Copiar" por item).
+   * @param item Item elegido.
+   * @returns No retorna un valor.
+   */
+  copiarItemCliente(item: ItemCliente) {
+    if (this.copiando || this.guardando) return;
+    this.modalItemsCliente = false;
+    this.busquedaCopia.setValue({ codigo: item.codigo, nombre: item.nombre, etiqueta: `${item.codigo} - ${item.nombre}` });
+    this.copiarDesdeItem();
+  }
+
+  /** Medidas de un item de la lista del cliente: "ancho x largo x fuelle unidad" (omite las que están en 0). */
+  medidasItem(item: ItemCliente): string {
+    const medidas = [item.ancho, item.largo, item.fuelle].filter(m => Number(m) > 0).map(m => this.numero(Number(m)));
+    return medidas.length ? `${medidas.join(' x ')} ${item.unidad ?? ''}`.trim() : '';
   }
 
   /**

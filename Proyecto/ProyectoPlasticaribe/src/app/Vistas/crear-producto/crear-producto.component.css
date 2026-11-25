@@ -567,6 +567,25 @@ p-autocomplete ::ng-deep .p-autocomplete {
   white-space: nowrap;
 }
 
+/* Título de la barra de copiar con el selector "Por item / Por cliente" a la derecha */
+.copiar-encabezado {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.copiar-encabezado .copiar-titulo {
+  flex-basis: auto;
+}
+
+::ng-deep .selector-modo-copia .p-button {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+}
+
 .copiar-campo {
   flex: 1 1 18rem;
   min-width: 0;
@@ -1299,12 +1318,42 @@ p-autocomplete ::ng-deep .p-autocomplete {
 
 /* N° de capas con el rojo de la marca (el tema lo pinta azul). */
 ::ng-deep .selector-capas-mezcla .p-button.p-highlight,
-::ng-deep .selector-capas-mezcla .p-button.p-highlight:hover {
+::ng-deep .selector-capas-mezcla .p-button.p-highlight:hover,
+::ng-deep .selector-modo-copia .p-button.p-highlight,
+::ng-deep .selector-modo-copia .p-button.p-highlight:hover {
   background: var(--rojo);
   border-color: var(--rojo);
   color: #fff;
 }
 
-::ng-deep .selector-capas-mezcla .p-button:focus {
+::ng-deep .selector-capas-mezcla .p-button:focus,
+::ng-deep .selector-modo-copia .p-button:focus {
   box-shadow: 0 0 0 0.2rem rgba(177, 29, 40, 0.3);
+}
+
+/* ---------- Diálogo "Items de <cliente>" (copia por cliente) ----------
+   Se dibuja en el body (appendTo): no hereda las variables de :host, por eso solo usa variables globales de la paleta. */
+::ng-deep .dialogo-items-cliente .p-dialog-header .p-dialog-title {
+  color: var(--rojo);
+}
+
+/* El ícono de ordenar queda al lado del título, sin bajar a otra línea */
+.tabla-items-cliente th {
+  white-space: nowrap;
+}
+
+/* La referencia es lo que identifica al item: ancho suficiente para verla completa */
+.tabla-items-cliente .columna-referencia {
+  min-width: 24rem;
+}
+
+.etiqueta-tintas {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--fondo-exito);
+  color: var(--texto-exito);
 }

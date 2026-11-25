@@ -1,4 +1,5 @@
 import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -234,7 +235,9 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     private estadosProcesosService: EstadosProcesos_OTService,
     private calculoCostos: OtCalculoCostosService,
     private creacionPdf: CreacionPdfService,
-    private fichaComplementariaService: FichaComplementariaItemService,) {
+    private fichaComplementariaService: FichaComplementariaItemService,
+    private rutaActiva: ActivatedRoute,
+    private router: Router,) {
 
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -472,6 +475,29 @@ export class Orden_TrabajoComponent implements OnInit, OnDestroy {
     this.sincronizarAnchoTotalSellado();
     this.limpiarCampos();
     this.ultimaOTBagPro();
+    this.cargarItemDesdeRuta();
+  }
+
+  /**
+   * Vía directa desde Crear Item: si la ruta trae ?item=X&presentacion=Y&referencia=Z, abre la pestaña Crear OT
+   * y consulta ese item como lo hace el doble clic de la búsqueda por item. Luego quita los parámetros de la URL
+   * para que al recargar no se vuelva a cargar. Sin parámetros no hace nada.
+   * @returns No retorna un valor.
+   */
+  private cargarItemDesdeRuta() {
+    const parametros = this.rutaActiva.snapshot.queryParamMap;
+    const item = Number(parametros.get('item'));
+    const presentacion = parametros.get('presentacion');
+    if (!(item > 0) || !presentacion) return;
+    this.tabActivo = 1;
+    this.consultarClientes();
+    this.FormOrdenTrabajo.patchValue({
+      Id_Producto: item,
+      Nombre_Producto: parametros.get('referencia') ?? '',
+      Presentacion: presentacion == 'Kilo' ? 'Kg' : presentacion == 'Unidad' ? 'Und' : presentacion,
+    });
+    this.consultarInfoProducto();
+    this.router.navigate([], { relativeTo: this.rutaActiva, queryParams: {}, replaceUrl: true });
   }
 
   /**

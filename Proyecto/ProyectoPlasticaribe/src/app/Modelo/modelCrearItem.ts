@@ -159,6 +159,27 @@ export interface ItemBusqueda {
   etiqueta?: string;
 }
 
+/** Item de un cliente para "Copiar desde item" por cliente (`GET api/ClientesOtItems/cliente/{cliente}`). */
+export interface ItemCliente {
+  codigo: number;
+  nombre: string;
+  presentaciones: string[];
+  formato: string | null;
+  material: string | null;
+  pigmento: string | null;
+  /** Unidad de las medidas (Cms, Pulgadas...). */
+  unidad: string | null;
+  ancho: number;
+  largo: number;
+  fuelle: number;
+  calibre: number;
+  impresion: boolean;
+  laminado: boolean;
+  /** Nombres de las tintas usadas. */
+  tintas: string[];
+  fechaCreacion: string | null;
+}
+
 /** Artículo de Zeus de un producto en una presentación (`GET api/Producto/{codigo}/articulosZeus`). */
 export interface ArticuloZeus {
   codigo: string;
