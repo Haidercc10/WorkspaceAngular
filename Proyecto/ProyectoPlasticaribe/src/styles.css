@@ -12,6 +12,8 @@
   --rojoClaro: #e4636e;          /* detalles suaves; acento sobre fondo oscuro */
   --azul-marca: #131f4c;         /* azul marino del logo: encabezados, menú, títulos */
   --azul-marca-medio: #283a75;   /* hover, bordes y botones secundarios */
+  --azul-boton: #283a75;         /* botones rellenos azules con ícono blanco (p. ej. editar en tablas): igual en ambos
+                                    temas, como --rojo; --azul-marca-medio cambia a lavanda en oscuro y no sirve de fondo */
 
   /* Neutros (reemplazan los #ccc, #ddd, #eee... sueltos; son iguales en ambos temas,
      para fondos y textos que deban cambiar con el tema usar las variables de abajo) */
@@ -526,6 +528,83 @@ th {
   font-weight: 500;
 }
 
+/* ==================== TOASTS CON MENSAJES LARGOS ====================
+   Algunos errores traen la excepción completa (URL, stack trace) sin espacios: el texto no se partía, ensanchaba
+   el toast y sacaba la X de la pantalla, sin forma de cerrarlo. Aplica a todos los p-toast (éxito, error,
+   advertencia, info), también a los que usan pTemplate="message".
+   - El toast centrado crece hasta 34rem (sin pasar del ancho de la pantalla); los breakpoints de cada p-toast siguen mandando.
+   - El texto se parte donde haga falta y el detalle hace scroll pasado el 40% del alto de la pantalla.
+   - La X nunca se encoge ni se desplaza: queda arriba a la derecha. */
+.p-toast {
+  max-width: calc(100vw - 2rem);
+}
+
+/* Varios toasts largos a la vez: la pila no pasa del alto de la pantalla y hace scroll, para que ninguno quede
+   fuera de la vista sin poder alcanzar su X */
+.p-toast.p-toast-center {
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.p-toast .p-toast-message .p-toast-message-content {
+  align-items: flex-start;
+}
+
+/* Todo lo que no sea el ícono ni la X puede encogerse (sin min-width 0, un texto sin espacios no se parte) */
+.p-toast .p-toast-message .p-toast-message-content > :not(.p-toast-icon-close):not(.p-toast-message-icon) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.p-toast .p-toast-message .p-toast-message-content,
+.p-toast .p-toast-message .p-toast-summary,
+.p-toast .p-toast-message .p-toast-detail {
+  overflow-wrap: anywhere;
+}
+
+.p-toast .p-toast-message .p-toast-message-content .p-toast-detail {
+  max-height: 40vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.p-toast .p-toast-message .p-toast-icon-close,
+.p-toast .p-toast-message .p-toast-message-icon {
+  flex-shrink: 0;
+}
+
+/* Scroll del detalle delgado y del color de cada tipo de toast (en vez del rojo global de las barras de scroll):
+   error rojo, éxito verde, advertencia ámbar, info azul. Son los mismos colores de texto de estado de la paleta,
+   con su versión para modo oscuro. */
+.p-toast .p-toast-message { --scroll-toast: var(--text-color-secondary); }
+.p-toast .p-toast-message.p-toast-message-error { --scroll-toast: var(--texto-peligro); }
+.p-toast .p-toast-message.p-toast-message-success { --scroll-toast: var(--texto-exito); }
+.p-toast .p-toast-message.p-toast-message-warn { --scroll-toast: var(--texto-advertencia); }
+.p-toast .p-toast-message.p-toast-message-info { --scroll-toast: var(--texto-info); }
+
+.p-toast .p-toast-message .p-toast-detail::-webkit-scrollbar {
+  width: 5px;
+}
+
+.p-toast .p-toast-message .p-toast-detail::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.p-toast .p-toast-message .p-toast-detail::-webkit-scrollbar-thumb {
+  background: var(--scroll-toast);
+  border-radius: 999px;
+}
+
+/* Firefox (no tiene ::-webkit-scrollbar). En Chrome no se ponen: si están, ignora los ::-webkit-scrollbar */
+@supports (-moz-appearance: none) {
+  .p-toast .p-toast-message .p-toast-detail {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-toast) transparent;
+  }
+}
+
 /* Mensajes informativos (severity 'info') en azul de la paleta: el tema lara los pinta en morado (#696cff).
    El prefijo "html body" gana al tema, que se carga con <link id="app-theme"> (claro u oscuro). */
 html body .p-toast .p-toast-message.p-toast-message-info,
@@ -548,6 +627,13 @@ html body .p-inline-message.p-inline-message-info .p-inline-message-icon {
 /* ESTILO DE PRIMENG */
 .p-input-icon-left {
   width: 100%;
+}
+
+/* Edge agrega su propio ojo (y una X) a los campos de contraseña; los formularios de la app ya tienen su botón
+   para ver la contraseña, así que salían dos. Se ocultan los del navegador en toda la app. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }
 
 .p-dropdown-icon-left > i {
