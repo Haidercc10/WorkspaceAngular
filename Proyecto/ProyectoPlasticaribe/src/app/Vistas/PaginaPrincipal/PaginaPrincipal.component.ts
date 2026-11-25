@@ -1,6 +1,5 @@
-import { Component, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
 import moment from 'moment';
-import { TabView } from 'primeng/tabview';
 import { AppComponent } from 'src/app/app.component';
 import { modelUsabilidad_Modulos } from 'src/app/Modelo/modelUsabilidad_Modulos';
 import { UsabilidadModulosService } from 'src/app/Servicios/Usabilidad_Modulos/usabilidad-modulos.service';
@@ -17,26 +16,6 @@ import { ConfirmationService } from 'primeng/api';
 })
 
 export class PaginaPrincipalComponent implements OnInit, OnDestroy {
-
-  @ViewChild('tabView') tabView : TabView; //Referencia al p-tabView para conocer el título de la pestaña seleccionada
-  //Fondo (clase CSS) que se muestra para cada pestaña, según su título
-  readonly fondoPorTab : { [header : string] : string } = {
-    'Producción' : 'fondo-produccion',
-    'Ordenes de Trabajo' : 'fondo-ot',
-    'Facturación' : 'fondo-facturacion',
-    'Materia Prima' : 'fondo-materia-prima',
-    'Pedidos' : 'fondo-pedidos',
-    'Facturación Vendedores' : 'fondo-facturacion-vendedores',
-    'Recaudos' : 'fondo-recaudos',
-    'Cuentas Por Pagar' : 'fondo-cuentas-pagar',
-    'Gerencia' : 'fondo-gerencia',
-    'Costos' : 'fondo-costos',
-    'Compras' : 'fondo-compras',
-    'Producción Áreas' : 'fondo-produccion-areas',
-    'Calidad' : 'fondo-calidad',
-  };
-  readonly capasFondo : string[] = Object.values(this.fondoPorTab); //Capas de fondo que se pintan en la vista
-  fondoActivo : string = 'fondo-produccion'; //Capa de fondo visible actualmente
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -66,7 +45,6 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.lecturaStorage();
     this.verificarAvisoTickets();
-    this.fondoActivo = [2].includes(this.ValidarRol) ? 'fondo-ot' : 'fondo-produccion'; //Para el rol 2 la primera pestaña es Ordenes de Trabajo
     this.production = true;
     this.ordenTrabajo = true;
   }
@@ -136,7 +114,6 @@ export class PaginaPrincipalComponent implements OnInit, OnDestroy {
   cambioTab(e : any) {  
     var index = e.index;
     let tab : any = e.originalEvent.srcElement.innerText;
-    this.fondoActivo = this.fondoPorTab[this.tabView?.tabs?.[index]?.header] ?? this.fondoActivo;
 
     //Usuario administrador.
     index == 1 ? this.ordenTrabajo = true : this.ordenTrabajo = false;

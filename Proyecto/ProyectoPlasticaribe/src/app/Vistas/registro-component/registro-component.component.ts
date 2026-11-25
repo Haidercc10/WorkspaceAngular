@@ -44,6 +44,13 @@ const proporcionLogo = () : number => {
 /** Límites del formulario de usuarios. */
 export const LIMITES_USUARIO = { nombre: 50, digitos: 16, password: 25 };
 
+/**
+ * Límites de roles y áreas, según las columnas de la BD: RolUsu_Nombre, Area_Nombre y tpUsu_Nombre son varchar(50)
+ * (crear un rol crea un tipo de usuario con el mismo nombre); RolUsu_Descripcion es varchar(200);
+ * Area_Descripcion es varchar(max), se limita a 500 (regla para campos de observación sin máximo).
+ */
+export const LIMITES_ROL_AREA = { nombre: 50, descripcionRol: 200, descripcionArea: 500 };
+
 /** Dígitos que toma el ID de usuario desde el final de la cédula. */
 const DIGITOS_ID_DESDE_CEDULA = 4;
 
@@ -83,6 +90,10 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
   arrayRoles : any[] = [];
   arrayEstados : any[] = [];
   arrayTiposUsuarios : any[] = [];
+  /** Opciones de los dropdowns del formulario de usuario, en orden alfabético. */
+  tiposUsuarioOrdenados : any[] = [];
+  areasOrdenadas : any[] = [];
+  rolesOrdenados : any[] = [];
   vistasAplicacion : any[] = []; /** Nodos del treeSelect de vistas (key = vp_Id) */
 
   // Usuarios
@@ -95,6 +106,7 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
   dialogUsuarios : boolean = false;
   accion : 'Crear' | 'Editar' = 'Crear';
   readonly limites = LIMITES_USUARIO;
+  readonly limitesRolArea = LIMITES_ROL_AREA;
   verPassword : boolean = false;
   /** true cuando el administrador escribió o borró el ID a mano: la cédula deja de rellenarlo. */
   private idEditadoManualmente : boolean = false;
@@ -134,14 +146,14 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
     });
 
     this.formRoles = this.formBuilder.group({
-      rolNombre: [null, Validators.required],
-      rolDescripcion: [null, Validators.required],
+      rolNombre: [null, [Validators.required, Validators.maxLength(LIMITES_ROL_AREA.nombre)]],
+      rolDescripcion: [null, [Validators.required, Validators.maxLength(LIMITES_ROL_AREA.descripcionRol)]],
       Vistas: [[], Validators.required],
     });
 
     this.formAreas = this.formBuilder.group({
-      areaNombre: [null, Validators.required],
-      areaDescripcion: [null],
+      areaNombre: [null, [Validators.required, Validators.maxLength(LIMITES_ROL_AREA.nombre)]],
+      areaDescripcion: [null, Validators.maxLength(LIMITES_ROL_AREA.descripcionArea)],
     });
   }
 
@@ -160,13 +172,28 @@ export class RegistroComponentComponent implements OnInit, OnDestroy {
 
   /* ============================== Catálogos ============================== */
 
-  cargarAreas = () => this.servicioAreas.srvObtenerLista().subscribe(data => this.arrayAreas = data);
+  /** Copia ordenada alfabéticamente por `campo` (sin distinguir mayúsculas ni tildes). */
+  private static ordenarPorNombre = (lista : any[], campo : string) : any[] =>
+    [...(lista ?? [])].sort((a, b) => String(a?.[campo] ?? '').localeCompare(String(b?.[campo] ?? ''), 'es', { sensitivity: 'base' }));
 
-  cargarRoles = () => this.servicioRoles.srvObtenerLista().subscribe(data => this.arrayRoles = data);
+  // Los dropdowns del formulario de usuario usan copias ordenadas alfabéticamente; las tablas de Roles y Áreas
+  // conservan el orden de la API (y se ordenan con sus encabezados).
+  cargarAreas = () => this.servicioAreas.srvObtenerLista().subscribe(data => {
+    this.arrayAreas = data;
+    this.areasOrdenadas = RegistroComponentComponent.ordenarPorNombre(data, 'area_Nombre');
+  });
+
+  cargarRoles = () => this.servicioRoles.srvObtenerLista().subscribe(data => {
+    this.arrayRoles = data;
+    this.rolesOrdenados = RegistroComponentComponent.ordenarPorNombre(data, 'rolUsu_Nombre');
+  });
 
   cargarEstados = () => this.servicioEstados.srvObtenerListaEstados().subscribe(data => this.arrayEstados = data.filter(item => item.estado_Nombre == 'ACTIVO' || item.estado_Nombre == 'INACTIVO'));
 
-  cargarTiposUsuarios = () => this.servicioTpUsuarios.srvObtenerLista().subscribe(data => this.arrayTiposUsuarios = data);
+  cargarTiposUsuarios = () => this.servicioTpUsuarios.srvObtenerLista().subscribe(data => {
+    this.arrayTiposUsuarios = data;
+    this.tiposUsuarioOrdenados = RegistroComponentComponent.ordenarPorNombre(data, 'tpUsu_Nombre');
+  });
 
   cargarVistas() {
     this.vistasPermisosService.Get_Todo().subscribe((data : any[]) => {
