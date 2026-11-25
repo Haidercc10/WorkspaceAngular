@@ -20,16 +20,16 @@ import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.servi
 import { pasosTutorialPedidosZeus } from 'src/app/Tutoriales/Tutoriales_PedidosZeus';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import {
-  DIAS_PROXIMOS, ESTADOS_OT, IndicadoresPedidos, OtDePedido, PedidoZeusLinea, ResumenPedido, Semaforo,
-  agruparPorConsecutivo, calcularIndicadores, calcularSemaforo, ciudadLegible, mapearLinea, normalizar, normalizarMunicipio, parsearCiudad,
-  procesoActualOt, resumirPedidos, sumarPor, textoBusqueda,
+  DIAS_PROXIMOS, ESTADOS_OT, IndicadoresPedidos, ItemConsolidado, OtDePedido, PedidoZeusLinea, ResumenPedido, SUGERENCIAS, Semaforo,
+  agruparPorConsecutivo, asignarStock, calcularIndicadores, calcularSemaforo, ciudadLegible, claveItem, consolidarPorItem, mapearLinea,
+  normalizar, normalizarMunicipio, parsearCiudad, procesoActualOt, resumirPedidos, sumarPor, textoBusqueda,
 } from './ReportePedidos_Zeus.modelo';
 
 /** Columna de la tabla de detalle. */
 interface ColumnaPedido {
   field: keyof PedidoZeusLinea | 'ciudadLegible';
   header: string;
-  tipo: 'texto' | 'numero' | 'moneda' | 'estado' | 'ot' | 'proceso' | 'producto' | 'entrega';
+  tipo: 'texto' | 'numero' | 'moneda' | 'estado' | 'ot' | 'proceso' | 'producto' | 'entrega' | 'stock' | 'sugerencia';
   defecto: boolean;
 }
 
@@ -58,7 +58,7 @@ interface ConsolidadoAsesor {
   proyectado: number | null;
 }
 
-const CLAVE_COLUMNAS = 'pedidos-zeus-columnas-v1';
+const CLAVE_COLUMNAS = 'pedidos-zeus-columnas-v2'; // v2: columna Sugerencia (las columnas guardadas antes vuelven al defecto)
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -125,9 +125,9 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
     { label: 'Parcialmente satisfecho', value: 'Parcialmente Satisfecho' },
   ];
   readonly opcionesSemaforo: { label: string; value: Semaforo; tooltip: string }[] = [
-    { label: 'Completo', value: 'completo', tooltip: 'Todos los ítems del pedido tienen stock suficiente: se puede facturar completo' },
-    { label: 'Parcial', value: 'parcial', tooltip: 'Al menos un ítem del pedido tiene stock suficiente' },
-    { label: 'Sin stock', value: 'sinStock', tooltip: 'Ningún ítem del pedido tiene stock suficiente' },
+    { label: 'Completo', value: 'completo', tooltip: 'El stock que le corresponde alcanza para todos los ítems del pedido: se puede facturar completo' },
+    { label: 'Parcial', value: 'parcial', tooltip: 'El stock que le corresponde alcanza para al menos un ítem del pedido' },
+    { label: 'Sin stock', value: 'sinStock', tooltip: 'Ningún ítem del pedido tiene stock disponible (no hay, o se sugiere para pedidos con mayor prioridad)' },
   ];
   readonly opcionesOrden = [
     { label: 'Semáforo', value: 'semaforo' },
@@ -143,7 +143,8 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
     { field: 'id_Producto', header: 'Ítem', tipo: 'texto', defecto: true },
     { field: 'producto', header: 'Producto', tipo: 'producto', defecto: true },
     { field: 'cant_Pendiente', header: 'Pendiente', tipo: 'numero', defecto: true },
-    { field: 'existencias', header: 'Stock', tipo: 'numero', defecto: true },
+    { field: 'existencias', header: 'Stock', tipo: 'stock', defecto: true },
+    { field: 'sugerencia', header: 'Sugerencia', tipo: 'sugerencia', defecto: true },
     { field: 'presentacion', header: 'Und', tipo: 'texto', defecto: true },
     { field: 'precioUnidad', header: 'Precio U.', tipo: 'moneda', defecto: true },
     { field: 'costo_Cant_Pendiente', header: 'Total pendiente', tipo: 'moneda', defecto: true },
@@ -168,6 +169,15 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
   lineasPagina: PedidoZeusLinea[] = [];
   /** Página (base 0) donde empiezan los pedidos sin stock; null si no aplica. */
   paginaSinStock: number | null = null;
+  /** Pestaña de la tabla: detalle por pedido o consolidado por ítem. */
+  vista: 'pedidos' | 'items' = 'pedidos';
+  /** Consolidado de todos los ítems (con todas sus líneas, aunque algunas no cumplan los filtros: compiten por el mismo stock). */
+  private itemsGlobales = new Map<string, ItemConsolidado>();
+  itemsFiltrados: ItemConsolidado[] = [];
+  itemsEnDisputa: number = 0;
+  soloEnDisputa: boolean = false;
+  expandedItems: { [clave: string]: boolean } = {};
+  readonly sugerencias = SUGERENCIAS;
   lineaDetalle: PedidoZeusLinea | null = null;
   detalleVisible: boolean = false;
   modalEstadosOrdenes: boolean = false;
@@ -236,10 +246,16 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
     this.tutoriales.cancelar(); // alCambiarTema ya se desuscribe solo al destruir el componente
   }
 
-  tutorial = () => this.tutoriales.iniciar(pasosTutorialPedidosZeus({ veFiltroVendedor: this.veFiltroVendedor, puedeVerOt: this.ValidarRol == 1 }));
+  tutorial() {
+    this.vista = 'pedidos'; // el tutorial señala la tabla por pedido
+    this.tutoriales.iniciar(pasosTutorialPedidosZeus({ veFiltroVendedor: this.veFiltroVendedor, puedeVerOt: this.ValidarRol == 1, esAdministrador: this.esAdministrador }));
+  }
 
   /** El rol 2 (vendedor) ya recibe solo sus pedidos desde el servidor. */
   get veFiltroVendedor(): boolean { return this.ValidarRol != 2; }
+
+  /** El análisis de pedidos (gráficas) solo lo ven los administradores. */
+  get esAdministrador(): boolean { return this.ValidarRol == 1; }
 
   // =====================================================================
   // Carga
@@ -257,7 +273,10 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
       next: (datos: any[]) => {
         const hoy = moment().startOf('day');
         this.lineas = (datos ?? []).map((d, i) => mapearLinea(d, i, hoy));
+        asignarStock(this.lineas); // reparte el stock entre los pedidos que piden el mismo ítem
         calcularSemaforo(this.lineas);
+        this.itemsGlobales = consolidarPorItem(this.lineas);
+        this.expandedItems = {};
         this.completarDepartamentos();
         this.ultimaActualizacion = new Date();
         this.armarOpciones();
@@ -267,6 +286,7 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
       error: () => {
         this.errorCarga = true;
         this.lineas = [];
+        this.itemsGlobales = new Map();
         this.aplicarFiltros();
         this.msj.mensajeError('Error', 'No fue posible consultar los pedidos de Zeus. Intenta de nuevo con el botón Actualizar.');
       },
@@ -468,6 +488,7 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
       this.expandedRows = {};
       this.resumenes.forEach((_, consecutivo) => this.expandedRows[consecutivo] = true);
     }
+    this.armarItems();
     // Se calcula aquí y no en un getter: un getter crearía un arreglo nuevo en cada detección de cambios
     this.filtrosActivos = this.calcularFiltrosActivos();
     if (this.mostrarAnalisis) this.armarGraficas();
@@ -476,6 +497,45 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
   cambiarOrden() {
     this.ordenarLineas();
     this.paginar(true);
+  }
+
+  /**
+   * Pestaña "Por ítem": los ítems que tienen alguna línea dentro de los filtros. Cada ítem muestra todas sus líneas
+   * (también las que no cumplen el filtro), porque todas compiten por el mismo stock. Primero los ítems en disputa.
+   */
+  armarItems() {
+    const claves = new Set(this.lineasFiltradas.map(claveItem));
+    const items = [...claves].map(c => this.itemsGlobales.get(c)).filter((i): i is ItemConsolidado => !!i);
+    this.itemsEnDisputa = items.filter(i => i.enDisputa).length;
+    this.itemsFiltrados = items
+      .filter(i => !this.soloEnDisputa || i.enDisputa)
+      .sort((a, b) => Number(b.enDisputa) - Number(a.enDisputa) || b.valorPendiente - a.valorPendiente);
+  }
+
+  /** La línea cumple los filtros activos (en la pestaña por ítem se atenúan las que no). */
+  enFiltro = (linea: PedidoZeusLinea) => this.idsFiltrados.has(linea.id);
+  private get idsFiltrados(): Set<number> {
+    if (this.cacheIds.origen !== this.lineasFiltradas) this.cacheIds = { origen: this.lineasFiltradas, ids: new Set(this.lineasFiltradas.map(l => l.id)) };
+    return this.cacheIds.ids;
+  }
+  private cacheIds: { origen: PedidoZeusLinea[] | null; ids: Set<number> } = { origen: null, ids: new Set() };
+
+  /** Texto del porqué de la prioridad de una línea frente a las demás que piden el mismo ítem. */
+  motivoPrioridad(l: PedidoZeusLinea): string {
+    const partes: string[] = [];
+    if (l.vencido) partes.push(`vencido hace ${-l.diasEntrega} ${l.diasEntrega === -1 ? 'día' : 'días'}`);
+    else if (l.fecha_Entrega) partes.push(l.diasEntrega === 0 ? 'entrega hoy' : `entrega en ${l.diasEntrega} ${l.diasEntrega === 1 ? 'día' : 'días'}`);
+    if (l.plazoPago != null) partes.push(l.plazoPago === 0 ? 'cliente de contado' : `plazo de pago ${l.plazoPago} días`);
+    return partes.join(' · ');
+  }
+
+  /** Explicación de la sugerencia de una línea (tooltip). */
+  explicarSugerencia(l: PedidoZeusLinea): string {
+    const base = this.sugerencias[l.sugerencia].tooltip;
+    if (l.pedidosItem <= 1) return base;
+    const competencia = `Prioridad ${l.prioridadStock} de ${l.pedidosItem} líneas que piden este ítem.`;
+    const con = l.comprometidoCon.length ? ` El stock se sugiere primero para: ${l.comprometidoCon.join(', ')}.` : '';
+    return `${base}. ${competencia}${con}`;
   }
 
   /**
@@ -634,6 +694,7 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
   // =====================================================================
 
   alternarAnalisis() {
+    if (!this.esAdministrador) return;
     this.mostrarAnalisis = !this.mostrarAnalisis;
     if (this.mostrarAnalisis) this.armarGraficas();
   }
@@ -759,8 +820,16 @@ export class ReportePedidos_ZeusComponent implements OnInit, OnDestroy {
     if (!this.facturacion$) {
       const actual = moment();
       const anterior = moment().subtract(1, 'month'); // en enero, el mes anterior es diciembre del año pasado
-      const aMapa = (lista: { vendedor: string; total: number }[]) =>
-        new Map((lista ?? []).map(x => [this.codigoVendedor(x.vendedor), Number(x.total) || 0] as [string, number]));
+      // Se suman los códigos que coinciden al normalizarlos ("7" y "007"): antes el último sobrescribía al primero
+      // y, si era solo el de devoluciones, el asesor quedaba en negativo
+      const aMapa = (lista: { vendedor: string; total: number }[]) => {
+        const totales = new Map<string, number>();
+        (lista ?? []).forEach(x => {
+          const codigo = this.codigoVendedor(x.vendedor);
+          totales.set(codigo, (totales.get(codigo) ?? 0) + (Number(x.total) || 0));
+        });
+        return totales;
+      };
       this.facturacion$ = forkJoin([
         this.inventarioZeusService.GetCostoFacturado_Vendedores(anterior.format('MM'), anterior.year()),
         this.inventarioZeusService.GetCostoFacturado_Vendedores(actual.format('MM'), actual.year()),

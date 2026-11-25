@@ -34,8 +34,25 @@ export interface PedidoZeusLinea {
   fecha_Creacion: string;
   fecha_Entrega: string;
   fecha_Factura: string;
-  /** La línea se puede facturar ya: stock ≥ pendiente. */
+  /** Días de plazo de pago del cliente (Zeus CLIENTES.DIPLAZO); null si la API no lo envía. */
+  plazoPago: number | null;
+  /** El stock del ítem alcanza para esta línea sola (sin contar los demás pedidos que piden el mismo ítem). */
+  stockSuficiente: boolean;
+  /**
+   * La línea se puede facturar ya: el stock que le queda después de atender a los pedidos con mayor prioridad
+   * cubre lo pendiente (ver asignarStock). Si el ítem está en 3 pedidos y el stock alcanza para uno, solo uno es facturable.
+   */
   facturable: boolean;
+  /** Cantidad de stock sugerida para esta línea según la prioridad. */
+  asignado: number;
+  /** Posición de la línea entre las que piden el mismo ítem (1 = se le asigna stock primero). */
+  prioridadStock: number;
+  /** Cuántas líneas abiertas piden el mismo ítem (incluida esta). */
+  pedidosItem: number;
+  /** Sugerencia de facturación según el stock asignado. */
+  sugerencia: Sugerencia;
+  /** Pedidos con mayor prioridad que consumen el stock que esta línea no alcanzó. */
+  comprometidoCon: string[];
   /** Semáforo del pedido al que pertenece la línea (se repite en todas sus líneas). */
   semaforoPedido: Semaforo;
   /** Fecha de entrega anterior a hoy. */
@@ -58,6 +75,16 @@ export interface PedidoZeusLinea {
 export function textoBusqueda(l: PedidoZeusLinea): string {
   return normalizar(`${l.consecutivo} ${l.cliente} ${l.nitCliente} ${l.id_Producto} ${l.producto} ${l.orden_Compra_CLiente} ${l.OT}`);
 }
+
+/** Qué hacer con una línea según el stock que le corresponde. */
+export type Sugerencia = 'facturar' | 'parcial' | 'comprometido' | 'sinStock';
+
+export const SUGERENCIAS: Record<Sugerencia, { nombre: string; clase: string; tooltip: string }> = {
+  facturar: { nombre: 'Facturar', clase: 'badge-exito', tooltip: 'El stock sugerido cubre todo lo pendiente' },
+  parcial: { nombre: 'Parcial', clase: 'badge-info', tooltip: 'El stock sugerido cubre solo una parte de lo pendiente' },
+  comprometido: { nombre: 'Comprometido', clase: 'badge-advertencia', tooltip: 'Hay stock, pero se sugiere para pedidos con mayor prioridad' },
+  sinStock: { nombre: 'Sin stock', clase: 'badge-peligro', tooltip: 'El ítem no tiene stock' },
+};
 
 /** Encabezado de un pedido (lo que se muestra en la fila de grupo de la tabla). */
 export interface ResumenPedido {
@@ -167,7 +194,14 @@ export function mapearLinea(datos: any, indice: number, hoy: moment.Moment = mom
     fecha_Creacion: fecha(datos.fecha_Creacion),
     fecha_Entrega: fechaEntrega,
     fecha_Factura: datos.fecha_Factura ?? '',
-    facturable: existencias >= pendiente,
+    plazoPago: datos.plazo_Pago == null || datos.plazo_Pago === '' ? null : numero(datos.plazo_Pago),
+    stockSuficiente: existencias >= pendiente,
+    facturable: existencias >= pendiente, // se recalcula en asignarStock
+    asignado: 0,
+    prioridadStock: 1,
+    pedidosItem: 1,
+    sugerencia: 'sinStock',
+    comprometidoCon: [],
     semaforoPedido: 'sinStock',
     vencido: !!fechaEntrega && diasEntrega < 0,
     diasEntrega,
@@ -179,6 +213,103 @@ export function mapearLinea(datos: any, indice: number, hoy: moment.Moment = mom
   };
   linea.busqueda = textoBusqueda(linea);
   return linea;
+}
+
+/** Clave del ítem en inventario: el stock de Zeus es por código y presentación. */
+export const claveItem = (l: Pick<PedidoZeusLinea, 'id_Producto' | 'presentacion'>) => `${l.id_Producto}|${normalizar(l.presentacion)}`;
+
+/**
+ * Prioridad para repartir el stock entre las líneas que piden el mismo ítem:
+ * 1. La fecha de entrega más antigua primero: los vencidos (el de más días de atraso antes) y luego la entrega más próxima.
+ * 2. Con la misma fecha de entrega, el cliente con menor plazo de pago (el dinero entra antes).
+ * 3. Por último, el pedido más antiguo (orden de llegada).
+ */
+export function compararPrioridad(a: PedidoZeusLinea, b: PedidoZeusLinea): number {
+  return (a.fecha_Entrega || '9999-12-31').localeCompare(b.fecha_Entrega || '9999-12-31')
+    || (a.plazoPago ?? Number.MAX_SAFE_INTEGER) - (b.plazoPago ?? Number.MAX_SAFE_INTEGER)
+    || a.fecha_Creacion.localeCompare(b.fecha_Creacion)
+    || Number(a.consecutivo) - Number(b.consecutivo)
+    || a.id - b.id;
+}
+
+/**
+ * Reparte el stock de cada ítem entre todas las líneas que lo piden, en orden de prioridad (compararPrioridad).
+ * Así, si 3 pedidos piden 100 y hay 100 en stock, solo el primero queda facturable y los otros quedan "comprometidos".
+ * Debe ejecutarse antes de calcularSemaforo, porque el semáforo usa `facturable`.
+ */
+export function asignarStock(lineas: PedidoZeusLinea[]): void {
+  const porItem = new Map<string, PedidoZeusLinea[]>();
+  for (const l of lineas) {
+    const clave = claveItem(l);
+    const grupo = porItem.get(clave);
+    if (grupo) grupo.push(l); else porItem.set(clave, [l]);
+  }
+  for (const grupo of porItem.values()) {
+    grupo.sort(compararPrioridad);
+    let restante = Math.max(grupo[0].existencias, 0);
+    const consumidores: string[] = [];
+    grupo.forEach((l, i) => {
+      l.prioridadStock = i + 1;
+      l.pedidosItem = grupo.length;
+      l.asignado = Math.max(Math.min(restante, l.cant_Pendiente), 0);
+      restante -= l.asignado;
+      l.facturable = l.asignado >= l.cant_Pendiente;
+      l.sugerencia = l.facturable ? 'facturar'
+        : l.asignado > 0 ? 'parcial'
+        : l.existencias > 0 ? 'comprometido' : 'sinStock';
+      l.comprometidoCon = l.facturable ? [] : [...new Set(consumidores)];
+      if (l.asignado > 0) consumidores.push(l.consecutivo);
+    });
+  }
+}
+
+/** Ítem consolidado: todas las líneas abiertas que piden el mismo ítem, en orden de prioridad. */
+export interface ItemConsolidado {
+  clave: string;
+  id_Producto: string;
+  producto: string;
+  presentacion: string;
+  existencias: number;
+  pendienteTotal: number;
+  valorPendiente: number;
+  /** Lo que falta para cubrir todos los pedidos. */
+  faltante: number;
+  /** % de lo pendiente que cubre el stock (0–100). */
+  cobertura: number;
+  pedidos: number;
+  facturables: number;
+  /** Varias líneas piden el ítem y el stock alcanza para alguna pero no para todas: hay que decidir a quién facturar. */
+  enDisputa: boolean;
+  lineas: PedidoZeusLinea[];
+}
+
+/** Consolida las líneas por ítem (después de asignarStock), con sus líneas en orden de prioridad. */
+export function consolidarPorItem(lineas: PedidoZeusLinea[]): Map<string, ItemConsolidado> {
+  const items = new Map<string, ItemConsolidado>();
+  for (const l of lineas) {
+    const clave = claveItem(l);
+    let item = items.get(clave);
+    if (!item) {
+      item = {
+        clave, id_Producto: l.id_Producto, producto: l.producto, presentacion: l.presentacion, existencias: l.existencias,
+        pendienteTotal: 0, valorPendiente: 0, faltante: 0, cobertura: 0, pedidos: 0, facturables: 0, enDisputa: false, lineas: [],
+      };
+      items.set(clave, item);
+    }
+    item.lineas.push(l);
+    item.pendienteTotal += l.cant_Pendiente;
+    item.valorPendiente += l.costo_Cant_Pendiente;
+    if (l.facturable) item.facturables++;
+  }
+  for (const item of items.values()) {
+    item.lineas.sort(compararPrioridad);
+    item.pedidos = new Set(item.lineas.map(l => l.consecutivo)).size;
+    const stock = Math.max(item.existencias, 0);
+    item.faltante = Math.max(item.pendienteTotal - stock, 0);
+    item.cobertura = item.pendienteTotal > 0 ? Math.min(stock / item.pendienteTotal, 1) * 100 : 100;
+    item.enDisputa = item.lineas.length > 1 && stock > 0 && stock < item.pendienteTotal;
+  }
+  return items;
 }
 
 /** Agrupa las líneas por consecutivo conservando el orden de llegada. */
