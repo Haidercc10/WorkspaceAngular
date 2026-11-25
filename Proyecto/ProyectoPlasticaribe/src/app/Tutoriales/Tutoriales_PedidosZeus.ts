@@ -12,10 +12,12 @@ export interface ContextoTutorialPedidosZeus {
   veFiltroVendedor : boolean;
   /** Puede abrir los procesos de la OT con doble clic (rol 1). */
   puedeVerOt : boolean;
+  /** Ve el panel de Análisis (solo administradores, rol 1). */
+  esAdministrador : boolean;
 }
 
 export function pasosTutorialPedidosZeus(ctx : ContextoTutorialPedidosZeus) : Step.StepOptions[] {
-  const { veFiltroVendedor, puedeVerOt } = ctx;
+  const { veFiltroVendedor, puedeVerOt, esAdministrador } = ctx;
 
   return armar('tutorial-pedidos-zeus', [
     paso(null, 'Pedidos de Productos',
@@ -26,27 +28,33 @@ export function pasosTutorialPedidosZeus(ctx : ContextoTutorialPedidosZeus) : St
       `<p>Resumen de los pedidos que estás viendo:</p>
        <ul>
          <li><b>Valor pendiente:</b> lo que falta por facturar.</li>
-         <li><b>Listo para facturar:</b> ítems con stock suficiente.</li>
+         <li><b>Listo para facturar:</b> ítems cuyo stock sugerido cubre lo pendiente (el stock de un ítem se cuenta una sola vez aunque esté en varios pedidos).</li>
          <li><b>Vencidos</b>, <b>Próximos 30 días</b> y <b>Programados</b>: según la fecha de entrega.</li>
          <li><b>Sin OT:</b> ítems que aún no tienen orden de trabajo.</li>
        </ul>
        <p>Haz clic en una tarjeta para filtrar la tabla; otro clic quita el filtro.</p>`),
 
-    paso('#panelAnalisis', 'Análisis',
+    esAdministrador && paso('#panelAnalisis', 'Análisis',
       `<p>Abre este panel para ver gráficas del valor pendiente por mes de entrega, por cliente y por vendedor.</p>
        <p>Las gráficas respetan los filtros que tengas aplicados.</p>`),
 
     paso('#filtrosPedidos', 'Filtros',
-      `<p>Busca por número de pedido, cliente, ítem, producto, orden de compra u OT, y combina los filtros de departamento, municipio, cliente${veFiltroVendedor ? ', vendedor' : ''} y rango de fecha de entrega.</p>
-       <p>Los municipios se limitan a los departamentos elegidos. Los botones de <b>Estado</b> y <b>Semáforo</b> se activan y desactivan con un clic.</p>
+      `<p>Los filtros están por secciones: <b>Búsqueda</b>, <b>Cliente${veFiltroVendedor ? ' y vendedor' : ''}</b>, <b>Ubicación</b>, <b>Fechas</b> (rango de entrega, mes de creación y mes de entrega) y <b>Estado y semáforo</b>.</p>
+       <p>Pasa el mouse sobre el ícono <i class="pi pi-question-circle"></i> de cada filtro para ver qué hace.</p>
        <p>Todo lo que filtres se aplica también a los indicadores, las gráficas y las exportaciones.</p>`),
 
     paso('#leyendaPedidos', 'Semáforo',
       `<ul>
-         <li><b>Completo (verde):</b> todos los ítems del pedido tienen stock: se puede facturar completo.</li>
-         <li><b>Parcial (azul):</b> al menos un ítem tiene stock. Esos ítems salen con fondo verde.</li>
-         <li><b>Sin stock (gris):</b> ningún ítem tiene stock suficiente.</li>
-       </ul>`),
+         <li><b>Completo (verde):</b> el stock que le corresponde alcanza para todos los ítems del pedido.</li>
+         <li><b>Parcial (azul):</b> alcanza para al menos un ítem. Esos ítems salen con fondo verde.</li>
+         <li><b>Sin stock (rojo):</b> ningún ítem tiene stock disponible.</li>
+       </ul>
+       <p>Si varios pedidos piden el mismo ítem, el stock se reparte empezando por el más vencido.</p>`),
+
+    paso('#pestanasPedidos', 'Por pedido o por ítem',
+      `<p><b>Por pedido:</b> cada pedido con sus ítems.</p>
+       <p><b>Por ítem:</b> cada ítem con todos los pedidos que lo piden, el stock sugerido para cada uno y a cuál conviene facturar primero:
+       el más vencido o con la entrega más próxima; con la misma fecha, el cliente con menor plazo de pago; y luego el pedido más antiguo.</p>`),
 
     paso('#tablaPedidos', 'Pedidos',
       `<p>Cada pedido muestra su número, cliente, ciudad, fecha de entrega (en rojo si está vencido), valor pendiente y el botón para ver su <b>PDF</b>.</p>

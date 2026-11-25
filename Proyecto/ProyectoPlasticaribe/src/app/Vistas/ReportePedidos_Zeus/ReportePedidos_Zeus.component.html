@@ -60,7 +60,7 @@
       </ng-container>
     </div>
     <button type="button" class="kpi kpi--exito" [class.kpi--activo]="filtroKpi === 'facturable'" [attr.aria-pressed]="filtroKpi === 'facturable'"
-      (click)="seleccionarKpi('facturable')" pTooltip="Ítems con stock mayor o igual a lo pendiente: se pueden facturar ya" tooltipPosition="top">
+      (click)="seleccionarKpi('facturable')" pTooltip="Ítems cuyo stock sugerido cubre lo pendiente: se pueden facturar ya. Si varios pedidos piden el mismo ítem, el stock se cuenta una sola vez" tooltipPosition="top">
       <span class="kpi__titulo"><i class="pi pi-check-circle"></i> Listo para facturar</span>
       <ng-container *ngIf="!cargandoTabla; else kpiCargando">
         <b class="kpi__valor">{{indicadores.facturableValor | currency:'USD':'symbol':'1.0-0'}}</b>
@@ -103,7 +103,7 @@
   <ng-template #kpiCargando><p-skeleton width="8rem" height="1.6rem" styleClass="my-1"></p-skeleton><p-skeleton width="6rem" height="0.8rem"></p-skeleton></ng-template>
 
   <!-- Análisis (gráficas): cerrado por defecto para no recargar la vista -->
-  <div class="panel-analisis mb-3" id="panelAnalisis">
+  <div class="panel-analisis mb-3" id="panelAnalisis" *ngIf="esAdministrador">
     <button type="button" class="panel-analisis__boton" (click)="alternarAnalisis()" [attr.aria-expanded]="mostrarAnalisis" [disabled]="cargandoTabla">
       <i class="pi" [ngClass]="mostrarAnalisis ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
       <i class="pi pi-chart-bar"></i> Análisis de pedidos <small class="texto-secundario">(según los filtros)</small>
@@ -124,56 +124,136 @@
     </div>
   </div>
 
-  <!-- Filtros -->
-  <div class="barra-filtros mb-2" id="filtrosPedidos">
-    <div class="barra-filtros__rejilla">
-      <span class="p-input-icon-left buscador">
-        <i class="pi pi-search"></i>
-        <input pInputText type="text" [(ngModel)]="busqueda" (input)="buscar()" placeholder="Buscar pedido, cliente, ítem, OC u OT"
-          pTooltip="Busca por N° de pedido, cliente, NIT, ítem, producto, OC u OT" tooltipPosition="top" aria-label="Buscar pedidos">
-      </span>
-      <p-multiSelect [options]="opcionesDepartamentos" [(ngModel)]="departamentosSel" (onChange)="cambiarDepartamentos()"
-        placeholder="Departamento" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} departamentos"
-        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por departamento"></p-multiSelect>
-      <p-multiSelect [options]="opcionesMunicipios" [(ngModel)]="municipiosSel" (onChange)="aplicarFiltros()"
-        placeholder="Municipio" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} municipios"
-        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por municipio"></p-multiSelect>
-      <p-multiSelect [options]="opcionesClientes" [(ngModel)]="clientesSel" (onChange)="aplicarFiltros()"
-        placeholder="Cliente" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} clientes"
-        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por cliente"></p-multiSelect>
-      <p-dropdown *ngIf="veFiltroVendedor" [options]="opcionesVendedores" [(ngModel)]="vendedorSel" (onChange)="aplicarFiltros()"
-        placeholder="Vendedor" [filter]="true" emptyFilterMessage="Sin resultados" [showClear]="true" appendTo="body"
-        styleClass="filtro" ariaLabel="Filtrar por vendedor"></p-dropdown>
-      <p-calendar [(ngModel)]="rangoEntrega" selectionMode="range" [readonlyInput]="true" dateFormat="dd/mm/yy" placeholder="Fecha de entrega"
-        [showIcon]="true" [showButtonBar]="true" (onSelect)="aplicarFiltros()" (onClearClick)="aplicarFiltros()" appendTo="body"
-        styleClass="filtro" ariaLabel="Filtrar por rango de fecha de entrega"></p-calendar>
-      <p-multiSelect [options]="opcionesMesesCreacion" [(ngModel)]="mesesCreacionSel" (onChange)="aplicarFiltros()"
-        placeholder="Mes de creación" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} meses"
-        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por año y mes de creación"></p-multiSelect>
-      <p-multiSelect [options]="opcionesMesesEntrega" [(ngModel)]="mesesEntregaSel" (onChange)="aplicarFiltros()"
-        placeholder="Mes de entrega" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} meses"
-        [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" ariaLabel="Filtrar por año y mes de entrega (vencimiento)"></p-multiSelect>
-    </div>
-    <div class="barra-filtros__fila">
-      <span class="texto-secundario etiqueta-grupo">Estado:</span>
-      <button *ngFor="let e of opcionesEstado" type="button" class="chip-filtro" [class.chip-filtro--activo]="estadosSel.includes(e.value)"
-        [attr.aria-pressed]="estadosSel.includes(e.value)" (click)="alternarEstado(e.value)">{{e.label}}</button>
-      <span class="texto-secundario etiqueta-grupo" id="leyendaPedidos">Semáforo:</span>
-      <button *ngFor="let s of opcionesSemaforo" type="button" class="chip-filtro" [class.chip-filtro--activo]="semaforosSel.includes(s.value)"
-        [attr.aria-pressed]="semaforosSel.includes(s.value)" (click)="alternarSemaforo(s.value)" [pTooltip]="s.tooltip" tooltipPosition="top">
-        <span class="punto punto--{{s.value}}"></span>{{s.label}}</button>
-    </div>
+  <!-- Filtros, por secciones. Cada título tiene un ícono con la explicación del filtro -->
+  <div class="barra-filtros" id="filtrosPedidos">
+    <fieldset class="grupo-filtros grupo-filtros--busqueda">
+      <legend class="grupo-filtros__titulo"><i class="pi pi-search"></i> Búsqueda</legend>
+      <div class="campo">
+        <label for="filtroBusqueda" class="campo__etiqueta">Pedido, cliente, ítem, OC u OT
+          <i class="pi pi-question-circle campo__ayuda" pTooltip="Escribe parte del N° de pedido, nombre o NIT del cliente, código o nombre del ítem, orden de compra del cliente u OT. Se busca mientras escribes." tooltipPosition="top"></i>
+        </label>
+        <span class="p-input-icon-left buscador">
+          <i class="pi pi-search"></i>
+          <input id="filtroBusqueda" pInputText type="text" [(ngModel)]="busqueda" (input)="buscar()" placeholder="Escribe para buscar…">
+        </span>
+      </div>
+    </fieldset>
+
+    <fieldset class="grupo-filtros grupo-filtros--personas">
+      <legend class="grupo-filtros__titulo"><i class="pi pi-users"></i> Cliente y vendedor</legend>
+      <div class="grupo-filtros__campos grupo-filtros__campos--anchos">
+        <div class="campo">
+          <label for="filtroCliente" class="campo__etiqueta">Cliente
+            <i class="pi pi-question-circle campo__ayuda" pTooltip="Muestra solo los pedidos de los clientes elegidos (puedes elegir varios). Al lado del nombre aparece la ciudad del cliente." tooltipPosition="top"></i>
+          </label>
+          <p-multiSelect inputId="filtroCliente" [options]="opcionesClientes" [(ngModel)]="clientesSel" (onChange)="aplicarFiltros()"
+            placeholder="Todos los clientes" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} clientes"
+            [maxSelectedLabels]="1" appendTo="body" styleClass="filtro" panelStyleClass="panel-filtro-ancho"></p-multiSelect>
+        </div>
+        <div class="campo" *ngIf="veFiltroVendedor">
+          <label for="filtroVendedor" class="campo__etiqueta">Vendedor
+            <i class="pi pi-question-circle campo__ayuda" pTooltip="Muestra solo los pedidos del vendedor elegido. Usa la × para quitarlo." tooltipPosition="top"></i>
+          </label>
+          <p-dropdown inputId="filtroVendedor" [options]="opcionesVendedores" [(ngModel)]="vendedorSel" (onChange)="aplicarFiltros()"
+            placeholder="Todos los vendedores" [filter]="true" emptyFilterMessage="Sin resultados" [showClear]="true" appendTo="body"
+            styleClass="filtro" panelStyleClass="panel-filtro-ancho"></p-dropdown>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="grupo-filtros grupo-filtros--ubicacion">
+      <legend class="grupo-filtros__titulo"><i class="pi pi-map-marker"></i> Ubicación del cliente</legend>
+      <div class="grupo-filtros__campos">
+        <div class="campo">
+          <label for="filtroDepartamento" class="campo__etiqueta">Departamento
+            <i class="pi pi-question-circle campo__ayuda" pTooltip="Solo aparecen los departamentos que tienen pedidos abiertos. Al elegir uno, la lista de municipios se reduce a ese departamento." tooltipPosition="top"></i>
+          </label>
+          <p-multiSelect inputId="filtroDepartamento" [options]="opcionesDepartamentos" [(ngModel)]="departamentosSel" (onChange)="cambiarDepartamentos()"
+            placeholder="Todos" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} departamentos"
+            [maxSelectedLabels]="1" appendTo="body" styleClass="filtro"></p-multiSelect>
+        </div>
+        <div class="campo">
+          <label for="filtroMunicipio" class="campo__etiqueta">Municipio
+            <i class="pi pi-question-circle campo__ayuda" pTooltip="Ciudad del cliente según el DANE. Si elegiste departamentos, solo muestra sus municipios." tooltipPosition="top"></i>
+          </label>
+          <p-multiSelect inputId="filtroMunicipio" [options]="opcionesMunicipios" [(ngModel)]="municipiosSel" (onChange)="aplicarFiltros()"
+            placeholder="Todos" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} municipios"
+            [maxSelectedLabels]="1" appendTo="body" styleClass="filtro"></p-multiSelect>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="grupo-filtros grupo-filtros--fechas">
+      <legend class="grupo-filtros__titulo"><i class="pi pi-calendar"></i> Fechas</legend>
+      <div class="grupo-filtros__campos">
+        <div class="campo">
+          <label for="filtroRangoEntrega" class="campo__etiqueta">Rango de fecha de entrega
+            <i class="pi pi-question-circle campo__ayuda" pTooltip="Elige el día inicial y el final: muestra los ítems cuya fecha de entrega está entre esos dos días." tooltipPosition="top"></i>
+          </label>
+          <p-calendar inputId="filtroRangoEntrega" [(ngModel)]="rangoEntrega" selectionMode="range" [readonlyInput]="true" dateFormat="dd/mm/yy"
+            placeholder="Desde – hasta" [showIcon]="true" [showButtonBar]="true" (onSelect)="aplicarFiltros()" (onClearClick)="aplicarFiltros()"
+            appendTo="body" styleClass="filtro"></p-calendar>
+        </div>
+        <div class="campo">
+          <label for="filtroMesCreacion" class="campo__etiqueta">Mes de creación
+            <i class="pi pi-question-circle campo__ayuda" pTooltip="Año y mes en que se creó el pedido en Zeus. Puedes elegir varios meses." tooltipPosition="top"></i>
+          </label>
+          <p-multiSelect inputId="filtroMesCreacion" [options]="opcionesMesesCreacion" [(ngModel)]="mesesCreacionSel" (onChange)="aplicarFiltros()"
+            placeholder="Todos" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} meses"
+            [maxSelectedLabels]="1" appendTo="body" styleClass="filtro"></p-multiSelect>
+        </div>
+        <div class="campo">
+          <label for="filtroMesEntrega" class="campo__etiqueta">Mes de entrega (vencimiento)
+            <i class="pi pi-question-circle campo__ayuda" pTooltip="Año y mes de la fecha de entrega pactada con el cliente. Puedes elegir varios meses." tooltipPosition="top"></i>
+          </label>
+          <p-multiSelect inputId="filtroMesEntrega" [options]="opcionesMesesEntrega" [(ngModel)]="mesesEntregaSel" (onChange)="aplicarFiltros()"
+            placeholder="Todos" [filter]="true" emptyFilterMessage="Sin resultados" selectedItemsLabel="{0} meses"
+            [maxSelectedLabels]="1" appendTo="body" styleClass="filtro"></p-multiSelect>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="grupo-filtros grupo-filtros--estado">
+      <legend class="grupo-filtros__titulo"><i class="pi pi-flag"></i> Estado y semáforo</legend>
+      <div class="barra-filtros__fila">
+        <span class="campo__etiqueta">Estado en Zeus
+          <i class="pi pi-question-circle campo__ayuda" pTooltip="Pendiente: no se ha facturado nada del ítem. Parcialmente satisfecho: ya se facturó una parte." tooltipPosition="top"></i>
+        </span>
+        <button *ngFor="let e of opcionesEstado" type="button" class="chip-filtro" [class.chip-filtro--activo]="estadosSel.includes(e.value)"
+          [attr.aria-pressed]="estadosSel.includes(e.value)" (click)="alternarEstado(e.value)">{{e.label}}</button>
+        <span class="separador-filtros" aria-hidden="true"></span>
+        <span class="campo__etiqueta" id="leyendaPedidos">Semáforo del pedido
+          <i class="pi pi-question-circle campo__ayuda" pTooltip="Qué tanto del pedido se puede facturar con el stock actual. El stock de un ítem se reparte entre los pedidos que lo piden, empezando por los vencidos." tooltipPosition="top"></i>
+        </span>
+        <button *ngFor="let s of opcionesSemaforo" type="button" class="chip-filtro" [class.chip-filtro--activo]="semaforosSel.includes(s.value)"
+          [attr.aria-pressed]="semaforosSel.includes(s.value)" (click)="alternarSemaforo(s.value)" [pTooltip]="s.tooltip" tooltipPosition="top">
+          <span class="punto punto--{{s.value}}"></span>{{s.label}}</button>
+      </div>
+    </fieldset>
   </div>
 
   <!-- Filtros activos -->
-  <div class="filtros-activos mb-2" *ngIf="filtrosActivos.length">
+  <div class="filtros-activos" *ngIf="filtrosActivos.length">
     <span class="texto-secundario">Filtrando por:</span>
     <p-chip *ngFor="let f of filtrosActivos" [label]="f.etiqueta" [removable]="true" (onRemove)="f.quitar()" styleClass="chip-activo"></p-chip>
     <button pButton type="button" class="p-button-outlined p-button-sm p-button-secondary boton-limpiar" icon="pi pi-eraser" label="Limpiar" (click)="limpiarFiltros()"></button>
   </div>
 
+  <!-- Pestañas de la tabla: detalle por pedido o consolidado por ítem -->
+  <div class="pestanas" role="tablist" aria-label="Vista de la tabla" id="pestanasPedidos">
+    <button type="button" role="tab" class="pestana" [class.pestana--activa]="vista === 'pedidos'" [attr.aria-selected]="vista === 'pedidos'"
+      (click)="vista = 'pedidos'" pTooltip="Cada pedido con sus ítems" tooltipPosition="top">
+      <i class="pi pi-list"></i> Por pedido <span class="pestana__contador">{{resumenes.size | number}}</span>
+    </button>
+    <button type="button" role="tab" class="pestana" [class.pestana--activa]="vista === 'items'" [attr.aria-selected]="vista === 'items'"
+      (click)="vista = 'items'" pTooltip="Cada ítem con todos los pedidos que lo piden y a cuál se sugiere facturar primero" tooltipPosition="top">
+      <i class="pi pi-box"></i> Por ítem <span class="pestana__contador">{{itemsFiltrados.length | number}}</span>
+      <span *ngIf="itemsEnDisputa" class="pestana__alerta">{{itemsEnDisputa | number}} con stock en disputa</span>
+    </button>
+  </div>
+
   <!-- Tabla agrupada por pedido -->
-  <div id="tablaPedidos">
+  <div id="tablaPedidos" *ngIf="vista === 'pedidos'">
     <p-table #dt [columns]="columnasSeleccionadas" [value]="lineasPagina" rowGroupMode="subheader" groupRowsBy="consecutivo"
       dataKey="consecutivo" [expandedRowKeys]="expandedRows" styleClass="p-datatable-sm tabla-pedidos" [rowHover]="true"
       [scrollable]="true" scrollHeight="60vh" [loading]="cargandoTabla">
@@ -208,7 +288,7 @@
 
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th *ngFor="let col of columns" [ngClass]="{'text-right': col.tipo === 'numero' || col.tipo === 'moneda', 'col-producto': col.tipo === 'producto'}">{{col.header}}</th>
+          <th *ngFor="let col of columns" [ngClass]="{'text-right': col.tipo === 'numero' || col.tipo === 'moneda' || col.tipo === 'stock', 'col-producto': col.tipo === 'producto'}">{{col.header}}</th>
         </tr>
       </ng-template>
 
@@ -244,7 +324,7 @@
       <!-- Ítems del pedido -->
       <ng-template pTemplate="rowexpansion" let-linea let-columns="columns">
         <tr class="fila-item" [class.fila-item--facturable]="linea.facturable" (click)="verDetalle(linea)">
-          <td *ngFor="let col of columns" [ngClass]="{'text-right': col.tipo === 'numero' || col.tipo === 'moneda', 'col-producto': col.tipo === 'producto'}">
+          <td *ngFor="let col of columns" [ngClass]="{'text-right': col.tipo === 'numero' || col.tipo === 'moneda' || col.tipo === 'stock', 'col-producto': col.tipo === 'producto'}">
             <ng-container [ngSwitch]="col.tipo">
               <span *ngSwitchCase="'numero'">{{valorCelda(linea, col) | number:'1.0-2'}}</span>
               <span *ngSwitchCase="'moneda'">{{valorCelda(linea, col) | currency:'USD':'symbol':'1.0-0'}}</span>
@@ -262,6 +342,12 @@
                 <p-skeleton *ngIf="cargandoOts && !linea.OT" width="6rem" height="1rem"></p-skeleton>
                 <span class="texto-recortado">{{linea.Proceso_OT}}</span>
               </ng-container>
+              <span *ngSwitchCase="'stock'" class="celda-stock">{{linea.existencias | number:'1.0-2'}}
+                <i *ngIf="linea.pedidosItem > 1" class="pi pi-share-alt icono-compartido" [class.icono-compartido--alerta]="!linea.facturable && linea.existencias > 0"
+                  [pTooltip]="'Stock compartido: ' + linea.pedidosItem + ' líneas piden este ítem. ' + explicarSugerencia(linea)" tooltipPosition="top"></i>
+              </span>
+              <span *ngSwitchCase="'sugerencia'" class="badge-estado {{sugerencias[linea.sugerencia].clase}}"
+                [pTooltip]="explicarSugerencia(linea)" tooltipPosition="left">{{sugerencias[linea.sugerencia].nombre}}</span>
               <span *ngSwitchCase="'entrega'" class="celda-entrega" [class.texto-peligro]="linea.vencido">{{linea.fecha_Entrega}}
                 <small *ngIf="linea.diasVencido" class="dias-vencido" pTooltip="Días de atraso respecto a la fecha de entrega" tooltipPosition="top">{{linea.diasVencido}} d</small>
               </span>
@@ -304,6 +390,119 @@
       </ng-template>
     </p-table>
   </div>
+
+  <!-- Consolidado por ítem: el stock se reparte entre los pedidos que piden el mismo ítem, en orden de prioridad -->
+  <div id="tablaItems" *ngIf="vista === 'items'">
+    <p-table [value]="itemsFiltrados" dataKey="clave" [expandedRowKeys]="expandedItems" styleClass="p-datatable-sm tabla-items"
+      [rowHover]="true" [scrollable]="true" scrollHeight="60vh" [loading]="cargandoTabla" [paginator]="itemsFiltrados.length > 25"
+      [rows]="25" [rowsPerPageOptions]="[25, 50, 100]">
+      <ng-template pTemplate="caption">
+        <div class="cabecera-tabla">
+          <small class="texto-secundario explicacion-items">
+            <i class="pi pi-info-circle"></i>
+            El stock de cada ítem se reparte entre los pedidos que lo piden, en este orden: <b>1.</b> el más vencido o con la entrega más próxima,
+            <b>2.</b> con la misma fecha, el cliente con menor plazo de pago, <b>3.</b> el pedido más antiguo.
+            Despliega un ítem para ver a qué pedido se sugiere facturar.
+          </small>
+          <div class="cabecera-tabla__controles">
+            <button type="button" class="chip-filtro" [class.chip-filtro--activo]="soloEnDisputa" [attr.aria-pressed]="soloEnDisputa"
+              (click)="soloEnDisputa = !soloEnDisputa; armarItems()"
+              pTooltip="Ítems que están en varios pedidos y cuyo stock alcanza para algunos pero no para todos" tooltipPosition="top">
+              <i class="pi pi-exclamation-triangle"></i> Solo stock en disputa ({{itemsEnDisputa | number}})
+            </button>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="col-expandir"></th>
+          <th>Ítem</th>
+          <th class="col-producto">Producto</th>
+          <th>Und</th>
+          <th class="text-right">Stock</th>
+          <th class="text-right">Pendiente total</th>
+          <th class="text-right" pTooltip="Lo que falta para cubrir todos los pedidos (pendiente total − stock)" tooltipPosition="top">Faltante</th>
+          <th pTooltip="Porcentaje de lo pendiente que cubre el stock actual" tooltipPosition="top">Cobertura</th>
+          <th class="text-center" pTooltip="Líneas que se pueden facturar completas con el stock sugerido / líneas que piden el ítem" tooltipPosition="top">Facturables</th>
+          <th class="text-right">Valor pendiente</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item let-expanded="expanded">
+        <tr class="fila-item-consolidado" [class.fila-item-consolidado--disputa]="item.enDisputa">
+          <td class="col-expandir">
+            <button type="button" pButton [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain p-button-sm"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" [attr.aria-label]="(expanded ? 'Ocultar' : 'Ver') + ' pedidos del ítem ' + item.id_Producto"></button>
+          </td>
+          <td><b>{{item.id_Producto}}</b></td>
+          <td class="col-producto">
+            <span class="texto-recortado" [pTooltip]="item.producto" tooltipPosition="top">{{item.producto}}</span>
+            <span *ngIf="item.enDisputa" class="badge-estado badge-advertencia ml-1"
+              pTooltip="El stock alcanza para algunos pedidos pero no para todos: revisa la sugerencia" tooltipPosition="top">En disputa</span>
+          </td>
+          <td>{{item.presentacion}}</td>
+          <td class="text-right">{{item.existencias | number:'1.0-2'}}</td>
+          <td class="text-right">{{item.pendienteTotal | number:'1.0-2'}}</td>
+          <td class="text-right" [class.texto-peligro]="item.faltante > 0">{{item.faltante | number:'1.0-2'}}</td>
+          <td>
+            <div class="cobertura" [attr.aria-label]="'Cobertura ' + (item.cobertura | number:'1.0-0') + '%'">
+              <div class="cobertura__barra"><div class="cobertura__relleno" [style.width.%]="item.cobertura"
+                [class.cobertura__relleno--total]="item.cobertura >= 100" [class.cobertura__relleno--nula]="item.cobertura <= 0"></div></div>
+              <small>{{item.cobertura | number:'1.0-0'}}%</small>
+            </div>
+          </td>
+          <td class="text-center">{{item.facturables}} de {{item.lineas.length}}</td>
+          <td class="text-right"><b>{{item.valorPendiente | currency:'USD':'symbol':'1.0-0'}}</b></td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="rowexpansion" let-item>
+        <tr class="fila-reparto">
+          <td colspan="10">
+            <table class="tabla-reparto" [attr.aria-label]="'Reparto sugerido del stock del ítem ' + item.id_Producto">
+              <thead>
+                <tr>
+                  <th class="text-center" pTooltip="Orden en que se reparte el stock" tooltipPosition="top">Prioridad</th>
+                  <th>Pedido</th>
+                  <th>Cliente</th>
+                  <th>Vendedor</th>
+                  <th>Entrega</th>
+                  <th pTooltip="Días de plazo de pago del cliente en Zeus" tooltipPosition="top">Plazo pago</th>
+                  <th class="text-right">Pendiente</th>
+                  <th class="text-right" pTooltip="Stock que se sugiere usar para esta línea" tooltipPosition="top">Stock sugerido</th>
+                  <th>Sugerencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let l of item.lineas" (click)="verDetalle(l)" class="cursor" [class.fila-fuera-filtro]="!enFiltro(l)"
+                  [pTooltip]="enFiltro(l) ? '' : 'No cumple los filtros actuales, pero compite por el mismo stock'" tooltipPosition="top">
+                  <td class="text-center"><span class="prioridad" [class.prioridad--primera]="l.prioridadStock === 1">{{l.prioridadStock}}</span></td>
+                  <td><b>{{l.consecutivo}}</b></td>
+                  <td class="celda-cliente-reparto"><span class="texto-recortado" [pTooltip]="l.cliente" tooltipPosition="top">{{l.cliente}}</span></td>
+                  <td class="texto-secundario">{{l.vendedor}}</td>
+                  <td [class.texto-peligro]="l.vencido">{{l.fecha_Entrega | date:'dd/MM/yyyy'}}
+                    <small class="d-block texto-secundario">{{motivoPrioridad(l)}}</small></td>
+                  <td>{{l.plazoPago == null ? '—' : l.plazoPago === 0 ? 'Contado' : l.plazoPago + ' días'}}</td>
+                  <td class="text-right">{{l.cant_Pendiente | number:'1.0-2'}}</td>
+                  <td class="text-right"><b>{{l.asignado | number:'1.0-2'}}</b></td>
+                  <td><span class="badge-estado {{sugerencias[l.sugerencia].clase}}" [pTooltip]="explicarSugerencia(l)" tooltipPosition="left">{{sugerencias[l.sugerencia].nombre}}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="10" class="text-center p-4">
+            {{ soloEnDisputa ? 'No hay ítems con stock en disputa con los filtros actuales.' : 'Ningún ítem cumple los filtros.' }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </ng-template>
 
 <!-- Detalle de una línea -->
@@ -328,6 +527,13 @@
       <div><small>Pendiente</small><b>{{l.cant_Pendiente | number:'1.0-2'}}</b></div>
       <div [class.detalle--exito]="l.facturable"><small>Stock</small><b>{{l.existencias | number:'1.0-2'}}</b></div>
     </div>
+    <dl class="detalle__lista">
+      <dt>Sugerencia</dt>
+      <dd><span class="badge-estado {{sugerencias[l.sugerencia].clase}}">{{sugerencias[l.sugerencia].nombre}}</span>
+        <small class="d-block texto-secundario">{{explicarSugerencia(l)}}</small></dd>
+      <dt>Stock sugerido</dt><dd>{{l.asignado | number:'1.0-2'}} de {{l.cant_Pendiente | number:'1.0-2'}} pendientes</dd>
+      <dt>Plazo de pago</dt><dd>{{l.plazoPago == null ? '—' : l.plazoPago === 0 ? 'Contado' : l.plazoPago + ' días'}}</dd>
+    </dl>
     <dl class="detalle__lista">
       <dt>Precio unidad</dt><dd>{{l.precioUnidad | currency:'USD':'symbol':'1.2-2'}}</dd>
       <dt>Total pendiente</dt><dd><b>{{l.costo_Cant_Pendiente | currency:'USD':'symbol':'1.2-2'}}</b></dd>
@@ -406,7 +612,7 @@
               pTooltip="Doble clic para ver los pedidos de {{a.vendedor}}" tooltipPosition="top" [showDelay]="400">
               <td><b>{{a.codigo}}</b> - {{a.vendedor}}</td>
               <td class="text-right">{{a.factMesAnterior == null ? '—' : (a.factMesAnterior | currency:'USD':'symbol':'1.0-0')}}</td>
-              <td class="text-right">{{a.factMesActual == null ? '—' : (a.factMesActual | currency:'USD':'symbol':'1.0-0')}}</td>
+              <td class="text-right" [class.texto-peligro]="a.factMesActual < 0">{{a.factMesActual == null ? '—' : (a.factMesActual | currency:'USD':'symbol':'1.0-0')}}</td>
               <td class="text-right texto-peligro">{{a.pendienteVencido | currency:'USD':'symbol':'1.0-0'}}</td>
               <td class="text-right">{{a.pendienteMes | currency:'USD':'symbol':'1.0-0'}}</td>
               <td class="text-right">{{a.pendienteFuturo | currency:'USD':'symbol':'1.0-0'}}</td>

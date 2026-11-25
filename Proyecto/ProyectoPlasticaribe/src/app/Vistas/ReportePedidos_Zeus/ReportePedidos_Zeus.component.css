@@ -155,11 +155,88 @@ button.kpi:disabled {
   height: 280px;
 }
 
-/* ---------- Filtros ---------- */
+/* ---------- Filtros (por secciones) ----------
+ * Rejilla de 12 columnas: fila 1 Búsqueda (4) + Cliente y vendedor (8); fila 2 Ubicación (5) + Fechas (7);
+ * fila 3 Estado y semáforo (12). En pantallas medianas, dos por fila; en móvil, una.
+ */
 .barra-filtros {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.grupo-filtros {
+  min-width: 0;
+  margin: 0;
+  padding: 0.6rem 0.8rem 0.8rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background-color: var(--surface-card);
+}
+
+.grupo-filtros--busqueda { grid-column: span 4; }
+.grupo-filtros--personas { grid-column: span 8; }
+.grupo-filtros--ubicacion { grid-column: span 5; }
+.grupo-filtros--fechas { grid-column: span 7; }
+.grupo-filtros--estado { grid-column: 1 / -1; }
+
+.grupo-filtros__titulo {
+  float: none;
+  width: auto;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--rojo-texto);
+}
+
+.grupo-filtros__titulo .pi {
+  margin-right: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.grupo-filtros__campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+}
+
+/* Cliente y vendedor: campos anchos para que se lea casi todo el nombre */
+.grupo-filtros__campos--anchos {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.campo {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+/* Títulos completos: pueden ocupar dos líneas, nunca se recortan */
+.campo__etiqueta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: normal;
+  color: var(--text-color);
+}
+
+.campo__ayuda {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  cursor: help;
+}
+
+.campo__ayuda:hover {
+  color: var(--rojo-texto);
 }
 
 .barra-filtros__fila {
@@ -169,30 +246,207 @@ button.kpi:disabled {
   gap: 0.6rem;
 }
 
-/* Filtros en una rejilla de columnas iguales: todos del mismo ancho y alineados (el buscador ocupa una más) */
-.barra-filtros__rejilla {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-  gap: 0.6rem;
+.separador-filtros {
+  width: 1px;
+  height: 1.6rem;
+  margin: 0 0.4rem;
+  background-color: var(--surface-border);
 }
 
-.barra-filtros__rejilla .buscador {
-  grid-column: span 2;
+.buscador {
+  display: block;
+  width: 100%;
 }
 
 .buscador input {
   width: 100%;
 }
 
-:host ::ng-deep .barra-filtros__rejilla .filtro,
-:host ::ng-deep .barra-filtros__rejilla .filtro.p-calendar {
+:host ::ng-deep .barra-filtros .filtro,
+:host ::ng-deep .barra-filtros .filtro.p-calendar {
   width: 100%;
   min-width: 0;
 }
 
-.etiqueta-grupo {
-  font-size: 0.9em;
-  margin-left: 0.25rem;
+/* Lista desplegable de cliente y vendedor más ancha que el campo, para leer el nombre completo */
+:host ::ng-deep .panel-filtro-ancho {
+  min-width: min(32rem, 95vw);
+}
+
+:host ::ng-deep .panel-filtro-ancho .p-multiselect-item,
+:host ::ng-deep .panel-filtro-ancho .p-dropdown-item {
+  white-space: normal;
+}
+
+/* ---------- Pestañas Por pedido / Por ítem ---------- */
+.pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  border-bottom: 2px solid var(--surface-border);
+}
+
+.pestana {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: -2px;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-color-secondary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pestana:hover {
+  color: var(--text-color);
+  background-color: var(--surface-hover);
+}
+
+.pestana--activa {
+  border-bottom-color: var(--rojo);
+  color: var(--rojo-texto);
+}
+
+.pestana:focus-visible {
+  outline: 2px solid var(--rojoClaro);
+  outline-offset: -2px;
+}
+
+.pestana__contador {
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background-color: var(--fondo-contador);
+  color: var(--texto-contador);
+  font-size: 0.8em;
+}
+
+.pestana__alerta {
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background-color: var(--fondo-advertencia);
+  color: var(--texto-advertencia);
+  font-size: 0.75em;
+}
+
+/* ---------- Consolidado por ítem ---------- */
+.explicacion-items {
+  flex: 1 1 30rem;
+  line-height: 1.4;
+}
+
+.col-expandir {
+  width: 3rem;
+  flex: 0 0 3rem;
+}
+
+:host ::ng-deep .tabla-items .p-datatable-tbody > tr.fila-item-consolidado--disputa > td:first-child {
+  box-shadow: inset 4px 0 0 var(--texto-advertencia);
+}
+
+.cobertura {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 7rem;
+}
+
+.cobertura__barra {
+  flex: 1;
+  height: 0.5rem;
+  border-radius: 999px;
+  background-color: var(--fondo-sutil);
+  overflow: hidden;
+}
+
+.cobertura__relleno {
+  height: 100%;
+  background-color: var(--texto-advertencia);
+}
+
+.cobertura__relleno--total { background-color: var(--texto-exito); }
+.cobertura__relleno--nula { background-color: transparent; }
+
+:host ::ng-deep .tabla-items .p-datatable-tbody > tr.fila-reparto > td {
+  padding: 0.25rem 0.5rem 0.75rem 3rem;
+  background-color: var(--fondo-sutil);
+}
+
+.tabla-reparto {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88em;
+}
+
+.tabla-reparto th {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--surface-border);
+  color: var(--text-color-secondary);
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabla-reparto td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--borde-sutil);
+  vertical-align: middle;
+}
+
+.tabla-reparto tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+.tabla-reparto th.text-right,
+.tabla-reparto td.text-right { text-align: right; }
+
+.tabla-reparto th.text-center,
+.tabla-reparto td.text-center { text-align: center; }
+
+.celda-cliente-reparto {
+  max-width: 18rem;
+}
+
+/* Líneas que no cumplen los filtros: se muestran atenuadas porque compiten por el mismo stock */
+.fila-fuera-filtro {
+  opacity: 0.6;
+}
+
+.prioridad {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background-color: var(--surface-border);
+  color: var(--text-color);
+  font-weight: 700;
+}
+
+.prioridad--primera {
+  background-color: var(--rojo);
+  color: var(--gris-100);
+}
+
+/* Stock compartido entre varios pedidos (tabla por pedido) */
+.celda-stock {
+  white-space: nowrap;
+}
+
+.icono-compartido {
+  margin-left: 0.3rem;
+  font-size: 0.8em;
+  color: var(--text-color-secondary);
+  cursor: help;
+}
+
+.icono-compartido--alerta {
+  color: var(--texto-advertencia);
 }
 
 .chip-filtro {
@@ -341,7 +595,8 @@ button.kpi:disabled {
 }
 
 /* Página activa con el rojo de marca (el tema la pinta azul) */
-:host ::ng-deep .paginador-pedidos .p-paginator-pages .p-paginator-page.p-highlight {
+:host ::ng-deep .paginador-pedidos .p-paginator-pages .p-paginator-page.p-highlight,
+:host ::ng-deep .tabla-items .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
   background: var(--fondo-acento);
   border-color: var(--rojo-texto);
   color: var(--rojo-texto);
@@ -560,6 +815,15 @@ button.kpi:disabled {
   box-shadow: inset 4px 0 0 var(--rojo);
 }
 
+@media (max-width: 1100px) {
+  .grupo-filtros--busqueda,
+  .grupo-filtros--personas,
+  .grupo-filtros--ubicacion,
+  .grupo-filtros--fechas {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 768px) {
   .graficas {
     grid-template-columns: 1fr;
@@ -569,8 +833,16 @@ button.kpi:disabled {
     margin-left: 0;
   }
 
-  .barra-filtros__rejilla .buscador {
-    grid-column: 1 / -1;
+  .grupo-filtros {
+    grid-column: 1 / -1 !important;
+  }
+
+  .separador-filtros {
+    display: none;
+  }
+
+  :host ::ng-deep .tabla-items .p-datatable-tbody > tr.fila-reparto > td {
+    padding-left: 0.5rem;
   }
 
   .vista-embebida {
