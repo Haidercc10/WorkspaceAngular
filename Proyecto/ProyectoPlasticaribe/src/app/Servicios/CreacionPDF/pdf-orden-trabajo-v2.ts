@@ -1,6 +1,5 @@
-import moment from 'moment';
-import { logoNuevoParaPdf } from 'src/app/logoPlasticaribeNuevo_Base64';
 import { FichaComplementariaItem, descripcionEmbobinado } from 'src/app/Modelo/modelEmbobinado';
+import { GRIS_SUAVE, TEXTO_SECUNDARIO, bandaCabeceraOT, fecha, num, pieOT, procesosOT, sinDato, txt, vacias, layoutTabla } from './pdf-orden-trabajo-comun';
 
 /*
  * PDF de la Orden de Trabajo, formato 2 (en prueba). Sigue el estilo del PDF de pedidos: tablas con borde gris,
@@ -8,15 +7,10 @@ import { FichaComplementariaItem, descripcionEmbobinado } from 'src/app/Modelo/m
  *   información de la orden (cliente e item, cantidades y fechas), mezcla, extrusión | impresión, laminado, producto terminado (con el desembobinado
  *   final) y al final una sola tabla de observaciones (general y de cada proceso).
  * Solo salen los procesos por los que pasa la OT.
- * Es independiente del formato actual (CreacionPdfService.crearPdfOrdenTrabajo), que no cambia.
+ * Es independiente del formato actual (pdf-orden-trabajo.ts); comparten encabezado, pie y estilos (pdf-orden-trabajo-comun.ts).
  * Recibe los mismos datos que el formato actual (ver CreacionPdfService.obtenerDatosOrdenTrabajo).
  */
 
-const GRIS = '#DDDDDD';
-/** Fondo de los subtítulos de sección dentro de una tabla. */
-const GRIS_SUAVE = '#F0F0F0';
-const BORDE = '#BBBBBB';
-const TEXTO_SECUNDARIO = '#6c757d';
 /** Alto reservado arriba para la cabecera (logo, título y número de OT); justo para que no quede una franja en blanco. */
 const MARGEN_SUPERIOR = 68;
 /** Separación entre tablas. */
@@ -27,55 +21,13 @@ const nombreCapa = (capa: number, totalCapas: number): string => totalCapas == 1
 
 type Par = [string, string];
 
-/** Texto limpio; los nulos (OT de BagPro o antiguas) quedan vacíos. */
-const txt = (valor: any): string => valor == null ? '' : valor.toString().trim();
-
-/** Número con separador de miles y los decimales indicados; los nulos o no numéricos son 0. */
-const num = (valor: any, decimales: number = 2): string => {
-  const numero = Number(valor);
-  return (Number.isFinite(numero) ? numero : 0).toLocaleString('en-US', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
-};
-
-/** Solo la fecha (yyyy-MM-dd): Plasticaribe y BagPro la envían con hora. */
-const fecha = (valor: any): string => valor ? String(valor).substring(0, 10) : '';
-
-/** Vacío o "NO APLICA..." cuenta como sin dato. */
-const sinDato = (texto: string): boolean => texto == '' || texto.toUpperCase().startsWith('NO APLICA');
-
 const etiqueta = (texto: string) => ({ text: texto, bold: true });
-
-/** Celdas vacías que acompañan a un colSpan (cada una es un objeto nuevo: pdfmake modifica los nodos). */
-const vacias = (cantidad: number) => Array.from({ length: cantidad }, () => ({}));
 
 /** Fila de título de sección (sombreada por el layout) que ocupa todas las columnas. */
 const filaTitulo = (texto: string, columnas: number) => [{ text: texto, colSpan: columnas, bold: true, fontSize: 11 }, ...vacias(columnas - 1)];
 
-/** Layout de las tablas: bordes grises, las primeras `filasGris` filas sombreadas y relleno vertical corto. */
-const layout = (filasGris: number = 1) => ({
-  fillColor: (fila: number) => fila < filasGris ? GRIS : null,
-  hLineColor: () => BORDE,
-  vLineColor: () => BORDE,
-  paddingTop: () => 2,
-  paddingBottom: () => 2,
-});
-
-/** Interpreta las banderas de proceso de la OT (pueden llegar como booleano, número o texto). */
-const activo = (valor: any): boolean => valor === true || valor == 1 || txt(valor).toUpperCase() == 'TRUE';
-
-/**
- * Procesos por los que pasa la OT. Si la fila no trae ninguna bandera (p. ej. una OT antigua de BagPro),
- * se muestran todos para no perder información.
- */
-function procesosOT(d: any) {
-  const banderas = ['extrusion', 'impresion', 'rotograbado', 'laminado', 'corte', 'sellado'];
-  if (!banderas.some(b => d[b] != null)) return { extrusion: true, impresion: true, laminado: true, productoTerminado: true };
-  return {
-    extrusion: activo(d.extrusion),
-    impresion: activo(d.impresion) || activo(d.rotograbado),
-    laminado: activo(d.laminado),
-    productoTerminado: activo(d.corte) || activo(d.sellado),
-  };
-}
+/** Layout de las tablas (estilo pedidos). */
+const layout = layoutTabla;
 
 /**
  * Filas etiqueta/valor. Con `porFila` 2 van dos datos por fila (4 columnas), como "Información del pedido";
@@ -255,55 +207,6 @@ function tablaObservaciones(d: any, procesos: ReturnType<typeof procesosOT>) {
   };
 }
 
-/** Cabecera de cada hoja: logo, título y el número de la OT en grande. */
-function cabecera(d: any) {
-  return (pagina: number, total: number) => [
-    {
-      margin: [25, 10, 25, 0],
-      columns: [
-        { image: logoNuevoParaPdf, width: 160, fit: [160, 32], margin: [0, 6, 0, 0] },
-        // Mismo estilo del centro de la cabecera común (PDF de pedidos): NIT y título en negrita, tamaño 10
-        {
-          width: '*',
-          alignment: 'center',
-          bold: true,
-          fontSize: 10,
-          lineHeight: 1.15,
-          margin: [0, 8, 0, 0],
-          stack: [
-            { text: 'NIT. 800188732' },
-            { text: 'Orden de Trabajo' },
-          ],
-        },
-        {
-          width: 160,
-          alignment: 'right',
-          stack: [
-            { text: `OT ${txt(d.numero_Orden)}`, bold: true, fontSize: 26 },
-            ...(total > 1 ? [{ text: `Hoja ${pagina} de ${total}`, fontSize: 8, color: TEXTO_SECUNDARIO }] : []),
-          ],
-        },
-      ],
-    },
-    { canvas: [{ type: 'line', x1: 25, y1: 4, x2: 587, y2: 4, lineWidth: 1, lineColor: BORDE }] },
-  ];
-}
-
-/** Pie de cada hoja: quién generó el documento y cuándo. */
-function pie(usuario: string) {
-  const expedicion = `${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`;
-  return (pagina: number, total: number) => ({
-    margin: [25, 10, 25, 0],
-    fontSize: 7,
-    color: TEXTO_SECUNDARIO,
-    columns: [
-      { text: `Documento generado por ${usuario ?? ''}` },
-      { text: `Expedición ${expedicion}`, alignment: 'center' },
-      { text: `${pagina} de ${total}`, alignment: 'right' },
-    ],
-  });
-}
-
 /** Contenido de la OT en una hoja; solo los procesos por los que pasa. */
 function contenido(d: any): any[] {
   const procesos = procesosOT(d);
@@ -389,8 +292,8 @@ export function definicionPdfOrdenTrabajoV2(datos_ot: any, usuario: string): any
     pageOrientation: 'portrait',
     pageMargins: [25, MARGEN_SUPERIOR, 25, 35],
     watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
-    header: cabecera(datos_ot),
-    footer: pie(usuario),
+    header: (pagina: number, total: number) => bandaCabeceraOT(datos_ot, pagina, total, 612),
+    footer: pieOT(usuario),
     content: contenido(datos_ot),
     defaultStyle: { fontSize: 9.5 },
   };
