@@ -245,12 +245,32 @@
     <app-ListaEventos [eventos]="eventosHoy" [detallado]="true" (seleccionar)="mostrarModalCalendario()"></app-ListaEventos>
     <ng-template pTemplate="footer">
       <div class="d-flex flex-wrap gap-2 justify-content-end">
-        <button pButton class="p-button-text p-button-secondary" type="button" label="No volver a mostrar" icon="pi pi-ban" (click)="noMostrarMasDialogoEventosDia('no')"></button>
-        <button pButton class="p-button-text p-button-secondary" type="button" label="Cerrar" icon="pi pi-times" (click)="noMostrarMasDialogoEventosDia('si')"></button>
+        <button pButton class="p-button-text p-button-secondary" type="button" label="No mostrar más hoy" icon="pi pi-ban" (click)="noMostrarEventosHoy()"></button>
+        <button pButton class="p-button-text p-button-secondary" type="button" label="Cerrar" icon="pi pi-times" (click)="eventosDia = false"></button>
         <button pButton class="botonVerCalendario" type="button" label="Ver calendario" icon="pi pi-calendar" (click)="mostrarModalCalendario()"></button>
       </div>
     </ng-template>
   </p-dialog>
+
+  <!-- Recordatorios de eventos con hora: 30 y 15 min antes y al iniciar -->
+  <p-toast [key]="claveToastRecordatorio" position="top-right" styleClass="toast-recordatorio-evento"
+           [breakpoints]="{'640px': {width: '100%', right: '0', left: '0'}}" (onClose)="alCerrarRecordatorio($event.message)">
+    <ng-template let-message pTemplate="message">
+      <div class="recordatorio-evento">
+        <i class="pi pi-clock recordatorio-evento-icono"></i>
+        <div class="recordatorio-evento-texto">
+          <div class="p-toast-summary">{{message.summary}}</div>
+          <div class="p-toast-detail">{{message.detail}}</div>
+          <div class="recordatorio-evento-acciones">
+            <button pButton type="button" class="p-button-sm botonVerCalendario" icon="pi pi-calendar" label="Ver calendario"
+                    (click)="verCalendarioDesdeRecordatorio(message)"></button>
+            <button pButton type="button" class="p-button-sm p-button-text p-button-secondary" icon="pi pi-ban" label="No mostrar más hoy"
+                    (click)="noMostrarEventosHoy()"></button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-toast>
 
   <!-- Correos de la página web -->
   <p-dialog [(visible)]="modalCorreos" [style]="{width: '90vw', maxWidth: '1400px'}" [breakpoints]="{'900px': '100vw'}"

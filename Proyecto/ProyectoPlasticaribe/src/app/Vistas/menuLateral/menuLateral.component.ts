@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, Message, MessageService } from 'primeng/api';
 import { EventoCalendario, EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -30,6 +30,20 @@ import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion
 const REFRESCO_CONTADORES_MS = 5 * 60 * 1000;
 /** Llave de sessionStorage: el aviso de eventos del día ya se mostró en esta sesión (el logout limpia sessionStorage). */
 const LLAVE_AVISO_EVENTOS_DIA = 'avisoEventosDiaMostrado';
+/** Minutos antes del inicio en que se recuerda un evento con hora (0 = al iniciar). Los de todo el día no tienen recordatorios. */
+const HITOS_RECORDATORIO_MIN = [30, 15, 0];
+/** El recordatorio "Empieza ahora" se muestra hasta este tiempo después del inicio (p. ej. si la pestaña estaba oculta). */
+const GRACIA_INICIO_MS = 2 * 60 * 1000;
+/** Cada cuánto se revisan los recordatorios mientras la pestaña está visible. */
+const REVISION_RECORDATORIOS_MS = 30 * 1000;
+/** Clave del p-toast de recordatorios (menuLateral.component.html). */
+const CLAVE_TOAST_RECORDATORIO = 'recordatorioEvento';
+/**
+ * localStorage, por usuario: día (YYYY-MM-DD) en que eligió "No mostrar más hoy" (sin aviso al entrar ni recordatorios),
+ * y recordatorios ya mostrados ("id|inicio" → menor hito mostrado), compartidos entre pestañas y recargas.
+ */
+const LLAVE_EVENTOS_SILENCIADOS = 'eventosSilenciados_';
+const LLAVE_RECORDATORIOS_MOSTRADOS = 'recordatoriosEventos_';
 
 /** Categorías que no se muestran como panel: Inicio, Pruebas y Vistas van como enlaces directos al tope del menú. */
 const CATEGORIAS_ENLACE_DIRECTO = ['Inicio', 'Pruebas', 'Vistas'];
@@ -80,6 +94,10 @@ export class MenuLateralComponent implements OnInit {
   eventosHoy: EventoCalendario[] = []; //Eventos que ocurren hoy (aviso "Eventos de hoy")
   eventosMes: EventoCalendario[] = []; //Eventos de hoy a fin de mes (badge y sección "Eventos" del menú de usuario)
   eventosDia: boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
+  readonly claveToastRecordatorio = CLAVE_TOAST_RECORDATORIO;
+  private readonly messageService = inject(MessageService);
+  /** Recordatorios visibles, uno por evento (id): al pasar al siguiente hito o cambiar la hora se reemplaza el anterior. */
+  private recordatoriosVisibles = new Map<number, Message>();
   cantidadCorreosNuevos: number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
   modoSeleccionado: boolean;
   private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene los logos y el "Ahora: …" al día con el tema
@@ -158,6 +176,7 @@ export class MenuLateralComponent implements OnInit {
     this.lecturaStorage();
     this.cantidadEventosMes();
     this.consultarEventosHoy();
+    this.programarRecordatoriosEventos();
     this.cargarMenuLateral();
     if (this.ValidarRol == 1) this.ticketsService.cargarCantidadesSoporte().subscribe();
     this.programarRefrescoContadores();
@@ -576,23 +595,26 @@ export class MenuLateralComponent implements OnInit {
         this.tooltipCalendario = this.cantidadEventos > 0
           ? `Calendario: ${this.cantidadEventos} evento(s) de hoy a fin de mes`
           : 'Calendario de eventos';
+        this.revisarRecordatorios();
       },
       error: () => { /* el contador es informativo: si falla, se conserva el último valor */ },
     });
   }
 
   /**
-   * Consulta los eventos de hoy y, si hay, los muestra una sola vez por sesión
-   * (salvo que el usuario haya elegido "No volver a mostrar"; el login borra esa preferencia).
+   * Aviso "Eventos de hoy", una sola vez por sesión (salvo que el usuario haya elegido "No mostrar más hoy").
+   * Muestra los eventos de todo el día y los que tienen hora y aún no empiezan: uno de 12:00 sale si se entra
+   * a las 8:00, pero ya no desde las 12:00.
    */
   consultarEventosHoy() {
     let avisoMostrado = false;
     try { avisoMostrado = sessionStorage.getItem(LLAVE_AVISO_EVENTOS_DIA) === '1'; } catch { }
-    if (avisoMostrado || this.cookieService.get('MostrarEventosDia') == 'no') return;
+    if (avisoMostrado || this.eventosSilenciadosHoy()) return;
 
     this.eventosCalService.getHoy(Number(this.ValidarRol)).subscribe({
       next: eventos => {
-        this.eventosHoy = eventos;
+        const ahora = new Date();
+        this.eventosHoy = eventos.filter(e => e.todoElDia || e.inicio > ahora);
         if (this.eventosHoy.length == 0) return;
         this.eventosDia = true;
         try { sessionStorage.setItem(LLAVE_AVISO_EVENTOS_DIA, '1'); } catch { }
@@ -607,9 +629,104 @@ export class MenuLateralComponent implements OnInit {
     this.modalCalendario = true;
   };
 
-  noMostrarMasDialogoEventosDia(mostrar: string) {
-    this.cookieService.set('MostrarEventosDia', mostrar, { expires: 365, sameSite: 'Lax' });
+  /** "No mostrar más hoy" (aviso de entrada y recordatorios): sin avisos de eventos hasta mañana. */
+  noMostrarEventosHoy() {
+    try { localStorage.setItem(LLAVE_EVENTOS_SILENCIADOS + this.storage_Id, moment().format('YYYY-MM-DD')); } catch { }
     this.eventosDia = false;
+    this.recordatoriosVisibles.clear();
+    this.messageService.clear(CLAVE_TOAST_RECORDATORIO);
+  }
+
+  private eventosSilenciadosHoy(): boolean {
+    try { return localStorage.getItem(LLAVE_EVENTOS_SILENCIADOS + this.storage_Id) === moment().format('YYYY-MM-DD'); }
+    catch { return false; }
+  }
+
+  /** Revisa los recordatorios cada REVISION_RECORDATORIOS_MS y al volver a la pestaña. */
+  private programarRecordatoriosEventos() {
+    merge(interval(REVISION_RECORDATORIOS_MS), fromEvent(this.document, 'visibilitychange'))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.revisarRecordatorios());
+  }
+
+  /**
+   * Recordatorios de eventos con hora: 30 y 15 minutos antes y al iniciar (HITOS_RECORDATORIO_MIN); cuando el evento
+   * empieza ya no se recuerda. Toma los eventos de eventosMes (se refrescan cada REFRESCO_CONTADORES_MS y al crear o
+   * editar uno). Solo con la pestaña visible; si se saltó un hito (pestaña oculta), sale solo el más reciente.
+   * Cada hito sale una vez aunque se recargue o haya varias pestañas (registro en localStorage).
+   */
+  private revisarRecordatorios() {
+    if (this.document.visibilityState !== 'visible' || this.eventosSilenciadosHoy()) return;
+
+    const ahora = Date.now();
+    const llaveRegistro = LLAVE_RECORDATORIOS_MOSTRADOS + this.storage_Id;
+    let mostrados: Record<string, number> = {};
+    try { mostrados = JSON.parse(localStorage.getItem(llaveRegistro) || '{}') ?? {}; } catch { }
+    let cambio = false;
+
+    for (const evento of this.eventosMes) {
+      if (evento.todoElDia) continue;
+      const inicio = evento.inicio.getTime();
+      if (ahora >= inicio + GRACIA_INICIO_MS) continue;
+      const alcanzados = HITOS_RECORDATORIO_MIN.filter(h => ahora >= inicio - h * 60000);
+      if (alcanzados.length == 0) continue;
+      const hito = Math.min(...alcanzados);
+      const llave = `${evento.id}|${inicio}`; // con el inicio: si editan la hora, se vuelve a recordar
+      if (mostrados[llave] != null && mostrados[llave] <= hito) continue;
+      mostrados[llave] = hito;
+      cambio = true;
+      this.mostrarRecordatorio(evento, hito);
+    }
+
+    // Recordatorios en pantalla de eventos eliminados o con otra hora de inicio (si la nueva ya tocaba, se reemplazó arriba)
+    const inicios = new Map(this.eventosMes.map(e => [e.id, e.inicio.getTime()]));
+    const obsoletos = [...this.recordatoriosVisibles.entries()].filter(([id, m]) => inicios.get(id) !== m.data.inicio);
+    if (obsoletos.length) {
+      obsoletos.forEach(([id]) => this.recordatoriosVisibles.delete(id));
+      this.redibujarRecordatorios();
+    }
+
+    // Se olvidan los registros de eventos que empezaron hace más de un día
+    for (const llave of Object.keys(mostrados)) {
+      if (Number(llave.split('|')[1]) < ahora - 24 * 60 * 60 * 1000) { delete mostrados[llave]; cambio = true; }
+    }
+    if (cambio) try { localStorage.setItem(llaveRegistro, JSON.stringify(mostrados)); } catch { }
+  }
+
+  private mostrarRecordatorio(evento: EventoCalendario, hito: number) {
+    const inicio = moment(evento.inicio), fin = moment(evento.fin);
+    const horario = inicio.isSame(fin, 'day')
+      ? `${inicio.format('h:mm a')} – ${fin.format('h:mm a')}`
+      : `${inicio.format('h:mm a')} – ${fin.format('D MMM h:mm a')}`;
+    // Los minutos que faltan de verdad: si el evento se creó con poca anticipación o la pestaña estuvo oculta,
+    // el hito de 30 puede salir cuando faltan 20.
+    const faltan = Math.ceil((evento.inicio.getTime() - Date.now()) / 60000);
+    this.recordatoriosVisibles.set(evento.id, {
+      key: CLAVE_TOAST_RECORDATORIO,
+      severity: hito == 0 ? 'warn' : 'info',
+      summary: hito == 0 || faltan <= 0 ? 'El evento empieza ahora'
+        : `El evento empieza en ${faltan} ${faltan == 1 ? 'minuto' : 'minutos'}`,
+      detail: `${evento.nombre} · ${horario}`,
+      sticky: true,
+      data: { id: evento.id, inicio: evento.inicio.getTime() },
+    });
+    this.redibujarRecordatorios();
+  }
+
+  /** PrimeNG no quita un mensaje suelto: se limpia la clave y se vuelven a agregar los vigentes. */
+  private redibujarRecordatorios() {
+    this.messageService.clear(CLAVE_TOAST_RECORDATORIO);
+    if (this.recordatoriosVisibles.size) this.messageService.addAll([...this.recordatoriosVisibles.values()]);
+  }
+
+  alCerrarRecordatorio(mensaje: Message) {
+    this.recordatoriosVisibles.delete(mensaje.data?.id);
+  }
+
+  verCalendarioDesdeRecordatorio(mensaje: Message) {
+    this.recordatoriosVisibles.delete(mensaje.data?.id);
+    this.redibujarRecordatorios();
+    this.mostrarModalCalendario();
   }
 
   /** Cierra la sesión de inmediato, sin confirmación. */
