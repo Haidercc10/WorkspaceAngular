@@ -25,6 +25,9 @@ export class DesperdicioService {
 
   GetDesperdiciosMes = (process : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/GetDesperdiciosMes/${process}`);
 
+  /** Desperdicio (Kg) del mes actual de todos los procesos en una sola consulta: [{ proceso, desperdicio }]. */
+  GetDesperdiciosMesPorProceso = () => this.http.get<{ proceso: string, desperdicio: number }[]>(this.rutaPlasticaribeAPI + `/Desperdicios/GetDesperdiciosMesPorProceso`);
+
   getMovimientosDesperdicios = (fecha1 : any, fecha2 : any, ruta : string = ``) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/getMovDesperdicios/${fecha1}/${fecha2}/${ruta}`);
   
   Put = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Desperdicios/${id}`, data);
