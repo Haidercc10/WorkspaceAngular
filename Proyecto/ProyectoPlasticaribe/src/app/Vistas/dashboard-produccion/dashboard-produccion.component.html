@@ -237,11 +237,11 @@
                                     <!-- Turnos: cada valor abre su propio detalle con doble clic -->
                                     <td>
                                         <span class="valor-turno cursor"
-                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA')"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'DIA', proc.nombre)"
                                             pTooltip="Doble clic para ver Producción Día" tooltipPosition="top">
                                             <i class="pi pi-sun"></i> {{data.weightDay | number :'1.0-0'}}</span>
                                         <span class="valor-turno cursor"
-                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE')"
+                                            (dblclick)="getDetailsProductionForMachine(data.processName, data.machine, 'NOCHE', proc.nombre)"
                                             pTooltip="Doble clic para ver Producción Noche" tooltipPosition="top">
                                             <i class="pi pi-moon"></i> {{data.weightNight | number :'1.0-0'}}</span>
                                     </td>
@@ -249,7 +249,7 @@
                                     <td class="col-ver">
                                         <p-button icon="pi pi-search" styleClass="p-button-rounded boton-ver"
                                             [style]="{width: '28px', height: '28px'}"
-                                            (click)="getDetailsProductionForMachine(data.processName, data.machine)"
+                                            (click)="getDetailsProductionForMachine(data.processName, data.machine, undefined, proc.nombre)"
                                             pTooltip="Ver registros de producción maquina N° {{data.machine}}"
                                             tooltipPosition="top"></p-button>
                                     </td>
@@ -271,14 +271,22 @@
 </div>
 
 <!--Modal de producción -->
-<p-dialog header="Reporte de producción" [(visible)]="productionReport" (onShow)="alMostrarReporteProduccion()" [modal]="true" [style]="{ width: '80vw' }"
-    [draggable]="false" [resizable]="false">
-    <app-Reporte-Produccion></app-Reporte-Produccion>
+<!-- appendTo="body": el diálogo se dibuja sobre toda la página. Dentro del dashboard quedaba por debajo de la barra
+     superior y del dock (el contenedor de Inicio creaba su propio apilamiento) y, si era más alto que la pantalla,
+     su título y la X para cerrar quedaban tapados por la barra superior. -->
+<p-dialog [header]="tituloReporte" [(visible)]="productionReport" (onShow)="alMostrarReporteProduccion()" (onHide)="cargandoReporte = false" [modal]="true" [style]="{ width: '80vw' }"
+    [breakpoints]="{'960px': '95vw'}" [draggable]="false" [resizable]="false" [closeOnEscape]="true" appendTo="body">
+    <!-- Primera carga: texto en el centro, sin máscara. El reporte ya existe (está consultando) pero oculto hasta que termina. -->
+    <div class="carga-reporte" *ngIf="cargandoReporte" role="status">
+        <p-progressSpinner styleClass="carga-reporte-spinner" strokeWidth="4"></p-progressSpinner>
+        <span>{{textoCargaReporte}}</span>
+    </div>
+    <app-Reporte-Produccion [hidden]="cargandoReporte" [mascaraCarga]="!cargandoReporte" (consultaTerminada)="alTerminarConsultaReporte()"></app-Reporte-Produccion>
 </p-dialog>
 
 <!--Modal de Desperdicios -->
 <p-dialog header="Reporte de Desperdicios" [(visible)]="wasteReport" [modal]="true" [style]="{ width: '95vw' }"
-    [draggable]="false" [resizable]="false">
+    [draggable]="false" [resizable]="false" [closeOnEscape]="true" appendTo="body">
     <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
     <div class="table-responsive">
         <p-table #dt2 [resizableColumns]="true" columnResizeMode="expand"

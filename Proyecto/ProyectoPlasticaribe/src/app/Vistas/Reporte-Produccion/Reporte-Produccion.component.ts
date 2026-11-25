@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Injectable, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -24,6 +24,11 @@ export class ReporteProduccionComponent implements OnInit {
 
   @ViewChild('dt') dt !: Table;
   cargando: boolean = false;
+  /** false cuando el reporte va dentro de otro diálogo que muestra su propio aviso de carga (p. ej. el dashboard
+   *  de producción): no se dibuja la máscara gris de pantalla completa. En la página del reporte queda en true. */
+  @Input() mascaraCarga: boolean = true;
+  /** Se emite cuando termina la consulta de producción (con o sin resultados, o con error). */
+  @Output() consultaTerminada = new EventEmitter<void>();
   modoSeleccionado: boolean = false;
   private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene modoSeleccionado al día con el tema
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -147,7 +152,7 @@ export class ReporteProduccionComponent implements OnInit {
 
   // Funcion que se encargará de consultar la informacion de produccion
   consultarProduccion() {
-    if (this.formFiltros.value.rangoFechas.length > 1) {
+    if (this.formFiltros.value.rangoFechas?.length > 1) {
       this.produccion = [];
       this.cargando = true;
       let fechaInicio = moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
@@ -156,8 +161,12 @@ export class ReporteProduccionComponent implements OnInit {
       this.bagProService.GetProduccionDetalladaAreas(fechaInicio, fechaFin, ruta).subscribe(res => this.produccion = res, error => {
         this.msj.mensajeAdvertencia(error.error);
         this.cargando = false;
-      }, () => this.cargando = false);
-    }
+        this.consultaTerminada.emit();
+      }, () => {
+        this.cargando = false;
+        this.consultaTerminada.emit();
+      });
+    } else this.consultaTerminada.emit(); // sin rango completo no consulta: quien espera no debe quedar "cargando"
   }
 
   // Funcion que se encargará de validar los parametros de la consulta

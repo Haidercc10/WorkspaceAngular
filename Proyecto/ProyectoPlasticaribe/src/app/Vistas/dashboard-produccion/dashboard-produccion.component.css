@@ -2,6 +2,25 @@
     text-align: center;
 }
 
+/* Popup del reporte de producción: texto de carga en el centro, sin máscara, mientras llega la primera consulta */
+.carga-reporte {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: 40vh;
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-size: 1.05rem;
+}
+
+/* Sin :host: el diálogo se dibuja en el body (appendTo), fuera del componente */
+.carga-reporte ::ng-deep .carga-reporte-spinner {
+    width: 3rem;
+    height: 3rem;
+}
+
 /* Desperdicio en las tablas por máquina: rojo de "valores negativos" de la paleta
    (reemplaza el palevioletred de la clase global .textRed solo en esta vista) */
 .textRed {

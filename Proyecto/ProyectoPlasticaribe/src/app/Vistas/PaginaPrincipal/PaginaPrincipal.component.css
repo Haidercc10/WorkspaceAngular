@@ -1,6 +1,7 @@
 .fondo {
+  /* Sin isolation: isolate (era para las capas de fondo, ya eliminadas): creaba un apilamiento propio y dejaba los
+     diálogos de los dashboards por debajo de la barra superior y del dock */
   position: relative;
-  isolation: isolate;
   height: 100%;
   min-height: 100vh;
 }

@@ -122,6 +122,11 @@ export class DashboardProduccionComponent implements OnInit, OnDestroy {
   productionReport: boolean = false;
   /** Filtros que se aplican al reporte de producción cuando el diálogo termina de abrirse. */
   private filtrosReporte: { proceso?: string, maquina?: number, turno?: string } | null = null;
+  /** Título del popup del reporte: máquina, área, turno (si aplica) y día consultados. */
+  tituloReporte: string = 'Reporte de producción';
+  /** true desde el clic en Ver hasta que el reporte termina su primera consulta: se ve el texto de carga. */
+  cargandoReporte: boolean = false;
+  textoCargaReporte: string = '';
   wasteReport: boolean = false;
   arrayModal: any[] = [];
 
@@ -433,16 +438,35 @@ export class DashboardProduccionComponent implements OnInit, OnDestroy {
 
   // ===================== Modales =====================
 
-  /** Abre el reporte de producción de una máquina (y turno, si se indica) del día seleccionado. */
-  getDetailsProductionForMachine(process?: string, machine?: number, turn?: string) {
+  /**
+   * Abre el reporte de producción de una máquina (y turno, si se indica) del día seleccionado.
+   * El popup abre de inmediato con el texto de carga (sin máscara) y con un título que dice qué se consultó;
+   * el reporte aparece cuando termina su consulta (evento consultaTerminada).
+   * @param nombreArea Nombre del proceso para mostrar (p. ej. "Extrusión"); el filtro usa process.
+   */
+  getDetailsProductionForMachine(process?: string, machine?: number, turn?: string, nombreArea?: string) {
     // El reporte se crea al abrir el diálogo: los filtros se aplican en alMostrarReporteProduccion
     this.filtrosReporte = { proceso: process?.toUpperCase(), maquina: machine, turno: turn };
+    const area = nombreArea ?? process ?? '';
+    const turno = turn ? ` (turno ${turn == 'DIA' ? 'día' : 'noche'})` : '';
+    const fecha = moment(this.dateSelected).format('DD/MM/YYYY');
+    this.tituloReporte = `Reporte de producción · Máquina ${machine} de ${area}${turno} · ${fecha}`;
+    this.textoCargaReporte = `Cargando reporte de producción para la máquina ${machine} de ${area}${turno}...`;
+    this.cargandoReporte = true;
     this.productionReport = true;
+  }
+
+  /** El reporte terminó su consulta: se cambia el texto de carga por el reporte. */
+  alTerminarConsultaReporte() {
+    this.cargandoReporte = false;
   }
 
   /** (onShow) del diálogo de producción: el componente del reporte ya existe y puede recibir los filtros. */
   alMostrarReporteProduccion() {
-    if (!this.cmproduction || !this.filtrosReporte) return;
+    if (!this.cmproduction || !this.filtrosReporte) {
+      this.cargandoReporte = false; // sin reporte no habrá consulta: no dejar el texto de carga para siempre
+      return;
+    }
     this.cmproduction.formFiltros.patchValue({
       rangoFechas: [new Date(this.dateSelected), new Date(this.dateSelected)],
       proceso: this.filtrosReporte.proceso ?? null,
